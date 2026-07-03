@@ -95,7 +95,7 @@ func _end_run(failed: bool) -> void:
 
 	var loot := orb_count
 	if failed:
-		loot = orb_count / 2
+		loot = int(round(orb_count * 0.5))
 		loot_label.text = "Fail!\n+%d Orbs (50%%)" % loot
 	else:
 		loot_label.text = "Run complete!\n+%d Orbs" % loot

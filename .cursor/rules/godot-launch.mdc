@@ -13,7 +13,8 @@ Kad korisnik ili agent treba **otvoriti Godot** ili **pokrenuti igru u editoru**
 2. Iz roota repoa:
 
 ```powershell
-.\scripts\godot-open.ps1
+.\scripts\godot-open.ps1          # editor
+.\scripts\godot-watch.ps1       # play + auto-restart kad se spremi kod u game/
 ```
 
 3. Skripta automatski:
@@ -22,7 +23,8 @@ Kad korisnik ili agent treba **otvoriti Godot** ili **pokrenuti igru u editoru**
 
 ## Agent
 
-- Za pokretanje Godota: `Shell` tool s `godot-open.ps1`, `block_until_ms: 0` (GUI proces u pozadini).
+- Za pokretanje Godota: `Shell` tool s `godot-open.ps1` ili `godot-watch.ps1`, `block_until_ms: 0`.
+- Za dev petlju s auto-restartom: preferiraj `godot-watch.ps1` (play prozor).
 - **Ne** predlaži raw `Godot_v4.7-stable_win64.exe` bez OpenGL flaga.
 - Ako exe nije na Desktopu/Downloads/C:\Godot\: korisnik postavi `$env:GODOT_PATH` prije skripte.
 

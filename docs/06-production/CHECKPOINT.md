@@ -231,11 +231,11 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ### B3 — Playtest greybox
 
-- [ ] 5 min igre na emulatoru — bilješke feela
-- [ ] Bilješke u [[../07-meta/changelog|changelog]]
-- [ ] Odluka: fluid swerve vs 3 fiksna lanea
+- [x] 5 min igre — editor + `godot-watch` (emulator preskočen, System UI freeze)
+- [x] Bilješke u [[../07-meta/changelog|changelog]]
+- [x] Odluka lanea: **3 fiksna lanea + tween 0.12 s**; fluid swerve → otvoreno M7 ako treba
 
-**Exit M6:** APK koji možeš poslati prijatelju za feel feedback.
+**Exit M6:** ✅ greybox feel potvrđen u editoru (APK/vanjski feedback opcionalno kasnije).
 
 ---
 
@@ -286,8 +286,8 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-1. **B3:** Export APK iz `game/` → 5 min playtest na Pixel_4 → bilješke u changelog
-2. Odluka: fluid swerve vs 3 fiksna lanea (trenutno: 3 lane snap)
+1. **C1:** kompletan loop — main menu → run → loot → kamp → Play
+2. Loot placeholder gumbi (×2, revive); merge kamp min 2 tiera
 
 ## Povezano
 

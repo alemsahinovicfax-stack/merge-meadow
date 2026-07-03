@@ -49,16 +49,22 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 - **Godot priručnik** (`docs/05-technical/godot/`) — konvencije-koda, scene-node-pravila, fizika-kolizije, signali-komunikacija, input-touch, resursi-save, greske-katalog, dev-workflow; linkano u `_index`, `AGENTS.md`
 - **Playtest B2 (prvi)** — bug: `loot_overlay` deklariran kao `Control` a scena `CanvasLayer` → `_ready()` pukao, run se nije pokretao (tajmer/orbovi/spawn mrtvi, swipe radio). Zabilježeno kao `greske-katalog` #1.
 
-### B3 playtest checklist (ti — sljedeći korak)
+### B3 playtest — bilješke (2026-07-03)
 
-1. `.\scripts\godot-open.ps1` → Project → Install Android Build Template (ako treba) → Export APK
-2. Pixel_4 emulator: pokreni APK
-3. **5 min igre** — zapiši:
-   - Swipe osjetljivost (previše / premalo?)
-   - Brzina scrolla (dosadno / prebrzo?)
-   - 3 fiksna lanea — želiš li fluid swerve?
-   - Fail feel (prepreka jasna?)
-4. Odluka swerve vs 3 lanea → ažuriraj `lane-run.md` + CHECKPOINT B3
+- **Vizuelno / funkcionalnost / UX:** dobro nakon fixa #1 + start dugmeta
+- **Swipe:** radi; instant snap osjećaj teleporta → **tween 0.12 s** (3 lanea, ne swerve)
+- **Brzina scrolla:** neutralno — bez promjene
+- **Fail loot:** floor na neparnim brojevima (5→2) osjećaj nepravedno → **`round(50%)`**
+- **Swerve vs 3 lanea:** odloženo — odluka nakon tween playtesta (M7 ako treba)
+- **Emulator Pixel_4:** System UI freeze pri pokretanju APK — preskočiti do M7/M8; greybox test F5 u editoru dovoljan
+
+### B3 zatvoreno (2026-07-03, drugi krug)
+
+- **Tween 0.12 s:** OK — nema više teleport feela
+- **round(50%) fail loot:** OK (5 orbova → 3)
+- **godot-watch:** radi — auto-restart na spremanje koda
+- **Lane odluka:** **3 fiksna lanea + tween** za greybox/M7; fluid swerve ostaje otvoreno u `lane-run.md`
+- **M6 exit:** greybox feel potvrđen u editoru; emulator/APK odgođeno
 
 ## Template za nove unose
 

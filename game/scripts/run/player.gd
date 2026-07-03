@@ -4,12 +4,13 @@ signal lane_changed(new_lane: int)
 signal hit_obstacle
 
 const SWIPE_THRESHOLD := 50.0
-
+const LANE_TWEEN_DURATION := 0.12
 var lane_index: int = 1
 var lane_x_positions: Array[float] = []
 var _touch_start: Vector2 = Vector2.ZERO
 var _touching: bool = false
 var _input_enabled: bool = true
+var _lane_tween: Tween
 
 
 func setup_lanes(positions: Array[float]) -> void:
@@ -19,7 +20,7 @@ func setup_lanes(positions: Array[float]) -> void:
 
 func reset_lane() -> void:
 	lane_index = 1
-	_apply_lane()
+	_apply_lane(false)
 
 
 func set_input_enabled(enabled: bool) -> void:
@@ -31,9 +32,21 @@ func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 
 
-func _apply_lane() -> void:
-	if lane_x_positions.size() >= 3:
-		position.x = lane_x_positions[lane_index]
+func _apply_lane(animate: bool) -> void:
+	if lane_x_positions.size() < 3:
+		return
+
+	var target_x := lane_x_positions[lane_index]
+	if _lane_tween and _lane_tween.is_valid():
+		_lane_tween.kill()
+
+	if not animate:
+		position.x = target_x
+		return
+
+	_lane_tween = create_tween()
+	_lane_tween.tween_property(self, "position:x", target_x, LANE_TWEEN_DURATION) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 
 func _input(event: InputEvent) -> void:
@@ -68,11 +81,11 @@ func _handle_swipe(end_pos: Vector2) -> void:
 		return
 	if delta.x > 0.0 and lane_index < 2:
 		lane_index += 1
-		_apply_lane()
+		_apply_lane(true)
 		lane_changed.emit(lane_index)
 	elif delta.x < 0.0 and lane_index > 0:
 		lane_index -= 1
-		_apply_lane()
+		_apply_lane(true)
 		lane_changed.emit(lane_index)
 
 

@@ -51,7 +51,7 @@ One-thumb swerve collector — ~90 s auto-run kroz lane, skupljanje orbova, izbj
 
 ## Otvorena pitanja
 
-- [ ] 3 fiksna lanea vs fluid swerve — prototip odluka
+- [x] 3 fiksna lanea vs fluid swerve — **greybox: 3 lane + tween 0.12 s** (B3 2026-07-03); swerve test u M7 ako treba
 - [ ] Endless mode: ista mehanika, procedural spawn
 
 ## Reference
