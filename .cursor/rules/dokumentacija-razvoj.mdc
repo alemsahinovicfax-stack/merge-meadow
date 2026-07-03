@@ -1,0 +1,48 @@
+---
+description: Workflow za dokumentaciju i faze razvoja do vertical slice-a
+alwaysApply: true
+---
+
+# Dokumentacija razvoja — workflow
+
+## Početak sesije
+
+1. Pročitaj **samo frontmatter** `docs/06-production/CHECKPOINT.md` (`aktivna_sekcija`, `sljedeci_korak`, `b0_aktivan`).
+2. **`b0_aktivan: true`** → kratki podsjetnik B0 (lista iz CHECKPOINT B0), ponudi „preskoči B0“ / „B0 gotovo“. **`false` ili nema polja** → **ne spominji B0** (0 tokena).
+3. Nađi prvu `[ ]` u aktivnoj sekciji (B, C, …) — to je sljedeći korak.
+4. Kratki sažetak: milestone, checkpoint, sljedeći korak. Ne čitaj cijeli CHECKPOINT ako nije potrebno.
+
+## Zatvaranje B0 („B0 gotovo“ ili „preskoči B0“)
+
+U `CHECKPOINT.md`:
+
+1. `b0_aktivan: false`
+2. `sljedeci_korak` → samo B1 (bez B0 teksta)
+3. **Obriši** cijelu sekciju `## Sekcija B0 — Opcionalno` (checkboxovi + upute za podsjetnik)
+4. Ostavi samo kratki blok:
+
+```markdown
+## B0 — zatvoreno ✅ (YYYY-MM-DD)
+
+- [što je urađeno ili „preskočeno“]
+```
+
+5. Ukloni B0 iz „Sljedeća akcija“. Rule **ne spominje B0** u budućim sesijama.
+
+## Tijekom sesije
+
+- Jedan checkpoint korak po sesiji (ili mala grupa).
+- Scope: `scope-guard.mdc` + `scope-i-granice.md` → `⚠️ SCOPE` ako izvan milestonea.
+- Ne masovno popunjavaj docs bez odgovora (osim „preporuka“).
+
+## Kraj sesije
+
+Ažuriraj CHECKPOINT frontmatter (`zadnje_azurirano`, `zadnja_sesija`, `sljedeci_korak`) + `[x]` checkboxovi + `changelog.md` ako treba.
+
+## Reference
+
+`CHECKPOINT.md` · `RADIONICA-razvoj.md` · `AGENTS.md` (root) · Gate: Sekcija A ✅ prije `game/`
+
+## Godot (HP AMD)
+
+Kad korisnik otvara Godot ili debugira editor: koristi `scripts/godot-open.ps1` (`--rendering-driver opengl3`). Vidi `docs/05-technical/godot-dev-setup.md`.

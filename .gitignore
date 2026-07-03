@@ -1,0 +1,22 @@
+# Obsidian — lokalno stanje UI-a (ne dijeliti)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/graph.json
+
+# Obsidian trash
+.trash/
+
+# Godot (kad postoji game/)
+game/.godot/
+game/.import/
+game/export/
+*.tmp
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Lokalne tajne (Obsidian) — nikad u git / remote
+**/credentials.local.md
+docs/00-personal/*.local.md

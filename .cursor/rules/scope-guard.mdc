@@ -1,0 +1,60 @@
+---
+description: Upozorenje kad feature ili kod izlazi iz scopea ili aktivnog milestonea
+alwaysApply: true
+---
+
+# Scope guard — Merge Meadow
+
+Agent **mora** aktivno upozoriti korisnika ako rad ili prijedlog izlazi iz scopea.
+
+## Prije svake nove feature / većeg koda
+
+1. Pročitaj `docs/06-production/CHECKPOINT.md` — `aktivna_sekcija` i prva neoznačena stavka
+2. Pročitaj `docs/06-production/scope-i-granice.md` — IN / OUT + tablica **M6 vs M7 vs launch**
+3. Provjeri `docs/01-vision/design-pillars.md` — krši li Pillar 2 (Fair F2P)?
+
+## Trenutni kod scope (M6 — CHECKPOINT B)
+
+**Dozvoljeno sada (B2):**
+- Lane run: swipe, 3 lanea ili swerve, auto-scroll
+- Spawn orbova + jedna prepreka
+- Kraj runa → placeholder loot broj
+- 50% loot na fail
+- Placeholder grafika (Godot primitives)
+
+**Zabranjeno u M6 (upozori ako korisnik traži):**
+- Merge kamp, shop, IAP, AdMob
+- Main menu polish, tutorial flow
+- iOS export
+- Više od ~10 test levela
+- Multiplayer, leaderboard, cloud save
+- Priča, cutscene, ljubimci unlock
+- Energy/stamina, pay-to-continue
+
+## Kako upozoriti (obavezno u chatu)
+
+Kad nešto nije u scopeu trenutnog milestonea ili je na OUT listi, **zaustavi se** i napiši:
+
+```
+⚠️ SCOPE — izvan trenutnog koraka
+
+Traženo: [kratko]
+Trenutno: M__ / CHECKPOINT [sekcija] — dozvoljeno: [lista]
+Status: [OUT za v1 | IN ali tek u M7/M8 | krši Pillar __]
+
+Preporuka: [odgodi na M7/M8/v1.1 ILI ažuriraj scope-i-granice ako svjesno mijenjamo plan]
+```
+
+Ne implementiraj OUT feature **dok korisnik eksplicitno ne potvrdi** promjenu scopea (i tada prvo ažuriraj `scope-i-granice.md`).
+
+## Izuzetci
+
+- Bugfix i refaktor unutar trenutne checkpoint stavke — OK
+- Korisnik kaže **"dodaj u scope"** — ažuriraj `scope-i-granice.md` + `changelog`, pa implementiraj
+- Sigurnost **v1 minimum** (vidi `sigurnost.md`) — OK u M7/M8, ne blokiraj ranije ali ne over-engineer u M6
+
+## Reference
+
+- `docs/06-production/scope-i-granice.md`
+- `docs/06-production/CHECKPOINT.md`
+- `docs/06-production/verzije-nakon-launcha.md` — što je prerano planirati
