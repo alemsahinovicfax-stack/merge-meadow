@@ -57,3 +57,13 @@ Setup upute: `docs/07-meta/obsidian-setup.md`
 - **Flag:** `--rendering-driver opengl3`
 - **Ne** pokretati raw `Godot_v4.7-stable_win64.exe` dvostrukim klikom
 - Detalji: `docs/05-technical/godot-dev-setup.md`
+
+## Pisanje Godot koda (game/)
+
+Prije pisanja/izmjene koda u `game/` konzultiraj **Godot priručnik**: `docs/05-technical/godot/_index.md`.
+
+- Konvencije: statičko tipiranje, `snake_case`, redoslijed u skripti (`konvencije-koda.md`)
+- **Tip u `@onready` mora odgovarati tipu node-a u sceni** (`scene-node-pravila.md`; čest bug — `greske-katalog.md` #1)
+- Kolizije: layer/mask tablica (`fizika-kolizije.md`)
+- Prije "gotovo": **headless smoke-test** (`dev-workflow.md`)
+- Kad nešto pukne i potrošiš vrijeme → dodaj unos u `greske-katalog.md`

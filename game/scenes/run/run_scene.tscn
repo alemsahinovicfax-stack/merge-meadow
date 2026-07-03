@@ -1,0 +1,167 @@
+[gd_scene load_steps=5 format=3 uid="uid://c8runscene01"]
+
+[ext_resource type="Script" path="res://scripts/run/run_controller.gd" id="1_run"]
+[ext_resource type="Script" path="res://scripts/run/player.gd" id="2_player"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
+size = Vector2(56, 56)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.12, 0.14, 0.18, 0.95)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+content_margin_left = 32.0
+content_margin_top = 32.0
+content_margin_right = 32.0
+content_margin_bottom = 32.0
+
+[node name="RunScene" type="Node2D"]
+script = ExtResource("1_run")
+
+[node name="Background" type="Polygon2D" parent="."]
+color = Color(0.14, 0.2, 0.16, 1)
+polygon = PackedVector2Array(0, 0, 1080, 0, 1080, 1920, 0, 1920)
+
+[node name="LaneGuides" type="Node2D" parent="."]
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="Player" type="Area2D" parent="."]
+collision_layer = 1
+collision_mask = 2
+script = ExtResource("2_player")
+
+[node name="Visual" type="Polygon2D" parent="Player"]
+color = Color(0.35, 0.65, 1, 1)
+polygon = PackedVector2Array(-28, -28, 28, -28, 28, 28, -28, 28)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TimerLabel" type="Label" parent="HUD"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -120.0
+offset_top = 48.0
+offset_right = 120.0
+offset_bottom = 120.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 52
+text = "75s"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OrbCounter" type="Label" parent="HUD"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -160.0
+offset_right = 200.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 44
+text = "Orbs: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StartOverlay" type="CanvasLayer" parent="."]
+
+[node name="Dim" type="ColorRect" parent="StartOverlay"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.65)
+
+[node name="Panel" type="PanelContainer" parent="StartOverlay"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -220.0
+offset_right = 300.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="StartOverlay/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="Title" type="Label" parent="StartOverlay/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 56
+text = "Merge Meadow"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="StartOverlay/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 28
+text = "Swipe lijevo/desno — skupljaj orbove,
+izbjegavaj crvene prepreke."
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="StartOverlay/Panel/VBox"]
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Start"
+
+[node name="LootOverlay" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="Dim" type="ColorRect" parent="LootOverlay"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.65)
+
+[node name="Panel" type="PanelContainer" parent="LootOverlay"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -180.0
+offset_right = 280.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="LootOverlay/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="LootLabel" type="Label" parent="LootOverlay/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 40
+text = "+0 Orbs"
+horizontal_alignment = 1
+
+[node name="RetryButton" type="Button" parent="LootOverlay/Panel/VBox"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Retry"

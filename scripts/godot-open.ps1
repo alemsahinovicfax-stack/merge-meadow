@@ -1,5 +1,6 @@
 # Merge Meadow — pokreni Godot 4.7 u OpenGL modu (HP AMD integrisana grafika).
-# Dvostruki klik ili: .\scripts\godot-open.ps1
+# PREPORUČENO: Cursor terminal → .\scripts\godot-open.ps1
+# Izbjegavaj dvostruki klik na Godot exe (Vulkan ne radi na ovom laptopu).
 # Opcionalno: $env:GODOT_PATH = "C:\putanja\Godot_v4.7-stable_win64.exe"
 
 $ErrorActionPreference = "Stop"
@@ -20,5 +21,16 @@ ili kopiraj exe u Desktop ili C:\Godot\
 }
 
 $godot = $candidates[0]
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$defaultProject = Join-Path $repoRoot "game\project.godot"
+
+$godotArgs = @("--rendering-driver", "opengl3")
+if ($args.Count -gt 0) {
+    $godotArgs += $args
+} elseif (Test-Path $defaultProject) {
+    $godotArgs += "--path", (Join-Path $repoRoot "game")
+    Write-Host "Project: $defaultProject"
+}
+
 Write-Host "Godot (OpenGL): $godot"
-& $godot --rendering-driver opengl3 @args
+& $godot @godotArgs

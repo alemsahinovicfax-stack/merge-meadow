@@ -42,6 +42,23 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
 - **B0 zatvoreno** — mood board (`ref-01`, `ref-02`), privacy `mergemeadow.support@gmail.com`, `credentials.local.md` (gitignore)
 - CHECKPOINT: `b0_aktivan: false`; B1 djelomično (Android Studio, Pixel_4, test APK)
+- **GitHub** — private repo `merge-meadow`, početni commit dokumentacije
+- **B1+B2 greybox kod** — `game/` Godot projekt (1080×1920, gl_compatibility), lane run: 3 lanea, swipe, auto-scroll, orbovi, prepreka, 75 s timer, loot overlay, 50% na fail, Retry
+- `godot-open.ps1` otvara `game/` po defaultu
+
+- **Godot priručnik** (`docs/05-technical/godot/`) — konvencije-koda, scene-node-pravila, fizika-kolizije, signali-komunikacija, input-touch, resursi-save, greske-katalog, dev-workflow; linkano u `_index`, `AGENTS.md`
+- **Playtest B2 (prvi)** — bug: `loot_overlay` deklariran kao `Control` a scena `CanvasLayer` → `_ready()` pukao, run se nije pokretao (tajmer/orbovi/spawn mrtvi, swipe radio). Zabilježeno kao `greske-katalog` #1.
+
+### B3 playtest checklist (ti — sljedeći korak)
+
+1. `.\scripts\godot-open.ps1` → Project → Install Android Build Template (ako treba) → Export APK
+2. Pixel_4 emulator: pokreni APK
+3. **5 min igre** — zapiši:
+   - Swipe osjetljivost (previše / premalo?)
+   - Brzina scrolla (dosadno / prebrzo?)
+   - 3 fiksna lanea — želiš li fluid swerve?
+   - Fail feel (prepreka jasna?)
+4. Odluka swerve vs 3 lanea → ažuriraj `lane-run.md` + CHECKPOINT B3
 
 ## Template za nove unose
 

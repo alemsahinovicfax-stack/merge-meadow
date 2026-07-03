@@ -1,3 +1,4 @@
 @echo off
-REM Dvostruki klik — otvara Godot u OpenGL modu (HP AMD laptop).
+REM Pokreni iz Cursor terminala: .\scripts\godot-open.ps1
+REM (bat samo wrapper — preferiraj PowerShell komandu iznad)
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0godot-open.ps1" %*

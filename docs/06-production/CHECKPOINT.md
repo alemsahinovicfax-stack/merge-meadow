@@ -9,11 +9,11 @@ povezano:
   - scope-i-granice
 ai_sažetak: "Operativni hub — frontmatter prvo; prva [ ] u aktivnoj sekciji je sljedeći korak."
 trenutna_faza: 5
-podfaza: greybox-spreman
+podfaza: greybox-aktivan
 aktivna_sekcija: B
 b0_aktivan: false
-sljedeci_korak: "B1: kreirati game/ u repou (portrait 1080×1920) + zatvoriti B1"
-zadnja_sesija: "B0 zatvoreno — mood board + privacy email; B1 djelomično (export test projekt)"
+sljedeci_korak: "B3: 5 min playtest na Pixel_4 emulatoru — bilješke feela + odluka swerve vs 3 lanea"
+zadnja_sesija: "Godot priručnik (docs/05-technical/godot/) + fix bug #1 (loot_overlay tip) + start dugme/state"
 zadnje_azurirano: 2026-07-03
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -213,17 +213,21 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 - [x] Instalirati **Godot 4.7** na HP Windows — pokretanje: `scripts/godot-open.bat` ([[../05-technical/godot-dev-setup|godot-dev-setup]])
 - [x] Instalirati **Android Studio** (samo za SDK + emulator, ne za kod)
 - [x] Kreirati AVD emulator — **Pixel_4** ([[../05-technical/platforme#Android emulator (HP)|platforme]])
-- [ ] Kreirati `game/` Godot projekt (portrait 1080×1920)
-- [ ] Git init + `.gitignore` za Godot (`.gitignore` postoji; repo još nije init)
-- [x] Android export template + prvi debug APK na emulatoru (test: `Documents\new-game-projecttt`)
+- [x] Kreirati `game/` Godot projekt (portrait 1080×1920)
+- [x] Git init + `.gitignore` za Godot (repo: `merge-meadow`)
+- [x] Android export template + prvi debug APK na emulatoru (test: `Documents\new-game-projecttt`; export za `game/` — jednom u editoru)
 
 ### B2 — Lane run (prva mehanika)
 
-- [ ] Scena: Player + 3 lanea + auto-scroll
-- [ ] Swipe L/R input
-- [ ] Spawn orbova + jedna prepreka
-- [ ] Kraj runa → placeholder loot broj
-- [ ] 50% loot na fail
+- [x] Scena: Player + 3 lanea + auto-scroll
+- [x] Swipe L/R input
+- [x] Spawn orbova + jedna prepreka
+- [x] Kraj runa → placeholder loot broj
+- [x] 50% loot na fail
+- [x] Start dugme + READY/RUNNING/ENDED state (jasan start/kraj) — nakon 1. playtesta
+- [x] Fix: `loot_overlay` tip `CanvasLayer` (bug #1, `godot/greske-katalog`)
+
+> **Godot kod:** prije izmjena u `game/` vidi [[../05-technical/godot/_index|Godot priručnik]].
 
 ### B3 — Playtest greybox
 
@@ -282,8 +286,8 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-1. **B1:** `game/` projekt u repou + `git init` → zatvori B1
-2. **B2:** lane run (swipe, orbs, prepreka)
+1. **B3:** Export APK iz `game/` → 5 min playtest na Pixel_4 → bilješke u changelog
+2. Odluka: fluid swerve vs 3 fiksna lanea (trenutno: 3 lane snap)
 
 ## Povezano
 

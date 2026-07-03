@@ -1,0 +1,32 @@
+---
+description: Godot se uvijek pokreće iz Cursor terminala — nikad raw exe dvostrukim klikom
+alwaysApply: true
+---
+
+# Godot launch — Cursor / terminal
+
+## Obavezno
+
+Kad korisnik ili agent treba **otvoriti Godot** ili **pokrenuti igru u editoru**:
+
+1. Koristi **terminal u Cursoru** (ne dvostruki klik na `.exe`, ne Windows shortcut bez flagova).
+2. Iz roota repoa:
+
+```powershell
+.\scripts\godot-open.ps1
+```
+
+3. Skripta automatski:
+   - dodaje `--rendering-driver opengl3` (HP AMD — bez ovoga editor ne radi)
+   - otvara `game/` projekt ako postoji
+
+## Agent
+
+- Za pokretanje Godota: `Shell` tool s `godot-open.ps1`, `block_until_ms: 0` (GUI proces u pozadini).
+- **Ne** predlaži raw `Godot_v4.7-stable_win64.exe` bez OpenGL flaga.
+- Ako exe nije na Desktopu/Downloads/C:\Godot\: korisnik postavi `$env:GODOT_PATH` prije skripte.
+
+## Reference
+
+- `scripts/godot-open.ps1` · `scripts/godot-open.bat`
+- `docs/05-technical/godot-dev-setup.md` · `AGENTS.md`

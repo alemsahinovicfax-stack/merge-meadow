@@ -11,6 +11,7 @@ tags: [hub, tehnicko]
 
 - [[platforme|platforme]] — Android/iOS, min verzije
 - [[godot-dev-setup|godot-dev-setup]] — Godot OpenGL launch (HP laptop)
+- [[godot/_index|Godot priručnik]] — konvencije koda, scene, fizika, signali, workflow, katalog grešaka
 - [[performanse|performanse]] — FPS, memorija, baterija
 - [[arhitektura|arhitektura]] — sistemi, moduli
 - [[engine-odluka|engine-odluka]] — usporedba i finalni izbor
