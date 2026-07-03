@@ -5,7 +5,7 @@
 
 param(
     [switch]$Editor,
-    [string]$Scene = "res://scenes/run/run_scene.tscn",
+    [string]$Scene = "",
     [int]$DebounceMs = 900
 )
 
@@ -59,7 +59,7 @@ function Register-GameWatcher {
 
 Write-Host '=== Godot watch - Merge Meadow ===' -ForegroundColor Green
 Write-Host ('Pratim: ' + $gameDir)
-Write-Host ('Mod: ' + $(if ($Editor) { 'Editor' } else { "Play ($Scene)" }))
+Write-Host ('Mod: ' + $(if ($Editor) { 'Editor' } else { if ($Scene) { "Play ($Scene)" } else { 'Play (main scene)' } }))
 Write-Host ('Debounce: ' + $DebounceMs + 'ms | Zaustavi: Ctrl+C')
 Write-Host ""
 

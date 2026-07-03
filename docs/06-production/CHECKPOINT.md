@@ -1,7 +1,7 @@
 ---
 type: produkcija
 status: aktivan
-milestone: M6
+milestone: M7
 tags: [produkcija, checkpoint, operativa]
 povezano:
   - RADIONICA-razvoj
@@ -9,11 +9,11 @@ povezano:
   - scope-i-granice
 ai_sažetak: "Operativni hub — frontmatter prvo; prva [ ] u aktivnoj sekciji je sljedeći korak."
 trenutna_faza: 5
-podfaza: greybox-aktivan
-aktivna_sekcija: B
+podfaza: vertical-slice
+aktivna_sekcija: C
 b0_aktivan: false
-sljedeci_korak: "B3: 5 min playtest na Pixel_4 emulatoru — bilješke feela + odluka swerve vs 3 lanea"
-zadnja_sesija: "Godot priručnik (docs/05-technical/godot/) + fix bug #1 (loot_overlay tip) + start dugme/state"
+sljedeci_korak: "C1: testirati loop main → run → loot → kamp → Play"
+zadnja_sesija: "M7 C1 — GameState, main menu, loot, kamp merge, magnet upgrade"
 zadnje_azurirano: 2026-07-03
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -245,11 +245,11 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ### C1 — Kompletan loop (greybox → polish)
 
-- [ ] Loot ekran (×2 rewarded placeholder, revive, retry, kamp)
-- [ ] Kamp: merge 2→1 (min 2 tiera)
-- [ ] 1 upgrade linija (magnet ili množitelj)
-- [ ] Main menu → Play → run → loot → kamp → Play
-- [ ] Tutorial run (prvi launch)
+- [x] Loot ekran (×2 rewarded placeholder, revive, retry, kamp)
+- [x] Kamp: merge 2→1 (min 2 tiera)
+- [x] 1 upgrade linija (magnet)
+- [x] Main menu → Play → run → loot → kamp → Play
+- [x] Tutorial hint (prvi launch — main menu + run banner)
 
 ### C2 — Art pass (slice scope)
 

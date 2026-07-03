@@ -1,7 +1,5 @@
 extends Node2D
 
-enum State { READY, RUNNING, ENDED }
-
 const RUN_DURATION := 75.0
 const BASE_SCROLL_SPEED := 400.0
 const SPAWN_INTERVAL := 1.2
@@ -15,16 +13,12 @@ const RAMP_EVERY := 15.0
 @onready var lane_guides: Node2D = $LaneGuides
 @onready var orb_counter_label: Label = $HUD/OrbCounter
 @onready var timer_label: Label = $HUD/TimerLabel
-@onready var start_overlay: CanvasLayer = $StartOverlay
-@onready var start_button: Button = $StartOverlay/Panel/VBox/StartButton
-@onready var loot_overlay: CanvasLayer = $LootOverlay
-@onready var loot_label: Label = $LootOverlay/Panel/VBox/LootLabel
-@onready var retry_button: Button = $LootOverlay/Panel/VBox/RetryButton
+@onready var tutorial_banner: Label = $HUD/TutorialBanner
 
 var _orb_scene: PackedScene = preload("res://scenes/run/orb.tscn")
 var _obstacle_scene: PackedScene = preload("res://scenes/run/obstacle.tscn")
 
-var _state: State = State.READY
+var _state: int = 0  # 0=running
 var lane_x_positions: Array[float] = []
 var scroll_speed: float = BASE_SCROLL_SPEED
 var elapsed: float = 0.0
@@ -37,15 +31,22 @@ func _ready() -> void:
 	_draw_lane_guides()
 	player.position.y = _viewport_size().y * 0.82
 	player.hit_obstacle.connect(_on_player_hit_obstacle)
-	start_button.pressed.connect(start_run)
-	retry_button.pressed.connect(start_run)
-	_enter_ready()
+	tutorial_banner.visible = not GameState.tutorial_seen
+	start_run()
+
+
+func start_run() -> void:
+	elapsed = 0.0
+	orb_count = 0
+	scroll_speed = BASE_SCROLL_SPEED
+	spawn_timer = 0.0
+	_clear_world_entities()
+	player.reset_lane()
+	player.set_input_enabled(true)
+	_update_hud()
 
 
 func _process(delta: float) -> void:
-	if _state != State.RUNNING:
-		return
-
 	elapsed += delta
 	if elapsed >= RUN_DURATION:
 		_end_run(false)
@@ -63,44 +64,10 @@ func _process(delta: float) -> void:
 	_update_hud()
 
 
-func start_run() -> void:
-	_state = State.RUNNING
-	elapsed = 0.0
-	orb_count = 0
-	scroll_speed = BASE_SCROLL_SPEED
-	spawn_timer = 0.0
-	start_overlay.visible = false
-	loot_overlay.visible = false
-	_clear_world_entities()
-	player.reset_lane()
-	player.set_input_enabled(true)
-	_update_hud()
-
-
-func _enter_ready() -> void:
-	_state = State.READY
-	elapsed = 0.0
-	orb_count = 0
-	start_overlay.visible = true
-	loot_overlay.visible = false
-	player.set_input_enabled(false)
-	_clear_world_entities()
-	player.reset_lane()
-	_update_hud()
-
-
 func _end_run(failed: bool) -> void:
-	_state = State.ENDED
 	player.set_input_enabled(false)
-
-	var loot := orb_count
-	if failed:
-		loot = int(round(orb_count * 0.5))
-		loot_label.text = "Fail!\n+%d Orbs (50%%)" % loot
-	else:
-		loot_label.text = "Run complete!\n+%d Orbs" % loot
-
-	loot_overlay.visible = true
+	GameState.finish_run(orb_count, failed)
+	GameState.go_to_scene(GameState.SCENE_LOOT)
 
 
 func _viewport_size() -> Vector2:
@@ -159,8 +126,7 @@ func _on_orb_collected() -> void:
 
 
 func _on_player_hit_obstacle() -> void:
-	if _state == State.RUNNING:
-		_end_run(true)
+	_end_run(true)
 
 
 func _update_hud() -> void:

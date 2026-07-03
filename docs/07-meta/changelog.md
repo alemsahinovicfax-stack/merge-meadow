@@ -66,6 +66,12 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 - **Lane odluka:** **3 fiksna lanea + tween** za greybox/M7; fluid swerve ostaje otvoreno u `lane-run.md`
 - **M6 exit:** greybox feel potvrđen u editoru; emulator/APK odgođeno
 
+## 2026-07-03 (M7)
+
+- **M7 C1 start** — `GameState` autoload, `main_menu` → `run` → `loot_screen` → `camp` loop
+- Loot: Double/Revive placeholder gumbi; kamp merge T1+T1→T2; magnet upgrade (4× T2)
+- Run: uklonjen inline loot/start overlay; tutorial banner na prvom runu
+
 ## Template za nove unose
 
 ```

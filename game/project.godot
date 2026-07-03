@@ -1,5 +1,5 @@
 ; Engine configuration file.
-; Merge Meadow — M6 greybox (portrait, OpenGL compatibility)
+; Merge Meadow — M7 vertical slice
 
 config_version=5
 
@@ -7,8 +7,12 @@ config_version=5
 
 config/name="Merge Meadow"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-run/main_scene="res://scenes/run/run_scene.tscn"
+run/main_scene="res://scenes/main_menu.tscn"
 config/icon="res://icon.svg"
+
+[autoload]
+
+GameState="*res://scripts/autoload/game_state.gd"
 
 [display]
 

@@ -62,11 +62,14 @@ function Start-GodotEditor {
 }
 
 function Start-GodotPlay {
-    param([string]$Scene = "res://scenes/run/run_scene.tscn")
+    param([string]$Scene = "")
 
     $godot = Get-GodotExecutable
-    $godotArgs = @(Get-GodotBaseArgs) + $Scene
-    Write-Host "[godot] Play: $Scene"
+    $godotArgs = @(Get-GodotBaseArgs)
+    if ($Scene) {
+        $godotArgs += $Scene
+    }
+    Write-Host "[godot] Play: $(if ($Scene) { $Scene } else { 'main scene' })"
     Write-Host "[godot] Exe: $godot"
     Start-Process -FilePath $godot -ArgumentList $godotArgs -WorkingDirectory (Get-RepoRoot)
 }
