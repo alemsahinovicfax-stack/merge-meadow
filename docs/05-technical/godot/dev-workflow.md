@@ -31,14 +31,18 @@ Cilj: uhvatiti greške **prije** nego što ručno otvoriš editor/emulator. (Bug
 Vidi `.cursor/rules/godot-launch.mdc` i [[godot-dev-setup|godot-dev-setup]]:
 
 ```powershell
-.\scripts\godot-open.ps1      # editor (jednokratno)
-.\scripts\godot-watch.ps1     # play prozor + auto-restart na promjenu koda
-.\scripts\godot-watch.ps1 -Editor   # editor + auto-restart
+.\scripts\godot-run.ps1           # pokreni IGRU jednom (play prozor)
+.\scripts\godot-run.ps1 -Editor   # otvori editor jednom
+.\scripts\godot-open.ps1          # editor (alias, jednokratno)
+.\scripts\godot-watch.ps1         # SAMO ručni rad: auto-restart na svaku izmjenu
 ```
 
 Skripta dodaje `--rendering-driver opengl3` (HP AMD) i otvara `game/`. **Ne** dvostruki klik na exe.
 
-**Watch mod:** prati `game/**/*.gd`, `*.tscn`, itd. — ugasi Godot i pokrene igru ponovo (~0.9 s nakon spremanja). Zaustavi s **Ctrl+C** u terminalu.
+**Pravilo paljenja:**
+
+- **Agent** pali Godot **jednom, na kraju** rada preko `godot-run.ps1`. Tokom editiranja koristi headless smoke-test, ne GUI.
+- **`godot-watch.ps1`** je za tvoj ručni rad kad ti sitno mijenjaš kod i želiš da se igra sama restarta. **Ne** pokrećeš ga dok agent radi — inače Godot bljeska na svaku izmjenu. Zaustavi s **Ctrl+C**.
 
 ## 2. Headless smoke-test (prije editora)
 
@@ -89,9 +93,9 @@ Feature je "gotov" kad:
 
 | Radnja | Komanda |
 |--------|---------|
-| Otvori editor | `.\scripts\godot-open.ps1` |
-| **Watch + auto-restart (play)** | `.\scripts\godot-watch.ps1` |
-| Watch + auto-restart (editor) | `.\scripts\godot-watch.ps1 -Editor` |
+| **Pokreni igru jednom** | `.\scripts\godot-run.ps1` |
+| Otvori editor jednom | `.\scripts\godot-run.ps1 -Editor` ili `.\scripts\godot-open.ps1` |
+| Watch (ručni rad, auto-restart) | `.\scripts\godot-watch.ps1` |
 | Headless smoke | `... --headless --path "game" --quit-after 3` |
 | Ugasi Godot | `taskkill /IM Godot_v4.7-stable_win64.exe /F` |
 

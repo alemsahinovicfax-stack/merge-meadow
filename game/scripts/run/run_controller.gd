@@ -42,6 +42,7 @@ func start_run() -> void:
 	spawn_timer = 0.0
 	_clear_world_entities()
 	player.reset_lane()
+	player.set_magnet_radius(GameState.get_magnet_radius())
 	player.set_input_enabled(true)
 	_update_hud()
 

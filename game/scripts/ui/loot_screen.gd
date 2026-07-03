@@ -50,6 +50,6 @@ func _on_retry_pressed() -> void:
 func _on_camp_pressed() -> void:
 	var deposited := GameState.deposit_loot_to_camp()
 	if deposited == 0 and GameState.last_loot > 0:
-		status_label.text = "Camp is full — merge or free slots first."
+		status_label.text = "Camp is full — go merge orbs first, then bring more."
 		return
 	GameState.go_to_scene(GameState.SCENE_CAMP)

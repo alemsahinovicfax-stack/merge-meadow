@@ -71,6 +71,10 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 - **M7 C1 start** — `GameState` autoload, `main_menu` → `run` → `loot_screen` → `camp` loop
 - Loot: Double/Revive placeholder gumbi; kamp merge T1+T1→T2; magnet upgrade (4× T2)
 - Run: uklonjen inline loot/start overlay; tutorial banner na prvom runu
+- **C1 fix** — kamp 6→**9 slotova**, magnet cost 4→**2× T2** (prije nemoguć: 6 slotova → max 3 T2)
+- **Magnet stvarni efekt** — `MagnetField` Area2D skuplja orbove u dometu (40 + 48/level px), vidljiv prsten; ne reagira na prepreke
+- Kamp/loot tekst jasniji: "orbovi stižu kao T1 → merge → T2 → magnet"; orb guard protiv dvostrukog pickupa
+- **godot-run.ps1** — jednokratno paljenje igre (agent pali JEDNOM na kraju, ne watch po izmjeni)
 
 ## Template za nove unose
 

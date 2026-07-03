@@ -40,26 +40,28 @@ func _build_slots() -> void:
 
 func _on_slot_pressed(index: int) -> void:
 	var tier := GameState.camp_slots[index]
+	var status := ""
+
 	if tier == 0:
 		_selected_slot = -1
-		_refresh_ui()
-		return
-
-	if _selected_slot < 0:
+		status = "That slot is empty. Tap an orb to select it."
+	elif _selected_slot < 0:
 		_selected_slot = index
+		status = "Selected T%d. Now tap another T%d to merge." % [tier, tier]
 	elif _selected_slot == index:
 		_selected_slot = -1
+		status = "Deselected."
 	else:
 		if GameState.try_merge_slots(_selected_slot, index):
-			info_label.text = "Merged!"
+			status = "Merged into T%d!" % GameState.camp_slots[index]
 		else:
-			info_label.text = "Pick two matching orbs to merge."
+			status = "No match — orbs must be the same tier."
 		_selected_slot = -1
 
-	_refresh_ui()
+	_refresh_ui(status)
 
 
-func _refresh_ui() -> void:
+func _refresh_ui(status: String = "") -> void:
 	for i in _slot_buttons.size():
 		var tier := GameState.camp_slots[i]
 		var button := _slot_buttons[i]
@@ -88,13 +90,24 @@ func _refresh_ui() -> void:
 			_:
 				button.text = "?"
 
-	magnet_label.text = "Magnet Lv %d / %d" % [GameState.magnet_level, GameState.MAGNET_MAX_LEVEL]
-	magnet_button.text = "Upgrade Magnet (%d T2)" % GameState.MAGNET_COST_T2
-	magnet_button.disabled = (
-		GameState.magnet_level >= GameState.MAGNET_MAX_LEVEL
-		or GameState.count_tier(2) < GameState.MAGNET_COST_T2
-	)
-	info_label.text = "Tap two matching orbs to merge (T1 + T1 → T2)."
+	var t1 := GameState.count_tier(1)
+	var t2 := GameState.count_tier(2)
+	magnet_label.text = "Magnet Lv %d / %d  (reach %dpx)   |   T1: %d   T2: %d" % [
+		GameState.magnet_level, GameState.MAGNET_MAX_LEVEL,
+		int(GameState.get_magnet_radius()), t1, t2
+	]
+
+	if GameState.magnet_level >= GameState.MAGNET_MAX_LEVEL:
+		magnet_button.text = "Magnet maxed out"
+		magnet_button.disabled = true
+	else:
+		magnet_button.text = "Upgrade Magnet  (needs %d× T2)" % GameState.MAGNET_COST_T2
+		magnet_button.disabled = t2 < GameState.MAGNET_COST_T2
+
+	if status != "":
+		info_label.text = status
+	else:
+		info_label.text = "Each run's orbs land here as T1. Tap two matching orbs to merge (T1+T1 = T2). Spend %d× T2 to upgrade the magnet (bigger pickup reach next run)." % GameState.MAGNET_COST_T2
 
 
 func _on_magnet_pressed() -> void:

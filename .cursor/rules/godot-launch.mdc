@@ -7,28 +7,32 @@ alwaysApply: true
 
 ## Obavezno
 
-Kad korisnik ili agent treba **otvoriti Godot** ili **pokrenuti igru u editoru**:
+Kad korisnik ili agent treba **otvoriti Godot** ili **pokrenuti igru**:
 
 1. Koristi **terminal u Cursoru** (ne dvostruki klik na `.exe`, ne Windows shortcut bez flagova).
 2. Iz roota repoa:
 
 ```powershell
-.\scripts\godot-open.ps1          # editor
-.\scripts\godot-watch.ps1       # play + auto-restart kad se spremi kod u game/
+.\scripts\godot-run.ps1           # pokreni IGRU jednom (play prozor)
+.\scripts\godot-run.ps1 -Editor   # otvori editor jednom
+.\scripts\godot-open.ps1          # editor (alias, jednokratno)
+.\scripts\godot-watch.ps1         # SAMO korisnik: auto-restart na svaku izmjenu
 ```
 
 3. Skripta automatski:
    - dodaje `--rendering-driver opengl3` (HP AMD — bez ovoga editor ne radi)
    - otvara `game/` projekt ako postoji
 
-## Agent
+## Agent — pravilo paljenja (VAŽNO)
 
-- Za pokretanje Godota: `Shell` tool s `godot-open.ps1` ili `godot-watch.ps1`, `block_until_ms: 0`.
-- Za dev petlju s auto-restartom: preferiraj `godot-watch.ps1` (play prozor).
+- **Pali Godot samo JEDNOM, na kraju sesije/prompta**, nakon što su sve izmjene i headless smoke-test gotovi.
+- Koristi `godot-run.ps1` (`Shell` tool, `block_until_ms: 0`). Skripta prvo ugasi prethodni Godot pa pokrene svjež.
+- **Ne pokreći `godot-watch.ps1`** dok editiraš kod — watcher restarta Godot na svaku izmjenu (višestruko paljenje). `godot-watch` je isključivo za korisnikov ručni rad kad on sam sitno mijenja kod.
+- Za provjeru grešaka tokom rada koristi **headless smoke-test** (`--headless ... --quit-after N`), ne GUI.
 - **Ne** predlaži raw `Godot_v4.7-stable_win64.exe` bez OpenGL flaga.
 - Ako exe nije na Desktopu/Downloads/C:\Godot\: korisnik postavi `$env:GODOT_PATH` prije skripte.
 
 ## Reference
 
-- `scripts/godot-open.ps1` · `scripts/godot-open.bat`
-- `docs/05-technical/godot-dev-setup.md` · `AGENTS.md`
+- `scripts/godot-run.ps1` (jednokratno) · `scripts/godot-open.ps1` · `scripts/godot-watch.ps1` (korisnik)
+- `docs/05-technical/godot-dev-setup.md` · `docs/05-technical/godot/dev-workflow.md` · `AGENTS.md`

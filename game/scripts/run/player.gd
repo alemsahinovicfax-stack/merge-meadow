@@ -5,12 +5,16 @@ signal hit_obstacle
 
 const SWIPE_THRESHOLD := 50.0
 const LANE_TWEEN_DURATION := 0.12
+
 var lane_index: int = 1
 var lane_x_positions: Array[float] = []
 var _touch_start: Vector2 = Vector2.ZERO
 var _touching: bool = false
 var _input_enabled: bool = true
 var _lane_tween: Tween
+var _magnet_radius: float = 0.0
+
+@onready var _magnet_field: Area2D = get_node_or_null("MagnetField")
 
 
 func setup_lanes(positions: Array[float]) -> void:
@@ -27,9 +31,20 @@ func set_input_enabled(enabled: bool) -> void:
 	_input_enabled = enabled
 
 
+func set_magnet_radius(radius: float) -> void:
+	_magnet_radius = radius
+	if _magnet_field:
+		var shape := _magnet_field.get_node_or_null("CollisionShape2D") as CollisionShape2D
+		if shape and shape.shape is CircleShape2D:
+			(shape.shape as CircleShape2D).radius = radius
+	queue_redraw()
+
+
 func _ready() -> void:
 	add_to_group("player")
 	area_entered.connect(_on_area_entered)
+	if _magnet_field:
+		_magnet_field.area_entered.connect(_on_magnet_area_entered)
 
 
 func _apply_lane(animate: bool) -> void:
@@ -95,3 +110,14 @@ func _on_area_entered(area: Area2D) -> void:
 			area.collect()
 	elif area.is_in_group("obstacle"):
 		hit_obstacle.emit()
+
+
+func _on_magnet_area_entered(area: Area2D) -> void:
+	# Magnet skuplja orbove u dometu, ali NE reagira na prepreke.
+	if area.is_in_group("orb") and area.has_method("collect"):
+		area.collect()
+
+
+func _draw() -> void:
+	if _magnet_radius > SWIPE_THRESHOLD:
+		draw_arc(Vector2.ZERO, _magnet_radius, 0.0, TAU, 48, Color(0.5, 0.8, 1.0, 0.25), 3.0)

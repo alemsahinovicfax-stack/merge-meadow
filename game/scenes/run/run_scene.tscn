@@ -1,10 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://c8runscene01"]
+[gd_scene load_steps=6 format=3 uid="uid://c8runscene01"]
 
 [ext_resource type="Script" path="res://scripts/run/run_controller.gd" id="1_run"]
 [ext_resource type="Script" path="res://scripts/run/player.gd" id="2_player"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(56, 56)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_magnet"]
+radius = 40.0
 
 [node name="RunScene" type="Node2D"]
 script = ExtResource("1_run")
@@ -28,6 +31,13 @@ polygon = PackedVector2Array(-28, -28, 28, -28, 28, 28, -28, 28)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 shape = SubResource("RectangleShape2D_player")
+
+[node name="MagnetField" type="Area2D" parent="Player"]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/MagnetField"]
+shape = SubResource("CircleShape2D_magnet")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 

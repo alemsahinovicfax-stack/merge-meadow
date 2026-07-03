@@ -5,10 +5,14 @@ const SCENE_RUN := "res://scenes/run/run_scene.tscn"
 const SCENE_LOOT := "res://scenes/ui/loot_screen.tscn"
 const SCENE_CAMP := "res://scenes/camp/camp_scene.tscn"
 
-const CAMP_SLOT_COUNT := 6
+const CAMP_SLOT_COUNT := 9
 const MAX_MERGE_TIER := 2
 const MAGNET_MAX_LEVEL := 4
-const MAGNET_COST_T2 := 4
+const MAGNET_COST_T2 := 2
+
+# Magnet efekt u runu: domet automatskog skupljanja orbova (px).
+const MAGNET_BASE_RADIUS := 40.0
+const MAGNET_RADIUS_PER_LEVEL := 48.0
 
 var last_loot: int = 0
 var last_failed: bool = false
@@ -122,6 +126,10 @@ func try_upgrade_magnet() -> bool:
 			removed += 1
 	magnet_level += 1
 	return true
+
+
+func get_magnet_radius() -> float:
+	return MAGNET_BASE_RADIUS + magnet_level * MAGNET_RADIUS_PER_LEVEL
 
 
 func mark_tutorial_seen() -> void:
