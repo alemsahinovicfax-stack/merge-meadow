@@ -1,0 +1,7 @@
+load_main_err=0
+play_exists=true
+play_script=(res://scripts/ui/ui_click_button.gd):<GDScript#-9223372008954264107>
+clicked_conns=1
+pressed_conns=1
+play_rect=[P: (0.0, 334.0), S: (560.0, 96.0)] global_center=(960.0, 1082.0)
+scene_after_click=MainMenu

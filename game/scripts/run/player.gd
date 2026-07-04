@@ -15,6 +15,7 @@ var _lane_tween: Tween
 var _magnet_radius: float = 0.0
 
 @onready var _magnet_field: Area2D = get_node_or_null("MagnetField")
+@onready var _pip_visual: Node2D = $PipVisual
 
 
 func setup_lanes(positions: Array[float]) -> void:
@@ -37,7 +38,8 @@ func set_magnet_radius(radius: float) -> void:
 		var shape := _magnet_field.get_node_or_null("CollisionShape2D") as CollisionShape2D
 		if shape and shape.shape is CircleShape2D:
 			(shape.shape as CircleShape2D).radius = radius
-	queue_redraw()
+	if _pip_visual and _pip_visual.has_method("set_magnet_radius"):
+		_pip_visual.set_magnet_radius(radius)
 
 
 func _ready() -> void:
@@ -45,6 +47,8 @@ func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 	if _magnet_field:
 		_magnet_field.area_entered.connect(_on_magnet_area_entered)
+	if _pip_visual and _pip_visual.has_method("set_magnet_radius"):
+		_pip_visual.set_magnet_radius(_magnet_radius)
 
 
 func _apply_lane(animate: bool) -> void:
@@ -105,19 +109,12 @@ func _handle_swipe(end_pos: Vector2) -> void:
 
 
 func _on_area_entered(area: Area2D) -> void:
-	if area.is_in_group("orb"):
-		if area.has_method("collect"):
-			area.collect()
+	if area.is_in_group("pickup") and area.has_method("collect"):
+		area.collect()
 	elif area.is_in_group("obstacle"):
 		hit_obstacle.emit()
 
 
 func _on_magnet_area_entered(area: Area2D) -> void:
-	# Magnet skuplja orbove u dometu, ali NE reagira na prepreke.
-	if area.is_in_group("orb") and area.has_method("collect"):
+	if area.is_in_group("pickup") and area.has_method("collect"):
 		area.collect()
-
-
-func _draw() -> void:
-	if _magnet_radius > SWIPE_THRESHOLD:
-		draw_arc(Vector2.ZERO, _magnet_radius, 0.0, TAU, 48, Color(0.5, 0.8, 1.0, 0.25), 3.0)

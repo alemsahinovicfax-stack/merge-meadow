@@ -1,6 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://c8mainmenu01"]
+[gd_scene load_steps=5 format=3 uid="uid://c8mainmenu01"]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="Script" path="res://scripts/visual/pip_placeholder_control.gd" id="2_pip_ui"]
+[ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="3_uibtn"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.12, 0.14, 0.18, 0.95)
@@ -23,6 +25,7 @@ grow_vertical = 2
 script = ExtResource("1_menu")
 
 [node name="Background" type="ColorRect" parent="."]
+mouse_filter = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -39,16 +42,23 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -320.0
-offset_top = -280.0
+offset_top = -300.0
 offset_right = 320.0
-offset_bottom = 280.0
+offset_bottom = 300.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="VBox" type="VBoxContainer" parent="Panel"]
 layout_mode = 2
-theme_override_constants/separation = 28
+theme_override_constants/separation = 20
+
+[node name="PipPortrait" type="Control" parent="Panel/VBox"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+script = ExtResource("2_pip_ui")
 
 [node name="Title" type="Label" parent="Panel/VBox"]
 layout_mode = 2
@@ -56,6 +66,14 @@ theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
 theme_override_font_sizes/font_size = 64
 text = "Merge Meadow"
 horizontal_alignment = 1
+
+[node name="Tagline" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.94, 0.9, 1)
+theme_override_font_sizes/font_size = 24
+text = "Help Pip bring color back to the meadow."
+horizontal_alignment = 1
+autowrap_mode = 2
 
 [node name="TutorialHint" type="Label" parent="Panel/VBox"]
 layout_mode = 2
@@ -65,8 +83,17 @@ text = "First run: swipe left/right to change lanes."
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="PlayButton" type="Button" parent="Panel/VBox"]
+[node name="PlayButton" type="PanelContainer" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-theme_override_font_sizes/font_size = 40
-text = "Play"
+script = ExtResource("3_uibtn")
+label_text = "Play"
+font_size = 40
+
+[node name="CampButton" type="PanelContainer" parent="Panel/VBox"]
+visible = false
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "Camp"
+font_size = 36

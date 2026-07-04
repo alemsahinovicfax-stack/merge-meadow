@@ -12,9 +12,10 @@ trenutna_faza: 5
 podfaza: vertical-slice
 aktivna_sekcija: C
 b0_aktivan: false
-sljedeci_korak: "C1: testirati loop main → run → loot → kamp → Play"
-zadnja_sesija: "M7 C1 — GameState, main menu, loot, kamp merge, magnet upgrade"
+sljedeci_korak: "C1½: build order (vidi Sekcija C backlog) — spec-driven; prvo art pass / save odluka"
+zadnja_sesija: "M7 C1 — revive fix (nastavi run), spec-vertical-slice + ekonomija-brojevi docs"
 zadnje_azurirano: 2026-07-03
+spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
 test_uredjaji:
@@ -243,6 +244,8 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 **Preduvjet:** M6 ✅
 
+> **Source of truth za slice:** [[../02-design/spec-vertical-slice|spec-vertical-slice]] (ponašanje po ekranu + DoD) i [[../02-design/ekonomija-brojevi|ekonomija-brojevi]] (sve konstante). **Prije kodiranja mehanike otvori spec — kod prati spec.**
+
 ### C1 — Kompletan loop (greybox → polish)
 
 - [x] Loot ekran (×2 rewarded placeholder, revive, retry, kamp)
@@ -250,6 +253,16 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 - [x] 1 upgrade linija (magnet)
 - [x] Main menu → Play → run → loot → kamp → Play
 - [x] Tutorial hint (prvi launch — main menu + run banner)
+- [x] **Revive fix** — revive sada NASTAVLJA run (ne dira loot); Double+Revive više ne skaču broj
+
+### C1½ — Build order (spec-driven, mali koraci)
+
+> Svaki korak: otvori spec → kodiraj → headless smoke → 5 min test → `[x]`. Jedan korac po sesiji.
+
+- [ ] **Odluka: save na disk?** — JSON `user://` u slice-u ili tek M8 (spec §5, `otvorena-pitanja`)
+- [ ] **Balans pass 1** — proigrati i zapisati osjećaj brojeva ([[../02-design/ekonomija-brojevi|brojevi]]): RUN_DURATION 75 vs 90, spawn gustoća, magnet cijene
+- [ ] **Fail/finish feedback** — jasna razlika fail vs finish na loot ekranu (spec §3)
+- [ ] Prelazak na **C2 art pass** kad loop feel potvrđen
 
 ### C2 — Art pass (slice scope)
 
@@ -286,8 +299,9 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-1. **C1:** kompletan loop — main menu → run → loot → kamp → Play
-2. Loot placeholder gumbi (×2, revive); merge kamp min 2 tiera
+1. **C1½ build order** (Sekcija C) — spec-driven, mali koraci; prvi: odluka o save na disk
+2. Prije mehanike **otvori** [[../02-design/spec-vertical-slice|spec-vertical-slice]] — kod prati spec
+3. Balans → mijenjaj u [[../02-design/ekonomija-brojevi|ekonomija-brojevi]] + kodu istovremeno
 
 ## Povezano
 

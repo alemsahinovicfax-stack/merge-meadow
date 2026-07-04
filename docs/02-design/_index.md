@@ -10,6 +10,8 @@ tags: [hub, dizajn]
 ## Dokumenti
 
 - [[gdd-overview|gdd-overview]] — sažetak cijelog GDD-a
+- ⭐ [[spec-vertical-slice|spec-vertical-slice]] — **source of truth** za M7 (kod prati ovo)
+- ⭐ [[ekonomija-brojevi|ekonomija-brojevi]] — sve balans-konstante slice-a
 - [[core-loop|core-loop]] — 30s / 5min / 1h petlje
 - [[kontrole-i-input|kontrole-i-input]] — touch geste, HUD
 - [[progresija|progresija]] — napredak kroz sate/dane

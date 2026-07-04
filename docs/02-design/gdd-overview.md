@@ -27,6 +27,11 @@ ai_sažetak: "Executive index Merge Meadow — lane run + merge kamp F2P hybrid 
 | Pillars | [[../01-vision/design-pillars|design-pillars]] |
 | Core loop | [[core-loop|core-loop]] |
 
+## Što gradimo SADA (source of truth)
+
+- [[spec-vertical-slice|spec-vertical-slice]] — tačno ponašanje svakog ekrana/mehanike + DoD (kod prati ovo)
+- [[ekonomija-brojevi|ekonomija-brojevi]] — sve balans-konstante slice-a na jednom mjestu
+
 ## Ključne mehanike (must-have v1)
 
 1. [[mehanike/lane-run|Lane run]] — core sesija, ad momenti

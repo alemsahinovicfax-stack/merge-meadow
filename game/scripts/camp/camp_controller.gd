@@ -1,120 +1,339 @@
 extends Control
 
-const TIER_COLORS: Dictionary = {
-	0: Color(0.2, 0.22, 0.25, 0.5),
-	1: Color(1.0, 0.85, 0.2, 1.0),
-	2: Color(0.55, 0.85, 1.0, 1.0),
-}
+@onready var gh_beds_grid: HBoxContainer = $Greenhouse/VBox/GhBedsGrid
+@onready var gh_hint_label: Label = $Greenhouse/VBox/GhHintLabel
+@onready var beds_grid: GridContainer = $GardenLayer/VBox/BedsGrid
+@onready var info_label: Label = $GardenLayer/VBox/InfoLabel
+@onready var seed_bag_label: Label = $GardenLayer/VBox/SeedBagLabel
+@onready var wallet_label: Label = $GardenLayer/VBox/WalletLabel
+@onready var collection_label: Label = $GardenLayer/VBox/CollectionLabel
+@onready var sprinkler_label: Label = $GardenLayer/VBox/SprinklerLabel
+@onready var donate_button: UiClickButton = $GardenLayer/VBox/ActionRow/DonateButton
+@onready var upgrade_button: UiClickButton = $GardenLayer/VBox/ActionRow/UpgradeButton
+@onready var exchange_button: UiClickButton = $GardenLayer/VBox/ExchangeButton
+@onready var loadout_button: UiClickButton = $GardenLayer/VBox/LoadoutButton
+@onready var play_button: UiClickButton = $GardenLayer/VBox/PlayButton
 
-@onready var slots_grid: GridContainer = $Panel/VBox/SlotsGrid
-@onready var info_label: Label = $Panel/VBox/InfoLabel
-@onready var magnet_label: Label = $Panel/VBox/MagnetLabel
-@onready var magnet_button: Button = $Panel/VBox/MagnetButton
-@onready var play_button: Button = $Panel/VBox/PlayButton
-
-var _selected_slot: int = -1
-var _slot_buttons: Array[Button] = []
+var _selected_garden: int = -1
+var _selected_greenhouse: int = -1
+var _garden_buttons: Array[CampBed] = []
+var _gh_buttons: Array[CampBed] = []
+var _planted_during_camp1: bool = false
 
 
 func _ready() -> void:
-	magnet_button.pressed.connect(_on_magnet_pressed)
-	play_button.pressed.connect(_on_play_pressed)
-	_build_slots()
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	set_process_input(true)
+	GameState.ensure_loot_in_camp_bag()
+	GameState.apply_debug_resources()
+	donate_button.clicked.connect(_on_donate_pressed)
+	upgrade_button.clicked.connect(_on_upgrade_pressed)
+	exchange_button.clicked.connect(_on_exchange_pressed)
+	loadout_button.clicked.connect(_on_loadout_pressed)
+	play_button.clicked.connect(_on_play_pressed)
+	_build_garden_beds()
+	_build_greenhouse_beds()
 	_refresh_ui()
 
 
-func _build_slots() -> void:
-	for child in slots_grid.get_children():
+func _input(event: InputEvent) -> void:
+	if not _is_primary_click_release(event):
+		return
+	var pos := _event_position(event)
+	if _route_click(pos):
+		get_viewport().set_input_as_handled()
+
+
+func _is_primary_click_release(event: InputEvent) -> bool:
+	if event is InputEventMouseButton:
+		var mouse := event as InputEventMouseButton
+		return mouse.button_index == MOUSE_BUTTON_LEFT and not mouse.pressed
+	if event is InputEventScreenTouch:
+		return (event as InputEventScreenTouch).pressed
+	return false
+
+
+func _event_position(event: InputEvent) -> Vector2:
+	if event is InputEventMouseButton:
+		return (event as InputEventMouseButton).position
+	if event is InputEventScreenTouch:
+		return (event as InputEventScreenTouch).position
+	return Vector2.ZERO
+
+
+func _route_click(pos: Vector2) -> bool:
+	if _hit_control(play_button, pos) and not play_button.disabled:
+		_on_play_pressed()
+		return true
+
+	if _hit_control(donate_button, pos):
+		if donate_button.disabled:
+			info_label.text = "Select a T2 bloom on a bed, then tap Donate."
+			return true
+		_on_donate_pressed()
+		return true
+
+	if _hit_control(upgrade_button, pos):
+		if upgrade_button.disabled:
+			info_label.text = "Donate %d blooms first (%d/%d)." % [
+				GameState.MAGNET_COST_T2,
+				GameState.sprinkler_donations,
+				GameState.MAGNET_COST_T2,
+			]
+			return true
+		_on_upgrade_pressed()
+		return true
+
+	if _hit_control(exchange_button, pos):
+		if exchange_button.disabled:
+			info_label.text = "Need 3× the same seed in your bag to trade."
+			return true
+		_on_exchange_pressed()
+		return true
+
+	if _hit_control(loadout_button, pos):
+		_on_loadout_pressed()
+		return true
+
+	for i in _garden_buttons.size():
+		if _hit_control(_garden_buttons[i], pos):
+			_on_garden_bed_tapped(i)
+			return true
+
+	for i in _gh_buttons.size():
+		if _hit_control(_gh_buttons[i], pos):
+			_on_greenhouse_bed_tapped(i)
+			return true
+
+	return false
+
+
+func _hit_control(control: Control, pos: Vector2) -> bool:
+	return control.is_visible_in_tree() and control.get_global_rect().has_point(pos)
+
+
+func _build_garden_beds() -> void:
+	for child in beds_grid.get_children():
 		child.queue_free()
-	_slot_buttons.clear()
-
-	for i in GameState.CAMP_SLOT_COUNT:
-		var button := Button.new()
-		button.custom_minimum_size = Vector2(140, 140)
-		button.focus_mode = Control.FOCUS_NONE
-		var slot_index := i
-		button.pressed.connect(func() -> void: _on_slot_pressed(slot_index))
-		slots_grid.add_child(button)
-		_slot_buttons.append(button)
+	_garden_buttons.clear()
+	for i in GameState.CAMP_BED_COUNT:
+		var bed := CampBed.new()
+		bed.setup(i, false)
+		bed.bed_tapped.connect(_on_garden_bed_tapped)
+		beds_grid.add_child(bed)
+		_garden_buttons.append(bed)
 
 
-func _on_slot_pressed(index: int) -> void:
-	var tier := GameState.camp_slots[index]
-	var status := ""
+func _build_greenhouse_beds() -> void:
+	for child in gh_beds_grid.get_children():
+		child.queue_free()
+	_gh_buttons.clear()
+	for i in GameState.GREENHOUSE_SLOT_COUNT:
+		var bed := CampBed.new()
+		bed.setup(i, true)
+		bed.bed_tapped.connect(_on_greenhouse_bed_tapped)
+		gh_beds_grid.add_child(bed)
+		_gh_buttons.append(bed)
 
-	if tier == 0:
-		_selected_slot = -1
-		status = "That slot is empty. Tap an orb to select it."
-	elif _selected_slot < 0:
-		_selected_slot = index
-		status = "Selected T%d. Now tap another T%d to merge." % [tier, tier]
-	elif _selected_slot == index:
-		_selected_slot = -1
-		status = "Deselected."
-	else:
-		if GameState.try_merge_slots(_selected_slot, index):
-			status = "Merged into T%d!" % GameState.camp_slots[index]
-		else:
-			status = "No match — orbs must be the same tier."
-		_selected_slot = -1
 
+func _clear_selection() -> void:
+	_selected_garden = -1
+	_selected_greenhouse = -1
+
+
+func _on_garden_bed_tapped(index: int) -> void:
+	_selected_greenhouse = -1
+	var status := _handle_bed_tap(index, false)
 	_refresh_ui(status)
 
 
-func _refresh_ui(status: String = "") -> void:
-	for i in _slot_buttons.size():
-		var tier := GameState.camp_slots[i]
-		var button := _slot_buttons[i]
-		var style := StyleBoxFlat.new()
-		style.bg_color = TIER_COLORS.get(tier, TIER_COLORS[0])
-		style.corner_radius_top_left = 16
-		style.corner_radius_top_right = 16
-		style.corner_radius_bottom_right = 16
-		style.corner_radius_bottom_left = 16
-		if i == _selected_slot:
-			style.border_width_left = 4
-			style.border_width_top = 4
-			style.border_width_right = 4
-			style.border_width_bottom = 4
-			style.border_color = Color(1, 1, 1, 1)
-		button.add_theme_stylebox_override("normal", style)
-		button.add_theme_stylebox_override("hover", style)
-		button.add_theme_stylebox_override("pressed", style)
-		match tier:
-			0:
-				button.text = ""
-			1:
-				button.text = "T1"
-			2:
-				button.text = "T2"
-			_:
-				button.text = "?"
+func _on_greenhouse_bed_tapped(index: int) -> void:
+	_selected_garden = -1
+	var status := _handle_bed_tap(index, true)
+	_refresh_ui(status)
 
-	var t1 := GameState.count_tier(1)
-	var t2 := GameState.count_tier(2)
-	magnet_label.text = "Magnet Lv %d / %d  (reach %dpx)   |   T1: %d   T2: %d" % [
-		GameState.magnet_level, GameState.MAGNET_MAX_LEVEL,
-		int(GameState.get_magnet_radius()), t1, t2
+
+func _handle_bed_tap(index: int, in_greenhouse: bool) -> String:
+	var selected := _selected_greenhouse if in_greenhouse else _selected_garden
+
+	if GameState.bed_is_empty(index, in_greenhouse):
+		if not in_greenhouse:
+			_selected_garden = -1
+		else:
+			_selected_greenhouse = -1
+		var type_id := GameState.first_seed_type_in_bag(in_greenhouse)
+		if type_id.is_empty():
+			if in_greenhouse:
+				return "Greenhouse takes ★★★ seeds only — none in your bag yet."
+			return "No garden seeds in bag — run again!"
+		if GameState.plant_seed_in_bed(index, type_id, in_greenhouse):
+			var name: String = GameState.SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+			if GameState.should_highlight_first_bed() and index == 0:
+				_planted_during_camp1 = true
+			return "Planted %s!" % name
+		return "Could not plant here."
+
+	if selected < 0:
+		if in_greenhouse:
+			_selected_greenhouse = index
+		else:
+			_selected_garden = index
+		var tier := GameState.get_bed_tier(index, in_greenhouse)
+		var type_name: String = GameState.SEED_DISPLAY_NAMES.get(
+			GameState.get_bed_type(index, in_greenhouse),
+			GameState.get_bed_type(index, in_greenhouse).capitalize()
+		)
+		if tier >= 2:
+			return (
+				"Selected %s bloom. Keep for collection, or Donate to Sprinkler."
+				% type_name
+			)
+		return "Selected %s T%d — tap a match to merge." % [type_name, tier]
+
+	if selected == index:
+		_clear_selection()
+		return "Deselected."
+
+	if GameState.try_merge_beds(selected, index, in_greenhouse):
+		_clear_selection()
+		return "Merged into a bigger bloom! Nice! The meadow feels brighter."
+	_clear_selection()
+	return "No match — same type and tier only."
+
+
+func _refresh_ui(status: String = "") -> void:
+	for i in _garden_buttons.size():
+		var bed := _garden_buttons[i]
+		bed.set_bed_state(
+			GameState.get_bed_type(i, false),
+			GameState.get_bed_tier(i, false),
+			i == _selected_garden,
+			false
+		)
+		bed.set_highlighted(GameState.should_highlight_first_bed() and i == 0)
+	for i in _gh_buttons.size():
+		var bed := _gh_buttons[i]
+		bed.set_bed_state(
+			GameState.get_bed_type(i, true),
+			GameState.get_bed_tier(i, true),
+			i == _selected_greenhouse,
+			true
+		)
+
+	seed_bag_label.text = GameState.format_seed_bag_label()
+	wallet_label.text = "Wallet: %d coins" % GameState.wallet_coins
+	collection_label.text = GameState.format_collection_label()
+
+	var t2_kept := GameState.count_all_flowers_tier(2)
+	sprinkler_label.text = (
+		"Sprinkler Lv %d / %d  (reach %dpx)  |  donated %d/%d  |  T2 kept: %d"
+		% [
+			GameState.magnet_level,
+			GameState.MAGNET_MAX_LEVEL,
+			int(GameState.get_magnet_radius()),
+			GameState.sprinkler_donations,
+			GameState.MAGNET_COST_T2,
+			t2_kept,
+		]
+	)
+
+	var can_donate := _selected_t2_bed().size() > 0 and GameState.sprinkler_donations < GameState.MAGNET_COST_T2
+	donate_button.disabled = not can_donate or GameState.magnet_level >= GameState.MAGNET_MAX_LEVEL
+	donate_button.label_text = "Donate bloom to Sprinkler (%d/%d)" % [
+		GameState.sprinkler_donations, GameState.MAGNET_COST_T2
 	]
 
 	if GameState.magnet_level >= GameState.MAGNET_MAX_LEVEL:
-		magnet_button.text = "Magnet maxed out"
-		magnet_button.disabled = true
+		upgrade_button.label_text = "Sprinkler maxed"
+		upgrade_button.disabled = true
 	else:
-		magnet_button.text = "Upgrade Magnet  (needs %d× T2)" % GameState.MAGNET_COST_T2
-		magnet_button.disabled = t2 < GameState.MAGNET_COST_T2
+		upgrade_button.label_text = "Upgrade Sprinkler"
+		upgrade_button.disabled = GameState.sprinkler_donations < GameState.MAGNET_COST_T2
+
+	var exch_type := GameState.first_exchangeable_type_in_bag()
+	exchange_button.disabled = exch_type.is_empty()
+	if exch_type.is_empty():
+		exchange_button.label_text = "Trade extras (need 3× same seed)"
+	else:
+		var name: String = GameState.SEED_DISPLAY_NAMES.get(exch_type, exch_type.capitalize())
+		exchange_button.label_text = "Trade 3× %s → %d coins" % [name, GameState.EXCHANGE_COINS_REWARD]
+
+	loadout_button.disabled = not GameState.loadout_enabled()
+	if GameState.loadout_enabled():
+		loadout_button.label_text = GameState.format_loadout_label()
+	else:
+		loadout_button.label_text = "Fill your basket later"
+
+	gh_hint_label.text = "★★★ seeds only (2 slots)"
 
 	if status != "":
 		info_label.text = status
+	elif GameState.tutorial_complete and GameState.get_loadout_type().is_empty():
+		info_label.text = (
+			"Clover will show up more in your next run! Fill your basket before Play."
+		)
+	elif GameState.should_highlight_first_bed():
+		if _planted_during_camp1:
+			info_label.text = "Collect more of the same seed to merge into a flower."
+		else:
+			info_label.text = "Plant your seed here! Tap the glowing bed."
+	elif GameState.tutorial_step == GameState.TutorialStep.CAMP_MERGE:
+		info_label.text = "Tap two matching sprouts to merge into a flower."
+	elif GameState.sum_seed_bag(GameState.seed_bag) > 0 and GameState.empty_garden_beds() > 0:
+		info_label.text = "Plant your seed here! Tap an empty bed."
+	elif GameState.count_flowers_tier(1) >= 2:
+		info_label.text = "Two sprouts ready — merge them, then keep or donate the bloom."
 	else:
-		info_label.text = "Each run's orbs land here as T1. Tap two matching orbs to merge (T1+T1 = T2). Spend %d× T2 to upgrade the magnet (bigger pickup reach next run)." % GameState.MAGNET_COST_T2
+		info_label.text = (
+			"Merge T1+T1 → T2 bloom. Keep blooms for your collection, "
+			+ "or donate to upgrade the sprinkler."
+		)
 
 
-func _on_magnet_pressed() -> void:
+func _selected_t2_bed() -> Dictionary:
+	if _selected_garden >= 0 and GameState.get_bed_tier(_selected_garden, false) == 2:
+		return {"index": _selected_garden, "greenhouse": false}
+	if _selected_greenhouse >= 0 and GameState.get_bed_tier(_selected_greenhouse, true) == 2:
+		return {"index": _selected_greenhouse, "greenhouse": true}
+	return {}
+
+
+func _on_donate_pressed() -> void:
+	var sel := _selected_t2_bed()
+	if sel.is_empty():
+		return
+	if GameState.donate_bloom_from_bed(sel.index, sel.greenhouse):
+		_clear_selection()
+		info_label.text = "Bloom donated! Donate one more to unlock upgrade."
+	_refresh_ui()
+
+
+func _on_upgrade_pressed() -> void:
 	if GameState.try_upgrade_magnet():
-		info_label.text = "Magnet upgraded!"
+		info_label.text = "Sprinkler upgraded — Pip reaches farther next run!"
+	_refresh_ui()
+
+
+func _on_exchange_pressed() -> void:
+	var type_id := GameState.first_exchangeable_type_in_bag()
+	if type_id.is_empty():
+		return
+	if GameState.exchange_seeds_from_bag(type_id):
+		var name: String = GameState.SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+		info_label.text = "Traded 3× %s for %d coins." % [name, GameState.EXCHANGE_COINS_REWARD]
+	_refresh_ui()
+
+
+func _on_loadout_pressed() -> void:
+	if not GameState.loadout_enabled():
+		info_label.text = "Fill your basket later — merge your first flower!"
+		return
+	var status := GameState.toggle_loadout_from_bag()
+	info_label.text = status
 	_refresh_ui()
 
 
 func _on_play_pressed() -> void:
-	GameState.go_to_scene(GameState.SCENE_RUN)
+	GameState.notify_camp_play()
+	GameState.begin_fresh_run()
+	SceneRouter.change_to(GameState.SCENE_RUN)

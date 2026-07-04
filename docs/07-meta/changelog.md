@@ -75,6 +75,22 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 - **Magnet stvarni efekt** — `MagnetField` Area2D skuplja orbove u dometu (40 + 48/level px), vidljiv prsten; ne reagira na prepreke
 - Kamp/loot tekst jasniji: "orbovi stižu kao T1 → merge → T2 → magnet"; orb guard protiv dvostrukog pickupa
 - **godot-run.ps1** — jednokratno paljenje igre (agent pali JEDNOM na kraju, ne watch po izmjeni)
+- **Revive bug fix** — "Revive" je samo prepisivao `last_loot` (kolizija s Double → broj orbova skakao gore/dolje "kako kad") i **nije nastavljao run**. Sad `request_revive()` vraća u run scenu i nastavlja tamo gdje si stao (zadržava skupljene orbove + preostalo vrijeme, čisti prepreke); max 1×/run; ne dira loot broj. `finish_run()` sada prima `elapsed`; dodan `_state` guard protiv dvostrukog `_end_run`.
+- **Dokumentacija smjera (source of truth):** [[../02-design/spec-vertical-slice|spec-vertical-slice]] — tačno ponašanje svakog ekrana/mehanike + DoD; [[../02-design/ekonomija-brojevi|ekonomija-brojevi]] — sve balans-konstante na jednom mjestu. CHECKPOINT Sekcija C dobila **C1½ build order** (spec-driven, mali koraci). Linkano u `gdd-overview`, `_index`. Cilj: kod prati spec, ne nagađamo dok kodiramo.
+- **F1 identitet u kodu** — `PipDraw` proceduralni placeholder (zeko); main menu tagline + Pip portrait; run HUD `PipBadge` (Pip + ime). Uklonjen plavi kvadratić. Sljedeće: F2 novčići + sjeme.
+- **F2 dvije valute u runu** — zlatni novčići (~70% pickupa) + zeleno Clover sjeme ★ (~30%); HUD Coins/Seeds; loot ekran oboje; `wallet_coins`; revive nosi coins+seeds. Stari `orb.tscn` zamijenjen `seed_pickup` + `coin`.
+- **Bugfix run raspad** — viewport 0×0 u `_ready()` → Pip u (0,0), bez laneova; `_wait_for_viewport()` + `Line2D` guideovi. Fail: **50% sjemena i 50% novčića**. Scratch: progress traka umjesto tajmera; pitanja ekonomije/kamp brojača (`ideje-gameplay-ekonomija`).
+
+## 2026-07-04
+
+- **F3 loot inventar po tipu** — `finish_run(seeds_by_type, coins, …)`; `last_seed_bag` / `carry_seed_bag`; loot ekran `+X Coins` / `+Y Clover`; `deposit_loot_to_camp()` deponira po tipu u slotove. `RUN_DURATION` ostaje **20 s** za playtest.
+- **F4 kamp vrt** — 6 gredica; … (vidi changelog 2026-07-04 kasnije)
+- **Kamp ekonomija (E2)** — 9 gredica, T2 keep/donate, staklenik 2 slota ★★★, zamjena 3 sjeme→8 coins, `discovered_blooms`.
+- **F5 loadout** — 1 basket slot, +5% spawn; debug 20 coins + 20 seeds u kampu.
+- **F6 tutorial** — Run1 45s / Run2 60s, vođenje, loadout nakon mergea.
+- **F7 playtest ✅** — DoD prošao.
+- **Post-tutorial hub** — main menu **Play** + **Camp**; `user://tutorial_flags.json`; save fix na prvi T2 merge.
+- **Ideje workflow** — [[ideje-kad-predloziti|ideje-kad-predloziti]] + rule `.cursor/rules/ideje-kad-predloziti.mdc`; backlog **UX-01** Main menu u kampu.
 
 ## Template za nove unose
 

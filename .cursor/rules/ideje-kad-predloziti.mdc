@@ -1,0 +1,39 @@
+---
+description: Kad predložiti scratch ideju iz docs/03-content — triggeri, format, scope.
+alwaysApply: true
+---
+
+# Ideje — kad predložiti
+
+Hub: `docs/06-production/ideje-kad-predloziti.md`
+
+## Kada ponuditi
+
+1. **CHECKPOINT korak** se poklapa s trigger tablicom u hub docu (camp → UX-01, run → R*, shop → F8, …).
+2. **Korisnik** dira tu oblast (npr. „kako izaći iz kampa“, „shop“, „tutorial opet“).
+3. **Kraj sesije** — najviše **1** ideja ako pomaže sljedećem koraku.
+
+**Ne predlagati** usred hitnog bugfixa, niti OUT scope feature (scope-guard).
+
+## Format (copy-paste)
+
+```
+💡 IDEJA [ID] — naslov
+
+Zašto sada: …
+Što: …
+Effort: S/M/L · Milestone: …
+Primjeniti sada, odgoditi, ili preskočiti?
+```
+
+## UX-01 (Main menu u kampu) — tipičan trigger
+
+Ponudi kad: `camp_controller`, `camp_scene`, navigacija, post-tutorial, restart Godota za hub.
+
+Ne implementiraj dok korisnik ne potvrdi (osim ako eksplicitno traži implementaciju te ideje).
+
+## Reference
+
+- Scratch: `docs/03-content/ideje-*.md`
+- Build order: `docs/06-production/ideje-roadmap-implementacije.md`
+- Scope: `docs/06-production/scope-i-granice.md`

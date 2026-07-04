@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://c8lootscreen01"]
+[gd_scene load_steps=4 format=3 uid="uid://c8lootscreen01"]
 
 [ext_resource type="Script" path="res://scripts/ui/loot_screen.gd" id="1_loot"]
+[ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.12, 0.14, 0.18, 0.95)
@@ -23,6 +24,7 @@ grow_vertical = 2
 script = ExtResource("1_loot")
 
 [node name="Dim" type="ColorRect" parent="."]
+mouse_filter = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -70,26 +72,30 @@ text = "Status"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="DoubleButton" type="Button" parent="Panel/VBox"]
+[node name="DoubleButton" type="PanelContainer" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Double Loot (rewarded placeholder)"
+script = ExtResource("2_uibtn")
+label_text = "Double Loot (rewarded placeholder)"
+font_size = 28
 
-[node name="ReviveButton" type="Button" parent="Panel/VBox"]
+[node name="ReviveButton" type="PanelContainer" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Revive — full loot (rewarded placeholder)"
+script = ExtResource("2_uibtn")
+label_text = "Revive — continue run (rewarded placeholder)"
+font_size = 28
 
-[node name="RetryButton" type="Button" parent="Panel/VBox"]
+[node name="RetryButton" type="PanelContainer" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "Retry"
+script = ExtResource("2_uibtn")
+label_text = "Retry"
+font_size = 32
 
-[node name="CampButton" type="Button" parent="Panel/VBox"]
+[node name="CampButton" type="PanelContainer" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "To Camp"
+script = ExtResource("2_uibtn")
+label_text = "To Camp"
+font_size = 32

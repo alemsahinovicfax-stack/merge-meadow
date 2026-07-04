@@ -8,6 +8,7 @@
 2. Ako `b0_aktivan: true` → kratki B0 podsjetnik; inače preskoči B0
 3. Prva neoznačena `[ ]` u aktivnoj CHECKPOINT sekciji = sljedeći korak
 4. Po potrebi: `RADIONICA-razvoj.md`, `milestone-i.md`, `otvorena-pitanja.md`
+5. Scratch ideje: `ideje-kad-predloziti.md` — ponudi max 1 kad trigger odgovara koraku (rule `ideje-kad-predloziti.mdc`)
 
 ## Frontmatter šema
 
