@@ -353,5 +353,5 @@ func _on_main_menu_pressed() -> void:
 
 func _on_play_pressed() -> void:
 	GameState.notify_camp_play()
-	GameState.begin_fresh_run()
+	GameState.begin_campaign_run()
 	SceneRouter.change_to(GameState.SCENE_RUN)

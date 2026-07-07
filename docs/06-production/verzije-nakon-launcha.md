@@ -43,6 +43,18 @@ Iz OUT / “kasnije” liste — **samo ako launch uspije**:
 - Lokalizacija (HR, DE…)
 - Više ljubimaca / cosmetic shop
 
+### Run / lane polish (rezervisano 2026-07-07 — nakon v1 launch)
+
+| ID | Ideja | Effort | Napomena |
+|----|--------|--------|----------|
+| R-P1 | Parallax pozadina (scroll s laneom ili ~80% brzine) | M | Dubina + kozmetika sa strane |
+| R-P2 | Krtica — telegraph 1 s, peek animacija, statična kolizija | M–L | Blaga prepreka, safe fantasy |
+| R-P3 | „New seed!“ toast gore (ikona + tekst) | S | `discovered_blooms` hook |
+| R-P4 | Tematske staze (proljeće, holiday…) | L | v1 = Meadow; sezone v1.1+ |
+| R-P5 | Unlock teme nakon završetka prethodne | M | Uz R-P4 |
+
+**Ne kodirati** dok M8 Sekcija D nije ✅.
+
 ## v2+ — samo naslovi (bez rada)
 
 - Battle pass

@@ -50,6 +50,14 @@ const POST_TUTORIAL_RUN_DURATION := 60.0
 
 enum TutorialStep { RUN1, CAMP1, RUN2, CAMP_MERGE, FREE }
 
+enum EndlessDifficulty { EASY, NORMAL, HARD }
+
+const ENDLESS_DIFFICULTY_LABELS: Dictionary = {
+	EndlessDifficulty.EASY: "Easy",
+	EndlessDifficulty.NORMAL: "Normal",
+	EndlessDifficulty.HARD: "Hard",
+}
+
 const TUTORIAL_FLAGS_PATH := "user://tutorial_flags.json"
 const PLAYER_SAVE_PATH := "user://player_save.json"
 const SAVE_VERSION := 1
@@ -84,6 +92,10 @@ var tutorial_step: int = TutorialStep.RUN1
 var tutorial_complete: bool = false
 var ads_removed: bool = false
 var starter_pack_owned: bool = false
+var run_level: int = 1
+var endless_runs_completed: int = 0
+var endless_difficulty: int = EndlessDifficulty.NORMAL
+var run_is_endless: bool = false
 
 # Jedan slot: type_id iz baga → +LOADOUT_SPAWN_BONUS šanse za sjeme u runu.
 var loadout_type_id: String = ""
@@ -126,6 +138,9 @@ func save_player_save() -> void:
 		"greenhouse_beds": _serialize_beds(greenhouse_beds),
 		"ads_removed": ads_removed,
 		"starter_pack_owned": starter_pack_owned,
+		"run_level": run_level,
+		"endless_runs_completed": endless_runs_completed,
+		"endless_difficulty": endless_difficulty,
 	}
 	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -151,6 +166,13 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	greenhouse_beds = _deserialize_beds(data.get("greenhouse_beds", []), GREENHOUSE_SLOT_COUNT)
 	ads_removed = bool(data.get("ads_removed", false))
 	starter_pack_owned = bool(data.get("starter_pack_owned", false))
+	run_level = clampi(int(data.get("run_level", 1)), 1, RunLevelLibrary.MAX_RUN_LEVEL)
+	endless_runs_completed = maxi(0, int(data.get("endless_runs_completed", 0)))
+	endless_difficulty = clampi(
+		int(data.get("endless_difficulty", EndlessDifficulty.NORMAL)),
+		EndlessDifficulty.EASY,
+		EndlessDifficulty.HARD,
+	)
 	return true
 
 
@@ -373,10 +395,35 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 	last_loot = sum_seed_bag(last_seed_bag)
 	wallet_coins += last_run_coins
 	_advance_tutorial_after_run()
+	if not last_failed and tutorial_complete:
+		if run_is_endless:
+			endless_runs_completed += 1
+		elif run_level < RunLevelLibrary.MAX_RUN_LEVEL:
+			run_level += 1
 	save_player_save()
 
 
+func is_endless_mode() -> bool:
+	return run_is_endless
+
+
+func get_endless_difficulty_label() -> String:
+	return ENDLESS_DIFFICULTY_LABELS.get(endless_difficulty, "Normal")
+
+
+func uses_run_level_config() -> bool:
+	return tutorial_complete
+
+
+func get_active_run_level_config():
+	if is_endless_mode():
+		return RunLevelLibrary.get_endless_config_for_difficulty(endless_difficulty)
+	return RunLevelLibrary.get_level(run_level)
+
+
 func get_run_duration() -> float:
+	if uses_run_level_config():
+		return get_active_run_level_config().duration_sec
 	if tutorial_complete:
 		return POST_TUTORIAL_RUN_DURATION
 	match tutorial_step:
@@ -472,6 +519,18 @@ func format_loot_outcome_detail() -> String:
 
 func has_pending_loot() -> bool:
 	return last_run_coins > 0 or last_loot > 0
+
+
+func begin_campaign_run() -> void:
+	run_is_endless = false
+	begin_fresh_run()
+
+
+func begin_endless_run(difficulty: int) -> void:
+	endless_difficulty = clampi(difficulty, EndlessDifficulty.EASY, EndlessDifficulty.HARD)
+	run_is_endless = true
+	begin_fresh_run()
+	save_player_save()
 
 
 func begin_fresh_run() -> void:

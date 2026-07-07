@@ -99,6 +99,8 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
 ## 2026-07-07
 
+- **M8 D1 run leveli** — `levels_1_10.json` + `RunLevelLibrary` curve 11–100; HUD `Lv X · Ys`; save `run_level`
+- **M8 D2 endless** — main menu sekcija; Easy/Normal/Hard (Lv 20/50/85, spawn ×0.9); odvojeno od kampanje
 - **C4 iOS pipeline** — `export_presets.cfg` (Android Debug + iOS), GitHub Actions `ios-xcode-export.yml`, `ios-export.md`
 - **C4 safe area** — `safe_area_helper.gd` na run HUD + settings gumbima
 - **C3 AdManager** — rewarded stub (~1s) za Double/Revive; hook za Poing AdMob plugin

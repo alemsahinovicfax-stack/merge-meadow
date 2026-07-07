@@ -22,18 +22,19 @@ Svaki **run level** = jedna JSON/Resource konfiguracija (trajanje, spawn, pretra
 
 ## Curve sažetak
 
-| Raspon | Trajanje | Prepreke | Cilj |
-|--------|----------|----------|------|
-| 1–10 | 50–60 s | Rijetke | Tutorial, D1 |
-| 11–40 | 60–75 s | Srednje | Tjedan 1 |
-| 41–70 | 75–90 s | Gušće | Mid-game |
-| 71–100 | 90 s | Najgušće | Pre-endless |
+| Raspon | Trajanje | Prepreke | Cilj | Izvor |
+|--------|----------|----------|------|-------|
+| 1–10 | 50–60 s | Rijetke | Tutorial, D1 | `levels_1_10.json` |
+| 11–40 | 60–75 s | Srednje | Tjedan 1 | `RunLevelLibrary._generate_curve_level` |
+| 41–70 | 75–90 s | Gušće | Mid-game | isto |
+| 71–100 | 90 s | Najgušće | Pre-endless | isto |
 | Endless | Procedural | Rampa | Post-launch grind |
 
 ## Endless mode
 
-- Bazira se na level 50+ poolu
-- Blago smanjen `orb_spawn` da kontrolira inflaciju
+- **Stub (M8 D2):** odvojeno od kampanje — u main menuu nakon tutoriala; tri težine (Easy / Normal / Hard) kao placeholder smajliji
+- Svaka težina koristi fiksni config baziran na Lv **20 / 50 / 85**, spawn ×0.9
+- Kampanja ostaje Lv 1–100 preko gumba **Play**
 - Generator detalji — **mjesec 2** (post-launch)
 
 ## Vertical slice (M7)

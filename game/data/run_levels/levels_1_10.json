@@ -1,0 +1,14 @@
+{
+  "levels": [
+    { "id": 1, "duration_sec": 50, "spawn_interval": 1.35, "spawn_chance": 0.62, "obstacle_chance": 0.05, "pickup_seed_chance": 0.28 },
+    { "id": 2, "duration_sec": 51, "spawn_interval": 1.32, "spawn_chance": 0.64, "obstacle_chance": 0.06, "pickup_seed_chance": 0.28 },
+    { "id": 3, "duration_sec": 52, "spawn_interval": 1.30, "spawn_chance": 0.65, "obstacle_chance": 0.07, "pickup_seed_chance": 0.29 },
+    { "id": 4, "duration_sec": 53, "spawn_interval": 1.28, "spawn_chance": 0.66, "obstacle_chance": 0.08, "pickup_seed_chance": 0.29 },
+    { "id": 5, "duration_sec": 54, "spawn_interval": 1.26, "spawn_chance": 0.67, "obstacle_chance": 0.09, "pickup_seed_chance": 0.29 },
+    { "id": 6, "duration_sec": 56, "spawn_interval": 1.24, "spawn_chance": 0.68, "obstacle_chance": 0.10, "pickup_seed_chance": 0.30 },
+    { "id": 7, "duration_sec": 57, "spawn_interval": 1.22, "spawn_chance": 0.68, "obstacle_chance": 0.11, "pickup_seed_chance": 0.30 },
+    { "id": 8, "duration_sec": 58, "spawn_interval": 1.20, "spawn_chance": 0.69, "obstacle_chance": 0.12, "pickup_seed_chance": 0.30 },
+    { "id": 9, "duration_sec": 59, "spawn_interval": 1.18, "spawn_chance": 0.70, "obstacle_chance": 0.14, "pickup_seed_chance": 0.30 },
+    { "id": 10, "duration_sec": 60, "scroll_speed_mult": 1.05, "spawn_interval": 1.12, "spawn_chance": 0.71, "obstacle_chance": 0.16, "pickup_seed_chance": 0.30 }
+  ]
+}

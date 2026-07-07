@@ -1,7 +1,7 @@
 ---
 type: produkcija
 status: aktivan
-milestone: M7
+milestone: M8
 tags: [produkcija, checkpoint, operativa]
 povezano:
   - RADIONICA-razvoj
@@ -9,11 +9,11 @@ povezano:
   - scope-i-granice
 ai_sažetak: "Operativni hub — frontmatter prvo; prva [ ] u aktivnoj sekciji je sljedeći korak."
 trenutna_faza: 5
-podfaza: vertical-slice
-aktivna_sekcija: C
+podfaza: launch-prep
+aktivna_sekcija: D
 b0_aktivan: false
-sljedeci_korak: "C4 — pokreni iOS export (GHA ili Mac) → build na iPhone"
-zadnja_sesija: "C4 init — iOS export preset, GHA workflow, safe area, ios-export.md"
+sljedeci_korak: "D3 — shop production (remove ads + starter pack)"
+zadnja_sesija: "D2 — endless u main menuu (Easy/Normal/Hard, odvojeno od kampanje)"
 zadnje_azurirano: 2026-07-07
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
@@ -289,8 +289,8 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sekcija D — Launch prep (nakon M7)
 
-- [ ] 100 run level konfiguracija
-- [ ] Endless mode
+- [x] 100 run level konfiguracija — **D1a** JSON 1–10 + **D1b** curve 11–100 (`RunLevelLibrary`)
+- [x] Endless mode — **D2 stub** main menu, Easy/Normal/Hard (Lv 20/50/85 base, spawn ×0.9), odvojeno od kampanje 1–100
 - [ ] Shop: remove ads + starter pack
 - [ ] EN store listing + screenshots
 - [ ] Google Play internal test

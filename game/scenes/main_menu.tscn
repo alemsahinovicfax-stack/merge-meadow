@@ -62,9 +62,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -320.0
-offset_top = -300.0
+offset_top = -360.0
 offset_right = 320.0
-offset_bottom = 300.0
+offset_bottom = 360.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
@@ -111,6 +111,60 @@ label_text = "Play"
 font_size = 40
 button_icon = "play"
 button_variant = "primary"
+
+[node name="EndlessSection" type="VBoxContainer" parent="Panel/VBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="EndlessTitle" type="Label" parent="Panel/VBox/EndlessSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.65, 0.58, 1)
+theme_override_font_sizes/font_size = 28
+text = "Endless"
+horizontal_alignment = 1
+
+[node name="EndlessPlayButton" type="PanelContainer" parent="Panel/VBox/EndlessSection"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "Play Endless"
+font_size = 32
+button_icon = "play"
+button_variant = "accent"
+
+[node name="DifficultyRow" type="HBoxContainer" parent="Panel/VBox/EndlessSection"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="EasyButton" type="PanelContainer" parent="Panel/VBox/EndlessSection/DifficultyRow"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "😊
+Easy"
+font_size = 28
+button_variant = "subtle"
+
+[node name="NormalButton" type="PanelContainer" parent="Panel/VBox/EndlessSection/DifficultyRow"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "😐
+Normal"
+font_size = 28
+button_variant = "primary"
+
+[node name="HardButton" type="PanelContainer" parent="Panel/VBox/EndlessSection/DifficultyRow"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "😰
+Hard"
+font_size = 28
+button_variant = "subtle"
 
 [node name="CampButton" type="PanelContainer" parent="Panel/VBox"]
 visible = false

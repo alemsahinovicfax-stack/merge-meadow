@@ -34,6 +34,11 @@ var elapsed: float = 0.0
 var coin_count: int = 0
 var seeds_by_type: Dictionary = {}
 var spawn_timer: float = 0.0
+var _spawn_interval: float = SPAWN_INTERVAL
+var _spawn_chance: float = SPAWN_CHANCE
+var _obstacle_chance: float = OBSTACLE_CHANCE
+var _pickup_seed_chance: float = PICKUP_SEED_CHANCE
+var _scroll_speed_base: float = BASE_SCROLL_SPEED
 var _guaranteed_seed_done: bool = false
 var _coins_callout_done: bool = false
 var _coins_callout_hide_at: float = -1.0
@@ -112,7 +117,7 @@ func _reset_common() -> void:
 		if not _world_ready:
 			_setup_world()
 	_state = 0
-	scroll_speed = BASE_SCROLL_SPEED
+	_apply_run_level_config()
 	spawn_timer = 0.0
 	_clear_world_entities()
 	player.reset_lane()
@@ -134,10 +139,10 @@ func _process(delta: float) -> void:
 	_update_tutorial_run_events()
 
 	var ramp_level := int(elapsed / RAMP_EVERY)
-	scroll_speed = BASE_SCROLL_SPEED * pow(1.0 + RAMP_STEP, ramp_level)
+	scroll_speed = _scroll_speed_base * pow(1.0 + RAMP_STEP, ramp_level)
 
 	spawn_timer += delta
-	if spawn_timer >= SPAWN_INTERVAL:
+	if spawn_timer >= _spawn_interval:
 		spawn_timer = 0.0
 		_try_spawn()
 
@@ -212,14 +217,30 @@ func _spawn_obstacle_at_lane(lane: int) -> void:
 	world.add_child(obstacle)
 
 
+func _apply_run_level_config() -> void:
+	_scroll_speed_base = BASE_SCROLL_SPEED
+	_spawn_interval = SPAWN_INTERVAL
+	_spawn_chance = SPAWN_CHANCE
+	_obstacle_chance = OBSTACLE_CHANCE
+	_pickup_seed_chance = PICKUP_SEED_CHANCE
+	if not GameState.uses_run_level_config():
+		return
+	var cfg = GameState.get_active_run_level_config()
+	_scroll_speed_base = BASE_SCROLL_SPEED * cfg.scroll_speed_mult
+	_spawn_interval = cfg.spawn_interval
+	_spawn_chance = cfg.spawn_chance
+	_obstacle_chance = cfg.obstacle_chance
+	_pickup_seed_chance = cfg.pickup_seed_chance
+
+
 func _try_spawn() -> void:
-	if randf() > SPAWN_CHANCE:
+	if randf() > _spawn_chance:
 		return
 
 	var lane := randi() % 3
 	var spawn_pos := Vector2(lane_x_positions[lane], -80.0)
 
-	if GameState.obstacles_enabled_for_run() and randf() < OBSTACLE_CHANCE:
+	if GameState.obstacles_enabled_for_run() and randf() < _obstacle_chance:
 		var obstacle := _obstacle_scene.instantiate()
 		obstacle.position = spawn_pos
 		world.add_child(obstacle)
@@ -239,7 +260,7 @@ func _try_spawn() -> void:
 
 
 func _effective_seed_spawn_chance() -> float:
-	var chance := PICKUP_SEED_CHANCE
+	var chance := _pickup_seed_chance
 	if not GameState.get_loadout_type().is_empty():
 		chance += GameState.LOADOUT_SPAWN_BONUS
 	return minf(chance, 0.85)
@@ -279,4 +300,12 @@ func _update_hud() -> void:
 	else:
 		loadout_label.visible = false
 	var remaining := maxf(0.0, GameState.get_run_duration() - elapsed)
-	timer_label.text = "%ds" % int(ceil(remaining))
+	if GameState.is_endless_mode():
+		timer_label.text = "Endless · %s · %ds" % [
+			GameState.get_endless_difficulty_label(),
+			int(ceil(remaining)),
+		]
+	elif GameState.uses_run_level_config():
+		timer_label.text = "Lv %d · %ds" % [GameState.run_level, int(ceil(remaining))]
+	else:
+		timer_label.text = "%ds" % int(ceil(remaining))

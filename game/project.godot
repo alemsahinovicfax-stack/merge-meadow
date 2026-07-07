@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+RunLevelLibrary="*res://scripts/run/run_level_library.gd"
 GameState="*res://scripts/autoload/game_state.gd"
 SceneRouter="*res://scripts/autoload/scene_router.gd"
 AdManager="*res://scripts/monetization/ad_manager.gd"

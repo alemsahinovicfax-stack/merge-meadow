@@ -7,7 +7,7 @@ extends RefCounted
 static func get_insets(viewport: Viewport) -> Vector4:
 	# top, right, bottom, left (px u viewport koordinatama)
 	var window := viewport.get_window()
-	if window == null:
+	if window == null or not window.has_method("get_window_safe_area"):
 		return Vector4.ZERO
 	var safe: Rect2i = window.get_window_safe_area()
 	var size := window.get_size()
