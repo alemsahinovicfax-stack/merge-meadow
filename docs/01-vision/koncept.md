@@ -24,7 +24,7 @@ Zašto ova igra, a ne druga slična?
 
 1. **Run + merge u jednom paketu** — lane collector daje 3–5 kratkih sesija dnevno (oglasi); merge kamp daje razlog za povratak sutra (IAP + retention).
 2. **Monetizacija ugrađena u loop** — rewarded revive/dupli loot na kraju runa; IAP na remove ads i impatijenciju (speed-up merge), ne na paywall corea.
-3. **Cute pastel + flat/pixel** — širok appeal na globalnom EN storeu bez AAA art budžeta; dovoljno distinct za screenshot/TikTok hook.
+3. **Cute pastel + flat cartoon** — širok appeal na globalnom EN storeu bez AAA art budžeta; dovoljno distinct za screenshot/TikTok hook.
 
 ## Igrački obećaj (player promise)
 

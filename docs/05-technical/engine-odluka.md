@@ -50,7 +50,7 @@ decision: godot-4
 
 **Odabir:** Godot **4.3+** (stabilna 4.x grana)
 
-**Zašto:** Merge Meadow je **2D flat + pixel UI** — Godot pokriva sve mehanike (lane, merge UI, tweens) uz minimalne zahtjeve na stroju. Brži path do `game/` foldera = brži path do storea i prihoda. Unity bi bio overkill i opterećujući za development na slabijem laptopu.
+**Zašto:** Merge Meadow je **2D flat cartoon** — Godot pokriva lane, merge UI, tweens uz minimalne zahtjeve na stroju.
 
 ## Tehnički stack (draft)
 

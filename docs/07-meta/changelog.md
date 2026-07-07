@@ -81,6 +81,12 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 - **F2 dvije valute u runu** — zlatni novčići (~70% pickupa) + zeleno Clover sjeme ★ (~30%); HUD Coins/Seeds; loot ekran oboje; `wallet_coins`; revive nosi coins+seeds. Stari `orb.tscn` zamijenjen `seed_pickup` + `coin`.
 - **Bugfix run raspad** — viewport 0×0 u `_ready()` → Pip u (0,0), bez laneova; `_wait_for_viewport()` + `Line2D` guideovi. Fail: **50% sjemena i 50% novčića**. Scratch: progress traka umjesto tajmera; pitanja ekonomije/kamp brojača (`ideje-gameplay-ekonomija`).
 
+## 2026-07-05
+
+- **Art smjer:** **flat cartoon** cijela igra — bez pixel grida. Ažurirano: art-direction, ui-i-art-alati, scope, pitch, CHECKPOINT C2.
+- **C2 alati:** Krita/Figma (Pip), Kenney flat UI.
+- **C1½ save** — `user://player_save.json` v1; balans pass 1 (60 s run); fail/finish loot UI; UX-01 Main menu u kampu.
+
 ## 2026-07-04
 
 - **F3 loot inventar po tipu** — `finish_run(seeds_by_type, coins, …)`; `last_seed_bag` / `carry_seed_bag`; loot ekran `+X Coins` / `+Y Clover`; `deposit_loot_to_camp()` deponira po tipu u slotove. `RUN_DURATION` ostaje **20 s** za playtest.
@@ -89,8 +95,22 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 - **F5 loadout** — 1 basket slot, +5% spawn; debug 20 coins + 20 seeds u kampu.
 - **F6 tutorial** — Run1 45s / Run2 60s, vođenje, loadout nakon mergea.
 - **F7 playtest ✅** — DoD prošao.
-- **Post-tutorial hub** — main menu **Play** + **Camp**; `user://tutorial_flags.json`; save fix na prvi T2 merge.
-- **Ideje workflow** — [[ideje-kad-predloziti|ideje-kad-predloziti]] + rule `.cursor/rules/ideje-kad-predloziti.mdc`; backlog **UX-01** Main menu u kampu.
+- **Post-tutorial hub** — main menu **Play** + **Camp**; tutorial save.
+
+## 2026-07-07
+
+- **C4 iOS pipeline** — `export_presets.cfg` (Android Debug + iOS), GitHub Actions `ios-xcode-export.yml`, `ios-export.md`
+- **C4 safe area** — `safe_area_helper.gd` na run HUD + settings gumbima
+- **C3 AdManager** — rewarded stub (~1s) za Double/Revive; hook za Poing AdMob plugin
+- **C3 IAPManager** — shop ekran (remove ads, starter pack); save `ads_removed` / `starter_pack_owned`
+- **C2 Kenney UI ikone** — 6 PNG iz `game-icons` (settings, wallet, retry, home, revive, double) → loot + kamp + main menu
+- **C2 pastel gumbi** — `ui_palette.gd`; `UiClickButton` varijante primary/accent/secondary/subtle; paneli warm white / mint
+- **C2 play ikona** — Figma Make `Play Button.make` zamijenio tamni placeholder
+
+## 2026-07-06
+
+- **Godot asset import** — `godot-import.ps1`; `godot-run.ps1` auto-import; rule `godot-assets-import.mdc`; greske-katalog #6 (nevidljiv sprite)
+- **C2 Pip sprite** — izvučen iz Figma Make `.make` exporta; `pip_idle.svg` u `game/assets/sprites/`; `PipDraw` zamijenjen `Sprite2D` (run) + texture draw (main menu, HUD badge)
 
 ## Template za nove unose
 

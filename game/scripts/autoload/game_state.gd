@@ -4,6 +4,7 @@ const SCENE_MAIN := "res://scenes/main_menu.tscn"
 const SCENE_RUN := "res://scenes/run/run_scene.tscn"
 const SCENE_LOOT := "res://scenes/ui/loot_screen.tscn"
 const SCENE_CAMP := "res://scenes/camp/camp_scene.tscn"
+const SCENE_SHOP := "res://scenes/ui/shop_screen.tscn"
 
 const CAMP_BED_COUNT := 9
 const GREENHOUSE_SLOT_COUNT := 2
@@ -38,21 +39,24 @@ const MAGNET_RADIUS_PER_LEVEL := 48.0
 const LOADOUT_SLOT_COUNT := 1
 const LOADOUT_SPAWN_BONUS := 0.05
 
-# Playtest — bez savea; reset na ulasku u kamp / boot.
+# Playtest — DEBUG seeda samo kad nema save datoteke (prvi boot).
 const DEBUG_DEV_RESOURCES := true
 const DEBUG_WALLET_COINS := 20
 const DEBUG_SEED_COUNT := 20
 
 const TUTORIAL_RUN1_DURATION := 45.0
 const TUTORIAL_RUN2_DURATION := 60.0
-const PLAYTEST_RUN_DURATION := 20.0
+const POST_TUTORIAL_RUN_DURATION := 60.0
 
 enum TutorialStep { RUN1, CAMP1, RUN2, CAMP_MERGE, FREE }
 
 const TUTORIAL_FLAGS_PATH := "user://tutorial_flags.json"
+const PLAYER_SAVE_PATH := "user://player_save.json"
+const SAVE_VERSION := 1
 
 var last_seed_bag: Dictionary = {}
 var last_run_coins: int = 0
+var last_raw_coins: int = 0
 var last_loot: int = 0
 var wallet_coins: int = 0
 var last_failed: bool = false
@@ -78,6 +82,8 @@ var sprinkler_donations: int = 0
 var discovered_blooms: Dictionary = {}
 var tutorial_step: int = TutorialStep.RUN1
 var tutorial_complete: bool = false
+var ads_removed: bool = false
+var starter_pack_owned: bool = false
 
 # Jedan slot: type_id iz baga → +LOADOUT_SPAWN_BONUS šanse za sjeme u runu.
 var loadout_type_id: String = ""
@@ -86,13 +92,120 @@ var loadout_type_id: String = ""
 func _ready() -> void:
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
-	load_tutorial_flags()
-	reset_garden_beds()
-	reset_greenhouse_beds()
-	apply_debug_resources()
+	if not load_player_save():
+		reset_garden_beds()
+		reset_greenhouse_beds()
+		_try_migrate_tutorial_flags_only()
+		_apply_debug_resources_if_new_game()
 
 
-func load_tutorial_flags() -> void:
+func load_player_save() -> bool:
+	if not FileAccess.file_exists(PLAYER_SAVE_PATH):
+		return false
+	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.READ)
+	if file == null:
+		return false
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if not parsed is Dictionary:
+		return false
+	return _apply_save_dict(parsed)
+
+
+func save_player_save() -> void:
+	var data := {
+		"version": SAVE_VERSION,
+		"tutorial_complete": tutorial_complete,
+		"tutorial_step": tutorial_step,
+		"wallet_coins": wallet_coins,
+		"seed_bag": seed_bag.duplicate(),
+		"magnet_level": magnet_level,
+		"sprinkler_donations": sprinkler_donations,
+		"loadout_type_id": loadout_type_id,
+		"discovered_blooms": discovered_blooms.duplicate(),
+		"garden_beds": _serialize_beds(garden_beds),
+		"greenhouse_beds": _serialize_beds(greenhouse_beds),
+		"ads_removed": ads_removed,
+		"starter_pack_owned": starter_pack_owned,
+	}
+	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.WRITE)
+	if file == null:
+		push_error("GameState: could not write %s" % PLAYER_SAVE_PATH)
+		return
+	file.store_string(JSON.stringify(data))
+
+
+func _apply_save_dict(data: Dictionary) -> bool:
+	if int(data.get("version", 0)) < SAVE_VERSION:
+		return false
+	tutorial_complete = bool(data.get("tutorial_complete", false))
+	tutorial_step = int(data.get("tutorial_step", TutorialStep.RUN1))
+	if tutorial_complete:
+		tutorial_step = TutorialStep.FREE
+	wallet_coins = maxi(0, int(data.get("wallet_coins", 0)))
+	seed_bag = _parse_string_int_dict(data.get("seed_bag", {}))
+	magnet_level = clampi(int(data.get("magnet_level", 0)), 0, MAGNET_MAX_LEVEL)
+	sprinkler_donations = maxi(0, int(data.get("sprinkler_donations", 0)))
+	loadout_type_id = str(data.get("loadout_type_id", ""))
+	discovered_blooms = _parse_string_bool_dict(data.get("discovered_blooms", {}))
+	garden_beds = _deserialize_beds(data.get("garden_beds", []), CAMP_BED_COUNT)
+	greenhouse_beds = _deserialize_beds(data.get("greenhouse_beds", []), GREENHOUSE_SLOT_COUNT)
+	ads_removed = bool(data.get("ads_removed", false))
+	starter_pack_owned = bool(data.get("starter_pack_owned", false))
+	return true
+
+
+func _serialize_beds(beds: Array) -> Array:
+	var out: Array = []
+	for bed in beds:
+		if bed == null:
+			out.append(null)
+		else:
+			out.append({
+				"type_id": str(bed.get("type_id", "")),
+				"tier": int(bed.get("tier", 0)),
+			})
+	return out
+
+
+func _deserialize_beds(data: Variant, expected: int) -> Array:
+	var beds: Array = []
+	var src: Array = data if data is Array else []
+	for i in expected:
+		if i < src.size() and src[i] is Dictionary:
+			var d: Dictionary = src[i]
+			var type_id := str(d.get("type_id", ""))
+			var tier := int(d.get("tier", 0))
+			if type_id.is_empty() or tier <= 0:
+				beds.append(null)
+			else:
+				beds.append({"type_id": type_id, "tier": tier})
+		else:
+			beds.append(null)
+	return beds
+
+
+func _parse_string_int_dict(data: Variant) -> Dictionary:
+	var out: Dictionary = {}
+	if not data is Dictionary:
+		return out
+	for key in data:
+		var count := int(data[key])
+		if count > 0:
+			out[str(key)] = count
+	return out
+
+
+func _parse_string_bool_dict(data: Variant) -> Dictionary:
+	var out: Dictionary = {}
+	if not data is Dictionary:
+		return out
+	for key in data:
+		if bool(data[key]):
+			out[str(key)] = true
+	return out
+
+
+func _try_migrate_tutorial_flags_only() -> void:
 	if not FileAccess.file_exists(TUTORIAL_FLAGS_PATH):
 		return
 	var file := FileAccess.open(TUTORIAL_FLAGS_PATH, FileAccess.READ)
@@ -105,12 +218,13 @@ func load_tutorial_flags() -> void:
 			tutorial_step = TutorialStep.FREE
 
 
-func save_tutorial_flags() -> void:
-	var file := FileAccess.open(TUTORIAL_FLAGS_PATH, FileAccess.WRITE)
-	if file == null:
-		push_error("GameState: could not write %s" % TUTORIAL_FLAGS_PATH)
+func _apply_debug_resources_if_new_game() -> void:
+	if not DEBUG_DEV_RESOURCES:
 		return
-	file.store_string(JSON.stringify({"tutorial_complete": tutorial_complete}))
+	if FileAccess.file_exists(PLAYER_SAVE_PATH):
+		return
+	wallet_coins = DEBUG_WALLET_COINS
+	seed_bag = {SEED_TYPE_CLOVER: DEBUG_SEED_COUNT}
 
 
 func mark_tutorial_complete() -> void:
@@ -118,7 +232,7 @@ func mark_tutorial_complete() -> void:
 		return
 	tutorial_complete = true
 	tutorial_step = TutorialStep.FREE
-	save_tutorial_flags()
+	save_player_save()
 
 
 func reset_garden_beds() -> void:
@@ -139,15 +253,7 @@ func go_to_scene(path: String) -> void:
 
 func go_to_camp() -> void:
 	deposit_loot_to_camp()
-	apply_debug_resources()
 	go_to_scene(SCENE_CAMP)
-
-
-func apply_debug_resources() -> void:
-	if not DEBUG_DEV_RESOURCES:
-		return
-	wallet_coins = DEBUG_WALLET_COINS
-	seed_bag = {SEED_TYPE_CLOVER: DEBUG_SEED_COUNT}
 
 
 func get_loadout_type() -> String:
@@ -182,12 +288,14 @@ func toggle_loadout_from_bag() -> String:
 		return "Fill your basket later — merge your first flower!"
 	if not loadout_type_id.is_empty():
 		clear_loadout()
+		save_player_save()
 		return "Loadout cleared."
 	var type_id := first_seed_type_in_bag(false)
 	if type_id.is_empty():
 		return "No garden seeds in bag for loadout."
 	if set_loadout_from_bag(type_id):
 		var name: String = SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+		save_player_save()
 		return "Equipped %s — more spawns next run!" % name
 	return "Could not set loadout."
 
@@ -248,6 +356,7 @@ func _halve_seed_bag(bag: Dictionary) -> Dictionary:
 
 func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed: float) -> void:
 	last_raw_seed_total = sum_seed_bag(seeds_by_type)
+	last_raw_coins = raw_coins
 	last_failed = failed
 	loot_doubled = false
 	carry_seed_bag = seeds_by_type.duplicate()
@@ -264,18 +373,19 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 	last_loot = sum_seed_bag(last_seed_bag)
 	wallet_coins += last_run_coins
 	_advance_tutorial_after_run()
+	save_player_save()
 
 
 func get_run_duration() -> float:
 	if tutorial_complete:
-		return PLAYTEST_RUN_DURATION
+		return POST_TUTORIAL_RUN_DURATION
 	match tutorial_step:
 		TutorialStep.RUN1:
 			return TUTORIAL_RUN1_DURATION
 		TutorialStep.RUN2:
 			return TUTORIAL_RUN2_DURATION
 		_:
-			return PLAYTEST_RUN_DURATION
+			return POST_TUTORIAL_RUN_DURATION
 
 
 func obstacles_enabled_for_run() -> bool:
@@ -309,6 +419,7 @@ func notify_camp_play() -> void:
 		return
 	if tutorial_step == TutorialStep.CAMP1:
 		tutorial_step = TutorialStep.RUN2
+		save_player_save()
 
 
 func _advance_tutorial_after_run() -> void:
@@ -319,6 +430,7 @@ func _advance_tutorial_after_run() -> void:
 			tutorial_step = TutorialStep.CAMP1
 		TutorialStep.RUN2:
 			tutorial_step = TutorialStep.CAMP_MERGE
+	save_player_save()
 
 
 func _notify_merge_completed() -> void:
@@ -341,6 +453,21 @@ func format_loot_label() -> String:
 	if lines.is_empty():
 		return "+0"
 	return "\n".join(lines)
+
+
+func format_loot_outcome_detail() -> String:
+	if last_failed:
+		var parts: PackedStringArray = []
+		if last_raw_coins > 0:
+			parts.append("%d → %d coins" % [last_raw_coins, last_run_coins])
+		if last_raw_seed_total > 0:
+			parts.append("%d → %d seeds" % [last_raw_seed_total, last_loot])
+		if parts.is_empty():
+			return "Obstacle hit — you keep half of what you pick up."
+		return "Obstacle hit — kept 50%%: " + ", ".join(parts) + "."
+	if last_run_coins > 0 or last_loot > 0:
+		return "Full rewards — Pip reached the finish!"
+	return "Run complete. Head to camp or try again!"
 
 
 func has_pending_loot() -> bool:
@@ -370,6 +497,7 @@ func double_loot_placeholder() -> bool:
 		wallet_coins += last_run_coins
 		last_run_coins *= 2
 	loot_doubled = true
+	save_player_save()
 	return true
 
 
@@ -413,6 +541,7 @@ func deposit_loot_to_camp() -> int:
 			deposited += count
 		last_seed_bag.erase(type_id)
 	last_loot = sum_seed_bag(last_seed_bag)
+	save_player_save()
 	return deposited
 
 
@@ -455,6 +584,7 @@ func plant_seed_in_bed(bed_index: int, type_id: String, in_greenhouse: bool = fa
 	if not take_seed_from_bag(type_id):
 		return false
 	beds[bed_index] = {"type_id": type_id, "tier": 1}
+	save_player_save()
 	return true
 
 
@@ -479,6 +609,7 @@ func try_merge_beds(index_a: int, index_b: int, in_greenhouse: bool = false) -> 
 	if tier + 1 >= 2:
 		discovered_blooms[type_id] = true
 		_notify_merge_completed()
+	save_player_save()
 	return true
 
 
@@ -522,6 +653,7 @@ func exchange_seeds_from_bag(type_id: String) -> bool:
 	if not take_seeds_from_bag(type_id, EXCHANGE_SEED_COUNT):
 		return false
 	wallet_coins += EXCHANGE_COINS_REWARD
+	save_player_save()
 	return true
 
 
@@ -538,6 +670,7 @@ func donate_bloom_from_bed(bed_index: int, in_greenhouse: bool = false) -> bool:
 		return false
 	beds[bed_index] = null
 	sprinkler_donations += 1
+	save_player_save()
 	return true
 
 
@@ -548,6 +681,7 @@ func try_upgrade_magnet() -> bool:
 		return false
 	sprinkler_donations = 0
 	magnet_level += 1
+	save_player_save()
 	return true
 
 

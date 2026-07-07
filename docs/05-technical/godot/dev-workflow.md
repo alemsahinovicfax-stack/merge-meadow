@@ -57,6 +57,21 @@ Provjeri da se projekt i scena učitaju bez grešaka, bez GUI-a:
 - `--quit-after N` = odradi N frame-ova pa izađi.
 - Ako konzola pokaže `SCRIPT ERROR` → popravi prije nego što otvoriš editor.
 
+**Desktop prozor (portrait kao telefon):** `project.godot` → `stretch/aspect=keep` + početni prozor 540×960. Viewport ostaje 1080×1920; široki monitor = crne trake lijevo/desno, ne širenje scene.
+
+## 2b. Import novih asseta (PNG/SVG)
+
+Kad dodaš fajl u `game/assets/` (ručno ili iz Figme):
+
+```powershell
+.\scripts\godot-import.ps1
+```
+
+`godot-run.ps1` i `godot-open.ps1` pozivaju import **automatski** prije play/editora.
+
+- Commitaj **`*.import`** uz asset (npr. `pip_idle.svg.import`) — inače `load()` = null na drugom računalu.
+- Vidi [[greske-katalog#6|greske-katalog #6]] (nevidljiv sprite).
+
 ## 3. F5 u editoru
 
 - Emulacija touch mišem je uključena (`emulate_touch_from_mouse`) — vidi [[input-touch|input-touch]].

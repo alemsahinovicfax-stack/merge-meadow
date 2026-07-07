@@ -16,7 +16,7 @@ Cute pastel ljubimci — cosmetic + flavor, bez borbenih statova u v1.
 | Unlock | Od starta |
 | Uloga | Tutorial companion, lane run sprite |
 | Bonus v1 | Cosmetic only |
-| Vizual | Bijeli/zelenkasti, pixel portrait |
+| Vizual | Bijeli/zelenkasti, **flat cartoon** portrait |
 
 ### Mochi (cat) — unlock kamp Lv.2
 

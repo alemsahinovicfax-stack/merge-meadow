@@ -67,6 +67,20 @@ Pri **Create New Project** odaberi renderer **Compatibility** (ne Forward+).
 
 U postojećem projektu: **Project → Project Settings → Rendering → Renderer → Rendering Method** = `gl_compatibility`.
 
+## Prozor igre na desktopu (portrait kao telefon)
+
+Problem: širok prozor razvlači viewport → lane pozadina i putovi se ne poklapaju.
+
+U `game/project.godot`:
+
+| Postavka | Vrijednost |
+|----------|------------|
+| `viewport` | 1080 × 1920 |
+| `stretch/aspect` | **`keep`** (ne `expand`) |
+| Početni prozor | 540 × 960 (polovica, udobno na laptopu) |
+
+Efekt: omjer uvijek 9:16 kao na telefonu; na širokom monitoru crne trake lijevo/desno. Možeš resizeati prozor — sadržaj ostaje portrait.
+
 ## Za agenta (Cursor)
 
 - **Ne predlaži** dvostruki klik na Godot exe bez OpenGL flaga — neće raditi na ovom laptopu.

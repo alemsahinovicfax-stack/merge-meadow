@@ -1,18 +1,24 @@
 extends Control
 
+const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
+const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
+
 @onready var gh_beds_grid: HBoxContainer = $Greenhouse/VBox/GhBedsGrid
 @onready var gh_hint_label: Label = $Greenhouse/VBox/GhHintLabel
 @onready var beds_grid: GridContainer = $GardenLayer/VBox/BedsGrid
 @onready var info_label: Label = $GardenLayer/VBox/InfoLabel
 @onready var seed_bag_label: Label = $GardenLayer/VBox/SeedBagLabel
-@onready var wallet_label: Label = $GardenLayer/VBox/WalletLabel
+@onready var wallet_label: Label = $GardenLayer/VBox/WalletRow/WalletLabel
+@onready var wallet_icon: TextureRect = $GardenLayer/VBox/WalletRow/WalletIcon
 @onready var collection_label: Label = $GardenLayer/VBox/CollectionLabel
 @onready var sprinkler_label: Label = $GardenLayer/VBox/SprinklerLabel
 @onready var donate_button: UiClickButton = $GardenLayer/VBox/ActionRow/DonateButton
 @onready var upgrade_button: UiClickButton = $GardenLayer/VBox/ActionRow/UpgradeButton
 @onready var exchange_button: UiClickButton = $GardenLayer/VBox/ExchangeButton
 @onready var loadout_button: UiClickButton = $GardenLayer/VBox/LoadoutButton
+@onready var main_menu_button: UiClickButton = $GardenLayer/VBox/MainMenuButton
 @onready var play_button: UiClickButton = $GardenLayer/VBox/PlayButton
+@onready var settings_button: UiClickButton = $SettingsButton
 
 var _selected_garden: int = -1
 var _selected_greenhouse: int = -1
@@ -23,20 +29,34 @@ var _planted_during_camp1: bool = false
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_process_input(true)
+	set_process_unhandled_input(true)
 	GameState.ensure_loot_in_camp_bag()
-	GameState.apply_debug_resources()
 	donate_button.clicked.connect(_on_donate_pressed)
 	upgrade_button.clicked.connect(_on_upgrade_pressed)
 	exchange_button.clicked.connect(_on_exchange_pressed)
 	loadout_button.clicked.connect(_on_loadout_pressed)
+	main_menu_button.clicked.connect(_on_main_menu_pressed)
 	play_button.clicked.connect(_on_play_pressed)
+	_setup_wallet_icon()
+	_setup_safe_area()
 	_build_garden_beds()
 	_build_greenhouse_beds()
 	_refresh_ui()
 
 
-func _input(event: InputEvent) -> void:
+func _setup_wallet_icon() -> void:
+	var tex := UI_ASSETS.get_kenney_icon("wallet")
+	if wallet_icon and tex:
+		wallet_icon.texture = tex
+
+
+func _setup_safe_area() -> void:
+	if settings_button:
+		SAFE_AREA.apply_top_margin(settings_button, 8.0)
+		SAFE_AREA.apply_horizontal_margins(settings_button)
+
+
+func _unhandled_input(event: InputEvent) -> void:
 	if not _is_primary_click_release(event):
 		return
 	var pos := _event_position(event)
@@ -62,6 +82,10 @@ func _event_position(event: InputEvent) -> Vector2:
 
 
 func _route_click(pos: Vector2) -> bool:
+	if _hit_control(main_menu_button, pos):
+		_on_main_menu_pressed()
+		return true
+
 	if _hit_control(play_button, pos) and not play_button.disabled:
 		_on_play_pressed()
 		return true
@@ -94,16 +118,6 @@ func _route_click(pos: Vector2) -> bool:
 	if _hit_control(loadout_button, pos):
 		_on_loadout_pressed()
 		return true
-
-	for i in _garden_buttons.size():
-		if _hit_control(_garden_buttons[i], pos):
-			_on_garden_bed_tapped(i)
-			return true
-
-	for i in _gh_buttons.size():
-		if _hit_control(_gh_buttons[i], pos):
-			_on_greenhouse_bed_tapped(i)
-			return true
 
 	return false
 
@@ -331,6 +345,10 @@ func _on_loadout_pressed() -> void:
 	var status := GameState.toggle_loadout_from_bag()
 	info_label.text = status
 	_refresh_ui()
+
+
+func _on_main_menu_pressed() -> void:
+	SceneRouter.change_to(GameState.SCENE_MAIN)
 
 
 func _on_play_pressed() -> void:

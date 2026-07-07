@@ -11,7 +11,7 @@ collision_layer = 2
 collision_mask = 0
 script = ExtResource("1_seed")
 
-[node name="SeedVisual" type="Node2D" parent="."]
+[node name="SeedVisual" type="Sprite2D" parent="."]
 z_index = 1
 script = ExtResource("2_visual")
 

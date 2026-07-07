@@ -1,31 +1,35 @@
 ; Engine configuration file.
-; Merge Meadow — M7 vertical slice
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
 config_version=5
 
 [application]
 
 config/name="Merge Meadow"
-config/features=PackedStringArray("4.7", "GL Compatibility")
 run/main_scene="res://scenes/main_menu.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
 GameState="*res://scripts/autoload/game_state.gd"
 SceneRouter="*res://scripts/autoload/scene_router.gd"
+AdManager="*res://scripts/monetization/ad_manager.gd"
+IAPManager="*res://scripts/monetization/iap_manager.gd"
 
 [display]
 
 window/size/viewport_width=1080
 window/size/viewport_height=1920
-window/handheld/orientation=1
+window/size/window_width_override=540
+window/size/window_height_override=960
 window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
-
-[input_devices]
-
-pointing/emulate_touch_from_mouse=false
+window/handheld/orientation=1
 
 [layer_names]
 
@@ -35,3 +39,4 @@ pointing/emulate_touch_from_mouse=false
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true

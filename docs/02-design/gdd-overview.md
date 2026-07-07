@@ -48,7 +48,7 @@ ai_sažetak: "Executive index Merge Meadow — lane run + merge kamp F2P hybrid 
 
 - [[kontrole-i-input|kontrole-i-input]] — portrait, swipe
 - [[../04-experience/ui-ux|ui-ux]] — screen flow
-- [[../04-experience/art-direction|art-direction]] — flat + pixel
+- [[../04-experience/art-direction|art-direction]] — flat cartoon
 
 ## Tehnički sažetak
 

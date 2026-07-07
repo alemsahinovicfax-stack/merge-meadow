@@ -5,6 +5,9 @@ extends PanelContainer
 
 signal clicked
 
+const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
+const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
+
 @export var label_text: String = "":
 	set(value):
 		label_text = value
@@ -15,12 +18,29 @@ signal clicked
 		font_size = value
 		_update_label()
 
+@export_enum("secondary", "primary", "accent", "subtle") var button_variant: String = "secondary":
+	set(value):
+		button_variant = value
+		_build_styles()
+		_apply_panel_style()
+
+@export_enum("none", "play", "settings", "wallet", "retry", "home", "revive", "double") var button_icon: String = "none":
+	set(value):
+		button_icon = value
+		_update_icon()
+
+@export var use_play_icon: bool = false:
+	set(value):
+		use_play_icon = value
+		_update_icon()
+
 var disabled: bool = false:
 	set(value):
 		disabled = value
 		_apply_disabled()
 
-
+var _row: HBoxContainer
+var _icon: TextureRect
 var _label: Label
 var _style_normal: StyleBoxFlat
 var _style_hover: StyleBoxFlat
@@ -34,8 +54,10 @@ func _ready() -> void:
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	focus_mode = Control.FOCUS_NONE
 	_build_styles()
-	_ensure_label()
+	_ensure_content()
 	_update_label()
+	_update_icon()
+	_apply_label_theme()
 	_apply_panel_style()
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
@@ -43,34 +65,52 @@ func _ready() -> void:
 
 
 func _build_styles() -> void:
-	_style_normal = StyleBoxFlat.new()
-	_style_normal.bg_color = Color(0.22, 0.28, 0.34, 1.0)
-	_style_normal.corner_radius_top_left = 12
-	_style_normal.corner_radius_top_right = 12
-	_style_normal.corner_radius_bottom_right = 12
-	_style_normal.corner_radius_bottom_left = 12
-	_style_normal.content_margin_left = 16.0
-	_style_normal.content_margin_top = 12.0
-	_style_normal.content_margin_right = 16.0
-	_style_normal.content_margin_bottom = 12.0
-
-	_style_hover = _style_normal.duplicate() as StyleBoxFlat
-	_style_hover.bg_color = Color(0.28, 0.36, 0.44, 1.0)
-
-	_style_pressed = _style_hover.duplicate() as StyleBoxFlat
-	_style_pressed.bg_color = Color(0.18, 0.24, 0.30, 1.0)
+	_style_normal = UI_PALETTE.button_style(button_variant, "normal")
+	_style_hover = UI_PALETTE.button_style(button_variant, "hover")
+	_style_pressed = UI_PALETTE.button_style(button_variant, "pressed")
 
 
-func _ensure_label() -> void:
-	_label = get_node_or_null("Label") as Label
+func _apply_label_theme() -> void:
+	if _label == null:
+		return
+	_label.add_theme_color_override("font_color", UI_PALETTE.UI_TEXT)
+
+
+func _ensure_content() -> void:
+	_row = get_node_or_null("ContentRow") as HBoxContainer
+	if _row == null:
+		var legacy_label := get_node_or_null("Label") as Label
+		_row = HBoxContainer.new()
+		_row.name = "ContentRow"
+		_row.alignment = BoxContainer.ALIGNMENT_CENTER
+		_row.add_theme_constant_override("separation", 12)
+		_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		if legacy_label:
+			remove_child(legacy_label)
+			_row.add_child(legacy_label)
+		add_child(_row)
+
+	_label = _row.get_node_or_null("Label") as Label
 	if _label == null:
 		_label = Label.new()
 		_label.name = "Label"
-		_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		add_child(_label)
+		_row.add_child(_label)
+
+	_icon = _row.get_node_or_null("Icon") as TextureRect
+	if _icon == null:
+		_icon = TextureRect.new()
+		_icon.name = "Icon"
+		_icon.visible = false
+		_icon.custom_minimum_size = Vector2(UI_ASSETS.BUTTON_ICON_SIZE, UI_ASSETS.BUTTON_ICON_SIZE)
+		_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		_row.add_child(_icon)
+		_row.move_child(_icon, 0)
 
 
 func _update_label() -> void:
@@ -79,6 +119,21 @@ func _update_label() -> void:
 	_label.text = label_text
 	if font_size > 0:
 		_label.add_theme_font_size_override("font_size", font_size)
+	_apply_label_theme()
+
+
+func _update_icon() -> void:
+	if _icon == null:
+		return
+	var tex: Texture2D = null
+	if use_play_icon or button_icon == "play":
+		tex = UI_ASSETS.get_play_icon()
+	elif button_icon != "none":
+		tex = UI_ASSETS.get_kenney_icon(button_icon)
+	_icon.texture = tex
+	_icon.visible = tex != null
+	if tex != null:
+		_icon.modulate = Color.WHITE if button_icon == "play" else UI_PALETTE.ICON_MODULATE
 
 
 func _apply_disabled() -> void:

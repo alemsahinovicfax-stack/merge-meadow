@@ -217,7 +217,7 @@ Redoslijed unutar F8 (može paralelno s artom):
 
 | # | Zadatak | Scope ref |
 |---|---------|-----------|
-| F8.0 | **Main menu gumb u kampu** (UX-01) | [[ideje-kad-predloziti\|ideje-kad-predloziti]] |
+| F8.0 | **Main menu gumb u kampu** (UX-01) ✅ | [[ideje-kad-predloziti\|ideje-kad-predloziti]] |
 | F8.1 | **10 tipova sjemena** (sprite T1+T2) | ideje-gameplay katalog |
 | F8.2 | **Staklenik** 2 slota (K3) za ★★★ | v1 launch |
 | F8.3 | **Dnevnik** lista (bez silueta) | v1 launch 🟡 |

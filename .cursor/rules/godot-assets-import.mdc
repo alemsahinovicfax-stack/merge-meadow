@@ -1,0 +1,47 @@
+---
+description: Godot asset import — novi PNG/SVG mora biti importan prije load(); Figma workflow
+globs: game/assets/**/*
+alwaysApply: false
+---
+
+# Godot asset import (C2+)
+
+## Problem (Pip nevidljiv, 2026-07-06)
+
+Novi fajl u `game/assets/` **nije odmah učitljiv**. `load("res://...")` vraća `null` dok Godot ne napravi `.import` + `.godot/imported/*.ctex`.
+
+- `ResourceLoader.exists(path)` = **false** prije importa
+- `Sprite2D` bez texture = **nevidljiv** (bez errora u UI)
+
+## Obavezno — agent
+
+Kad **dodaš ili mijenjaš** asset u `game/assets/`:
+
+1. Pokreni `.\scripts\godot-import.ps1` (ili `godot-run.ps1` koji import radi automatski)
+2. Commitaj **`*.import`** uz PNG/SVG (npr. `pip_idle.svg.import`) — ne samo raw fajl
+3. U kodu: `PipAssets.get_texture()` + **fallback** na `PipDraw` ako texture null
+4. Headless provjera: `ResourceLoader.exists("res://assets/...")` prije playtesta
+
+```powershell
+.\scripts\godot-import.ps1
+& "$env:USERPROFILE\Desktop\Godot_v4.7-stable_win64.exe" --headless --rendering-driver opengl3 --path "game" -s "res://tools/pip_texture_test.gd"
+```
+
+## Figma → igra (što agent može)
+
+| Izvor | Agent može? | Napomena |
+|-------|-------------|----------|
+| **Export PNG** u `game/assets/` | ✅ Da | Najpouzdanije — transparent 256×256 |
+| **Figma Make `.make`** u Downloads | ✅ Da | ZIP: SVG iz `ai_chat.json` ili raster iz `images/`; **nije** gotov game asset |
+| **Figma URL / cloud** | ⚠️ Ograničeno | Treba Figma MCP auth + link na frame; nije uvijek dostupno |
+| **Dvostruki klik `.make`** | ❌ | To je Figma projekt, ne sprite |
+
+**Korisnik:** Figma → Export **PNG** (transparent) → `game/assets/sprites/` → reci agentu „dodaj u kod“.
+
+**Agent:** import → `pip_assets.gd` / scena → smoke-test → `godot-run.ps1`.
+
+## Reference
+
+- `docs/05-technical/godot/greske-katalog.md` #6
+- `docs/04-experience/ui-i-art-alati.md` — Figma workflow
+- `scripts/godot-import.ps1`

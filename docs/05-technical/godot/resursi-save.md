@@ -12,7 +12,7 @@ ai_sažetak: "preload vs load, .tres resursi za level/balans config, JSON save u
 
 # Resursi i save
 
-> ⚠️ **M6 greybox nema save ni perzistenciju.** Brojač je lokalan i nestaje na restart. Ovaj doc je priprema za **M7** (kamp, upgradei, balans config). Čitaj kad kreneš C1.
+> ⚠️ **M6 greybox nema save.** M7 slice: minimalni `user://player_save.json` v1 u `GameState` (vidi [[../../02-design/spec-vertical-slice|spec §5]]).
 
 ## preload vs load
 

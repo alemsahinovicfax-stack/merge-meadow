@@ -23,7 +23,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 
 | Konstanta | Vrijednost | Značenje |
 |-----------|-----------|----------|
-| `RUN_DURATION` | `20.0` s (playtest) / `75` kanon | trajanje runa |
+| `RUN_DURATION` | `60.0` s (post-tutorial) / `75` kanon M8 | `POST_TUTORIAL_RUN_DURATION` u `game_state.gd` |
 | `BASE_SCROLL_SPEED` | `400.0` px/s | početna brzina |
 | `RAMP_STEP` | `0.05` | +5% brzine po koraku |
 | `RAMP_EVERY` | `15.0` s | ramp interval |
@@ -41,6 +41,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | Double | ×2 **samo loot trenutnog runa** (`last_*`); wallet + bonus jednom za ovaj run |
 | Revive | nastavi run, ne dira loot |
 | To Camp | sjemena → `seed_bag`; novčići već u `wallet_coins` pri `finish_run` |
+| **Fail vs finish UI** | crvena/zelena traka + naslov; status `X → Y` na failu (50%) |
 
 ## Novčići (`wallet_coins`)
 
@@ -104,6 +105,17 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 - 9 gredica → max **4 T2** odjednom (8 slotova u mergeu) → 2 za sprinkler + 2 zadržana za kolekciju.
 - Staklenik odvaja ★★★ od vrta — manje zagušenja kad dođe više tipova.
 
+## Balans pass 1 (2026-07-05)
+
+| Promjena | Prije | Sada | Razlog |
+|----------|-------|------|--------|
+| Post-tutorial run | 20 s | **60 s** | 20 s prekratko za camp loop; 75 s ostaje M8 target |
+| Spawn interval / chance | 1.2 / 0.7 | bez promjene | ~8–12 pickupa u 60 s — OK za prvi pass |
+| Obstacle chance | 0.25 | bez promjene | dovoljno rizika bez frustracije |
+| Magnet T2 cost | 2 donacije | bez promjene | 9 gredica i dalje podržava 2 upgrade ciklusa |
+
+**Osjećaj:** 60 s daje prostor za loadout (+5% spawn) i sprinkler upgrade bez žurbe. Fine-tune nakon shop prototipa (F8.4).
+
 ## Odluke (2026-07-04)
 
 - **E2 cilj igrača:** oboje — T2 za **sprinkler** ili **kolekciju** (setovi/dnevnik kasnije).
@@ -112,7 +124,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 
 ## Otvorena pitanja
 
-- [ ] `RUN_DURATION` 20 vs 75 s — playtest
+- [x] `RUN_DURATION` post-tutorial — **60 s** (pass 1); 75 s ako M8 playtest traži
 - [ ] Exchange rate po rarity (sad flat 3→8)
 - [ ] Set bonus brojke kad dnevnik uđe u kod
 

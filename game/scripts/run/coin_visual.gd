@@ -1,13 +1,22 @@
-extends Node2D
+extends Sprite2D
 
-## Vizual novčića u runu (Node2D _draw).
+## Novčić u runu — Kenney-style sprite.
+
+const ASSETS := preload("res://scripts/visual/pickup_assets.gd")
 
 
 func _ready() -> void:
-	queue_redraw()
+	var tex := ASSETS.get_coin_texture()
+	texture = tex
+	centered = true
+	if tex != null:
+		scale = Vector2.ONE * ASSETS.run_scale(tex, ASSETS.COIN_RUN_SIZE)
+	else:
+		queue_redraw()
 
 
 func _draw() -> void:
-	draw_circle(Vector2.ZERO, 16.0, Color(1.0, 0.82, 0.2, 1.0))
-	draw_arc(Vector2.ZERO, 16.0, 0.0, TAU, 24, Color(0.85, 0.6, 0.05, 1.0), 2.5)
-	draw_circle(Vector2(-4.0, -5.0), 4.0, Color(1.0, 1.0, 0.85, 0.5))
+	if texture != null:
+		return
+	draw_circle(Vector2.ZERO, 16.0, Color("#FFD56B"))
+	draw_arc(Vector2.ZERO, 16.0, 0.0, TAU, 24, Color("#2D3436"), 2.5)

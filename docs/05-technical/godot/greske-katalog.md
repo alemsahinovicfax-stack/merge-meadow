@@ -116,6 +116,28 @@ ai_sažetak: "Živa lista naučenih Godot grešaka u projektu — simptom, uzrok
 
 ---
 
+## #6 — Novi sprite nevidljiv (`load()` = null)
+
+**Datum:** 2026-07-06 (C2 Pip art pass)
+
+**Simptom:**
+- Pip (ili drugi PNG/SVG) **potpuno nevidljiv** u runu i UI; nema `SCRIPT ERROR`.
+
+**Uzrok:**
+Novi fajl u `game/assets/` dodan izvan editora. Godot **nije importao** asset → `ResourceLoader.exists()` = false → `load()` vraća `null` → `Sprite2D` bez texture.
+
+**Rješenje:**
+1. `.\scripts\godot-import.ps1` (ili `godot-run.ps1` koji sada import radi automatski)
+2. Commit **`pip_idle.svg.import`** uz source fajl
+3. `pip_assets.gd`: provjeri `ResourceLoader.exists` + fallback na `PipDraw`
+
+**Prevencija:**
+- [[dev-workflow|dev-workflow]] — import prije playtesta
+- `.cursor/rules/godot-assets-import.mdc`
+- Agent: nakon novog asseta uvijek `godot-import.ps1`
+
+---
+
 ## Kako dodati novi unos
 
 ```markdown

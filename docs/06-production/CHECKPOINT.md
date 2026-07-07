@@ -12,9 +12,9 @@ trenutna_faza: 5
 podfaza: vertical-slice
 aktivna_sekcija: C
 b0_aktivan: false
-sljedeci_korak: "C1½: build order (vidi Sekcija C backlog) — spec-driven; prvo art pass / save odluka"
-zadnja_sesija: "M7 C1 — revive fix (nastavi run), spec-vertical-slice + ekonomija-brojevi docs"
-zadnje_azurirano: 2026-07-03
+sljedeci_korak: "C4 — pokreni iOS export (GHA ili Mac) → build na iPhone"
+zadnja_sesija: "C4 init — iOS export preset, GHA workflow, safe area, ios-export.md"
+zadnje_azurirano: 2026-07-07
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -259,26 +259,28 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 > Svaki korak: otvori spec → kodiraj → headless smoke → 5 min test → `[x]`. Jedan korac po sesiji.
 
-- [ ] **Odluka: save na disk?** — JSON `user://` u slice-u ili tek M8 (spec §5, `otvorena-pitanja`)
-- [ ] **Balans pass 1** — proigrati i zapisati osjećaj brojeva ([[../02-design/ekonomija-brojevi|brojevi]]): RUN_DURATION 75 vs 90, spawn gustoća, magnet cijene
-- [ ] **Fail/finish feedback** — jasna razlika fail vs finish na loot ekranu (spec §3)
-- [ ] Prelazak na **C2 art pass** kad loop feel potvrđen
+- [x] **Odluka: save na disk?** — **minimalni JSON v1** u M7 (`user://player_save.json`); F8.7 proširi
+- [x] **Balans pass 1** — RUN **60 s** post-tutorial; spawn/magnet bez promjene ([[../02-design/ekonomija-brojevi|brojevi]] § pass 1)
+- [x] **Fail/finish feedback** — loot ekran: boja trake/naslova + `X → Y` na failu
+- [x] Prelazak na **C2 art pass** kad loop feel potvrđen
 
 ### C2 — Art pass (slice scope)
 
-- [ ] Flat orbs + pastel lane (art-direction paleta)
-- [ ] Pixel UI ikone (min set)
-- [ ] Pip placeholder sprite
+> **Operativni vodič:** [[../04-experience/ui-i-art-alati|ui-i-art-alati]] — flat cartoon; Krita/Figma (Pip) + Kenney flat UI.
+
+- [x] Flat cartoon pickupe + pastel lane (art-direction paleta) — lane: `lane_background.png` Figma
+- [x] Flat UI ikone (min set) — Kenney `game-icons` → `game/assets/ui/kenney/`
+- [x] Pip flat cartoon sprite — **Figma Make** → `game/assets/sprites/pip_idle.svg`
 
 ### C3 — Monetizacija (test integracija)
 
-- [ ] AdMob rewarded test (test ad unit)
-- [ ] IAP stub / test purchase flow (Android)
+- [x] AdMob rewarded test (test ad unit) — `AdManager` stub + plugin hook
+- [x] IAP stub / test purchase flow (Android) — `IAPManager` + `shop_screen`
 
 ### C4 — iOS na iPhoneu
 
-- [ ] iOS export pipeline riješen (Mac ili CI)
-- [ ] Build na tvoj iPhone (TestFlight ili dev install)
+- [x] iOS export pipeline — `export_presets.cfg` + `.github/workflows/ios-xcode-export.yml` + [[../05-technical/godot/ios-export|ios-export]]
+- [ ] Build na tvoj iPhone (TestFlight ili dev install) — **zahtijeva Mac ili GHA artifact**
 - [ ] Test: run + merge na stvarnom uređaju
 
 **Exit M7:** Vanjski playtester igra 5 min bez vođenja.

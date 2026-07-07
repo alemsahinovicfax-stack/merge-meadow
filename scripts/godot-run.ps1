@@ -10,6 +10,9 @@ param(
 $ErrorActionPreference = "Stop"
 . "$PSScriptRoot\godot-lib.ps1"
 
+# Novi asseti u game/assets/ moraju biti importani prije play/editora.
+Invoke-GodotImport
+
 # Ugasi eventualni prethodni Godot da ne ostane duplikat prozora.
 Stop-GodotProcess
 Start-Sleep -Milliseconds 300

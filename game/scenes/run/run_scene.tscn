@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://c8runscene01"]
+[gd_scene load_steps=8 format=3 uid="uid://c8runscene01"]
 
 [ext_resource type="Script" path="res://scripts/run/run_controller.gd" id="1_run"]
 [ext_resource type="Script" path="res://scripts/run/player.gd" id="2_player"]
 [ext_resource type="Script" path="res://scripts/visual/pip_placeholder_control.gd" id="3_pip_ui"]
 [ext_resource type="Script" path="res://scripts/visual/pip_visual.gd" id="4_pip_visual"]
+[ext_resource type="Script" path="res://scripts/visual/lane_background.gd" id="5_lane_bg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(56, 56)
@@ -11,14 +12,30 @@ size = Vector2(56, 56)
 [sub_resource type="CircleShape2D" id="CircleShape2D_magnet"]
 radius = 40.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pickup_hud"]
+bg_color = Color(1, 0.98, 0.94, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.176, 0.204, 0.212, 0.18)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 24.0
+content_margin_top = 14.0
+content_margin_right = 24.0
+content_margin_bottom = 14.0
+
 [node name="RunScene" type="Node2D"]
 script = ExtResource("1_run")
 
-[node name="Background" type="Polygon2D" parent="."]
-color = Color(0.14, 0.2, 0.16, 1)
-polygon = PackedVector2Array(0, 0, 1080, 0, 1080, 1920, 0, 1920)
+[node name="Background" type="Sprite2D" parent="."]
+script = ExtResource("5_lane_bg")
 
 [node name="LaneGuides" type="Node2D" parent="."]
+visible = false
 
 [node name="World" type="Node2D" parent="."]
 
@@ -27,7 +44,7 @@ collision_layer = 1
 collision_mask = 2
 script = ExtResource("2_player")
 
-[node name="PipVisual" type="Node2D" parent="Player"]
+[node name="PipVisual" type="Sprite2D" parent="Player"]
 script = ExtResource("4_pip_visual")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
@@ -57,7 +74,7 @@ script = ExtResource("3_pip_ui")
 
 [node name="PipName" type="Label" parent="HUD/PipBadge"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.98, 0.92, 1)
+theme_override_colors/font_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
 theme_override_font_sizes/font_size = 32
 text = "Pip"
 vertical_alignment = 1
@@ -65,7 +82,7 @@ vertical_alignment = 1
 [node name="LoadoutLabel" type="Label" parent="HUD/PipBadge"]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.95, 0.65, 1)
+theme_override_colors/font_color = Color(0.36078432, 0.23921569, 0.47843137, 1)
 theme_override_font_sizes/font_size = 22
 text = "Basket: Clover"
 vertical_alignment = 1
@@ -79,38 +96,68 @@ offset_top = 48.0
 offset_right = 120.0
 offset_bottom = 120.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
 theme_override_font_sizes/font_size = 52
 text = "75s"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PickupCounters" type="HBoxContainer" parent="HUD"]
+[node name="PickupBar" type="PanelContainer" parent="HUD"]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -280.0
-offset_top = -160.0
-offset_right = 280.0
-offset_bottom = -80.0
+offset_left = -310.0
+offset_top = -175.0
+offset_right = 310.0
+offset_bottom = -65.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/separation = 48
+theme_override_styles/panel = SubResource("StyleBoxFlat_pickup_hud")
+
+[node name="PickupCounters" type="HBoxContainer" parent="HUD/PickupBar"]
+layout_mode = 2
+theme_override_constants/separation = 40
 alignment = 1
 
-[node name="CoinLabel" type="Label" parent="HUD/PickupCounters"]
+[node name="CoinRow" type="HBoxContainer" parent="HUD/PickupBar/PickupCounters"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="CoinIcon" type="TextureRect" parent="HUD/PickupBar/PickupCounters/CoinRow"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinLabel" type="Label" parent="HUD/PickupBar/PickupCounters/CoinRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6039216, 0.44705883, 0.03529412, 1)
+theme_override_colors/font_outline_color = Color(1, 1, 1, 0.9)
+theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 36
 text = "Coins: 0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SeedLabel" type="Label" parent="HUD/PickupCounters"]
+[node name="SeedRow" type="HBoxContainer" parent="HUD/PickupBar/PickupCounters"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.55, 0.9, 0.5, 1)
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="SeedIcon" type="TextureRect" parent="HUD/PickupBar/PickupCounters/SeedRow"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SeedLabel" type="Label" parent="HUD/PickupBar/PickupCounters/SeedRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.36078432, 0.23921569, 0.47843137, 1)
+theme_override_colors/font_outline_color = Color(1, 1, 1, 0.9)
+theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 36
 text = "Seeds: 0"
 horizontal_alignment = 1
@@ -125,7 +172,7 @@ offset_top = 140.0
 offset_right = 400.0
 offset_bottom = 220.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_colors/font_color = Color(0.2901961, 0.2901961, 0.2901961, 0.85)
 theme_override_font_sizes/font_size = 26
 text = "Swipe left / right to change lanes"
 horizontal_alignment = 1

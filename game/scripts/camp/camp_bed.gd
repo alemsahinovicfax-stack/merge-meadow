@@ -10,6 +10,8 @@ var _tier: int = 0
 var _selected: bool = false
 var _highlighted: bool = false
 var _pressing: bool = false
+var _touch_active: bool = false
+var _suppress_mouse: bool = false
 
 
 func _ready() -> void:
@@ -41,8 +43,26 @@ func set_highlighted(on: bool) -> void:
 
 
 func _on_gui_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		var touch := event as InputEventScreenTouch
+		if touch.pressed:
+			_touch_active = true
+		elif _touch_active:
+			bed_tapped.emit(bed_index)
+			_touch_active = false
+			_suppress_mouse = true
+		accept_event()
+		return
 	if event is InputEventMouseButton:
 		var mouse := event as InputEventMouseButton
+		if _suppress_mouse:
+			if not mouse.pressed:
+				_suppress_mouse = false
+			accept_event()
+			return
+		if _touch_active:
+			accept_event()
+			return
 		if mouse.button_index != MOUSE_BUTTON_LEFT:
 			return
 		if mouse.pressed:
@@ -51,11 +71,6 @@ func _on_gui_input(event: InputEvent) -> void:
 			if _pressing:
 				bed_tapped.emit(bed_index)
 			_pressing = false
-		accept_event()
-	elif event is InputEventScreenTouch:
-		var touch := event as InputEventScreenTouch
-		if touch.pressed:
-			bed_tapped.emit(bed_index)
 		accept_event()
 
 

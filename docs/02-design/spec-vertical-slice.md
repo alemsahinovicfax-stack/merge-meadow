@@ -84,7 +84,7 @@ Sprema `carry_orbs`/`carry_elapsed` (za mogući revive) i računa `last_loot`:
 
 **Scena:** `scenes/ui/loot_screen.tscn` · **skripta:** `scripts/ui/loot_screen.gd`
 
-Prikaz: naslov (Failed/Complete), `+N Orbs`, status linija.
+Prikaz: naslov (Failed/Complete), boja trake, `+N Coins/Seeds`, status s **X → Y** na failu.
 
 | Dugme | Ponašanje | Uvjet |
 |-------|-----------|-------|
@@ -133,18 +133,20 @@ Prikaz: naslov (Failed/Complete), `+N Orbs`, status linija.
 | Loot | `last_loot`, `last_raw_orbs`, `last_failed`, `loot_doubled` | rezultat zadnjeg runa + double flag |
 | Revive/resume | `revive_used_this_run`, `resume_pending`, `carry_orbs`, `carry_elapsed` | nastavak runa |
 | Kamp | `camp_slots[]`, `magnet_level` | meta progres |
-| Ostalo | `tutorial_seen` | prvi launch |
+| Ostalo | `tutorial_*`, `loadout_type_id` | onboarding + basket |
 
-> **Napomena:** trenutno **nema save na disk** — sve se resetira gašenjem igre. Perzistentni save (JSON u `user://`) je M7 kandidat, vidi [[../05-technical/godot/resursi-save|resursi-save]] i [[../06-production/otvorena-pitanja|otvorena-pitanja]].
+**Save (C1½ odluka 2026-07-05):** minimalni JSON `user://player_save.json` v1 — wallet, bag, kreveti, sprinkler, kolekcija, loadout, tutorial. **Ne** sprema run-in-progress (`last_*`, `carry_*`). Migracija iz `tutorial_flags.json`. Pun cloud/M8 save → F8.7.
+
+> Debug `DEBUG_DEV_RESOURCES` samo kad **nema** save datoteke (prvi boot).
 
 ---
 
 ## Otvorene odluke (drže smjer jasnim)
 
-- [ ] Save na disk (JSON) u slice-u ili tek M8? → [[../06-production/otvorena-pitanja|otvorena-pitanja]]
+- [x] Save na disk (JSON) u slice-u — **minimalni `player_save.json` v1** (M7); puni save F8.7
 - [ ] Fluid swerve vs 3 lanea (playtest) → [[mehanike/lane-run|lane-run]]
-- [ ] % loota na fail (50% potvrđeno u greyboxu) — ostaje?
-- [ ] Balans brojeva (spawn, ramp, magnet cijene) → [[ekonomija-brojevi|brojevi]] nakon playtesta
+- [x] % loota na fail (50%) — ostaje
+- [x] Balans pass 1 — RUN 60 s post-tutorial; spawn/magnet bez promjene
 
 ## Povezano
 

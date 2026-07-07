@@ -8,13 +8,17 @@ const PICKUP_SEED_CHANCE := 0.30
 const RAMP_STEP := 0.05
 const RAMP_EVERY := 15.0
 
+const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
+const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
+
 @onready var loadout_label: Label = $HUD/PipBadge/LoadoutLabel
 
 @onready var world: Node2D = $World
 @onready var player: Area2D = $Player
-@onready var lane_guides: Node2D = $LaneGuides
-@onready var coin_counter_label: Label = $HUD/PickupCounters/CoinLabel
-@onready var seed_counter_label: Label = $HUD/PickupCounters/SeedLabel
+@onready var coin_counter_label: Label = $HUD/PickupBar/PickupCounters/CoinRow/CoinLabel
+@onready var seed_counter_label: Label = $HUD/PickupBar/PickupCounters/SeedRow/SeedLabel
+@onready var coin_hud_icon: TextureRect = $HUD/PickupBar/PickupCounters/CoinRow/CoinIcon
+@onready var seed_hud_icon: TextureRect = $HUD/PickupBar/PickupCounters/SeedRow/SeedIcon
 @onready var timer_label: Label = $HUD/TimerLabel
 @onready var tutorial_banner: Label = $HUD/TutorialBanner
 
@@ -55,9 +59,29 @@ func _wait_for_viewport() -> void:
 
 func _setup_world() -> void:
 	_calculate_lanes()
-	_draw_lane_guides()
+	_setup_pickup_hud_icons()
+	_setup_safe_area()
 	player.position.y = _viewport_size().y * 0.82
 	_world_ready = true
+
+
+func _setup_safe_area() -> void:
+	var pickup_bar := $HUD/PickupBar as Control
+	if timer_label:
+		SAFE_AREA.apply_top_margin(timer_label, 8.0)
+	if tutorial_banner:
+		SAFE_AREA.apply_top_margin(tutorial_banner)
+	if pickup_bar:
+		SAFE_AREA.apply_bottom_margin(pickup_bar, 16.0)
+
+
+func _setup_pickup_hud_icons() -> void:
+	var coin_tex := PICKUP_ASSETS.get_coin_texture()
+	var seed_tex := PICKUP_ASSETS.get_seed_texture()
+	if coin_hud_icon and coin_tex:
+		coin_hud_icon.texture = coin_tex
+	if seed_hud_icon and seed_tex:
+		seed_hud_icon.texture = seed_tex
 
 
 func start_run() -> void:
@@ -158,18 +182,6 @@ func _calculate_lanes() -> void:
 	var width := _viewport_size().x
 	lane_x_positions = [width * 0.25, width * 0.5, width * 0.75]
 	player.setup_lanes(lane_x_positions)
-
-
-func _draw_lane_guides() -> void:
-	for child in lane_guides.get_children():
-		child.queue_free()
-	var height := _viewport_size().y
-	for x in lane_x_positions:
-		var line := Line2D.new()
-		line.width = 4.0
-		line.default_color = Color(1.0, 1.0, 1.0, 0.08)
-		line.points = PackedVector2Array([Vector2(x, 0.0), Vector2(x, height)])
-		lane_guides.add_child(line)
 
 
 func _clear_world_entities() -> void:

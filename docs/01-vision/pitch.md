@@ -27,7 +27,7 @@ Pastelni svijet s ljubimcima, zadovoljavajući merge „pop“ i brojke koje ras
 
 ## Elevator pitch (1 paragraf)
 
-Merge Meadow je mobilna hybrid-casual igra za igrače koji vole kratke sesije i dugoročan napredak. U 60–90 sekundi trčiš kroz lane, skupljaš resurse i izbjegavaš prepreke; između runova spajaš iste resurse u kampu (2→1) da otključaš magnete, množitelje i nove ljubimce. Svaki merge daje zadovoljavajući „pop“, a brojke rastu — to te drži da otvoriš app i sutra. Besplatno je za igrati: rewarded oglasi nude revive, dupli loot ili free chest; IAP pokriva remove ads, starter pack i consumable boostere. Dizajnirano za solo student tim: flat 2D gameplay, pixel UI, 100 runova na launch + endless mode, Android i iOS od starta.
+Merge Meadow je mobilna hybrid-casual igra za igrače koji vole kratke sesije i dugoročan napredak. U 60–90 sekundi trčiš kroz lane, skupljaš resurse i izbjegavaš prepreke; između runova spajaš iste resurse u kampu (2→1) da otključaš magnete, množitelje i nove ljubimce. Svaki merge daje zadovoljavajući „pop“, a brojke rastu — to te drži da otvoriš app i sutra. Besplatno je za igrati: rewarded oglasi nude revive, dupli loot ili free chest; IAP pokriva remove ads, starter pack i consumable boostere. Dizajnirano za solo student tim: **flat cartoon** 2D, 100 runova na launch + endless mode, Android i iOS od starta.
 
 ## Pitch (EN — store listing)
 

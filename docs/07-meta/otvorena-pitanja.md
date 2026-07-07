@@ -32,7 +32,7 @@ _(Faza 4 riješena — vidi Riješeno ✅)_
 - **Pitch jedna rečenica:** vidi [[../01-vision/pitch|pitch]]
 - **Monetizacija:** F2P hybrid — rewarded ads + IAP (remove ads, starter pack, boosteri)
 - **Store jezik:** EN primarno, globalno tržište
-- **Vizualni smjer:** cute minimal, pastel, životinje; flat gameplay + pixel UI
+- **Vizualni smjer:** cute minimal, pastel, životinje; **flat 2D cartoon** (2026-07-05)
 - **Platforme:** Android + iOS od starta
 - **Kapacitet:** ~5–8 h/tj. (varira), 4–6 mj. do launch; marketing €50–100 test
 - **Sadržaj launch:** 100 runova + endless; generator levela plan mjesec 2

@@ -8,8 +8,15 @@
 
 # Godot (kad postoji game/)
 game/.godot/
+game/.godot/export_credentials.cfg
 game/.import/
 game/export/
+game/*.apk
+game/*.apk.idsig
+game/assets/ui/_kenney_src/
+game/assets/ui/_extract/
+game/android/**/.godot/
+game/android/libs/
 *.tmp
 
 # OS
@@ -20,3 +27,5 @@ Desktop.ini
 # Lokalne tajne (Obsidian) — nikad u git / remote
 **/credentials.local.md
 docs/00-personal/*.local.md
+game/export_credentials/
+game/**/admob_app_id.local.*

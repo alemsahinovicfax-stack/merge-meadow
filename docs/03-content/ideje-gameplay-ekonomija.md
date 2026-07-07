@@ -401,7 +401,7 @@ grid kamp           →  vrt+staklenik+loadout →  craft, streak     →  battl
 | Sjeme spriteovi | **10 tipova** × (sjeme + cvijet T2) = 20 | ne 30 na launch |
 | Grmovi (dobar/loš) | 🟡 1 par | v1.1 drugi par |
 | Kamp pozadina (vrt + staklenik) | ✅ 1 scena | scroll ili statično |
-| UI pixel set | ✅ min | loot, kamp, shop, diary |
+| UI flat set | ✅ min | loot, kamp, shop, diary |
 | Muzika | 🟡 1 loop kamp | opcionalno |
 
 ### Što **rezati** ako kasniš (redoslijed žrtvovanja)

@@ -82,7 +82,7 @@ Detalji → [[CHECKPOINT#Dokumentacija vs kod — kada što radiš|CHECKPOINT]]
 | 7.3 | 1 upgrade linija (magnet/množitelj) | [ ] |
 | 7.4 | Menu → run → loot → kamp flow | [ ] |
 | 7.5 | Tutorial prvi launch | [ ] |
-| 7.6 | Art pass (flat + pixel UI, slice scope) | [ ] |
+| 7.6 | Art pass (**flat cartoon**, slice scope) | [ ] |
 | 7.7 | AdMob test + IAP stub (Android) | [ ] |
 | 7.8 | iOS build na iPhone (Mac/CI) | [ ] |
 

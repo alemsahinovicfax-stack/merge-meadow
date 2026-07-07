@@ -5,7 +5,12 @@
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="3_uibtn"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.12, 0.14, 0.18, 0.95)
+bg_color = Color(1, 0.973, 0.941, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.176, 0.204, 0.212, 0.12)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20
@@ -23,6 +28,21 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
+
+[node name="SettingsButton" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -88.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 88.0
+grow_horizontal = 0
+script = ExtResource("3_uibtn")
+label_text = ""
+button_icon = "settings"
+button_variant = "subtle"
 
 [node name="Background" type="ColorRect" parent="."]
 mouse_filter = 2
@@ -89,6 +109,8 @@ layout_mode = 2
 script = ExtResource("3_uibtn")
 label_text = "Play"
 font_size = 40
+button_icon = "play"
+button_variant = "primary"
 
 [node name="CampButton" type="PanelContainer" parent="Panel/VBox"]
 visible = false
@@ -97,3 +119,12 @@ layout_mode = 2
 script = ExtResource("3_uibtn")
 label_text = "Camp"
 font_size = 36
+
+[node name="ShopButton" type="PanelContainer" parent="Panel/VBox"]
+visible = false
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "Shop"
+font_size = 32
+button_variant = "accent"

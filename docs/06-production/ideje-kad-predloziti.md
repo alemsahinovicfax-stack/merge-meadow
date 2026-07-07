@@ -38,7 +38,7 @@ Primjeniti sada, odgoditi, ili preskočiti?
 
 | Kad radimo… | CHECKPOINT / fajl | Predloži iz… | Primjer ID |
 |-------------|-------------------|--------------|------------|
-| Camp UI, navigacija, gumbi | `camp_*`, F4–F5 | [[../03-content/ideje-prvo-iskustvo\|prvo iskustvo]], roadmap F8 | **UX-01** Main menu |
+| Camp UI, navigacija, gumbi | `camp_*`, F4–F5, F8 shop | ideje-prvo-iskustvo, roadmap F8 | **UX-04** Hub carousel |
 | Run feel, spawn, HUD | `run_controller`, F2–F5 | [[../03-content/ideje-gameplay-ekonomija\|gameplay ekonomija]] R1–R7 | R3 zlatni grm |
 | Loot / fail / rewarded | `loot_screen`, F3 | prvo iskustvo, monetizacija M1–M2 | — |
 | Ekonomija, shop, novčići | `game_state`, F8 | [[../02-design/ekonomija-brojevi\|brojevi]], ideje §6 shop | Shop stub |
@@ -50,7 +50,8 @@ Primjeniti sada, odgoditi, ili preskočiti?
 
 | ID | Ideja | Trigger (kad ponuditi) | Effort | Milestone |
 |----|-------|------------------------|--------|-----------|
-| **UX-01** | **Main menu gumb u kampu** — `To Meadow` / `Home`; Play+Camp hub bez restarta Godota | Camp UI, navigacija, post-tutorial, korisnik spominje restart | **S** | M7 / v1.1 |
+| **UX-01** | **Main menu gumb u kampu** | Camp navigacija | **S** | ✅ M7 2026-07-05 |
+| **UX-04** | **Hub carousel** (Clash Royale swipe) — Meadow / Garden / Greenhouse / Shop | F8 shop, C2 art, meta UI | **L** | F8 / v1 |
 | UX-02 | Progress traka umjesto countdown tajmera | Run HUD / C2 art pass | M | v1.1 |
 | UX-03 | Reset tutorial (dev) u settings | Debug, QA tutoriala | S | dev only |
 
@@ -63,6 +64,23 @@ Primjeniti sada, odgoditi, ili preskočiti?
 **DoD:** Jedan tap iz kampa → main menu s Play + Camp; headless smoke prolazi.
 
 **Povezano:** [[../03-content/ideje-prvo-iskustvo#nakon-tutorijala--main-menu-hub-odlučeno-2026-07-04|post-tutorial hub]]
+
+### UX-04 — Hub carousel (Clash Royale meta) — ideja 2026-07-05
+
+**Koncept:** Jedan meta-layer s **swipe L/R** između full-screen stranica (prst na mobitelu).
+
+| Stranica | Svrha |
+|----------|--------|
+| **Meadow (home)** | Play + art, wallet (coins/seeds), level/progres, Settings ikona |
+| **Garden** | T1–T2 merge, sprinkler, loadout, osnovni camp loop |
+| **Greenhouse** | T3 / ★★★ mehanike, kompleksniji UI — **zaseban ekran** |
+| **Shop** | Kozmetika, coins sink |
+
+**Garden:** zadržati mali **preview widget u ćošku** za selektirana ★★★ sjemenja (link u puni Greenhouse ekran).
+
+**Run / loot** ostaju odvojene scene (ne dio carousela).
+
+**Effort:** L — nova `meta_hub` scena, swipe input, refaktor camp → garden page. **Ne raditi prije C2 + shop stub (F8.4).**
 
 ## Agent checklist (po sesiji)
 

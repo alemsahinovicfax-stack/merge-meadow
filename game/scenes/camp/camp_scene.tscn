@@ -4,7 +4,12 @@
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.1, 0.16, 0.12, 0.88)
+bg_color = Color(0.659, 0.902, 0.812, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.176, 0.204, 0.212, 0.12)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
@@ -22,6 +27,21 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_camp")
+
+[node name="SettingsButton" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -88.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 88.0
+grow_horizontal = 0
+script = ExtResource("2_uibtn")
+label_text = ""
+button_icon = "settings"
+button_variant = "subtle"
 
 [node name="MeadowBg" type="ColorRect" parent="."]
 layout_mode = 1
@@ -108,12 +128,24 @@ theme_override_font_sizes/font_size = 22
 text = "Seeds in bag: none"
 horizontal_alignment = 1
 
-[node name="WalletLabel" type="Label" parent="GardenLayer/VBox"]
+[node name="WalletRow" type="HBoxContainer" parent="GardenLayer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="WalletIcon" type="TextureRect" parent="GardenLayer/VBox/WalletRow"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WalletLabel" type="Label" parent="GardenLayer/VBox/WalletRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
 theme_override_font_sizes/font_size = 22
 text = "Wallet: 0 coins"
-horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CollectionLabel" type="Label" parent="GardenLayer/VBox"]
 layout_mode = 2
@@ -170,9 +202,19 @@ script = ExtResource("2_uibtn")
 label_text = "Basket: empty (tap to equip)"
 font_size = 22
 
+[node name="MainMenuButton" type="PanelContainer" parent="GardenLayer/VBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+script = ExtResource("2_uibtn")
+label_text = "Main Menu"
+font_size = 24
+button_icon = "home"
+
 [node name="PlayButton" type="PanelContainer" parent="GardenLayer/VBox"]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 script = ExtResource("2_uibtn")
 label_text = "Play"
 font_size = 36
+button_icon = "play"
+button_variant = "primary"

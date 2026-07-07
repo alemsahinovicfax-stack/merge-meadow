@@ -41,7 +41,7 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - Godot 4, Android + iOS export
 - EN UI copy
 - SFX (pickup, merge, fail); muzika opcionalna u kampu
-- Flat 2D gameplay + pixel UI ikone
+- Flat 2D **flat cartoon** (pastel, soft outline) — bez pixel grida
 
 ### Content
 - 100 run level konfiguracija + endless
@@ -70,7 +70,7 @@ Manji scope za **prvi igrivi dokaz** u `game/`:
 | Slice IN | Launch IN |
 |----------|-----------|
 | 1 lane run + osnovni loot ekran | 100 runova |
-| Placeholder art | Final flat + pixel |
+| Placeholder art | Final **flat cartoon** |
 | Kamp merge (1 tier) | Puni merge tree |
 | 10 test runova | 100 + endless |
 | Android APK test | Android + iOS store |

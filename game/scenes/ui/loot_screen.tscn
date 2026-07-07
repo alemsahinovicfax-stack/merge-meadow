@@ -4,7 +4,12 @@
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.12, 0.14, 0.18, 0.95)
+bg_color = Color(1, 0.973, 0.941, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.176, 0.204, 0.212, 0.12)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20
@@ -52,6 +57,12 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 layout_mode = 2
 theme_override_constants/separation = 20
 
+[node name="OutcomeAccent" type="ColorRect" parent="Panel/VBox"]
+layout_mode = 2
+mouse_filter = 2
+custom_minimum_size = Vector2(0, 8)
+color = Color(0.22, 0.72, 0.38, 0.95)
+
 [node name="TitleLabel" type="Label" parent="Panel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 44
@@ -76,15 +87,19 @@ autowrap_mode = 2
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 script = ExtResource("2_uibtn")
-label_text = "Double Loot (rewarded placeholder)"
+label_text = "Double Loot"
 font_size = 28
+button_icon = "double"
+button_variant = "accent"
 
 [node name="ReviveButton" type="PanelContainer" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 script = ExtResource("2_uibtn")
-label_text = "Revive — continue run (rewarded placeholder)"
+label_text = "Revive — continue run"
 font_size = 28
+button_icon = "revive"
+button_variant = "accent"
 
 [node name="RetryButton" type="PanelContainer" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 72)
@@ -92,6 +107,7 @@ layout_mode = 2
 script = ExtResource("2_uibtn")
 label_text = "Retry"
 font_size = 32
+button_icon = "retry"
 
 [node name="CampButton" type="PanelContainer" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 72)
@@ -99,3 +115,4 @@ layout_mode = 2
 script = ExtResource("2_uibtn")
 label_text = "To Camp"
 font_size = 32
+button_icon = "home"

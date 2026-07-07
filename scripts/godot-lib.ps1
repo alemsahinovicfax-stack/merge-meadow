@@ -88,3 +88,14 @@ function Start-GodotForeground {
     Write-Host "Godot (OpenGL): $godot"
     & $godot @godotArgs
 }
+
+function Invoke-GodotImport {
+    <# Headless import — obavezno nakon novog PNG/SVG u game/assets/ (inače load() = null). #>
+    $godot = Get-GodotExecutable
+    Write-Host "[godot] Import assets (headless)..."
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    & $godot --headless --rendering-driver opengl3 --path (Get-GameDir) --import 2>&1 | Out-Null
+    $ErrorActionPreference = $prevEap
+    # Godot --import ponekad vrati nenulti exit iako je import uspio.
+}

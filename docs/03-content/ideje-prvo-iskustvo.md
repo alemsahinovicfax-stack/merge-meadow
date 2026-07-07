@@ -155,7 +155,7 @@ Igrač bira: novi run ili direktno u vrt.
 | **Problem** | Hub (Play + Camp) je na main menuu, ali iz kampa samo **Play** — restart Godota da vidiš hub. |
 | **Rješenje** | Gumb **Main Menu** u kampu → `main_menu.tscn` (tutorial flag ostaje). |
 | **Kad raditi** | Camp navigacija / F8 polish — vidi [[../06-production/ideje-kad-predloziti\|ideje-kad-predloziti]] UX-01. |
-| **Status** | ideja — korisnik odobrio smjer 2026-07-05 |
+| **Status** | ✅ implementirano 2026-07-05 (`MainMenuButton` u `camp_scene`) |
 
 ---
 

@@ -1,0 +1,41 @@
+name: iOS Xcode Export
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-ios:
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: game
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: firebelley/setup-godot@v2
+        with:
+          godot-version: 4.7-stable
+          include-templates: true
+
+      - name: Patch Team ID from secret
+        if: ${{ secrets.IOS_TEAM_ID != '' }}
+        run: |
+          sed -i '' 's/YOUR_TEAM_ID/${{ secrets.IOS_TEAM_ID }}/g' export_presets.cfg
+          if [ -n "${{ secrets.IOS_BUNDLE_ID }}" ]; then
+            sed -i '' 's/com.mergemeadow.game/${{ secrets.IOS_BUNDLE_ID }}/g' export_presets.cfg
+          fi
+
+      - name: Export iOS Xcode project
+        run: |
+          godot --headless --path . --export-project "iOS" "export/ios/MergeMeadow.xcodeproj"
+
+      - name: Upload Xcode project
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-xcode-project
+          path: game/export/ios/

@@ -5,4 +5,7 @@
 
 $ErrorActionPreference = "Stop"
 . "$PSScriptRoot\godot-lib.ps1"
+if (Test-Path (Get-GameProjectPath)) {
+    Invoke-GodotImport
+}
 Start-GodotForeground -ExtraArgs $args

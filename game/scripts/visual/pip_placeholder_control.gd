@@ -1,7 +1,8 @@
 extends Control
 
-## Mali Pip preview za UI (main menu, HUD badge).
+## Pip portrait za UI (main menu, HUD badge) — isti sprite kao u runu.
 
+const PIP_ASSETS := preload("res://scripts/visual/pip_assets.gd")
 const PIP_DRAW := preload("res://scripts/visual/pip_draw.gd")
 
 
@@ -26,6 +27,13 @@ func _draw() -> void:
 	var side := minf(size.x, size.y)
 	if side < 1.0:
 		return
-	var scale := side / 56.0
+	var tex := PIP_ASSETS.get_texture()
+	if tex != null:
+		var draw_scale := PIP_ASSETS.ui_scale_for_side(side)
+		var draw_size := Vector2.ONE * PIP_ASSETS.SOURCE_FRAME_SIZE * draw_scale
+		var top_left := (size - draw_size) * 0.5
+		draw_texture_rect(tex, Rect2(top_left, draw_size), false)
+		return
 	var center := size * 0.5
+	var scale := side / 56.0
 	PIP_DRAW.draw_pip(self, center, scale)
