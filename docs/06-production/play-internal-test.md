@@ -20,9 +20,20 @@ ai_sažetak: "Korak-po-korak D5 — Google Play internal testing track (APK, lis
 
 ## Prije uploada
 
-- [ ] **Privacy policy URL** — hostaj [[../05-technical/privacy-policy-draft|privacy-policy-draft]] (GitHub Pages, Notion, …)
+- [ ] **Privacy policy URL** — `privacy/index.html` → GitHub Pages (vidi ispod)
 - [ ] **Developer account** — Google Play Console ($25 one-time), app kreirana
 - [ ] **Svjež export** (opcionalno): Godot → Export → `merge_meadow_debug.apk` ili release AAB
+
+### Privacy policy — GitHub Pages (korak 1)
+
+GitHub **ne objavljuje Pages na private repou** bez paid plana. Poruka *Upgrade or make this repository public* = normalno.
+
+1. **Repo → Settings → General → Change visibility → Public**  
+   *(Kod ostaje na GitHubu; igra se ne “skida” s interneta — samo je repo vidljiv. Ako ne želiš public, koristi Notion/Google Sites umjesto Pages.)*
+2. **Settings → Pages → Build and deployment → Source: GitHub Actions**
+3. Push `master` (workflow `Privacy policy Pages` deploya samo folder `privacy/`, ne cijeli vault)
+4. URL za Play Console: **`https://alemsahinovicfax-stack.github.io/merge-meadow/`**
+5. Provjeri u incognito prije submita
 
 ## Play Console — redoslijed
 

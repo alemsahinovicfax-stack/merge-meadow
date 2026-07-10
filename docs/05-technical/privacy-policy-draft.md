@@ -47,8 +47,10 @@ If you have questions about this privacy policy or the app, contact us at:
 ## TODO prije launcha (M8)
 
 - [x] Zamijeni placeholder email
-- [ ] Objavi na javnom URL-u
+- [ ] Objavi na javnom URL-u — vidi `privacy/index.html` + [[../06-production/play-internal-test#Korak 1|D5 korak 1]]
 - [ ] Link u Google Play Console i App Store Connect
+
+**Ciljani URL (GitHub Pages):** `https://alemsahinovicfax-stack.github.io/merge-meadow/`
 
 ## Povezano
 
