@@ -41,7 +41,7 @@ Vidi `game/scripts/monetization/monetization_config.gd`.
 | Fajl | Uloga |
 |------|--------|
 | `scripts/monetization/ad_manager.gd` | Rewarded ×2 + revive |
-| `scripts/monetization/iap_manager.gd` | IAP stub (billing M8) |
+| `scripts/monetization/iap_manager.gd` | IAP production (billing D3) |
 | `scripts/ui/loot_screen.gd` | Poziva `AdManager.request_rewarded()` |
 
 Kad je `res://addons/admob` prisutan, `AdManager` prelazi na `admob_plugin` backend (rewarded load još treba dovršiti prema Poing docs).

@@ -97,6 +97,13 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 - **F7 playtest ✅** — DoD prošao.
 - **Post-tutorial hub** — main menu **Play** + **Camp**; tutorial save.
 
+## 2026-07-09
+
+- **M8 D3 shop production** — `IAPManager` BillingClient hook (purchase, acknowledge, restore); shop UI + opisi proizvoda; `AdManager` interstitial hook poštuje remove ads; `iap-billing-setup.md`
+- **M8 D3 dev reset** — `Reset Purchases (dev)` u stub shopu; restore klikabilan s jasnom porukom
+- **M8 D4 store listing** — `store-listing-en.md`, `store-screenshots.md`, `marketing/store/`, capture skripta + screenshot save tool
+- **Git solo workflow** — rule `git-solo-workflow.mdc` + AGENTS.md sekcija (master direct push, English remote)
+
 ## 2026-07-07
 
 - **M8 D1 run leveli** — `levels_1_10.json` + `RunLevelLibrary` curve 11–100; HUD `Lv X · Ys`; save `run_level`
@@ -113,6 +120,11 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
 - **Godot asset import** — `godot-import.ps1`; `godot-run.ps1` auto-import; rule `godot-assets-import.mdc`; greske-katalog #6 (nevidljiv sprite)
 - **C2 Pip sprite** — izvučen iz Figma Make `.make` exporta; `pip_idle.svg` u `game/assets/sprites/`; `PipDraw` zamijenjen `Sprite2D` (run) + texture draw (main menu, HUD badge)
+
+## 2026-07-10
+
+- **M8 D3–D4** — production shop/IAP hooks, 8× store screenshots, EN listing, Android emulator scripts (API 33), loot→camp click-through fix, shop dev UI hidden on export
+- **D5 runbook** — [[../06-production/play-internal-test|play-internal-test]]
 
 ## Template za nove unose
 

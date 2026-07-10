@@ -29,6 +29,7 @@ Ovo je praktični priručnik za razvoj u `game/`. [`arhitektura.md`](../arhitekt
 | Nešto puca / čudno se ponaša | [[greske-katalog\|greske-katalog]] |
 | Prije commita / testa | [[dev-workflow\|dev-workflow]] |
 | iOS export / iPhone test (C4) | [[ios-export\|ios-export]] |
+| IAP / Google Play Billing (D3) | [[iap-billing-setup\|iap-billing-setup]] |
 
 ## Zlatna pravila (TL;DR)
 

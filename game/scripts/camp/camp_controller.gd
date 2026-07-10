@@ -29,7 +29,6 @@ var _planted_during_camp1: bool = false
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	set_process_unhandled_input(true)
 	GameState.ensure_loot_in_camp_bag()
 	donate_button.clicked.connect(_on_donate_pressed)
 	upgrade_button.clicked.connect(_on_upgrade_pressed)
@@ -54,76 +53,6 @@ func _setup_safe_area() -> void:
 	if settings_button:
 		SAFE_AREA.apply_top_margin(settings_button, 8.0)
 		SAFE_AREA.apply_horizontal_margins(settings_button)
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if not _is_primary_click_release(event):
-		return
-	var pos := _event_position(event)
-	if _route_click(pos):
-		get_viewport().set_input_as_handled()
-
-
-func _is_primary_click_release(event: InputEvent) -> bool:
-	if event is InputEventMouseButton:
-		var mouse := event as InputEventMouseButton
-		return mouse.button_index == MOUSE_BUTTON_LEFT and not mouse.pressed
-	if event is InputEventScreenTouch:
-		return (event as InputEventScreenTouch).pressed
-	return false
-
-
-func _event_position(event: InputEvent) -> Vector2:
-	if event is InputEventMouseButton:
-		return (event as InputEventMouseButton).position
-	if event is InputEventScreenTouch:
-		return (event as InputEventScreenTouch).position
-	return Vector2.ZERO
-
-
-func _route_click(pos: Vector2) -> bool:
-	if _hit_control(main_menu_button, pos):
-		_on_main_menu_pressed()
-		return true
-
-	if _hit_control(play_button, pos) and not play_button.disabled:
-		_on_play_pressed()
-		return true
-
-	if _hit_control(donate_button, pos):
-		if donate_button.disabled:
-			info_label.text = "Select a T2 bloom on a bed, then tap Donate."
-			return true
-		_on_donate_pressed()
-		return true
-
-	if _hit_control(upgrade_button, pos):
-		if upgrade_button.disabled:
-			info_label.text = "Donate %d blooms first (%d/%d)." % [
-				GameState.MAGNET_COST_T2,
-				GameState.sprinkler_donations,
-				GameState.MAGNET_COST_T2,
-			]
-			return true
-		_on_upgrade_pressed()
-		return true
-
-	if _hit_control(exchange_button, pos):
-		if exchange_button.disabled:
-			info_label.text = "Need 3× the same seed in your bag to trade."
-			return true
-		_on_exchange_pressed()
-		return true
-
-	if _hit_control(loadout_button, pos):
-		_on_loadout_pressed()
-		return true
-
-	return false
-
-
-func _hit_control(control: Control, pos: Vector2) -> bool:
-	return control.is_visible_in_tree() and control.get_global_rect().has_point(pos)
 
 
 func _build_garden_beds() -> void:

@@ -46,16 +46,16 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -340.0
-offset_top = -320.0
+offset_top = -380.0
 offset_right = 340.0
-offset_bottom = 320.0
+offset_bottom = 380.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="VBox" type="VBoxContainer" parent="Panel"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 16
 
 [node name="TitleLabel" type="Label" parent="Panel/VBox"]
 layout_mode = 2
@@ -68,7 +68,7 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.35, 0.35, 1)
 theme_override_font_sizes/font_size = 22
-text = "Shop — IAP test"
+text = "Support the game — optional purchases."
 horizontal_alignment = 1
 autowrap_mode = 2
 
@@ -80,6 +80,13 @@ label_text = "Remove Ads — €3.99"
 font_size = 28
 button_variant = "accent"
 
+[node name="RemoveAdsDesc" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
+theme_override_font_sizes/font_size = 18
+text = "Turn off interstitial ads between runs. Rewarded videos stay optional."
+autowrap_mode = 2
+
 [node name="StarterPackButton" type="PanelContainer" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
@@ -87,6 +94,29 @@ script = ExtResource("2_uibtn")
 label_text = "Starter Pack — €1.99"
 font_size = 28
 button_variant = "secondary"
+
+[node name="StarterPackDesc" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
+theme_override_font_sizes/font_size = 18
+text = "One-time boost: +15 coins and +8 clover seeds."
+autowrap_mode = 2
+
+[node name="RestoreButton" type="PanelContainer" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+script = ExtResource("2_uibtn")
+label_text = "Restore Purchases"
+font_size = 24
+button_variant = "subtle"
+
+[node name="ResetDevButton" type="PanelContainer" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+script = ExtResource("2_uibtn")
+label_text = "Reset Purchases (dev)"
+font_size = 22
+button_variant = "subtle"
 
 [node name="BackButton" type="PanelContainer" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 64)

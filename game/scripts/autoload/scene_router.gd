@@ -2,8 +2,17 @@ extends Node
 
 ## Autoload — mijenja scenu iz UI-a (preživi i kad se trenutni ekran gasi).
 
+const INPUT_BLOCK_MS := 400
+
+var _input_block_until_msec: int = 0
+
+
+func is_input_blocked() -> bool:
+	return Time.get_ticks_msec() < _input_block_until_msec
+
 
 func change_to(path: String) -> void:
+	_input_block_until_msec = Time.get_ticks_msec() + INPUT_BLOCK_MS
 	call_deferred("_change_to", path)
 
 

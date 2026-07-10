@@ -40,4 +40,6 @@ window/handheld/orientation=1
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+rendering_device/driver.android="opengl3"
 textures/vram_compression/import_etc2_astc=true

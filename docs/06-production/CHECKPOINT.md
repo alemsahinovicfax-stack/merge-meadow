@@ -12,14 +12,15 @@ trenutna_faza: 5
 podfaza: launch-prep
 aktivna_sekcija: D
 b0_aktivan: false
-sljedeci_korak: "D3 — shop production (remove ads + starter pack)"
-zadnja_sesija: "D2 — endless u main menuu (Easy/Normal/Hard, odvojeno od kampanje)"
-zadnje_azurirano: 2026-07-07
+sljedeci_korak: "D5 — Google Play internal test"
+zadnja_sesija: "D4 gotovo — 8/8 store PNG; loot→camp fix; shop dev UI"
+zadnje_azurirano: 2026-07-10
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
 test_uredjaji:
-  - "Android emulator Pixel_4 (primarni — svaki dan)"
+  - "Android emulator Pixel_4_API33 (API 33, host GPU — primarni)"
+  - "Android emulator Pixel_4 (API 30 — NE za Godot 4, samo GLES2 guest)"
   - "iPhone (iOS test — M7, C4)"
 strategija_platforme: android-first
 # --- Praćenje faza (agent + ti) ---
@@ -291,8 +292,8 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 - [x] 100 run level konfiguracija — **D1a** JSON 1–10 + **D1b** curve 11–100 (`RunLevelLibrary`)
 - [x] Endless mode — **D2 stub** main menu, Easy/Normal/Hard (Lv 20/50/85 base, spawn ×0.9), odvojeno od kampanje 1–100
-- [ ] Shop: remove ads + starter pack
-- [ ] EN store listing + screenshots
+- [x] Shop: remove ads + starter pack — **D3** `IAPManager` billing hook, restore, shop UI, interstitial respects `ads_removed`
+- [x] EN store listing + screenshots — **D4** 8× PNG u `marketing/store/screenshots/`, copy u `store-listing-en.md`
 - [ ] Google Play internal test
 - [ ] App Store Connect (iOS)
 - [ ] €50–100 CPI test kampanja
@@ -301,9 +302,9 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-1. **C1½ build order** (Sekcija C) — spec-driven, mali koraci; prvi: odluka o save na disk
-2. Prije mehanike **otvori** [[../02-design/spec-vertical-slice|spec-vertical-slice]] — kod prati spec
-3. Balans → mijenjaj u [[../02-design/ekonomija-brojevi|ekonomija-brojevi]] + kodu istovremeno
+1. **D5** — [[play-internal-test|play-internal-test]] (Play Console internal track)
+2. Hostaj privacy policy URL prije store submita
+3. Play Console: IAP product IDs (`remove_ads`, `starter_pack`) kad uključiš billing plugin
 
 ## Povezano
 

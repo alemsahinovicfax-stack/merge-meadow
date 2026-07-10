@@ -168,7 +168,9 @@ func _on_mouse_exited() -> void:
 
 
 func _on_gui_input(event: InputEvent) -> void:
-	if disabled:
+	if disabled or SceneRouter.is_input_blocked():
+		if event is InputEventMouseButton or event is InputEventScreenTouch:
+			accept_event()
 		return
 	if event is InputEventMouseButton:
 		var mouse := event as InputEventMouseButton

@@ -83,6 +83,36 @@ func _try_init_admob_plugin() -> bool:
 	return true
 
 
+func can_show_interstitial(_placement: String) -> bool:
+	return not GameState.ads_removed
+
+
+func show_interstitial(placement: String, on_finished: Callable = Callable()) -> void:
+	if not can_show_interstitial(placement):
+		if on_finished.is_valid():
+			on_finished.call()
+		return
+	match backend:
+		Backend.ADMOB_PLUGIN:
+			_show_plugin_interstitial(placement, on_finished)
+		_:
+			_show_stub_interstitial(placement, on_finished)
+
+
+func _show_stub_interstitial(_placement: String, on_finished: Callable) -> void:
+	var timer := get_tree().create_timer(0.35)
+	timer.timeout.connect(func() -> void:
+		if on_finished.is_valid():
+			on_finished.call()
+	, CONNECT_ONE_SHOT)
+
+
+func _show_plugin_interstitial(placement: String, on_finished: Callable) -> void:
+	push_warning("AdManager: interstitial plugin hook pending — skipping for %s" % placement)
+	if on_finished.is_valid():
+		on_finished.call()
+
+
 func _request_plugin_rewarded(placement: String) -> void:
 	if _rewarded_loader == null:
 		_fail_rewarded(placement, "plugin_not_ready")

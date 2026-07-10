@@ -13,6 +13,7 @@ game/.import/
 game/export/
 game/*.apk
 game/*.apk.idsig
+marketing/store/*.log
 game/assets/ui/_kenney_src/
 game/assets/ui/_extract/
 game/android/**/.godot/

@@ -98,7 +98,7 @@ Detalji → [[CHECKPOINT#Dokumentacija vs kod — kada što radiš|CHECKPOINT]]
 |---|---------|------|
 | 8.1 | 100 runova + endless | [ ] |
 | 8.2 | Shop production IAP | [ ] |
-| 8.3 | EN store listing + ASO | [ ] |
+| 8.3 | EN store listing + ASO | [x] |
 | 8.4 | Google Play + App Store submit | [ ] |
 | 8.5 | Marketing test €50–100 | [ ] |
 

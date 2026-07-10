@@ -17,7 +17,8 @@ tags: [hub, produkcija]
 - [[ideje-kad-predloziti|ideje-kad-predloziti]] — kad agent predlaže scratch ideje
 - [[milestone-i|milestone-i]] — konkretni ciljevi
 - [[rizici|rizici]] — što može poći po zlu
-- [[testiranje|testiranje]] — QA plan, beta, feedback
+- [[store-listing-en|store-listing-en]] — EN Play / App Store copy (D4)
+- [[store-screenshots|store-screenshots]] — screenshot plan + capture
 
 ## Povezano
 

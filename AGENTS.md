@@ -59,6 +59,13 @@ Setup upute: `docs/07-meta/obsidian-setup.md`
 - **Ne** pokretati raw `Godot_v4.7-stable_win64.exe` dvostrukim klikom
 - Detalji: `docs/05-technical/godot-dev-setup.md`
 
+## Git — solo (master)
+
+- **Default grana:** `master` — radi i pushaj direktno, bez feature grana i PR-ova osim ako eksplicitno tražiš
+- **Remote = engleski:** commit poruke, branch imena, PR tekst
+- **Push:** na kraju sesije ili na zahtjev — `git push origin master`
+- Detalji: rule `.cursor/rules/git-solo-workflow.mdc`
+
 ## Pisanje Godot koda (game/)
 
 Prije pisanja/izmjene koda u `game/` konzultiraj **Godot priručnik**: `docs/05-technical/godot/_index.md`.

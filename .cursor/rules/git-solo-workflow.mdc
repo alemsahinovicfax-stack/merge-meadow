@@ -1,0 +1,32 @@
+---
+description: Solo git workflow — master branch, English on remote, no PRs by default
+alwaysApply: true
+---
+
+# Git — solo developer
+
+Solo projekt. **Ne predlagati feature grane ni PR** osim ako korisnik eksplicitno traži.
+
+## Default workflow
+
+- Radi sve na **`master`** (default grana repoa; nije `main`)
+- `commit` → `git push origin master` na kraju sesije ili kad korisnik traži push
+- Commit samo kad korisnik eksplicitno traži (user rule)
+
+## Engleski na remote
+
+Sve što ide na GitHub — **engleski**:
+
+- commit poruke (npr. `M8 D3: shop remove-ads stub`)
+- branch imena (ako ikad treba grana)
+- PR naslovi i opisi (ako korisnik traži PR)
+
+Lokalno: docs i chat mogu ostati na hrvatskom.
+
+## Kada spomenuti granu
+
+Samo ako korisnik traži eksperiment, risky refactor, ili paralelni rad — npr. `experiment/shop-iap`. Inače preskoči.
+
+## Reference
+
+- `AGENTS.md` — Git sekcija

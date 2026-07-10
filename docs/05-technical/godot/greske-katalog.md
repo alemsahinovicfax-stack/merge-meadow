@@ -138,6 +138,65 @@ Novi fajl u `game/assets/` dodan izvan editora. Godot **nije importao** asset �
 
 ---
 
+## #7 — Android emulator: "Unable to set up Godot engine" / crni ekran
+
+**Datum:** 2026-07-09 (D4 screenshot prep), prošireno 2026-07-10
+
+**Simptom:**
+- Klik na ikonu igre u emulatoru → **Unable to set up Godot engine** (ili crni ekran).
+- Logcat: `createContext failed: EGL_SUCCESS` ili `Couldn't present to Vulkan queue (VkResult error 5)`.
+
+**Uzrok (lanac):**
+
+| # | Problem | Simptom |
+|---|---------|---------|
+| 1 | Stari test APK (`com.example.newgameproject`) | Pogrešna app / crash |
+| 2 | Export bez **x86_64** ABI | APK ne radi na Pixel AVD |
+| 3 | **API 30 system image** → guest `ANDROID_EMU_gles_max_version_2` (GLES 2 only) | Godot 4 `gl_compatibility` treba **GLES 3+** → `createContext failed: EGL_SUCCESS` |
+| 4 | Stale export cache → manifest `rendering.method=mobile` (Vulkan) | Engine starta, ali crni ekran (Vulkan queue error) |
+| 5 | **SwiftShader** na API 33 | Godot starta, ali shader uniform limit (261) — koristi **`-gpu host`** |
+
+**Rješenje (provjereno 2026-07-10):**
+
+1. Instaliraj **API 33+** system image (`google_apis` ili `google_apis_playstore`, x86_64):
+   ```powershell
+   sdkmanager "system-images;android-33;google_apis;x86_64"
+   ```
+2. Kreiraj AVD **Pixel_4_API33** (skripta ispod to radi automatski).
+3. Pokreni emulator s **host GPU** (AMD integrisana OK na API 33):
+   ```powershell
+   .\scripts\start-android-emulator.ps1              # Pixel_4_API33, -gpu host
+   .\scripts\android-launch-game.ps1                 # install + start + logcat
+   ```
+4. Export: `x86_64=true`, manifest `gl_compatibility`, `merge_meadow_debug.apk`.
+5. **Ne koristi Pixel_4 (API 30)** za Godot 4 — guest je uvijek GLES 2, bez obzira na SwiftShader/host.
+
+**Prevencija:**
+- `export_presets.cfg`: `x86_64=true`, `command_line/extra_args="--rendering-driver opengl3"`.
+- `project.godot`: `renderer/rendering_method.mobile="gl_compatibility"`.
+- Dev emulator: **Pixel_4_API33** (ne API 30 s default GPU).
+- Screenshot tek nakon svježeg exporta iz `game/`.
+
+---
+
+## #8 — Loot → Camp: dupli klik pokreće Play
+
+**Datum:** 2026-07-10
+
+**Simptom:** Fail loot → **To Camp** → kamp se otvori, ali odmah krene novi run.
+
+**Uzrok:** `camp_controller._unhandled_input` hvata **mouse release** na Play poziciji. To Camp i Play su skoro isti Y; release nakon scene change aktivira Play.
+
+**Rješenje:**
+1. Uklonjen dupli button routing iz `camp_controller` (`UiClickButton.clicked` je dovoljan).
+2. `SceneRouter` blokira UI input 400 ms nakon `change_to`.
+3. `UiClickButton` ignorira input dok je block aktivan.
+4. Loot zaključava gumbe pri odlasku u kamp.
+
+**Prevencija:** ne dodavati `_unhandled_input` release-handling za gumbe s `UiClickButton`.
+
+---
+
 ## Kako dodati novi unos
 
 ```markdown

@@ -58,8 +58,8 @@ Merge Meadow je mobilna hybrid-casual igra za igrače koji vole kratke sesije i 
 ## Otvorena pitanja
 
 - [ ] Koji je finalni naziv igre? (Merge Meadow je radni)
-- [ ] Treba li podnaslov na storeu? (npr. „Run & Merge“)
-- [ ] Finalni EN naslov i subtitle za ASO test
+- [x] Treba li podnaslov na storeu? → **Run, Collect & Merge** (App Store subtitle)
+- [x] Finalni EN naslov i subtitle za ASO test → vidi [[../06-production/store-listing-en|store-listing-en]]
 
 ## Povezano
 

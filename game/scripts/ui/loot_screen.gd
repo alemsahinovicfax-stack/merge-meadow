@@ -105,9 +105,24 @@ func _ad_status_text(message: String) -> String:
 
 
 func _on_retry_pressed() -> void:
-	GameState.begin_fresh_run()
-	SceneRouter.change_to(GameState.SCENE_RUN)
+	var start_run := func() -> void:
+		GameState.begin_fresh_run()
+		SceneRouter.change_to(GameState.SCENE_RUN)
+	if AdManager.can_show_interstitial(CONFIG.PLACEMENT_LOOT_RETRY):
+		status_label.text = "Loading…"
+		retry_button.disabled = true
+		AdManager.show_interstitial(CONFIG.PLACEMENT_LOOT_RETRY, start_run)
+	else:
+		start_run.call()
 
 
 func _on_camp_pressed() -> void:
+	_set_nav_locked(true)
 	GameState.go_to_camp()
+
+
+func _set_nav_locked(locked: bool) -> void:
+	double_button.disabled = locked
+	revive_button.disabled = locked
+	retry_button.disabled = locked
+	camp_button.disabled = locked
