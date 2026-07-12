@@ -23,6 +23,12 @@ func refresh_companion_visual() -> void:
 
 func _apply_companion_visual() -> void:
 	var companion_id := GameState.get_active_companion_id()
+	var pip_skin := GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_PIP_SKIN)
+	if companion_id == CompanionConfig.ID_PIP and not pip_skin.is_empty():
+		_use_draw_fallback = true
+		texture = null
+		scale = Vector2.ONE
+		return
 	var tex := COMPANION_ASSETS.get_run_texture(companion_id)
 	if tex != null:
 		texture = tex

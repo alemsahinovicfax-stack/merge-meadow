@@ -1,0 +1,109 @@
+[gd_scene load_steps=3 format=3 uid="uid://mergearena01"]
+
+[ext_resource type="Script" path="res://scripts/camp/merge_arena_controller.gd" id="1_arena"]
+[ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
+
+[node name="MergeArena" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_arena")
+
+[node name="Bg" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.16, 0.24, 0.18, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -72.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopBar" type="HBoxContainer" parent="RootVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BackButton" type="PanelContainer" parent="RootVBox/TopBar"]
+custom_minimum_size = Vector2(120, 52)
+layout_mode = 2
+script = ExtResource("2_uibtn")
+label_text = "Camp"
+font_size = 20
+button_variant = "subtle"
+
+[node name="Title" type="Label" parent="RootVBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "Merge Arena"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="InfoLabel" type="Label" parent="RootVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Drag matching seeds together."
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Playfield" type="Control" parent="RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 400)
+
+[node name="InboxPanel" type="PanelContainer" parent="RootVBox"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
+
+[node name="VBox" type="VBoxContainer" parent="RootVBox/InboxPanel"]
+layout_mode = 2
+
+[node name="InboxTitle" type="Label" parent="RootVBox/InboxPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Bloom inbox"
+
+[node name="InboxScroll" type="ScrollContainer" parent="RootVBox/InboxPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 2
+
+[node name="InboxRow" type="HBoxContainer" parent="RootVBox/InboxPanel/VBox/InboxScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="FooterBar" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -72.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="DoneButton" type="PanelContainer" parent="FooterBar"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_uibtn")
+label_text = "Done"
+font_size = 24
+button_variant = "primary"

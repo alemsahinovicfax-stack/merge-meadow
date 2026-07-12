@@ -9,8 +9,14 @@ func _ready() -> void:
 	z_index = -10
 	texture = _load_texture()
 	centered = false
+	_apply_meadow_cosmetic()
 	_fit_to_viewport()
 	get_viewport().size_changed.connect(_fit_to_viewport)
+
+
+func _apply_meadow_cosmetic() -> void:
+	var bg_id := GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_MEADOW_BG)
+	modulate = CosmeticCatalog.get_meadow_modulate(bg_id)
 
 
 func _load_texture() -> Texture2D:

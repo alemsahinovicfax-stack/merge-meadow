@@ -13,23 +13,30 @@ const NOSE := Color(1.0, 0.55, 0.62, 1.0)
 
 
 static func draw_pip(canvas: CanvasItem, center: Vector2, scale: float = 1.0) -> void:
+	var palette := _resolve_palette()
+	var body: Color = palette.get("body", BODY)
+	var ear: Color = palette.get("ear", EAR)
+	var ear_inner: Color = palette.get("ear_inner", EAR_INNER)
+	var outline: Color = palette.get("outline", OUTLINE)
 	var s := scale
 	var body_r := 22.0 * s
 	var body_center := center + Vector2(0.0, 4.0 * s)
 
-	# Uši (iza glave)
-	canvas.draw_circle(center + Vector2(-14.0 * s, -18.0 * s), 10.0 * s, EAR)
-	canvas.draw_circle(center + Vector2(14.0 * s, -18.0 * s), 10.0 * s, EAR)
-	canvas.draw_circle(center + Vector2(-14.0 * s, -18.0 * s), 5.5 * s, EAR_INNER)
-	canvas.draw_circle(center + Vector2(14.0 * s, -18.0 * s), 5.5 * s, EAR_INNER)
+	canvas.draw_circle(center + Vector2(-14.0 * s, -18.0 * s), 10.0 * s, ear)
+	canvas.draw_circle(center + Vector2(14.0 * s, -18.0 * s), 10.0 * s, ear)
+	canvas.draw_circle(center + Vector2(-14.0 * s, -18.0 * s), 5.5 * s, ear_inner)
+	canvas.draw_circle(center + Vector2(14.0 * s, -18.0 * s), 5.5 * s, ear_inner)
 
-	# Tijelo
-	canvas.draw_circle(body_center, body_r, BODY)
-	canvas.draw_arc(body_center, body_r, 0.0, TAU, 32, OUTLINE, 2.0 * s)
+	canvas.draw_circle(body_center, body_r, body)
+	canvas.draw_arc(body_center, body_r, 0.0, TAU, 32, outline, 2.0 * s)
 
-	# Oči
 	canvas.draw_circle(center + Vector2(-8.0 * s, -2.0 * s), 3.0 * s, EYE)
 	canvas.draw_circle(center + Vector2(8.0 * s, -2.0 * s), 3.0 * s, EYE)
-
-	# Nos
 	canvas.draw_circle(center + Vector2(0.0, 6.0 * s), 3.5 * s, NOSE)
+
+
+static func _resolve_palette() -> Dictionary:
+	var skin_id := GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_PIP_SKIN)
+	if skin_id.is_empty():
+		return {}
+	return CosmeticCatalog.get_pip_palette(skin_id)

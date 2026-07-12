@@ -87,7 +87,9 @@ func _ensure_content() -> void:
 		_row.add_theme_constant_override("separation", 12)
 		_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		if legacy_label:
+			legacy_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			remove_child(legacy_label)
 			_row.add_child(legacy_label)
 		add_child(_row)
@@ -100,6 +102,7 @@ func _ensure_content() -> void:
 		_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_row.add_child(_label)
 
 	_icon = _row.get_node_or_null("Icon") as TextureRect
@@ -110,8 +113,16 @@ func _ensure_content() -> void:
 		_icon.custom_minimum_size = Vector2(UI_ASSETS.BUTTON_ICON_SIZE, UI_ASSETS.BUTTON_ICON_SIZE)
 		_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_row.add_child(_icon)
 		_row.move_child(_icon, 0)
+
+	if _row:
+		_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if _label:
+		_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if _icon:
+		_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 func _update_label() -> void:

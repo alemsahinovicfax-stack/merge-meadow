@@ -4,7 +4,14 @@ const SCENE_MAIN := "res://scenes/main_menu.tscn"
 const SCENE_RUN := "res://scenes/run/run_scene.tscn"
 const SCENE_LOOT := "res://scenes/ui/loot_screen.tscn"
 const SCENE_CAMP := "res://scenes/camp/camp_scene.tscn"
+const SCENE_MERGE_ARENA := "res://scenes/camp/merge_arena.tscn"
 const SCENE_SHOP := "res://scenes/ui/shop_screen.tscn"
+const SCENE_COLLECTION := "res://scenes/ui/collection_journal.tscn"
+
+const ARENA_MAX_CHIPS := 40
+const ARENA_SNAP_DISTANCE := 100.0
+const ARENA_MAGNET_RADIUS := 130.0
+const BLOOM_INBOX_MAX := 12
 
 const CAMP_BED_COUNT := 9
 const CAMP_BED_BONUS := 3
@@ -22,6 +29,7 @@ const MYTHIC_RARITY := 3
 
 const EXCHANGE_SEED_COUNT := 3
 const EXCHANGE_COINS_REWARD := 8
+const CRYSTAL_EXCHANGE_COINS := 10
 
 const SEED_TYPE_CLOVER := "clover"
 
@@ -77,7 +85,7 @@ const ENDLESS_DIFFICULTY_LABELS: Dictionary = {
 
 const TUTORIAL_FLAGS_PATH := "user://tutorial_flags.json"
 const PLAYER_SAVE_PATH := "user://player_save.json"
-const SAVE_VERSION := 4
+const SAVE_VERSION := 7
 
 var last_seed_bag: Dictionary = {}
 var last_run_coins: int = 0
@@ -101,6 +109,11 @@ var carry_seeds: int = 0
 # null = prazno; inače { type_id, tier }
 var garden_beds: Array = []
 var greenhouse_beds: Array = []
+var garden_crystal_stash: Dictionary = {}
+var owned_cosmetics: Dictionary = {}
+var equipped_cosmetics: Dictionary = {}
+var booster_inventory: Dictionary = {}
+var merge_hint_booster_active: bool = false
 
 var magnet_level: int = 0
 var sprinkler_donations: int = 0
@@ -126,6 +139,9 @@ var collection_kept_tiers: Dictionary = {}
 var last_daily_chest_day: String = ""
 var active_companion_id: String = COMPANION_PIP
 var mochi_unlock_seen: bool = false
+var collection_journal_pending: Dictionary = {}
+var bloom_inbox: Array = []
+var _arena_chip_counter: int = 1
 
 
 func _ready() -> void:
@@ -165,6 +181,10 @@ func save_player_save() -> void:
 		"discovered_blooms": discovered_blooms.duplicate(),
 		"garden_beds": _serialize_beds(garden_beds),
 		"greenhouse_beds": _serialize_beds(greenhouse_beds),
+		"garden_crystal_stash": garden_crystal_stash.duplicate(),
+		"owned_cosmetics": owned_cosmetics.duplicate(),
+		"equipped_cosmetics": equipped_cosmetics.duplicate(),
+		"booster_inventory": booster_inventory.duplicate(),
 		"ads_removed": ads_removed,
 		"starter_pack_owned": starter_pack_owned,
 		"run_level": run_level,
@@ -176,6 +196,8 @@ func save_player_save() -> void:
 		"last_daily_chest_day": last_daily_chest_day,
 		"active_companion_id": active_companion_id,
 		"mochi_unlock_seen": mochi_unlock_seen,
+		"collection_journal_pending": collection_journal_pending.duplicate(),
+		"bloom_inbox": bloom_inbox.duplicate(true),
 	}
 	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -202,6 +224,10 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	discovered_blooms = _parse_string_bool_dict(data.get("discovered_blooms", {}))
 	garden_beds = _deserialize_beds(data.get("garden_beds", []), CAMP_BED_COUNT)
 	greenhouse_beds = _deserialize_beds(data.get("greenhouse_beds", []), GREENHOUSE_SLOT_COUNT)
+	garden_crystal_stash = _parse_string_int_dict(data.get("garden_crystal_stash", {}))
+	owned_cosmetics = _parse_string_bool_dict(data.get("owned_cosmetics", {}))
+	equipped_cosmetics = _parse_string_string_dict(data.get("equipped_cosmetics", {}))
+	booster_inventory = _parse_string_int_dict(data.get("booster_inventory", {}))
 	ads_removed = bool(data.get("ads_removed", false))
 	starter_pack_owned = bool(data.get("starter_pack_owned", false))
 	run_level = clampi(int(data.get("run_level", 1)), 1, RunLevelLibrary.MAX_RUN_LEVEL)
@@ -217,8 +243,13 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	last_daily_chest_day = str(data.get("last_daily_chest_day", ""))
 	active_companion_id = str(data.get("active_companion_id", COMPANION_PIP))
 	mochi_unlock_seen = bool(data.get("mochi_unlock_seen", false))
+	collection_journal_pending = _parse_string_int_dict(data.get("collection_journal_pending", {}))
 	if not is_companion_unlocked(active_companion_id):
 		active_companion_id = COMPANION_PIP
+	bloom_inbox = _deserialize_bloom_inbox(data.get("bloom_inbox", []))
+	if int(data.get("version", 0)) < SAVE_VERSION:
+		_migrate_legacy_beds_to_inbox()
+	_clear_legacy_beds()
 	_refresh_seed_unlock_from_lifetime()
 	_ensure_garden_bed_capacity()
 	if not is_seed_type_unlocked(loadout_type_id):
@@ -277,6 +308,17 @@ func _parse_string_bool_dict(data: Variant) -> Dictionary:
 	return out
 
 
+func _parse_string_string_dict(data: Variant) -> Dictionary:
+	var out: Dictionary = {}
+	if not data is Dictionary:
+		return out
+	for key in data:
+		var value := str(data[key])
+		if not value.is_empty():
+			out[str(key)] = value
+	return out
+
+
 func _try_migrate_tutorial_flags_only() -> void:
 	if not FileAccess.file_exists(TUTORIAL_FLAGS_PATH):
 		return
@@ -296,7 +338,25 @@ func _apply_debug_resources_if_new_game() -> void:
 	if FileAccess.file_exists(PLAYER_SAVE_PATH):
 		return
 	wallet_coins = DEBUG_WALLET_COINS
-	seed_bag = {SEED_TYPE_CLOVER: DEBUG_SEED_COUNT}
+	_apply_debug_unlocked_seeds(10)
+
+
+## Dev/playtest — min. count po otključanom tipu (ignorira soft cap u torbi).
+func ensure_dev_unlocked_seeds(count_per_type: int = 10) -> void:
+	if not DEBUG_DEV_RESOURCES:
+		return
+	_apply_debug_unlocked_seeds(count_per_type)
+	save_player_save()
+
+
+func _apply_debug_unlocked_seeds(count_per_type: int) -> void:
+	for i in range(seed_unlock_index + 1):
+		var type_id := SeedUnlockConfig.get_type_at_index(i)
+		if type_id.is_empty():
+			continue
+		var current := int(seed_bag.get(type_id, 0))
+		if current < count_per_type:
+			seed_bag[type_id] = count_per_type
 
 
 func mark_tutorial_complete() -> void:
@@ -325,7 +385,30 @@ func go_to_scene(path: String) -> void:
 
 func go_to_camp() -> void:
 	deposit_loot_to_camp()
+	if should_offer_merge_arena():
+		go_to_merge_arena()
+	else:
+		go_to_camp_hub()
+
+
+func go_to_camp_hub() -> void:
 	go_to_scene(SCENE_CAMP)
+
+
+func go_to_merge_arena() -> void:
+	go_to_scene(SCENE_MERGE_ARENA)
+
+
+func go_to_collection_journal() -> void:
+	go_to_scene(SCENE_COLLECTION)
+
+
+func should_offer_merge_arena() -> bool:
+	return sum_seed_bag(seed_bag) > 0
+
+
+func should_prompt_merge_tutorial() -> bool:
+	return not tutorial_complete and tutorial_step == TutorialStep.CAMP1
 
 
 func get_loadout_type() -> String:
@@ -418,7 +501,6 @@ func resolve_plant_type(for_greenhouse: bool, preferred: String = "") -> String:
 func ensure_loot_in_camp_bag() -> void:
 	if sum_seed_bag(last_seed_bag) > 0:
 		deposit_loot_to_camp()
-	auto_plant_from_bag()
 
 
 func get_seed_rarity(type_id: String) -> int:
@@ -696,6 +778,75 @@ func format_collection_label() -> String:
 	return "Collection: " + ", ".join(parts)
 
 
+func _mark_collection_journal_new(type_id: String, tier: int) -> void:
+	if type_id.is_empty():
+		return
+	var journal_tier := maxi(1, tier)
+	var prev := int(collection_journal_pending.get(type_id, 0))
+	collection_journal_pending[type_id] = maxi(prev, journal_tier)
+
+
+func has_collection_journal_news() -> bool:
+	return not collection_journal_pending.is_empty()
+
+
+func count_collection_journal_news() -> int:
+	return collection_journal_pending.size()
+
+
+func mark_collection_journal_viewed() -> void:
+	if collection_journal_pending.is_empty():
+		return
+	collection_journal_pending.clear()
+	save_player_save()
+
+
+func get_collection_journal_entries() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for i in SeedUnlockConfig.chain_size():
+		var type_id := SeedUnlockConfig.get_type_at_index(i)
+		if type_id.is_empty():
+			continue
+		var spawn_unlocked := is_seed_type_unlocked(type_id)
+		var discovered := bool(discovered_blooms.get(type_id, false))
+		var kept_tier := int(collection_kept_tiers.get(type_id, 0))
+		var display_tier := kept_tier
+		if display_tier <= 0 and discovered:
+			display_tier = 1
+		var state := "locked"
+		if kept_tier >= 3:
+			state = "album_t3"
+		elif kept_tier >= 2:
+			state = "album_t2"
+		elif discovered or spawn_unlocked:
+			state = "seen"
+		out.append({
+			"type_id": type_id,
+			"display_name": SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize()),
+			"rarity": get_seed_rarity(type_id),
+			"spawn_unlocked": spawn_unlocked,
+			"discovered": discovered,
+			"kept_tier": kept_tier,
+			"display_tier": display_tier,
+			"state": state,
+			"is_new": collection_journal_pending.has(type_id),
+			"new_tier": int(collection_journal_pending.get(type_id, 0)),
+		})
+	return out
+
+
+func format_collection_journal_summary() -> String:
+	var entries := get_collection_journal_entries()
+	var kept := 0
+	var seen := 0
+	for entry in entries:
+		if str(entry.get("state", "")).begins_with("album"):
+			kept += 1
+		elif str(entry.get("state", "")) != "locked":
+			seen += 1
+	return "Album: %d blooms kept · %d spotted" % [kept, seen]
+
+
 func _halve_seed_bag(bag: Dictionary) -> Dictionary:
 	var out: Dictionary = {}
 	for type_id in bag:
@@ -795,7 +946,7 @@ func show_rewarded_loot_buttons() -> bool:
 
 
 func should_highlight_first_bed() -> bool:
-	return not tutorial_complete and tutorial_step == TutorialStep.CAMP1
+	return should_prompt_merge_tutorial()
 
 
 func notify_camp_play() -> void:
@@ -987,7 +1138,6 @@ func claim_daily_chest() -> String:
 	var added := add_seeds_to_bag(type_id, DAILY_CHEST_SEEDS)
 	wallet_coins += DAILY_CHEST_COINS
 	last_daily_chest_day = _today_key()
-	auto_plant_from_bag()
 	save_player_save()
 	var name: String = SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
 	if added < DAILY_CHEST_SEEDS:
@@ -999,25 +1149,7 @@ func claim_daily_chest() -> String:
 
 
 func auto_plant_from_bag() -> int:
-	## Samo dovršava parove za merge — ne puni prazne gredice nasumično.
-	if not tutorial_complete or should_highlight_first_bed():
-		return 0
-	var planted := 0
-	for in_greenhouse in [false, true]:
-		while true:
-			var type_id := _pick_pair_completion_type(in_greenhouse)
-			if type_id.is_empty():
-				break
-			var bed_idx := _first_empty_bed_index(in_greenhouse)
-			if bed_idx < 0:
-				break
-			if plant_seed_in_bed(bed_idx, type_id, in_greenhouse):
-				planted += 1
-			else:
-				break
-	if planted > 0:
-		save_player_save()
-	return planted
+	return 0
 
 
 func _pick_pair_completion_type(in_greenhouse: bool) -> String:
@@ -1030,28 +1162,11 @@ func _pick_pair_completion_type(in_greenhouse: bool) -> String:
 
 
 func keep_all_blooms_on_beds() -> int:
-	var kept := 0
-	for in_greenhouse in [false, true]:
-		var beds := _bed_array(in_greenhouse)
-		for i in beds.size():
-			if beds[i] == null:
-				continue
-			if int(beds[i].get("tier", 0)) < 2:
-				continue
-			if keep_bloom_from_bed(i, in_greenhouse):
-				kept += 1
-	if kept > 0:
-		auto_plant_from_bag()
-	return kept
+	return keep_all_bloom_inbox()
 
 
 func count_blooms_on_beds(min_tier: int = 2) -> int:
-	var total := 0
-	for in_greenhouse in [false, true]:
-		for bed in _bed_array(in_greenhouse):
-			if bed != null and int(bed.get("tier", 0)) >= min_tier:
-				total += 1
-	return total
+	return count_bloom_inbox(min_tier)
 
 
 func _first_empty_bed_index(in_greenhouse: bool) -> int:
@@ -1088,6 +1203,7 @@ func keep_bloom_from_bed(bed_index: int, in_greenhouse: bool = false) -> bool:
 	var prev := int(collection_kept_tiers.get(type_id, 0))
 	collection_kept_tiers[type_id] = maxi(prev, tier)
 	discovered_blooms[type_id] = true
+	_mark_collection_journal_new(type_id, tier)
 	beds[bed_index] = null
 	save_player_save()
 	return true
@@ -1157,6 +1273,7 @@ func try_merge_beds(index_a: int, index_b: int, in_greenhouse: bool = false) -> 
 	beds[index_a] = null
 	if tier + 1 >= 2:
 		discovered_blooms[type_id] = true
+		_mark_collection_journal_new(type_id, 1)
 		_notify_merge_completed()
 	save_player_save()
 	return true
@@ -1340,3 +1457,457 @@ func poll_mochi_unlock_toast() -> String:
 	mochi_unlock_seen = true
 	save_player_save()
 	return "Mochi joined the meadow! Pick a companion below."
+
+
+func _clear_legacy_beds() -> void:
+	garden_beds.clear()
+	greenhouse_beds.clear()
+
+
+func _migrate_legacy_beds_to_inbox() -> void:
+	for in_greenhouse in [false, true]:
+		for bed in _bed_array(in_greenhouse):
+			if bed == null:
+				continue
+			var tier := int(bed.get("tier", 0))
+			if tier >= 2:
+				push_bloom_inbox(str(bed.get("type_id", "")), tier)
+
+
+func _deserialize_bloom_inbox(raw: Variant) -> Array:
+	var out: Array = []
+	if raw is Array:
+		for item in raw:
+			if item is Dictionary:
+				out.append(item.duplicate())
+	return out
+
+
+func get_bloom_inbox_entries() -> Array:
+	return bloom_inbox.duplicate(true)
+
+
+func count_bloom_inbox(min_tier: int = 2) -> int:
+	var total := 0
+	for item in bloom_inbox:
+		if int(item.get("tier", 0)) >= min_tier:
+			total += 1
+	return total
+
+
+func push_bloom_inbox(type_id: String, tier: int) -> bool:
+	if type_id.is_empty() or tier < 2:
+		return false
+	if bloom_inbox.size() >= BLOOM_INBOX_MAX:
+		return false
+	bloom_inbox.append({"type_id": type_id, "tier": tier})
+	discovered_blooms[type_id] = true
+	_mark_collection_journal_new(type_id, 1)
+	save_player_save()
+	return true
+
+
+func donate_bloom(type_id: String, tier: int) -> bool:
+	if type_id.is_empty() or tier < 2:
+		return false
+	if tier == 2:
+		if magnet_level >= MAGNET_MAX_LEVEL:
+			return false
+		if sprinkler_donations >= MAGNET_COST_T2:
+			return false
+		sprinkler_donations += 1
+	elif tier >= MAX_MERGE_TIER:
+		if multiplier_level >= MULTIPLIER_MAX_LEVEL:
+			return false
+		if multiplier_donations >= MULTIPLIER_COST_T3:
+			return false
+		multiplier_donations += 1
+	else:
+		return false
+	save_player_save()
+	return true
+
+
+func can_keep_bloom_upgrade(type_id: String, tier: int) -> bool:
+	if type_id.is_empty() or tier < 2:
+		return false
+	return tier > int(collection_kept_tiers.get(type_id, 0))
+
+
+func keep_bloom(type_id: String, tier: int) -> bool:
+	if not can_keep_bloom_upgrade(type_id, tier):
+		return false
+	collection_kept_tiers[type_id] = tier
+	discovered_blooms[type_id] = true
+	_mark_collection_journal_new(type_id, tier)
+	save_player_save()
+	return true
+
+
+func basket_bloom_type(type_id: String) -> bool:
+	if type_id.is_empty() or is_mythic_seed(type_id):
+		return false
+	loadout_type_id = type_id
+	save_player_save()
+	return true
+
+
+func keep_all_bloom_inbox() -> int:
+	var kept := 0
+	for i in range(bloom_inbox.size() - 1, -1, -1):
+		if keep_bloom_inbox(i):
+			kept += 1
+	return kept
+
+
+func keep_bloom_inbox(index: int) -> bool:
+	if index < 0 or index >= bloom_inbox.size():
+		return false
+	var item: Dictionary = bloom_inbox[index]
+	var type_id := str(item.get("type_id", ""))
+	var tier := int(item.get("tier", 0))
+	if not keep_bloom(type_id, tier):
+		return false
+	bloom_inbox.remove_at(index)
+	return true
+
+
+func donate_bloom_inbox(index: int) -> bool:
+	if index < 0 or index >= bloom_inbox.size():
+		return false
+	var item: Dictionary = bloom_inbox[index]
+	var type_id := str(item.get("type_id", ""))
+	var tier := int(item.get("tier", 0))
+	if not donate_bloom(type_id, tier):
+		return false
+	bloom_inbox.remove_at(index)
+	return true
+
+
+func basket_bloom_inbox(index: int) -> bool:
+	if index < 0 or index >= bloom_inbox.size():
+		return false
+	var type_id := str(bloom_inbox[index].get("type_id", ""))
+	if not basket_bloom_type(type_id):
+		return false
+	bloom_inbox.remove_at(index)
+	return true
+
+
+func flush_bloom_inbox_to_album() -> int:
+	var kept := 0
+	for i in range(bloom_inbox.size() - 1, -1, -1):
+		if keep_bloom_inbox(i):
+			kept += 1
+	return kept
+
+
+func pull_seeds_to_arena(max_count: int) -> Array:
+	var out: Array = []
+	if max_count <= 0:
+		return out
+	var queue := _build_arena_pour_queue()
+	var pulled := 0
+	for type_id in queue:
+		if pulled >= max_count:
+			break
+		if not take_seed_from_bag(type_id):
+			continue
+		var chip_id := _arena_chip_counter
+		_arena_chip_counter += 1
+		out.append({"chip_id": chip_id, "type_id": type_id, "tier": 1})
+		pulled += 1
+	if pulled > 0:
+		save_player_save()
+	return out
+
+
+func _compare_seed_pour_priority(a: String, b: String) -> bool:
+	var ra := get_seed_rarity(a)
+	var rb := get_seed_rarity(b)
+	if ra != rb:
+		return ra < rb
+	return SeedUnlockConfig.get_index(a) < SeedUnlockConfig.get_index(b)
+
+
+func get_bag_types_by_pour_priority() -> Array[String]:
+	var out: Array[String] = []
+	for type_id in seed_bag:
+		if int(seed_bag.get(type_id, 0)) > 0:
+			out.append(str(type_id))
+	out.sort_custom(_compare_seed_pour_priority)
+	return out
+
+
+func _build_arena_pour_queue() -> Array[String]:
+	var sorted_types := get_bag_types_by_pour_priority()
+	if sorted_types.is_empty():
+		return []
+	var priority_types: Array[String] = []
+	var lowest_rarity := get_seed_rarity(sorted_types[0])
+	for type_id in sorted_types:
+		if get_seed_rarity(type_id) != lowest_rarity:
+			break
+		priority_types.append(type_id)
+		if priority_types.size() >= 2:
+			break
+	var queue: Array[String] = []
+	for type_id in priority_types:
+		var count := int(seed_bag.get(type_id, 0))
+		for _i in count:
+			queue.append(type_id)
+	for type_id in sorted_types:
+		if priority_types.has(type_id):
+			continue
+		var count := int(seed_bag.get(type_id, 0))
+		for _i in count:
+			queue.append(type_id)
+	return queue
+
+
+func stash_garden_crystal(type_id: String) -> void:
+	if type_id.is_empty():
+		return
+	discovered_blooms[type_id] = true
+	_mark_collection_journal_new(type_id, MAX_MERGE_TIER)
+	garden_crystal_stash[type_id] = int(garden_crystal_stash.get(type_id, 0)) + 1
+	save_player_save()
+
+
+func get_garden_crystal_total() -> int:
+	return sum_seed_bag(garden_crystal_stash)
+
+
+func format_garden_crystal_stash_label() -> String:
+	var total := get_garden_crystal_total()
+	if total <= 0:
+		return "Garden stash: empty (T3 crystals from merge go here)"
+	var types: Array[String] = []
+	for type_id in garden_crystal_stash:
+		if int(garden_crystal_stash.get(type_id, 0)) > 0:
+			types.append(str(type_id))
+	types.sort_custom(_compare_seed_pour_priority)
+	var parts: PackedStringArray = []
+	for type_id in types:
+		var count := int(garden_crystal_stash.get(type_id, 0))
+		var name: String = SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+		parts.append("%s×%d" % [name, count])
+	return "Garden stash: %s (%d total)" % [", ".join(parts), total]
+
+
+func first_garden_crystal_type() -> String:
+	var types: Array[String] = []
+	for type_id in garden_crystal_stash:
+		if int(garden_crystal_stash.get(type_id, 0)) > 0:
+			types.append(str(type_id))
+	if types.is_empty():
+		return ""
+	types.sort_custom(_compare_seed_pour_priority)
+	return types[0]
+
+
+func exchange_garden_crystal(type_id: String = "") -> bool:
+	if type_id.is_empty():
+		type_id = first_garden_crystal_type()
+	if type_id.is_empty():
+		return false
+	var have := int(garden_crystal_stash.get(type_id, 0))
+	if have <= 0:
+		return false
+	if have <= 1:
+		garden_crystal_stash.erase(type_id)
+	else:
+		garden_crystal_stash[type_id] = have - 1
+	wallet_coins += CRYSTAL_EXCHANGE_COINS
+	save_player_save()
+	return true
+
+
+func sum_seed_bag_only() -> int:
+	return sum_seed_bag(seed_bag)
+
+
+func get_bag_preview_types(limit: int = 3) -> Array[String]:
+	var priority := get_bag_types_by_pour_priority()
+	if priority.is_empty():
+		return []
+	var out: Array[String] = []
+	for type_id in priority:
+		out.append(type_id)
+		if out.size() >= limit:
+			break
+	return out
+
+
+func spawn_arena_chips_from_bag() -> Array:
+	# Legacy — koristi pull_seeds_to_arena iz kontrolera.
+	return pull_seeds_to_arena(ARENA_MAX_CHIPS)
+
+
+func try_merge_arena_chips(chip_a: int, chip_b: int, chip_data: Dictionary) -> Dictionary:
+	if chip_a == chip_b:
+		return {"ok": false, "msg": "Same chip."}
+	if not chip_data.has(chip_a) or not chip_data.has(chip_b):
+		return {"ok": false, "msg": "Missing chip."}
+	var a: Dictionary = chip_data[chip_a]
+	var b: Dictionary = chip_data[chip_b]
+	if str(a.get("type_id", "")) != str(b.get("type_id", "")):
+		return {"ok": false, "msg": "Different types."}
+	var tier := int(a.get("tier", 1))
+	if tier != int(b.get("tier", 1)) or tier >= MAX_MERGE_TIER:
+		return {"ok": false, "msg": "Cannot merge these tiers."}
+	var type_id: String = str(a.get("type_id", ""))
+	var new_tier := tier + 1
+	_notify_merge_completed()
+	if new_tier >= MAX_MERGE_TIER:
+		var center: Vector2 = (a.get("pos", Vector2.ZERO) + b.get("pos", Vector2.ZERO)) * 0.5
+		chip_data.erase(chip_b)
+		chip_data[chip_a] = {"chip_id": chip_a, "type_id": type_id, "tier": new_tier, "pos": center}
+		discovered_blooms[type_id] = true
+		_mark_collection_journal_new(type_id, new_tier)
+		return {"ok": true, "to_inbox": false, "new_tier": new_tier, "crystal": true}
+	var center: Vector2 = (a.get("pos", Vector2.ZERO) + b.get("pos", Vector2.ZERO)) * 0.5
+	chip_data.erase(chip_b)
+	chip_data[chip_a] = {"chip_id": chip_a, "type_id": type_id, "tier": new_tier, "pos": center}
+	return {"ok": true, "to_inbox": false, "new_tier": new_tier}
+
+
+func commit_arena_chips_to_bag(chip_data: Dictionary) -> void:
+	for _chip_id in chip_data:
+		var entry: Dictionary = chip_data[_chip_id]
+		var tier := int(entry.get("tier", 1))
+		var type_id := str(entry.get("type_id", ""))
+		if type_id.is_empty():
+			continue
+		if tier <= 1:
+			add_seeds_to_bag(type_id, 1)
+		elif tier >= MAX_MERGE_TIER:
+			stash_garden_crystal(type_id)
+		elif can_keep_bloom_upgrade(type_id, tier):
+			keep_bloom(type_id, tier)
+		elif not donate_bloom(type_id, tier):
+			pass
+	chip_data.clear()
+	save_player_save()
+
+
+func owns_cosmetic(cosmetic_id: String) -> bool:
+	return bool(owned_cosmetics.get(cosmetic_id, false))
+
+
+func is_cosmetic_equipped(cosmetic_id: String) -> bool:
+	if not owns_cosmetic(cosmetic_id):
+		return false
+	var slot := CosmeticCatalog.get_slot(cosmetic_id)
+	return str(equipped_cosmetics.get(slot, "")) == cosmetic_id
+
+
+func get_equipped_cosmetic(slot: String) -> String:
+	var item_id := str(equipped_cosmetics.get(slot, ""))
+	if item_id.is_empty() or not owns_cosmetic(item_id):
+		return ""
+	return item_id
+
+
+func buy_cosmetic_with_coins(cosmetic_id: String) -> String:
+	if cosmetic_id.is_empty() or CosmeticCatalog.get_item(cosmetic_id).is_empty():
+		return "Unknown item."
+	if owns_cosmetic(cosmetic_id):
+		equip_cosmetic(cosmetic_id)
+		return "%s equipped." % CosmeticCatalog.get_title(cosmetic_id)
+	var cost := CosmeticCatalog.get_coin_cost(cosmetic_id)
+	if wallet_coins < cost:
+		return "Need %d coins." % cost
+	wallet_coins -= cost
+	owned_cosmetics[cosmetic_id] = true
+	equip_cosmetic(cosmetic_id)
+	save_player_save()
+	return "Purchased %s!" % CosmeticCatalog.get_title(cosmetic_id)
+
+
+func equip_cosmetic(cosmetic_id: String) -> bool:
+	if not owns_cosmetic(cosmetic_id):
+		return false
+	var slot := CosmeticCatalog.get_slot(cosmetic_id)
+	if slot.is_empty():
+		return false
+	equipped_cosmetics[slot] = cosmetic_id
+	save_player_save()
+	return true
+
+
+func get_cosmetic_shop_entries() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for item_id in CosmeticCatalog.all_ids():
+		out.append({"id": item_id})
+	return out
+
+
+func get_booster_count(booster_id: String) -> int:
+	return maxi(0, int(booster_inventory.get(booster_id, 0)))
+
+
+func add_booster(booster_id: String, count: int = 1) -> void:
+	if booster_id.is_empty() or count <= 0:
+		return
+	booster_inventory[booster_id] = get_booster_count(booster_id) + count
+	save_player_save()
+
+
+func use_booster(booster_id: String) -> String:
+	if get_booster_count(booster_id) <= 0:
+		return "No boosters left."
+	match booster_id:
+		MonetizationConfig.BOOSTER_MERGE_HINT:
+			merge_hint_booster_active = true
+			_consume_booster(booster_id)
+			return "Merge Hint ready — open Merge arena."
+		MonetizationConfig.BOOSTER_LOOT_BURST:
+			var added := _grant_loot_burst_seeds()
+			_consume_booster(booster_id)
+			return "Loot Burst: +%d seeds to bag!" % added
+		_:
+			return "Unknown booster."
+
+
+func _consume_booster(booster_id: String) -> void:
+	var left := get_booster_count(booster_id) - 1
+	if left <= 0:
+		booster_inventory.erase(booster_id)
+	else:
+		booster_inventory[booster_id] = left
+	save_player_save()
+
+
+func _grant_loot_burst_seeds() -> int:
+	var added := 0
+	for _i in MonetizationConfig.LOOT_BURST_SEEDS:
+		var type_id := pick_random_run_seed_type()
+		if add_seeds_to_bag(type_id, 1):
+			added += 1
+	save_player_save()
+	return added
+
+
+func consume_merge_hint_booster() -> bool:
+	if not merge_hint_booster_active:
+		return false
+	merge_hint_booster_active = false
+	return true
+
+
+func get_merge_hint_message(chip_data: Dictionary) -> String:
+	var counts: Dictionary = {}
+	for _chip_id in chip_data:
+		var entry: Dictionary = chip_data[_chip_id]
+		if int(entry.get("tier", 1)) != 1:
+			continue
+		var type_id := str(entry.get("type_id", ""))
+		if type_id.is_empty():
+			continue
+		counts[type_id] = int(counts.get(type_id, 0)) + 1
+	for type_id in counts:
+		if int(counts[type_id]) >= 2:
+			var name: String = SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+			return "Hint: merge two %s seeds." % name
+	return "Hint: pour seeds and merge matching pairs."

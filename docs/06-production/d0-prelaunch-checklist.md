@@ -112,9 +112,9 @@ Legenda: ✅ gotovo · 🟡 djelomično · ❌ nedostaje · ⏸ odgođeno (plan)
 | U3 | Kamp: merge, upgrade, Keep, auto-plant | ✅ | Keep oslobađa gredicu; torba soft cap 40 |
 | U4 | **Daily chest** | ✅ | `claim_daily_chest()`, save v4, kamp gumb |
 | U5 | Shop: remove ads + starter pack | ✅ | `shop_screen.gd`, `IAPManager` |
-| U6 | Shop: **booster consumables** | ❌ | Samo 2 SKU u `monetization_config.gd` |
-| U7 | Shop / kamp kozmetika (3–5 itema) | ❌ | F8.4 — nema coin shop UI |
-| U8 | **Dnevnik kolekcije** (lista otkrića) | 🟡 | Samo `format_collection_label()` — nema zasebnog ekrana |
+| U6 | Shop: **booster consumables** | ✅ | Merge Hint + Loot Burst IAP; inventory + Use u shopu |
+| U7 | Shop / kamp kozmetika (3–5 itema) | ✅ | 5 coin itema u shopu (`cosmetic_catalog.gd`) |
+| U8 | **Dnevnik kolekcije** (lista otkrića) | ✅ | `collection_journal.tscn`, 📖 u kamp top baru, NEW badge |
 | U9 | Settings ekran | ❌ | Gumb postoji (`SettingsButton`) — **nema handlera** |
 | U10 | EN UI copy | ✅ | Store + in-game EN |
 
@@ -187,7 +187,7 @@ Prioritet = **igrač osjeća gotov proizvod** prije store naknade.
 ### Blok B — Sadržaj i identitet
 5. **T2 / F8.1** — spriteovi sjemena + cvijet po tipu (min 7, cilj 10)
 6. **G7 / F8.9** — Mochi cosmetic unlock (kamp milestone) ✅
-7. **U8** — dnevnik ekran (lista + “new discovery”)
+7. **U8** — dnevnik ekran (lista + “new discovery”) ✅
 8. **U7** — shop kozmetika + **U6** booster consumables
 
 ### Blok C — Feel i polish

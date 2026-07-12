@@ -197,6 +197,20 @@ Novi fajl u `game/assets/` dodan izvan editora. Godot **nije importao** asset �
 
 ---
 
+## #9 — Autoload `GameState` ne učitava → Play (i sve) ne radi
+
+**Datum:** 2026-07-12 (D0 / Mochi)
+
+**Simptom:** Main menu **Play** ne reagira; u Godot outputu `Invalid access ... on Nil` za `GameState`.
+
+**Uzrok:** Parse error u `game_state.gd` — `mochi_unlock_seen` korišten u save/load bez `var` deklaracije. Cijeli autoload padne; global `GameState` je `null`.
+
+**Rješenje:** Dodati `var mochi_unlock_seen: bool = false` uz ostale companion varijable.
+
+**Prevencija:** headless `--verbose` ili `--quit-after 3` — provjeri da se `GameState` pojavi u root children; svaka nova save polja mora imati `var`.
+
+---
+
 ## Kako dodati novi unos
 
 ```markdown

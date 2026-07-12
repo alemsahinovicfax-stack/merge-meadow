@@ -2,7 +2,9 @@ extends Control
 
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
 const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
-const AlmanacRow := preload("res://scripts/ui/shop_almanac_row.gd")
+const CosmeticRow := preload("res://scripts/ui/shop_cosmetic_row.gd")
+const BoosterRow := preload("res://scripts/ui/shop_booster_row.gd")
+const CATALOG := preload("res://scripts/monetization/cosmetic_catalog.gd")
 
 @onready var coins_label: Label = $RootVBox/ResourceBar/HBox/CoinsRow/CoinsLabel
 @onready var seeds_label: Label = $RootVBox/ResourceBar/HBox/SeedsRow/SeedsLabel
@@ -12,18 +14,24 @@ const AlmanacRow := preload("res://scripts/ui/shop_almanac_row.gd")
 @onready var top_progress_bar: ProgressBar = $RootVBox/TopProgress/VBox/TopProgressRow/TopProgressBar
 @onready var top_progress_label: Label = $RootVBox/TopProgress/VBox/TopProgressRow/TopProgressLabel
 @onready var top_coin_button: UiClickButton = $RootVBox/TopProgress/VBox/TopCoinButton
-@onready var almanac_scroll: ScrollContainer = $RootVBox/AlmanacScroll
-@onready var almanac_list: VBoxContainer = $RootVBox/AlmanacScroll/AlmanacList
-@onready var status_label: Label = $RootVBox/IapPanel/VBox/StatusLabel
-@onready var remove_ads_button: UiClickButton = $RootVBox/IapPanel/VBox/RemoveAdsButton
-@onready var remove_ads_desc: Label = $RootVBox/IapPanel/VBox/RemoveAdsDesc
-@onready var starter_pack_button: UiClickButton = $RootVBox/IapPanel/VBox/StarterPackButton
-@onready var starter_pack_desc: Label = $RootVBox/IapPanel/VBox/StarterPackDesc
-@onready var restore_button: UiClickButton = $RootVBox/IapPanel/VBox/RestoreButton
-@onready var reset_dev_button: UiClickButton = $RootVBox/IapPanel/VBox/ResetDevButton
+@onready var main_scroll: ScrollContainer = $RootVBox/MainScroll
+@onready var main_content: VBoxContainer = $RootVBox/MainScroll/MainContent
+@onready var almanac_list: VBoxContainer = $RootVBox/MainScroll/MainContent/AlmanacList
+@onready var cosmetics_list: VBoxContainer = $RootVBox/MainScroll/MainContent/CoinShopPanel/VBox/CosmeticsList
+@onready var boosters_list: VBoxContainer = $RootVBox/MainScroll/MainContent/BoosterPanel/VBox/BoostersList
+@onready var status_label: Label = $RootVBox/MainScroll/MainContent/IapPanel/VBox/StatusLabel
+@onready var remove_ads_button: UiClickButton = $RootVBox/MainScroll/MainContent/IapPanel/VBox/RemoveAdsButton
+@onready var remove_ads_desc: Label = $RootVBox/MainScroll/MainContent/IapPanel/VBox/RemoveAdsDesc
+@onready var starter_pack_button: UiClickButton = $RootVBox/MainScroll/MainContent/IapPanel/VBox/StarterPackButton
+@onready var starter_pack_desc: Label = $RootVBox/MainScroll/MainContent/IapPanel/VBox/StarterPackDesc
+@onready var restore_button: UiClickButton = $RootVBox/MainScroll/MainContent/IapPanel/VBox/RestoreButton
+@onready var reset_dev_button: UiClickButton = $RootVBox/MainScroll/MainContent/IapPanel/VBox/ResetDevButton
 @onready var back_button: UiClickButton = $RootVBox/TopBar/BackButton
 
-var _rebuild_pending: bool = false
+var _ui_ready: bool = false
+var _refresh_pending: bool = false
+var _shop_lists_built: bool = false
+var _last_scroll_width: float = -1.0
 
 
 func _ready() -> void:
@@ -32,24 +40,64 @@ func _ready() -> void:
 	var tex := UI_ASSETS.get_kenney_icon("wallet")
 	if wallet_icon and tex:
 		wallet_icon.texture = tex
-	top_coin_button.clicked.connect(_on_coin_unlock_pressed)
-	remove_ads_button.clicked.connect(_on_remove_ads_pressed)
-	starter_pack_button.clicked.connect(_on_starter_pack_pressed)
-	restore_button.clicked.connect(_on_restore_pressed)
-	reset_dev_button.clicked.connect(_on_reset_dev_pressed)
-	back_button.clicked.connect(_on_back_pressed)
+	if top_coin_button:
+		top_coin_button.clicked.connect(_on_coin_unlock_pressed)
+	if remove_ads_button:
+		remove_ads_button.clicked.connect(_on_remove_ads_pressed)
+	if starter_pack_button:
+		starter_pack_button.clicked.connect(_on_starter_pack_pressed)
+	if restore_button:
+		restore_button.clicked.connect(_on_restore_pressed)
+	if reset_dev_button:
+		reset_dev_button.clicked.connect(_on_reset_dev_pressed)
+	if back_button:
+		back_button.clicked.connect(_on_back_pressed)
 	IAPManager.purchase_completed.connect(_on_purchase_completed)
 	IAPManager.purchase_failed.connect(_on_purchase_failed)
-	IAPManager.catalog_updated.connect(_refresh_ui)
+	IAPManager.catalog_updated.connect(_on_catalog_updated)
 	IAPManager.restore_completed.connect(_on_restore_completed)
-	if almanac_scroll:
-		almanac_scroll.resized.connect(_sync_almanac_width)
-	visibility_changed.connect(_on_visibility_changed)
+	if main_scroll:
+		main_scroll.resized.connect(_sync_scroll_width)
+	call_deferred("_finish_ready")
+
+
+func _finish_ready() -> void:
+	if not is_inside_tree():
+		return
+	_ui_ready = true
+	_ensure_shop_lists_built()
 	_refresh_ui()
 
 
-func _on_visibility_changed() -> void:
-	if visible:
+func _ensure_shop_lists_built() -> void:
+	if _shop_lists_built or almanac_list == null:
+		return
+	_shop_lists_built = true
+	var entries := GameState.get_almanac_chain_ui_data()
+	# Almanac rows built as simple labels to avoid Godot crash with many dynamic rows.
+	for entry in entries:
+		var line := Label.new()
+		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		line.add_theme_font_size_override("font_size", 18)
+		line.text = _format_almanac_line(entry)
+		almanac_list.add_child(line)
+	for entry in GameState.get_cosmetic_shop_entries():
+		var item_id := str(entry.get("id", ""))
+		var row := CosmeticRow.new()
+		row.apply(item_id)
+		cosmetics_list.add_child(row)
+		row.buy_pressed.connect(_on_cosmetic_buy.bind(item_id))
+		row.equip_pressed.connect(_on_cosmetic_equip.bind(item_id))
+	for booster_id in CONFIG.all_booster_ids():
+		var brow := BoosterRow.new()
+		brow.apply(booster_id)
+		boosters_list.add_child(brow)
+		brow.buy_pressed.connect(_on_booster_buy.bind(booster_id))
+		brow.use_pressed.connect(_on_booster_use.bind(booster_id))
+
+
+func _on_catalog_updated() -> void:
+	if _ui_ready and _shop_lists_built:
 		_refresh_ui()
 
 
@@ -67,16 +115,79 @@ func _style_top_progress_bar() -> void:
 	top_progress_bar.show_percentage = false
 
 
-func _sync_almanac_width() -> void:
-	if almanac_list and almanac_scroll:
-		almanac_list.custom_minimum_size.x = almanac_scroll.size.x
+func _sync_scroll_width() -> void:
+	if main_content == null or main_scroll == null:
+		return
+	var width := main_scroll.size.x
+	if width <= 1.0 or is_equal_approx(width, _last_scroll_width):
+		return
+	_last_scroll_width = width
+	main_content.custom_minimum_size.x = width
 
 
 func _refresh_ui() -> void:
+	if not _ui_ready or not is_inside_tree():
+		return
+	if _refresh_pending:
+		return
+	_refresh_pending = true
+	call_deferred("_apply_refresh")
+
+
+func _apply_refresh() -> void:
+	_refresh_pending = false
+	if not is_inside_tree():
+		return
 	_update_resources()
 	_refresh_top_progress()
-	_request_almanac_rebuild()
+	_refresh_almanac_rows()
+	_refresh_cosmetic_rows()
+	_refresh_booster_rows()
 	_refresh_iap_section()
+	_sync_scroll_width()
+
+
+func _format_almanac_line(entry: Dictionary) -> String:
+	var name: String = str(entry.get("name", "?"))
+	var stars: String = str(entry.get("stars", ""))
+	var spawn_unlocked := bool(entry.get("spawn_unlocked", false))
+	var prog: Dictionary = entry.get("tier_progress", {})
+	if spawn_unlocked and bool(prog.get("complete", false)):
+		return "%s %s — all tiers discovered" % [name, stars]
+	var caption := str(prog.get("caption", ""))
+	if caption.is_empty():
+		return "%s %s" % [name, stars]
+	var have := int(prog.get("have", 0))
+	var need := maxi(1, int(prog.get("need", 1)))
+	return "%s %s — %s (%d/%d)" % [name, stars, caption, have, need]
+
+
+func _refresh_almanac_rows() -> void:
+	if almanac_list == null:
+		return
+	var entries := GameState.get_almanac_chain_ui_data()
+	for i in entries.size():
+		if i >= almanac_list.get_child_count():
+			break
+		var row := almanac_list.get_child(i)
+		if row is Label:
+			row.text = _format_almanac_line(entries[i])
+
+
+func _refresh_cosmetic_rows() -> void:
+	if cosmetics_list == null:
+		return
+	for child in cosmetics_list.get_children():
+		if child is CosmeticRow and child.item_id != "":
+			child.apply(child.item_id)
+
+
+func _refresh_booster_rows() -> void:
+	if boosters_list == null:
+		return
+	for child in boosters_list.get_children():
+		if child is BoosterRow and child.booster_id != "":
+			child.apply(child.booster_id)
 
 
 func _update_resources() -> void:
@@ -119,49 +230,50 @@ func _refresh_top_progress() -> void:
 		top_coin_button.visible = false
 
 
-func _request_almanac_rebuild() -> void:
-	if _rebuild_pending:
+func _on_cosmetic_buy(item_id: String) -> void:
+	if status_label:
+		status_label.text = GameState.buy_cosmetic_with_coins(item_id)
+	_refresh_ui()
+
+
+func _on_cosmetic_equip(item_id: String) -> void:
+	if GameState.equip_cosmetic(item_id) and status_label:
+		status_label.text = "%s equipped." % CATALOG.get_title(item_id)
+	_refresh_ui()
+
+
+func _on_booster_buy(booster_id: String) -> void:
+	var sku := CONFIG.booster_sku(booster_id)
+	if sku.is_empty():
 		return
-	_rebuild_pending = true
-	call_deferred("_rebuild_almanac")
+	status_label.text = "Processing purchase…"
+	IAPManager.purchase(sku)
 
 
-func _rebuild_almanac() -> void:
-	_rebuild_pending = false
-	if almanac_list == null:
-		return
-	for child in almanac_list.get_children():
-		almanac_list.remove_child(child)
-		child.queue_free()
-	call_deferred("_populate_almanac")
-
-
-func _populate_almanac() -> void:
-	if not is_inside_tree() or almanac_list == null:
-		return
-	for entry in GameState.get_almanac_chain_ui_data():
-		var row := AlmanacRow.new()
-		almanac_list.add_child(row)
-		row.apply(entry)
-		if not bool(entry.get("spawn_unlocked", true)) and bool(entry.get("can_coin_unlock", false)):
-			row.coin_unlock_pressed.connect(_on_row_coin_unlock_pressed)
-	call_deferred("_sync_almanac_width")
+func _on_booster_use(booster_id: String) -> void:
+	if status_label:
+		status_label.text = GameState.use_booster(booster_id)
+	_refresh_ui()
 
 
 func _refresh_iap_section() -> void:
-	if status_label == null:
+	if status_label == null or remove_ads_button == null:
 		return
 	status_label.text = "Optional real-money purchases — Fair F2P."
-	remove_ads_desc.text = CONFIG.get_product_description(CONFIG.SKU_REMOVE_ADS)
-	starter_pack_desc.text = CONFIG.get_product_description(CONFIG.SKU_STARTER_PACK)
+	if remove_ads_desc:
+		remove_ads_desc.text = CONFIG.get_product_description(CONFIG.SKU_REMOVE_ADS)
+	if starter_pack_desc:
+		starter_pack_desc.text = CONFIG.get_product_description(CONFIG.SKU_STARTER_PACK)
 	remove_ads_button.label_text = _product_button_label(CONFIG.SKU_REMOVE_ADS)
 	starter_pack_button.label_text = _product_button_label(CONFIG.SKU_STARTER_PACK)
 	remove_ads_button.disabled = IAPManager.owns_product(CONFIG.SKU_REMOVE_ADS)
 	starter_pack_button.disabled = IAPManager.owns_product(CONFIG.SKU_STARTER_PACK)
-	restore_button.visible = not IAPManager.is_stub_mode()
-	restore_button.disabled = IAPManager.is_busy()
-	reset_dev_button.visible = Engine.is_editor_hint() and IAPManager.is_stub_mode()
-	reset_dev_button.disabled = IAPManager.is_busy()
+	if restore_button:
+		restore_button.visible = not IAPManager.is_stub_mode()
+		restore_button.disabled = IAPManager.is_busy()
+	if reset_dev_button:
+		reset_dev_button.visible = Engine.is_editor_hint() and IAPManager.is_stub_mode()
+		reset_dev_button.disabled = IAPManager.is_busy()
 
 
 func _product_button_label(sku: String) -> String:
@@ -173,10 +285,6 @@ func _product_button_label(sku: String) -> String:
 	return "%s — %s" % [prefix, price]
 
 
-func _on_row_coin_unlock_pressed() -> void:
-	_do_coin_unlock()
-
-
 func _on_coin_unlock_pressed() -> void:
 	_do_coin_unlock()
 
@@ -184,9 +292,7 @@ func _on_coin_unlock_pressed() -> void:
 func _do_coin_unlock() -> void:
 	if status_label:
 		status_label.text = GameState.try_coin_unlock_next_seed()
-	_update_resources()
-	_refresh_top_progress()
-	_request_almanac_rebuild()
+	_refresh_ui()
 
 
 func _on_remove_ads_pressed() -> void:
@@ -214,12 +320,17 @@ func _on_purchase_completed(sku: String) -> void:
 		CONFIG.SKU_REMOVE_ADS:
 			status_label.text = "Ads removed — interstitials are off."
 		CONFIG.SKU_STARTER_PACK:
-			status_label.text = "Starter pack unlocked — +%d coins, +%d seeds!" % [
+			status_label.text = "Starter pack unlocked — +%d coins, +%d seeds, +%d booster!" % [
 				CONFIG.STARTER_PACK_COINS,
 				CONFIG.STARTER_PACK_SEEDS,
+				CONFIG.STARTER_PACK_BOOSTERS,
 			]
 		_:
-			status_label.text = "Purchase complete: %s" % sku
+			var booster_id := CONFIG.sku_booster_id(sku)
+			if not booster_id.is_empty():
+				status_label.text = "Booster added to inventory!"
+			else:
+				status_label.text = "Purchase complete: %s" % sku
 	_refresh_ui()
 
 

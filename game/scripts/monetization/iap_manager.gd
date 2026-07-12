@@ -39,6 +39,8 @@ func is_busy() -> bool:
 
 
 func owns_product(sku: String) -> bool:
+	if CONFIG.is_consumable(sku):
+		return false
 	match sku:
 		CONFIG.SKU_REMOVE_ADS:
 			return GameState.ads_removed
@@ -254,6 +256,11 @@ func _grant_product(sku: String) -> void:
 			GameState.starter_pack_owned = true
 			GameState.wallet_coins += CONFIG.STARTER_PACK_COINS
 			GameState.add_seeds_to_bag(GameState.SEED_TYPE_CLOVER, CONFIG.STARTER_PACK_SEEDS)
+			GameState.add_booster(CONFIG.BOOSTER_MERGE_HINT, CONFIG.STARTER_PACK_BOOSTERS)
+		_:
+			var booster_id := CONFIG.sku_booster_id(sku)
+			if not booster_id.is_empty():
+				GameState.add_booster(booster_id, 1)
 	GameState.save_player_save()
 
 

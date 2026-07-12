@@ -12,9 +12,9 @@ trenutna_faza: 5
 podfaza: pre-launch-polish
 aktivna_sekcija: D
 b0_aktivan: false
-sljedeci_korak: "D0 Blok B — dnevnik kolekcije ili shop kozmetika"
-zadnja_sesija: "D0 Blok B — Mochi unlock (companion picker, run skin, save)"
-zadnje_azurirano: 2026-07-11
+sljedeci_korak: "D0 Blok C — SFX + art pass + Settings ekran"
+zadnja_sesija: "D0 Blok B — shop kozmetika (5 coin itema) + booster consumables (IAP)"
+zadnje_azurirano: 2026-07-12
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -306,8 +306,8 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 **Blok B — sadržaj**
 - [ ] Spriteovi sjemena/cvijeta po tipu (min 7, cilj 10) — 🟡 7 procedural (`seed_visual_config.gd`)
 - [x] **Mochi** ljubimac unlock (cosmetic) — kamp Lv 2, companion picker, run skin
-- [ ] **Dnevnik** kolekcije (zaseban ekran)
-- [ ] Shop: kozmetika + **booster consumables**
+- [x] **Dnevnik** kolekcije (zaseban ekran) — Bloom Album, 📖 u kampu, NEW badge
+- [x] Shop: kozmetika + **booster consumables**
 
 **Blok C — polish**
 - [ ] **SFX** (pickup, merge, fail)

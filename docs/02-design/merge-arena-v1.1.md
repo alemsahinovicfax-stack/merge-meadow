@@ -14,8 +14,7 @@ ai_sažetak: "Odobren v1.1 redesign — gredice zamijenjene Merge Arenom (magnet
 
 # Merge Arena + Daily Goals (v1.1)
 
-> **Status:** odobreno u dizajnerskoj sesiji **2026-07-11**.  
-> **Ne mijenja v1 launch kod** — trenutni kamp (gredice + pair-first UX) ostaje do objave; ovo je ciljani **prvi veći update** (v1.1).
+> **Status:** implementirano u kodu **2026-07-12** (MA-01 faza 1–3). Gredice uklonjene; kamp = hub + **Merge Arena** scena.
 
 ## Problem (zašto)
 
@@ -72,10 +71,10 @@ Kamp hub zadržava: **Play**, **Shop**, **upgrade kartice** (Sprinkler, Loot Boo
 
 ### Magnet drag + snap
 
-1. **Touch down** na T1 chip → „hvata“ sjeme (lag follow prsta).
-2. Dok držiš, **najbliže istog `type_id`** u magnet radiusu (`ARENA_MAGNET_RADIUS`) lagano klizi prema tebi.
-3. **Release** unutar snap distance → **merge animacija** (scale pop + SFX) → jedan T+1, drugi nestaje.
-4. **Release** daleko → sjeme pada na mjesto (blagi bounce, bez punog physics enginea ako je skupo).
+1. **Tap seed bag** (donji centar) — izbaci sjeme u arenu (do **40** na polju); ponovni tap dopunjava praznine.
+2. Vrećica **otvorena + wiggle** kad ima **≥2** sjemena u torbi; prazna/zatvorena kad je torba prazna.
+3. **Touch down** na chip → drag; **magnet** privlači isti tip+tier u radiusu `ARENA_MAGNET_RADIUS`.
+4. **Release** unutar snap distance → merge; **T1+T1 → T2** ostaje u areni; **T2+T2 → T3** u Bloom inbox.
 
 **Feel:** brže od grid tap-a, zabavnije od čistog menija; mobile-first (jedan prst).
 

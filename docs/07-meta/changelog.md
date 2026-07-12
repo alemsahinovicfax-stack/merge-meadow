@@ -144,6 +144,13 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 - **D0 checklist** — [[../06-production/d0-prelaunch-checklist|d0-prelaunch-checklist]]: gap analiza koda vs v1 IN (~45% gotovo); Blok A–E redoslijed rada
 - **Projekcija prihoda** — [[../06-production/troskovi-launcha#Projekcija: koliko do prvih ~100 USD? (pretpostavka)|troskovi-launcha]]: realistično **2–4 mj.** do ~100 USD neto nakon Android launcha
 
+## 2026-07-12
+
+- **Play fix** — `mochi_unlock_seen` var u `game_state.gd` (autoload parse error); `UiClickButton` child mouse_filter
+- **Bloom Album (U8)** — `collection_journal.tscn`, 7-tip lista, NEW badge, 📖 u kamp top baru; save `collection_journal_pending`
+- **Merge Arena MA-01** — vrećica, pour prioritet, T3 → garden stash, crystal exchange u kampu
+- **Shop U6/U7** — 5 coin kozmetika (`cosmetic_catalog.gd`), 2 IAP boostera (Merge Hint, Loot Burst), shop UI paneli
+
 ## Template za nove unose
 
 ```
