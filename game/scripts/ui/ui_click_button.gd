@@ -7,6 +7,7 @@ signal clicked
 
 const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
 const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
+const READABILITY := preload("res://scripts/ui/ui_readability.gd")
 
 @export var label_text: String = "":
 	set(value):
@@ -118,7 +119,7 @@ func _update_label() -> void:
 		return
 	_label.text = label_text
 	if font_size > 0:
-		_label.add_theme_font_size_override("font_size", font_size)
+		_label.add_theme_font_size_override("font_size", READABILITY.font(font_size))
 	_apply_label_theme()
 
 

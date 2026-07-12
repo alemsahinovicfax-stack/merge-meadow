@@ -12,6 +12,9 @@ const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
 
 @onready var loadout_label: Label = $HUD/PipBadge/LoadoutLabel
+@onready var pip_name_label: Label = $HUD/PipBadge/PipName
+@onready var pip_portrait: Control = $HUD/PipBadge/PipPortrait
+@onready var pickup_feed: Label = $HUD/PickupFeed
 
 @onready var world: Node2D = $World
 @onready var player: Area2D = $Player
@@ -267,19 +270,21 @@ func _effective_seed_spawn_chance() -> float:
 
 
 func _pick_seed_type_id() -> String:
-	var loadout := GameState.get_loadout_type()
-	if not loadout.is_empty():
-		return loadout
-	return GameState.SEED_TYPE_CLOVER
+	return GameState.pick_random_run_seed_type()
 
 
 func _on_coin_collected() -> void:
 	coin_count += 1
+	if pickup_feed and pickup_feed.has_method("push_coin"):
+		pickup_feed.push_coin()
 	_update_hud()
 
 
 func _on_seed_collected(type_id: String) -> void:
 	seeds_by_type[type_id] = int(seeds_by_type.get(type_id, 0)) + 1
+	GameState.record_seed_pickup_lifetime(type_id, 1)
+	if pickup_feed and pickup_feed.has_method("push_seed"):
+		pickup_feed.push_seed(type_id)
 	_update_hud()
 
 
@@ -288,8 +293,16 @@ func _on_player_hit_obstacle() -> void:
 
 
 func _update_hud() -> void:
-	coin_counter_label.text = "Coins: %d" % coin_count
-	seed_counter_label.text = "Seeds: %d" % GameState.sum_seed_bag(seeds_by_type)
+	var mult := GameState.get_loot_multiplier()
+	if mult > 1.0:
+		coin_counter_label.text = "Coins: %d (×%.2g)" % [coin_count, mult]
+	else:
+		coin_counter_label.text = "Coins: %d" % coin_count
+	seed_counter_label.text = _format_seed_hud_line()
+	if pip_name_label:
+		pip_name_label.text = GameState.get_companion_display_name()
+	if pip_portrait and pip_portrait.has_method("refresh_portrait"):
+		pip_portrait.refresh_portrait()
 	if not GameState.get_loadout_type().is_empty():
 		var name: String = GameState.SEED_DISPLAY_NAMES.get(
 			GameState.get_loadout_type(),
@@ -309,3 +322,16 @@ func _update_hud() -> void:
 		timer_label.text = "Lv %d · %ds" % [GameState.run_level, int(ceil(remaining))]
 	else:
 		timer_label.text = "%ds" % int(ceil(remaining))
+
+
+func _format_seed_hud_line() -> String:
+	var parts: PackedStringArray = []
+	for type_id in seeds_by_type:
+		var count := int(seeds_by_type[type_id])
+		if count <= 0:
+			continue
+		var name: String = GameState.SEED_DISPLAY_NAMES.get(type_id, str(type_id).capitalize())
+		parts.append("%s×%d" % [name, count])
+	if parts.is_empty():
+		return "Seeds: 0"
+	return ", ".join(parts)

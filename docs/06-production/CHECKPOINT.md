@@ -9,12 +9,12 @@ povezano:
   - scope-i-granice
 ai_sažetak: "Operativni hub — frontmatter prvo; prva [ ] u aktivnoj sekciji je sljedeći korak."
 trenutna_faza: 5
-podfaza: launch-prep
+podfaza: pre-launch-polish
 aktivna_sekcija: D
 b0_aktivan: false
-sljedeci_korak: "D5 — Google Play internal test"
-zadnja_sesija: "D4 gotovo — 8/8 store PNG; loot→camp fix; shop dev UI"
-zadnje_azurirano: 2026-07-10
+sljedeci_korak: "D0 Blok B — dnevnik kolekcije ili shop kozmetika"
+zadnja_sesija: "D0 Blok B — Mochi unlock (companion picker, run skin, save)"
+zadnje_azurirano: 2026-07-11
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -22,7 +22,7 @@ test_uredjaji:
   - "Android emulator Pixel_4_API33 (API 33, host GPU — primarni)"
   - "Android emulator Pixel_4 (API 30 — NE za Godot 4, samo GLES2 guest)"
   - "iPhone (iOS test — M7, C4)"
-strategija_platforme: android-first
+strategija_platforme: "android-first; iOS kad prikupi ~99 USD (Apple Developer)"
 # --- Praćenje faza (agent + ti) ---
 dokumentacija_zavrsena_do: "M5½ — CHECKPOINT Sekcija A (A1–A4)"
 prva_faza_kodiranja: "M6 — CHECKPOINT Sekcija B (B1–B3)"
@@ -42,8 +42,8 @@ sljedeca_runda_dokumentacije: "CHECKPOINT B3 — nakon greybox playtesta"
 | **Podfaza** | `greybox-spreman` — dokumentacija detalji **završena**; sljedeće M6 (`game/`) |
 | **Igra** | Merge Meadow — hybrid casual lane run + merge kamp |
 | **Engine** | Godot 4.x (HP laptop / Windows) |
-| **Strategija** | **Android-first** — jedan kod, iOS export kasnije (M7) |
-| **Test** | Emulator (dnevno) → stariji Android (fizički) → iPhone (M7) |
+| **Strategija** | **Android-first** — objava tek kad je igra max polish; **iOS odgođen** dok se ne prikupi ~**99 USD** |
+| **Test** | Emulator (dnevno) → stariji Android (fizički) → iPhone (**Faza 4**, ne sada) |
 
 ## Dokumentacija vs kod — kada što radiš
 
@@ -290,21 +290,53 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sekcija D — Launch prep (nakon M7)
 
+> **Plan objave (2026-07-11):** [[troskovi-launcha|troskovi-launcha]] — **Faza 1** polish + sve v1 ideje (**0 USD**) → **Faza 2** Play **25 USD** (Android only) → **Faza 3** updates dok se ne prikupi **~99 USD** → **Faza 4** iOS.
+
+### D0 — Pre-launch polish (prije store naknade)
+
+> Detaljna tablica: [[d0-prelaunch-checklist|d0-prelaunch-checklist]] (~55% gotovo, 2026-07-11).
+
+**Blok A — gameplay (scope IN)**
+- [x] Merge **T3** (MAX_MERGE_TIER 3)
+- [x] Upgrade **množitelj** (Loot Boost Lv 4, ×2.0)
+- [x] Spawn pool — **Seed Almanac** (lifetime unlock + coins shortcut)
+- [x] **Kamp A+C** — torba soft cap, auto-plant, Keep oslobađa gredicu, +3 gredice na max Sprinkler
+- [x] **Daily chest** u kampu
+
+**Blok B — sadržaj**
+- [ ] Spriteovi sjemena/cvijeta po tipu (min 7, cilj 10) — 🟡 7 procedural (`seed_visual_config.gd`)
+- [x] **Mochi** ljubimac unlock (cosmetic) — kamp Lv 2, companion picker, run skin
+- [ ] **Dnevnik** kolekcije (zaseban ekran)
+- [ ] Shop: kozmetika + **booster consumables**
+
+**Blok C — polish**
+- [ ] **SFX** (pickup, merge, fail)
+- [ ] Art pass (kamp biljke, splash/branding)
+- [ ] Settings ekran (sound, restore)
+- [ ] `DEBUG_DEV_RESOURCES` off + release AAB test
+- [ ] Vanjski playtest 5 min (M7 exit ponovno)
+
+**Blok D — monetizacija production**
+- [ ] Poing **AdMob + Billing** plugin na Androidu
+- [ ] Production ad unit ID-evi (ne test)
+
+**Već gotovo (D0)**
 - [x] 100 run level konfiguracija — **D1a** JSON 1–10 + **D1b** curve 11–100 (`RunLevelLibrary`)
 - [x] Endless mode — **D2 stub** main menu, Easy/Normal/Hard (Lv 20/50/85 base, spawn ×0.9), odvojeno od kampanje 1–100
 - [x] Shop: remove ads + starter pack — **D3** `IAPManager` billing hook, restore, shop UI, interstitial respects `ads_removed`
 - [x] EN store listing + screenshots — **D4** 8× PNG u `marketing/store/screenshots/`, copy u `store-listing-en.md`
-- [ ] Google Play internal test
-- [ ] App Store Connect (iOS)
-- [ ] €50–100 CPI test kampanja
+- [ ] Google Play internal test — **Faza 2** (nakon D0 + **25 USD**)
+- [ ] Google Play production launch — **Faza 2**
+- [ ] App Store Connect (iOS) — **Faza 4** (nakon ~**99 USD** + iOS prilagođavanje)
+- [ ] €50–100 CPI test kampanja — **Faza 3** (nakon Android launcha)
 
 ---
 
 ## Sljedeća akcija (sada)
 
-1. **D5** — [[play-internal-test|play-internal-test]] (Play Console internal track)
-2. Hostaj privacy policy URL prije store submita
-3. Play Console: IAP product IDs (`remove_ads`, `starter_pack`) kad uključiš billing plugin
+1. **D0 Blok B** — [[d0-prelaunch-checklist|d0-prelaunch-checklist]] (spriteovi sjemena/cvijeta, Mochi…)
+2. **Ne** plaćati Play Console dok D0 nije ✅
+3. Kad D0 gotov → **25 USD** → [[play-internal-test|D5 internal test]]
 
 ## Povezano
 

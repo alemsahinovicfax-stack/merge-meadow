@@ -11,6 +11,8 @@ tags: [hub, produkcija]
 
 - [[CHECKPOINT|CHECKPOINT]] — **dnevni operativni vodič** (otvori prvo)
 - [[RADIONICA-razvoj|RADIONICA-razvoj]] — **master plan** razvoja do vertical slice-a (faze 0–7)
+- [[d0-prelaunch-checklist|d0-prelaunch-checklist]] — Faza 1 checklist (prije Play $25)
+- [[troskovi-launcha|troskovi-launcha]] — naknade store + faze objave (Android → iOS)
 - [[scope-i-granice|scope-i-granice]] — što JE i što NIJE u v1
 - [[verzije-nakon-launcha|verzije-nakon-launcha]] — v1.1+ parking (ne planirati detaljno sada)
 - [[ideje-roadmap-implementacije|ideje-roadmap-implementacije]] — build order F0–F9

@@ -38,7 +38,7 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - Offline gameplay; IAP zahtijeva mrežu
 
 ### Tech
-- Godot 4, Android + iOS export
+- Godot 4, **Android launch prvo**; iOS export kad se prikupi ~**99 USD** (Apple Developer)
 - EN UI copy
 - SFX (pickup, merge, fail); muzika opcionalna u kampu
 - Flat 2D **flat cartoon** (pastel, soft outline) — bez pixel grida
@@ -105,7 +105,8 @@ Agent te upozorava — `.cursor/rules/scope-guard.mdc`
 
 ## Otvorena pitanja
 
-- [ ] Točan launch datum (TBD ovisno o fakultetu/ispitima)
+- [x] Launch redoslijed — **Android kad max polish; iOS kad ~99 USD** → [[troskovi-launcha|troskovi-launcha]]
+- [ ] Točan Android launch datum (TBD — ovisno o fakultetu + D0 polish)
 - [ ] Je li 100 runova launch blocker ili 50 + endless za raniji launch?
 
 ## Povezano

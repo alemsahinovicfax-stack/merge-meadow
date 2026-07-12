@@ -1,22 +1,26 @@
 extends Sprite2D
 
-## Sjeme u runu — seed sprite.
+## Sjeme u runu — proceduralno po tipu (7 distinct vizuala).
 
-const ASSETS := preload("res://scripts/visual/pickup_assets.gd")
+const CONFIG := preload("res://scripts/visual/seed_visual_config.gd")
+
+var _type_id: String = "clover"
 
 
 func _ready() -> void:
-	var tex := ASSETS.get_seed_texture()
-	texture = tex
+	texture = null
 	centered = true
-	if tex != null:
-		scale = Vector2.ONE * ASSETS.run_scale(tex, ASSETS.SEED_RUN_SIZE)
-	else:
-		queue_redraw()
+	var parent_pickup := get_parent()
+	if parent_pickup != null and "type_id" in parent_pickup:
+		_type_id = str(parent_pickup.type_id)
+	queue_redraw()
+
+
+func setup(type_id: String) -> void:
+	_type_id = type_id
+	texture = null
+	queue_redraw()
 
 
 func _draw() -> void:
-	if texture != null:
-		return
-	draw_circle(Vector2.ZERO, 22.0, Color("#FFEAA7"))
-	draw_arc(Vector2.ZERO, 22.0, 0.0, TAU, 24, Color("#2D3436"), 2.0)
+	CONFIG.draw_run_seed(self, _type_id)

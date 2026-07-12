@@ -642,6 +642,17 @@ SHOP (M8)         │
 - [ ] E1–E5: ~~potvrdi prije F4~~ → E2 + kapacitet **odlučeno 2026-07-04** (vidi gornju tablicu)
 - [ ] Zamijeniti tajmer progress trakom — kada (v1.1 / art pass)?
 
+---
+
+## Odobreno za v1.1 (2026-07-11)
+
+| ID | Naslov | Sažetak | Doc |
+|----|--------|---------|-----|
+| **MA-01** | Merge Arena | Gredice → poseban ekran; T1 rasuta + magnet drag; T2/T3 u Bloom inbox traku | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] |
+| **DG-01** | Daily Goals | 3 mini-zadatka/dan (coins, seeds po unlocku, merge tier) + bonus reward; prošireni chest | isti |
+
+**Ne implementirati prije v1 launch.** Trenutni kamp (pair-first, seed chips, Keep→Album) = ship blocker polish, ne zamjena.
+
 ## Povezano
 
 - [[ideje-identitet-lore|ideje-identitet-lore]] — Pip + sjeme/cvijet

@@ -53,7 +53,7 @@ Merge chain ne smije biti predugačak u v1 — max 3–4 tiera za launch.
 
 ## Otvorena pitanja
 
-- [ ] Grid 4×4 vs linearni slotovi — UX prototip
+- [ ] Grid 4×4 vs linearni slotovi — UX prototip → **v1.1:** [[../merge-arena-v1.1|Merge Arena]] zamjenjuje grid (odobreno 2026-07-11)
 - [ ] Idle merge (auto) — OUT za v1
 
 ## Reference

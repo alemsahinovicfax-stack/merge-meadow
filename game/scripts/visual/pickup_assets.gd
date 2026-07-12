@@ -19,10 +19,14 @@ static func get_coin_texture() -> Texture2D:
 	return _coin_tex
 
 
-static func get_seed_texture() -> Texture2D:
+static func get_seed_texture(_type_id: String = "") -> Texture2D:
 	if _seed_tex == null and ResourceLoader.exists(SEED_PATH):
 		_seed_tex = load(SEED_PATH) as Texture2D
 	return _seed_tex
+
+
+static func get_seed_tint(type_id: String) -> Color:
+	return SeedVisualConfig.palette(type_id).seed
 
 
 static func run_scale(tex: Texture2D, display_side: float) -> float:

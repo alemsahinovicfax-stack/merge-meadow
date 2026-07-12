@@ -77,11 +77,17 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 |-----------|-----------|----------|
 | `CAMP_BED_COUNT` | **9** | gredice vrta (3×3) |
 | `GREENHOUSE_SLOT_COUNT` | **2** | staklenik (★★★ only) |
-| `MAX_MERGE_TIER` | `2` | T1 sjeme → T2 cvijet |
+| `MAX_MERGE_TIER` | `3` | T1→T2→T3 crystal |
 | merge | 2× isti `type_id` + isti tier | T1+T1=T2 |
-| T2 nakon mergea | **zadrži** na gredici ili **doniraj** sprinkleru | igrač bira (E2 ✅) |
-| `sprinkler_donations` | 0–2 | donirani T2 prije upgradea |
+| T2 nakon mergea | **Keep** (kolekcija, oslobađa gredicu) ili **doniraj** sprinkleru | igrač bira |
+| `collection_kept_tiers` | po `type_id` → max tier | Keep ne drži cvijet na gredici |
+| `SEED_BAG_SOFT_CAP` | **40** | torba; višak se ne prima |
+| auto-plant | pri ulasku u kamp + nakon Keep/chest | preskače tutorial CAMP1 |
+| `CAMP_BED_BONUS` | **+3** gredice | kad je Sprinkler max (9→12) |
+| `DAILY_CHEST_COINS` | **8** | jednom dnevno (save `last_daily_chest_day`) |
+| `DAILY_CHEST_SEEDS` | **3** | random iz unlocked spawn poola |
 | `discovered_blooms` | po `type_id` | priprema za dnevnik/setove |
+| `sprinkler_donations` | 0–2 | donirani T2 prije upgradea |
 | `EXCHANGE_SEED_COUNT` | `3` | K4 zamjena viška |
 | `EXCHANGE_COINS_REWARD` | `8` | novčići po zamjeni |
 
@@ -90,9 +96,22 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | Rarity | Primjer | Lokacija |
 |--------|---------|----------|
 | ★–★★ | Clover, Tulip | vrt (gredice) |
-| ★★★ | Pumpkin, Watermelon | staklenik |
+| ★★★ | Pumpkin, Watermelon | staklenik (kad otključeno u lancu) |
 
-## Sprinkler (`game_state.gd`)
+## Seed unlock — Almanac (2026-07-11)
+
+> Kod: `scripts/progression/seed_unlock_config.gd` · `game_state.gd` · Shop **Seed Almanac**
+
+| Pravilo | Vrijednost |
+|---------|------------|
+| Lanac (linearno) | Clover → Daisy → Buttercup → Tulip → Sunflower → Pumpkin → Watermelon |
+| Unlock trigger | **Lifetime** skupljeno u runovima prethodnog tipa (ne troši torbe) |
+| Pragovi | 10 / 10 / 10 / 12 / 12 / 15 / 15 (prethodni tip → sljedeći) |
+| Auto-unlock | Kad lifetime ≥ prag → sljedeći tip u **spawn poolu** odmah |
+| Coins shortcut | 120 / 150 / 150 / 180 / 200 / 220 (preskoči grind) |
+| Run spawn | Samo **otključani** tipovi (+ loadout bias) |
+
+## Sprinkler + Loot Boost (`game_state.gd`)
 
 | Konstanta | Vrijednost |
 |-----------|-----------|
@@ -100,9 +119,12 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | `MAGNET_COST_T2` | `2` donirana T2 cvijeta po levelu |
 | `MAGNET_BASE_RADIUS` | `40` px |
 | `MAGNET_RADIUS_PER_LEVEL` | `48` px |
+| `MULTIPLIER_MAX_LEVEL` | `4` |
+| `MULTIPLIER_COST_T3` | `2` donirana T3 po levelu |
+| `MULTIPLIER_VALUES` | ×1.0, ×1.25, ×1.5, ×1.75, ×2.0 |
 
 ### Provjera kapaciteta
-- 9 gredica → max **4 T2** odjednom (8 slotova u mergeu) → 2 za sprinkler + 2 zadržana za kolekciju.
+- 9 gredica (+3 bonus na max Sprinkler) → merge workspace; kolekcija ide u **Keep**, ne zauzima gredicu.
 - Staklenik odvaja ★★★ od vrta — manje zagušenja kad dođe više tipova.
 
 ## Balans pass 1 (2026-07-05)
@@ -118,9 +140,9 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 
 ## Odluke (2026-07-04)
 
-- **E2 cilj igrača:** oboje — T2 za **sprinkler** ili **kolekciju** (setovi/dnevnik kasnije).
-- **Tierovi:** T1→T2 samo (bez T3 u v1).
-- **Redoslijed implementacije:** 9 gredica → izbor T2 → staklenik + zamjena.
+- **E2 cilj igrača:** oboje — T2/T3 za **sprinkler / Loot Boost** ili **Keep** u kolekciju.
+- **Tierovi:** T1→T2→T3 crystal (v1).
+- **Kamp UX:** torba + auto-plant + Keep oslobađa gredicu (A+C).
 
 ## Otvorena pitanja
 

@@ -94,13 +94,17 @@ Detalji → [[CHECKPOINT#Dokumentacija vs kod — kada što radiš|CHECKPOINT]]
 
 ## M8 — Launch (izvan slice-a)
 
-| # | Zadatak | Done |
-|---|---------|------|
-| 8.1 | 100 runova + endless | [ ] |
-| 8.2 | Shop production IAP | [ ] |
-| 8.3 | EN store listing + ASO | [x] |
-| 8.4 | Google Play + App Store submit | [ ] |
-| 8.5 | Marketing test €50–100 | [ ] |
+> **Plan (2026-07-11):** [[troskovi-launcha|troskovi-launcha]] — Faza 1 polish → Faza 2 Android (**25 USD**) → Faza 3 rast → Faza 4 iOS (**99 USD/god**).
+
+| # | Zadatak | Done | Faza |
+|---|---------|------|------|
+| 8.0 | Pre-launch polish + sve v1 IN ideje | [ ] | **1** — [[d0-prelaunch-checklist|checklist ~45%]] |
+| 8.1 | 100 runova + endless | [x] | 1 |
+| 8.2 | Shop production IAP | [x] | 1 (ID-evi u Fazi 2) |
+| 8.3 | EN store listing + ASO | [x] | ✅ |
+| 8.4a | Google Play submit (Android only) | [ ] | **2** |
+| 8.4b | App Store submit (iOS) | [ ] | **4** |
+| 8.5 | Marketing test €50–100 | [ ] | **3** |
 
 ---
 
@@ -111,7 +115,7 @@ Detalji → [[CHECKPOINT#Dokumentacija vs kod — kada što radiš|CHECKPOINT]]
 | Datum | 2026-06-30 |
 | DoD 7/7 | ✅ |
 | Engine | Godot 4 |
-| Platforme | Android + iOS |
+| Platforme | Android launch (Faza 2); iOS kad ~99 USD (Faza 4) |
 
 ---
 
@@ -124,12 +128,12 @@ Detalji → [[CHECKPOINT#Dokumentacija vs kod — kada što radiš|CHECKPOINT]]
 | Stariji Android telefon | Fizički test | Kad nabavljen |
 | iPhone | iOS test | **M7 (C4)** — ne paralelno s greyboxom |
 
-**Strategija:** Android-first, jedan Godot projekt. Detalji → [[../05-technical/platforme|platforme]] · [[CHECKPOINT|CHECKPOINT]]
+**Strategija:** Android-first; **objava tek kad je max polish**; iOS odgođen dok se ne prikupi ~**99 USD**. Detalji → [[troskovi-launcha|troskovi-launcha]] · [[../05-technical/platforme|platforme]] · [[CHECKPOINT|CHECKPOINT]]
 
 ## Otvorena pitanja
 
-- [ ] Realan launch datum (ovisno o fakultetu)
-- [ ] Mac pristup za iOS — fakultet, prijatelj, ili cloud CI?
+- [x] Realan launch datum — **odgođen**: prvo Faza 1 polish; Android kad spremno; iOS kad ~99 USD
+- [ ] Mac pristup za iOS — **Faza 4** (fakultet, prijatelj, cloud CI)
 - [x] Android telefon ili emulator? → **Emulator primarno** + stariji Android kad nabavi; iPhone za iOS u M7
 
 ## Povezano

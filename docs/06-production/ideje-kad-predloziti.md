@@ -45,6 +45,8 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | Tutorial, onboarding | `tutorial_*`, F6–F7 | [[../03-content/ideje-prvo-iskustvo\|prvo iskustvo]] | — |
 | Art / placeholder zamjena | CHECKPOINT C2 | roadmap F8, ideje launch scope | Pip sprite |
 | Retention, dnevni loop | poslije F7 gate | ideje T1–T4, K5 pasivni | Daily chest |
+| Merge UX, slot overflow | kamp playtest, pre-launch | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] | **MA-01** Merge Arena |
+| Daily retention | post-launch metrika | merge-arena-v1.1 § DG-01 | **DG-01** Daily Goals |
 
 ## Backlog — UX / flow (prioritet za predlaganje)
 
@@ -54,6 +56,8 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | **UX-04** | **Hub carousel** (Clash Royale swipe) — Meadow / Garden / Greenhouse / Shop | F8 shop, C2 art, meta UI | **L** | F8 / v1 |
 | UX-02 | Progress traka umjesto countdown tajmera | Run HUD / C2 art pass | M | v1.1 |
 | UX-03 | Reset tutorial (dev) u settings | Debug, QA tutoriala | S | dev only |
+| **MA-01** | **Merge Arena** (zamjena gredica) | Slot overflow, merge feel | **L** | v1.1.0 |
+| **DG-01** | **Daily Goals** (3 task + bonus) | Retention, daily loop | **M** | v1.1.1 |
 
 ### UX-01 — Main menu u kampu (detalj)
 

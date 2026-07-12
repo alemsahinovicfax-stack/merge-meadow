@@ -126,6 +126,24 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 - **M8 D3–D4** — production shop/IAP hooks, 8× store screenshots, EN listing, Android emulator scripts (API 33), loot→camp click-through fix, shop dev UI hidden on export
 - **D5 runbook** — [[../06-production/play-internal-test|play-internal-test]]
 
+## 2026-07-11 (kod)
+
+- **Seed Almanac** — linear unlock (lifetime auto + coins shortcut); spawn pool = unlocked types; Shop UI; save v3
+- **D0 Blok A.1–A.2** — merge T3; Loot Boost upgrade (4 levela)
+- **Kamp A+C + daily chest** — Keep, auto-plant, soft cap 40, +3 gredice; daily chest u kampu; save v4
+- **Shop UX** — almanac tier 1→3, top progress bar, coin unlock fix
+- **Kamp UX faza A** — resource strip, context panel, sticky Play
+- **7 seed vizuala** — `seed_visual_config.gd`, camp T1/T2/T3 + run pickup po tipu
+- **Mochi companion** — unlock kamp Lv 2 (Sprinkler+Boost); picker u kampu; procedural cat u runu; save `active_companion_id`
+
+## 2026-07-11
+
+- **Merge Arena + Daily Goals (v1.1)** — odobren dizajn [[../02-design/merge-arena-v1.1|merge-arena-v1.1]]: zamjena gredica, magnet drag, Bloom inbox, daily chest → 3 zadatka; MA-01 / DG-01 u [[../06-production/verzije-nakon-launcha|verzije-nakon-launcha]]
+- **Plan objave** — [[../06-production/troskovi-launcha|troskovi-launcha]]: tablica troškova; Faza 1 polish (0 USD) → Faza 2 Android (25 USD) → Faza 3 updates → Faza 4 iOS (99 USD/god kad prikupi kapital)
+- **CHECKPOINT D0** — pre-launch polish prije Play Console; D5/iOS/CPI odgođeni po fazama
+- **D0 checklist** — [[../06-production/d0-prelaunch-checklist|d0-prelaunch-checklist]]: gap analiza koda vs v1 IN (~45% gotovo); Blok A–E redoslijed rada
+- **Projekcija prihoda** — [[../06-production/troskovi-launcha#Projekcija: koliko do prvih ~100 USD? (pretpostavka)|troskovi-launcha]]: realistično **2–4 mj.** do ~100 USD neto nakon Android launcha
+
 ## Template za nove unose
 
 ```

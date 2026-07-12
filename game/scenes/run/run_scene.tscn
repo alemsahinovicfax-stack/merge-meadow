@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://c8runscene01"]
+[gd_scene load_steps=9 format=3 uid="uid://c8runscene01"]
 
 [ext_resource type="Script" path="res://scripts/run/run_controller.gd" id="1_run"]
 [ext_resource type="Script" path="res://scripts/run/player.gd" id="2_player"]
 [ext_resource type="Script" path="res://scripts/visual/pip_placeholder_control.gd" id="3_pip_ui"]
 [ext_resource type="Script" path="res://scripts/visual/pip_visual.gd" id="4_pip_visual"]
 [ext_resource type="Script" path="res://scripts/visual/lane_background.gd" id="5_lane_bg"]
+[ext_resource type="Script" path="res://scripts/ui/run_pickup_feed.gd" id="6_feed"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(56, 56)
@@ -162,6 +163,17 @@ theme_override_font_sizes/font_size = 36
 text = "Seeds: 0"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="PickupFeed" type="Label" parent="HUD"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 120.0
+offset_right = -24.0
+offset_bottom = 320.0
+grow_horizontal = 0
+script = ExtResource("6_feed")
 
 [node name="TutorialBanner" type="Label" parent="HUD"]
 anchors_preset = 5

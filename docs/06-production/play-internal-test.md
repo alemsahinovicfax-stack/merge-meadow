@@ -7,12 +7,15 @@ povezano:
   - CHECKPOINT
   - store-listing-en
   - store-screenshots
+  - troskovi-launcha
   - ../05-technical/privacy-policy-draft
   - ../05-technical/godot/iap-billing-setup
 ai_sažetak: "Korak-po-korak D5 — Google Play internal testing track (APK, listing, screenshots, testeri)."
 ---
 
 # D5 — Google Play internal test
+
+> ⚠️ **Faza 2** — pokreni **tek kad** [[troskovi-launcha#Plan faza (ažurirano)|Faza 1 (D0 polish)]] završi **i** platiš **25 USD** Play developer račun. Do tada: samo lokalni build + playtest.
 
 > **Build:** `game/merge_meadow_debug.apk` (export: Android Debug, x86_64 + arm64)  
 > **Package:** `com.mergemeadow.game`  

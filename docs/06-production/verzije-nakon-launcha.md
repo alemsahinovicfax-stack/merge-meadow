@@ -35,6 +35,15 @@ RADIONICA-razvoj pokriva do **vertical slice (Faza 7)**. **Alpha, beta, puni lau
 
 Iz OUT / “kasnije” liste — **samo ako launch uspije**:
 
+### Prioritet A — odobreno 2026-07-11
+
+| ID | Ideja | Effort | Doc |
+|----|--------|--------|-----|
+| **MA-01** | **Merge Arena** — zamjena gredica; magnet drag T1; Bloom inbox (Donate/Keep/Basket) | **L** | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] |
+| **DG-01** | **Daily Goals** — 3 dnevna zadatka + bonus (prošireni daily chest) | **M** | isti doc § Daily Goals |
+
+Redoslijed: **MA-01 (v1.1.0)** → **DG-01 (v1.1.1)**. v1 launch zadržava grid kamp + pair-first UX.
+
 - Level generator (procedural) — već planirano “mjesec 2”
 - Treći ljubimac (Bramble)
 - `speed_merge_24h` IAP ([[../02-design/monetizacija|monetizacija]])
