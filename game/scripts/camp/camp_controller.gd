@@ -198,10 +198,15 @@ func _apply_hub_chrome() -> void:
 		collection_button.visible = show_local_chrome
 	if resource_bar:
 		resource_bar.visible = show_local_chrome
-	if footer_bar and root_vbox:
-		var footer_h := 64.0 if _meta_hub_embedded else 72.0
-		footer_bar.offset_top = -footer_h
-		root_vbox.offset_bottom = -footer_h
+	if footer_bar:
+		footer_bar.visible = show_local_chrome
+	if root_vbox:
+		if _meta_hub_embedded:
+			root_vbox.offset_bottom = 0.0
+		else:
+			root_vbox.offset_bottom = -72.0
+			if footer_bar:
+				footer_bar.offset_top = -72.0
 
 
 func _process(delta: float) -> void:
@@ -377,22 +382,41 @@ func _rebuild_seed_bag_grid() -> void:
 			chip.connect("chip_pressed", _on_seed_chip_pressed)
 		if chip.has_method("set_selected"):
 			chip.call("set_selected", type_id == _selected_trade_type)
+		if chip.has_method("set_in_basket"):
+			chip.call("set_in_basket", type_id == GameState.get_loadout_type())
 
 
 func _on_seed_chip_pressed(type_id: String) -> void:
-	if int(GameState.seed_bag.get(type_id, 0)) < GameState.EXCHANGE_SEED_COUNT:
+	var count := int(GameState.seed_bag.get(type_id, 0))
+	if count < 1:
 		return
-	_selected_trade_type = type_id
+	var status := ""
+	if GameState.loadout_enabled():
+		if GameState.set_loadout_from_bag(type_id):
+			GameState.save_player_save()
+			status = GameState.format_loadout_label()
+		elif GameState.is_mythic_seed(type_id):
+			status = "Mythic seeds stay in the greenhouse — pick a garden seed for the basket."
+	if count >= GameState.EXCHANGE_SEED_COUNT:
+		_selected_trade_type = type_id
 	_refresh_seed_chip_selection()
 	_refresh_exchange_button()
+	_refresh_loadout()
+	if not status.is_empty():
+		_set_status_toast(status)
 
 
 func _refresh_seed_chip_selection() -> void:
 	if seed_bag_grid == null:
 		return
+	var basket_id := GameState.get_loadout_type()
 	for child in seed_bag_grid.get_children():
-		if child.has_method("get_type_id") and child.has_method("set_selected"):
-			child.call("set_selected", str(child.call("get_type_id")) == _selected_trade_type)
+		if child.has_method("get_type_id"):
+			var tid := str(child.call("get_type_id"))
+			if child.has_method("set_selected"):
+				child.call("set_selected", tid == _selected_trade_type)
+			if child.has_method("set_in_basket"):
+				child.call("set_in_basket", tid == basket_id)
 
 
 func _validate_crystal_selection() -> void:
@@ -472,7 +496,7 @@ func _garden_cliff_text(bag_count: int, crystal_total: int) -> String:
 	):
 		return "1 more T2 to upgrade Sprinkler."
 	if bag_count > 0:
-		return "You have seeds — Merge below."
+		return "Bag seeds are T1 — pour in Arena or trade 3→coins. T2 blooms resolve in Arena."
 	if crystal_total > 0:
 		return "%d crystals ready — exchange for coins." % crystal_total
 	if GameState.count_collection_journal_news() > 0:
@@ -482,10 +506,12 @@ func _garden_cliff_text(bag_count: int, crystal_total: int) -> String:
 
 func _refresh_loadout() -> void:
 	loadout_button.disabled = not GameState.loadout_enabled()
-	if GameState.loadout_enabled():
-		loadout_button.label_text = GameState.format_loadout_label()
-	else:
+	if not GameState.loadout_enabled():
 		loadout_button.label_text = "Basket (unlock after first merge)"
+	elif GameState.get_loadout_type().is_empty():
+		loadout_button.label_text = "Basket empty — tap a seed in the bag"
+	else:
+		loadout_button.label_text = "%s (tap to clear)" % GameState.format_loadout_label()
 
 
 func _refresh_collection_badge() -> void:
@@ -683,7 +709,12 @@ func _on_loadout_pressed() -> void:
 	if not GameState.loadout_enabled():
 		_refresh_ui("Merge your first flower to unlock the basket.")
 		return
-	_refresh_ui(GameState.cycle_loadout_from_bag())
+	if GameState.get_loadout_type().is_empty():
+		_refresh_ui("Tap a seed in the Garden bag to fill the basket.")
+		return
+	GameState.clear_loadout()
+	GameState.save_player_save()
+	_refresh_ui("Basket cleared.")
 
 
 func _on_collection_pressed() -> void:

@@ -258,6 +258,31 @@ Novi fajl u `game/assets/` dodan izvan editora. Godot **nije importao** asset �
 **Prevencija:** koje pravilo/doc ovo sprječava ubuduće.
 ```
 
+---
+
+## #12 — Signal emit + `.bind` = dupli argument (Shop cosmetics)
+
+**Datum:** 2026-08-16 (M8 D0, Bug-017)
+
+**Simptom:**
+- Klik na „N coins“ u Shop Cosmetics ne smanjuje wallet; dugme izgleda klikabilno.
+
+**Uzrok:**
+```gdscript
+signal buy_pressed(item_id: String)
+row.buy_pressed.connect(_on_cosmetic_buy.bind(item_id))
+# emit(item_id) + bind(item_id) → handler dobije 2 argumenta, očekuje 1 → fail
+```
+
+**Rješenje:**
+```gdscript
+row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
+```
+
+**Prevencija:**
+- Kad signal već nosi ID, **ne** `.bind` isti ID.
+- Headless smoke za buy path (`shop_cosmetic_buy_smoke.gd`).
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

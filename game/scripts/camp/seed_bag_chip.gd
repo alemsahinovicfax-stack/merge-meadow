@@ -1,7 +1,7 @@
 class_name SeedBagChip
 extends PanelContainer
 
-## Garden bag cell — procedural seed icon + name + count; tap to select for trade.
+## Garden bag cell — tap: basket loadout + trade select (if count >= 3).
 
 signal chip_pressed(type_id: String)
 
@@ -14,11 +14,14 @@ var _count: int = 0
 var _display_name: String = ""
 var _rarity: int = 1
 var _trade_eligible: bool = false
+var _tap_enabled: bool = false
 var _selected: bool = false
+var _in_basket: bool = false
 
 var _icon: Control
 var _name_label: Label
 var _count_label: Label
+var _basket_label: Label
 var _panel_style: StyleBoxFlat
 
 
@@ -36,6 +39,7 @@ func apply(type_id: String, count: int, display_name: String, rarity: int) -> vo
 	_display_name = display_name
 	_rarity = rarity
 	_trade_eligible = count >= GameState.EXCHANGE_SEED_COUNT
+	_tap_enabled = count >= 1
 	_ensure_children()
 	_refresh_labels()
 	if _icon and _icon.has_method("setup"):
@@ -49,6 +53,11 @@ func get_type_id() -> String:
 
 func set_selected(on: bool) -> void:
 	_selected = on and _trade_eligible
+	_apply_visual_state()
+
+
+func set_in_basket(on: bool) -> void:
+	_in_basket = on
 	_apply_visual_state()
 
 
@@ -97,10 +106,18 @@ func _ensure_children() -> void:
 	_count_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	text_col.add_child(_count_label)
 
+	_basket_label = Label.new()
+	_basket_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_basket_label.visible = false
+	_basket_label.text = "In basket"
+	text_col.add_child(_basket_label)
+
 	TEXT_LAYOUT.body_label_scroll(_name_label)
 	TEXT_LAYOUT.card_title_scroll(_count_label)
+	TEXT_LAYOUT.caption_label_scroll(_basket_label)
 	TEXT_LAYOUT.ink(_name_label)
 	TEXT_LAYOUT.ink(_count_label)
+	TEXT_LAYOUT.ink(_basket_label)
 
 
 func _refresh_labels() -> void:
@@ -120,18 +137,26 @@ func _apply_visual_state() -> void:
 		_panel_style.set_border_width_all(4)
 		_panel_style.border_color = UI_PALETTE.PEACH
 		_panel_style.bg_color = Color(1.0, 0.94, 0.88, 1.0)
+	elif _in_basket:
+		_panel_style.set_border_width_all(3)
+		_panel_style.border_color = Color(0.35, 0.62, 0.42, 1.0)
+		_panel_style.bg_color = Color(0.92, 0.98, 0.93, 1.0)
 	else:
 		_panel_style.set_border_width_all(2)
 		_panel_style.border_color = Color(
 			UI_PALETTE.OUTLINE.r, UI_PALETTE.OUTLINE.g, UI_PALETTE.OUTLINE.b, 0.16
 		)
 		_panel_style.bg_color = UI_PALETTE.WARM_WHITE
-	modulate = Color(1, 1, 1, 1) if _trade_eligible else Color(1, 1, 1, 0.55)
-	mouse_filter = Control.MOUSE_FILTER_STOP if _trade_eligible else Control.MOUSE_FILTER_IGNORE
+	if _basket_label:
+		_basket_label.visible = _in_basket
+		if _in_basket:
+			TEXT_LAYOUT.ink(_basket_label)
+	modulate = Color(1, 1, 1, 1) if _tap_enabled else Color(1, 1, 1, 0.55)
+	mouse_filter = Control.MOUSE_FILTER_STOP if _tap_enabled else Control.MOUSE_FILTER_IGNORE
 
 
 func _gui_input(event: InputEvent) -> void:
-	if not _trade_eligible:
+	if not _tap_enabled:
 		return
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton

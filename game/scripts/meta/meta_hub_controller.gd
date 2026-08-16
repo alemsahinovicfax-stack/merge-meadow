@@ -3,7 +3,6 @@ extends Control
 const MetaHubPagesScript := preload("res://scripts/meta/meta_hub_pages.gd")
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
 const TEXT_LAYOUT := preload("res://scripts/ui/ui_text_layout.gd")
-const TYPO := preload("res://scripts/ui/ui_typography.gd")
 const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
 
 @onready var swipe_pager: Control = $RootVBox/SwipePager
@@ -12,7 +11,6 @@ const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
 @onready var seeds_label: Label = $RootVBox/TopBar/Panel/HBox/SeedChip/HBox/SeedsLabel
 @onready var coin_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/CoinChip/HBox/CoinIcon
 @onready var seed_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/SeedChip/HBox/SeedIcon
-@onready var page_caption: Label = $RootVBox/PageIndicator/NavPanel/Margin/VBox/CaptionLabel
 @onready var page_tabs: HBoxContainer = $RootVBox/PageIndicator/NavPanel/Margin/VBox/TabsRow
 @onready var settings_button: UiClickButton = $RootVBox/TopBar/Panel/HBox/SettingsButton
 @onready var nav_panel: PanelContainer = $RootVBox/PageIndicator/NavPanel
@@ -59,9 +57,6 @@ func _setup_nav_bar() -> void:
 		TEXT_LAYOUT.header_chip_count(coins_label)
 	if seeds_label:
 		TEXT_LAYOUT.header_chip_count(seeds_label)
-	if page_caption:
-		page_caption.add_theme_font_size_override("font_size", TYPO.CARD_TITLE)
-		TEXT_LAYOUT.ink(page_caption)
 
 
 func _setup_resource_icons() -> void:
@@ -132,8 +127,6 @@ func _on_page_changed(index: int) -> void:
 	_current_page = index
 	_load_neighbors(index)
 	_update_tab_highlight(index)
-	if page_caption:
-		page_caption.text = MetaHubPagesScript.PAGE_LABELS[index]
 	refresh_top_bar()
 	_refresh_embedded_page(index)
 	_notify_arena_page_active(index == MetaHubPagesScript.ARENA)
@@ -274,15 +267,10 @@ func refresh_top_bar() -> void:
 
 
 func _show_swipe_hint_if_needed() -> void:
-	if GameState.tutorial_complete:
-		return
-	if page_caption:
-		page_caption.text = "Swipe left or right to explore — %s" % MetaHubPagesScript.PAGE_LABELS[
-			swipe_pager.current_page
-		]
+	# Bug-019: caption removed; tab labels already name each page.
+	pass
 
 
 func _on_settings_pressed() -> void:
-	# Placeholder — Settings modal u D0 Blok C.
-	if page_caption:
-		page_caption.text = "Settings coming soon."
+	# Placeholder — Settings screen in D0-P (no caption toast).
+	pass

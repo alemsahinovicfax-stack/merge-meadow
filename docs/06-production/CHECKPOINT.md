@@ -12,8 +12,8 @@ trenutna_faza: 5
 podfaza: d0-prelaunch
 aktivna_sekcija: D
 b0_aktivan: false
-sljedeci_korak: "5-min D0 playtest gate → zatim D0-P Settings (sound + restore)"
-zadnja_sesija: "Commit+push Bug-006–014 hub polish; playtest gate"
+sljedeci_korak: "D0-P — Settings / polish (Bug-006–019 ✅)"
+zadnja_sesija: "Bug-016: odd T2 recycle on Done + Arena/Camp copy"
 zadnje_azurirano: 2026-08-16
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
@@ -39,7 +39,7 @@ sljedeca_runda_dokumentacije: "Prije store (D0/D4) — listing/ASO; inače samo 
 | Polje | Vrijednost |
 |-------|------------|
 | **Milestone** | **M8** — Launch prep (Sekcija D) |
-| **Podfaza** | `d0-prelaunch` — Bug-006–014 ✅; sljedeće: 5-min playtest → D0-P |
+| **Podfaza** | `d0-prelaunch` — Bug-006–019 ✅; sljedeće: **D0-P** (Settings / polish) |
 | **Igra** | Merge Meadow — hybrid casual lane run + merge kamp |
 | **Engine** | Godot 4.x (HP laptop / Windows) |
 | **Save** | Lokalni JSON (`user://player_save.json`) — **bez** server/baze u v1 |
@@ -345,10 +345,9 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-1. **Ti:** **5-min D0 playtest** (gate) — checklist u [[d0-functional-audit#5-min vanjski playtest (gate prije D0-P)|d0-functional-audit]] + hub/shop/camp/arena (Bug-008/010–013)
-2. **Sljedeća sesija (agent):** ako ima novih bugova → fix pass; ako čisto → **D0-P Settings** (sound + IAP restore stub)
-3. **Ne** plaćati Play Console dok D0 nije ✅
-4. Bug-006–014 paket ✅ (hub, camp trade/crystal, shop bez Almanac)
+1. **Ti / agent:** D0-P — Settings ekran + polish (SFX/art po listi)
+2. **Ne** plaćati Play Console dok D0 nije ✅
+3. Bug-006–019 paket ✅
 
 ## Povezano
 

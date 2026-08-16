@@ -80,8 +80,13 @@ Legenda: ✅ OK · 🟡 djelomično / placeholder · ❌ broken · ⏸ odgođeno
 | Bug-012 | Camp | Crystal exchange u istom bloku kao seed trade | Zaseban crystal panel + select + scroll | P1 | ✅ |
 | Bug-013 | Shop | Seed Almanac suvišan | Ukloniti Almanac iz Shop UI (unlock ostaje u GameState) | P2 | ✅ |
 | Bug-014 | Hub header | Ikone bez vidljivog broja | Čitljiv broj pored ikone | P0 | ✅ |
+| Bug-015 | Run HUD | Coins/seeds counters poremećeni; gornji HUD zbrka | Top strip: timer/level, companion, counters, feed | P0 | ✅ |
+| Bug-016 | Arena + Camp | Odd T2 bez jasnog izlaza | T2 tap Donate/Keep/Basket; Done recycle T2→T1 (bag T1-only) | P1 | ✅ |
+| Bug-017 | Shop | Cosmetics dugmad ne skidaju coins | Buy → wallet−; Equip radi | P0 | ✅ |
+| Bug-018 | Camp Garden | Nema izbora basket tipa; footer Merge/Play suvišan u hubu | Tap tip → loadout; sakrij Merge/Play u hub mode | P1 | ✅ |
+| Bug-019 | Meta hub | Bottom caption sekcije oduzima prostor | Ukloniti CaptionLabel; tabovi+swipe ostaju | P2 | ✅ |
 
-> Plan promptovi (copy-paste): [[plan-prompts-bug-010-014|plan-prompts-bug-010-014]]. Redoslijed: **014 → 010 → 011 → 012 → 013**.
+> Plan promptovi (copy-paste): [[plan-prompts-bug-010-014|plan-prompts-bug-010-014]] (✅) · [[plan-prompts-bug-015-019|plan-prompts-bug-015-019]]. Redoslijed **015–019:** **015 → 017 → 019 → 018 → 016**.
 
 ### Bug-008 — zone + UniqueName (Faza 0)
 
@@ -116,6 +121,7 @@ Playtest (5 min): daily READY iznad folda; 1 tap → overlay +8 coins / +3 seeds
 | `collection_journal_smoke.gd` | ✅ OK |
 | `loot_camp_nav_smoke.gd` | ✅ OK |
 | `camp_layout_smoke.gd` | ✅ OK |
+| `arena_odd_t2_smoke.gd` | ✅ OK (Bug-016 recycle) |
 | `save_persistence_smoke.gd` | ✅ OK |
 | `balance_snapshot.gd` | ✅ OK (avg ~8 coins/seeds sim) |
 

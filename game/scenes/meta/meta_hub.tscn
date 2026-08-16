@@ -183,7 +183,7 @@ offset_bottom = 1600.0
 
 [node name="PageIndicator" type="MarginContainer" parent="RootVBox"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 88)
+custom_minimum_size = Vector2(0, 56)
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 6
@@ -201,12 +201,7 @@ theme_override_constants/margin_bottom = 2
 
 [node name="VBox" type="VBoxContainer" parent="RootVBox/PageIndicator/NavPanel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="CaptionLabel" type="Label" parent="RootVBox/PageIndicator/NavPanel/Margin/VBox"]
-layout_mode = 2
-text = "Home"
-horizontal_alignment = 1
+theme_override_constants/separation = 0
 
 [node name="TabsRow" type="HBoxContainer" parent="RootVBox/PageIndicator/NavPanel/Margin/VBox"]
 layout_mode = 2

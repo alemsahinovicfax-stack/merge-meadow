@@ -66,6 +66,13 @@ func _step() -> void:
 	hub.go_to_page(MetaHubPages.SHOP, false)
 	for _i in 20:
 		await process_frame
+	var caption := hub.get_node_or_null(
+		"RootVBox/PageIndicator/NavPanel/Margin/VBox/CaptionLabel"
+	)
+	if caption != null:
+		push_error("meta_hub_flow_smoke: CaptionLabel should be removed (Bug-019)")
+		quit(1)
+		return
 	var swipe := hub.get_node_or_null("RootVBox/SwipePager")
 	if swipe == null or not swipe.has_method("get_pages_host"):
 		push_error("meta_hub_flow_smoke: shop swipe host missing")

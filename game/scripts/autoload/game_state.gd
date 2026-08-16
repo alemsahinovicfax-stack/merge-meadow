@@ -1882,23 +1882,43 @@ func try_merge_arena_chips(chip_a: int, chip_b: int, chip_data: Dictionary) -> D
 	return {"ok": true, "to_inbox": false, "new_tier": new_tier}
 
 
-func commit_arena_chips_to_bag(chip_data: Dictionary) -> void:
+## Resolve one arena leftover chip. Never silently drops T2+ (Bug-016).
+## Returns: bagged | crystal | kept | donated | recycled | skipped
+func resolve_arena_leftover_bloom(type_id: String, tier: int) -> String:
+	if type_id.is_empty():
+		return "skipped"
+	if tier <= 1:
+		add_seeds_to_bag(type_id, 1)
+		return "bagged"
+	if tier >= MAX_MERGE_TIER:
+		stash_garden_crystal(type_id)
+		return "crystal"
+	if can_keep_bloom_upgrade(type_id, tier):
+		keep_bloom(type_id, tier)
+		return "kept"
+	if donate_bloom(type_id, tier):
+		return "donated"
+	# Odd T2 with album+donate blocked — recycle to T1 (Fair F2P).
+	if add_seeds_to_bag(type_id, 1) > 0:
+		return "recycled"
+	wallet_coins += 2
+	return "recycled"
+
+
+func commit_arena_chips_to_bag(chip_data: Dictionary) -> Dictionary:
+	var summary := {"bagged": 0, "crystal": 0, "kept": 0, "donated": 0, "recycled": 0}
 	for _chip_id in chip_data:
 		var entry: Dictionary = chip_data[_chip_id]
 		var tier := int(entry.get("tier", 1))
 		var type_id := str(entry.get("type_id", ""))
 		if type_id.is_empty():
 			continue
-		if tier <= 1:
-			add_seeds_to_bag(type_id, 1)
-		elif tier >= MAX_MERGE_TIER:
-			stash_garden_crystal(type_id)
-		elif can_keep_bloom_upgrade(type_id, tier):
-			keep_bloom(type_id, tier)
-		elif not donate_bloom(type_id, tier):
-			pass
+		var result := resolve_arena_leftover_bloom(type_id, tier)
+		if summary.has(result):
+			summary[result] = int(summary[result]) + 1
 	chip_data.clear()
 	save_player_save()
+	return summary
 
 
 func owns_cosmetic(cosmetic_id: String) -> bool:

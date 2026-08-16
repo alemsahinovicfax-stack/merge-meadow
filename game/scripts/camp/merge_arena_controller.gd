@@ -558,6 +558,11 @@ func _setup_bloom_panel() -> void:
 	var title := Label.new()
 	title.name = "Title"
 	col.add_child(title)
+	var subtitle := Label.new()
+	subtitle.name = "Subtitle"
+	subtitle.visible = false
+	subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	col.add_child(subtitle)
 	var row := HBoxContainer.new()
 	row.name = "ActionRow"
 	row.add_theme_constant_override("separation", 8)
@@ -602,21 +607,25 @@ func _show_bloom_panel(chip: ArenaSeedChip) -> void:
 	if title:
 		title.text = "%s T%d" % [name, chip.tier]
 	var donate: UiClickButton = _bloom_panel.get_node("VBox/ActionRow/DonateBtn") as UiClickButton
+	var donate_off := false
 	if donate:
 		if chip.tier == 2:
-			donate.disabled = (
+			donate_off = (
 				GameState.magnet_level >= GameState.MAGNET_MAX_LEVEL
 				or GameState.sprinkler_donations >= GameState.MAGNET_COST_T2
 			)
 		else:
-			donate.disabled = (
+			donate_off = (
 				GameState.multiplier_level >= GameState.MULTIPLIER_MAX_LEVEL
 				or GameState.multiplier_donations >= GameState.MULTIPLIER_COST_T3
 			)
+		donate.disabled = donate_off
 	var keep: UiClickButton = _bloom_panel.get_node("VBox/ActionRow/KeepBtn") as UiClickButton
+	var keep_off := false
 	if keep:
 		var can_upgrade := GameState.can_keep_bloom_upgrade(chip.type_id, chip.tier)
-		keep.disabled = not can_upgrade
+		keep_off = not can_upgrade
+		keep.disabled = keep_off
 		if can_upgrade:
 			var prev := int(GameState.collection_kept_tiers.get(chip.type_id, 0))
 			if prev <= 0:
@@ -629,6 +638,17 @@ func _show_bloom_panel(chip: ArenaSeedChip) -> void:
 				keep.label_text = "In Album"
 			else:
 				keep.label_text = "Keep"
+	var basket: UiClickButton = _bloom_panel.get_node("VBox/ActionRow/BasketBtn") as UiClickButton
+	if basket:
+		basket.disabled = false
+	var subtitle: Label = _bloom_panel.get_node_or_null("VBox/Subtitle") as Label
+	if subtitle:
+		if donate_off and keep_off:
+			subtitle.text = "Odd bloom — Basket, or Done returns a seed"
+			subtitle.visible = true
+		else:
+			subtitle.text = ""
+			subtitle.visible = false
 	var center := chip.get_center()
 	_bloom_panel.position = center + Vector2(-120.0, -ArenaSeedChip.CHIP_RADIUS - 90.0)
 	_bloom_panel.visible = true
@@ -647,7 +667,7 @@ func _on_bloom_donate() -> void:
 		info_label.text = "Donated!"
 		_consume_bloom_target()
 	else:
-		info_label.text = "Cannot donate — try Basket or leave for auto-donate on Done."
+		info_label.text = "Donate full — try Basket, or Done recycles to a seed."
 
 
 func _on_bloom_keep() -> void:
@@ -734,6 +754,8 @@ func _update_hint() -> void:
 		info_label.text = "Tap the bag below — seeds jump into the arena!"
 	elif bag > 0 and _chips.size() < GameState.ARENA_MAX_CHIPS:
 		info_label.text = "Tap bag again to pour more (up to %d on field)." % GameState.ARENA_MAX_CHIPS
+	elif _field_has_t2_bloom():
+		info_label.text = "Odd T2: tap for Donate/Keep/Basket, or merge another T2."
 	elif not _chips.is_empty():
 		info_label.text = "Merge T1→T2→T3. T3 crystals go to garden stash. Tap T2 blooms to spend."
 	elif bag <= 0 and _chips.is_empty():
@@ -741,3 +763,10 @@ func _update_hint() -> void:
 			info_label.text = "Out of seeds — tap Done or pour again when you have more."
 		else:
 			info_label.text = "No seeds left — tap Done to return to camp."
+
+
+func _field_has_t2_bloom() -> bool:
+	for chip in _chips:
+		if is_instance_valid(chip) and chip.tier == 2:
+			return true
+	return false

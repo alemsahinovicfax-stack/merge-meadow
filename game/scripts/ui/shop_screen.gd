@@ -101,14 +101,15 @@ func _ensure_shop_lists_built() -> void:
 		var row := ShopCosmeticRow.new()
 		cosmetics_list.add_child(row)
 		row.apply(item_id)
-		row.buy_pressed.connect(_on_cosmetic_buy.bind(item_id))
-		row.equip_pressed.connect(_on_cosmetic_equip.bind(item_id))
+		# Signal already emits item_id — do not .bind (double-arg breaks buy).
+		row.buy_pressed.connect(_on_cosmetic_buy)
+		row.equip_pressed.connect(_on_cosmetic_equip)
 	for booster_id in CONFIG.all_booster_ids():
 		var brow := ShopBoosterRow.new()
 		boosters_list.add_child(brow)
 		brow.apply(booster_id)
-		brow.buy_pressed.connect(_on_booster_buy.bind(booster_id))
-		brow.use_pressed.connect(_on_booster_use.bind(booster_id))
+		brow.buy_pressed.connect(_on_booster_buy)
+		brow.use_pressed.connect(_on_booster_use)
 
 
 func _on_catalog_updated() -> void:

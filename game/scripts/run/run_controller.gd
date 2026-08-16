@@ -11,19 +11,19 @@ const RAMP_EVERY := 15.0
 const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
 
-@onready var loadout_label: Label = $HUD/PipBadge/LoadoutLabel
-@onready var pip_name_label: Label = $HUD/PipBadge/PipName
-@onready var pip_portrait: Control = $HUD/PipBadge/PipPortrait
-@onready var pickup_feed: Label = $HUD/PickupFeed
-
+@onready var top_hud: MarginContainer = $HUD/TopHud
+@onready var loadout_label: Label = $HUD/TopHud/TopHudVBox/TopRow/PipBadge/LoadoutLabel
+@onready var pip_name_label: Label = $HUD/TopHud/TopHudVBox/TopRow/PipBadge/PipName
+@onready var pip_portrait: Control = $HUD/TopHud/TopHudVBox/TopRow/PipBadge/PipPortrait
+@onready var pickup_feed: Label = $HUD/TopHud/TopHudVBox/PickupFeed
 @onready var world: Node2D = $World
 @onready var player: Area2D = $Player
-@onready var coin_counter_label: Label = $HUD/PickupBar/PickupCounters/CoinRow/CoinLabel
-@onready var seed_counter_label: Label = $HUD/PickupBar/PickupCounters/SeedRow/SeedLabel
-@onready var coin_hud_icon: TextureRect = $HUD/PickupBar/PickupCounters/CoinRow/CoinIcon
-@onready var seed_hud_icon: TextureRect = $HUD/PickupBar/PickupCounters/SeedRow/SeedIcon
-@onready var timer_label: Label = $HUD/TimerLabel
-@onready var tutorial_banner: Label = $HUD/TutorialBanner
+@onready var coin_counter_label: Label = $HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/CoinRow/CoinLabel
+@onready var seed_counter_label: Label = $HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/SeedRow/SeedLabel
+@onready var coin_hud_icon: TextureRect = $HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/CoinRow/CoinIcon
+@onready var seed_hud_icon: TextureRect = $HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/SeedRow/SeedIcon
+@onready var timer_label: Label = $HUD/TopHud/TopHudVBox/TopRow/TimerLabel
+@onready var tutorial_banner: Label = $HUD/TopHud/TopHudVBox/TutorialBanner
 
 var _coin_scene: PackedScene = preload("res://scenes/run/coin.tscn")
 var _seed_scene: PackedScene = preload("res://scenes/run/seed_pickup.tscn")
@@ -74,13 +74,8 @@ func _setup_world() -> void:
 
 
 func _setup_safe_area() -> void:
-	var pickup_bar := $HUD/PickupBar as Control
-	if timer_label:
-		SAFE_AREA.apply_top_margin(timer_label, 8.0)
-	if tutorial_banner:
-		SAFE_AREA.apply_top_margin(tutorial_banner)
-	if pickup_bar:
-		SAFE_AREA.apply_bottom_margin(pickup_bar, 16.0)
+	if top_hud:
+		SAFE_AREA.apply_top_margin(top_hud, 8.0)
 
 
 func _setup_pickup_hud_icons() -> void:
@@ -295,12 +290,8 @@ func _on_player_hit_obstacle() -> void:
 func _update_hud() -> void:
 	if coin_counter_label == null or seed_counter_label == null:
 		return
-	var mult := GameState.get_loot_multiplier()
-	if mult > 1.0:
-		coin_counter_label.text = "Coins: %d (×%.2g)" % [coin_count, mult]
-	else:
-		coin_counter_label.text = "Coins: %d" % coin_count
-	seed_counter_label.text = _format_seed_hud_line()
+	coin_counter_label.text = "%d" % coin_count
+	seed_counter_label.text = "%d" % _sum_run_seeds()
 	if pip_name_label:
 		pip_name_label.text = GameState.get_companion_display_name()
 	if pip_portrait and pip_portrait.has_method("refresh_portrait"):
@@ -326,14 +317,8 @@ func _update_hud() -> void:
 		timer_label.text = "%ds" % int(ceil(remaining))
 
 
-func _format_seed_hud_line() -> String:
-	var parts: PackedStringArray = []
+func _sum_run_seeds() -> int:
+	var total := 0
 	for type_id in seeds_by_type:
-		var count := int(seeds_by_type[type_id])
-		if count <= 0:
-			continue
-		var name: String = GameState.SEED_DISPLAY_NAMES.get(type_id, str(type_id).capitalize())
-		parts.append("%s×%d" % [name, count])
-	if parts.is_empty():
-		return "Seeds: 0"
-	return ", ".join(parts)
+		total += int(seeds_by_type[type_id])
+	return total

@@ -11,6 +11,12 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
 ## 2026-08-16
 
+- **Bug-016** — odd T2: Done/Back više ne briše bloom (keep→donate→recycle T1); Arena hint/panel copy; Camp bag = T1-only
+- **Bug-018** — Garden bag tap → basket loadout + badge; LoadoutButton clear; hub-embedded sakriva Footer Merge/Play
+- **Bug-019** — hub bottom nav: uklonjen CaptionLabel; niži PageIndicator; tabovi+swipe ostaju
+- **Bug-017** — shop cosmetics buy: uklonjen `.bind` na signalima (dupli arg); wallet− + equip; booster connect isto
+- **Bug-015** — run HUD top strip: Pip | Timer/Lv | coin+seed brojevi na vrhu; feed ispod; compact counters
+- **Bug-015–019** plan prompt paket — [[../06-production/plan-prompts-bug-015-019|plan-prompts-bug-015-019]] (run HUD, T2 leftover, shop cosmetics, garden basket/footer, hub caption)
 - **Bug-010–014** plan prompt paket — [[../06-production/plan-prompts-bug-010-014|plan-prompts-bug-010-014]] (arena swipe lock, seed trade select, crystal panel, ukloni Shop Almanac, header brojevi)
 - **Bug-014** — hub header: `header_chip_count` (tamni ink, no clip); gušći chip bg; smoke assert brojeva
 - **Bug-010** — merge arena session lock (swipe+tabs); `process_mode` pause off-page; Done/Back unlock
