@@ -2,7 +2,9 @@ class_name CollectionJournalRow
 extends PanelContainer
 
 const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
+const TEXT_LAYOUT := preload("res://scripts/ui/ui_text_layout.gd")
 const READABILITY := preload("res://scripts/ui/ui_readability.gd")
+const TYPO := preload("res://scripts/ui/ui_typography.gd")
 const BloomIcon := preload("res://scripts/ui/collection_bloom_icon.gd")
 
 var _entry: Dictionary = {}
@@ -29,7 +31,7 @@ func _ensure_built() -> void:
 	if _built:
 		return
 	_built = true
-	custom_minimum_size = Vector2(0, 88)
+	custom_minimum_size = Vector2(0, 72)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	var style := UI_PALETTE.button_style("subtle", "normal")
@@ -55,14 +57,14 @@ func _ensure_built() -> void:
 	text_col.add_child(title_row)
 
 	_title = Label.new()
-	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_title.add_theme_font_size_override("font_size", READABILITY.font(24))
+	TEXT_LAYOUT.card_title_scroll_readable(_title)
+	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_title.add_theme_color_override("font_color", UI_PALETTE.UI_TEXT)
 	title_row.add_child(_title)
 
 	_new_badge = Label.new()
 	_new_badge.text = "NEW"
-	_new_badge.add_theme_font_size_override("font_size", READABILITY.font(16))
+	TEXT_LAYOUT.caption_label_scroll_readable(_new_badge)
 	_new_badge.add_theme_color_override("font_color", Color(1.0, 0.95, 0.85))
 	var badge_bg := StyleBoxFlat.new()
 	badge_bg.bg_color = Color(0.85, 0.35, 0.28)
@@ -75,7 +77,7 @@ func _ensure_built() -> void:
 	title_row.add_child(_new_badge)
 
 	_stars = Label.new()
-	_stars.add_theme_font_size_override("font_size", READABILITY.font(18))
+	_stars.add_theme_font_size_override("font_size", READABILITY.font(TYPO.BODY))
 	_stars.add_theme_color_override("font_color", Color(0.72, 0.62, 0.2))
 	text_col.add_child(_stars)
 
@@ -84,13 +86,12 @@ func _ensure_built() -> void:
 	text_col.add_child(_tier_row)
 	for tier in [1, 2, 3]:
 		var chip := Label.new()
-		chip.add_theme_font_size_override("font_size", READABILITY.font(16))
+		TEXT_LAYOUT.caption_label_scroll_readable(chip)
 		_tier_row.add_child(chip)
 		_tier_labels.append(chip)
 
 	_caption = Label.new()
-	_caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_caption.add_theme_font_size_override("font_size", READABILITY.font(17))
+	TEXT_LAYOUT.body_label_scroll(_caption)
 	_caption.add_theme_color_override("font_color", Color(0.38, 0.42, 0.38))
 	text_col.add_child(_caption)
 

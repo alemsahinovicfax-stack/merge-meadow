@@ -1,11 +1,13 @@
 class_name ShopBoosterRow
-extends PanelContainer
+extends VBoxContainer
 
 signal buy_pressed(booster_id: String)
 signal use_pressed(booster_id: String)
 
 const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
+const TEXT_LAYOUT := preload("res://scripts/ui/ui_text_layout.gd")
+const TYPO := preload("res://scripts/ui/ui_typography.gd")
 
 var booster_id: String = ""
 var _title: Label
@@ -36,55 +38,44 @@ func _ensure_built() -> void:
 	if _built:
 		return
 	_built = true
-	custom_minimum_size = Vector2(0, 92)
+	custom_minimum_size = Vector2(0, 108)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.92, 0.88, 1.0, 0.55)
-	style.set_corner_radius_all(10)
-	style.content_margin_left = 12.0
-	style.content_margin_top = 8.0
-	style.content_margin_right = 12.0
-	style.content_margin_bottom = 8.0
-	add_theme_stylebox_override("panel", style)
-
-	var root := VBoxContainer.new()
-	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	root.add_theme_constant_override("separation", 6)
-	add_child(root)
+	add_theme_constant_override("separation", 8)
 
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override("separation", 8)
-	root.add_child(top)
+	add_child(top)
 
 	_title = Label.new()
-	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_title.add_theme_font_size_override("font_size", 20)
+	TEXT_LAYOUT.card_title_scroll(_title)
+	_title.add_theme_font_size_override("font_size", 28)
 	_title.add_theme_color_override("font_color", UI_PALETTE.UI_TEXT)
 	top.add_child(_title)
 
 	_count = Label.new()
-	_count.add_theme_font_size_override("font_size", 18)
+	_count.add_theme_font_size_override("font_size", TYPO.BODY)
 	_count.add_theme_color_override("font_color", Color(0.35, 0.38, 0.55))
 	top.add_child(_count)
 
 	_desc = Label.new()
-	_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_desc.add_theme_font_size_override("font_size", 15)
+	TEXT_LAYOUT.body_label_scroll(_desc)
 	_desc.add_theme_color_override("font_color", Color(0.42, 0.4, 0.48))
-	root.add_child(_desc)
+	add_child(_desc)
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
-	root.add_child(row)
+	add_child(row)
 
 	_use = Button.new()
 	_use.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_use.add_theme_font_size_override("font_size", 16)
+	_use.custom_minimum_size = Vector2(0, 56)
+	_use.add_theme_font_size_override("font_size", 26)
 	row.add_child(_use)
 
 	_buy = Button.new()
 	_buy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_buy.add_theme_font_size_override("font_size", 16)
+	_buy.custom_minimum_size = Vector2(0, 56)
+	_buy.add_theme_font_size_override("font_size", 26)
 	row.add_child(_buy)
 
 
@@ -98,7 +89,7 @@ func _refresh() -> void:
 	_count.text = "×%d" % owned
 	_use.text = "Use"
 	_use.disabled = owned <= 0
-	_buy.text = "Buy — %s" % IAPManager.get_price_label(sku)
+	_buy.text = "Buy %s" % IAPManager.get_price_label(sku)
 	_buy.disabled = IAPManager.is_busy()
 
 

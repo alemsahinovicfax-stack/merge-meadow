@@ -57,6 +57,18 @@ Provjeri da se projekt i scena učitaju bez grešaka, bez GUI-a:
 - `--quit-after N` = odradi N frame-ova pa izađi.
 - Ako konzola pokaže `SCRIPT ERROR` → popravi prije nego što otvoriš editor.
 
+**D0-F smoke suite** (`game/scripts/dev/`):
+
+```powershell
+$g = "$env:USERPROFILE\Desktop\Godot_v4.7-stable_win64.exe"
+$p = "game"
+foreach ($s in @("meta_hub_flow_smoke","loot_camp_nav_smoke","shop_open_smoke","save_persistence_smoke","balance_snapshot")) {
+  & $g --headless --rendering-driver opengl3 --path $p --script "res://scripts/dev/$s.gd"
+}
+```
+
+Matrica: [[../../06-production/d0-functional-audit|d0-functional-audit]].
+
 **Desktop prozor (portrait kao telefon):** `project.godot` → `stretch/aspect=keep` + početni prozor 540×960. Viewport ostaje 1080×1920; široki monitor = crne trake lijevo/desno, ne širenje scene.
 
 ## 2b. Import novih asseta (PNG/SVG)

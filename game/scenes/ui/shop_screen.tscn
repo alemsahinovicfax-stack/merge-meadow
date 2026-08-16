@@ -75,7 +75,7 @@ theme_override_constants/separation = 12
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
-theme_override_font_sizes/font_size = 40
+theme_override_font_sizes/font_size = 34
 text = "Shop"
 vertical_alignment = 1
 
@@ -111,14 +111,14 @@ stretch_mode = 5
 [node name="CoinsLabel" type="Label" parent="RootVBox/ResourceBar/HBox/CoinsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.38, 0.2, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 26
 text = "0"
 vertical_alignment = 1
 
 [node name="CoinsCaption" type="Label" parent="RootVBox/ResourceBar/HBox/CoinsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.45, 0.35, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 16
 text = "coins"
 vertical_alignment = 1
 
@@ -126,88 +126,38 @@ vertical_alignment = 1
 layout_mode = 2
 theme_override_constants/separation = 8
 
+[node name="SeedsIcon" type="TextureRect" parent="RootVBox/ResourceBar/HBox/SeedsRow"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
 [node name="SeedsLabel" type="Label" parent="RootVBox/ResourceBar/HBox/SeedsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.25, 0.5, 0.28, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 26
 text = "0 / 40"
 vertical_alignment = 1
 
 [node name="SeedsCaption" type="Label" parent="RootVBox/ResourceBar/HBox/SeedsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.48, 0.36, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 16
 text = "seeds"
 vertical_alignment = 1
-
-[node name="TopProgress" type="PanelContainer" parent="RootVBox"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_resource")
-
-[node name="VBox" type="VBoxContainer" parent="RootVBox/TopProgress"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="TopProgressTitle" type="Label" parent="RootVBox/TopProgress/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.22, 0.42, 0.28, 1)
-theme_override_font_sizes/font_size = 20
-text = "Unlock Daisy — Tier 1"
-
-[node name="TopProgressCaption" type="Label" parent="RootVBox/TopProgress/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 16
-text = "Collect Clover in runs (lifetime)"
-
-[node name="TopProgressRow" type="HBoxContainer" parent="RootVBox/TopProgress/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="TopProgressBar" type="ProgressBar" parent="RootVBox/TopProgress/VBox/TopProgressRow"]
-custom_minimum_size = Vector2(0, 28)
-layout_mode = 2
-size_flags_horizontal = 3
-max_value = 10.0
-show_percentage = false
-
-[node name="TopProgressLabel" type="Label" parent="RootVBox/TopProgress/VBox/TopProgressRow"]
-custom_minimum_size = Vector2(64, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.28, 0.42, 0.3, 1)
-theme_override_font_sizes/font_size = 18
-text = "0 / 10"
-horizontal_alignment = 2
-
-[node name="TopCoinButton" type="PanelContainer" parent="RootVBox/TopProgress/VBox"]
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "Unlock now — 120 coins"
-font_size = 20
-button_variant = "primary"
 
 [node name="MainScroll" type="ScrollContainer" parent="RootVBox"]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
-vertical_scroll_mode = 1
+vertical_scroll_mode = 2
 
 [node name="MainContent" type="VBoxContainer" parent="RootVBox/MainScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
-
-[node name="AlmanacHeader" type="Label" parent="RootVBox/MainScroll/MainContent"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.25, 0.45, 0.32, 1)
-theme_override_font_sizes/font_size = 26
-text = "Seed Almanac"
-
-[node name="AlmanacList" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
+size_flags_vertical = 0
+theme_override_constants/separation = 16
 
 [node name="CoinShopPanel" type="PanelContainer" parent="RootVBox/MainScroll/MainContent"]
 layout_mode = 2
@@ -215,24 +165,22 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_resource")
 
 [node name="VBox" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent/CoinShopPanel"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="CoinShopTitle" type="Label" parent="RootVBox/MainScroll/MainContent/CoinShopPanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.38, 0.2, 1)
-theme_override_font_sizes/font_size = 24
 text = "Cosmetics (coins)"
 
 [node name="CoinShopHint" type="Label" parent="RootVBox/MainScroll/MainContent/CoinShopPanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 16
 text = "Cosmetic-only — no gameplay advantage."
 autowrap_mode = 2
 
 [node name="CosmeticsList" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent/CoinShopPanel/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="BoosterPanel" type="PanelContainer" parent="RootVBox/MainScroll/MainContent"]
 layout_mode = 2
@@ -245,14 +193,12 @@ theme_override_constants/separation = 8
 [node name="BoosterTitle" type="Label" parent="RootVBox/MainScroll/MainContent/BoosterPanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.28, 0.45, 1)
-theme_override_font_sizes/font_size = 24
 text = "Boosters (consumables)"
 horizontal_alignment = 1
 
 [node name="BoosterHint" type="Label" parent="RootVBox/MainScroll/MainContent/BoosterPanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 16
 text = "Buy with real money — use from inventory."
 horizontal_alignment = 1
 autowrap_mode = 2
@@ -272,60 +218,61 @@ theme_override_constants/separation = 8
 [node name="IapTitle" type="Label" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.28, 0.45, 1)
-theme_override_font_sizes/font_size = 24
 text = "Support the game"
 horizontal_alignment = 1
 
 [node name="StatusLabel" type="Label" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.35, 0.35, 0.35, 1)
-theme_override_font_sizes/font_size = 17
 text = "Optional real-money purchases."
 horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="RemoveAdsButton" type="PanelContainer" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 script = ExtResource("2_uibtn")
 label_text = "Remove Ads"
-font_size = 24
+font_size = 26
 button_variant = "accent"
 
 [node name="RemoveAdsDesc" type="Label" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 16
 text = "Turn off interstitial ads between runs."
 autowrap_mode = 2
 
 [node name="StarterPackButton" type="PanelContainer" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 script = ExtResource("2_uibtn")
 label_text = "Starter Pack"
-font_size = 24
+font_size = 26
 button_variant = "secondary"
 
 [node name="StarterPackDesc" type="Label" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
-theme_override_font_sizes/font_size = 16
 text = "One-time boost."
 autowrap_mode = 2
 
 [node name="RestoreButton" type="PanelContainer" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-custom_minimum_size = Vector2(0, 48)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 script = ExtResource("2_uibtn")
 label_text = "Restore Purchases"
-font_size = 20
+font_size = 26
 button_variant = "subtle"
 
 [node name="ResetDevButton" type="PanelContainer" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 script = ExtResource("2_uibtn")
 label_text = "Reset Purchases (dev)"
-font_size = 18
+font_size = 26
 button_variant = "subtle"
+
+[node name="BottomSpacer" type="Control" parent="RootVBox/MainScroll/MainContent"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+mouse_filter = 2

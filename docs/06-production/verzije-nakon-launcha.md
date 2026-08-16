@@ -40,9 +40,11 @@ Iz OUT / “kasnije” liste — **samo ako launch uspije**:
 | ID | Ideja | Effort | Doc |
 |----|--------|--------|-----|
 | **MA-01** | **Merge Arena** — zamjena gredica; magnet drag T1; Bloom inbox (Donate/Keep/Basket) | **L** | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] |
+| **MA-01b** | **Arena Muncher** — pest jede T1/T2, freeze 2 s na T3 | **M** | [[../02-design/merge-arena-pest\|merge-arena-pest]] |
+| **UX-04** | **Hub carousel** — Shop · Main (centar) · Camp · Arena · Collection | **L** | [[../06-production/ideje-kad-predloziti\|ideje-kad-predloziti]] § UX-04 |
 | **DG-01** | **Daily Goals** — 3 dnevna zadatka + bonus (prošireni daily chest) | **M** | isti doc § Daily Goals |
 
-Redoslijed: **MA-01 (v1.1.0)** → **DG-01 (v1.1.1)**. v1 launch zadržava grid kamp + pair-first UX.
+Redoslijed: **v1.1.0 paket (MA-01 + MA-01b + UX-04)** → **DG-01 (v1.1.1)**.
 
 - Level generator (procedural) — već planirano “mjesec 2”
 - Treći ljubimac (Bramble)

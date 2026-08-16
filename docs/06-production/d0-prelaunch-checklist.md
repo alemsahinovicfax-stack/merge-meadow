@@ -115,7 +115,7 @@ Legenda: ✅ gotovo · 🟡 djelomično · ❌ nedostaje · ⏸ odgođeno (plan)
 | U6 | Shop: **booster consumables** | ✅ | Merge Hint + Loot Burst IAP; inventory + Use u shopu |
 | U7 | Shop / kamp kozmetika (3–5 itema) | ✅ | 5 coin itema u shopu (`cosmetic_catalog.gd`) |
 | U8 | **Dnevnik kolekcije** (lista otkrića) | ✅ | `collection_journal.tscn`, 📖 u kamp top baru, NEW badge |
-| U9 | Settings ekran | ❌ | Gumb postoji (`SettingsButton`) — **nema handlera** |
+| U9 | Settings ekran | 🟡 | Placeholder handleri (hub/camp/menu); puni ekran **D0-P** |
 | U10 | EN UI copy | ✅ | Store + in-game EN |
 
 ---
@@ -176,35 +176,42 @@ Legenda: ✅ gotovo · 🟡 djelomično · ❌ nedostaje · ⏸ odgođeno (plan)
 
 ## Preporučeni redoslijed rada
 
-Prioritet = **igrač osjeća gotov proizvod** prije store naknade.
+Prioritet = **igra radi ispravno i balansirano** prije VFX/visual/sound polish i store naknade.
 
-### Blok A — Gameplay koji scope zahtijeva
-1. **G4** — merge T3 (`MAX_MERGE_TIER := 3`, UI + balans)
-2. **G6** — množitelj upgrade (4 levela, kamp UI, efekt u runu)
-3. **G10** — spawn pool svih 7+ sjemena (ne samo clover)
-4. **U4** — daily chest ✅ (kamp, save v4, D7 retention hook)
+### D0-F — Funkcionalnost (sada, prije polish)
 
-### Blok B — Sadržaj i identitet
-5. **T2 / F8.1** — spriteovi sjemena + cvijet po tipu (min 7, cilj 10)
-6. **G7 / F8.9** — Mochi cosmetic unlock (kamp milestone) ✅
-7. **U8** — dnevnik ekran (lista + “new discovery”) ✅
-8. **U7** — shop kozmetika + **U6** booster consumables
+1. **F1** — puni audit svih ekrana (meta hub ulaz) → [[d0-functional-audit|d0-functional-audit]]
+2. **F2** — debug + regression fixevi (greske-katalog, bug lista)
+3. **F3** — popravke mehanika + sync spec s merge arena modelom
+4. **F4** — balans pass + 5-min playtest + `ekonomija-brojevi`
 
-### Blok C — Feel i polish
-9. **T3** — SFX set (pickup, merge, fail, UI click)
-10. **T1** — kamp/run art pass (procedural → sprite gdje treba)
-11. **U1** — splash scena ili branded export splash
-12. **U9** — settings (sound toggle, restore purchases link)
-13. **T6** — isključi debug resurse; release build test
+### Blok A — Gameplay (gotovo ✅)
+1. **G4** — merge T3 ✅
+2. **G6** — množitelj upgrade ✅
+3. **G10** — spawn pool almanac ✅
+4. **U4** — daily chest ✅
 
-### Blok D — Monetizacija production
-14. **M1–M3** — Poing AdMob + Billing plugin, test na **fizičkom** Androidu
-15. **M5** — production ad unit ID-evi (ne test)
+### Blok B — Sadržaj (djelomično)
+5. **T2 / F8.1** — spriteovi sjemena — 🟡 procedural, PNG **D0-P**
+6. **G7 / F8.9** — Mochi ✅
+7. **U8** — dnevnik ✅
+8. **U7 / U6** — shop kozmetika + boosteri ✅
 
-### Blok E — Gate prije $25
-16. **T9** — vanjski playtest + bilješke u changelog
-17. **T7** — release AAB, keystore, smoke na emulatoru + telefon
-18. Sve checkboxove gore označiti ✅ → **Faza 2**
+### D0-P — Feel i polish *(nakon F4)*
+9. **T3** — SFX set
+10. **T1** — kamp/run art pass
+11. **U1** — splash / branded export
+12. **U9** — settings ekran
+13. **T6** — debug resursi off; release AAB test
+
+### D0-M — Monetizacija production *(nakon F4)*
+14. **M1–M3** — Poing AdMob + Billing
+15. **M5** — production ad unit ID-evi
+
+### Blok E — Gate prije $25 *(nakon D0-P/M)*
+16. **T9** — vanjski playtest (F4 uključuje 5-min gate)
+17. **T7** — release AAB, keystore
+18. Sve checkboxove ✅ → **Faza 2**
 
 ---
 
@@ -215,7 +222,7 @@ Prioritet = **igrač osjeća gotov proizvod** prije store naknade.
 | MA-01 | Merge Arena (zamjena gredica) | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] |
 | DG-01 | Daily Goals (3 zadatka + bonus) | isti |
 
-Trenutni D0 koristi **grid kamp + pair-first UX** — dovoljno za launch.
+Trenutni D0 koristi **meta hub + merge arena + seed bag** — grid kamp zamijenjen u M8.
 
 ---
 

@@ -23,14 +23,38 @@ Ovo je **jedan izvor istine** za ono što gradimo u M7. Za razliku od [[gdd-over
 ## Screen flow
 
 ```
-Main Menu ──Play──► Run ──(finish/fail)──► Loot ──┬─ Double (×2, 1×)
-   ▲                 ▲                            ├─ Revive → NASTAVI Run (1×)
-   │                 │                            ├─ Retry → svjež Run
-   └──────── Play ── Camp ◄──── To Camp ──────────┘
-                     (merge + magnet upgrade)
+Meta Hub (main) — swipe/tabs: Shop · Journal · Home · Camp · Arena
+    Home ──Play──► Run ──(finish/fail)──► Loot ──┬─ Double (×2, 1×)
+    ▲                 ▲                            ├─ Revive → NASTAVI Run (1×)
+    │                 │                            ├─ Retry → svjež Run
+    └──────── Play ── Camp ◄──── To Camp ──────────┘
+                     (upgrades + footer Merge/Play)
+                         │
+                         └──► Merge Arena (T1→T3, pest, bloom inbox)
 ```
 
-Prijelazi idu kroz `GameState.go_to_scene()`. Stanje između scena čuva **`GameState`** autoload (jedini "mozak" izvan scena).
+Prijelazi idu kroz `GameState.go_to_*` / `SceneRouter`. Stanje između scena čuva **`GameState`** autoload.
+
+---
+
+## 0. Meta Hub
+
+**Scena:** `scenes/meta/meta_hub.tscn` · **skripta:** `scripts/meta/meta_hub_controller.gd`
+
+| Stranica | Indeks | Ugrađena scena |
+|----------|--------|----------------|
+| Shop | 0 | `shop_screen.tscn` |
+| Journal | 1 | `collection_journal.tscn` |
+| Home | 2 | `main_menu.tscn` |
+| Camp | 3 | `camp_scene.tscn` |
+| Arena | 4 | `merge_arena.tscn` |
+
+- Swipe lijevo/desno ili tabovi; shared top bar prikazuje coin/seed ikone (`pickups/coin.png`, `pickups/seed.png`) + brojeve (bez riječi). Page ResourceBar skriven kad je stranica ugrađena u hub.
+- Page dots (○/●) uklonjeni — navigacija preko tabova + caption.
+- Ugrađene stranice imaju `meta_hub_embedded = true`; Back/Home gumbi skriveni gdje dupliciraju hub navigaciju.
+- **Settings** gumb na hubu: placeholder poruka (puni ekran → D0-P).
+
+**Gotovo kad:** sve 5 stranica učitava bez crasha; navigacija ne gubi stanje; Play iz Home/Camp pokreće run.
 
 ---
 
@@ -99,28 +123,43 @@ Prikaz: naslov (Failed/Complete), boja trake, `+N Coins/Seeds`, status s **X →
 
 ---
 
-## 4. Camp (merge + magnet)
+## 4. Camp (upgrades + seed bag)
 
 **Scena:** `scenes/camp/camp_scene.tscn` · **skripta:** `scripts/camp/camp_controller.gd`
 
-### Slotovi
-- `CAMP_SLOT_COUNT` slotova (mreža). Deponovani loot puni prazne slotove kao **T1**, po jedan orb = jedan slot.
-- Ako nema praznih slotova → loot ostaje na loot ekranu (poruka "Camp full").
+### Seed bag (ne grid slotovi)
+- Run loot → `seed_bag` (Dictionary tip→count), soft cap **40**.
+- **Garden kartica:** sažetak `Seeds: N/40` + **vizualni bag grid** (ikona + ime + broj po tipu s count > 0).
+- **To Camp** na loot ekranu: `deposit_loot_to_camp()` → ako ima sjemena, **Merge Arena**, inače **Camp**.
 
-### Merge
-- Tap orb → selektiraj; tap drugi **isti tier** → merge: `T + T = T+1`, jedan slot se prazni.
-- Max tier = `MAX_MERGE_TIER` (T2 u slice-u). T2+T2 se **ne** mergea (nema T3 u slice).
-- Različiti tierovi ili prazan slot → nema merge (poruka).
+### Kamp UI
+- **Layout (D0-P / Bug-008 / Bug-012):** zone Daily → Garden (bag + seed trade) → Crystal stash → Upgrades → Run prep → Footer Merge/Play. Merge i dalje u Areni, ne na gridu.
+- **Sprinkler (magnet):** donate T2 bloomovi → `magnet_level` (0–4), veći domet u runu.
+- **Loot Boost:** donate T3 → `multiplier_level` (0–4), ×1.0–×2.0 u runu.
+- **Exchange:** 3× isti tip iz baga → coins (Garden kartica, select tipa); crystal exchange: zasebna Crystal stash kartica (select tipa, 1→coins); seed trade ostaje u Garden kartici.
+- **Daily chest**, **loadout basket** (1 slot, +5% spawn šanse).
+- Footer: **Merge** → arena; **Play** → svjež run.
 
-### Magnet upgrade
-- Trošak: `MAGNET_COST_T2` × T2 orbova → `magnet_level += 1`.
-- Max level `MAGNET_MAX_LEVEL`. Efekt: veći pickup domet u sljedećem runu (`get_magnet_radius()`).
-- Ekonomija mora biti **ostvariva** (dovoljno slotova da se skupi potreban T2) — vidi [[ekonomija-brojevi|brojevi]].
+### Merge (Arena — §4b)
+Merge T1→T2→T3 radi u **Merge Arena**, ne na gridu u kampu. Max tier = `MAX_MERGE_TIER` (3).
 
 | Play | → svjež Run |
 |------|-------------|
 
-**Gotovo kad:** merge T1+T1=T2 radi i vizualno je jasan; magnet upgrade je dostižan i mijenja domet u runu; instrukcije u `info_label` vode igrača korak-po-korak.
+**Gotovo kad:** bag prima loot; upgrade donate radi; Merge/Play navigacija ispravna; status toast + Garden cliff vode igrača.
+
+---
+
+## 4b. Merge Arena
+
+**Scena:** `scenes/camp/merge_arena.tscn` · **skripta:** `scripts/camp/merge_arena_controller.gd`
+
+- Drag-and-drop chipovi iz **seed bag**; merge isti tip + tier → tier+1.
+- **Pest** jede T1/T2; T3 freeze.
+- **Bloom inbox:** Keep (album) / Donate (sprinkler/multiplier progress).
+- Povratak → Camp hub stranica.
+
+**Gotovo kad:** T1→T3 lanac radi; Keep/Donate ažuriraju album i donate brojače.
 
 ---
 
@@ -132,7 +171,7 @@ Prikaz: naslov (Failed/Complete), boja trake, `+N Coins/Seeds`, status s **X →
 |-------|-----------|-------|
 | Loot | `last_loot`, `last_raw_orbs`, `last_failed`, `loot_doubled` | rezultat zadnjeg runa + double flag |
 | Revive/resume | `revive_used_this_run`, `resume_pending`, `carry_orbs`, `carry_elapsed` | nastavak runa |
-| Kamp | `camp_slots[]`, `magnet_level` | meta progres |
+| Kamp | `seed_bag`, `magnet_level`, `multiplier_level`, `garden_crystals` | meta progres (bag + upgrades) |
 | Ostalo | `tutorial_*`, `loadout_type_id` | onboarding + basket |
 
 **Save (C1½ odluka 2026-07-05):** minimalni JSON `user://player_save.json` v1 — wallet, bag, kreveti, sprinkler, kolekcija, loadout, tutorial. **Ne** sprema run-in-progress (`last_*`, `carry_*`). Migracija iz `tutorial_flags.json`. Pun cloud/M8 save → F8.7.

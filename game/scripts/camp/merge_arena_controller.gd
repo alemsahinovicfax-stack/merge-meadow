@@ -2,6 +2,7 @@ extends Control
 
 const ArenaSeedChip := preload("res://scripts/camp/arena_seed_chip.gd")
 const ArenaSeedBag := preload("res://scripts/camp/arena_seed_bag.gd")
+const ArenaPest := preload("res://scripts/camp/arena_pest.gd")
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
 
 const CHIP_MIN_DIST := 102.0
@@ -24,6 +25,9 @@ var _magnet_lock_drag: ArenaSeedChip = null
 var _magnet_lock_partner: ArenaSeedChip = null
 var _bloom_panel: PanelContainer
 var _bloom_target: ArenaSeedChip = null
+var _pest: ArenaPest
+var _swipe_locked: bool = false
+var _page_active: bool = true
 
 
 func _ready() -> void:
@@ -33,6 +37,10 @@ func _ready() -> void:
 	SAFE_AREA.apply_top_margin($RootVBox/TopBar, 8.0)
 	playfield.resized.connect(_layout_bag)
 	call_deferred("_deferred_boot")
+
+
+func _exit_tree() -> void:
+	_set_hub_nav_locked(false)
 
 
 func _deferred_boot() -> void:
@@ -45,7 +53,9 @@ func _deferred_boot() -> void:
 		legacy.visible = false
 	_setup_bag()
 	_setup_bloom_panel()
+	_setup_pest()
 	_apply_merge_hint_if_ready()
+	_apply_pest_tutorial_if_ready()
 	_update_hint()
 	_refresh_bag()
 
@@ -81,8 +91,116 @@ func _layout_bag() -> void:
 	_seed_bag.set_layout_position(Vector2(x, y))
 
 
-func _process(_delta: float) -> void:
+func _apply_pest_tutorial_if_ready() -> void:
+	if not GameState.should_show_arena_pest_tutorial():
+		return
+	info_label.text = "Pour seeds — watch the muncher! Merge to T3 to freeze it."
+
+
+func _setup_pest() -> void:
+	if _pest != null:
+		return
+	_pest = ArenaPest.new()
+	_pest.name = "MuncherPest"
+	playfield.add_child(_pest)
+	_pest.setup(
+		_get_edible_chips_for_pest,
+		_get_bag_keepout_rect,
+		_playfield_bounds,
+		_pest_eat_chip
+	)
+	call_deferred("_layout_pest_nest")
+
+
+func _layout_pest_nest() -> void:
+	if _pest == null or playfield == null:
+		return
+	var bounds := _playfield_bounds()
+	_pest.set_nest_position(Vector2(bounds.position.x + bounds.size.x * 0.5, bounds.position.y + 28.0))
+	_pest.reset_to_nest()
+
+
+func _get_edible_chips_for_pest() -> Array:
+	var out: Array = []
+	for chip in _chips:
+		if not is_instance_valid(chip):
+			continue
+		if chip.is_dragging():
+			continue
+		if chip.tier <= 2:
+			out.append(chip)
+	return out
+
+
+func _pest_eat_chip(chip: ArenaSeedChip) -> void:
+	if not _chips.has(chip):
+		return
+	_hide_bloom_panel()
+	_remove_chip(chip)
+	_update_hint()
+	_refresh_bag()
+
+
+func _notify_meta_swipe_lock(locked: bool) -> void:
+	_set_hub_nav_locked(locked)
+
+
+func _set_hub_nav_locked(locked: bool) -> void:
+	if not GameState.meta_hub_active:
+		_swipe_locked = false
+		return
+	if _swipe_locked == locked:
+		return
+	_swipe_locked = locked
+	for hub in get_tree().get_nodes_in_group("meta_hub"):
+		if hub.has_method("set_nav_locked"):
+			hub.set_nav_locked(locked)
+		elif hub.has_method("set_swipe_enabled"):
+			hub.set_swipe_enabled(not locked)
+
+
+func _is_session_active() -> bool:
+	if _chips.size() > 0:
+		return true
+	if _pest != null and _pest.is_active():
+		return true
+	return false
+
+
+func _sync_hub_nav_lock() -> void:
+	_set_hub_nav_locked(_is_session_active())
+
+
+func set_arena_page_active(active: bool) -> void:
+	_page_active = active
+	process_mode = Node.PROCESS_MODE_INHERIT if active else Node.PROCESS_MODE_DISABLED
+	if active:
+		if playfield:
+			_layout_bag()
+			_layout_pest_nest()
+		_refresh_bag()
+		_sync_hub_nav_lock()
+	else:
+		# Stay locked only while session lives; tabs should already block leave.
+		_sync_hub_nav_lock()
+
+
+func set_meta_hub_mode(_enabled: bool) -> void:
+	if back_button:
+		back_button.visible = not _enabled
+
+
+func refresh_for_meta_hub() -> void:
+	_refresh_bag()
+	_update_hint()
+	_sync_hub_nav_lock()
+
+
+func _process(delta: float) -> void:
 	_apply_magnet_pull()
+	if _pest:
+		_pest.tick(delta)
+	_sync_hub_nav_lock()
 
 
 func _apply_magnet_pull() -> void:
@@ -182,7 +300,13 @@ func _on_bag_clicked() -> void:
 		return
 	_spawn_poured_chips(pulled)
 	_repel_chips_from_bag()
-	info_label.text = "Poured %d seeds — drag matching ones together!" % pulled.size()
+	if _pest:
+		_pest.on_seeds_poured(not _chips.is_empty())
+	if GameState.should_show_arena_pest_tutorial():
+		info_label.text = "Muncher woke up — merge fast! T3 merge freezes it 2s."
+		GameState.mark_arena_pest_tutorial_shown()
+	else:
+		info_label.text = "Poured %d seeds — drag matching ones together!" % pulled.size()
 	_update_hint()
 	_refresh_bag()
 
@@ -368,8 +492,10 @@ func _on_chip_released(chip: ArenaSeedChip) -> void:
 			}
 			var name: String = GameState.SEED_DISPLAY_NAMES.get(chip.type_id, chip.type_id)
 			if new_tier >= GameState.MAX_MERGE_TIER:
+				if _pest:
+					_pest.on_t3_created()
 				GameState.stash_garden_crystal(chip.type_id)
-				info_label.text = "%s crystal → garden stash!" % name
+				info_label.text = "%s crystal → garden stash! Muncher frozen 2s." % name
 				_remove_chip(chip)
 				_update_hint()
 				_refresh_bag()
@@ -405,6 +531,8 @@ func _remove_chip(chip: ArenaSeedChip) -> void:
 	_chips.erase(chip)
 	_chip_data.erase(chip.chip_id)
 	chip.queue_free()
+	if _pest:
+		_pest.on_field_chip_count_changed(_chips.size())
 
 
 func _setup_bloom_panel() -> void:
@@ -570,17 +698,29 @@ func _refresh_bag() -> void:
 func _on_done_pressed() -> void:
 	_hide_bloom_panel()
 	GameState.commit_arena_chips_to_bag(_chip_data)
-	_chips.clear()
-	_chip_data.clear()
+	_clear_field_chips()
+	if _pest:
+		_pest.reset_to_nest()
+	_set_hub_nav_locked(false)
 	GameState.go_to_camp_hub()
 
 
 func _on_back_pressed() -> void:
 	_hide_bloom_panel()
 	GameState.commit_arena_chips_to_bag(_chip_data)
+	_clear_field_chips()
+	if _pest:
+		_pest.reset_to_nest()
+	_set_hub_nav_locked(false)
+	GameState.go_to_camp_hub()
+
+
+func _clear_field_chips() -> void:
+	for chip in _chips:
+		if is_instance_valid(chip):
+			chip.queue_free()
 	_chips.clear()
 	_chip_data.clear()
-	GameState.go_to_camp_hub()
 
 
 func _update_hint() -> void:
@@ -597,4 +737,7 @@ func _update_hint() -> void:
 	elif not _chips.is_empty():
 		info_label.text = "Merge T1→T2→T3. T3 crystals go to garden stash. Tap T2 blooms to spend."
 	elif bag <= 0 and _chips.is_empty():
-		info_label.text = "No seeds left — tap Done to return to camp."
+		if _pest and _pest.is_active():
+			info_label.text = "Out of seeds — tap Done or pour again when you have more."
+		else:
+			info_label.text = "No seeds left — tap Done to return to camp."

@@ -1,3 +1,4 @@
+@tool
 class_name UiClickButton
 extends PanelContainer
 
@@ -35,6 +36,19 @@ const READABILITY := preload("res://scripts/ui/ui_readability.gd")
 		use_play_icon = value
 		_update_icon()
 
+@export var label_autowrap: bool = false:
+	set(value):
+		label_autowrap = value
+		_apply_label_layout()
+
+## Identifikator za UiClickGuard log / debounce (postavi u editoru).
+@export var click_action_id: String = ""
+
+## Ako je postavljeno, guarded klik otvara scenu preko UiClickGuard (bez ručnog handlera).
+@export_file("*.tscn") var navigation_scene: String = ""
+
+@export var guarded_click: bool = false
+
 var disabled: bool = false:
 	set(value):
 		disabled = value
@@ -56,6 +70,7 @@ func _ready() -> void:
 	focus_mode = Control.FOCUS_NONE
 	_build_styles()
 	_ensure_content()
+	_apply_label_layout()
 	_update_label()
 	_update_icon()
 	_apply_label_theme()
@@ -63,6 +78,21 @@ func _ready() -> void:
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	gui_input.connect(_on_gui_input)
+
+
+func _notification(what: int) -> void:
+	if Engine.is_editor_hint() and what == NOTIFICATION_ENTER_TREE:
+		call_deferred("_validate_in_editor")
+
+
+func _validate_in_editor() -> void:
+	if not Engine.is_editor_hint():
+		return
+	var guard := get_node_or_null("/root/UiClickGuard")
+	if guard == null:
+		return
+	for issue in guard.validate_button_exports(self):
+		push_warning("UiClickButton %s: %s" % [name, issue])
 
 
 func _build_styles() -> void:
@@ -125,6 +155,21 @@ func _ensure_content() -> void:
 		_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
+func _apply_label_layout() -> void:
+	if _label == null:
+		return
+	if label_autowrap:
+		_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	else:
+		_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
+
 func _update_label() -> void:
 	if _label == null:
 		return
@@ -179,6 +224,18 @@ func _on_mouse_exited() -> void:
 	_apply_panel_style()
 
 
+func _emit_clicked() -> void:
+	if guarded_click and not navigation_scene.is_empty():
+		var guard := get_node_or_null("/root/UiClickGuard")
+		if guard:
+			guard.safe_change_scene(
+				navigation_scene,
+				click_action_id if not click_action_id.is_empty() else name
+			)
+			return
+	clicked.emit()
+
+
 func _on_gui_input(event: InputEvent) -> void:
 	if disabled or SceneRouter.is_input_blocked():
 		if event is InputEventMouseButton or event is InputEventScreenTouch:
@@ -193,7 +250,7 @@ func _on_gui_input(event: InputEvent) -> void:
 			_apply_panel_style()
 		else:
 			if _pressing:
-				clicked.emit()
+				_emit_clicked()
 			_pressing = false
 			_apply_panel_style()
 		accept_event()
@@ -202,7 +259,7 @@ func _on_gui_input(event: InputEvent) -> void:
 		if touch.pressed:
 			_pressing = true
 			_apply_panel_style()
-			clicked.emit()
+			_emit_clicked()
 		else:
 			_pressing = false
 			_apply_panel_style()

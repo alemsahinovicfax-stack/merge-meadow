@@ -226,6 +226,8 @@ Zadrži / premjesti:
 - [ ] Save v4 migracija na postojećem saveu
 - [ ] Daily 3/3 bonus jednom dnevno
 - [ ] Tutorial update (CAMP koraci → Arena, ne gredice)
+- [x] **MA-01b Muncher pest** — vidi [[merge-arena-pest|merge-arena-pest]]
+- [x] **UX-04 Hub carousel** — `meta_hub.tscn`, Main Menu centar
 
 ---
 

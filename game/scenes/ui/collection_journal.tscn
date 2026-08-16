@@ -50,20 +50,22 @@ button_variant = "subtle"
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.92, 0.55, 1)
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 34
 text = "Bloom Album"
 vertical_alignment = 1
 
 [node name="SummaryLabel" type="Label" parent="RootVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.82, 0.9, 0.84, 1)
-theme_override_font_sizes/font_size = 22
 text = "Album: 0 blooms kept"
 horizontal_alignment = 1
+autowrap_mode = 2
 
 [node name="ListScroll" type="ScrollContainer" parent="RootVBox"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
 
 [node name="List" type="VBoxContainer" parent="RootVBox/ListScroll"]
 layout_mode = 2

@@ -14,7 +14,7 @@ var selected: bool = false
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	custom_minimum_size = Vector2(72, 72)
+	custom_minimum_size = Vector2(80, 80)
 	queue_redraw()
 
 

@@ -1,0 +1,213 @@
+[gd_scene load_steps=8 format=3 uid="uid://meta_hub_v11"]
+
+[ext_resource type="Script" path="res://scripts/meta/meta_hub_controller.gd" id="1_hub"]
+[ext_resource type="Script" path="res://scripts/ui/swipe_pager.gd" id="2_pager"]
+[ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="3_uibtn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chrome"]
+bg_color = Color(1, 0.973, 0.941, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.176, 0.204, 0.212, 0.12)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_coin"]
+bg_color = Color(1, 0.722, 0.549, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.176, 0.204, 0.212, 0.1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_seed"]
+bg_color = Color(0.659, 0.902, 0.812, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.176, 0.204, 0.212, 0.1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nav"]
+bg_color = Color(1, 0.973, 0.941, 0.94)
+border_width_top = 2
+border_color = Color(0.176, 0.204, 0.212, 0.1)
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+
+[node name="MetaHub" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hub")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.12, 0.17, 0.14, 1)
+
+[node name="RootVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TopBar" type="MarginContainer" parent="RootVBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="Panel" type="PanelContainer" parent="RootVBox/TopBar"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_chrome")
+
+[node name="HBox" type="HBoxContainer" parent="RootVBox/TopBar/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CoinChip" type="PanelContainer" parent="RootVBox/TopBar/Panel/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_coin")
+
+[node name="HBox" type="HBoxContainer" parent="RootVBox/TopBar/Panel/HBox/CoinChip"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CoinIcon" type="TextureRect" parent="RootVBox/TopBar/Panel/HBox/CoinChip/HBox"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinsLabel" type="Label" parent="RootVBox/TopBar/Panel/HBox/CoinChip/HBox"]
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 28
+text = "0"
+vertical_alignment = 1
+clip_text = false
+
+[node name="SeedChip" type="PanelContainer" parent="RootVBox/TopBar/Panel/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_seed")
+
+[node name="HBox" type="HBoxContainer" parent="RootVBox/TopBar/Panel/HBox/SeedChip"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SeedIcon" type="TextureRect" parent="RootVBox/TopBar/Panel/HBox/SeedChip/HBox"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SeedsLabel" type="Label" parent="RootVBox/TopBar/Panel/HBox/SeedChip/HBox"]
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 28
+text = "0"
+vertical_alignment = 1
+clip_text = false
+
+[node name="Spacer" type="Control" parent="RootVBox/TopBar/Panel/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="SettingsButton" type="PanelContainer" parent="RootVBox/TopBar/Panel/HBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(56, 56)
+script = ExtResource("3_uibtn")
+label_text = ""
+button_icon = "settings"
+button_variant = "subtle"
+
+[node name="SwipePager" type="Control" parent="RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_pager")
+
+[node name="PagesHost" type="Control" parent="RootVBox/SwipePager"]
+layout_mode = 0
+offset_right = 5400.0
+offset_bottom = 1600.0
+
+[node name="PageIndicator" type="MarginContainer" parent="RootVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 88)
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="NavPanel" type="PanelContainer" parent="RootVBox/PageIndicator"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_nav")
+
+[node name="Margin" type="MarginContainer" parent="RootVBox/PageIndicator/NavPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 2
+
+[node name="VBox" type="VBoxContainer" parent="RootVBox/PageIndicator/NavPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CaptionLabel" type="Label" parent="RootVBox/PageIndicator/NavPanel/Margin/VBox"]
+layout_mode = 2
+text = "Home"
+horizontal_alignment = 1
+
+[node name="TabsRow" type="HBoxContainer" parent="RootVBox/PageIndicator/NavPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6

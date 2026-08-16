@@ -1,11 +1,12 @@
 class_name ShopCosmeticRow
-extends PanelContainer
+extends HBoxContainer
 
 signal buy_pressed(item_id: String)
 signal equip_pressed(item_id: String)
 
 const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
 const CATALOG := preload("res://scripts/monetization/cosmetic_catalog.gd")
+const TEXT_LAYOUT := preload("res://scripts/ui/ui_text_layout.gd")
 
 var item_id: String = ""
 var _title: Label
@@ -32,44 +33,30 @@ func _ensure_built() -> void:
 	if _built:
 		return
 	_built = true
-	custom_minimum_size = Vector2(0, 88)
+	custom_minimum_size = Vector2(0, 100)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1.0, 0.98, 0.94, 0.92)
-	style.set_corner_radius_all(10)
-	style.set_border_width_all(2)
-	style.border_color = Color(UI_PALETTE.OUTLINE.r, UI_PALETTE.OUTLINE.g, UI_PALETTE.OUTLINE.b, 0.1)
-	style.content_margin_left = 12.0
-	style.content_margin_top = 8.0
-	style.content_margin_right = 12.0
-	style.content_margin_bottom = 8.0
-	add_theme_stylebox_override("panel", style)
-
-	var root := HBoxContainer.new()
-	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	root.add_theme_constant_override("separation", 10)
-	add_child(root)
+	add_theme_constant_override("separation", 12)
 
 	var text_col := VBoxContainer.new()
 	text_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	text_col.add_theme_constant_override("separation", 4)
-	root.add_child(text_col)
+	text_col.add_theme_constant_override("separation", 6)
+	add_child(text_col)
 
 	_title = Label.new()
-	_title.add_theme_font_size_override("font_size", 20)
+	TEXT_LAYOUT.card_title_scroll(_title)
+	_title.add_theme_font_size_override("font_size", 28)
 	_title.add_theme_color_override("font_color", UI_PALETTE.UI_TEXT)
 	text_col.add_child(_title)
 
 	_desc = Label.new()
-	_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_desc.add_theme_font_size_override("font_size", 15)
+	TEXT_LAYOUT.body_label_scroll(_desc)
 	_desc.add_theme_color_override("font_color", Color(0.4, 0.42, 0.4))
 	text_col.add_child(_desc)
 
 	_action = Button.new()
-	_action.custom_minimum_size = Vector2(132, 52)
-	_action.add_theme_font_size_override("font_size", 16)
-	root.add_child(_action)
+	_action.custom_minimum_size = Vector2(168, 60)
+	_action.add_theme_font_size_override("font_size", 26)
+	add_child(_action)
 
 
 func _refresh() -> void:

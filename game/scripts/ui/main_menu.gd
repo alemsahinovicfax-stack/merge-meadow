@@ -20,8 +20,10 @@ func _ready() -> void:
 	normal_button.clicked.connect(_on_normal_pressed)
 	hard_button.clicked.connect(_on_hard_pressed)
 	endless_play_button.clicked.connect(_on_endless_play_pressed)
-	camp_button.clicked.connect(_on_camp_pressed)
-	shop_button.clicked.connect(_on_shop_pressed)
+	UiClickGuard.wire_button(camp_button, "nav_camp", _on_camp_pressed)
+	UiClickGuard.wire_button(shop_button, "nav_shop", _on_shop_pressed)
+	if settings_button:
+		settings_button.clicked.connect(_on_settings_pressed)
 	_setup_safe_area()
 	_refresh_menu()
 
@@ -68,7 +70,10 @@ func _on_hard_pressed() -> void:
 
 
 func _on_shop_pressed() -> void:
-	SceneRouter.change_to(GameState.SCENE_SHOP)
+	if GameState.meta_hub_active:
+		GameState.go_to_meta_page(MetaHubPages.SHOP)
+	else:
+		UiClickGuard.safe_change_scene(GameState.SCENE_SHOP, "main_menu_shop")
 
 
 func _on_play_pressed() -> void:
@@ -82,4 +87,22 @@ func _on_endless_play_pressed() -> void:
 
 
 func _on_camp_pressed() -> void:
-	SceneRouter.change_to(GameState.SCENE_CAMP)
+	if GameState.meta_hub_active:
+		GameState.go_to_meta_page(MetaHubPages.CAMP)
+	else:
+		UiClickGuard.safe_change_scene(GameState.SCENE_CAMP, "main_menu_camp")
+
+
+func _on_settings_pressed() -> void:
+	if tutorial_hint:
+		tutorial_hint.text = "Settings coming soon."
+		tutorial_hint.visible = true
+
+
+func set_meta_hub_mode(enabled: bool) -> void:
+	if settings_button:
+		settings_button.visible = not enabled
+
+
+func refresh_for_meta_hub() -> void:
+	_refresh_menu()

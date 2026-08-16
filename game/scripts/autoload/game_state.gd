@@ -1,6 +1,7 @@
 extends Node
 
 const SCENE_MAIN := "res://scenes/main_menu.tscn"
+const SCENE_META_HUB := "res://scenes/meta/meta_hub.tscn"
 const SCENE_RUN := "res://scenes/run/run_scene.tscn"
 const SCENE_LOOT := "res://scenes/ui/loot_screen.tscn"
 const SCENE_CAMP := "res://scenes/camp/camp_scene.tscn"
@@ -12,6 +13,13 @@ const ARENA_MAX_CHIPS := 40
 const ARENA_SNAP_DISTANCE := 100.0
 const ARENA_MAGNET_RADIUS := 130.0
 const BLOOM_INBOX_MAX := 12
+
+const ARENA_PEST_SPEED := 85.0
+const ARENA_PEST_EAT_RADIUS := 36.0
+const ARENA_PEST_EAT_DURATION := 0.5
+const ARENA_PEST_T3_FREEZE := 2.0
+const ARENA_PEST_WAKE_DELAY := 0.3
+const ARENA_PEST_TARGET_REEVAL := 0.25
 
 const CAMP_BED_COUNT := 9
 const CAMP_BED_BONUS := 3
@@ -143,6 +151,10 @@ var collection_journal_pending: Dictionary = {}
 var bloom_inbox: Array = []
 var _arena_chip_counter: int = 1
 
+var meta_hub_active: bool = false
+var meta_hub_pending_page: int = MetaHubPages.MAIN
+var arena_pest_tutorial_shown: bool = false
+
 
 func _ready() -> void:
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
@@ -198,6 +210,7 @@ func save_player_save() -> void:
 		"mochi_unlock_seen": mochi_unlock_seen,
 		"collection_journal_pending": collection_journal_pending.duplicate(),
 		"bloom_inbox": bloom_inbox.duplicate(true),
+		"arena_pest_tutorial_shown": arena_pest_tutorial_shown,
 	}
 	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -247,6 +260,7 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	if not is_companion_unlocked(active_companion_id):
 		active_companion_id = COMPANION_PIP
 	bloom_inbox = _deserialize_bloom_inbox(data.get("bloom_inbox", []))
+	arena_pest_tutorial_shown = bool(data.get("arena_pest_tutorial_shown", false))
 	if int(data.get("version", 0)) < SAVE_VERSION:
 		_migrate_legacy_beds_to_inbox()
 	_clear_legacy_beds()
@@ -383,6 +397,56 @@ func go_to_scene(path: String) -> void:
 	SceneRouter.change_to(path)
 
 
+func go_to_meta_hub(page: int = MetaHubPages.MAIN) -> void:
+	meta_hub_pending_page = clampi(page, 0, MetaHubPages.PAGE_COUNT - 1)
+	go_to_scene(SCENE_META_HUB)
+
+
+func go_to_meta_page(page: int) -> void:
+	page = clampi(page, 0, MetaHubPages.PAGE_COUNT - 1)
+	if meta_hub_active:
+		var tree := Engine.get_main_loop() as SceneTree
+		if tree:
+			for hub in tree.get_nodes_in_group("meta_hub"):
+				if hub.has_method("go_to_page"):
+					hub.go_to_page(page)
+					return
+	meta_hub_pending_page = page
+	go_to_scene(SCENE_META_HUB)
+
+
+func go_to_meta_home() -> void:
+	go_to_meta_page(MetaHubPages.MAIN)
+
+
+func set_meta_hub_embedded(page_root: Control, embedded: bool) -> void:
+	if page_root == null:
+		return
+	page_root.set_meta("meta_hub_embedded", embedded)
+
+
+func is_meta_hub_embedded(node: Node) -> bool:
+	if node == null:
+		return false
+	var current: Node = node
+	while current:
+		if current is Control and bool(current.get_meta("meta_hub_embedded", false)):
+			return true
+		current = current.get_parent()
+	return meta_hub_active
+
+
+func mark_arena_pest_tutorial_shown() -> void:
+	if arena_pest_tutorial_shown:
+		return
+	arena_pest_tutorial_shown = true
+	save_player_save()
+
+
+func should_show_arena_pest_tutorial() -> bool:
+	return not arena_pest_tutorial_shown
+
+
 func go_to_camp() -> void:
 	deposit_loot_to_camp()
 	if should_offer_merge_arena():
@@ -392,15 +456,15 @@ func go_to_camp() -> void:
 
 
 func go_to_camp_hub() -> void:
-	go_to_scene(SCENE_CAMP)
+	go_to_meta_page(MetaHubPages.CAMP)
 
 
 func go_to_merge_arena() -> void:
-	go_to_scene(SCENE_MERGE_ARENA)
+	go_to_meta_page(MetaHubPages.ARENA)
 
 
 func go_to_collection_journal() -> void:
-	go_to_scene(SCENE_COLLECTION)
+	go_to_meta_page(MetaHubPages.COLLECTION)
 
 
 func should_offer_merge_arena() -> bool:
@@ -756,6 +820,52 @@ func format_seed_bag_label() -> String:
 		var stars := "★".repeat(get_seed_rarity(type_id))
 		parts.append("%d %s %s" % [count, name, stars])
 	return "Seeds in bag (%d/%d): " % [total, SEED_BAG_SOFT_CAP] + ", ".join(parts)
+
+
+func get_seed_bag_entries() -> Array[Dictionary]:
+	## Sorted inventory rows for Garden UI: rarity desc, then display name.
+	var out: Array[Dictionary] = []
+	for type_id in seed_bag:
+		var count := int(seed_bag[type_id])
+		if count <= 0:
+			continue
+		var tid := str(type_id)
+		out.append({
+			"type_id": tid,
+			"count": count,
+			"display_name": SEED_DISPLAY_NAMES.get(tid, tid.capitalize()),
+			"rarity": get_seed_rarity(tid),
+		})
+	out.sort_custom(_compare_seed_bag_entry_display)
+	return out
+
+
+func get_garden_crystal_entries() -> Array[Dictionary]:
+	## Sorted crystal stash rows for CrystalCard UI.
+	var out: Array[Dictionary] = []
+	for type_id in garden_crystal_stash:
+		var count := int(garden_crystal_stash[type_id])
+		if count <= 0:
+			continue
+		var tid := str(type_id)
+		out.append({
+			"type_id": tid,
+			"count": count,
+			"display_name": SEED_DISPLAY_NAMES.get(tid, tid.capitalize()),
+			"rarity": get_seed_rarity(tid),
+		})
+	out.sort_custom(_compare_seed_bag_entry_display)
+	return out
+
+
+func _compare_seed_bag_entry_display(a: Dictionary, b: Dictionary) -> bool:
+	var ra := int(a.get("rarity", 0))
+	var rb := int(b.get("rarity", 0))
+	if ra != rb:
+		return ra > rb
+	var na := str(a.get("display_name", ""))
+	var nb := str(b.get("display_name", ""))
+	return na.naturalnocasecmp_to(nb) < 0
 
 
 func format_collection_label() -> String:
@@ -1360,7 +1470,7 @@ func format_loot_multiplier_label() -> String:
 	var mult := get_loot_multiplier()
 	if mult <= 1.0:
 		return "Loot Boost Lv 0 / %d (×1.0)" % MULTIPLIER_MAX_LEVEL
-	return "Loot Boost Lv %d / %d (×%.2g)" % [multiplier_level, MULTIPLIER_MAX_LEVEL, mult]
+	return "Loot Boost Lv %d / %d (x%.2f)" % [multiplier_level, MULTIPLIER_MAX_LEVEL, mult]
 
 
 func donate_crystal_from_bed(bed_index: int, in_greenhouse: bool = false) -> bool:

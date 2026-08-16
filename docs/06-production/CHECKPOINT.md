@@ -9,12 +9,12 @@ povezano:
   - scope-i-granice
 ai_sažetak: "Operativni hub — frontmatter prvo; prva [ ] u aktivnoj sekciji je sljedeći korak."
 trenutna_faza: 5
-podfaza: pre-launch-polish
+podfaza: d0-prelaunch
 aktivna_sekcija: D
 b0_aktivan: false
-sljedeci_korak: "D0 Blok C — SFX + art pass + Settings ekran"
-zadnja_sesija: "D0 Blok B — shop kozmetika (5 coin itema) + booster consumables (IAP)"
-zadnje_azurirano: 2026-07-12
+sljedeci_korak: "5-min D0 playtest gate → zatim D0-P Settings (sound + restore)"
+zadnja_sesija: "Commit+push Bug-006–014 hub polish; playtest gate"
+zadnje_azurirano: 2026-08-16
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -25,8 +25,8 @@ test_uredjaji:
 strategija_platforme: "android-first; iOS kad prikupi ~99 USD (Apple Developer)"
 # --- Praćenje faza (agent + ti) ---
 dokumentacija_zavrsena_do: "M5½ — CHECKPOINT Sekcija A (A1–A4)"
-prva_faza_kodiranja: "M6 — CHECKPOINT Sekcija B (B1–B3)"
-sljedeca_runda_dokumentacije: "CHECKPOINT B3 — nakon greybox playtesta"
+prva_faza_kodiranja: "M6 — CHECKPOINT Sekcija B (B1–B3) ✅"
+sljedeca_runda_dokumentacije: "Prije store (D0/D4) — listing/ASO; inače samo sync uz kod"
 ---
 
 # CHECKPOINT — operativni vodič
@@ -38,12 +38,13 @@ sljedeca_runda_dokumentacije: "CHECKPOINT B3 — nakon greybox playtesta"
 
 | Polje | Vrijednost |
 |-------|------------|
-| **Faza** | 5 — Gate prošao ✅ |
-| **Podfaza** | `greybox-spreman` — dokumentacija detalji **završena**; sljedeće M6 (`game/`) |
+| **Milestone** | **M8** — Launch prep (Sekcija D) |
+| **Podfaza** | `d0-prelaunch` — Bug-006–014 ✅; sljedeće: 5-min playtest → D0-P |
 | **Igra** | Merge Meadow — hybrid casual lane run + merge kamp |
 | **Engine** | Godot 4.x (HP laptop / Windows) |
-| **Strategija** | **Android-first** — objava tek kad je igra max polish; **iOS odgođen** dok se ne prikupi ~**99 USD** |
-| **Test** | Emulator (dnevno) → stariji Android (fizički) → iPhone (**Faza 4**, ne sada) |
+| **Save** | Lokalni JSON (`user://player_save.json`) — **bez** server/baze u v1 |
+| **Strategija** | **Android-first** — Play nakon D0 + **25 USD**; **iOS** kad ~**99 USD** |
+| **Test** | Emulator (dnevno) → stariji Android (fizički) → iPhone (Faza 4) |
 
 ## Dokumentacija vs kod — kada što radiš
 
@@ -53,33 +54,33 @@ sljedeca_runda_dokumentacije: "CHECKPOINT B3 — nakon greybox playtesta"
 |---------|-----------|------------|--------|
 | Planiranje prije koda | **M5½** | **Sekcija A** (A1–A4) | ✅ **Gotovo** |
 
-Od sada **ne pišeš** novu viziju, pitch, core loop ni scope osim ako nešto **svjesno mijenjaš** nakon playtesta (tada ažuriraj samo dotični doc + `otvorena-pitanja`).
+Od sada **ne pišeš** novu viziju, pitch, core loop ni scope osim ako nešto **svjesno mijenjaš** nakon playtesta (tada ažuriraj samo dotični doc + `otvorena-pitanja`). **Veliki docs refactor nije potreban** — samo sync uz kod.
 
-### Prva faza kodiranja — **M6 greybox** (sada)
+### Kodiranje — **M8 / D0** (sada)
 
 | Pitanje | Odgovor |
 |---------|---------|
-| **Do čega kodiram?** | **CHECKPOINT B1 → B3** (M6), **ne** do launcha / v1 |
-| **Što gradim?** | Samo **lane run** + placeholder loot — bez mergea, shopa, 100 levela |
-| **Kada M6 završava?** | APK na emulatoru + **5 min playtest** + bilješke (B3) |
-| **Je li ovo “verzija 1”?** | **Ne.** Ovo je **greybox prototip** — dokaz feela. v1 launch = **M8 / Sekcija D** |
+| **Do čega kodiram?** | **D0** (pre-launch) — funkcionalnost ✅, pa polish (D0-P) + monetizacija prod (D0-M) |
+| **Što je gotovo?** | M6 greybox ✅ · M7 slice ✅ · D0 Blok A/B gameplay+sadržaj (većina) · D0-F F0–F4 ✅ |
+| **Što slijedi?** | Bug lista → fix → 5-min playtest → **D0-P** (SFX, art, Settings) → D0-M → Play internal |
+| **Je li ovo “verzija 1”?** | Još ne — v1 = D0 ✅ + Play naknada. Store listing draft već postoji (D4). |
 
 ```
-M5½ docs ✅  →  M6 kod (B1–B3)  →  kratko docs  →  M7 kod (C)  →  docs D  →  M8 launch
-              ↑ TI SI OVDJE
+M5½ docs ✅ → M6 ✅ → M7 ✅ → M8 D0-F ✅ → D0-P / D0-M → Play launch
+                                         ↑ TI SI OVDJE
 ```
 
 ### Kada **nastaviti pisati** dokumentaciju (sljedeće runde)
 
 | # | Kada (trigger) | Milestone | Checkpoint | Što ažurirati |
 |---|----------------|-----------|------------|---------------|
-| 1 | **Nakon M6 playtesta** | M6 završen | **B3** | `changelog`, `lane-run.md` (swerve vs 3 lanea), `otvorena-pitanja` |
-| 2 | **Tijekom M7** | M7 | C1–C3 | `ekonomija` brojke ako treba, `ui-ux` sitnice, test bilješke |
-| 3 | **Nakon M7 playtesta** | M7 završen | **C** exit | `milestone-i`, `scope` samo ako se scope promijenio |
-| 4 | **Prije store objave** | M8 | **Sekcija D** | store listing, ASO keywords, screenshot plan |
+| 1 | **Nakon M6 playtesta** | M6 | **B3** | ✅ urađeno |
+| 2 | **Tijekom M7** | M7 | C1–C3 | ✅ urađeno (ekonomija, UI sitnice) |
+| 3 | **Nakon M7 playtesta** | M7 | **C** exit | ✅ / po potrebi scope |
+| 4 | **Prije store objave** | M8 | **Sekcija D** | store listing, ASO, screenshot plan (D4 draft ✅) |
 | 5 | **Tjedno** (5 min) | — | — | `otvorena-pitanja` pregled |
 
-**Pravilo:** između triggera **1–2** → uglavnom **kodiraš**, ne širiš dokumentaciju. Nova ideja? Prvo `scope-i-granice` + pillari — ako nije IN, ne kodiraj.
+**Pravilo:** dok traje D0 → uglavnom **kod + playtest**, docs samo sync. Nova ideja? Prvo `scope-i-granice` + pillari — ako nije IN, ne kodiraj.
 
 ### ⚠️ Scope guard (agent + ti)
 
@@ -94,10 +95,10 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 | Faza | Tip rada | Milestone | Checkpoint | Trajanje (okvirno) |
 |------|----------|-----------|------------|-------------------|
 | Planiranje | 📝 dokumentacija | M0–M5½ | A | ✅ gotovo |
-| **Greybox** | **💻 prvi kod** | **M6** | **B** | dok B3 nije ✅ |
-| Ažuriranje | 📝 kratko | — | B3 | 1 sesija |
-| Vertical slice | 💻 drugi kod | M7 | C | dok C nije ✅ |
-| Launch prep | 📝 + 💻 | M8 | D | 100 runova, shop, store |
+| Greybox | 💻 prvi kod | M6 | B | ✅ gotovo |
+| Ažuriranje | 📝 kratko | — | B3 | ✅ gotovo |
+| Vertical slice | 💻 drugi kod | M7 | C | ✅ gotovo (C4 iPhone build još otvoren) |
+| **Launch prep** | **📝 + 💻** | **M8** | **D** | **D0-F ✅ → D0-P / D0-M → Play** |
 
 ## Android-first — zašto i kako
 
@@ -139,11 +140,11 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Kako koristiti ovaj fajl
 
-1. Nađi **prvu neoznačenu** stavku u aktivnoj sekciji.
+1. Nađi **prvu neoznačenu** stavku u aktivnoj sekciji (**D**).
 2. Radi **jednu** stavku po sesiji (ili jednu malu grupu).
 3. Označi `[x]` kad je gotovo u ovom fajlu + u ciljnom `.md`.
 4. Ažuriraj `zadnje_azurirano` u frontmatteru.
-5. Kad je **Sekcija A = 100%** → promijeni `podfaza` u `greybox` i kreni `game/`.
+5. Aktivna sekcija = **D** — ne vraćaj se na A/B osim bugfixa u starom kodu.
 
 ---
 
@@ -304,19 +305,29 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 - [x] **Daily chest** u kampu
 
 **Blok B — sadržaj**
-- [ ] Spriteovi sjemena/cvijeta po tipu (min 7, cilj 10) — 🟡 7 procedural (`seed_visual_config.gd`)
+- [ ] Spriteovi sjemena/cvijeta po tipu (min 7, cilj 10) — 🟡 7 procedural — **odgođeno u D0-P**
 - [x] **Mochi** ljubimac unlock (cosmetic) — kamp Lv 2, companion picker, run skin
 - [x] **Dnevnik** kolekcije (zaseban ekran) — Bloom Album, 📖 u kampu, NEW badge
 - [x] Shop: kozmetika + **booster consumables**
 
-**Blok C — polish**
+### D0-F — Funkcionalnost prije polish (sada)
+
+> Redoslijed promijenjen 2026-07-29. Detaljna matrica: [[d0-functional-audit|d0-functional-audit]].
+
+- [x] **F0** — CHECKPOINT + checklist + audit doc
+- [x] **F1** — funkcionalni audit (meta hub matrica + headless smokes)
+- [x] **F2** — debug (meta hub page slot, run HUD guard, settings placeholder)
+- [x] **F3** — spec sync (`spec-vertical-slice` → merge arena + meta hub)
+- [x] **F4** — balans pass 1 (`balance_snapshot`, `ekonomija-brojevi`); **5-min playtest** → ručno
+
+**Blok C — polish** *(nakon F4 + playtest — D0-P)*
 - [ ] **SFX** (pickup, merge, fail)
 - [ ] Art pass (kamp biljke, splash/branding)
 - [ ] Settings ekran (sound, restore)
 - [ ] `DEBUG_DEV_RESOURCES` off + release AAB test
 - [ ] Vanjski playtest 5 min (M7 exit ponovno)
 
-**Blok D — monetizacija production**
+**Blok D — monetizacija production** *(nakon F4 — D0-M)*
 - [ ] Poing **AdMob + Billing** plugin na Androidu
 - [ ] Production ad unit ID-evi (ne test)
 
@@ -334,9 +345,10 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-1. **D0 Blok B** — [[d0-prelaunch-checklist|d0-prelaunch-checklist]] (spriteovi sjemena/cvijeta, Mochi…)
-2. **Ne** plaćati Play Console dok D0 nije ✅
-3. Kad D0 gotov → **25 USD** → [[play-internal-test|D5 internal test]]
+1. **Ti:** **5-min D0 playtest** (gate) — checklist u [[d0-functional-audit#5-min vanjski playtest (gate prije D0-P)|d0-functional-audit]] + hub/shop/camp/arena (Bug-008/010–013)
+2. **Sljedeća sesija (agent):** ako ima novih bugova → fix pass; ako čisto → **D0-P Settings** (sound + IAP restore stub)
+3. **Ne** plaćati Play Console dok D0 nije ✅
+4. Bug-006–014 paket ✅ (hub, camp trade/crystal, shop bez Almanac)
 
 ## Povezano
 

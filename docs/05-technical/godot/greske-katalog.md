@@ -197,6 +197,23 @@ Novi fajl u `game/assets/` dodan izvan editora. Godot **nije importao** asset �
 
 ---
 
+## #10 — Shop: `ScrollContainer` + `custom_minimum_size.x` sync → crash (signal 11)
+
+**Datum:** 2026-07-29 (D0 polish)
+
+**Simptom:** Klik **Shop** (ili headless `shop_open_smoke.gd`) — Godot **signal 11** / „Object was deleted while awaiting a callback”; cijeli proces pukne.
+
+**Uzrok:** `shop_screen.gd` slušao `MainScroll.resized` i postavljao `MainContent.custom_minimum_size.x = scroll.width`. Na Godot 4.7 (OpenGL, headless) to pokrene layout petlju / use-after-free u ScrollContainer-u.
+
+**Rješenje:**
+1. Ukloniti `_sync_scroll_width` / `resized` handler na shop `MainScroll`.
+2. Širinu sadržaja držati preko `size_flags_horizontal = EXPAND_FILL` na `MainContent` (bez runtime min-width sync-a).
+3. Dinamički shop redovi: `HBoxContainer` / `VBoxContainer` (ne `PanelContainer.new()` u scrollu).
+
+**Prevencija:** `UiClickGuard` autoload + `scripts/dev/ui_button_click_smoke.gd` prije playtesta; ne sync-ati `custom_minimum_size` iz `ScrollContainer.resized` bez potrebe.
+
+---
+
 ## #9 — Autoload `GameState` ne učitava → Play (i sve) ne radi
 
 **Datum:** 2026-07-12 (D0 / Mochi)
@@ -208,6 +225,20 @@ Novi fajl u `game/assets/` dodan izvan editora. Godot **nije importao** asset �
 **Rješenje:** Dodati `var mochi_unlock_seen: bool = false` uz ostale companion varijable.
 
 **Prevencija:** headless `--verbose` ili `--quit-after 3` — provjeri da se `GameState` pojavi u root children; svaka nova save polja mora imati `var`.
+
+---
+
+## #11 — Meta hub: `Invalid new child index` pri lazy load stranice
+
+**Datum:** 2026-07-29 (D0-F2)
+
+**Simptom:** Loot → Camp/Arena ili `go_to_page(3)` pri bootu — ERROR `Invalid new child index: 3` u `meta_hub_controller._load_page`.
+
+**Uzrok:** `host.move_child(page, index)` zahtijeva da host već ima dovoljno djece; stranice su se učitavale out-of-order (npr. Arena prije Shop/Home).
+
+**Rješenje:** `_ensure_page_slots()` — 5 placeholder `PageSlot_*` kontrola prije učitavanja; zamjena slota pravom scenom na indeksu.
+
+**Prevencija:** `meta_hub_flow_smoke.gd` + `loot_camp_nav_smoke.gd`.
 
 ---
 

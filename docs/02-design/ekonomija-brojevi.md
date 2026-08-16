@@ -64,12 +64,16 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | Pip skin | 250 |
 | Pozadina livade | 150 |
 
-### Otvoreni targeti (playtest — kasnije)
+### Otvoreni targeti (playtest — F4 pass 1, 2026-07-29)
 
-| Parametar | Napomena |
-|-----------|----------|
-| Prosječno coins / run | TBD nakon shop prototipa |
-| Fine-tune shop cijena | nakon 5-min playtest gatea |
+| Parametar | Measured | Napomena |
+|-----------|----------|----------|
+| Prosječno coins / run (simulacija 5× `finish_run`) | **~8** | `balance_snapshot.gd`; stvarni runovi variraju s levelom |
+| Prosječno seeds / run (simulacija) | **~8** | fail 50% na alternirajućim runovima uključen |
+| Fine-tune shop cijena | pending | nakon 5-min vanjskog playtesta |
+| Vrijeme do prvog mergea (onboarding) | pending | test bez `DEBUG_DEV_RESOURCES` |
+
+> **5-min playtest gate:** koristi checklist u [[../06-production/d0-functional-audit#F4 — Balans bilješke|d0-functional-audit]] prije D0-P.
 
 ## Kamp / vrt (`game_state.gd`)
 
@@ -98,9 +102,10 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | ★–★★ | Clover, Tulip | vrt (gredice) |
 | ★★★ | Pumpkin, Watermelon | staklenik (kad otključeno u lancu) |
 
-## Seed unlock — Almanac (2026-07-11)
+## Seed unlock — Almanac (2026-07-11; Shop UI removed Bug-013)
 
-> Kod: `scripts/progression/seed_unlock_config.gd` · `game_state.gd` · Shop **Seed Almanac**
+> Kod: `scripts/progression/seed_unlock_config.gd` · `game_state.gd`  
+> Unlock u v1 UI: **lifetime auto** u runovima (nema Shop Seed Almanac sekcije). Coin shortcut ostaje u GameState API bez Shop CTA.
 
 | Pravilo | Vrijednost |
 |---------|------------|
@@ -108,7 +113,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | Unlock trigger | **Lifetime** skupljeno u runovima prethodnog tipa (ne troši torbe) |
 | Pragovi | 10 / 10 / 10 / 12 / 12 / 15 / 15 (prethodni tip → sljedeći) |
 | Auto-unlock | Kad lifetime ≥ prag → sljedeći tip u **spawn poolu** odmah |
-| Coins shortcut | 120 / 150 / 150 / 180 / 200 / 220 (preskoči grind) |
+| Coins shortcut | 120 / 150 / 150 / 180 / 200 / 220 (API only — bez Shop UI u v1) |
 | Run spawn | Samo **otključani** tipovi (+ loadout bias) |
 
 ## Sprinkler + Loot Boost (`game_state.gd`)
@@ -122,6 +127,17 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | `MULTIPLIER_MAX_LEVEL` | `4` |
 | `MULTIPLIER_COST_T3` | `2` donirana T3 po levelu |
 | `MULTIPLIER_VALUES` | ×1.0, ×1.25, ×1.5, ×1.75, ×2.0 |
+
+### Merge Arena — Muncher pest (MA-01b, v1.1)
+
+| Konstanta | Vrijednost | Napomena |
+|-----------|------------|----------|
+| `ARENA_PEST_SPEED` | 85 px/s | @ 1080×1920 |
+| `ARENA_PEST_EAT_RADIUS` | 36 px | |
+| `ARENA_PEST_EAT_DURATION` | 0.5 s | |
+| `ARENA_PEST_T3_FREEZE` | 2.0 s | nakon T3 mergea |
+| `ARENA_PEST_WAKE_DELAY` | 0.3 s | prije lova |
+| `ARENA_PEST_TARGET_REEVAL` | 0.25 s | |
 
 ### Provjera kapaciteta
 - 9 gredica (+3 bonus na max Sprinkler) → merge workspace; kolekcija ide u **Keep**, ne zauzima gredicu.

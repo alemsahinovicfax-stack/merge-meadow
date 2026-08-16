@@ -21,6 +21,9 @@ func _change_to(path: String) -> void:
 	if tree == null:
 		push_error("SceneRouter: no SceneTree")
 		return
+	if not ResourceLoader.exists(path):
+		push_error("SceneRouter failed: missing scene %s" % path)
+		return
 	var err := tree.change_scene_to_file(path)
 	if err != OK:
 		push_error("SceneRouter failed: %s (err %d)" % [path, err])

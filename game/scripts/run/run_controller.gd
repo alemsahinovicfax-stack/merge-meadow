@@ -293,6 +293,8 @@ func _on_player_hit_obstacle() -> void:
 
 
 func _update_hud() -> void:
+	if coin_counter_label == null or seed_counter_label == null:
+		return
 	var mult := GameState.get_loot_multiplier()
 	if mult > 1.0:
 		coin_counter_label.text = "Coins: %d (×%.2g)" % [coin_count, mult]

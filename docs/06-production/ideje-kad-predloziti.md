@@ -53,7 +53,8 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | ID | Ideja | Trigger (kad ponuditi) | Effort | Milestone |
 |----|-------|------------------------|--------|-----------|
 | **UX-01** | **Main menu gumb u kampu** | Camp navigacija | **S** | ✅ M7 2026-07-05 |
-| **UX-04** | **Hub carousel** (Clash Royale swipe) — Meadow / Garden / Greenhouse / Shop | F8 shop, C2 art, meta UI | **L** | F8 / v1 |
+| **UX-04** | **Hub carousel** (Clash Royale swipe) — Shop · **Main Menu (centar)** · Camp · Arena · Collection | F8 shop, C2 art, meta UI | **L** | v1.1.0 |
+| **MA-01b** | **Arena Muncher** — pest jede T1/T2, freeze na T3 | MA-01 playtest | **M** | v1.1.0 |
 | UX-02 | Progress traka umjesto countdown tajmera | Run HUD / C2 art pass | M | v1.1 |
 | UX-03 | Reset tutorial (dev) u settings | Debug, QA tutoriala | S | dev only |
 | **MA-01** | **Merge Arena** (zamjena gredica) | Slot overflow, merge feel | **L** | v1.1.0 |
@@ -69,22 +70,23 @@ Primjeniti sada, odgoditi, ili preskočiti?
 
 **Povezano:** [[../03-content/ideje-prvo-iskustvo#nakon-tutorijala--main-menu-hub-odlučeno-2026-07-04|post-tutorial hub]]
 
-### UX-04 — Hub carousel (Clash Royale meta) — ideja 2026-07-05
+### UX-04 — Hub carousel (Clash Royale meta) — odobreno v1.1.0 (2026-07-29)
 
-**Koncept:** Jedan meta-layer s **swipe L/R** između full-screen stranica (prst na mobitelu).
+**Koncept:** Jedan meta-layer s **swipe L/R** između 5 full-screen stranica. **Default landing = Main Menu (centar).**
 
-| Stranica | Svrha |
-|----------|--------|
-| **Meadow (home)** | Play + art, wallet (coins/seeds), level/progres, Settings ikona |
-| **Garden** | T1–T2 merge, sprinkler, loadout, osnovni camp loop |
-| **Greenhouse** | T3 / ★★★ mehanike, kompleksniji UI — **zaseban ekran** |
-| **Shop** | Kozmetika, coins sink |
-
-**Garden:** zadržati mali **preview widget u ćošku** za selektirana ★★★ sjemenja (link u puni Greenhouse ekran).
+| # | Stranica | Svrha |
+|---|----------|--------|
+| 0 | **Shop** | Kozmetika, IAP, coins sink |
+| 1 | **Main Menu ★** | Play, Endless, Camp/Shop shortcuti (trenutni hub) |
+| 2 | **Camp / Garden** | Upgrade kartice, daily, Play/Merge footer |
+| 3 | **Merge Arena** | MA-01 + MA-01b Muncher |
+| 4 | **Collection / Journal** | Album, ★★★ preview |
 
 **Run / loot** ostaju odvojene scene (ne dio carousela).
 
-**Effort:** L — nova `meta_hub` scena, swipe input, refaktor camp → garden page. **Ne raditi prije C2 + shop stub (F8.4).**
+**Kod:** `game/scenes/meta/meta_hub.tscn`, `swipe_pager.gd`, `meta_hub_controller.gd`.
+
+**Effort:** L — implementirano u v1.1 paket.
 
 ## Agent checklist (po sesiji)
 

@@ -9,6 +9,28 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-08-16
+
+- **Bug-010–014** plan prompt paket — [[../06-production/plan-prompts-bug-010-014|plan-prompts-bug-010-014]] (arena swipe lock, seed trade select, crystal panel, ukloni Shop Almanac, header brojevi)
+- **Bug-014** — hub header: `header_chip_count` (tamni ink, no clip); gušći chip bg; smoke assert brojeva
+- **Bug-010** — merge arena session lock (swipe+tabs); `process_mode` pause off-page; Done/Back unlock
+- **Bug-013** — uklonjen Seed Almanac (i TopProgress) iz Shop UI; Cosmetics/Boosters/IAP ostaju; unlock ostaje u GameState (lifetime)
+- **Bug-012** — Crystal stash kartica odvojena od Garden seed trade; select tipa + Exchange 1→coins; scroll grid
+- **Bug-011** — Garden seed trade: tap chip (count≥3) to select, then Trade; select persists after Trade while count≥3 (spam Trade without re-tap)
+
+## 2026-08-15
+
+- [[../06-production/CHECKPOINT|CHECKPOINT]] sync — „Gdje smo“ i putanja usklađeni s **M8 / D0** (više ne piše M6 greybox); potvrda: lokalni JSON save, bez server/baze u v1; bez velikog docs refactora
+- **Bug-006** — meta hub redoslijed Shop → Journal → Home → Camp → Arena; uklonjene page dots; navigacija preko `MetaHubPages` konstanti
+- **Bug-008** — camp UX: zone Daily → Garden → Upgrades → Run prep → Footer; daily chest READY/CLAIMED + reward overlay; hub mode sakriva dupli chrome
+- **Bug-009** — shared hub header: coin/seed pickup ikone, pastel pill chipovi, page ResourceBar skriven kad je embedded
+- **Bug-007** — shop UX: veći tekst (section 32 / rows 28); hub sakriva TopBar+ResourceBar+TopProgress; coin unlock CTA u Seed Almanac redu; veći Almanac/Cosmetics + scroll spacer
+- **Garden seed bag grid** — vizualni prikaz tipova u bagu (ikona + ime + broj) u Garden kartici; `get_seed_bag_entries()`
+
+## 2026-07-29
+
+- **v1.1 paket (kod)** — UX-04 hub carousel (`meta_hub`, swipe L/R, Main Menu centar); MA-01b Arena Muncher pest ([[../02-design/merge-arena-pest|merge-arena-pest]]); navigacija preko `GameState.go_to_meta_page()`
+
 ## 2026-06-30
 
 - Inicijalna struktura dokumentacije (7 slojeva)
