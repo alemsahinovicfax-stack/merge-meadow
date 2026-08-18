@@ -9,10 +9,11 @@ const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
 @onready var top_bar: MarginContainer = $RootVBox/TopBar
 @onready var coins_label: Label = $RootVBox/TopBar/Panel/HBox/CoinChip/HBox/CoinsLabel
 @onready var seeds_label: Label = $RootVBox/TopBar/Panel/HBox/SeedChip/HBox/SeedsLabel
+@onready var diamonds_label: Label = $RootVBox/TopBar/Panel/HBox/DiamondChip/HBox/DiamondsLabel
 @onready var coin_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/CoinChip/HBox/CoinIcon
 @onready var seed_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/SeedChip/HBox/SeedIcon
+@onready var diamond_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/DiamondChip/HBox/DiamondIcon
 @onready var page_tabs: HBoxContainer = $RootVBox/PageIndicator/NavPanel/Margin/VBox/TabsRow
-@onready var settings_button: UiClickButton = $RootVBox/TopBar/Panel/HBox/SettingsButton
 @onready var nav_panel: PanelContainer = $RootVBox/PageIndicator/NavPanel
 
 var _tab_buttons: Array[UiClickButton] = []
@@ -27,8 +28,6 @@ func _ready() -> void:
 	add_to_group("meta_hub")
 	GameState.meta_hub_active = true
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if settings_button:
-		settings_button.clicked.connect(_on_settings_pressed)
 	swipe_pager.page_changed.connect(_on_page_changed)
 	_pages_loaded.resize(MetaHubPagesScript.PAGE_COUNT)
 	for i in MetaHubPagesScript.PAGE_COUNT:
@@ -57,6 +56,8 @@ func _setup_nav_bar() -> void:
 		TEXT_LAYOUT.header_chip_count(coins_label)
 	if seeds_label:
 		TEXT_LAYOUT.header_chip_count(seeds_label)
+	if diamonds_label:
+		TEXT_LAYOUT.header_chip_count(diamonds_label)
 
 
 func _setup_resource_icons() -> void:
@@ -66,6 +67,9 @@ func _setup_resource_icons() -> void:
 	var seed_tex := PICKUP_ASSETS.get_seed_texture()
 	if seed_icon and seed_tex:
 		seed_icon.texture = seed_tex
+	var diamond_tex := PICKUP_ASSETS.get_diamond_texture()
+	if diamond_icon and diamond_tex:
+		diamond_icon.texture = diamond_tex
 
 
 func _finish_boot(start: int) -> void:
@@ -264,13 +268,11 @@ func refresh_top_bar() -> void:
 	if seeds_label:
 		seeds_label.text = str(GameState.sum_seed_bag_only())
 		TEXT_LAYOUT.ink(seeds_label)
+	if diamonds_label:
+		diamonds_label.text = str(GameState.get_diamonds())
+		TEXT_LAYOUT.ink(diamonds_label)
 
 
 func _show_swipe_hint_if_needed() -> void:
 	# Bug-019: caption removed; tab labels already name each page.
-	pass
-
-
-func _on_settings_pressed() -> void:
-	# Placeholder — Settings screen in D0-P (no caption toast).
 	pass

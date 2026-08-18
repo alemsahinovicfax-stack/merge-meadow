@@ -1,6 +1,6 @@
 extends Control
 
-## T3 crystal preview for CrystalStashChip (CampPlantDraw).
+## T3 flower preview for CrystalStashChip (CampPlantDraw fitted).
 
 const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
 
@@ -22,5 +22,4 @@ func _draw() -> void:
 	var side := minf(size.x, size.y)
 	if side < 8.0:
 		return
-	var center := size * 0.5
-	PLANT_DRAW.draw_plant(self, center + Vector2(0.0, side * 0.08), type_id, 3)
+	PLANT_DRAW.draw_fitted_plant(self, size * 0.5, type_id, 3, side)

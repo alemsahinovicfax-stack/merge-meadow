@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8diamond01"]
+
+[ext_resource type="Script" path="res://scripts/run/diamond_pickup.gd" id="1_diamond"]
+[ext_resource type="Script" path="res://scripts/run/diamond_visual.gd" id="2_visual"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_diamond"]
+radius = 18.0
+
+[node name="Diamond" type="Area2D" groups=["diamond", "pickup"]]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_diamond")
+
+[node name="DiamondVisual" type="Sprite2D" parent="."]
+script = ExtResource("2_visual")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_diamond")

@@ -313,71 +313,6 @@ text = ""
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="DailyChestCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 96)
-layout_mode = 2
-mouse_filter = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_daily_ready")
-
-[node name="DailyHBox" type="HBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/DailyChestCard"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 14
-
-[node name="ChestVisual" type="Control" parent="RootVBox/MainScroll/ContentMargin/Content/DailyChestCard/DailyHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(72, 72)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="ChestBody" type="Panel" parent="RootVBox/MainScroll/ContentMargin/Content/DailyChestCard/DailyHBox/ChestVisual"]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -44.0
-grow_horizontal = 2
-grow_vertical = 0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_chest_body")
-
-[node name="ChestLid" type="Panel" parent="RootVBox/MainScroll/ContentMargin/Content/DailyChestCard/DailyHBox/ChestVisual"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 4.0
-offset_top = 4.0
-offset_right = -4.0
-offset_bottom = 32.0
-grow_horizontal = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_chest_lid")
-
-[node name="DailyVBox" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/DailyChestCard/DailyHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_constants/separation = 4
-alignment = 1
-
-[node name="DailyTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/DailyChestCard/DailyHBox/DailyVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.29, 0.22, 0.1, 1)
-theme_override_font_sizes/font_size = 26
-text = "Daily gift"
-autowrap_mode = 2
-
-[node name="DailyCaption" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/DailyChestCard/DailyHBox/DailyVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.28, 0.16, 1)
-theme_override_font_sizes/font_size = 18
-text = "Tap to open"
-autowrap_mode = 2
-
 [node name="GardenCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
@@ -408,9 +343,16 @@ text = "Seeds: 0 / 40"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="SeedBagGrid" type="GridContainer" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
+[node name="SeedBagScroll" type="ScrollContainer" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SeedBagGrid" type="GridContainer" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox/SeedBagScroll"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 2
@@ -420,7 +362,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 script = ExtResource("2_uibtn")
-label_text = "Trade 3 same → 8 coins"
+label_text = "Select a seed to trade"
 font_size = 18
 label_autowrap = true
 
@@ -435,14 +377,14 @@ theme_override_constants/separation = 8
 [node name="CrystalTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Crystal stash"
+text = "Flower stash"
 horizontal_alignment = 1
 
 [node name="CrystalCliff" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Merge T3 in Arena → crystals here"
+text = "Merge T3 in Arena → flowers here"
 horizontal_alignment = 1
 autowrap_mode = 2
 
@@ -450,7 +392,7 @@ autowrap_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "Crystals: 0"
+text = "Flowers: 0"
 horizontal_alignment = 1
 autowrap_mode = 2
 
@@ -473,7 +415,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 script = ExtResource("2_uibtn")
-label_text = "Select a crystal to exchange"
+label_text = "Select a flower to exchange"
 font_size = 18
 label_autowrap = true
 button_variant = "accent"
@@ -556,15 +498,6 @@ theme_override_font_sizes/font_size = 24
 text = "For next run"
 horizontal_alignment = 1
 
-[node name="LoadoutButton" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/RunPrepCard/RunPrepVBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "Basket"
-font_size = 18
-label_autowrap = true
-
 [node name="CompanionTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/RunPrepCard/RunPrepVBox"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -639,70 +572,3 @@ font_size = 28
 button_icon = "play"
 button_variant = "primary"
 
-[node name="RewardOverlay" type="Control" parent="."]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 0
-
-[node name="Dim" type="ColorRect" parent="RewardOverlay"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 0
-color = Color(0.05, 0.07, 0.06, 0.58)
-
-[node name="RewardPanel" type="PanelContainer" parent="RewardOverlay"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -160.0
-offset_right = 200.0
-offset_bottom = 160.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="RewardVBox" type="VBoxContainer" parent="RewardOverlay/RewardPanel"]
-layout_mode = 2
-theme_override_constants/separation = 14
-alignment = 1
-
-[node name="RewardTitle" type="Label" parent="RewardOverlay/RewardPanel/RewardVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
-theme_override_font_sizes/font_size = 28
-text = "Daily gift"
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="RewardBody" type="Label" parent="RewardOverlay/RewardPanel/RewardVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
-theme_override_font_sizes/font_size = 22
-text = "+8 coins"
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="RewardOkButton" type="PanelContainer" parent="RewardOverlay/RewardPanel/RewardVBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 56)
-layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "OK"
-font_size = 24
-button_variant = "primary"

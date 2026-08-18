@@ -21,17 +21,14 @@ func _run() -> void:
 		quit(1)
 		return
 	var required: Array[String] = [
-		"DailyChestCard",
 		"GardenCliff",
 		"BagLabel",
 		"SeedBagGrid",
 		"CrystalGrid",
 		"CrystalExchangeButton",
 		"UpgradeButton",
-		"LoadoutButton",
 		"MergeButton",
 		"PlayButton",
-		"RewardOverlay",
 		"HomeButton",
 		"ResourceBar",
 	]

@@ -48,7 +48,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | Pravilo | Vrijednost / napomena |
 |---------|----------------------|
 | Izvor: run pickup | ~70% spawnova (balans **niski prioritet** do shopa) |
-| Izvor: exchange | 3× isti tip iz baga → `8` coins |
+| Izvor: exchange | Seed: ★1=`1` / ★2=`2` / ★3=`4` C po sjemeniu × take (1–3); Flower/crystal: ★1=`5` / ★2=`10` / ★3=`20` po komadu |
 | Izvor: rewarded ×2 | ×2 `last_run_coins` / `last_seed_bag` (samo ovaj run) |
 | Sink v1 | **samo kozmetika** (shop M8) — ne magnet, ne loadout |
 | Magnet upgrade | **T2 bloom donate** — novčići ne utječu na snagu |
@@ -92,8 +92,9 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | `DAILY_CHEST_SEEDS` | **3** | random iz unlocked spawn poola |
 | `discovered_blooms` | po `type_id` | priprema za dnevnik/setove |
 | `sprinkler_donations` | 0–2 | donirani T2 prije upgradea |
-| `EXCHANGE_SEED_COUNT` | `3` | K4 zamjena viška |
-| `EXCHANGE_COINS_REWARD` | `8` | novčići po zamjeni |
+| `EXCHANGE_SEED_COUNT` | `3` | max sjemena po Trade |
+| `SEED_EXCHANGE_COINS_BY_RARITY` | ★1=`1`, ★2=`2`, ★3=`4` | C po sjemeniu |
+| `CRYSTAL_EXCHANGE_COINS_BY_RARITY` | ★1=`5`, ★2=`10`, ★3=`20` | C po flower/crystal |
 
 ### Rarity → gdje se sadi
 
@@ -163,7 +164,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 ## Otvorena pitanja
 
 - [x] `RUN_DURATION` post-tutorial — **60 s** (pass 1); 75 s ako M8 playtest traži
-- [ ] Exchange rate po rarity (sad flat 3→8)
+- [x] Exchange rate po rarity (seed 1/2/4; flower 5/10/20 — Bug-031)
 - [ ] Set bonus brojke kad dnevnik uđe u kod
 
 ## Povezano

@@ -7,7 +7,6 @@ signal drag_released(chip: ArenaSeedChip)
 signal bloom_tapped(chip: ArenaSeedChip)
 
 const CHIP_RADIUS := 48.0
-const CONFIG := preload("res://scripts/visual/seed_visual_config.gd")
 const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
 
 var chip_id: int = -1
@@ -93,17 +92,17 @@ func _end_drag() -> void:
 
 func _draw() -> void:
 	var center := size * 0.5
-	var draw_scale := 1.12
-	if GameState.is_mythic_seed(type_id) and tier <= 1:
-		draw_scale = 0.92
 	if tier >= 2:
 		draw_set_transform(center + Vector2(0.0, 10.0), 0.0, Vector2(0.88, 0.88))
 		PLANT_DRAW.draw_plant(self, Vector2.ZERO, type_id, tier)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	else:
-		draw_set_transform(center, 0.0, Vector2(draw_scale, draw_scale))
-		CONFIG.draw_run_seed(self, type_id)
-		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		var fit_frac := PLANT_DRAW.FIT_FRAC
+		if GameState.is_mythic_seed(type_id):
+			fit_frac = 0.30
+		PLANT_DRAW.draw_fitted_plant(
+			self, center, type_id, 1, CHIP_RADIUS * 2.0, fit_frac
+		)
 	draw_arc(center, CHIP_RADIUS, 0.0, TAU, 32, Color(0.2, 0.28, 0.22, 0.35), 2.0)
 	if tier >= 2:
 		draw_string(

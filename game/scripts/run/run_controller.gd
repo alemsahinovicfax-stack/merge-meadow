@@ -5,6 +5,7 @@ const SPAWN_INTERVAL := 1.2
 const SPAWN_CHANCE := 0.7
 const OBSTACLE_CHANCE := 0.25
 const PICKUP_SEED_CHANCE := 0.30
+const DIAMOND_SEED_RATIO := 300
 const RAMP_STEP := 0.05
 const RAMP_EVERY := 15.0
 
@@ -20,13 +21,16 @@ const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
 @onready var player: Area2D = $Player
 @onready var coin_counter_label: Label = $HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/CoinRow/CoinLabel
 @onready var seed_counter_label: Label = $HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/SeedRow/SeedLabel
+@onready var diamond_counter_label: Label = $HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/DiamondRow/DiamondLabel
 @onready var coin_hud_icon: TextureRect = $HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/CoinRow/CoinIcon
 @onready var seed_hud_icon: TextureRect = $HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/SeedRow/SeedIcon
+@onready var diamond_hud_icon: TextureRect = $HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/DiamondRow/DiamondIcon
 @onready var timer_label: Label = $HUD/TopHud/TopHudVBox/TopRow/TimerLabel
 @onready var tutorial_banner: Label = $HUD/TopHud/TopHudVBox/TutorialBanner
 
 var _coin_scene: PackedScene = preload("res://scenes/run/coin.tscn")
 var _seed_scene: PackedScene = preload("res://scenes/run/seed_pickup.tscn")
+var _diamond_scene: PackedScene = preload("res://scenes/run/diamond_pickup.tscn")
 var _obstacle_scene: PackedScene = preload("res://scenes/run/obstacle.tscn")
 
 var _state: int = 0  # 0=running
@@ -81,10 +85,13 @@ func _setup_safe_area() -> void:
 func _setup_pickup_hud_icons() -> void:
 	var coin_tex := PICKUP_ASSETS.get_coin_texture()
 	var seed_tex := PICKUP_ASSETS.get_seed_texture()
+	var diamond_tex := PICKUP_ASSETS.get_diamond_texture()
 	if coin_hud_icon and coin_tex:
 		coin_hud_icon.texture = coin_tex
 	if seed_hud_icon and seed_tex:
 		seed_hud_icon.texture = seed_tex
+	if diamond_hud_icon and diamond_tex:
+		diamond_hud_icon.texture = diamond_tex
 
 
 func start_run() -> void:
@@ -243,18 +250,28 @@ func _try_spawn() -> void:
 		obstacle.position = spawn_pos
 		world.add_child(obstacle)
 	elif randf() < _effective_seed_spawn_chance():
-		var seed := _seed_scene.instantiate()
-		seed.position = spawn_pos
-		var type_id := _pick_seed_type_id()
-		if seed.has_method("setup"):
-			seed.setup(type_id, GameState.get_seed_rarity(type_id))
-		seed.collected.connect(_on_seed_collected)
-		world.add_child(seed)
+		if randf() < 1.0 / float(DIAMOND_SEED_RATIO):
+			_spawn_diamond(spawn_pos)
+		else:
+			var seed := _seed_scene.instantiate()
+			seed.position = spawn_pos
+			var type_id := _pick_seed_type_id()
+			if seed.has_method("setup"):
+				seed.setup(type_id, GameState.get_seed_rarity(type_id))
+			seed.collected.connect(_on_seed_collected)
+			world.add_child(seed)
 	else:
 		var coin := _coin_scene.instantiate()
 		coin.position = spawn_pos
 		coin.collected.connect(_on_coin_collected)
 		world.add_child(coin)
+
+
+func _spawn_diamond(spawn_pos: Vector2) -> void:
+	var diamond := _diamond_scene.instantiate()
+	diamond.position = spawn_pos
+	diamond.collected.connect(_on_diamond_collected)
+	world.add_child(diamond)
 
 
 func _effective_seed_spawn_chance() -> float:
@@ -283,6 +300,13 @@ func _on_seed_collected(type_id: String) -> void:
 	_update_hud()
 
 
+func _on_diamond_collected() -> void:
+	GameState.add_diamonds(1)
+	if pickup_feed:
+		pickup_feed.text = "+1 diamond"
+	_update_hud()
+
+
 func _on_player_hit_obstacle() -> void:
 	_end_run(true)
 
@@ -292,6 +316,8 @@ func _update_hud() -> void:
 		return
 	coin_counter_label.text = "%d" % coin_count
 	seed_counter_label.text = "%d" % _sum_run_seeds()
+	if diamond_counter_label:
+		diamond_counter_label.text = "%d" % GameState.get_diamonds()
 	if pip_name_label:
 		pip_name_label.text = GameState.get_companion_display_name()
 	if pip_portrait and pip_portrait.has_method("refresh_portrait"):

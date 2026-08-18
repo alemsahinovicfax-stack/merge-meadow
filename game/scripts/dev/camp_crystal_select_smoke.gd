@@ -34,6 +34,20 @@ func _run() -> void:
 		push_error("camp_crystal_select_smoke: CrystalCard missing")
 		quit(1)
 		return
+	var seed_scroll := camp.get_node_or_null(
+		"RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox/SeedBagScroll"
+	)
+	if seed_scroll == null:
+		push_error("camp_crystal_select_smoke: SeedBagScroll missing (layout parity)")
+		quit(1)
+		return
+	var seed_grid_path := camp.get_node_or_null(
+		"RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox/SeedBagScroll/SeedBagGrid"
+	)
+	if seed_grid_path == null:
+		push_error("camp_crystal_select_smoke: SeedBagGrid not under SeedBagScroll")
+		quit(1)
+		return
 	gs.set("garden_crystal_stash", {"clover": 2, "daisy": 1})
 	gs.set("wallet_coins", 10)
 	if camp.has_method("_refresh_crystal_card"):
@@ -77,7 +91,7 @@ func _run() -> void:
 		push_error("camp_crystal_select_smoke: clover expected 1 got %s" % str(stash.get("clover")))
 		quit(1)
 		return
-	var reward := int(gs.get("CRYSTAL_EXCHANGE_COINS"))
+	var reward := int(gs.call("crystal_exchange_coins_for_type", "clover"))
 	if int(gs.get("wallet_coins")) != 10 + reward:
 		push_error(
 			"camp_crystal_select_smoke: coins expected %d got %s"

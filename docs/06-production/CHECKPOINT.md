@@ -12,8 +12,8 @@ trenutna_faza: 5
 podfaza: d0-prelaunch
 aktivna_sekcija: D
 b0_aktivan: false
-sljedeci_korak: "D0-P — Settings / polish (Bug-006–019 ✅)"
-zadnja_sesija: "Bug-016: odd T2 recycle on Done + Arena/Camp copy"
+sljedeci_korak: "D0-P — polish (SFX/art/Settings) ili 5-min playtest; Bug-029–032 ✅"
+zadnja_sesija: "Bug-030: rarity theme bg (Album + Garden seed chips)"
 zadnje_azurirano: 2026-08-16
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
@@ -39,7 +39,7 @@ sljedeca_runda_dokumentacije: "Prije store (D0/D4) — listing/ASO; inače samo 
 | Polje | Vrijednost |
 |-------|------------|
 | **Milestone** | **M8** — Launch prep (Sekcija D) |
-| **Podfaza** | `d0-prelaunch` — Bug-006–019 ✅; sljedeće: **D0-P** (Settings / polish) |
+| **Podfaza** | `d0-prelaunch` — Bug-006–032 ✅; sljedeće: **D0-P** / playtest |
 | **Igra** | Merge Meadow — hybrid casual lane run + merge kamp |
 | **Engine** | Godot 4.x (HP laptop / Windows) |
 | **Save** | Lokalni JSON (`user://player_save.json`) — **bez** server/baze u v1 |
@@ -345,9 +345,9 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-1. **Ti / agent:** D0-P — Settings ekran + polish (SFX/art po listi)
+1. **Ti:** 5-min playtest ili kreni u **D0-P** (SFX, art, Settings ekran)
 2. **Ne** plaćati Play Console dok D0 nije ✅
-3. Bug-006–019 paket ✅
+3. Bug-006–032 ✅ (uklj. paket 029–032)
 
 ## Povezano
 

@@ -1,8 +1,8 @@
 extends Control
 
-## Icon half of SeedBagChip — procedural run seed art.
+## Icon half of SeedBagChip — Album T1 sprout (CampPlantDraw).
 
-const CONFIG := preload("res://scripts/visual/seed_visual_config.gd")
+const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
 
 var type_id: String = "clover"
 
@@ -22,6 +22,4 @@ func _draw() -> void:
 	var side := minf(size.x, size.y)
 	if side < 8.0:
 		return
-	var scale := (side * 0.42) / 22.0
-	draw_set_transform(size * 0.5, 0.0, Vector2(scale, scale))
-	CONFIG.draw_run_seed(self, type_id)
+	PLANT_DRAW.draw_fitted_plant(self, size * 0.5, type_id, 1, side)

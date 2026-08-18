@@ -7,15 +7,16 @@ const READABILITY := preload("res://scripts/ui/ui_readability.gd")
 const TYPO := preload("res://scripts/ui/ui_typography.gd")
 const BloomIcon := preload("res://scripts/ui/collection_bloom_icon.gd")
 
+const TIER_ICON_SIZE := 64.0
+
 var _entry: Dictionary = {}
 var _built: bool = false
-var _icon: Control
 var _title: Label
 var _stars: Label
 var _caption: Label
 var _new_badge: Label
-var _tier_row: HBoxContainer
-var _tier_labels: Array[Label] = []
+var _tier_icons: Array[Control] = []
+var _tier_captions: Array[Label] = []
 
 
 func apply(entry: Dictionary) -> void:
@@ -27,38 +28,41 @@ func apply(entry: Dictionary) -> void:
 		_refresh()
 
 
+func _ready() -> void:
+	if not _entry.is_empty() and not _built:
+		_ensure_built()
+		_refresh()
+
+
+func get_tier_icon(tier: int) -> Control:
+	var idx := tier - 1
+	if idx < 0 or idx >= _tier_icons.size():
+		return null
+	return _tier_icons[idx]
+
+
 func _ensure_built() -> void:
 	if _built:
 		return
 	_built = true
-	custom_minimum_size = Vector2(0, 72)
+	custom_minimum_size = Vector2(0, 120)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
-	var style := UI_PALETTE.button_style("subtle", "normal")
-	add_theme_stylebox_override("panel", style)
+	add_theme_stylebox_override("panel", UI_PALETTE.rarity_bg_style(1, true))
 
-	var root := HBoxContainer.new()
-	root.add_theme_constant_override("separation", 14)
+	var root := VBoxContainer.new()
+	root.add_theme_constant_override("separation", 8)
 	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	add_child(root)
 
-	_icon = BloomIcon.new()
-	_icon.custom_minimum_size = Vector2(72, 72)
-	_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	root.add_child(_icon)
-
-	var text_col := VBoxContainer.new()
-	text_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	text_col.add_theme_constant_override("separation", 4)
-	root.add_child(text_col)
-
 	var title_row := HBoxContainer.new()
 	title_row.add_theme_constant_override("separation", 8)
-	text_col.add_child(title_row)
+	root.add_child(title_row)
 
 	_title = Label.new()
 	TEXT_LAYOUT.card_title_scroll_readable(_title)
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_title.add_theme_color_override("font_color", UI_PALETTE.UI_TEXT)
 	title_row.add_child(_title)
 
@@ -79,49 +83,68 @@ func _ensure_built() -> void:
 	_stars = Label.new()
 	_stars.add_theme_font_size_override("font_size", READABILITY.font(TYPO.BODY))
 	_stars.add_theme_color_override("font_color", Color(0.72, 0.62, 0.2))
-	text_col.add_child(_stars)
+	root.add_child(_stars)
 
-	_tier_row = HBoxContainer.new()
-	_tier_row.add_theme_constant_override("separation", 8)
-	text_col.add_child(_tier_row)
+	var tier_row := HBoxContainer.new()
+	tier_row.name = "TierIconsRow"
+	tier_row.add_theme_constant_override("separation", 16)
+	tier_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	root.add_child(tier_row)
+
 	for tier in [1, 2, 3]:
-		var chip := Label.new()
-		TEXT_LAYOUT.caption_label_scroll_readable(chip)
-		_tier_row.add_child(chip)
-		_tier_labels.append(chip)
+		var col := VBoxContainer.new()
+		col.add_theme_constant_override("separation", 4)
+		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		col.alignment = BoxContainer.ALIGNMENT_CENTER
+		tier_row.add_child(col)
+
+		var icon: Control = BloomIcon.new()
+		icon.name = "TierIcon%d" % tier
+		icon.custom_minimum_size = Vector2(TIER_ICON_SIZE, TIER_ICON_SIZE)
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		col.add_child(icon)
+		_tier_icons.append(icon)
+
+		var cap := Label.new()
+		cap.text = "T%d" % tier
+		cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		TEXT_LAYOUT.caption_label_scroll_readable(cap)
+		col.add_child(cap)
+		_tier_captions.append(cap)
 
 	_caption = Label.new()
 	TEXT_LAYOUT.body_label_scroll(_caption)
 	_caption.add_theme_color_override("font_color", Color(0.38, 0.42, 0.38))
-	text_col.add_child(_caption)
+	root.add_child(_caption)
 
 
 func _refresh() -> void:
 	var state := str(_entry.get("state", "locked"))
 	var kept_tier := int(_entry.get("kept_tier", 0))
-	var display_tier := int(_entry.get("display_tier", 0))
 	var rarity := int(_entry.get("rarity", 1))
-	var locked := state == "locked"
+	var type_id := str(_entry.get("type_id", ""))
+	var locked_entry := state == "locked"
 
 	_title.text = str(_entry.get("display_name", "?"))
 	_stars.text = "★".repeat(clampi(rarity, 1, 3))
 	_new_badge.visible = bool(_entry.get("is_new", false))
 
-	if _icon.has_method("apply"):
-		_icon.call("apply", str(_entry.get("type_id", "")), display_tier if not locked else 0, locked)
-
 	for i in 3:
 		var tier := i + 1
-		var chip: Label = _tier_labels[i]
-		if locked:
-			chip.text = "T%d — ?" % tier
-			chip.add_theme_color_override("font_color", Color(0.55, 0.58, 0.55))
-		elif kept_tier >= tier:
-			chip.text = "T%d ✓" % tier
-			chip.add_theme_color_override("font_color", Color(0.22, 0.48, 0.28))
+		var unlocked := false
+		if not locked_entry:
+			if tier == 1:
+				unlocked = true
+			else:
+				unlocked = kept_tier >= tier
+		var icon := _tier_icons[i]
+		if icon.has_method("apply"):
+			icon.call("apply", type_id, tier if unlocked else 0, not unlocked)
+		var cap: Label = _tier_captions[i]
+		if unlocked:
+			cap.add_theme_color_override("font_color", Color(0.22, 0.48, 0.28))
 		else:
-			chip.text = "T%d —" % tier
-			chip.add_theme_color_override("font_color", Color(0.62, 0.64, 0.6))
+			cap.add_theme_color_override("font_color", Color(0.55, 0.58, 0.55))
 
 	match state:
 		"locked":
@@ -143,3 +166,5 @@ func _refresh() -> void:
 			_caption.text = "New bloom kept in Album!"
 		else:
 			_caption.text = "New discovery!"
+
+	add_theme_stylebox_override("panel", UI_PALETTE.rarity_bg_style(rarity, locked_entry))

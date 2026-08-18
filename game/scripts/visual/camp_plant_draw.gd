@@ -7,6 +7,9 @@ const CONFIG := preload("res://scripts/visual/seed_visual_config.gd")
 
 const SOIL := Color(0.42, 0.28, 0.18, 1.0)
 const SOIL_EDGE := Color(0.32, 0.2, 0.12, 0.9)
+## Album / chip fit — same math as collection_bloom_icon (Bug-029).
+const FIT_REF_EXTENT := 28.0
+const FIT_FRAC := 0.36
 
 
 static func draw_bed_soil(canvas: CanvasItem, rect: Rect2, selected: bool) -> void:
@@ -25,6 +28,27 @@ static func draw_plant(canvas: CanvasItem, center: Vector2, type_id: String, tie
 		_draw_bloom(canvas, center, type_id)
 	else:
 		_draw_sprout(canvas, center, type_id)
+
+
+static func draw_fitted_plant(
+	canvas: CanvasItem,
+	local_center: Vector2,
+	type_id: String,
+	tier: int,
+	side: float,
+	fit_frac: float = FIT_FRAC,
+	y_nudge_frac: float = 0.02
+) -> void:
+	if side < 8.0:
+		return
+	var s := (side * fit_frac) / FIT_REF_EXTENT
+	canvas.draw_set_transform(
+		local_center + Vector2(0.0, side * y_nudge_frac),
+		0.0,
+		Vector2(s, s)
+	)
+	draw_plant(canvas, Vector2.ZERO, type_id, tier)
+	canvas.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 static func _pal(type_id: String) -> Dictionary:

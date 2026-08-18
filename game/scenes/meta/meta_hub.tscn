@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://meta_hub_v11"]
+[gd_scene load_steps=9 format=3 uid="uid://meta_hub_v11"]
 
 [ext_resource type="Script" path="res://scripts/meta/meta_hub_controller.gd" id="1_hub"]
 [ext_resource type="Script" path="res://scripts/ui/swipe_pager.gd" id="2_pager"]
@@ -38,6 +38,22 @@ content_margin_bottom = 6.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_seed"]
 bg_color = Color(0.659, 0.902, 0.812, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.176, 0.204, 0.212, 0.1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_diamond"]
+bg_color = Color(0.55, 0.88, 0.92, 0.85)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -158,18 +174,37 @@ text = "0"
 vertical_alignment = 1
 clip_text = false
 
+[node name="DiamondChip" type="PanelContainer" parent="RootVBox/TopBar/Panel/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_diamond")
+
+[node name="HBox" type="HBoxContainer" parent="RootVBox/TopBar/Panel/HBox/DiamondChip"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DiamondIcon" type="TextureRect" parent="RootVBox/TopBar/Panel/HBox/DiamondChip/HBox"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DiamondsLabel" type="Label" parent="RootVBox/TopBar/Panel/HBox/DiamondChip/HBox"]
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 28
+text = "0"
+vertical_alignment = 1
+clip_text = false
+
 [node name="Spacer" type="Control" parent="RootVBox/TopBar/Panel/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
-
-[node name="SettingsButton" type="PanelContainer" parent="RootVBox/TopBar/Panel/HBox"]
-layout_mode = 2
-custom_minimum_size = Vector2(56, 56)
-script = ExtResource("3_uibtn")
-label_text = ""
-button_icon = "settings"
-button_variant = "subtle"
 
 [node name="SwipePager" type="Control" parent="RootVBox"]
 layout_mode = 2

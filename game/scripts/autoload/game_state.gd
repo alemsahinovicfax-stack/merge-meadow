@@ -36,8 +36,10 @@ const MULTIPLIER_VALUES: Array[float] = [1.0, 1.25, 1.5, 1.75, 2.0]
 const MYTHIC_RARITY := 3
 
 const EXCHANGE_SEED_COUNT := 3
-const EXCHANGE_COINS_REWARD := 8
-const CRYSTAL_EXCHANGE_COINS := 10
+## Coins per seed traded, keyed by rarity ★1–3 (Bug-031).
+const SEED_EXCHANGE_COINS_BY_RARITY := {1: 1, 2: 2, 3: 4}
+## Coins per crystal/flower traded, keyed by rarity ★1–3.
+const CRYSTAL_EXCHANGE_COINS_BY_RARITY := {1: 5, 2: 10, 3: 20}
 
 const SEED_TYPE_CLOVER := "clover"
 
@@ -93,13 +95,14 @@ const ENDLESS_DIFFICULTY_LABELS: Dictionary = {
 
 const TUTORIAL_FLAGS_PATH := "user://tutorial_flags.json"
 const PLAYER_SAVE_PATH := "user://player_save.json"
-const SAVE_VERSION := 7
+const SAVE_VERSION := 8
 
 var last_seed_bag: Dictionary = {}
 var last_run_coins: int = 0
 var last_raw_coins: int = 0
 var last_loot: int = 0
 var wallet_coins: int = 0
+var wallet_diamonds: int = 0
 var last_failed: bool = false
 var last_raw_seed_total: int = 0
 var loot_doubled: bool = false
@@ -184,6 +187,7 @@ func save_player_save() -> void:
 		"tutorial_complete": tutorial_complete,
 		"tutorial_step": tutorial_step,
 		"wallet_coins": wallet_coins,
+		"wallet_diamonds": wallet_diamonds,
 		"seed_bag": seed_bag.duplicate(),
 		"magnet_level": magnet_level,
 		"sprinkler_donations": sprinkler_donations,
@@ -228,6 +232,8 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	if tutorial_complete:
 		tutorial_step = TutorialStep.FREE
 	wallet_coins = maxi(0, int(data.get("wallet_coins", 0)))
+	# SAVE_VERSION 8 — older saves default to 0 diamonds.
+	wallet_diamonds = maxi(0, int(data.get("wallet_diamonds", 0)))
 	seed_bag = _parse_string_int_dict(data.get("seed_bag", {}))
 	magnet_level = clampi(int(data.get("magnet_level", 0)), 0, MAGNET_MAX_LEVEL)
 	sprinkler_donations = maxi(0, int(data.get("sprinkler_donations", 0)))
@@ -487,21 +493,40 @@ func format_loadout_label() -> String:
 	return "Basket: %s %s  (+%.0f%% spawn)" % [name, stars, LOADOUT_SPAWN_BONUS * 100.0]
 
 
-func set_loadout_from_bag(type_id: String) -> bool:
+## Set run spawn bias. Unlocked + non-mythic; bag count not required (Bug-023 Home picker).
+func set_loadout(type_id: String) -> bool:
 	if type_id.is_empty():
 		return false
 	if not is_seed_type_unlocked(type_id):
 		return false
-	if int(seed_bag.get(type_id, 0)) <= 0:
-		return false
 	if is_mythic_seed(type_id):
 		return false
 	loadout_type_id = type_id
+	save_player_save()
 	return true
+
+
+func set_loadout_from_bag(type_id: String) -> bool:
+	return set_loadout(type_id)
 
 
 func clear_loadout() -> void:
 	loadout_type_id = ""
+	save_player_save()
+
+
+func get_unlocked_loadout_types() -> Array[String]:
+	var out: Array[String] = []
+	for type_id in get_unlocked_run_spawn_types():
+		if is_mythic_seed(type_id):
+			continue
+		out.append(type_id)
+	out.sort_custom(func(a: String, b: String) -> bool:
+		var na: String = SEED_DISPLAY_NAMES.get(a, a)
+		var nb: String = SEED_DISPLAY_NAMES.get(b, b)
+		return na < nb
+	)
+	return out
 
 
 func toggle_loadout_from_bag() -> String:
@@ -781,6 +806,17 @@ func format_shop_resources_line() -> String:
 	return "%d coins  ·  %d / %d seeds in bag" % [wallet_coins, seeds, SEED_BAG_SOFT_CAP]
 
 
+func get_diamonds() -> int:
+	return wallet_diamonds
+
+
+func add_diamonds(amount: int) -> void:
+	if amount <= 0:
+		return
+	wallet_diamonds += amount
+	save_player_save()
+
+
 func try_coin_unlock_next_seed() -> String:
 	if not has_pending_seed_unlock():
 		return "All seeds already unlocked."
@@ -823,7 +859,7 @@ func format_seed_bag_label() -> String:
 
 
 func get_seed_bag_entries() -> Array[Dictionary]:
-	## Sorted inventory rows for Garden UI: rarity desc, then display name.
+	## Sorted inventory rows for Garden UI: rarity ASC (★ → ★★★), then display name.
 	var out: Array[Dictionary] = []
 	for type_id in seed_bag:
 		var count := int(seed_bag[type_id])
@@ -836,7 +872,7 @@ func get_seed_bag_entries() -> Array[Dictionary]:
 			"display_name": SEED_DISPLAY_NAMES.get(tid, tid.capitalize()),
 			"rarity": get_seed_rarity(tid),
 		})
-	out.sort_custom(_compare_seed_bag_entry_display)
+	out.sort_custom(_compare_seed_bag_entry_asc)
 	return out
 
 
@@ -856,6 +892,16 @@ func get_garden_crystal_entries() -> Array[Dictionary]:
 		})
 	out.sort_custom(_compare_seed_bag_entry_display)
 	return out
+
+
+func _compare_seed_bag_entry_asc(a: Dictionary, b: Dictionary) -> bool:
+	var ra := int(a.get("rarity", 0))
+	var rb := int(b.get("rarity", 0))
+	if ra != rb:
+		return ra < rb
+	var na := str(a.get("display_name", ""))
+	var nb := str(b.get("display_name", ""))
+	return na.naturalnocasecmp_to(nb) < 0
 
 
 func _compare_seed_bag_entry_display(a: Dictionary, b: Dictionary) -> bool:
@@ -1419,16 +1465,43 @@ func first_seed_type_in_bag(for_greenhouse: bool = false) -> String:
 
 
 func first_exchangeable_type_in_bag() -> String:
-	for type_id in seed_bag:
-		if int(seed_bag.get(type_id, 0)) >= EXCHANGE_SEED_COUNT:
-			return str(type_id)
-	return ""
+	var entries := get_seed_bag_entries()
+	if entries.is_empty():
+		return ""
+	return str(entries[0].get("type_id", ""))
+
+
+func seed_exchange_take_count(bag_count: int) -> int:
+	if bag_count <= 0:
+		return 0
+	if bag_count >= EXCHANGE_SEED_COUNT:
+		return EXCHANGE_SEED_COUNT
+	return bag_count
+
+
+func seed_exchange_coins_per_seed(type_id: String) -> int:
+	return int(SEED_EXCHANGE_COINS_BY_RARITY.get(get_seed_rarity(type_id), 1))
+
+
+func seed_exchange_coins_for_take(take: int, type_id: String) -> int:
+	if take <= 0:
+		return 0
+	return take * seed_exchange_coins_per_seed(type_id)
+
+
+func crystal_exchange_coins_for_type(type_id: String) -> int:
+	return int(CRYSTAL_EXCHANGE_COINS_BY_RARITY.get(get_seed_rarity(type_id), 5))
 
 
 func exchange_seeds_from_bag(type_id: String) -> bool:
-	if not take_seeds_from_bag(type_id, EXCHANGE_SEED_COUNT):
+	var bag_count := int(seed_bag.get(type_id, 0))
+	var take := seed_exchange_take_count(bag_count)
+	if take <= 0:
 		return false
-	wallet_coins += EXCHANGE_COINS_REWARD
+	var coins := seed_exchange_coins_for_take(take, type_id)
+	if not take_seeds_from_bag(type_id, take):
+		return false
+	wallet_coins += coins
 	save_player_save()
 	return true
 
@@ -1779,6 +1852,9 @@ func stash_garden_crystal(type_id: String) -> void:
 	if type_id.is_empty():
 		return
 	discovered_blooms[type_id] = true
+	# Arena T3 auto-stashes — unlock Album T3 (player cannot Keep the chip).
+	var prev_kept := int(collection_kept_tiers.get(type_id, 0))
+	collection_kept_tiers[type_id] = maxi(prev_kept, MAX_MERGE_TIER)
 	_mark_collection_journal_new(type_id, MAX_MERGE_TIER)
 	garden_crystal_stash[type_id] = int(garden_crystal_stash.get(type_id, 0)) + 1
 	save_player_save()
@@ -1828,7 +1904,7 @@ func exchange_garden_crystal(type_id: String = "") -> bool:
 		garden_crystal_stash.erase(type_id)
 	else:
 		garden_crystal_stash[type_id] = have - 1
-	wallet_coins += CRYSTAL_EXCHANGE_COINS
+	wallet_coins += crystal_exchange_coins_for_type(type_id)
 	save_player_save()
 	return true
 

@@ -5,7 +5,7 @@ extends Control
 
 signal bag_clicked
 
-const CONFIG := preload("res://scripts/visual/seed_visual_config.gd")
+const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
 const BAG_SIZE := Vector2(160, 130)
 const DRAW_SCALE := 1.35
 
@@ -109,9 +109,9 @@ func _draw() -> void:
 		for i in peek:
 			var offset := Vector2(-24.0 * s + float(i) * 24.0 * s, -42.0 * s - float(i % 2) * 8.0)
 			var type_id := _preview_types[i] if i < _preview_types.size() else "clover"
-			draw_set_transform(Vector2(cx, base_y) + offset, 0.0, Vector2(0.72 * s, 0.72 * s))
-			CONFIG.draw_run_seed(self, type_id)
-			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+			PLANT_DRAW.draw_fitted_plant(
+				self, Vector2(cx, base_y) + offset, type_id, 1, 40.0 * s
+			)
 	else:
 		draw_colored_polygon(
 			PackedVector2Array([

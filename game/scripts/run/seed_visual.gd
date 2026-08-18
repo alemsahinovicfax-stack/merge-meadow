@@ -1,8 +1,9 @@
 extends Sprite2D
 
-## Sjeme u runu — proceduralno po tipu (7 distinct vizuala).
+## Sjeme u runu — Album T1 sprout (CampPlantDraw), footprint ~starog seed-ball-a.
 
-const CONFIG := preload("res://scripts/visual/seed_visual_config.gd")
+const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
+const RUN_SIDE := 56.0
 
 var _type_id: String = "clover"
 
@@ -23,4 +24,4 @@ func setup(type_id: String) -> void:
 
 
 func _draw() -> void:
-	CONFIG.draw_run_seed(self, _type_id)
+	PLANT_DRAW.draw_fitted_plant(self, Vector2.ZERO, _type_id, 1, RUN_SIDE)

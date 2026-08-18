@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://c8mainmenu01"]
+[gd_scene load_steps=12 format=3 uid="uid://c8mainmenu01"]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Script" path="res://scripts/visual/pip_placeholder_control.gd" id="2_pip_ui"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="3_uibtn"]
+[ext_resource type="Script" path="res://scripts/ui/home_basket_visual.gd" id="4_basket_vis"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(1, 0.973, 0.941, 0.95)
@@ -20,6 +21,78 @@ content_margin_top = 40.0
 content_margin_right = 40.0
 content_margin_bottom = 40.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_daily_ready"]
+bg_color = Color(1, 0.78, 0.48, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.85, 0.55, 0.15, 0.55)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chest_body"]
+bg_color = Color(0.62, 0.38, 0.16, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.2, 0.08, 0.7)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chest_lid"]
+bg_color = Color(0.92, 0.72, 0.28, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.38, 0.1, 0.65)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_basket"]
+bg_color = Color(0.78, 0.9, 0.72, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.35, 0.55, 0.32, 0.5)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward"]
+bg_color = Color(1, 0.973, 0.941, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.176, 0.204, 0.212, 0.16)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+content_margin_left = 24.0
+content_margin_top = 22.0
+content_margin_right = 24.0
+content_margin_bottom = 22.0
+
 [node name="MainMenu" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -28,6 +101,162 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.14, 0.2, 0.16, 1)
+
+[node name="DecorMoundLeft" type="ColorRect" parent="."]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -220.0
+offset_right = 280.0
+offset_bottom = 40.0
+grow_vertical = 0
+color = Color(0.18, 0.28, 0.2, 0.55)
+
+[node name="DecorMoundRight" type="ColorRect" parent="."]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -180.0
+offset_right = 40.0
+offset_bottom = 50.0
+grow_horizontal = 0
+grow_vertical = 0
+color = Color(0.16, 0.26, 0.18, 0.5)
+
+[node name="HomeTopStack" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 360.0
+offset_bottom = 248.0
+theme_override_constants/separation = 8
+
+[node name="DailyChestCard" type="PanelContainer" parent="HomeTopStack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(336, 104)
+layout_mode = 2
+mouse_filter = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_daily_ready")
+
+[node name="DailyHBox" type="HBoxContainer" parent="HomeTopStack/DailyChestCard"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="ChestVisual" type="Control" parent="HomeTopStack/DailyChestCard/DailyHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ChestBody" type="Panel" parent="HomeTopStack/DailyChestCard/DailyHBox/ChestVisual"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -44.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_chest_body")
+
+[node name="ChestLid" type="Panel" parent="HomeTopStack/DailyChestCard/DailyHBox/ChestVisual"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = 32.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_chest_lid")
+
+[node name="DailyVBox" type="VBoxContainer" parent="HomeTopStack/DailyChestCard/DailyHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="DailyTitle" type="Label" parent="HomeTopStack/DailyChestCard/DailyHBox/DailyVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.22, 0.1, 1)
+theme_override_font_sizes/font_size = 26
+text = "Daily gift"
+autowrap_mode = 2
+
+[node name="DailyCaption" type="Label" parent="HomeTopStack/DailyChestCard/DailyHBox/DailyVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.28, 0.16, 1)
+theme_override_font_sizes/font_size = 18
+text = "Tap to open"
+autowrap_mode = 2
+
+[node name="BasketCard" type="PanelContainer" parent="HomeTopStack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(336, 104)
+layout_mode = 2
+mouse_filter = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_basket")
+
+[node name="BasketHBox" type="HBoxContainer" parent="HomeTopStack/BasketCard"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="BasketVisual" type="Control" parent="HomeTopStack/BasketCard/BasketHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("4_basket_vis")
+
+[node name="BasketVBox" type="VBoxContainer" parent="HomeTopStack/BasketCard/BasketHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="BasketTitle" type="Label" parent="HomeTopStack/BasketCard/BasketHBox/BasketVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.28, 0.18, 1)
+theme_override_font_sizes/font_size = 26
+text = "Basket"
+autowrap_mode = 2
+
+[node name="BasketCaption" type="Label" parent="HomeTopStack/BasketCard/BasketHBox/BasketVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.38, 0.28, 1)
+theme_override_font_sizes/font_size = 18
+text = "Tap to choose"
+autowrap_mode = 2
 
 [node name="SettingsButton" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -43,16 +272,6 @@ script = ExtResource("3_uibtn")
 label_text = ""
 button_icon = "settings"
 button_variant = "subtle"
-
-[node name="Background" type="ColorRect" parent="."]
-mouse_filter = 2
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.14, 0.2, 0.16, 1)
 
 [node name="Panel" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -166,19 +385,141 @@ Hard"
 font_size = 28
 button_variant = "subtle"
 
-[node name="CampButton" type="PanelContainer" parent="Panel/VBox"]
+[node name="RewardOverlay" type="Control" parent="."]
+unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(0, 80)
-layout_mode = 2
-script = ExtResource("3_uibtn")
-label_text = "Camp"
-font_size = 36
+z_index = 40
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
 
-[node name="ShopButton" type="PanelContainer" parent="Panel/VBox"]
-visible = false
-custom_minimum_size = Vector2(0, 72)
+[node name="Dim" type="ColorRect" parent="RewardOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.05, 0.07, 0.06, 0.58)
+
+[node name="RewardPanel" type="PanelContainer" parent="RewardOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -160.0
+offset_right = 200.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
+
+[node name="RewardVBox" type="VBoxContainer" parent="RewardOverlay/RewardPanel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="RewardTitle" type="Label" parent="RewardOverlay/RewardPanel/RewardVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 28
+text = "Daily gift"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RewardBody" type="Label" parent="RewardOverlay/RewardPanel/RewardVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 22
+text = "+8 coins"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RewardOkButton" type="PanelContainer" parent="RewardOverlay/RewardPanel/RewardVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 script = ExtResource("3_uibtn")
-label_text = "Shop"
-font_size = 32
-button_variant = "accent"
+label_text = "OK"
+font_size = 24
+button_variant = "primary"
+
+[node name="BasketPickerOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 45
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="Dim" type="ColorRect" parent="BasketPickerOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.05, 0.07, 0.06, 0.58)
+
+[node name="PickerPanel" type="PanelContainer" parent="BasketPickerOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -360.0
+offset_right = 280.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
+
+[node name="PickerVBox" type="VBoxContainer" parent="BasketPickerOverlay/PickerPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PickerTitle" type="Label" parent="BasketPickerOverlay/PickerPanel/PickerVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 28
+text = "Choose basket seed"
+horizontal_alignment = 1
+
+[node name="PickerScroll" type="ScrollContainer" parent="BasketPickerOverlay/PickerPanel/PickerVBox"]
+custom_minimum_size = Vector2(0, 480)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="PickerList" type="VBoxContainer" parent="BasketPickerOverlay/PickerPanel/PickerVBox/PickerScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="PickerCloseButton" type="PanelContainer" parent="BasketPickerOverlay/PickerPanel/PickerVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "Close"
+font_size = 24
+button_variant = "subtle"
+

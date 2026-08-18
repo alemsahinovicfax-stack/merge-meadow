@@ -1,6 +1,6 @@
 extends Control
 
-## Mini preview — T1 sprout, T2 bloom, T3 crystal (CampPlantDraw).
+## Mini preview — T1 sprout, T2 bloom, T3 crystal (CampPlantDraw), fit-scaled for journal icons.
 
 const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
 
@@ -11,6 +11,7 @@ const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip_contents = true
 	resized.connect(_on_resized)
 	_on_resized()
 
@@ -36,4 +37,4 @@ func _draw() -> void:
 		draw_circle(center, side * 0.22, Color(0.55, 0.58, 0.55, 0.35))
 		draw_arc(center, side * 0.22, 0.0, TAU, 24, Color(0.4, 0.42, 0.4, 0.5), 2.0)
 		return
-	PLANT_DRAW.draw_plant(self, center + Vector2(0.0, side * 0.08), type_id, plant_tier)
+	PLANT_DRAW.draw_fitted_plant(self, center, type_id, plant_tier, side)

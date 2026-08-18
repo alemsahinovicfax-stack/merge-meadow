@@ -168,8 +168,36 @@ func _step() -> void:
 		push_error("meta_hub_flow_smoke: camp ResourceBar should be hidden in hub")
 		quit(1)
 		return
-	if camp.get_node_or_null("%DailyChestCard") == null:
-		push_error("meta_hub_flow_smoke: camp DailyChestCard missing")
+	if camp.get_node_or_null("%DailyChestCard") != null:
+		push_error("meta_hub_flow_smoke: camp DailyChestCard should be removed (Bug-022)")
+		quit(1)
+		return
+	hub.go_to_page(MetaHubPages.MAIN, false)
+	for _k in 8:
+		await process_frame
+	var home: Node = host.get_node_or_null("Page_%d" % MetaHubPages.MAIN)
+	if home == null:
+		push_error("meta_hub_flow_smoke: home page missing")
+		quit(1)
+		return
+	if home.get_node_or_null("%DailyChestCard") == null:
+		push_error("meta_hub_flow_smoke: home DailyChestCard missing")
+		quit(1)
+		return
+	if home.get_node_or_null("Panel/VBox/CampButton") != null:
+		push_error("meta_hub_flow_smoke: Home CampButton should be removed")
+		quit(1)
+		return
+	if home.get_node_or_null("Panel/VBox/ShopButton") != null:
+		push_error("meta_hub_flow_smoke: Home ShopButton should be removed")
+		quit(1)
+		return
+	if home.get_node_or_null("SettingsButton") == null:
+		push_error("meta_hub_flow_smoke: Home SettingsButton missing")
+		quit(1)
+		return
+	if hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/SettingsButton") != null:
+		push_error("meta_hub_flow_smoke: hub TopBar SettingsButton should be removed")
 		quit(1)
 		return
 	print("meta_hub_flow_smoke OK")

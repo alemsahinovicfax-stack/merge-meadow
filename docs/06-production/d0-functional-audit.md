@@ -17,7 +17,7 @@ ai_sažetak: "Radna matrica D0-F — ekran × očekivano ponašanje × status ×
 
 Legenda: ✅ OK · 🟡 djelomično / placeholder · ❌ broken · ⏸ odgođeno (D0-P/M)
 
-**Zadnje ažuriranje:** 2026-08-16 (Bug-010–014 prompt paket)
+**Zadnje ažuriranje:** 2026-08-16 (Bug-030 ✅ — rarity theme bg)
 
 ---
 
@@ -85,8 +85,21 @@ Legenda: ✅ OK · 🟡 djelomično / placeholder · ❌ broken · ⏸ odgođeno
 | Bug-017 | Shop | Cosmetics dugmad ne skidaju coins | Buy → wallet−; Equip radi | P0 | ✅ |
 | Bug-018 | Camp Garden | Nema izbora basket tipa; footer Merge/Play suvišan u hubu | Tap tip → loadout; sakrij Merge/Play u hub mode | P1 | ✅ |
 | Bug-019 | Meta hub | Bottom caption sekcije oduzima prostor | Ukloniti CaptionLabel; tabovi+swipe ostaju | P2 | ✅ |
+| Bug-020 | Wallet + Run | Nema dijamant valute / rare drop | Hub+run diamond chip; ~1/300 seed pickupa | P1 | ✅ |
+| Bug-021 | Journal | Jedan vizual po tipu | T1/T2/T3 ikone; locked sivo, unlocked boja | P2 | ✅ |
+| Bug-022 | Home | Camp/Shop CTA; Settings u headeru; chest u Campu | Home polish; Settings+DailyChest na Home | P0 | ✅ |
+| Bug-023 | Home + Camp | Basket biranje u Campu | Basket picker na Home; ukloni camp basket UX | P0 | ✅ |
+| Bug-024 | Home | Basket u središnjem Panelu | Kartica ispod DailyChest; prazna/filled korpa | P1 | ✅ |
+| Bug-025 | Camp Garden | Nema default select; leftover 1–2 zaglavi; sort DESC | Default TL select; rarity ASC; trade 1–2 proporcionalno | P1 | ✅ |
+| Bug-026 | Journal | T1 clip / slotovi zbunjuju (T2/T3 na krivim mjestima) | Slot 1=T1, 2=T2, 3=T3 čitljivo; caption | P1 | ✅ |
+| Bug-027 | Meta hub | Ručni swipe ostavi ekran između stranica | Uvijek snap na punu page | P0 | ✅ |
+| Bug-028 | Journal + Arena | T3 merge ne otključava Journal T3 | stash_garden_crystal → kept_tier=3 | P0 | ✅ |
+| Bug-029 | Visual | T1 Album ≠ run/camp/arena | Uskladi T1 na Album look | P1 | ✅ |
+| Bug-030 | Journal + Camp | Nema rarity bg theme | ★1 plava / ★2 ljubičasta / ★3 zlatna | P2 | ✅ |
+| Bug-031 | Camp exchange | Flat 3→8 / crystal 10; nema cijene na chipu | Rate po rarity + cost label | P1 | ✅ |
+| Bug-032 | Camp Garden/Crystal | Različit layout; isti icon; Crystal copy | Layout parity; T1 vs T3 icons; UI Flower | P1 | ✅ |
 
-> Plan promptovi (copy-paste): [[plan-prompts-bug-010-014|plan-prompts-bug-010-014]] (✅) · [[plan-prompts-bug-015-019|plan-prompts-bug-015-019]]. Redoslijed **015–019:** **015 → 017 → 019 → 018 → 016**.
+> Plan promptovi (copy-paste): [[plan-prompts-bug-010-014|plan-prompts-bug-010-014]] (✅) · [[plan-prompts-bug-015-019|plan-prompts-bug-015-019]] (✅) · [[plan-prompts-bug-020-023|plan-prompts-bug-020-023]] (✅) · [[plan-prompts-bug-024-027|plan-prompts-bug-024-027]] (✅) · [[plan-prompts-bug-029-032|plan-prompts-bug-029-032]]. Redoslijed **029–032:** **029 → 030 → 031 → 032**.
 
 ### Bug-008 — zone + UniqueName (Faza 0)
 

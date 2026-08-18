@@ -14,6 +14,37 @@ const ICON_MODULATE := Color("#2D3436")
 const CORNER_RADIUS := 12
 const CORNER_RADIUS_PANEL := 20
 
+## Pastel rarity chip/row backgrounds (Bug-030).
+const RARITY_BG_1 := Color("#B8D4F0")
+const RARITY_BG_2 := Color("#E0C4FF")
+const RARITY_BG_3 := Color("#FFE8B8")
+const RARITY_BG_LOCKED := Color("#E4E4E0")
+
+
+static func rarity_bg_color(rarity: int, locked: bool = false) -> Color:
+	if locked:
+		return RARITY_BG_LOCKED
+	match clampi(rarity, 1, 3):
+		2:
+			return RARITY_BG_2
+		3:
+			return RARITY_BG_3
+		_:
+			return RARITY_BG_1
+
+
+static func rarity_bg_style(rarity: int, locked: bool = false) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = rarity_bg_color(rarity, locked)
+	style.set_corner_radius_all(10)
+	style.set_border_width_all(2)
+	style.border_color = Color(OUTLINE.r, OUTLINE.g, OUTLINE.b, 0.16)
+	style.content_margin_left = 10.0
+	style.content_margin_top = 8.0
+	style.content_margin_right = 10.0
+	style.content_margin_bottom = 8.0
+	return style
+
 
 static func button_style(variant: String, state: String) -> StyleBoxFlat:
 	var bg := MINT

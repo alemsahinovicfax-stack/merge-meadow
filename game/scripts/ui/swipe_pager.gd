@@ -66,9 +66,18 @@ func get_pages_host() -> Control:
 	return _pages_host
 
 
+## Public align helper (smoke + callers) — never leave host between pages.
+func ensure_aligned(animated: bool = false) -> void:
+	_ensure_page_aligned(animated)
+
+
 func go_to_page(index: int, animated: bool = true) -> void:
 	index = clampi(index, 0, page_count - 1)
 	if index == current_page and _drag_offset == 0.0 and not _dragging:
+		# Mid-tween kill can leave host.x off base while drag_offset is 0.
+		if _pages_host != null and _page_width >= 1.0:
+			if absf(_pages_host.position.x - _get_base_offset()) > 0.5:
+				_ensure_page_aligned(animated)
 		return
 	current_page = index
 	_snap_to_page(animated)
@@ -111,6 +120,18 @@ func _apply_offset() -> void:
 	_pages_host.position.x = _get_base_offset() + _drag_offset
 
 
+func _capture_host_offset() -> void:
+	if _pages_host == null or _page_width < 1.0:
+		_drag_offset = 0.0
+		return
+	_drag_offset = _pages_host.position.x - _get_base_offset()
+
+
+func _ensure_page_aligned(animated: bool = true) -> void:
+	_drag_offset = 0.0
+	_snap_to_page(animated)
+
+
 func _snap_to_page(animated: bool) -> void:
 	_kill_snap_tween()
 	_drag_offset = 0.0
@@ -129,6 +150,14 @@ func _kill_snap_tween() -> void:
 	if _snap_tween != null and _snap_tween.is_valid():
 		_snap_tween.kill()
 	_snap_tween = null
+
+
+func _cancel_active_pointer() -> void:
+	if not _touch_active:
+		_reset_gesture()
+		return
+	_ensure_page_aligned(true)
+	_reset_gesture()
 
 
 func _is_pointer_inside(pos: Vector2) -> bool:
@@ -151,7 +180,7 @@ func _input(event: InputEvent) -> void:
 func _handle_touch(touch: InputEventScreenTouch) -> void:
 	if not _is_pointer_inside(touch.position):
 		if not touch.pressed:
-			_reset_gesture()
+			_cancel_active_pointer()
 		return
 	if touch.pressed:
 		_start_pointer(touch.position.x, touch.position)
@@ -170,7 +199,7 @@ func _handle_mouse_button(mouse: InputEventMouseButton) -> void:
 		return
 	if not _is_pointer_inside(mouse.position):
 		if not mouse.pressed:
-			_reset_gesture()
+			_cancel_active_pointer()
 		return
 	if mouse.pressed:
 		_start_pointer(mouse.position.x, mouse.position)
@@ -186,6 +215,7 @@ func _handle_mouse_motion(motion: InputEventMouseMotion) -> void:
 
 func _start_pointer(x: float, pos: Vector2) -> void:
 	_kill_snap_tween()
+	_capture_host_offset()
 	_touch_active = true
 	_swipe_gesture = false
 	_gesture_start = pos
@@ -212,6 +242,7 @@ func _update_pointer(x: float, pos: Vector2) -> void:
 			_drag_start_x = _gesture_start.x
 			_drag_start_offset = _drag_offset
 		else:
+			_ensure_page_aligned(true)
 			_reset_gesture()
 			return
 	var now := Time.get_ticks_msec() / 1000.0
@@ -233,6 +264,8 @@ func _finish_pointer(_x: float) -> void:
 	if _swipe_gesture and _dragging:
 		_end_drag()
 		get_viewport().set_input_as_handled()
+	else:
+		_ensure_page_aligned(true)
 	_reset_gesture()
 
 
