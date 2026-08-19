@@ -46,6 +46,9 @@ func owns_product(sku: String) -> bool:
 			return GameState.ads_removed
 		CONFIG.SKU_STARTER_PACK:
 			return GameState.starter_pack_owned
+	var season_id := CONFIG.season_id_for_sku(sku)
+	if not season_id.is_empty():
+		return GameState.owned_paid_seasons.has(season_id)
 	return false
 
 
@@ -91,6 +94,7 @@ func reset_purchases_for_dev() -> void:
 		return
 	GameState.ads_removed = false
 	GameState.starter_pack_owned = false
+	GameState.clear_owned_paid_seasons()
 	GameState.save_player_save()
 	catalog_updated.emit()
 
@@ -258,9 +262,13 @@ func _grant_product(sku: String) -> void:
 			GameState.add_seeds_to_bag(GameState.SEED_TYPE_CLOVER, CONFIG.STARTER_PACK_SEEDS)
 			GameState.add_booster(CONFIG.BOOSTER_MERGE_HINT, CONFIG.STARTER_PACK_BOOSTERS)
 		_:
-			var booster_id := CONFIG.sku_booster_id(sku)
-			if not booster_id.is_empty():
-				GameState.add_booster(booster_id, 1)
+			var season_id := CONFIG.season_id_for_sku(sku)
+			if not season_id.is_empty():
+				GameState.grant_paid_season(season_id)
+			else:
+				var booster_id := CONFIG.sku_booster_id(sku)
+				if not booster_id.is_empty():
+					GameState.add_booster(booster_id, 1)
 	GameState.save_player_save()
 
 

@@ -1,0 +1,104 @@
+[gd_scene load_steps=3 format=3 uid="uid://seasonunlocksheet01"]
+
+[ext_resource type="Script" path="res://scripts/ui/season_unlock_sheet.gd" id="1_sheet"]
+[ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(1, 0.973, 0.941, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.176, 0.204, 0.212, 0.16)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+content_margin_left = 24.0
+content_margin_top = 20.0
+content_margin_right = 24.0
+content_margin_bottom = 20.0
+
+[node name="SeasonUnlockSheet" type="Control"]
+visible = false
+z_index = 60
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("1_sheet")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.05, 0.07, 0.06, 0.58)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -220.0
+offset_right = 240.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="UnlockTitle" type="Label" parent="Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 28
+text = "Unlock"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="UnlockCoins" type="Label" parent="Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 22
+text = "Coins  0 / 80"
+horizontal_alignment = 1
+
+[node name="UnlockT3" type="Label" parent="Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 22
+text = "Flowers  0 / 5"
+horizontal_alignment = 1
+
+[node name="UnlockButton" type="PanelContainer" parent="Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+script = ExtResource("2_uibtn")
+label_text = "Unlock"
+font_size = 24
+button_variant = "primary"
+
+[node name="UnlockCloseButton" type="PanelContainer" parent="Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+script = ExtResource("2_uibtn")
+label_text = "Close"
+font_size = 24
+button_variant = "subtle"

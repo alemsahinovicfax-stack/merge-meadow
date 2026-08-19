@@ -23,6 +23,7 @@ const SHOP_BUTTON := 26
 @onready var main_content: VBoxContainer = $RootVBox/MainScroll/MainContent
 @onready var cosmetics_list: VBoxContainer = $RootVBox/MainScroll/MainContent/CoinShopPanel/VBox/CosmeticsList
 @onready var boosters_list: VBoxContainer = $RootVBox/MainScroll/MainContent/BoosterPanel/VBox/BoostersList
+@onready var season_packs_list: VBoxContainer = $RootVBox/MainScroll/MainContent/SeasonPacksPanel/VBox/SeasonPacksList
 @onready var status_label: Label = $RootVBox/MainScroll/MainContent/IapPanel/VBox/StatusLabel
 @onready var remove_ads_button: UiClickButton = $RootVBox/MainScroll/MainContent/IapPanel/VBox/RemoveAdsButton
 @onready var remove_ads_desc: Label = $RootVBox/MainScroll/MainContent/IapPanel/VBox/RemoveAdsDesc
@@ -90,7 +91,7 @@ func _connect_iap_signals() -> void:
 func _ensure_shop_lists_built() -> void:
 	if _shop_lists_built:
 		return
-	if cosmetics_list == null or boosters_list == null:
+	if cosmetics_list == null or boosters_list == null or season_packs_list == null:
 		push_error("ShopScreen: list container missing — skip dynamic rows")
 		return
 	_shop_lists_built = true
@@ -110,6 +111,16 @@ func _ensure_shop_lists_built() -> void:
 		brow.apply(booster_id)
 		brow.buy_pressed.connect(_on_booster_buy)
 		brow.use_pressed.connect(_on_booster_use)
+	for def in SeasonCatalog.paid_defs():
+		var sku := def.iap_product_id
+		if sku.is_empty():
+			continue
+		var btn := UiClickButton.new()
+		btn.custom_minimum_size = Vector2(0, 72)
+		btn.font_size = SHOP_BUTTON
+		btn.set_meta("season_sku", sku)
+		btn.clicked.connect(func() -> void: _on_season_pack_pressed(sku))
+		season_packs_list.add_child(btn)
 
 
 func _on_catalog_updated() -> void:
@@ -155,6 +166,14 @@ func _apply_scroll_typography() -> void:
 		var booster_hint := booster_panel.get_node_or_null("BoosterHint")
 		if booster_hint is Label:
 			_shop_hint_label(booster_hint)
+	var season_panel := main_content.get_node_or_null("SeasonPacksPanel/VBox")
+	if season_panel:
+		var season_title := season_panel.get_node_or_null("SeasonPacksTitle")
+		if season_title is Label:
+			_shop_section_title(season_title)
+		var season_hint := season_panel.get_node_or_null("SeasonPacksHint")
+		if season_hint is Label:
+			_shop_hint_label(season_hint)
 	var iap_panel := main_content.get_node_or_null("IapPanel/VBox")
 	if iap_panel:
 		var iap_title := iap_panel.get_node_or_null("IapTitle")
@@ -200,6 +219,7 @@ func _apply_refresh() -> void:
 	_update_resources()
 	_refresh_cosmetic_rows()
 	_refresh_booster_rows()
+	_refresh_season_pack_rows()
 	_refresh_iap_section()
 	_notify_hub_chrome()
 
@@ -242,11 +262,50 @@ func _on_cosmetic_equip(item_id: String) -> void:
 	_refresh_ui()
 
 
+func _refresh_season_pack_rows() -> void:
+	if season_packs_list == null:
+		return
+	for child in season_packs_list.get_children():
+		if not child is UiClickButton:
+			continue
+		var sku := str(child.get_meta("season_sku", ""))
+		if sku.is_empty():
+			continue
+		var btn := child as UiClickButton
+		btn.label_text = _season_pack_button_label(sku)
+		btn.button_variant = "primary" if IAPManager.owns_product(sku) else "accent"
+		btn.disabled = IAPManager.is_busy()
+
+
+func _season_pack_button_label(sku: String) -> String:
+	var title := CONFIG.get_product_title(sku)
+	if not IAPManager.owns_product(sku):
+		return "%s — %s" % [title, IAPManager.get_price_label(sku)]
+	var season_id := CONFIG.season_id_for_sku(sku)
+	if GameState.active_season_id == season_id:
+		return "%s — Selected" % title
+	return "%s — Select theme" % title
+
+
+func _on_season_pack_pressed(sku: String) -> void:
+	if IAPManager.owns_product(sku):
+		var season_id := CONFIG.season_id_for_sku(sku)
+		if GameState.set_active_season(season_id) and status_label:
+			status_label.text = "%s is now your active theme." % CONFIG.get_product_title(sku)
+		_refresh_ui()
+		return
+	if status_label:
+		status_label.text = "Processing purchase…"
+	IAPManager.purchase(sku)
+	_refresh_ui()
+
+
 func _on_booster_buy(booster_id: String) -> void:
 	var sku := CONFIG.booster_sku(booster_id)
 	if sku.is_empty():
 		return
-	status_label.text = "Processing purchase…"
+	if status_label:
+		status_label.text = "Processing purchase…"
 	IAPManager.purchase(sku)
 
 
@@ -316,11 +375,14 @@ func _on_purchase_completed(sku: String) -> void:
 				CONFIG.STARTER_PACK_BOOSTERS,
 			]
 		_:
-			var booster_id := CONFIG.sku_booster_id(sku)
-			if not booster_id.is_empty():
-				status_label.text = "Booster added to inventory!"
+			if CONFIG.is_season_sku(sku):
+				status_label.text = "%s theme unlocked." % CONFIG.get_product_title(sku)
 			else:
-				status_label.text = "Purchase complete: %s" % sku
+				var booster_id := CONFIG.sku_booster_id(sku)
+				if not booster_id.is_empty():
+					status_label.text = "Booster added to inventory!"
+				else:
+					status_label.text = "Purchase complete: %s" % sku
 	_refresh_ui()
 
 

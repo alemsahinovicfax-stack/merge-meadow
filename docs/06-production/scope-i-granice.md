@@ -62,6 +62,16 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 | 3D grafika | Nepotrebno + teže na slabom laptopu |
 | Web build | Nije revenue target |
 | Level generator na launch | Mjesec 2 — launch s 100 + endless |
+| **SEZ-01 sezone / teme** | v1.1+ (P0 freeze) — nije launch blocker |
+
+## v1.1+ — IN scope ✅ (SEZ-P0, 2026-08-19)
+
+Agent **smije** kodirati SEZ-B…E kao v1.1 track (nakon P0). Nije dio v1 launch IN.
+
+| IN | Napomena |
+|----|----------|
+| **SEZ-01** | Free linear sezone (coins + T3 check-only) + paid IAP packs; Home Stage + Browser; Unlock sheet na next-free teaser; run spawn/BG hook; Fair F2P (paid = tema, ne snaga) |
+| Prompti | [[plan-prompts-sez-01|plan-prompts-sez-01]] **B → C → D → E** |
 
 ## Vertical slice (Faza 6–7) — prije punog launcha
 
@@ -91,8 +101,8 @@ Agent te upozorava — `.cursor/rules/scope-guard.mdc`
 |-----------|------------|--------|-----------------------------|
 | **M6** | B | Lane run, placeholder loot | Merge, shop, ads, iOS, menu |
 | **M7** | C | Cijeli loop, test AdMob, art slice | 100 levela, pun production shop |
-| **M8** | D | Launch IN lista | OUT tablica |
-| **v1.1+** | — | [[verzije-nakon-launcha|verzije-nakon-launcha]] | Sve ostalo |
+| **M8** | D | Launch IN lista | OUT tablica (uklj. sezone na launch) |
+| **v1.1+** | — | [[verzije-nakon-launcha|verzije-nakon-launcha]] + **SEZ-01** (B–E) | v2+, battle pass, cloud |
 
 ## Kapacitet
 

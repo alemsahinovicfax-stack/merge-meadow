@@ -95,7 +95,7 @@ const ENDLESS_DIFFICULTY_LABELS: Dictionary = {
 
 const TUTORIAL_FLAGS_PATH := "user://tutorial_flags.json"
 const PLAYER_SAVE_PATH := "user://player_save.json"
-const SAVE_VERSION := 8
+const SAVE_VERSION := 9
 
 var last_seed_bag: Dictionary = {}
 var last_run_coins: int = 0
@@ -157,6 +157,9 @@ var _arena_chip_counter: int = 1
 var meta_hub_active: bool = false
 var meta_hub_pending_page: int = MetaHubPages.MAIN
 var arena_pest_tutorial_shown: bool = false
+var active_season_id: String = SeasonCatalog.DEFAULT_SEASON_ID
+var unlocked_seasons: Array[String] = [SeasonCatalog.DEFAULT_SEASON_ID]
+var owned_paid_seasons: Array[String] = []
 
 
 func _ready() -> void:
@@ -215,12 +218,134 @@ func save_player_save() -> void:
 		"collection_journal_pending": collection_journal_pending.duplicate(),
 		"bloom_inbox": bloom_inbox.duplicate(true),
 		"arena_pest_tutorial_shown": arena_pest_tutorial_shown,
+		"active_season_id": active_season_id,
+		"unlocked_seasons": unlocked_seasons.duplicate(),
+		"owned_paid_seasons": owned_paid_seasons.duplicate(),
 	}
 	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		push_error("GameState: could not write %s" % PLAYER_SAVE_PATH)
 		return
 	file.store_string(JSON.stringify(data))
+
+
+func t3_flower_count() -> int:
+	return get_garden_crystal_total()
+
+
+func get_season_def(season_id: String) -> SeasonDef:
+	return SeasonCatalog.get_def(season_id)
+
+
+func is_season_unlocked_free(season_id: String) -> bool:
+	return unlocked_seasons.has(season_id)
+
+
+func is_season_playable(season_id: String) -> bool:
+	var def := SeasonCatalog.get_def(season_id)
+	if def == null:
+		return false
+	if def.is_free():
+		return unlocked_seasons.has(season_id)
+	return owned_paid_seasons.has(season_id)
+
+
+func can_unlock_free(season_id: String) -> bool:
+	var def := SeasonCatalog.get_def(season_id)
+	if def == null or not def.is_free():
+		return false
+	if unlocked_seasons.has(season_id):
+		return false
+	var prev_id := SeasonCatalog.previous_free_id(def)
+	if not prev_id.is_empty() and not unlocked_seasons.has(prev_id):
+		return false
+	if wallet_coins < def.coins_cost:
+		return false
+	if t3_flower_count() < def.t3_flowers_required:
+		return false
+	return true
+
+
+func unlock_free(season_id: String) -> bool:
+	if not can_unlock_free(season_id):
+		return false
+	var def := SeasonCatalog.get_def(season_id)
+	wallet_coins -= def.coins_cost
+	unlocked_seasons.append(season_id)
+	active_season_id = season_id
+	save_player_save()
+	return true
+
+
+func set_active_season(season_id: String) -> bool:
+	if not is_season_playable(season_id):
+		return false
+	active_season_id = season_id
+	save_player_save()
+	return true
+
+
+func grant_paid_season(season_id: String) -> bool:
+	var def := SeasonCatalog.get_def(season_id)
+	if def == null or not def.is_paid():
+		return false
+	if not owned_paid_seasons.has(season_id):
+		owned_paid_seasons.append(season_id)
+	active_season_id = season_id
+	save_player_save()
+	return true
+
+
+func list_playable_season_ids() -> Array[String]:
+	var out: Array[String] = []
+	for def in SeasonCatalog.free_defs_sorted():
+		if is_season_playable(def.id):
+			out.append(def.id)
+	for def in SeasonCatalog.paid_defs():
+		if is_season_playable(def.id):
+			out.append(def.id)
+	return out
+
+
+func next_locked_free_id() -> String:
+	for def in SeasonCatalog.free_defs_sorted():
+		if not unlocked_seasons.has(def.id):
+			return def.id
+	return ""
+
+
+func reset_seasons_to_s1() -> void:
+	active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
+	unlocked_seasons.clear()
+	unlocked_seasons.append(SeasonCatalog.DEFAULT_SEASON_ID)
+	owned_paid_seasons.clear()
+
+
+func clear_owned_paid_seasons() -> void:
+	owned_paid_seasons.clear()
+	_normalize_season_progress()
+
+
+func _normalize_season_progress() -> void:
+	var default_id := SeasonCatalog.DEFAULT_SEASON_ID
+	if not unlocked_seasons.has(default_id):
+		unlocked_seasons.insert(0, default_id)
+	var cleaned_free: Array[String] = []
+	for sid in unlocked_seasons:
+		var def := SeasonCatalog.get_def(sid)
+		if def != null and def.is_free() and not cleaned_free.has(sid):
+			cleaned_free.append(sid)
+	if cleaned_free.is_empty():
+		cleaned_free.append(default_id)
+	unlocked_seasons = cleaned_free
+	var cleaned_paid: Array[String] = []
+	for sid in owned_paid_seasons:
+		var def := SeasonCatalog.get_def(sid)
+		if def != null and def.is_paid() and not cleaned_paid.has(sid):
+			cleaned_paid.append(sid)
+	owned_paid_seasons = cleaned_paid
+	if not is_season_playable(active_season_id):
+		active_season_id = default_id
 
 
 func _apply_save_dict(data: Dictionary) -> bool:
@@ -267,6 +392,10 @@ func _apply_save_dict(data: Dictionary) -> bool:
 		active_companion_id = COMPANION_PIP
 	bloom_inbox = _deserialize_bloom_inbox(data.get("bloom_inbox", []))
 	arena_pest_tutorial_shown = bool(data.get("arena_pest_tutorial_shown", false))
+	unlocked_seasons = _parse_string_array(data.get("unlocked_seasons", []))
+	owned_paid_seasons = _parse_string_array(data.get("owned_paid_seasons", []))
+	active_season_id = str(data.get("active_season_id", SeasonCatalog.DEFAULT_SEASON_ID))
+	_normalize_season_progress()
 	if int(data.get("version", 0)) < SAVE_VERSION:
 		_migrate_legacy_beds_to_inbox()
 	_clear_legacy_beds()
@@ -325,6 +454,17 @@ func _parse_string_bool_dict(data: Variant) -> Dictionary:
 	for key in data:
 		if bool(data[key]):
 			out[str(key)] = true
+	return out
+
+
+func _parse_string_array(data: Variant) -> Array[String]:
+	var out: Array[String] = []
+	if not data is Array:
+		return out
+	for item in data:
+		var value := str(item).strip_edges()
+		if not value.is_empty() and not out.has(value):
+			out.append(value)
 	return out
 
 
@@ -638,11 +778,33 @@ func get_unlocked_run_spawn_types() -> Array[String]:
 	return out
 
 
-func pick_random_run_seed_type() -> String:
+func get_active_season_spawn_types() -> Array[String]:
+	var out: Array[String] = []
+	var def: SeasonDef = get_season_def(active_season_id)
+	var source: Array[String] = []
+	if def != null:
+		source = def.seed_type_ids
+	else:
+		source = get_unlocked_run_spawn_types()
+	for type_id in source:
+		if is_seed_type_unlocked(type_id):
+			out.append(type_id)
+	if out.is_empty():
+		out.append(SEED_TYPE_CLOVER)
+	return out
+
+
+func is_loadout_in_active_season_pool() -> bool:
 	var loadout := get_loadout_type()
-	if not loadout.is_empty() and is_seed_type_unlocked(loadout):
-		return loadout
-	var pool := get_unlocked_run_spawn_types()
+	if loadout.is_empty():
+		return false
+	return get_active_season_spawn_types().has(loadout)
+
+
+func pick_random_run_seed_type() -> String:
+	var pool := get_active_season_spawn_types()
+	if is_loadout_in_active_season_pool():
+		return get_loadout_type()
 	if pool.is_empty():
 		return SEED_TYPE_CLOVER
 	return pool[randi() % pool.size()]

@@ -45,6 +45,7 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | Tutorial, onboarding | `tutorial_*`, F6–F7 | [[../03-content/ideje-prvo-iskustvo\|prvo iskustvo]] | — |
 | Art / placeholder zamjena | CHECKPOINT C2 | roadmap F8, ideje launch scope | Pip sprite |
 | Retention, dnevni loop | poslije F7 gate | ideje T1–T4, K5 pasivni | Daily chest |
+| Home Stage / Shop IAP / post-launch tema | Home polish, shop packs, v1.1 | [[../03-content/ideje-sezone\|ideje-sezone]] | **SEZ-01** |
 | Merge UX, slot overflow | kamp playtest, pre-launch | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] | **MA-01** Merge Arena |
 | Daily retention | post-launch metrika | merge-arena-v1.1 § DG-01 | **DG-01** Daily Goals |
 
@@ -59,6 +60,7 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | UX-03 | Reset tutorial (dev) u settings | Debug, QA tutoriala | S | dev only |
 | **MA-01** | **Merge Arena** (zamjena gredica) | Slot overflow, merge feel | **L** | v1.1.0 |
 | **DG-01** | **Daily Goals** (3 task + bonus) | Retention, daily loop | **M** | v1.1.1 |
+| **SEZ-01** | **Sezone / teme** (free linear + paid IAP; Home Stage) | Home, Shop IAP, post-launch | **L** | v1.1+ · prompti [[plan-prompts-sez-01\|plan-prompts-sez-01]] |
 
 ### UX-01 — Main menu u kampu (detalj)
 
@@ -101,4 +103,6 @@ Primjeniti sada, odgoditi, ili preskočiti?
 - [[ideje-roadmap-implementacije|build order F0–F9]]
 - [[../03-content/ideje-prvo-iskustvo|prvo iskustvo]]
 - [[../03-content/ideje-gameplay-ekonomija|gameplay ekonomija]]
+- [[../03-content/ideje-sezone|SEZ-01 sezone]]
+- [[plan-prompts-sez-01|plan-prompts-sez-01]] — P0→E
 - `.cursor/rules/ideje-kad-predloziti.mdc`

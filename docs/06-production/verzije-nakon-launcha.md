@@ -25,7 +25,8 @@ RADIONICA-razvoj pokriva do **vertical slice (Faza 7)**. **Alpha, beta, puni lau
 
 | Što | Prerano? | Kada planirati |
 |-----|----------|----------------|
-| v2, live ops, sezone | **Da** | Nakon launch metrika (D30 retention) |
+| v2, live ops | **Da** | Nakon launch metrika (D30 retention) |
+| **SEZ-01 sezone** | **Ne** — aktivni v1.1 (P0 freeze) | Implementacija B→E sada |
 | v1.1 popis ideja | OK kao lista | Nakon M7 playtesta |
 | Mjesec 2 level generator | OK kao jedna rečenica | Već u [[scope-i-granice|scope]] |
 | Alpha/beta proces | OK outline | Prije M8 (vidi [[testiranje|testiranje]]) |
@@ -39,12 +40,15 @@ Iz OUT / “kasnije” liste — **samo ako launch uspije**:
 
 | ID | Ideja | Effort | Doc |
 |----|--------|--------|-----|
-| **MA-01** | **Merge Arena** — zamjena gredica; magnet drag T1; Bloom inbox (Donate/Keep/Basket) | **L** | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] |
-| **MA-01b** | **Arena Muncher** — pest jede T1/T2, freeze 2 s na T3 | **M** | [[../02-design/merge-arena-pest\|merge-arena-pest]] |
-| **UX-04** | **Hub carousel** — Shop · Main (centar) · Camp · Arena · Collection | **L** | [[../06-production/ideje-kad-predloziti\|ideje-kad-predloziti]] § UX-04 |
+| **MA-01** | **Merge Arena** — zamjena gredica; magnet drag T1; Bloom inbox (Donate/Keep/Basket) | **L** | [[../02-design/merge-arena-v1.1|merge-arena-v1.1]] |
+| **MA-01b** | **Arena Muncher** — pest jede T1/T2, freeze 2 s na T3 | **M** | [[../02-design/merge-arena-pest|merge-arena-pest]] |
+| **UX-04** | **Hub carousel** — Shop · Main (centar) · Camp · Arena · Collection | **L** | [[../06-production/ideje-kad-predloziti|ideje-kad-predloziti]] § UX-04 |
 | **DG-01** | **Daily Goals** — 3 dnevna zadatka + bonus (prošireni daily chest) | **M** | isti doc § Daily Goals |
+| **SEZ-01** | **Sezone / teme** — free linear (coins + T3) + paid IAP; Home Stage + Browser | **L** | [[../03-content/ideje-sezone|ideje-sezone]] · [[plan-prompts-sez-01|plan-prompts-sez-01]] |
 
-Redoslijed: **v1.1.0 paket (MA-01 + MA-01b + UX-04)** → **DG-01 (v1.1.1)**.
+**SEZ-01 status (P0 freeze, 2026-08-19):** odobreno za implementaciju. Sljedeći korak **SEZ-B**. Ne čeka store D30.
+
+Redoslijed: **SEZ-01 (B→E, sada)** može paralelno s v1.1.0 paketom (MA-01 + MA-01b + UX-04) i R-P4/R-P5. **DG-01** ostaje v1.1.1.
 
 - Level generator (procedural) — već planirano “mjesec 2”
 - Treći ljubimac (Bramble)
@@ -61,10 +65,10 @@ Redoslijed: **v1.1.0 paket (MA-01 + MA-01b + UX-04)** → **DG-01 (v1.1.1)**.
 | R-P1 | Parallax pozadina (scroll s laneom ili ~80% brzine) | M | Dubina + kozmetika sa strane |
 | R-P2 | Krtica — telegraph 1 s, peek animacija, statična kolizija | M–L | Blaga prepreka, safe fantasy |
 | R-P3 | „New seed!“ toast gore (ikona + tekst) | S | `discovered_blooms` hook |
-| R-P4 | Tematske staze (proljeće, holiday…) | L | v1 = Meadow; sezone v1.1+ |
-| R-P5 | Unlock teme nakon završetka prethodne | M | Uz R-P4 |
+| R-P4 | Tematske staze (proljeće, holiday…) | L | v1 = Meadow; sezone → **SEZ-01** (B–E OK) |
+| R-P5 | Unlock teme nakon završetka prethodne | M | Uz R-P4 / SEZ-01 free linear |
 
-**Ne kodirati** dok M8 Sekcija D nije ✅.
+**Ne kodirati** R-P1–P3 dok M8 Sekcija D nije ✅. **SEZ-01 izuzetak:** smije se kodirati (P0 freeze).
 
 ## v2+ — samo naslovi (bez rada)
 
@@ -74,7 +78,7 @@ Redoslijed: **v1.1.0 paket (MA-01 + MA-01b + UX-04)** → **DG-01 (v1.1.1)**.
 - Više kamp zona
 - Collab / eventi
 
-**Pravilo:** nova v1.1+ ideja → dodaj ovdje, **ne kodiraj** dok M8 nije ✅.
+**Pravilo:** nova v1.1+ ideja → dodaj ovdje. **Ne kodiraj** dok M8 nije ✅, osim **SEZ-01** (P0 freeze).
 
 ## Povezano
 

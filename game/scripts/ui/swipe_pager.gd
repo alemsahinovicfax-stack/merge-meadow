@@ -13,6 +13,7 @@ const DEFAULT_PAGE_COUNT := 5
 const DEFAULT_START_PAGE := 1
 const SWIPE_AXIS_LOCK_PX := 20.0
 const SWIPE_AXIS_DOMINANCE := 1.15
+const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
 
 @export var page_count: int = DEFAULT_PAGE_COUNT
 @export var start_page: int = DEFAULT_START_PAGE
@@ -164,6 +165,19 @@ func _is_pointer_inside(pos: Vector2) -> bool:
 	return get_global_rect().has_point(pos)
 
 
+func should_block_hub_swipe_at(pos: Vector2) -> bool:
+	var tree := get_tree()
+	if tree == null:
+		return false
+	for node in tree.get_nodes_in_group(BLOCK_HUB_SWIPE_GROUP):
+		var ctrl := node as Control
+		if ctrl == null or not ctrl.is_visible_in_tree():
+			continue
+		if ctrl.get_global_rect().has_point(pos):
+			return true
+	return false
+
+
 func _input(event: InputEvent) -> void:
 	if not _swipe_enabled or _page_width < 1.0:
 		return
@@ -183,6 +197,8 @@ func _handle_touch(touch: InputEventScreenTouch) -> void:
 			_cancel_active_pointer()
 		return
 	if touch.pressed:
+		if should_block_hub_swipe_at(touch.position):
+			return
 		_start_pointer(touch.position.x, touch.position)
 	else:
 		_finish_pointer(touch.position.x)
@@ -202,6 +218,8 @@ func _handle_mouse_button(mouse: InputEventMouseButton) -> void:
 			_cancel_active_pointer()
 		return
 	if mouse.pressed:
+		if should_block_hub_swipe_at(mouse.position):
+			return
 		_start_pointer(mouse.position.x, mouse.position)
 	else:
 		_finish_pointer(mouse.position.x)

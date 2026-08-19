@@ -29,6 +29,7 @@ enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 @onready var basket_picker_overlay: Control = %BasketPickerOverlay
 @onready var picker_list: VBoxContainer = %PickerList
 @onready var picker_close_button: UiClickButton = %PickerCloseButton
+@onready var season_stage: Control = %SeasonStage
 
 var _chest_ui_state: ChestUiState = ChestUiState.LOCKED
 var _chest_pulsing: bool = false
@@ -125,6 +126,8 @@ func _refresh_menu() -> void:
 	play_button.label_text = "Play"
 	_refresh_difficulty_selection()
 	_refresh_basket_card()
+	if season_stage and season_stage.has_method("refresh"):
+		season_stage.call("refresh")
 
 
 func _refresh_difficulty_selection() -> void:

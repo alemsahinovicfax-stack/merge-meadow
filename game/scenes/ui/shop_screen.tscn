@@ -207,6 +207,31 @@ autowrap_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 8
 
+[node name="SeasonPacksPanel" type="PanelContainer" parent="RootVBox/MainScroll/MainContent"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_iap")
+
+[node name="VBox" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent/SeasonPacksPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SeasonPacksTitle" type="Label" parent="RootVBox/MainScroll/MainContent/SeasonPacksPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.28, 0.45, 1)
+text = "Season packs"
+horizontal_alignment = 1
+
+[node name="SeasonPacksHint" type="Label" parent="RootVBox/MainScroll/MainContent/SeasonPacksPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
+text = "Cosmetic themes. No extra power."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="SeasonPacksList" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent/SeasonPacksPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
 [node name="IapPanel" type="PanelContainer" parent="RootVBox/MainScroll/MainContent"]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_iap")

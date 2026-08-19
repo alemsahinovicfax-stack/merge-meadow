@@ -9,6 +9,19 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-08-19
+
+- **SEZ-E** — paid season IAP stub (`season_pack_moonlit_warren` / `coral_tide`); Shop Season packs + Browser Premium live; smoke `season_iap_smoke`
+- **SEZ-D** — run spawn = SeasonDef ∩ unlocked; S2 stub pool clover/daisy/buttercup; BG + obstacle tint; smoke `season_run_smoke`
+- **SEZ-C** — Home Season Stage + next-free teaser → Unlock sheet (P11); Browser free; paid placeholder; hub swipe isolation; smoke `season_home_smoke`
+- **SEZ-B** — SeasonDef JSON katalog + GameState `active`/`unlocked`/`owned` + free unlock (T3 check-only) + save v9; smoke `season_unlock_smoke`
+- **SEZ-P0** — SEZ-01 **IN v1.1** (nije v1 launch); P11 **Unlock sheet only**; CHECKPOINT → SEZ-B
+- **SEZ-01** plan prompt paket — [[../06-production/plan-prompts-sez-01|plan-prompts-sez-01]] (P0 scope → B data → C Home → D run → E paid); freeze P1–P15 u [[../03-content/ideje-sezone-pitanja|pitanja]]
+
+## 2026-08-18
+
+- **SEZ-01** scratch docs — sezone/teme (Country Bloom S1, free linear + paid IAP, Home Stage): [[../03-content/ideje-sezone|ideje-sezone]] + UX / ekonomija / content / data-model / [[../03-content/ideje-sezone-pitanja|pitanja]]; OUT v1, kandidat v1.1+
+
 ## 2026-08-16
 
 - **Bug-030** — Rarity theme bg: ★1 plava / ★2 ljubičasta / ★3 zlatna (Album redovi + Garden seed chipovi); locked sivo

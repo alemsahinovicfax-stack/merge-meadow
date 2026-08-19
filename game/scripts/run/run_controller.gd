@@ -220,6 +220,8 @@ func _spawn_obstacle_at_lane(lane: int) -> void:
 	var obstacle := _obstacle_scene.instantiate()
 	obstacle.position = Vector2(lane_x_positions[lane], -80.0)
 	world.add_child(obstacle)
+	if obstacle.has_method("apply_season_tint"):
+		obstacle.call("apply_season_tint")
 
 
 func _apply_run_level_config() -> void:
@@ -249,6 +251,8 @@ func _try_spawn() -> void:
 		var obstacle := _obstacle_scene.instantiate()
 		obstacle.position = spawn_pos
 		world.add_child(obstacle)
+		if obstacle.has_method("apply_season_tint"):
+			obstacle.call("apply_season_tint")
 	elif randf() < _effective_seed_spawn_chance():
 		if randf() < 1.0 / float(DIAMOND_SEED_RATIO):
 			_spawn_diamond(spawn_pos)
@@ -276,7 +280,7 @@ func _spawn_diamond(spawn_pos: Vector2) -> void:
 
 func _effective_seed_spawn_chance() -> float:
 	var chance := _pickup_seed_chance
-	if not GameState.get_loadout_type().is_empty():
+	if GameState.is_loadout_in_active_season_pool():
 		chance += GameState.LOADOUT_SPAWN_BONUS
 	return minf(chance, 0.85)
 

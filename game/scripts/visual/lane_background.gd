@@ -3,23 +3,35 @@ extends Sprite2D
 ## Lane run pozadina — Figma Make export, cover-scale na viewport.
 
 const TEXTURE_PATH := "res://assets/backgrounds/lane_background.png"
+const SeasonThemeScript := preload("res://scripts/seasons/season_theme.gd")
 
 
 func _ready() -> void:
 	z_index = -10
-	texture = _load_texture()
 	centered = false
+	apply_theme()
+	get_viewport().size_changed.connect(_fit_to_viewport)
+
+
+func apply_theme() -> void:
+	texture = _load_texture()
 	_apply_meadow_cosmetic()
 	_fit_to_viewport()
-	get_viewport().size_changed.connect(_fit_to_viewport)
 
 
 func _apply_meadow_cosmetic() -> void:
 	var bg_id := GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_MEADOW_BG)
-	modulate = CosmeticCatalog.get_meadow_modulate(bg_id)
+	var cosmetic := CosmeticCatalog.get_meadow_modulate(bg_id)
+	var season: Color = SeasonThemeScript.bg_modulate(GameState.active_season_id)
+	modulate = cosmetic * season
 
 
 func _load_texture() -> Texture2D:
+	var def: SeasonDef = GameState.get_season_def(GameState.active_season_id)
+	if def != null and not def.run_bg_path.is_empty() and ResourceLoader.exists(def.run_bg_path):
+		var seasonal := load(def.run_bg_path) as Texture2D
+		if seasonal:
+			return seasonal
 	if ResourceLoader.exists(TEXTURE_PATH):
 		return load(TEXTURE_PATH) as Texture2D
 	push_warning("LaneBackground: missing %s" % TEXTURE_PATH)

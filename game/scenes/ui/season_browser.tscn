@@ -1,0 +1,112 @@
+[gd_scene load_steps=3 format=3 uid="uid://seasonbrowser01"]
+
+[ext_resource type="Script" path="res://scripts/ui/season_browser.gd" id="1_browser"]
+[ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(1, 0.973, 0.941, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.176, 0.204, 0.212, 0.16)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+content_margin_left = 20.0
+content_margin_top = 16.0
+content_margin_right = 20.0
+content_margin_bottom = 16.0
+
+[node name="SeasonBrowser" type="Control"]
+visible = false
+z_index = 55
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("1_browser")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.05, 0.07, 0.06, 0.58)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -420.0
+offset_top = -360.0
+offset_right = 420.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Panel/VBox"]
+layout_mode = 2
+
+[node name="BrowserTitle" type="Label" parent="Panel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 28
+text = "Seasons"
+
+[node name="BrowserCloseButton" type="PanelContainer" parent="Panel/VBox/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 48)
+layout_mode = 2
+script = ExtResource("2_uibtn")
+label_text = "Close"
+font_size = 20
+button_variant = "subtle"
+
+[node name="FreeLabel" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 20
+text = "Free"
+
+[node name="FreeScroll" type="ScrollContainer" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="FreeRow" type="HBoxContainer" parent="Panel/VBox/FreeScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PaidLabel" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
+theme_override_font_sizes/font_size = 20
+text = "Premium"
+
+[node name="PaidScroll" type="ScrollContainer" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="PaidRow" type="HBoxContainer" parent="Panel/VBox/PaidScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10

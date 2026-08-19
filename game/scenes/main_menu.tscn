@@ -1,9 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://c8mainmenu01"]
+[gd_scene load_steps=13 format=3 uid="uid://c8mainmenu01"]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Script" path="res://scripts/visual/pip_placeholder_control.gd" id="2_pip_ui"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="3_uibtn"]
 [ext_resource type="Script" path="res://scripts/ui/home_basket_visual.gd" id="4_basket_vis"]
+[ext_resource type="PackedScene" path="res://scenes/ui/season_stage.tscn" id="5_stage"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(1, 0.973, 0.941, 0.95)
@@ -321,6 +322,10 @@ theme_override_font_sizes/font_size = 26
 text = "First run: swipe left/right to change lanes."
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="SeasonStage" parent="Panel/VBox" instance=ExtResource("5_stage")]
+unique_name_in_owner = true
+layout_mode = 2
 
 [node name="PlayButton" type="PanelContainer" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 96)

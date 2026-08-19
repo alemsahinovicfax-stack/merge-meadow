@@ -14,6 +14,8 @@ const SKU_REMOVE_ADS := "remove_ads"
 const SKU_STARTER_PACK := "starter_pack"
 const SKU_BOOSTER_MERGE_HINT := "booster_merge_hint"
 const SKU_BOOSTER_LOOT_BURST := "booster_loot_burst"
+const SKU_SEASON_MOONLIT := "season_pack_moonlit_warren"
+const SKU_SEASON_CORAL := "season_pack_coral_tide"
 
 const BOOSTER_MERGE_HINT := "merge_hint"
 const BOOSTER_LOOT_BURST := "loot_burst"
@@ -54,6 +56,22 @@ const IAP_PRODUCTS := {
 		"play_product_id": "booster_loot_burst",
 		"consumable": true,
 		"booster_id": BOOSTER_LOOT_BURST,
+	},
+	SKU_SEASON_MOONLIT: {
+		"title": "Moonlit Warren",
+		"description": "Unlock the Moonlit Warren theme. Cosmetic only — no extra loot or magnet power.",
+		"price_label": "€2.99",
+		"play_product_id": "season_pack_moonlit_warren",
+		"consumable": false,
+		"season_id": "moonlit_warren",
+	},
+	SKU_SEASON_CORAL: {
+		"title": "Coral Tide Garden",
+		"description": "Unlock the Coral Tide Garden theme. Cosmetic only — no extra loot or magnet power.",
+		"price_label": "€3.49",
+		"play_product_id": "season_pack_coral_tide",
+		"consumable": false,
+		"season_id": "coral_tide",
 	},
 }
 
@@ -104,3 +122,11 @@ static func get_product_title(sku: String) -> String:
 
 static func get_product_description(sku: String) -> String:
 	return str(IAP_PRODUCTS.get(sku, {}).get("description", ""))
+
+
+static func is_season_sku(sku: String) -> bool:
+	return not season_id_for_sku(sku).is_empty()
+
+
+static func season_id_for_sku(sku: String) -> String:
+	return str(IAP_PRODUCTS.get(sku, {}).get("season_id", ""))
