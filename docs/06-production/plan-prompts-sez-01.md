@@ -5,8 +5,7 @@ milestone: "v1.1+"
 tags: [produkcija, sezone, plan, prompt]
 povezano:
   - ideje-sezone
-  - ideje-sezone-pitanja
-  - ideje-sezone-data-model
+  - ideje-home-polish
   - CHECKPOINT
 ai_sažetak: "Copy-paste Plan-mode promptovi SEZ-01 — P0 scope → B data → C Home → D run → E paid IAP."
 ---
@@ -14,7 +13,7 @@ ai_sažetak: "Copy-paste Plan-mode promptovi SEZ-01 — P0 scope → B data → 
 # Plan promptovi — SEZ-01 Sezone
 
 > **Kako:** novi chat → mode **Plan** → zalijepi **jedan** prompt → odobri plan → tek onda Agent implementacija.
-> **Redoslijed:** **P0 → B → C → D → E**
+> **Redoslijed:** **P0 → B → C → D → E** — **track zatvoren (P0–E ✅)**. Home layout/swipe dalje: [[plan-prompts-home-polish|HOME-01]].
 > **Ideje:** [[../03-content/ideje-sezone|ideje-sezone]] · [[../03-content/ideje-sezone-pitanja|pitanja]] · [[../03-content/ideje-sezone-data-model|data-model]]
 
 ## Freeze defaulti (2026-08-19)

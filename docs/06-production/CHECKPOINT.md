@@ -12,8 +12,8 @@ trenutna_faza: 5
 podfaza: d0-prelaunch
 aktivna_sekcija: D
 b0_aktivan: false
-sljedeci_korak: "D0-P polish / 5-min playtest (SEZ-01 P0–E ✅)"
-zadnja_sesija: "SEZ-E — paid season IAP stub + Shop/Browser buy/select; smoke season_iap_smoke"
+sljedeci_korak: "Plan mode: HOME-A (flatten Home, kill Panel) — plan-prompts-home-polish"
+zadnja_sesija: "HOME-P0 — Home polish docs (free 3-slot strip, kill Panel); SEZ-01 pushed"
 zadnje_azurirano: 2026-08-19
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
@@ -39,7 +39,7 @@ sljedeca_runda_dokumentacije: "Prije store (D0/D4) — listing/ASO; inače samo 
 | Polje | Vrijednost |
 |-------|------------|
 | **Milestone** | **M8** — Launch prep (Sekcija D) |
-| **Podfaza** | `d0-prelaunch` + **SEZ-01** P0–E ✅; Bug-006–032 ✅ |
+| **Podfaza** | `d0-prelaunch` + **SEZ-01** P0–E ✅ + **HOME-P0** docs; Bug-006–032 ✅ |
 | **Igra** | Merge Meadow — hybrid casual lane run + merge kamp |
 | **Engine** | Godot 4.x (HP laptop / Windows) |
 | **Save** | Lokalni JSON (`user://player_save.json`) — **bez** server/baze u v1 |
@@ -345,7 +345,7 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-1. **D0-P / playtest** — 5-min hub+run; polish (SFX, art, Settings) prema CHECKPOINT D0-P
+1. **Plan mode:** HOME-A — zalijepi prompt **Prompt — HOME-A** iz [[plan-prompts-home-polish|plan-prompts-home-polish]]
 2. **Ne** plaćati Play Console dok D0 nije ✅
 
 ## Povezano

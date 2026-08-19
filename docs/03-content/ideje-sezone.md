@@ -9,11 +9,12 @@ povezano:
   - ideje-sezone-content
   - ideje-sezone-data-model
   - ideje-sezone-pitanja
+  - ideje-home-polish
   - ideje-kad-predloziti
   - design-pillars
   - ekonomija
   - verzije-nakon-launcha
-ai_sažetak: "SEZ-01 hub — P0–E ✅; sljedeće D0-P / playtest."
+ai_sažetak: "SEZ-01 hub — P0–E ✅; Home Stage UX ide na HOME-01 (3-slot free traka)."
 ---
 
 # IDEJE — Sezone / teme (SEZ-01 hub)
@@ -38,7 +39,7 @@ Igrač skuplja **sjeme**, **T3 cvjetove (Flower)** i **novčiće** da otključav
 |--|--|
 | **v1 launch** | ❌ OUT |
 | **v1.1+** | ✅ **IN (P0)** |
-| **Trenutni track** | **P0–E ✅** — natrag na D0-P / playtest |
+| **Trenutni track** | **P0–E ✅** · Home vizual → [[ideje-home-polish\|HOME-01]] |
 
 ## Pojmovnik
 
@@ -124,12 +125,12 @@ Primjer seed slotova (placeholder imena — vidi [[ideje-sezone-content|content]
 
 | Doc | Sadržaj |
 |-----|---------|
-| [[ideje-sezone-ux-home\|UX Home + Browser]] | Stage, swipe, popup free/paid |
+| [[ideje-sezone-ux-home\|UX Home + Browser]] | SEZ-C povijest; novi Home = [[ideje-home-polish\|HOME-01]] |
 | [[ideje-sezone-ekonomija\|Ekonomija]] | Coins, T3 gate, IAP, Pillar 2 |
 | [[ideje-sezone-content\|Content bible]] | S1 + placeholder free/paid |
 | [[ideje-sezone-data-model\|Data model]] | SeasonDef, save, build order A–E |
-| [[ideje-sezone-pitanja|Otvorena pitanja]] | Freeze P1–P15; P11 = Unlock sheet samo |
-| [[../06-production/plan-prompts-sez-01\|Plan promptovi]] | Copy-paste **P0 → B → C → D → E** |
+| [[ideje-sezone-pitanja|Otvorena pitanja]] | Freeze P1–P15; P16–P17 → HOME-01 |
+| [[../06-production/plan-prompts-sez-01\|Plan promptovi]] | Copy-paste **P0 → B → C → D → E** (gotovo) |
 
 ## Odnos prema hub carouselu
 
@@ -138,7 +139,8 @@ Meta hub već ima swipe **stranica** (Shop · Home · Camp · …). Season Stage
 ## Agent / produkcija
 
 - Predloži **SEZ-01** kad se radi Home polish, Shop IAP, ili post-launch retention.
-- **Implementacija:** zalijepi prompt iz [[../06-production/plan-prompts-sez-01|plan-prompts-sez-01]] (sljedeće **SEZ-B**).
+- **Implementacija sezona (gotovo):** [[../06-production/plan-prompts-sez-01|plan-prompts-sez-01]] P0–E.
+- **Home layout/swipe:** [[ideje-home-polish|HOME-01]] · prompti [[../06-production/plan-prompts-home-polish|plan-prompts-home-polish]] (sljedeće **HOME-A**).
 - Format predlaganja: vidi [[../06-production/ideje-kad-predloziti|ideje-kad-predloziti]].
 
 ## Povezano

@@ -10,7 +10,7 @@ povezano:
   - ideje-sezone-content
   - ideje-sezone-data-model
   - plan-prompts-sez-01
-ai_sažetak: "SEZ-01 pitanja — P1–P15 odgovoreno (freeze + 2026-08-19)."
+ai_sažetak: "SEZ-01 pitanja — P1–P15 freeze; Home swipe/layout P16–P17 u HOME-01."
 ---
 
 # IDEJE — Sezone: otvorena pitanja
@@ -134,6 +134,14 @@ ai_sažetak: "SEZ-01 pitanja — P1–P15 odgovoreno (freeze + 2026-08-19)."
 
 **Odgovor (2026-08-19):** Trenutno **samo art reskin** prepreka/neprijatelja; nema novih behavioura po sezoni.
 
+### P16 — Home Stage swipe: paid?
+
+**Odgovor (2026-08-19, HOME-01):** Home traka = **samo free** lanac. Paid nisu kartice na Home swipeu. Vidi [[ideje-home-polish-pitanja|HOME pitanja]].
+
+### P17 — Home „veliki prozor“
+
+**Odgovor (2026-08-19, HOME-01):** Ukinuti cijeli centrirani `Panel` na Homeu. Vidi [[ideje-home-polish-layout|layout]].
+
 ---
 
 ## Defaulti (sažetak freeze)
@@ -142,5 +150,5 @@ Vidi [[../06-production/plan-prompts-sez-01|plan-prompts-sez-01]] tablicu freeze
 
 ## Povezano
 
-- [[ideje-sezone|hub]] · [[ideje-sezone-ux-home|UX]] · [[ideje-sezone-ekonomija|ekonomija]] · [[ideje-sezone-content|content]] · [[ideje-sezone-data-model|data model]]
+- [[ideje-sezone|hub]] · [[ideje-sezone-ux-home|UX]] · [[ideje-home-polish|HOME-01]] · [[ideje-sezone-ekonomija|ekonomija]] · [[ideje-sezone-content|content]] · [[ideje-sezone-data-model|data model]]
 - [[../06-production/plan-prompts-sez-01|plan-prompts-sez-01]]

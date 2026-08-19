@@ -14,6 +14,7 @@ tags: [hub, sadrzaj]
 - [[likovi/_index|likovi]] — atomski fajlovi po liku
 - [[nivoi/_index|nivoi]] — atomski fajlovi po nivou
 - [[ideje-sezone|SEZ-01 sezone]] — scratch: free/paid teme (v1.1+)
+- [[ideje-home-polish|HOME-01 Home polish]] — ukinuti Panel; free 3-slot swipe traka
 
 ## Povezano
 

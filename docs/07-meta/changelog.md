@@ -11,6 +11,7 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
 ## 2026-08-19
 
+- **HOME-P0** — Home polish spec: ukinuti Panel; 3-slot **free** swipe traka; pitanja P16–P27; prompti [[../06-production/plan-prompts-home-polish|plan-prompts-home-polish]]
 - **SEZ-E** — paid season IAP stub (`season_pack_moonlit_warren` / `coral_tide`); Shop Season packs + Browser Premium live; smoke `season_iap_smoke`
 - **SEZ-D** — run spawn = SeasonDef ∩ unlocked; S2 stub pool clover/daisy/buttercup; BG + obstacle tint; smoke `season_run_smoke`
 - **SEZ-C** — Home Season Stage + next-free teaser → Unlock sheet (P11); Browser free; paid placeholder; hub swipe isolation; smoke `season_home_smoke`

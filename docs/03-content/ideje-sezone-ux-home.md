@@ -8,12 +8,14 @@ povezano:
   - ideje-sezone-ekonomija
   - ideje-sezone-pitanja
   - ideje-kad-predloziti
-ai_sažetak: "SEZ-01 UX — Home Season Stage, swipe aktivnih, Season Browser free gore / paid dolje."
+ai_sažetak: "SEZ-01 UX — Browser + Unlock sheet ostaju; Home Stage layout/swipe superseded by HOME-01."
 ---
 
 # IDEJE — Sezone UX (Home + Season Browser)
 
-> [[ideje-sezone|SEZ-01]]. **C (Home Stage + Browser free) implementirano.** P11: teaser tap → Unlock sheet samo. Paid Browser red je placeholder (E).
+> [[ideje-sezone|SEZ-01]]. **C implementirano** (thin Stage). **HOME-01 supersedea** Home layout + swipe: [[ideje-home-polish|ideje-home-polish]] (ukinuti Panel; 3-slot **samo free**). Browser + P11 Unlock sheet **ostaju**.
+>
+> Dolje je **SEZ-C povijest** (ActiveCard + swipe svih playable uključujući paid). Ne koristiti kao spec za novi Home kod.
 
 ## Cilj osjećaja
 

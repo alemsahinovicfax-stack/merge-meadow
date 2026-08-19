@@ -243,7 +243,8 @@ Redoslijed unutar F8 (može paralelno s artom):
 - Loadout 3 slota
 - Zlatni grm, craft lane dekor
 - 7-day streak
-- **SEZ-01 Sezone / teme** (free linear + paid IAP; Home Stage) — [[../03-content/ideje-sezone|ideje-sezone]] · odgovori [[../03-content/ideje-sezone-pitanja|pitanja]] prije koda
+- **SEZ-01 Sezone / teme** (free linear + paid IAP) — [[../03-content/ideje-sezone|ideje-sezone]] · P0–E ✅
+- **HOME-01 Home polish** (kill Panel + free 3-slot strip) — [[../03-content/ideje-home-polish|ideje-home-polish]] · prompti [[plan-prompts-home-polish|plan-prompts-home-polish]]
 
 ---
 

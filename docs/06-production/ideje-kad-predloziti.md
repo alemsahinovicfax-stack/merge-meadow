@@ -46,6 +46,7 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | Art / placeholder zamjena | CHECKPOINT C2 | roadmap F8, ideje launch scope | Pip sprite |
 | Retention, dnevni loop | poslije F7 gate | ideje T1–T4, K5 pasivni | Daily chest |
 | Home Stage / Shop IAP / post-launch tema | Home polish, shop packs, v1.1 | [[../03-content/ideje-sezone\|ideje-sezone]] | **SEZ-01** |
+| Home layout, Panel chrome, season strip | `main_menu`, `season_stage` | [[../03-content/ideje-home-polish\|HOME-01]] | **HOME-01** |
 | Merge UX, slot overflow | kamp playtest, pre-launch | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] | **MA-01** Merge Arena |
 | Daily retention | post-launch metrika | merge-arena-v1.1 § DG-01 | **DG-01** Daily Goals |
 
@@ -60,7 +61,8 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | UX-03 | Reset tutorial (dev) u settings | Debug, QA tutoriala | S | dev only |
 | **MA-01** | **Merge Arena** (zamjena gredica) | Slot overflow, merge feel | **L** | v1.1.0 |
 | **DG-01** | **Daily Goals** (3 task + bonus) | Retention, daily loop | **M** | v1.1.1 |
-| **SEZ-01** | **Sezone / teme** (free linear + paid IAP; Home Stage) | Home, Shop IAP, post-launch | **L** | v1.1+ · prompti [[plan-prompts-sez-01\|plan-prompts-sez-01]] |
+| **SEZ-01** | **Sezone / teme** (free linear + paid IAP; Home Stage) | Home, Shop IAP, post-launch | **L** | v1.1+ · prompti [[plan-prompts-sez-01\|plan-prompts-sez-01]] **P0–E ✅** |
+| **HOME-01** | **Home polish** — ukinuti Panel; 3-slot free swipe | `main_menu`, Season Stage | **M** | v1.1+ · prompti [[plan-prompts-home-polish\|plan-prompts-home-polish]] |
 
 ### UX-01 — Main menu u kampu (detalj)
 
