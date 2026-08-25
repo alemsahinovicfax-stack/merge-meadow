@@ -67,6 +67,10 @@ func purchase(sku: String) -> void:
 	if not CONFIG.IAP_PRODUCTS.has(sku):
 		purchase_failed.emit(sku, "unknown_sku")
 		return
+	var season_id := CONFIG.season_id_for_sku(sku)
+	if GameState.is_test_locked_season(season_id):
+		purchase_failed.emit(sku, "test_locked")
+		return
 	if owns_product(sku):
 		purchase_failed.emit(sku, "already_owned")
 		return

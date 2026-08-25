@@ -1,17 +1,40 @@
-[gd_scene load_steps=4 format=3 uid="uid://seasonstage01"]
+[gd_scene load_steps=7 format=3 uid="uid://seasonstage01"]
 
 [ext_resource type="Script" path="res://scripts/ui/season_stage.gd" id="1_stage"]
 [ext_resource type="PackedScene" path="res://scenes/ui/season_browser.tscn" id="2_browser"]
 [ext_resource type="PackedScene" path="res://scenes/ui/season_unlock_sheet.tscn" id="3_sheet"]
+[ext_resource type="Script" path="res://scripts/ui/season_roster_panel.gd" id="4_roster"]
+[ext_resource type="Script" path="res://scripts/ui/season_unlock_gate.gd" id="5_gate"]
+[ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="6_uibtn"]
 
 [node name="SeasonStage" type="Control"]
-custom_minimum_size = Vector2(0, 260)
+custom_minimum_size = Vector2(0, 416)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 0
 script = ExtResource("1_stage")
 
-[node name="Row" type="HBoxContainer" parent="."]
+[node name="BandColumn" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="PaidBand" type="Control" parent="BandColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.0
+mouse_filter = 2
+
+[node name="PaidMotion" type="Control" parent="BandColumn/PaidBand"]
+unique_name_in_owner = true
 clip_contents = true
 layout_mode = 1
 anchors_preset = 15
@@ -19,82 +42,294 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+
+[node name="PaidRow" type="HBoxContainer" parent="BandColumn/PaidBand/PaidMotion"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
 theme_override_constants/separation = 8
 
-[node name="ActiveCard" type="PanelContainer" parent="Row"]
+[node name="PaidLeftSlot" type="PanelContainer" parent="BandColumn/PaidBand/PaidMotion/PaidRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 240)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 2.3
-mouse_filter = 0
-
-[node name="ActiveVBox" type="VBoxContainer" parent="Row/ActiveCard"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="StageBadge" type="Label" parent="Row/ActiveCard/ActiveVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.22, 0.28, 0.24, 1)
-theme_override_font_sizes/font_size = 16
-text = "Free"
-
-[node name="StageTitle" type="Label" parent="Row/ActiveCard/ActiveVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.18, 0.22, 0.2, 1)
-theme_override_font_sizes/font_size = 32
-text = "Country Bloom"
-autowrap_mode = 2
-
-[node name="StageTagline" type="Label" parent="Row/ActiveCard/ActiveVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.25, 0.3, 0.28, 1)
-theme_override_font_sizes/font_size = 16
-text = "Warm fields"
-autowrap_mode = 2
-
-[node name="StageSeeds" type="Label" parent="Row/ActiveCard/ActiveVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.22, 0.28, 0.24, 1)
-theme_override_font_sizes/font_size = 16
-text = "clover · daisy · buttercup"
-
-[node name="StageRabbit" type="ColorRect" parent="Row/ActiveCard/ActiveVBox"]
-custom_minimum_size = Vector2(48, 36)
-layout_mode = 2
-size_flags_horizontal = 0
-color = Color(0.95, 0.9, 0.82, 1)
-
-[node name="TeaserCard" type="PanelContainer" parent="Row"]
-unique_name_in_owner = true
-clip_contents = true
-custom_minimum_size = Vector2(120, 240)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 1.0
-mouse_filter = 0
+size_flags_vertical = 3
+mouse_filter = 2
 
-[node name="TeaserVBox" type="VBoxContainer" parent="Row/TeaserCard"]
+[node name="PaidLeftTitle" type="Label" parent="BandColumn/PaidBand/PaidMotion/PaidRow/PaidLeftSlot"]
+unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.22, 0.2, 1)
+theme_override_font_sizes/font_size = 14
+text = "Moonlit Warren"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="PaidCenterSlot" type="PanelContainer" parent="BandColumn/PaidBand/PaidMotion/PaidRow"]
+unique_name_in_owner = true
+clip_contents = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.35
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="PaidCenterFill" type="Control" parent="BandColumn/PaidBand/PaidMotion/PaidRow/PaidCenterSlot"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PaidCenterTitle" type="Label" parent="BandColumn/PaidBand/PaidMotion/PaidRow/PaidCenterSlot/PaidCenterFill"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 48.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.22, 0.2, 1)
+theme_override_font_sizes/font_size = 16
+text = "Moonlit Warren"
+horizontal_alignment = 1
+vertical_alignment = 0
+autowrap_mode = 2
+
+[node name="PaidRoster" type="PanelContainer" parent="BandColumn/PaidBand/PaidMotion/PaidRow/PaidCenterSlot/PaidCenterFill"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(260, 348)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -356.0
+offset_right = 268.0
+offset_bottom = -8.0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("4_roster")
+
+[node name="PaidRightSlot" type="PanelContainer" parent="BandColumn/PaidBand/PaidMotion/PaidRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.0
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="PaidRightTitle" type="Label" parent="BandColumn/PaidBand/PaidMotion/PaidRow/PaidRightSlot"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.18, 0.2, 1)
+theme_override_font_sizes/font_size = 14
+text = "Coral Tide Garden"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="BandSep" type="ColorRect" parent="BandColumn"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+color = Color(0.2, 0.25, 0.22, 0.35)
+
+[node name="FreeBand" type="Control" parent="BandColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 4.0
+mouse_filter = 2
+
+[node name="StripMotion" type="Control" parent="BandColumn/FreeBand"]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Row" type="HBoxContainer" parent="BandColumn/FreeBand/StripMotion"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
 theme_override_constants/separation = 8
 
-[node name="TeaserHint" type="Label" parent="Row/TeaserCard/TeaserVBox"]
+[node name="LeftSlot" type="PanelContainer" parent="BandColumn/FreeBand/StripMotion/Row"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 0.2, 0.22, 1)
-theme_override_font_sizes/font_size = 18
-text = "🔒 Locked"
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.0
+size_flags_vertical = 3
+mouse_filter = 2
 
-[node name="TeaserTitle" type="Label" parent="Row/TeaserCard/TeaserVBox"]
+[node name="LeftTitle" type="Label" parent="BandColumn/FreeBand/StripMotion/Row/LeftSlot"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.22, 0.2, 1)
+theme_override_font_sizes/font_size = 20
+text = "Country Bloom"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="CenterSlot" type="PanelContainer" parent="BandColumn/FreeBand/StripMotion/Row"]
+unique_name_in_owner = true
+clip_contents = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.35
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="CenterFill" type="Control" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CenterTitle" type="Label" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 72.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.22, 0.2, 1)
+theme_override_font_sizes/font_size = 28
+text = "Country Bloom"
+horizontal_alignment = 1
+vertical_alignment = 0
+autowrap_mode = 2
+
+[node name="FreeRoster" type="PanelContainer" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 348)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -356.0
+offset_right = 268.0
+offset_bottom = -8.0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("4_roster")
+
+[node name="UnlockGate" type="PanelContainer" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill"]
+unique_name_in_owner = true
+visible = false
+z_index = 1
+custom_minimum_size = Vector2(220, 168)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -228.0
+offset_top = -176.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("5_gate")
+
+[node name="UnlockGateVBox" type="VBoxContainer" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="UnlockGateCoins" type="Label" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.965, 0.839, 1)
+theme_override_font_sizes/font_size = 18
+text = "Coins  0 / 150"
+
+[node name="UnlockGateCoinsBar" type="ProgressBar" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+mouse_filter = 2
+max_value = 150.0
+value = 0.0
+show_percentage = false
+
+[node name="UnlockGateT3" type="Label" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.965, 0.839, 1)
+theme_override_font_sizes/font_size = 18
+text = "Seeds  0 / 8"
+
+[node name="UnlockGateT3Bar" type="ProgressBar" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+mouse_filter = 2
+max_value = 8.0
+value = 0.0
+show_percentage = false
+
+[node name="UnlockGateButton" type="PanelContainer" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+mouse_filter = 0
+script = ExtResource("6_uibtn")
+label_text = "Unlock"
+font_size = 22
+button_variant = "subtle"
+
+[node name="RightSlot" type="PanelContainer" parent="BandColumn/FreeBand/StripMotion/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.0
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="RightTitle" type="Label" parent="BandColumn/FreeBand/StripMotion/Row/RightSlot"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
 theme_override_colors/font_color = Color(0.18, 0.18, 0.2, 1)
 theme_override_font_sizes/font_size = 20
 text = "Frost Orchard"
+horizontal_alignment = 1
+vertical_alignment = 1
 autowrap_mode = 2
 
 [node name="SeasonBrowser" parent="." instance=ExtResource("2_browser")]

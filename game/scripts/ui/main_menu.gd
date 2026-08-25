@@ -5,19 +5,17 @@ const TEXT_LAYOUT := preload("res://scripts/ui/ui_text_layout.gd")
 
 enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 
-@onready var tutorial_hint: Label = $Panel/VBox/TutorialHint
+@onready var tutorial_hint: Label = %TutorialHint
 @onready var settings_button: UiClickButton = $SettingsButton
 @onready var home_top_stack: VBoxContainer = %HomeTopStack
+@onready var home_column: VBoxContainer = %HomeColumn
 @onready var basket_card: PanelContainer = %BasketCard
 @onready var basket_visual: Control = %BasketVisual
 @onready var basket_title: Label = %BasketTitle
 @onready var basket_caption: Label = %BasketCaption
-@onready var play_button: UiClickButton = $Panel/VBox/PlayButton
-@onready var endless_section: VBoxContainer = $Panel/VBox/EndlessSection
-@onready var easy_button: UiClickButton = $Panel/VBox/EndlessSection/DifficultyRow/EasyButton
-@onready var normal_button: UiClickButton = $Panel/VBox/EndlessSection/DifficultyRow/NormalButton
-@onready var hard_button: UiClickButton = $Panel/VBox/EndlessSection/DifficultyRow/HardButton
-@onready var endless_play_button: UiClickButton = $Panel/VBox/EndlessSection/EndlessPlayButton
+@onready var play_button: UiClickButton = %PlayButton
+@onready var play_theme_badge: Label = %PlayThemeBadge
+@onready var endless_play_button: UiClickButton = %EndlessPlayButton
 @onready var daily_chest_card: PanelContainer = %DailyChestCard
 @onready var daily_title: Label = %DailyTitle
 @onready var daily_caption: Label = %DailyCaption
@@ -41,9 +39,6 @@ var _basket_locked: bool = false
 
 func _ready() -> void:
 	play_button.clicked.connect(_on_play_pressed)
-	easy_button.clicked.connect(_on_easy_pressed)
-	normal_button.clicked.connect(_on_normal_pressed)
-	hard_button.clicked.connect(_on_hard_pressed)
 	endless_play_button.clicked.connect(_on_endless_play_pressed)
 	if picker_close_button:
 		picker_close_button.clicked.connect(_close_basket_picker)
@@ -64,6 +59,8 @@ func _ready() -> void:
 	_cache_daily_styles()
 	_setup_typography()
 	_setup_safe_area()
+	if OS.is_debug_build() and not GameState.skip_debug_season_unlock:
+		GameState.debug_unlock_all_seasons()
 	_refresh_menu()
 	_refresh_chest_card()
 	_refresh_basket_card()
@@ -91,6 +88,8 @@ func _setup_safe_area() -> void:
 	if home_top_stack:
 		SAFE_AREA.apply_top_margin(home_top_stack, 8.0)
 		SAFE_AREA.apply_horizontal_margins(home_top_stack)
+	if home_column:
+		SAFE_AREA.apply_bottom_margin(home_column, 8.0)
 
 
 func _cache_daily_styles() -> void:
@@ -122,37 +121,19 @@ func _exit_tree() -> void:
 func _refresh_menu() -> void:
 	var hub := GameState.tutorial_complete
 	tutorial_hint.visible = not hub
-	endless_section.visible = hub
+	if endless_play_button:
+		endless_play_button.visible = hub
 	play_button.label_text = "Play"
-	_refresh_difficulty_selection()
+	_refresh_play_theme_badge()
 	_refresh_basket_card()
 	if season_stage and season_stage.has_method("refresh"):
 		season_stage.call("refresh")
 
 
-func _refresh_difficulty_selection() -> void:
-	var selected := GameState.endless_difficulty
-	easy_button.button_variant = "primary" if selected == GameState.EndlessDifficulty.EASY else "subtle"
-	normal_button.button_variant = "primary" if selected == GameState.EndlessDifficulty.NORMAL else "subtle"
-	hard_button.button_variant = "primary" if selected == GameState.EndlessDifficulty.HARD else "subtle"
-
-
-func _select_difficulty(difficulty: int) -> void:
-	GameState.endless_difficulty = difficulty
-	GameState.save_player_save()
-	_refresh_difficulty_selection()
-
-
-func _on_easy_pressed() -> void:
-	_select_difficulty(GameState.EndlessDifficulty.EASY)
-
-
-func _on_normal_pressed() -> void:
-	_select_difficulty(GameState.EndlessDifficulty.NORMAL)
-
-
-func _on_hard_pressed() -> void:
-	_select_difficulty(GameState.EndlessDifficulty.HARD)
+func _refresh_play_theme_badge() -> void:
+	if play_theme_badge == null:
+		return
+	play_theme_badge.visible = false
 
 
 func _on_play_pressed() -> void:
@@ -161,7 +142,7 @@ func _on_play_pressed() -> void:
 
 
 func _on_endless_play_pressed() -> void:
-	GameState.begin_endless_run(GameState.endless_difficulty)
+	GameState.begin_endless_run(GameState.EndlessDifficulty.HARD)
 	SceneRouter.change_to(GameState.SCENE_RUN)
 
 

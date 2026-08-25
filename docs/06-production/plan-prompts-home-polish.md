@@ -18,7 +18,7 @@ ai_sažetak: "Copy-paste Plan-mode promptovi HOME-01 — P0 docs → A layout �
 > **Redoslijed:** **P0 → A → B → C**  
 > **Ideje:** [[../03-content/ideje-home-polish|hub]] · [[../03-content/ideje-home-polish-pitanja|pitanja]] · [[../03-content/ideje-home-polish-layout|layout]] · [[../03-content/ideje-home-polish-carousel|carousel]]
 
-**HOME-P0 (docs)** urađen 2026-08-19. Sljedeći kod-korak = **HOME-A**.
+**HOME-P0–C** urađeni 2026-08-19. Track zatvoren. Swipe/tap na karticama = **HOME-02** [[plan-prompts-home-hit-targets|plan-prompts-home-hit-targets]].
 
 ## Freeze defaulti
 
@@ -161,5 +161,8 @@ Nakon C: natrag na D0-P playtest; sezone art ostaje zaseban track.
 ## Povezano
 
 - [[../03-content/ideje-home-polish|HOME-01 hub]]
+- [[plan-prompts-home-hit-targets|HOME-02 hit targets]]
+- [[plan-prompts-home-chrome|HOME-03 chrome]]
+- [[plan-prompts-home-paid|HOME-04 paid dual-band]]
 - [[plan-prompts-sez-01|SEZ-01 prompti]] (P0–E zatvoreno; C Stage UX superseded)
 - [[CHECKPOINT|CHECKPOINT]]

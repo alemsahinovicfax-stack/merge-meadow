@@ -53,7 +53,23 @@ const PALETTES: Dictionary = {
 
 
 static func palette(type_id: String) -> Dictionary:
-	return PALETTES.get(type_id, PALETTES["clover"])
+	if PALETTES.has(type_id):
+		return PALETTES[type_id]
+	return _hashed_palette(type_id)
+
+
+static func _hashed_palette(type_id: String) -> Dictionary:
+	var hue := float(absi(type_id.hash()) % 360) / 360.0
+	var petal := Color.from_hsv(hue, 0.52, 0.92)
+	var center := Color.from_hsv(fmod(hue + 0.08, 1.0), 0.62, 0.78)
+	var seed := Color.from_hsv(hue, 0.48, 0.82)
+	var crystal := Color.from_hsv(fmod(hue + 0.18, 1.0), 0.55, 0.95)
+	return {
+		"petal": petal,
+		"center": center,
+		"seed": seed,
+		"crystal": crystal,
+	}
 
 
 static func draw_run_seed(canvas: CanvasItem, type_id: String) -> void:

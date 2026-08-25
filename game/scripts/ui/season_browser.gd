@@ -8,6 +8,7 @@ signal closed
 
 const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
+const PackCard := preload("res://scripts/ui/season_pack_card.gd")
 
 @onready var dim: Control = $Dim
 @onready var close_button: UiClickButton = %BrowserCloseButton
@@ -60,17 +61,23 @@ func _rebuild() -> void:
 		var playable := GameState.is_season_playable(def.id)
 		var card := _make_free_card(def.display_name, playable)
 		var sid := def.id
-		if playable:
+		if GameState.is_test_locked_season(sid):
+			card.clicked.connect(func() -> void: _bounce_card(card))
+		elif playable:
 			card.clicked.connect(func() -> void: _on_free_unlocked_pressed(sid))
+		elif GameState.is_free_selectable(sid):
+			card.clicked.connect(func() -> void: _on_free_next_lock_pressed(sid))
 		else:
-			card.clicked.connect(func() -> void: unlock_requested.emit(sid))
+			card.clicked.connect(func() -> void: _bounce_card(card))
 		free_row.add_child(card)
 	for def in SeasonCatalog.paid_defs():
 		var sku := def.iap_product_id
 		var owned := IAPManager.owns_product(sku)
-		var card := _make_paid_card(def.display_name, sku, owned)
+		var card := _make_paid_card(sku)
 		var sid := def.id
-		if owned:
+		if GameState.is_test_locked_season(sid):
+			card.clicked.connect(func() -> void: _bounce_card(card))
+		elif owned:
 			card.clicked.connect(func() -> void: _on_paid_owned_pressed(sid))
 		else:
 			card.clicked.connect(func() -> void: _on_paid_buy_pressed(sku))
@@ -91,23 +98,21 @@ func _make_free_card(title: String, unlocked: bool) -> UiClickButton:
 	return btn
 
 
-func _make_paid_card(title: String, sku: String, owned: bool) -> UiClickButton:
-	var btn := UiClickButton.new()
-	btn.custom_minimum_size = Vector2(168, 120)
-	btn.font_size = 20
-	btn.label_autowrap = true
-	if owned:
-		btn.label_text = "%s\nSelect" % title
-		btn.button_variant = "primary"
-	else:
-		btn.label_text = "%s\n%s" % [title, IAPManager.get_price_label(sku)]
-		btn.button_variant = "accent"
-	btn.disabled = IAPManager.is_busy()
-	return btn
+func _make_paid_card(sku: String) -> UiClickButton:
+	var card := PackCard.new()
+	card.custom_minimum_size = Vector2(168, 120)
+	card.apply(sku)
+	return card
 
 
 func _on_free_unlocked_pressed(season_id: String) -> void:
 	if GameState.set_active_season(season_id):
+		season_selected.emit(season_id)
+		close()
+
+
+func _on_free_next_lock_pressed(season_id: String) -> void:
+	if GameState.set_free_strip_focus(season_id):
 		season_selected.emit(season_id)
 		close()
 
@@ -119,6 +124,9 @@ func _on_paid_owned_pressed(season_id: String) -> void:
 
 
 func _on_paid_buy_pressed(sku: String) -> void:
+	var season_id := CONFIG.season_id_for_sku(sku)
+	if GameState.is_test_locked_season(season_id):
+		return
 	IAPManager.purchase(sku)
 
 
@@ -134,6 +142,15 @@ func _on_purchase_completed(sku: String) -> void:
 func _on_purchase_failed(_sku: String, _reason: String) -> void:
 	if visible:
 		_rebuild()
+
+
+func _bounce_card(card: Control) -> void:
+	if card == null:
+		return
+	card.modulate.a = 1.0
+	var tw := create_tween()
+	tw.tween_property(card, "modulate:a", 0.55, 0.11).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tw.tween_property(card, "modulate:a", 1.0, 0.11).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 
 func _clear_row(row: HBoxContainer) -> void:

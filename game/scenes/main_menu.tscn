@@ -1,26 +1,10 @@
-[gd_scene load_steps=13 format=3 uid="uid://c8mainmenu01"]
+[gd_scene load_steps=10 format=3 uid="uid://c8mainmenu01"]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Script" path="res://scripts/visual/pip_placeholder_control.gd" id="2_pip_ui"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="3_uibtn"]
 [ext_resource type="Script" path="res://scripts/ui/home_basket_visual.gd" id="4_basket_vis"]
 [ext_resource type="PackedScene" path="res://scenes/ui/season_stage.tscn" id="5_stage"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(1, 0.973, 0.941, 0.95)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.176, 0.204, 0.212, 0.12)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-content_margin_left = 40.0
-content_margin_top = 40.0
-content_margin_right = 40.0
-content_margin_bottom = 40.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_daily_ready"]
 bg_color = Color(1, 0.78, 0.48, 0.95)
@@ -274,40 +258,31 @@ label_text = ""
 button_icon = "settings"
 button_variant = "subtle"
 
-[node name="Panel" type="PanelContainer" parent="."]
+[node name="HomeColumn" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -320.0
-offset_top = -360.0
-offset_right = 320.0
-offset_bottom = 360.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 268.0
+offset_right = -48.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+mouse_filter = 2
+theme_override_constants/separation = 12
 
-[node name="VBox" type="VBoxContainer" parent="Panel"]
-layout_mode = 2
-theme_override_constants/separation = 20
-
-[node name="PipPortrait" type="Control" parent="Panel/VBox"]
-custom_minimum_size = Vector2(96, 96)
+[node name="PipPortrait" type="Control" parent="HomeColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 script = ExtResource("2_pip_ui")
 
-[node name="Title" type="Label" parent="Panel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
-theme_override_font_sizes/font_size = 64
-text = "Merge Meadow"
-horizontal_alignment = 1
-
-[node name="Tagline" type="Label" parent="Panel/VBox"]
+[node name="Tagline" type="Label" parent="HomeColumn"]
+visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.88, 0.94, 0.9, 1)
 theme_override_font_sizes/font_size = 24
@@ -315,7 +290,8 @@ text = "Help Pip bring color back to the meadow."
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="TutorialHint" type="Label" parent="Panel/VBox"]
+[node name="TutorialHint" type="Label" parent="HomeColumn"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
 theme_override_font_sizes/font_size = 26
@@ -323,72 +299,43 @@ text = "First run: swipe left/right to change lanes."
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="SeasonStage" parent="Panel/VBox" instance=ExtResource("5_stage")]
+[node name="SeasonStage" parent="HomeColumn" instance=ExtResource("5_stage")]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="PlayButton" type="PanelContainer" parent="Panel/VBox"]
-custom_minimum_size = Vector2(0, 96)
+[node name="PlayButton" type="PanelContainer" parent="HomeColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(540, 96)
 layout_mode = 2
+size_flags_horizontal = 4
 script = ExtResource("3_uibtn")
 label_text = "Play"
 font_size = 40
 button_icon = "play"
 button_variant = "primary"
 
-[node name="EndlessSection" type="VBoxContainer" parent="Panel/VBox"]
+[node name="PlayThemeBadge" type="Label" parent="HomeColumn"]
+unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="EndlessTitle" type="Label" parent="Panel/VBox/EndlessSection"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.55, 0.65, 0.58, 1)
-theme_override_font_sizes/font_size = 28
-text = "Endless"
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.72, 1)
+theme_override_font_sizes/font_size = 22
+text = "Theme: Moonlit Warren"
 horizontal_alignment = 1
 
-[node name="EndlessPlayButton" type="PanelContainer" parent="Panel/VBox/EndlessSection"]
-custom_minimum_size = Vector2(0, 72)
+[node name="EndlessPlayButton" type="PanelContainer" parent="HomeColumn"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(540, 72)
 layout_mode = 2
+size_flags_horizontal = 4
 script = ExtResource("3_uibtn")
 label_text = "Play Endless"
 font_size = 32
 button_icon = "play"
 button_variant = "accent"
-
-[node name="DifficultyRow" type="HBoxContainer" parent="Panel/VBox/EndlessSection"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="EasyButton" type="PanelContainer" parent="Panel/VBox/EndlessSection/DifficultyRow"]
-custom_minimum_size = Vector2(96, 96)
-layout_mode = 2
-script = ExtResource("3_uibtn")
-label_text = "😊
-Easy"
-font_size = 28
-button_variant = "subtle"
-
-[node name="NormalButton" type="PanelContainer" parent="Panel/VBox/EndlessSection/DifficultyRow"]
-custom_minimum_size = Vector2(96, 96)
-layout_mode = 2
-script = ExtResource("3_uibtn")
-label_text = "😐
-Normal"
-font_size = 28
-button_variant = "primary"
-
-[node name="HardButton" type="PanelContainer" parent="Panel/VBox/EndlessSection/DifficultyRow"]
-custom_minimum_size = Vector2(96, 96)
-layout_mode = 2
-script = ExtResource("3_uibtn")
-label_text = "😰
-Hard"
-font_size = 28
-button_variant = "subtle"
 
 [node name="RewardOverlay" type="Control" parent="."]
 unique_name_in_owner = true

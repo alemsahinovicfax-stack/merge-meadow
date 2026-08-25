@@ -7,13 +7,14 @@ povezano:
   - ideje-sezone
   - ideje-sezone-ekonomija
   - ideje-sezone-pitanja
+  - ideje-home-paid
   - ideje-kad-predloziti
-ai_sažetak: "SEZ-01 UX — Browser + Unlock sheet ostaju; Home Stage layout/swipe superseded by HOME-01."
+ai_sažetak: "SEZ-01 UX — Browser + Unlock sheet ostaju; Home Stage superseded by HOME-01 + HOME-04 dual-band."
 ---
 
 # IDEJE — Sezone UX (Home + Season Browser)
 
-> [[ideje-sezone|SEZ-01]]. **C implementirano** (thin Stage). **HOME-01 supersedea** Home layout + swipe: [[ideje-home-polish|ideje-home-polish]] (ukinuti Panel; 3-slot **samo free**). Browser + P11 Unlock sheet **ostaju**.
+> [[ideje-sezone|SEZ-01]]. **C implementirano** (thin Stage). **HOME-01 supersedea** Home layout + swipe: [[ideje-home-polish|ideje-home-polish]] (ukinuti Panel; 3-slot **samo free**). **HOME-04** dodaje PaidBand gore — [[ideje-home-paid|ideje-home-paid]]. Browser + P11 Unlock sheet **ostaju**.
 >
 > Dolje je **SEZ-C povijest** (ActiveCard + swipe svih playable uključujući paid). Ne koristiti kao spec za novi Home kod.
 

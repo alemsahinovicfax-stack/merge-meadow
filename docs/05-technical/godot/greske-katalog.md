@@ -283,6 +283,18 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 - Kad signal već nosi ID, **ne** `.bind` isti ID.
 - Headless smoke za buy path (`shop_cosmetic_buy_smoke.gd`).
 
+## #13 — Home season kartice gutaju swipe (`mouse_filter STOP`)
+
+**Datum:** 2026-08-19 (HOME-02 HIT-A)
+
+**Simptom:** Swipe/tap sezona radi samo u prazninama između panela. Srednja kartica nije klikabilna; bokovi nisu swipeable.
+
+**Uzrok:** `PanelContainer` slotovi i Labeli default/STOP. `SeasonStage.gui_input` nikad ne vidi prst na kartici.
+
+**Rješenje:** `MOUSE_FILTER_IGNORE` na `Row` stablu (`_ignore_hits`); Stage ostaje STOP. Browser/Unlock sheet ne IGNORE.
+
+**Prevencija:** `season_home_smoke` assert filtera; [[../../03-content/ideje-home-hit-targets-tehnika|HOME-02 tehnika]].
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

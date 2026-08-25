@@ -14,7 +14,7 @@ func _test() -> void:
 	await process_frame
 
 	var menu := current_scene
-	var btn := menu.get_node("Panel/VBox/PlayButton")
+	var btn := menu.get_node("%PlayButton")
 	var center: Vector2 = btn.get_global_rect().get_center()
 
 	# Touch (kao emulate_touch_from_mouse=true)

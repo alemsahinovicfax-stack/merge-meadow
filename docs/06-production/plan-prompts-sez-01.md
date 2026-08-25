@@ -179,5 +179,6 @@ U planu:
 
 - [[../03-content/ideje-sezone|ideje-sezone]] hub
 - [[../03-content/ideje-sezone-ux-home|UX]] · [[../03-content/ideje-sezone-ekonomija|ekonomija]] · [[../03-content/ideje-sezone-content|content]] · [[../03-content/ideje-sezone-data-model|data-model]]
+- [[plan-prompts-home-paid|HOME-04]] — Shop pack UI + Home dual-band (nakon E)
 - [[plan-prompts-bug-029-032|plan-prompts-bug-029-032]] — šablon
 - [[CHECKPOINT|CHECKPOINT]]

@@ -33,12 +33,30 @@ func _run() -> void:
 	if gs == null:
 		_fail("GameState missing")
 		return
+	gs.set("skip_debug_season_unlock", true)
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
 
 	var defs: Array = SeasonCatalog.all_defs()
-	if defs.size() != 5:
-		_fail("catalog size %d expected 5" % defs.size())
+	if defs.size() != 8:
+		_fail("catalog size %d expected 8" % defs.size())
+		return
+	var roster_ids: Dictionary = {}
+	var roster_total := 0
+	for def_any in defs:
+		var def_row: SeasonDef = def_any
+		if def_row.roster.size() != 6:
+			_fail("%s roster size %d expected 6" % [def_row.id, def_row.roster.size()])
+			return
+		for entry in def_row.roster:
+			var rid := str(entry.get("id", ""))
+			if rid.is_empty() or roster_ids.has(rid):
+				_fail("roster id missing or duplicate: %s" % rid)
+				return
+			roster_ids[rid] = true
+			roster_total += 1
+	if roster_total != 48:
+		_fail("roster total %d expected 48" % roster_total)
 		return
 	var s1_def: SeasonDef = SeasonCatalog.get_def(S1)
 	if s1_def == null or s1_def.seed_type_ids.size() != 7:
@@ -152,6 +170,63 @@ func _run() -> void:
 	unlocked = gs.get("unlocked_seasons")
 	if not unlocked.has(S2):
 		_fail("save round-trip missing S2")
+		return
+
+	gs.set("wallet_coins", 150)
+	gs.set("garden_crystal_stash", {"clover": 8})
+	if not bool(gs.call("can_unlock_free", S3)):
+		_fail("S3 should be unlockable after S2 + 150 coins + 8 T3")
+		return
+	if not bool(gs.call("unlock_free", S3)):
+		_fail("S3 unlock should succeed")
+		return
+	if not bool(gs.call("is_season_playable", S3)):
+		_fail("S3 should be playable after unlock")
+		return
+	if bool(gs.call("is_test_locked_season", "amber_canopy")):
+		_fail("amber_canopy must not be test-locked")
+		return
+	if not bool(gs.call("is_free_selectable", "amber_canopy")):
+		_fail("amber_canopy should be selectable as next-lock after lantern")
+		return
+	if not bool(gs.call("is_test_locked_season", "ember_fen")):
+		_fail("ember_fen must stay test-locked")
+		return
+	gs.set("wallet_coins", 220)
+	gs.set("garden_crystal_stash", {"clover": 12})
+	if not bool(gs.call("can_unlock_free", "amber_canopy")):
+		_fail("can_unlock_free(amber) should work after lantern + 220c/12 T3")
+		return
+	if not bool(gs.call("unlock_free", "amber_canopy")):
+		_fail("amber unlock should succeed")
+		return
+	if not bool(gs.call("is_season_playable", "amber_canopy")):
+		_fail("amber should be playable after unlock")
+		return
+
+	_reset_new_game(gs)
+	gs.set("wallet_coins", 80)
+	gs.set("garden_crystal_stash", {"clover": 5})
+	if not bool(gs.call("unlock_free", S2)):
+		_fail("S2 unlock before debug skip test failed")
+		return
+	gs.call("debug_unlock_all_seasons")
+	if bool(gs.call("is_season_playable", S3)):
+		_fail("debug_unlock_all must skip lantern_meadow")
+		return
+	if not bool(gs.call("is_free_selectable", S3)):
+		_fail("lantern_meadow should be selectable as next-lock")
+		return
+	if bool(gs.call("is_free_selectable", "amber_canopy")):
+		_fail("amber_canopy must not be selectable")
+		return
+	if bool(gs.call("is_season_playable", "amber_canopy")):
+		_fail("debug_unlock_all must skip amber_canopy")
+		return
+	gs.set("wallet_coins", 150)
+	gs.set("garden_crystal_stash", {"clover": 8})
+	if not bool(gs.call("can_unlock_free", S3)):
+		_fail("can_unlock_free(lantern) should still work")
 		return
 
 	if FileAccess.file_exists(SAVE_PATH):

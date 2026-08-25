@@ -136,7 +136,9 @@ ai_sažetak: "SEZ-01 pitanja — P1–P15 freeze; Home swipe/layout P16–P17 u 
 
 ### P16 — Home Stage swipe: paid?
 
-**Odgovor (2026-08-19, HOME-01):** Home traka = **samo free** lanac. Paid nisu kartice na Home swipeu. Vidi [[ideje-home-polish-pitanja|HOME pitanja]].
+**Odgovor (2026-08-19, HOME-01):** Free traka = **samo free** lanac. Paid nisu kartice u **istom** swipeu.
+
+**HOME-04 (2026-08-20):** paid na Homeu u **zasebnoj gornjoj** traci. Vidi [[ideje-home-paid|HOME-04]] · [[ideje-home-polish-pitanja|HOME pitanja]].
 
 ### P17 — Home „veliki prozor“
 
@@ -150,5 +152,5 @@ Vidi [[../06-production/plan-prompts-sez-01|plan-prompts-sez-01]] tablicu freeze
 
 ## Povezano
 
-- [[ideje-sezone|hub]] · [[ideje-sezone-ux-home|UX]] · [[ideje-home-polish|HOME-01]] · [[ideje-sezone-ekonomija|ekonomija]] · [[ideje-sezone-content|content]] · [[ideje-sezone-data-model|data model]]
+- [[ideje-sezone|hub]] · [[ideje-sezone-ux-home|UX]] · [[ideje-home-polish|HOME-01]] · [[ideje-home-paid|HOME-04]] · [[ideje-sezone-ekonomija|ekonomija]] · [[ideje-sezone-content|content]] · [[ideje-sezone-data-model|data model]]
 - [[../06-production/plan-prompts-sez-01|plan-prompts-sez-01]]

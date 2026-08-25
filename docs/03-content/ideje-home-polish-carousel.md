@@ -7,6 +7,7 @@ povezano:
   - ideje-home-polish
   - ideje-home-polish-layout
   - ideje-home-polish-pitanja
+  - ideje-home-hit-targets
   - ideje-sezone
   - ideje-sezone-ux-home
 ai_sažetak: "HOME-01 carousel — linear 3-slot free traka; centar veći; lijevo previous unlocked; desno next locked ili unlocked."
@@ -14,7 +15,7 @@ ai_sažetak: "HOME-01 carousel — linear 3-slot free traka; centar veći; lijev
 
 # IDEJE — Home polish carousel (free 3-slot)
 
-> [[ideje-home-polish|HOME-01]]. Freeze **P16**: samo **free** lanac. Paid nikad nije slot na traci.
+> [[ideje-home-polish|HOME-01]]. Freeze **P16**: **free** lanac na ovoj traci. Paid nisu slotovi ovdje — od HOME-04 žive u **zasebnoj** gornjoj traci ([[ideje-home-paid|HOME-04]]), ne u istom swipeu.
 
 ## Metafora
 
@@ -78,11 +79,13 @@ Poslije:
 
 Igrač swipe lijevo → S1 opet centar, S2 desno pune boje (ne siva).
 
-## Paid i `active_season_id` (P16 freeze, detalj)
+## Paid i `active_season_id` (P16, zatim HOME-04)
 
-Home traka **nikad** ne crta `moonlit_warren` / `coral_tide`.
+**HOME-01 P16:** ova (free) traka **nikad** ne crta `moonlit_warren` / `coral_tide` kao slotove.
 
-Ali Play koristi `active_season_id`, a P12 grant paid **auto-switcha** active na paid.
+**HOME-04:** paid se crtaju na **PaidBand** gore. FreeBand pravila ispod ostaju. Ne miješati ID-eve u jedan `cycle_playable`.
+
+Play koristi `active_season_id`, a P12 grant paid **auto-switcha** active na paid.
 
 Zato postoje **dva pojma**:
 
@@ -96,7 +99,7 @@ Zato postoje **dva pojma**:
 1. Strip **uvijek** vizualizira free lanac oko `strip_focus_id`.
 2. Ako je `active` paid, centar i dalje pokazuje **zadnji free fokus** (ne paid art).
 3. Swipe/tap na free karticu postavlja **oboje**: `strip_focus_id` i `active_season_id` na tu free (paid više nije active).
-4. Paid i dalje biraš u Browseru/Shopu; Play tada vozi paid temu dok strip laže „zadnju free“.
+4. Paid biraš u Browseru, Shopu, ili [[ideje-home-paid|HOME-04]] PaidBand; dok je free-hero, Play može voziti paid uz P21 badge.
 
 **Mismatch:** igrač vidi Country Bloom u sredini, a run je Moonlit.  
 **P21 default:** mali badge na/uz Play, npr. `Theme: Moonlit Warren` (EN), samo kad `active` nije isti kao `strip_focus_id`. Tap badge **ne** mora otvoriti Shop (može no-op ili Browser paid). Override u pitanjima.
@@ -128,6 +131,8 @@ Kad `set_active_season` na paid: strip fokus ostaje.
 | Tap desno unlocked | Fokus next. |
 | Tap+swipe konflikt | Ista lock distanca kao Stage (`SWIPE_LOCK_PX` ~20): prešao prag = swipe, inače tap. |
 
+**Hit-through (HOME-02 / P28):** ova tablica vrijedi za prst koji **počinje na kartici**, ne samo u praznini. Ako paneli `STOP`-aju event, P19 u kodu postoji a playtest vidi mrtve zone — vidi [[ideje-home-hit-targets|HOME-02]] · [[ideje-home-hit-targets-gesta|gesta]].
+
 **Nema wrapa (P20).** Na S1 swipe desno ne skače na S3.
 
 Hub: `block_hub_swipe` samo na strip Control.
@@ -151,7 +156,7 @@ Animacija (P23 default): **snap ~180ms** ease-out, ne instant cut kao današnji 
 | Free unlocked, susjed | L ili R | full, manja | fokus na nju |
 | Free locked, next | R | grey+lock | Unlock sheet |
 | Free locked, not next | — | nije na traci | samo Browser lista |
-| Paid owned/unowned | — | nije na traci | Browser/Shop |
+| Paid owned/unowned | — na **free** traci | nije ovdje | Browser/Shop / [[ideje-home-paid\|HOME-04]] PaidBand |
 
 ## Što ostaje iz SEZ-C
 
@@ -182,4 +187,4 @@ Traka ne smije vizualno reći da je paid „jači“. Paid uopće nije tu. Badge
 ## Povezano
 
 - [[ideje-home-polish|hub]] · [[ideje-home-polish-layout|layout]] · [[ideje-home-polish-pitanja|pitanja]]
-- [[ideje-sezone-ux-home|stari SEZ-C UX]]
+- [[ideje-sezone-ux-home|stari SEZ-C UX]] · [[ideje-home-paid|HOME-04]]

@@ -228,9 +228,12 @@ text = "Cosmetic themes. No extra power."
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="SeasonPacksList" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent/SeasonPacksPanel/VBox"]
+[node name="SeasonPacksGrid" type="GridContainer" parent="RootVBox/MainScroll/MainContent/SeasonPacksPanel/VBox"]
+unique_name_in_owner = true
+columns = 2
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
 
 [node name="IapPanel" type="PanelContainer" parent="RootVBox/MainScroll/MainContent"]
 layout_mode = 2

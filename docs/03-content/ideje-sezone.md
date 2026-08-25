@@ -10,11 +10,12 @@ povezano:
   - ideje-sezone-data-model
   - ideje-sezone-pitanja
   - ideje-home-polish
+  - ideje-home-paid
   - ideje-kad-predloziti
   - design-pillars
   - ekonomija
   - verzije-nakon-launcha
-ai_sažetak: "SEZ-01 hub — P0–E ✅; Home Stage UX ide na HOME-01 (3-slot free traka)."
+ai_sažetak: "SEZ-01 hub — P0–E ✅; Home free traka HOME-01; paid dual-band HOME-04."
 ---
 
 # IDEJE — Sezone / teme (SEZ-01 hub)
@@ -29,7 +30,7 @@ Igrač skuplja **sjeme**, **T3 cvjetove (Flower)** i **novčiće** da otključav
 
 - **Free sezone** idu **linearno** (S1 → S2 → …): prva je besplatna; sljedeće koštaju soft coins **i** zahtijevaju prag T3 flowera.
 - **Paid sezone** kupuju se **pravim novcem** u Shopu (IAP), nisu linearne, imaju ekskluzivni dizajn.
-- Na **Home** je uvijek **aktivna sezona**; swipe L/R bira među otključanim; tap otvara **Season Browser** (free gore, paid dolje).
+- Na **Home** je uvijek **aktivna sezona**; swipe L/R bira unutar **hero** trake (free ili paid band — [[ideje-home-paid|HOME-04]]); tap centra hero otvara **Season Browser**.
 
 **Zašto:** retention (novi vizualni svjetovi), jasna soft-sink petlja (coins + flowers), Fair IAP (tema, ne pay-to-win).
 
@@ -110,7 +111,7 @@ Primjer seed slotova (placeholder imena — vidi [[ideje-sezone-content|content]
 | Animal / companion | Skin ili unlock rabbit uz clear |
 | Enemies / obstacles | Vizualni reskin (ista gameplay kolizija draft) |
 | Home thumbnail | Ime, mood art, seed/flower peek, clear rabbit |
-| Shop | Paid pack rows |
+| Shop | Paid pack **kartice** (2-col, bez Select — [[ideje-home-paid-shop\|HOME-04 shop]]) |
 | Journal | Filter po sezoni **TBD** |
 
 ## Što sezona **ne** mijenja (v1.1 draft — Fair F2P)
@@ -125,7 +126,7 @@ Primjer seed slotova (placeholder imena — vidi [[ideje-sezone-content|content]
 
 | Doc | Sadržaj |
 |-----|---------|
-| [[ideje-sezone-ux-home\|UX Home + Browser]] | SEZ-C povijest; novi Home = [[ideje-home-polish\|HOME-01]] |
+| [[ideje-sezone-ux-home\|UX Home + Browser]] | SEZ-C povijest; novi Home = [[ideje-home-polish\|HOME-01]] + [[ideje-home-paid\|HOME-04]] |
 | [[ideje-sezone-ekonomija\|Ekonomija]] | Coins, T3 gate, IAP, Pillar 2 |
 | [[ideje-sezone-content\|Content bible]] | S1 + placeholder free/paid |
 | [[ideje-sezone-data-model\|Data model]] | SeasonDef, save, build order A–E |
@@ -140,7 +141,7 @@ Meta hub već ima swipe **stranica** (Shop · Home · Camp · …). Season Stage
 
 - Predloži **SEZ-01** kad se radi Home polish, Shop IAP, ili post-launch retention.
 - **Implementacija sezona (gotovo):** [[../06-production/plan-prompts-sez-01|plan-prompts-sez-01]] P0–E.
-- **Home layout/swipe:** [[ideje-home-polish|HOME-01]] · prompti [[../06-production/plan-prompts-home-polish|plan-prompts-home-polish]] (sljedeće **HOME-A**).
+- **Home layout/swipe:** [[ideje-home-polish|HOME-01]] · [[ideje-home-paid|HOME-04]] dual-band (prompti [[../06-production/plan-prompts-home-paid|plan-prompts-home-paid]]).
 - Format predlaganja: vidi [[../06-production/ideje-kad-predloziti|ideje-kad-predloziti]].
 
 ## Povezano

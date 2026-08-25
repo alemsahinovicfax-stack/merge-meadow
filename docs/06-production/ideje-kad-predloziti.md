@@ -7,9 +7,16 @@ povezano:
   - ideje-roadmap-implementacije
   - ideje-prvo-iskustvo
   - ideje-gameplay-ekonomija
+  - ideje-home-paid
+  - ideje-home-glide
+  - ideje-home-focus
+  - ideje-home-unlock
+  - ideje-home-incard
+  - ideje-home-cardfit
+  - ideje-arena
   - CHECKPOINT
   - RADIONICA-razvoj
-ai_sažetak: "Kad agent predlaže scratch ideju iz vaulta — triggeri, format, backlog UX-01+."
+ai_sažetak: "Kad agent predlaže scratch ideju iz vaulta — triggeri, format, backlog UX-01+ / HOME-09 / ARENA-01."
 ---
 
 # Ideje — kad predložiti (agent + ti)
@@ -47,8 +54,17 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | Retention, dnevni loop | poslije F7 gate | ideje T1–T4, K5 pasivni | Daily chest |
 | Home Stage / Shop IAP / post-launch tema | Home polish, shop packs, v1.1 | [[../03-content/ideje-sezone\|ideje-sezone]] | **SEZ-01** |
 | Home layout, Panel chrome, season strip | `main_menu`, `season_stage` | [[../03-content/ideje-home-polish\|HOME-01]] | **HOME-01** |
+| Home strip swipe mrtav na karticama | `season_stage` gui_input, paneli | [[../03-content/ideje-home-hit-targets\|HOME-02]] | **HOME-02** |
+| Home chrome, Endless Hard, strip slide | `main_menu`, Endless, `season_stage` tap/tween | [[../03-content/ideje-home-chrome\|HOME-03]] | **HOME-03** |
+| Shop season packs / paid vs free na Homeu | `shop_screen`, `season_stage` dual-band | [[../03-content/ideje-home-paid\|HOME-04]] | **HOME-04** |
+| Home L/R glajd, vertikalni band swipe, outline | `season_stage` slide/swipe | [[../03-content/ideje-home-glide\|HOME-05]] | **HOME-05** |
+| Home L/R cut, invert swipe, Browser ne fokusira, Theme badge | `season_stage`, `season_browser`, `PlayThemeBadge` | [[../03-content/ideje-home-focus\|HOME-06]] | **HOME-06** |
+| Swipe dolje select, next-lock Unlock, 48 roster cvjetova | `season_stage`, `game_state`, `seasons.json` | [[../03-content/ideje-home-unlock\|HOME-07]] | **HOME-07** |
+| Roster/Unlock nisu u prozoru sezone, premalo se vidi | `season_stage` CenterSlot, roster/gate overlay | [[../03-content/ideje-home-incard\|HOME-08]] | **HOME-08** |
+| Unlock nije na Amberu / ime nije na sredini / roster isti na svim sezonama | `TEST_LOCK` amber, CenterTitle, roster frame | [[../03-content/ideje-home-cardfit\|HOME-09]] | **HOME-09** |
 | Merge UX, slot overflow | kamp playtest, pre-launch | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] | **MA-01** Merge Arena |
-| Daily retention | post-launch metrika | merge-arena-v1.1 § DG-01 | **DG-01** Daily Goals |
+| Arena monotonija, combo, cliff, daily u areni | `merge_arena_controller`, Muncher, post-MA-01 playtest | [[../03-content/ideje-arena\|ideje-arena]] | **ARENA-01** |
+| Daily retention | post-launch metrika | merge-arena-v1.1 § DG-01 · ARENA-01 daily slice | **DG-01** Daily Goals |
 
 ## Backlog — UX / flow (prioritet za predlaganje)
 
@@ -62,7 +78,16 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | **MA-01** | **Merge Arena** (zamjena gredica) | Slot overflow, merge feel | **L** | v1.1.0 |
 | **DG-01** | **Daily Goals** (3 task + bonus) | Retention, daily loop | **M** | v1.1.1 |
 | **SEZ-01** | **Sezone / teme** (free linear + paid IAP; Home Stage) | Home, Shop IAP, post-launch | **L** | v1.1+ · prompti [[plan-prompts-sez-01\|plan-prompts-sez-01]] **P0–E ✅** |
-| **HOME-01** | **Home polish** — ukinuti Panel; 3-slot free swipe | `main_menu`, Season Stage | **M** | v1.1+ · prompti [[plan-prompts-home-polish\|plan-prompts-home-polish]] |
+| **HOME-01** | **Home polish** — ukinuti Panel; 3-slot free swipe | `main_menu`, Season Stage | **M** | v1.1+ · prompti [[plan-prompts-home-polish\|plan-prompts-home-polish]] **P0–C ✅** |
+| **HOME-02** | **Hit targets** — swipe+tap preko kartica | `season_stage` paneli gutaju input | **S** | v1.1+ · [[plan-prompts-home-hit-targets\|plan-prompts-home-hit-targets]] **HIT-A ✅** |
+| **HOME-03** | **Home chrome** — 2 gumba, Browser samo C, Endless Hard, slide | `main_menu`, Endless, strip tween | **M** | v1.1+ · [[plan-prompts-home-chrome\|plan-prompts-home-chrome]] **P0–C ✅** |
+| **HOME-04** | **Paid dual-band + shop packs** — bez Select; 2-col; 20/80 paid/free | Shop packs, Home paid vs free | **L** | v1.1+ · [[plan-prompts-home-paid\|plan-prompts-home-paid]] **P0–C ✅** |
+| **HOME-05** | **Glide + katalog** — full-slot L/R; vertikalni swap; Play outline; +1 free +2 paid | Home swipe, nove sezone | **M** | v1.1+ · [[plan-prompts-home-glide\|plan-prompts-home-glide]] **P0–C ✅** |
+| **HOME-06** | **Focus korekcija** — L/R bez cuta; invert swipe; Browser fokus; outline; test-lock; bez badgea | L/R cut, Browser, Theme: label | **M** | v1.1+ · [[plan-prompts-home-focus\|plan-prompts-home-focus]] **P0–C ✅** |
+| **HOME-07** | **Unlock + roster** — swipe dolje select; next-lock Unlock; 48 T3 cvjetova | Select, lantern test, roster | **M** | v1.1+ · [[plan-prompts-home-unlock\|plan-prompts-home-unlock]] **P0–C ✅** |
+| **HOME-08** | **In-card chrome** — roster+Unlock u hero-centar prozoru; veći tip; Lantern gate na kartici | Overlay vs prozor, čitljivost | **S** | v1.1+ · [[plan-prompts-home-incard\|plan-prompts-home-incard]] **P0–B ✅** |
+| **HOME-09** | **Cardfit** — Amber off TEST_LOCK; naslov sredina; roster kontrast+širina | Unlock „nije napravljen“, ime gore, isti tamni roster | **S** | v1.1+ · [[plan-prompts-home-cardfit\|plan-prompts-home-cardfit]] **P0–A ✅** |
+| **ARENA-01** | **Arena zabavnija** — combo+pulse, auto-refill, leftover T2→2×T1, daily badge | Arena dosadna, Muncher, T2 chore | **M** | v1.1+ · [[../03-content/ideje-arena\|ideje-arena]] **freeze ✅** · prompti [[plan-prompts-arena\|plan-prompts-arena]] COMB-A… |
 
 ### UX-01 — Main menu u kampu (detalj)
 
@@ -106,5 +131,8 @@ Primjeniti sada, odgoditi, ili preskočiti?
 - [[../03-content/ideje-prvo-iskustvo|prvo iskustvo]]
 - [[../03-content/ideje-gameplay-ekonomija|gameplay ekonomija]]
 - [[../03-content/ideje-sezone|SEZ-01 sezone]]
+- [[../03-content/ideje-arena|ARENA-01 Merge Arena]]
+- [[plan-prompts-arena|plan-prompts-arena]] — COMB-A→FEEL-B
+- [[../03-content/ideje-home-cardfit|HOME-09 Cardfit]]
 - [[plan-prompts-sez-01|plan-prompts-sez-01]] — P0→E
 - `.cursor/rules/ideje-kad-predloziti.mdc`

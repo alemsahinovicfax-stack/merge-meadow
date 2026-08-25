@@ -10,16 +10,20 @@ povezano:
   - ideje-sezone
   - ideje-sezone-ux-home
   - plan-prompts-home-polish
+  - ideje-home-hit-targets
+  - ideje-home-chrome
+  - ideje-home-paid
   - ideje-kad-predloziti
   - CHECKPOINT
-ai_sažetak: "HOME-01 hub — ukinuti Home Panel-okvir; srednja swipe traka samo po free sezonama (3 slota)."
+ai_sažetak: "HOME-01 hub — ukinuti Home Panel-okvir; 3-slot free swipe traka. Kod P0–C ✅; paid band je HOME-04."
 ---
 
 # IDEJE — Home polish (HOME-01 hub)
 
 > **ID:** **HOME-01** · v1.1+ / D0-P kandidat (nije v1 launch blocker).  
-> **Kod:** još **nije** — samo dokumentacija (HOME-P0). Prompti: [[../06-production/plan-prompts-home-polish|plan-prompts-home-polish]].  
-> **Pillar:** [[../01-vision/design-pillars|Fair F2P]] — Home traka **ne** prodaje snagu; paid ostaje Shop/Browser.
+> **Kod:** **P0–C ✅** (2026-08-19) — flatten Home, 3-slot strip, Play badge. Prompti: [[../06-production/plan-prompts-home-polish|plan-prompts-home-polish]].  
+> **Slijedi:** [[ideje-home-chrome|HOME-03]] CHROME-C ✅. [[ideje-home-hit-targets|HOME-02]] HIT-A ✅. Paid na Homeu: [[ideje-home-paid|HOME-04]] (zasebna gornja traka, ne isti swipe).  
+> **Pillar:** [[../01-vision/design-pillars|Fair F2P]] — free traka **ne** prodaje snagu; paid je Shop + HOME-04 PaidBand, ne loot.
 
 ## Pitch
 
@@ -33,7 +37,7 @@ Igrač treba **otvoren Home** i **jedno jasno swipe polje na sredini** koje pri�
 
 Kad otključa S2, S2 **prelazi u sredinu**, S1 ide **lijevo** (i ostaje igrivo-izgledajuća, ne siva).
 
-Paid sezone **nisu** na ovoj traci. Kupuju se u Shopu / Browser Premium redu.
+Paid sezone **nisu** slotovi na **free** traci. Kupuju se u Shopu; na Homeu žive u **zasebnoj gornjoj** traci ([[ideje-home-paid|HOME-04]]). HOME-01 P16 je to zabranio u **istom** swipeu — HOME-04 to ne vraća, samo dodaje drugi band.
 
 ## Zašto sada
 
@@ -113,15 +117,18 @@ flowchart TD
 | [[ideje-home-polish-layout\|layout]] | Ubiti Panel; z-order; header/Play/chest |
 | [[ideje-home-polish-carousel\|carousel]] | 3 slota, veličine, gest, mismatch paid |
 | [[ideje-home-polish-pitanja\|pitanja]] | P16–P27 freeze + otvoreno |
-| [[../06-production/plan-prompts-home-polish\|prompti]] | HOME-P0 → A → B → C |
+| [[../06-production/plan-prompts-home-polish\|prompti]] | HOME-P0 → A → B → C ✅ |
+| [[ideje-home-hit-targets\|HOME-02]] | Hit-through kartica (P28); swipe+tap preko panela |
+| [[ideje-home-chrome\|HOME-03]] | Chrome: 2 gumba; Browser samo C; Endless Hard; slide |
+| [[ideje-home-paid\|HOME-04]] | Paid dual-band + shop packs (P16 override: zasebna gornja traka) |
 
 ## Agent / produkcija
 
-- Ne kodirati dok korisnik ne zalijepi **HOME-A** (ili kasnije) iz prompt huba. Ova sesija = **HOME-P0**.
-- Kad Home/Stage/main_menu: predloži **HOME-01** (format u [[../06-production/ideje-kad-predloziti|ideje-kad-predloziti]]).
+- HOME-01/02/03 kod-trackovi zatvoreni. Paid Shop/Home: **HOME-04** / **PAID-A**.
+- Kad Shop season packs ili „gdje su paid na Homeu“: predloži **HOME-04**.
 
 ## Povezano
 
-- [[ideje-sezone|SEZ-01]] · [[ideje-sezone-pitanja|SEZ pitanja]]
+- [[ideje-sezone|SEZ-01]] · [[ideje-sezone-pitanja|SEZ pitanja]] · [[ideje-home-paid|HOME-04]]
 - [[../06-production/CHECKPOINT|CHECKPOINT]]
 - [[../06-production/scope-i-granice|scope]]

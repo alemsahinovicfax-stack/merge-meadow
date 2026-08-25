@@ -15,7 +15,7 @@ func _test() -> void:
 	var gs := get_root().get_node_or_null("GameState")
 	print("router=", router, " gs=", gs)
 	var menu := current_scene
-	var btn := menu.get_node("Panel/VBox/PlayButton") if menu else null
+	var btn := menu.get_node("%PlayButton") if menu else null
 	if btn and router and gs:
 		gs.call("begin_campaign_run")
 		router.call("change_to", gs.get("SCENE_RUN"))

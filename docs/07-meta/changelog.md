@@ -9,8 +9,41 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-08-25
+
+- **ARENA-01 prompti** — grupe G1–G5 ([[../03-content/ideje-arena-grupe|ideje-arena-grupe]]); Plan-only [[plan-prompts-arena|plan-prompts-arena]] COMB-A → FLOW-A → FLOW-B → DAILY-A → FEEL-A → FEEL-B
+- **HOME-09 CARDFIT-A** — Amber skinut s TEST_LOCK; Unlock gate na next-lock free (Amber 220c/12 T3); debug skip lantern+amber po id-u; Ember ostaje paid lock
+- **HOME-09 CARDFIT-P0** — docs + prompti: Amber skinut s TEST_LOCK (gate na next-lock free, npr. Amber Canopy); naslov sezone opet na sredini kartice; roster/gate pozadina po sezoni (kontrast); širi roster; Ember ostaje paid TEST_LOCK; [[../06-production/plan-prompts-home-cardfit|plan-prompts-home-cardfit]] CARDFIT-P0 → A → B
+
+## 2026-08-20
+
+- **HOME-08 INCARD-B** — Unlock gate u free hero-centar kartici (Lantern); Seeds + sivo→primary; Stage overlay uklonjen
+- **HOME-08 INCARD-A** — roster u hero-centar kartici (`FreeRoster`/`PaidRoster`); veći T3+★+ime; Stage overlay uklonjen; Unlock gate još Stage (B)
+- **HOME-08 INCARD-P0** — docs + prompti: roster i Unlock u hero-centar prozoru sezone (ne Stage overlay); veći tip; Lantern gate na kartici
+- **ARENA-01 freeze** — A0–A35: Combo HUD + coins na 5+; pulse; auto-refill na 10; leftover T2→2×T1; nema bloom panela u areni; daily badge; prompti sljedeći
+- **ARENA-01 docs** — Merge Arena zabavnija: hub + ciljevi/feel/bloom/pest; A0 smjer (mješavina + goals_on_top); A1–A35 otvoreno; nije D0 blocker; prompti nakon freezea
+- **HOME-07 UNLOCK-A–C** — swipe dolje = select; next-lock inline Unlock; debug skip lantern; 48 T3 roster dolje-lijevo
+- **HOME-07 UNLOCK-P0** — docs + prompti: swipe dolje = select; next-lock Unlock; lantern test-lock skip; 48 T3 roster
+- **HOME-06 FOCUS-D** — L/R sezone: in-place pretapanje `BAND_TWEEN_SEC` (nema HBox pomaka); ista glatkoća kao free↔paid visine
+- **HOME-06 FOCUS-A–C** — invert V swipe; L/R stretch pretapanje bez cuta; Browser → band+centar; outline 5px+sjena; test-lock amber/ember; ugašen PlayThemeBadge; smoke `season_home_smoke`
+- **HOME-06 FOCUS-P0** — korekcija HOME-05: band-swap ostaje; L/R bez cuta; invert swipe; Browser fokus; outline; test-lock amber/ember; bez Theme badgea; prompti [[../06-production/plan-prompts-home-focus|plan-prompts-home-focus]]
+- **HOME-05 GLIDE-A–C** — full-slot L/R glajd ~250ms; vertikalni swipe = band swap (tap ostaje); Play-active outline; S4 Amber Canopy + paid Starfall Glade / Ember Fen; Shop 2×2
+- **HOME-04 PAID-C** — Home dual-band: visina tween ~250ms; izolirani hero swipe (`cycle_paid`); preview tap-swap; P11 sheet iz locked preview; smoke `season_home_smoke`
+- **HOME-04 PAID-B** — Home dual-band: PaidBand gore / FreeBand dolje; 20/80 instant visine; `home_band` + `paid_strip_focus_id`; tap preview = swap; smoke `season_home_smoke`
+- **HOME-04 PAID-A** — Shop Season packs: 2-col `SeasonPackCard` (Browser shared); owned tap no-op (nema Select); smoke `shop_open_smoke` + `season_iap_smoke`
+- **HOME-04 PAID-P0** — Paid dual-band + shop packs spec: Shop 2-col Browser kartice bez Select; Home PaidBand top / FreeBand bottom 20/80; preview statičan; tap okvira = swap; P45–P59 freeze; prompti [[../06-production/plan-prompts-home-paid|plan-prompts-home-paid]]
+
 ## 2026-08-19
 
+- **HOME-03 CHROME-C** — strip snap-slide ~220ms (`StripMotion` offsets); bounce na rubu
+- **HOME-03 CHROME-B** — Browser samo tap na srednju karticu; gap no-op
+- **HOME-03 CHROME-A** — Home: Pip + Play + Play Endless; Endless uvijek Hard; bez wordmarka/difficulty
+- **HOME-03 CHROME-P0** — Home chrome spec: 2 gumba; Browser samo centar; Endless Hard + ista sezona; strip slide; prompti [[../06-production/plan-prompts-home-chrome|plan-prompts-home-chrome]]
+- **HOME-02 HIT-A** — Season Stage hit-through: `Row`/slotovi `MOUSE_FILTER_IGNORE`; swipe+tap na karticama
+- **HOME-02 HIT-P0** — Home hit targets: paneli gutaju swipe/tap; P28–P35; prompti [[../06-production/plan-prompts-home-hit-targets|plan-prompts-home-hit-targets]]
+- **HOME-C** — Play `Theme:` badge kad active ≠ strip; debug unlock svih sezona za swipe test
+- **HOME-B** — 3-slot free Home traka (`strip_focus_id`, save v10); uže Play/Endless Play; smoke `season_home_smoke`
+- **HOME-A** — ukinut Home `Panel`; flatten `HomeColumn` (compact Pip+title, SEZ-C Stage, Play)
 - **HOME-P0** — Home polish spec: ukinuti Panel; 3-slot **free** swipe traka; pitanja P16–P27; prompti [[../06-production/plan-prompts-home-polish|plan-prompts-home-polish]]
 - **SEZ-E** — paid season IAP stub (`season_pack_moonlit_warren` / `coral_tide`); Shop Season packs + Browser Premium live; smoke `season_iap_smoke`
 - **SEZ-D** — run spawn = SeasonDef ∩ unlocked; S2 stub pool clover/daisy/buttercup; BG + obstacle tint; smoke `season_run_smoke`

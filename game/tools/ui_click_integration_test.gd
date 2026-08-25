@@ -22,7 +22,7 @@ func _run() -> void:
 		quit(1)
 		return
 
-	var play := root.get_node_or_null("Panel/VBox/PlayButton")
+	var play := root.get_node_or_null("%PlayButton")
 	log.append("play_exists=%s" % (play != null))
 	if play == null:
 		_write_log(log)

@@ -20,6 +20,8 @@ var run_bg_path: String = ""
 var animal_skin_id: String = ""
 var obstacle_theme_id: String = ""
 var clear_rabbit_id: String = ""
+## Home catalog stubs — not the run seed pool (HOME-07).
+var roster: Array[Dictionary] = []
 
 
 func is_free() -> bool:
@@ -55,4 +57,21 @@ static func from_dict(data: Dictionary) -> SeasonDef:
 			var type_id := str(item).strip_edges()
 			if not type_id.is_empty() and not def.seed_type_ids.has(type_id):
 				def.seed_type_ids.append(type_id)
+	var roster_raw: Variant = data.get("roster", [])
+	if roster_raw is Array:
+		for item in roster_raw:
+			if not item is Dictionary:
+				continue
+			var rid := str(item.get("id", "")).strip_edges()
+			if rid.is_empty():
+				continue
+			var rarity := clampi(int(item.get("rarity", 1)), 1, 3)
+			var display := str(item.get("display_name", rid)).strip_edges()
+			if display.is_empty():
+				display = rid
+			def.roster.append({
+				"id": rid,
+				"display_name": display,
+				"rarity": rarity,
+			})
 	return def

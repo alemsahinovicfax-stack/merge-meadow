@@ -6,6 +6,7 @@ const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
 const TEXT_LAYOUT := preload("res://scripts/ui/ui_text_layout.gd")
 const CosmeticRow := preload("res://scripts/ui/shop_cosmetic_row.gd")
 const BoosterRow := preload("res://scripts/ui/shop_booster_row.gd")
+const PackCard := preload("res://scripts/ui/season_pack_card.gd")
 const CATALOG := preload("res://scripts/monetization/cosmetic_catalog.gd")
 
 const SHOP_SECTION_TITLE := 32
@@ -23,7 +24,7 @@ const SHOP_BUTTON := 26
 @onready var main_content: VBoxContainer = $RootVBox/MainScroll/MainContent
 @onready var cosmetics_list: VBoxContainer = $RootVBox/MainScroll/MainContent/CoinShopPanel/VBox/CosmeticsList
 @onready var boosters_list: VBoxContainer = $RootVBox/MainScroll/MainContent/BoosterPanel/VBox/BoostersList
-@onready var season_packs_list: VBoxContainer = $RootVBox/MainScroll/MainContent/SeasonPacksPanel/VBox/SeasonPacksList
+@onready var season_packs_grid: GridContainer = %SeasonPacksGrid
 @onready var status_label: Label = $RootVBox/MainScroll/MainContent/IapPanel/VBox/StatusLabel
 @onready var remove_ads_button: UiClickButton = $RootVBox/MainScroll/MainContent/IapPanel/VBox/RemoveAdsButton
 @onready var remove_ads_desc: Label = $RootVBox/MainScroll/MainContent/IapPanel/VBox/RemoveAdsDesc
@@ -91,7 +92,7 @@ func _connect_iap_signals() -> void:
 func _ensure_shop_lists_built() -> void:
 	if _shop_lists_built:
 		return
-	if cosmetics_list == null or boosters_list == null or season_packs_list == null:
+	if cosmetics_list == null or boosters_list == null or season_packs_grid == null:
 		push_error("ShopScreen: list container missing — skip dynamic rows")
 		return
 	_shop_lists_built = true
@@ -115,12 +116,12 @@ func _ensure_shop_lists_built() -> void:
 		var sku := def.iap_product_id
 		if sku.is_empty():
 			continue
-		var btn := UiClickButton.new()
-		btn.custom_minimum_size = Vector2(0, 72)
-		btn.font_size = SHOP_BUTTON
-		btn.set_meta("season_sku", sku)
-		btn.clicked.connect(func() -> void: _on_season_pack_pressed(sku))
-		season_packs_list.add_child(btn)
+		var card := PackCard.new()
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		card.custom_minimum_size = Vector2(0, 120)
+		card.apply(sku)
+		card.clicked.connect(func() -> void: _on_season_pack_pressed(sku))
+		season_packs_grid.add_child(card)
 
 
 func _on_catalog_updated() -> void:
@@ -263,36 +264,18 @@ func _on_cosmetic_equip(item_id: String) -> void:
 
 
 func _refresh_season_pack_rows() -> void:
-	if season_packs_list == null:
+	if season_packs_grid == null:
 		return
-	for child in season_packs_list.get_children():
-		if not child is UiClickButton:
-			continue
-		var sku := str(child.get_meta("season_sku", ""))
-		if sku.is_empty():
-			continue
-		var btn := child as UiClickButton
-		btn.label_text = _season_pack_button_label(sku)
-		btn.button_variant = "primary" if IAPManager.owns_product(sku) else "accent"
-		btn.disabled = IAPManager.is_busy()
-
-
-func _season_pack_button_label(sku: String) -> String:
-	var title := CONFIG.get_product_title(sku)
-	if not IAPManager.owns_product(sku):
-		return "%s — %s" % [title, IAPManager.get_price_label(sku)]
-	var season_id := CONFIG.season_id_for_sku(sku)
-	if GameState.active_season_id == season_id:
-		return "%s — Selected" % title
-	return "%s — Select theme" % title
+	for child in season_packs_grid.get_children():
+		if child.has_method("apply") and str(child.get("sku")) != "":
+			child.apply(str(child.get("sku")))
 
 
 func _on_season_pack_pressed(sku: String) -> void:
 	if IAPManager.owns_product(sku):
-		var season_id := CONFIG.season_id_for_sku(sku)
-		if GameState.set_active_season(season_id) and status_label:
-			status_label.text = "%s is now your active theme." % CONFIG.get_product_title(sku)
-		_refresh_ui()
+		return
+	var season_id := CONFIG.season_id_for_sku(sku)
+	if GameState.is_test_locked_season(season_id):
 		return
 	if status_label:
 		status_label.text = "Processing purchase…"

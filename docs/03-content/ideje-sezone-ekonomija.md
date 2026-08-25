@@ -7,6 +7,7 @@ povezano:
   - ideje-sezone
   - ideje-sezone-ux-home
   - ideje-sezone-pitanja
+  - ideje-home-paid-shop
   - ekonomija
   - ekonomija-brojevi
   - design-pillars
@@ -52,7 +53,7 @@ Pri uspješnom unlocku:
 | 1 | `country_bloom` | 0 | 0 |
 | 2 | `frost_orchard` | 80 | 5 |
 | 3 | `lantern_meadow` | 150 | 8 |
-| 4+ | TBD | raste | raste |
+| 4 | `amber_canopy` | 220 | 12 |
 
 > Sink: free sezone **ne** smiju zahtijevati IAP. Ako coins/T3 nedostaju → igraj / merge / exchange, ne „Buy season with real money“ kao jedini put.
 
@@ -82,7 +83,8 @@ Pri uspješnom unlocku:
 ### Shop UI
 
 - Sekcija **Season packs** ispod / pored cosmetics.
-- Owned → „Select on Home“ deep-link.
+- Kartice kao Browser prozori, **2 po redu**, wrap dolje — [[ideje-home-paid-shop|HOME-04 shop]].
+- Owned → label **Owned**, tap no-op (nema Select / „Select on Home“).
 - **Ne** prikazivati paid kao jači loot / bolji magnet.
 
 ## Pillar 2 — Fair F2P checklist
@@ -117,4 +119,4 @@ Pri uspješnom unlocku:
 
 - [[../02-design/ekonomija|ekonomija]] · [[../02-design/ekonomija-brojevi|ekonomija-brojevi]]
 - [[../01-vision/design-pillars|design-pillars]]
-- [[ideje-sezone-ux-home|UX]] · [[ideje-sezone-data-model|data model]]
+- [[ideje-sezone-ux-home|UX]] · [[ideje-sezone-data-model|data model]] · [[ideje-home-paid-shop|HOME-04 shop]]

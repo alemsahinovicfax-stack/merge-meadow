@@ -81,6 +81,26 @@ func _run() -> void:
 		_fail("owns_product should be true after grant")
 		return
 
+	if not bool(gs.call("set_active_season", S1)):
+		_fail("could not switch active back to S1")
+		return
+	var shop_scene: PackedScene = load("res://scenes/ui/shop_screen.tscn")
+	if shop_scene == null:
+		_fail("shop_screen.tscn missing")
+		return
+	var shop: Node = shop_scene.instantiate()
+	root.add_child(shop)
+	for _i in 16:
+		await process_frame
+	if shop.has_method("_on_season_pack_pressed"):
+		shop.call("_on_season_pack_pressed", SKU)
+	if str(gs.get("active_season_id")) != S1:
+		_fail("shop owned tap must not overwrite active (P47)")
+		shop.queue_free()
+		return
+	shop.queue_free()
+	await process_frame
+
 	completed["sku"] = ""
 	failed["reason"] = ""
 	iap.call("purchase", SKU)

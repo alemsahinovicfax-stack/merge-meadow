@@ -15,7 +15,7 @@ func _ready() -> void:
 	var menu := get_tree().current_scene
 	print("current=", menu.name if menu else "null")
 	if menu:
-		var btn := menu.get_node_or_null("Panel/VBox/PlayButton") as Button
+		var btn := menu.get_node_or_null("%PlayButton") as Button
 		if btn:
 			print("connections=", btn.pressed.get_connections().size())
 			btn.pressed.emit()

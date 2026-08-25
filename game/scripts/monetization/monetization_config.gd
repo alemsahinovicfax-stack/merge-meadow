@@ -16,6 +16,8 @@ const SKU_BOOSTER_MERGE_HINT := "booster_merge_hint"
 const SKU_BOOSTER_LOOT_BURST := "booster_loot_burst"
 const SKU_SEASON_MOONLIT := "season_pack_moonlit_warren"
 const SKU_SEASON_CORAL := "season_pack_coral_tide"
+const SKU_SEASON_STARFALL := "season_pack_starfall_glade"
+const SKU_SEASON_EMBER := "season_pack_ember_fen"
 
 const BOOSTER_MERGE_HINT := "merge_hint"
 const BOOSTER_LOOT_BURST := "loot_burst"
@@ -72,6 +74,22 @@ const IAP_PRODUCTS := {
 		"play_product_id": "season_pack_coral_tide",
 		"consumable": false,
 		"season_id": "coral_tide",
+	},
+	SKU_SEASON_STARFALL: {
+		"title": "Starfall Glade",
+		"description": "Unlock the Starfall Glade theme. Cosmetic only — no extra loot or magnet power.",
+		"price_label": "€2.99",
+		"play_product_id": "season_pack_starfall_glade",
+		"consumable": false,
+		"season_id": "starfall_glade",
+	},
+	SKU_SEASON_EMBER: {
+		"title": "Ember Fen",
+		"description": "Unlock the Ember Fen theme. Cosmetic only — no extra loot or magnet power.",
+		"price_label": "€3.49",
+		"play_product_id": "season_pack_ember_fen",
+		"consumable": false,
+		"season_id": "ember_fen",
 	},
 }
 

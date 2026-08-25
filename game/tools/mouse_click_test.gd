@@ -13,7 +13,7 @@ func _test() -> void:
 	await process_frame
 
 	var menu := current_scene
-	var btn := menu.get_node("Panel/VBox/PlayButton")
+	var btn := menu.get_node("%PlayButton")
 	print("clicked_conns=", btn.get_signal_connection_list("clicked").size())
 	print("pressed_conns=", btn.get_signal_connection_list("pressed").size())
 	print("btn_rect=", btn.get_global_rect())

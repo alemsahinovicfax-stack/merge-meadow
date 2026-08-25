@@ -17,7 +17,7 @@ func _test() -> void:
 	if menu == null:
 		quit()
 		return
-	var btn := menu.get_node_or_null("Panel/VBox/PlayButton")
+	var btn := menu.get_node_or_null("%PlayButton")
 	print("btn=", btn)
 	if btn and btn.has_signal("clicked"):
 		print("connections=", btn.get_signal_connection_list("clicked").size())
