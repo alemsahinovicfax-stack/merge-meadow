@@ -61,6 +61,8 @@ func _ready() -> void:
 	_setup_safe_area()
 	if OS.is_debug_build() and not GameState.skip_debug_season_unlock:
 		GameState.debug_unlock_all_seasons()
+		GameState.debug_relock_playtest_free()
+		GameState.debug_grant_unlock_test_funds()
 	_refresh_menu()
 	_refresh_chest_card()
 	_refresh_basket_card()
@@ -157,16 +159,18 @@ func _refresh_chest_card() -> void:
 		return
 	if _chest_ui_state == ChestUiState.OPENING:
 		return
+	GameState.ensure_arena_daily_task()
 	if not GameState.tutorial_complete:
 		_chest_ui_state = ChestUiState.LOCKED
 		daily_chest_card.visible = false
 		_stop_chest_pulse()
 		return
 	daily_chest_card.visible = true
+	var arena_line := GameState.get_arena_daily_home_line()
 	if GameState.can_claim_daily_chest():
 		_chest_ui_state = ChestUiState.READY
 		daily_title.text = "Daily gift"
-		daily_caption.text = "Tap to open"
+		daily_caption.text = "Tap to open\n%s" % arena_line
 		if _style_daily_ready:
 			daily_chest_card.add_theme_stylebox_override("panel", _style_daily_ready)
 		if chest_visual:
@@ -175,7 +179,7 @@ func _refresh_chest_card() -> void:
 	else:
 		_chest_ui_state = ChestUiState.CLAIMED
 		daily_title.text = "Daily gift"
-		daily_caption.text = "Back tomorrow"
+		daily_caption.text = "Back tomorrow\n%s" % arena_line
 		if _style_daily_claimed:
 			daily_chest_card.add_theme_stylebox_override("panel", _style_daily_claimed)
 		if chest_visual:
@@ -219,6 +223,12 @@ func _on_daily_chest_pressed() -> void:
 	if _chest_ui_state == ChestUiState.LOCKED:
 		return
 	if _chest_ui_state == ChestUiState.CLAIMED:
+		if GameState.can_claim_arena_daily():
+			var badge_msg := GameState.claim_arena_daily()
+			_refresh_chest_card()
+			_notify_hub_chrome()
+			_show_reward_overlay("Arena daily!", badge_msg)
+			return
 		_show_reward_overlay(
 			"Come back tomorrow",
 			"Daily chest already opened today — come back tomorrow!"
@@ -234,6 +244,9 @@ func _on_daily_chest_pressed() -> void:
 
 func _finish_chest_claim() -> void:
 	var msg := GameState.claim_daily_chest()
+	if GameState.can_claim_arena_daily():
+		var badge_msg := GameState.claim_arena_daily()
+		msg = "%s\n%s" % [msg, badge_msg]
 	_chest_ui_state = ChestUiState.CLAIMED
 	_refresh_chest_card()
 	_notify_hub_chrome()

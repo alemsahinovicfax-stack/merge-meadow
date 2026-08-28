@@ -19,6 +19,20 @@ func _fail(msg: String) -> void:
 	quit(1)
 
 
+func _label_has_ellipsis(ctrl: Control) -> bool:
+	if ctrl == null:
+		return false
+	for node in ctrl.find_children("*", "Label", true, false):
+		var t := (node as Label).text
+		if t.find("…") >= 0 or t.find("...") >= 0:
+			return true
+	return false
+
+
+func _rgb_equal(a: Color, b: Color) -> bool:
+	return is_equal_approx(a.r, b.r) and is_equal_approx(a.g, b.g) and is_equal_approx(a.b, b.b)
+
+
 func _run() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
@@ -191,6 +205,31 @@ func _run() -> void:
 	if gate == null or not gate.visible:
 		_fail("next-lock center should show Unlock gate")
 		return
+	if gate.anchor_left >= 0.5:
+		_fail("UnlockGate must sit in the lower-center half, not the right corner")
+		return
+	if gate.anchor_top < 0.58:
+		_fail("UnlockGate must sit below the lock+title, got anchor_top=%s" % gate.anchor_top)
+		return
+	var gate_panel := gate.get_theme_stylebox("panel")
+	if gate_panel is StyleBoxFlat:
+		var flat := gate_panel as StyleBoxFlat
+		if flat.bg_color.a > 0.01:
+			_fail("UnlockGate panel must be frameless, bg alpha=%s" % flat.bg_color.a)
+			return
+		if flat.border_width_left > 0 or flat.border_width_top > 0 or flat.border_width_right > 0 or flat.border_width_bottom > 0:
+			_fail("UnlockGate panel must have no border")
+			return
+	elif gate_panel != null and not (gate_panel is StyleBoxEmpty):
+		_fail("UnlockGate panel must be empty or transparent flat")
+		return
+	if center.text.find("🔒") < 0 or center.text.find("Frost Orchard") < 0:
+		_fail("locked Frost center must show lock and name, got '%s'" % center.text)
+		return
+	var frost_roster: Control = stage.get_node_or_null("%FreeRoster") as Control
+	if frost_roster != null and frost_roster.visible:
+		_fail("FreeRoster must hide on locked next-lock Frost")
+		return
 	if gate.get_parent() == stage:
 		_fail("UnlockGate must not be a Stage overlay")
 		return
@@ -242,6 +281,32 @@ func _run() -> void:
 	if roster.has_method("rarity3_display") and str(roster.call("rarity3_display")) != "Harvest Pumpkin":
 		_fail("Bloom roster ★★★ expected Harvest Pumpkin")
 		return
+	if _label_has_ellipsis(roster):
+		_fail("Bloom roster names must not use ellipsis")
+		return
+	if center.vertical_alignment != VERTICAL_ALIGNMENT_CENTER:
+		_fail("CenterTitle must be vertically centered")
+		return
+	if not is_equal_approx(center.anchor_bottom, 1.0):
+		_fail("CenterTitle must fill the hero card (not top-only)")
+		return
+	await process_frame
+	if roster.position.x < 0.0:
+		_fail("FreeRoster must not clip left, position.x=%s" % roster.position.x)
+		return
+	var center_fill: Control = roster.get_parent() as Control
+	if center_fill == null or center_fill.name != "CenterFill":
+		_fail("FreeRoster parent must be CenterFill")
+		return
+	if roster.size.x <= 260.0:
+		_fail("FreeRoster should be wider than 260px, got %s" % roster.size.x)
+		return
+	if roster.size.x < 0.70 * center_fill.size.x:
+		_fail("FreeRoster width %s must be >= 0.70 of CenterFill %s" % [roster.size.x, center_fill.size.x])
+		return
+	var bloom_roster_bg := Color.BLACK
+	if roster.has_method("panel_bg_color"):
+		bloom_roster_bg = roster.call("panel_bg_color") as Color
 
 	var stage_ctrl := stage as Control
 	if stage_ctrl and swipe.has_method("should_block_hub_swipe_at"):
@@ -250,8 +315,8 @@ func _run() -> void:
 			_fail("Stage rect should block hub swipe")
 			return
 
-	gs.set("wallet_coins", 80)
-	gs.set("garden_crystal_stash", {"clover": 5})
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"clover": 20})
 	if not stage.has_method("open_unlock_sheet"):
 		_fail("open_unlock_sheet missing")
 		return
@@ -427,6 +492,18 @@ func _run() -> void:
 		if paid_center_title.text.find("Moonlit") < 0:
 			_fail("Browser select should show Moonlit as paid hero center")
 			return
+		if paid_center_title.vertical_alignment != VERTICAL_ALIGNMENT_CENTER:
+			_fail("PaidCenterTitle must be vertically centered")
+			return
+		var moon_roster: Control = stage.get_node_or_null("%PaidRoster") as Control
+		if moon_roster == null or not moon_roster.visible:
+			_fail("PaidRoster should show on Moonlit paid-hero")
+			return
+		if moon_roster.has_method("panel_bg_color"):
+			var moon_bg: Color = moon_roster.call("panel_bg_color")
+			if _rgb_equal(moon_bg, bloom_roster_bg):
+				_fail("Moonlit roster bg RGB should differ from Bloom")
+				return
 		stage.call("swap_home_band", "free", "frost_orchard")
 		await create_timer(0.35).timeout
 		if str(gs.get("home_band")) != "free":
@@ -487,19 +564,50 @@ func _run() -> void:
 		if str(gs.get("strip_focus_id")) != "lantern_meadow":
 			_fail("swipe-down select must keep lantern strip focus")
 			return
-	gs.set("wallet_coins", 150)
-	gs.set("garden_crystal_stash", {"clover": 8})
+	gs.set("wallet_coins", 499)
+	gs.set("garden_crystal_stash", {"clover": 20})
+	if stage.has_method("refresh"):
+		stage.call("refresh")
+	await process_frame
+	if bool(gs.call("can_unlock_free", "lantern_meadow")):
+		_fail("lantern must stay locked with 499c")
+		return
+	if gate_btn == null or gate_btn.mouse_filter != Control.MOUSE_FILTER_IGNORE:
+		_fail("Unlock with 499c should IGNORE")
+		return
+	if str(gate_btn.get("button_variant")) != "subtle":
+		_fail("Unlock with 499c should stay subtle, got %s" % str(gate_btn.get("button_variant")))
+		return
+	var coins_lbl: Label = stage.get_node_or_null("%UnlockGateCoins") as Label
+	var seeds_lbl: Label = stage.get_node_or_null("%UnlockGateT3") as Label
+	if coins_lbl == null or coins_lbl.text.find("/ 500") < 0:
+		_fail("Lantern coins bar should show / 500")
+		return
+	if seeds_lbl == null or seeds_lbl.text.find("/ 20") < 0:
+		_fail("Lantern seeds bar should show / 20")
+		return
+	if roster != null and roster.visible:
+		_fail("FreeRoster must hide on locked Lantern")
+		return
+	if center.text.find("🔒") < 0 or center.text.find("Lantern Meadow") < 0:
+		_fail("locked Lantern center must show lock and name, got '%s'" % center.text)
+		return
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"clover": 20})
 	if stage.has_method("refresh"):
 		stage.call("refresh")
 	await process_frame
 	if not bool(gs.call("can_unlock_free", "lantern_meadow")):
-		_fail("lantern should be unlockable with 150c/8 T3")
+		_fail("lantern should be unlockable with 500c/20 T3")
 		return
 	if gate == null or not gate.visible:
 		_fail("lantern center should show Unlock gate with resources")
 		return
 	if gate_btn == null or gate_btn.mouse_filter != Control.MOUSE_FILTER_STOP:
 		_fail("ready Unlock button should STOP")
+		return
+	if str(gate_btn.get("button_variant")) != "gold":
+		_fail("ready Unlock should be gold, got %s" % str(gate_btn.get("button_variant")))
 		return
 	if gate.has_method("_on_unlock_clicked"):
 		gate.call("_on_unlock_clicked")
@@ -513,6 +621,15 @@ func _run() -> void:
 	if gate.visible:
 		_fail("Unlock gate should hide after lantern grant")
 		return
+	if roster == null or not roster.visible:
+		_fail("FreeRoster should show after lantern unlock")
+		return
+	if roster.has_method("has_entry") and not bool(roster.call("has_entry", "Paper Lantern Bloom")):
+		_fail("Lantern roster expected Paper Lantern Bloom")
+		return
+	if _label_has_ellipsis(roster):
+		_fail("Lantern roster names must not use ellipsis")
+		return
 	if stage.has_method("cycle_free_strip"):
 		stage.call("cycle_free_strip", 1)
 		await create_timer(0.35).timeout
@@ -525,19 +642,31 @@ func _run() -> void:
 	if gate == null or not gate.visible:
 		_fail("amber center should show Unlock gate")
 		return
-	if gate_btn == null or gate_btn.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-		_fail("disabled Amber Unlock should IGNORE without 220c/12 T3")
+	if roster != null and roster.visible:
+		_fail("FreeRoster must hide on locked Amber")
 		return
-	gs.set("wallet_coins", 220)
-	gs.set("garden_crystal_stash", {"clover": 12})
+	if coins_lbl == null or coins_lbl.text.find("/ 500") < 0:
+		_fail("Amber coins bar should show / 500")
+		return
+	if gate_btn == null or gate_btn.mouse_filter != Control.MOUSE_FILTER_IGNORE:
+		_fail("disabled Amber Unlock should IGNORE without 500c/20 T3")
+		return
+	if str(gate_btn.get("button_variant")) != "subtle":
+		_fail("disabled Amber Unlock should stay subtle")
+		return
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"clover": 20})
 	if stage.has_method("refresh"):
 		stage.call("refresh")
 	await process_frame
 	if not bool(gs.call("can_unlock_free", "amber_canopy")):
-		_fail("amber should be unlockable with 220c/12 T3")
+		_fail("amber should be unlockable with 500c/20 T3")
 		return
 	if gate_btn.mouse_filter != Control.MOUSE_FILTER_STOP:
 		_fail("ready Amber Unlock button should STOP")
+		return
+	if str(gate_btn.get("button_variant")) != "gold":
+		_fail("ready Amber Unlock should be gold")
 		return
 	if gate.has_method("_on_unlock_clicked"):
 		gate.call("_on_unlock_clicked")
@@ -551,6 +680,20 @@ func _run() -> void:
 	if gate.visible:
 		_fail("Unlock gate should hide after amber grant")
 		return
+	if roster == null or not roster.visible:
+		_fail("FreeRoster should show after amber unlock")
+		return
+	if roster.has_method("has_entry") and not bool(roster.call("has_entry", "Golden Oak Bloom")):
+		_fail("Amber roster expected Golden Oak Bloom")
+		return
+	if _label_has_ellipsis(roster):
+		_fail("Amber roster names must not use ellipsis")
+		return
+	if roster.has_method("panel_bg_color"):
+		var amber_bg: Color = roster.call("panel_bg_color")
+		if amber_bg.is_equal_approx(bloom_roster_bg):
+			_fail("Amber roster bg should differ from Bloom")
+			return
 	if stage.has_method("cycle_paid_strip"):
 		stage.call("swap_home_band", "paid", "coral_tide")
 		await create_timer(0.35).timeout
@@ -574,6 +717,14 @@ func _run() -> void:
 		if paid_roster.has_method("rarity3_display") and str(paid_roster.call("rarity3_display")) != "Reef Crown":
 			_fail("Coral unowned roster ★★★ expected Reef Crown")
 			return
+		if _label_has_ellipsis(paid_roster):
+			_fail("Coral roster names must not use ellipsis")
+			return
+		if paid_roster.has_method("panel_bg_color"):
+			var coral_bg: Color = paid_roster.call("panel_bg_color")
+			if coral_bg.is_equal_approx(bloom_roster_bg):
+				_fail("Coral roster bg should differ from Bloom")
+				return
 		if gate != null and gate.visible:
 			_fail("paid unowned must not show coin Unlock gate")
 			return

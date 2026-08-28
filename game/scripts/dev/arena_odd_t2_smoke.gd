@@ -1,6 +1,6 @@
 extends SceneTree
 
-## Bug-016 — odd T2 with album+donate blocked recycles to T1 on commit.
+## FLOW-A — leftover T2 on Done becomes 2× T1 in the bag.
 
 
 func _initialize() -> void:
@@ -18,9 +18,6 @@ func _run() -> void:
 		quit(1)
 		return
 	gs.set("seed_bag", {"clover": 2})
-	gs.set("collection_kept_tiers", {"clover": 2})
-	gs.set("sprinkler_donations", 2)
-	gs.set("magnet_level", 0)
 	var before := int(gs.get("seed_bag")["clover"])
 	var chips := {
 		"chip_odd_t2": {
@@ -32,15 +29,19 @@ func _run() -> void:
 	}
 	var summary: Dictionary = gs.call("commit_arena_chips_to_bag", chips)
 	var after := int(gs.get("seed_bag").get("clover", 0))
-	if after != before + 1:
+	if after != before + 2:
 		push_error(
 			"arena_odd_t2_smoke: expected clover bag %d got %d (summary=%s)"
-			% [before + 1, after, str(summary)]
+			% [before + 2, after, str(summary)]
 		)
 		quit(1)
 		return
 	if int(summary.get("recycled", 0)) != 1:
 		push_error("arena_odd_t2_smoke: expected recycled=1 got %s" % str(summary))
+		quit(1)
+		return
+	if int(summary.get("kept", 0)) != 0 or int(summary.get("donated", 0)) != 0:
+		push_error("arena_odd_t2_smoke: arena Done must not keep/donate")
 		quit(1)
 		return
 	if not chips.is_empty():

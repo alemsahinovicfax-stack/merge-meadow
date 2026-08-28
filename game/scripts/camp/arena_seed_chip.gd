@@ -3,8 +3,8 @@ extends Control
 
 ## Sjeme u merge areni — T1/T2, drag + magnet snap merge.
 
+signal drag_started(chip: ArenaSeedChip)
 signal drag_released(chip: ArenaSeedChip)
-signal bloom_tapped(chip: ArenaSeedChip)
 
 const CHIP_RADIUS := 48.0
 const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
@@ -12,6 +12,17 @@ const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
 var chip_id: int = -1
 var type_id: String = ""
 var tier: int = 1
+
+var _pulse_highlight: bool = false
+var pulse_highlight: bool:
+	set(value):
+		if _pulse_highlight == value:
+			return
+		_pulse_highlight = value
+		set_process(value)
+		queue_redraw()
+	get:
+		return _pulse_highlight
 
 var _dragging: bool = false
 var _drag_offset: Vector2 = Vector2.ZERO
@@ -26,6 +37,7 @@ func setup(id: int, seed_type: String, at: Vector2, seed_tier: int = 1) -> void:
 	custom_minimum_size = Vector2(CHIP_RADIUS * 2.0, CHIP_RADIUS * 2.0)
 	size = custom_minimum_size
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	set_process(false)
 	queue_redraw()
 
 
@@ -77,6 +89,7 @@ func _begin_drag(local_pos: Vector2) -> void:
 	_drag_offset = local_pos
 	_drag_start_global = get_global_mouse_position()
 	z_index = 10
+	drag_started.emit(self)
 
 
 func _end_drag() -> void:
@@ -84,10 +97,12 @@ func _end_drag() -> void:
 		return
 	_dragging = false
 	z_index = 0
-	var moved := _drag_start_global.distance_to(get_global_mouse_position())
-	if tier >= 2 and moved < 14.0:
-		bloom_tapped.emit(self)
 	drag_released.emit(self)
+
+
+func _process(_delta: float) -> void:
+	if pulse_highlight:
+		queue_redraw()
 
 
 func _draw() -> void:
@@ -104,6 +119,9 @@ func _draw() -> void:
 			self, center, type_id, 1, CHIP_RADIUS * 2.0, fit_frac
 		)
 	draw_arc(center, CHIP_RADIUS, 0.0, TAU, 32, Color(0.2, 0.28, 0.22, 0.35), 2.0)
+	if pulse_highlight:
+		var pulse := 0.45 + 0.35 * (0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.012))
+		draw_arc(center, CHIP_RADIUS + 6.0, 0.0, TAU, 32, Color(0.95, 0.85, 0.25, pulse), 4.0)
 	if tier >= 2:
 		draw_string(
 			ThemeDB.fallback_font,

@@ -23,6 +23,8 @@ tags: [hub, sadrzaj]
 - [[ideje-home-unlock|HOME-07 Unlock + roster]] — swipe dolje select; next-lock Unlock; 48 T3 cvjetova
 - [[ideje-home-incard|HOME-08 In-card chrome]] — roster i Unlock u hero-centar prozoru sezone; veći tip
 - [[ideje-home-cardfit|HOME-09 Cardfit]] — Amber off TEST_LOCK; naslov sredina; roster kontrast + širina
+- [[ideje-home-lockflow|HOME-10 Lockflow]] — locked poster 500/20 gold; roster desno bez ellipsisa; wash
+- [[ideje-home-barfit|HOME-11 Barfit]] — locked barovi niže ispod 🔒+ime; bez gate okvira; debug 500 coins
 - [[ideje-arena|ARENA-01 Merge Arena]] — combo, leftover T2, daily badge; grupe + [[../06-production/plan-prompts-arena|prompti]] COMB-A
 
 ## Povezano

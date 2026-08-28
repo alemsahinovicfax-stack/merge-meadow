@@ -12,9 +12,9 @@ trenutna_faza: 5
 podfaza: d0-prelaunch
 aktivna_sekcija: D
 b0_aktivan: false
-sljedeci_korak: "D0-P / 5-min playtest. HOME-09 CARDFIT-A ✅ — zalijepi CARDFIT-B (naslov+kontrast)."
-zadnja_sesija: "HOME-09 CARDFIT-A — Amber off TEST_LOCK; gate na next-lock free; Ember paid lock"
-zadnje_azurirano: 2026-08-25
+sljedeci_korak: "D0-P / playtest. HOME-11 BARFIT-A ✅. HOME-10 LOCKFLOW-A–B ✅."
+zadnja_sesija: "HOME-11 BARFIT-A — UnlockGate ispod 🔒+ime, frameless, debug 500c/20 T3"
+zadnje_azurirano: 2026-08-26
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -39,7 +39,7 @@ sljedeca_runda_dokumentacije: "Prije store (D0/D4) — listing/ASO; inače samo 
 | Polje | Vrijednost |
 |-------|------------|
 | **Milestone** | **M8** — Launch prep (Sekcija D) |
-| **Podfaza** | `d0-prelaunch` + **HOME-09** CARDFIT-A ✅; **HOME-08** INCARD-B ✅; **ARENA-01** freeze ✅; **HOME-07** UNLOCK-C ✅; **HOME-06** FOCUS-D ✅; **HOME-05** GLIDE-C ✅; **HOME-04** PAID-C ✅; Bug-006–032 ✅ |
+| **Podfaza** | `d0-prelaunch` + **HOME-11** BARFIT-A ✅; **HOME-10** LOCKFLOW-A–B ✅; **HOME-09** CARDFIT-B ✅; **HOME-08** INCARD-B ✅; **ARENA-01** freeze ✅; **HOME-07** UNLOCK-C ✅; **HOME-06** FOCUS-D ✅; **HOME-05** GLIDE-C ✅; **HOME-04** PAID-C ✅; Bug-006–032 ✅ |
 | **Igra** | Merge Meadow — hybrid casual lane run + merge kamp |
 | **Engine** | Godot 4.x (HP laptop / Windows) |
 | **Save** | Lokalni JSON (`user://player_save.json`) — **bez** server/baze u v1 |
@@ -346,10 +346,12 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 ## Sljedeća akcija (sada)
 
 1. **D0-P / playtest** — swipe sezona treba kliziti; tap centar = Browser; Play Endless = Hard
-2. **HOME-09 CARDFIT-A ✅** — sljedeće: zalijepi **CARDFIT-B** ([[plan-prompts-home-cardfit|prompti]]) — naslov sredina, roster kontrast+širina
-3. **HOME-08 INCARD-B ✅** — Unlock gate u CenterSlot
-4. **ARENA-01** — zalijepi **COMB-A** ([[plan-prompts-arena|prompti]]) · [[../03-content/ideje-arena-grupe|grupe]]
-5. **Ne** plaćati Play Console dok D0 nije ✅
+2. **HOME-11 BARFIT-A ✅** — gate niže ispod 🔒+ime; bez okvira; debug 500c ([[plan-prompts-home-barfit|prompti]])
+3. **HOME-10 LOCKFLOW-A–B ✅** — locked poster 500/20 gold; roster desno, puna imena, wash
+4. **HOME-09 CARDFIT-A–B ✅** — Amber gate; naslov sredina; roster kontrast+širina
+5. **HOME-08 INCARD-B ✅** — Unlock gate u CenterSlot
+6. **ARENA-01 COMB-A ✅ FLOW-A ✅ FLOW-B ✅ DAILY-A ✅ FEEL-A ✅ FEEL-B ✅** — prompti gotovi ([[plan-prompts-arena|prompti]]) · [[../03-content/ideje-arena-grupe|grupe]]
+7. **Ne** plaćati Play Console dok D0 nije ✅
 
 ## Povezano
 
@@ -361,6 +363,8 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 - [[plan-prompts-home-focus|HOME-06 prompti]]
 - [[plan-prompts-home-unlock|HOME-07 prompti]]
 - [[plan-prompts-home-incard|HOME-08 prompti]]
+- [[plan-prompts-home-lockflow|HOME-10 prompti]]
+- [[plan-prompts-home-barfit|HOME-11 prompti]]
 - [[plan-prompts-home-cardfit|HOME-09 prompti]]
 - [[plan-prompts-arena|ARENA-01 prompti]]
 - [[../03-content/ideje-arena|ARENA-01 hub]]

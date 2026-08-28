@@ -9,8 +9,26 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-08-26
+
+- **ARENA-01 FEEL-B** — clear-field VFX kad nema legalnog para (odd leftover OK); jednom po pouru; bez coina; smoke `arena_feel_b_smoke` (grana `ARENA`)
+- **ARENA-01 FEEL-A** — mali Pip na rubu playfielda (IGNORE, nije eat target); bounce na combo ≥2 / T3; `$Bg` livada tint raste s T3 u sesiji, reset na Done/Back; smoke `arena_feel_a_smoke` (grana `ARENA`)
+- **ARENA-01 DAILY-A** — jedan local-day arena zadatak (merge 3× T2 / 1 T3 / combo 5); `DailyLabel` n/N; Home chest tap za streak badge bez coina/sjemena; `SAVE_VERSION` 12; smoke `arena_daily_smoke` (grana `ARENA`)
+- **ARENA-01 FLOW-B** — auto-pour kad polje padne na ≤10 (do 40 ili praznog baga); pour preferira tip s točno 1 chipom na polju; Done ostaje slobodan; smoke `arena_flow_b_smoke` (grana `ARENA`)
+- **ARENA-01 FLOW-A** — uklonjen Donate/Album/Basket panel u areni; leftover T2 bez para → 2× T1 u bag; T2 ostaje dok ima T2 para / pour / 2 T1 na polju; Done T2 također 2× T1; smoke `arena_flow_a_smoke` (grana `ARENA`)
+
+## 2026-08-26
+
+- **HOME-11 BARFIT-A** — UnlockGate `anchor_top` 0.62 (ispod 🔒+ime); frameless panel; debug floor 500 coins + 20 T3
+- **HOME-11 BARFIT-P0** — docs + prompti: locked barovi ispod 🔒+ime; bez gate okvira; debug floor 500 coins + 20 T3; [[../06-production/plan-prompts-home-barfit|plan-prompts-home-barfit]] BARFIT-P0 → A
+- **HOME-10 LOCKFLOW-B** — roster `anchor_right` 0.85 (raste desno, bez lijevog clipa); puna imena bez ellipsisa; wash `FRAME_ALPHA` 0.28; `apply_season` na morph midpoint
+- **HOME-10 LOCKFLOW-A** — locked free poster: ime sredina, Coins/Seeds 500/20, Unlock sivi→zlatni; roster skriven dok je next-lock; Lantern+Amber locked bez TEST_LOCK
+- **HOME-10 LOCKFLOW-P0** — docs + prompti: locked free = ime sredina + Coins/Seeds 500/20 + Unlock sivi→zlatni; roster skriven dok locked, pa širi desno bez ellipsisa; blaga transparentna wash (nema swipe glitcha); Lantern+Amber locked bez TEST_LOCK; [[../06-production/plan-prompts-home-lockflow|plan-prompts-home-lockflow]] LOCKFLOW-P0 → A → B
+
 ## 2026-08-25
 
+- **ARENA-01 COMB-A** — Combo HUD od 2 (`Combo N`), prozor 1.4 s (timeout/Done/Back gase; pest eat ne); 2 coins jednom na pragu 5, dnevni cap 10 (`SAVE_VERSION` 11); pair pulse istog `type_id`+`tier`; smoke `arena_combo_smoke` (grana `ARENA`)
+- **HOME-09 CARDFIT-B** — ime sezone na sredini kartice; roster/gate okvir iz mood palete (kontrast po sezoni); širi roster (~0.48 / min 320)
 - **ARENA-01 prompti** — grupe G1–G5 ([[../03-content/ideje-arena-grupe|ideje-arena-grupe]]); Plan-only [[plan-prompts-arena|plan-prompts-arena]] COMB-A → FLOW-A → FLOW-B → DAILY-A → FEEL-A → FEEL-B
 - **HOME-09 CARDFIT-A** — Amber skinut s TEST_LOCK; Unlock gate na next-lock free (Amber 220c/12 T3); debug skip lantern+amber po id-u; Ember ostaje paid lock
 - **HOME-09 CARDFIT-P0** — docs + prompti: Amber skinut s TEST_LOCK (gate na next-lock free, npr. Amber Canopy); naslov sezone opet na sredini kartice; roster/gate pozadina po sezoni (kontrast); širi roster; Ember ostaje paid TEST_LOCK; [[../06-production/plan-prompts-home-cardfit|plan-prompts-home-cardfit]] CARDFIT-P0 → A → B

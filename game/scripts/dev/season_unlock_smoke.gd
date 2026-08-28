@@ -66,8 +66,16 @@ func _run() -> void:
 		_fail("S1 seed pool mismatch")
 		return
 	var s3_def: SeasonDef = SeasonCatalog.get_def(S3)
-	if s3_def == null or s3_def.t3_flowers_required != 8 or s3_def.coins_cost != 150:
-		_fail("S3 costs expected 150 coins + 8 T3")
+	if s3_def == null or s3_def.t3_flowers_required != 20 or s3_def.coins_cost != 500:
+		_fail("S3 costs expected 500 coins + 20 T3")
+		return
+	var s2_def: SeasonDef = SeasonCatalog.get_def(S2)
+	if s2_def == null or s2_def.t3_flowers_required != 20 or s2_def.coins_cost != 500:
+		_fail("S2 costs expected 500 coins + 20 T3")
+		return
+	var amber_def: SeasonDef = SeasonCatalog.get_def("amber_canopy")
+	if amber_def == null or amber_def.t3_flowers_required != 20 or amber_def.coins_cost != 500:
+		_fail("Amber costs expected 500 coins + 20 T3")
 		return
 
 	_reset_new_game(gs)
@@ -94,25 +102,33 @@ func _run() -> void:
 	if bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock with 0 coins/T3 should fail")
 		return
-	gs.set("wallet_coins", 80)
+	gs.set("wallet_coins", 499)
+	gs.set("garden_crystal_stash", {"clover": 20})
+	if bool(gs.call("unlock_free", S2)):
+		_fail("S2 unlock with 499 coins should fail")
+		return
+	if int(gs.get("wallet_coins")) != 499:
+		_fail("coins spent on failed coin gate")
+		return
+	gs.set("wallet_coins", 500)
 	gs.set("garden_crystal_stash", {})
 	if bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock with coins but 0 T3 should fail")
 		return
-	if int(gs.get("wallet_coins")) != 80:
+	if int(gs.get("wallet_coins")) != 500:
 		_fail("coins spent on failed T3 gate")
 		return
 
-	gs.set("wallet_coins", 150)
-	gs.set("garden_crystal_stash", {"clover": 8})
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"clover": 20})
 	if bool(gs.call("unlock_free", S3)):
 		_fail("S3 unlock before S2 should fail")
 		return
-	if int(gs.get("wallet_coins")) != 150:
+	if int(gs.get("wallet_coins")) != 500:
 		_fail("coins spent on blocked S3")
 		return
 	var stash_before: Dictionary = gs.get("garden_crystal_stash")
-	if int(stash_before.get("clover", 0)) != 8:
+	if int(stash_before.get("clover", 0)) != 20:
 		_fail("T3 stash mutated on blocked S3")
 		return
 
@@ -130,19 +146,23 @@ func _run() -> void:
 		return
 
 	_reset_new_game(gs)
-	gs.set("wallet_coins", 80)
+	gs.set("wallet_coins", 500)
 	gs.set("garden_crystal_stash", {"clover": 3, "daisy": 2})
 	if int(gs.call("t3_flower_count")) != 5:
 		_fail("t3_flower_count expected 5")
 		return
+	if bool(gs.call("unlock_free", S2)):
+		_fail("S2 unlock with 5 T3 should fail")
+		return
+	gs.set("garden_crystal_stash", {"clover": 12, "daisy": 8})
 	if not bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock should succeed")
 		return
 	if int(gs.get("wallet_coins")) != 0:
-		_fail("S2 should spend 80 coins")
+		_fail("S2 should spend 500 coins")
 		return
 	stash_before = gs.get("garden_crystal_stash")
-	if int(stash_before.get("clover", 0)) != 3 or int(stash_before.get("daisy", 0)) != 2:
+	if int(stash_before.get("clover", 0)) != 12 or int(stash_before.get("daisy", 0)) != 8:
 		_fail("T3 check-only violated")
 		return
 	if str(gs.get("active_season_id")) != S2:
@@ -151,12 +171,12 @@ func _run() -> void:
 
 	gs.set("wallet_coins", 0)
 	if bool(gs.call("unlock_free", S3)):
-		_fail("S3 after S2 still needs 150 coins")
+		_fail("S3 after S2 still needs 500 coins")
 		return
-	gs.set("wallet_coins", 150)
-	gs.set("garden_crystal_stash", {"clover": 7})
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"clover": 19})
 	if bool(gs.call("unlock_free", S3)):
-		_fail("S3 after S2 still needs 8 T3")
+		_fail("S3 after S2 still needs 20 T3")
 		return
 
 	gs.set("active_season_id", S1)
@@ -172,10 +192,10 @@ func _run() -> void:
 		_fail("save round-trip missing S2")
 		return
 
-	gs.set("wallet_coins", 150)
-	gs.set("garden_crystal_stash", {"clover": 8})
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"clover": 20})
 	if not bool(gs.call("can_unlock_free", S3)):
-		_fail("S3 should be unlockable after S2 + 150 coins + 8 T3")
+		_fail("S3 should be unlockable after S2 + 500 coins + 20 T3")
 		return
 	if not bool(gs.call("unlock_free", S3)):
 		_fail("S3 unlock should succeed")
@@ -192,10 +212,10 @@ func _run() -> void:
 	if not bool(gs.call("is_test_locked_season", "ember_fen")):
 		_fail("ember_fen must stay test-locked")
 		return
-	gs.set("wallet_coins", 220)
-	gs.set("garden_crystal_stash", {"clover": 12})
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"clover": 20})
 	if not bool(gs.call("can_unlock_free", "amber_canopy")):
-		_fail("can_unlock_free(amber) should work after lantern + 220c/12 T3")
+		_fail("can_unlock_free(amber) should work after lantern + 500c/20 T3")
 		return
 	if not bool(gs.call("unlock_free", "amber_canopy")):
 		_fail("amber unlock should succeed")
@@ -205,8 +225,8 @@ func _run() -> void:
 		return
 
 	_reset_new_game(gs)
-	gs.set("wallet_coins", 80)
-	gs.set("garden_crystal_stash", {"clover": 5})
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"clover": 20})
 	if not bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock before debug skip test failed")
 		return
@@ -223,8 +243,8 @@ func _run() -> void:
 	if bool(gs.call("is_season_playable", "amber_canopy")):
 		_fail("debug_unlock_all must skip amber_canopy")
 		return
-	gs.set("wallet_coins", 150)
-	gs.set("garden_crystal_stash", {"clover": 8})
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"clover": 20})
 	if not bool(gs.call("can_unlock_free", S3)):
 		_fail("can_unlock_free(lantern) should still work")
 		return

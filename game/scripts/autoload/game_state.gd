@@ -12,6 +12,8 @@ const SCENE_COLLECTION := "res://scenes/ui/collection_journal.tscn"
 const ARENA_MAX_CHIPS := 40
 const ARENA_SNAP_DISTANCE := 100.0
 const ARENA_MAGNET_RADIUS := 130.0
+const ARENA_COMBO_COINS := 2
+const ARENA_COMBO_COIN_DAILY_CAP := 10
 const BLOOM_INBOX_MAX := 12
 
 const ARENA_PEST_SPEED := 85.0
@@ -95,7 +97,7 @@ const ENDLESS_DIFFICULTY_LABELS: Dictionary = {
 
 const TUTORIAL_FLAGS_PATH := "user://tutorial_flags.json"
 const PLAYER_SAVE_PATH := "user://player_save.json"
-const SAVE_VERSION := 10
+const SAVE_VERSION := 12
 ## HOME-06 P80 / HOME-09 P105 — last paid stays locked for IAP playtest.
 const TEST_LOCK_LAST_SEASONS := true
 const TEST_LOCK_PAID_ID := "ember_fen"
@@ -154,6 +156,14 @@ var seed_unlock_index: int = 0
 var lifetime_seeds_collected: Dictionary = {}
 var collection_kept_tiers: Dictionary = {}
 var last_daily_chest_day: String = ""
+var combo_coin_day: String = ""
+var combo_coins_granted_today: int = 0
+var arena_daily_day: String = ""
+var arena_daily_kind: String = ""
+var arena_daily_progress: int = 0
+var arena_daily_goal: int = 1
+var arena_daily_claimed_day: String = ""
+var arena_daily_streak: int = 0
 var active_companion_id: String = COMPANION_PIP
 var mochi_unlock_seen: bool = false
 var collection_journal_pending: Dictionary = {}
@@ -224,6 +234,14 @@ func save_player_save() -> void:
 		"lifetime_seeds_collected": lifetime_seeds_collected.duplicate(),
 		"collection_kept_tiers": collection_kept_tiers.duplicate(),
 		"last_daily_chest_day": last_daily_chest_day,
+		"combo_coin_day": combo_coin_day,
+		"combo_coins_granted_today": combo_coins_granted_today,
+		"arena_daily_day": arena_daily_day,
+		"arena_daily_kind": arena_daily_kind,
+		"arena_daily_progress": arena_daily_progress,
+		"arena_daily_goal": arena_daily_goal,
+		"arena_daily_claimed_day": arena_daily_claimed_day,
+		"arena_daily_streak": arena_daily_streak,
 		"active_companion_id": active_companion_id,
 		"mochi_unlock_seen": mochi_unlock_seen,
 		"collection_journal_pending": collection_journal_pending.duplicate(),
@@ -581,6 +599,44 @@ func debug_unlock_all_seasons() -> void:
 	save_player_save()
 
 
+func debug_grant_unlock_test_funds() -> void:
+	if not OS.is_debug_build():
+		return
+	wallet_coins = maxi(wallet_coins, 500)
+	var have := t3_flower_count()
+	if have < 20:
+		var clover := int(garden_crystal_stash.get("clover", 0))
+		garden_crystal_stash["clover"] = clover + (20 - have)
+	save_player_save()
+
+
+func debug_relock_playtest_free() -> void:
+	if not OS.is_debug_build():
+		return
+	var kept: Array[String] = []
+	for sid in unlocked_seasons:
+		var id := str(sid)
+		if id == DEBUG_SKIP_FREE_ID or id == DEBUG_SKIP_AMBER_ID:
+			continue
+		if not kept.has(id):
+			kept.append(id)
+	if not kept.has(SeasonCatalog.DEFAULT_SEASON_ID):
+		kept.insert(0, SeasonCatalog.DEFAULT_SEASON_ID)
+	if not kept.has("frost_orchard"):
+		kept.append("frost_orchard")
+	unlocked_seasons.clear()
+	for id in kept:
+		unlocked_seasons.append(id)
+	if is_season_playable("frost_orchard"):
+		strip_focus_id = "frost_orchard"
+		active_season_id = "frost_orchard"
+	else:
+		strip_focus_id = SeasonCatalog.DEFAULT_SEASON_ID
+		active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
+	_normalize_season_progress()
+	save_player_save()
+
+
 func _strip_focus_index() -> int:
 	var i := 0
 	for def in SeasonCatalog.free_defs_sorted():
@@ -636,6 +692,14 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	lifetime_seeds_collected = _parse_string_int_dict(data.get("lifetime_seeds_collected", {}))
 	collection_kept_tiers = _parse_string_int_dict(data.get("collection_kept_tiers", {}))
 	last_daily_chest_day = str(data.get("last_daily_chest_day", ""))
+	combo_coin_day = str(data.get("combo_coin_day", ""))
+	combo_coins_granted_today = maxi(0, int(data.get("combo_coins_granted_today", 0)))
+	arena_daily_day = str(data.get("arena_daily_day", ""))
+	arena_daily_kind = str(data.get("arena_daily_kind", ""))
+	arena_daily_progress = maxi(0, int(data.get("arena_daily_progress", 0)))
+	arena_daily_goal = maxi(1, int(data.get("arena_daily_goal", 1)))
+	arena_daily_claimed_day = str(data.get("arena_daily_claimed_day", ""))
+	arena_daily_streak = maxi(0, int(data.get("arena_daily_streak", 0)))
 	active_companion_id = str(data.get("active_companion_id", COMPANION_PIP))
 	mochi_unlock_seen = bool(data.get("mochi_unlock_seen", false))
 	collection_journal_pending = _parse_string_int_dict(data.get("collection_journal_pending", {}))
@@ -1694,6 +1758,21 @@ func _today_key() -> String:
 	return "%04d-%02d-%02d" % [int(d.year), int(d.month), int(d.day)]
 
 
+func try_grant_arena_combo_coins() -> int:
+	var today := _today_key()
+	if combo_coin_day != today:
+		combo_coin_day = today
+		combo_coins_granted_today = 0
+	var remaining := ARENA_COMBO_COIN_DAILY_CAP - combo_coins_granted_today
+	if remaining <= 0:
+		return 0
+	var grant := mini(ARENA_COMBO_COINS, remaining)
+	wallet_coins += grant
+	combo_coins_granted_today += grant
+	save_player_save()
+	return grant
+
+
 func can_claim_daily_chest() -> bool:
 	return tutorial_complete and last_daily_chest_day != _today_key()
 
@@ -1718,6 +1797,81 @@ func claim_daily_chest() -> String:
 			% [DAILY_CHEST_COINS, added, name]
 		)
 	return "Daily chest: +%d coins and +%d %s seeds!" % [DAILY_CHEST_COINS, added, name]
+
+
+const ARENA_DAILY_KINDS: PackedStringArray = ["merge_t2", "make_t3", "combo_5"]
+
+
+func _arena_daily_kind_for_day(day: String) -> String:
+	if day.is_empty():
+		return ARENA_DAILY_KINDS[0]
+	var idx := absi(day.hash()) % ARENA_DAILY_KINDS.size()
+	return ARENA_DAILY_KINDS[idx]
+
+
+func _arena_daily_goal_for_kind(kind: String) -> int:
+	if kind == "merge_t2":
+		return 3
+	return 1
+
+
+func ensure_arena_daily_task() -> void:
+	var today := _today_key()
+	if arena_daily_day == today and not arena_daily_kind.is_empty():
+		arena_daily_goal = _arena_daily_goal_for_kind(arena_daily_kind)
+		arena_daily_progress = mini(arena_daily_progress, arena_daily_goal)
+		return
+	arena_daily_day = today
+	arena_daily_kind = _arena_daily_kind_for_day(today)
+	arena_daily_goal = _arena_daily_goal_for_kind(arena_daily_kind)
+	arena_daily_progress = 0
+	save_player_save()
+
+
+func note_arena_daily_event(kind: String) -> void:
+	ensure_arena_daily_task()
+	if kind != arena_daily_kind:
+		return
+	if arena_daily_progress >= arena_daily_goal:
+		return
+	arena_daily_progress += 1
+	save_player_save()
+
+
+func can_claim_arena_daily() -> bool:
+	ensure_arena_daily_task()
+	return (
+		arena_daily_progress >= arena_daily_goal
+		and arena_daily_claimed_day != _today_key()
+	)
+
+
+func claim_arena_daily() -> String:
+	if not can_claim_arena_daily():
+		return "Arena daily already claimed today."
+	arena_daily_claimed_day = _today_key()
+	arena_daily_streak += 1
+	save_player_save()
+	return "Arena streak %d" % arena_daily_streak
+
+
+func get_arena_daily_hud_text() -> String:
+	ensure_arena_daily_task()
+	var n := mini(arena_daily_progress, arena_daily_goal)
+	if arena_daily_kind == "merge_t2":
+		return "Merge T2 %d/%d" % [n, arena_daily_goal]
+	if arena_daily_kind == "make_t3":
+		return "T3 %d/%d" % [n, arena_daily_goal]
+	return "Combo 5 %d/%d" % [n, arena_daily_goal]
+
+
+func get_arena_daily_home_line() -> String:
+	ensure_arena_daily_task()
+	if arena_daily_claimed_day == _today_key():
+		return "Arena streak %d" % arena_daily_streak
+	if arena_daily_progress >= arena_daily_goal:
+		return "Arena daily — tap for badge"
+	return "Arena %d/%d" % [mini(arena_daily_progress, arena_daily_goal), arena_daily_goal]
 
 
 func auto_plant_from_bag() -> int:
@@ -2201,11 +2355,11 @@ func flush_bloom_inbox_to_album() -> int:
 	return kept
 
 
-func pull_seeds_to_arena(max_count: int) -> Array:
+func pull_seeds_to_arena(max_count: int, field_type_counts: Dictionary = {}) -> Array:
 	var out: Array = []
 	if max_count <= 0:
 		return out
-	var queue := _build_arena_pour_queue()
+	var queue := _build_arena_pour_queue(field_type_counts)
 	var pulled := 0
 	for type_id in queue:
 		if pulled >= max_count:
@@ -2238,24 +2392,39 @@ func get_bag_types_by_pour_priority() -> Array[String]:
 	return out
 
 
-func _build_arena_pour_queue() -> Array[String]:
+func _build_arena_pour_queue(field_type_counts: Dictionary = {}) -> Array[String]:
 	var sorted_types := get_bag_types_by_pour_priority()
 	if sorted_types.is_empty():
 		return []
-	var priority_types: Array[String] = []
-	var lowest_rarity := get_seed_rarity(sorted_types[0])
+	var queue: Array[String] = []
+	var queued_orphans: Dictionary = {}
 	for type_id in sorted_types:
+		if int(field_type_counts.get(type_id, 0)) != 1:
+			continue
+		var count := int(seed_bag.get(type_id, 0))
+		for _i in count:
+			queue.append(type_id)
+		queued_orphans[type_id] = true
+	var rest: Array[String] = []
+	for type_id in sorted_types:
+		if queued_orphans.has(type_id):
+			continue
+		rest.append(type_id)
+	if rest.is_empty():
+		return queue
+	var priority_types: Array[String] = []
+	var lowest_rarity := get_seed_rarity(rest[0])
+	for type_id in rest:
 		if get_seed_rarity(type_id) != lowest_rarity:
 			break
 		priority_types.append(type_id)
 		if priority_types.size() >= 2:
 			break
-	var queue: Array[String] = []
 	for type_id in priority_types:
 		var count := int(seed_bag.get(type_id, 0))
 		for _i in count:
 			queue.append(type_id)
-	for type_id in sorted_types:
+	for type_id in rest:
 		if priority_types.has(type_id):
 			continue
 		var count := int(seed_bag.get(type_id, 0))
@@ -2375,7 +2544,7 @@ func try_merge_arena_chips(chip_a: int, chip_b: int, chip_data: Dictionary) -> D
 
 
 ## Resolve one arena leftover chip. Never silently drops T2+ (Bug-016).
-## Returns: bagged | crystal | kept | donated | recycled | skipped
+## Returns: bagged | crystal | recycled | skipped
 func resolve_arena_leftover_bloom(type_id: String, tier: int) -> String:
 	if type_id.is_empty():
 		return "skipped"
@@ -2385,13 +2554,8 @@ func resolve_arena_leftover_bloom(type_id: String, tier: int) -> String:
 	if tier >= MAX_MERGE_TIER:
 		stash_garden_crystal(type_id)
 		return "crystal"
-	if can_keep_bloom_upgrade(type_id, tier):
-		keep_bloom(type_id, tier)
-		return "kept"
-	if donate_bloom(type_id, tier):
-		return "donated"
-	# Odd T2 with album+donate blocked — recycle to T1 (Fair F2P).
-	if add_seeds_to_bag(type_id, 1) > 0:
+	# FLOW-A — leftover T2 → 2× T1. Arena does not donate/keep.
+	if add_seeds_to_bag(type_id, 2) > 0:
 		return "recycled"
 	wallet_coins += 2
 	return "recycled"

@@ -12,7 +12,7 @@ ai_sažetak: "HOME-09 roster — pozadina po sezoni iz mood palete (kontrast); �
 
 # IDEJE — HOME-09 roster kontrast i širina
 
-> [[ideje-home-cardfit|hub]]. Parent, 6 redova, T3+★+ime, HIT-A IGNORE, L/R i preview bez rostera — ostaje [[ideje-home-incard-roster|HOME-08 roster]]. Ovaj doc overridea **boju okvira** (P90/P94 jedan tamni frame) i **širinu** panela.
+> [[ideje-home-cardfit|hub]]. Parent, 6 redova, T3+★+ime, HIT-A IGNORE, L/R i preview bez rostera — ostaje [[ideje-home-incard-roster|HOME-08 roster]]. **Kod CARDFIT-B ✅** — frame iz mood palete, širi panel.
 
 ## Što je krivo
 

@@ -251,7 +251,9 @@ Redoslijed unutar F8 (može paralelno s artom):
 - **HOME-06 Focus korekcija** — [[../03-content/ideje-home-focus|ideje-home-focus]] · prompti [[plan-prompts-home-focus|plan-prompts-home-focus]] **P0–C ✅**
 - **HOME-07 Unlock + roster** — [[../03-content/ideje-home-unlock|ideje-home-unlock]] · prompti [[plan-prompts-home-unlock|plan-prompts-home-unlock]] **P0–C ✅**
 - **HOME-08 In-card chrome** — [[../03-content/ideje-home-incard|ideje-home-incard]] · prompti [[plan-prompts-home-incard|plan-prompts-home-incard]] **P0–B ✅**
-- **HOME-09 Cardfit** — [[../03-content/ideje-home-cardfit|ideje-home-cardfit]] · prompti [[plan-prompts-home-cardfit|plan-prompts-home-cardfit]] **P0–A ✅** (B kod još ne)
+- **HOME-09 Cardfit** — [[../03-content/ideje-home-cardfit|ideje-home-cardfit]] · prompti [[plan-prompts-home-cardfit|plan-prompts-home-cardfit]] **P0–B ✅**
+- **HOME-10 Lockflow** — [[../03-content/ideje-home-lockflow|ideje-home-lockflow]] · prompti [[plan-prompts-home-lockflow|plan-prompts-home-lockflow]] **P0–B ✅**
+- **HOME-11 Barfit** — [[../03-content/ideje-home-barfit|ideje-home-barfit]] · prompti [[plan-prompts-home-barfit|plan-prompts-home-barfit]] **P0–A ✅**
 
 ---
 

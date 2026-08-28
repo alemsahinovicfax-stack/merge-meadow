@@ -17,7 +17,7 @@ ai_sažetak: "HOME-08 hub — roster i Unlock gate u hero-centar prozoru sezone;
 
 > **ID:** **HOME-08** · v1.1+ (nije v1 launch blocker).  
 > **Kod:** **INCARD-A–B ✅**. Prompti: [[../06-production/plan-prompts-home-incard|plan-prompts-home-incard]].  
-> **Chrome korekcija:** [[ideje-home-cardfit|HOME-09]] — Amber TEST_LOCK gasi gate u saveu s otključanim Lanternom; naslov gore; isti tamni roster na svim sezonama.  
+> **Chrome korekcija:** [[ideje-home-cardfit|HOME-09]] CARDFIT ✅; dalje [[ideje-home-lockflow|HOME-10]] — roster clip, locked poster 500/20 gold.  
 > **Prethodnik:** [[ideje-home-unlock|HOME-07]] UNLOCK-A–C ✅ — **krivo shvaćen layout** (Stage overlay umjesto prozora sezone).  
 > **Pillar:** [[../01-vision/design-pillars|Fair F2P]] — paid roster je kozmetički pregled; coin Unlock samo na **prvoj zaključanoj free** sezoni.
 

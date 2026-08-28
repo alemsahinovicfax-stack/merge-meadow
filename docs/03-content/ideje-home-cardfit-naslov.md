@@ -12,7 +12,7 @@ ai_sažetak: "HOME-09 naslov — ime sezone opet vertikalno centrirano u hero-ce
 
 # IDEJE — HOME-09 ime sezone na sredini kartice
 
-> [[ideje-home-cardfit|hub]]. Override [[ideje-home-incard-pitanja|P100]] (naslov gore). Layout rostera/gatea ostaje overlay; ime se vraća u sredinu kao prije INCARD-A.
+> [[ideje-home-cardfit|hub]]. Override [[ideje-home-incard-pitanja|P100]] (naslov gore). **Kod CARDFIT-B ✅.**
 
 ## Što je krivo
 

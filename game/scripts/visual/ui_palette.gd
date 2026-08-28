@@ -6,6 +6,8 @@ extends RefCounted
 const MINT := Color("#A8E6CF")
 const LAVENDER := Color("#D4A5FF")
 const PEACH := Color("#FFB88C")
+const GOLD := Color("#E8C44A")
+const GOLD_INK := Color("#1A1A14")
 const WARM_WHITE := Color("#FFF8F0")
 const OUTLINE := Color("#2D3436")
 const UI_TEXT := Color("#4A4A4A")
@@ -55,6 +57,8 @@ static func button_style(variant: String, state: String) -> StyleBoxFlat:
 			bg = LAVENDER if state == "normal" else LAVENDER.lightened(0.05) if state == "hover" else LAVENDER.darkened(0.05)
 		"subtle":
 			bg = WARM_WHITE if state == "normal" else Color("#FFFDF9") if state == "hover" else Color("#F5EDE0")
+		"gold":
+			bg = GOLD if state == "normal" else GOLD.lightened(0.06) if state == "hover" else GOLD.darkened(0.07)
 		_:
 			bg = MINT if state == "normal" else MINT.lightened(0.05) if state == "hover" else MINT.darkened(0.06)
 
@@ -62,7 +66,8 @@ static func button_style(variant: String, state: String) -> StyleBoxFlat:
 	style.bg_color = bg
 	style.set_corner_radius_all(CORNER_RADIUS)
 	style.set_border_width_all(2)
-	style.border_color = Color(OUTLINE.r, OUTLINE.g, OUTLINE.b, 0.14)
+	var border_a := 0.25 if variant == "gold" else 0.14
+	style.border_color = Color(OUTLINE.r, OUTLINE.g, OUTLINE.b, border_a)
 	if variant == "subtle":
 		style.content_margin_left = 10.0
 		style.content_margin_top = 10.0

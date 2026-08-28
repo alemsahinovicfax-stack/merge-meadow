@@ -1,10 +1,9 @@
 extends PanelContainer
 
-## HOME-08 — 6 T3 roster rows inside the hero-center season card.
+## HOME-08/09 — 6 T3 roster rows inside the hero-center season card.
 
+const CONTRAST := preload("res://scripts/ui/season_card_contrast.gd")
 const PLANT_ICON := preload("res://scripts/ui/collection_bloom_icon.gd")
-const CREAM := Color("FFF6D6")
-const FRAME := Color("1A1A14")
 const ROW_H := 56.0
 const ICON_S := 52.0
 const NAME_FONT := 22
@@ -18,17 +17,21 @@ var _icons: Array[Control] = []
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_apply_frame()
+	_apply_frame("")
 	_build_rows()
 
 
 func apply_season(season_id: String) -> void:
+	_apply_frame(season_id)
+	var ink := CONTRAST.text_color(season_id)
 	var def: SeasonDef = GameState.get_season_def(season_id)
 	var entries: Array = def.roster if def else []
 	for i in 6:
 		var icon: Control = _icons[i]
 		var stars: Label = _star_labels[i]
 		var name_l: Label = _name_labels[i]
+		stars.add_theme_color_override("font_color", ink)
+		name_l.add_theme_color_override("font_color", ink)
 		if i >= entries.size():
 			icon.visible = false
 			stars.text = ""
@@ -59,14 +62,15 @@ func rarity3_display() -> String:
 	return ""
 
 
-func _apply_frame() -> void:
-	var box := StyleBoxFlat.new()
-	box.bg_color = Color(FRAME.r, FRAME.g, FRAME.b, 0.88)
-	box.set_corner_radius_all(12)
-	box.set_content_margin_all(12)
-	box.set_border_width_all(1)
-	box.border_color = Color(CREAM.r, CREAM.g, CREAM.b, 0.35)
-	add_theme_stylebox_override("panel", box)
+func panel_bg_color() -> Color:
+	var box := get_theme_stylebox("panel") as StyleBoxFlat
+	if box == null:
+		return Color.BLACK
+	return box.bg_color
+
+
+func _apply_frame(season_id: String) -> void:
+	add_theme_stylebox_override("panel", CONTRAST.make_frame(season_id))
 
 
 func _build_rows() -> void:
@@ -74,6 +78,7 @@ func _build_rows() -> void:
 	_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_col.add_theme_constant_override("separation", 2)
 	add_child(_col)
+	var ink := CONTRAST.text_color("")
 	for _i in 6:
 		var row := HBoxContainer.new()
 		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -85,17 +90,18 @@ func _build_rows() -> void:
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var stars := Label.new()
 		stars.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		stars.add_theme_color_override("font_color", CREAM)
+		stars.add_theme_color_override("font_color", ink)
 		stars.add_theme_font_size_override("font_size", STAR_FONT)
 		stars.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		stars.custom_minimum_size = Vector2(56, 0)
 		var name_l := Label.new()
 		name_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		name_l.add_theme_color_override("font_color", CREAM)
+		name_l.add_theme_color_override("font_color", ink)
 		name_l.add_theme_font_size_override("font_size", NAME_FONT)
 		name_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		name_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		name_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		name_l.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+		name_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(icon)
 		row.add_child(stars)
 		row.add_child(name_l)

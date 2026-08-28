@@ -19,6 +19,7 @@ ai_sažetak: "Copy-paste Plan-mode promptovi HOME-07 — UNLOCK-P0 → A select/
 > **Redoslijed:** **UNLOCK-P0 → A → B → C** — **sve ✅**  
 > **Layout korekcija:** [[plan-prompts-home-incard|HOME-08 INCARD]] (roster/gate u prozoru).  
 > **Cardfit korekcija:** [[plan-prompts-home-cardfit|HOME-09 CARDFIT]] (Amber off TEST_LOCK; naslov sredina; roster kontrast).  
+> **Lockflow korekcija:** [[plan-prompts-home-lockflow|HOME-10 LOCKFLOW]] (locked poster 500/20 gold; roster desno + wash).  
 > **Ideje:** [[../03-content/ideje-home-unlock|hub]] · [[../03-content/ideje-home-unlock-pitanja|pitanja]]
 
 ## Freeze

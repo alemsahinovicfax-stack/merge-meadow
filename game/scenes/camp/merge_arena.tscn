@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://mergearena01"]
+[gd_scene load_steps=4 format=3 uid="uid://mergearena01"]
 
 [ext_resource type="Script" path="res://scripts/camp/merge_arena_controller.gd" id="1_arena"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
+[ext_resource type="Script" path="res://scripts/visual/pip_placeholder_control.gd" id="3_pip"]
 
 [node name="MergeArena" type="Control"]
 layout_mode = 3
@@ -51,6 +52,15 @@ text = "Merge Arena"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="ComboLabel" type="Label" parent="RootVBox/TopBar"]
+visible = false
+custom_minimum_size = Vector2(120, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Combo"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="InfoLabel" type="Label" parent="RootVBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
@@ -58,10 +68,29 @@ text = "Drag matching seeds together."
 autowrap_mode = 2
 horizontal_alignment = 1
 
+[node name="DailyLabel" type="Label" parent="RootVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Merge T2 0/3"
+horizontal_alignment = 1
+
 [node name="Playfield" type="Control" parent="RootVBox"]
 layout_mode = 2
 size_flags_vertical = 3
 custom_minimum_size = Vector2(0, 400)
+
+[node name="ArenaPip" type="Control" parent="RootVBox/Playfield"]
+z_index = 4
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 0
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 84.0
+offset_bottom = 80.0
+mouse_filter = 2
+script = ExtResource("3_pip")
+companion_id = "pip"
+follow_active_companion = false
 
 [node name="InboxPanel" type="PanelContainer" parent="RootVBox"]
 visible = false

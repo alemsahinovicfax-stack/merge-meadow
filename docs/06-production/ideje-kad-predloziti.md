@@ -13,10 +13,12 @@ povezano:
   - ideje-home-unlock
   - ideje-home-incard
   - ideje-home-cardfit
+  - ideje-home-lockflow
+  - ideje-home-barfit
   - ideje-arena
   - CHECKPOINT
   - RADIONICA-razvoj
-ai_sažetak: "Kad agent predlaže scratch ideju iz vaulta — triggeri, format, backlog UX-01+ / HOME-09 / ARENA-01."
+ai_sažetak: "Kad agent predlaže scratch ideju iz vaulta — triggeri, format, backlog UX-01+ / HOME-11 / ARENA-01."
 ---
 
 # Ideje — kad predložiti (agent + ti)
@@ -62,6 +64,8 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | Swipe dolje select, next-lock Unlock, 48 roster cvjetova | `season_stage`, `game_state`, `seasons.json` | [[../03-content/ideje-home-unlock\|HOME-07]] | **HOME-07** |
 | Roster/Unlock nisu u prozoru sezone, premalo se vidi | `season_stage` CenterSlot, roster/gate overlay | [[../03-content/ideje-home-incard\|HOME-08]] | **HOME-08** |
 | Unlock nije na Amberu / ime nije na sredini / roster isti na svim sezonama | `TEST_LOCK` amber, CenterTitle, roster frame | [[../03-content/ideje-home-cardfit\|HOME-09]] | **HOME-09** |
+| Roster biježi lijevo / ellipsis / boja kasni na swipe / locked = ime+barovi+zlatni Unlock | `FreeRoster` clip, `UnlockGate` kut, `seasons.json` cost | [[../03-content/ideje-home-lockflow\|HOME-10]] | **HOME-10** |
+| Barovi prekrivaju 🔒+ime / suvišan gate okvir / treba 500c za test Unlock | `UnlockGate` `anchor_top`, `make_frame`, debug wallet | [[../03-content/ideje-home-barfit\|HOME-11]] | **HOME-11** |
 | Merge UX, slot overflow | kamp playtest, pre-launch | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] | **MA-01** Merge Arena |
 | Arena monotonija, combo, cliff, daily u areni | `merge_arena_controller`, Muncher, post-MA-01 playtest | [[../03-content/ideje-arena\|ideje-arena]] | **ARENA-01** |
 | Daily retention | post-launch metrika | merge-arena-v1.1 § DG-01 · ARENA-01 daily slice | **DG-01** Daily Goals |
@@ -86,7 +90,9 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | **HOME-06** | **Focus korekcija** — L/R bez cuta; invert swipe; Browser fokus; outline; test-lock; bez badgea | L/R cut, Browser, Theme: label | **M** | v1.1+ · [[plan-prompts-home-focus\|plan-prompts-home-focus]] **P0–C ✅** |
 | **HOME-07** | **Unlock + roster** — swipe dolje select; next-lock Unlock; 48 T3 cvjetova | Select, lantern test, roster | **M** | v1.1+ · [[plan-prompts-home-unlock\|plan-prompts-home-unlock]] **P0–C ✅** |
 | **HOME-08** | **In-card chrome** — roster+Unlock u hero-centar prozoru; veći tip; Lantern gate na kartici | Overlay vs prozor, čitljivost | **S** | v1.1+ · [[plan-prompts-home-incard\|plan-prompts-home-incard]] **P0–B ✅** |
-| **HOME-09** | **Cardfit** — Amber off TEST_LOCK; naslov sredina; roster kontrast+širina | Unlock „nije napravljen“, ime gore, isti tamni roster | **S** | v1.1+ · [[plan-prompts-home-cardfit\|plan-prompts-home-cardfit]] **P0–A ✅** |
+| **HOME-09** | **Cardfit** — Amber off TEST_LOCK; naslov sredina; roster kontrast+širina | Unlock „nije napravljen“, ime gore, isti tamni roster | **S** | v1.1+ · [[plan-prompts-home-cardfit\|plan-prompts-home-cardfit]] **P0–B ✅** |
+| **HOME-10** | **Lockflow** — locked poster 500/20 gold; roster desno bez ellipsisa; wash | Roster clip lijevo, `...`, swipe glitch boje, Unlock nije ime+barovi | **S** | v1.1+ · [[plan-prompts-home-lockflow\|plan-prompts-home-lockflow]] **P0–B ✅** |
+| **HOME-11** | **Barfit** — gate niže ispod 🔒+ime; bez okvira; debug 500c | Barovi prekrivaju ime/katanac, wash panel suvišan, Unlock se ne da testirati | **S** | v1.1+ · [[plan-prompts-home-barfit\|plan-prompts-home-barfit]] **P0–A ✅** |
 | **ARENA-01** | **Arena zabavnija** — combo+pulse, auto-refill, leftover T2→2×T1, daily badge | Arena dosadna, Muncher, T2 chore | **M** | v1.1+ · [[../03-content/ideje-arena\|ideje-arena]] **freeze ✅** · prompti [[plan-prompts-arena\|plan-prompts-arena]] COMB-A… |
 
 ### UX-01 — Main menu u kampu (detalj)
@@ -133,6 +139,8 @@ Primjeniti sada, odgoditi, ili preskočiti?
 - [[../03-content/ideje-sezone|SEZ-01 sezone]]
 - [[../03-content/ideje-arena|ARENA-01 Merge Arena]]
 - [[plan-prompts-arena|plan-prompts-arena]] — COMB-A→FEEL-B
+- [[../03-content/ideje-home-lockflow|HOME-10 Lockflow]]
+- [[../03-content/ideje-home-barfit|HOME-11 Barfit]]
 - [[../03-content/ideje-home-cardfit|HOME-09 Cardfit]]
 - [[plan-prompts-sez-01|plan-prompts-sez-01]] — P0→E
 - `.cursor/rules/ideje-kad-predloziti.mdc`

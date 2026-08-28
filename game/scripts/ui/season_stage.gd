@@ -2,6 +2,8 @@ extends Control
 
 ## Home Season Stage — dual-band + in-card roster (HOME-08 A).
 
+const CONTRAST := preload("res://scripts/ui/season_card_contrast.gd")
+
 const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
 const SWIPE_LOCK_PX := 20.0
 const SNAP_SEC := 0.22
@@ -85,8 +87,8 @@ func refresh() -> void:
 	_fill_strips()
 	if not _band_tween_busy:
 		_apply_band_heights()
-	_refresh_roster()
 	_refresh_unlock_gate()
+	_refresh_roster()
 	_notify_home_badge()
 
 
@@ -138,14 +140,14 @@ func swap_home_band(to_band: String, focus_id: String) -> void:
 	var already := GameState.home_band == target
 	if already:
 		_fill_strips()
-		_refresh_roster()
 		_refresh_unlock_gate()
+		_refresh_roster()
 		_notify_home_badge()
 		return
 	GameState.set_home_band(target)
 	_fill_strips()
-	_refresh_roster()
 	_refresh_unlock_gate()
+	_refresh_roster()
 	_tween_band_heights()
 
 
@@ -397,6 +399,7 @@ func _fill_slot(slot: PanelContainer, title: Label, season_id: String, locked: b
 		title.text = "🔒\n%s" % name
 		locked = true
 	title.add_theme_font_size_override("font_size", _slot_font(slot == center_slot, preview))
+	title.add_theme_color_override("font_color", CONTRAST.title_color(season_id))
 	_apply_card_color(slot, _mood_color(season_id), locked, season_id)
 
 
@@ -416,6 +419,7 @@ func _fill_paid_slot(slot: PanelContainer, title: Label, season_id: String, is_h
 		var price := _paid_price_label(def)
 		title.text = "🔒\n%s\n%s" % [name, price]
 	title.add_theme_font_size_override("font_size", _slot_font(slot == paid_center_slot, not is_hero_band))
+	title.add_theme_color_override("font_color", CONTRAST.title_color(season_id))
 	_apply_card_color(slot, _mood_color(season_id), not owned, season_id)
 
 
@@ -460,6 +464,8 @@ func _play_paid_slide(dir: int) -> void:
 func _apply_free_cycle(dir: int) -> void:
 	GameState.cycle_free_strip(dir)
 	_fill_free_slots()
+	_refresh_unlock_gate()
+	_refresh_roster()
 
 
 func _finish_free_morph() -> void:
@@ -471,6 +477,8 @@ func _finish_free_morph() -> void:
 func _apply_paid_cycle(dir: int) -> void:
 	GameState.cycle_paid_strip(dir)
 	_fill_paid_slots()
+	_refresh_unlock_gate()
+	_refresh_roster()
 
 
 func _finish_paid_morph() -> void:
@@ -497,10 +505,11 @@ func _fill_paid_slots() -> void:
 func _refresh_roster() -> void:
 	var hero_id := GameState.home_hero_center_id()
 	var paid_hero := GameState.home_band == "paid"
+	var gate_up := unlock_gate != null and unlock_gate.visible
 	if free_roster:
 		if free_roster.has_method("apply_season"):
 			free_roster.call("apply_season", hero_id)
-		free_roster.visible = not paid_hero
+		free_roster.visible = not paid_hero and not gate_up
 	if paid_roster:
 		if paid_roster.has_method("apply_season"):
 			paid_roster.call("apply_season", hero_id)
@@ -623,25 +632,7 @@ func _notify_home_badge() -> void:
 
 
 func _mood_color(season_id: String) -> Color:
-	match season_id:
-		"country_bloom":
-			return Color("A8E6CF")
-		"frost_orchard":
-			return Color("C5D5E8")
-		"lantern_meadow":
-			return Color("C9B8E0")
-		"amber_canopy":
-			return Color("E8C48A")
-		"moonlit_warren":
-			return Color("3D3A6B")
-		"coral_tide":
-			return Color("E8A090")
-		"starfall_glade":
-			return Color("6B5B95")
-		"ember_fen":
-			return Color("C45C26")
-		_:
-			return Color("DDE8DC")
+	return CONTRAST.mood_color(season_id)
 
 
 func _apply_card_color(card: PanelContainer, color: Color, locked: bool, season_id: String) -> void:

@@ -30,8 +30,8 @@
 			"order": 2,
 			"display_name": "Frost Orchard",
 			"tagline": "Crisp air, silver blossom.",
-			"coins_cost": 80,
-			"t3_flowers_required": 5,
+			"coins_cost": 500,
+			"t3_flowers_required": 20,
 			"iap_product_id": "",
 			"seed_type_ids": ["clover", "daisy", "buttercup"],
 			"roster": [
@@ -54,8 +54,8 @@
 			"order": 3,
 			"display_name": "Lantern Meadow",
 			"tagline": "Dusk lights among tall grass.",
-			"coins_cost": 150,
-			"t3_flowers_required": 8,
+			"coins_cost": 500,
+			"t3_flowers_required": 20,
 			"iap_product_id": "",
 			"seed_type_ids": ["tulip", "sunflower", "pumpkin"],
 			"roster": [
@@ -78,8 +78,8 @@
 			"order": 4,
 			"display_name": "Amber Canopy",
 			"tagline": "Warm late-season light through high leaves.",
-			"coins_cost": 220,
-			"t3_flowers_required": 12,
+			"coins_cost": 500,
+			"t3_flowers_required": 20,
 			"iap_product_id": "",
 			"seed_type_ids": ["clover", "daisy", "buttercup"],
 			"roster": [

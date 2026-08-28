@@ -4,6 +4,8 @@ extends PanelContainer
 
 signal unlock_clicked
 
+const CONTRAST := preload("res://scripts/ui/season_card_contrast.gd")
+
 @onready var coins_label: Label = $UnlockGateVBox/UnlockGateCoins
 @onready var t3_label: Label = $UnlockGateVBox/UnlockGateT3
 @onready var coins_bar: ProgressBar = $UnlockGateVBox/UnlockGateCoinsBar
@@ -16,7 +18,7 @@ var _season_id: String = ""
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visible = false
-	_apply_frame()
+	_apply_frame("")
 	if coins_label:
 		coins_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if t3_label:
@@ -63,10 +65,11 @@ func refresh_gate(hero_id: String, free_is_hero: bool) -> void:
 	var can := GameState.can_unlock_free(hero_id)
 	if unlock_button:
 		unlock_button.disabled = not can
-		unlock_button.button_variant = "primary" if can else "subtle"
+		unlock_button.button_variant = "gold" if can else "subtle"
 		unlock_button.mouse_filter = (
 			Control.MOUSE_FILTER_STOP if can else Control.MOUSE_FILTER_IGNORE
 		)
+	_apply_frame(hero_id)
 
 
 func _on_unlock_clicked() -> void:
@@ -81,11 +84,14 @@ func _on_unlock_clicked() -> void:
 			hub.call("refresh_top_bar")
 
 
-func _apply_frame() -> void:
+func _apply_frame(season_id: String) -> void:
 	var box := StyleBoxFlat.new()
-	box.bg_color = Color(0.102, 0.102, 0.078, 0.88)
-	box.set_corner_radius_all(12)
-	box.set_content_margin_all(10)
-	box.set_border_width_all(1)
-	box.border_color = Color(1.0, 0.965, 0.839, 0.35)
+	box.bg_color = Color(0, 0, 0, 0)
+	box.set_border_width_all(0)
+	box.set_content_margin_all(8)
 	add_theme_stylebox_override("panel", box)
+	var ink := CONTRAST.text_color(season_id)
+	if coins_label:
+		coins_label.add_theme_color_override("font_color", ink)
+	if t3_label:
+		t3_label.add_theme_color_override("font_color", ink)

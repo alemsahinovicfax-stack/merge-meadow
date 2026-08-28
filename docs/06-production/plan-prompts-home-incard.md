@@ -16,7 +16,7 @@ ai_sažetak: "Copy-paste Plan-mode promptovi HOME-08 — INCARD-P0 docs → A ro
 
 > **Kako:** novi chat → mode **Plan** → zalijepi **jedan** prompt → odobri → Agent.  
 > **Redoslijed:** **INCARD-P0 → A → B** — **sve ✅**  
-> **Chrome korekcija:** [[plan-prompts-home-cardfit|HOME-09 CARDFIT]].  
+> **Chrome korekcija:** [[plan-prompts-home-cardfit|HOME-09 CARDFIT]] ✅ · [[plan-prompts-home-lockflow|HOME-10 LOCKFLOW]].  
 > **Ideje:** [[../03-content/ideje-home-incard|hub]] · [[../03-content/ideje-home-incard-pitanja|pitanja]]
 
 ## Freeze

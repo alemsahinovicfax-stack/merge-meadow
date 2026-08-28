@@ -18,10 +18,20 @@ ai_sažetak: "Copy-paste Plan-mode promptovi ARENA-01 — COMB-A → FLOW-A → 
 # Plan promptovi — ARENA-01 Merge Arena zabavnija
 
 > **Kako:** novi chat → mode **Plan** → zalijepi **jedan** prompt → odobri → Agent.  
-> **Redoslijed:** **COMB-A → FLOW-A → FLOW-B → DAILY-A → FEEL-A → FEEL-B**  
+> **Redoslijed:** **COMB-A ✅ → FLOW-A ✅ → FLOW-B ✅ → DAILY-A ✅ → FEEL-A ✅ → FEEL-B ✅**  
 > **Grupe:** [[../03-content/ideje-arena-grupe|ideje-arena-grupe]] · freeze [[../03-content/ideje-arena-pitanja|pitanja]] · hub [[../03-content/ideje-arena|ideje-arena]]
 
-Nijedan prompt još nije urađen (2026-08-25). Nema `game/` dok ne zalijepiš COMB-A.
+**COMB-A ✅** (2026-08-25, grana `ARENA`) — Combo HUD od 2, prozor 1.4 s, 2 coins na pragu 5 + dnevni cap 10, pair pulse.
+
+**FLOW-A ✅** (2026-08-26, grana `ARENA`) — nema bloom panela; leftover T2 → 2× T1; T2 ostaje dok ima para u runu.
+
+**FLOW-B ✅** (2026-08-26, grana `ARENA`) — auto-pour kad polje ≤10 do 40/praznog baga; pour preferira orphan tip (1 na polju).
+
+**DAILY-A ✅** (2026-08-26, grana `ARENA`) — jedan arena zadatak / local day (`merge_t2` 3 / `make_t3` 1 / `combo_5` 1); n/N u areni; Home chest tap za streak badge bez coina/sjemena; `SAVE_VERSION` 12.
+
+**FEEL-A ✅** (2026-08-26, grana `ARENA`) — mali Pip na rubu playfielda (nije kolizija/eat); bounce na combo ≥2 ili T3; sesijski livada tint po T3, reset na Done/Back.
+
+**FEEL-B ✅** (2026-08-26, grana `ARENA`) — clear-field VFX kad nema legalnog para (odd leftover OK); jednom po pouru; bez coina; Done i pour i dalje rade. ARENA-01 prompti gotovi.
 
 ## Freeze (sažetak za agente)
 
@@ -207,5 +217,5 @@ Acceptance: kad ostane samo nespareno sjeme, jedan vizualni beat; wallet ne rast
 ## Povezano
 
 - [[../03-content/ideje-arena|hub]] · [[../03-content/ideje-arena-grupe|grupe]] · [[../03-content/ideje-arena-pitanja|pitanja]]
-- [[plan-prompts-home-cardfit|HOME-09]] (isti Plan-only obrazac)
+- [[plan-prompts-home-lockflow|HOME-10]] · [[plan-prompts-home-barfit|HOME-11]] · [[plan-prompts-home-cardfit|HOME-09]] (isti Plan-only obrazac)
 - [[CHECKPOINT|CHECKPOINT]]

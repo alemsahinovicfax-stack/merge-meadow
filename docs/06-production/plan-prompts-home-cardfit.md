@@ -17,9 +17,10 @@ ai_sažetak: "Copy-paste Plan-mode promptovi HOME-09 — CARDFIT-P0 docs → A A
 
 > **Kako:** novi chat → mode **Plan** → zalijepi **jedan** prompt → odobri → Agent.  
 > **Redoslijed:** **CARDFIT-P0 → A → B**  
+> **Chrome korekcija:** [[plan-prompts-home-lockflow|HOME-10 LOCKFLOW]] ✅ · [[plan-prompts-home-barfit|HOME-11 BARFIT]].  
 > **Ideje:** [[../03-content/ideje-home-cardfit|hub]] · [[../03-content/ideje-home-cardfit-gate|gate]] · [[../03-content/ideje-home-cardfit-naslov|naslov]] · [[../03-content/ideje-home-cardfit-roster|roster]] · [[../03-content/ideje-home-cardfit-pitanja|pitanja]]
 
-**CARDFIT-P0** urađen 2026-08-25 (docs). **CARDFIT-A** urađen 2026-08-25. **CARDFIT-B** još nije.
+**CARDFIT-P0** urađen 2026-08-25 (docs). **CARDFIT-A** urađen 2026-08-25. **CARDFIT-B** urađen 2026-08-25.
 
 ## Freeze
 
@@ -109,9 +110,9 @@ Acceptance: selektovana sezona ima ime NA SREDINI kartice; Bloom vs Moonlit vs A
 ## Redoslijed i ovisnosti
 
 - **P0** prije A/B (docs). Već urađeno 2026-08-25.
-- **A** urađen 2026-08-25. **B** sljedeći — B boji gate frame po `hero_id`; A je Amber pustila u centar.
+- **A** urađen 2026-08-25. **B** urađen 2026-08-25.
 - Ne spajati A i B u jedan prompt.
 
 ## Povezano
 
-- [[plan-prompts-home-incard|HOME-08]] · [[plan-prompts-home-unlock|HOME-07]] · [[plan-prompts-home-focus|HOME-06]]
+- [[plan-prompts-home-lockflow|HOME-10]] · [[plan-prompts-home-incard|HOME-08]] · [[plan-prompts-home-unlock|HOME-07]] · [[plan-prompts-home-focus|HOME-06]]

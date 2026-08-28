@@ -12,9 +12,27 @@ const BAG_LIFT := 100.0
 const BAG_KEEPOUT_SIDE := 56.0
 const BAG_KEEPOUT_TOP := 140.0
 const BAG_KEEPOUT_BOTTOM := 36.0
+const ARENA_COMBO_WINDOW_SEC := 1.4
+const COMBO_HUD_MIN := 2
+const COMBO_COIN_THRESHOLD := 5
+const ARENA_AUTO_REFILL_AT := 10
+const ARENA_BG_BASE := Color(0.16, 0.24, 0.18, 1.0)
+const ARENA_BG_BLOOM := Color(0.20, 0.36, 0.22, 1.0)
+const ARENA_TINT_T3_CAP := 4
+const ARENA_PIP_SIZE := Vector2(72, 72)
+const ARENA_PIP_INSET := Vector2(12, 8)
+const ARENA_PIP_REACT_SCALE := 1.18
+const ARENA_PIP_REACT_SEC := 0.28
+const CLEAR_CHIP_SCALE := 1.12
+const CLEAR_VFX_SEC := 0.4
+const CLEAR_FLASH_COLOR := Color(1.0, 0.96, 0.82, 1.0)
 
+@onready var meadow_bg: ColorRect = $Bg
 @onready var playfield: Control = $RootVBox/Playfield
+@onready var arena_pip: Control = $RootVBox/Playfield/ArenaPip
 @onready var info_label: Label = $RootVBox/InfoLabel
+@onready var daily_label: Label = $RootVBox/DailyLabel
+@onready var combo_label: Label = $RootVBox/TopBar/ComboLabel
 @onready var done_button: UiClickButton = $FooterBar/DoneButton
 @onready var back_button: UiClickButton = $RootVBox/TopBar/BackButton
 
@@ -23,11 +41,18 @@ var _chip_data: Dictionary = {}
 var _seed_bag: ArenaSeedBag
 var _magnet_lock_drag: ArenaSeedChip = null
 var _magnet_lock_partner: ArenaSeedChip = null
-var _bloom_panel: PanelContainer
-var _bloom_target: ArenaSeedChip = null
 var _pest: ArenaPest
 var _swipe_locked: bool = false
 var _page_active: bool = true
+var _combo_count: int = 0
+var _combo_window_left: float = 0.0
+var _combo_coin_granted_this_streak: bool = false
+var _auto_pouring: bool = false
+var _session_t3_count: int = 0
+var _pip_react_tween: Tween = null
+var _clear_vfx_done_this_pour: bool = false
+var _clear_vfx_tween: Tween = null
+var _clear_flash: ColorRect = null
 
 
 func _ready() -> void:
@@ -35,7 +60,7 @@ func _ready() -> void:
 	done_button.clicked.connect(_on_done_pressed)
 	back_button.clicked.connect(_on_back_pressed)
 	SAFE_AREA.apply_top_margin($RootVBox/TopBar, 8.0)
-	playfield.resized.connect(_layout_bag)
+	playfield.resized.connect(_layout_playfield_chrome)
 	call_deferred("_deferred_boot")
 
 
@@ -52,12 +77,14 @@ func _deferred_boot() -> void:
 	if legacy:
 		legacy.visible = false
 	_setup_bag()
-	_setup_bloom_panel()
 	_setup_pest()
+	_layout_arena_pip()
+	_apply_meadow_tint()
 	_apply_merge_hint_if_ready()
 	_apply_pest_tutorial_if_ready()
 	_update_hint()
 	_refresh_bag()
+	_refresh_daily_hud()
 
 
 func _apply_merge_hint_if_ready() -> void:
@@ -89,6 +116,140 @@ func _layout_bag() -> void:
 	var x := (field.x - bag_size.x) * 0.5
 	var y := field.y - bag_size.y - BAG_BOTTOM_PAD - BAG_LIFT
 	_seed_bag.set_layout_position(Vector2(x, y))
+
+
+func _layout_playfield_chrome() -> void:
+	_layout_bag()
+	_layout_arena_pip()
+	_layout_pest_nest()
+
+
+func _layout_arena_pip() -> void:
+	if arena_pip == null or playfield == null:
+		return
+	arena_pip.custom_minimum_size = ARENA_PIP_SIZE
+	arena_pip.size = ARENA_PIP_SIZE
+	arena_pip.position = ARENA_PIP_INSET
+	arena_pip.pivot_offset = ARENA_PIP_SIZE * 0.5
+	arena_pip.z_index = 4
+	arena_pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _add_session_t3() -> void:
+	_session_t3_count += 1
+	_apply_meadow_tint()
+	_react_arena_pip()
+
+
+func get_session_t3_count() -> int:
+	return _session_t3_count
+
+
+func _apply_meadow_tint() -> void:
+	if meadow_bg == null:
+		return
+	var t := minf(float(_session_t3_count) / float(ARENA_TINT_T3_CAP), 1.0)
+	meadow_bg.color = ARENA_BG_BASE.lerp(ARENA_BG_BLOOM, t)
+
+
+func _react_arena_pip() -> void:
+	if arena_pip == null:
+		return
+	if _pip_react_tween != null:
+		_pip_react_tween.kill()
+		_pip_react_tween = null
+	arena_pip.pivot_offset = arena_pip.size * 0.5
+	arena_pip.scale = Vector2.ONE
+	_pip_react_tween = create_tween()
+	_pip_react_tween.tween_property(
+		arena_pip, "scale", Vector2(ARENA_PIP_REACT_SCALE, ARENA_PIP_REACT_SCALE), ARENA_PIP_REACT_SEC * 0.45
+	)
+	_pip_react_tween.tween_property(arena_pip, "scale", Vector2.ONE, ARENA_PIP_REACT_SEC * 0.55)
+
+
+func _reset_session_feel() -> void:
+	_session_t3_count = 0
+	_apply_meadow_tint()
+	if _pip_react_tween != null:
+		_pip_react_tween.kill()
+		_pip_react_tween = null
+	if arena_pip:
+		arena_pip.scale = Vector2.ONE
+	_clear_vfx_done_this_pour = false
+	if _clear_vfx_tween != null:
+		_clear_vfx_tween.kill()
+		_clear_vfx_tween = null
+	if _clear_flash:
+		_clear_flash.visible = false
+		_clear_flash.modulate.a = 0.0
+
+
+func is_clear_of_pairs() -> bool:
+	var counts: Dictionary = {}
+	for chip in _chips:
+		if not is_instance_valid(chip):
+			continue
+		var key := "%s:%d" % [chip.type_id, chip.tier]
+		counts[key] = int(counts.get(key, 0)) + 1
+	for n in counts.values():
+		if int(n) >= 2:
+			return false
+	return true
+
+
+func did_play_clear_vfx_this_pour() -> bool:
+	return _clear_vfx_done_this_pour
+
+
+func _maybe_play_clear_vfx() -> void:
+	if _clear_vfx_done_this_pour:
+		return
+	if _chips.is_empty():
+		return
+	if not is_clear_of_pairs():
+		return
+	_clear_vfx_done_this_pour = true
+	_play_clear_field_vfx()
+
+
+func _ensure_clear_flash() -> void:
+	if _clear_flash != null or playfield == null:
+		return
+	_clear_flash = ColorRect.new()
+	_clear_flash.name = "ClearFlash"
+	_clear_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_clear_flash.z_index = 8
+	_clear_flash.color = CLEAR_FLASH_COLOR
+	_clear_flash.modulate.a = 0.0
+	_clear_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_clear_flash.visible = false
+	playfield.add_child(_clear_flash)
+
+
+func _play_clear_field_vfx() -> void:
+	_ensure_clear_flash()
+	if _clear_vfx_tween != null:
+		_clear_vfx_tween.kill()
+		_clear_vfx_tween = null
+	if _clear_flash:
+		_clear_flash.visible = true
+		_clear_flash.modulate.a = 0.4
+	for chip in _chips:
+		if not is_instance_valid(chip):
+			continue
+		chip.pivot_offset = chip.size * 0.5
+		chip.scale = Vector2.ONE
+		var chip_tw := create_tween()
+		chip_tw.tween_property(chip, "scale", Vector2(CLEAR_CHIP_SCALE, CLEAR_CHIP_SCALE), CLEAR_VFX_SEC * 0.45)
+		chip_tw.tween_property(chip, "scale", Vector2.ONE, CLEAR_VFX_SEC * 0.55)
+	if _clear_flash == null:
+		return
+	_clear_vfx_tween = create_tween()
+	_clear_vfx_tween.tween_property(_clear_flash, "modulate:a", 0.0, CLEAR_VFX_SEC)
+	_clear_vfx_tween.tween_callback(func() -> void:
+		if _clear_flash:
+			_clear_flash.visible = false
+	)
 
 
 func _apply_pest_tutorial_if_ready() -> void:
@@ -135,10 +296,12 @@ func _get_edible_chips_for_pest() -> Array:
 func _pest_eat_chip(chip: ArenaSeedChip) -> void:
 	if not _chips.has(chip):
 		return
-	_hide_bloom_panel()
 	_remove_chip(chip)
+	_resolve_stranded_t2()
 	_update_hint()
 	_refresh_bag()
+	_try_auto_refill()
+	_maybe_play_clear_vfx()
 
 
 func _notify_meta_swipe_lock(locked: bool) -> void:
@@ -176,8 +339,7 @@ func set_arena_page_active(active: bool) -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT if active else Node.PROCESS_MODE_DISABLED
 	if active:
 		if playfield:
-			_layout_bag()
-			_layout_pest_nest()
+			_layout_playfield_chrome()
 		_refresh_bag()
 		_sync_hub_nav_lock()
 	else:
@@ -193,13 +355,87 @@ func set_meta_hub_mode(_enabled: bool) -> void:
 func refresh_for_meta_hub() -> void:
 	_refresh_bag()
 	_update_hint()
+	_refresh_daily_hud()
 	_sync_hub_nav_lock()
+
+
+func register_arena_combo_merge() -> void:
+	if _combo_window_left > 0.0:
+		_combo_count += 1
+	else:
+		_combo_count = 1
+	_combo_window_left = ARENA_COMBO_WINDOW_SEC
+	if _combo_count == COMBO_COIN_THRESHOLD and not _combo_coin_granted_this_streak:
+		GameState.try_grant_arena_combo_coins()
+		_combo_coin_granted_this_streak = true
+	if _combo_count >= COMBO_COIN_THRESHOLD:
+		GameState.note_arena_daily_event("combo_5")
+	if _combo_count >= COMBO_HUD_MIN:
+		_react_arena_pip()
+	_refresh_combo_hud()
+	_refresh_daily_hud()
+
+
+func get_combo_count() -> int:
+	return _combo_count
+
+
+func is_combo_hud_visible() -> bool:
+	return combo_label != null and combo_label.visible
+
+
+func _clear_combo() -> void:
+	_combo_count = 0
+	_combo_window_left = 0.0
+	_combo_coin_granted_this_streak = false
+	_refresh_combo_hud()
+
+
+func _refresh_combo_hud() -> void:
+	if combo_label == null:
+		return
+	if _combo_count >= COMBO_HUD_MIN:
+		combo_label.visible = true
+		combo_label.text = "Combo %d" % _combo_count
+	else:
+		combo_label.visible = false
+
+
+func _refresh_daily_hud() -> void:
+	if daily_label == null:
+		return
+	daily_label.visible = true
+	daily_label.text = GameState.get_arena_daily_hud_text()
+
+
+func _on_chip_drag_started(chip: ArenaSeedChip) -> void:
+	_set_pair_pulses(chip)
+
+
+func _set_pair_pulses(held: ArenaSeedChip) -> void:
+	if not is_instance_valid(held):
+		_clear_pair_pulses()
+		return
+	for other in _chips:
+		if not is_instance_valid(other) or other == held:
+			continue
+		other.pulse_highlight = other.type_id == held.type_id and other.tier == held.tier
+
+
+func _clear_pair_pulses() -> void:
+	for chip in _chips:
+		if is_instance_valid(chip):
+			chip.pulse_highlight = false
 
 
 func _process(delta: float) -> void:
 	_apply_magnet_pull()
 	if _pest:
 		_pest.tick(delta)
+	if _combo_window_left > 0.0:
+		_combo_window_left -= delta
+		if _combo_window_left <= 0.0:
+			_clear_combo()
 	_sync_hub_nav_lock()
 
 
@@ -292,27 +528,72 @@ func _on_bag_clicked() -> void:
 		info_label.text = "Bag is empty."
 		_refresh_bag()
 		return
-	var to_pour := mini(slots, bag_count)
-	var pulled := GameState.pull_seeds_to_arena(to_pour)
-	if pulled.is_empty():
+	var poured := _pour_available_seeds()
+	if poured <= 0:
 		info_label.text = "Nothing to pour."
 		_refresh_bag()
 		return
-	_spawn_poured_chips(pulled)
-	_repel_chips_from_bag()
-	if _pest:
-		_pest.on_seeds_poured(not _chips.is_empty())
 	if GameState.should_show_arena_pest_tutorial():
 		info_label.text = "Muncher woke up — merge fast! T3 merge freezes it 2s."
 		GameState.mark_arena_pest_tutorial_shown()
 	else:
-		info_label.text = "Poured %d seeds — drag matching ones together!" % pulled.size()
-	_update_hint()
-	_refresh_bag()
+		info_label.text = "Poured %d seeds — drag matching ones together!" % poured
 
 
 func _arena_slots_available() -> int:
 	return maxi(0, GameState.ARENA_MAX_CHIPS - _chips.size())
+
+
+func _field_type_counts() -> Dictionary:
+	var counts: Dictionary = {}
+	for chip in _chips:
+		if not is_instance_valid(chip):
+			continue
+		var type_id := chip.type_id
+		counts[type_id] = int(counts.get(type_id, 0)) + 1
+	return counts
+
+
+func _pour_available_seeds() -> int:
+	var slots := _arena_slots_available()
+	if slots <= 0:
+		return 0
+	var bag_count := GameState.sum_seed_bag_only()
+	if bag_count <= 0:
+		return 0
+	var to_pour := mini(slots, bag_count)
+	var pulled: Array = GameState.pull_seeds_to_arena(to_pour, _field_type_counts())
+	if pulled.is_empty():
+		return 0
+	_spawn_poured_chips(pulled)
+	_repel_chips_from_bag()
+	if _pest:
+		_pest.on_seeds_poured(not _chips.is_empty())
+	_resolve_stranded_t2()
+	_update_hint()
+	_refresh_bag()
+	return pulled.size()
+
+
+func _try_auto_refill() -> void:
+	if _auto_pouring:
+		return
+	if _chips.size() <= 0 or _chips.size() > ARENA_AUTO_REFILL_AT:
+		return
+	if GameState.sum_seed_bag_only() <= 0:
+		return
+	if _arena_slots_available() <= 0:
+		return
+	_auto_pouring = true
+	_pour_available_seeds()
+	_auto_pouring = false
+	if (
+		_chips.size() > 0
+		and _chips.size() <= ARENA_AUTO_REFILL_AT
+		and GameState.sum_seed_bag_only() > 0
+		and _arena_slots_available() > 0
+	):
+		call_deferred("_try_auto_refill")
 
 
 func _get_bag_keepout_rect() -> Rect2:
@@ -347,6 +628,7 @@ func _repel_chips_from_bag() -> void:
 
 
 func _spawn_poured_chips(entries: Array) -> void:
+	_clear_vfx_done_this_pour = false
 	var existing: Array[Vector2] = []
 	for chip in _chips:
 		existing.append(chip.get_center())
@@ -359,8 +641,8 @@ func _spawn_poured_chips(entries: Array) -> void:
 		existing.append(pos)
 		var chip := ArenaSeedChip.new()
 		chip.setup(chip_id, type_id, pos, tier)
+		chip.drag_started.connect(_on_chip_drag_started)
 		chip.drag_released.connect(_on_chip_released)
-		chip.bloom_tapped.connect(_on_bloom_tapped)
 		playfield.add_child(chip)
 		_chips.append(chip)
 		_chip_data[chip_id] = {"chip_id": chip_id, "type_id": type_id, "tier": tier, "pos": pos}
@@ -473,12 +755,12 @@ func _resolve_overlaps(moved: ArenaSeedChip) -> void:
 
 func _on_chip_released(chip: ArenaSeedChip) -> void:
 	_clear_magnet_lock()
+	_clear_pair_pulses()
 	_sync_chip_pos(chip)
 	var partner := _find_snap_partner(chip)
 	if partner != null:
 		var result := GameState.try_merge_arena_chips(chip.chip_id, partner.chip_id, _chip_data)
 		if bool(result.get("ok", false)):
-			_hide_bloom_panel()
 			_remove_chip(partner)
 			var new_tier := int(result.get("new_tier", 2))
 			var merged_center := (chip.get_center() + partner.get_center()) * 0.5
@@ -490,21 +772,34 @@ func _on_chip_released(chip: ArenaSeedChip) -> void:
 				"tier": new_tier,
 				"pos": merged_center,
 			}
+			register_arena_combo_merge()
+			if new_tier == 2:
+				GameState.note_arena_daily_event("merge_t2")
+			elif new_tier >= GameState.MAX_MERGE_TIER:
+				GameState.note_arena_daily_event("make_t3")
+			_refresh_daily_hud()
 			var name: String = GameState.SEED_DISPLAY_NAMES.get(chip.type_id, chip.type_id)
 			if new_tier >= GameState.MAX_MERGE_TIER:
+				_add_session_t3()
 				if _pest:
 					_pest.on_t3_created()
 				GameState.stash_garden_crystal(chip.type_id)
 				info_label.text = "%s crystal → garden stash! Muncher frozen 2s." % name
 				_remove_chip(chip)
+				_resolve_stranded_t2()
 				_update_hint()
 				_refresh_bag()
+				_try_auto_refill()
+				_maybe_play_clear_vfx()
 				return
 			else:
 				info_label.text = "Merged to T%d — keep merging!" % new_tier
 			_resolve_overlaps(chip)
+			_resolve_stranded_t2()
 			_update_hint()
 			_refresh_bag()
+			_try_auto_refill()
+			_maybe_play_clear_vfx()
 			return
 		info_label.text = str(result.get("msg", "No merge."))
 	_resolve_overlaps(chip)
@@ -535,173 +830,49 @@ func _remove_chip(chip: ArenaSeedChip) -> void:
 		_pest.on_field_chip_count_changed(_chips.size())
 
 
-func _setup_bloom_panel() -> void:
-	if _bloom_panel != null:
-		return
-	_bloom_panel = PanelContainer.new()
-	_bloom_panel.name = "BloomActionPanel"
-	_bloom_panel.visible = false
-	_bloom_panel.z_index = 60
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1.0, 0.97, 0.9, 0.96)
-	style.set_corner_radius_all(12)
-	style.content_margin_left = 10.0
-	style.content_margin_top = 8.0
-	style.content_margin_right = 10.0
-	style.content_margin_bottom = 8.0
-	_bloom_panel.add_theme_stylebox_override("panel", style)
-	playfield.add_child(_bloom_panel)
-	var col := VBoxContainer.new()
-	col.name = "VBox"
-	col.add_theme_constant_override("separation", 6)
-	_bloom_panel.add_child(col)
-	var title := Label.new()
-	title.name = "Title"
-	col.add_child(title)
-	var subtitle := Label.new()
-	subtitle.name = "Subtitle"
-	subtitle.visible = false
-	subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	col.add_child(subtitle)
-	var row := HBoxContainer.new()
-	row.name = "ActionRow"
-	row.add_theme_constant_override("separation", 8)
-	col.add_child(row)
-	var donate := UiClickButton.new()
-	donate.name = "DonateBtn"
-	donate.label_text = "Donate"
-	donate.font_size = 16
-	donate.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	donate.clicked.connect(_on_bloom_donate)
-	row.add_child(donate)
-	var keep := UiClickButton.new()
-	keep.name = "KeepBtn"
-	keep.label_text = "Album"
-	keep.font_size = 16
-	keep.button_variant = "accent"
-	keep.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	keep.clicked.connect(_on_bloom_keep)
-	row.add_child(keep)
-	var basket := UiClickButton.new()
-	basket.name = "BasketBtn"
-	basket.label_text = "Basket"
-	basket.font_size = 16
-	basket.button_variant = "subtle"
-	basket.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	basket.clicked.connect(_on_bloom_basket)
-	row.add_child(basket)
+func _t2_has_pair_chance(chip: ArenaSeedChip) -> bool:
+	var type_id := chip.type_id
+	var other_t2 := 0
+	var field_t1 := 0
+	for other in _chips:
+		if not is_instance_valid(other) or other == chip:
+			continue
+		if other.type_id != type_id:
+			continue
+		if other.tier == 2:
+			other_t2 += 1
+		elif other.tier == 1:
+			field_t1 += 1
+	if other_t2 > 0:
+		return true
+	if int(GameState.seed_bag.get(type_id, 0)) > 0:
+		return true
+	return field_t1 >= 2
 
 
-func _on_bloom_tapped(chip: ArenaSeedChip) -> void:
-	if chip.tier < 2:
-		return
-	_show_bloom_panel(chip)
-
-
-func _show_bloom_panel(chip: ArenaSeedChip) -> void:
-	if _bloom_panel == null:
-		return
-	_bloom_target = chip
-	var name: String = GameState.SEED_DISPLAY_NAMES.get(chip.type_id, chip.type_id)
-	var title: Label = _bloom_panel.get_node("VBox/Title") as Label
-	if title:
-		title.text = "%s T%d" % [name, chip.tier]
-	var donate: UiClickButton = _bloom_panel.get_node("VBox/ActionRow/DonateBtn") as UiClickButton
-	var donate_off := false
-	if donate:
-		if chip.tier == 2:
-			donate_off = (
-				GameState.magnet_level >= GameState.MAGNET_MAX_LEVEL
-				or GameState.sprinkler_donations >= GameState.MAGNET_COST_T2
-			)
-		else:
-			donate_off = (
-				GameState.multiplier_level >= GameState.MULTIPLIER_MAX_LEVEL
-				or GameState.multiplier_donations >= GameState.MULTIPLIER_COST_T3
-			)
-		donate.disabled = donate_off
-	var keep: UiClickButton = _bloom_panel.get_node("VBox/ActionRow/KeepBtn") as UiClickButton
-	var keep_off := false
-	if keep:
-		var can_upgrade := GameState.can_keep_bloom_upgrade(chip.type_id, chip.tier)
-		keep_off = not can_upgrade
-		keep.disabled = keep_off
-		if can_upgrade:
-			var prev := int(GameState.collection_kept_tiers.get(chip.type_id, 0))
-			if prev <= 0:
-				keep.label_text = "Album"
-			else:
-				keep.label_text = "Album T%d→T%d" % [prev, chip.tier]
-		else:
-			var kept := int(GameState.collection_kept_tiers.get(chip.type_id, 0))
-			if kept >= chip.tier:
-				keep.label_text = "In Album"
-			else:
-				keep.label_text = "Keep"
-	var basket: UiClickButton = _bloom_panel.get_node("VBox/ActionRow/BasketBtn") as UiClickButton
-	if basket:
-		basket.disabled = false
-	var subtitle: Label = _bloom_panel.get_node_or_null("VBox/Subtitle") as Label
-	if subtitle:
-		if donate_off and keep_off:
-			subtitle.text = "Odd bloom — Basket, or Done returns a seed"
-			subtitle.visible = true
-		else:
-			subtitle.text = ""
-			subtitle.visible = false
-	var center := chip.get_center()
-	_bloom_panel.position = center + Vector2(-120.0, -ArenaSeedChip.CHIP_RADIUS - 90.0)
-	_bloom_panel.visible = true
-
-
-func _hide_bloom_panel() -> void:
-	if _bloom_panel:
-		_bloom_panel.visible = false
-	_bloom_target = null
-
-
-func _on_bloom_donate() -> void:
-	if _bloom_target == null:
-		return
-	if GameState.donate_bloom(_bloom_target.type_id, _bloom_target.tier):
-		info_label.text = "Donated!"
-		_consume_bloom_target()
-	else:
-		info_label.text = "Donate full — try Basket, or Done recycles to a seed."
-
-
-func _on_bloom_keep() -> void:
-	if _bloom_target == null:
-		return
-	if GameState.keep_bloom(_bloom_target.type_id, _bloom_target.tier):
-		info_label.text = "Saved to Album!"
-		_consume_bloom_target()
-	else:
-		info_label.text = "Already in Album at this tier — Donate or Basket."
-
-
-func _on_bloom_basket() -> void:
-	if _bloom_target == null:
-		return
-	if GameState.basket_bloom_type(_bloom_target.type_id):
-		var name: String = GameState.SEED_DISPLAY_NAMES.get(
-			GameState.get_loadout_type(),
-			GameState.get_loadout_type()
-		)
-		info_label.text = "Basket set to %s." % name
-		_consume_bloom_target()
-	else:
-		info_label.text = "Cannot use basket for this bloom."
-
-
-func _consume_bloom_target() -> void:
-	if _bloom_target == null:
-		return
-	var chip := _bloom_target
-	_hide_bloom_panel()
-	_remove_chip(chip)
-	_update_hint()
-	_refresh_bag()
+func _resolve_stranded_t2() -> void:
+	var snapshot: Array[ArenaSeedChip] = []
+	for chip in _chips:
+		if is_instance_valid(chip) and chip.tier == 2:
+			snapshot.append(chip)
+	var recycled_any := false
+	for chip in snapshot:
+		if not is_instance_valid(chip) or not _chips.has(chip):
+			continue
+		if chip.tier != 2:
+			continue
+		if _t2_has_pair_chance(chip):
+			continue
+		if GameState.seed_bag_remaining_capacity() < 2:
+			continue
+		var added := GameState.add_seeds_to_bag(chip.type_id, 2)
+		if added < 2:
+			continue
+		_remove_chip(chip)
+		recycled_any = true
+	if recycled_any:
+		GameState.save_player_save()
+		_try_auto_refill()
 
 
 func _refresh_bag() -> void:
@@ -716,7 +887,9 @@ func _refresh_bag() -> void:
 
 
 func _on_done_pressed() -> void:
-	_hide_bloom_panel()
+	_reset_session_feel()
+	_clear_combo()
+	_clear_pair_pulses()
 	GameState.commit_arena_chips_to_bag(_chip_data)
 	_clear_field_chips()
 	if _pest:
@@ -726,7 +899,9 @@ func _on_done_pressed() -> void:
 
 
 func _on_back_pressed() -> void:
-	_hide_bloom_panel()
+	_reset_session_feel()
+	_clear_combo()
+	_clear_pair_pulses()
 	GameState.commit_arena_chips_to_bag(_chip_data)
 	_clear_field_chips()
 	if _pest:
@@ -749,24 +924,15 @@ func _update_hint() -> void:
 		return
 	var bag := GameState.sum_seed_bag_only()
 	if GameState.should_prompt_merge_tutorial():
-		info_label.text = "Tap bag to pour seeds. Drag to merge. Tap blooms to spend."
+		info_label.text = "Tap bag to pour seeds. Drag matching seeds together."
 	elif bag >= 2 and _chips.is_empty():
 		info_label.text = "Tap the bag below — seeds jump into the arena!"
 	elif bag > 0 and _chips.size() < GameState.ARENA_MAX_CHIPS:
 		info_label.text = "Tap bag again to pour more (up to %d on field)." % GameState.ARENA_MAX_CHIPS
-	elif _field_has_t2_bloom():
-		info_label.text = "Odd T2: tap for Donate/Keep/Basket, or merge another T2."
 	elif not _chips.is_empty():
-		info_label.text = "Merge T1→T2→T3. T3 crystals go to garden stash. Tap T2 blooms to spend."
+		info_label.text = "Merge T1→T2→T3. T3 crystals go to garden stash."
 	elif bag <= 0 and _chips.is_empty():
 		if _pest and _pest.is_active():
 			info_label.text = "Out of seeds — tap Done or pour again when you have more."
 		else:
 			info_label.text = "No seeds left — tap Done to return to camp."
-
-
-func _field_has_t2_bloom() -> bool:
-	for chip in _chips:
-		if is_instance_valid(chip) and chip.tier == 2:
-			return true
-	return false

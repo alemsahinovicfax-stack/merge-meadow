@@ -20,11 +20,12 @@ const READABILITY := preload("res://scripts/ui/ui_readability.gd")
 		font_size = value
 		_update_label()
 
-@export_enum("secondary", "primary", "accent", "subtle") var button_variant: String = "secondary":
+@export_enum("secondary", "primary", "accent", "subtle", "gold") var button_variant: String = "secondary":
 	set(value):
 		button_variant = value
 		_build_styles()
 		_apply_panel_style()
+		_apply_label_theme()
 
 @export_enum("none", "play", "settings", "wallet", "retry", "home", "revive", "double") var button_icon: String = "none":
 	set(value):
@@ -104,7 +105,8 @@ func _build_styles() -> void:
 func _apply_label_theme() -> void:
 	if _label == null:
 		return
-	_label.add_theme_color_override("font_color", UI_PALETTE.UI_TEXT)
+	var ink := UI_PALETTE.GOLD_INK if button_variant == "gold" else UI_PALETTE.UI_TEXT
+	_label.add_theme_color_override("font_color", ink)
 
 
 func _ensure_content() -> void:

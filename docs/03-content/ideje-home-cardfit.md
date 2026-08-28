@@ -10,6 +10,7 @@ povezano:
   - ideje-home-cardfit-pitanja
   - plan-prompts-home-cardfit
   - ideje-home-incard
+  - ideje-home-lockflow
   - CHECKPOINT
 ai_sažetak: "HOME-09 hub — Amber više nije TEST_LOCK (gate na next-lock free); naslov opet na sredini kartice; roster pozadina po sezoni + širi panel."
 ---
@@ -17,7 +18,8 @@ ai_sažetak: "HOME-09 hub — Amber više nije TEST_LOCK (gate na next-lock free
 # IDEJE — Home cardfit (HOME-09 hub)
 
 > **ID:** **HOME-09** · v1.1+ (nije v1 launch blocker).  
-> **Kod:** **CARDFIT-A ✅**. Prompti: [[../06-production/plan-prompts-home-cardfit|plan-prompts-home-cardfit]] **CARDFIT-P0 → A ✅ → B**.  
+> **Kod:** **CARDFIT-A–B ✅**. Prompti: [[../06-production/plan-prompts-home-cardfit|plan-prompts-home-cardfit]] **CARDFIT-P0 → A → B** sve ✅.  
+> **Chrome korekcija:** [[ideje-home-lockflow|HOME-10]] — roster clip lijevo + ellipsis; swipe wash lag; locked poster (ime + 500/20 + gold Unlock).  
 > **Prethodnik:** [[ideje-home-incard|HOME-08]] INCARD-A–B ✅ — roster i Unlock **jesu** u hero-centar prozoru, ali playtest kaže da Unlock „nije napravljen“, ime više nije na sredini, roster je isti tamni okvir na svakoj sezoni, tekst ne staje.  
 > **Pillar:** [[../01-vision/design-pillars|Fair F2P]] — coin Unlock i dalje samo lanac **free** sezona (next-lock). Paid (Moonlit / Coral / Starfall / Ember) **nema** coin Unlock. Ember ostaje paid TEST_LOCK / IAP.
 
@@ -125,5 +127,5 @@ Detalj: [[ideje-home-cardfit-gate|gate]] · [[ideje-home-cardfit-naslov|naslov]]
 
 ## Povezano
 
-- [[ideje-home-incard|HOME-08]] · [[ideje-home-unlock|HOME-07]] · [[ideje-home-focus|HOME-06]]
+- [[ideje-home-lockflow|HOME-10]] · [[ideje-home-barfit|HOME-11]] · [[ideje-home-incard|HOME-08]] · [[ideje-home-unlock|HOME-07]] · [[ideje-home-focus|HOME-06]]
 - [[../06-production/CHECKPOINT|CHECKPOINT]] · [[../06-production/plan-prompts-home-cardfit|prompti]]
