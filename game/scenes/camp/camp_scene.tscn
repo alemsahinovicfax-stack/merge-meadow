@@ -1,8 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://c8campscene01"]
+[gd_scene load_steps=11 format=3 uid="uid://c8campscene01"]
 
 [ext_resource type="Script" path="res://scripts/camp/camp_controller.gd" id="1_camp"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
-[ext_resource type="Script" path="res://scripts/ui/companion_slot.gd" id="3_companion"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top"]
 bg_color = Color(0.12, 0.2, 0.14, 0.92)
@@ -322,9 +321,10 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="GardenTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Garden"
+text = "Seeds"
 horizontal_alignment = 1
 
 [node name="GardenCliff" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
@@ -375,16 +375,18 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="CrystalTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Flower stash"
+text = "Flowers"
 horizontal_alignment = 1
 
 [node name="CrystalCliff" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Merge T3 in Arena → flowers here"
+text = ""
 horizontal_alignment = 1
 autowrap_mode = 2
 
@@ -443,7 +445,7 @@ autowrap_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Donated 0/2 T2 — donate in Arena"
+text = "Spend 2 flowers"
 autowrap_mode = 2
 
 [node name="UpgradeButton" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards/SprinklerCard/SprinklerVBox"]
@@ -473,7 +475,7 @@ autowrap_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Donated 0/2 T3 — donate in Arena"
+text = "Spend 2 flowers"
 autowrap_mode = 2
 
 [node name="UpgradeMultiplierButton" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards/LootCard/LootVBox"]
@@ -483,54 +485,6 @@ layout_mode = 2
 script = ExtResource("2_uibtn")
 label_text = "Upgrade"
 font_size = 20
-
-[node name="RunPrepCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_card")
-
-[node name="RunPrepVBox" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/RunPrepCard"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="RunPrepTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/RunPrepCard/RunPrepVBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "For next run"
-horizontal_alignment = 1
-
-[node name="CompanionTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/RunPrepCard/RunPrepVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Companion"
-horizontal_alignment = 1
-
-[node name="CompanionHint" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/RunPrepCard/RunPrepVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Tap to choose who runs with you"
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="CompanionRow" type="HBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/RunPrepCard/RunPrepVBox"]
-layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="PipSlot" type="Control" parent="RootVBox/MainScroll/ContentMargin/Content/RunPrepCard/RunPrepVBox/CompanionRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 2
-script = ExtResource("3_companion")
-companion_id = "pip"
-
-[node name="MochiSlot" type="Control" parent="RootVBox/MainScroll/ContentMargin/Content/RunPrepCard/RunPrepVBox/CompanionRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 2
-script = ExtResource("3_companion")
-companion_id = "mochi"
 
 [node name="FooterBar" type="MarginContainer" parent="."]
 unique_name_in_owner = true

@@ -70,4 +70,5 @@ vertical_scroll_mode = 2
 [node name="List" type="VBoxContainer" parent="RootVBox/ListScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 0
 theme_override_constants/separation = 10

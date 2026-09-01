@@ -20,9 +20,11 @@ const CrystalStashChipScript := preload("res://scripts/camp/crystal_stash_chip.g
 @onready var seeds_label: Label = %SeedsLabel
 @onready var status_toast: PanelContainer = %StatusToast
 @onready var status_label: Label = %StatusLabel
+@onready var garden_title: Label = %GardenTitle
 @onready var garden_cliff: Label = %GardenCliff
 @onready var bag_label: Label = %BagLabel
 @onready var seed_bag_grid: GridContainer = %SeedBagGrid
+@onready var crystal_title: Label = %CrystalTitle
 @onready var crystal_cliff: Label = %CrystalCliff
 @onready var crystal_total_label: Label = %CrystalTotalLabel
 @onready var crystal_grid: GridContainer = %CrystalGrid
@@ -34,10 +36,6 @@ const CrystalStashChipScript := preload("res://scripts/camp/crystal_stash_chip.g
 @onready var multiplier_label: Label = %MultiplierLabel
 @onready var multiplier_caption: Label = %MultiplierCaption
 @onready var upgrade_multiplier_button: UiClickButton = %UpgradeMultiplierButton
-@onready var companion_title: Label = %CompanionTitle
-@onready var companion_hint: Label = %CompanionHint
-@onready var pip_companion_slot: Control = %PipSlot
-@onready var mochi_companion_slot: Control = %MochiSlot
 @onready var footer_bar: MarginContainer = %FooterBar
 @onready var merge_button: UiClickButton = %MergeButton
 @onready var play_button: UiClickButton = %PlayButton
@@ -64,6 +62,8 @@ func _ready() -> void:
 	_setup_resource_icons()
 	_setup_typography()
 	_setup_safe_area()
+	if crystal_cliff:
+		crystal_cliff.visible = false
 	_apply_hub_chrome()
 	_force_default_trade_select = true
 	if _meta_hub_embedded:
@@ -110,23 +110,10 @@ func _setup_typography() -> void:
 		TEXT_LAYOUT.card_title_scroll(multiplier_label)
 	if multiplier_caption:
 		TEXT_LAYOUT.caption_label_scroll(multiplier_caption)
-	if companion_title:
-		TEXT_LAYOUT.card_title_scroll(companion_title)
-	if companion_hint:
-		TEXT_LAYOUT.caption_label_scroll(companion_hint)
-	var garden_title := get_node_or_null("RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox/GardenTitle")
-	if garden_title is Label:
+	if garden_title:
 		TEXT_LAYOUT.section_title_scroll(garden_title)
-	var crystal_title := get_node_or_null(
-		"RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox/CrystalTitle"
-	)
-	if crystal_title is Label:
+	if crystal_title:
 		TEXT_LAYOUT.section_title_scroll(crystal_title)
-	var run_prep_title := get_node_or_null(
-		"RootVBox/MainScroll/ContentMargin/Content/RunPrepCard/RunPrepVBox/RunPrepTitle"
-	)
-	if run_prep_title is Label:
-		TEXT_LAYOUT.section_title_scroll(run_prep_title)
 
 func _setup_safe_area() -> void:
 	if top_strip and not _meta_hub_embedded:
@@ -134,10 +121,6 @@ func _setup_safe_area() -> void:
 		SAFE_AREA.apply_horizontal_margins(top_strip)
 	if footer_bar:
 		SAFE_AREA.apply_bottom_margin(footer_bar, 4.0 if _meta_hub_embedded else 8.0)
-	if pip_companion_slot and pip_companion_slot.has_signal("slot_pressed"):
-		pip_companion_slot.slot_pressed.connect(_on_companion_slot_pressed)
-	if mochi_companion_slot and mochi_companion_slot.has_signal("slot_pressed"):
-		mochi_companion_slot.slot_pressed.connect(_on_companion_slot_pressed)
 
 func _apply_hub_chrome() -> void:
 	var show_local_chrome := not _meta_hub_embedded
@@ -184,14 +167,13 @@ func _refresh_ui(status: String = "") -> void:
 	_refresh_upgrade_cards()
 	_refresh_garden_card()
 	_refresh_crystal_card()
-	_refresh_companion_ui()
 	_refresh_collection_badge()
 	_set_status_toast(status)
 	_notify_hub_chrome()
 
 func _refresh_upgrade_cards() -> void:
 	var magnet_maxed := GameState.magnet_level >= GameState.MAGNET_MAX_LEVEL
-	var magnet_ready := GameState.sprinkler_donations >= GameState.MAGNET_COST_T2
+	var can_spend := GameState.can_spend_flowers_for_upgrade(_selected_crystal_type)
 	sprinkler_label.text = "Sprinkler  Lv %d/%d" % [
 		GameState.magnet_level,
 		GameState.MAGNET_MAX_LEVEL,
@@ -200,42 +182,43 @@ func _refresh_upgrade_cards() -> void:
 		sprinkler_caption.text = "Max level · reach %dpx" % int(GameState.get_magnet_radius())
 		upgrade_button.label_text = "Maxed"
 		upgrade_button.disabled = true
-	elif magnet_ready:
-		sprinkler_caption.text = "Donated %d/%d T2 — ready" % [
-			GameState.sprinkler_donations,
-			GameState.MAGNET_COST_T2,
-		]
-		upgrade_button.label_text = "Upgrade"
-		upgrade_button.disabled = false
 	else:
-		sprinkler_caption.text = "Donated %d/%d T2 — donate in Arena" % [
-			GameState.sprinkler_donations,
-			GameState.MAGNET_COST_T2,
+		var now_px := int(GameState.get_magnet_radius_for_level(GameState.magnet_level))
+		var next_px := int(GameState.get_magnet_radius_for_level(GameState.magnet_level + 1))
+		var cost_bit := "Spend 2 flowers" if can_spend else "Need 2 flowers"
+		sprinkler_caption.text = "Wider seed magnet next run · %d→%d px · %s" % [
+			now_px,
+			next_px,
+			cost_bit,
 		]
 		upgrade_button.label_text = "Upgrade"
-		upgrade_button.disabled = true
+		upgrade_button.disabled = not can_spend
 
 	var loot_maxed := GameState.multiplier_level >= GameState.MULTIPLIER_MAX_LEVEL
-	var loot_ready := GameState.multiplier_donations >= GameState.MULTIPLIER_COST_T3
 	multiplier_label.text = GameState.format_loot_multiplier_label()
 	if loot_maxed:
 		multiplier_caption.text = "Max level"
 		upgrade_multiplier_button.label_text = "Maxed"
 		upgrade_multiplier_button.disabled = true
-	elif loot_ready:
-		multiplier_caption.text = "Donated %d/%d T3 — ready" % [
-			GameState.multiplier_donations,
-			GameState.MULTIPLIER_COST_T3,
-		]
-		upgrade_multiplier_button.label_text = "Upgrade"
-		upgrade_multiplier_button.disabled = false
 	else:
-		multiplier_caption.text = "Donated %d/%d T3 — donate in Arena" % [
-			GameState.multiplier_donations,
-			GameState.MULTIPLIER_COST_T3,
+		var cur_mult := GameState.get_loot_multiplier_for_level(GameState.multiplier_level)
+		var next_mult := GameState.get_loot_multiplier_for_level(GameState.multiplier_level + 1)
+		var loot_cost := "Spend 2 flowers" if can_spend else "Need 2 flowers"
+		multiplier_caption.text = "More loot next run · now ×%s, next ×%s · %s" % [
+			_format_loot_times(cur_mult),
+			_format_loot_times(next_mult),
+			loot_cost,
 		]
 		upgrade_multiplier_button.label_text = "Upgrade"
-		upgrade_multiplier_button.disabled = true
+		upgrade_multiplier_button.disabled = not can_spend
+
+
+func _format_loot_times(mult: float) -> String:
+	var snapped_v := snappedf(mult, 0.01)
+	if is_equal_approx(snapped_v, snappedf(snapped_v, 1.0)):
+		return "%d.0" % int(round(snapped_v))
+	return str(snapped_v)
+
 
 func _refresh_garden_card() -> void:
 	var bag_count := GameState.sum_seed_bag(GameState.seed_bag)
@@ -257,10 +240,7 @@ func _refresh_crystal_card() -> void:
 	if crystal_total_label:
 		crystal_total_label.text = "Flowers: %d" % crystal_total
 	if crystal_cliff:
-		if crystal_total <= 0:
-			crystal_cliff.text = "Merge T3 in Arena → flowers here"
-		else:
-			crystal_cliff.text = "Tap a flower type, then Exchange for coins."
+		crystal_cliff.visible = false
 	_rebuild_crystal_grid()
 	_refresh_crystal_exchange_button()
 
@@ -298,9 +278,7 @@ func _refresh_exchange_button() -> void:
 		var bag_count := int(GameState.seed_bag.get(_selected_trade_type, 0))
 		var take := GameState.seed_exchange_take_count(bag_count)
 		var coins := GameState.seed_exchange_coins_for_take(take, _selected_trade_type)
-		var seed_name: String = GameState.SEED_DISPLAY_NAMES.get(
-			_selected_trade_type, _selected_trade_type.capitalize()
-		)
+		var seed_name: String = GameState.get_seed_display_name(_selected_trade_type)
 		exchange_button.label_text = "Trade %d× %s → %d coins" % [take, seed_name, coins]
 	else:
 		exchange_button.label_text = "Select a seed to trade"
@@ -369,9 +347,7 @@ func _refresh_crystal_exchange_button() -> void:
 	var has_select := not _selected_crystal_type.is_empty()
 	crystal_exchange_button.disabled = not has_select
 	if has_select:
-		var crystal_name: String = GameState.SEED_DISPLAY_NAMES.get(
-			_selected_crystal_type, _selected_crystal_type.capitalize()
-		)
+		var crystal_name: String = GameState.get_seed_display_name(_selected_crystal_type)
 		var coins := GameState.crystal_exchange_coins_for_type(_selected_crystal_type)
 		crystal_exchange_button.label_text = "Exchange %s → %d coins" % [
 			crystal_name,
@@ -422,19 +398,10 @@ func _refresh_crystal_chip_selection() -> void:
 func _garden_cliff_text(bag_count: int, crystal_total: int) -> String:
 	if GameState.should_prompt_merge_tutorial():
 		return "Tutorial: open Merge and drag same seeds together."
-	var need_t2 := GameState.MAGNET_COST_T2 - GameState.sprinkler_donations
-	if (
-		GameState.magnet_level < GameState.MAGNET_MAX_LEVEL
-		and need_t2 > 0
-		and need_t2 <= 1
-	):
-		return "1 more T2 to upgrade Sprinkler."
 	if bag_count > 0:
 		return "Bag seeds are T1 — pour in Arena or trade 3→coins. T2 blooms resolve in Arena."
 	if crystal_total > 0:
 		return "%d flowers ready — exchange for coins." % crystal_total
-	if GameState.count_collection_journal_news() > 0:
-		return "New blooms in Journal — swipe to the Journal tab."
 	return "Run → collect seeds → Merge here."
 
 
@@ -446,43 +413,20 @@ func _refresh_collection_badge() -> void:
 	collection_badge.visible = news > 0 and not _meta_hub_embedded
 	collection_badge.text = "!" if news == 1 else str(mini(news, 9))
 
-func _set_status_toast(status: String) -> void:
-	if status_toast == null or status_label == null:
-		return
-	if status.is_empty():
-		return
-	status_label.text = status
-	status_toast.visible = true
-
-func _refresh_companion_ui() -> void:
-	var active := GameState.get_active_companion_id()
-	if pip_companion_slot and pip_companion_slot.has_method("set_selected"):
-		pip_companion_slot.set_selected(active == GameState.COMPANION_PIP)
-	if mochi_companion_slot and mochi_companion_slot.has_method("set_selected"):
-		mochi_companion_slot.set_selected(active == GameState.COMPANION_MOCHI)
-	if companion_hint:
-		companion_hint.text = GameState.format_mochi_unlock_hint()
-	var unlock_msg := GameState.poll_mochi_unlock_toast()
-	if not unlock_msg.is_empty():
-		_set_status_toast(unlock_msg)
-
-func _on_companion_slot_pressed(companion_id: String) -> void:
-	_refresh_ui(GameState.try_set_active_companion(companion_id))
+func _set_status_toast(_status: String) -> void:
+	if status_toast:
+		status_toast.visible = false
 
 func _on_merge_pressed() -> void:
 	GameState.go_to_merge_arena()
 
 func _on_upgrade_pressed() -> void:
-	if GameState.try_upgrade_magnet():
-		_refresh_ui("Sprinkler upgraded!")
-	else:
-		_refresh_ui()
+	GameState.try_upgrade_magnet(_selected_crystal_type)
+	_refresh_ui()
 
 func _on_upgrade_multiplier_pressed() -> void:
-	if GameState.try_upgrade_multiplier():
-		_refresh_ui("Loot Boost upgraded — ×%.2g next run!" % GameState.get_loot_multiplier())
-	else:
-		_refresh_ui()
+	GameState.try_upgrade_multiplier(_selected_crystal_type)
+	_refresh_ui()
 
 func _on_exchange_pressed() -> void:
 	if _selected_trade_type.is_empty():
@@ -498,7 +442,7 @@ func _on_exchange_pressed() -> void:
 	var coins := GameState.seed_exchange_coins_for_take(take, type_id)
 	var entries_before: Array = GameState.get_seed_bag_entries()
 	if GameState.exchange_seeds_from_bag(type_id):
-		var seed_name: String = GameState.SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+		var seed_name: String = GameState.get_seed_display_name(type_id)
 		if int(GameState.seed_bag.get(type_id, 0)) < 1:
 			_selected_trade_type = _next_trade_type_after(entries_before, type_id)
 		# else keep same type for spam Trade
@@ -514,9 +458,7 @@ func _on_crystal_exchange_pressed() -> void:
 		_refresh_ui("No flowers of that type left.")
 		return
 	if GameState.exchange_garden_crystal(crystal_type):
-		var crystal_name: String = GameState.SEED_DISPLAY_NAMES.get(
-			crystal_type, crystal_type.capitalize()
-		)
+		var crystal_name: String = GameState.get_seed_display_name(crystal_type)
 		var coins := GameState.crystal_exchange_coins_for_type(crystal_type)
 		# Keep select while count >= 1; _validate_crystal_selection clears when gone.
 		_refresh_ui("Traded %s flower for %d coins." % [crystal_name, coins])

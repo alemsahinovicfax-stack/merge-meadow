@@ -28,6 +28,10 @@ enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 @onready var picker_list: VBoxContainer = %PickerList
 @onready var picker_close_button: UiClickButton = %PickerCloseButton
 @onready var season_stage: Control = %SeasonStage
+@onready var field_backdrop: ColorRect = %FieldBackdrop
+@onready var season_name_chip: UiClickButton = %SeasonNameChip
+@onready var decor_mound_left: ColorRect = $DecorMoundLeft
+@onready var decor_mound_right: ColorRect = $DecorMoundRight
 
 var _chest_ui_state: ChestUiState = ChestUiState.LOCKED
 var _chest_pulsing: bool = false
@@ -56,6 +60,8 @@ func _ready() -> void:
 		_on_daily_chest_resized()
 	if basket_card:
 		basket_card.gui_input.connect(_on_basket_card_gui_input)
+	if season_name_chip:
+		season_name_chip.clicked.connect(_on_season_name_chip_pressed)
 	_cache_daily_styles()
 	_setup_typography()
 	_setup_safe_area()
@@ -63,6 +69,9 @@ func _ready() -> void:
 		GameState.debug_unlock_all_seasons()
 		GameState.debug_relock_playtest_free()
 		GameState.debug_grant_unlock_test_funds()
+	var pip_portrait: Control = get_node_or_null("%PipPortrait") as Control
+	if pip_portrait:
+		pip_portrait.visible = false
 	_refresh_menu()
 	_refresh_chest_card()
 	_refresh_basket_card()
@@ -90,6 +99,8 @@ func _setup_safe_area() -> void:
 	if home_top_stack:
 		SAFE_AREA.apply_top_margin(home_top_stack, 8.0)
 		SAFE_AREA.apply_horizontal_margins(home_top_stack)
+	if season_name_chip:
+		SAFE_AREA.apply_top_margin(season_name_chip, 8.0)
 	if home_column:
 		SAFE_AREA.apply_bottom_margin(home_column, 8.0)
 
@@ -123,13 +134,55 @@ func _exit_tree() -> void:
 func _refresh_menu() -> void:
 	var hub := GameState.tutorial_complete
 	tutorial_hint.visible = not hub
-	if endless_play_button:
-		endless_play_button.visible = hub
 	play_button.label_text = "Play"
 	_refresh_play_theme_badge()
 	_refresh_basket_card()
+	_refresh_endless_button()
 	if season_stage and season_stage.has_method("refresh"):
 		season_stage.call("refresh")
+	sync_field_backdrop()
+
+
+func sync_field_backdrop() -> void:
+	var open := GameState.home_season_field_open
+	if field_backdrop:
+		field_backdrop.visible = open
+		if open:
+			field_backdrop.color = SeasonTheme.home_field_tint(GameState.home_season_field_id)
+			field_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if decor_mound_left:
+		decor_mound_left.visible = not open
+	if decor_mound_right:
+		decor_mound_right.visible = not open
+	_sync_loadout_to_open_season()
+	_refresh_basket_card()
+	_refresh_endless_button()
+	_refresh_season_name_chip()
+
+
+func _refresh_season_name_chip() -> void:
+	if season_name_chip == null:
+		return
+	var open := GameState.home_season_field_open
+	season_name_chip.visible = open
+	if not open:
+		season_name_chip.label_text = ""
+		return
+	var def: SeasonDef = GameState.get_season_def(GameState.home_season_field_id)
+	season_name_chip.label_text = def.display_name if def else GameState.home_season_field_id
+
+
+func _on_season_name_chip_pressed() -> void:
+	if season_stage and season_stage.has_method("close_season_field"):
+		season_stage.call("close_season_field")
+
+
+func _refresh_endless_button() -> void:
+	if endless_play_button == null:
+		return
+	endless_play_button.visible = (
+		GameState.tutorial_complete and GameState.home_season_field_open
+	)
 
 
 func _refresh_play_theme_badge() -> void:
@@ -138,12 +191,34 @@ func _refresh_play_theme_badge() -> void:
 	play_theme_badge.visible = false
 
 
+func home_play_action() -> String:
+	if GameState.home_season_field_open:
+		return "run"
+	if GameState.is_season_playable(GameState.home_hero_center_id()):
+		return "open_field"
+	return "snap"
+
+
 func _on_play_pressed() -> void:
-	GameState.begin_campaign_run()
-	SceneRouter.change_to(GameState.SCENE_RUN)
+	var action := home_play_action()
+	if action == "run":
+		GameState.begin_campaign_run()
+		SceneRouter.change_to(GameState.SCENE_RUN)
+		return
+	if action == "open_field":
+		if season_stage and season_stage.has_method("open_season_field"):
+			season_stage.call("open_season_field")
+		return
+	if season_stage and season_stage.has_method("snap_carousel_to_active"):
+		season_stage.call("snap_carousel_to_active")
 
 
 func _on_endless_play_pressed() -> void:
+	if not GameState.home_season_field_open:
+		return
+	var field_id := GameState.home_season_field_id
+	if not field_id.is_empty():
+		GameState.set_active_season(field_id)
 	GameState.begin_endless_run(GameState.EndlessDifficulty.HARD)
 	SceneRouter.change_to(GameState.SCENE_RUN)
 
@@ -290,9 +365,21 @@ func refresh_for_meta_hub() -> void:
 	_refresh_basket_card()
 
 
+func _sync_loadout_to_open_season() -> void:
+	if not GameState.home_season_field_open:
+		return
+	var loadout := GameState.get_loadout_type()
+	if loadout.is_empty():
+		return
+	var pool: Array[String] = SeedCatalog.types_for_season(GameState.home_season_field_id)
+	if not pool.has(loadout):
+		GameState.clear_loadout()
+
+
 func _refresh_basket_card() -> void:
 	if basket_card == null:
 		return
+	basket_card.visible = GameState.home_season_field_open
 	_basket_locked = not GameState.loadout_enabled()
 	if _basket_locked:
 		if basket_title:
@@ -313,7 +400,7 @@ func _refresh_basket_card() -> void:
 		if basket_visual and basket_visual.has_method("set_loadout_type"):
 			basket_visual.call("set_loadout_type", "")
 	else:
-		var name: String = GameState.SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+		var name: String = GameState.get_seed_display_name(type_id)
 		var stars := "★".repeat(GameState.get_seed_rarity(type_id))
 		if basket_title:
 			basket_title.text = name
@@ -358,6 +445,8 @@ func _on_picker_dim_gui_input(event: InputEvent) -> void:
 
 
 func _open_basket_picker() -> void:
+	if not GameState.home_season_field_open:
+		return
 	if basket_picker_overlay == null or picker_list == null:
 		return
 	_rebuild_picker_list()
@@ -384,8 +473,8 @@ func _rebuild_picker_list() -> void:
 	clear_btn.disabled = current.is_empty()
 	clear_btn.clicked.connect(_on_basket_clear_picked)
 	picker_list.add_child(clear_btn)
-	for type_id in GameState.get_unlocked_loadout_types():
-		var name: String = GameState.SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+	for type_id in GameState.get_unlocked_loadout_types_for_season(GameState.home_season_field_id):
+		var name: String = GameState.get_seed_display_name(type_id)
 		var stars := "★".repeat(GameState.get_seed_rarity(type_id))
 		var row := UiClickButton.new()
 		row.custom_minimum_size = Vector2(0, 56)

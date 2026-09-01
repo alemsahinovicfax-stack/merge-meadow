@@ -1,7 +1,7 @@
 class_name SeedVisualConfig
 extends RefCounted
 
-## Boje i proceduralni crtež po tipu sjemena (7 launch tipova).
+## Boje i proceduralni crtež: Bloom 7 paleta; ostali catalog id-evi hash HSV fallback.
 
 const STEM := Color(0.35, 0.62, 0.32, 1.0)
 const LEAF := Color(0.42, 0.76, 0.38, 1.0)

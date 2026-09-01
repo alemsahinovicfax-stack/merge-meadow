@@ -10,7 +10,11 @@ povezano:
   - ideje-arena-pest
   - ideje-arena-pitanja
   - ideje-arena-grupe
+  - ideje-arena-leftover
+  - ideje-arena-sort
   - plan-prompts-arena
+  - plan-prompts-arena-leftover
+  - plan-prompts-arena-sort
   - merge-arena-v1.1
   - merge-arena-pest
   - merge-kamp
@@ -25,6 +29,7 @@ ai_sažetak: "ARENA-01 hub — freeze 2026-08-20: combo+coins, pulse, auto-refil
 > **ID:** **ARENA-01** · v1.1+ (nije v1 launch blocker, nije D0-P).  
 > **Kod:** još nije. Prompti: [[../06-production/plan-prompts-arena|plan-prompts-arena]] **COMB-A → FLOW-A → FLOW-B → DAILY-A → FEEL-A → FEEL-B**. Grupe: [[ideje-arena-grupe|grupe]].  
 > **Freeze:** A0–A35 **2026-08-20** — [[ideje-arena-pitanja|pitanja]].  
+> **Nasljednik:** [[ideje-arena-leftover|ARENA-02 leftover]] — overlay n/4, hide, debug 100. Pour ÷4 **overridea** [[ideje-arena-sort|ARENA-03]] (sav T1 po CHAIN + vacuum). E kod ne.  
 > **Prethodnik:** [[../02-design/merge-arena-v1.1|MA-01]] magnet arena ✅ · [[../02-design/merge-arena-pest|MA-01b]] Muncher ✅ · [[../06-production/ideje-kad-predloziti|UX-04]] hub page Arena ✅.  
 > **Pillar:** [[../01-vision/design-pillars|Fair F2P]] — merge ostaje besplatan; nema pay-to-merge. [[../01-vision/design-pillars|Pillar 3]] — nema fail statea u areni; ciljevi su nagrada, ne kazna.
 
@@ -251,18 +256,24 @@ Redoslijed: **COMB-A → FLOW-A → FLOW-B → DAILY-A → FEEL-A → FEEL-B** (
 | [[ideje-arena-pitanja\|pitanja]] | A0–A35 freeze |
 | [[ideje-arena-grupe\|grupe]] | G1–G5 mapa → prompt ID-evi |
 | [[../06-production/plan-prompts-arena\|prompti]] | COMB-A … FEEL-B (Plan-only) |
+| [[ideje-arena-leftover\|ARENA-02 leftover]] | Overlay n/4, refill 12, debug 100; pour ÷4 overridean ARENA-03 |
+| [[ideje-arena-sort\|ARENA-03 sort]] | Pour sav T1 po CHAIN; vacuum t1_eq &lt; 4; overlay ostaje |
 
 ## Agent
 
 - Kad korisnik dira Merge Arena, Muncher, combo, leftover T2 → **ARENA-01**.
-- Freeze ✅. Grupe + prompti ✅. Sljedeće: zalijepi **COMB-A**. Ne kodirati bez Plan odobrenja.
+- Kad dira overlay `n/4`, „trebam još sjemena“, debug 100 T1 → **ARENA-02** [[ideje-arena-leftover|leftover]].
+- Kad dira pour miješa tipove, floor-4 ostatak, Muncher ostavi 3 T1, vacuum → **ARENA-03** [[ideje-arena-sort|sort]].
+- Freeze ✅. Kod COMB-A…FEEL-B ✅. Leftover **P0 ✅ A ✅ B ✅ C ✅ D ✅**. Sort **P0 ✅**.
 - **Ne** predlagati pay-to-merge, energy, fail u areni, bloom panel natrag.
 - MA-01 magnet ostaje. Bloom inbox/panel u specu je overridean ovim freezeom za **kod**, ne za kanon doc dok „dodaj u scope“.
 
 ## Povezano
 
 - [[ideje-arena-pitanja|pitanja]] · [[ideje-arena-grupe|grupe]] · [[ideje-arena-ciljevi|ciljevi]] · [[ideje-arena-feel|feel]]
-- [[../06-production/plan-prompts-arena|prompti]]
+- [[../06-production/plan-prompts-arena|prompti]] COMB-A…FEEL-B
+- [[ideje-arena-leftover|ARENA-02 leftover]] · [[../06-production/plan-prompts-arena-leftover|leftover prompti]]
+- [[ideje-arena-sort|ARENA-03 sort]] · [[../06-production/plan-prompts-arena-sort|sort prompti]]
 - [[../02-design/merge-arena-v1.1|MA-01]] · [[../02-design/merge-arena-pest|MA-01b]]
 - [[ideje-gameplay-ekonomija|gameplay ekonomija]] MA-01 / DG-01
 - [[../06-production/CHECKPOINT|CHECKPOINT]]

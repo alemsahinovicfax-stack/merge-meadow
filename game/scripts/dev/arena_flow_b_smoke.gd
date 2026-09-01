@@ -1,6 +1,6 @@
 extends SceneTree
 
-## ARENA-01 FLOW-B — auto-refill at 10; pour prefers field orphans.
+## ARENA-01 FLOW-B — auto-refill at 12; ARENA-03 SORT-A pour (all T1 if >=4, no floor-4).
 
 
 const SAVE_PATH := "user://player_save.json"
@@ -55,13 +55,6 @@ func _run() -> void:
 		_fail("GameState missing")
 		return
 	var backup := _backup_save()
-	gs.set("seed_bag", {"clover": 2, "daisy": 2})
-	var pulled: Array = gs.call("pull_seeds_to_arena", 1, {"clover": 1})
-	if pulled.is_empty() or str(pulled[0].get("type_id", "")) != "clover":
-		_restore_save(backup)
-		_fail("orphan prefer should pour clover first, got %s" % str(pulled))
-		return
-
 	var err := change_scene_to_file("res://scenes/camp/merge_arena.tscn")
 	if err != OK:
 		_restore_save(backup)
@@ -80,16 +73,16 @@ func _run() -> void:
 		return
 
 	var spawn: Array = []
-	for i in 11:
+	for i in 13:
 		spawn.append({"chip_id": 9300 + i, "type_id": "clover", "tier": 1})
 	gs.set("seed_bag", {"clover": 20})
 	arena.call("_spawn_poured_chips", spawn)
 	for _j in 4:
 		await process_frame
 	var before_count := _field_chips(arena).size()
-	if before_count < 11:
+	if before_count < 13:
 		_restore_save(backup)
-		_fail("expected 11 spawned chips, got %d" % before_count)
+		_fail("expected 13 spawned chips, got %d" % before_count)
 		return
 	var bag_before := int(gs.get("seed_bag").get("clover", 0))
 	var chips := _field_chips(arena)
@@ -99,9 +92,9 @@ func _run() -> void:
 		await process_frame
 	var after_count := _field_chips(arena).size()
 	var bag_after := int(gs.get("seed_bag").get("clover", 0))
-	if after_count <= 10:
+	if after_count <= before_count:
 		_restore_save(backup)
-		_fail("auto-refill should grow field after merge-to-10, got %d" % after_count)
+		_fail("auto-refill should grow field after merge-to-12, got %d" % after_count)
 		return
 	if bag_after >= bag_before:
 		_restore_save(backup)

@@ -45,6 +45,8 @@ const PRESS_FREE := 2
 @onready var free_roster: Control = %FreeRoster
 @onready var paid_roster: Control = %PaidRoster
 @onready var unlock_gate: Control = %UnlockGate
+@onready var band_column: Control = %BandColumn
+@onready var season_field: Control = %SeasonField
 
 var _pressing: bool = false
 var _swiped: bool = false
@@ -73,6 +75,10 @@ func _ready() -> void:
 		unlock_sheet.unlocked.connect(_on_unlocked)
 	if unlock_gate and unlock_gate.has_signal("unlock_clicked"):
 		unlock_gate.unlock_clicked.connect(_on_gate_unlocked)
+	var seasons_btn: Control = get_node_or_null("%SeasonsButton") as Control
+	if seasons_btn:
+		seasons_btn.visible = false
+		seasons_btn.set("label_text", "")
 	refresh()
 
 
@@ -89,6 +95,7 @@ func refresh() -> void:
 		_apply_band_heights()
 	_refresh_unlock_gate()
 	_refresh_roster()
+	_sync_season_field()
 	_notify_home_badge()
 
 
@@ -161,6 +168,102 @@ func open_browser() -> void:
 		browser.call("open_browser")
 
 
+func open_season_field() -> bool:
+	if not GameState.open_home_season_field():
+		return false
+	if browser and browser.visible and browser.has_method("close"):
+		browser.call("close")
+	_sync_season_field()
+	return true
+
+
+func close_season_field() -> void:
+	GameState.close_home_season_field()
+	_sync_season_field()
+	refresh()
+
+
+func snap_carousel_to_active() -> bool:
+	if GameState.home_season_field_open:
+		return false
+	var id := GameState.active_season_id
+	if id.is_empty() or not GameState.is_season_playable(id):
+		id = SeasonCatalog.DEFAULT_SEASON_ID
+	var def: SeasonDef = GameState.get_season_def(id)
+	if def == null:
+		return false
+	if _band_tween:
+		_band_tween.kill()
+		_band_tween = null
+	_band_tween_busy = false
+	var band := "paid" if def.is_paid() else "free"
+	GameState.set_home_band(band)
+	if def.is_paid():
+		GameState.set_paid_strip_focus(id)
+	else:
+		GameState.set_free_strip_focus(id)
+	refresh()
+	_apply_band_heights()
+	return true
+
+
+func _sync_season_field() -> void:
+	var open := GameState.home_season_field_open
+	if band_column:
+		band_column.visible = not open
+	if season_field:
+		season_field.visible = open
+		season_field.mouse_filter = (
+			Control.MOUSE_FILTER_STOP if open else Control.MOUSE_FILTER_IGNORE
+		)
+		if open and season_field.has_method("apply_season"):
+			season_field.call("apply_season", GameState.home_season_field_id)
+		elif not open and season_field.has_method("dismiss_flowers"):
+			season_field.call("dismiss_flowers")
+	var seasons_btn: Control = get_node_or_null("%SeasonsButton") as Control
+	if seasons_btn:
+		seasons_btn.visible = false
+	_notify_home_field_backdrop()
+
+
+func _try_close_field_on_back() -> bool:
+	if not GameState.home_season_field_open:
+		return false
+	if not is_visible_in_tree():
+		return false
+	close_season_field()
+	return true
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_echo():
+		return
+	var back := false
+	if event.is_action_pressed("ui_cancel"):
+		back = true
+	elif event is InputEventKey:
+		var key := event as InputEventKey
+		back = key.pressed and key.keycode == KEY_ESCAPE
+	if not back:
+		return
+	if _try_close_field_on_back():
+		get_viewport().set_input_as_handled()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		_try_close_field_on_back()
+
+
+func _notify_home_field_backdrop() -> void:
+	var n: Node = get_parent()
+	while n:
+		if n.has_method("sync_field_backdrop"):
+			n.call("sync_field_backdrop")
+			return
+		n = n.get_parent()
+
+
 func _on_browser_selected(season_id: String) -> void:
 	var def: SeasonDef = GameState.get_season_def(season_id)
 	if def == null:
@@ -189,6 +292,9 @@ func _overlay_blocks_input() -> bool:
 
 
 func _on_stage_gui_input(event: InputEvent) -> void:
+	if GameState.home_season_field_open:
+		accept_event()
+		return
 	if _slide_busy or _band_tween_busy or _overlay_blocks_input():
 		accept_event()
 		return
@@ -296,6 +402,8 @@ func _is_preview_press() -> bool:
 
 
 func _handle_tap(pos: Vector2) -> void:
+	if GameState.home_season_field_open:
+		return
 	if _slide_busy or _band_tween_busy or _overlay_blocks_input():
 		return
 	if not is_inside_tree():
@@ -340,7 +448,10 @@ func _on_paid_slot_tapped(season_id: String, which: String) -> void:
 		swap_home_band("paid", season_id)
 		return
 	if which == "center":
-		open_browser()
+		if GameState.is_season_playable(season_id):
+			open_season_field()
+		else:
+			open_browser()
 		return
 	cycle_paid_strip(-1 if which == "left" else 1)
 
@@ -365,7 +476,10 @@ func _on_free_slot_tapped(season_id: String, which: String) -> void:
 		else:
 			_play_bounce(row)
 		return
-	open_browser()
+	if GameState.is_season_playable(season_id):
+		open_season_field()
+	else:
+		open_browser()
 
 
 func _can_cycle(dir: int) -> bool:

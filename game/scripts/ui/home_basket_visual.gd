@@ -1,8 +1,8 @@
 extends Control
 
-## Home basket card icon — empty outline or filled seed.
+## Home basket card icon — empty outline or T3 plant for the selected seed.
 
-const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
+const CampPlantDraw := preload("res://scripts/visual/camp_plant_draw.gd")
 
 var _type_id: String = ""
 
@@ -24,17 +24,7 @@ func _draw() -> void:
 	if _type_id.is_empty():
 		_draw_empty_basket(center, side)
 		return
-	var tex := PICKUP_ASSETS.get_seed_texture(_type_id)
-	var tint := PICKUP_ASSETS.get_seed_tint(_type_id)
-	if tex != null:
-		var display := side * 0.72
-		var scale := display / maxf(tex.get_size().x, tex.get_size().y)
-		var draw_size := tex.get_size() * scale
-		var dest := Rect2(center - draw_size * 0.5, draw_size)
-		draw_texture_rect(tex, dest, false, tint)
-	else:
-		draw_circle(center, side * 0.22, tint)
-		draw_arc(center, side * 0.22, 0.0, TAU, 20, Color(0.2, 0.2, 0.2, 0.55), 2.0)
+	CampPlantDraw.draw_fitted_plant(self, center, _type_id, 3, side)
 
 
 func _draw_empty_basket(center: Vector2, side: float) -> void:

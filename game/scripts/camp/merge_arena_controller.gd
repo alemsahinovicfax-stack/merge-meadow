@@ -2,8 +2,12 @@ extends Control
 
 const ArenaSeedChip := preload("res://scripts/camp/arena_seed_chip.gd")
 const ArenaSeedBag := preload("res://scripts/camp/arena_seed_bag.gd")
+const ArenaVacuumFly := preload("res://scripts/camp/arena_vacuum_fly.gd")
 const ArenaPest := preload("res://scripts/camp/arena_pest.gd")
+const SeedBagChipScript := preload("res://scripts/camp/seed_bag_chip.gd")
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
+const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
+const TYPO := preload("res://scripts/ui/ui_typography.gd")
 
 const CHIP_MIN_DIST := 102.0
 const CHIP_SEPARATION := 102.0
@@ -15,7 +19,7 @@ const BAG_KEEPOUT_BOTTOM := 36.0
 const ARENA_COMBO_WINDOW_SEC := 1.4
 const COMBO_HUD_MIN := 2
 const COMBO_COIN_THRESHOLD := 5
-const ARENA_AUTO_REFILL_AT := 10
+const ARENA_AUTO_REFILL_AT := 12
 const ARENA_BG_BASE := Color(0.16, 0.24, 0.18, 1.0)
 const ARENA_BG_BLOOM := Color(0.20, 0.36, 0.22, 1.0)
 const ARENA_TINT_T3_CAP := 4
@@ -26,6 +30,12 @@ const ARENA_PIP_REACT_SEC := 0.28
 const CLEAR_CHIP_SCALE := 1.12
 const CLEAR_VFX_SEC := 0.4
 const CLEAR_FLASH_COLOR := Color(1.0, 0.96, 0.82, 1.0)
+const VACUUM_FLY_SEC := 0.38
+const VACUUM_FLY_STAGGER_SEC := 0.05
+const VACUUM_FLY_END_SCALE := 0.2
+const VACUUM_BAG_PUNCH_SCALE := 1.14
+const VACUUM_BAG_PUNCH_UP_SEC := 0.08
+const VACUUM_BAG_PUNCH_DOWN_SEC := 0.12
 
 @onready var meadow_bg: ColorRect = $Bg
 @onready var playfield: Control = $RootVBox/Playfield
@@ -35,6 +45,9 @@ const CLEAR_FLASH_COLOR := Color(1.0, 0.96, 0.82, 1.0)
 @onready var combo_label: Label = $RootVBox/TopBar/ComboLabel
 @onready var done_button: UiClickButton = $FooterBar/DoneButton
 @onready var back_button: UiClickButton = $RootVBox/TopBar/BackButton
+@onready var need_more_overlay: Control = $NeedMoreSeedsOverlay
+@onready var need_more_title: Label = $NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsTitle
+@onready var need_more_list: VBoxContainer = $NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsScroll/NeedMoreSeedsList
 
 var _chips: Array[ArenaSeedChip] = []
 var _chip_data: Dictionary = {}
@@ -53,31 +66,39 @@ var _pip_react_tween: Tween = null
 var _clear_vfx_done_this_pour: bool = false
 var _clear_vfx_tween: Tween = null
 var _clear_flash: ColorRect = null
+var _vacuum_flies: Array[Control] = []
+var _vacuum_fly_tweens: Array[Tween] = []
+var _vacuum_fly_stagger: int = 0
+var _bag_punch_tween: Tween = null
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	done_button.clicked.connect(_on_done_pressed)
 	back_button.clicked.connect(_on_back_pressed)
+	need_more_overlay.gui_input.connect(_on_need_more_overlay_gui_input)
+	_style_need_more_title()
 	SAFE_AREA.apply_top_margin($RootVBox/TopBar, 8.0)
 	playfield.resized.connect(_layout_playfield_chrome)
 	call_deferred("_deferred_boot")
 
 
 func _exit_tree() -> void:
+	_kill_vacuum_flies()
 	_set_hub_nav_locked(false)
 
 
 func _deferred_boot() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
-	GameState.ensure_dev_unlocked_seeds(10)
+	GameState.apply_debug_leftover_test_bag()
 	GameState.flush_bloom_inbox_to_album()
 	var legacy := $RootVBox.get_node_or_null("InboxPanel")
 	if legacy:
 		legacy.visible = false
 	_setup_bag()
 	_setup_pest()
+	need_more_overlay.visible = false
 	_layout_arena_pip()
 	_apply_meadow_tint()
 	_apply_merge_hint_if_ready()
@@ -297,10 +318,12 @@ func _pest_eat_chip(chip: ArenaSeedChip) -> void:
 	if not _chips.has(chip):
 		return
 	_remove_chip(chip)
+	_resolve_t3_starved_types()
 	_resolve_stranded_t2()
 	_update_hint()
 	_refresh_bag()
 	_try_auto_refill()
+	_resolve_t3_starved_types()
 	_maybe_play_clear_vfx()
 
 
@@ -343,6 +366,7 @@ func set_arena_page_active(active: bool) -> void:
 		_refresh_bag()
 		_sync_hub_nav_lock()
 	else:
+		_hide_need_more_overlay()
 		# Stay locked only while session lives; tabs should already block leave.
 		_sync_hub_nav_lock()
 
@@ -530,7 +554,10 @@ func _on_bag_clicked() -> void:
 		return
 	var poured := _pour_available_seeds()
 	if poured <= 0:
-		info_label.text = "Nothing to pour."
+		if _bag_has_pourable_set():
+			info_label.text = "Nothing to pour."
+		else:
+			_show_need_more_seeds_overlay()
 		_refresh_bag()
 		return
 	if GameState.should_show_arena_pest_tutorial():
@@ -538,6 +565,73 @@ func _on_bag_clicked() -> void:
 		GameState.mark_arena_pest_tutorial_shown()
 	else:
 		info_label.text = "Poured %d seeds — drag matching ones together!" % poured
+
+
+func _bag_has_pourable_set() -> bool:
+	var bag: Dictionary = GameState.seed_bag
+	for type_id in bag:
+		if int(bag[type_id]) >= 4 and not GameState.is_arena_pour_locked(str(type_id)):
+			return true
+	return false
+
+
+func _show_need_more_seeds_overlay() -> void:
+	_rebuild_need_more_list()
+	need_more_overlay.visible = true
+
+
+func _hide_need_more_overlay() -> void:
+	if need_more_overlay:
+		need_more_overlay.visible = false
+	if need_more_list == null:
+		return
+	for child in need_more_list.get_children():
+		need_more_list.remove_child(child)
+		child.queue_free()
+
+
+func _style_need_more_title() -> void:
+	if need_more_title == null:
+		return
+	need_more_title.add_theme_font_size_override("font_size", TYPO.SECTION_TITLE)
+	need_more_title.add_theme_color_override("font_color", UI_PALETTE.WARM_WHITE)
+	need_more_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	need_more_title.clip_text = false
+	need_more_title.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+
+
+func _rebuild_need_more_list() -> void:
+	for child in need_more_list.get_children():
+		need_more_list.remove_child(child)
+		child.queue_free()
+	var entries := GameState.get_seed_bag_entries()
+	for entry in entries:
+		var chip: PanelContainer = SeedBagChipScript.new()
+		need_more_list.add_child(chip)
+		chip.call(
+			"apply",
+			str(entry.get("type_id", "")),
+			int(entry.get("count", 0)),
+			str(entry.get("display_name", "")),
+			int(entry.get("rarity", 1))
+		)
+		if chip.has_method("set_trade_eligible"):
+			chip.call("set_trade_eligible", false)
+		if chip.has_method("set_count_quota_display"):
+			chip.call("set_count_quota_display", true)
+
+
+func _on_need_more_overlay_gui_input(event: InputEvent) -> void:
+	if not need_more_overlay.visible:
+		return
+	if event is InputEventMouseButton:
+		var mb := event as InputEventMouseButton
+		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+			_on_done_pressed()
+	elif event is InputEventScreenTouch:
+		var st := event as InputEventScreenTouch
+		if st.pressed:
+			_on_done_pressed()
 
 
 func _arena_slots_available() -> int:
@@ -569,6 +663,7 @@ func _pour_available_seeds() -> int:
 	_repel_chips_from_bag()
 	if _pest:
 		_pest.on_seeds_poured(not _chips.is_empty())
+	_resolve_t3_starved_types()
 	_resolve_stranded_t2()
 	_update_hint()
 	_refresh_bag()
@@ -585,8 +680,10 @@ func _try_auto_refill() -> void:
 	if _arena_slots_available() <= 0:
 		return
 	_auto_pouring = true
-	_pour_available_seeds()
+	var poured := _pour_available_seeds()
 	_auto_pouring = false
+	if poured <= 0:
+		return
 	if (
 		_chips.size() > 0
 		and _chips.size() <= ARENA_AUTO_REFILL_AT
@@ -786,24 +883,30 @@ func _on_chip_released(chip: ArenaSeedChip) -> void:
 				GameState.stash_garden_crystal(chip.type_id)
 				info_label.text = "%s crystal → garden stash! Muncher frozen 2s." % name
 				_remove_chip(chip)
+				_resolve_t3_starved_types()
 				_resolve_stranded_t2()
 				_update_hint()
 				_refresh_bag()
 				_try_auto_refill()
+				_resolve_t3_starved_types()
 				_maybe_play_clear_vfx()
 				return
 			else:
 				info_label.text = "Merged to T%d — keep merging!" % new_tier
 			_resolve_overlaps(chip)
+			_resolve_t3_starved_types()
 			_resolve_stranded_t2()
 			_update_hint()
 			_refresh_bag()
 			_try_auto_refill()
+			_resolve_t3_starved_types()
 			_maybe_play_clear_vfx()
 			return
 		info_label.text = str(result.get("msg", "No merge."))
 	_resolve_overlaps(chip)
 	_repel_chips_from_bag()
+	_resolve_t3_starved_types()
+	_resolve_stranded_t2()
 	_refresh_bag()
 
 
@@ -830,6 +933,160 @@ func _remove_chip(chip: ArenaSeedChip) -> void:
 		_pest.on_field_chip_count_changed(_chips.size())
 
 
+func _bag_mouth_local() -> Vector2:
+	if playfield == null:
+		return Vector2.ZERO
+	if _seed_bag == null:
+		return Vector2(playfield.size.x * 0.5, playfield.size.y - 24.0)
+	var bag_size := _seed_bag.size
+	if bag_size.x < 1.0:
+		bag_size = ArenaSeedBag.BAG_SIZE
+	return _seed_bag.position + Vector2(bag_size.x * 0.5, 28.0)
+
+
+func _vacuum_fly_chip(chip: ArenaSeedChip) -> void:
+	if not is_instance_valid(chip) or playfield == null:
+		return
+	var seed_type := chip.type_id
+	var seed_tier := chip.tier
+	var center := chip.get_center()
+	_remove_chip(chip)
+	var ghost := ArenaVacuumFly.new()
+	playfield.add_child(ghost)
+	ghost.setup(seed_type, seed_tier, center)
+	_vacuum_flies.append(ghost)
+	var delay := float(_vacuum_fly_stagger) * VACUUM_FLY_STAGGER_SEC
+	_vacuum_fly_stagger += 1
+	var end_pos := _bag_mouth_local() - ghost.size * 0.5
+	var tw := create_tween()
+	_vacuum_fly_tweens.append(tw)
+	tw.tween_interval(delay)
+	tw.tween_property(ghost, "position", end_pos, VACUUM_FLY_SEC).set_trans(
+		Tween.TRANS_CUBIC
+	).set_ease(Tween.EASE_IN)
+	tw.parallel().tween_property(
+		ghost, "scale", Vector2(VACUUM_FLY_END_SCALE, VACUUM_FLY_END_SCALE), VACUUM_FLY_SEC
+	).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tw.chain().tween_callback(_on_vacuum_fly_arrived.bind(ghost, tw))
+
+
+func _on_vacuum_fly_arrived(ghost: Control, tw: Tween) -> void:
+	_vacuum_fly_tweens.erase(tw)
+	_vacuum_flies.erase(ghost)
+	if is_instance_valid(ghost):
+		ghost.queue_free()
+	_punch_seed_bag()
+
+
+func _punch_seed_bag() -> void:
+	if _seed_bag == null:
+		return
+	if _bag_punch_tween != null:
+		_bag_punch_tween.kill()
+		_bag_punch_tween = null
+	_seed_bag.pivot_offset = _seed_bag.size * 0.5
+	_seed_bag.scale = Vector2.ONE
+	_bag_punch_tween = create_tween()
+	_bag_punch_tween.tween_property(
+		_seed_bag, "scale", Vector2(VACUUM_BAG_PUNCH_SCALE, VACUUM_BAG_PUNCH_SCALE), VACUUM_BAG_PUNCH_UP_SEC
+	)
+	_bag_punch_tween.tween_property(_seed_bag, "scale", Vector2.ONE, VACUUM_BAG_PUNCH_DOWN_SEC)
+
+
+func _kill_vacuum_flies() -> void:
+	for tw in _vacuum_fly_tweens:
+		if tw != null:
+			tw.kill()
+	_vacuum_fly_tweens.clear()
+	for ghost in _vacuum_flies:
+		if is_instance_valid(ghost):
+			ghost.queue_free()
+	_vacuum_flies.clear()
+	_vacuum_fly_stagger = 0
+	if _bag_punch_tween != null:
+		_bag_punch_tween.kill()
+		_bag_punch_tween = null
+	if _seed_bag != null:
+		_seed_bag.scale = Vector2.ONE
+
+
+func _type_t1_eq(type_id: String) -> int:
+	var field_t1 := 0
+	var field_t2 := 0
+	for chip in _chips:
+		if not is_instance_valid(chip):
+			continue
+		if chip.type_id != type_id:
+			continue
+		if chip.tier == 1:
+			field_t1 += 1
+		elif chip.tier == 2:
+			field_t2 += 1
+	return field_t1 + field_t2 * 2 + _pourable_bag_t1(type_id)
+
+
+func _pourable_bag_t1(type_id: String) -> int:
+	if GameState.is_arena_pour_locked(type_id):
+		return 0
+	var bag_n := int(GameState.seed_bag.get(type_id, 0))
+	if bag_n < 4:
+		return 0
+	return bag_n
+
+
+func _resolve_t3_starved_types() -> void:
+	_vacuum_fly_stagger = 0
+	var type_ids: Dictionary = {}
+	for chip in _chips:
+		if not is_instance_valid(chip):
+			continue
+		if chip.tier != 1 and chip.tier != 2:
+			continue
+		type_ids[chip.type_id] = true
+	var vacuumed_any := false
+	var leftover_became_pourable := false
+	for type_id in type_ids:
+		var id := str(type_id)
+		if _type_t1_eq(id) >= 4:
+			continue
+		var idle: Array[ArenaSeedChip] = []
+		var needed := 0
+		for chip in _chips:
+			if not is_instance_valid(chip) or not _chips.has(chip):
+				continue
+			if chip.type_id != id:
+				continue
+			if chip.is_dragging():
+				continue
+			if chip.tier == 1:
+				idle.append(chip)
+				needed += 1
+			elif chip.tier == 2:
+				idle.append(chip)
+				needed += 2
+		if idle.is_empty() or needed <= 0:
+			continue
+		var added := GameState.add_seeds_to_bag_unbounded(id, needed)
+		if added < needed:
+			continue
+		for chip in idle:
+			if is_instance_valid(chip) and _chips.has(chip):
+				_vacuum_fly_chip(chip)
+		if int(GameState.seed_bag.get(id, 0)) >= 4:
+			GameState.unlock_arena_pour_type(id)
+			leftover_became_pourable = true
+		else:
+			GameState.lock_arena_pour_type(id)
+		vacuumed_any = true
+	if vacuumed_any:
+		GameState.save_player_save()
+		# S32 — empty field after leftover that now makes a T3 set; do not dump other bag types.
+		if leftover_became_pourable and _chips.is_empty() and not _auto_pouring:
+			_auto_pouring = true
+			_pour_available_seeds()
+			_auto_pouring = false
+
+
 func _t2_has_pair_chance(chip: ArenaSeedChip) -> bool:
 	var type_id := chip.type_id
 	var other_t2 := 0
@@ -851,6 +1108,7 @@ func _t2_has_pair_chance(chip: ArenaSeedChip) -> bool:
 
 
 func _resolve_stranded_t2() -> void:
+	_vacuum_fly_stagger = 0
 	var snapshot: Array[ArenaSeedChip] = []
 	for chip in _chips:
 		if is_instance_valid(chip) and chip.tier == 2:
@@ -868,7 +1126,7 @@ func _resolve_stranded_t2() -> void:
 		var added := GameState.add_seeds_to_bag(chip.type_id, 2)
 		if added < 2:
 			continue
-		_remove_chip(chip)
+		_vacuum_fly_chip(chip)
 		recycled_any = true
 	if recycled_any:
 		GameState.save_player_save()
@@ -887,11 +1145,13 @@ func _refresh_bag() -> void:
 
 
 func _on_done_pressed() -> void:
+	_hide_need_more_overlay()
 	_reset_session_feel()
 	_clear_combo()
 	_clear_pair_pulses()
 	GameState.commit_arena_chips_to_bag(_chip_data)
 	_clear_field_chips()
+	GameState.clear_arena_pour_locks()
 	if _pest:
 		_pest.reset_to_nest()
 	_set_hub_nav_locked(false)
@@ -899,11 +1159,13 @@ func _on_done_pressed() -> void:
 
 
 func _on_back_pressed() -> void:
+	_hide_need_more_overlay()
 	_reset_session_feel()
 	_clear_combo()
 	_clear_pair_pulses()
 	GameState.commit_arena_chips_to_bag(_chip_data)
 	_clear_field_chips()
+	GameState.clear_arena_pour_locks()
 	if _pest:
 		_pest.reset_to_nest()
 	_set_hub_nav_locked(false)
@@ -911,6 +1173,7 @@ func _on_back_pressed() -> void:
 
 
 func _clear_field_chips() -> void:
+	_kill_vacuum_flies()
 	for chip in _chips:
 		if is_instance_valid(chip):
 			chip.queue_free()

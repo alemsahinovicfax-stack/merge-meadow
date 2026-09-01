@@ -18,11 +18,13 @@ var _rarity: int = 1
 var _trade_eligible: bool = false
 var _tap_enabled: bool = false
 var _selected: bool = false
+var _quota_display: bool = false
 
 var _icon: Control
 var _name_label: Label
 var _count_label: Label
 var _price_label: Label
+var _price_pill: Control
 var _coin_icon: TextureRect
 var _panel_style: StyleBoxFlat
 
@@ -40,6 +42,7 @@ func apply(type_id: String, count: int, display_name: String, rarity: int) -> vo
 	_count = count
 	_display_name = display_name
 	_rarity = rarity
+	_quota_display = false
 	_trade_eligible = count >= 1
 	_tap_enabled = _trade_eligible
 	_ensure_children()
@@ -60,10 +63,26 @@ func set_selected(on: bool) -> void:
 
 func set_trade_eligible(eligible: bool) -> void:
 	_trade_eligible = eligible
-	_tap_enabled = _trade_eligible
+	_tap_enabled = _trade_eligible and not _quota_display
 	if not _trade_eligible:
 		_selected = false
 	_apply_visual_state()
+
+
+func set_count_quota_display(on: bool) -> void:
+	_quota_display = on
+	if on:
+		_trade_eligible = false
+		_tap_enabled = false
+		_selected = false
+	_refresh_labels()
+	_apply_visual_state()
+
+
+func get_count_label_text() -> String:
+	if _count_label == null:
+		return ""
+	return _count_label.text
 
 
 func _ensure_children() -> void:
@@ -108,6 +127,7 @@ func _ensure_children() -> void:
 	price_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	price_pill.size_flags_horizontal = Control.SIZE_SHRINK_END
 	price_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_price_pill = price_pill
 	var pill_style := StyleBoxFlat.new()
 	pill_style.bg_color = PRICE_PILL_BG
 	pill_style.set_corner_radius_all(8)
@@ -156,7 +176,10 @@ func _refresh_labels() -> void:
 		return
 	var stars := "★".repeat(maxi(_rarity, 1))
 	_name_label.text = "%s %s" % [_display_name, stars]
-	_count_label.text = "×%d" % _count
+	if _quota_display:
+		_count_label.text = "%d/4" % _count
+	else:
+		_count_label.text = "×%d" % _count
 	_price_label.text = "%d" % GameState.seed_exchange_coins_per_seed(_type_id)
 	_price_label.add_theme_color_override("font_color", UI_PALETTE.OUTLINE)
 	TEXT_LAYOUT.ink(_name_label)
@@ -177,7 +200,9 @@ func _apply_visual_state() -> void:
 			UI_PALETTE.OUTLINE.r, UI_PALETTE.OUTLINE.g, UI_PALETTE.OUTLINE.b, 0.16
 		)
 		_panel_style.bg_color = rarity_bg
-	modulate = Color(1, 1, 1, 1) if _tap_enabled else Color(1, 1, 1, 0.55)
+	if _price_pill:
+		_price_pill.visible = not _quota_display
+	modulate = Color(1, 1, 1, 1) if (_tap_enabled or _quota_display) else Color(1, 1, 1, 0.55)
 	mouse_filter = Control.MOUSE_FILTER_STOP if _tap_enabled else Control.MOUSE_FILTER_IGNORE
 
 

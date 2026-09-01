@@ -97,6 +97,18 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.14, 0.2, 0.16, 1)
 
+[node name="FieldBackdrop" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.9, 0.95, 0.86, 1)
+
 [node name="DecorMoundLeft" type="ColorRect" parent="."]
 mouse_filter = 2
 layout_mode = 1
@@ -201,48 +213,6 @@ theme_override_font_sizes/font_size = 18
 text = "Tap to open"
 autowrap_mode = 2
 
-[node name="BasketCard" type="PanelContainer" parent="HomeTopStack"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(336, 104)
-layout_mode = 2
-mouse_filter = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_basket")
-
-[node name="BasketHBox" type="HBoxContainer" parent="HomeTopStack/BasketCard"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 14
-
-[node name="BasketVisual" type="Control" parent="HomeTopStack/BasketCard/BasketHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(72, 72)
-layout_mode = 2
-mouse_filter = 2
-script = ExtResource("4_basket_vis")
-
-[node name="BasketVBox" type="VBoxContainer" parent="HomeTopStack/BasketCard/BasketHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_constants/separation = 4
-alignment = 1
-
-[node name="BasketTitle" type="Label" parent="HomeTopStack/BasketCard/BasketHBox/BasketVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 0.28, 0.18, 1)
-theme_override_font_sizes/font_size = 26
-text = "Basket"
-autowrap_mode = 2
-
-[node name="BasketCaption" type="Label" parent="HomeTopStack/BasketCard/BasketHBox/BasketVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.38, 0.28, 1)
-theme_override_font_sizes/font_size = 18
-text = "Tap to choose"
-autowrap_mode = 2
-
 [node name="SettingsButton" type="PanelContainer" parent="."]
 layout_mode = 1
 anchors_preset = 1
@@ -256,6 +226,25 @@ grow_horizontal = 0
 script = ExtResource("3_uibtn")
 label_text = ""
 button_icon = "settings"
+button_variant = "subtle"
+
+[node name="SeasonNameChip" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(280, 48)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -140.0
+offset_top = 28.0
+offset_right = 140.0
+offset_bottom = 76.0
+grow_horizontal = 2
+mouse_filter = 0
+script = ExtResource("3_uibtn")
+label_text = ""
+font_size = 22
 button_variant = "subtle"
 
 [node name="HomeColumn" type="VBoxContainer" parent="."]
@@ -275,6 +264,7 @@ theme_override_constants/separation = 12
 
 [node name="PipPortrait" type="Control" parent="HomeColumn"]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -304,9 +294,59 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="PlayButton" type="PanelContainer" parent="HomeColumn"]
+[node name="PlayRow" type="HBoxContainer" parent="HomeColumn"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(540, 96)
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BasketCard" type="PanelContainer" parent="HomeColumn/PlayRow"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(320, 96)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_basket")
+
+[node name="BasketHBox" type="HBoxContainer" parent="HomeColumn/PlayRow/BasketCard"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="BasketVisual" type="Control" parent="HomeColumn/PlayRow/BasketCard/BasketHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("4_basket_vis")
+
+[node name="BasketVBox" type="VBoxContainer" parent="HomeColumn/PlayRow/BasketCard/BasketHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="BasketTitle" type="Label" parent="HomeColumn/PlayRow/BasketCard/BasketHBox/BasketVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.28, 0.18, 1)
+theme_override_font_sizes/font_size = 26
+text = "Basket"
+autowrap_mode = 2
+
+[node name="BasketCaption" type="Label" parent="HomeColumn/PlayRow/BasketCard/BasketHBox/BasketVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.38, 0.28, 1)
+theme_override_font_sizes/font_size = 18
+text = "Tap to choose"
+autowrap_mode = 2
+
+[node name="PlayButton" type="PanelContainer" parent="HomeColumn/PlayRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 96)
 layout_mode = 2
 size_flags_horizontal = 4
 script = ExtResource("3_uibtn")
@@ -314,6 +354,18 @@ label_text = "Play"
 font_size = 40
 button_icon = "play"
 button_variant = "primary"
+
+[node name="EndlessPlayButton" type="PanelContainer" parent="HomeColumn/PlayRow"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(320, 96)
+layout_mode = 2
+size_flags_horizontal = 4
+script = ExtResource("3_uibtn")
+label_text = "Play Endless"
+font_size = 28
+button_icon = "play"
+button_variant = "accent"
 
 [node name="PlayThemeBadge" type="Label" parent="HomeColumn"]
 unique_name_in_owner = true
@@ -324,18 +376,6 @@ theme_override_colors/font_color = Color(0.92, 0.88, 0.72, 1)
 theme_override_font_sizes/font_size = 22
 text = "Theme: Moonlit Warren"
 horizontal_alignment = 1
-
-[node name="EndlessPlayButton" type="PanelContainer" parent="HomeColumn"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(540, 72)
-layout_mode = 2
-size_flags_horizontal = 4
-script = ExtResource("3_uibtn")
-label_text = "Play Endless"
-font_size = 32
-button_icon = "play"
-button_variant = "accent"
 
 [node name="RewardOverlay" type="Control" parent="."]
 unique_name_in_owner = true

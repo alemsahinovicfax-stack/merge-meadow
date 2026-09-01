@@ -11,6 +11,8 @@ povezano:
   - ideje-arena-feel
   - ideje-arena-bloom
   - ideje-arena-pest
+  - plan-prompts-arena-leftover
+  - plan-prompts-arena-sort
   - CHECKPOINT
 ai_sažetak: "Copy-paste Plan-mode promptovi ARENA-01 — COMB-A → FLOW-A → FLOW-B → DAILY-A → FEEL-A → FEEL-B."
 ---
@@ -217,5 +219,7 @@ Acceptance: kad ostane samo nespareno sjeme, jedan vizualni beat; wallet ne rast
 ## Povezano
 
 - [[../03-content/ideje-arena|hub]] · [[../03-content/ideje-arena-grupe|grupe]] · [[../03-content/ideje-arena-pitanja|pitanja]]
+- [[plan-prompts-arena-leftover|ARENA-02 leftover]] LEFTOVER-P0 → A → B ✅ · C-P0 ✅ · C ✅ · D ✅ · E-P0 ✅ · E ne
+- [[plan-prompts-arena-sort|ARENA-03 sort]] SORT-P0 ✅ A ✅ B ✅ VAC-A ✅ VAC-F ✅ VAC-L ✅
 - [[plan-prompts-home-lockflow|HOME-10]] · [[plan-prompts-home-barfit|HOME-11]] · [[plan-prompts-home-cardfit|HOME-09]] (isti Plan-only obrazac)
 - [[CHECKPOINT|CHECKPOINT]]

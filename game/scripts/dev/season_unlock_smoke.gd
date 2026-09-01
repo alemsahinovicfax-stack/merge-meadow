@@ -77,6 +77,29 @@ func _run() -> void:
 	if amber_def == null or amber_def.t3_flowers_required != 20 or amber_def.coins_cost != 500:
 		_fail("Amber costs expected 500 coins + 20 T3")
 		return
+	if s1_def.roster.is_empty() or str(s1_def.roster[0].get("id", "")) != "clover":
+		_fail("Bloom roster id 0 expected clover")
+		return
+	if s2_def.seed_type_ids.size() != 6 or str(s2_def.seed_type_ids[0]) != "frost_snowdrop":
+		_fail("Frost seed_type_ids expected 6 starting frost_snowdrop")
+		return
+	var catalog_ids: Array = SeedCatalog.all_type_ids()
+	if catalog_ids.size() != 49:
+		_fail("SeedCatalog size %d expected 49" % catalog_ids.size())
+		return
+	var catalog_seen: Dictionary = {}
+	for tid_any in catalog_ids:
+		var tid := str(tid_any)
+		if catalog_seen.has(tid):
+			_fail("SeedCatalog duplicate %s" % tid)
+			return
+		catalog_seen[tid] = true
+	if not catalog_ids.has("clover") or not catalog_ids.has("frost_snowdrop"):
+		_fail("SeedCatalog missing clover or frost_snowdrop")
+		return
+	if str(SeedCatalog.season_id_for("frost_snowdrop")) != S2:
+		_fail("frost_snowdrop season_id_for expected frost_orchard")
+		return
 
 	_reset_new_game(gs)
 	if str(gs.get("active_season_id")) != S1:

@@ -120,8 +120,9 @@ static func _draw_bloom(canvas: CanvasItem, center: Vector2, type_id: String) ->
 			canvas.draw_line(center + Vector2(-15.0, -4.0), center + Vector2(15.0, -4.0), Color(0.12, 0.32, 0.15), 3.0)
 			canvas.draw_arc(center + Vector2(0.0, -2.0), 9.0, 0.0, PI, 14, pal.center, 10.0)
 		_:
-			for offset in [Vector2(-14.0, -4.0), Vector2(14.0, -4.0), Vector2(0.0, -16.0)]:
-				canvas.draw_circle(center + offset, 12.0, pal.petal)
+			for i in 6:
+				var a := float(i) / 6.0 * TAU
+				canvas.draw_circle(center + Vector2(cos(a), sin(a)) * 13.0 + Vector2(0, -6), 6.0, pal.petal)
 			canvas.draw_circle(center + Vector2(0.0, -6.0), 8.0, pal.center)
 
 

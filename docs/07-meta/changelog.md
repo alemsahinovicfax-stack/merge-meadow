@@ -9,6 +9,88 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-09-01
+
+- **HOME-14 LIFE-D** — MeadowPip Walk/Sniff/Sleep u `meadow_safe_rect`; close/karusel hide; PipPortrait off; [[../03-content/ideje-home-meadow-life|hub]] · [[../06-production/plan-prompts-home-meadow-life|prompti]] LIFE-D ✅
+
+- **HOME-14 LIFE-C** — 13 dekorativnih cvjetova u `meadow_safe_rect` (Daily/Settings/chip/PlayRow); clip SeasonField; smoke 12–14 + no chrome overlap; [[../03-content/ideje-home-meadow-life|hub]] · [[../06-production/plan-prompts-home-meadow-life|prompti]] LIFE-C ✅
+
+- **HOME-14 LIFE-B** — PlayRow Basket/Play/Endless **320×96**, shrink-center; karusel samo Play iste visine; [[../03-content/ideje-home-meadow-life|hub]] · [[../06-production/plan-prompts-home-meadow-life|prompti]] LIFE-B ✅
+
+- **HOME-14 LIFE-A** — karusel Play nikad run; locked/unowned → `snap_carousel_to_active`; playable → polje; polje Play → run; [[../03-content/ideje-home-meadow-life|hub]] · [[../06-production/plan-prompts-home-meadow-life|prompti]] LIFE-A ✅
+
+- **HOME-14 LIFE-P0** — docs freeze meadow life: Play 3-koraka (nikad run s karusela); jednaki PlayRow; 12–14 cvjetova u chrome-safe zoni; MeadowPip hod/njuh/spavanje; [[../03-content/ideje-home-meadow-life|hub]] · [[../06-production/plan-prompts-home-meadow-life|prompti]] LIFE-P0 ✅ → A–D
+
+- **HOME-13 CHROME-E** — `%SeasonNameChip` gore (ime sezone); tap/Back/Escape → `close_season_field`; `%SeasonsButton` UniqueName hidden; [[../03-content/ideje-home-meadow-chrome|hub]] · [[../06-production/plan-prompts-home-meadow-chrome|prompti]] CHROME-E ✅
+
+- **HOME-13 CHROME-D** — Play Endless samo u otvorenom polju, desno od Play; `set_active_season(home_season_field_id)` pa Hard; karusel hidden; [[../03-content/ideje-home-meadow-chrome|hub]] · [[../06-production/plan-prompts-home-meadow-chrome|prompti]] CHROME-D ✅
+
+- **HOME-13 CHROME-C** — Basket samo u otvorenom polju, lijevo od Play; picker `types_for_season` ∩ unlocked; T3 `CampPlantDraw`; `clear_loadout` van poola; [[../03-content/ideje-home-meadow-chrome|hub]] · [[../06-production/plan-prompts-home-meadow-chrome|prompti]] CHROME-C ✅
+
+- **HOME-13 CHROME-B** — `%FieldBackdrop` full-bleed MainMenu tint iza Daily/Settings/Play; karusel tamni bg; `SeasonTheme.home_field_tint`; [[../03-content/ideje-home-meadow-chrome|hub]] · [[../06-production/plan-prompts-home-meadow-chrome|prompti]] CHROME-B ✅
+
+- **HOME-13 CHROME-A** — `%PipPortrait` i `%MeadowPip` hidden; wander stop; UniqueName ostaje; smokes `season_home_smoke` / `season_meadow_smoke`; [[../03-content/ideje-home-meadow-chrome|hub]] · [[../06-production/plan-prompts-home-meadow-chrome|prompti]] CHROME-A ✅
+
+- **HOME-13 CHROME-P0** — docs freeze meadow chrome: Basket/Endless samo u polju; full-bleed; Pip van; name-chip natrag; [[../03-content/ideje-home-meadow-chrome|hub]] · [[../06-production/plan-prompts-home-meadow-chrome|prompti]] P0 ✅ A–E
+
+- **HOME-12 MEADOW-C** — jedan `MeadowPip` na SeasonField; Tween wander među cvijećem otvorene sezone; IGNORE; isti node za Frost; [[../03-content/ideje-home-meadow|hub]] · [[../06-production/plan-prompts-seed-meadow|prompti]] MEADOW-C ✅
+
+- **HOME-12 MEADOW-B** — 6–10 dekorativnih cvjetova iz `seed_type_ids` otvorenog fielda; `apply_season` rebuild; IGNORE; [[../03-content/ideje-home-meadow|hub]] · [[../06-production/plan-prompts-seed-meadow|prompti]] MEADOW-B ✅
+
+- **HOME-12 MEADOW-A** — jedan `SeasonField` + `apply_season`; Play/tap playable → polje; Play na polju → run; Seasons → karusel; smoke `season_meadow_smoke`; [[../03-content/ideje-home-meadow|hub]] · [[../06-production/plan-prompts-seed-meadow|prompti]] MEADOW-A ✅
+
+- **SEED-01 SEED-C** — T1–T3 fallback draw (hash paleta; frost T2 nije clover 3-list); pour `SeedCatalog.all_type_ids()` ∩ bag; smoke `seed_draw_pour_smoke`; [[../03-content/ideje-seed-pool|hub]] · [[../06-production/plan-prompts-seed-meadow|prompti]] SEED-C ✅
+
+- **SEED-01 SEED-B** — Bloom album `SeedCatalog.all_type_ids()` (49); Frost locked dok nije discovered; camp Trade/Exchange `get_seed_display_name`; [[../03-content/ideje-seed-pool|hub]] · [[../06-production/plan-prompts-seed-meadow|prompti]] SEED-B ✅
+
+- **SEED-01 SEED-A** — `SeedCatalog`; `seed_type_ids` = roster merge id; Bloom CHAIN 7 ostaje; Frost run pool `frost_snowdrop` (nije clover); [[../03-content/ideje-seed-pool|hub]] · [[../06-production/plan-prompts-seed-meadow|prompti]] SEED-A ✅
+
+- **plan-prompts-seed-meadow** — SEED-01 + HOME-12 copy-paste u jednom fajlu (1 SEED-A … 6 MEADOW-C); stari `plan-prompts-seed-pool` / `plan-prompts-home-meadow` = stub; [[../06-production/plan-prompts-seed-meadow|prompti]]
+
+- **SEED-01 SEED-P0** — docs: jedan `type_id` namespace; `seed_type_ids` = merge tipovi sezone; journal/arena/camp; Bloom CHAIN 7 ostaje; [[../03-content/ideje-seed-pool|hub]] · [[../06-production/plan-prompts-seed-pool|prompti]] SEED-P0 ✅ → A → B → C (nema `game/` u P0)
+
+- **HOME-12 amend** — jedno `SeasonField` + `apply_season` za **sve playable** sezone (P141 Bloom-only povučen); [[../03-content/ideje-home-meadow|hub]] · [[../06-production/plan-prompts-home-meadow|prompti]]
+
+- **CAMP-02 CAMP2-P0** — docs: prazna rupa između Seeds i `Seeds: n/cap`; GardenCliff hidden + prazan (C21, override C7); [[../03-content/ideje-camp-cliff|hub]] · [[../06-production/plan-prompts-camp-cliff|prompti]] CAMP2-P0 ✅ → A (nema `game/` u P0)
+
+- **HOME-12 MEADOW-P0** — docs: polje na Homeu (tap/Play → polje, Play na polju → run, gumb Seasons natrag); [[../03-content/ideje-home-meadow|hub]] · [[../06-production/plan-prompts-home-meadow|prompti]] MEADOW-P0 ✅ → A → B → C (nema `game/` u P0)
+
+## 2026-08-30
+
+- **CAMP-01 CAMP-B** — Sprinkler i Loot Boost atomic 2 T3 iz Flowers; caption magnet px / loot ×; `camp_donate_smoke`
+
+- **CAMP-01 CAMP-A** — StatusToast no-op; GardenCliff bez journal/T2 grana; CrystalCliff hidden; naslovi Seeds / Flowers; RunPrep companion picker uklonjen; smoke `camp_layout_smoke`
+
+- **CAMP-01 CAMP-P0** — docs: kamp chrome (toast, journal/crystal cliff, companion picker, Seeds/Flowers); Sprinkler i Loot Boost troše 2 T3 iz Flowers (atomic); arena donate ostaje mrtav; [[../03-content/ideje-camp|hub]] · [[../06-production/plan-prompts-camp|prompti]] P0 ✅ A ✅ B ✅ (nema `game/` u P0)
+
+## 2026-08-29
+
+- **ARENA-03 VAC-L** — lock samo dok `bag &lt; 4`; nakupljeni leftover ≥4 ide u tap/autopour; S32 pour nakon vacuuma na praznom polju; smoke `arena_vacuum_l_smoke`
+
+- **ARENA-03 VAC-F** — leftover T1/T2 (i FLOW-A T2 recycle) ghostom lete u korpicu; bag punch; state odmah; smoke `arena_vacuum_fly_smoke`
+
+- **ARENA-03 VAC-A** — vacuum vraća leftover i kad je debug bag preko 40; `t1_eq` broji bag samo ako ≥4 i unlocked; drugi vacuum nakon refill/pour i drop bez mergea; smoke `arena_vacuum_stuck_smoke`
+
+- **ARENA-03 SORT-B** — čim `t1_eq < 4`, idle T1/T2 tog tipa u torbu kao T1 + lock pour do Done; 3 T1 asap (ne leftover-E par); smoke `arena_sort_b_smoke`
+
+- **ARENA-03 SORT-A** — pour sav T1 po `CHAIN` ako ≥4 i nije locked; ukinut leftover-A `floor(n/4)*4` i petlja prva 2 rarity; `max_count` bez floor-4; cap 40 / refill 12 / polje 0 ne auto; smoke `arena_leftover_a_smoke` (31 daisy + 9 buttercup)
+
+- **ARENA-03 SORT-P0** — docs: pour sav T1 po `CHAIN` (ne floor-4); skip bag &lt;4 i locked; vacuum kad t1_eq &lt; 4 (T2→2 T1, lock do Done); overlay B+C i grant D ostaju; leftover-E kod superseded; [[../03-content/ideje-arena-sort|hub]] · [[plan-prompts-arena-sort|prompti]] SORT-P0 → A → B (nema `game/` u P0)
+
+## 2026-08-28
+
+- **ARENA-02 LEFTOVER-D** — debug torba freeze 100 T1 jednom po procesu (clover 19, daisy 22, buttercup 13, tulip 28, sunflower 18); Arena bez min-10; smoke `arena_leftover_d_smoke`
+
+- **ARENA-02 LEFTOVER-E-P0** — docs: mid-session neparni T1 tog tipa ide u torbu (3 clover → 1 bag + 2 polje); L1 reopen L31–L37; overlay B+C ostaje; D (100 T1) zasebno; [[../03-content/ideje-arena-leftover-field|field]] · [[plan-prompts-arena-leftover|prompti]] E-P0 → E (nema `game/` u E-P0)
+
+- **ARENA-02 LEFTOVER-C** — overlay hide prije Camp (Done/Back + page inactive); povratak Arena taba bez popup-a; naslov **You need more seeds!** `WARM_WHITE`; smoke `arena_leftover_c_smoke`
+
+- **ARENA-02 LEFTOVER-C-P0** — docs: overlay hide prije Camp (hub persist), čist Arena tab, naslov **You need more seeds!** svijetao u popup-u; debug 100 T1 freeze 19/22/13/28/18 jednom po procesu; L21–L30; [[../03-content/ideje-arena-leftover-grant|grant]] · [[plan-prompts-arena-leftover|prompti]] C-P0 → C → D (nema `game/` u C-P0)
+
+- **ARENA-02 LEFTOVER-B** — stuck vreća (nema tipa ≥4) otvara overlay **You need more seeds!** + kamp T1 lista **`n/4`**; tap = Done → Camp; auto-refill ne otvara; smoke `arena_leftover_b_smoke`
+- **ARENA-02 LEFTOVER-A** — pour uvijek `floor(n/4)*4` po tipu; `max_count` floor-4; `ARENA_AUTO_REFILL_AT` 10→12; auto-refill stane kad pull vrati `[]`; A15 ne trese 3 na orphan; smoke `arena_leftover_a_smoke` + `arena_flow_b_smoke` prag 12
+- **ARENA-02 LEFTOVER-P0** — leftover docs: pour uvijek ÷4 po tipu (6 clover → 4 polje, 2 torba); auto-refill 10→12; stuck vreća → overlay **You need more seeds!** + kamp T1 lista **`n/4`**, tap → Camp; freeze L0–L20; [[../03-content/ideje-arena-leftover|hub]] · [[plan-prompts-arena-leftover|prompti]] P0 → A → B (nema `game/` u P0)
+
 ## 2026-08-26
 
 - **ARENA-01 FEEL-B** — clear-field VFX kad nema legalnog para (odd leftover OK); jednom po pouru; bez coina; smoke `arena_feel_b_smoke` (grana `ARENA`)

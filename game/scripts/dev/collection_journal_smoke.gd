@@ -11,6 +11,26 @@ func _gs() -> Node:
 	return get_root().get_node_or_null("GameState")
 
 
+func _assert_catalog_album(gs: Node, list: VBoxContainer) -> String:
+	var entries: Array = gs.call("get_collection_journal_entries")
+	var catalog_ids: Array = SeedCatalog.all_type_ids()
+	if entries.size() != catalog_ids.size():
+		return "entries %d != catalog %d" % [entries.size(), catalog_ids.size()]
+	if list.get_child_count() != entries.size():
+		return "list rows %d != entries %d" % [list.get_child_count(), entries.size()]
+	var frost_state := ""
+	for entry_any in entries:
+		var entry: Dictionary = entry_any
+		if str(entry.get("type_id", "")) == "frost_snowdrop":
+			frost_state = str(entry.get("state", ""))
+			break
+	if frost_state.is_empty():
+		return "missing frost_snowdrop entry"
+	if frost_state != "locked":
+		return "frost_snowdrop state %s expected locked" % frost_state
+	return ""
+
+
 func _assert_clover_tiers(row: Node, kept: int) -> String:
 	for tier in [1, 2, 3]:
 		var icon: Node = row.call("get_tier_icon", tier)
@@ -70,6 +90,11 @@ func _run() -> void:
 	var list := journal.get_node_or_null("RootVBox/ListScroll/List") as VBoxContainer
 	if list == null or list.get_child_count() < 1:
 		push_error("collection_journal_smoke: journal list empty")
+		quit(1)
+		return
+	var catalog_msg := _assert_catalog_album(gs, list)
+	if not catalog_msg.is_empty():
+		push_error("collection_journal_smoke (catalog): %s" % catalog_msg)
 		quit(1)
 		return
 	var clover_row: Node = list.get_child(0)

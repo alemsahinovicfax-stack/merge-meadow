@@ -89,8 +89,22 @@ func _run() -> void:
 	if endless_btn == null:
 		_fail("EndlessPlayButton missing")
 		return
-	if not endless_btn.visible:
-		_fail("EndlessPlayButton should show after tutorial")
+	if endless_btn.visible:
+		_fail("carousel EndlessPlayButton should be hidden after tutorial")
+		return
+	var play_btn_home: Control = home.get_node_or_null("%PlayButton") as Control
+	if play_btn_home == null:
+		_fail("PlayButton missing")
+		return
+	if not is_equal_approx(play_btn_home.custom_minimum_size.y, 96.0):
+		_fail("carousel Play min height expected 96 got %s" % str(play_btn_home.custom_minimum_size))
+		return
+	var pip_portrait: Control = home.get_node_or_null("%PipPortrait") as Control
+	if pip_portrait == null:
+		_fail("PipPortrait missing")
+		return
+	if pip_portrait.visible:
+		_fail("PipPortrait should be hidden")
 		return
 	var stage: Node = home.get_node_or_null("%SeasonStage")
 	if stage == null:
@@ -127,6 +141,42 @@ func _run() -> void:
 	if str(gs.get("home_band")) != "free":
 		_fail("new game home_band should be free")
 		return
+	if stage.has_method("swap_home_band"):
+		stage.call("swap_home_band", "paid", "coral_tide")
+		await process_frame
+		await process_frame
+	if str(gs.get("home_band")) != "paid":
+		_fail("LIFE-A setup: expected paid band")
+		return
+	if bool(gs.call("is_season_playable", "coral_tide")):
+		_fail("LIFE-A: coral_tide should be unowned")
+		return
+	if str(home.call("home_play_action")) != "snap":
+		_fail("LIFE-A unowned paid: home_play_action should be snap")
+		return
+	home.call("_on_play_pressed")
+	await process_frame
+	await process_frame
+	if bool(gs.get("home_season_field_open")):
+		_fail("LIFE-A paid Play should not open field")
+		return
+	if str(gs.get("home_band")) != "free":
+		_fail("LIFE-A paid Play should snap home_band to free")
+		return
+	if str(gs.call("home_hero_center_id")) != "country_bloom":
+		_fail("LIFE-A paid Play should snap to Bloom")
+		return
+	if current_scene and str(current_scene.scene_file_path).find("run_scene") >= 0:
+		_fail("LIFE-A paid Play should not enter run")
+		return
+	gs.call("set_paid_strip_focus", "moonlit_warren")
+	if stage.has_method("swap_home_band"):
+		stage.call("swap_home_band", "free", "country_bloom")
+		await process_frame
+		await process_frame
+	if stage.has_method("refresh"):
+		stage.call("refresh")
+	await process_frame
 	var paid_row: Control = stage.get_node_or_null("%PaidRow") as Control
 	if paid_row == null or paid_row.mouse_filter != Control.MOUSE_FILTER_IGNORE:
 		_fail("PaidRow must IGNORE")
@@ -182,11 +232,14 @@ func _run() -> void:
 		stage.call("_handle_tap", tap_at)
 		await process_frame
 		var browser_open: Node = stage.get_node_or_null("%SeasonBrowser")
-		if browser_open == null or not bool(browser_open.get("visible")):
-			_fail("Center tap should open Browser")
+		if browser_open and bool(browser_open.get("visible")):
+			_fail("Playable center tap should open field, not Browser")
 			return
-		if browser_open.has_method("close"):
-			browser_open.call("close")
+		if not bool(gs.get("home_season_field_open")):
+			_fail("Playable center tap should open season field")
+			return
+		if stage.has_method("close_season_field"):
+			stage.call("close_season_field")
 		await process_frame
 
 	if stage.has_method("cycle_free_strip"):

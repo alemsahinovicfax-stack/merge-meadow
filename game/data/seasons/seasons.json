@@ -11,12 +11,12 @@
 			"iap_product_id": "",
 			"seed_type_ids": ["clover", "daisy", "buttercup", "tulip", "sunflower", "pumpkin", "watermelon"],
 			"roster": [
-				{"id": "meadow_clover", "display_name": "Meadow Clover", "rarity": 1},
-				{"id": "field_daisy", "display_name": "Field Daisy", "rarity": 1},
-				{"id": "buttercup_lane", "display_name": "Buttercup Lane", "rarity": 1},
-				{"id": "barn_tulip", "display_name": "Barn Tulip", "rarity": 2},
-				{"id": "sunfence", "display_name": "Sunfence", "rarity": 2},
-				{"id": "harvest_pumpkin", "display_name": "Harvest Pumpkin", "rarity": 3}
+				{"id": "clover", "display_name": "Meadow Clover", "rarity": 1},
+				{"id": "daisy", "display_name": "Field Daisy", "rarity": 1},
+				{"id": "buttercup", "display_name": "Buttercup Lane", "rarity": 1},
+				{"id": "tulip", "display_name": "Barn Tulip", "rarity": 2},
+				{"id": "sunflower", "display_name": "Sunfence", "rarity": 2},
+				{"id": "pumpkin", "display_name": "Harvest Pumpkin", "rarity": 3}
 			],
 			"thumbnail_path": "",
 			"run_bg_path": "",
@@ -33,7 +33,7 @@
 			"coins_cost": 500,
 			"t3_flowers_required": 20,
 			"iap_product_id": "",
-			"seed_type_ids": ["clover", "daisy", "buttercup"],
+			"seed_type_ids": ["frost_snowdrop", "ice_crocus", "silver_aconite", "winter_camellia", "hoarfrost_rose", "crystal_peony"],
 			"roster": [
 				{"id": "frost_snowdrop", "display_name": "Frost Snowdrop", "rarity": 1},
 				{"id": "ice_crocus", "display_name": "Ice Crocus", "rarity": 1},
@@ -57,7 +57,7 @@
 			"coins_cost": 500,
 			"t3_flowers_required": 20,
 			"iap_product_id": "",
-			"seed_type_ids": ["tulip", "sunflower", "pumpkin"],
+			"seed_type_ids": ["dusk_firefly_grass", "paper_lantern_bloom", "evening_primrose", "foxfire_lily", "glow_wisteria", "midnight_lotus"],
 			"roster": [
 				{"id": "dusk_firefly_grass", "display_name": "Dusk Firefly Grass", "rarity": 1},
 				{"id": "paper_lantern_bloom", "display_name": "Paper Lantern Bloom", "rarity": 1},
@@ -81,7 +81,7 @@
 			"coins_cost": 500,
 			"t3_flowers_required": 20,
 			"iap_product_id": "",
-			"seed_type_ids": ["clover", "daisy", "buttercup"],
+			"seed_type_ids": ["copper_leaf", "maple_aster", "russet_mallow", "cider_dahlia", "golden_oak_bloom", "amber_magnolia"],
 			"roster": [
 				{"id": "copper_leaf", "display_name": "Copper Leaf", "rarity": 1},
 				{"id": "maple_aster", "display_name": "Maple Aster", "rarity": 1},
@@ -105,7 +105,7 @@
 			"coins_cost": 0,
 			"t3_flowers_required": 0,
 			"iap_product_id": "season_pack_moonlit_warren",
-			"seed_type_ids": ["clover", "daisy", "buttercup", "tulip", "sunflower", "pumpkin", "watermelon"],
+			"seed_type_ids": ["moon_moss", "nightshade_petal", "silver_harebell", "lunar_orchid", "star_jasmine", "umbral_lily"],
 			"roster": [
 				{"id": "moon_moss", "display_name": "Moon Moss", "rarity": 1},
 				{"id": "nightshade_petal", "display_name": "Nightshade Petal", "rarity": 1},
@@ -129,7 +129,7 @@
 			"coins_cost": 0,
 			"t3_flowers_required": 0,
 			"iap_product_id": "season_pack_coral_tide",
-			"seed_type_ids": ["clover", "daisy", "buttercup", "tulip", "sunflower", "pumpkin", "watermelon"],
+			"seed_type_ids": ["sea_thrift", "salt_daisy", "tide_anemone", "coral_hibiscus", "pearl_waterlily", "reef_crown"],
 			"roster": [
 				{"id": "sea_thrift", "display_name": "Sea Thrift", "rarity": 1},
 				{"id": "salt_daisy", "display_name": "Salt Daisy", "rarity": 1},
@@ -153,7 +153,7 @@
 			"coins_cost": 0,
 			"t3_flowers_required": 0,
 			"iap_product_id": "season_pack_starfall_glade",
-			"seed_type_ids": ["clover", "daisy", "buttercup", "tulip", "sunflower", "pumpkin", "watermelon"],
+			"seed_type_ids": ["comet_sprig", "nebula_clover", "meteor_daisy", "aurora_tulip", "galaxy_sunburst", "nova_bloom"],
 			"roster": [
 				{"id": "comet_sprig", "display_name": "Comet Sprig", "rarity": 1},
 				{"id": "nebula_clover", "display_name": "Nebula Clover", "rarity": 1},
@@ -177,7 +177,7 @@
 			"coins_cost": 0,
 			"t3_flowers_required": 0,
 			"iap_product_id": "season_pack_ember_fen",
-			"seed_type_ids": ["clover", "daisy", "buttercup", "tulip", "sunflower", "pumpkin", "watermelon"],
+			"seed_type_ids": ["marsh_rush", "peat_violet", "cinder_buttercup", "flame_iris", "smoke_lotus", "fenfire_crown"],
 			"roster": [
 				{"id": "marsh_rush", "display_name": "Marsh Rush", "rarity": 1},
 				{"id": "peat_violet", "display_name": "Peat Violet", "rarity": 1},

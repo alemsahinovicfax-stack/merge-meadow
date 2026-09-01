@@ -13,8 +13,8 @@ podfaza: d0-prelaunch
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. HOME-11 BARFIT-A ✅. HOME-10 LOCKFLOW-A–B ✅."
-zadnja_sesija: "HOME-11 BARFIT-A — UnlockGate ispod 🔒+ime, frameless, debug 500c/20 T3"
-zadnje_azurirano: 2026-08-26
+zadnja_sesija: "HOME-14 LIFE-D — MeadowPip Walk/Sniff/Sleep u meadow_safe_rect"
+zadnje_azurirano: 2026-09-01
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -39,7 +39,7 @@ sljedeca_runda_dokumentacije: "Prije store (D0/D4) — listing/ASO; inače samo 
 | Polje | Vrijednost |
 |-------|------------|
 | **Milestone** | **M8** — Launch prep (Sekcija D) |
-| **Podfaza** | `d0-prelaunch` + **HOME-11** BARFIT-A ✅; **HOME-10** LOCKFLOW-A–B ✅; **HOME-09** CARDFIT-B ✅; **HOME-08** INCARD-B ✅; **ARENA-01** freeze ✅; **HOME-07** UNLOCK-C ✅; **HOME-06** FOCUS-D ✅; **HOME-05** GLIDE-C ✅; **HOME-04** PAID-C ✅; Bug-006–032 ✅ |
+| **Podfaza** | `d0-prelaunch` + **SEED-01** P0 ✅ **A ✅ B ✅ C ✅**; **HOME-12** MEADOW-P0 ✅ **MEADOW-A ✅ B ✅ C ✅**; **HOME-13** CHROME-P0 ✅ **A ✅ B ✅ C ✅ D ✅ E ✅**; **HOME-14** LIFE-P0 ✅ **A ✅ B ✅ C ✅ D ✅**; **CAMP-02** P0 ✅; **CAMP-01** P0 ✅ A ✅ B ✅; **HOME-11** BARFIT-A ✅; **HOME-10** LOCKFLOW-A–B ✅; **HOME-09** CARDFIT-B ✅; **HOME-08** INCARD-B ✅; **ARENA-03** SORT-P0 ✅ A ✅ B ✅ VAC-A ✅ VAC-F ✅ VAC-L ✅; **ARENA-02** leftover A–D ✅ C-P0 ✅ E-P0 ✅ (E kod ne — ARENA-03); **ARENA-01** COMB–FEEL ✅; **HOME-07** UNLOCK-C ✅; **HOME-06** FOCUS-D ✅; **HOME-05** GLIDE-C ✅; **HOME-04** PAID-C ✅; Bug-006–032 ✅ |
 | **Igra** | Merge Meadow — hybrid casual lane run + merge kamp |
 | **Engine** | Godot 4.x (HP laptop / Windows) |
 | **Save** | Lokalni JSON (`user://player_save.json`) — **bez** server/baze u v1 |
@@ -346,12 +346,17 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 ## Sljedeća akcija (sada)
 
 1. **D0-P / playtest** — swipe sezona treba kliziti; tap centar = Browser; Play Endless = Hard
-2. **HOME-11 BARFIT-A ✅** — gate niže ispod 🔒+ime; bez okvira; debug 500c ([[plan-prompts-home-barfit|prompti]])
-3. **HOME-10 LOCKFLOW-A–B ✅** — locked poster 500/20 gold; roster desno, puna imena, wash
-4. **HOME-09 CARDFIT-A–B ✅** — Amber gate; naslov sredina; roster kontrast+širina
-5. **HOME-08 INCARD-B ✅** — Unlock gate u CenterSlot
-6. **ARENA-01 COMB-A ✅ FLOW-A ✅ FLOW-B ✅ DAILY-A ✅ FEEL-A ✅ FEEL-B ✅** — prompti gotovi ([[plan-prompts-arena|prompti]]) · [[../03-content/ideje-arena-grupe|grupe]]
-7. **Ne** plaćati Play Console dok D0 nije ✅
+2. **CAMP-02 P0 ✅** — sljedeće Plan **CAMP2-A** ([[plan-prompts-camp-cliff|prompti]]) · [[../03-content/ideje-camp-cliff|hub]]
+3. **SEED-01 P0 ✅ A ✅ B ✅ C ✅** · **HOME-12 MEADOW-A ✅ B ✅ C ✅** — playlist gotova · [[../03-content/ideje-seed-pool|SEED hub]] · [[../03-content/ideje-home-meadow|HOME-12 hub]]
+4. **HOME-13 CHROME-P0 ✅ A ✅ B ✅ C ✅ D ✅ E ✅** — playlist gotova ([[plan-prompts-home-meadow-chrome|prompti]]) · [[../03-content/ideje-home-meadow-chrome|hub]]
+5. **HOME-14 LIFE-P0 ✅ A ✅ B ✅ C ✅ D ✅** — playlist gotova ([[plan-prompts-home-meadow-life|prompti]]) · [[../03-content/ideje-home-meadow-life|hub]]
+6. **CAMP-01 P0 ✅ A ✅ B ✅** — Flowers upgrade ([[plan-prompts-camp|prompti]]) · [[../03-content/ideje-camp|hub]]
+7. **HOME-11 BARFIT-A ✅** — gate niže ispod 🔒+ime; bez okvira; debug 500c ([[plan-prompts-home-barfit|prompti]])
+8. **HOME-10 LOCKFLOW-A–B ✅** — locked poster 500/20 gold; roster desno, puna imena, wash
+9. **HOME-09 CARDFIT-A–B ✅** — Amber gate; naslov sredina; roster kontrast+širina
+10. **HOME-08 INCARD-B ✅** — Unlock gate u CenterSlot
+11. **ARENA-01 COMB-A ✅ FLOW-A ✅ FLOW-B ✅ DAILY-A ✅ FEEL-A ✅ FEEL-B ✅** · **ARENA-02 LEFTOVER-P0 ✅ A ✅ B ✅ C-P0 ✅ C ✅ D ✅ E-P0 ✅** (E kod ne) · **ARENA-03 SORT-P0 ✅ A ✅ B ✅ VAC-A ✅ VAC-F ✅ VAC-L ✅** ([[plan-prompts-arena-sort|sort prompti]]) · [[../03-content/ideje-arena-sort|hub]]
+12. **Ne** plaćati Play Console dok D0 nije ✅
 
 ## Povezano
 
@@ -365,7 +370,24 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 - [[plan-prompts-home-incard|HOME-08 prompti]]
 - [[plan-prompts-home-lockflow|HOME-10 prompti]]
 - [[plan-prompts-home-barfit|HOME-11 prompti]]
+- [[plan-prompts-seed-meadow|SEED-01 + HOME-12 prompti]]
+- [[../03-content/ideje-home-meadow|HOME-12 meadow hub]]
+- [[plan-prompts-home-meadow-chrome|HOME-13 chrome prompti]]
+- [[../03-content/ideje-home-meadow-chrome|HOME-13 chrome hub]]
+- [[plan-prompts-home-meadow-life|HOME-14 life prompti]]
+- [[../03-content/ideje-home-meadow-life|HOME-14 life hub]]
+- [[../03-content/ideje-seed-pool|SEED-01 hub]]
 - [[plan-prompts-home-cardfit|HOME-09 prompti]]
 - [[plan-prompts-arena|ARENA-01 prompti]]
 - [[../03-content/ideje-arena|ARENA-01 hub]]
+- [[plan-prompts-arena-leftover|ARENA-02 leftover prompti]]
+- [[../03-content/ideje-arena-leftover|ARENA-02 leftover hub]]
+- [[../03-content/ideje-arena-leftover-grant|ARENA-02 debug 100 T1]]
+- [[../03-content/ideje-arena-leftover-field|ARENA-02 field leftover T1]]
+- [[plan-prompts-arena-sort|ARENA-03 sort prompti]]
+- [[../03-content/ideje-arena-sort|ARENA-03 sort hub]]
+- [[plan-prompts-camp|CAMP-01 prompti]]
+- [[../03-content/ideje-camp|CAMP-01 hub]]
+- [[plan-prompts-camp-cliff|CAMP-02 cliff prompti]]
+- [[../03-content/ideje-camp-cliff|CAMP-02 cliff hub]]
 - [[../00-home|Home]]

@@ -15,10 +15,18 @@ povezano:
   - ideje-home-cardfit
   - ideje-home-lockflow
   - ideje-home-barfit
+  - ideje-home-meadow
+  - ideje-seed-pool
+  - ideje-home-meadow-chrome
+  - ideje-home-meadow-life
   - ideje-arena
+  - ideje-arena-leftover
+  - ideje-arena-sort
+  - ideje-camp
+  - ideje-camp-cliff
   - CHECKPOINT
   - RADIONICA-razvoj
-ai_sažetak: "Kad agent predlaže scratch ideju iz vaulta — triggeri, format, backlog UX-01+ / HOME-11 / ARENA-01."
+ai_sažetak: "Kad agent predlaže scratch ideju iz vaulta — triggeri, format, backlog UX-01+ / HOME-14 / HOME-13 / HOME-12 / SEED-01 / CAMP-02 / ARENA / CAMP-01."
 ---
 
 # Ideje — kad predložiti (agent + ti)
@@ -48,6 +56,8 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | Kad radimo… | CHECKPOINT / fajl | Predloži iz… | Primjer ID |
 |-------------|-------------------|--------------|------------|
 | Camp UI, navigacija, gumbi | `camp_*`, F4–F5, F8 shop | ideje-prvo-iskustvo, roadmap F8 | **UX-04** Hub carousel |
+| Camp toast, Seeds/Flowers, companion picker, Sprinkler/Loot donate | `camp_controller`, `camp_scene`, upgrade kartice | [[../03-content/ideje-camp\|ideje-camp]] | **CAMP-01** |
+| Seeds rupa, „Bag seeds are“, tekst između naslova i broja | `GardenCliff`, `_garden_cliff_text` | [[../03-content/ideje-camp-cliff\|ideje-camp-cliff]] | **CAMP-02** |
 | Run feel, spawn, HUD | `run_controller`, F2–F5 | [[../03-content/ideje-gameplay-ekonomija\|gameplay ekonomija]] R1–R7 | R3 zlatni grm |
 | Loot / fail / rewarded | `loot_screen`, F3 | prvo iskustvo, monetizacija M1–M2 | — |
 | Ekonomija, shop, novčići | `game_state`, F8 | [[../02-design/ekonomija-brojevi\|brojevi]], ideje §6 shop | Shop stub |
@@ -66,8 +76,14 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | Unlock nije na Amberu / ime nije na sredini / roster isti na svim sezonama | `TEST_LOCK` amber, CenterTitle, roster frame | [[../03-content/ideje-home-cardfit\|HOME-09]] | **HOME-09** |
 | Roster biježi lijevo / ellipsis / boja kasni na swipe / locked = ime+barovi+zlatni Unlock | `FreeRoster` clip, `UnlockGate` kut, `seasons.json` cost | [[../03-content/ideje-home-lockflow\|HOME-10]] | **HOME-10** |
 | Barovi prekrivaju 🔒+ime / suvišan gate okvir / treba 500c za test Unlock | `UnlockGate` `anchor_top`, `make_frame`, debug wallet | [[../03-content/ideje-home-barfit\|HOME-11]] | **HOME-11** |
+| Uđi u sezonu, polje na Homeu, Pip šeta, Seasons natrag, apply_season | `season_stage`, `main_menu` Play, SeasonField | [[../03-content/ideje-home-meadow\|HOME-12]] | **HOME-12** |
+| Basket u polju, Endless samo u sezoni, full-bleed tint, Pip van, natrag s karusela | `BasketCard`, `EndlessPlayButton`, `PipPortrait`, `MeadowPip`, `SeasonsButton` | [[../03-content/ideje-home-meadow-chrome\|HOME-13]] | **HOME-13** |
+| Play na locked/paid → run; nejednaki PlayRow; malo cvijeća; Pip skriven u polju | `_on_play_pressed`, `PlayRow`, `FLOWER_SLOTS`, `MeadowPip` | [[../03-content/ideje-home-meadow-life\|HOME-14]] | **HOME-14** |
+| Frost spawna clover, album nema snowdrop, T1–T3 svih sezona, camp imena | `seasons.json` seed_type_ids, CHAIN, camp_plant_draw, journal | [[../03-content/ideje-seed-pool\|SEED-01]] | **SEED-01** |
 | Merge UX, slot overflow | kamp playtest, pre-launch | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] | **MA-01** Merge Arena |
 | Arena monotonija, combo, cliff, daily u areni | `merge_arena_controller`, Muncher, post-MA-01 playtest | [[../03-content/ideje-arena\|ideje-arena]] | **ARENA-01** |
+| Odd T1 na polju, pour ostatak, vreća s 1–3, „trebam još sjemena“, overlay ostaje nakon Camp | `pull_seeds_to_arena`, `NeedMoreSeedsOverlay`, `ensure_dev_unlocked_seeds`, post-ARENA-01 playtest | [[../03-content/ideje-arena-leftover\|ideje-arena-leftover]] | **ARENA-02** |
+| Muncher ostavi 3 T1, pour miješa tipove, daisy pa sljedeći, vacuum kad nema T3 | `_build_arena_pour_queue`, `_pest_eat_chip`, leftover-A floor-4, post-ARENA-02 playtest | [[../03-content/ideje-arena-sort\|ideje-arena-sort]] | **ARENA-03** |
 | Daily retention | post-launch metrika | merge-arena-v1.1 § DG-01 · ARENA-01 daily slice | **DG-01** Daily Goals |
 
 ## Backlog — UX / flow (prioritet za predlaganje)
@@ -93,7 +109,15 @@ Primjeniti sada, odgoditi, ili preskočiti?
 | **HOME-09** | **Cardfit** — Amber off TEST_LOCK; naslov sredina; roster kontrast+širina | Unlock „nije napravljen“, ime gore, isti tamni roster | **S** | v1.1+ · [[plan-prompts-home-cardfit\|plan-prompts-home-cardfit]] **P0–B ✅** |
 | **HOME-10** | **Lockflow** — locked poster 500/20 gold; roster desno bez ellipsisa; wash | Roster clip lijevo, `...`, swipe glitch boje, Unlock nije ime+barovi | **S** | v1.1+ · [[plan-prompts-home-lockflow\|plan-prompts-home-lockflow]] **P0–B ✅** |
 | **HOME-11** | **Barfit** — gate niže ispod 🔒+ime; bez okvira; debug 500c | Barovi prekrivaju ime/katanac, wash panel suvišan, Unlock se ne da testirati | **S** | v1.1+ · [[plan-prompts-home-barfit\|plan-prompts-home-barfit]] **P0–A ✅** |
-| **ARENA-01** | **Arena zabavnija** — combo+pulse, auto-refill, leftover T2→2×T1, daily badge | Arena dosadna, Muncher, T2 chore | **M** | v1.1+ · [[../03-content/ideje-arena\|ideje-arena]] **freeze ✅** · prompti [[plan-prompts-arena\|plan-prompts-arena]] COMB-A… |
+| **HOME-12** | **Meadow** — jedno SeasonField, sve playable; tap/Play → polje; Play na polju → run; Seasons natrag | Dual-band umjesto svijeta; Play odmah run; 8 scena | **M** | v1.1+ · [[../03-content/ideje-home-meadow\|ideje-home-meadow]] **MEADOW-P0 ✅** · [[plan-prompts-seed-meadow\|plan-prompts-seed-meadow]] 4–6 ✅ |
+| **HOME-13** | **Meadow chrome** — Basket/Endless u polju; full-bleed; Pip van; name-chip natrag | Basket na karuselu; Endless krivi spawn; Seasons gumb na cvijeću | **M** | v1.1+ · [[../03-content/ideje-home-meadow-chrome\|ideje-home-meadow-chrome]] **CHROME-P0 ✅ A–E ✅** · [[plan-prompts-home-meadow-chrome\|plan-prompts-home-meadow-chrome]] |
+| **HOME-14** | **Meadow life** — Play 3-koraka; jednaki PlayRow; 12–14 cvjetova u safe zoni; Pip hod/njuh/spavanje | Play na paid/locked = run; nejednaki gumbi; cvijeće pod chromeom; Pip off | **M** | v1.1+ · [[../03-content/ideje-home-meadow-life\|ideje-home-meadow-life]] **LIFE-P0 ✅ A ✅ B ✅** · [[plan-prompts-home-meadow-life\|plan-prompts-home-meadow-life]] C–D |
+| **SEED-01** | **Seed pool** — jedan type_id; run/journal/arena/camp po sezoni; T1–T3 fallback | Roster ≠ spawn; CHAIN-only journal; Frost = clover | **M** | v1.1+ · [[../03-content/ideje-seed-pool\|ideje-seed-pool]] **SEED-P0 ✅** · [[plan-prompts-seed-meadow\|plan-prompts-seed-meadow]] 1–3 |
+| **ARENA-01** | **Arena zabavnija** — combo+pulse, auto-refill, leftover T2→2×T1, daily badge | Arena dosadna, Muncher, T2 chore | **M** | v1.1+ · [[../03-content/ideje-arena\|ideje-arena]] **freeze ✅** · kod COMB-A…FEEL-B ✅ · [[plan-prompts-arena\|plan-prompts-arena]] |
+| **ARENA-02** | **Leftover ÷4** — pour ×4; refill 12; overlay n/4 tap→Camp; hide+naslov; debug 100 | Odd T1 na polju; overlay ostaje na tab return | **S** | v1.1+ · [[../03-content/ideje-arena-leftover\|ideje-arena-leftover]] **P0 ✅ A ✅ B ✅ C-P0 ✅ C ✅ D ✅ E-P0 ✅** · E kod ne · [[plan-prompts-arena-leftover\|plan-prompts-arena-leftover]] |
+| **ARENA-03** | **Sort + vacuum** — pour sav T1 po CHAIN; skip &lt;4; vacuum t1_eq &lt; 4; overlay ostaje | Muncher 3 T1; pour miješa tipove; leftover-A floor-4 | **M** | v1.1+ · [[../03-content/ideje-arena-sort\|ideje-arena-sort]] **SORT-P0 ✅ A ✅ B ✅ VAC-A ✅ VAC-F ✅ VAC-L ✅** · [[plan-prompts-arena-sort\|plan-prompts-arena-sort]] |
+| **CAMP-01** | **Kamp chrome + Flowers upgrade** — Seeds/Flowers; bez toast/companion; 2 T3 po Upgrade | Toast, Garden ime, donate in Arena, companion picker | **M** | v1.1+ · [[../03-content/ideje-camp\|ideje-camp]] **CAMP-P0 ✅ A ✅ B ✅** · [[plan-prompts-camp\|plan-prompts-camp]] |
+| **CAMP-02** | **Seeds cliff** — prazna rupa između Seeds i `Seeds: n` | „Bag seeds are T1…“ | **S** | v1.1+ · [[../03-content/ideje-camp-cliff\|ideje-camp-cliff]] **CAMP2-P0 ✅** · [[plan-prompts-camp-cliff\|plan-prompts-camp-cliff]] |
 
 ### UX-01 — Main menu u kampu (detalj)
 
@@ -138,9 +162,25 @@ Primjeniti sada, odgoditi, ili preskočiti?
 - [[../03-content/ideje-gameplay-ekonomija|gameplay ekonomija]]
 - [[../03-content/ideje-sezone|SEZ-01 sezone]]
 - [[../03-content/ideje-arena|ARENA-01 Merge Arena]]
-- [[plan-prompts-arena|plan-prompts-arena]] — COMB-A→FEEL-B
+- [[plan-prompts-arena|plan-prompts-arena]] — COMB-A→FEEL-B ✅
+- [[../03-content/ideje-arena-leftover|ARENA-02 leftover]]
+- [[../03-content/ideje-arena-leftover-field|ARENA-02 field leftover T1]] (E kod ne)
+- [[plan-prompts-arena-leftover|plan-prompts-arena-leftover]] — P0→A→B ✅ · C-P0 ✅ · C ✅ · D ✅ · E-P0 ✅ · E ne
+- [[../03-content/ideje-arena-sort|ARENA-03 sort]]
+- [[plan-prompts-arena-sort|plan-prompts-arena-sort]] — SORT-P0 ✅ A ✅ B ✅ VAC-A ✅ VAC-F ✅ VAC-L ✅
 - [[../03-content/ideje-home-lockflow|HOME-10 Lockflow]]
 - [[../03-content/ideje-home-barfit|HOME-11 Barfit]]
+- [[../03-content/ideje-home-meadow|HOME-12 Meadow]]
+- [[../03-content/ideje-home-meadow-chrome|HOME-13 Meadow chrome]]
+- [[../03-content/ideje-home-meadow-life|HOME-14 Meadow life]]
+- [[../03-content/ideje-seed-pool|SEED-01 seed pool]]
+- [[plan-prompts-seed-meadow|plan-prompts-seed-meadow]] — 1 SEED-A … 6 MEADOW-C
+- [[plan-prompts-home-meadow-chrome|plan-prompts-home-meadow-chrome]] — CHROME-P0 ✅ A–E ✅
+- [[plan-prompts-home-meadow-life|plan-prompts-home-meadow-life]] — LIFE-P0 ✅ A ✅ B ✅ → C–D
+- [[../03-content/ideje-camp|CAMP-01 kamp]]
+- [[plan-prompts-camp|plan-prompts-camp]] — P0 ✅ A ✅ B ✅
+- [[../03-content/ideje-camp-cliff|CAMP-02 Seeds cliff]]
+- [[plan-prompts-camp-cliff|plan-prompts-camp-cliff]] — CAMP2-P0 ✅ → A
 - [[../03-content/ideje-home-cardfit|HOME-09 Cardfit]]
 - [[plan-prompts-sez-01|plan-prompts-sez-01]] — P0→E
 - `.cursor/rules/ideje-kad-predloziti.mdc`

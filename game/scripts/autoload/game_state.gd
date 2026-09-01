@@ -34,6 +34,7 @@ const MAGNET_MAX_LEVEL := 4
 const MAGNET_COST_T2 := 2
 const MULTIPLIER_MAX_LEVEL := 4
 const MULTIPLIER_COST_T3 := 2
+const UPGRADE_FLOWER_COST := 2
 const MULTIPLIER_VALUES: Array[float] = [1.0, 1.25, 1.5, 1.75, 2.0]
 const MYTHIC_RARITY := 3
 
@@ -80,6 +81,14 @@ const MOCHI_UNLOCK_CAMP_LEVEL := 2
 const DEBUG_DEV_RESOURCES := true
 const DEBUG_WALLET_COINS := 20
 const DEBUG_SEED_COUNT := 20
+## ARENA-02 leftover playtest. Overwrite ignores SEED_BAG_SOFT_CAP (stays 40).
+const DEBUG_LEFTOVER_TEST_BAG: Dictionary = {
+	"clover": 19,
+	"daisy": 22,
+	"buttercup": 13,
+	"tulip": 28,
+	"sunflower": 18,
+}
 
 const TUTORIAL_RUN1_DURATION := 45.0
 const TUTORIAL_RUN2_DURATION := 60.0
@@ -117,6 +126,7 @@ var loot_doubled: bool = false
 var revive_used_this_run: bool = false
 
 var seed_bag: Dictionary = {}
+var _debug_leftover_bag_applied: bool = false
 
 var resume_pending: bool = false
 var carry_seed_bag: Dictionary = {}
@@ -169,6 +179,7 @@ var mochi_unlock_seen: bool = false
 var collection_journal_pending: Dictionary = {}
 var bloom_inbox: Array = []
 var _arena_chip_counter: int = 1
+var _arena_pour_locked_types: Dictionary = {}
 
 var meta_hub_active: bool = false
 var meta_hub_pending_page: int = MetaHubPages.MAIN
@@ -176,6 +187,8 @@ var arena_pest_tutorial_shown: bool = false
 var active_season_id: String = SeasonCatalog.DEFAULT_SEASON_ID
 var strip_focus_id: String = SeasonCatalog.DEFAULT_SEASON_ID
 var home_band: String = "free"
+var home_season_field_open: bool = false
+var home_season_field_id: String = ""
 var paid_strip_focus_id: String = ""
 var unlocked_seasons: Array[String] = [SeasonCatalog.DEFAULT_SEASON_ID]
 var owned_paid_seasons: Array[String] = []
@@ -191,6 +204,8 @@ func _ready() -> void:
 		_try_migrate_tutorial_flags_only()
 		_apply_debug_resources_if_new_game()
 		_normalize_season_progress()
+	else:
+		apply_debug_leftover_test_bag()
 
 
 func load_player_save() -> bool:
@@ -381,6 +396,8 @@ func reset_seasons_to_s1() -> void:
 	active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
 	strip_focus_id = SeasonCatalog.DEFAULT_SEASON_ID
 	home_band = "free"
+	home_season_field_open = false
+	home_season_field_id = ""
 	paid_strip_focus_id = ""
 	unlocked_seasons.clear()
 	unlocked_seasons.append(SeasonCatalog.DEFAULT_SEASON_ID)
@@ -463,6 +480,25 @@ func home_hero_center_id() -> String:
 	if home_band == "paid":
 		return paid_strip_focus_id
 	return strip_focus_id
+
+
+func can_open_home_season_field() -> bool:
+	return is_season_playable(home_hero_center_id())
+
+
+func open_home_season_field() -> bool:
+	if not can_open_home_season_field():
+		return false
+	var id := home_hero_center_id()
+	home_season_field_open = true
+	home_season_field_id = id
+	set_active_season(id)
+	return true
+
+
+func close_home_season_field() -> void:
+	home_season_field_open = false
+	home_season_field_id = ""
 
 
 func set_home_band(band: String) -> void:
@@ -816,7 +852,27 @@ func _apply_debug_resources_if_new_game() -> void:
 	if FileAccess.file_exists(PLAYER_SAVE_PATH):
 		return
 	wallet_coins = DEBUG_WALLET_COINS
-	_apply_debug_unlocked_seeds(10)
+	apply_debug_leftover_test_bag()
+
+
+func apply_debug_leftover_test_bag() -> bool:
+	return _try_apply_debug_leftover_test_bag(DEBUG_DEV_RESOURCES)
+
+
+func _try_apply_debug_leftover_test_bag(dev_enabled: bool) -> bool:
+	if not dev_enabled:
+		return false
+	if _debug_leftover_bag_applied:
+		return false
+	seed_bag = DEBUG_LEFTOVER_TEST_BAG.duplicate()
+	seed_unlock_index = 4
+	tutorial_complete = true
+	tutorial_step = TutorialStep.FREE
+	for type_id in DEBUG_LEFTOVER_TEST_BAG:
+		discovered_blooms[str(type_id)] = true
+	_debug_leftover_bag_applied = true
+	save_player_save()
+	return true
 
 
 ## Dev/playtest — min. count po otključanom tipu (ignorira soft cap u torbi).
@@ -946,7 +1002,7 @@ func get_loadout_type() -> String:
 func format_loadout_label() -> String:
 	if loadout_type_id.is_empty():
 		return "Basket: empty (tap to equip)"
-	var name: String = SEED_DISPLAY_NAMES.get(loadout_type_id, loadout_type_id.capitalize())
+	var name: String = get_seed_display_name(loadout_type_id)
 	var stars := "★".repeat(get_seed_rarity(loadout_type_id))
 	return "Basket: %s %s  (+%.0f%% spawn)" % [name, stars, LOADOUT_SPAWN_BONUS * 100.0]
 
@@ -980,10 +1036,20 @@ func get_unlocked_loadout_types() -> Array[String]:
 			continue
 		out.append(type_id)
 	out.sort_custom(func(a: String, b: String) -> bool:
-		var na: String = SEED_DISPLAY_NAMES.get(a, a)
-		var nb: String = SEED_DISPLAY_NAMES.get(b, b)
+		var na: String = get_seed_display_name(a)
+		var nb: String = get_seed_display_name(b)
 		return na < nb
 	)
+	return out
+
+
+func get_unlocked_loadout_types_for_season(season_id: String) -> Array[String]:
+	var out: Array[String] = []
+	for type_id in SeedCatalog.types_for_season(season_id):
+		if is_mythic_seed(type_id):
+			continue
+		if is_seed_type_unlocked(type_id):
+			out.append(type_id)
 	return out
 
 
@@ -1006,7 +1072,7 @@ func cycle_loadout_from_bag() -> String:
 			next_index = (idx + 1) % types.size()
 	var next_type: String = types[next_index]
 	if set_loadout_from_bag(next_type):
-		var name: String = SEED_DISPLAY_NAMES.get(next_type, next_type.capitalize())
+		var name: String = get_seed_display_name(next_type)
 		save_player_save()
 		return "Basket: %s — more in next run (tap to change)" % name
 	return "Could not set basket."
@@ -1021,8 +1087,8 @@ func get_sorted_bag_types(for_greenhouse: bool = false) -> Array[String]:
 		if is_mythic_seed(str(type_id)) == for_greenhouse:
 			out.append(str(type_id))
 	out.sort_custom(func(a: String, b: String) -> bool:
-		var na: String = SEED_DISPLAY_NAMES.get(a, a)
-		var nb: String = SEED_DISPLAY_NAMES.get(b, b)
+		var na: String = get_seed_display_name(a)
+		var nb: String = get_seed_display_name(b)
 		return na < nb
 	)
 	return out
@@ -1050,17 +1116,27 @@ func ensure_loot_in_camp_bag() -> void:
 		deposit_loot_to_camp()
 
 
+func get_seed_display_name(type_id: String) -> String:
+	var named := SeedCatalog.display_name(type_id)
+	if not named.is_empty():
+		return named
+	return str(SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize()))
+
+
 func get_seed_rarity(type_id: String) -> int:
-	return int(SEED_RARITY.get(type_id, 1))
+	return SeedCatalog.rarity(type_id)
 
 
 func is_seed_type_unlocked(type_id: String) -> bool:
 	if type_id.is_empty():
 		return false
 	var idx := SeedUnlockConfig.get_index(type_id)
-	if idx < 0:
+	if idx >= 0:
+		return idx <= seed_unlock_index
+	var season_id := SeedCatalog.season_id_for(type_id)
+	if season_id.is_empty():
 		return false
-	return idx <= seed_unlock_index
+	return is_season_playable(season_id)
 
 
 func get_lifetime_seeds_collected(type_id: String) -> int:
@@ -1153,14 +1229,8 @@ func format_seed_almanac_progress() -> String:
 	if not has_pending_seed_unlock():
 		return "Seed Almanac: all meadow seeds unlocked!"
 	var preview := get_next_seed_unlock_preview()
-	var prev_name: String = SEED_DISPLAY_NAMES.get(
-		str(preview.get("prev_type", "")),
-		str(preview.get("prev_type", "")).capitalize()
-	)
-	var next_name: String = SEED_DISPLAY_NAMES.get(
-		str(preview.get("next_type", "")),
-		str(preview.get("next_type", "")).capitalize()
-	)
+	var prev_name: String = get_seed_display_name(str(preview.get("prev_type", "")))
+	var next_name: String = get_seed_display_name(str(preview.get("next_type", "")))
 	return "Unlock %s: collect %d/%d %s in runs (lifetime)." % [
 		next_name,
 		int(preview.get("lifetime_have", 0)),
@@ -1206,14 +1276,8 @@ func get_seed_almanac_tier_progress(type_id: String) -> Dictionary:
 func get_almanac_top_progress() -> Dictionary:
 	if has_pending_seed_unlock():
 		var preview := get_next_seed_unlock_preview()
-		var next_name: String = SEED_DISPLAY_NAMES.get(
-			str(preview.get("next_type", "")),
-			str(preview.get("next_type", "")).capitalize()
-		)
-		var prev_name: String = SEED_DISPLAY_NAMES.get(
-			str(preview.get("prev_type", "")),
-			str(preview.get("prev_type", "")).capitalize()
-		)
+		var next_name: String = get_seed_display_name(str(preview.get("next_type", "")))
+		var prev_name: String = get_seed_display_name(str(preview.get("prev_type", "")))
 		return {
 			"title": "Unlock %s — Tier 1" % next_name,
 			"have": int(preview.get("lifetime_have", 0)),
@@ -1230,7 +1294,7 @@ func get_almanac_top_progress() -> Dictionary:
 		var prog := get_seed_almanac_tier_progress(type_id)
 		if prog.is_empty() or bool(prog.get("complete", false)):
 			continue
-		var display_name: String = SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+		var display_name: String = get_seed_display_name(type_id)
 		return {
 			"title": "%s → Tier %d" % [display_name, int(prog.get("next_tier", 2))],
 			"have": int(prog.get("have", 0)),
@@ -1249,7 +1313,7 @@ func get_almanac_chain_ui_data() -> Array[Dictionary]:
 		var type_id := SeedUnlockConfig.get_type_at_index(i)
 		if type_id.is_empty():
 			continue
-		var display_name: String = SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+		var display_name: String = get_seed_display_name(type_id)
 		var stars := "★".repeat(get_seed_rarity(type_id))
 		var spawn_unlocked := is_seed_type_unlocked(type_id)
 		var almanac_tier := get_seed_almanac_tier(type_id)
@@ -1267,7 +1331,7 @@ func get_almanac_chain_ui_data() -> Array[Dictionary]:
 			entry["can_coin_unlock"] = false
 		else:
 			var prev_type := SeedUnlockConfig.get_type_at_index(i - 1)
-			var prev_name: String = SEED_DISPLAY_NAMES.get(prev_type, prev_type.capitalize())
+			var prev_name: String = get_seed_display_name(prev_type)
 			entry["tier_progress"] = {
 				"have": get_lifetime_seeds_collected(prev_type),
 				"need": SeedUnlockConfig.lifetime_required_to_unlock_next(i - 1),
@@ -1305,7 +1369,7 @@ func try_coin_unlock_next_seed() -> String:
 	if wallet_coins < cost:
 		return "Need %d coins (you have %d)." % [cost, wallet_coins]
 	var next_type := SeedUnlockConfig.get_type_at_index(next_index)
-	var next_name: String = SEED_DISPLAY_NAMES.get(next_type, next_type.capitalize())
+	var next_name: String = get_seed_display_name(next_type)
 	wallet_coins -= cost
 	seed_unlock_index = next_index
 	save_player_save()
@@ -1332,7 +1396,7 @@ func format_seed_bag_label() -> String:
 		var count := int(seed_bag[type_id])
 		if count <= 0:
 			continue
-		var name: String = SEED_DISPLAY_NAMES.get(type_id, str(type_id).capitalize())
+		var name: String = get_seed_display_name(type_id)
 		var stars := "★".repeat(get_seed_rarity(type_id))
 		parts.append("%d %s %s" % [count, name, stars])
 	return "Seeds in bag (%d/%d): " % [total, SEED_BAG_SOFT_CAP] + ", ".join(parts)
@@ -1349,7 +1413,7 @@ func get_seed_bag_entries() -> Array[Dictionary]:
 		out.append({
 			"type_id": tid,
 			"count": count,
-			"display_name": SEED_DISPLAY_NAMES.get(tid, tid.capitalize()),
+			"display_name": get_seed_display_name(tid),
 			"rarity": get_seed_rarity(tid),
 		})
 	out.sort_custom(_compare_seed_bag_entry_asc)
@@ -1367,7 +1431,7 @@ func get_garden_crystal_entries() -> Array[Dictionary]:
 		out.append({
 			"type_id": tid,
 			"count": count,
-			"display_name": SEED_DISPLAY_NAMES.get(tid, tid.capitalize()),
+			"display_name": get_seed_display_name(tid),
 			"rarity": get_seed_rarity(tid),
 		})
 	out.sort_custom(_compare_seed_bag_entry_display)
@@ -1402,12 +1466,12 @@ func format_collection_label() -> String:
 		var tier := int(collection_kept_tiers[type_id])
 		if tier <= 0:
 			continue
-		var name: String = SEED_DISPLAY_NAMES.get(type_id, str(type_id).capitalize())
+		var name: String = get_seed_display_name(type_id)
 		parts.append("%s T%d" % [name, tier])
 	for type_id in discovered_blooms:
 		if collection_kept_tiers.has(type_id):
 			continue
-		var name: String = SEED_DISPLAY_NAMES.get(type_id, str(type_id).capitalize())
+		var name: String = get_seed_display_name(type_id)
 		parts.append(name)
 	if parts.is_empty():
 		return "Collection: none yet"
@@ -1439,8 +1503,7 @@ func mark_collection_journal_viewed() -> void:
 
 func get_collection_journal_entries() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
-	for i in SeedUnlockConfig.chain_size():
-		var type_id := SeedUnlockConfig.get_type_at_index(i)
+	for type_id in SeedCatalog.all_type_ids():
 		if type_id.is_empty():
 			continue
 		var spawn_unlocked := is_seed_type_unlocked(type_id)
@@ -1449,16 +1512,20 @@ func get_collection_journal_entries() -> Array[Dictionary]:
 		var display_tier := kept_tier
 		if display_tier <= 0 and discovered:
 			display_tier = 1
+		var in_chain := SeedUnlockConfig.get_index(type_id) >= 0
+		var spotted := discovered or kept_tier >= 2
+		if in_chain:
+			spotted = spotted or spawn_unlocked
 		var state := "locked"
 		if kept_tier >= 3:
 			state = "album_t3"
 		elif kept_tier >= 2:
 			state = "album_t2"
-		elif discovered or spawn_unlocked:
+		elif spotted:
 			state = "seen"
 		out.append({
 			"type_id": type_id,
-			"display_name": SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize()),
+			"display_name": get_seed_display_name(type_id),
 			"rarity": get_seed_rarity(type_id),
 			"spawn_unlocked": spawn_unlocked,
 			"discovered": discovered,
@@ -1619,7 +1686,7 @@ func format_loot_label() -> String:
 		var count := int(last_seed_bag[type_id])
 		if count <= 0:
 			continue
-		var display_name: String = SEED_DISPLAY_NAMES.get(type_id, str(type_id).capitalize())
+		var display_name: String = get_seed_display_name(type_id)
 		lines.append("+%d %s" % [count, display_name])
 	if lines.is_empty():
 		return "+0"
@@ -1702,6 +1769,14 @@ func add_seeds_to_bag(type_id: String, count: int) -> int:
 	var to_add := mini(count, room)
 	seed_bag[type_id] = int(seed_bag.get(type_id, 0)) + to_add
 	return to_add
+
+
+## Arena vacuum: return chips even when the bag is already over SEED_BAG_SOFT_CAP (debug grant).
+func add_seeds_to_bag_unbounded(type_id: String, count: int) -> int:
+	if count <= 0 or type_id.is_empty():
+		return 0
+	seed_bag[type_id] = int(seed_bag.get(type_id, 0)) + count
+	return count
 
 
 func seed_bag_remaining_capacity() -> int:
@@ -1790,7 +1865,7 @@ func claim_daily_chest() -> String:
 	wallet_coins += DAILY_CHEST_COINS
 	last_daily_chest_day = _today_key()
 	save_player_save()
-	var name: String = SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+	var name: String = get_seed_display_name(type_id)
 	if added < DAILY_CHEST_SEEDS:
 		return (
 			"Daily chest: +%d coins, +%d %s (bag almost full!)."
@@ -2093,12 +2168,63 @@ func donate_bloom_from_bed(bed_index: int, in_greenhouse: bool = false) -> bool:
 	return true
 
 
-func try_upgrade_magnet() -> bool:
+func pick_upgrade_flower_type(preferred: String = "") -> String:
+	if int(garden_crystal_stash.get(preferred, 0)) >= UPGRADE_FLOWER_COST:
+		return preferred
+	var candidates: Array[Dictionary] = []
+	for type_id in garden_crystal_stash:
+		var count := int(garden_crystal_stash[type_id])
+		if count < UPGRADE_FLOWER_COST:
+			continue
+		candidates.append({
+			"type_id": str(type_id),
+			"rarity": get_seed_rarity(str(type_id)),
+			"count": count,
+			"chain": SeedUnlockConfig.get_index(str(type_id)),
+		})
+	if candidates.is_empty():
+		return ""
+	candidates.sort_custom(_compare_upgrade_flower_pick)
+	return str(candidates[0].get("type_id", ""))
+
+
+func _compare_upgrade_flower_pick(a: Dictionary, b: Dictionary) -> bool:
+	var rarity_a := int(a.get("rarity", 1))
+	var rarity_b := int(b.get("rarity", 1))
+	if rarity_a != rarity_b:
+		return rarity_a < rarity_b
+	var count_a := int(a.get("count", 0))
+	var count_b := int(b.get("count", 0))
+	if count_a != count_b:
+		return count_a > count_b
+	return int(a.get("chain", 99)) < int(b.get("chain", 99))
+
+
+func can_spend_flowers_for_upgrade(preferred: String = "") -> bool:
+	return not pick_upgrade_flower_type(preferred).is_empty()
+
+
+func spend_flowers_for_upgrade(preferred: String = "") -> bool:
+	var type_id := pick_upgrade_flower_type(preferred)
+	if type_id.is_empty():
+		return false
+	var have := int(garden_crystal_stash.get(type_id, 0))
+	if have < UPGRADE_FLOWER_COST:
+		return false
+	var left := have - UPGRADE_FLOWER_COST
+	if left <= 0:
+		garden_crystal_stash.erase(type_id)
+	else:
+		garden_crystal_stash[type_id] = left
+	save_player_save()
+	return true
+
+
+func try_upgrade_magnet(preferred: String = "") -> bool:
 	if magnet_level >= MAGNET_MAX_LEVEL:
 		return false
-	if sprinkler_donations < MAGNET_COST_T2:
+	if not spend_flowers_for_upgrade(preferred):
 		return false
-	sprinkler_donations = 0
 	magnet_level += 1
 	_ensure_garden_bed_capacity()
 	save_player_save()
@@ -2106,7 +2232,12 @@ func try_upgrade_magnet() -> bool:
 
 
 func get_loot_multiplier() -> float:
-	return MULTIPLIER_VALUES[multiplier_level]
+	return get_loot_multiplier_for_level(multiplier_level)
+
+
+func get_loot_multiplier_for_level(level: int) -> float:
+	var idx := clampi(level, 0, MULTIPLIER_VALUES.size() - 1)
+	return MULTIPLIER_VALUES[idx]
 
 
 func format_loot_multiplier_label() -> String:
@@ -2133,19 +2264,22 @@ func donate_crystal_from_bed(bed_index: int, in_greenhouse: bool = false) -> boo
 	return true
 
 
-func try_upgrade_multiplier() -> bool:
+func try_upgrade_multiplier(preferred: String = "") -> bool:
 	if multiplier_level >= MULTIPLIER_MAX_LEVEL:
 		return false
-	if multiplier_donations < MULTIPLIER_COST_T3:
+	if not spend_flowers_for_upgrade(preferred):
 		return false
-	multiplier_donations = 0
 	multiplier_level += 1
 	save_player_save()
 	return true
 
 
+func get_magnet_radius_for_level(level: int) -> float:
+	return MAGNET_BASE_RADIUS + float(level) * MAGNET_RADIUS_PER_LEVEL
+
+
 func get_magnet_radius() -> float:
-	return MAGNET_BASE_RADIUS + magnet_level * MAGNET_RADIUS_PER_LEVEL
+	return get_magnet_radius_for_level(magnet_level)
 
 
 func get_camp_progress_level() -> int:
@@ -2355,11 +2489,40 @@ func flush_bloom_inbox_to_album() -> int:
 	return kept
 
 
-func pull_seeds_to_arena(max_count: int, field_type_counts: Dictionary = {}) -> Array:
+func is_arena_pour_locked(type_id: String) -> bool:
+	if type_id.is_empty() or not _arena_pour_locked_types.has(type_id):
+		return false
+	# S31 — lock does not block a real T3 set sitting in the bag.
+	if int(seed_bag.get(type_id, 0)) >= 4:
+		return false
+	return true
+
+
+func lock_arena_pour_type(type_id: String) -> void:
+	if type_id.is_empty():
+		return
+	if int(seed_bag.get(type_id, 0)) >= 4:
+		_arena_pour_locked_types.erase(type_id)
+		return
+	_arena_pour_locked_types[type_id] = true
+
+
+func unlock_arena_pour_type(type_id: String) -> void:
+	if type_id.is_empty():
+		return
+	_arena_pour_locked_types.erase(type_id)
+
+
+func clear_arena_pour_locks() -> void:
+	_arena_pour_locked_types.clear()
+
+
+func pull_seeds_to_arena(max_count: int, _field_type_counts: Dictionary = {}) -> Array:
 	var out: Array = []
+	max_count = maxi(0, max_count)
 	if max_count <= 0:
 		return out
-	var queue := _build_arena_pour_queue(field_type_counts)
+	var queue := _build_arena_pour_queue()
 	var pulled := 0
 	for type_id in queue:
 		if pulled >= max_count:
@@ -2392,44 +2555,21 @@ func get_bag_types_by_pour_priority() -> Array[String]:
 	return out
 
 
-func _build_arena_pour_queue(field_type_counts: Dictionary = {}) -> Array[String]:
-	var sorted_types := get_bag_types_by_pour_priority()
-	if sorted_types.is_empty():
-		return []
+func _append_pourable_to_queue(queue: Array[String], type_id: String) -> int:
+	var n := int(seed_bag.get(type_id, 0))
+	if n < 4:
+		return 0
+	if is_arena_pour_locked(type_id):
+		return 0
+	for _i in n:
+		queue.append(type_id)
+	return n
+
+
+func _build_arena_pour_queue(_field_type_counts: Dictionary = {}) -> Array[String]:
 	var queue: Array[String] = []
-	var queued_orphans: Dictionary = {}
-	for type_id in sorted_types:
-		if int(field_type_counts.get(type_id, 0)) != 1:
-			continue
-		var count := int(seed_bag.get(type_id, 0))
-		for _i in count:
-			queue.append(type_id)
-		queued_orphans[type_id] = true
-	var rest: Array[String] = []
-	for type_id in sorted_types:
-		if queued_orphans.has(type_id):
-			continue
-		rest.append(type_id)
-	if rest.is_empty():
-		return queue
-	var priority_types: Array[String] = []
-	var lowest_rarity := get_seed_rarity(rest[0])
-	for type_id in rest:
-		if get_seed_rarity(type_id) != lowest_rarity:
-			break
-		priority_types.append(type_id)
-		if priority_types.size() >= 2:
-			break
-	for type_id in priority_types:
-		var count := int(seed_bag.get(type_id, 0))
-		for _i in count:
-			queue.append(type_id)
-	for type_id in rest:
-		if priority_types.has(type_id):
-			continue
-		var count := int(seed_bag.get(type_id, 0))
-		for _i in count:
-			queue.append(type_id)
+	for type_id in SeedCatalog.all_type_ids():
+		_append_pourable_to_queue(queue, type_id)
 	return queue
 
 
@@ -2461,7 +2601,7 @@ func format_garden_crystal_stash_label() -> String:
 	var parts: PackedStringArray = []
 	for type_id in types:
 		var count := int(garden_crystal_stash.get(type_id, 0))
-		var name: String = SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+		var name: String = get_seed_display_name(type_id)
 		parts.append("%s×%d" % [name, count])
 	return "Garden stash: %s (%d total)" % [", ".join(parts), total]
 
@@ -2694,6 +2834,6 @@ func get_merge_hint_message(chip_data: Dictionary) -> String:
 		counts[type_id] = int(counts.get(type_id, 0)) + 1
 	for type_id in counts:
 		if int(counts[type_id]) >= 2:
-			var name: String = SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+			var name: String = get_seed_display_name(type_id)
 			return "Hint: merge two %s seeds." % name
 	return "Hint: pour seeds and merge matching pairs."

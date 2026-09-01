@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://seasonstage01"]
+[gd_scene load_steps=9 format=3 uid="uid://seasonstage01"]
 
 [ext_resource type="Script" path="res://scripts/ui/season_stage.gd" id="1_stage"]
 [ext_resource type="PackedScene" path="res://scenes/ui/season_browser.tscn" id="2_browser"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://scripts/ui/season_roster_panel.gd" id="4_roster"]
 [ext_resource type="Script" path="res://scripts/ui/season_unlock_gate.gd" id="5_gate"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="6_uibtn"]
+[ext_resource type="Script" path="res://scripts/ui/season_field.gd" id="7_field"]
+[ext_resource type="Script" path="res://scripts/ui/season_field_pip.gd" id="8_pip"]
 
 [node name="SeasonStage" type="Control"]
 custom_minimum_size = Vector2(0, 416)
@@ -15,6 +17,7 @@ mouse_filter = 0
 script = ExtResource("1_stage")
 
 [node name="BandColumn" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -335,6 +338,63 @@ text = "Frost Orchard"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
+
+[node name="SeasonField" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 0
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("7_field")
+
+[node name="FieldGround" type="ColorRect" parent="SeasonField"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.9, 0.95, 0.86, 1)
+
+[node name="SeasonsButton" type="PanelContainer" parent="SeasonField"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(220, 64)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -110.0
+offset_top = 12.0
+offset_right = 110.0
+offset_bottom = 76.0
+grow_horizontal = 2
+mouse_filter = 0
+script = ExtResource("6_uibtn")
+label_text = ""
+font_size = 28
+button_variant = "secondary"
+
+[node name="MeadowPip" type="Control" parent="SeasonField"]
+unique_name_in_owner = true
+visible = false
+z_index = 20
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 0
+offset_left = 20.0
+offset_top = 120.0
+offset_right = 92.0
+offset_bottom = 192.0
+mouse_filter = 2
+script = ExtResource("8_pip")
 
 [node name="SeasonBrowser" parent="." instance=ExtResource("2_browser")]
 unique_name_in_owner = true

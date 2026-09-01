@@ -33,19 +33,24 @@ func _run() -> void:
 	gs.set("garden_crystal_stash", {"clover": 5})
 
 	var s1_pool: Array = gs.call("get_active_season_spawn_types")
-	if not s1_pool.has("watermelon"):
-		_fail("S1 pool should include watermelon")
+	if not s1_pool.has("clover") or not s1_pool.has("watermelon"):
+		_fail("S1 pool should include clover and watermelon")
 		return
 
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"clover": 20})
 	if not bool(gs.call("unlock_free", "frost_orchard")):
 		_fail("could not unlock frost_orchard")
 		return
 	var frost_pool: Array = gs.call("get_active_season_spawn_types")
-	if frost_pool.has("watermelon"):
-		_fail("frost pool should not include watermelon")
+	if not frost_pool.has("frost_snowdrop"):
+		_fail("frost pool missing frost_snowdrop")
 		return
-	if not frost_pool.has("clover"):
-		_fail("frost pool missing clover")
+	if frost_pool.has("clover") or frost_pool.has("watermelon"):
+		_fail("frost pool should not include clover/watermelon")
+		return
+	if frost_pool.size() == 3 and frost_pool.has("daisy") and frost_pool.has("buttercup"):
+		_fail("frost pool still Bloom clover-daisy-buttercup")
 		return
 
 	gs.set("loadout_type_id", "watermelon")
@@ -72,8 +77,8 @@ func _run() -> void:
 		_fail("Background apply_theme missing")
 		return
 	var m1: Color = bg.get("modulate")
-	gs.set("wallet_coins", 80)
-	gs.set("garden_crystal_stash", {"clover": 5})
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"clover": 20})
 	if not bool(gs.call("unlock_free", "frost_orchard")):
 		_fail("frost unlock before tint compare failed")
 		return

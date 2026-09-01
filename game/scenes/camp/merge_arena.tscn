@@ -136,3 +136,67 @@ script = ExtResource("2_uibtn")
 label_text = "Done"
 font_size = 24
 button_variant = "primary"
+
+[node name="NeedMoreSeedsOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 30
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="Dim" type="ColorRect" parent="NeedMoreSeedsOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.06, 0.08, 0.07, 0.72)
+
+[node name="Panel" type="PanelContainer" parent="NeedMoreSeedsOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.08
+anchor_top = 0.16
+anchor_right = 0.92
+anchor_bottom = 0.84
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="NeedMoreSeedsOverlay/Panel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="NeedMoreSeedsTitle" type="Label" parent="NeedMoreSeedsOverlay/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.972549, 0.941176, 1)
+theme_override_font_sizes/font_size = 28
+text = "You need more seeds!"
+horizontal_alignment = 1
+autowrap_mode = 3
+clip_text = false
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="NeedMoreSeedsScroll" type="ScrollContainer" parent="NeedMoreSeedsOverlay/Panel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+horizontal_scroll_mode = 0
+
+[node name="NeedMoreSeedsList" type="VBoxContainer" parent="NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+

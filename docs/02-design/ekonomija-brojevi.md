@@ -83,7 +83,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | `GREENHOUSE_SLOT_COUNT` | **2** | staklenik (★★★ only) |
 | `MAX_MERGE_TIER` | `3` | T1→T2→T3 crystal |
 | merge | 2× isti `type_id` + isti tier | T1+T1=T2 |
-| T2 nakon mergea | **Keep** (kolekcija, oslobađa gredicu) ili **doniraj** sprinkleru | igrač bira |
+| T2 nakon mergea | leftover u areni → 2× T1; T3 ide u Flowers | CAMP-01: upgrade se plaća iz Flowers |
 | `collection_kept_tiers` | po `type_id` → max tier | Keep ne drži cvijet na gredici |
 | `SEED_BAG_SOFT_CAP` | **40** | torba; višak se ne prima |
 | auto-plant | pri ulasku u kamp + nakon Keep/chest | preskače tutorial CAMP1 |
@@ -91,7 +91,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | `DAILY_CHEST_COINS` | **8** | jednom dnevno (save `last_daily_chest_day`) |
 | `DAILY_CHEST_SEEDS` | **3** | random iz unlocked spawn poola |
 | `discovered_blooms` | po `type_id` | priprema za dnevnik/setove |
-| `sprinkler_donations` | 0–2 | donirani T2 prije upgradea |
+| `sprinkler_donations` | 0–2 | legacy save polje; CAMP-01 B **ne** koristi za Upgrade |
 | `EXCHANGE_SEED_COUNT` | `3` | max sjemena po Trade |
 | `SEED_EXCHANGE_COINS_BY_RARITY` | ★1=`1`, ★2=`2`, ★3=`4` | C po sjemeniu |
 | `CRYSTAL_EXCHANGE_COINS_BY_RARITY` | ★1=`5`, ★2=`10`, ★3=`20` | C po flower/crystal |
@@ -122,11 +122,12 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | Konstanta | Vrijednost |
 |-----------|-----------|
 | `MAGNET_MAX_LEVEL` | `4` |
-| `MAGNET_COST_T2` | `2` donirana T2 cvijeta po levelu |
+| `UPGRADE_FLOWER_COST` | **2 T3 Flowers** po levelu (atomic tap u kampu) |
+| `MAGNET_COST_T2` | `2` — legacy broj za stari donate API; resurs upgradea je T3 |
 | `MAGNET_BASE_RADIUS` | `40` px |
 | `MAGNET_RADIUS_PER_LEVEL` | `48` px |
 | `MULTIPLIER_MAX_LEVEL` | `4` |
-| `MULTIPLIER_COST_T3` | `2` donirana T3 po levelu |
+| `MULTIPLIER_COST_T3` | `2` — legacy donate broj; Loot Boost troši isti `UPGRADE_FLOWER_COST` |
 | `MULTIPLIER_VALUES` | ×1.0, ×1.25, ×1.5, ×1.75, ×2.0 |
 
 ### Merge Arena — Muncher pest (MA-01b, v1.1)
@@ -151,13 +152,13 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | Post-tutorial run | 20 s | **60 s** | 20 s prekratko za camp loop; 75 s ostaje M8 target |
 | Spawn interval / chance | 1.2 / 0.7 | bez promjene | ~8–12 pickupa u 60 s — OK za prvi pass |
 | Obstacle chance | 0.25 | bez promjene | dovoljno rizika bez frustracije |
-| Magnet T2 cost | 2 donacije | bez promjene | 9 gredica i dalje podržava 2 upgrade ciklusa |
+| Magnet T2 cost | 2 donacije | **CAMP-01 B:** 2 T3 Flowers | arena više ne donira |
 
 **Osjećaj:** 60 s daje prostor za loadout (+5% spawn) i sprinkler upgrade bez žurbe. Fine-tune nakon shop prototipa (F8.4).
 
 ## Odluke (2026-07-04)
 
-- **E2 cilj igrača:** oboje — T2/T3 za **sprinkler / Loot Boost** ili **Keep** u kolekciju.
+- **E2 cilj igrača:** T3 Flowers za **Sprinkler / Loot Boost** (kamp spend) ili Exchange za coins. Arena ne donira.
 - **Tierovi:** T1→T2→T3 crystal (v1).
 - **Kamp UX:** torba + auto-plant + Keep oslobađa gredicu (A+C).
 

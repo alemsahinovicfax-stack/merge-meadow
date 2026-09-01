@@ -26,6 +26,13 @@ static func bg_modulate(season_id: String) -> Color:
 			return Color.WHITE
 
 
+static func home_field_tint(season_id: String) -> Color:
+	var tint := bg_modulate(season_id)
+	if tint.is_equal_approx(Color.WHITE):
+		return Color(0.90, 0.95, 0.86, 1.0)
+	return tint
+
+
 static func obstacle_modulate(season_id: String) -> Color:
 	match season_id:
 		"country_bloom":

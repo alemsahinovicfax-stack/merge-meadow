@@ -20,7 +20,7 @@ var run_bg_path: String = ""
 var animal_skin_id: String = ""
 var obstacle_theme_id: String = ""
 var clear_rabbit_id: String = ""
-## Home catalog stubs — not the run seed pool (HOME-07).
+## Home roster — same type_id namespace as seed_type_ids (6 rows; Bloom spawn may have 7).
 var roster: Array[Dictionary] = []
 
 
