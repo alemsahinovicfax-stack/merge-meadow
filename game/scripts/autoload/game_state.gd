@@ -124,7 +124,14 @@ var last_raw_seed_total: int = 0
 var loot_doubled: bool = false
 var revive_used_this_run: bool = false
 
-var seed_bag: Dictionary = {}
+## Property (not a plain var) — see seed_bag_domain.gd's header for why:
+## ~50 sites in this file plus several external scripts read/write
+## GameState.seed_bag directly as a raw Dictionary. The getter returns the
+## actual backing Dictionary (not a copy) so in-place mutations like
+## `seed_bag[type_id] = x` keep working exactly as before.
+var seed_bag: Dictionary:
+	get: return seed_bag_domain.bag
+	set(value): seed_bag_domain.bag = value
 var _debug_leftover_bag_applied: bool = false
 
 var resume_pending: bool = false
@@ -146,6 +153,7 @@ var cosmetics: Cosmetics
 var boosters: Boosters
 var companions: Companions
 var tutorial: Tutorial
+var seed_bag_domain: SeedBagDomain
 
 ## Kept as a var (not moved into Boosters) because merge_arena_controller.gd
 ## reads it directly as GameState.merge_hint_booster_active in two places;
@@ -219,6 +227,7 @@ func _ready() -> void:
 	boosters = Boosters.new(self)
 	companions = Companions.new(self)
 	tutorial = Tutorial.new(self)
+	seed_bag_domain = SeedBagDomain.new(self)
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
@@ -1547,36 +1556,11 @@ func sum_seed_bag(bag: Dictionary) -> int:
 
 
 func format_seed_bag_label() -> String:
-	var total := sum_seed_bag(seed_bag)
-	if seed_bag.is_empty():
-		return "Seeds in bag: none (0/%d)" % SEED_BAG_SOFT_CAP
-	var parts: PackedStringArray = []
-	for type_id in seed_bag:
-		var count := int(seed_bag[type_id])
-		if count <= 0:
-			continue
-		var name: String = get_seed_display_name(type_id)
-		var stars := "★".repeat(get_seed_rarity(type_id))
-		parts.append("%d %s %s" % [count, name, stars])
-	return "Seeds in bag (%d/%d): " % [total, SEED_BAG_SOFT_CAP] + ", ".join(parts)
+	return seed_bag_domain.format_label()
 
 
 func get_seed_bag_entries() -> Array[Dictionary]:
-	## Sorted inventory rows for Garden UI: rarity ASC (★ → ★★★), then display name.
-	var out: Array[Dictionary] = []
-	for type_id in seed_bag:
-		var count := int(seed_bag[type_id])
-		if count <= 0:
-			continue
-		var tid := str(type_id)
-		out.append({
-			"type_id": tid,
-			"count": count,
-			"display_name": get_seed_display_name(tid),
-			"rarity": get_seed_rarity(tid),
-		})
-	out.sort_custom(_compare_seed_bag_entry_asc)
-	return out
+	return seed_bag_domain.entries()
 
 
 func get_garden_crystal_entries() -> Array[Dictionary]:
@@ -1901,43 +1885,25 @@ func request_revive() -> bool:
 	return true
 
 
+## Facade forwards to SeedBagDomain (Stage 4.3) — names/signatures unchanged.
 func add_seeds_to_bag(type_id: String, count: int) -> int:
-	if count <= 0 or type_id.is_empty():
-		return 0
-	var room := seed_bag_remaining_capacity()
-	if room <= 0:
-		return 0
-	var to_add := mini(count, room)
-	seed_bag[type_id] = int(seed_bag.get(type_id, 0)) + to_add
-	return to_add
+	return seed_bag_domain.add(type_id, count)
 
 
-## Arena vacuum: return chips even when the bag is already over SEED_BAG_SOFT_CAP (debug grant).
 func add_seeds_to_bag_unbounded(type_id: String, count: int) -> int:
-	if count <= 0 or type_id.is_empty():
-		return 0
-	seed_bag[type_id] = int(seed_bag.get(type_id, 0)) + count
-	return count
+	return seed_bag_domain.add_unbounded(type_id, count)
 
 
 func seed_bag_remaining_capacity() -> int:
-	return maxi(0, SEED_BAG_SOFT_CAP - sum_seed_bag(seed_bag))
+	return seed_bag_domain.remaining_capacity()
 
 
 func take_seeds_from_bag(type_id: String, count: int) -> bool:
-	var have := int(seed_bag.get(type_id, 0))
-	if have < count:
-		return false
-	have -= count
-	if have <= 0:
-		seed_bag.erase(type_id)
-	else:
-		seed_bag[type_id] = have
-	return true
+	return seed_bag_domain.take(type_id, count)
 
 
 func take_seed_from_bag(type_id: String) -> bool:
-	return take_seeds_from_bag(type_id, 1)
+	return seed_bag_domain.take_one(type_id)
 
 
 func deposit_loot_to_camp() -> int:
@@ -2751,7 +2717,7 @@ func exchange_garden_crystal(type_id: String = "") -> bool:
 
 
 func sum_seed_bag_only() -> int:
-	return sum_seed_bag(seed_bag)
+	return seed_bag_domain.sum()
 
 
 func get_bag_preview_types(limit: int = 3) -> Array[String]:
