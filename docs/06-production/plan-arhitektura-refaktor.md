@@ -13,7 +13,9 @@ ai_sažetak: "Kod arhitektura refaktor — u toku. GameState pun split po domena
 
 > **Status:** CAMP-06 je gotov i committan (`7b010d7`) — preduvjet ispunjen, refaktor je **u toku**. Prva verzija ovog doca (2026-09-07) je pretpostavljala "pun domain split u jednom prolazu"; nakon detaljnog remapiranja `game_state.gd` (2026-09-07, drugi prolaz) ispalo je da je to previše rizično bez testova (430 poziva iz 38 fajlova, nula signala, jedna 150-linijska `_apply_save_dict` koja dira ~35 varijabli). Ovaj doc sad opisuje **8 malih, samostalno-shippable etapa** koje vode do istog odobrenog cilja.
 >
-> **Napredak:** Stage 0 ✅ (`abd9743`) · Stage 1 ✅ (`c25a191`) · Stage 2 ✅ (`79f4523`) · Stage 3 ✅ (`83d2abd`, Cosmetics+Boosters ekstraktovani) · Stage 4-7 preostaju. Usput nađen i **prijavljen (ne popravljen)** pre-postojeći bug: `shop_nav_smoke.gd` puca sa "Identifier not found: SceneRouter" — potvrđeno da postoji i prije refaktora, nije regresija.
+> **Napredak:** Stage 0 ✅ (`abd9743`) · Stage 1 ✅ (`c25a191`) · Stage 2 ✅ (`79f4523`) · Stage 3 ✅ (`83d2abd`, Cosmetics+Boosters ekstraktovani) · Stage 4.1 ✅ (`134c034`, Companions) · Stage 4.2 ✅ (`77ec067`, Tutorial) · Stage 4.3 ✅ (`39589eb`, Seed bag) · Stage 4.4 ✅ (2026-09-07, Garden beds — vidi napomenu ispod) · Stage 4.5-7 preostaju. Usput nađen i **prijavljen (ne popravljen)** pre-postojeći bug: `shop_nav_smoke.gd` puca sa "Identifier not found: SceneRouter" — potvrđeno da postoji i prije refaktora, nije regresija.
+>
+> **Stage 4.4 napomena (2026-09-07):** Garden beds nije ekstraktovan kao domena — pokazalo se da je cijeli `garden_beds`/`greenhouse_beds` bed-merge API (~20 funkcija, ~180 linija: `plant_seed_in_bed`, `try_merge_beds`, `keep_bloom_from_bed`, `bed_is_empty`, `get_bed_type/tier`, `count_flowers_tier`, `empty_garden_beds`, `resolve_plant_type`, itd.) **mrtav kod** — prežitak pred-Arena prototipa, bez ijednog pozivaoca iz `merge_arena_controller.gd` ili bilo kojeg drugog ekrana. Obrisano umjesto ekstraktovano. `garden_beds`/`greenhouse_beds` nizovi + `_bed_array`/`_serialize_beds`/`_deserialize_beds`/`_migrate_legacy_beds_to_inbox` ostaju — i dalje služe kao landing pad za migraciju starih save-ova (`SAVE_VERSION` < 12). GUT 33/33 + `save_persistence_smoke`/`camp_donate_smoke` zeleno prije i poslije.
 
 ## Trenutno stanje `game_state.gd` (izmjereno 2026-09-07, post-CAMP-06)
 
@@ -40,14 +42,14 @@ Isti pattern za `donate_bloom_from_bed` (~2302), `donate_crystal_from_bed` (~239
 `owned_cosmetics`/`equipped_cosmetics` (2868-2918) → `game/scripts/economy/cosmetics.gd` kao `GameState.cosmetics`. `booster_inventory`/`merge_hint_booster_active` (2920-2987) → `game/scripts/economy/boosters.gd` kao `GameState.boosters`. Facade-forward sa istim imenima funkcija na `GameState` (ne breaking rename još). Svaka nova klasa dobija svoj `apply_from_save()`/`to_save_dict()`.
 
 ### Stage 4 — Ostale domene, po redoslijedu rizika (isti pattern kao Stage 3)
-1. Companions (2437-2495) — čita magnet/multiplier, ne piše tuđe stanje
-2. Tutorial (1048-1054 + run lifecycle ~1701-1909)
-3. Seed bag (razbacano ~1262, 1527, 1911, 2251 — skupi prvo)
-4. Garden beds (2100-2317, 1962-1997)
-5. Crystal stash (2724-2799 + ~1571)
-6. Bloom inbox (2521-2637)
-7. Arena (1984-1997, 2640-2865) — 152 poziva iz camp/
-8. Seasons (278-789) — najveći, najviše poziva (season_stage.gd = 71), radi zadnje
+1. ✅ Companions — čita magnet/multiplier, ne piše tuđe stanje (`134c034`)
+2. ✅ Tutorial — run lifecycle (`77ec067`)
+3. ✅ Seed bag — razbacano bilo ~1262, 1527, 1911, 2251 (`39589eb`)
+4. ✅ Garden beds — ispalo mrtav kod, obrisan umjesto ekstraktovan (vidi napomenu gore, 2026-09-07)
+5. Crystal stash
+6. Bloom inbox
+7. Arena — 152 poziva iz camp/
+8. Seasons — najveći, najviše poziva (season_stage.gd = 71), radi zadnje
 
 ### Stage 5 — SaveManager thin-out
 `_apply_save_dict` postaje dispatcher (`economy.apply_from_save(data)`, `seasons.apply_from_save(data)`, …). Dvije strukturne migracije sele u `game/scripts/autoload/save_migrations.gd`, pokreću se prije dispatch-a domenama. `SAVE_VERSION` ostaje na `GameState`.

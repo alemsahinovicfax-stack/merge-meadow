@@ -46,19 +46,20 @@ func test_apply_save_dict_clamps_magnet_level_above_max() -> void:
 	assert_eq(_gs.magnet_level, _gs.MAGNET_MAX_LEVEL, "magnet_level must clamp to MAGNET_MAX_LEVEL, not store 999")
 
 
-func test_apply_save_dict_clears_greenhouse_beds_unconditionally() -> void:
-	# Characterizes existing (surprising) behavior: _clear_legacy_beds() runs on
-	# every load regardless of version, and only garden_beds gets re-padded by
-	# _ensure_garden_bed_capacity() afterward — greenhouse_beds stays empty.
+func test_apply_save_dict_clears_legacy_beds_unconditionally() -> void:
+	# Characterizes existing behavior: _clear_legacy_beds() runs on every load
+	# regardless of save version. garden_beds/greenhouse_beds only survive as a
+	# landing pad for _migrate_legacy_beds_to_inbox() (see that test below) — the
+	# bed-merge gameplay itself was removed as dead code in
+	# plan-arhitektura-refaktor.md Stage 4.4 (2026-09-07).
 	var ok: bool = _gs.call("_apply_save_dict", {
 		"version": 1,
+		"garden_beds": [{"type_id": "clover", "tier": 1}],
 		"greenhouse_beds": [{"type_id": "clover", "tier": 1}],
 	})
 	assert_true(ok)
-	assert_eq(_gs.greenhouse_beds.size(), 0, "greenhouse_beds is always cleared on load today")
-	assert_eq(_gs.garden_beds.size(), _gs.get_garden_bed_capacity(), "garden_beds is re-padded to capacity after clearing")
-	for bed in _gs.garden_beds:
-		assert_null(bed)
+	assert_eq(_gs.garden_beds.size(), 0, "garden_beds is always cleared on load")
+	assert_eq(_gs.greenhouse_beds.size(), 0, "greenhouse_beds is always cleared on load")
 
 
 func test_legacy_t2_plus_beds_migrate_to_bloom_inbox_on_old_version() -> void:

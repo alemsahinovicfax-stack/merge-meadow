@@ -24,7 +24,6 @@ const ARENA_PEST_WAKE_DELAY := 0.3
 const ARENA_PEST_TARGET_REEVAL := 0.25
 
 const CAMP_BED_COUNT := 9
-const CAMP_BED_BONUS := 3
 const GREENHOUSE_SLOT_COUNT := 2
 const SEED_BAG_SOFT_CAP := 40
 const DAILY_CHEST_COINS := 8
@@ -918,7 +917,6 @@ func _apply_save_dict(data: Dictionary) -> bool:
 		_migrate_legacy_beds_to_inbox()
 	_clear_legacy_beds()
 	_refresh_seed_unlock_from_lifetime()
-	_ensure_garden_bed_capacity()
 	if not is_seed_type_unlocked(loadout_type_id):
 		loadout_type_id = ""
 	return true
@@ -1242,23 +1240,6 @@ func get_sorted_bag_types(for_greenhouse: bool = false) -> Array[String]:
 		return na < nb
 	)
 	return out
-
-
-func resolve_plant_type(for_greenhouse: bool, preferred: String = "") -> String:
-	if not preferred.is_empty() and int(seed_bag.get(preferred, 0)) > 0:
-		if is_mythic_seed(preferred) == for_greenhouse:
-			return preferred
-	var pair_type := _pick_pair_completion_type(for_greenhouse)
-	if not pair_type.is_empty():
-		return pair_type
-	var loadout := get_loadout_type()
-	if not loadout.is_empty() and int(seed_bag.get(loadout, 0)) > 0:
-		if is_mythic_seed(loadout) == for_greenhouse:
-			return loadout
-	var sorted := get_sorted_bag_types(for_greenhouse)
-	if sorted.is_empty():
-		return ""
-	return sorted[0]
 
 
 func ensure_loot_in_camp_bag() -> void:
@@ -1918,23 +1899,6 @@ func deposit_loot_to_camp() -> int:
 	return deposited
 
 
-func get_garden_bed_capacity() -> int:
-	var bonus := CAMP_BED_BONUS if magnet_level >= MAGNET_MAX_LEVEL else 0
-	return CAMP_BED_COUNT + bonus
-
-
-func bonus_garden_beds_unlocked() -> bool:
-	return magnet_level >= MAGNET_MAX_LEVEL
-
-
-func _ensure_garden_bed_capacity() -> void:
-	var cap := get_garden_bed_capacity()
-	while garden_beds.size() < cap:
-		garden_beds.append(null)
-	while garden_beds.size() > cap:
-		garden_beds.pop_back()
-
-
 func _today_key() -> String:
 	var d := Time.get_date_dict_from_system()
 	return "%04d-%02d-%02d" % [int(d.year), int(d.month), int(d.day)]
@@ -2056,155 +2020,14 @@ func get_arena_daily_home_line() -> String:
 	return "Arena %d/%d" % [mini(arena_daily_progress, arena_daily_goal), arena_daily_goal]
 
 
-func auto_plant_from_bag() -> int:
-	return 0
-
-
-func _pick_pair_completion_type(in_greenhouse: bool) -> String:
-	var on_beds := _bed_t1_counts(in_greenhouse)
-	for type_id in on_beds:
-		if int(on_beds[type_id]) % 2 == 1:
-			if int(seed_bag.get(type_id, 0)) > 0:
-				return str(type_id)
-	return ""
-
-
-func keep_all_blooms_on_beds() -> int:
-	return keep_all_bloom_inbox()
-
-
-func count_blooms_on_beds(min_tier: int = 2) -> int:
-	return count_bloom_inbox(min_tier)
-
-
-func _first_empty_bed_index(in_greenhouse: bool) -> int:
-	var beds := _bed_array(in_greenhouse)
-	for i in beds.size():
-		if beds[i] == null:
-			return i
-	return -1
-
-
-func _bed_t1_counts(in_greenhouse: bool) -> Dictionary:
-	var counts: Dictionary = {}
-	for bed in _bed_array(in_greenhouse):
-		if bed == null:
-			continue
-		if int(bed.get("tier", 0)) != 1:
-			continue
-		var type_id := str(bed.get("type_id", ""))
-		counts[type_id] = int(counts.get(type_id, 0)) + 1
-	return counts
-
-
-func keep_bloom_from_bed(bed_index: int, in_greenhouse: bool = false) -> bool:
-	var beds := _bed_array(in_greenhouse)
-	if bed_index < 0 or bed_index >= beds.size():
-		return false
-	var bed: Variant = beds[bed_index]
-	if bed == null:
-		return false
-	var tier := int(bed.get("tier", 0))
-	if tier < 2:
-		return false
-	var type_id: String = str(bed.get("type_id", ""))
-	var prev := int(collection_kept_tiers.get(type_id, 0))
-	collection_kept_tiers[type_id] = maxi(prev, tier)
-	discovered_blooms[type_id] = true
-	_mark_collection_journal_new(type_id, tier)
-	beds[bed_index] = null
-	save_player_save()
-	return true
-
-
+## _bed_array/garden_beds/greenhouse_beds survive only to support
+## _migrate_legacy_beds_to_inbox() below — the bed-merge gameplay these once
+## backed was superseded by the Arena chip-merge system
+## (merge_arena_controller.gd) and had zero live callers left (plan-arhitektura-refaktor.md
+## Stage 4.4, confirmed 2026-09-07: no controller/UI referenced plant_seed_in_bed,
+## try_merge_beds, keep_bloom_from_bed, or any bed-index accessor).
 func _bed_array(in_greenhouse: bool) -> Array:
 	return greenhouse_beds if in_greenhouse else garden_beds
-
-
-func _bed_capacity(in_greenhouse: bool) -> int:
-	if in_greenhouse:
-		return GREENHOUSE_SLOT_COUNT
-	return get_garden_bed_capacity()
-
-
-func bed_is_empty(index: int, in_greenhouse: bool = false) -> bool:
-	return _bed_array(in_greenhouse)[index] == null
-
-
-func get_bed_type(index: int, in_greenhouse: bool = false) -> String:
-	if _bed_array(in_greenhouse)[index] == null:
-		return ""
-	return str(_bed_array(in_greenhouse)[index].get("type_id", ""))
-
-
-func get_bed_tier(index: int, in_greenhouse: bool = false) -> int:
-	if _bed_array(in_greenhouse)[index] == null:
-		return 0
-	return int(_bed_array(in_greenhouse)[index].get("tier", 0))
-
-
-func plant_seed_in_bed(bed_index: int, type_id: String, in_greenhouse: bool = false) -> bool:
-	var beds := _bed_array(in_greenhouse)
-	if bed_index < 0 or bed_index >= beds.size():
-		return false
-	if beds[bed_index] != null:
-		return false
-	var mythic := is_mythic_seed(type_id)
-	if in_greenhouse and not mythic:
-		return false
-	if not in_greenhouse and mythic:
-		return false
-	if not take_seed_from_bag(type_id):
-		return false
-	beds[bed_index] = {"type_id": type_id, "tier": 1}
-	save_player_save()
-	return true
-
-
-func try_merge_beds(index_a: int, index_b: int, in_greenhouse: bool = false) -> bool:
-	if index_a == index_b:
-		return false
-	var beds := _bed_array(in_greenhouse)
-	var bed_a: Variant = beds[index_a]
-	var bed_b: Variant = beds[index_b]
-	if bed_a == null or bed_b == null:
-		return false
-	if str(bed_a.get("type_id", "")) != str(bed_b.get("type_id", "")):
-		return false
-	if int(bed_a.get("tier", 0)) != int(bed_b.get("tier", 0)):
-		return false
-	var tier := int(bed_a.get("tier", 0))
-	if tier <= 0 or tier >= MAX_MERGE_TIER:
-		return false
-	var type_id: String = str(bed_a.get("type_id", ""))
-	beds[index_b] = {"type_id": type_id, "tier": tier + 1}
-	beds[index_a] = null
-	if tier + 1 >= 2:
-		discovered_blooms[type_id] = true
-		_mark_collection_journal_new(type_id, 1)
-		tutorial.notify_merge_completed()
-	save_player_save()
-	return true
-
-
-func count_flowers_tier(tier: int, in_greenhouse: bool = false) -> int:
-	var total := 0
-	for bed in _bed_array(in_greenhouse):
-		if bed != null and int(bed.get("tier", 0)) == tier:
-			total += 1
-	return total
-
-
-func count_all_flowers_tier(tier: int) -> int:
-	return count_flowers_tier(tier, false) + count_flowers_tier(tier, true)
-
-
-func empty_garden_beds() -> int:
-	var total := 0
-	for i in get_garden_bed_capacity():
-		if i < garden_beds.size() and garden_beds[i] == null:
-			total += 1
-	return total
 
 
 func first_seed_type_in_bag(for_greenhouse: bool = false) -> String:
@@ -2352,7 +2175,6 @@ func try_upgrade_magnet(preferred: String = "") -> bool:
 	if not spend_flowers_for_upgrade(preferred):
 		return false
 	magnet_level += 1
-	_ensure_garden_bed_capacity()
 	save_player_save()
 	return true
 
