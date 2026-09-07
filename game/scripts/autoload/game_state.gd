@@ -14,7 +14,6 @@ const ARENA_SNAP_DISTANCE := 100.0
 const ARENA_MAGNET_RADIUS := 130.0
 const ARENA_COMBO_COINS := 2
 const ARENA_COMBO_COIN_DAILY_CAP := 10
-const BLOOM_INBOX_MAX := 12
 
 const ARENA_PEST_SPEED := 85.0
 const ARENA_PEST_EAT_RADIUS := 36.0
@@ -162,6 +161,7 @@ var companions: Companions
 var tutorial: Tutorial
 var seed_bag_domain: SeedBagDomain
 var crystal_stash_domain: CrystalStashDomain
+var bloom_inbox_domain: BloomInboxDomain
 
 ## Kept as a var (not moved into Boosters) because merge_arena_controller.gd
 ## reads it directly as GameState.merge_hint_booster_active in two places;
@@ -211,7 +211,14 @@ var arena_daily_goal: int = 1
 var arena_daily_claimed_day: String = ""
 var arena_daily_streak: int = 0
 var collection_journal_pending: Dictionary = {}
-var bloom_inbox: Array = []
+
+## Property (not a plain var) — see bloom_inbox.gd's header for why. Nothing
+## external reads this raw today, but the shim keeps the same pattern as
+## seed_bag/garden_crystal_stash and lets tests poke the real backing Array.
+var bloom_inbox: Array:
+	get: return bloom_inbox_domain.inbox
+	set(value): bloom_inbox_domain.inbox = value
+
 var _arena_chip_counter: int = 1
 var _arena_pour_locked_types: Dictionary = {}
 
@@ -235,6 +242,7 @@ func _ready() -> void:
 	tutorial = Tutorial.new(self)
 	seed_bag_domain = SeedBagDomain.new(self)
 	crystal_stash_domain = CrystalStashDomain.new(self)
+	bloom_inbox_domain = BloomInboxDomain.new(self)
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
@@ -909,7 +917,7 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	arena_daily_streak = maxi(0, int(data.get("arena_daily_streak", 0)))
 	companions.apply_from_save(data)
 	collection_journal_pending = _parse_string_int_dict(data.get("collection_journal_pending", {}))
-	bloom_inbox = _deserialize_bloom_inbox(data.get("bloom_inbox", []))
+	bloom_inbox = bloom_inbox_domain.deserialize(data.get("bloom_inbox", []))
 	unlocked_seasons = _parse_string_array(data.get("unlocked_seasons", []))
 	owned_paid_seasons = _parse_string_array(data.get("owned_paid_seasons", []))
 	active_season_id = str(data.get("active_season_id", SeasonCatalog.DEFAULT_SEASON_ID))
@@ -2211,31 +2219,13 @@ func _migrate_legacy_beds_to_inbox() -> void:
 				push_bloom_inbox(str(bed.get("type_id", "")), tier)
 
 
-func _deserialize_bloom_inbox(raw: Variant) -> Array:
-	var out: Array = []
-	if raw is Array:
-		for item in raw:
-			if item is Dictionary:
-				out.append(item.duplicate())
-	return out
-
-
 func count_bloom_inbox(min_tier: int = 2) -> int:
-	var total := 0
-	for item in bloom_inbox:
-		if int(item.get("tier", 0)) >= min_tier:
-			total += 1
-	return total
+	return bloom_inbox_domain.count(min_tier)
 
 
 func push_bloom_inbox(type_id: String, tier: int) -> bool:
-	if type_id.is_empty() or tier < 2:
+	if not bloom_inbox_domain.push(type_id, tier):
 		return false
-	if bloom_inbox.size() >= BLOOM_INBOX_MAX:
-		return false
-	bloom_inbox.append({"type_id": type_id, "tier": tier})
-	discovered_blooms[type_id] = true
-	_mark_collection_journal_new(type_id, 1)
 	save_player_save()
 	return true
 
@@ -2257,23 +2247,11 @@ func keep_bloom(type_id: String, tier: int) -> bool:
 
 
 func keep_bloom_inbox(index: int) -> bool:
-	if index < 0 or index >= bloom_inbox.size():
-		return false
-	var item: Dictionary = bloom_inbox[index]
-	var type_id := str(item.get("type_id", ""))
-	var tier := int(item.get("tier", 0))
-	if not keep_bloom(type_id, tier):
-		return false
-	bloom_inbox.remove_at(index)
-	return true
+	return bloom_inbox_domain.keep_at(index)
 
 
 func flush_bloom_inbox_to_album() -> int:
-	var kept := 0
-	for i in range(bloom_inbox.size() - 1, -1, -1):
-		if keep_bloom_inbox(i):
-			kept += 1
-	return kept
+	return bloom_inbox_domain.flush_to_album()
 
 
 func is_arena_pour_locked(type_id: String) -> bool:
