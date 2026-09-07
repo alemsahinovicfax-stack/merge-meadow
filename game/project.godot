@@ -33,6 +33,10 @@ window/size/window_height_override=960
 window/stretch/mode="canvas_items"
 window/handheld/orientation=1
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
 [layer_names]
 
 2d_physics/layer_1="player"
@@ -40,7 +44,7 @@ window/handheld/orientation=1
 
 [rendering]
 
+rendering_device/driver.android="opengl3"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-rendering_device/driver.android="opengl3"
 textures/vram_compression/import_etc2_astc=true
