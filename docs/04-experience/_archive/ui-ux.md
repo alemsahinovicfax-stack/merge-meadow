@@ -1,9 +1,11 @@
 ---
-status: draft
-tags: [iskustvo, ui]
+status: arhiva
+tags: [iskustvo, ui, arhiva]
 ---
 
 # UI / UX
+
+> **Arhivirano 2026-09-07** — opisuje stari screen-flow (odvojeni main menu/kamp/shop ekrani), superseded je stvarnim meta-hub-om s tabovima. Trenutni izvor istine: [[../../02-design/spec-vertical-slice|spec-vertical-slice]].
 
 ## Sažetak
 

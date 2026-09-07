@@ -58,5 +58,5 @@ Igraču se prikazuje kroz imena ljubimaca, nazive upgradea i opise u shopu — *
 ## Povezano
 
 - [[../04-experience/art-direction|art-direction]]
-- [[../04-experience/ui-ux|ui-ux]]
+- [[../02-design/spec-vertical-slice|spec-vertical-slice]] (stari ui-ux arhiviran)
 - [[../01-vision/pitch|pitch]]

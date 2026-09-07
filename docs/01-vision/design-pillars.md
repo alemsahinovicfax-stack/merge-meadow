@@ -1,6 +1,13 @@
 ---
-status: draft
+type: vision
+status: aktivan
+milestone: —
 tags: [vizija, pillars]
+povezano:
+  - pitch
+  - koncept
+  - scope-i-granice
+ai_sažetak: "Tri nepregovarljiva principa: Fair F2P > Svaki run se isplati > Kamp zove natrag. Pillar 2 se nikad ne žrtvuje — koristi za scope guard provjere."
 ---
 
 # Design pillars

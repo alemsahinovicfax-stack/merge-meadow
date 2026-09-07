@@ -4,7 +4,7 @@ status: aktivan
 milestone: v1.1
 tags: [dizajn, mehanika, merge, kamp, retention]
 povezano:
-  - mehanike/merge-kamp
+  - mehanike/_archive/merge-kamp
   - ekonomija-brojevi
   - core-loop
   - verzije-nakon-launcha
@@ -241,7 +241,7 @@ Zadrži / premjesti:
 
 ## Povezano
 
-- [[mehanike/merge-kamp|merge-kamp]] — **trenutni** kanon (v1)
+- ovaj dokument **je** trenutni kanon za kamp/arenu (stari [[mehanike/_archive/merge-kamp|merge-kamp]] arhiviran)
 - [[ekonomija-brojevi|ekonomija-brojevi]]
 - [[../06-production/verzije-nakon-launcha|verzije-nakon-launcha]]
 - [[../03-content/ideje-gameplay-ekonomija|ideje-gameplay-ekonomija]] — MA-01, DG-01

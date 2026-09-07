@@ -9,6 +9,52 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-09-06
+
+- **CAMP-06 Camp fill** — bez Pip's Garden; Seeds/Flowers/Link ~⅓ bez vanjskog scrolla; SeasonLink simetrija + deblja kratka linija; chip ime lijevo + broj desno; debug design stash; [[../03-content/ideje-camp-fill|hub]] · [[../06-production/plan-prompts-camp-fill|freeze]]
+
+- **CAMP-05 Camp row** — editor fixture Bloom+Frost, paid locked; chip red (ikona 80, samo popunjene ★, ime/broj desno); SeasonLink iste dimenzije kao Seeds/Flowers; [[../03-content/ideje-camp-row|hub]] · [[../06-production/plan-prompts-camp-row|freeze]]
+
+- **CAMP-04 Camp read** — SeasonLink dva stupca coins|flower; Unlock širina = Exchange; chip poster-stack (ikona, 3-slot zvijezde, ime, broj); scroll 420; [[../03-content/_archive/ideje-camp-read|hub]] · [[../06-production/_archive/plan-prompts-camp-read|freeze]]
+
+- **HOME-18 Poster fit** — locked 🔒+ime vraćen na sredinu (`CenterTitle` CENTER); `%UnlockGate` `anchor_top` 0.60; shared poster divider + coin 40 / flower 92; `watermelon` izbačen (Bloom 6 tipova); [[../03-content/ideje-home-poster-fit|hub]] · [[../06-production/plan-prompts-home-poster-fit|freeze]]
+
+- **HOME-17 Unlock poster** — jedan ★3 po sezoni; shared coin+cvijet poster na Home gate i Camp SeasonLink; basket prikazuje sva sjemena (locked siva); prazan basket i claimable daily chest blink+shake; title-TOP / gate 0.26 / watermelon ★2 **superseded** HOME-18; [[../03-content/_archive/ideje-home-unlock-poster|hub]] · [[../06-production/_archive/plan-prompts-home-unlock-poster|freeze]]
+
+## 2026-09-03
+
+- **Playtest fixture** — debug boot stavlja **22** T1 `pumpkin` (★3) u `seed_bag` (uz 19 pumpkin cvijeća)
+
+- **Star-3 unlock + Journal swipe + Camp link** — Journal staggered rows (nema 49-row hitch na swipe); free S2+ = 500 coins + 20 rarity-3 T3 **prethodne** sezone, `unlock_free` troši oba; Bloom roster + `watermelon`; kamp kartica = Home locked poster, Unlock gumb (gold kad može) = Home + 0.4 s + spend; Seeds/Flowers scroll **280**; debug fixture S1 + 19 pumpkin; [[../06-production/plan-prompts-star3-unlock-hub|freeze]] · [[../03-content/ideje-sezone-ekonomija|ekonomija]]
+
+## 2026-09-02
+
+- **CAMP-03 CAMP3-C** — kamp kartica next locked free sezone (barovi + Unlock); Unlock vodi na Home locked poster, ne `unlock_free`; [[../03-content/ideje-camp-link|hub]] · [[../06-production/plan-prompts-home-camp-field|prompti]] CAMP3-C ✅
+
+- **CAMP-03 CAMP3-B** — Flowers chip `rarity_bg` kao Seeds; Exchange auto-select sljedeći ASC nakon deplete; crystal grid ASC; [[../03-content/ideje-camp-link|hub]] · [[../06-production/plan-prompts-home-camp-field|prompti]] CAMP3-B ✅
+
+- **CAMP-03 CAMP3-A** — Seeds/Flowers samo naslov; GardenCliff/BagLabel/CrystalTotalLabel hidden; scrollovi 220→242; UpgradeCards ostaju hidden; [[../03-content/ideje-camp-link|hub]] · [[../06-production/plan-prompts-home-camp-field|prompti]] CAMP3-A ✅
+
+- **HOME-16 FIELD-D** — Magnet pa Loot Boost kompaktno ispod Settings na otvorenom polju; kamp `%UpgradeCards` hidden; spend `try_upgrade_*("")` 2 T3 ostaje; [[../03-content/ideje-home-meadow-field|hub]] · [[../06-production/plan-prompts-home-camp-field|prompti]] FIELD-D ✅
+
+- **HOME-16 FIELD-C** — hub swipe Journal/Camp dok je season field otvoren; Stage van `block_hub_swipe`; Daily/Basket/Settings/chip/PlayRow u grupi; session ostaje open na CAMP/MAIN hop; karusel Stage i dalje blokira; [[../03-content/ideje-home-meadow-field|hub]] · [[../06-production/plan-prompts-home-camp-field|prompti]] FIELD-C ✅
+
+- **HOME-16 FIELD-B** — basket picker jedan stupac, bez `PickerScroll`; `%PickerPanel` visina wrap title + T3 redovi + footer; T3/★3/Clear+Close ostaju; [[../03-content/ideje-home-meadow-field|hub]] · [[../06-production/plan-prompts-home-camp-field|prompti]] FIELD-B ✅
+
+- **HOME-16 FIELD-A** — claimed Daily overlay title Come back tomorrow; body `Daily chest already opened today.`; `claim_daily_chest` already-claimed isti trim; caption Back tomorrow ostaje; [[../03-content/ideje-home-meadow-field|hub]] · [[../06-production/plan-prompts-home-camp-field|prompti]] FIELD-A ✅
+
+- **HOME-16 FIELD-P0 + CAMP-03 CAMP3-P0** — docs freeze: Daily overlay body; basket bez scrolla; hub swipe u polju; Magnet/Loot na polju; kamp Seeds/Flowers naslov +10%; Flowers = Seeds; next-lock kartica → Home; CAMP2-A superseded; [[../03-content/ideje-home-meadow-field|HOME-16]] · [[../03-content/ideje-camp-link|CAMP-03]] · [[../06-production/plan-prompts-home-camp-field|prompti]] FIELD-P0 ✅ CAMP3-P0 ✅ → A–D / A–C (nema `game/` u P0)
+
+- **HOME-15 DOCK-D** — Home Daily caption samo Tap to open / Back tomorrow; tap ne `claim_arena_daily`; arena HUD ostaje; [[../03-content/ideje-home-meadow-dock|hub]] · [[../06-production/plan-prompts-home-meadow-dock|prompti]] DOCK-D ✅
+
+- **HOME-15 DOCK-C** — Basket 336×104 ispod Daily; PlayRow Seasons|Play|Endless; chip ne close; `meadow_safe_rect` + Basket; [[../03-content/ideje-home-meadow-dock|hub]] · [[../06-production/plan-prompts-home-meadow-dock|prompti]] DOCK-C ✅
+
+- **HOME-15 DOCK-B** — meadow flowers `plant_tier = 3`; isti crystal draw kao BasketVisual; count 12–14 ostaje; [[../03-content/ideje-home-meadow-dock|hub]] · [[../06-production/plan-prompts-home-meadow-dock|prompti]] DOCK-B ✅
+
+- **HOME-15 DOCK-A** — basket picker: T3 ikona iznad imena; ★3 (`pumpkin`) selectable; Clear+Close stacked footer; [[../03-content/ideje-home-meadow-dock|hub]] · [[../06-production/plan-prompts-home-meadow-dock|prompti]] DOCK-A ✅
+
+- **HOME-15 DOCK-P0** — docs freeze meadow dock: T3/★3 picker; Basket ispod Daily; Seasons u PlayRow; Daily bez arena streaka; [[../03-content/ideje-home-meadow-dock|hub]] · [[../06-production/plan-prompts-home-meadow-dock|prompti]] DOCK-P0 ✅ → A–D
+
 ## 2026-09-01
 
 - **HOME-14 LIFE-D** — MeadowPip Walk/Sniff/Sleep u `meadow_safe_rect`; close/karusel hide; PipPortrait off; [[../03-content/ideje-home-meadow-life|hub]] · [[../06-production/plan-prompts-home-meadow-life|prompti]] LIFE-D ✅

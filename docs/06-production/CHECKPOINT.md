@@ -4,17 +4,14 @@ status: aktivan
 milestone: M8
 tags: [produkcija, checkpoint, operativa]
 povezano:
-  - RADIONICA-razvoj
-  - milestone-i
   - scope-i-granice
-ai_sažetak: "Operativni hub — frontmatter prvo; prva [ ] u aktivnoj sekciji je sljedeći korak."
-trenutna_faza: 5
-podfaza: d0-prelaunch
+  - plan-arhitektura-refaktor
+ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmatter prvo; prva [ ] u aktivnoj sekciji je sljedeći korak."
 aktivna_sekcija: D
 b0_aktivan: false
-sljedeci_korak: "D0-P / playtest. HOME-11 BARFIT-A ✅. HOME-10 LOCKFLOW-A–B ✅."
-zadnja_sesija: "HOME-14 LIFE-D — MeadowPip Walk/Sniff/Sleep u meadow_safe_rect"
-zadnje_azurirano: 2026-09-01
+sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — thirds + link symmetry."
+zadnja_sesija: "CAMP-06 — camp fill, thirds, link symmetry, chip name+count"
+zadnje_azurirano: 2026-09-06
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -32,14 +29,15 @@ sljedeca_runda_dokumentacije: "Prije store (D0/D4) — listing/ASO; inače samo 
 # CHECKPOINT — operativni vodič
 
 > **Otvori ovaj fajl na početku svake sesije.**  
-> Redoslijed: `CHECKPOINT` → `RADIONICA-razvoj` → konkretni doc → tek onda `game/`.
+> Redoslijed: `CHECKPOINT` → konkretni doc (`sljedeci_korak` link) → tek onda `game/`.
+> `CHECKPOINT.md` je **jedini izvor istine** za fazu/milestone (RADIONICA-razvoj, milestone-i i roadmap su arhivirani u [[_archive/_index|_archive/]] — zamrznuti prije M7/M8, više se ne ažuriraju).
 
 ## Gdje smo
 
 | Polje | Vrijednost |
 |-------|------------|
 | **Milestone** | **M8** — Launch prep (Sekcija D) |
-| **Podfaza** | `d0-prelaunch` + **SEED-01** P0 ✅ **A ✅ B ✅ C ✅**; **HOME-12** MEADOW-P0 ✅ **MEADOW-A ✅ B ✅ C ✅**; **HOME-13** CHROME-P0 ✅ **A ✅ B ✅ C ✅ D ✅ E ✅**; **HOME-14** LIFE-P0 ✅ **A ✅ B ✅ C ✅ D ✅**; **CAMP-02** P0 ✅; **CAMP-01** P0 ✅ A ✅ B ✅; **HOME-11** BARFIT-A ✅; **HOME-10** LOCKFLOW-A–B ✅; **HOME-09** CARDFIT-B ✅; **HOME-08** INCARD-B ✅; **ARENA-03** SORT-P0 ✅ A ✅ B ✅ VAC-A ✅ VAC-F ✅ VAC-L ✅; **ARENA-02** leftover A–D ✅ C-P0 ✅ E-P0 ✅ (E kod ne — ARENA-03); **ARENA-01** COMB–FEEL ✅; **HOME-07** UNLOCK-C ✅; **HOME-06** FOCUS-D ✅; **HOME-05** GLIDE-C ✅; **HOME-04** PAID-C ✅; Bug-006–032 ✅ |
+| **Podfaza** | `d0-prelaunch` — **CAMP-06 u toku**; sve ostalo ✅. Puna tablica traka: [[#Aktivne trake (feature ID)\|Aktivne trake]] niže. |
 | **Igra** | Merge Meadow — hybrid casual lane run + merge kamp |
 | **Engine** | Godot 4.x (HP laptop / Windows) |
 | **Save** | Lokalni JSON (`user://player_save.json`) — **bez** server/baze u v1 |
@@ -170,7 +168,7 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 ### A2 — Iskustvo i sadržaj
 
 - [x] [[../03-content/svijet-i-lore|svijet-i-lore]]
-- [x] [[../04-experience/ui-ux|ui-ux]]
+- [x] [[../02-design/spec-vertical-slice|spec-vertical-slice]] (stari ui-ux arhiviran)
 - [x] [[../04-experience/art-direction|art-direction]]
 - [x] [[../04-experience/audio-direction|audio-direction]]
 - [x] [[../04-experience/pristupacnost|pristupacnost]] — minimalni standardi
@@ -345,24 +343,46 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-1. **D0-P / playtest** — swipe sezona treba kliziti; tap centar = Browser; Play Endless = Hard
-2. **CAMP-02 P0 ✅** — sljedeće Plan **CAMP2-A** ([[plan-prompts-camp-cliff|prompti]]) · [[../03-content/ideje-camp-cliff|hub]]
-3. **SEED-01 P0 ✅ A ✅ B ✅ C ✅** · **HOME-12 MEADOW-A ✅ B ✅ C ✅** — playlist gotova · [[../03-content/ideje-seed-pool|SEED hub]] · [[../03-content/ideje-home-meadow|HOME-12 hub]]
-4. **HOME-13 CHROME-P0 ✅ A ✅ B ✅ C ✅ D ✅ E ✅** — playlist gotova ([[plan-prompts-home-meadow-chrome|prompti]]) · [[../03-content/ideje-home-meadow-chrome|hub]]
-5. **HOME-14 LIFE-P0 ✅ A ✅ B ✅ C ✅ D ✅** — playlist gotova ([[plan-prompts-home-meadow-life|prompti]]) · [[../03-content/ideje-home-meadow-life|hub]]
-6. **CAMP-01 P0 ✅ A ✅ B ✅** — Flowers upgrade ([[plan-prompts-camp|prompti]]) · [[../03-content/ideje-camp|hub]]
-7. **HOME-11 BARFIT-A ✅** — gate niže ispod 🔒+ime; bez okvira; debug 500c ([[plan-prompts-home-barfit|prompti]])
-8. **HOME-10 LOCKFLOW-A–B ✅** — locked poster 500/20 gold; roster desno, puna imena, wash
-9. **HOME-09 CARDFIT-A–B ✅** — Amber gate; naslov sredina; roster kontrast+širina
-10. **HOME-08 INCARD-B ✅** — Unlock gate u CenterSlot
-11. **ARENA-01 COMB-A ✅ FLOW-A ✅ FLOW-B ✅ DAILY-A ✅ FEEL-A ✅ FEEL-B ✅** · **ARENA-02 LEFTOVER-P0 ✅ A ✅ B ✅ C-P0 ✅ C ✅ D ✅ E-P0 ✅** (E kod ne) · **ARENA-03 SORT-P0 ✅ A ✅ B ✅ VAC-A ✅ VAC-F ✅ VAC-L ✅** ([[plan-prompts-arena-sort|sort prompti]]) · [[../03-content/ideje-arena-sort|hub]]
-12. **Ne** plaćati Play Console dok D0 nije ✅
+**Sada radimo:** CAMP-06 — camp fill (thirds; no Pip's Garden; link symmetry; chip name+count) · [[plan-prompts-camp-fill|freeze]] · [[../03-content/ideje-camp-fill|hub]]
+
+**Nakon CAMP-06:** D0-P / playtest (swipe sezona treba kliziti; tap centar = Browser; Play Endless = Hard) → [[plan-arhitektura-refaktor|kod arhitektura refaktor]]
+
+**Ne** plaćati Play Console dok D0 nije ✅.
+
+### Aktivne trake (feature ID)
+
+| ID | Status | Napomena | Link |
+|----|--------|----------|------|
+| CAMP-06 | 🔲 u toku | thirds fill, link symmetry, chip name+count | [[plan-prompts-camp-fill\|freeze]] · [[../03-content/ideje-camp-fill\|hub]] |
+| CAMP-05 | ✅ (dio superseded CAMP-06) | camp row — two-free fixture, chip red+filled stars | [[plan-prompts-camp-row\|freeze]] · [[../03-content/ideje-camp-row\|hub]] |
+| CAMP-04 | ✅ arhivirano (superseded CAMP-05→06) | camp read | [[_archive/plan-prompts-camp-read\|freeze]] · [[../03-content/_archive/ideje-camp-read\|hub]] |
+| CAMP-03 | ✅ | kamp link — Seeds/Flowers naslov, next-lock → Home | [[plan-prompts-home-camp-field\|prompti]] · [[../03-content/ideje-camp-link\|hub]] |
+| CAMP-02 | ✅ (A superseded CAMP3-A) | Seeds cliff | [[plan-prompts-camp-cliff\|prompti]] · [[../03-content/ideje-camp-cliff\|hub]] |
+| CAMP-01 | ✅ | Flowers upgrade | [[plan-prompts-camp\|prompti]] · [[../03-content/ideje-camp\|hub]] |
+| HOME-18 | ✅ | poster fit — 🔒+ime sredina, divider, coin 40/flower 92 | [[plan-prompts-home-poster-fit\|freeze]] · [[../03-content/ideje-home-poster-fit\|hub]] |
+| HOME-17 | ✅ arhivirano (superseded HOME-18) | unlock poster | [[_archive/plan-prompts-home-unlock-poster\|freeze]] · [[../03-content/_archive/ideje-home-unlock-poster\|hub]] |
+| HOME-16 | ✅ | Meadow field — daily overlay, basket no-scroll | [[plan-prompts-home-camp-field\|prompti]] · [[../03-content/ideje-home-meadow-field\|hub]] |
+| HOME-15 | ✅ | Meadow dock — DOCK P0–D | [[plan-prompts-home-meadow-dock\|prompti]] · [[../03-content/ideje-home-meadow-dock\|hub]] |
+| HOME-14 | ✅ | Meadow life — LIFE P0–D | [[plan-prompts-home-meadow-life\|prompti]] · [[../03-content/ideje-home-meadow-life\|hub]] |
+| HOME-13 | ✅ | Meadow chrome — CHROME P0, A–E | [[plan-prompts-home-meadow-chrome\|prompti]] · [[../03-content/ideje-home-meadow-chrome\|hub]] |
+| HOME-12 | ✅ | Meadow — MEADOW P0, A–C | [[../03-content/ideje-home-meadow\|hub]] |
+| HOME-11 | ✅ | BARFIT-A — gate niže ispod 🔒+ime | [[plan-prompts-home-barfit\|prompti]] |
+| HOME-10 | ✅ | LOCKFLOW A–B — locked poster 500/20 gold | — |
+| HOME-09 | ✅ | CARDFIT A–B — Amber gate | [[plan-prompts-home-cardfit\|prompti]] |
+| HOME-08 | ✅ | INCARD-B — Unlock gate u CenterSlot | — |
+| HOME-04–07 | ✅ | PAID/GLIDE/FOCUS/UNLOCK | [[plan-prompts-home-paid\|04]] · [[plan-prompts-home-glide\|05]] · [[plan-prompts-home-focus\|06]] · [[plan-prompts-home-unlock\|07]] |
+| SEED-01 | ✅ | seed pool — jedan type_id | [[plan-prompts-seed-meadow\|prompti]] · [[../03-content/ideje-seed-pool\|hub]] |
+| ARENA-01–03 | ✅ | combo/feel, leftover ÷4, sort+vacuum | [[plan-prompts-arena\|01]] · [[plan-prompts-arena-leftover\|02]] · [[plan-prompts-arena-sort\|03]] |
+| Bug-006–032 | ✅ | zatvoreno | [[d0-functional-audit\|audit]] |
+
+Star-3 unlock hub ✅ — Journal deferred swipe; free unlock 500c + 20 ★3 prethodne sezone; scroll 280 ([[plan-prompts-star3-unlock-hub|freeze]]).
 
 ## Povezano
 
-- [[RADIONICA-razvoj|RADIONICA-razvoj]] — faze 0–7
-- [[milestone-i|milestone-i]] — milestone sažetak
-- [[roadmap|roadmap]]
+- [[plan-arhitektura-refaktor|plan-arhitektura-refaktor]] — kod refaktor nakon CAMP-06 (GameState split, GUT, naming)
+- [[_archive/RADIONICA-razvoj|RADIONICA-razvoj]] (arhivirano) — faze 0–7, historijski zapis
+- [[_archive/milestone-i|milestone-i]] (arhivirano) — stari milestone sažetak
+- [[_archive/roadmap|roadmap]] (arhivirano)
 - [[plan-prompts-home-paid|HOME-04 prompti]]
 - [[plan-prompts-home-glide|HOME-05 prompti]]
 - [[plan-prompts-home-focus|HOME-06 prompti]]
@@ -376,6 +396,22 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 - [[../03-content/ideje-home-meadow-chrome|HOME-13 chrome hub]]
 - [[plan-prompts-home-meadow-life|HOME-14 life prompti]]
 - [[../03-content/ideje-home-meadow-life|HOME-14 life hub]]
+- [[plan-prompts-home-meadow-dock|HOME-15 dock prompti]]
+- [[../03-content/ideje-home-meadow-dock|HOME-15 dock hub]]
+- [[plan-prompts-home-camp-field|HOME-16 field + CAMP-03 prompti]]
+- [[_archive/plan-prompts-home-unlock-poster|HOME-17 unlock poster]] (arhivirano)
+- [[../03-content/_archive/ideje-home-unlock-poster|HOME-17 hub]] (arhivirano)
+- [[plan-prompts-home-poster-fit|HOME-18 poster fit]]
+- [[../03-content/ideje-home-poster-fit|HOME-18 hub]]
+- [[plan-prompts-star3-unlock-hub|star-3 unlock + Journal + Camp link]]
+- [[../03-content/ideje-home-meadow-field|HOME-16 field hub]]
+- [[../03-content/ideje-camp-link|CAMP-03 kamp link hub]]
+- [[_archive/plan-prompts-camp-read|CAMP-04 camp read]] (arhivirano)
+- [[../03-content/_archive/ideje-camp-read|CAMP-04 hub]] (arhivirano)
+- [[plan-prompts-camp-row|CAMP-05 camp row]]
+- [[../03-content/ideje-camp-row|CAMP-05 hub]]
+- [[plan-prompts-camp-fill|CAMP-06 camp fill]]
+- [[../03-content/ideje-camp-fill|CAMP-06 hub]]
 - [[../03-content/ideje-seed-pool|SEED-01 hub]]
 - [[plan-prompts-home-cardfit|HOME-09 prompti]]
 - [[plan-prompts-arena|ARENA-01 prompti]]

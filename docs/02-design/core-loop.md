@@ -6,7 +6,7 @@ tags: [dizajn, core-loop]
 povezano:
   - gdd-overview
   - lane-run
-  - merge-kamp
+  - merge-arena-v1.1
   - progresija
 ai_sažetak: "Petlja run → loot → kamp → merge → jači run; micro ~90s, session 8–15 min."
 ---

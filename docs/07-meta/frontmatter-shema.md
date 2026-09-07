@@ -18,7 +18,7 @@ Kopiraj u nove note ili koristi [[../templates/template-doc|template-doc]].
 ```yaml
 ---
 type: dizajn              # vision | dizajn | mehanika | sadrzaj | iskustvo | tehnicko | produkcija | adr | meta | personal
-status: draft             # draft | aktivan | zatvoreno | out-v1 | ideja
+status: draft             # draft | aktivan | zatvoreno | out-v1 | ideja | koncept | arhiva
 milestone: M6             # M0–M8 ili —
 tags: [dizajn, core-loop]
 povezano:
@@ -43,9 +43,21 @@ ai_sažetak: "Jedna rečenica što ova stranica govori agentu."
 | `meta` | `07-meta/` |
 | `personal` | `00-personal/` |
 
+## `status` vrijednosti — pojašnjenje
+
+| Vrijednost | Značenje |
+|------------|----------|
+| `draft` | Sadržaj postoji ali nije finalno potvrđen |
+| `aktivan` | Trenutno važeći, održava se |
+| `zatvoreno` | Gotovo, ne mijenja se, ali nije arhivirano (npr. završen milestone) |
+| `out-v1` | Svjesno izvan scopea za v1 |
+| `ideja` | Scratch/brainstorm, još nije odluka |
+| `koncept` | **Hub `_index.md` fajlovi** — nema svoj sadržaj, samo linkovi na djecu |
+| `arhiva` | Fajl je premješten u `_archive/` — zamijenjen novijim dokumentom, zadržan kao historijski zapis |
+
 ## Operativni hubovi (dodatna polja)
 
-`CHECKPOINT.md` i `RADIONICA-razvoj.md` zadržavaju svoja polja (`trenutna_faza`, `aktivna_sekcija`, `b0_aktivan`, …). Ne prepisuj ih generičkom šemom.
+`CHECKPOINT.md` zadržava svoja dodatna polja (`aktivna_sekcija`, `b0_aktivan`, `sljedeci_korak`, …). Ne prepisuj ih generičkom šemom. (`RADIONICA-razvoj.md`/`milestone-i.md`/`roadmap.md` su arhivirani u `06-production/_archive/` — CHECKPOINT je jedini izvor istine za fazu/milestone.)
 
 ## Za agenta
 

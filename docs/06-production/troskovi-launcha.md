@@ -5,7 +5,6 @@ milestone: M8
 tags: [produkcija, launch, troškovi, monetizacija, platforme]
 povezano:
   - CHECKPOINT
-  - milestone-i
   - scope-i-granice
   - play-internal-test
   - ../05-technical/platforme
@@ -204,6 +203,5 @@ IAP     = rijetki remove ads (€3.99) i starter pack (€1.99), ~85% neto nakon
 
 - [[CHECKPOINT|CHECKPOINT]] — aktivna sekcija D
 - [[play-internal-test|play-internal-test]] — runbook (Faza 2)
-- [[milestone-i|milestone-i]] — M8 ciljevi
 - [[scope-i-granice|scope-i-granice]] — što mora biti gotovo prije launcha
 - [[../05-technical/platforme|platforme]] — Android-first, iOS kasnije

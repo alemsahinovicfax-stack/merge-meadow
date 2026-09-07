@@ -658,7 +658,7 @@ SHOP (M8)         │
 ## Povezano
 
 - [[ideje-identitet-lore|ideje-identitet-lore]] — Pip + sjeme/cvijet
-- [[../02-design/mehanike/merge-kamp|merge-kamp]] — trenutni kamp (kanon)
+- [[../02-design/spec-vertical-slice|spec-vertical-slice]] — trenutni kamp (kanon; stari merge-kamp arhiviran)
 - [[ideje-arena|ARENA-01]] — zabavnija arena (scratch, v1.1+)
 - [[../02-design/ekonomija|ekonomija]] · [[../02-design/ekonomija-brojevi|ekonomija-brojevi]]
 - [[../02-design/spec-vertical-slice|spec-vertical-slice]]

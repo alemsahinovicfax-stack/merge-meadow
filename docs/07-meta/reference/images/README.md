@@ -19,7 +19,7 @@ Detalji palete i stila: [[../../04-experience/art-direction|art-direction]].
 ## Napomene
 
 - Reference su **mood**, ne 1:1 kopija za store — greybox (M6) i dalje koristi placeholdere.
-- Slika 2 je više „character roster / meadow“ nego UI mockup — dovoljno za B0; kamp layout se definira u [[../../04-experience/ui-ux|ui-ux]] kad dođe M7.
+- Slika 2 je više „character roster / meadow“ nego UI mockup — dovoljno za B0; kamp layout se definira u [[../../02-design/spec-vertical-slice|spec-vertical-slice]] (stari [[../../04-experience/_archive/ui-ux|ui-ux]] arhiviran).
 - Izvor: Craiyon (generirano iz promptova u B0 sesiji).
 
 ## Sljedeće (B0)

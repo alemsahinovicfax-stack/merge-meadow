@@ -19,7 +19,7 @@ tags: [produkcija, verzije, post-launch]
 | **v1.1+** | Mali updatei nakon launcha | Post-M8 |
 | **Alpha / beta** | Test s javnošću prije production | Između M7 i M8 (opcionalno) |
 
-RADIONICA-razvoj pokriva do **vertical slice (Faza 7)**. **Alpha, beta, puni launch** su u [[roadmap|roadmap]] i CHECKPOINT **Sekcija D**.
+**Alpha, beta, puni launch** su u CHECKPOINT **Sekcija D** (jedini izvor istine za fazu/milestone).
 
 ## Je li prerano planirati dalje verzije?
 
@@ -83,6 +83,5 @@ Redoslijed: **SEZ-01 (B→E, sada)** može paralelno s v1.1.0 paketom (MA-01 + M
 ## Povezano
 
 - [[scope-i-granice|scope-i-granice]]
-- [[milestone-i|milestone-i]]
 - [[CHECKPOINT|CHECKPOINT]]
 - [[../05-technical/sigurnost|sigurnost]]

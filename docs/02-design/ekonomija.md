@@ -1,6 +1,13 @@
 ---
-status: draft
+type: dizajn
+status: aktivan
+milestone: M6
 tags: [dizajn, ekonomija]
+povezano:
+  - ekonomija-brojevi
+  - core-loop
+  - progresija
+ai_sažetak: "Jedna soft valuta (Orbs) s tierovima kroz merge; IAP daje burst, ne paywall. Konkretne brojke → ekonomija-brojevi.md."
 ---
 
 # Ekonomija
@@ -69,4 +76,4 @@ Run (earn T1) → Kamp merge (T1→T2→T3) → Upgrade sink → Jači run → v
 
 - [[monetizacija|monetizacija]]
 - [[progresija|progresija]]
-- [[mehanike/merge-kamp|merge-kamp]]
+- [[merge-arena-v1.1|merge-arena-v1.1]] (kanon; stari mehanike/merge-kamp arhiviran)

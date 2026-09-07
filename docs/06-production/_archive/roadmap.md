@@ -1,13 +1,15 @@
 ---
-status: koncept
-tags: [produkcija, roadmap]
+status: arhiva
+tags: [produkcija, roadmap, arhiva]
 ---
 
 # Roadmap
 
+> **Arhivirano 2026-09-07** — zamijenjeno sa [[../CHECKPOINT|CHECKPOINT.md]] (jedini izvor istine za fazu/milestone). Ovaj dokument je zamrznut na fazi 6 (greybox) i ne odražava M7/M8 napredak.
+
 ## Sažetak
 
-Faze rada do vertical slice-a. **Detalji → [[RADIONICA-razvoj|RADIONICA-razvoj]]**
+Faze rada do vertical slice-a. **Detalji → [[RADIONICA-razvoj|RADIONICA-razvoj]]** (arhivirano)
 
 ## Faze (do slice-a)
 

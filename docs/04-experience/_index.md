@@ -10,7 +10,7 @@ tags: [hub, iskustvo]
 ## Dokumenti
 
 - [[ui-i-art-alati|ui-i-art-alati]] — **operativno:** alati, Cursor modeli, 1× Pip (ti) + 1× UI pack (Kenney)
-- [[ui-ux|ui-ux]] — ekrani, flow, mobile UX
+- [[../02-design/spec-vertical-slice|spec-vertical-slice]] — ekrani, flow, mobile UX (trenutno; stari [[_archive/ui-ux|ui-ux]] arhiviran)
 - [[art-direction|art-direction]] — stil, paleta, mood
 - [[audio-direction|audio-direction]] — muzika, SFX, ambient
 - [[pristupacnost|pristupacnost]] — font, kontrast, difficulty

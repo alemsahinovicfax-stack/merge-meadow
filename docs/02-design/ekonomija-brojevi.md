@@ -6,7 +6,7 @@ tags: [dizajn, ekonomija, balans, brojevi, source-of-truth]
 povezano:
   - ekonomija
   - spec-vertical-slice
-  - mehanike/merge-kamp
+  - mehanike/_archive/merge-kamp
   - CHECKPOINT
 ai_sažetak: "Sve balans-konstante slice-a na jednom mjestu (run, loot, kamp, sprinkler) + gdje su u kodu."
 ---

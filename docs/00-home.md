@@ -18,8 +18,7 @@ ai_sažetak: "Ulazna stranica vaulta — linkovi na operativu, slojeve i DoD pri
 
 ## Brzi linkovi
 
-- [[06-production/CHECKPOINT|CHECKPOINT]] — **dnevni checkpoint** (što raditi danas)
-- [[06-production/RADIONICA-razvoj|RADIONICA-razvoj]] — master plan razvoja (faze 0–7)
+- [[06-production/CHECKPOINT|CHECKPOINT]] — **dnevni checkpoint** (što raditi danas) i jedini izvor istine za fazu/milestone
 - [[01-vision/pitch|pitch]] — što je igra u jednoj rečenici
 - [[02-design/core-loop|core-loop]] — zašto igrač ostaje
 - [[06-production/scope-i-granice|scope-i-granice]] — što gradimo u v1
@@ -34,7 +33,7 @@ ai_sažetak: "Ulazna stranica vaulta — linkovi na operativu, slojeve i DoD pri
 3. [[03-content/_index|Sadržaj]] — svijet, likovi, nivoi
 4. [[04-experience/_index|Iskustvo]] — UI, art, audio
 5. [[05-technical/_index|Tehničko]] — platforme, engine, arhitektura
-6. [[06-production/_index|Produkcija]] — scope, roadmap, milestone-i
+6. [[06-production/_index|Produkcija]] — scope, checkpoint, plan-prompti
 7. [[07-meta/_index|Meta]] — reference, rječnik, changelog
 
 ## Definition of Done (prije koda)
@@ -45,4 +44,4 @@ ai_sažetak: "Ulazna stranica vaulta — linkovi na operativu, slojeve i DoD pri
 - [x] Koje su 3 glavne mehanike? → [[02-design/mehanike/_index|mehanike]]
 - [x] Što je IN i što je OUT za v1? → [[06-production/scope-i-granice|scope-i-granice]]
 - [x] Koji engine i zašto? → [[05-technical/engine-odluka|engine-odluka]]
-- [x] Koji je prvi milestone (vertical slice)? → [[06-production/milestone-i|milestone-i]]
+- [x] Koji je prvi milestone (vertical slice)? → [[06-production/CHECKPOINT|CHECKPOINT]]

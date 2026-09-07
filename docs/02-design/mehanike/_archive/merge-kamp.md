@@ -1,9 +1,11 @@
 ---
-status: draft
-tags: [mehanika, merge]
+status: arhiva
+tags: [mehanika, merge, arhiva]
 ---
 
 # Merge kamp
+
+> **Arhivirano 2026-09-07** — opisuje predMerge-Arena grid kamp, superseded je stvarnom implementacijom. Trenutni izvor istine: [[../spec-vertical-slice|spec-vertical-slice]] i [[../merge-arena-v1.1|merge-arena-v1.1]].
 
 ## Sažetak
 

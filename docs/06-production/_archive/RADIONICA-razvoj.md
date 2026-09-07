@@ -1,8 +1,8 @@
 ---
 type: produkcija
-status: aktivan
+status: arhiva
 milestone: M6
-tags: [produkcija, radionica, master]
+tags: [produkcija, radionica, master, arhiva]
 povezano:
   - CHECKPOINT
   - milestone-i
@@ -13,6 +13,8 @@ podfaza: greybox-spreman
 ---
 
 # Radionica razvoja — do vertical slice-a
+
+> **Arhivirano 2026-09-07** — zamijenjeno sa [[../CHECKPOINT|CHECKPOINT.md]] (jedini izvor istine za fazu/milestone). Ovaj dokument je zamrznut na `trenutna_faza: 5` (prije M7/M8) i drži se samo kao historijski zapis faza 0–7.
 
 > **Jedini izvor istine** za redoslijed rada od dokumentacije do prvog igrivog vertical slice-a.
 > Beta, launch i marketing nisu u ovom dokumentu.

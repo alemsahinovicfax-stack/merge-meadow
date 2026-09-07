@@ -5,31 +5,17 @@ alwaysApply: true
 
 # Scope guard — Merge Meadow
 
+> Ista pravila su i u `CLAUDE.md` § "Scope guard" (root repoa, kanonski) — ovaj fajl postoji odvojeno samo da Cursor-ov `alwaysApply` UI radi.
+
 Agent **mora** aktivno upozoriti korisnika ako rad ili prijedlog izlazi iz scopea.
 
 ## Prije svake nove feature / većeg koda
 
-1. Pročitaj `docs/06-production/CHECKPOINT.md` — `aktivna_sekcija` i prva neoznačena stavka
-2. Pročitaj `docs/06-production/scope-i-granice.md` — IN / OUT + tablica **M6 vs M7 vs launch**
+1. Pročitaj `docs/06-production/CHECKPOINT.md` frontmatter — `milestone` (trenutni, npr. M8) i `aktivna_sekcija` + prva neoznačena stavka
+2. Pročitaj `docs/06-production/scope-i-granice.md` — nađi red za **taj isti milestone** u tablici "Scope po milestoneu" (IN / OUT kolone) — to je trenutni kod scope, ne pamti ga statično
 3. Provjeri `docs/01-vision/design-pillars.md` — krši li Pillar 2 (Fair F2P)?
 
-## Trenutni kod scope (M6 — CHECKPOINT B)
-
-**Dozvoljeno sada (B2):**
-- Lane run: swipe, 3 lanea ili swerve, auto-scroll
-- Spawn orbova + jedna prepreka
-- Kraj runa → placeholder loot broj
-- 50% loot na fail
-- Placeholder grafika (Godot primitives)
-
-**Zabranjeno u M6 (upozori ako korisnik traži):**
-- Merge kamp, shop, IAP, AdMob
-- Main menu polish, tutorial flow
-- iOS export
-- Više od ~10 test levela
-- Multiplayer, leaderboard, cloud save
-- Priča, cutscene, ljubimci unlock
-- Energy/stamina, pay-to-continue
+**Ne kopiraj scope tablicu ovdje** — ona se mijenja kako projekt napreduje (M6 → M7 → M8 → v1.1+) i svaka kopija u ovom fajlu bi garantovano zastarjela. Uvijek čitaj `scope-i-granice.md` uživo za trenutni milestone iz CHECKPOINT-a.
 
 ## Kako upozoriti (obavezno u chatu)
 

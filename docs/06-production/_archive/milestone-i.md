@@ -1,8 +1,8 @@
 ---
 type: produkcija
-status: aktivan
+status: arhiva
 milestone: M6
-tags: [produkcija, milestone, checkpoint]
+tags: [produkcija, milestone, checkpoint, arhiva]
 povezano:
   - CHECKPOINT
   - RADIONICA-razvoj
@@ -12,8 +12,10 @@ ai_sažetak: "M0–M8 pregled i kriteriji; dnevni rad ide preko CHECKPOINT-a."
 
 # Milestone-i
 
-> **Dnevni rad:** koristi [[CHECKPOINT|CHECKPOINT]] — ovaj fajl je pregled i kriteriji.  
-> **Detaljni koraci:** [[RADIONICA-razvoj|RADIONICA-razvoj]]
+> **Arhivirano 2026-09-07** — zamijenjeno sa [[../CHECKPOINT|CHECKPOINT.md]] (jedini izvor istine za fazu/milestone). Zadržano kao historijski zapis M0–M8 kriterija.
+
+> **Dnevni rad:** koristi [[../CHECKPOINT|CHECKPOINT]] — ovaj fajl je pregled i kriteriji.  
+> **Detaljni koraci:** [[RADIONICA-razvoj|RADIONICA-razvoj]] (arhivirano)
 
 ## Dokumentacija vs kod (sažetak)
 

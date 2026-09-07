@@ -4,7 +4,7 @@ status: aktivan
 milestone: M6
 tags: [produkcija, scope]
 povezano:
-  - milestone-i
+  - CHECKPOINT
   - gdd-overview
   - verzije-nakon-launcha
 ai_sažetak: "v1 IN/OUT scope za solo deva; scope guard referenca za agenta."
@@ -121,8 +121,7 @@ Agent te upozorava — `.cursor/rules/scope-guard.mdc`
 
 ## Povezano
 
-- [[milestone-i|milestone-i]]
-- [[roadmap|roadmap]]
+- [[CHECKPOINT|CHECKPOINT]]
 - [[../01-vision/design-pillars|design-pillars]]
 - [[../05-technical/engine-odluka|engine-odluka]]
 - [[verzije-nakon-launcha|verzije-nakon-launcha]]

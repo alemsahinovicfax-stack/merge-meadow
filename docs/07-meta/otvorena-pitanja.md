@@ -41,7 +41,7 @@ _(Faza 4 riješena — vidi Riješeno ✅)_
 - **Referentne igre:** Mob Control, Merge Mansion, Subway Surfers — vidi [[../01-vision/konkurencija-i-inspiracija|konkurencija-i-inspiracija]]
 - **Faza 1 Vizija:** ✅ završena (2026-06-30)
 - **Faza 2 Core dizajn:** ✅ lane run, merge kamp, množitelj; core loop; kontrole — vidi [[../02-design/core-loop|core-loop]]
-- **Faza 3 Sadržaj i iskustvo:** ✅ svijet, UI flow, art direction — vidi [[../04-experience/ui-ux|ui-ux]]
+- **Faza 3 Sadržaj i iskustvo:** ✅ svijet, UI flow, art direction — vidi [[../02-design/spec-vertical-slice|spec-vertical-slice]] (stari ui-ux arhiviran)
 - **Faza 4 Tehničko:** ✅ Godot 4, Android+iOS, IN/OUT scope — vidi [[../05-technical/engine-odluka|engine-odluka]]
 - **Faza 5 Gate:** ✅ DoD 7/7 — spremno za `game/`
 - **Dev setup:** HP Windows, Android-first; emulator primarno; stariji Android + iPhone (M7) — vidi [[../05-technical/platforme|platforme]] folder

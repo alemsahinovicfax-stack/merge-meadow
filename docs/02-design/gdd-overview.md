@@ -35,7 +35,7 @@ ai_sažetak: "Executive index Merge Meadow — lane run + merge kamp F2P hybrid 
 ## Ključne mehanike (must-have v1)
 
 1. [[mehanike/lane-run|Lane run]] — core sesija, ad momenti
-2. [[mehanike/merge-kamp|Merge kamp]] — meta, D7 retention
+2. [[spec-vertical-slice|Merge kamp]] — meta, D7 retention (kanon: spec-vertical-slice; stari mehanike/merge-kamp arhiviran)
 3. [[mehanike/mnozitelj-upgrade|Množitelj i upgrade]] — power fantasy
 
 ## Progresija i ekonomija
@@ -47,7 +47,7 @@ ai_sažetak: "Executive index Merge Meadow — lane run + merge kamp F2P hybrid 
 ## Kontrole i UX
 
 - [[kontrole-i-input|kontrole-i-input]] — portrait, swipe
-- [[../04-experience/ui-ux|ui-ux]] — screen flow
+- [[spec-vertical-slice|spec-vertical-slice]] — screen flow (kanon; stari ui-ux arhiviran)
 - [[../04-experience/art-direction|art-direction]] — flat cartoon
 
 ## Tehnički sažetak
@@ -73,4 +73,4 @@ GDD je usklađen s [[../06-production/scope-i-granice|scope-i-granice]] IN/OUT l
 ## Povezano
 
 - [[_index|← Dizajn]]
-- [[../06-production/milestone-i|milestone-i]]
+- [[../06-production/CHECKPOINT|CHECKPOINT]]

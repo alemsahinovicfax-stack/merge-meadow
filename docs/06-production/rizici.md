@@ -38,5 +38,4 @@ Top rizici za solo studenta na HP Windows + iPhone — s mitigacijom.
 ## Povezano
 
 - [[CHECKPOINT|CHECKPOINT]]
-- [[roadmap|roadmap]]
 - [[../05-technical/platforme|platforme]]

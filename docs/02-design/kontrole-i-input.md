@@ -74,6 +74,6 @@ Opcionalno u postavkama — default ON.
 ## Povezano
 
 - [[mehanike/lane-run|lane-run]]
-- [[mehanike/merge-kamp|merge-kamp]]
-- [[../04-experience/ui-ux|ui-ux]]
+- [[merge-arena-v1.1|merge-arena-v1.1]] (kanon; stari mehanike/merge-kamp arhiviran)
+- [[spec-vertical-slice|spec-vertical-slice]] (screen flow; stari [[../04-experience/_archive/ui-ux|ui-ux]] arhiviran)
 - [[../05-technical/platforme|platforme]]

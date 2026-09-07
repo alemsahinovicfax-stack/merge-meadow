@@ -150,4 +150,4 @@ Novi projekti: renderer **Compatibility** (`gl_compatibility`).
 
 - [[engine-odluka|engine-odluka]]
 - [[performanse|performanse]]
-- [[../04-experience/ui-ux|ui-ux]]
+- [[../02-design/spec-vertical-slice|spec-vertical-slice]] (stari ui-ux arhiviran)

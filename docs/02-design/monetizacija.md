@@ -85,5 +85,5 @@ tags: [dizajn, monetizacija]
 ## Povezano
 
 - [[ekonomija|ekonomija]]
-- [[../04-experience/ui-ux|ui-ux]]
+- [[spec-vertical-slice|spec-vertical-slice]] (screen flow; stari [[../04-experience/_archive/ui-ux|ui-ux]] arhiviran)
 - [[../06-production/scope-i-granice|scope-i-granice]]
