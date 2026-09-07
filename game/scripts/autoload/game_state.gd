@@ -2103,20 +2103,6 @@ func _donate_toward_multiplier() -> bool:
 	return true
 
 
-func donate_bloom_from_bed(bed_index: int, in_greenhouse: bool = false) -> bool:
-	var beds := _bed_array(in_greenhouse)
-	if bed_index < 0 or bed_index >= beds.size():
-		return false
-	var bed: Variant = beds[bed_index]
-	if bed == null or int(bed.get("tier", 0)) != 2:
-		return false
-	if not _donate_toward_magnet():
-		return false
-	beds[bed_index] = null
-	save_player_save()
-	return true
-
-
 func pick_upgrade_flower_type(preferred: String = "") -> String:
 	if int(garden_crystal_stash.get(preferred, 0)) >= UPGRADE_FLOWER_COST:
 		return preferred
@@ -2193,20 +2179,6 @@ func format_loot_multiplier_label() -> String:
 	if mult <= 1.0:
 		return "Loot Boost Lv 0 / %d (×1.0)" % MULTIPLIER_MAX_LEVEL
 	return "Loot Boost Lv %d / %d (x%.2f)" % [multiplier_level, MULTIPLIER_MAX_LEVEL, mult]
-
-
-func donate_crystal_from_bed(bed_index: int, in_greenhouse: bool = false) -> bool:
-	var beds := _bed_array(in_greenhouse)
-	if bed_index < 0 or bed_index >= beds.size():
-		return false
-	var bed: Variant = beds[bed_index]
-	if bed == null or int(bed.get("tier", 0)) != MAX_MERGE_TIER:
-		return false
-	if not _donate_toward_multiplier():
-		return false
-	beds[bed_index] = null
-	save_player_save()
-	return true
 
 
 func try_upgrade_multiplier(preferred: String = "") -> bool:
@@ -2341,14 +2313,6 @@ func basket_bloom_type(type_id: String) -> bool:
 	loadout_type_id = type_id
 	save_player_save()
 	return true
-
-
-func keep_all_bloom_inbox() -> int:
-	var kept := 0
-	for i in range(bloom_inbox.size() - 1, -1, -1):
-		if keep_bloom_inbox(i):
-			kept += 1
-	return kept
 
 
 func keep_bloom_inbox(index: int) -> bool:
