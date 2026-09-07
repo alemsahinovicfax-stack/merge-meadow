@@ -72,7 +72,7 @@ func test_legacy_t2_plus_beds_migrate_to_bloom_inbox_on_old_version() -> void:
 	})
 	assert_true(ok)
 	assert_eq(_gs.count_bloom_inbox(2), 1, "the tier-2 legacy bed should have migrated into bloom_inbox")
-	var entries: Array = _gs.get_bloom_inbox_entries()
+	var entries: Array = _gs.bloom_inbox
 	assert_eq(str(entries[0].get("type_id", "")), "clover")
 	assert_eq(int(entries[0].get("tier", 0)), 2)
 

@@ -154,5 +154,3 @@ func _reset_upgrade_state(gs: Node, stash: Dictionary, magnet: int, loot: int) -
 	gs.set("garden_crystal_stash", stash.duplicate())
 	gs.set("magnet_level", magnet)
 	gs.set("multiplier_level", loot)
-	gs.set("sprinkler_donations", 0)
-	gs.set("multiplier_donations", 0)

@@ -172,9 +172,7 @@ var merge_hint_booster_active: bool:
 	set(value): boosters.merge_hint_active = value
 
 var magnet_level: int = 0
-var sprinkler_donations: int = 0
 var multiplier_level: int = 0
-var multiplier_donations: int = 0
 var discovered_blooms: Dictionary = {}
 
 ## Kept as properties (not plain facade methods) because main_menu.gd and
@@ -268,9 +266,7 @@ func save_player_save() -> void:
 		"wallet_diamonds": wallet_diamonds,
 		"seed_bag": seed_bag.duplicate(),
 		"magnet_level": magnet_level,
-		"sprinkler_donations": sprinkler_donations,
 		"multiplier_level": multiplier_level,
-		"multiplier_donations": multiplier_donations,
 		"loadout_type_id": loadout_type_id,
 		"discovered_blooms": discovered_blooms.duplicate(),
 		"garden_beds": _serialize_beds(garden_beds),
@@ -881,9 +877,7 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	wallet_diamonds = maxi(0, int(data.get("wallet_diamonds", 0)))
 	seed_bag = _parse_string_int_dict(data.get("seed_bag", {}))
 	magnet_level = clampi(int(data.get("magnet_level", 0)), 0, MAGNET_MAX_LEVEL)
-	sprinkler_donations = maxi(0, int(data.get("sprinkler_donations", 0)))
 	multiplier_level = clampi(int(data.get("multiplier_level", 0)), 0, MULTIPLIER_MAX_LEVEL)
-	multiplier_donations = maxi(0, int(data.get("multiplier_donations", 0)))
 	loadout_type_id = str(data.get("loadout_type_id", ""))
 	discovered_blooms = _parse_string_bool_dict(data.get("discovered_blooms", {}))
 	garden_beds = _deserialize_beds(data.get("garden_beds", []), CAMP_BED_COUNT)
@@ -2077,28 +2071,6 @@ func exchange_seeds_from_bag(type_id: String) -> bool:
 	return true
 
 
-## Upgrades indirection (plan-arhitektura-refaktor.md Stage 2). Every donation
-## flow (Garden-bed, Bloom-inbox) should go through these instead of touching
-## sprinkler_donations/multiplier_donations directly — also collapses the
-## magnet/multiplier-cap guard that used to be duplicated at every call site.
-func _donate_toward_magnet() -> bool:
-	if magnet_level >= MAGNET_MAX_LEVEL:
-		return false
-	if sprinkler_donations >= MAGNET_COST_T2:
-		return false
-	sprinkler_donations += 1
-	return true
-
-
-func _donate_toward_multiplier() -> bool:
-	if multiplier_level >= MULTIPLIER_MAX_LEVEL:
-		return false
-	if multiplier_donations >= MULTIPLIER_COST_T3:
-		return false
-	multiplier_donations += 1
-	return true
-
-
 func pick_upgrade_flower_type(preferred: String = "") -> String:
 	if int(garden_crystal_stash.get(preferred, 0)) >= UPGRADE_FLOWER_COST:
 		return preferred
@@ -2248,10 +2220,6 @@ func _deserialize_bloom_inbox(raw: Variant) -> Array:
 	return out
 
 
-func get_bloom_inbox_entries() -> Array:
-	return bloom_inbox.duplicate(true)
-
-
 func count_bloom_inbox(min_tier: int = 2) -> int:
 	var total := 0
 	for item in bloom_inbox:
@@ -2272,21 +2240,6 @@ func push_bloom_inbox(type_id: String, tier: int) -> bool:
 	return true
 
 
-func donate_bloom(type_id: String, tier: int) -> bool:
-	if type_id.is_empty() or tier < 2:
-		return false
-	if tier == 2:
-		if not _donate_toward_magnet():
-			return false
-	elif tier >= MAX_MERGE_TIER:
-		if not _donate_toward_multiplier():
-			return false
-	else:
-		return false
-	save_player_save()
-	return true
-
-
 func can_keep_bloom_upgrade(type_id: String, tier: int) -> bool:
 	if type_id.is_empty() or tier < 2:
 		return false
@@ -2303,14 +2256,6 @@ func keep_bloom(type_id: String, tier: int) -> bool:
 	return true
 
 
-func basket_bloom_type(type_id: String) -> bool:
-	if type_id.is_empty() or is_mythic_seed(type_id):
-		return false
-	loadout_type_id = type_id
-	save_player_save()
-	return true
-
-
 func keep_bloom_inbox(index: int) -> bool:
 	if index < 0 or index >= bloom_inbox.size():
 		return false
@@ -2318,28 +2263,6 @@ func keep_bloom_inbox(index: int) -> bool:
 	var type_id := str(item.get("type_id", ""))
 	var tier := int(item.get("tier", 0))
 	if not keep_bloom(type_id, tier):
-		return false
-	bloom_inbox.remove_at(index)
-	return true
-
-
-func donate_bloom_inbox(index: int) -> bool:
-	if index < 0 or index >= bloom_inbox.size():
-		return false
-	var item: Dictionary = bloom_inbox[index]
-	var type_id := str(item.get("type_id", ""))
-	var tier := int(item.get("tier", 0))
-	if not donate_bloom(type_id, tier):
-		return false
-	bloom_inbox.remove_at(index)
-	return true
-
-
-func basket_bloom_inbox(index: int) -> bool:
-	if index < 0 or index >= bloom_inbox.size():
-		return false
-	var type_id := str(bloom_inbox[index].get("type_id", ""))
-	if not basket_bloom_type(type_id):
 		return false
 	bloom_inbox.remove_at(index)
 	return true
