@@ -145,6 +145,7 @@ var garden_crystal_stash: Dictionary = {}
 var cosmetics: Cosmetics
 var boosters: Boosters
 var companions: Companions
+var tutorial: Tutorial
 
 ## Kept as a var (not moved into Boosters) because merge_arena_controller.gd
 ## reads it directly as GameState.merge_hint_booster_active in two places;
@@ -159,8 +160,19 @@ var sprinkler_donations: int = 0
 var multiplier_level: int = 0
 var multiplier_donations: int = 0
 var discovered_blooms: Dictionary = {}
-var tutorial_step: int = TutorialStep.RUN1
-var tutorial_complete: bool = false
+
+## Kept as properties (not plain facade methods) because main_menu.gd and
+## loot_screen.gd read GameState.tutorial_complete/tutorial_step as raw
+## fields, and several functions below (get_run_duration, loadout_enabled,
+## ...) do the same internally — the shim lets `tutorial` own the real
+## storage without touching every one of those read sites.
+var tutorial_complete: bool:
+	get: return tutorial.complete
+	set(value): tutorial.complete = value
+var tutorial_step: int:
+	get: return tutorial.step
+	set(value): tutorial.step = value
+
 var ads_removed: bool = false
 var starter_pack_owned: bool = false
 var run_level: int = 1
@@ -191,7 +203,6 @@ var _arena_pour_locked_types: Dictionary = {}
 
 var meta_hub_active: bool = false
 var meta_hub_pending_page: int = MetaHubPages.MAIN
-var arena_pest_tutorial_shown: bool = false
 var active_season_id: String = SeasonCatalog.DEFAULT_SEASON_ID
 var strip_focus_id: String = SeasonCatalog.DEFAULT_SEASON_ID
 var home_band: String = "free"
@@ -207,12 +218,13 @@ func _ready() -> void:
 	cosmetics = Cosmetics.new(self)
 	boosters = Boosters.new(self)
 	companions = Companions.new(self)
+	tutorial = Tutorial.new(self)
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
 		reset_garden_beds()
 		reset_greenhouse_beds()
-		_try_migrate_tutorial_flags_only()
+		tutorial.migrate_legacy_flags()
 		_apply_debug_resources_if_new_game()
 		_normalize_season_progress()
 	else:
@@ -234,8 +246,6 @@ func load_player_save() -> bool:
 func save_player_save() -> void:
 	var data := {
 		"version": SAVE_VERSION,
-		"tutorial_complete": tutorial_complete,
-		"tutorial_step": tutorial_step,
 		"wallet_coins": wallet_coins,
 		"wallet_diamonds": wallet_diamonds,
 		"seed_bag": seed_bag.duplicate(),
@@ -267,7 +277,6 @@ func save_player_save() -> void:
 		"arena_daily_streak": arena_daily_streak,
 		"collection_journal_pending": collection_journal_pending.duplicate(),
 		"bloom_inbox": bloom_inbox.duplicate(true),
-		"arena_pest_tutorial_shown": arena_pest_tutorial_shown,
 		"active_season_id": active_season_id,
 		"strip_focus_id": strip_focus_id,
 		"home_band": home_band,
@@ -278,6 +287,7 @@ func save_player_save() -> void:
 	data.merge(cosmetics.to_save_dict())
 	data.merge(boosters.to_save_dict())
 	data.merge(companions.to_save_dict())
+	data.merge(tutorial.to_save_dict())
 	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		push_error("GameState: could not write %s" % PLAYER_SAVE_PATH)
@@ -847,10 +857,7 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	var version := int(data.get("version", 0))
 	if version < 1:
 		return false
-	tutorial_complete = bool(data.get("tutorial_complete", false))
-	tutorial_step = int(data.get("tutorial_step", TutorialStep.RUN1))
-	if tutorial_complete:
-		tutorial_step = TutorialStep.FREE
+	tutorial.apply_from_save(data)
 	wallet_coins = maxi(0, int(data.get("wallet_coins", 0)))
 	# SAVE_VERSION 8 — older saves default to 0 diamonds.
 	wallet_diamonds = maxi(0, int(data.get("wallet_diamonds", 0)))
@@ -891,7 +898,6 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	companions.apply_from_save(data)
 	collection_journal_pending = _parse_string_int_dict(data.get("collection_journal_pending", {}))
 	bloom_inbox = _deserialize_bloom_inbox(data.get("bloom_inbox", []))
-	arena_pest_tutorial_shown = bool(data.get("arena_pest_tutorial_shown", false))
 	unlocked_seasons = _parse_string_array(data.get("unlocked_seasons", []))
 	owned_paid_seasons = _parse_string_array(data.get("owned_paid_seasons", []))
 	active_season_id = str(data.get("active_season_id", SeasonCatalog.DEFAULT_SEASON_ID))
@@ -991,19 +997,6 @@ func _parse_string_string_dict(data: Variant) -> Dictionary:
 	return out
 
 
-func _try_migrate_tutorial_flags_only() -> void:
-	if not FileAccess.file_exists(TUTORIAL_FLAGS_PATH):
-		return
-	var file := FileAccess.open(TUTORIAL_FLAGS_PATH, FileAccess.READ)
-	if file == null:
-		return
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
-	if parsed is Dictionary:
-		tutorial_complete = bool(parsed.get("tutorial_complete", false))
-		if tutorial_complete:
-			tutorial_step = TutorialStep.FREE
-
-
 func _apply_debug_resources_if_new_game() -> void:
 	if not DEBUG_DEV_RESOURCES:
 		return
@@ -1051,12 +1044,9 @@ func _apply_debug_unlocked_seeds(count_per_type: int) -> void:
 			seed_bag[type_id] = count_per_type
 
 
+## Facade forwards to Tutorial (Stage 4.2) — names/signatures unchanged.
 func mark_tutorial_complete() -> void:
-	if tutorial_complete:
-		return
-	tutorial_complete = true
-	tutorial_step = TutorialStep.FREE
-	save_player_save()
+	tutorial.mark_complete()
 
 
 func reset_garden_beds() -> void:
@@ -1115,14 +1105,11 @@ func is_meta_hub_embedded(node: Node) -> bool:
 
 
 func mark_arena_pest_tutorial_shown() -> void:
-	if arena_pest_tutorial_shown:
-		return
-	arena_pest_tutorial_shown = true
-	save_player_save()
+	tutorial.mark_arena_pest_shown()
 
 
 func should_show_arena_pest_tutorial() -> bool:
-	return not arena_pest_tutorial_shown
+	return tutorial.should_show_arena_pest()
 
 
 func go_to_camp() -> void:
@@ -1150,7 +1137,7 @@ func should_offer_merge_arena() -> bool:
 
 
 func should_prompt_merge_tutorial() -> bool:
-	return not tutorial_complete and tutorial_step == TutorialStep.CAMP1
+	return tutorial.should_prompt_merge()
 
 
 func get_loadout_type() -> String:
@@ -1757,7 +1744,7 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 		last_run_coins = scaled_coins
 	last_loot = sum_seed_bag(last_seed_bag)
 	_add_coins(last_run_coins)
-	_advance_tutorial_after_run()
+	tutorial.advance_after_run()
 	if not last_failed and tutorial_complete:
 		if run_is_endless:
 			endless_runs_completed += 1
@@ -1805,11 +1792,11 @@ func obstacles_enabled_for_run() -> bool:
 
 
 func is_tutorial_run1() -> bool:
-	return not tutorial_complete and tutorial_step == TutorialStep.RUN1
+	return tutorial.is_run1()
 
 
 func is_tutorial_run2() -> bool:
-	return not tutorial_complete and tutorial_step == TutorialStep.RUN2
+	return tutorial.is_run2()
 
 
 func loadout_enabled() -> bool:
@@ -1830,24 +1817,6 @@ func notify_camp_play() -> void:
 	if tutorial_step == TutorialStep.CAMP1:
 		tutorial_step = TutorialStep.RUN2
 		save_player_save()
-
-
-func _advance_tutorial_after_run() -> void:
-	if tutorial_complete:
-		return
-	match tutorial_step:
-		TutorialStep.RUN1:
-			tutorial_step = TutorialStep.CAMP1
-		TutorialStep.RUN2:
-			tutorial_step = TutorialStep.CAMP_MERGE
-	save_player_save()
-
-
-func _notify_merge_completed() -> void:
-	if tutorial_complete:
-		return
-	# Prvi T2 merge završava tutorial (ne samo u CAMP_MERGE — debug bag može ranije).
-	mark_tutorial_complete()
 
 
 func format_loot_label() -> String:
@@ -2247,7 +2216,7 @@ func try_merge_beds(index_a: int, index_b: int, in_greenhouse: bool = false) -> 
 	if tier + 1 >= 2:
 		discovered_blooms[type_id] = true
 		_mark_collection_journal_new(type_id, 1)
-		_notify_merge_completed()
+		tutorial.notify_merge_completed()
 	save_player_save()
 	return true
 
@@ -2816,7 +2785,7 @@ func try_merge_arena_chips(chip_a: int, chip_b: int, chip_data: Dictionary) -> D
 		return {"ok": false, "msg": "Cannot merge these tiers."}
 	var type_id: String = str(a.get("type_id", ""))
 	var new_tier := tier + 1
-	_notify_merge_completed()
+	tutorial.notify_merge_completed()
 	if new_tier >= MAX_MERGE_TIER:
 		var center: Vector2 = (a.get("pos", Vector2.ZERO) + b.get("pos", Vector2.ZERO)) * 0.5
 		chip_data.erase(chip_b)
