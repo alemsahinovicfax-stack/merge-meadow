@@ -13,7 +13,7 @@ ai_sažetak: "Kod arhitektura refaktor — u toku. GameState pun split po domena
 
 > **Status:** CAMP-06 je gotov i committan (`7b010d7`) — preduvjet ispunjen, refaktor je **u toku**. Prva verzija ovog doca (2026-09-07) je pretpostavljala "pun domain split u jednom prolazu"; nakon detaljnog remapiranja `game_state.gd` (2026-09-07, drugi prolaz) ispalo je da je to previše rizično bez testova (430 poziva iz 38 fajlova, nula signala, jedna 150-linijska `_apply_save_dict` koja dira ~35 varijabli). Ovaj doc sad opisuje **8 malih, samostalno-shippable etapa** koje vode do istog odobrenog cilja.
 >
-> **Napredak:** Stage 0 ✅ (`abd9743`) · Stage 1 ✅ (`c25a191`) · Stage 2 ✅ (`79f4523`) · Stage 3 ✅ (`83d2abd`, Cosmetics+Boosters ekstraktovani) · Stage 4.1 ✅ (`134c034`, Companions) · Stage 4.2 ✅ (`77ec067`, Tutorial) · Stage 4.3 ✅ (`39589eb`, Seed bag) · Stage 4.4 ✅ (2026-09-07, Garden beds — vidi napomenu ispod) · Stage 4.5-7 preostaju. Usput nađen i **prijavljen (ne popravljen)** pre-postojeći bug: `shop_nav_smoke.gd` puca sa "Identifier not found: SceneRouter" — potvrđeno da postoji i prije refaktora, nije regresija.
+> **Napredak:** Stage 0 ✅ (`abd9743`) · Stage 1 ✅ (`c25a191`) · Stage 2 ✅ (`79f4523`) · Stage 3 ✅ (`83d2abd`, Cosmetics+Boosters ekstraktovani) · Stage 4.1 ✅ (`134c034`, Companions) · Stage 4.2 ✅ (`77ec067`, Tutorial) · Stage 4.3 ✅ (`39589eb`, Seed bag) · Stage 4.4 ✅ (`4822da0` + `af1f57b`, Garden beds — vidi napomenu ispod) · Stage 4.5 ✅ (`f79d8f0`, Crystal stash) · Stage 4.6-7 preostaju. Usput nađen i **prijavljen (ne popravljen)** pre-postojeći bug: `shop_nav_smoke.gd` puca sa "Identifier not found: SceneRouter" — potvrđeno da postoji i prije refaktora, nije regresija.
 >
 > **Stage 4.4 napomena (2026-09-07):** Garden beds nije ekstraktovan kao domena — pokazalo se da je cijeli `garden_beds`/`greenhouse_beds` bed-merge API (~20 funkcija, ~180 linija: `plant_seed_in_bed`, `try_merge_beds`, `keep_bloom_from_bed`, `bed_is_empty`, `get_bed_type/tier`, `count_flowers_tier`, `empty_garden_beds`, `resolve_plant_type`, itd.) **mrtav kod** — prežitak pred-Arena prototipa, bez ijednog pozivaoca iz `merge_arena_controller.gd` ili bilo kojeg drugog ekrana. Obrisano umjesto ekstraktovano. `garden_beds`/`greenhouse_beds` nizovi + `_bed_array`/`_serialize_beds`/`_deserialize_beds`/`_migrate_legacy_beds_to_inbox` ostaju — i dalje služe kao landing pad za migraciju starih save-ova (`SAVE_VERSION` < 12). GUT 33/33 + `save_persistence_smoke`/`camp_donate_smoke` zeleno prije i poslije.
 
@@ -46,8 +46,8 @@ Isti pattern za `donate_bloom_from_bed` (~2302), `donate_crystal_from_bed` (~239
 2. ✅ Tutorial — run lifecycle (`77ec067`)
 3. ✅ Seed bag — razbacano bilo ~1262, 1527, 1911, 2251 (`39589eb`)
 4. ✅ Garden beds — ispalo mrtav kod, obrisan umjesto ekstraktovan (vidi napomenu gore, 2026-09-07)
-5. Crystal stash
-6. Bloom inbox
+5. ✅ Crystal stash → `game/scripts/economy/crystal_stash.gd` (`f79d8f0`)
+6. Bloom inbox — **napomena (2026-09-07):** dio ove domene (`donate_bloom_inbox`, `basket_bloom_inbox`, `BloomInboxItem` UI klasa u `bloom_inbox_item.gd`) izgleda necorišten (BloomInboxItem se nigdje ne instancira) — provjeriti je li per-item donate/keep/basket dizajn napušten u korist `flush_bloom_inbox_to_album()` prije ekstrakcije, isto kao Stage 4.4
 7. Arena — 152 poziva iz camp/
 8. Seasons — najveći, najviše poziva (season_stage.gd = 71), radi zadnje
 
