@@ -26,8 +26,11 @@ func _run() -> void:
 		quit(1)
 		return
 	gs.set("wallet_coins", 300)
-	gs.set("owned_cosmetics", {})
-	gs.set("equipped_cosmetics", {})
+	# CAMP-06-era refactor (plan-arhitektura-refaktor.md Stage 3) moved these
+	# into GameState.cosmetics — poke that object instead of GameState directly.
+	var cosmetics: Object = gs.get("cosmetics")
+	cosmetics.set("owned", {})
+	cosmetics.set("equipped", {})
 	if shop.has_method("_refresh_ui"):
 		shop.call("_refresh_ui")
 	for _j in 4:
@@ -44,7 +47,7 @@ func _run() -> void:
 		)
 		quit(1)
 		return
-	var owned: Dictionary = gs.get("owned_cosmetics")
+	var owned: Dictionary = cosmetics.get("owned")
 	if not bool(owned.get("meadow_sunset", false)):
 		push_error("shop_cosmetic_buy_smoke: meadow_sunset should be owned")
 		quit(1)

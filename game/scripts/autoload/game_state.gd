@@ -138,10 +138,20 @@ var carry_seeds: int = 0
 var garden_beds: Array = []
 var greenhouse_beds: Array = []
 var garden_crystal_stash: Dictionary = {}
-var owned_cosmetics: Dictionary = {}
-var equipped_cosmetics: Dictionary = {}
-var booster_inventory: Dictionary = {}
-var merge_hint_booster_active: bool = false
+
+## Extracted domains (plan-arhitektura-refaktor.md Stage 3+). Instantiated in
+## _ready(). Facade methods below (owns_cosmetic, use_booster, ...) forward to
+## these — external call sites are unchanged.
+var cosmetics: Cosmetics
+var boosters: Boosters
+
+## Kept as a var (not moved into Boosters) because merge_arena_controller.gd
+## reads it directly as GameState.merge_hint_booster_active in two places;
+## this getter/setter keeps that working while boosters.merge_hint_active
+## stays the single source of truth.
+var merge_hint_booster_active: bool:
+	get: return boosters.merge_hint_active
+	set(value): boosters.merge_hint_active = value
 
 var magnet_level: int = 0
 var sprinkler_donations: int = 0
@@ -195,6 +205,8 @@ var skip_debug_season_unlock: bool = false
 
 
 func _ready() -> void:
+	cosmetics = Cosmetics.new(self)
+	boosters = Boosters.new(self)
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
@@ -236,9 +248,6 @@ func save_player_save() -> void:
 		"garden_beds": _serialize_beds(garden_beds),
 		"greenhouse_beds": _serialize_beds(greenhouse_beds),
 		"garden_crystal_stash": garden_crystal_stash.duplicate(),
-		"owned_cosmetics": owned_cosmetics.duplicate(),
-		"equipped_cosmetics": equipped_cosmetics.duplicate(),
-		"booster_inventory": booster_inventory.duplicate(),
 		"ads_removed": ads_removed,
 		"starter_pack_owned": starter_pack_owned,
 		"run_level": run_level,
@@ -268,6 +277,8 @@ func save_player_save() -> void:
 		"unlocked_seasons": unlocked_seasons.duplicate(),
 		"owned_paid_seasons": owned_paid_seasons.duplicate(),
 	}
+	data.merge(cosmetics.to_save_dict())
+	data.merge(boosters.to_save_dict())
 	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		push_error("GameState: could not write %s" % PLAYER_SAVE_PATH)
@@ -854,9 +865,8 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	garden_beds = _deserialize_beds(data.get("garden_beds", []), CAMP_BED_COUNT)
 	greenhouse_beds = _deserialize_beds(data.get("greenhouse_beds", []), GREENHOUSE_SLOT_COUNT)
 	garden_crystal_stash = _parse_string_int_dict(data.get("garden_crystal_stash", {}))
-	owned_cosmetics = _parse_string_bool_dict(data.get("owned_cosmetics", {}))
-	equipped_cosmetics = _parse_string_string_dict(data.get("equipped_cosmetics", {}))
-	booster_inventory = _parse_string_int_dict(data.get("booster_inventory", {}))
+	cosmetics.apply_from_save(data)
+	boosters.apply_from_save(data)
 	ads_removed = bool(data.get("ads_removed", false))
 	starter_pack_owned = bool(data.get("starter_pack_owned", false))
 	run_level = clampi(int(data.get("run_level", 1)), 1, RunLevelLibrary.MAX_RUN_LEVEL)
@@ -2893,122 +2903,47 @@ func commit_arena_chips_to_bag(chip_data: Dictionary) -> Dictionary:
 	return summary
 
 
+## Facade forwards to Cosmetics/Boosters (Stage 3) — names/signatures kept
+## identical to before extraction so external call sites don't change.
 func owns_cosmetic(cosmetic_id: String) -> bool:
-	return bool(owned_cosmetics.get(cosmetic_id, false))
+	return cosmetics.owns(cosmetic_id)
 
 
 func is_cosmetic_equipped(cosmetic_id: String) -> bool:
-	if not owns_cosmetic(cosmetic_id):
-		return false
-	var slot := CosmeticCatalog.get_slot(cosmetic_id)
-	return str(equipped_cosmetics.get(slot, "")) == cosmetic_id
+	return cosmetics.is_equipped(cosmetic_id)
 
 
 func get_equipped_cosmetic(slot: String) -> String:
-	var item_id := str(equipped_cosmetics.get(slot, ""))
-	if item_id.is_empty() or not owns_cosmetic(item_id):
-		return ""
-	return item_id
+	return cosmetics.get_equipped(slot)
 
 
 func buy_cosmetic_with_coins(cosmetic_id: String) -> String:
-	if cosmetic_id.is_empty() or CosmeticCatalog.get_item(cosmetic_id).is_empty():
-		return "Unknown item."
-	if owns_cosmetic(cosmetic_id):
-		equip_cosmetic(cosmetic_id)
-		return "%s equipped." % CosmeticCatalog.get_title(cosmetic_id)
-	var cost := CosmeticCatalog.get_coin_cost(cosmetic_id)
-	if not _try_spend_coins(cost):
-		return "Need %d coins." % cost
-	owned_cosmetics[cosmetic_id] = true
-	equip_cosmetic(cosmetic_id)
-	save_player_save()
-	return "Purchased %s!" % CosmeticCatalog.get_title(cosmetic_id)
+	return cosmetics.buy_with_coins(cosmetic_id)
 
 
 func equip_cosmetic(cosmetic_id: String) -> bool:
-	if not owns_cosmetic(cosmetic_id):
-		return false
-	var slot := CosmeticCatalog.get_slot(cosmetic_id)
-	if slot.is_empty():
-		return false
-	equipped_cosmetics[slot] = cosmetic_id
-	save_player_save()
-	return true
+	return cosmetics.equip(cosmetic_id)
 
 
 func get_cosmetic_shop_entries() -> Array[Dictionary]:
-	var out: Array[Dictionary] = []
-	for item_id in CosmeticCatalog.all_ids():
-		out.append({"id": item_id})
-	return out
+	return cosmetics.shop_entries()
 
 
 func get_booster_count(booster_id: String) -> int:
-	return maxi(0, int(booster_inventory.get(booster_id, 0)))
+	return boosters.count(booster_id)
 
 
 func add_booster(booster_id: String, count: int = 1) -> void:
-	if booster_id.is_empty() or count <= 0:
-		return
-	booster_inventory[booster_id] = get_booster_count(booster_id) + count
-	save_player_save()
+	boosters.add(booster_id, count)
 
 
 func use_booster(booster_id: String) -> String:
-	if get_booster_count(booster_id) <= 0:
-		return "No boosters left."
-	match booster_id:
-		MonetizationConfig.BOOSTER_MERGE_HINT:
-			merge_hint_booster_active = true
-			_consume_booster(booster_id)
-			return "Merge Hint ready — open Merge arena."
-		MonetizationConfig.BOOSTER_LOOT_BURST:
-			var added := _grant_loot_burst_seeds()
-			_consume_booster(booster_id)
-			return "Loot Burst: +%d seeds to bag!" % added
-		_:
-			return "Unknown booster."
-
-
-func _consume_booster(booster_id: String) -> void:
-	var left := get_booster_count(booster_id) - 1
-	if left <= 0:
-		booster_inventory.erase(booster_id)
-	else:
-		booster_inventory[booster_id] = left
-	save_player_save()
-
-
-func _grant_loot_burst_seeds() -> int:
-	var added := 0
-	for _i in MonetizationConfig.LOOT_BURST_SEEDS:
-		var type_id := pick_random_run_seed_type()
-		if add_seeds_to_bag(type_id, 1):
-			added += 1
-	save_player_save()
-	return added
+	return boosters.use(booster_id)
 
 
 func consume_merge_hint_booster() -> bool:
-	if not merge_hint_booster_active:
-		return false
-	merge_hint_booster_active = false
-	return true
+	return boosters.consume_merge_hint()
 
 
 func get_merge_hint_message(chip_data: Dictionary) -> String:
-	var counts: Dictionary = {}
-	for _chip_id in chip_data:
-		var entry: Dictionary = chip_data[_chip_id]
-		if int(entry.get("tier", 1)) != 1:
-			continue
-		var type_id := str(entry.get("type_id", ""))
-		if type_id.is_empty():
-			continue
-		counts[type_id] = int(counts.get(type_id, 0)) + 1
-	for type_id in counts:
-		if int(counts[type_id]) >= 2:
-			var name: String = get_seed_display_name(type_id)
-			return "Hint: merge two %s seeds." % name
-	return "Hint: pour seeds and merge matching pairs."
+	return boosters.get_merge_hint_message(chip_data)
