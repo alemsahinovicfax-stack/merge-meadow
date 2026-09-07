@@ -20,6 +20,7 @@ ai_sažetak: "HOME-14 hub — Play 3-koraka (nikad run s karusela); jednaki Play
 
 > **ID:** **HOME-14** · v1.1+ (nije v1 launch blocker).  
 > **Kod:** **LIFE-P0 ✅ LIFE-A ✅ LIFE-B ✅ LIFE-C ✅ LIFE-D ✅**. Playlist gotova. Grupe: [[ideje-home-meadow-life-grupe|grupe]].  
+> **Sljedeće:** [[ideje-home-meadow-dock|HOME-15]] Basket/Seasons/Daily.  
 > **Prethodnik:** [[ideje-home-meadow-chrome|HOME-13]] CHROME-P0 ✅ A–E ✅ — Basket/Endless u polju, full-bleed, name chip; PipPortrait ostaje off.  
 > **Pillar:** [[../01-vision/design-pillars|Fair F2P]] — polje/Pip = **tema**, ne snaga.
 
@@ -79,5 +80,5 @@ HOME-13 je skinuo MeadowPip (šum na chromeu). **LIFE-A–D ✅** — Play 3-kor
 
 ## Povezano
 
-- [[ideje-home-meadow-chrome|HOME-13]] · [[ideje-home-meadow|HOME-12]] · [[ideje-home-meadow-pip|HOME-12 Pip]]
+- [[ideje-home-meadow-chrome|HOME-13]] · [[ideje-home-meadow|HOME-12]] · [[ideje-home-meadow-pip|HOME-12 Pip]] · [[ideje-home-meadow-dock|HOME-15]]
 - [[../06-production/plan-prompts-home-meadow-life|prompti]] · [[CHECKPOINT|CHECKPOINT]]

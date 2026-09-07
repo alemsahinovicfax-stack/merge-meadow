@@ -7,13 +7,14 @@ povezano:
   - ideje-camp-cliff
   - ideje-camp-pitanja
   - plan-prompts-camp-cliff
-ai_sažetak: "CAMP-02 pitanje C21 — GardenCliff uvijek hidden + prazan; override C7 za taj slot."
+ai_sažetak: "CAMP-02 pitanje C21 — GardenCliff hidden + prazan; kod ide u CAMP-03 C22 (CAMP2-A superseded)."
 ---
 
 # IDEJE — CAMP-02 pitanja (C21)
 
 > [[ideje-camp-cliff|hub]]. Freeze **2026-09-01**.  
-> CAMP-01 **C1–C20** ostaju osim **C7 za GardenCliff slot**. C2/C20 (nema journal / T2 stringova) i dalje vrijede — prazan label ih automatski zadovoljava.
+> **Kod:** C21 implementira [[ideje-camp-link-pitanja|C22]] u CAMP3-A. Ne pasteati CAMP2-A.  
+> CAMP-01 **C1–C20** ostaju osim **C7 za GardenCliff slot**. C2/C20 (nema journal / T2 stringova) i dalje vrijede — prazan label ih automatski zadovoljava. CAMP-03 **C23** dodatno sklanja BagLabel.
 
 C1 (toast), C3 (CrystalCliff hidden), C4–C6 (naslovi / RunPrep), C8–C14 (Flowers spend), C15–C20 (companion, milestone, arena/home ruke dalje) **ne dirati**.
 
@@ -44,4 +45,4 @@ Agent **ne** mora pitati. Preporuka: ostavi node u tscn (kao StatusToast / Cryst
 
 ## Povezano
 
-- [[ideje-camp-pitanja|C1–C20]] · [[../06-production/plan-prompts-camp-cliff|prompti]]
+- [[ideje-camp-pitanja|C1–C20]] · [[ideje-camp-link-pitanja|C22–C34]] · [[../06-production/plan-prompts-camp-cliff|prompti]]

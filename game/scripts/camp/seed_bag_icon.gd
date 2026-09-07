@@ -9,7 +9,7 @@ var type_id: String = "clover"
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	custom_minimum_size = Vector2(48, 48)
+	custom_minimum_size = Vector2(80, 80)
 	resized.connect(queue_redraw)
 
 

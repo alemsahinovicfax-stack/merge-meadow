@@ -1,7 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://c8campscene01"]
+[gd_scene load_steps=13 format=3 uid="uid://c8campscene01"]
 
 [ext_resource type="Script" path="res://scripts/camp/camp_controller.gd" id="1_camp"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
+[ext_resource type="Script" path="res://scripts/camp/season_link_card.gd" id="3_slink"]
+[ext_resource type="Script" path="res://scripts/ui/season_unlock_progress.gd" id="4_progress"]
+[ext_resource type="Script" path="res://scripts/ui/home_basket_picker_icon.gd" id="5_flower"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top"]
 bg_color = Color(0.12, 0.2, 0.14, 0.92)
@@ -170,11 +173,12 @@ button_variant = "subtle"
 
 [node name="CampTitle" type="Label" parent="RootVBox/TopStrip/VBox/TopBar"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.92, 0.55, 1)
 theme_override_font_sizes/font_size = 34
-text = "Pip's Garden"
+text = ""
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -281,11 +285,12 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
-vertical_scroll_mode = 2
+vertical_scroll_mode = 0
 
 [node name="ContentMargin" type="MarginContainer" parent="RootVBox/MainScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_top = 8
@@ -294,7 +299,8 @@ theme_override_constants/margin_bottom = 8
 [node name="Content" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+size_flags_vertical = 3
+theme_override_constants/separation = 8
 
 [node name="StatusToast" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
 unique_name_in_owner = true
@@ -313,12 +319,16 @@ horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="GardenCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
+unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
 [node name="GardenVBox" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard"]
 layout_mode = 2
-theme_override_constants/separation = 8
+size_flags_vertical = 3
+theme_override_constants/separation = 6
 
 [node name="GardenTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
 unique_name_in_owner = true
@@ -329,14 +339,16 @@ horizontal_alignment = 1
 
 [node name="GardenCliff" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "Run → collect seeds → Merge here."
+text = ""
 horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="BagLabel" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Seeds: 0 / 40"
@@ -344,7 +356,7 @@ horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="SeedBagScroll" type="ScrollContainer" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
-custom_minimum_size = Vector2(0, 220)
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
@@ -367,12 +379,16 @@ font_size = 18
 label_autowrap = true
 
 [node name="CrystalCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
+unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
 [node name="CrystalVBox" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard"]
 layout_mode = 2
-theme_override_constants/separation = 8
+size_flags_vertical = 3
+theme_override_constants/separation = 6
 
 [node name="CrystalTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
 unique_name_in_owner = true
@@ -392,6 +408,7 @@ autowrap_mode = 2
 
 [node name="CrystalTotalLabel" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Flowers: 0"
@@ -399,7 +416,7 @@ horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="CrystalScroll" type="ScrollContainer" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
-custom_minimum_size = Vector2(0, 220)
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
@@ -422,7 +439,143 @@ font_size = 18
 label_autowrap = true
 button_variant = "accent"
 
+[node name="SeasonLinkCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.0
+mouse_filter = 0
+script = ExtResource("3_slink")
+
+[node name="SeasonLinkVBox" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="SeasonLinkTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 36
+text = "Frost Orchard"
+horizontal_alignment = 1
+
+[node name="SeasonLinkInset" type="MarginContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox"]
+layout_mode = 2
+mouse_filter = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_right = 0
+
+[node name="SeasonLinkInner" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="SeasonUnlockProgress" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+alignment = 1
+script = ExtResource("4_progress")
+
+[node name="SeasonLinkCoinIcon" type="TextureRect" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SeasonLinkCoins" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+text = "0 / 500"
+horizontal_alignment = 1
+
+[node name="SeasonLinkCoinsBar" type="ProgressBar" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+mouse_filter = 2
+max_value = 500.0
+value = 0.0
+show_percentage = false
+
+[node name="SectionDivider" type="Control" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 3
+
+[node name="Line" type="ColorRect" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress/SectionDivider"]
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.1, 0.35)
+
+[node name="SeasonLinkFlower" type="Control" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+custom_minimum_size = Vector2(92, 92)
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 4
+script = ExtResource("5_flower")
+
+[node name="SeasonLinkStars" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "★★★"
+horizontal_alignment = 1
+
+[node name="SeasonLinkFlowerName" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "Harvest Pumpkin"
+horizontal_alignment = 1
+
+[node name="SeasonLinkT3" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+text = "0 / 20"
+horizontal_alignment = 1
+
+[node name="SeasonLinkT3Bar" type="ProgressBar" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+mouse_filter = 2
+max_value = 20.0
+value = 0.0
+show_percentage = false
+
+[node name="SeasonLinkSpacer" type="Control" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner"]
+layout_mode = 2
+mouse_filter = 2
+size_flags_vertical = 3
+
+[node name="SeasonLinkUnlock" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+mouse_filter = 0
+script = ExtResource("2_uibtn")
+label_text = "Unlock"
+font_size = 32
+button_variant = "gold"
+
 [node name="UpgradeCards" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_constants/separation = 8
 

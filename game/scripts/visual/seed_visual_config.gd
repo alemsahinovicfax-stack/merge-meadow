@@ -43,12 +43,6 @@ const PALETTES: Dictionary = {
 		"seed": Color(0.88, 0.55, 0.15, 1.0),
 		"crystal": Color(0.92, 0.48, 0.05, 1.0),
 	},
-	"watermelon": {
-		"petal": Color(0.35, 0.72, 0.38, 1.0),
-		"center": Color(0.88, 0.22, 0.28, 1.0),
-		"seed": Color(0.42, 0.68, 0.35, 1.0),
-		"crystal": Color(0.28, 0.82, 0.42, 1.0),
-	},
 }
 
 
@@ -104,9 +98,5 @@ static func draw_run_seed(canvas: CanvasItem, type_id: String) -> void:
 			canvas.draw_circle(Vector2(0, 2), 16.0, pal.petal)
 			canvas.draw_line(Vector2(0, -14), Vector2(0, -6), STEM, 3.0)
 			canvas.draw_circle(Vector2(0, -16), 4.0, LEAF)
-		"watermelon":
-			canvas.draw_circle(Vector2.ZERO, 18.0, pal.petal)
-			canvas.draw_line(Vector2(-14, 0), Vector2(14, 0), Color(0.15, 0.38, 0.18), 3.0)
-			canvas.draw_arc(Vector2.ZERO, 10.0, 0.0, PI, 12, pal.center, 8.0)
 		_:
 			canvas.draw_circle(Vector2.ZERO, 8.0, pal.center)

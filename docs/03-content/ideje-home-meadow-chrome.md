@@ -22,7 +22,7 @@ ai_sažetak: "HOME-13 hub — Basket i Endless samo u polju; full-bleed tint; Pi
 
 > **ID:** **HOME-13** · v1.1+ (nije v1 launch blocker).  
 > **Kod:** **CHROME-P0 ✅ A ✅ B ✅ C ✅ D ✅ E ✅**. Playlist zatvoren ([[../06-production/plan-prompts-home-meadow-chrome|prompti]]). Grupe: [[ideje-home-meadow-chrome-grupe|grupe]].  
-> **Sljedeće:** [[ideje-home-meadow-life|HOME-14]] meadow life.  
+> **Sljedeće:** [[ideje-home-meadow-life|HOME-14]] ✅ · [[ideje-home-meadow-dock|HOME-15]] dock.  
 > **Prethodnik:** [[ideje-home-meadow|HOME-12]] MEADOW-A ✅ B ✅ C ✅ — jedan `SeasonField` + `apply_season` ostaje.  
 > **Pillar:** [[../01-vision/design-pillars|Fair F2P]] — paid/sezona = **tema**, ne snaga; basket filter ne daje jači run.
 

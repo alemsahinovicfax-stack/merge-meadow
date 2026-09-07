@@ -145,7 +145,7 @@ anchors_preset = 0
 offset_left = 24.0
 offset_top = 24.0
 offset_right = 360.0
-offset_bottom = 248.0
+offset_bottom = 360.0
 theme_override_constants/separation = 8
 
 [node name="DailyChestCard" type="PanelContainer" parent="HomeTopStack"]
@@ -213,7 +213,51 @@ theme_override_font_sizes/font_size = 18
 text = "Tap to open"
 autowrap_mode = 2
 
+[node name="BasketCard" type="PanelContainer" parent="HomeTopStack"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(336, 104)
+layout_mode = 2
+mouse_filter = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_basket")
+
+[node name="BasketHBox" type="HBoxContainer" parent="HomeTopStack/BasketCard"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="BasketVisual" type="Control" parent="HomeTopStack/BasketCard/BasketHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("4_basket_vis")
+
+[node name="BasketVBox" type="VBoxContainer" parent="HomeTopStack/BasketCard/BasketHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="BasketTitle" type="Label" parent="HomeTopStack/BasketCard/BasketHBox/BasketVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.28, 0.18, 1)
+theme_override_font_sizes/font_size = 26
+text = "Basket"
+autowrap_mode = 2
+
+[node name="BasketCaption" type="Label" parent="HomeTopStack/BasketCard/BasketHBox/BasketVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.38, 0.28, 1)
+theme_override_font_sizes/font_size = 18
+text = "Tap to choose"
+autowrap_mode = 2
+
 [node name="SettingsButton" type="PanelContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -226,6 +270,63 @@ grow_horizontal = 0
 script = ExtResource("3_uibtn")
 label_text = ""
 button_icon = "settings"
+button_variant = "subtle"
+
+[node name="FieldUpgradeStack" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 96.0
+offset_right = -24.0
+offset_bottom = 256.0
+grow_horizontal = 0
+mouse_filter = 0
+theme_override_constants/separation = 8
+
+[node name="MagnetRow" type="VBoxContainer" parent="FieldUpgradeStack"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="MagnetTitle" type="Label" parent="FieldUpgradeStack/MagnetRow"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 0
+theme_override_font_sizes/font_size = 16
+text = "Magnet"
+horizontal_alignment = 2
+
+[node name="MagnetButton" type="PanelContainer" parent="FieldUpgradeStack/MagnetRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "Upgrade"
+font_size = 18
+button_variant = "subtle"
+
+[node name="LootBoostRow" type="VBoxContainer" parent="FieldUpgradeStack"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="LootBoostTitle" type="Label" parent="FieldUpgradeStack/LootBoostRow"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 0
+theme_override_font_sizes/font_size = 16
+text = "Loot Boost"
+horizontal_alignment = 2
+
+[node name="LootBoostButton" type="PanelContainer" parent="FieldUpgradeStack/LootBoostRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "Upgrade"
+font_size = 18
 button_variant = "subtle"
 
 [node name="SeasonNameChip" type="PanelContainer" parent="."]
@@ -241,7 +342,7 @@ offset_top = 28.0
 offset_right = 140.0
 offset_bottom = 76.0
 grow_horizontal = 2
-mouse_filter = 0
+mouse_filter = 2
 script = ExtResource("3_uibtn")
 label_text = ""
 font_size = 22
@@ -254,7 +355,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 48.0
-offset_top = 268.0
+offset_top = 380.0
 offset_right = -48.0
 offset_bottom = -24.0
 grow_horizontal = 2
@@ -300,49 +401,16 @@ layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="BasketCard" type="PanelContainer" parent="HomeColumn/PlayRow"]
+[node name="SeasonsRowButton" type="PanelContainer" parent="HomeColumn/PlayRow"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(320, 96)
 layout_mode = 2
 size_flags_horizontal = 4
-mouse_filter = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_basket")
-
-[node name="BasketHBox" type="HBoxContainer" parent="HomeColumn/PlayRow/BasketCard"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 14
-
-[node name="BasketVisual" type="Control" parent="HomeColumn/PlayRow/BasketCard/BasketHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(72, 72)
-layout_mode = 2
-mouse_filter = 2
-script = ExtResource("4_basket_vis")
-
-[node name="BasketVBox" type="VBoxContainer" parent="HomeColumn/PlayRow/BasketCard/BasketHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_constants/separation = 4
-alignment = 1
-
-[node name="BasketTitle" type="Label" parent="HomeColumn/PlayRow/BasketCard/BasketHBox/BasketVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 0.28, 0.18, 1)
-theme_override_font_sizes/font_size = 26
-text = "Basket"
-autowrap_mode = 2
-
-[node name="BasketCaption" type="Label" parent="HomeColumn/PlayRow/BasketCard/BasketHBox/BasketVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.38, 0.28, 1)
-theme_override_font_sizes/font_size = 18
-text = "Tap to choose"
-autowrap_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "Seasons"
+font_size = 28
+button_variant = "subtle"
 
 [node name="PlayButton" type="PanelContainer" parent="HomeColumn/PlayRow"]
 unique_name_in_owner = true
@@ -469,6 +537,7 @@ mouse_filter = 0
 color = Color(0.05, 0.07, 0.06, 0.58)
 
 [node name="PickerPanel" type="PanelContainer" parent="BasketPickerOverlay"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -494,19 +563,27 @@ theme_override_font_sizes/font_size = 28
 text = "Choose basket seed"
 horizontal_alignment = 1
 
-[node name="PickerScroll" type="ScrollContainer" parent="BasketPickerOverlay/PickerPanel/PickerVBox"]
-custom_minimum_size = Vector2(0, 480)
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="PickerList" type="VBoxContainer" parent="BasketPickerOverlay/PickerPanel/PickerVBox/PickerScroll"]
+[node name="PickerList" type="VBoxContainer" parent="BasketPickerOverlay/PickerPanel/PickerVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="PickerCloseButton" type="PanelContainer" parent="BasketPickerOverlay/PickerPanel/PickerVBox"]
+[node name="PickerFooter" type="VBoxContainer" parent="BasketPickerOverlay/PickerPanel/PickerVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PickerClearButton" type="PanelContainer" parent="BasketPickerOverlay/PickerPanel/PickerVBox/PickerFooter"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "Clear basket"
+font_size = 22
+button_variant = "subtle"
+
+[node name="PickerCloseButton" type="PanelContainer" parent="BasketPickerOverlay/PickerPanel/PickerVBox/PickerFooter"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2

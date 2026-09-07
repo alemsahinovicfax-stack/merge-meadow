@@ -42,20 +42,19 @@ func _run() -> void:
 		return
 	var first_chip: Node = grid.get_child(0)
 	var first_id := str(first_chip.call("get_type_id")) if first_chip.has_method("get_type_id") else ""
-	if first_id != "clover" and first_id != "daisy":
-		# Both ★1; either OK as first among rarity-1 (name order: Buttercup… Clover… Daisy).
-		# With only clover+daisy among ★1, clover comes before daisy alphabetically.
-		push_error("camp_trade_select_smoke: ASC expected ★1 first got %s" % first_id)
+	if first_id != "daisy":
+		push_error("camp_trade_select_smoke: ASC expected Field Daisy first got %s" % first_id)
 		quit(1)
 		return
-	if first_id != "clover":
-		push_error("camp_trade_select_smoke: expected clover before daisy got %s" % first_id)
+	var chip_err := _assert_chip_stack(first_chip as Control, "seed")
+	if not chip_err.is_empty():
+		push_error("camp_trade_select_smoke: %s" % chip_err)
 		quit(1)
 		return
 
 	var selected := str(camp.get("_selected_trade_type"))
-	if selected != "clover":
-		push_error("camp_trade_select_smoke: default select should be clover got %s" % selected)
+	if selected != "daisy":
+		push_error("camp_trade_select_smoke: default select should be daisy got %s" % selected)
 		quit(1)
 		return
 
@@ -94,11 +93,11 @@ func _run() -> void:
 		)
 		quit(1)
 		return
-	# After daisy depletes, next in ASC order is tulip.
+	# After daisy depletes, next in ASC order is clover (Meadow Clover).
 	selected = str(camp.get("_selected_trade_type"))
-	if selected != "tulip":
+	if selected != "clover":
 		push_error(
-			"camp_trade_select_smoke: after daisy deplete expected tulip got %s" % selected
+			"camp_trade_select_smoke: after daisy deplete expected clover got %s" % selected
 		)
 		quit(1)
 		return
@@ -181,3 +180,34 @@ func _run() -> void:
 
 	print("camp_trade_select_smoke OK")
 	quit(0)
+
+
+func _assert_chip_stack(chip: Control, kind: String) -> String:
+	if chip == null:
+		return "%s chip missing" % kind
+	var min_h := chip.custom_minimum_size.y
+	if min_h < 90.0 or min_h > 120.0:
+		return "%s chip min_h %s" % [kind, str(min_h)]
+	var icon := chip.find_child("PlantIcon", true, false) as Control
+	if icon == null or icon.custom_minimum_size.x < 76.0:
+		return "%s icon too small" % kind
+	var name_lab := chip.find_child("NameLabel", true, false) as Label
+	if name_lab == null:
+		return "%s NameLabel missing" % kind
+	if name_lab.text.find("★") >= 0:
+		return "%s name must not include stars, got '%s'" % [kind, name_lab.text]
+	var want_stars := clampi(int(chip.get("_rarity")), 0, 3)
+	var stars := chip.find_child("StarsRow", true, false) as HBoxContainer
+	if stars == null or stars.get_child_count() != want_stars:
+		return "%s StarsRow must have %d filled stars" % [kind, want_stars]
+	var count_lab := chip.find_child("CountLabel", true, false) as Control
+	var pill := chip.find_child("PricePill", true, false) as Control
+	if count_lab == null or pill == null:
+		return "%s count/pill missing" % kind
+	if name_lab.global_position.x <= icon.global_position.x:
+		return "%s name must sit right of icon" % kind
+	if count_lab.global_position.x <= icon.global_position.x:
+		return "%s count must sit right of icon" % kind
+	if pill.global_position.x <= count_lab.global_position.x:
+		return "%s pill must sit right of count" % kind
+	return ""

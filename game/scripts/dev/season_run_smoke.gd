@@ -33,12 +33,15 @@ func _run() -> void:
 	gs.set("garden_crystal_stash", {"clover": 5})
 
 	var s1_pool: Array = gs.call("get_active_season_spawn_types")
-	if not s1_pool.has("clover") or not s1_pool.has("watermelon"):
-		_fail("S1 pool should include clover and watermelon")
+	if not s1_pool.has("clover") or not s1_pool.has("pumpkin"):
+		_fail("S1 pool should include clover and pumpkin")
+		return
+	if s1_pool.has("watermelon"):
+		_fail("S1 pool must not include watermelon")
 		return
 
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("garden_crystal_stash", {"pumpkin": 20})
 	if not bool(gs.call("unlock_free", "frost_orchard")):
 		_fail("could not unlock frost_orchard")
 		return
@@ -46,18 +49,18 @@ func _run() -> void:
 	if not frost_pool.has("frost_snowdrop"):
 		_fail("frost pool missing frost_snowdrop")
 		return
-	if frost_pool.has("clover") or frost_pool.has("watermelon"):
-		_fail("frost pool should not include clover/watermelon")
+	if frost_pool.has("clover") or frost_pool.has("watermelon") or frost_pool.has("pumpkin"):
+		_fail("frost pool should not include clover/watermelon/pumpkin")
 		return
 	if frost_pool.size() == 3 and frost_pool.has("daisy") and frost_pool.has("buttercup"):
 		_fail("frost pool still Bloom clover-daisy-buttercup")
 		return
 
-	gs.set("loadout_type_id", "watermelon")
+	gs.set("loadout_type_id", "pumpkin")
 	for _i in 40:
 		var picked := str(gs.call("pick_random_run_seed_type"))
-		if picked == "watermelon":
-			_fail("frost+watermelon loadout spawned watermelon")
+		if picked == "watermelon" or picked == "pumpkin":
+			_fail("frost+pumpkin loadout spawned Bloom type %s" % picked)
 			return
 		if not frost_pool.has(picked):
 			_fail("pick outside frost pool: %s" % picked)
@@ -78,7 +81,7 @@ func _run() -> void:
 		return
 	var m1: Color = bg.get("modulate")
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("garden_crystal_stash", {"pumpkin": 20})
 	if not bool(gs.call("unlock_free", "frost_orchard")):
 		_fail("frost unlock before tint compare failed")
 		return

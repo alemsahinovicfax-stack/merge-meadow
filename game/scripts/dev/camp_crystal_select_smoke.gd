@@ -1,6 +1,6 @@
 extends SceneTree
 
-## Bug-012 — select crystal type then exchange 1 → coins; select persists while count >= 1.
+## CAMP3-B — default ASC select, persist, next-type after deplete, rarity bg.
 
 
 func _initialize() -> void:
@@ -48,8 +48,9 @@ func _run() -> void:
 		push_error("camp_crystal_select_smoke: SeedBagGrid not under SeedBagScroll")
 		quit(1)
 		return
-	gs.set("garden_crystal_stash", {"clover": 2, "daisy": 1})
+	gs.set("garden_crystal_stash", {"clover": 2, "daisy": 1, "pumpkin": 1})
 	gs.set("wallet_coins", 10)
+	camp.set("_force_default_crystal_select", true)
 	if camp.has_method("_refresh_crystal_card"):
 		camp.call("_refresh_crystal_card")
 	elif camp.has_method("_refresh_ui"):
@@ -57,8 +58,19 @@ func _run() -> void:
 	for _j in 4:
 		await process_frame
 	var grid := camp.get_node_or_null("%CrystalGrid") as GridContainer
-	if grid == null or grid.get_child_count() < 2:
+	if grid == null or grid.get_child_count() < 3:
 		push_error("camp_crystal_select_smoke: CrystalGrid missing chips")
+		quit(1)
+		return
+	var first_chip: Node = grid.get_child(0)
+	var first_id := str(first_chip.call("get_type_id")) if first_chip.has_method("get_type_id") else ""
+	if first_id != "daisy":
+		push_error("camp_crystal_select_smoke: ASC expected Field Daisy first got %s" % first_id)
+		quit(1)
+		return
+	var chip_err := _assert_chip_stack(first_chip as Control, "flower")
+	if not chip_err.is_empty():
+		push_error("camp_crystal_select_smoke: %s" % chip_err)
 		quit(1)
 		return
 	var exchange := camp.get_node_or_null("%CrystalExchangeButton")
@@ -66,20 +78,38 @@ func _run() -> void:
 		push_error("camp_crystal_select_smoke: CrystalExchangeButton missing")
 		quit(1)
 		return
-	if not bool(exchange.get("disabled")):
-		push_error("camp_crystal_select_smoke: Exchange should start disabled")
-		quit(1)
-		return
-	if camp.has_method("_on_crystal_chip_pressed"):
-		camp.call("_on_crystal_chip_pressed", "clover")
-	await process_frame
 	var selected := str(camp.get("_selected_crystal_type"))
-	if selected != "clover":
-		push_error("camp_crystal_select_smoke: expected clover selected got %s" % selected)
+	if selected != "daisy":
+		push_error("camp_crystal_select_smoke: default select should be daisy got %s" % selected)
 		quit(1)
 		return
 	if bool(exchange.get("disabled")):
-		push_error("camp_crystal_select_smoke: Exchange should be enabled")
+		push_error("camp_crystal_select_smoke: Exchange should be enabled after default select")
+		quit(1)
+		return
+	var daisy_chip := _chip_by_type(grid, "daisy")
+	var pumpkin_chip := _chip_by_type(grid, "pumpkin")
+	var daisy_bg := _chip_bg(daisy_chip)
+	var pumpkin_bg := _chip_bg(pumpkin_chip)
+	if daisy_bg.is_equal_approx(pumpkin_bg):
+		push_error("camp_crystal_select_smoke: star-1 daisy bg should differ from star-3 pumpkin")
+		quit(1)
+		return
+	gs.set("garden_crystal_stash", {"clover": 2, "daisy": 1})
+	camp.set("_force_default_crystal_select", true)
+	camp.call("_refresh_crystal_card")
+	for _j2 in 4:
+		await process_frame
+	if camp.has_method("_on_crystal_chip_pressed"):
+		camp.call("_on_crystal_chip_pressed", "clover")
+	await process_frame
+	selected = str(camp.get("_selected_crystal_type"))
+	if selected != "clover":
+		push_error("camp_crystal_select_smoke: tap clover should select got %s" % selected)
+		quit(1)
+		return
+	if bool(exchange.get("disabled")):
+		push_error("camp_crystal_select_smoke: Exchange should be enabled for clover")
 		quit(1)
 		return
 	if camp.has_method("_on_crystal_exchange_pressed"):
@@ -124,13 +154,66 @@ func _run() -> void:
 		quit(1)
 		return
 	selected = str(camp.get("_selected_crystal_type"))
-	if not selected.is_empty():
-		push_error("camp_crystal_select_smoke: select should clear when clover gone got %s" % selected)
+	if selected != "daisy":
+		push_error("camp_crystal_select_smoke: after clover deplete expected daisy got %s" % selected)
 		quit(1)
 		return
-	if not bool(exchange.get("disabled")):
-		push_error("camp_crystal_select_smoke: Exchange should be disabled when select cleared")
+	if bool(exchange.get("disabled")):
+		push_error("camp_crystal_select_smoke: leftover daisy should keep Exchange enabled")
+		quit(1)
+		return
+	if int(stash.get("daisy", 0)) != 1:
+		push_error("camp_crystal_select_smoke: daisy leftover expected 1 got %s" % str(stash.get("daisy")))
 		quit(1)
 		return
 	print("camp_crystal_select_smoke OK")
 	quit(0)
+
+
+func _chip_by_type(grid: GridContainer, type_id: String) -> Node:
+	if grid == null:
+		return null
+	for child in grid.get_children():
+		if child.has_method("get_type_id") and str(child.call("get_type_id")) == type_id:
+			return child
+	return null
+
+
+func _chip_bg(chip: Node) -> Color:
+	if chip == null or not (chip is Control):
+		return Color.BLACK
+	var sb := (chip as Control).get_theme_stylebox("panel")
+	if sb is StyleBoxFlat:
+		return (sb as StyleBoxFlat).bg_color
+	return Color.BLACK
+
+
+func _assert_chip_stack(chip: Control, kind: String) -> String:
+	if chip == null:
+		return "%s chip missing" % kind
+	var min_h := chip.custom_minimum_size.y
+	if min_h < 90.0 or min_h > 120.0:
+		return "%s chip min_h %s" % [kind, str(min_h)]
+	var icon := chip.find_child("PlantIcon", true, false) as Control
+	if icon == null or icon.custom_minimum_size.x < 76.0:
+		return "%s icon too small" % kind
+	var name_lab := chip.find_child("NameLabel", true, false) as Label
+	if name_lab == null:
+		return "%s NameLabel missing" % kind
+	if name_lab.text.find("★") >= 0:
+		return "%s name must not include stars, got '%s'" % [kind, name_lab.text]
+	var want_stars := clampi(int(chip.get("_rarity")), 0, 3)
+	var stars := chip.find_child("StarsRow", true, false) as HBoxContainer
+	if stars == null or stars.get_child_count() != want_stars:
+		return "%s StarsRow must have %d filled stars" % [kind, want_stars]
+	var count_lab := chip.find_child("CountLabel", true, false) as Control
+	var pill := chip.find_child("PricePill", true, false) as Control
+	if count_lab == null or pill == null:
+		return "%s count/pill missing" % kind
+	if name_lab.global_position.x <= icon.global_position.x:
+		return "%s name must sit right of icon" % kind
+	if count_lab.global_position.x <= icon.global_position.x:
+		return "%s count must sit right of icon" % kind
+	if pill.global_position.x <= count_lab.global_position.x:
+		return "%s pill must sit right of count" % kind
+	return ""

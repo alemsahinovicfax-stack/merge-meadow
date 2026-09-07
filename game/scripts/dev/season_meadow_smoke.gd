@@ -1,6 +1,6 @@
 extends SceneTree
 
-## HOME-12 MEADOW-A/B + HOME-13 A–E + HOME-14 LIFE-A/B/C/D — SeasonField; Play 3-koraka; equal PlayRow; chrome-safe flowers; Pip FSM.
+## HOME-12–15 meadow — SeasonField; Play 3-koraka; equal PlayRow; chrome-safe flowers; Pip FSM; T3 match.
 
 
 const SAVE_PATH := "user://player_save.json"
@@ -69,6 +69,47 @@ func _picker_labels(home: Node) -> PackedStringArray:
 	return out
 
 
+func _find_picker_icon(n: Node) -> Control:
+	if n.name == "PlantIcon":
+		return n as Control
+	for child in n.get_children():
+		var found := _find_picker_icon(child)
+		if found:
+			return found
+	return null
+
+
+func _has_scroll_clip_ancestor(n: Node) -> bool:
+	var walk := n.get_parent()
+	while walk:
+		if walk is ScrollContainer:
+			return true
+		walk = walk.get_parent()
+	return false
+
+
+func _assert_picker_fits_panel(home: Node) -> String:
+	var list: Node = home.get_node_or_null("%PickerList")
+	var panel := home.get_node_or_null("%PickerPanel") as Control
+	if list == null:
+		return "PickerList missing"
+	if panel == null:
+		return "PickerPanel missing"
+	if _has_scroll_clip_ancestor(list):
+		return "PickerList must not sit under a ScrollContainer"
+	var outer := panel.get_global_rect().grow(1.0)
+	for child in list.get_children():
+		var row := child as Control
+		if row == null:
+			continue
+		if not outer.encloses(row.get_global_rect()):
+			return "flower row not inside PickerPanel: %s" % str(row.get("label_text"))
+		var icon := _find_picker_icon(row)
+		if icon != null and not outer.encloses(icon.get_global_rect()):
+			return "T3 icon not inside PickerPanel: %s" % str(row.get("label_text"))
+	return ""
+
+
 func _assert_pip_alive(field: Node, pip: Control, label: String) -> String:
 	if pip == null:
 		return "%s MeadowPip missing" % label
@@ -87,19 +128,19 @@ func _assert_pip_alive(field: Node, pip: Control, label: String) -> String:
 
 
 func _assert_play_row_equal(home: Node) -> String:
-	var basket_n: Control = home.get_node_or_null("%BasketCard") as Control
+	var seasons_n: Control = home.get_node_or_null("%SeasonsRowButton") as Control
 	var play_n: Control = home.get_node_or_null("%PlayButton") as Control
 	var endless_n: Control = home.get_node_or_null("%EndlessPlayButton") as Control
-	if basket_n == null or play_n == null or endless_n == null:
+	if seasons_n == null or play_n == null or endless_n == null:
 		return "PlayRow children missing"
 	var ms: Vector2 = play_n.custom_minimum_size
-	if basket_n.custom_minimum_size != ms or endless_n.custom_minimum_size != ms:
-		return "PlayRow min sizes differ play=%s basket=%s endless=%s" % [
-			str(ms), str(basket_n.custom_minimum_size), str(endless_n.custom_minimum_size)
+	if seasons_n.custom_minimum_size != ms or endless_n.custom_minimum_size != ms:
+		return "PlayRow min sizes differ play=%s seasons=%s endless=%s" % [
+			str(ms), str(seasons_n.custom_minimum_size), str(endless_n.custom_minimum_size)
 		]
-	if not is_equal_approx(basket_n.size.y, play_n.size.y) or not is_equal_approx(endless_n.size.y, play_n.size.y):
-		return "PlayRow heights differ play=%.0f basket=%.0f endless=%.0f" % [
-			play_n.size.y, basket_n.size.y, endless_n.size.y
+	if not is_equal_approx(seasons_n.size.y, play_n.size.y) or not is_equal_approx(endless_n.size.y, play_n.size.y):
+		return "PlayRow heights differ play=%.0f seasons=%.0f endless=%.0f" % [
+			play_n.size.y, seasons_n.size.y, endless_n.size.y
 		]
 	return ""
 
@@ -117,6 +158,8 @@ func _assert_flowers(field: Node, pool: Array, label: String) -> String:
 		var type_id := str(flower.get("type_id"))
 		if not pool_set.has(type_id):
 			return "%s flower type %s not in pool" % [label, type_id]
+		if int(flower.get("plant_tier")) != 3:
+			return "%s flower plant_tier expected 3 got %s" % [label, str(flower.get("plant_tier"))]
 	if _has_arena_chip(field):
 		return "%s must not instance ArenaSeedChip" % label
 	return ""
@@ -127,18 +170,20 @@ func _assert_flowers_clear_chrome(home: Node, field: Node, label: String) -> Str
 		return "%s chrome check missing nodes" % label
 	var chrome: Array[Control] = []
 	var daily: Control = home.get_node_or_null("%DailyChestCard") as Control
+	var basket_chrome: Control = home.get_node_or_null("%BasketCard") as Control
 	var chip: Control = home.get_node_or_null("%SeasonNameChip") as Control
 	var play_row: Control = home.get_node_or_null("%PlayRow") as Control
 	var settings: Control = home.get_node_or_null("%SettingsButton") as Control
 	if settings == null:
 		settings = home.get_node_or_null("SettingsButton") as Control
-	for node in [daily, settings, chip, play_row]:
+	var upgrades: Control = home.get_node_or_null("%FieldUpgradeStack") as Control
+	for node in [daily, basket_chrome, settings, chip, play_row, upgrades]:
 		var control: Control = node as Control
 		if control == null or not control.visible:
 			continue
 		chrome.append(control)
 	if chrome.is_empty():
-		return "%s expected Daily/Settings/chip/PlayRow for chrome check" % label
+		return "%s expected Daily/Basket/Settings/chip/PlayRow for chrome check" % label
 	var margin := 12.0
 	for flower in _field_flowers(field):
 		var fr: Rect2 = (flower as Control).get_global_rect()
@@ -146,6 +191,80 @@ func _assert_flowers_clear_chrome(home: Node, field: Node, label: String) -> Str
 			var cr: Rect2 = blocker.get_global_rect().grow(margin)
 			if fr.intersects(cr):
 				return "%s flower intersects %s" % [label, blocker.name]
+	return ""
+
+
+func _assert_field_upgrades_open(home: Node, label: String) -> String:
+	if home == null:
+		return "%s field upgrades missing home" % label
+	var settings: Control = home.get_node_or_null("%SettingsButton") as Control
+	if settings == null:
+		settings = home.get_node_or_null("SettingsButton") as Control
+	var stack: Control = home.get_node_or_null("%FieldUpgradeStack") as Control
+	var magnet: Control = home.get_node_or_null("%MagnetButton") as Control
+	var loot: Control = home.get_node_or_null("%LootBoostButton") as Control
+	var magnet_title: Label = home.get_node_or_null("%MagnetTitle") as Label
+	var loot_title: Label = home.get_node_or_null("%LootBoostTitle") as Label
+	if stack == null or not stack.visible:
+		return "%s FieldUpgradeStack should be visible" % label
+	if magnet == null or not magnet.is_visible_in_tree():
+		return "%s MagnetButton should be visible" % label
+	if loot == null or not loot.is_visible_in_tree():
+		return "%s LootBoostButton should be visible" % label
+	if settings and magnet.global_position.y + 0.5 < settings.get_global_rect().end.y:
+		return "%s Magnet should sit below Settings" % label
+	if loot.global_position.y <= magnet.global_position.y:
+		return "%s Loot Boost should sit below Magnet" % label
+	var mag_t := magnet_title.text if magnet_title else ""
+	var loot_t := loot_title.text if loot_title else ""
+	if mag_t.find("Magnet") < 0:
+		return "%s title should contain Magnet got '%s'" % [label, mag_t]
+	if loot_t.find("Loot Boost") < 0:
+		return "%s title should contain Loot Boost got '%s'" % [label, loot_t]
+	var blob := "%s %s %s %s" % [
+		mag_t,
+		loot_t,
+		str(magnet.get("label_text")),
+		str(loot.get("label_text")),
+	]
+	if blob.find("Sprinkler") >= 0:
+		return "%s upgrade chrome must not say Sprinkler" % label
+	for bad in ["px", "×", "x1", "x2"]:
+		if blob.find(bad) >= 0:
+			return "%s upgrade chrome must not contain %s" % [label, bad]
+	return ""
+
+
+func _assert_field_upgrades_hidden(home: Node, label: String) -> String:
+	if home == null:
+		return "%s field upgrades missing home" % label
+	var stack: Control = home.get_node_or_null("%FieldUpgradeStack") as Control
+	if stack == null:
+		return "%s FieldUpgradeStack missing" % label
+	if stack.visible:
+		return "%s FieldUpgradeStack should be hidden" % label
+	return ""
+
+
+func _assert_open_field_hub_swipe(home: Node, swipe: Node, field: Control) -> String:
+	if swipe == null or not swipe.has_method("should_block_hub_swipe_at"):
+		return "SwipePager missing should_block_hub_swipe_at"
+	var mid_ctrl := field
+	if mid_ctrl == null or not mid_ctrl.visible:
+		mid_ctrl = home.get_node_or_null("%SeasonStage") as Control
+	if mid_ctrl == null:
+		return "SeasonField/Stage missing for swipe check"
+	var mid: Vector2 = mid_ctrl.get_global_rect().get_center()
+	if bool(swipe.call("should_block_hub_swipe_at", mid)):
+		return "field mid should not block hub swipe"
+	var chrome: Control = home.get_node_or_null("%DailyChestCard") as Control
+	if chrome == null or not chrome.visible:
+		chrome = home.get_node_or_null("%PlayRow") as Control
+	if chrome == null:
+		return "Daily/PlayRow missing for swipe chrome check"
+	var chrome_mid: Vector2 = chrome.get_global_rect().get_center()
+	if not bool(swipe.call("should_block_hub_swipe_at", chrome_mid)):
+		return "Daily or PlayRow should block hub swipe"
 	return ""
 
 
@@ -220,18 +339,28 @@ func _run() -> void:
 		return
 	var basket: Control = home.get_node_or_null("%BasketCard") as Control
 	var play_row: Node = home.get_node_or_null("%PlayRow")
+	var stack := home.get_node_or_null("%HomeTopStack")
 	if basket == null:
 		_fail("BasketCard missing")
 		return
 	if basket.visible:
 		_fail("carousel BasketCard should be hidden")
 		return
-	if play_row == null or basket.get_parent() != play_row:
-		_fail("BasketCard parent should be PlayRow")
+	if stack == null or basket.get_parent() != stack:
+		_fail("BasketCard parent should be HomeTopStack")
 		return
-	var stack := home.get_node_or_null("%HomeTopStack")
-	if stack != null and basket.get_parent() == stack:
-		_fail("carousel BasketCard must not sit under HomeTopStack")
+	if play_row != null and basket.get_parent() == play_row:
+		_fail("carousel BasketCard must not sit under PlayRow")
+		return
+	var seasons_row: Control = home.get_node_or_null("%SeasonsRowButton") as Control
+	if seasons_row == null:
+		_fail("SeasonsRowButton missing")
+		return
+	if seasons_row.visible:
+		_fail("carousel SeasonsRowButton should be hidden")
+		return
+	if play_row != null and seasons_row.get_parent() != play_row:
+		_fail("SeasonsRowButton parent should be PlayRow")
 		return
 	var endless_btn: Control = home.get_node_or_null("%EndlessPlayButton") as Control
 	if endless_btn == null:
@@ -250,8 +379,8 @@ func _run() -> void:
 	if not is_equal_approx(play_btn_carousel.custom_minimum_size.y, 96.0):
 		_fail("carousel Play min height expected 96 got %s" % str(play_btn_carousel.custom_minimum_size))
 		return
-	if basket.custom_minimum_size != play_btn_carousel.custom_minimum_size:
-		_fail("carousel Basket min size should match Play")
+	if seasons_row.custom_minimum_size != play_btn_carousel.custom_minimum_size:
+		_fail("carousel Seasons min size should match Play")
 		return
 	if endless_btn.custom_minimum_size != play_btn_carousel.custom_minimum_size:
 		_fail("carousel Endless min size should match Play")
@@ -259,6 +388,10 @@ func _run() -> void:
 	var name_chip: Control = home.get_node_or_null("%SeasonNameChip") as Control
 	if name_chip and name_chip.visible:
 		_fail("carousel SeasonNameChip should be hidden")
+		return
+	var carousel_up_err := _assert_field_upgrades_hidden(home, "carousel")
+	if not carousel_up_err.is_empty():
+		_fail(carousel_up_err)
 		return
 
 	home.call("_on_play_pressed")
@@ -301,11 +434,56 @@ func _run() -> void:
 	if bloom_chip.find("Country Bloom") < 0:
 		_fail("Bloom chip expected Country Bloom got '%s'" % bloom_chip)
 		return
+	await process_frame
+	await process_frame
+	var bloom_up_err := _assert_field_upgrades_open(home, "Bloom open")
+	if not bloom_up_err.is_empty():
+		_fail(bloom_up_err)
+		return
+	var swipe_err := _assert_open_field_hub_swipe(home, swipe, field)
+	if not swipe_err.is_empty():
+		_fail("Bloom open: %s" % swipe_err)
+		return
+	if hub.has_method("go_to_page"):
+		hub.call("go_to_page", MetaHubPages.CAMP, false)
+	for _camp_i in 12:
+		await process_frame
+	if not bool(gs.get("home_season_field_open")):
+		_fail("CAMP hop should keep home_season_field_open")
+		return
+	if str(gs.get("home_season_field_id")) != "country_bloom":
+		_fail("CAMP hop should keep field_id country_bloom")
+		return
+	hub.call("go_to_page", MetaHubPages.MAIN, false)
+	for _main_i in 12:
+		await process_frame
+	if not bool(gs.get("home_season_field_open")):
+		_fail("return MAIN should keep home_season_field_open")
+		return
+	if str(gs.get("home_season_field_id")) != "country_bloom":
+		_fail("return MAIN should keep field_id country_bloom")
+		return
+	if field == null or not field.visible:
+		_fail("return MAIN should still show SeasonField")
+		return
 	var bloom_def: SeasonDef = gs.call("get_season_def", "country_bloom")
 	var bloom_pool: Array = bloom_def.seed_type_ids if bloom_def else []
 	var bloom_flower_err := _assert_flowers(field, bloom_pool, "Bloom")
 	if not bloom_flower_err.is_empty():
 		_fail(bloom_flower_err)
+		return
+	if not home.has_method("_on_basket_type_picked"):
+		_fail("missing _on_basket_type_picked")
+		return
+	home.call("_on_basket_type_picked", "clover")
+	await process_frame
+	var basket_vis: Node = home.get_node_or_null("%BasketVisual")
+	if basket_vis == null:
+		_fail("BasketVisual missing")
+		return
+	var vis_script: Script = basket_vis.get_script()
+	if vis_script == null or not str(vis_script.resource_path).ends_with("home_basket_visual.gd"):
+		_fail("BasketVisual must keep home_basket_visual.gd T3 path")
 		return
 	var bloom_chrome_err := _assert_flowers_clear_chrome(home, field, "Bloom")
 	if not bloom_chrome_err.is_empty():
@@ -327,6 +505,13 @@ func _run() -> void:
 	var backdrop: ColorRect = home.get_node_or_null("%FieldBackdrop") as ColorRect
 	var home_bg: ColorRect = home.get_node_or_null("Background") as ColorRect
 	var daily: Control = home.get_node_or_null("%DailyChestCard") as Control
+	var daily_caption: Label = home.get_node_or_null("%DailyCaption") as Label
+	if daily_caption == null:
+		_fail("DailyCaption missing")
+		return
+	if daily_caption.text.find("Arena streak") >= 0 or daily_caption.text.find("Arena daily") >= 0:
+		_fail("Bloom DailyCaption must not mention arena")
+		return
 	var play_btn: Control = home.get_node_or_null("%PlayButton") as Control
 	if backdrop == null:
 		_fail("FieldBackdrop missing")
@@ -355,8 +540,24 @@ func _run() -> void:
 	if not basket.visible:
 		_fail("Bloom open: BasketCard should be visible")
 		return
-	if play_btn and basket.global_position.x >= play_btn.global_position.x:
-		_fail("Bloom open: BasketCard should sit left of Play")
+	if stack == null or basket.get_parent() != stack:
+		_fail("Bloom open: BasketCard parent should be HomeTopStack")
+		return
+	if play_row != null and basket.get_parent() == play_row:
+		_fail("Bloom open: BasketCard must not sit under PlayRow")
+		return
+	if daily:
+		if basket.get_global_rect().position.y + 0.5 < daily.get_global_rect().end.y:
+			_fail("Bloom open: BasketCard should sit below Daily")
+			return
+	if absf(basket.custom_minimum_size.x - 336.0) > 1.0 or absf(basket.custom_minimum_size.y - 104.0) > 1.0:
+		_fail("Bloom open: Basket min size expected 336x104 got %s" % str(basket.custom_minimum_size))
+		return
+	if absf(basket.size.x - 336.0) > 12.0 or absf(basket.size.y - 104.0) > 12.0:
+		_fail("Bloom open: Basket size expected ~336x104 got %s" % str(basket.size))
+		return
+	if not seasons_row.visible:
+		_fail("Bloom open: SeasonsRowButton should be visible")
 		return
 	if not endless_btn.visible:
 		_fail("Bloom open: EndlessPlayButton should be visible")
@@ -387,9 +588,26 @@ func _run() -> void:
 		if str(label).findn("frost") >= 0 or str(label).findn("snowdrop") >= 0:
 			_fail("Bloom picker row must not list frost-only seed: %s" % label)
 			return
+	if home.has_method("_open_basket_picker"):
+		home.call("_open_basket_picker")
+	await process_frame
+	await process_frame
+	var bloom_fit := _assert_picker_fits_panel(home)
+	if not bloom_fit.is_empty():
+		_fail("Bloom open: %s" % bloom_fit)
+		return
+	if home.has_method("_close_basket_picker"):
+		home.call("_close_basket_picker")
+	await process_frame
 
 	if name_chip.has_signal("clicked"):
 		name_chip.emit_signal("clicked")
+		await process_frame
+	if not bool(gs.get("home_season_field_open")):
+		_fail("SeasonNameChip clicked should not close the field")
+		return
+	if seasons_row.has_signal("clicked"):
+		seasons_row.emit_signal("clicked")
 	elif stage.has_method("close_season_field"):
 		stage.call("close_season_field")
 	await process_frame
@@ -423,11 +641,18 @@ func _run() -> void:
 	if basket.visible:
 		_fail("close should hide BasketCard")
 		return
+	if seasons_row.visible:
+		_fail("close should hide SeasonsRowButton")
+		return
 	if endless_btn.visible:
 		_fail("close should hide EndlessPlayButton")
 		return
 	if name_chip.visible:
 		_fail("close should hide SeasonNameChip")
+		return
+	var close_up_err := _assert_field_upgrades_hidden(home, "close")
+	if not close_up_err.is_empty():
+		_fail(close_up_err)
 		return
 	gs.set("loadout_type_id", "clover")
 
@@ -466,6 +691,10 @@ func _run() -> void:
 	if not frost_flower_err.is_empty():
 		_fail(frost_flower_err)
 		return
+	var frost_up_err := _assert_field_upgrades_open(home, "Frost open")
+	if not frost_up_err.is_empty():
+		_fail(frost_up_err)
+		return
 	var frost_chrome_err := _assert_flowers_clear_chrome(home, field, "Frost")
 	if not frost_chrome_err.is_empty():
 		_fail(frost_chrome_err)
@@ -493,6 +722,12 @@ func _run() -> void:
 		return
 	if not basket.visible:
 		_fail("Frost open: BasketCard should be visible")
+		return
+	if stack == null or basket.get_parent() != stack:
+		_fail("Frost open: BasketCard parent should be HomeTopStack")
+		return
+	if not seasons_row.visible:
+		_fail("Frost open: SeasonsRowButton should be visible")
 		return
 	if not endless_btn.visible:
 		_fail("Frost open: EndlessPlayButton should be visible")
@@ -564,6 +799,10 @@ func _run() -> void:
 		return
 	if name_chip.visible:
 		_fail("Frost close should hide SeasonNameChip")
+		return
+	var frost_close_up_err := _assert_field_upgrades_hidden(home, "Frost close")
+	if not frost_close_up_err.is_empty():
+		_fail(frost_close_up_err)
 		return
 	gs.call("reset_seasons_to_s1")
 	gs.set("strip_focus_id", "lantern_meadow")

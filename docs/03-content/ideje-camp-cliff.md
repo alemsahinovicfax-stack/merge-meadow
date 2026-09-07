@@ -9,13 +9,14 @@ povezano:
   - ideje-camp-chrome
   - plan-prompts-camp-cliff
   - CHECKPOINT
-ai_sažetak: "CAMP-02 hub — između Seeds naslova i Seeds: n/cap nema teksta; GardenCliff hidden + prazan (override C7)."
+ai_sažetak: "CAMP-02 hub — C21 freeze ostaje; CAMP2-A kod superseded od CAMP-03 A (GardenCliff + BagLabel)."
 ---
 
 # IDEJE — CAMP-02 Seeds cliff (prazna rupa)
 
 > **ID:** **CAMP-02** · v1.1+ (nije v1 launch blocker, nije D0-P art).  
-> **Kod:** još nije. Prompti: [[../06-production/plan-prompts-camp-cliff|plan-prompts-camp-cliff]] **CAMP2-P0 ✅ → A**.  
+> **Kod:** **ne pasteati CAMP2-A.** Docs **CAMP2-P0 ✅**. C21 kod upija [[ideje-camp-link|CAMP-03]] **CAMP3-A** (C22–C23: cliff **i** Broj `Seeds: n/cap`). Prompti: [[../06-production/plan-prompts-camp-cliff|plan-prompts-camp-cliff]] **CAMP2-P0 ✅ · A superseded**.  
+> **Nastavak:** [[ideje-camp-link|CAMP-03]] · [[../06-production/plan-prompts-home-camp-field|playlist]].  
 > **Prethodnik:** [[ideje-camp|CAMP-01]] A ✅ B ✅ — toast van, Seeds/Flowers, Upgrade iz Flowers. C7 je ostavio GardenCliff hintove (bag T1, tutorial, fallback). Playtest: ta rupa i dalje smeta.  
 > **Pillar:** [[../01-vision/design-pillars|Fair F2P]] — nema IAP; samo copy.
 
@@ -74,11 +75,11 @@ Detalj: [[ideje-camp-cliff-pitanja|C21]].
 
 ## Agent
 
-- Kad korisnik dira „Bag seeds are“, „tekst ispod Seeds“, „rupa između naslova i broja“ → **CAMP-02**.
-- Ne dirati CAMP-01 spend / captione.
-- Ne spajati s HOME-12 kodom.
+- Kad korisnik dira „Bag seeds are“, „tekst ispod Seeds“, „rupa između naslova i broja“ → **CAMP-03 A** (ne CAMP2-A).
+- Ne dirati CAMP-01 spend API.
+- Ne spajati s HOME-12 kodom. Ne pasteati CAMP2-A.
 
 ## Povezano
 
-- [[ideje-camp|CAMP-01 hub]] · [[ideje-camp-chrome|chrome]] · [[ideje-camp-cliff-pitanja|C21]]
-- [[../06-production/plan-prompts-camp-cliff|prompti]] · [[../06-production/CHECKPOINT|CHECKPOINT]]
+- [[ideje-camp|CAMP-01 hub]] · [[ideje-camp-link|CAMP-03]] · [[ideje-camp-chrome|chrome]] · [[ideje-camp-cliff-pitanja|C21]]
+- [[../06-production/plan-prompts-camp-cliff|prompti]] · [[../06-production/plan-prompts-home-camp-field|CAMP-03 playlist]] · [[../06-production/CHECKPOINT|CHECKPOINT]]

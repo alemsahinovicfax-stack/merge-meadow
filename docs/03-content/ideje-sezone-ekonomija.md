@@ -11,56 +11,58 @@ povezano:
   - ekonomija
   - ekonomija-brojevi
   - design-pillars
-ai_sažetak: "SEZ-01 ekonomija — free coins+T3 gate, paid IAP packs, Pillar 2 guardrails."
+ai_sažetak: "SEZ-01 ekonomija — free 500c + 20 star-3 T3 prethodne sezone (spend); paid IAP packs; Pillar 2."
 ---
 
 # IDEJE — Sezone ekonomija i monetizacija
 
-> Scratch · [[ideje-sezone|SEZ-01]]. Brojevi su **draft** dok playtest ne kaže drugačije.
+> Scratch · [[ideje-sezone|SEZ-01]]. Free S2+ freeze **2026-09-03**: 500 coins + 20 rarity-3 T3 **prethodne** sezone; `unlock_free` **troši** oba (draft B).
 
 ## Dvije putanje unlocka
 
 | Kind | Valuta | Gate | Redoslijed |
 |------|--------|------|------------|
-| **Free** | `wallet_coins` + T3 Flower stash | prag po sezoni | Linear `order` |
+| **Free** | `wallet_coins` + rarity-3 T3 cvijeće **prethodne** free sezone | prag 500 / 20 | Linear `order` |
 | **Paid** | Pravi novac (IAP) | kupnja / restore | Ne-linear |
 
 S1 **Country Bloom** — cost 0, odmah unlocked.
 
 ## Free unlock (S2+)
 
-### Formula (draft)
+### Formula (freeze 2026-09-03)
 
 ```
 can_unlock(season) =
   season.kind == free
   AND previous free (order-1) unlocked
   AND wallet_coins >= season.coins_cost
-  AND t3_flower_count >= season.t3_flowers_required
+  AND star3_flower_count(previous_free) >= season.t3_flowers_required
 ```
+
+`star3_flower_count` = `garden_crystal_stash` za **jedan** `rarity == 3` tip prethodne sezone (Frost = Harvest Pumpkin). Svaka sezona ima točno jedan ★3 (`watermelon` je ★2).
 
 Pri uspješnom unlocku:
 
 1. Oduzmi `coins_cost` iz `wallet_coins`.
-2. **T3 flowers:** draft A — samo **provjera** (ne troši); draft B — **potroši** Y iz `garden_crystal_stash` (global ili po tipu). → [[ideje-sezone-pitanja|pitanje 3]]
+2. **T3 flowers:** draft **B** — potroši `t3_flowers_required` iz star-3 poola prethodne sezone (FIFO po tipu).
 3. Dodaj `season.id` u `unlocked_seasons`.
-4. Opcionalno auto-`active_season_id = season.id`.
+4. `active_season_id` / `strip_focus_id` = ta sezona.
 
-### Draft tablica troškova (placeholder)
+### Troškovi (JSON)
 
-| Season order | Example id | Coins | T3 flowers req |
-|--------------|------------|-------|----------------|
+| Season order | Example id | Coins | Star-3 T3 (prethodna sezona) |
+|--------------|------------|-------|------------------------------|
 | 1 | `country_bloom` | 0 | 0 |
-| 2 | `frost_orchard` | 80 | 5 |
-| 3 | `lantern_meadow` | 150 | 8 |
-| 4 | `amber_canopy` | 220 | 12 |
+| 2 | `frost_orchard` | 500 | 20 Bloom ★3 |
+| 3 | `lantern_meadow` | 500 | 20 Frost ★3 |
+| 4 | `amber_canopy` | 500 | 20 Lantern ★3 |
 
 > Sink: free sezone **ne** smiju zahtijevati IAP. Ako coins/T3 nedostaju → igraj / merge / exchange, ne „Buy season with real money“ kao jedini put.
 
 ### Odnos prema postojećem exchange
 
 - Seed trade i Flower exchange (Bug-031 rates) ostaju izvor soft coins.
-- T3 flower stash (`garden_crystal_stash`) = gate resurs (UI ime Flower).
+- T3 flower stash (`garden_crystal_stash`) = gate resurs, ali **samo rarity 3 prethodne sezone**.
 - Diamonds (`wallet_diamonds`) — **ne** trošiti na free season unlock u draftu (zadržati za shop/kozmetiku TBD).
 
 ## Paid seasons (IAP)

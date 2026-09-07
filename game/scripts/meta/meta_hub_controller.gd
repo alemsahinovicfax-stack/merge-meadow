@@ -26,6 +26,8 @@ var _current_page: int = MetaHubPagesScript.MAIN
 
 func _ready() -> void:
 	add_to_group("meta_hub")
+	if OS.is_debug_build() and not GameState.skip_debug_season_unlock:
+		GameState.debug_playtest_two_free()
 	GameState.meta_hub_active = true
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	swipe_pager.page_changed.connect(_on_page_changed)
@@ -125,6 +127,10 @@ func set_nav_locked(locked: bool) -> void:
 
 func is_nav_locked() -> bool:
 	return _nav_locked
+
+
+func current_page_index() -> int:
+	return _current_page
 
 
 func _on_page_changed(index: int) -> void:

@@ -104,6 +104,7 @@ Acceptance: Upgrade radi iz Flowers; caption kaže magnet/loot efekat; “donate
 ## Povezano
 
 - [[../03-content/ideje-camp|hub]] · [[../03-content/ideje-camp-grupe|grupe]] · [[../03-content/ideje-camp-pitanja|pitanja]]
-- [[plan-prompts-camp-cliff|CAMP-02 cliff]] (GardenCliff rupa — odvojen track)
+- [[plan-prompts-camp-cliff|CAMP-02 cliff]] (GardenCliff — **CAMP2-A superseded** → CAMP3-A)
+- [[plan-prompts-home-camp-field|HOME-16 + CAMP-03]]
 - [[../03-content/ideje-arena|ARENA-01]] A11c · [[plan-prompts-arena|ARENA-01 prompti]]
 - [[CHECKPOINT|CHECKPOINT]]

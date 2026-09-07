@@ -53,7 +53,6 @@ const SEED_DISPLAY_NAMES: Dictionary = {
 	"tulip": "Tulip",
 	"sunflower": "Sunflower",
 	"pumpkin": "Pumpkin",
-	"watermelon": "Watermelon",
 }
 
 # Default spawn rarity (★ count). Mythic (3) → staklenik.
@@ -64,7 +63,6 @@ const SEED_RARITY: Dictionary = {
 	"tulip": 2,
 	"sunflower": 2,
 	"pumpkin": 3,
-	"watermelon": 3,
 }
 
 const MAGNET_BASE_RADIUS := 40.0
@@ -78,7 +76,7 @@ const COMPANION_MOCHI := "mochi"
 const MOCHI_UNLOCK_CAMP_LEVEL := 2
 
 # Playtest — DEBUG seeda samo kad nema save datoteke (prvi boot).
-const DEBUG_DEV_RESOURCES := true
+const DEBUG_DEV_RESOURCES := false
 const DEBUG_WALLET_COINS := 20
 const DEBUG_SEED_COUNT := 20
 ## ARENA-02 leftover playtest. Overwrite ignores SEED_BAG_SOFT_CAP (stays 40).
@@ -107,6 +105,7 @@ const ENDLESS_DIFFICULTY_LABELS: Dictionary = {
 const TUTORIAL_FLAGS_PATH := "user://tutorial_flags.json"
 const PLAYER_SAVE_PATH := "user://player_save.json"
 const SAVE_VERSION := 12
+const RETIRED_SEED_TYPE_IDS: Array[String] = ["watermelon"]
 ## HOME-06 P80 / HOME-09 P105 — last paid stays locked for IAP playtest.
 const TEST_LOCK_LAST_SEASONS := true
 const TEST_LOCK_PAID_ID := "ember_fen"
@@ -280,6 +279,70 @@ func t3_flower_count() -> int:
 	return get_garden_crystal_total()
 
 
+func star3_type_ids_for_season(season_id: String) -> Array[String]:
+	var out: Array[String] = []
+	var def := SeasonCatalog.get_def(season_id)
+	if def == null:
+		return out
+	for type_id in def.seed_type_ids:
+		if type_id.is_empty():
+			continue
+		if get_seed_rarity(type_id) < 3:
+			continue
+		if not out.has(type_id):
+			out.append(type_id)
+	return out
+
+
+func star3_type_id_for_season(season_id: String) -> String:
+	var ids := star3_type_ids_for_season(season_id)
+	if ids.size() != 1:
+		push_error(
+			"star3_type_id_for_season(%s) expected 1 rarity-3, got %d"
+			% [season_id, ids.size()]
+		)
+		return str(ids[0]) if not ids.is_empty() else ""
+	return ids[0]
+
+
+func star3_flower_count_for_season(season_id: String) -> int:
+	var type_id := star3_type_id_for_season(season_id)
+	if type_id.is_empty():
+		return 0
+	return maxi(0, int(garden_crystal_stash.get(type_id, 0)))
+
+
+func previous_free_id_for(season_id: String) -> String:
+	return SeasonCatalog.previous_free_id(SeasonCatalog.get_def(season_id))
+
+
+func star3_flower_count_for_unlock(season_id: String) -> int:
+	var prev := previous_free_id_for(season_id)
+	if prev.is_empty():
+		return 0
+	return star3_flower_count_for_season(prev)
+
+
+func _spend_star3_flowers_for_unlock(season_id: String, amount: int) -> void:
+	if amount <= 0:
+		return
+	var prev := previous_free_id_for(season_id)
+	var left := amount
+	for type_id in star3_type_ids_for_season(prev):
+		if left <= 0:
+			break
+		var have := maxi(0, int(garden_crystal_stash.get(type_id, 0)))
+		if have <= 0:
+			continue
+		var take := mini(have, left)
+		var remain := have - take
+		if remain <= 0:
+			garden_crystal_stash.erase(type_id)
+		else:
+			garden_crystal_stash[type_id] = remain
+		left -= take
+
+
 func get_season_def(season_id: String) -> SeasonDef:
 	return SeasonCatalog.get_def(season_id)
 
@@ -329,7 +392,7 @@ func can_unlock_free(season_id: String) -> bool:
 		return false
 	if wallet_coins < def.coins_cost:
 		return false
-	if t3_flower_count() < def.t3_flowers_required:
+	if star3_flower_count_for_unlock(season_id) < def.t3_flowers_required:
 		return false
 	return true
 
@@ -339,6 +402,7 @@ func unlock_free(season_id: String) -> bool:
 		return false
 	var def := SeasonCatalog.get_def(season_id)
 	wallet_coins -= def.coins_cost
+	_spend_star3_flowers_for_unlock(season_id, def.t3_flowers_required)
 	unlocked_seasons.append(season_id)
 	active_season_id = season_id
 	strip_focus_id = season_id
@@ -639,10 +703,41 @@ func debug_grant_unlock_test_funds() -> void:
 	if not OS.is_debug_build():
 		return
 	wallet_coins = maxi(wallet_coins, 500)
-	var have := t3_flower_count()
-	if have < 20:
-		var clover := int(garden_crystal_stash.get("clover", 0))
-		garden_crystal_stash["clover"] = clover + (20 - have)
+	var next_id := next_locked_free_id()
+	if next_id.is_empty():
+		save_player_save()
+		return
+	var def := SeasonCatalog.get_def(next_id)
+	var need := 20
+	if def != null:
+		need = def.t3_flowers_required
+	var have := star3_flower_count_for_unlock(next_id)
+	if have < need:
+		var types := star3_type_ids_for_season(previous_free_id_for(next_id))
+		var fill_id := "pumpkin"
+		if not types.is_empty():
+			fill_id = types[0]
+			if types.has("pumpkin"):
+				fill_id = "pumpkin"
+		garden_crystal_stash[fill_id] = int(garden_crystal_stash.get(fill_id, 0)) + (need - have)
+	save_player_save()
+
+
+func debug_playtest_two_free() -> void:
+	if not OS.is_debug_build():
+		return
+	unlocked_seasons.clear()
+	unlocked_seasons.append(SeasonCatalog.DEFAULT_SEASON_ID)
+	if not unlocked_seasons.has("frost_orchard"):
+		unlocked_seasons.append("frost_orchard")
+	owned_paid_seasons.clear()
+	if is_season_playable("frost_orchard"):
+		strip_focus_id = "frost_orchard"
+		active_season_id = "frost_orchard"
+	else:
+		strip_focus_id = SeasonCatalog.DEFAULT_SEASON_ID
+		active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
+	_normalize_season_progress()
 	save_player_save()
 
 
@@ -671,6 +766,53 @@ func debug_relock_playtest_free() -> void:
 		active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
 	_normalize_season_progress()
 	save_player_save()
+
+
+func debug_fixture_s1_star3_playtest() -> void:
+	if not OS.is_debug_build():
+		return
+	var default_id := SeasonCatalog.DEFAULT_SEASON_ID
+	unlocked_seasons.clear()
+	unlocked_seasons.append(default_id)
+	active_season_id = default_id
+	strip_focus_id = default_id
+	home_band = "free"
+	home_season_field_open = false
+	home_season_field_id = ""
+	_normalize_season_progress()
+	wallet_coins = maxi(wallet_coins, 500)
+	for type_id in star3_type_ids_for_season(default_id):
+		garden_crystal_stash.erase(type_id)
+	garden_crystal_stash["pumpkin"] = 19
+	_remap_seed_bag_to_season(default_id)
+	seed_bag["pumpkin"] = 22
+	save_player_save()
+
+
+func _remap_seed_bag_to_season(season_id: String) -> void:
+	var allowed := SeedCatalog.types_for_season(season_id)
+	if allowed.is_empty():
+		return
+	var kept: Dictionary = {}
+	var overflow: Array[int] = []
+	for type_id in seed_bag:
+		var n := int(seed_bag[type_id])
+		if n <= 0:
+			continue
+		if allowed.has(type_id):
+			kept[type_id] = n
+		else:
+			overflow.append(n)
+	for n in overflow:
+		var dest := ""
+		for tid in allowed:
+			if int(kept.get(tid, 0)) <= 0:
+				dest = tid
+				break
+		if dest.is_empty():
+			dest = allowed[0]
+		kept[dest] = n if int(kept.get(dest, 0)) <= 0 else int(kept.get(dest, 0)) + n
+	seed_bag = kept
 
 
 func _strip_focus_index() -> int:
@@ -726,6 +868,7 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	)
 	seed_unlock_index = clampi(int(data.get("seed_unlock_index", 0)), 0, SeedUnlockConfig.chain_size() - 1)
 	lifetime_seeds_collected = _parse_string_int_dict(data.get("lifetime_seeds_collected", {}))
+	_drop_retired_seed_keys()
 	collection_kept_tiers = _parse_string_int_dict(data.get("collection_kept_tiers", {}))
 	last_daily_chest_day = str(data.get("last_daily_chest_day", ""))
 	combo_coin_day = str(data.get("combo_coin_day", ""))
@@ -788,6 +931,15 @@ func _deserialize_beds(data: Variant, expected: int) -> Array:
 		else:
 			beds.append(null)
 	return beds
+
+
+func _drop_retired_seed_keys() -> void:
+	for bag in [seed_bag, last_seed_bag, garden_crystal_stash, lifetime_seeds_collected]:
+		for tid in RETIRED_SEED_TYPE_IDS:
+			if bag.has(tid):
+				bag.erase(tid)
+	if RETIRED_SEED_TYPE_IDS.has(loadout_type_id):
+		loadout_type_id = ""
 
 
 func _parse_string_int_dict(data: Variant) -> Dictionary:
@@ -1007,13 +1159,11 @@ func format_loadout_label() -> String:
 	return "Basket: %s %s  (+%.0f%% spawn)" % [name, stars, LOADOUT_SPAWN_BONUS * 100.0]
 
 
-## Set run spawn bias. Unlocked + non-mythic; bag count not required (Bug-023 Home picker).
+## Set run spawn bias. Unlocked; Home basket may include ★3 (theme spawn bias, Fair F2P).
 func set_loadout(type_id: String) -> bool:
 	if type_id.is_empty():
 		return false
 	if not is_seed_type_unlocked(type_id):
-		return false
-	if is_mythic_seed(type_id):
 		return false
 	loadout_type_id = type_id
 	save_player_save()
@@ -1046,8 +1196,6 @@ func get_unlocked_loadout_types() -> Array[String]:
 func get_unlocked_loadout_types_for_season(season_id: String) -> Array[String]:
 	var out: Array[String] = []
 	for type_id in SeedCatalog.types_for_season(season_id):
-		if is_mythic_seed(type_id):
-			continue
 		if is_seed_type_unlocked(type_id):
 			out.append(type_id)
 	return out
@@ -1434,7 +1582,7 @@ func get_garden_crystal_entries() -> Array[Dictionary]:
 			"display_name": get_seed_display_name(tid),
 			"rarity": get_seed_rarity(tid),
 		})
-	out.sort_custom(_compare_seed_bag_entry_display)
+	out.sort_custom(_compare_seed_bag_entry_asc)
 	return out
 
 
@@ -1856,7 +2004,7 @@ func claim_daily_chest() -> String:
 	if not tutorial_complete:
 		return "Finish the tutorial first."
 	if not can_claim_daily_chest():
-		return "Daily chest already opened today — come back tomorrow!"
+		return "Daily chest already opened today."
 	var pool := get_unlocked_run_spawn_types()
 	if pool.is_empty():
 		pool = [SEED_TYPE_CLOVER]

@@ -23,7 +23,7 @@ ai_sažetak: "HOME-12 hub — jedno SeasonField za svaku playable sezonu (apply_
 
 > **ID:** **HOME-12** · v1.1+ (nije v1 launch blocker).  
 > **Kod:** **MEADOW-A ✅ B ✅ C ✅**. Prompti: [[../06-production/plan-prompts-seed-meadow|plan-prompts-seed-meadow]] **1–6 ✅**. Grupe: [[ideje-home-meadow-grupe|grupe]].  
-> **Sljedeće:** [[ideje-home-meadow-life|HOME-14]] meadow life (Play 3-koraka, jednaki PlayRow, više cvijeća, Pip FSM). HOME-13 chrome ✅.  
+> **Sljedeće:** [[ideje-home-meadow-dock|HOME-15]] dock. HOME-14 life ✅. HOME-13 chrome ✅.  
 > **Sjeme:** unique T1–T3 po sezoni = [[ideje-seed-pool|SEED-01]] (**prije MEADOW-B**).  
 > **Prethodnik:** [[ideje-home-barfit|HOME-11]] BARFIT-A ✅ — dual-band karusel ostaje kad meadow **nije** otvoren.  
 > **Override 2026-09-01:** P141/P142/P151 Bloom-only **povučen**. Jedan shell, sve **playable** sezone.  
@@ -88,4 +88,5 @@ Roster id-evi (`frost_snowdrop`) **nisu** `seed_type_ids` — to popravlja [[ide
 - [[ideje-seed-pool|SEED-01]] · [[../06-production/plan-prompts-seed-meadow|prompti]]
 - [[ideje-home-meadow-chrome|HOME-13 chrome]] · [[../06-production/plan-prompts-home-meadow-chrome|HOME-13 prompti]]
 - [[ideje-home-meadow-life|HOME-14 life]] · [[../06-production/plan-prompts-home-meadow-life|HOME-14 prompti]]
+- [[ideje-home-meadow-dock|HOME-15 dock]] · [[../06-production/plan-prompts-home-meadow-dock|HOME-15 prompti]]
 - [[ideje-home-barfit|HOME-11]] · [[ideje-sezone|SEZ-01]]

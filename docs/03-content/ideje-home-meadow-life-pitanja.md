@@ -60,4 +60,5 @@ P137 tap playable → polje. P143 locked **nema** polja. P145 IGNORE. P146 sessi
 ## Povezano
 
 - [[ideje-home-meadow-pitanja|P137–P158]] · [[ideje-home-meadow-chrome-pitanja|P159–P178]]
+- [[ideje-home-meadow-dock-pitanja|HOME-15 P197+]]
 - [[../06-production/plan-prompts-home-meadow-life|prompti]]

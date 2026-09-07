@@ -27,11 +27,22 @@ func _run() -> void:
 	if gs == null:
 		_fail("GameState missing")
 		return
+	var upgrade_cards := camp.get_node_or_null("%UpgradeCards") as Control
+	if upgrade_cards == null:
+		_fail("UpgradeCards missing")
+		return
+	if upgrade_cards.visible:
+		_fail("UpgradeCards should stay hidden")
+		return
 
 	_reset_upgrade_state(gs, {"clover": 2}, 0, 0)
 	camp.set("_selected_crystal_type", "")
 	camp.call("_refresh_ui")
 	await process_frame
+	upgrade_cards = camp.get_node_or_null("%UpgradeCards") as Control
+	if upgrade_cards == null or upgrade_cards.visible:
+		_fail("UpgradeCards should stay hidden after refresh")
+		return
 	var sprinkler_btn := camp.get_node("%UpgradeButton")
 	if sprinkler_btn == null or bool(sprinkler_btn.get("disabled")):
 		_fail("2 clover should enable Sprinkler Upgrade")

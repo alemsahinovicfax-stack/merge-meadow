@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://seasonstage01"]
+[gd_scene load_steps=11 format=3 uid="uid://seasonstage01"]
 
 [ext_resource type="Script" path="res://scripts/ui/season_stage.gd" id="1_stage"]
 [ext_resource type="PackedScene" path="res://scenes/ui/season_browser.tscn" id="2_browser"]
@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="6_uibtn"]
 [ext_resource type="Script" path="res://scripts/ui/season_field.gd" id="7_field"]
 [ext_resource type="Script" path="res://scripts/ui/season_field_pip.gd" id="8_pip"]
+[ext_resource type="Script" path="res://scripts/ui/season_unlock_progress.gd" id="9_progress"]
+[ext_resource type="Script" path="res://scripts/ui/home_basket_picker_icon.gd" id="10_flower"]
 
 [node name="SeasonStage" type="Control"]
 custom_minimum_size = Vector2(0, 416)
@@ -256,15 +258,15 @@ script = ExtResource("4_roster")
 unique_name_in_owner = true
 visible = false
 z_index = 1
-custom_minimum_size = Vector2(280, 168)
+custom_minimum_size = Vector2(280, 210)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.12
-anchor_top = 0.62
+anchor_top = 0.60
 anchor_right = 0.88
 anchor_bottom = 1.0
-offset_top = 8.0
-offset_bottom = -12.0
+offset_top = 4.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
@@ -275,34 +277,86 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="UnlockGateCoins" type="Label" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox"]
+[node name="UnlockProgress" type="VBoxContainer" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+alignment = 1
+script = ExtResource("9_progress")
+
+[node name="UnlockCoinIcon" type="TextureRect" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox/UnlockProgress"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="UnlockGateCoins" type="Label" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox/UnlockProgress"]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.965, 0.839, 1)
 theme_override_font_sizes/font_size = 18
-text = "Coins  0 / 500"
+text = "0 / 500"
+horizontal_alignment = 1
 
-[node name="UnlockGateCoinsBar" type="ProgressBar" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox"]
+[node name="UnlockGateCoinsBar" type="ProgressBar" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox/UnlockProgress"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 14)
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 mouse_filter = 2
 max_value = 500.0
 value = 0.0
 show_percentage = false
 
-[node name="UnlockGateT3" type="Label" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox"]
+[node name="SectionDivider" type="Control" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox/UnlockProgress"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 3
+
+[node name="Line" type="ColorRect" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox/UnlockProgress/SectionDivider"]
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.1, 0.1, 0.1, 0.35)
+
+[node name="FlowerVisual" type="Control" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox/UnlockProgress"]
+custom_minimum_size = Vector2(92, 92)
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 4
+script = ExtResource("10_flower")
+
+[node name="StarsLabel" type="Label" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox/UnlockProgress"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "★★★"
+horizontal_alignment = 1
+
+[node name="UnlockFlowerName" type="Label" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox/UnlockProgress"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "Harvest Pumpkin"
+horizontal_alignment = 1
+
+[node name="UnlockGateT3" type="Label" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox/UnlockProgress"]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.965, 0.839, 1)
 theme_override_font_sizes/font_size = 18
-text = "Seeds  0 / 20"
+text = "0 / 20"
+horizontal_alignment = 1
 
-[node name="UnlockGateT3Bar" type="ProgressBar" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox"]
+[node name="UnlockGateT3Bar" type="ProgressBar" parent="BandColumn/FreeBand/StripMotion/Row/CenterSlot/CenterFill/UnlockGate/UnlockGateVBox/UnlockProgress"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 14)
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 mouse_filter = 2
 max_value = 20.0
@@ -316,7 +370,7 @@ layout_mode = 2
 mouse_filter = 0
 script = ExtResource("6_uibtn")
 label_text = "Unlock"
-font_size = 22
+font_size = 26
 button_variant = "subtle"
 
 [node name="RightSlot" type="PanelContainer" parent="BandColumn/FreeBand/StripMotion/Row"]

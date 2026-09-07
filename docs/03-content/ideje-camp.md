@@ -9,8 +9,10 @@ povezano:
   - ideje-camp-donate
   - ideje-camp-grupe
   - ideje-camp-cliff
+  - ideje-camp-link
   - plan-prompts-camp
   - plan-prompts-camp-cliff
+  - plan-prompts-home-camp-field
   - ideje-arena
   - ekonomija-brojevi
   - ideje-kad-predloziti
@@ -22,7 +24,7 @@ ai_sažetak: "CAMP-01 hub — manje tutorijala u kampu; Seeds/Flowers; bez compa
 
 > **ID:** **CAMP-01** · v1.1+ (nije v1 launch blocker, nije D0-P art).  
 > **Kod:** **CAMP-A ✅ B ✅**. Prompti: [[../06-production/plan-prompts-camp|plan-prompts-camp]] **CAMP-P0 ✅ → A ✅ → B ✅**. Grupe: [[ideje-camp-grupe|grupe]].  
-> **Nastavak:** [[ideje-camp-cliff|CAMP-02]] — GardenCliff rupa; prompti [[../06-production/plan-prompts-camp-cliff|plan-prompts-camp-cliff]] **CAMP2-P0 ✅ → A**.  
+> **Nastavak:** [[ideje-camp-cliff|CAMP-02]] P0 ✅ (A superseded) → [[ideje-camp-link|CAMP-03]] chrome + Flowers parity + next-lock; prompti [[../06-production/plan-prompts-home-camp-field|plan-prompts-home-camp-field]].  
 > **Freeze:** C1–C20 **2026-08-30** — [[ideje-camp-pitanja|pitanja]]. C21 (CAMP-02) overridea C7 za GardenCliff slot.  
 > **Prethodnik:** ARENA-01 FLOW-A ✅ — arena više **ne** donira (leftover T2 → 2× T1; T3 → flower stash).  
 > **Pillar:** [[../01-vision/design-pillars|Fair F2P]] — upgrade ostaje besplatan sink (cvijeće iz igre); nema IAP na Sprinkler / Loot Boost.
@@ -106,14 +108,14 @@ Detalj: [[ideje-camp-chrome|chrome]] · [[ideje-camp-donate|donate]].
 
 ## Agent
 
-- Kad korisnik dira kamp toast, Garden/Seeds, Flower stash, companion picker, „donate in Arena“, Sprinkler / Loot Boost — **CAMP-01**.
-- Kad korisnik dira „Bag seeds are“, tekst između Seeds i broja — **CAMP-02** ([[ideje-camp-cliff|cliff]]).
+- Kad korisnik dira kamp toast, Garden/Seeds, Flower stash, companion picker, „donate in Arena“, Sprinkler / Loot Boost — **CAMP-01** (spend API) ili **HOME-16 FIELD-D** (UI na polju).
+- Kad korisnik dira „Bag seeds are“, tekst između Seeds i broja, Flowers kao Seeds, next-lock u kampu — **CAMP-03** ([[ideje-camp-link|link]]). CAMP-02-A ne pasteati.
 - Ne spajati A i B. A ne dira `MAGNET_COST` / `try_upgrade_*`.
 - Ne oživljavati arena donate da „popraviš“ caption.
 - Fair F2P: cvijeće iz mergea, ne shop.
 
 ## Povezano
 
-- [[ideje-camp-pitanja|pitanja]] · [[ideje-camp-grupe|grupe]] · [[ideje-camp-cliff|CAMP-02 cliff]]
-- [[../06-production/plan-prompts-camp|prompti]] · [[../06-production/plan-prompts-camp-cliff|CAMP-02 prompti]] · [[../06-production/CHECKPOINT|CHECKPOINT]]
+- [[ideje-camp-pitanja|pitanja]] · [[ideje-camp-grupe|grupe]] · [[ideje-camp-cliff|CAMP-02 cliff]] · [[ideje-camp-link|CAMP-03]]
+- [[../06-production/plan-prompts-camp|prompti]] · [[../06-production/plan-prompts-camp-cliff|CAMP-02 prompti]] · [[../06-production/plan-prompts-home-camp-field|CAMP-03 playlist]] · [[../06-production/CHECKPOINT|CHECKPOINT]]
 - [[ideje-arena|ARENA-01]] A11c · [[../02-design/ekonomija-brojevi|ekonomija-brojevi]]

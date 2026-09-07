@@ -209,6 +209,11 @@ func snap_carousel_to_active() -> bool:
 
 func _sync_season_field() -> void:
 	var open := GameState.home_season_field_open
+	if open:
+		if is_in_group(BLOCK_HUB_SWIPE_GROUP):
+			remove_from_group(BLOCK_HUB_SWIPE_GROUP)
+	elif not is_in_group(BLOCK_HUB_SWIPE_GROUP):
+		add_to_group(BLOCK_HUB_SWIPE_GROUP)
 	if band_column:
 		band_column.visible = not open
 	if season_field:
@@ -226,10 +231,24 @@ func _sync_season_field() -> void:
 	_notify_home_field_backdrop()
 
 
+func _is_hub_on_home() -> bool:
+	if not is_inside_tree():
+		return true
+	var hubs := get_tree().get_nodes_in_group("meta_hub")
+	if hubs.is_empty():
+		return true
+	var hub: Node = hubs[0]
+	if hub.has_method("current_page_index"):
+		return int(hub.call("current_page_index")) == MetaHubPages.MAIN
+	return true
+
+
 func _try_close_field_on_back() -> bool:
 	if not GameState.home_season_field_open:
 		return false
 	if not is_visible_in_tree():
+		return false
+	if not _is_hub_on_home():
 		return false
 	close_season_field()
 	return true

@@ -7,18 +7,20 @@ povezano:
   - ideje-camp-cliff
   - ideje-camp-cliff-pitanja
   - ideje-camp
+  - ideje-camp-link
+  - plan-prompts-home-camp-field
   - CHECKPOINT
-ai_sažetak: "Copy-paste Plan-mode promptovi CAMP-02 — CAMP2-P0 ✅ docs → A GardenCliff hidden."
+ai_sažetak: "Copy-paste Plan-mode promptovi CAMP-02 — CAMP2-P0 ✅ docs; CAMP2-A superseded od CAMP3-A."
 ---
 
 # Plan promptovi — CAMP-02 Seeds cliff
 
-> **Kako:** novi chat → mode **Plan** → zalijepi **jedan** prompt → odobri → Agent.  
-> **Redoslijed:** **CAMP2-P0 ✅ → A**.  
+> **Kako:** **ne pasteati CAMP2-A.** C21 kod je u [[plan-prompts-home-camp-field|CAMP3-A]].  
+> **Redoslijed:** **CAMP2-P0 ✅**. A superseded 2026-09-02.  
 > **Ideje:** [[../03-content/ideje-camp-cliff|hub]] · [[../03-content/ideje-camp-cliff-pitanja|C21]]  
 > **Grana:** **`master`**. Nije D0 blocker. Ne spajati s [[plan-prompts-seed-meadow|SEED/HOME-12]].
 
-**CAMP2-P0** ✅ 2026-09-01 (docs). **A** još nije.
+**CAMP2-P0** ✅ 2026-09-01 (docs). **CAMP2-A superseded** — koristi **CAMP3-A**.
 
 ## Freeze
 
@@ -42,7 +44,11 @@ Fajlovi: ideje-camp-cliff.md hub; ideje-camp-cliff-pitanja.md C21; plan-prompts-
 
 ---
 
-## Prompt — CAMP2-A (GardenCliff van)
+## Prompt — CAMP2-A (GardenCliff van) — SUPERSEDED 2026-09-02
+
+> **Ne pasteati.** C21 + BagLabel hide ide u [[plan-prompts-home-camp-field|CAMP3-A]] (C22–C23). Blok ostaje arhiva.
+
+### CAMP2-A (arhiva, ne paste)
 
 ```
 MODE: Plan only — ne implementiraj. Napravi detaljan i opširan plan.
@@ -69,11 +75,12 @@ Acceptance: Seeds kartica = naslov pa odmah Seeds: n/cap; nema "Bag seeds are"; 
 ## Redoslijed i ovisnosti
 
 1. **CAMP2-P0** docs — **✅ 2026-09-01**.  
-2. **CAMP2-A** GardenCliff hide.  
-3. Ne spajati s HOME-12 meadow kodom.
+2. **CAMP2-A** — **superseded** 2026-09-02 → [[plan-prompts-home-camp-field|CAMP3-A]].  
+3. Ne spajati s HOME-12 meadow kodom. Ne pasteati A.
 
 ## Povezano
 
 - [[../03-content/ideje-camp|CAMP-01]] · [[plan-prompts-camp|CAMP-01 prompti]]
+- [[../03-content/ideje-camp-link|CAMP-03]] · [[plan-prompts-home-camp-field|HOME-16 + CAMP-03 prompti]]
 - [[plan-prompts-seed-meadow|SEED-01 + HOME-12]] (odvojen track)
 - [[CHECKPOINT|CHECKPOINT]]

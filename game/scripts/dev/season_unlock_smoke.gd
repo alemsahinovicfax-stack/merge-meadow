@@ -59,11 +59,14 @@ func _run() -> void:
 		_fail("roster total %d expected 48" % roster_total)
 		return
 	var s1_def: SeasonDef = SeasonCatalog.get_def(S1)
-	if s1_def == null or s1_def.seed_type_ids.size() != 7:
-		_fail("S1 seed pool not 7 types")
+	if s1_def == null or s1_def.seed_type_ids.size() != 6:
+		_fail("S1 seed pool not 6 types")
 		return
-	if str(s1_def.seed_type_ids[0]) != "clover" or str(s1_def.seed_type_ids[6]) != "watermelon":
+	if str(s1_def.seed_type_ids[0]) != "clover" or str(s1_def.seed_type_ids[5]) != "pumpkin":
 		_fail("S1 seed pool mismatch")
+		return
+	if s1_def.seed_type_ids.has("watermelon"):
+		_fail("S1 pool must not include watermelon")
 		return
 	var s3_def: SeasonDef = SeasonCatalog.get_def(S3)
 	if s3_def == null or s3_def.t3_flowers_required != 20 or s3_def.coins_cost != 500:
@@ -84,8 +87,8 @@ func _run() -> void:
 		_fail("Frost seed_type_ids expected 6 starting frost_snowdrop")
 		return
 	var catalog_ids: Array = SeedCatalog.all_type_ids()
-	if catalog_ids.size() != 49:
-		_fail("SeedCatalog size %d expected 49" % catalog_ids.size())
+	if catalog_ids.size() != 48:
+		_fail("SeedCatalog size %d expected 48" % catalog_ids.size())
 		return
 	var catalog_seen: Dictionary = {}
 	for tid_any in catalog_ids:
@@ -99,6 +102,24 @@ func _run() -> void:
 		return
 	if str(SeedCatalog.season_id_for("frost_snowdrop")) != S2:
 		_fail("frost_snowdrop season_id_for expected frost_orchard")
+		return
+	if catalog_ids.has("watermelon"):
+		_fail("SeedCatalog must not include watermelon")
+		return
+	if SeedCatalog.rarity("pumpkin") != 3:
+		_fail("pumpkin rarity expected 3")
+		return
+	for def_any in defs:
+		var star_def: SeasonDef = def_any
+		var star3_n := 0
+		for entry in star_def.roster:
+			if int(entry.get("rarity", 1)) == 3:
+				star3_n += 1
+		if star3_n != 1:
+			_fail("%s should have exactly 1 rarity-3, got %d" % [star_def.id, star3_n])
+			return
+	if str(gs.call("star3_type_id_for_season", S1)) != "pumpkin":
+		_fail("Bloom star-3 should be pumpkin")
 		return
 
 	_reset_new_game(gs)
@@ -126,7 +147,7 @@ func _run() -> void:
 		_fail("S2 unlock with 0 coins/T3 should fail")
 		return
 	gs.set("wallet_coins", 499)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("garden_crystal_stash", {"pumpkin": 20})
 	if bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock with 499 coins should fail")
 		return
@@ -144,6 +165,14 @@ func _run() -> void:
 
 	gs.set("wallet_coins", 500)
 	gs.set("garden_crystal_stash", {"clover": 20})
+	if bool(gs.call("unlock_free", S2)):
+		_fail("S2 unlock with clover T3 (not star-3) should fail")
+		return
+	if int(gs.get("wallet_coins")) != 500:
+		_fail("coins spent on clover T3 gate")
+		return
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {"pumpkin": 20})
 	if bool(gs.call("unlock_free", S3)):
 		_fail("S3 unlock before S2 should fail")
 		return
@@ -151,7 +180,7 @@ func _run() -> void:
 		_fail("coins spent on blocked S3")
 		return
 	var stash_before: Dictionary = gs.get("garden_crystal_stash")
-	if int(stash_before.get("clover", 0)) != 20:
+	if int(stash_before.get("pumpkin", 0)) != 20:
 		_fail("T3 stash mutated on blocked S3")
 		return
 
@@ -178,6 +207,10 @@ func _run() -> void:
 		_fail("S2 unlock with 5 T3 should fail")
 		return
 	gs.set("garden_crystal_stash", {"clover": 12, "daisy": 8})
+	if bool(gs.call("unlock_free", S2)):
+		_fail("S2 unlock with non-star-3 T3 should fail")
+		return
+	gs.set("garden_crystal_stash", {"pumpkin": 20})
 	if not bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock should succeed")
 		return
@@ -185,8 +218,8 @@ func _run() -> void:
 		_fail("S2 should spend 500 coins")
 		return
 	stash_before = gs.get("garden_crystal_stash")
-	if int(stash_before.get("clover", 0)) != 12 or int(stash_before.get("daisy", 0)) != 8:
-		_fail("T3 check-only violated")
+	if int(stash_before.get("pumpkin", 0)) != 0:
+		_fail("S2 should spend 20 pumpkin star-3")
 		return
 	if str(gs.get("active_season_id")) != S2:
 		_fail("P12 auto-switch S2 failed")
@@ -197,7 +230,11 @@ func _run() -> void:
 		_fail("S3 after S2 still needs 500 coins")
 		return
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"clover": 19})
+	gs.set("garden_crystal_stash", {"pumpkin": 19})
+	if bool(gs.call("unlock_free", S3)):
+		_fail("S3 after S2 still needs 20 star-3 from Frost")
+		return
+	gs.set("garden_crystal_stash", {"crystal_peony": 19})
 	if bool(gs.call("unlock_free", S3)):
 		_fail("S3 after S2 still needs 20 T3")
 		return
@@ -216,9 +253,9 @@ func _run() -> void:
 		return
 
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("garden_crystal_stash", {"crystal_peony": 20})
 	if not bool(gs.call("can_unlock_free", S3)):
-		_fail("S3 should be unlockable after S2 + 500 coins + 20 T3")
+		_fail("S3 should be unlockable after S2 + 500 coins + 20 Frost star-3")
 		return
 	if not bool(gs.call("unlock_free", S3)):
 		_fail("S3 unlock should succeed")
@@ -236,9 +273,9 @@ func _run() -> void:
 		_fail("ember_fen must stay test-locked")
 		return
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("garden_crystal_stash", {"midnight_lotus": 20})
 	if not bool(gs.call("can_unlock_free", "amber_canopy")):
-		_fail("can_unlock_free(amber) should work after lantern + 500c/20 T3")
+		_fail("can_unlock_free(amber) should work after lantern + 500c/20 Lantern star-3")
 		return
 	if not bool(gs.call("unlock_free", "amber_canopy")):
 		_fail("amber unlock should succeed")
@@ -249,7 +286,7 @@ func _run() -> void:
 
 	_reset_new_game(gs)
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("garden_crystal_stash", {"pumpkin": 20})
 	if not bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock before debug skip test failed")
 		return
@@ -267,7 +304,7 @@ func _run() -> void:
 		_fail("debug_unlock_all must skip amber_canopy")
 		return
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("garden_crystal_stash", {"crystal_peony": 20})
 	if not bool(gs.call("can_unlock_free", S3)):
 		_fail("can_unlock_free(lantern) should still work")
 		return

@@ -67,9 +67,9 @@ func _refresh() -> void:
 		return
 	title_label.text = "Unlock %s" % def.display_name
 	var coins := GameState.wallet_coins
-	var t3 := GameState.t3_flower_count()
-	coins_label.text = "Coins  %d / %d" % [coins, def.coins_cost]
-	t3_label.text = "Flowers  %d / %d" % [t3, def.t3_flowers_required]
+	var t3 := GameState.star3_flower_count_for_unlock(_season_id)
+	coins_label.text = "%d / %d" % [coins, def.coins_cost]
+	t3_label.text = "%d / %d" % [t3, def.t3_flowers_required]
 	if unlock_button:
 		unlock_button.disabled = not GameState.can_unlock_free(_season_id)
 

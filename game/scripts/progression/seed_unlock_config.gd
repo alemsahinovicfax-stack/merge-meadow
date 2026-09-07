@@ -10,14 +10,13 @@ const CHAIN: Array[String] = [
 	"tulip",
 	"sunflower",
 	"pumpkin",
-	"watermelon",
 ]
 
 # CHAIN[i] lifetime collected → unlock CHAIN[i + 1]
-const LIFETIME_TO_UNLOCK_NEXT: Array[int] = [10, 10, 10, 12, 12, 15, 15]
+const LIFETIME_TO_UNLOCK_NEXT: Array[int] = [10, 10, 10, 12, 12, 15]
 
 # Coins to unlock CHAIN[i] early (CHAIN[0] always free at start)
-const COIN_UNLOCK_COST: Array[int] = [0, 120, 150, 150, 180, 200, 220]
+const COIN_UNLOCK_COST: Array[int] = [0, 120, 150, 150, 180, 200]
 
 # Almanac tier milestones — lifetime seeds collected for this type (T1 = spawn unlocked)
 const ALMANAC_TIER2_LIFETIME := 10

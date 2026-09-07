@@ -10,7 +10,6 @@ const FALLBACK_DISPLAY: Dictionary = {
 	"tulip": "Tulip",
 	"sunflower": "Sunflower",
 	"pumpkin": "Pumpkin",
-	"watermelon": "Watermelon",
 }
 
 const FALLBACK_RARITY: Dictionary = {
@@ -20,7 +19,6 @@ const FALLBACK_RARITY: Dictionary = {
 	"tulip": 2,
 	"sunflower": 2,
 	"pumpkin": 3,
-	"watermelon": 3,
 }
 
 static var _built: bool = false

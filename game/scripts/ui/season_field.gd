@@ -127,10 +127,9 @@ func _rebuild_flowers(season_id: String) -> void:
 	var count := clampi(FLOWER_COUNT, 12, mini(14, FLOWER_SLOTS.size()))
 	for i in count:
 		var type_id := str(pool[i % pool.size()])
-		var tier := 1 if (i % 2) == 0 else 2
 		var flower: SeasonFieldFlower = FLOWER_SCRIPT.new()
 		add_child(flower)
-		flower.setup(type_id, tier)
+		flower.setup(type_id, 3)
 		flower.z_index = 0
 		var slot: Vector2 = FLOWER_SLOTS[i]
 		var pos := safe.position + slot * safe.size
@@ -166,12 +165,14 @@ func _chrome_controls() -> Array[Control]:
 	if root == null:
 		return out
 	var daily: Control = root.get_node_or_null("%DailyChestCard") as Control
+	var basket: Control = root.get_node_or_null("%BasketCard") as Control
 	var chip: Control = root.get_node_or_null("%SeasonNameChip") as Control
 	var play_row: Control = root.get_node_or_null("%PlayRow") as Control
 	var settings: Control = root.get_node_or_null("%SettingsButton") as Control
 	if settings == null:
 		settings = root.get_node_or_null("SettingsButton") as Control
-	for node in [daily, settings, chip, play_row]:
+	var upgrades: Control = root.get_node_or_null("%FieldUpgradeStack") as Control
+	for node in [daily, basket, settings, chip, play_row, upgrades]:
 		var chrome: Control = node as Control
 		if chrome == null or not chrome.visible:
 			continue

@@ -9,7 +9,7 @@
 			"coins_cost": 0,
 			"t3_flowers_required": 0,
 			"iap_product_id": "",
-			"seed_type_ids": ["clover", "daisy", "buttercup", "tulip", "sunflower", "pumpkin", "watermelon"],
+			"seed_type_ids": ["clover", "daisy", "buttercup", "tulip", "sunflower", "pumpkin"],
 			"roster": [
 				{"id": "clover", "display_name": "Meadow Clover", "rarity": 1},
 				{"id": "daisy", "display_name": "Field Daisy", "rarity": 1},

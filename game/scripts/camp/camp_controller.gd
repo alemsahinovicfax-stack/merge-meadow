@@ -30,6 +30,7 @@ const CrystalStashChipScript := preload("res://scripts/camp/crystal_stash_chip.g
 @onready var crystal_grid: GridContainer = %CrystalGrid
 @onready var crystal_exchange_button: UiClickButton = %CrystalExchangeButton
 @onready var exchange_button: UiClickButton = %ExchangeButton
+@onready var upgrade_cards: VBoxContainer = %UpgradeCards
 @onready var sprinkler_label: Label = %SprinklerLabel
 @onready var sprinkler_caption: Label = %SprinklerCaption
 @onready var upgrade_button: UiClickButton = %UpgradeButton
@@ -39,11 +40,13 @@ const CrystalStashChipScript := preload("res://scripts/camp/crystal_stash_chip.g
 @onready var footer_bar: MarginContainer = %FooterBar
 @onready var merge_button: UiClickButton = %MergeButton
 @onready var play_button: UiClickButton = %PlayButton
+@onready var season_link_card: PanelContainer = %SeasonLinkCard
 
 var _meta_hub_embedded: bool = false
 var _selected_trade_type: String = ""
 var _selected_crystal_type: String = ""
 var _force_default_trade_select: bool = false
+var _force_default_crystal_select: bool = false
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -62,10 +65,11 @@ func _ready() -> void:
 	_setup_resource_icons()
 	_setup_typography()
 	_setup_safe_area()
-	if crystal_cliff:
-		crystal_cliff.visible = false
+	_hide_upgrade_cards()
+	_hide_seeds_flowers_chrome()
 	_apply_hub_chrome()
 	_force_default_trade_select = true
+	_force_default_crystal_select = true
 	if _meta_hub_embedded:
 		call_deferred("_refresh_ui")
 	else:
@@ -87,7 +91,8 @@ func _setup_resource_icons() -> void:
 
 func _setup_typography() -> void:
 	if camp_title:
-		TEXT_LAYOUT.screen_title(camp_title)
+		camp_title.visible = false
+		camp_title.text = ""
 	if coins_label:
 		TEXT_LAYOUT.stat_label(coins_label)
 	if seeds_label:
@@ -148,6 +153,7 @@ func set_meta_hub_mode(enabled: bool) -> void:
 
 func refresh_for_meta_hub() -> void:
 	_force_default_trade_select = true
+	_force_default_crystal_select = true
 	_refresh_ui()
 
 func _notify_hub_chrome() -> void:
@@ -155,7 +161,26 @@ func _notify_hub_chrome() -> void:
 		return
 	get_tree().call_group("meta_hub", "refresh_top_bar")
 
+func _hide_upgrade_cards() -> void:
+	if upgrade_cards:
+		upgrade_cards.visible = false
+
+
+func _hide_seeds_flowers_chrome() -> void:
+	if garden_cliff:
+		garden_cliff.visible = false
+		garden_cliff.text = ""
+	if bag_label:
+		bag_label.visible = false
+	if crystal_total_label:
+		crystal_total_label.visible = false
+	if crystal_cliff:
+		crystal_cliff.visible = false
+
+
 func _refresh_ui(status: String = "") -> void:
+	_hide_upgrade_cards()
+	_hide_seeds_flowers_chrome()
 	if coins_label:
 		coins_label.text = "%d" % GameState.wallet_coins
 	if seeds_label:
@@ -167,6 +192,8 @@ func _refresh_ui(status: String = "") -> void:
 	_refresh_upgrade_cards()
 	_refresh_garden_card()
 	_refresh_crystal_card()
+	if season_link_card and season_link_card.has_method("refresh"):
+		season_link_card.refresh()
 	_refresh_collection_badge()
 	_set_status_toast(status)
 	_notify_hub_chrome()
@@ -221,24 +248,12 @@ func _format_loot_times(mult: float) -> String:
 
 
 func _refresh_garden_card() -> void:
-	var bag_count := GameState.sum_seed_bag(GameState.seed_bag)
-	var crystal_total := GameState.get_garden_crystal_total()
 	_validate_trade_selection()
-	if bag_label:
-		if bag_count <= 0:
-			bag_label.text = "Seeds: 0 / %d — Play to collect" % GameState.SEED_BAG_SOFT_CAP
-		else:
-			bag_label.text = "Seeds: %d / %d" % [bag_count, GameState.SEED_BAG_SOFT_CAP]
 	_rebuild_seed_bag_grid()
 	_refresh_exchange_button()
-	if garden_cliff:
-		garden_cliff.text = _garden_cliff_text(bag_count, crystal_total)
 
 func _refresh_crystal_card() -> void:
-	var crystal_total := GameState.get_garden_crystal_total()
 	_validate_crystal_selection()
-	if crystal_total_label:
-		crystal_total_label.text = "Flowers: %d" % crystal_total
 	if crystal_cliff:
 		crystal_cliff.visible = false
 	_rebuild_crystal_grid()
@@ -338,8 +353,30 @@ func _refresh_seed_chip_selection() -> void:
 func _validate_crystal_selection() -> void:
 	if _selected_crystal_type.is_empty():
 		return
-	if int(GameState.garden_crystal_stash.get(_selected_crystal_type, 0)) < 1:
+	if int(GameState.garden_crystal_stash.get(_selected_crystal_type, 0)) >= 1:
+		return
+	var entries := GameState.get_garden_crystal_entries()
+	if entries.is_empty():
 		_selected_crystal_type = ""
+	else:
+		_selected_crystal_type = str(entries[0].get("type_id", ""))
+
+
+func _next_crystal_type_after(entries_before: Array, depleted_type: String) -> String:
+	var idx := -1
+	for i in entries_before.size():
+		if str(entries_before[i].get("type_id", "")) == depleted_type:
+			idx = i
+			break
+	for i in range(idx + 1, entries_before.size()):
+		var tid := str(entries_before[i].get("type_id", ""))
+		if int(GameState.garden_crystal_stash.get(tid, 0)) >= 1:
+			return tid
+	for i in range(0, maxi(idx, 0)):
+		var tid := str(entries_before[i].get("type_id", ""))
+		if int(GameState.garden_crystal_stash.get(tid, 0)) >= 1:
+			return tid
+	return ""
 
 func _refresh_crystal_exchange_button() -> void:
 	if crystal_exchange_button == null:
@@ -364,6 +401,14 @@ func _rebuild_crystal_grid() -> void:
 		child.queue_free()
 	var entries := GameState.get_garden_crystal_entries()
 	crystal_grid.visible = not entries.is_empty()
+	if _force_default_crystal_select:
+		_force_default_crystal_select = false
+		if entries.is_empty():
+			_selected_crystal_type = ""
+		else:
+			_selected_crystal_type = str(entries[0].get("type_id", ""))
+	else:
+		_validate_crystal_selection()
 	for entry in entries:
 		var type_id := str(entry.get("type_id", ""))
 		var count := int(entry.get("count", 0))
@@ -395,14 +440,8 @@ func _refresh_crystal_chip_selection() -> void:
 		if child.has_method("get_type_id") and child.has_method("set_selected"):
 			child.call("set_selected", str(child.call("get_type_id")) == _selected_crystal_type)
 
-func _garden_cliff_text(bag_count: int, crystal_total: int) -> String:
-	if GameState.should_prompt_merge_tutorial():
-		return "Tutorial: open Merge and drag same seeds together."
-	if bag_count > 0:
-		return "Bag seeds are T1 — pour in Arena or trade 3→coins. T2 blooms resolve in Arena."
-	if crystal_total > 0:
-		return "%d flowers ready — exchange for coins." % crystal_total
-	return "Run → collect seeds → Merge here."
+func _garden_cliff_text(_bag_count: int, _crystal_total: int) -> String:
+	return ""
 
 
 func _refresh_collection_badge() -> void:
@@ -454,13 +493,18 @@ func _on_crystal_exchange_pressed() -> void:
 		return
 	var crystal_type := _selected_crystal_type
 	if int(GameState.garden_crystal_stash.get(crystal_type, 0)) < 1:
-		_selected_crystal_type = ""
+		var leftover := GameState.get_garden_crystal_entries()
+		_selected_crystal_type = (
+			str(leftover[0].get("type_id", "")) if not leftover.is_empty() else ""
+		)
 		_refresh_ui("No flowers of that type left.")
 		return
+	var entries_before: Array = GameState.get_garden_crystal_entries()
 	if GameState.exchange_garden_crystal(crystal_type):
 		var crystal_name: String = GameState.get_seed_display_name(crystal_type)
 		var coins := GameState.crystal_exchange_coins_for_type(crystal_type)
-		# Keep select while count >= 1; _validate_crystal_selection clears when gone.
+		if int(GameState.garden_crystal_stash.get(crystal_type, 0)) < 1:
+			_selected_crystal_type = _next_crystal_type_after(entries_before, crystal_type)
 		_refresh_ui("Traded %s flower for %d coins." % [crystal_name, coins])
 
 

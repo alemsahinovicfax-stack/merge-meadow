@@ -77,9 +77,6 @@ static func _draw_sprout(canvas: CanvasItem, center: Vector2, type_id: String) -
 		"pumpkin":
 			canvas.draw_circle(center + Vector2(0.0, 0.0), 9.0, pal.seed)
 			canvas.draw_line(center + Vector2(0.0, -10.0), center + Vector2(0.0, -4.0), CONFIG.STEM, 3.0)
-		"watermelon":
-			canvas.draw_circle(center + Vector2(0.0, 0.0), 10.0, pal.petal)
-			canvas.draw_line(center + Vector2(-8.0, 0.0), center + Vector2(8.0, 0.0), Color(0.15, 0.35, 0.18), 2.0)
 		_:
 			canvas.draw_circle(center + Vector2(0.0, -4.0), 7.0, pal.seed)
 
@@ -115,10 +112,6 @@ static func _draw_bloom(canvas: CanvasItem, center: Vector2, type_id: String) ->
 			canvas.draw_circle(center + Vector2(0.0, -2.0), 16.0, pal.petal)
 			canvas.draw_line(center + Vector2(0.0, -20.0), center + Vector2(0.0, -8.0), CONFIG.STEM, 4.0)
 			canvas.draw_circle(center + Vector2(0.0, -22.0), 5.0, CONFIG.LEAF)
-		"watermelon":
-			canvas.draw_circle(center + Vector2(0.0, -4.0), 17.0, pal.petal)
-			canvas.draw_line(center + Vector2(-15.0, -4.0), center + Vector2(15.0, -4.0), Color(0.12, 0.32, 0.15), 3.0)
-			canvas.draw_arc(center + Vector2(0.0, -2.0), 9.0, 0.0, PI, 14, pal.center, 10.0)
 		_:
 			for i in 6:
 				var a := float(i) / 6.0 * TAU

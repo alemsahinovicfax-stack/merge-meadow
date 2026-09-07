@@ -24,16 +24,27 @@ func _run() -> void:
 		"GardenCliff",
 		"GardenTitle",
 		"BagLabel",
+		"SeedBagScroll",
 		"SeedBagGrid",
+		"ExchangeButton",
 		"CrystalTitle",
+		"CrystalTotalLabel",
+		"CrystalScroll",
 		"CrystalGrid",
 		"CrystalExchangeButton",
+		"UpgradeCards",
 		"UpgradeButton",
 		"MergeButton",
 		"PlayButton",
 		"HomeButton",
 		"ResourceBar",
 		"StatusToast",
+		"SeasonLinkCard",
+		"SeasonLinkTitle",
+		"SeasonLinkCoins",
+		"SeasonLinkT3",
+		"SeasonLinkUnlock",
+		"GardenCard",
 	]
 	for node_name in required:
 		var node := camp.get_node_or_null("%" + node_name)
@@ -84,19 +95,78 @@ func _run() -> void:
 		quit(1)
 		return
 	var cliff := camp.get_node("%GardenCliff") as Label
+	if cliff == null or cliff.visible:
+		push_error("camp_layout_smoke: GardenCliff should stay hidden")
+		quit(1)
+		return
 	var cliff_text := cliff.text if cliff else ""
-	if cliff_text.contains("New blooms in Journal") or cliff_text.contains("1 more T2"):
-		push_error("camp_layout_smoke: GardenCliff still has journal/T2 tutorial: %s" % cliff_text)
+	if (
+		not cliff_text.is_empty()
+		or cliff_text.contains("Bag seeds are")
+		or cliff_text.contains("New blooms in Journal")
+		or cliff_text.contains("1 more T2")
+	):
+		push_error("camp_layout_smoke: GardenCliff still has hint text: %s" % cliff_text)
 		quit(1)
 		return
 	if camp.has_method("_garden_cliff_text"):
 		var empty_cliff := str(camp.call("_garden_cliff_text", 0, 0))
-		if empty_cliff.contains("New blooms in Journal") or empty_cliff.contains("1 more T2"):
+		var bag_cliff := str(camp.call("_garden_cliff_text", 3, 2))
+		if not empty_cliff.is_empty() or not bag_cliff.is_empty():
 			push_error(
-				"camp_layout_smoke: _garden_cliff_text(0,0) still tutorial: %s" % empty_cliff
+				"camp_layout_smoke: _garden_cliff_text should return empty got '%s' / '%s'"
+				% [empty_cliff, bag_cliff]
 			)
 			quit(1)
 			return
+		if (
+			empty_cliff.contains("New blooms in Journal")
+			or empty_cliff.contains("1 more T2")
+			or bag_cliff.contains("Bag seeds are")
+		):
+			push_error("camp_layout_smoke: _garden_cliff_text leftover C7 string")
+			quit(1)
+			return
+	var bag_label := camp.get_node_or_null("%BagLabel") as CanvasItem
+	if bag_label == null or bag_label.visible:
+		push_error("camp_layout_smoke: BagLabel should stay hidden")
+		quit(1)
+		return
+	var crystal_total := camp.get_node_or_null("%CrystalTotalLabel") as CanvasItem
+	if crystal_total == null or crystal_total.visible:
+		push_error("camp_layout_smoke: CrystalTotalLabel should stay hidden")
+		quit(1)
+		return
+	var seed_scroll := camp.get_node_or_null("%SeedBagScroll") as Control
+	var crystal_scroll := camp.get_node_or_null("%CrystalScroll") as Control
+	if seed_scroll == null or crystal_scroll == null:
+		push_error("camp_layout_smoke: SeedBagScroll/CrystalScroll missing")
+		quit(1)
+		return
+	var garden_card := camp.get_node_or_null("%GardenCard") as Control
+	var crystal_card := camp.get_node_or_null("%CrystalCard") as Control
+	var season_link_card := camp.get_node_or_null("%SeasonLinkCard") as Control
+	if garden_card == null or crystal_card == null or season_link_card == null:
+		push_error("camp_layout_smoke: GardenCard/CrystalCard/SeasonLinkCard missing")
+		quit(1)
+		return
+	if (
+		not is_equal_approx(garden_card.size_flags_stretch_ratio, crystal_card.size_flags_stretch_ratio)
+		or not is_equal_approx(garden_card.size_flags_stretch_ratio, season_link_card.size_flags_stretch_ratio)
+	):
+		push_error("camp_layout_smoke: Garden/Crystal/SeasonLink should share stretch ratio (thirds)")
+		quit(1)
+		return
+	var upgrade_cards := camp.get_node_or_null("%UpgradeCards") as CanvasItem
+	if upgrade_cards == null or upgrade_cards.visible:
+		push_error("camp_layout_smoke: UpgradeCards should stay hidden")
+		quit(1)
+		return
+	var exchange := camp.get_node_or_null("%ExchangeButton") as CanvasItem
+	if exchange == null:
+		push_error("camp_layout_smoke: ExchangeButton missing")
+		quit(1)
+		return
 	var grid := camp.get_node("%SeedBagGrid") as GridContainer
 	if grid == null or grid.get_child_count() < 2:
 		push_error(

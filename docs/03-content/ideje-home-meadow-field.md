@@ -2,47 +2,82 @@
 type: sadrzaj
 status: ideja
 milestone: "v1.1+"
-tags: [sadrzaj, home, ux, sezone, meadow, cvijece, scratch]
+tags: [sadrzaj, home, ux, sezone, meadow, basket, daily, swipe, upgrade, scratch]
 povezano:
-  - ideje-home-meadow
-  - ideje-home-meadow-shell
-  - ideje-home-meadow-pip
-  - ideje-seed-pool
-  - ideje-home-meadow-pitanja
-  - ideje-home-meadow-life-layout
-ai_sažetak: "HOME-12 B — 6–10 cvjetova. HOME-14 C: 12–14 + chrome-safe rect."
+  - ideje-home-meadow-field-pitanja
+  - ideje-home-meadow-field-grupe
+  - ideje-home-meadow-field-daily
+  - ideje-home-meadow-field-basket
+  - ideje-home-meadow-field-swipe
+  - ideje-home-meadow-field-upgrades
+  - ideje-home-meadow-dock
+  - ideje-camp-link
+  - plan-prompts-home-camp-field
+  - CHECKPOINT
+ai_sažetak: "HOME-16 hub — FIELD-P0 docs; FIELD-A ✅ Daily overlay; FIELD-B ✅ basket; FIELD-C ✅ swipe; FIELD-D ✅ Magnet/Loot."
 ---
 
-# IDEJE — HOME-12 cvijeće na polju
+# IDEJE — Home meadow field (HOME-16 hub)
 
-> [[ideje-home-meadow|hub]] · freeze P145, P149, P157, P158.  
-> **Kod:** **MEADOW-B ✅**. Ovisi o **MEADOW-A** i **SEED-A** (`seed_type_ids` = merge tipovi te sezone). **Ne** Pip (C).  
-> **HOME-14 C:** 12–14 + chrome-safe rect — [[ideje-home-meadow-life-layout|life layout]].
+> **ID:** **HOME-16** · v1.1+ (nije v1 launch blocker).  
+> **Kod:** **FIELD-A ✅** **FIELD-B ✅** **FIELD-C ✅** **FIELD-D ✅**. Docs **FIELD-P0 ✅**. Prompti: [[../06-production/plan-prompts-home-camp-field|plan-prompts-home-camp-field]] **FIELD-P0 ✅ → A ✅ → B ✅ → C ✅ → D ✅**. Grupe: [[ideje-home-meadow-field-grupe|grupe]].  
+> **Prethodnik:** [[ideje-home-meadow-dock|HOME-15]] DOCK-P0 ✅ A–D ✅ — picker T3/★3; Basket ispod Daily; Seasons u PlayRow; Daily bez arena streaka.  
+> **Paralelni kamp:** [[ideje-camp-link|CAMP-03]] — Seeds/Flowers chrome; Flowers = Seeds; next-lock kartica. FIELD-D **prije** CAMP3-A.  
+> **Pillar:** [[../01-vision/design-pillars|Fair F2P]] — Magnet / Loot Boost i dalje troše **2 T3** iz Flowers; nema IAP na upgrade.
 
-## Što se vidi
+## Pitch
 
-Na `FieldGround` **6–10** cvjetova iz `get_season_def(home_season_field_id).seed_type_ids`. Draw [`camp_plant_draw.gd`](../../game/scripts/visual/camp_plant_draw.gd) (T1/T2 mix). Nakon SEED-A Frost vidi `frost_snowdrop`, ne clover.
+U polju sezone Daily gift popup **ne ponavlja** „come back tomorrow“ u bodyju. Basket picker **nema scroll** — svi cvjetovi (jedan stupac) stanu na ekran. Hub swipe **lijevo = Journal, desno = Camp** radi i dok si **unutar** sezone, ne samo na karuselu. Sprinkler / Loot Boost **nestaju iz kampa** (API ostaje) i stoje **kompaktno gore desno na polju**: Magnet pa Loot Boost, svaki s Upgrade.
 
-`apply_season` / open **rebuild** childrene — ne ostavljati Bloom clover na Frost fieldu (to je bug).
+## Zašto sada
 
-Fiksni layout (% od size). Nema drag. `IGNORE`. Nije inventar.
+HOME-15 je zatvorio dock. Claimed Daily overlay i dalje kaže isto dvaput. Picker ima 400 px scroll iako sezona ima ≤7 tipova. `SeasonStage` u `block_hub_swipe` gutа cijeli full-bleed field pa se ne može otići u Camp/Journal. Upgrade kartice u kampu zauzimaju prostor koji CAMP-03 treba za Seeds/Flowers + next-lock.
 
-## Tehnika
+## Simptom vs cilj
 
-- Mali Control, **ne** `ArenaSeedChip`.
-- Close meadow → free/hide flowers.
-- Scale ~0.7–0.9 arena chip.
+| Danas | Cilj |
+|-------|------|
+| Overlay title *i* body: come back tomorrow | Title **Come back tomorrow**; body **Daily chest already opened today.** |
+| `PickerScroll` 400 px, clip | Jedan stupac, **nema scrolla**; panel raste; sve T3 ikone vidljive |
+| Hub swipe u polju mrtav | Field open: Stage **nije** u `block_hub_swipe`; chrome **jest** |
+| Sprinkler + Loot Boost kartice u kampu | Kartice hidden; **Magnet** / **Loot Boost** na polju, UR ispod Settings |
 
-## Što B **ne** radi
+## Što HOME-16 **jest**
 
-- Pip. JSON rewrite. 8 flower scena. Arena instanca.
+- Override Daily claimed copy (P206 caption ostaje Tap to open / Back tomorrow).
+- Override picker visine: bez scrolla, jedan stupac (DOCK-A T3/★3/footer ostaju).
+- Override hub swipe samo dok je field open (karusel Stage i dalje blokira L/R sezona).
+- Premještaj upgrade UI: kamp `%UpgradeCards` hidden; polje dobije kompaktne gumbe. Spend **ne** mijenja (C8–C11).
 
-## Smoke
+## Što HOME-16 **nije**
 
-Open Bloom → 6–10 IGNORE, tipovi ⊆ Bloom `seed_type_ids`. Open Frost (playable) → tipovi ⊆ Frost pool, **nije** isti skup kao Bloom ako SEED-A gotov. Jedan SeasonField. Nema `ArenaSeedChip`.
+- Shop IAP, AdMob, Unlock JSON 500/20, leftover/vacuum, Pip FSM, Play 3-koraka, SeedCatalog JSON, `SAVE_VERSION`.
+- Kamp Seeds/Flowers naslovi, +10%, next-lock kartica — to je [[ideje-camp-link|CAMP-03]].
+- Brisanje `magnet_level` / `multiplier_level` / `try_upgrade_*`.
+- 8 tscn polja.
 
-## Acceptance B
+## Agent
 
-- Polje pokazuje cvijeće **te** sezone.
-- Promjena sezone mijenja cvijeće (rebuild).
-- Tap cvijet no-op. Seasons zatvara.
+- Daily overlay body → **FIELD-A ✅**.
+- Basket bez scrolla → **FIELD-B ✅**.
+- Hub swipe u polju → **FIELD-C ✅**.
+- Magnet/Loot na polju + hide camp cards → **FIELD-D ✅**.
+- Ne spajati D s CAMP3-A. Ne spajati s DOCK/LIFE/CHROME kod promptima.
+
+## Paket
+
+| Doc | Što |
+|-----|-----|
+| ovaj hub | pitch + override |
+| [[ideje-home-meadow-field-daily\|daily]] | overlay body (A) |
+| [[ideje-home-meadow-field-basket\|basket]] | no-scroll picker (B) |
+| [[ideje-home-meadow-field-swipe\|swipe]] | hub pager u polju (C) |
+| [[ideje-home-meadow-field-upgrades\|upgrades]] | Magnet/Loot na polju (D) |
+| [[ideje-home-meadow-field-pitanja\|pitanja]] | P215–P232 |
+| [[ideje-home-meadow-field-grupe\|grupe]] | A–D mapa |
+| [[../06-production/plan-prompts-home-camp-field\|prompti]] | copy-paste (HOME-16 + CAMP-03) |
+
+## Povezano
+
+- [[ideje-home-meadow-dock|HOME-15]] · [[ideje-camp-link|CAMP-03]] · [[ideje-camp|CAMP-01]]
+- [[../06-production/plan-prompts-home-camp-field|prompti]] · [[CHECKPOINT|CHECKPOINT]]

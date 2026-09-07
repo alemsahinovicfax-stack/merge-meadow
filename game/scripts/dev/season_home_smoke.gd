@@ -33,6 +33,95 @@ func _rgb_equal(a: Color, b: Color) -> bool:
 	return is_equal_approx(a.r, b.r) and is_equal_approx(a.g, b.g) and is_equal_approx(a.b, b.b)
 
 
+func _today() -> String:
+	var d := Time.get_date_dict_from_system()
+	return "%04d-%02d-%02d" % [int(d.year), int(d.month), int(d.day)]
+
+
+func _caption_has_arena(text: String) -> bool:
+	return text.find("Arena streak") >= 0 or text.find("Arena daily") >= 0
+
+
+func _assert_home_daily_gift(home: Node, gs: Node) -> String:
+	gs.set("last_daily_chest_day", "")
+	if home.has_method("_refresh_chest_card"):
+		home.call("_refresh_chest_card")
+	var caption: Label = home.get_node_or_null("%DailyCaption") as Label
+	if caption == null:
+		return "DailyCaption missing"
+	if caption.text != "Tap to open":
+		return "ready DailyCaption expected Tap to open got %s" % caption.text
+	if home.has_method("is_chest_attention_active") and not bool(home.call("is_chest_attention_active")):
+		return "ready daily chest should blink/shake"
+	if _caption_has_arena(caption.text):
+		return "ready DailyCaption must not mention arena"
+	gs.set("arena_daily_day", _today())
+	gs.set("arena_daily_kind", "merge_t2")
+	gs.set("arena_daily_goal", 3)
+	gs.set("arena_daily_progress", 3)
+	gs.set("arena_daily_claimed_day", "")
+	gs.set("arena_daily_streak", 7)
+	if not home.has_method("_finish_chest_claim"):
+		return "home missing _finish_chest_claim"
+	home.call("_finish_chest_claim")
+	if int(gs.get("arena_daily_streak")) != 7:
+		return "claim_daily_chest must not bump arena_daily_streak"
+	if caption.text != "Back tomorrow":
+		return "claimed DailyCaption expected Back tomorrow got %s" % caption.text
+	if home.has_method("is_chest_attention_active") and bool(home.call("is_chest_attention_active")):
+		return "claimed daily chest should stop attention"
+	if _caption_has_arena(caption.text):
+		return "claimed DailyCaption must not mention arena"
+	if home.has_method("_on_daily_chest_pressed"):
+		home.call("_on_daily_chest_pressed")
+	if int(gs.get("arena_daily_streak")) != 7:
+		return "claimed Daily tap must not bump arena_daily_streak"
+	var reward_title: Label = home.get_node_or_null("%RewardTitle") as Label
+	if reward_title == null:
+		return "RewardTitle missing"
+	if reward_title.text.find("Come back tomorrow") < 0:
+		return "claimed overlay title expected Come back tomorrow got %s" % reward_title.text
+	if reward_title.text == "Arena daily!":
+		return "claimed Daily overlay must not be Arena daily"
+	var reward_body: Label = home.get_node_or_null("%RewardBody") as Label
+	if reward_body == null:
+		return "RewardBody missing"
+	if reward_body.text.find("already opened today") < 0:
+		return "claimed overlay body expected already opened today got %s" % reward_body.text
+	if reward_body.text.findn("come back tomorrow") >= 0:
+		return "claimed overlay body must not repeat come back tomorrow got %s" % reward_body.text
+	var already := str(gs.call("claim_daily_chest"))
+	if already.findn("come back tomorrow") >= 0:
+		return "claim_daily_chest already-claimed must not say come back tomorrow got %s" % already
+	if already.find("already opened today") < 0:
+		return "claim_daily_chest already-claimed expected already opened today got %s" % already
+	if home.has_method("_hide_reward_overlay"):
+		home.call("_hide_reward_overlay")
+	return ""
+
+
+func _assert_open_field_hub_swipe(home: Node, swipe: Node, field: Control) -> String:
+	if swipe == null or not swipe.has_method("should_block_hub_swipe_at"):
+		return "SwipePager missing should_block_hub_swipe_at"
+	var mid_ctrl := field
+	if mid_ctrl == null or not mid_ctrl.visible:
+		mid_ctrl = home.get_node_or_null("%SeasonStage") as Control
+	if mid_ctrl == null:
+		return "SeasonField/Stage missing for swipe check"
+	var mid: Vector2 = mid_ctrl.get_global_rect().get_center()
+	if bool(swipe.call("should_block_hub_swipe_at", mid)):
+		return "field mid should not block hub swipe"
+	var chrome: Control = home.get_node_or_null("%DailyChestCard") as Control
+	if chrome == null or not chrome.visible:
+		chrome = home.get_node_or_null("%PlayRow") as Control
+	if chrome == null:
+		return "Daily/PlayRow missing for swipe chrome check"
+	var chrome_mid: Vector2 = chrome.get_global_rect().get_center()
+	if not bool(swipe.call("should_block_hub_swipe_at", chrome_mid)):
+		return "Daily or PlayRow should block hub swipe"
+	return ""
+
+
 func _run() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
@@ -91,6 +180,21 @@ func _run() -> void:
 		return
 	if endless_btn.visible:
 		_fail("carousel EndlessPlayButton should be hidden after tutorial")
+		return
+	var seasons_row_home: Control = home.get_node_or_null("%SeasonsRowButton") as Control
+	if seasons_row_home == null:
+		_fail("SeasonsRowButton missing")
+		return
+	if seasons_row_home.visible:
+		_fail("carousel SeasonsRowButton should be hidden")
+		return
+	var basket_home: Control = home.get_node_or_null("%BasketCard") as Control
+	if basket_home and basket_home.visible:
+		_fail("carousel BasketCard should be hidden")
+		return
+	var daily_err := _assert_home_daily_gift(home, gs)
+	if not daily_err.is_empty():
+		_fail(daily_err)
 		return
 	var play_btn_home: Control = home.get_node_or_null("%PlayButton") as Control
 	if play_btn_home == null:
@@ -238,6 +342,11 @@ func _run() -> void:
 		if not bool(gs.get("home_season_field_open")):
 			_fail("Playable center tap should open season field")
 			return
+		var field_ctrl: Control = stage.get_node_or_null("%SeasonField") as Control
+		var field_swipe_err := _assert_open_field_hub_swipe(home, swipe, field_ctrl)
+		if not field_swipe_err.is_empty():
+			_fail(field_swipe_err)
+			return
 		if stage.has_method("close_season_field"):
 			stage.call("close_season_field")
 		await process_frame
@@ -258,11 +367,37 @@ func _run() -> void:
 	if gate == null or not gate.visible:
 		_fail("next-lock center should show Unlock gate")
 		return
+	var frost_coin: TextureRect = stage.get_node_or_null("%UnlockCoinIcon") as TextureRect
+	var frost_flower: Label = stage.get_node_or_null("%UnlockFlowerName") as Label
+	var frost_coins: Label = stage.get_node_or_null("%UnlockGateCoins") as Label
+	if frost_coin == null or frost_coin.texture == null:
+		_fail("Frost unlock poster coin icon missing texture")
+		return
+	if frost_flower == null or frost_flower.text.findn("Harvest Pumpkin") < 0:
+		_fail("Frost poster flower should be Harvest Pumpkin, got '%s'" % (frost_flower.text if frost_flower else ""))
+		return
+	if frost_coins == null or frost_coins.text.find("Coins") >= 0:
+		_fail("Frost coins label must be n / need, got '%s'" % (frost_coins.text if frost_coins else ""))
+		return
 	if gate.anchor_left >= 0.5:
 		_fail("UnlockGate must sit in the lower-center half, not the right corner")
 		return
-	if gate.anchor_top < 0.58:
-		_fail("UnlockGate must sit below the lock+title, got anchor_top=%s" % gate.anchor_top)
+	if gate.anchor_top < 0.54 or gate.anchor_top >= 0.70:
+		_fail("UnlockGate must sit in the lower band, got anchor_top=%s" % gate.anchor_top)
+		return
+	var unlock_progress: Control = stage.get_node_or_null("%UnlockProgress") as Control
+	if unlock_progress == null or unlock_progress.get_node_or_null("SectionDivider") == null:
+		_fail("UnlockProgress must have SectionDivider")
+		return
+	if frost_coin.custom_minimum_size.x > 44.0:
+		_fail("Unlock coin side must be <= 44, got %s" % frost_coin.custom_minimum_size.x)
+		return
+	var frost_flower_visual: Control = unlock_progress.get_node_or_null("FlowerVisual") as Control
+	if frost_flower_visual == null or frost_flower_visual.custom_minimum_size.x < 88.0:
+		_fail(
+			"Unlock flower min side must be >= 88, got %s"
+			% (frost_flower_visual.custom_minimum_size.x if frost_flower_visual else 0.0)
+		)
 		return
 	var gate_panel := gate.get_theme_stylebox("panel")
 	if gate_panel is StyleBoxFlat:
@@ -278,6 +413,9 @@ func _run() -> void:
 		return
 	if center.text.find("🔒") < 0 or center.text.find("Frost Orchard") < 0:
 		_fail("locked Frost center must show lock and name, got '%s'" % center.text)
+		return
+	if center.vertical_alignment != VERTICAL_ALIGNMENT_CENTER:
+		_fail("locked CenterTitle must stay vertically centered")
 		return
 	var frost_roster: Control = stage.get_node_or_null("%FreeRoster") as Control
 	if frost_roster != null and frost_roster.visible:
@@ -369,7 +507,7 @@ func _run() -> void:
 			return
 
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("garden_crystal_stash", {"pumpkin": 20})
 	if not stage.has_method("open_unlock_sheet"):
 		_fail("open_unlock_sheet missing")
 		return
@@ -618,7 +756,7 @@ func _run() -> void:
 			_fail("swipe-down select must keep lantern strip focus")
 			return
 	gs.set("wallet_coins", 499)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("garden_crystal_stash", {"crystal_peony": 20})
 	if stage.has_method("refresh"):
 		stage.call("refresh")
 	await process_frame
@@ -633,11 +771,25 @@ func _run() -> void:
 		return
 	var coins_lbl: Label = stage.get_node_or_null("%UnlockGateCoins") as Label
 	var seeds_lbl: Label = stage.get_node_or_null("%UnlockGateT3") as Label
-	if coins_lbl == null or coins_lbl.text.find("/ 500") < 0:
+	var coin_icon: TextureRect = stage.get_node_or_null("%UnlockCoinIcon") as TextureRect
+	var flower_name: Label = stage.get_node_or_null("%UnlockFlowerName") as Label
+	if coins_lbl == null or coins_lbl.text.find("Coins") >= 0:
+		_fail("Lantern coins label must not say Coins, got '%s'" % (coins_lbl.text if coins_lbl else ""))
+		return
+	if coins_lbl.text.find("/ 500") < 0:
 		_fail("Lantern coins bar should show / 500")
 		return
 	if seeds_lbl == null or seeds_lbl.text.find("/ 20") < 0:
-		_fail("Lantern seeds bar should show / 20")
+		_fail("Lantern star-3 count should show / 20")
+		return
+	if seeds_lbl.text.find("★★★") >= 0:
+		_fail("Lantern count label should not include stars, got '%s'" % seeds_lbl.text)
+		return
+	if coin_icon == null or coin_icon.texture == null:
+		_fail("Unlock poster coin icon missing texture")
+		return
+	if flower_name == null or flower_name.text.findn("Crystal Peony") < 0:
+		_fail("Lantern poster flower should be Crystal Peony, got '%s'" % (flower_name.text if flower_name else ""))
 		return
 	if roster != null and roster.visible:
 		_fail("FreeRoster must hide on locked Lantern")
@@ -646,12 +798,12 @@ func _run() -> void:
 		_fail("locked Lantern center must show lock and name, got '%s'" % center.text)
 		return
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("garden_crystal_stash", {"crystal_peony": 20})
 	if stage.has_method("refresh"):
 		stage.call("refresh")
 	await process_frame
 	if not bool(gs.call("can_unlock_free", "lantern_meadow")):
-		_fail("lantern should be unlockable with 500c/20 T3")
+		_fail("lantern should be unlockable with 500c/20 Frost star-3")
 		return
 	if gate == null or not gate.visible:
 		_fail("lantern center should show Unlock gate with resources")
@@ -708,12 +860,12 @@ func _run() -> void:
 		_fail("disabled Amber Unlock should stay subtle")
 		return
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("garden_crystal_stash", {"midnight_lotus": 20})
 	if stage.has_method("refresh"):
 		stage.call("refresh")
 	await process_frame
 	if not bool(gs.call("can_unlock_free", "amber_canopy")):
-		_fail("amber should be unlockable with 500c/20 T3")
+		_fail("amber should be unlockable with 500c/20 Lantern star-3")
 		return
 	if gate_btn.mouse_filter != Control.MOUSE_FILTER_STOP:
 		_fail("ready Amber Unlock button should STOP")

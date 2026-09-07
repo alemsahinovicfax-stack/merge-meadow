@@ -80,7 +80,7 @@ func _run() -> void:
 		push_error("collection_journal_smoke: journal load failed %d" % err)
 		quit(1)
 		return
-	for _i in 12:
+	for _i in 16:
 		await process_frame
 	var journal := current_scene as Control
 	if journal == null:
@@ -115,7 +115,7 @@ func _run() -> void:
 		push_error("collection_journal_smoke: journal reload failed %d" % err)
 		quit(1)
 		return
-	for _j in 12:
+	for _j in 16:
 		await process_frame
 	journal = current_scene as Control
 	list = journal.get_node_or_null("RootVBox/ListScroll/List") as VBoxContainer
@@ -149,7 +149,7 @@ func _run() -> void:
 		push_error("collection_journal_smoke: journal reload after stash failed %d" % err)
 		quit(1)
 		return
-	for _k in 12:
+	for _k in 16:
 		await process_frame
 	journal = current_scene as Control
 	list = journal.get_node_or_null("RootVBox/ListScroll/List") as VBoxContainer

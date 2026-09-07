@@ -64,4 +64,5 @@ P137 ulaz, P138 Play dual, P143 locked nema polja, P145 IGNORE cvijeće, P146 se
 
 - [[ideje-home-meadow-pitanja|P137–P158]] · [[ideje-home-chrome-pitanja|HOME-03 P]]
 - [[ideje-home-meadow-life-pitanja|HOME-14 P179+]]
+- [[ideje-home-meadow-dock-pitanja|HOME-15 P197+]]
 - [[../06-production/plan-prompts-home-meadow-chrome|prompti]]
