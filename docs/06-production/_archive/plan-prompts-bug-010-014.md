@@ -1,13 +1,15 @@
 ---
 type: produkcija
-status: aktivan
+status: arhiva
 milestone: M8
-tags: [produkcija, qa, plan, prompt]
+tags: [produkcija, qa, plan, prompt, arhiva]
 povezano:
   - d0-functional-audit
   - CHECKPOINT
 ai_sažetak: "Copy-paste Plan-mode promptovi Bug-010–014 — jedan chat + Plan mode po stavci."
 ---
+
+> **Arhivirano 2026-09-07** — svih 5 bugova (010–014) ✅ zatvoreno, vidi [[../d0-functional-audit|d0-functional-audit]]. Zadržano kao historijski zapis.
 
 # Plan promptovi — Bug-010 do Bug-014
 

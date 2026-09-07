@@ -1,13 +1,15 @@
 ---
 type: produkcija
-status: aktivan
+status: arhiva
 milestone: M8
-tags: [produkcija, qa, plan, prompt]
+tags: [produkcija, qa, plan, prompt, arhiva]
 povezano:
   - d0-functional-audit
   - CHECKPOINT
 ai_sažetak: "Copy-paste Plan-mode promptovi Bug-020–023 — Home, basket, journal, dijamanti."
 ---
+
+> **Arhivirano 2026-09-07** — svih 4 bugova (020–023) ✅ zatvoreno, vidi [[../d0-functional-audit|d0-functional-audit]]. Zadržano kao historijski zapis.
 
 # Plan promptovi — Bug-020 do Bug-023
 

@@ -210,25 +210,25 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 - **Bug-031 UI** — Garden chip price badge: desno broj + coin ikona (bez "seed = N C")
 - **Bug-031** — Exchange po rarity: seed ★1/2/3 = 1/2/4 C; flower 5/10/20; chip cost captions; leftover n×rate
 - **Bug-029** — T1 Album sprout unify: `CampPlantDraw.draw_fitted_plant`; bag / arena chip+peek / run pickup
-- **Bug-029–032** plan prompt paket — [[../06-production/plan-prompts-bug-029-032|plan-prompts-bug-029-032]] (T1 unify, rarity theme, exchange balance, Garden/Flower UX); redoslijed **029 → 030 → 031 → 032**
+- **Bug-029–032** plan prompt paket — [[../06-production/_archive/plan-prompts-bug-029-032|plan-prompts-bug-029-032]] (T1 unify, rarity theme, exchange balance, Garden/Flower UX); redoslijed **029 → 030 → 031 → 032**
 - **Bug-028** — `stash_garden_crystal` diže `collection_kept_tiers` na T3 (Journal T3 nakon arena merge)
 - **Bug-026** — Journal: T1/T2/T3 ikone scale-fit (bez clipa); 64px; unlock pravila ista; paket 024–027 ✅
 - **Bug-025** — Garden trade: rarity ASC grid; default TL select on page show; leftover 1–2 tradeable (proporcionalni coins)
 - **Bug-024** — Home BasketCard ispod DailyChest (prazna/filled korpa); uklonjen iz središnjeg Panela
 - **Bug-027** — SwipePager: capture mid-tween offset + ensure align na finish/cancel (nema stuck mid-page)
-- **Bug-024–027** plan prompt paket — [[../06-production/plan-prompts-bug-024-027|plan-prompts-bug-024-027]] (swipe snap, Home basket kartica, Garden trade leftover, journal T1–T3 fix)
+- **Bug-024–027** plan prompt paket — [[../06-production/_archive/plan-prompts-bug-024-027|plan-prompts-bug-024-027]] (swipe snap, Home basket kartica, Garden trade leftover, journal T1–T3 fix)
 - **Bug-020** — soft valuta `wallet_diamonds` (SAVE_VERSION 8); rare run drop ~1/300 seed-branch; hub DiamondChip + run DiamondRow; bez shop spend
 - **Bug-021** — Journal: tri bloom ikone T1/T2/T3 po tipu (locked sivo, unlocked boja)
 - **Bug-023** — Basket picker na Home (unlocked tipovi + Clear); Camp bez LoadoutButton/chip→loadout (trade-only)
 - **Bug-022** — Home: uklonjeni Camp/Shop CTA; Settings samo na Home; DailyChest+overlay s Campa na Home; meadow dekor
-- **Bug-020–023** plan prompt paket — [[../06-production/plan-prompts-bug-020-023|plan-prompts-bug-020-023]] (Home refactor, basket na Home, journal T1–T3 visuals, dijamant valuta)
+- **Bug-020–023** plan prompt paket — [[../06-production/_archive/plan-prompts-bug-020-023|plan-prompts-bug-020-023]] (Home refactor, basket na Home, journal T1–T3 visuals, dijamant valuta)
 - **Bug-016** — odd T2: Done/Back više ne briše bloom (keep→donate→recycle T1); Arena hint/panel copy; Camp bag = T1-only
 - **Bug-018** — Garden bag tap → basket loadout + badge; LoadoutButton clear; hub-embedded sakriva Footer Merge/Play
 - **Bug-019** — hub bottom nav: uklonjen CaptionLabel; niži PageIndicator; tabovi+swipe ostaju
 - **Bug-017** — shop cosmetics buy: uklonjen `.bind` na signalima (dupli arg); wallet− + equip; booster connect isto
 - **Bug-015** — run HUD top strip: Pip | Timer/Lv | coin+seed brojevi na vrhu; feed ispod; compact counters
-- **Bug-015–019** plan prompt paket — [[../06-production/plan-prompts-bug-015-019|plan-prompts-bug-015-019]] (run HUD, T2 leftover, shop cosmetics, garden basket/footer, hub caption)
-- **Bug-010–014** plan prompt paket — [[../06-production/plan-prompts-bug-010-014|plan-prompts-bug-010-014]] (arena swipe lock, seed trade select, crystal panel, ukloni Shop Almanac, header brojevi)
+- **Bug-015–019** plan prompt paket — [[../06-production/_archive/plan-prompts-bug-015-019|plan-prompts-bug-015-019]] (run HUD, T2 leftover, shop cosmetics, garden basket/footer, hub caption)
+- **Bug-010–014** plan prompt paket — [[../06-production/_archive/plan-prompts-bug-010-014|plan-prompts-bug-010-014]] (arena swipe lock, seed trade select, crystal panel, ukloni Shop Almanac, header brojevi)
 - **Bug-014** — hub header: `header_chip_count` (tamni ink, no clip); gušći chip bg; smoke assert brojeva
 - **Bug-010** — merge arena session lock (swipe+tabs); `process_mode` pause off-page; Done/Back unlock
 - **Bug-013** — uklonjen Seed Almanac (i TopProgress) iz Shop UI; Cosmetics/Boosters/IAP ostaju; unlock ostaje u GameState (lifetime)
