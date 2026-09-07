@@ -401,7 +401,7 @@ func unlock_free(season_id: String) -> bool:
 	if not can_unlock_free(season_id):
 		return false
 	var def := SeasonCatalog.get_def(season_id)
-	wallet_coins -= def.coins_cost
+	_try_spend_coins(def.coins_cost)
 	_spend_star3_flowers_for_unlock(season_id, def.t3_flowers_required)
 	unlocked_seasons.append(season_id)
 	active_season_id = season_id
@@ -1509,16 +1509,34 @@ func add_diamonds(amount: int) -> void:
 	save_player_save()
 
 
+## Economy indirection (plan-arhitektura-refaktor.md Stage 1). Every domain that
+## grants/spends coins should go through these two instead of touching
+## wallet_coins directly — keeps the coupling in one place ahead of the
+## eventual Economy class extraction (Stage 3+).
+func _add_coins(amount: int) -> void:
+	if amount <= 0:
+		return
+	wallet_coins += amount
+
+
+func _try_spend_coins(amount: int) -> bool:
+	if amount <= 0:
+		return true
+	if wallet_coins < amount:
+		return false
+	wallet_coins -= amount
+	return true
+
+
 func try_coin_unlock_next_seed() -> String:
 	if not has_pending_seed_unlock():
 		return "All seeds already unlocked."
 	var next_index := seed_unlock_index + 1
 	var cost := SeedUnlockConfig.coin_cost_to_unlock_index(next_index)
-	if wallet_coins < cost:
+	if not _try_spend_coins(cost):
 		return "Need %d coins (you have %d)." % [cost, wallet_coins]
 	var next_type := SeedUnlockConfig.get_type_at_index(next_index)
 	var next_name: String = get_seed_display_name(next_type)
-	wallet_coins -= cost
 	seed_unlock_index = next_index
 	save_player_save()
 	return "%s unlocked early — look for it in your next run!" % next_name
@@ -1732,7 +1750,7 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 		last_seed_bag = scaled_seeds.duplicate()
 		last_run_coins = scaled_coins
 	last_loot = sum_seed_bag(last_seed_bag)
-	wallet_coins += last_run_coins
+	_add_coins(last_run_coins)
 	_advance_tutorial_after_run()
 	if not last_failed and tutorial_complete:
 		if run_is_endless:
@@ -1892,7 +1910,7 @@ func double_loot_placeholder() -> bool:
 		last_seed_bag[type_id] = int(last_seed_bag[type_id]) * 2
 	last_loot = sum_seed_bag(last_seed_bag)
 	if last_run_coins > 0:
-		wallet_coins += last_run_coins
+		_add_coins(last_run_coins)
 		last_run_coins *= 2
 	loot_doubled = true
 	save_player_save()
@@ -1990,7 +2008,7 @@ func try_grant_arena_combo_coins() -> int:
 	if remaining <= 0:
 		return 0
 	var grant := mini(ARENA_COMBO_COINS, remaining)
-	wallet_coins += grant
+	_add_coins(grant)
 	combo_coins_granted_today += grant
 	save_player_save()
 	return grant
@@ -2010,7 +2028,7 @@ func claim_daily_chest() -> String:
 		pool = [SEED_TYPE_CLOVER]
 	var type_id: String = pool[randi() % pool.size()]
 	var added := add_seeds_to_bag(type_id, DAILY_CHEST_SEEDS)
-	wallet_coins += DAILY_CHEST_COINS
+	_add_coins(DAILY_CHEST_COINS)
 	last_daily_chest_day = _today_key()
 	save_player_save()
 	var name: String = get_seed_display_name(type_id)
@@ -2294,7 +2312,7 @@ func exchange_seeds_from_bag(type_id: String) -> bool:
 	var coins := seed_exchange_coins_for_take(take, type_id)
 	if not take_seeds_from_bag(type_id, take):
 		return false
-	wallet_coins += coins
+	_add_coins(coins)
 	save_player_save()
 	return true
 
@@ -2777,7 +2795,7 @@ func exchange_garden_crystal(type_id: String = "") -> bool:
 		garden_crystal_stash.erase(type_id)
 	else:
 		garden_crystal_stash[type_id] = have - 1
-	wallet_coins += crystal_exchange_coins_for_type(type_id)
+	_add_coins(crystal_exchange_coins_for_type(type_id))
 	save_player_save()
 	return true
 
@@ -2845,7 +2863,7 @@ func resolve_arena_leftover_bloom(type_id: String, tier: int) -> String:
 	# FLOW-A — leftover T2 → 2× T1. Arena does not donate/keep.
 	if add_seeds_to_bag(type_id, 2) > 0:
 		return "recycled"
-	wallet_coins += 2
+	_add_coins(2)
 	return "recycled"
 
 
@@ -2890,9 +2908,8 @@ func buy_cosmetic_with_coins(cosmetic_id: String) -> String:
 		equip_cosmetic(cosmetic_id)
 		return "%s equipped." % CosmeticCatalog.get_title(cosmetic_id)
 	var cost := CosmeticCatalog.get_coin_cost(cosmetic_id)
-	if wallet_coins < cost:
+	if not _try_spend_coins(cost):
 		return "Need %d coins." % cost
-	wallet_coins -= cost
 	owned_cosmetics[cosmetic_id] = true
 	equip_cosmetic(cosmetic_id)
 	save_player_save()
