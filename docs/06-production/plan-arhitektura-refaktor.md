@@ -12,6 +12,8 @@ ai_sažetak: "Kod arhitektura refaktor — u toku. GameState pun split po domena
 # Plan — kod arhitektura refaktor
 
 > **Status:** CAMP-06 je gotov i committan (`7b010d7`) — preduvjet ispunjen, refaktor je **u toku**. Prva verzija ovog doca (2026-09-07) je pretpostavljala "pun domain split u jednom prolazu"; nakon detaljnog remapiranja `game_state.gd` (2026-09-07, drugi prolaz) ispalo je da je to previše rizično bez testova (430 poziva iz 38 fajlova, nula signala, jedna 150-linijska `_apply_save_dict` koja dira ~35 varijabli). Ovaj doc sad opisuje **8 malih, samostalno-shippable etapa** koje vode do istog odobrenog cilja.
+>
+> **Napredak:** Stage 0 ✅ (`abd9743`) · Stage 1 ✅ (`c25a191`) · Stage 2 ✅ (`79f4523`) · Stage 3 ✅ (`83d2abd`, Cosmetics+Boosters ekstraktovani) · Stage 4-7 preostaju. Usput nađen i **prijavljen (ne popravljen)** pre-postojeći bug: `shop_nav_smoke.gd` puca sa "Identifier not found: SceneRouter" — potvrđeno da postoji i prije refaktora, nije regresija.
 
 ## Trenutno stanje `game_state.gd` (izmjereno 2026-09-07, post-CAMP-06)
 
