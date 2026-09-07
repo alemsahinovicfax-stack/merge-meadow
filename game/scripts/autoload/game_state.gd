@@ -143,7 +143,15 @@ var carry_seeds: int = 0
 # null = prazno; inače { type_id, tier }
 var garden_beds: Array = []
 var greenhouse_beds: Array = []
-var garden_crystal_stash: Dictionary = {}
+
+## Property (not a plain var) — see crystal_stash.gd's header for why:
+## camp_controller.gd reads/writes GameState.garden_crystal_stash directly as
+## a raw Dictionary. The getter returns the actual backing Dictionary (not a
+## copy) so in-place mutations keep working as before — same pattern as
+## seed_bag.
+var garden_crystal_stash: Dictionary:
+	get: return crystal_stash_domain.stash
+	set(value): crystal_stash_domain.stash = value
 
 ## Extracted domains (plan-arhitektura-refaktor.md Stage 3+). Instantiated in
 ## _ready(). Facade methods below (owns_cosmetic, use_booster, ...) forward to
@@ -153,6 +161,7 @@ var boosters: Boosters
 var companions: Companions
 var tutorial: Tutorial
 var seed_bag_domain: SeedBagDomain
+var crystal_stash_domain: CrystalStashDomain
 
 ## Kept as a var (not moved into Boosters) because merge_arena_controller.gd
 ## reads it directly as GameState.merge_hint_booster_active in two places;
@@ -227,6 +236,7 @@ func _ready() -> void:
 	companions = Companions.new(self)
 	tutorial = Tutorial.new(self)
 	seed_bag_domain = SeedBagDomain.new(self)
+	crystal_stash_domain = CrystalStashDomain.new(self)
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
@@ -1545,21 +1555,7 @@ func get_seed_bag_entries() -> Array[Dictionary]:
 
 
 func get_garden_crystal_entries() -> Array[Dictionary]:
-	## Sorted crystal stash rows for CrystalCard UI.
-	var out: Array[Dictionary] = []
-	for type_id in garden_crystal_stash:
-		var count := int(garden_crystal_stash[type_id])
-		if count <= 0:
-			continue
-		var tid := str(type_id)
-		out.append({
-			"type_id": tid,
-			"count": count,
-			"display_name": get_seed_display_name(tid),
-			"rarity": get_seed_rarity(tid),
-		})
-	out.sort_custom(_compare_seed_bag_entry_asc)
-	return out
+	return crystal_stash_domain.entries()
 
 
 func _compare_seed_bag_entry_asc(a: Dictionary, b: Dictionary) -> bool:
@@ -2449,40 +2445,20 @@ func stash_garden_crystal(type_id: String) -> void:
 	var prev_kept := int(collection_kept_tiers.get(type_id, 0))
 	collection_kept_tiers[type_id] = maxi(prev_kept, MAX_MERGE_TIER)
 	_mark_collection_journal_new(type_id, MAX_MERGE_TIER)
-	garden_crystal_stash[type_id] = int(garden_crystal_stash.get(type_id, 0)) + 1
+	crystal_stash_domain.add(type_id)
 	save_player_save()
 
 
 func get_garden_crystal_total() -> int:
-	return sum_seed_bag(garden_crystal_stash)
+	return crystal_stash_domain.total()
 
 
 func format_garden_crystal_stash_label() -> String:
-	var total := get_garden_crystal_total()
-	if total <= 0:
-		return "Garden stash: empty (T3 crystals from merge go here)"
-	var types: Array[String] = []
-	for type_id in garden_crystal_stash:
-		if int(garden_crystal_stash.get(type_id, 0)) > 0:
-			types.append(str(type_id))
-	types.sort_custom(_compare_seed_pour_priority)
-	var parts: PackedStringArray = []
-	for type_id in types:
-		var count := int(garden_crystal_stash.get(type_id, 0))
-		var name: String = get_seed_display_name(type_id)
-		parts.append("%s×%d" % [name, count])
-	return "Garden stash: %s (%d total)" % [", ".join(parts), total]
+	return crystal_stash_domain.format_label()
 
 
 func first_garden_crystal_type() -> String:
-	var types: Array[String] = []
-	for type_id in garden_crystal_stash:
-		if int(garden_crystal_stash.get(type_id, 0)) > 0:
-			types.append(str(type_id))
-	if types.is_empty():
-		return ""
-	types.sort_custom(_compare_seed_pour_priority)
-	return types[0]
+	return crystal_stash_domain.first_type()
 
 
 func exchange_garden_crystal(type_id: String = "") -> bool:
@@ -2490,13 +2466,8 @@ func exchange_garden_crystal(type_id: String = "") -> bool:
 		type_id = first_garden_crystal_type()
 	if type_id.is_empty():
 		return false
-	var have := int(garden_crystal_stash.get(type_id, 0))
-	if have <= 0:
+	if not crystal_stash_domain.take_one(type_id):
 		return false
-	if have <= 1:
-		garden_crystal_stash.erase(type_id)
-	else:
-		garden_crystal_stash[type_id] = have - 1
 	_add_coins(crystal_exchange_coins_for_type(type_id))
 	save_player_save()
 	return true
