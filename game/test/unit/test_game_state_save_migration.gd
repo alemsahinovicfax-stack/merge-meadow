@@ -36,7 +36,7 @@ func test_apply_save_dict_defaults_missing_fields() -> void:
 	assert_eq(_gs.seed_bag, {})
 	assert_eq(_gs.magnet_level, 0)
 	assert_eq(_gs.multiplier_level, 0)
-	assert_eq(_gs.active_companion_id, _gs.COMPANION_PIP, "unknown/missing companion must fall back to Pip")
+	assert_eq(_gs.get_active_companion_id(), _gs.COMPANION_PIP, "unknown/missing companion must fall back to Pip")
 	assert_eq(_gs.active_season_id, SeasonCatalog.DEFAULT_SEASON_ID)
 
 

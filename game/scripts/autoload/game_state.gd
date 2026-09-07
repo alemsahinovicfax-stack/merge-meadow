@@ -144,6 +144,7 @@ var garden_crystal_stash: Dictionary = {}
 ## these — external call sites are unchanged.
 var cosmetics: Cosmetics
 var boosters: Boosters
+var companions: Companions
 
 ## Kept as a var (not moved into Boosters) because merge_arena_controller.gd
 ## reads it directly as GameState.merge_hint_booster_active in two places;
@@ -183,8 +184,6 @@ var arena_daily_progress: int = 0
 var arena_daily_goal: int = 1
 var arena_daily_claimed_day: String = ""
 var arena_daily_streak: int = 0
-var active_companion_id: String = COMPANION_PIP
-var mochi_unlock_seen: bool = false
 var collection_journal_pending: Dictionary = {}
 var bloom_inbox: Array = []
 var _arena_chip_counter: int = 1
@@ -207,6 +206,7 @@ var skip_debug_season_unlock: bool = false
 func _ready() -> void:
 	cosmetics = Cosmetics.new(self)
 	boosters = Boosters.new(self)
+	companions = Companions.new(self)
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
@@ -265,8 +265,6 @@ func save_player_save() -> void:
 		"arena_daily_goal": arena_daily_goal,
 		"arena_daily_claimed_day": arena_daily_claimed_day,
 		"arena_daily_streak": arena_daily_streak,
-		"active_companion_id": active_companion_id,
-		"mochi_unlock_seen": mochi_unlock_seen,
 		"collection_journal_pending": collection_journal_pending.duplicate(),
 		"bloom_inbox": bloom_inbox.duplicate(true),
 		"arena_pest_tutorial_shown": arena_pest_tutorial_shown,
@@ -279,6 +277,7 @@ func save_player_save() -> void:
 	}
 	data.merge(cosmetics.to_save_dict())
 	data.merge(boosters.to_save_dict())
+	data.merge(companions.to_save_dict())
 	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		push_error("GameState: could not write %s" % PLAYER_SAVE_PATH)
@@ -889,11 +888,8 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	arena_daily_goal = maxi(1, int(data.get("arena_daily_goal", 1)))
 	arena_daily_claimed_day = str(data.get("arena_daily_claimed_day", ""))
 	arena_daily_streak = maxi(0, int(data.get("arena_daily_streak", 0)))
-	active_companion_id = str(data.get("active_companion_id", COMPANION_PIP))
-	mochi_unlock_seen = bool(data.get("mochi_unlock_seen", false))
+	companions.apply_from_save(data)
 	collection_journal_pending = _parse_string_int_dict(data.get("collection_journal_pending", {}))
-	if not is_companion_unlocked(active_companion_id):
-		active_companion_id = COMPANION_PIP
 	bloom_inbox = _deserialize_bloom_inbox(data.get("bloom_inbox", []))
 	arena_pest_tutorial_shown = bool(data.get("arena_pest_tutorial_shown", false))
 	unlocked_seasons = _parse_string_array(data.get("unlocked_seasons", []))
@@ -2478,64 +2474,29 @@ func get_camp_progress_level() -> int:
 	return magnet_level + multiplier_level
 
 
+## Facade forwards to Companions (Stage 4.1) — names/signatures unchanged.
 func is_companion_unlocked(companion_id: String) -> bool:
-	if companion_id == COMPANION_PIP:
-		return true
-	if companion_id == COMPANION_MOCHI:
-		return get_camp_progress_level() >= MOCHI_UNLOCK_CAMP_LEVEL
-	return false
+	return companions.is_unlocked(companion_id)
 
 
 func get_active_companion_id() -> String:
-	if is_companion_unlocked(active_companion_id):
-		return active_companion_id
-	return COMPANION_PIP
+	return companions.get_active_id()
 
 
 func get_companion_display_name(companion_id: String = "") -> String:
-	var id := companion_id if not companion_id.is_empty() else get_active_companion_id()
-	return _companion_name(id)
-
-
-func _companion_name(companion_id: String) -> String:
-	match companion_id:
-		COMPANION_PIP:
-			return "Pip"
-		COMPANION_MOCHI:
-			return "Mochi"
-		_:
-			return companion_id.capitalize()
+	return companions.display_name(companion_id)
 
 
 func format_mochi_unlock_hint() -> String:
-	if is_companion_unlocked(COMPANION_MOCHI):
-		return "Mochi unlocked — tap to run as cat!"
-	var need := MOCHI_UNLOCK_CAMP_LEVEL - get_camp_progress_level()
-	return "Mochi unlocks at camp level %d (%d upgrade%s to go)." % [
-		MOCHI_UNLOCK_CAMP_LEVEL,
-		maxi(0, need),
-		"" if need == 1 else "s",
-	]
+	return companions.format_mochi_unlock_hint()
 
 
 func try_set_active_companion(companion_id: String) -> String:
-	if not is_companion_unlocked(companion_id):
-		return format_mochi_unlock_hint()
-	if active_companion_id == companion_id:
-		return "%s is already your runner." % _companion_name(companion_id)
-	active_companion_id = companion_id
-	save_player_save()
-	return "%s will join your next run!" % _companion_name(companion_id)
+	return companions.try_set_active(companion_id)
 
 
 func poll_mochi_unlock_toast() -> String:
-	if mochi_unlock_seen:
-		return ""
-	if not is_companion_unlocked(COMPANION_MOCHI):
-		return ""
-	mochi_unlock_seen = true
-	save_player_save()
-	return "Mochi joined the meadow! Pick a companion below."
+	return companions.poll_mochi_unlock_toast()
 
 
 func _clear_legacy_beds() -> void:
