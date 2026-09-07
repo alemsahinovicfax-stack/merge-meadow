@@ -2317,6 +2317,28 @@ func exchange_seeds_from_bag(type_id: String) -> bool:
 	return true
 
 
+## Upgrades indirection (plan-arhitektura-refaktor.md Stage 2). Every donation
+## flow (Garden-bed, Bloom-inbox) should go through these instead of touching
+## sprinkler_donations/multiplier_donations directly — also collapses the
+## magnet/multiplier-cap guard that used to be duplicated at every call site.
+func _donate_toward_magnet() -> bool:
+	if magnet_level >= MAGNET_MAX_LEVEL:
+		return false
+	if sprinkler_donations >= MAGNET_COST_T2:
+		return false
+	sprinkler_donations += 1
+	return true
+
+
+func _donate_toward_multiplier() -> bool:
+	if multiplier_level >= MULTIPLIER_MAX_LEVEL:
+		return false
+	if multiplier_donations >= MULTIPLIER_COST_T3:
+		return false
+	multiplier_donations += 1
+	return true
+
+
 func donate_bloom_from_bed(bed_index: int, in_greenhouse: bool = false) -> bool:
 	var beds := _bed_array(in_greenhouse)
 	if bed_index < 0 or bed_index >= beds.size():
@@ -2324,12 +2346,9 @@ func donate_bloom_from_bed(bed_index: int, in_greenhouse: bool = false) -> bool:
 	var bed: Variant = beds[bed_index]
 	if bed == null or int(bed.get("tier", 0)) != 2:
 		return false
-	if magnet_level >= MAGNET_MAX_LEVEL:
-		return false
-	if sprinkler_donations >= MAGNET_COST_T2:
+	if not _donate_toward_magnet():
 		return false
 	beds[bed_index] = null
-	sprinkler_donations += 1
 	save_player_save()
 	return true
 
@@ -2420,12 +2439,9 @@ func donate_crystal_from_bed(bed_index: int, in_greenhouse: bool = false) -> boo
 	var bed: Variant = beds[bed_index]
 	if bed == null or int(bed.get("tier", 0)) != MAX_MERGE_TIER:
 		return false
-	if multiplier_level >= MULTIPLIER_MAX_LEVEL:
-		return false
-	if multiplier_donations >= MULTIPLIER_COST_T3:
+	if not _donate_toward_multiplier():
 		return false
 	beds[bed_index] = null
-	multiplier_donations += 1
 	save_player_save()
 	return true
 
@@ -2564,17 +2580,11 @@ func donate_bloom(type_id: String, tier: int) -> bool:
 	if type_id.is_empty() or tier < 2:
 		return false
 	if tier == 2:
-		if magnet_level >= MAGNET_MAX_LEVEL:
+		if not _donate_toward_magnet():
 			return false
-		if sprinkler_donations >= MAGNET_COST_T2:
-			return false
-		sprinkler_donations += 1
 	elif tier >= MAX_MERGE_TIER:
-		if multiplier_level >= MULTIPLIER_MAX_LEVEL:
+		if not _donate_toward_multiplier():
 			return false
-		if multiplier_donations >= MULTIPLIER_COST_T3:
-			return false
-		multiplier_donations += 1
 	else:
 		return false
 	save_player_save()
