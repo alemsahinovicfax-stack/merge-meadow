@@ -1026,7 +1026,7 @@ func _apply_debug_resources_if_new_game() -> void:
 
 
 func apply_debug_leftover_test_bag() -> bool:
-	return _try_apply_debug_leftover_test_bag(DEBUG_DEV_RESOURCES)
+	return _try_apply_debug_leftover_test_bag(OS.is_debug_build())
 
 
 func _try_apply_debug_leftover_test_bag(dev_enabled: bool) -> bool:
@@ -1047,7 +1047,7 @@ func _try_apply_debug_leftover_test_bag(dev_enabled: bool) -> bool:
 
 ## Dev/playtest — min. count po otključanom tipu (ignorira soft cap u torbi).
 func ensure_dev_unlocked_seeds(count_per_type: int = 10) -> void:
-	if not DEBUG_DEV_RESOURCES:
+	if not OS.is_debug_build():
 		return
 	_apply_debug_unlocked_seeds(count_per_type)
 	save_player_save()

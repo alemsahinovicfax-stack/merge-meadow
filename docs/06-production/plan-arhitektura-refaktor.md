@@ -18,6 +18,8 @@ ai_sažetak: "Kod arhitektura refaktor — u toku. GameState pun split po domena
 > `game_state.gd`: 2987 → 2503 linija nakon Stage 4.1-4.6 (dead-code brisanje + 4 domenske klase ekstraktovane).
 >
 > **Stage 4.4 napomena (2026-09-07):** Garden beds nije ekstraktovan kao domena — pokazalo se da je cijeli `garden_beds`/`greenhouse_beds` bed-merge API (~20 funkcija, ~180 linija: `plant_seed_in_bed`, `try_merge_beds`, `keep_bloom_from_bed`, `bed_is_empty`, `get_bed_type/tier`, `count_flowers_tier`, `empty_garden_beds`, `resolve_plant_type`, itd.) **mrtav kod** — prežitak pred-Arena prototipa, bez ijednog pozivaoca iz `merge_arena_controller.gd` ili bilo kojeg drugog ekrana. Obrisano umjesto ekstraktovano. `garden_beds`/`greenhouse_beds` nizovi + `_bed_array`/`_serialize_beds`/`_deserialize_beds`/`_migrate_legacy_beds_to_inbox` ostaju — i dalje služe kao landing pad za migraciju starih save-ova (`SAVE_VERSION` < 12). GUT 33/33 + `save_persistence_smoke`/`camp_donate_smoke` zeleno prije i poslije.
+>
+> **2026-09-07, van etapa:** `apply_debug_leftover_test_bag()`/`ensure_dev_unlocked_seeds()` guard popravljen (`DEBUG_DEV_RESOURCES` konstanta → `OS.is_debug_build()`) — bio je flipnut na `false` u `7b010d7` (CAMP-06 commit), pa su `arena_leftover_d_smoke` i `arena_leftover_b_smoke` (potonji: stara pretpostavka o alfabetskom sortu, ne guard) popravljeni izolovano od Stage 7. Stage 7 sad je samo fizički file-move.
 
 ## Trenutno stanje `game_state.gd` (izmjereno 2026-09-07, post-CAMP-06)
 
@@ -60,7 +62,7 @@ Isti pattern za `donate_bloom_from_bed` (~2302), `donate_crystal_from_bed` (~239
 Nakon što je Seasons svoja klasa: kanon = **"Season"** kao jedini content-noun (najmanje disruptivno, `SeasonDef`/`SeasonCatalog`/`SeasonTheme`/`SeasonCardContrast` već konzistentni). `strip_focus_id` → `focus_season_id`, riješi "field" sudar (`SeasonField`'s meadow vs. `season_stage`'s overlay) preimenovanjem dekorativnog widgeta na `meadow_ground`/`_meadow_bounds()`. `camp_controller.gd`'s `top_strip` → `top_bar`.
 
 ### Stage 7 — Dev-only izolacija
-`debug_*`/`DEBUG_*` (674-789, 1001-1046, konstante 79-114) → `game/scripts/autoload/game_state_debug.gd`, konzistentno iza `OS.is_debug_build()` (fix: `apply_debug_leftover_test_bag()` i `ensure_dev_unlocked_seeds()` trenutno nemaju runtime guard, samo `DEBUG_DEV_RESOURCES == false` konstantu).
+`debug_*`/`DEBUG_*` (674-789, 1001-1046, konstante 79-114) → `game/scripts/autoload/game_state_debug.gd`, konzistentno iza `OS.is_debug_build()`. Guard fix (`apply_debug_leftover_test_bag()` i `ensure_dev_unlocked_seeds()` gate) urađen prije samog Stage 7-a, 2026-09-07 — vidi ispod; ostaje samo fizički file-move.
 
 ## Sitniji cleanup (usput, ne zaseban stage)
 

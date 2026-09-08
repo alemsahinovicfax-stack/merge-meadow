@@ -183,7 +183,16 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("list should have 3 rows, got %s" % (str(list.get_child_count()) if list else "null"))
 		return
-	var clover_chip: Node = list.get_child(0)
+	var clover_chip: Node = null
+	for i in list.get_child_count():
+		var row := list.get_child(i)
+		if row.has_method("get_type_id") and str(row.call("get_type_id")) == "clover":
+			clover_chip = row
+			break
+	if clover_chip == null:
+		_restore_save(backup)
+		_fail("clover row missing from need-more list")
+		return
 	var count_text := ""
 	if clover_chip.has_method("get_count_label_text"):
 		count_text = str(clover_chip.call("get_count_label_text"))
