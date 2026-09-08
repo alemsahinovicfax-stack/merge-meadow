@@ -102,9 +102,6 @@ const TUTORIAL_FLAGS_PATH := "user://tutorial_flags.json"
 const PLAYER_SAVE_PATH := "user://player_save.json"
 const SAVE_VERSION := 12
 const RETIRED_SEED_TYPE_IDS: Array[String] = ["watermelon"]
-## HOME-06 P80 / HOME-09 P105 — last paid stays locked for IAP playtest.
-const TEST_LOCK_LAST_SEASONS := true
-const TEST_LOCK_PAID_ID := "ember_fen"
 ## HOME-07 P84 + HOME-09 P111 — debug skip so a free next-lock remains; can_unlock_free still works.
 const DEBUG_SKIP_FREE_ID := "lantern_meadow"
 const DEBUG_SKIP_AMBER_ID := "amber_canopy"
@@ -161,6 +158,7 @@ var seed_bag_domain: SeedBagDomain
 var crystal_stash_domain: CrystalStashDomain
 var bloom_inbox_domain: BloomInboxDomain
 var arena_domain: ArenaDomain
+var seasons_domain: SeasonsDomain
 
 ## Kept as a var (not moved into Boosters) because merge_arena_controller.gd
 ## reads it directly as GameState.merge_hint_booster_active in two places;
@@ -240,14 +238,34 @@ var bloom_inbox: Array:
 
 var meta_hub_active: bool = false
 var meta_hub_pending_page: int = MetaHubPages.MAIN
-var active_season_id: String = SeasonCatalog.DEFAULT_SEASON_ID
-var strip_focus_id: String = SeasonCatalog.DEFAULT_SEASON_ID
-var home_band: String = "free"
-var home_season_field_open: bool = false
-var home_season_field_id: String = ""
-var paid_strip_focus_id: String = ""
-var unlocked_seasons: Array[String] = [SeasonCatalog.DEFAULT_SEASON_ID]
-var owned_paid_seasons: Array[String] = []
+## Properties (not plain vars) — see crystal_stash.gd's header for why: the
+## save dict and several UI files (main_menu.gd, season_stage.gd) read/write
+## these by the same names as before Stage 4.8, now shimmed to
+## seasons_domain's fields.
+var active_season_id: String:
+	get: return seasons_domain.active_id
+	set(value): seasons_domain.active_id = value
+var strip_focus_id: String:
+	get: return seasons_domain.strip_focus_id
+	set(value): seasons_domain.strip_focus_id = value
+var home_band: String:
+	get: return seasons_domain.home_band
+	set(value): seasons_domain.home_band = value
+var home_season_field_open: bool:
+	get: return seasons_domain.field_open
+	set(value): seasons_domain.field_open = value
+var home_season_field_id: String:
+	get: return seasons_domain.field_id
+	set(value): seasons_domain.field_id = value
+var paid_strip_focus_id: String:
+	get: return seasons_domain.paid_strip_focus_id
+	set(value): seasons_domain.paid_strip_focus_id = value
+var unlocked_seasons: Array[String]:
+	get: return seasons_domain.unlocked
+	set(value): seasons_domain.unlocked = value
+var owned_paid_seasons: Array[String]:
+	get: return seasons_domain.owned_paid
+	set(value): seasons_domain.owned_paid = value
 var skip_debug_season_unlock: bool = false
 
 
@@ -260,6 +278,7 @@ func _ready() -> void:
 	crystal_stash_domain = CrystalStashDomain.new(self)
 	bloom_inbox_domain = BloomInboxDomain.new(self)
 	arena_domain = ArenaDomain.new(self)
+	seasons_domain = SeasonsDomain.new(self)
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
@@ -338,396 +357,156 @@ func t3_flower_count() -> int:
 	return get_garden_crystal_total()
 
 
+## Facade forwards to SeasonsDomain (Stage 4.8) — names/signatures kept
+## identical to before extraction so external call sites (season_stage.gd
+## alone makes 71 GameState.* calls) and the debug_*/Stage-7 functions below
+## don't change.
 func star3_type_ids_for_season(season_id: String) -> Array[String]:
-	var out: Array[String] = []
-	var def := SeasonCatalog.get_def(season_id)
-	if def == null:
-		return out
-	for type_id in def.seed_type_ids:
-		if type_id.is_empty():
-			continue
-		if get_seed_rarity(type_id) < 3:
-			continue
-		if not out.has(type_id):
-			out.append(type_id)
-	return out
+	return seasons_domain.star3_type_ids_for_season(season_id)
 
 
 func star3_type_id_for_season(season_id: String) -> String:
-	var ids := star3_type_ids_for_season(season_id)
-	if ids.size() != 1:
-		push_error(
-			"star3_type_id_for_season(%s) expected 1 rarity-3, got %d"
-			% [season_id, ids.size()]
-		)
-		return str(ids[0]) if not ids.is_empty() else ""
-	return ids[0]
+	return seasons_domain.star3_type_id_for_season(season_id)
 
 
 func star3_flower_count_for_season(season_id: String) -> int:
-	var type_id := star3_type_id_for_season(season_id)
-	if type_id.is_empty():
-		return 0
-	return maxi(0, int(garden_crystal_stash.get(type_id, 0)))
+	return seasons_domain.star3_flower_count_for_season(season_id)
 
 
 func previous_free_id_for(season_id: String) -> String:
-	return SeasonCatalog.previous_free_id(SeasonCatalog.get_def(season_id))
+	return seasons_domain.previous_free_id_for(season_id)
 
 
 func star3_flower_count_for_unlock(season_id: String) -> int:
-	var prev := previous_free_id_for(season_id)
-	if prev.is_empty():
-		return 0
-	return star3_flower_count_for_season(prev)
-
-
-func _spend_star3_flowers_for_unlock(season_id: String, amount: int) -> void:
-	if amount <= 0:
-		return
-	var prev := previous_free_id_for(season_id)
-	var left := amount
-	for type_id in star3_type_ids_for_season(prev):
-		if left <= 0:
-			break
-		var have := maxi(0, int(garden_crystal_stash.get(type_id, 0)))
-		if have <= 0:
-			continue
-		var take := mini(have, left)
-		var remain := have - take
-		if remain <= 0:
-			garden_crystal_stash.erase(type_id)
-		else:
-			garden_crystal_stash[type_id] = remain
-		left -= take
+	return seasons_domain.star3_flower_count_for_unlock(season_id)
 
 
 func get_season_def(season_id: String) -> SeasonDef:
-	return SeasonCatalog.get_def(season_id)
+	return seasons_domain.get_def(season_id)
 
 
 func is_season_unlocked_free(season_id: String) -> bool:
-	return unlocked_seasons.has(season_id)
+	return seasons_domain.is_unlocked_free(season_id)
 
 
 func is_test_locked_season(season_id: String) -> bool:
-	if not TEST_LOCK_LAST_SEASONS or season_id.is_empty():
-		return false
-	return season_id == TEST_LOCK_PAID_ID
+	return seasons_domain.is_test_locked(season_id)
 
 
 func is_season_playable(season_id: String) -> bool:
-	if is_test_locked_season(season_id):
-		return false
-	var def := SeasonCatalog.get_def(season_id)
-	if def == null:
-		return false
-	if def.is_free():
-		return unlocked_seasons.has(season_id)
-	return owned_paid_seasons.has(season_id)
+	return seasons_domain.is_playable(season_id)
 
 
 func is_free_selectable(season_id: String) -> bool:
-	if is_season_playable(season_id):
-		return true
-	if is_test_locked_season(season_id):
-		return false
-	var def := SeasonCatalog.get_def(season_id)
-	if def == null or not def.is_free():
-		return false
-	return season_id == next_locked_free_id()
+	return seasons_domain.is_free_selectable(season_id)
 
 
 func can_unlock_free(season_id: String) -> bool:
-	if is_test_locked_season(season_id):
-		return false
-	var def := SeasonCatalog.get_def(season_id)
-	if def == null or not def.is_free():
-		return false
-	if unlocked_seasons.has(season_id):
-		return false
-	var prev_id := SeasonCatalog.previous_free_id(def)
-	if not prev_id.is_empty() and not unlocked_seasons.has(prev_id):
-		return false
-	if wallet_coins < def.coins_cost:
-		return false
-	if star3_flower_count_for_unlock(season_id) < def.t3_flowers_required:
-		return false
-	return true
+	return seasons_domain.can_unlock_free(season_id)
 
 
 func unlock_free(season_id: String) -> bool:
-	if not can_unlock_free(season_id):
-		return false
-	var def := SeasonCatalog.get_def(season_id)
-	_try_spend_coins(def.coins_cost)
-	_spend_star3_flowers_for_unlock(season_id, def.t3_flowers_required)
-	unlocked_seasons.append(season_id)
-	active_season_id = season_id
-	strip_focus_id = season_id
-	save_player_save()
-	return true
+	return seasons_domain.unlock_free(season_id)
 
 
 func set_active_season(season_id: String, sync_strip: bool = true) -> bool:
-	if not is_season_playable(season_id):
-		return false
-	active_season_id = season_id
-	if sync_strip:
-		var def := SeasonCatalog.get_def(season_id)
-		if def != null and def.is_free():
-			strip_focus_id = season_id
-		elif def != null and def.is_paid():
-			paid_strip_focus_id = season_id
-	save_player_save()
-	return true
+	return seasons_domain.set_active(season_id, sync_strip)
 
 
 func grant_paid_season(season_id: String) -> bool:
-	if is_test_locked_season(season_id):
-		return false
-	var def := SeasonCatalog.get_def(season_id)
-	if def == null or not def.is_paid():
-		return false
-	if not owned_paid_seasons.has(season_id):
-		owned_paid_seasons.append(season_id)
-	active_season_id = season_id
-	paid_strip_focus_id = season_id
-	save_player_save()
-	return true
+	return seasons_domain.grant_paid(season_id)
 
 
 func list_playable_season_ids() -> Array[String]:
-	var out: Array[String] = []
-	for def in SeasonCatalog.free_defs_sorted():
-		if is_season_playable(def.id):
-			out.append(def.id)
-	for def in SeasonCatalog.paid_defs():
-		if is_season_playable(def.id):
-			out.append(def.id)
-	return out
+	return seasons_domain.list_playable_ids()
 
 
 func next_locked_free_id() -> String:
-	for def in SeasonCatalog.free_defs_sorted():
-		if not unlocked_seasons.has(def.id):
-			return def.id
-	return ""
+	return seasons_domain.next_locked_free_id()
 
 
 func reset_seasons_to_s1() -> void:
-	active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
-	strip_focus_id = SeasonCatalog.DEFAULT_SEASON_ID
-	home_band = "free"
-	home_season_field_open = false
-	home_season_field_id = ""
-	paid_strip_focus_id = ""
-	unlocked_seasons.clear()
-	unlocked_seasons.append(SeasonCatalog.DEFAULT_SEASON_ID)
-	owned_paid_seasons.clear()
-	_normalize_season_progress()
+	seasons_domain.reset_to_s1()
 
 
 func clear_owned_paid_seasons() -> void:
-	owned_paid_seasons.clear()
-	_normalize_season_progress()
+	seasons_domain.clear_owned_paid()
 
 
 func _normalize_season_progress() -> void:
-	var default_id := SeasonCatalog.DEFAULT_SEASON_ID
-	if not unlocked_seasons.has(default_id):
-		unlocked_seasons.insert(0, default_id)
-	var cleaned_free: Array[String] = []
-	for sid in unlocked_seasons:
-		var def := SeasonCatalog.get_def(sid)
-		if def != null and def.is_free() and not cleaned_free.has(sid):
-			cleaned_free.append(sid)
-	if cleaned_free.is_empty():
-		cleaned_free.append(default_id)
-	unlocked_seasons = cleaned_free
-	var cleaned_paid: Array[String] = []
-	for sid in owned_paid_seasons:
-		var def := SeasonCatalog.get_def(sid)
-		if def != null and def.is_paid() and not cleaned_paid.has(sid):
-			cleaned_paid.append(sid)
-	owned_paid_seasons = cleaned_paid
-	if not is_season_playable(active_season_id):
-		active_season_id = default_id
-	var strip_def := SeasonCatalog.get_def(strip_focus_id)
-	if strip_def == null or not strip_def.is_free() or not is_free_selectable(strip_focus_id):
-		strip_focus_id = _highest_unlocked_free_id()
-	if home_band != "free" and home_band != "paid":
-		home_band = "free"
-	var paid_ok := false
-	for paid_def in SeasonCatalog.paid_defs():
-		if paid_def.id == paid_strip_focus_id:
-			paid_ok = true
-			break
-	if not paid_ok:
-		paid_strip_focus_id = _first_paid_id()
+	seasons_domain.normalize_progress()
 
 
 func highest_unlocked_free_id() -> String:
-	return _highest_unlocked_free_id()
+	return seasons_domain.highest_unlocked_free_id()
 
 
 func last_playable_for_home_select() -> String:
-	if home_band == "paid":
-		var best := ""
-		for def in SeasonCatalog.paid_defs():
-			if is_season_playable(def.id):
-				best = def.id
-		if not best.is_empty():
-			return best
-	return _highest_unlocked_free_id()
-
-
-func _highest_unlocked_free_id() -> String:
-	var best := SeasonCatalog.DEFAULT_SEASON_ID
-	var best_order := -1
-	for def in SeasonCatalog.free_defs_sorted():
-		if is_season_playable(def.id) and def.order >= best_order:
-			best = def.id
-			best_order = def.order
-	return best
-
-
-func _first_paid_id() -> String:
-	var paid_list := SeasonCatalog.paid_defs()
-	if paid_list.is_empty():
-		return ""
-	return paid_list[0].id
+	return seasons_domain.last_playable_for_home_select()
 
 
 func home_hero_center_id() -> String:
-	if home_band == "paid":
-		return paid_strip_focus_id
-	return strip_focus_id
+	return seasons_domain.home_hero_center_id()
 
 
 func can_open_home_season_field() -> bool:
-	return is_season_playable(home_hero_center_id())
+	return seasons_domain.can_open_home_season_field()
 
 
 func open_home_season_field() -> bool:
-	if not can_open_home_season_field():
-		return false
-	var id := home_hero_center_id()
-	home_season_field_open = true
-	home_season_field_id = id
-	set_active_season(id)
-	return true
+	return seasons_domain.open_home_season_field()
 
 
 func close_home_season_field() -> void:
-	home_season_field_open = false
-	home_season_field_id = ""
+	seasons_domain.close_home_season_field()
 
 
 func set_home_band(band: String) -> void:
-	home_band = "paid" if band == "paid" else "free"
-	save_player_save()
+	seasons_domain.set_home_band(band)
 
 
 func set_paid_strip_focus(season_id: String) -> bool:
-	var def := SeasonCatalog.get_def(season_id)
-	if def == null or not def.is_paid():
-		return false
-	paid_strip_focus_id = season_id
-	save_player_save()
-	return true
+	return seasons_domain.set_paid_strip_focus(season_id)
 
 
 func set_free_strip_focus(season_id: String) -> bool:
-	var def := SeasonCatalog.get_def(season_id)
-	if def == null or not def.is_free():
-		return false
-	if not is_free_selectable(season_id):
-		return false
-	strip_focus_id = season_id
-	save_player_save()
-	return true
+	return seasons_domain.set_free_strip_focus(season_id)
 
 
 func strip_center_id() -> String:
-	return strip_focus_id
+	return seasons_domain.strip_center_id()
 
 
 func strip_left_id() -> String:
-	var idx := _strip_focus_index()
-	if idx <= 0:
-		return ""
-	return SeasonCatalog.free_defs_sorted()[idx - 1].id
+	return seasons_domain.strip_left_id()
 
 
 func strip_right_id() -> String:
-	var free_list := SeasonCatalog.free_defs_sorted()
-	var idx := _strip_focus_index()
-	if idx < 0 or idx >= free_list.size() - 1:
-		return ""
-	return free_list[idx + 1].id
+	return seasons_domain.strip_right_id()
 
 
 func is_strip_right_locked() -> bool:
-	var right_id := strip_right_id()
-	if right_id.is_empty():
-		return false
-	return not is_season_playable(right_id)
+	return seasons_domain.is_strip_right_locked()
 
 
 func cycle_free_strip(dir: int) -> bool:
-	if dir == 0:
-		return false
-	var free_list := SeasonCatalog.free_defs_sorted()
-	var idx := _strip_focus_index()
-	if idx < 0:
-		return false
-	var next_idx := idx + dir
-	if next_idx < 0 or next_idx >= free_list.size():
-		return false
-	var next_id := free_list[next_idx].id
-	if not is_free_selectable(next_id):
-		return false
-	if is_season_playable(next_id):
-		return set_active_season(next_id)
-	return set_free_strip_focus(next_id)
+	return seasons_domain.cycle_free_strip(dir)
 
 
 func paid_center_id() -> String:
-	return paid_strip_focus_id
+	return seasons_domain.paid_center_id()
 
 
 func paid_left_id() -> String:
-	var idx := _paid_focus_index()
-	if idx <= 0:
-		return ""
-	return SeasonCatalog.paid_defs()[idx - 1].id
+	return seasons_domain.paid_left_id()
 
 
 func paid_right_id() -> String:
-	var paid_list := SeasonCatalog.paid_defs()
-	var idx := _paid_focus_index()
-	if idx < 0 or idx >= paid_list.size() - 1:
-		return ""
-	return paid_list[idx + 1].id
+	return seasons_domain.paid_right_id()
 
 
 func cycle_paid_strip(dir: int) -> bool:
-	if dir == 0:
-		return false
-	var paid_list := SeasonCatalog.paid_defs()
-	var idx := _paid_focus_index()
-	if idx < 0:
-		return false
-	var next_idx := idx + dir
-	if next_idx < 0 or next_idx >= paid_list.size():
-		return false
-	var next_id := paid_list[next_idx].id
-	paid_strip_focus_id = next_id
-	if is_season_playable(next_id):
-		return set_active_season(next_id)
-	save_player_save()
-	return true
+	return seasons_domain.cycle_paid_strip(dir)
 
 
 func debug_unlock_all_seasons() -> void:
@@ -872,24 +651,6 @@ func _remap_seed_bag_to_season(season_id: String) -> void:
 			dest = allowed[0]
 		kept[dest] = n if int(kept.get(dest, 0)) <= 0 else int(kept.get(dest, 0)) + n
 	seed_bag = kept
-
-
-func _strip_focus_index() -> int:
-	var i := 0
-	for def in SeasonCatalog.free_defs_sorted():
-		if def.id == strip_focus_id:
-			return i
-		i += 1
-	return 0
-
-
-func _paid_focus_index() -> int:
-	var i := 0
-	for def in SeasonCatalog.paid_defs():
-		if def.id == paid_strip_focus_id:
-			return i
-		i += 1
-	return 0
 
 
 func _apply_save_dict(data: Dictionary) -> bool:
