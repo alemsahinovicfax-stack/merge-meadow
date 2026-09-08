@@ -12,8 +12,6 @@ const SCENE_COLLECTION := "res://scenes/ui/collection_journal.tscn"
 const ARENA_MAX_CHIPS := 40
 const ARENA_SNAP_DISTANCE := 100.0
 const ARENA_MAGNET_RADIUS := 130.0
-const ARENA_COMBO_COINS := 2
-const ARENA_COMBO_COIN_DAILY_CAP := 10
 
 const ARENA_PEST_SPEED := 85.0
 const ARENA_PEST_EAT_RADIUS := 36.0
@@ -162,6 +160,7 @@ var tutorial: Tutorial
 var seed_bag_domain: SeedBagDomain
 var crystal_stash_domain: CrystalStashDomain
 var bloom_inbox_domain: BloomInboxDomain
+var arena_domain: ArenaDomain
 
 ## Kept as a var (not moved into Boosters) because merge_arena_controller.gd
 ## reads it directly as GameState.merge_hint_booster_active in two places;
@@ -202,15 +201,35 @@ var seed_unlock_index: int = 0
 var lifetime_seeds_collected: Dictionary = {}
 var collection_kept_tiers: Dictionary = {}
 var last_daily_chest_day: String = ""
-var combo_coin_day: String = ""
-var combo_coins_granted_today: int = 0
-var arena_daily_day: String = ""
-var arena_daily_kind: String = ""
-var arena_daily_progress: int = 0
-var arena_daily_goal: int = 1
-var arena_daily_claimed_day: String = ""
-var arena_daily_streak: int = 0
 var collection_journal_pending: Dictionary = {}
+
+## Properties (not plain vars) — see crystal_stash.gd's header for why: the
+## save dict (to_save_dict/apply_from_save) reads/writes these by the same
+## names as before Stage 4.7, now shimmed to arena_domain's fields.
+var combo_coin_day: String:
+	get: return arena_domain.combo_coin_day
+	set(value): arena_domain.combo_coin_day = value
+var combo_coins_granted_today: int:
+	get: return arena_domain.combo_coins_granted_today
+	set(value): arena_domain.combo_coins_granted_today = value
+var arena_daily_day: String:
+	get: return arena_domain.daily_day
+	set(value): arena_domain.daily_day = value
+var arena_daily_kind: String:
+	get: return arena_domain.daily_kind
+	set(value): arena_domain.daily_kind = value
+var arena_daily_progress: int:
+	get: return arena_domain.daily_progress
+	set(value): arena_domain.daily_progress = value
+var arena_daily_goal: int:
+	get: return arena_domain.daily_goal
+	set(value): arena_domain.daily_goal = value
+var arena_daily_claimed_day: String:
+	get: return arena_domain.daily_claimed_day
+	set(value): arena_domain.daily_claimed_day = value
+var arena_daily_streak: int:
+	get: return arena_domain.daily_streak
+	set(value): arena_domain.daily_streak = value
 
 ## Property (not a plain var) — see bloom_inbox.gd's header for why. Nothing
 ## external reads this raw today, but the shim keeps the same pattern as
@@ -218,9 +237,6 @@ var collection_journal_pending: Dictionary = {}
 var bloom_inbox: Array:
 	get: return bloom_inbox_domain.inbox
 	set(value): bloom_inbox_domain.inbox = value
-
-var _arena_chip_counter: int = 1
-var _arena_pour_locked_types: Dictionary = {}
 
 var meta_hub_active: bool = false
 var meta_hub_pending_page: int = MetaHubPages.MAIN
@@ -243,6 +259,7 @@ func _ready() -> void:
 	seed_bag_domain = SeedBagDomain.new(self)
 	crystal_stash_domain = CrystalStashDomain.new(self)
 	bloom_inbox_domain = BloomInboxDomain.new(self)
+	arena_domain = ArenaDomain.new(self)
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
@@ -1903,18 +1920,7 @@ func _today_key() -> String:
 
 
 func try_grant_arena_combo_coins() -> int:
-	var today := _today_key()
-	if combo_coin_day != today:
-		combo_coin_day = today
-		combo_coins_granted_today = 0
-	var remaining := ARENA_COMBO_COIN_DAILY_CAP - combo_coins_granted_today
-	if remaining <= 0:
-		return 0
-	var grant := mini(ARENA_COMBO_COINS, remaining)
-	_add_coins(grant)
-	combo_coins_granted_today += grant
-	save_player_save()
-	return grant
+	return arena_domain.grant_combo_coins()
 
 
 func can_claim_daily_chest() -> bool:
@@ -1943,79 +1949,28 @@ func claim_daily_chest() -> String:
 	return "Daily chest: +%d coins and +%d %s seeds!" % [DAILY_CHEST_COINS, added, name]
 
 
-const ARENA_DAILY_KINDS: PackedStringArray = ["merge_t2", "make_t3", "combo_5"]
-
-
-func _arena_daily_kind_for_day(day: String) -> String:
-	if day.is_empty():
-		return ARENA_DAILY_KINDS[0]
-	var idx := absi(day.hash()) % ARENA_DAILY_KINDS.size()
-	return ARENA_DAILY_KINDS[idx]
-
-
-func _arena_daily_goal_for_kind(kind: String) -> int:
-	if kind == "merge_t2":
-		return 3
-	return 1
-
-
 func ensure_arena_daily_task() -> void:
-	var today := _today_key()
-	if arena_daily_day == today and not arena_daily_kind.is_empty():
-		arena_daily_goal = _arena_daily_goal_for_kind(arena_daily_kind)
-		arena_daily_progress = mini(arena_daily_progress, arena_daily_goal)
-		return
-	arena_daily_day = today
-	arena_daily_kind = _arena_daily_kind_for_day(today)
-	arena_daily_goal = _arena_daily_goal_for_kind(arena_daily_kind)
-	arena_daily_progress = 0
-	save_player_save()
+	arena_domain.ensure_daily_task()
 
 
 func note_arena_daily_event(kind: String) -> void:
-	ensure_arena_daily_task()
-	if kind != arena_daily_kind:
-		return
-	if arena_daily_progress >= arena_daily_goal:
-		return
-	arena_daily_progress += 1
-	save_player_save()
+	arena_domain.note_daily_event(kind)
 
 
 func can_claim_arena_daily() -> bool:
-	ensure_arena_daily_task()
-	return (
-		arena_daily_progress >= arena_daily_goal
-		and arena_daily_claimed_day != _today_key()
-	)
+	return arena_domain.can_claim_daily()
 
 
 func claim_arena_daily() -> String:
-	if not can_claim_arena_daily():
-		return "Arena daily already claimed today."
-	arena_daily_claimed_day = _today_key()
-	arena_daily_streak += 1
-	save_player_save()
-	return "Arena streak %d" % arena_daily_streak
+	return arena_domain.claim_daily()
 
 
 func get_arena_daily_hud_text() -> String:
-	ensure_arena_daily_task()
-	var n := mini(arena_daily_progress, arena_daily_goal)
-	if arena_daily_kind == "merge_t2":
-		return "Merge T2 %d/%d" % [n, arena_daily_goal]
-	if arena_daily_kind == "make_t3":
-		return "T3 %d/%d" % [n, arena_daily_goal]
-	return "Combo 5 %d/%d" % [n, arena_daily_goal]
+	return arena_domain.get_daily_hud_text()
 
 
 func get_arena_daily_home_line() -> String:
-	ensure_arena_daily_task()
-	if arena_daily_claimed_day == _today_key():
-		return "Arena streak %d" % arena_daily_streak
-	if arena_daily_progress >= arena_daily_goal:
-		return "Arena daily — tap for badge"
-	return "Arena %d/%d" % [mini(arena_daily_progress, arena_daily_goal), arena_daily_goal]
+	return arena_domain.get_daily_home_line()
 
 
 ## _bed_array/garden_beds/greenhouse_beds survive only to support
@@ -2255,52 +2210,23 @@ func flush_bloom_inbox_to_album() -> int:
 
 
 func is_arena_pour_locked(type_id: String) -> bool:
-	if type_id.is_empty() or not _arena_pour_locked_types.has(type_id):
-		return false
-	# S31 — lock does not block a real T3 set sitting in the bag.
-	if int(seed_bag.get(type_id, 0)) >= 4:
-		return false
-	return true
+	return arena_domain.is_pour_locked(type_id)
 
 
 func lock_arena_pour_type(type_id: String) -> void:
-	if type_id.is_empty():
-		return
-	if int(seed_bag.get(type_id, 0)) >= 4:
-		_arena_pour_locked_types.erase(type_id)
-		return
-	_arena_pour_locked_types[type_id] = true
+	arena_domain.lock_pour_type(type_id)
 
 
 func unlock_arena_pour_type(type_id: String) -> void:
-	if type_id.is_empty():
-		return
-	_arena_pour_locked_types.erase(type_id)
+	arena_domain.unlock_pour_type(type_id)
 
 
 func clear_arena_pour_locks() -> void:
-	_arena_pour_locked_types.clear()
+	arena_domain.clear_pour_locks()
 
 
 func pull_seeds_to_arena(max_count: int, _field_type_counts: Dictionary = {}) -> Array:
-	var out: Array = []
-	max_count = maxi(0, max_count)
-	if max_count <= 0:
-		return out
-	var queue := _build_arena_pour_queue()
-	var pulled := 0
-	for type_id in queue:
-		if pulled >= max_count:
-			break
-		if not take_seed_from_bag(type_id):
-			continue
-		var chip_id := _arena_chip_counter
-		_arena_chip_counter += 1
-		out.append({"chip_id": chip_id, "type_id": type_id, "tier": 1})
-		pulled += 1
-	if pulled > 0:
-		save_player_save()
-	return out
+	return arena_domain.pull_seeds(max_count, _field_type_counts)
 
 
 func _compare_seed_pour_priority(a: String, b: String) -> bool:
@@ -2318,24 +2244,6 @@ func get_bag_types_by_pour_priority() -> Array[String]:
 			out.append(str(type_id))
 	out.sort_custom(_compare_seed_pour_priority)
 	return out
-
-
-func _append_pourable_to_queue(queue: Array[String], type_id: String) -> int:
-	var n := int(seed_bag.get(type_id, 0))
-	if n < 4:
-		return 0
-	if is_arena_pour_locked(type_id):
-		return 0
-	for _i in n:
-		queue.append(type_id)
-	return n
-
-
-func _build_arena_pour_queue(_field_type_counts: Dictionary = {}) -> Array[String]:
-	var queue: Array[String] = []
-	for type_id in SeedCatalog.all_type_ids():
-		_append_pourable_to_queue(queue, type_id)
-	return queue
 
 
 func stash_garden_crystal(type_id: String) -> void:
@@ -2396,65 +2304,17 @@ func spawn_arena_chips_from_bag() -> Array:
 
 
 func try_merge_arena_chips(chip_a: int, chip_b: int, chip_data: Dictionary) -> Dictionary:
-	if chip_a == chip_b:
-		return {"ok": false, "msg": "Same chip."}
-	if not chip_data.has(chip_a) or not chip_data.has(chip_b):
-		return {"ok": false, "msg": "Missing chip."}
-	var a: Dictionary = chip_data[chip_a]
-	var b: Dictionary = chip_data[chip_b]
-	if str(a.get("type_id", "")) != str(b.get("type_id", "")):
-		return {"ok": false, "msg": "Different types."}
-	var tier := int(a.get("tier", 1))
-	if tier != int(b.get("tier", 1)) or tier >= MAX_MERGE_TIER:
-		return {"ok": false, "msg": "Cannot merge these tiers."}
-	var type_id: String = str(a.get("type_id", ""))
-	var new_tier := tier + 1
-	tutorial.notify_merge_completed()
-	if new_tier >= MAX_MERGE_TIER:
-		var center: Vector2 = (a.get("pos", Vector2.ZERO) + b.get("pos", Vector2.ZERO)) * 0.5
-		chip_data.erase(chip_b)
-		chip_data[chip_a] = {"chip_id": chip_a, "type_id": type_id, "tier": new_tier, "pos": center}
-		discovered_blooms[type_id] = true
-		_mark_collection_journal_new(type_id, new_tier)
-		return {"ok": true, "to_inbox": false, "new_tier": new_tier, "crystal": true}
-	var center: Vector2 = (a.get("pos", Vector2.ZERO) + b.get("pos", Vector2.ZERO)) * 0.5
-	chip_data.erase(chip_b)
-	chip_data[chip_a] = {"chip_id": chip_a, "type_id": type_id, "tier": new_tier, "pos": center}
-	return {"ok": true, "to_inbox": false, "new_tier": new_tier}
+	return arena_domain.try_merge_chips(chip_a, chip_b, chip_data)
 
 
 ## Resolve one arena leftover chip. Never silently drops T2+ (Bug-016).
 ## Returns: bagged | crystal | recycled | skipped
 func resolve_arena_leftover_bloom(type_id: String, tier: int) -> String:
-	if type_id.is_empty():
-		return "skipped"
-	if tier <= 1:
-		add_seeds_to_bag(type_id, 1)
-		return "bagged"
-	if tier >= MAX_MERGE_TIER:
-		stash_garden_crystal(type_id)
-		return "crystal"
-	# FLOW-A — leftover T2 → 2× T1. Arena does not donate/keep.
-	if add_seeds_to_bag(type_id, 2) > 0:
-		return "recycled"
-	_add_coins(2)
-	return "recycled"
+	return arena_domain.resolve_leftover_bloom(type_id, tier)
 
 
 func commit_arena_chips_to_bag(chip_data: Dictionary) -> Dictionary:
-	var summary := {"bagged": 0, "crystal": 0, "kept": 0, "donated": 0, "recycled": 0}
-	for _chip_id in chip_data:
-		var entry: Dictionary = chip_data[_chip_id]
-		var tier := int(entry.get("tier", 1))
-		var type_id := str(entry.get("type_id", ""))
-		if type_id.is_empty():
-			continue
-		var result := resolve_arena_leftover_bloom(type_id, tier)
-		if summary.has(result):
-			summary[result] = int(summary[result]) + 1
-	chip_data.clear()
-	save_player_save()
-	return summary
+	return arena_domain.commit_chips_to_bag(chip_data)
 
 
 ## Facade forwards to Cosmetics/Boosters (Stage 3) — names/signatures kept
