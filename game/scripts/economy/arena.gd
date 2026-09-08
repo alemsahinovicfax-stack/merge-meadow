@@ -40,6 +40,30 @@ func _init(owner: Variant) -> void:
 	_owner = owner
 
 
+func apply_from_save(data: Dictionary) -> void:
+	combo_coin_day = str(data.get("combo_coin_day", ""))
+	combo_coins_granted_today = maxi(0, int(data.get("combo_coins_granted_today", 0)))
+	daily_day = str(data.get("arena_daily_day", ""))
+	daily_kind = str(data.get("arena_daily_kind", ""))
+	daily_progress = maxi(0, int(data.get("arena_daily_progress", 0)))
+	daily_goal = maxi(1, int(data.get("arena_daily_goal", 1)))
+	daily_claimed_day = str(data.get("arena_daily_claimed_day", ""))
+	daily_streak = maxi(0, int(data.get("arena_daily_streak", 0)))
+
+
+func to_save_dict() -> Dictionary:
+	return {
+		"combo_coin_day": combo_coin_day,
+		"combo_coins_granted_today": combo_coins_granted_today,
+		"arena_daily_day": daily_day,
+		"arena_daily_kind": daily_kind,
+		"arena_daily_progress": daily_progress,
+		"arena_daily_goal": daily_goal,
+		"arena_daily_claimed_day": daily_claimed_day,
+		"arena_daily_streak": daily_streak,
+	}
+
+
 func grant_combo_coins() -> int:
 	var today: String = _owner._today_key()
 	if combo_coin_day != today:

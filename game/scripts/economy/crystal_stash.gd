@@ -26,6 +26,14 @@ func _init(owner: Variant) -> void:
 	_owner = owner
 
 
+func apply_from_save(data: Dictionary) -> void:
+	stash = SaveDictUtils.parse_string_int_dict(data.get("garden_crystal_stash", {}))
+
+
+func to_save_dict() -> Dictionary:
+	return {"garden_crystal_stash": stash.duplicate()}
+
+
 func add(type_id: String) -> void:
 	if type_id.is_empty():
 		return

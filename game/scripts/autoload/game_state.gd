@@ -159,6 +159,7 @@ var crystal_stash_domain: CrystalStashDomain
 var bloom_inbox_domain: BloomInboxDomain
 var arena_domain: ArenaDomain
 var seasons_domain: SeasonsDomain
+var save_migrations: SaveMigrations
 
 ## Kept as a var (not moved into Boosters) because merge_arena_controller.gd
 ## reads it directly as GameState.merge_hint_booster_active in two places;
@@ -279,6 +280,7 @@ func _ready() -> void:
 	bloom_inbox_domain = BloomInboxDomain.new(self)
 	arena_domain = ArenaDomain.new(self)
 	seasons_domain = SeasonsDomain.new(self)
+	save_migrations = SaveMigrations.new(self)
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
@@ -308,14 +310,12 @@ func save_player_save() -> void:
 		"version": SAVE_VERSION,
 		"wallet_coins": wallet_coins,
 		"wallet_diamonds": wallet_diamonds,
-		"seed_bag": seed_bag.duplicate(),
 		"magnet_level": magnet_level,
 		"multiplier_level": multiplier_level,
 		"loadout_type_id": loadout_type_id,
 		"discovered_blooms": discovered_blooms.duplicate(),
 		"garden_beds": _serialize_beds(garden_beds),
 		"greenhouse_beds": _serialize_beds(greenhouse_beds),
-		"garden_crystal_stash": garden_crystal_stash.duplicate(),
 		"ads_removed": ads_removed,
 		"starter_pack_owned": starter_pack_owned,
 		"run_level": run_level,
@@ -325,27 +325,17 @@ func save_player_save() -> void:
 		"lifetime_seeds_collected": lifetime_seeds_collected.duplicate(),
 		"collection_kept_tiers": collection_kept_tiers.duplicate(),
 		"last_daily_chest_day": last_daily_chest_day,
-		"combo_coin_day": combo_coin_day,
-		"combo_coins_granted_today": combo_coins_granted_today,
-		"arena_daily_day": arena_daily_day,
-		"arena_daily_kind": arena_daily_kind,
-		"arena_daily_progress": arena_daily_progress,
-		"arena_daily_goal": arena_daily_goal,
-		"arena_daily_claimed_day": arena_daily_claimed_day,
-		"arena_daily_streak": arena_daily_streak,
 		"collection_journal_pending": collection_journal_pending.duplicate(),
-		"bloom_inbox": bloom_inbox.duplicate(true),
-		"active_season_id": active_season_id,
-		"strip_focus_id": strip_focus_id,
-		"home_band": home_band,
-		"paid_strip_focus_id": paid_strip_focus_id,
-		"unlocked_seasons": unlocked_seasons.duplicate(),
-		"owned_paid_seasons": owned_paid_seasons.duplicate(),
 	}
 	data.merge(cosmetics.to_save_dict())
 	data.merge(boosters.to_save_dict())
 	data.merge(companions.to_save_dict())
 	data.merge(tutorial.to_save_dict())
+	data.merge(seed_bag_domain.to_save_dict())
+	data.merge(crystal_stash_domain.to_save_dict())
+	data.merge(bloom_inbox_domain.to_save_dict())
+	data.merge(arena_domain.to_save_dict())
+	data.merge(seasons_domain.to_save_dict())
 	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		push_error("GameState: could not write %s" % PLAYER_SAVE_PATH)
@@ -661,14 +651,14 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	wallet_coins = maxi(0, int(data.get("wallet_coins", 0)))
 	# SAVE_VERSION 8 — older saves default to 0 diamonds.
 	wallet_diamonds = maxi(0, int(data.get("wallet_diamonds", 0)))
-	seed_bag = _parse_string_int_dict(data.get("seed_bag", {}))
+	seed_bag_domain.apply_from_save(data)
 	magnet_level = clampi(int(data.get("magnet_level", 0)), 0, MAGNET_MAX_LEVEL)
 	multiplier_level = clampi(int(data.get("multiplier_level", 0)), 0, MULTIPLIER_MAX_LEVEL)
 	loadout_type_id = str(data.get("loadout_type_id", ""))
 	discovered_blooms = _parse_string_bool_dict(data.get("discovered_blooms", {}))
 	garden_beds = _deserialize_beds(data.get("garden_beds", []), CAMP_BED_COUNT)
 	greenhouse_beds = _deserialize_beds(data.get("greenhouse_beds", []), GREENHOUSE_SLOT_COUNT)
-	garden_crystal_stash = _parse_string_int_dict(data.get("garden_crystal_stash", {}))
+	crystal_stash_domain.apply_from_save(data)
 	cosmetics.apply_from_save(data)
 	boosters.apply_from_save(data)
 	ads_removed = bool(data.get("ads_removed", false))
@@ -682,29 +672,17 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	)
 	seed_unlock_index = clampi(int(data.get("seed_unlock_index", 0)), 0, SeedUnlockConfig.chain_size() - 1)
 	lifetime_seeds_collected = _parse_string_int_dict(data.get("lifetime_seeds_collected", {}))
-	_drop_retired_seed_keys()
+	save_migrations.drop_retired_seed_keys()
 	collection_kept_tiers = _parse_string_int_dict(data.get("collection_kept_tiers", {}))
 	last_daily_chest_day = str(data.get("last_daily_chest_day", ""))
-	combo_coin_day = str(data.get("combo_coin_day", ""))
-	combo_coins_granted_today = maxi(0, int(data.get("combo_coins_granted_today", 0)))
-	arena_daily_day = str(data.get("arena_daily_day", ""))
-	arena_daily_kind = str(data.get("arena_daily_kind", ""))
-	arena_daily_progress = maxi(0, int(data.get("arena_daily_progress", 0)))
-	arena_daily_goal = maxi(1, int(data.get("arena_daily_goal", 1)))
-	arena_daily_claimed_day = str(data.get("arena_daily_claimed_day", ""))
-	arena_daily_streak = maxi(0, int(data.get("arena_daily_streak", 0)))
+	arena_domain.apply_from_save(data)
 	companions.apply_from_save(data)
 	collection_journal_pending = _parse_string_int_dict(data.get("collection_journal_pending", {}))
-	bloom_inbox = bloom_inbox_domain.deserialize(data.get("bloom_inbox", []))
-	unlocked_seasons = _parse_string_array(data.get("unlocked_seasons", []))
-	owned_paid_seasons = _parse_string_array(data.get("owned_paid_seasons", []))
-	active_season_id = str(data.get("active_season_id", SeasonCatalog.DEFAULT_SEASON_ID))
-	strip_focus_id = str(data.get("strip_focus_id", SeasonCatalog.DEFAULT_SEASON_ID))
-	home_band = str(data.get("home_band", "free"))
-	paid_strip_focus_id = str(data.get("paid_strip_focus_id", ""))
+	bloom_inbox_domain.apply_from_save(data)
+	seasons_domain.apply_from_save(data)
 	_normalize_season_progress()
 	if int(data.get("version", 0)) < SAVE_VERSION:
-		_migrate_legacy_beds_to_inbox()
+		save_migrations.migrate_legacy_beds_to_inbox()
 	_clear_legacy_beds()
 	_refresh_seed_unlock_from_lifetime()
 	if not is_seed_type_unlocked(loadout_type_id):
@@ -742,15 +720,6 @@ func _deserialize_beds(data: Variant, expected: int) -> Array:
 	return beds
 
 
-func _drop_retired_seed_keys() -> void:
-	for bag in [seed_bag, last_seed_bag, garden_crystal_stash, lifetime_seeds_collected]:
-		for tid in RETIRED_SEED_TYPE_IDS:
-			if bag.has(tid):
-				bag.erase(tid)
-	if RETIRED_SEED_TYPE_IDS.has(loadout_type_id):
-		loadout_type_id = ""
-
-
 func _parse_string_int_dict(data: Variant) -> Dictionary:
 	var out: Dictionary = {}
 	if not data is Dictionary:
@@ -769,28 +738,6 @@ func _parse_string_bool_dict(data: Variant) -> Dictionary:
 	for key in data:
 		if bool(data[key]):
 			out[str(key)] = true
-	return out
-
-
-func _parse_string_array(data: Variant) -> Array[String]:
-	var out: Array[String] = []
-	if not data is Array:
-		return out
-	for item in data:
-		var value := str(item).strip_edges()
-		if not value.is_empty() and not out.has(value):
-			out.append(value)
-	return out
-
-
-func _parse_string_string_dict(data: Variant) -> Dictionary:
-	var out: Dictionary = {}
-	if not data is Dictionary:
-		return out
-	for key in data:
-		var value := str(data[key])
-		if not value.is_empty():
-			out[str(key)] = value
 	return out
 
 
@@ -1735,7 +1682,7 @@ func get_arena_daily_home_line() -> String:
 
 
 ## _bed_array/garden_beds/greenhouse_beds survive only to support
-## _migrate_legacy_beds_to_inbox() below — the bed-merge gameplay these once
+## save_migrations.migrate_legacy_beds_to_inbox() — the bed-merge gameplay these once
 ## backed was superseded by the Arena chip-merge system
 ## (merge_arena_controller.gd) and had zero live callers left (plan-arhitektura-refaktor.md
 ## Stage 4.4, confirmed 2026-09-07: no controller/UI referenced plant_seed_in_bed,
@@ -1923,16 +1870,6 @@ func poll_mochi_unlock_toast() -> String:
 func _clear_legacy_beds() -> void:
 	garden_beds.clear()
 	greenhouse_beds.clear()
-
-
-func _migrate_legacy_beds_to_inbox() -> void:
-	for in_greenhouse in [false, true]:
-		for bed in _bed_array(in_greenhouse):
-			if bed == null:
-				continue
-			var tier := int(bed.get("tier", 0))
-			if tier >= 2:
-				push_bloom_inbox(str(bed.get("type_id", "")), tier)
 
 
 func count_bloom_inbox(min_tier: int = 2) -> int:

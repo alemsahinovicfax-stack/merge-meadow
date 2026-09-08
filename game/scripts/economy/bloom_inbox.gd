@@ -26,6 +26,14 @@ func _init(owner: Variant) -> void:
 	_owner = owner
 
 
+func apply_from_save(data: Dictionary) -> void:
+	inbox = deserialize(data.get("bloom_inbox", []))
+
+
+func to_save_dict() -> Dictionary:
+	return {"bloom_inbox": inbox.duplicate(true)}
+
+
 func deserialize(raw: Variant) -> Array:
 	var out: Array = []
 	if raw is Array:

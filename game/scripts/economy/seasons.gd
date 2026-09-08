@@ -40,6 +40,26 @@ func _init(owner: Variant) -> void:
 	_owner = owner
 
 
+func apply_from_save(data: Dictionary) -> void:
+	unlocked = SaveDictUtils.parse_string_array(data.get("unlocked_seasons", []))
+	owned_paid = SaveDictUtils.parse_string_array(data.get("owned_paid_seasons", []))
+	active_id = str(data.get("active_season_id", SeasonCatalog.DEFAULT_SEASON_ID))
+	strip_focus_id = str(data.get("strip_focus_id", SeasonCatalog.DEFAULT_SEASON_ID))
+	home_band = str(data.get("home_band", "free"))
+	paid_strip_focus_id = str(data.get("paid_strip_focus_id", ""))
+
+
+func to_save_dict() -> Dictionary:
+	return {
+		"active_season_id": active_id,
+		"strip_focus_id": strip_focus_id,
+		"home_band": home_band,
+		"paid_strip_focus_id": paid_strip_focus_id,
+		"unlocked_seasons": unlocked.duplicate(),
+		"owned_paid_seasons": owned_paid.duplicate(),
+	}
+
+
 func star3_type_ids_for_season(season_id: String) -> Array[String]:
 	var out: Array[String] = []
 	var def := SeasonCatalog.get_def(season_id)

@@ -23,6 +23,14 @@ func _init(owner: Variant) -> void:
 	_owner = owner
 
 
+func apply_from_save(data: Dictionary) -> void:
+	bag = SaveDictUtils.parse_string_int_dict(data.get("seed_bag", {}))
+
+
+func to_save_dict() -> Dictionary:
+	return {"seed_bag": bag.duplicate()}
+
+
 func add(type_id: String, count: int) -> int:
 	if count <= 0 or type_id.is_empty():
 		return 0
