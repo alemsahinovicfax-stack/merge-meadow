@@ -6,16 +6,18 @@ tags: [produkcija, arhitektura, refaktor, gamestate, testing]
 povezano:
   - CHECKPOINT
   - scope-i-granice
-ai_sažetak: "Kod arhitektura refaktor — u toku. GameState pun split po domenama u 8 sigurnih etapa, GUT testing, season/home naming, sitni cleanup. Stage 0-4.7 gotovi, Stage 5 (SaveManager thin-out) sljedeći."
+ai_sažetak: "Kod arhitektura refaktor — u toku. GameState pun split po domenama u 8 sigurnih etapa, GUT testing, season/home naming, sitni cleanup. Stage 0-4 gotovi (svih 8 domena ekstraktovano), Stage 5 (SaveManager thin-out) sljedeći."
 ---
 
 # Plan — kod arhitektura refaktor
 
 > **Status:** CAMP-06 je gotov i committan (`7b010d7`) — preduvjet ispunjen, refaktor je **u toku**. Prva verzija ovog doca (2026-09-07) je pretpostavljala "pun domain split u jednom prolazu"; nakon detaljnog remapiranja `game_state.gd` (2026-09-07, drugi prolaz) ispalo je da je to previše rizično bez testova (430 poziva iz 38 fajlova, nula signala, jedna 150-linijska `_apply_save_dict` koja dira ~35 varijabli). Ovaj doc sad opisuje **8 malih, samostalno-shippable etapa** koje vode do istog odobrenog cilja.
 >
-> **Napredak:** Stage 0 ✅ (`abd9743`) · Stage 1 ✅ (`c25a191`) · Stage 2 ✅ (`79f4523`) · Stage 3 ✅ (`83d2abd`, Cosmetics+Boosters ekstraktovani) · Stage 4.1 ✅ (`134c034`, Companions) · Stage 4.2 ✅ (`77ec067`, Tutorial) · Stage 4.3 ✅ (`39589eb`, Seed bag) · Stage 4.4 ✅ (`4822da0` + `af1f57b`, Garden beds — vidi napomenu ispod) · Stage 4.5 ✅ (`f79d8f0`, Crystal stash) · Stage 4.6 ✅ (`c2f3641` dead-code prep + `dc0fff4` extrakcija, Bloom inbox) · Stage 4.7 ✅ (`9687d8e`, Arena — najveći blast radius dosad, 152 poziva) · Stage 5-7 preostaju. Usput nađen i **prijavljen (ne popravljen)** pre-postojeći bug: `shop_nav_smoke.gd` puca sa "Identifier not found: SceneRouter" — potvrđeno da postoji i prije refaktora, nije regresija.
+> **Napredak:** Stage 0 ✅ (`abd9743`) · Stage 1 ✅ (`c25a191`) · Stage 2 ✅ (`79f4523`) · Stage 3 ✅ (`83d2abd`, Cosmetics+Boosters ekstraktovani) · Stage 4.1 ✅ (`134c034`, Companions) · Stage 4.2 ✅ (`77ec067`, Tutorial) · Stage 4.3 ✅ (`39589eb`, Seed bag) · Stage 4.4 ✅ (`4822da0` + `af1f57b`, Garden beds — vidi napomenu ispod) · Stage 4.5 ✅ (`f79d8f0`, Crystal stash) · Stage 4.6 ✅ (`c2f3641` dead-code prep + `dc0fff4` extrakcija, Bloom inbox) · Stage 4.7 ✅ (`9687d8e`, Arena — 152 poziva) · Stage 4.8 ✅ (`901fb7e`, Seasons — najveći blast radius, 71 poziva) · **Stage 4 gotov (svih 8 domena)**, Stage 5-7 preostaju. Usput nađen i **prijavljen (ne popravljen)** pre-postojeći bug: `shop_nav_smoke.gd` puca sa "Identifier not found: SceneRouter" — potvrđeno da postoji i prije refaktora, nije regresija.
 >
-> `game_state.gd`: 2987 → 2363 linija nakon Stage 4.1-4.7 (dead-code brisanje + 5 domenskih klasa ekstraktovano).
+> `game_state.gd`: 2987 → 2124 linija nakon Stage 4.1-4.8 (dead-code brisanje + 6 domenskih klasa ekstraktovano).
+>
+> **Stage 4.8 napomena (2026-09-08):** Seasons je najveći preostali domen (season_stage.gd samo 71 poziva). Free/paid unlock state, star3-flower unlock cost, i home/strip navigacija → `game/scripts/economy/seasons.gd` (`SeasonsDomain`). `debug_unlock_all_seasons`/`debug_grant_unlock_test_funds`/`debug_playtest_two_free`/`debug_relock_playtest_free`/`debug_fixture_s1_star3_playtest`/`_remap_seed_bag_to_season` namjerno ostaju na `GameState` — Stage 7 teritorija (fizički file-move), rade nepromijenjeno preko istih property/facade imena. `get_unlocked_loadout_types_for_season`/`get_active_season_spawn_types`/`is_loadout_in_active_season_pool` takođe ostaju — seed-unlock/spawn-pool utility, ne season-progression state. GUT 33/33 + svih 7 season/strip/home-basket smoke skripti + `save_persistence_smoke`/`camp_donate_smoke` zeleno prije i poslije.
 >
 > **Stage 4.7 napomena (2026-09-08):** Arena je bila najviše cross-domain-spregnuta domena dosad (Economy preko `_add_coins`, seed_bag preko `take_seed_from_bag`/`add_seeds_to_bag`, crystal_stash preko `stash_garden_crystal`, tutorial preko `notify_merge_completed`). `ARENA_MAX_CHIPS`/`ARENA_SNAP_DISTANCE`/`ARENA_MAGNET_RADIUS`/`ARENA_PEST_*` ostaju na `GameState` (čitaju se direktno kao `GameState.ARENA_*` iz `merge_arena_controller.gd`/`arena_pest.gd`) — nisu ekstraktovani, isti princip kao Garden beds' migration landing-pad. `_compare_seed_pour_priority`/`get_bag_types_by_pour_priority` ostaju takođe — dijeljena sortirajuća utility i za `crystal_stash.gd`, nije Arena-ekskluzivna. GUT 33/33 + svih 17 arena/merge_arena smoke skripti + `save_persistence_smoke`/`camp_donate_smoke` zeleno prije i poslije.
 >
@@ -54,8 +56,8 @@ Isti pattern za `donate_bloom_from_bed` (~2302), `donate_crystal_from_bed` (~239
 4. ✅ Garden beds — ispalo mrtav kod, obrisan umjesto ekstraktovan (vidi napomenu gore, 2026-09-07)
 5. ✅ Crystal stash → `game/scripts/economy/crystal_stash.gd` (`f79d8f0`)
 6. ✅ Bloom inbox → `game/scripts/economy/bloom_inbox.gd` (`dc0fff4`) — potvrđeno: per-item donate/keep/basket dizajn (`donate_bloom_inbox`, `basket_bloom_inbox`, `BloomInboxItem`) bio mrtav kod, zamijenjen CAMP-01 B redizajnom (`flush_bloom_inbox_to_album()` auto-keep). Obrisano u `c2f3641` prije ekstrakcije.
-7. Arena — 152 poziva iz camp/
-8. Seasons — najveći, najviše poziva (season_stage.gd = 71), radi zadnje
+7. ✅ Arena → `game/scripts/economy/arena.gd` (`9687d8e`) — 152 poziva iz camp/
+8. ✅ Seasons → `game/scripts/economy/seasons.gd` (`901fb7e`) — najveći, 71 poziva
 
 ### Stage 5 — SaveManager thin-out
 `_apply_save_dict` postaje dispatcher (`economy.apply_from_save(data)`, `seasons.apply_from_save(data)`, …). Dvije strukturne migracije sele u `game/scripts/autoload/save_migrations.gd`, pokreću se prije dispatch-a domenama. `SAVE_VERSION` ostaje na `GameState`.
