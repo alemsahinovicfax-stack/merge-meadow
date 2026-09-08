@@ -6,16 +6,18 @@ tags: [produkcija, arhitektura, refaktor, gamestate, testing]
 povezano:
   - CHECKPOINT
   - scope-i-granice
-ai_sažetak: "Kod arhitektura refaktor — u toku. GameState pun split po domenama u 8 sigurnih etapa, GUT testing, season/home naming, sitni cleanup. Stage 0/1 aktivni."
+ai_sažetak: "Kod arhitektura refaktor — u toku. GameState pun split po domenama u 8 sigurnih etapa, GUT testing, season/home naming, sitni cleanup. Stage 0-4.7 gotovi, Stage 5 (SaveManager thin-out) sljedeći."
 ---
 
 # Plan — kod arhitektura refaktor
 
 > **Status:** CAMP-06 je gotov i committan (`7b010d7`) — preduvjet ispunjen, refaktor je **u toku**. Prva verzija ovog doca (2026-09-07) je pretpostavljala "pun domain split u jednom prolazu"; nakon detaljnog remapiranja `game_state.gd` (2026-09-07, drugi prolaz) ispalo je da je to previše rizično bez testova (430 poziva iz 38 fajlova, nula signala, jedna 150-linijska `_apply_save_dict` koja dira ~35 varijabli). Ovaj doc sad opisuje **8 malih, samostalno-shippable etapa** koje vode do istog odobrenog cilja.
 >
-> **Napredak:** Stage 0 ✅ (`abd9743`) · Stage 1 ✅ (`c25a191`) · Stage 2 ✅ (`79f4523`) · Stage 3 ✅ (`83d2abd`, Cosmetics+Boosters ekstraktovani) · Stage 4.1 ✅ (`134c034`, Companions) · Stage 4.2 ✅ (`77ec067`, Tutorial) · Stage 4.3 ✅ (`39589eb`, Seed bag) · Stage 4.4 ✅ (`4822da0` + `af1f57b`, Garden beds — vidi napomenu ispod) · Stage 4.5 ✅ (`f79d8f0`, Crystal stash) · Stage 4.6 ✅ (`c2f3641` dead-code prep + `dc0fff4` extrakcija, Bloom inbox) · Stage 4.7-7 preostaju. Usput nađen i **prijavljen (ne popravljen)** pre-postojeći bug: `shop_nav_smoke.gd` puca sa "Identifier not found: SceneRouter" — potvrđeno da postoji i prije refaktora, nije regresija.
+> **Napredak:** Stage 0 ✅ (`abd9743`) · Stage 1 ✅ (`c25a191`) · Stage 2 ✅ (`79f4523`) · Stage 3 ✅ (`83d2abd`, Cosmetics+Boosters ekstraktovani) · Stage 4.1 ✅ (`134c034`, Companions) · Stage 4.2 ✅ (`77ec067`, Tutorial) · Stage 4.3 ✅ (`39589eb`, Seed bag) · Stage 4.4 ✅ (`4822da0` + `af1f57b`, Garden beds — vidi napomenu ispod) · Stage 4.5 ✅ (`f79d8f0`, Crystal stash) · Stage 4.6 ✅ (`c2f3641` dead-code prep + `dc0fff4` extrakcija, Bloom inbox) · Stage 4.7 ✅ (`9687d8e`, Arena — najveći blast radius dosad, 152 poziva) · Stage 5-7 preostaju. Usput nađen i **prijavljen (ne popravljen)** pre-postojeći bug: `shop_nav_smoke.gd` puca sa "Identifier not found: SceneRouter" — potvrđeno da postoji i prije refaktora, nije regresija.
 >
-> `game_state.gd`: 2987 → 2503 linija nakon Stage 4.1-4.6 (dead-code brisanje + 4 domenske klase ekstraktovane).
+> `game_state.gd`: 2987 → 2363 linija nakon Stage 4.1-4.7 (dead-code brisanje + 5 domenskih klasa ekstraktovano).
+>
+> **Stage 4.7 napomena (2026-09-08):** Arena je bila najviše cross-domain-spregnuta domena dosad (Economy preko `_add_coins`, seed_bag preko `take_seed_from_bag`/`add_seeds_to_bag`, crystal_stash preko `stash_garden_crystal`, tutorial preko `notify_merge_completed`). `ARENA_MAX_CHIPS`/`ARENA_SNAP_DISTANCE`/`ARENA_MAGNET_RADIUS`/`ARENA_PEST_*` ostaju na `GameState` (čitaju se direktno kao `GameState.ARENA_*` iz `merge_arena_controller.gd`/`arena_pest.gd`) — nisu ekstraktovani, isti princip kao Garden beds' migration landing-pad. `_compare_seed_pour_priority`/`get_bag_types_by_pour_priority` ostaju takođe — dijeljena sortirajuća utility i za `crystal_stash.gd`, nije Arena-ekskluzivna. GUT 33/33 + svih 17 arena/merge_arena smoke skripti + `save_persistence_smoke`/`camp_donate_smoke` zeleno prije i poslije.
 >
 > **Stage 4.4 napomena (2026-09-07):** Garden beds nije ekstraktovan kao domena — pokazalo se da je cijeli `garden_beds`/`greenhouse_beds` bed-merge API (~20 funkcija, ~180 linija: `plant_seed_in_bed`, `try_merge_beds`, `keep_bloom_from_bed`, `bed_is_empty`, `get_bed_type/tier`, `count_flowers_tier`, `empty_garden_beds`, `resolve_plant_type`, itd.) **mrtav kod** — prežitak pred-Arena prototipa, bez ijednog pozivaoca iz `merge_arena_controller.gd` ili bilo kojeg drugog ekrana. Obrisano umjesto ekstraktovano. `garden_beds`/`greenhouse_beds` nizovi + `_bed_array`/`_serialize_beds`/`_deserialize_beds`/`_migrate_legacy_beds_to_inbox` ostaju — i dalje služe kao landing pad za migraciju starih save-ova (`SAVE_VERSION` < 12). GUT 33/33 + `save_persistence_smoke`/`camp_donate_smoke` zeleno prije i poslije.
 >
