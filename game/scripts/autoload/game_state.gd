@@ -71,19 +71,6 @@ const COMPANION_PIP := "pip"
 const COMPANION_MOCHI := "mochi"
 const MOCHI_UNLOCK_CAMP_LEVEL := 2
 
-# Playtest — DEBUG seeda samo kad nema save datoteke (prvi boot).
-const DEBUG_DEV_RESOURCES := false
-const DEBUG_WALLET_COINS := 20
-const DEBUG_SEED_COUNT := 20
-## ARENA-02 leftover playtest. Overwrite ignores SEED_BAG_SOFT_CAP (stays 40).
-const DEBUG_LEFTOVER_TEST_BAG: Dictionary = {
-	"clover": 19,
-	"daisy": 22,
-	"buttercup": 13,
-	"tulip": 28,
-	"sunflower": 18,
-}
-
 const TUTORIAL_RUN1_DURATION := 45.0
 const TUTORIAL_RUN2_DURATION := 60.0
 const POST_TUTORIAL_RUN_DURATION := 60.0
@@ -102,9 +89,6 @@ const TUTORIAL_FLAGS_PATH := "user://tutorial_flags.json"
 const PLAYER_SAVE_PATH := "user://player_save.json"
 const SAVE_VERSION := 12
 const RETIRED_SEED_TYPE_IDS: Array[String] = ["watermelon"]
-## HOME-07 P84 + HOME-09 P111 — debug skip so a free next-lock remains; can_unlock_free still works.
-const DEBUG_SKIP_FREE_ID := "lantern_meadow"
-const DEBUG_SKIP_AMBER_ID := "amber_canopy"
 
 var last_seed_bag: Dictionary = {}
 var last_run_coins: int = 0
@@ -125,8 +109,12 @@ var revive_used_this_run: bool = false
 var seed_bag: Dictionary:
 	get: return seed_bag_domain.bag
 	set(value): seed_bag_domain.bag = value
-var _debug_leftover_bag_applied: bool = false
-
+## Property (not a plain var) — arena_leftover_d_smoke.gd and
+## game/tools/grant_test_seeds.gd both reset this by name via
+## gs.set("_debug_leftover_bag_applied", false) to force a fresh apply.
+var _debug_leftover_bag_applied: bool:
+	get: return debug._leftover_bag_applied
+	set(value): debug._leftover_bag_applied = value
 var resume_pending: bool = false
 var carry_seed_bag: Dictionary = {}
 var carry_coins: int = 0
@@ -160,6 +148,7 @@ var bloom_inbox_domain: BloomInboxDomain
 var arena_domain: ArenaDomain
 var seasons_domain: SeasonsDomain
 var save_migrations: SaveMigrations
+var debug: GameStateDebug
 
 ## Kept as a var (not moved into Boosters) because merge_arena_controller.gd
 ## reads it directly as GameState.merge_hint_booster_active in two places;
@@ -281,13 +270,14 @@ func _ready() -> void:
 	arena_domain = ArenaDomain.new(self)
 	seasons_domain = SeasonsDomain.new(self)
 	save_migrations = SaveMigrations.new(self)
+	debug = GameStateDebug.new(self)
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
 		reset_garden_beds()
 		reset_greenhouse_beds()
 		tutorial.migrate_legacy_flags()
-		_apply_debug_resources_if_new_game()
+		debug.apply_resources_if_new_game()
 		_normalize_season_progress()
 	else:
 		apply_debug_leftover_test_bag()
@@ -499,148 +489,29 @@ func cycle_paid_strip(dir: int) -> bool:
 	return seasons_domain.cycle_paid_strip(dir)
 
 
+## Facade forwards to GameStateDebug (Stage 7) — names/signatures kept
+## identical, since apply_debug_leftover_test_bag()/
+## _try_apply_debug_leftover_test_bag() are called from live production
+## code (merge_arena_controller.gd) and by name via gs.call(...) from
+## several dev smoke scripts, not just other debug tooling.
 func debug_unlock_all_seasons() -> void:
-	if not OS.is_debug_build():
-		return
-	for def in SeasonCatalog.free_defs_sorted():
-		if (
-			is_test_locked_season(def.id)
-			or def.id == DEBUG_SKIP_FREE_ID
-			or def.id == DEBUG_SKIP_AMBER_ID
-		):
-			continue
-		if not unlocked_seasons.has(def.id):
-			unlocked_seasons.append(def.id)
-	for def in SeasonCatalog.paid_defs():
-		if is_test_locked_season(def.id):
-			continue
-		if not owned_paid_seasons.has(def.id):
-			owned_paid_seasons.append(def.id)
-	var s2 := "frost_orchard"
-	if unlocked_seasons.has(s2):
-		focus_season_id = s2
-		active_season_id = s2
-	else:
-		focus_season_id = SeasonCatalog.DEFAULT_SEASON_ID
-		active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
-	_normalize_season_progress()
-	save_player_save()
+	debug.unlock_all_seasons()
 
 
 func debug_grant_unlock_test_funds() -> void:
-	if not OS.is_debug_build():
-		return
-	wallet_coins = maxi(wallet_coins, 500)
-	var next_id := next_locked_free_id()
-	if next_id.is_empty():
-		save_player_save()
-		return
-	var def := SeasonCatalog.get_def(next_id)
-	var need := 20
-	if def != null:
-		need = def.t3_flowers_required
-	var have := star3_flower_count_for_unlock(next_id)
-	if have < need:
-		var types := star3_type_ids_for_season(previous_free_id_for(next_id))
-		var fill_id := "pumpkin"
-		if not types.is_empty():
-			fill_id = types[0]
-			if types.has("pumpkin"):
-				fill_id = "pumpkin"
-		garden_crystal_stash[fill_id] = int(garden_crystal_stash.get(fill_id, 0)) + (need - have)
-	save_player_save()
+	debug.grant_unlock_test_funds()
 
 
 func debug_playtest_two_free() -> void:
-	if not OS.is_debug_build():
-		return
-	unlocked_seasons.clear()
-	unlocked_seasons.append(SeasonCatalog.DEFAULT_SEASON_ID)
-	if not unlocked_seasons.has("frost_orchard"):
-		unlocked_seasons.append("frost_orchard")
-	owned_paid_seasons.clear()
-	if is_season_playable("frost_orchard"):
-		focus_season_id = "frost_orchard"
-		active_season_id = "frost_orchard"
-	else:
-		focus_season_id = SeasonCatalog.DEFAULT_SEASON_ID
-		active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
-	_normalize_season_progress()
-	save_player_save()
+	debug.playtest_two_free()
 
 
 func debug_relock_playtest_free() -> void:
-	if not OS.is_debug_build():
-		return
-	var kept: Array[String] = []
-	for sid in unlocked_seasons:
-		var id := str(sid)
-		if id == DEBUG_SKIP_FREE_ID or id == DEBUG_SKIP_AMBER_ID:
-			continue
-		if not kept.has(id):
-			kept.append(id)
-	if not kept.has(SeasonCatalog.DEFAULT_SEASON_ID):
-		kept.insert(0, SeasonCatalog.DEFAULT_SEASON_ID)
-	if not kept.has("frost_orchard"):
-		kept.append("frost_orchard")
-	unlocked_seasons.clear()
-	for id in kept:
-		unlocked_seasons.append(id)
-	if is_season_playable("frost_orchard"):
-		focus_season_id = "frost_orchard"
-		active_season_id = "frost_orchard"
-	else:
-		focus_season_id = SeasonCatalog.DEFAULT_SEASON_ID
-		active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
-	_normalize_season_progress()
-	save_player_save()
+	debug.relock_playtest_free()
 
 
 func debug_fixture_s1_star3_playtest() -> void:
-	if not OS.is_debug_build():
-		return
-	var default_id := SeasonCatalog.DEFAULT_SEASON_ID
-	unlocked_seasons.clear()
-	unlocked_seasons.append(default_id)
-	active_season_id = default_id
-	focus_season_id = default_id
-	home_band = "free"
-	home_season_field_open = false
-	home_season_field_id = ""
-	_normalize_season_progress()
-	wallet_coins = maxi(wallet_coins, 500)
-	for type_id in star3_type_ids_for_season(default_id):
-		garden_crystal_stash.erase(type_id)
-	garden_crystal_stash["pumpkin"] = 19
-	_remap_seed_bag_to_season(default_id)
-	seed_bag["pumpkin"] = 22
-	save_player_save()
-
-
-func _remap_seed_bag_to_season(season_id: String) -> void:
-	var allowed := SeedCatalog.types_for_season(season_id)
-	if allowed.is_empty():
-		return
-	var kept: Dictionary = {}
-	var overflow: Array[int] = []
-	for type_id in seed_bag:
-		var n := int(seed_bag[type_id])
-		if n <= 0:
-			continue
-		if allowed.has(type_id):
-			kept[type_id] = n
-		else:
-			overflow.append(n)
-	for n in overflow:
-		var dest := ""
-		for tid in allowed:
-			if int(kept.get(tid, 0)) <= 0:
-				dest = tid
-				break
-		if dest.is_empty():
-			dest = allowed[0]
-		kept[dest] = n if int(kept.get(dest, 0)) <= 0 else int(kept.get(dest, 0)) + n
-	seed_bag = kept
+	debug.fixture_s1_star3_playtest()
 
 
 func _apply_save_dict(data: Dictionary) -> bool:
@@ -741,51 +612,17 @@ func _parse_string_bool_dict(data: Variant) -> Dictionary:
 	return out
 
 
-func _apply_debug_resources_if_new_game() -> void:
-	if not DEBUG_DEV_RESOURCES:
-		return
-	if FileAccess.file_exists(PLAYER_SAVE_PATH):
-		return
-	wallet_coins = DEBUG_WALLET_COINS
-	apply_debug_leftover_test_bag()
-
-
 func apply_debug_leftover_test_bag() -> bool:
-	return _try_apply_debug_leftover_test_bag(OS.is_debug_build())
+	return debug.apply_leftover_test_bag()
 
 
 func _try_apply_debug_leftover_test_bag(dev_enabled: bool) -> bool:
-	if not dev_enabled:
-		return false
-	if _debug_leftover_bag_applied:
-		return false
-	seed_bag = DEBUG_LEFTOVER_TEST_BAG.duplicate()
-	seed_unlock_index = 4
-	tutorial_complete = true
-	tutorial_step = TutorialStep.FREE
-	for type_id in DEBUG_LEFTOVER_TEST_BAG:
-		discovered_blooms[str(type_id)] = true
-	_debug_leftover_bag_applied = true
-	save_player_save()
-	return true
+	return debug.try_apply_leftover_test_bag(dev_enabled)
 
 
 ## Dev/playtest — min. count po otključanom tipu (ignorira soft cap u torbi).
 func ensure_dev_unlocked_seeds(count_per_type: int = 10) -> void:
-	if not OS.is_debug_build():
-		return
-	_apply_debug_unlocked_seeds(count_per_type)
-	save_player_save()
-
-
-func _apply_debug_unlocked_seeds(count_per_type: int) -> void:
-	for i in range(seed_unlock_index + 1):
-		var type_id := SeedUnlockConfig.get_type_at_index(i)
-		if type_id.is_empty():
-			continue
-		var current := int(seed_bag.get(type_id, 0))
-		if current < count_per_type:
-			seed_bag[type_id] = count_per_type
+	debug.ensure_dev_unlocked_seeds(count_per_type)
 
 
 ## Facade forwards to Tutorial (Stage 4.2) — names/signatures unchanged.
