@@ -243,17 +243,7 @@ Redoslijed unutar F8 (može paralelno s artom):
 - Loadout 3 slota
 - Zlatni grm, craft lane dekor
 - 7-day streak
-- **SEZ-01 Sezone / teme** (free linear + paid IAP) — [[../03-content/ideje-sezone|ideje-sezone]] · P0–E ✅
-- **HOME-01 Home polish** (kill Panel + free 3-slot strip) — [[../03-content/ideje-home-polish|ideje-home-polish]] · prompti [[plan-prompts-home-polish|plan-prompts-home-polish]] **P0–C ✅**
-- **HOME-03 Home chrome** — [[../03-content/ideje-home-chrome|ideje-home-chrome]] · **CHROME-C ✅**
-- **HOME-04 Paid dual-band + shop packs** — [[../03-content/ideje-home-paid|ideje-home-paid]] · prompti [[plan-prompts-home-paid|plan-prompts-home-paid]] **P0–C ✅**
-- **HOME-05 Glide + katalog** — [[../03-content/ideje-home-glide|ideje-home-glide]] · prompti [[plan-prompts-home-glide|plan-prompts-home-glide]] **P0–C ✅**
-- **HOME-06 Focus korekcija** — [[../03-content/ideje-home-focus|ideje-home-focus]] · prompti [[plan-prompts-home-focus|plan-prompts-home-focus]] **P0–C ✅**
-- **HOME-07 Unlock + roster** — [[../03-content/ideje-home-unlock|ideje-home-unlock]] · prompti [[plan-prompts-home-unlock|plan-prompts-home-unlock]] **P0–C ✅**
-- **HOME-08 In-card chrome** — [[../03-content/ideje-home-incard|ideje-home-incard]] · prompti [[plan-prompts-home-incard|plan-prompts-home-incard]] **P0–B ✅**
-- **HOME-09 Cardfit** — [[../03-content/ideje-home-cardfit|ideje-home-cardfit]] · prompti [[plan-prompts-home-cardfit|plan-prompts-home-cardfit]] **P0–B ✅**
-- **HOME-10 Lockflow** — [[../03-content/ideje-home-lockflow|ideje-home-lockflow]] · prompti [[plan-prompts-home-lockflow|plan-prompts-home-lockflow]] **P0–B ✅**
-- **HOME-11 Barfit** — [[../03-content/ideje-home-barfit|ideje-home-barfit]] · prompti [[plan-prompts-home-barfit|plan-prompts-home-barfit]] **P0–A ✅**
+- **SEZ-01…HOME-11** (Sezone/teme, Home polish/chrome/paid/glide/focus/unlock/incard/cardfit/lockflow/barfit) — svi isporučeni; scratch idea/prompt fajlovi uklonjeni 2026-09-08, vidi [[CHECKPOINT|CHECKPOINT]] Aktivne trake za historiju
 
 ---
 

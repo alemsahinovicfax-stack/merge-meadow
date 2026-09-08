@@ -44,7 +44,7 @@ Iz OUT / “kasnije” liste — **samo ako launch uspije**:
 | **MA-01b** | **Arena Muncher** — pest jede T1/T2, freeze 2 s na T3 | **M** | [[../02-design/merge-arena-pest|merge-arena-pest]] |
 | **UX-04** | **Hub carousel** — Shop · Main (centar) · Camp · Arena · Collection | **L** | [[../06-production/ideje-kad-predloziti|ideje-kad-predloziti]] § UX-04 |
 | **DG-01** | **Daily Goals** — 3 dnevna zadatka + bonus (prošireni daily chest) | **M** | isti doc § Daily Goals |
-| **SEZ-01** | **Sezone / teme** — free linear (coins + T3) + paid IAP; Home Stage + Browser | **L** | [[../03-content/ideje-sezone|ideje-sezone]] · [[plan-prompts-sez-01|plan-prompts-sez-01]] |
+| **SEZ-01** | **Sezone / teme** — free linear (coins + T3) + paid IAP; Home Stage + Browser | **L** | **isporučeno** |
 
 **SEZ-01 status (P0 freeze, 2026-08-19):** odobreno za implementaciju. Sljedeći korak **SEZ-B**. Ne čeka store D30.
 

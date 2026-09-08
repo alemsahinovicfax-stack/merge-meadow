@@ -16,7 +16,6 @@ tags: [hub, produkcija]
 - [[scope-i-granice|scope-i-granice]] — što JE i što NIJE u v1
 - [[verzije-nakon-launcha|verzije-nakon-launcha]] — v1.1+ parking (ne planirati detaljno sada)
 - [[ideje-roadmap-implementacije|ideje-roadmap-implementacije]] — build order F0–F9 (staro, vidi CHECKPOINT za trenutno stanje)
-- [[plan-prompts-star3-unlock-hub|plan-prompts-star3-unlock-hub]] — Journal swipe + star-3 unlock + camp link (jedan plan)
 - [[rizici|rizici]] — što može poći po zlu
 - [[store-listing-en|store-listing-en]] — EN Play / App Store copy (D4)
 - [[store-screenshots|store-screenshots]] — screenshot plan + capture

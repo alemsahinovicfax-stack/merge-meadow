@@ -70,8 +70,7 @@ Agent **smije** kodirati SEZ-B…E kao v1.1 track (nakon P0). Nije dio v1 launch
 
 | IN | Napomena |
 |----|----------|
-| **SEZ-01** | Free linear sezone (coins + T3 check-only) + paid IAP packs; Home Stage + Browser; Unlock sheet na next-free teaser; run spawn/BG hook; Fair F2P (paid = tema, ne snaga) |
-| Prompti | [[plan-prompts-sez-01|plan-prompts-sez-01]] **B → C → D → E** |
+| **SEZ-01** | Free linear sezone (coins + T3 check-only) + paid IAP packs; Home Stage + Browser; Unlock sheet na next-free teaser; run spawn/BG hook; Fair F2P (paid = tema, ne snaga) — **isporučeno** |
 
 ## Vertical slice (Faza 6–7) — prije punog launcha
 

@@ -9,7 +9,6 @@ povezano:
   - ekonomija
   - merge-kamp
   - spec-vertical-slice
-  - ideje-arena
 ai_sažetak: "SCRATCH brainstorm — rarity orbovi, grmovi između laneova, novčići, kolekcionarski dnevnik, shop skinovi, boostovi, ideje za kamp. Nije kanon."
 ---
 
@@ -650,7 +649,7 @@ SHOP (M8)         │
 | ID | Naslov | Sažetak | Doc |
 |----|--------|---------|-----|
 | **MA-01** | Merge Arena | Gredice → poseban ekran; T1 rasuta + magnet drag; T2/T3 u Bloom inbox traku | [[../02-design/merge-arena-v1.1\|merge-arena-v1.1]] |
-| **ARENA-01** | Arena zabavnija | Isti magnet + combo, soft cliff, daily slice; Q&A A1–A35; nije D0 | [[ideje-arena\|ideje-arena]] |
+| **ARENA-01** | Arena zabavnija | Isti magnet + combo, soft cliff, daily slice; Q&A A1–A35 | **isporučeno** |
 | **DG-01** | Daily Goals | 3 mini-zadatka/dan (coins, seeds po unlocku, merge tier) + bonus reward; prošireni chest | MA-01 spec · ARENA-01 može uzeti 1. slice |
 
 **Ne implementirati prije v1 launch.** Trenutni kamp (pair-first, seed chips, Keep→Album) = ship blocker polish, ne zamjena.
@@ -659,6 +658,5 @@ SHOP (M8)         │
 
 - [[ideje-identitet-lore|ideje-identitet-lore]] — Pip + sjeme/cvijet
 - [[../02-design/spec-vertical-slice|spec-vertical-slice]] — trenutni kamp (kanon; stari merge-kamp arhiviran)
-- [[ideje-arena|ARENA-01]] — zabavnija arena (scratch, v1.1+)
 - [[../02-design/ekonomija|ekonomija]] · [[../02-design/ekonomija-brojevi|ekonomija-brojevi]]
 - [[../02-design/spec-vertical-slice|spec-vertical-slice]]
