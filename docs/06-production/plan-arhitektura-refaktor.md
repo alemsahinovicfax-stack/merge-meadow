@@ -6,16 +6,16 @@ tags: [produkcija, arhitektura, refaktor, gamestate, testing]
 povezano:
   - CHECKPOINT
   - scope-i-granice
-ai_sažetak: "Kod arhitektura refaktor — u toku. GameState pun split po domenama u 8 sigurnih etapa, GUT testing, season/home naming, sitni cleanup. Stage 0-5 gotovi, Stage 6 (naming konsolidacija) sljedeći."
+ai_sažetak: "Kod arhitektura refaktor — u toku. GameState pun split po domenama u 8 sigurnih etapa, GUT testing, season/home naming, sitni cleanup. Stage 0-6 gotovi, Stage 7 (dev-only izolacija) sljedeći i zadnji."
 ---
 
 # Plan — kod arhitektura refaktor
 
 > **Status:** CAMP-06 je gotov i committan (`7b010d7`) — preduvjet ispunjen, refaktor je **u toku**. Prva verzija ovog doca (2026-09-07) je pretpostavljala "pun domain split u jednom prolazu"; nakon detaljnog remapiranja `game_state.gd` (2026-09-07, drugi prolaz) ispalo je da je to previše rizično bez testova (430 poziva iz 38 fajlova, nula signala, jedna 150-linijska `_apply_save_dict` koja dira ~35 varijabli). Ovaj doc sad opisuje **8 malih, samostalno-shippable etapa** koje vode do istog odobrenog cilja.
 >
-> **Napredak:** Stage 0 ✅ (`abd9743`) · Stage 1 ✅ (`c25a191`) · Stage 2 ✅ (`79f4523`) · Stage 3 ✅ (`83d2abd`, Cosmetics+Boosters ekstraktovani) · Stage 4.1 ✅ (`134c034`, Companions) · Stage 4.2 ✅ (`77ec067`, Tutorial) · Stage 4.3 ✅ (`39589eb`, Seed bag) · Stage 4.4 ✅ (`4822da0` + `af1f57b`, Garden beds — vidi napomenu ispod) · Stage 4.5 ✅ (`f79d8f0`, Crystal stash) · Stage 4.6 ✅ (`c2f3641` dead-code prep + `dc0fff4` extrakcija, Bloom inbox) · Stage 4.7 ✅ (`9687d8e`, Arena — 152 poziva) · Stage 4.8 ✅ (`901fb7e`, Seasons — najveći blast radius, 71 poziva) · **Stage 4 gotov (svih 8 domena)** · Stage 5 ✅ (`6652aae`, SaveManager thin-out) · Stage 6-7 preostaju. Usput nađen i **prijavljen (ne popravljen)** pre-postojeći bug: `shop_nav_smoke.gd` puca sa "Identifier not found: SceneRouter" — potvrđeno da postoji i prije refaktora, nije regresija.
+> **Napredak:** Stage 0 ✅ (`abd9743`) · Stage 1 ✅ (`c25a191`) · Stage 2 ✅ (`79f4523`) · Stage 3 ✅ (`83d2abd`, Cosmetics+Boosters ekstraktovani) · Stage 4.1 ✅ (`134c034`, Companions) · Stage 4.2 ✅ (`77ec067`, Tutorial) · Stage 4.3 ✅ (`39589eb`, Seed bag) · Stage 4.4 ✅ (`4822da0` + `af1f57b`, Garden beds — vidi napomenu ispod) · Stage 4.5 ✅ (`f79d8f0`, Crystal stash) · Stage 4.6 ✅ (`c2f3641` dead-code prep + `dc0fff4` extrakcija, Bloom inbox) · Stage 4.7 ✅ (`9687d8e`, Arena — 152 poziva) · Stage 4.8 ✅ (`901fb7e`, Seasons — najveći blast radius, 71 poziva) · **Stage 4 gotov (svih 8 domena)** · Stage 5 ✅ (`6652aae`, SaveManager thin-out) · Stage 6 ✅ (`5d01945`, naming konsolidacija) · Stage 7 preostaje. Usput nađen i **prijavljen (ne popravljen)** pre-postojeći bug: `shop_nav_smoke.gd` puca sa "Identifier not found: SceneRouter" — potvrđeno da postoji i prije refaktora, nije regresija.
 >
-> `game_state.gd`: 2987 → 2061 linija nakon Stage 4.1-5.
+> `game_state.gd`: 2987 → 2061 linija nakon Stage 4.1-5 (Stage 6 je čist rename, bez promjene linija).
 >
 > **Stage 5 napomena (2026-09-08):** `_apply_save_dict()`/`save_player_save()` su sad čisti per-domain dispatcheri — svaka od 5 preostalih ekstraktovanih domena (seed_bag, crystal_stash, bloom_inbox, arena, seasons) dobila je svoj `apply_from_save()`/`to_save_dict()` preko `SaveDictUtils` (cosmetics/boosters/companions/tutorial su to već imali od Stage 3/4). Dvije strukturne migracije (`_drop_retired_seed_keys`, `_migrate_legacy_beds_to_inbox`) preselile u `game/scripts/autoload/save_migrations.gd` (`SaveMigrations`) — čist code-motion, isti pozivi na istim mjestima. `SAVE_VERSION` ostaje na `GameState`. Verifikovano protiv `test_game_state_save_migration.gd` — 7 karakterizacionih testova napisanih baš da dokažu da ova etapa ništa ne mijenja — svih 7 zeleno, plus GUT 33/33 + 9 save/load-osjetljivih smoke skripti.
 >
@@ -64,8 +64,8 @@ Isti pattern za `donate_bloom_from_bed` (~2302), `donate_crystal_from_bed` (~239
 ### Stage 5 — SaveManager thin-out
 `_apply_save_dict` postaje dispatcher (`economy.apply_from_save(data)`, `seasons.apply_from_save(data)`, …). Dvije strukturne migracije sele u `game/scripts/autoload/save_migrations.gd`, pokreću se prije dispatch-a domenama. `SAVE_VERSION` ostaje na `GameState`.
 
-### Stage 6 — Season/home naming konsolidacija
-Nakon što je Seasons svoja klasa: kanon = **"Season"** kao jedini content-noun (najmanje disruptivno, `SeasonDef`/`SeasonCatalog`/`SeasonTheme`/`SeasonCardContrast` već konzistentni). `strip_focus_id` → `focus_season_id`, riješi "field" sudar (`SeasonField`'s meadow vs. `season_stage`'s overlay) preimenovanjem dekorativnog widgeta na `meadow_ground`/`_meadow_bounds()`. `camp_controller.gd`'s `top_strip` → `top_bar`.
+### Stage 6 — Season/home naming konsolidacija ✅ (`5d01945`)
+Nakon što je Seasons svoja klasa: kanon = **"Season"** kao jedini content-noun (najmanje disruptivno, `SeasonDef`/`SeasonCatalog`/`SeasonTheme`/`SeasonCardContrast` već konzistentni). `strip_focus_id` → `focus_season_id` ✅ (save-dict ključ ostaje `"strip_focus_id"` — save kompatibilnost; `paid_strip_focus_id` namjerno netaknut, doc imenuje samo ovo polje). "Field" sudar (`SeasonField`'s meadow vs. `season_stage`'s overlay) riješen ✅ preimenovanjem dekorativnog widgeta na `meadow_ground`/`_meadow_bounds()` (+ scene node `FieldGround` → `MeadowGround`). `camp_controller.gd`'s `top_strip` → **`header_panel`** ✅ (ne `top_bar` kako je doc doslovno predložio — `camp_scene.tscn` već ima nevezan child node legitimno nazvan "TopBar" (dugme-red ugniježđen unutar ovog kontejnera), pa bi ponovna upotreba tog imena za vanjski kontejner zamijenila jedan sudar imena gorim (roditelj i dijete dijele ime); `header_panel` zadržava stvarnu namjeru — prestati koristiti "strip" za nevezani layout chrome).
 
 ### Stage 7 — Dev-only izolacija
 `debug_*`/`DEBUG_*` (674-789, 1001-1046, konstante 79-114) → `game/scripts/autoload/game_state_debug.gd`, konzistentno iza `OS.is_debug_build()`. Guard fix (`apply_debug_leftover_test_bag()` i `ensure_dev_unlocked_seeds()` gate) urađen prije samog Stage 7-a, 2026-09-07 — vidi ispod; ostaje samo fizički file-move.
