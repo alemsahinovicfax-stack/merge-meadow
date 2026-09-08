@@ -407,7 +407,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("7_field")
 
-[node name="FieldGround" type="ColorRect" parent="SeasonField"]
+[node name="MeadowGround" type="ColorRect" parent="SeasonField"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15

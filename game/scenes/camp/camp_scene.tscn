@@ -149,20 +149,20 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 0
 
-[node name="TopStrip" type="PanelContainer" parent="RootVBox"]
+[node name="HeaderPanel" type="PanelContainer" parent="RootVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_top")
 
-[node name="VBox" type="VBoxContainer" parent="RootVBox/TopStrip"]
+[node name="VBox" type="VBoxContainer" parent="RootVBox/HeaderPanel"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="TopBar" type="HBoxContainer" parent="RootVBox/TopStrip/VBox"]
+[node name="TopBar" type="HBoxContainer" parent="RootVBox/HeaderPanel/VBox"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="HomeButton" type="PanelContainer" parent="RootVBox/TopStrip/VBox/TopBar"]
+[node name="HomeButton" type="PanelContainer" parent="RootVBox/HeaderPanel/VBox/TopBar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(52, 52)
 layout_mode = 2
@@ -171,7 +171,7 @@ label_text = ""
 button_icon = "home"
 button_variant = "subtle"
 
-[node name="CampTitle" type="Label" parent="RootVBox/TopStrip/VBox/TopBar"]
+[node name="CampTitle" type="Label" parent="RootVBox/HeaderPanel/VBox/TopBar"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -182,7 +182,7 @@ text = ""
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CollectionButton" type="PanelContainer" parent="RootVBox/TopStrip/VBox/TopBar"]
+[node name="CollectionButton" type="PanelContainer" parent="RootVBox/HeaderPanel/VBox/TopBar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(52, 52)
 layout_mode = 2
@@ -191,7 +191,7 @@ label_text = "📖"
 font_size = 28
 button_variant = "subtle"
 
-[node name="CollectionBadge" type="Label" parent="RootVBox/TopStrip/VBox/TopBar/CollectionButton"]
+[node name="CollectionBadge" type="Label" parent="RootVBox/HeaderPanel/VBox/TopBar/CollectionButton"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -210,7 +210,7 @@ text = "!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SettingsButton" type="PanelContainer" parent="RootVBox/TopStrip/VBox/TopBar"]
+[node name="SettingsButton" type="PanelContainer" parent="RootVBox/HeaderPanel/VBox/TopBar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(52, 52)
 layout_mode = 2
@@ -219,17 +219,17 @@ label_text = ""
 button_icon = "settings"
 button_variant = "subtle"
 
-[node name="ResourceBar" type="HBoxContainer" parent="RootVBox/TopStrip/VBox"]
+[node name="ResourceBar" type="HBoxContainer" parent="RootVBox/HeaderPanel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="CoinsRow" type="HBoxContainer" parent="RootVBox/TopStrip/VBox/ResourceBar"]
+[node name="CoinsRow" type="HBoxContainer" parent="RootVBox/HeaderPanel/VBox/ResourceBar"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="WalletIcon" type="TextureRect" parent="RootVBox/TopStrip/VBox/ResourceBar/CoinsRow"]
+[node name="WalletIcon" type="TextureRect" parent="RootVBox/HeaderPanel/VBox/ResourceBar/CoinsRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
@@ -238,7 +238,7 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CoinsLabel" type="Label" parent="RootVBox/TopStrip/VBox/ResourceBar/CoinsRow"]
+[node name="CoinsLabel" type="Label" parent="RootVBox/HeaderPanel/VBox/ResourceBar/CoinsRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
@@ -246,18 +246,18 @@ theme_override_font_sizes/font_size = 26
 text = "0"
 vertical_alignment = 1
 
-[node name="CoinsCaption" type="Label" parent="RootVBox/TopStrip/VBox/ResourceBar/CoinsRow"]
+[node name="CoinsCaption" type="Label" parent="RootVBox/HeaderPanel/VBox/ResourceBar/CoinsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.82, 0.7, 1)
 theme_override_font_sizes/font_size = 16
 text = "coins"
 vertical_alignment = 1
 
-[node name="SeedsRow" type="HBoxContainer" parent="RootVBox/TopStrip/VBox/ResourceBar"]
+[node name="SeedsRow" type="HBoxContainer" parent="RootVBox/HeaderPanel/VBox/ResourceBar"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="SeedsIcon" type="TextureRect" parent="RootVBox/TopStrip/VBox/ResourceBar/SeedsRow"]
+[node name="SeedsIcon" type="TextureRect" parent="RootVBox/HeaderPanel/VBox/ResourceBar/SeedsRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
@@ -266,7 +266,7 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SeedsLabel" type="Label" parent="RootVBox/TopStrip/VBox/ResourceBar/SeedsRow"]
+[node name="SeedsLabel" type="Label" parent="RootVBox/HeaderPanel/VBox/ResourceBar/SeedsRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.95, 0.6, 1)
@@ -274,7 +274,7 @@ theme_override_font_sizes/font_size = 26
 text = "0 / 40"
 vertical_alignment = 1
 
-[node name="SeedsCaption" type="Label" parent="RootVBox/TopStrip/VBox/ResourceBar/SeedsRow"]
+[node name="SeedsCaption" type="Label" parent="RootVBox/HeaderPanel/VBox/ResourceBar/SeedsRow"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.9, 0.72, 1)
 theme_override_font_sizes/font_size = 16

@@ -7,7 +7,7 @@ const SeedBagChipScript := preload("res://scripts/camp/seed_bag_chip.gd")
 const CrystalStashChipScript := preload("res://scripts/camp/crystal_stash_chip.gd")
 
 @onready var root_vbox: VBoxContainer = %RootVBox
-@onready var top_strip: PanelContainer = %TopStrip
+@onready var header_panel: PanelContainer = %HeaderPanel
 @onready var home_button: UiClickButton = %HomeButton
 @onready var camp_title: Label = %CampTitle
 @onready var collection_button: UiClickButton = %CollectionButton
@@ -121,9 +121,9 @@ func _setup_typography() -> void:
 		TEXT_LAYOUT.section_title_scroll(crystal_title)
 
 func _setup_safe_area() -> void:
-	if top_strip and not _meta_hub_embedded:
-		SAFE_AREA.apply_top_margin(top_strip, 8.0)
-		SAFE_AREA.apply_horizontal_margins(top_strip)
+	if header_panel and not _meta_hub_embedded:
+		SAFE_AREA.apply_top_margin(header_panel, 8.0)
+		SAFE_AREA.apply_horizontal_margins(header_panel)
 	if footer_bar:
 		SAFE_AREA.apply_bottom_margin(footer_bar, 4.0 if _meta_hub_embedded else 8.0)
 

@@ -16,6 +16,12 @@
 ## spawn-pool utility that reads season state, not season-progression state
 ## itself (same reasoning as crystal_stash.gd leaving pour-priority sort on
 ## the owner).
+##
+## Stage 6 naming note: `focus_season_id` was `strip_focus_id` — renamed so
+## "Season" stays the one content-noun (plan-arhitektura-refaktor.md Stage 6).
+## The save-dict key stays `"strip_focus_id"` in apply_from_save()/
+## to_save_dict() on purpose, so existing player saves keep loading.
+## `paid_strip_focus_id` is untouched — Stage 6 only names this one field.
 class_name SeasonsDomain
 extends RefCounted
 
@@ -23,7 +29,7 @@ const TEST_LOCK_LAST_SEASONS := true
 const TEST_LOCK_PAID_ID := "ember_fen"
 
 var active_id: String = SeasonCatalog.DEFAULT_SEASON_ID
-var strip_focus_id: String = SeasonCatalog.DEFAULT_SEASON_ID
+var focus_season_id: String = SeasonCatalog.DEFAULT_SEASON_ID
 var home_band: String = "free"
 var paid_strip_focus_id: String = ""
 var unlocked: Array[String] = [SeasonCatalog.DEFAULT_SEASON_ID]
@@ -44,7 +50,7 @@ func apply_from_save(data: Dictionary) -> void:
 	unlocked = SaveDictUtils.parse_string_array(data.get("unlocked_seasons", []))
 	owned_paid = SaveDictUtils.parse_string_array(data.get("owned_paid_seasons", []))
 	active_id = str(data.get("active_season_id", SeasonCatalog.DEFAULT_SEASON_ID))
-	strip_focus_id = str(data.get("strip_focus_id", SeasonCatalog.DEFAULT_SEASON_ID))
+	focus_season_id = str(data.get("strip_focus_id", SeasonCatalog.DEFAULT_SEASON_ID))
 	home_band = str(data.get("home_band", "free"))
 	paid_strip_focus_id = str(data.get("paid_strip_focus_id", ""))
 
@@ -52,7 +58,7 @@ func apply_from_save(data: Dictionary) -> void:
 func to_save_dict() -> Dictionary:
 	return {
 		"active_season_id": active_id,
-		"strip_focus_id": strip_focus_id,
+		"strip_focus_id": focus_season_id,
 		"home_band": home_band,
 		"paid_strip_focus_id": paid_strip_focus_id,
 		"unlocked_seasons": unlocked.duplicate(),
@@ -186,7 +192,7 @@ func unlock_free(season_id: String) -> bool:
 	spend_star3_flowers_for_unlock(season_id, def.t3_flowers_required)
 	unlocked.append(season_id)
 	active_id = season_id
-	strip_focus_id = season_id
+	focus_season_id = season_id
 	_owner.save_player_save()
 	return true
 
@@ -198,7 +204,7 @@ func set_active(season_id: String, sync_strip: bool = true) -> bool:
 	if sync_strip:
 		var def := SeasonCatalog.get_def(season_id)
 		if def != null and def.is_free():
-			strip_focus_id = season_id
+			focus_season_id = season_id
 		elif def != null and def.is_paid():
 			paid_strip_focus_id = season_id
 	_owner.save_player_save()
@@ -239,7 +245,7 @@ func next_locked_free_id() -> String:
 
 func reset_to_s1() -> void:
 	active_id = SeasonCatalog.DEFAULT_SEASON_ID
-	strip_focus_id = SeasonCatalog.DEFAULT_SEASON_ID
+	focus_season_id = SeasonCatalog.DEFAULT_SEASON_ID
 	home_band = "free"
 	field_open = false
 	field_id = ""
@@ -275,9 +281,9 @@ func normalize_progress() -> void:
 	owned_paid = cleaned_paid
 	if not is_playable(active_id):
 		active_id = default_id
-	var strip_def := SeasonCatalog.get_def(strip_focus_id)
-	if strip_def == null or not strip_def.is_free() or not is_free_selectable(strip_focus_id):
-		strip_focus_id = _highest_unlocked_free_id()
+	var strip_def := SeasonCatalog.get_def(focus_season_id)
+	if strip_def == null or not strip_def.is_free() or not is_free_selectable(focus_season_id):
+		focus_season_id = _highest_unlocked_free_id()
 	if home_band != "free" and home_band != "paid":
 		home_band = "free"
 	var paid_ok := false
@@ -324,7 +330,7 @@ func _first_paid_id() -> String:
 func home_hero_center_id() -> String:
 	if home_band == "paid":
 		return paid_strip_focus_id
-	return strip_focus_id
+	return focus_season_id
 
 
 func can_open_home_season_field() -> bool:
@@ -366,13 +372,13 @@ func set_free_strip_focus(season_id: String) -> bool:
 		return false
 	if not is_free_selectable(season_id):
 		return false
-	strip_focus_id = season_id
+	focus_season_id = season_id
 	_owner.save_player_save()
 	return true
 
 
 func strip_center_id() -> String:
-	return strip_focus_id
+	return focus_season_id
 
 
 func strip_left_id() -> String:
@@ -455,7 +461,7 @@ func cycle_paid_strip(dir: int) -> bool:
 func _strip_focus_index() -> int:
 	var i := 0
 	for def in SeasonCatalog.free_defs_sorted():
-		if def.id == strip_focus_id:
+		if def.id == focus_season_id:
 			return i
 		i += 1
 	return 0

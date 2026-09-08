@@ -246,9 +246,9 @@ var meta_hub_pending_page: int = MetaHubPages.MAIN
 var active_season_id: String:
 	get: return seasons_domain.active_id
 	set(value): seasons_domain.active_id = value
-var strip_focus_id: String:
-	get: return seasons_domain.strip_focus_id
-	set(value): seasons_domain.strip_focus_id = value
+var focus_season_id: String:
+	get: return seasons_domain.focus_season_id
+	set(value): seasons_domain.focus_season_id = value
 var home_band: String:
 	get: return seasons_domain.home_band
 	set(value): seasons_domain.home_band = value
@@ -518,10 +518,10 @@ func debug_unlock_all_seasons() -> void:
 			owned_paid_seasons.append(def.id)
 	var s2 := "frost_orchard"
 	if unlocked_seasons.has(s2):
-		strip_focus_id = s2
+		focus_season_id = s2
 		active_season_id = s2
 	else:
-		strip_focus_id = SeasonCatalog.DEFAULT_SEASON_ID
+		focus_season_id = SeasonCatalog.DEFAULT_SEASON_ID
 		active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
 	_normalize_season_progress()
 	save_player_save()
@@ -560,10 +560,10 @@ func debug_playtest_two_free() -> void:
 		unlocked_seasons.append("frost_orchard")
 	owned_paid_seasons.clear()
 	if is_season_playable("frost_orchard"):
-		strip_focus_id = "frost_orchard"
+		focus_season_id = "frost_orchard"
 		active_season_id = "frost_orchard"
 	else:
-		strip_focus_id = SeasonCatalog.DEFAULT_SEASON_ID
+		focus_season_id = SeasonCatalog.DEFAULT_SEASON_ID
 		active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
 	_normalize_season_progress()
 	save_player_save()
@@ -587,10 +587,10 @@ func debug_relock_playtest_free() -> void:
 	for id in kept:
 		unlocked_seasons.append(id)
 	if is_season_playable("frost_orchard"):
-		strip_focus_id = "frost_orchard"
+		focus_season_id = "frost_orchard"
 		active_season_id = "frost_orchard"
 	else:
-		strip_focus_id = SeasonCatalog.DEFAULT_SEASON_ID
+		focus_season_id = SeasonCatalog.DEFAULT_SEASON_ID
 		active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
 	_normalize_season_progress()
 	save_player_save()
@@ -603,7 +603,7 @@ func debug_fixture_s1_star3_playtest() -> void:
 	unlocked_seasons.clear()
 	unlocked_seasons.append(default_id)
 	active_season_id = default_id
-	strip_focus_id = default_id
+	focus_season_id = default_id
 	home_band = "free"
 	home_season_field_open = false
 	home_season_field_id = ""

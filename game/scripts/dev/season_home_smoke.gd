@@ -354,7 +354,7 @@ func _run() -> void:
 	if stage.has_method("cycle_free_strip"):
 		stage.call("cycle_free_strip", 1)
 	await create_timer(0.35).timeout
-	if str(gs.get("strip_focus_id")) != "frost_orchard":
+	if str(gs.get("focus_season_id")) != "frost_orchard":
 		_fail("next-lock swipe should center Frost Orchard")
 		return
 	if str(gs.get("active_season_id")) != "country_bloom":
@@ -443,7 +443,7 @@ func _run() -> void:
 		return
 	stage.call("cycle_free_strip", -1)
 	await create_timer(0.35).timeout
-	if str(gs.get("strip_focus_id")) != "country_bloom":
+	if str(gs.get("focus_season_id")) != "country_bloom":
 		_fail("cycle back should restore Country Bloom")
 		return
 	if int(swipe.get("current_page")) != MetaHubPages.MAIN:
@@ -536,7 +536,7 @@ func _run() -> void:
 	if str(gs.get("active_season_id")) != "frost_orchard":
 		_fail("unlock did not auto-switch active")
 		return
-	if str(gs.get("strip_focus_id")) != "frost_orchard":
+	if str(gs.get("focus_season_id")) != "frost_orchard":
 		_fail("unlock did not move strip focus to S2")
 		return
 	if center.text.find("Frost Orchard") < 0:
@@ -605,7 +605,7 @@ func _run() -> void:
 		if str(gs.get("home_band")) != "free":
 			_fail("locked free preview tap should swap to free-hero")
 			return
-		if str(gs.get("strip_focus_id")) != "lantern_meadow":
+		if str(gs.get("focus_season_id")) != "lantern_meadow":
 			_fail("next-lock preview tap should center lantern_meadow")
 			return
 		if sheet != null and bool(sheet.get("visible")):
@@ -614,7 +614,7 @@ func _run() -> void:
 		if stage.has_method("cycle_free_strip"):
 			stage.call("cycle_free_strip", -1)
 			await create_timer(0.35).timeout
-		if str(gs.get("strip_focus_id")) != "frost_orchard":
+		if str(gs.get("focus_season_id")) != "frost_orchard":
 			_fail("cycle back from lantern should restore frost")
 			return
 	if int(swipe.get("current_page")) != MetaHubPages.MAIN:
@@ -630,7 +630,7 @@ func _run() -> void:
 	if str(gs.get("active_season_id")) != "moonlit_warren":
 		_fail("paid grant should set active")
 		return
-	if str(gs.get("strip_focus_id")) != "frost_orchard":
+	if str(gs.get("focus_season_id")) != "frost_orchard":
 		_fail("paid grant must not change strip_focus")
 		return
 	if str(gs.get("home_band")) != "free":
@@ -740,7 +740,7 @@ func _run() -> void:
 	if stage.has_method("cycle_free_strip"):
 		stage.call("cycle_free_strip", 1)
 		await create_timer(0.35).timeout
-	if str(gs.get("strip_focus_id")) != "lantern_meadow":
+	if str(gs.get("focus_season_id")) != "lantern_meadow":
 		_fail("cycle onto lantern should work after debug skip")
 		return
 	if str(gs.get("active_season_id")) == "lantern_meadow":
@@ -752,7 +752,7 @@ func _run() -> void:
 		if str(gs.get("active_season_id")) != "frost_orchard":
 			_fail("swipe-down on lantern should select last playable frost")
 			return
-		if str(gs.get("strip_focus_id")) != "lantern_meadow":
+		if str(gs.get("focus_season_id")) != "lantern_meadow":
 			_fail("swipe-down select must keep lantern strip focus")
 			return
 	gs.set("wallet_coins", 499)
@@ -838,7 +838,7 @@ func _run() -> void:
 	if stage.has_method("cycle_free_strip"):
 		stage.call("cycle_free_strip", 1)
 		await create_timer(0.35).timeout
-	if str(gs.get("strip_focus_id")) != "amber_canopy":
+	if str(gs.get("focus_season_id")) != "amber_canopy":
 		_fail("next-lock Amber should become center after lantern grant")
 		return
 	if str(gs.get("active_season_id")) == "amber_canopy":

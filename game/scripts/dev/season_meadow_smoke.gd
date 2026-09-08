@@ -659,7 +659,7 @@ func _run() -> void:
 	var unlocked: Array = gs.get("unlocked_seasons")
 	if not unlocked.has("frost_orchard"):
 		unlocked.append("frost_orchard")
-	gs.set("strip_focus_id", "frost_orchard")
+	gs.set("focus_season_id", "frost_orchard")
 	gs.set("home_band", "free")
 	if not bool(gs.call("can_open_home_season_field")):
 		_fail("playable Frost should can_open")
@@ -672,12 +672,12 @@ func _run() -> void:
 	if str(gs.get("home_season_field_id")) != "frost_orchard":
 		_fail("field_id expected frost_orchard got %s" % str(gs.get("home_season_field_id")))
 		return
-	var ground: ColorRect = stage.get_node_or_null("%FieldGround") as ColorRect
+	var ground: ColorRect = stage.get_node_or_null("%MeadowGround") as ColorRect
 	if ground == null:
-		_fail("FieldGround missing")
+		_fail("MeadowGround missing")
 		return
 	if ground.color.is_equal_approx(BLOOM_PASTEL) or ground.color.is_equal_approx(Color.WHITE):
-		_fail("Frost FieldGround tint should differ from Bloom")
+		_fail("Frost MeadowGround tint should differ from Bloom")
 		return
 	if not backdrop.visible:
 		_fail("Frost open: FieldBackdrop should be visible")
@@ -805,7 +805,7 @@ func _run() -> void:
 		_fail(frost_close_up_err)
 		return
 	gs.call("reset_seasons_to_s1")
-	gs.set("strip_focus_id", "lantern_meadow")
+	gs.set("focus_season_id", "lantern_meadow")
 	if stage.has_method("refresh"):
 		stage.call("refresh")
 	await process_frame

@@ -227,8 +227,8 @@ func _run() -> void:
 	if int(hub.call("current_page_index")) != MetaHubPages.MAIN:
 		_fail("card tap should go to Home, page=%s" % str(hub.call("current_page_index")))
 		return
-	if str(gs.get("strip_focus_id")) != S2:
-		_fail("strip_focus should be frost_orchard, got %s" % str(gs.get("strip_focus_id")))
+	if str(gs.get("focus_season_id")) != S2:
+		_fail("strip_focus should be frost_orchard, got %s" % str(gs.get("focus_season_id")))
 		return
 	if str(gs.get("home_band")) != "free":
 		_fail("home_band should be free")

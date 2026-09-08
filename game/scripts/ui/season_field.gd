@@ -34,7 +34,7 @@ const FLOWER_SLOTS: Array[Vector2] = [
 	Vector2(0.68, 0.80),
 ]
 
-@onready var field_ground: ColorRect = $FieldGround
+@onready var meadow_ground: ColorRect = $MeadowGround
 @onready var meadow_pip: Control = $MeadowPip
 var _open_season_id: String = ""
 var _wander_tween: Tween = null
@@ -48,14 +48,14 @@ func _ready() -> void:
 
 func apply_season(season_id: String) -> void:
 	_open_season_id = season_id
-	if field_ground:
-		field_ground.color = SeasonTheme.home_field_tint(season_id)
+	if meadow_ground:
+		meadow_ground.color = SeasonTheme.home_field_tint(season_id)
 	_rebuild_flowers(season_id)
 	call_deferred("_rebuild_flowers_deferred", season_id)
 
 
 func meadow_safe_rect() -> Rect2:
-	var bounds := _field_bounds()
+	var bounds := _meadow_bounds()
 	if bounds.size.x < 8.0 or bounds.size.y < 8.0:
 		return bounds
 	var safe := bounds
@@ -106,7 +106,7 @@ func _rebuild_flowers_deferred(season_id: String) -> void:
 
 func _is_shell_child(child: Node) -> bool:
 	var n := str(child.name)
-	return n == "FieldGround" or n == "SeasonsButton" or n == "MeadowPip"
+	return n == "MeadowGround" or n == "SeasonsButton" or n == "MeadowPip"
 
 
 func _rebuild_flowers(season_id: String) -> void:
@@ -114,7 +114,7 @@ func _rebuild_flowers(season_id: String) -> void:
 	if season_id.is_empty():
 		_hide_pip_and_stop()
 		return
-	var bounds := _field_bounds()
+	var bounds := _meadow_bounds()
 	if bounds.size.x < 8.0 or bounds.size.y < 8.0:
 		_hide_pip_and_stop()
 		return
@@ -139,10 +139,10 @@ func _rebuild_flowers(season_id: String) -> void:
 	_restart_wander()
 
 
-func _field_bounds() -> Rect2:
+func _meadow_bounds() -> Rect2:
 	var bounds := size
-	if bounds.x < 8.0 and field_ground:
-		bounds = field_ground.size
+	if bounds.x < 8.0 and meadow_ground:
+		bounds = meadow_ground.size
 	return Rect2(Vector2.ZERO, bounds)
 
 
