@@ -10,6 +10,7 @@ const GOLD := Color("#E8C44A")
 const GOLD_INK := Color("#1A1A14")
 const WARM_WHITE := Color("#FFF8F0")
 const OUTLINE := Color("#2D3436")
+const PRICE_BG := Color("#FFE8B8")
 const UI_TEXT := Color("#4A4A4A")
 const ICON_MODULATE := Color("#2D3436")
 
@@ -59,6 +60,8 @@ static func button_style(variant: String, state: String) -> StyleBoxFlat:
 			bg = WARM_WHITE if state == "normal" else Color("#FFFDF9") if state == "hover" else Color("#F5EDE0")
 		"gold":
 			bg = GOLD if state == "normal" else GOLD.lightened(0.06) if state == "hover" else GOLD.darkened(0.07)
+		"price":
+			bg = PRICE_BG if state == "normal" else PRICE_BG.lightened(0.05) if state == "hover" else PRICE_BG.darkened(0.06)
 		_:
 			bg = MINT if state == "normal" else MINT.lightened(0.05) if state == "hover" else MINT.darkened(0.06)
 

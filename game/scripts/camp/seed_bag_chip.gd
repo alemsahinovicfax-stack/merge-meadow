@@ -10,13 +10,21 @@ const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
 const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
 const SeedBagIcon := preload("res://scripts/camp/seed_bag_icon.gd")
 const RarityStars := preload("res://scripts/ui/rarity_stars.gd")
-const PRICE_PILL_BG := Color("#FFE8B8")
+const DRAG_SCROLL := preload("res://scripts/ui/drag_scroll.gd")
+const PRICE_PILL_BG := UI_PALETTE.PRICE_BG
 const CHIP_MIN_H := 110.0
-const NAME_FONT := 26
-const COUNT_FONT := 32
+const NAME_FONT := 30
+const COUNT_FONT := 34
 const STAR_FONT := 22
 const PRICE_FONT := 36
 const COIN_SIDE := 36.0
+## Count i price pill dijele visinu i zaobljenost (širina ostaje po sadržaju).
+const PILL_H := 60.0
+const PILL_CORNER := 8
+const CHIP_PAD_Y := 5.0
+## Label zvjezdica nosi praznu liniju ispod glifa — negativan razmak je skida
+## i time snižava cijeli okvir.
+const STAR_GAP := -8
 
 var _type_id: String = "clover"
 var _count: int = 0
@@ -31,10 +39,15 @@ var _icon: Control
 var _stars_row: HBoxContainer
 var _name_label: Label
 var _count_label: Label
+var _count_pill: PanelContainer
+var _count_pill_style: StyleBoxFlat
 var _price_label: Label
 var _price_pill: Control
 var _coin_icon: TextureRect
 var _panel_style: StyleBoxFlat
+var _scroll: ScrollContainer
+var _drag_dist: float = 0.0
+var _pressing: bool = false
 
 
 func _ready() -> void:
@@ -62,6 +75,15 @@ func apply(type_id: String, count: int, display_name: String, rarity: int) -> vo
 
 func get_type_id() -> String:
 	return _type_id
+
+
+## Lagani update za hold-trade — bez ponovnog setup-a ikone kao u apply().
+func set_count(count: int) -> void:
+	_count = count
+	_trade_eligible = count >= 1
+	_tap_enabled = _trade_eligible and not _quota_display
+	_refresh_labels()
+	_apply_visual_state()
 
 
 func set_selected(on: bool) -> void:
@@ -102,9 +124,9 @@ func _ensure_children() -> void:
 	_panel_style.set_border_width_all(2)
 	_panel_style.border_color = Color(UI_PALETTE.OUTLINE.r, UI_PALETTE.OUTLINE.g, UI_PALETTE.OUTLINE.b, 0.16)
 	_panel_style.content_margin_left = 6
-	_panel_style.content_margin_top = 6
+	_panel_style.content_margin_top = CHIP_PAD_Y
 	_panel_style.content_margin_right = 6
-	_panel_style.content_margin_bottom = 6
+	_panel_style.content_margin_bottom = CHIP_PAD_Y
 	add_theme_stylebox_override("panel", _panel_style)
 
 	var row := HBoxContainer.new()
@@ -120,52 +142,71 @@ func _ensure_children() -> void:
 	icon_col.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	icon_col.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	icon_col.alignment = BoxContainer.ALIGNMENT_CENTER
-	icon_col.add_theme_constant_override("separation", 0)
+	icon_col.add_theme_constant_override("separation", STAR_GAP)
 	row.add_child(icon_col)
+
+	_stars_row = RarityStars.make_row(_rarity, STAR_FONT)
+	icon_col.add_child(_stars_row)
 
 	_icon = SeedBagIcon.new()
 	_icon.name = "PlantIcon"
 	_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	icon_col.add_child(_icon)
 
-	_stars_row = RarityStars.make_row(_rarity, STAR_FONT)
-	icon_col.add_child(_stars_row)
-
-	var text_col := VBoxContainer.new()
+	var text_col := HBoxContainer.new()
 	text_col.name = "TextCol"
 	text_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	text_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	text_col.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	text_col.alignment = BoxContainer.ALIGNMENT_CENTER
-	text_col.add_theme_constant_override("separation", 2)
+	text_col.add_theme_constant_override("separation", 10)
 	row.add_child(text_col)
 
 	_name_label = Label.new()
 	_name_label.name = "NameLabel"
 	_name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_name_label.add_theme_font_size_override("font_size", NAME_FONT)
 	text_col.add_child(_name_label)
 
+	_count_pill = PanelContainer.new()
+	_count_pill.name = "CountPill"
+	_count_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_count_pill.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_count_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_count_pill.custom_minimum_size = Vector2(0, PILL_H)
+	_count_pill_style = StyleBoxFlat.new()
+	_count_pill_style.set_corner_radius_all(PILL_CORNER)
+	_count_pill_style.set_border_width_all(1)
+	_count_pill_style.border_color = Color(UI_PALETTE.OUTLINE.r, UI_PALETTE.OUTLINE.g, UI_PALETTE.OUTLINE.b, 0.18)
+	_count_pill_style.content_margin_left = 10
+	_count_pill_style.content_margin_top = 6
+	_count_pill_style.content_margin_right = 10
+	_count_pill_style.content_margin_bottom = 6
+	_count_pill.add_theme_stylebox_override("panel", _count_pill_style)
+	text_col.add_child(_count_pill)
+
 	_count_label = Label.new()
 	_count_label.name = "CountLabel"
 	_count_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_count_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_count_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_count_label.add_theme_font_size_override("font_size", COUNT_FONT)
-	text_col.add_child(_count_label)
+	_count_pill.add_child(_count_label)
 
 	var price_pill := PanelContainer.new()
 	price_pill.name = "PricePill"
 	price_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	price_pill.size_flags_horizontal = Control.SIZE_SHRINK_END
 	price_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	price_pill.custom_minimum_size = Vector2(0, PILL_H)
 	_price_pill = price_pill
 	var pill_style := StyleBoxFlat.new()
 	pill_style.bg_color = PRICE_PILL_BG
-	pill_style.set_corner_radius_all(8)
+	pill_style.set_corner_radius_all(PILL_CORNER)
 	pill_style.set_border_width_all(1)
 	pill_style.border_color = Color(UI_PALETTE.OUTLINE.r, UI_PALETTE.OUTLINE.g, UI_PALETTE.OUTLINE.b, 0.22)
 	pill_style.content_margin_left = 8
@@ -173,7 +214,7 @@ func _ensure_children() -> void:
 	pill_style.content_margin_right = 8
 	pill_style.content_margin_bottom = 6
 	price_pill.add_theme_stylebox_override("panel", pill_style)
-	row.add_child(price_pill)
+	text_col.add_child(price_pill)
 
 	var price_row := HBoxContainer.new()
 	price_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -211,11 +252,13 @@ func _refresh_labels() -> void:
 	if _quota_display:
 		_count_label.text = "%d/4" % _count
 	else:
-		_count_label.text = "×%d" % _count
+		_count_label.text = "%d" % _count
 	_price_label.text = "%d" % GameState.seed_exchange_coins_per_seed(_type_id)
 	_price_label.add_theme_color_override("font_color", UI_PALETTE.OUTLINE)
 	if _stars_row:
 		RarityStars.apply_row(_stars_row, _rarity, STAR_FONT)
+	if _count_pill_style:
+		_count_pill_style.bg_color = UI_PALETTE.rarity_bg_color(_rarity, false).lerp(UI_PALETTE.WARM_WHITE, 0.55)
 	TEXT_LAYOUT.ink(_name_label)
 	TEXT_LAYOUT.ink(_count_label)
 
@@ -240,16 +283,40 @@ func _apply_visual_state() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP if _tap_enabled else Control.MOUSE_FILTER_IGNORE
 
 
+func _get_scroll() -> ScrollContainer:
+	if _scroll == null or not is_instance_valid(_scroll):
+		_scroll = DRAG_SCROLL.find_scroll(self)
+	return _scroll
+
+
 func _gui_input(event: InputEvent) -> void:
 	if not _tap_enabled:
 		return
+	var dy := DRAG_SCROLL.drag_delta(event)
+	if not is_zero_approx(dy):
+		_drag_dist += absf(dy)
+		DRAG_SCROLL.apply(_get_scroll(), dy)
+		accept_event()
+		return
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
-		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
-			chip_pressed.emit(_type_id)
-			accept_event()
+		if mb.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if mb.pressed:
+			_pressing = true
+			_drag_dist = 0.0
+		else:
+			if _pressing and _drag_dist < DRAG_SCROLL.TAP_SLOP:
+				chip_pressed.emit(_type_id)
+			_pressing = false
+		accept_event()
 	elif event is InputEventScreenTouch:
 		var st := event as InputEventScreenTouch
 		if st.pressed:
-			chip_pressed.emit(_type_id)
-			accept_event()
+			_pressing = true
+			_drag_dist = 0.0
+		else:
+			if _pressing and _drag_dist < DRAG_SCROLL.TAP_SLOP:
+				chip_pressed.emit(_type_id)
+			_pressing = false
+		accept_event()

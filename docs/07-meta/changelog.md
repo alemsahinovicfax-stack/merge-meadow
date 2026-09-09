@@ -9,6 +9,14 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-09-08
+
+- **CAMP-06 Camp polish (runda 4)** — hold trguje 10/s (`TRADE_HOLD_RATE`, prije 6); ime/brojčanik/cjenovnik vraćeni na vertikalni centar okvira (uklonjen `RightWrap`/`TextTopSpacer` iz runde 3 — slika ostaje ~15 px niža, svjestan izbor, okvir ostaje ~119 px); header i link-season kartica prate **svaki pojedini trade** uživo (`_refresh_live_chrome()` zove `refresh_top_bar` na hub-u i `season_link_card.refresh()` iz brzog hold-puta, ne više samo iz punog `_refresh_ui`); `camp_trade_hold_smoke` kodira 10/s i žive brojeve usred holda
+
+- **CAMP-06 Camp polish (runda 3)** — okvir chipa niži ~150→~119 px bez diranja elemenata: prazan spacer ispod ikone zamijenjen `RightWrap`-om koji desnu stranu spušta za izmjerenu visinu zvjezdica (isto poravnanje, manje praznine), padding 6→5; link-season `SeasonLinkSpacer` skriven a `SeasonUnlockProgress` dobio EXPAND pa blok stoji u sredini između naslova i dugmeta; balans-spacer na vrhu obje kolone spušta coin i cvijet na tačan vertikalni centar polovine; slotovi se mjere (`get_combined_minimum_size`) umjesto fiksnih konstanti pa barovi i brojevi padaju red-u-red; linija ide do dugmeta, jednako odmaknuta kao od naslova (`CAMP_VLINE_INSET` 18, separacije 8/8); `camp_season_link_smoke` dobio geometrijske tvrdnje (ikone i barovi u istom redu, ikone na centru, jednaki razmaci linije)
+
+- **CAMP-06 Camp polish** — chip: zvjezdice u fiksnom slotu + spacer ispod ikone (ikona centrirana s tekstom), ime centrirano između ikone i broja, count pill = visina/zaobljenost price pilla (`PILL_H` 60, radius 8); swipe/drag skrol preko chipova (`drag_scroll.gd`, tap tek ispod 12 px pomaka) i `vertical_scroll_mode = 3` (bez trake); sva tri dugmeta 460×64 centrirana, Trade dugmad `price` varijanta (#FFE8B8) s providnom ispunom kad nema selekcije; **Trade = 1 sjeme po tapu**, držanje 6/s uz automatski prelazak na sljedeći tip (`UiClickButton.auto_repeat`, save odgođen do otpuštanja); SeasonLink kolone dijele slotove (zvjezdice/slika/ime/broj/bar) pa su slike i barovi na istoj visini, linija 72 % visine reda
+
 ## 2026-09-06
 
 - **CAMP-06 Camp fill** — bez Pip's Garden; Seeds/Flowers/Link ~⅓ bez vanjskog scrolla; SeasonLink simetrija + deblja kratka linija; chip ime lijevo + broj desno; debug design stash; [[../03-content/ideje-camp-fill|hub]] · [[../06-production/plan-prompts-camp-fill|freeze]]

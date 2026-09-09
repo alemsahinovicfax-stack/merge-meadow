@@ -30,3 +30,6 @@ Desktop.ini
 docs/00-personal/*.local.md
 game/export_credentials/
 game/**/admob_app_id.local.*
+
+# Claude Code — lične postavke (ne dijeliti)
+.claude/settings.local.json

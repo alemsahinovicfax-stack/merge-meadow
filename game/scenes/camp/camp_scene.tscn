@@ -360,6 +360,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
 
 [node name="SeedBagGrid" type="GridContainer" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox/SeedBagScroll"]
 unique_name_in_owner = true
@@ -371,12 +372,13 @@ columns = 2
 
 [node name="ExchangeButton" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(460, 64)
 layout_mode = 2
+size_flags_horizontal = 4
 script = ExtResource("2_uibtn")
-label_text = "Select a seed to trade"
-font_size = 18
-label_autowrap = true
+label_text = "Trade"
+font_size = 32
+button_variant = "price"
 
 [node name="CrystalCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
 unique_name_in_owner = true
@@ -420,6 +422,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
 
 [node name="CrystalGrid" type="GridContainer" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox/CrystalScroll"]
 unique_name_in_owner = true
@@ -431,13 +434,13 @@ columns = 2
 
 [node name="CrystalExchangeButton" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
+custom_minimum_size = Vector2(460, 64)
 layout_mode = 2
+size_flags_horizontal = 4
 script = ExtResource("2_uibtn")
-label_text = "Select a flower to exchange"
-font_size = 18
-label_autowrap = true
-button_variant = "accent"
+label_text = "Trade"
+font_size = 32
+button_variant = "price"
 
 [node name="SeasonLinkCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
 unique_name_in_owner = true
@@ -452,7 +455,7 @@ script = ExtResource("3_slink")
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="SeasonLinkTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox"]
 unique_name_in_owner = true
@@ -477,6 +480,7 @@ theme_override_constants/separation = 8
 [node name="SeasonUnlockProgress" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 4
 alignment = 1
@@ -559,14 +563,15 @@ value = 0.0
 show_percentage = false
 
 [node name="SeasonLinkSpacer" type="Control" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner"]
+visible = false
 layout_mode = 2
 mouse_filter = 2
-size_flags_vertical = 3
 
 [node name="SeasonLinkUnlock" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(460, 64)
 layout_mode = 2
+size_flags_horizontal = 4
 mouse_filter = 0
 script = ExtResource("2_uibtn")
 label_text = "Unlock"

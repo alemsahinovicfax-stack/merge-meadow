@@ -34,7 +34,7 @@ const UPGRADE_FLOWER_COST := 2
 const MULTIPLIER_VALUES: Array[float] = [1.0, 1.25, 1.5, 1.75, 2.0]
 const MYTHIC_RARITY := 3
 
-const EXCHANGE_SEED_COUNT := 3
+const EXCHANGE_SEED_COUNT := 1
 ## Coins per seed traded, keyed by rarity ★1–3 (Bug-031).
 const SEED_EXCHANGE_COINS_BY_RARITY := {1: 1, 2: 2, 3: 4}
 ## Coins per crystal/flower traded, keyed by rarity ★1–3.
@@ -1566,7 +1566,7 @@ func crystal_exchange_coins_for_type(type_id: String) -> int:
 	return int(CRYSTAL_EXCHANGE_COINS_BY_RARITY.get(get_seed_rarity(type_id), 5))
 
 
-func exchange_seeds_from_bag(type_id: String) -> bool:
+func exchange_seeds_from_bag(type_id: String, save: bool = true) -> bool:
 	var bag_count := int(seed_bag.get(type_id, 0))
 	var take := seed_exchange_take_count(bag_count)
 	if take <= 0:
@@ -1575,7 +1575,8 @@ func exchange_seeds_from_bag(type_id: String) -> bool:
 	if not take_seeds_from_bag(type_id, take):
 		return false
 	_add_coins(coins)
-	save_player_save()
+	if save:
+		save_player_save()
 	return true
 
 
@@ -1805,7 +1806,7 @@ func first_garden_crystal_type() -> String:
 	return crystal_stash_domain.first_type()
 
 
-func exchange_garden_crystal(type_id: String = "") -> bool:
+func exchange_garden_crystal(type_id: String = "", save: bool = true) -> bool:
 	if type_id.is_empty():
 		type_id = first_garden_crystal_type()
 	if type_id.is_empty():
@@ -1813,7 +1814,8 @@ func exchange_garden_crystal(type_id: String = "") -> bool:
 	if not crystal_stash_domain.take_one(type_id):
 		return false
 	_add_coins(crystal_exchange_coins_for_type(type_id))
-	save_player_save()
+	if save:
+		save_player_save()
 	return true
 
 

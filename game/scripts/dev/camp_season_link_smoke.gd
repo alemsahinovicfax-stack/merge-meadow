@@ -44,6 +44,56 @@ func _unlock_all_free(gs: Node) -> void:
 	gs.set("unlocked_seasons", unlocked)
 
 
+func _center_y(node: Control) -> float:
+	return node.global_position.y + node.size.y * 0.5
+
+
+## CAMP-06: slike u centru svoje polovine, barovi u istom redu, linija ide do
+## dugmeta jednako odmaknuta kao od naslova.
+func _assert_link_geometry(camp: Node, split_row: Control) -> String:
+	var coin_icon := camp.get_node_or_null("%SeasonLinkCoinIcon") as Control
+	var flower := split_row.find_child("SeasonLinkFlower", true, false) as Control
+	var coins_bar := camp.get_node_or_null("%SeasonLinkCoinsBar") as Control
+	var t3_bar := camp.get_node_or_null("%SeasonLinkT3Bar") as Control
+	var title := camp.get_node_or_null("%SeasonLinkTitle") as Control
+	var unlock := camp.get_node_or_null("%SeasonLinkUnlock") as Control
+	var line := split_row.get_node_or_null("SectionDivider") as Control
+	if (
+		coin_icon == null
+		or flower == null
+		or coins_bar == null
+		or t3_bar == null
+		or title == null
+		or unlock == null
+		or line == null
+	):
+		return "link geometry: node missing"
+	if absf(_center_y(coin_icon) - _center_y(flower)) > 2.0:
+		return (
+			"coin and flower must share a row, coin=%s flower=%s"
+			% [str(_center_y(coin_icon)), str(_center_y(flower))]
+		)
+	if absf(_center_y(coins_bar) - _center_y(t3_bar)) > 2.0:
+		return (
+			"bars must share a row, coins=%s t3=%s"
+			% [str(_center_y(coins_bar)), str(_center_y(t3_bar))]
+		)
+	var row_center := _center_y(split_row)
+	if absf(_center_y(coin_icon) - row_center) > 4.0:
+		return (
+			"images must sit at the vertical center, icon=%s row=%s"
+			% [str(_center_y(coin_icon)), str(row_center)]
+		)
+	var gap_top := line.global_position.y - (title.global_position.y + title.size.y)
+	var gap_bottom := unlock.global_position.y - (line.global_position.y + line.size.y)
+	if absf(gap_top - gap_bottom) > 3.0:
+		return (
+			"divider gaps must match, title gap=%s button gap=%s"
+			% [str(gap_top), str(gap_bottom)]
+		)
+	return ""
+
+
 func _run() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
@@ -149,6 +199,10 @@ func _run() -> void:
 		return
 	if split_row.get_node_or_null("SectionDivider") == null:
 		_fail("SplitRow must have vertical SectionDivider")
+		return
+	var geom_err := _assert_link_geometry(camp, split_row)
+	if not geom_err.is_empty():
+		_fail(geom_err)
 		return
 	if coins_lbl.get_theme_font_size("font_size") < 28:
 		_fail("Camp coins font must be >= 28, got %s" % coins_lbl.get_theme_font_size("font_size"))

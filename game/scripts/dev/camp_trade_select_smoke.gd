@@ -58,7 +58,13 @@ func _run() -> void:
 		quit(1)
 		return
 
-	# Daisy (2) can select and trade leftover.
+	# CAMP-06: jedan tap = jedno sjeme (hold ponavlja, vidi camp_trade_hold_smoke).
+	if int(gs.call("seed_exchange_take_count", 8)) != 1:
+		push_error("camp_trade_select_smoke: one tap must take exactly 1 seed")
+		quit(1)
+		return
+
+	# Daisy (2) can select and trade one at a time.
 	if camp.has_method("_on_seed_chip_pressed"):
 		camp.call("_on_seed_chip_pressed", "daisy")
 	await process_frame
@@ -72,25 +78,39 @@ func _run() -> void:
 		push_error("camp_trade_select_smoke: Trade should enable for daisy leftover")
 		quit(1)
 		return
-	var coins_before := int(gs.get("wallet_coins"))
-	var leftover_coins := int(gs.call("seed_exchange_coins_for_take", 2, "daisy"))
-	if leftover_coins != 2:
-		push_error("camp_trade_select_smoke: expected 2 coins for take=2 daisy got %d" % leftover_coins)
+	var daisy_coin := int(gs.call("seed_exchange_coins_for_take", 1, "daisy"))
+	if daisy_coin != 1:
+		push_error("camp_trade_select_smoke: expected 1 coin per daisy got %d" % daisy_coin)
 		quit(1)
 		return
+	var coins_before := int(gs.get("wallet_coins"))
 	camp.call("_on_exchange_pressed")
 	for _k in 4:
 		await process_frame
 	var bag: Dictionary = gs.get("seed_bag")
-	if int(bag.get("daisy", 0)) != 0:
-		push_error("camp_trade_select_smoke: daisy should be 0 after leftover trade")
+	if int(bag.get("daisy", 0)) != 1:
+		push_error("camp_trade_select_smoke: daisy expected 1 got %s" % str(bag.get("daisy")))
 		quit(1)
 		return
-	if int(gs.get("wallet_coins")) != coins_before + leftover_coins:
+	if int(gs.get("wallet_coins")) != coins_before + daisy_coin:
 		push_error(
-			"camp_trade_select_smoke: coins after daisy trade expected %d got %s"
-			% [coins_before + leftover_coins, str(gs.get("wallet_coins"))]
+			"camp_trade_select_smoke: coins after daisy tap expected %d got %s"
+			% [coins_before + daisy_coin, str(gs.get("wallet_coins"))]
 		)
+		quit(1)
+		return
+	selected = str(camp.get("_selected_trade_type"))
+	if selected != "daisy":
+		push_error("camp_trade_select_smoke: daisy should keep select got %s" % selected)
+		quit(1)
+		return
+
+	camp.call("_on_exchange_pressed")
+	for _l in 4:
+		await process_frame
+	bag = gs.get("seed_bag")
+	if int(bag.get("daisy", 0)) != 0:
+		push_error("camp_trade_select_smoke: daisy should be 0 after second tap")
 		quit(1)
 		return
 	# After daisy depletes, next in ASC order is clover (Meadow Clover).
@@ -102,21 +122,21 @@ func _run() -> void:
 		quit(1)
 		return
 
-	# Batch trade clover 8 → 5 → 2; leftover 2 still tradeable.
+	# Clover 8 → 7 per tap; select persists while stock remains.
 	camp.call("_on_seed_chip_pressed", "clover")
 	await process_frame
 	coins_before = int(gs.get("wallet_coins"))
-	var batch := int(gs.call("seed_exchange_coins_for_take", 3, "clover"))
+	var clover_coin := int(gs.call("seed_exchange_coins_for_take", 1, "clover"))
 	camp.call("_on_exchange_pressed")
 	for _m in 4:
 		await process_frame
 	bag = gs.get("seed_bag")
-	if int(bag.get("clover", 0)) != 5:
-		push_error("camp_trade_select_smoke: clover expected 5 got %s" % str(bag.get("clover")))
+	if int(bag.get("clover", 0)) != 7:
+		push_error("camp_trade_select_smoke: clover expected 7 got %s" % str(bag.get("clover")))
 		quit(1)
 		return
-	if int(gs.get("wallet_coins")) != coins_before + batch:
-		push_error("camp_trade_select_smoke: batch coins wrong")
+	if int(gs.get("wallet_coins")) != coins_before + clover_coin:
+		push_error("camp_trade_select_smoke: single tap coins wrong")
 		quit(1)
 		return
 	selected = str(camp.get("_selected_trade_type"))
@@ -124,38 +144,27 @@ func _run() -> void:
 		push_error("camp_trade_select_smoke: select should persist got %s" % selected)
 		quit(1)
 		return
-
-	camp.call("_on_exchange_pressed")
-	for _n in 4:
-		await process_frame
-	bag = gs.get("seed_bag")
-	if int(bag.get("clover", 0)) != 2:
-		push_error("camp_trade_select_smoke: clover expected 2 got %s" % str(bag.get("clover")))
-		quit(1)
-		return
-	selected = str(camp.get("_selected_trade_type"))
-	if selected != "clover":
-		push_error("camp_trade_select_smoke: leftover 2 should keep select got %s" % selected)
-		quit(1)
-		return
 	if exchange and bool(exchange.get("disabled")):
-		push_error("camp_trade_select_smoke: Trade should stay enabled for leftover 2")
+		push_error("camp_trade_select_smoke: Trade should stay enabled while clover remains")
 		quit(1)
 		return
 
+	# Drain the remaining 7 clover one tap at a time.
 	coins_before = int(gs.get("wallet_coins"))
-	camp.call("_on_exchange_pressed")
+	for _n in 7:
+		camp.call("_on_exchange_pressed")
+		await process_frame
 	for _o in 4:
 		await process_frame
 	bag = gs.get("seed_bag")
 	if int(bag.get("clover", 0)) != 0:
-		push_error("camp_trade_select_smoke: clover should be 0 after leftover trade")
+		push_error("camp_trade_select_smoke: clover should be 0 got %s" % str(bag.get("clover")))
 		quit(1)
 		return
-	if int(gs.get("wallet_coins")) != coins_before + 2:
+	if int(gs.get("wallet_coins")) != coins_before + clover_coin * 7:
 		push_error(
-			"camp_trade_select_smoke: leftover clover coins expected %d got %s"
-			% [coins_before + 2, str(gs.get("wallet_coins"))]
+			"camp_trade_select_smoke: drain coins expected %d got %s"
+			% [coins_before + clover_coin * 7, str(gs.get("wallet_coins"))]
 		)
 		quit(1)
 		return

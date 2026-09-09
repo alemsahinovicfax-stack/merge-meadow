@@ -5,6 +5,7 @@ extends PanelContainer
 ## Klikabilni panel — ne nasljeđuje BaseButton (Godot 4.7 lomi pressed/clicked na desktopu).
 
 signal clicked
+signal press_ended
 
 const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
 const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
@@ -20,7 +21,7 @@ const READABILITY := preload("res://scripts/ui/ui_readability.gd")
 		font_size = value
 		_update_label()
 
-@export_enum("secondary", "primary", "accent", "subtle", "gold") var button_variant: String = "secondary":
+@export_enum("secondary", "primary", "accent", "subtle", "gold", "price") var button_variant: String = "secondary":
 	set(value):
 		button_variant = value
 		_build_styles()
@@ -50,6 +51,14 @@ const READABILITY := preload("res://scripts/ui/ui_readability.gd")
 
 @export var guarded_click: bool = false
 
+## Drži-za-ponavljanje: tap = 1 klik, držanje = auto_repeat_rate klikova u sekundi.
+@export var auto_repeat: bool = false
+@export var auto_repeat_delay: float = 0.35
+@export var auto_repeat_rate: float = 6.0
+
+## Kad je disabled: providna ispuna umjesto zatamnjenja cijelog dugmeta.
+@export var ghost_when_disabled: bool = false
+
 var disabled: bool = false:
 	set(value):
 		disabled = value
@@ -61,11 +70,17 @@ var _label: Label
 var _style_normal: StyleBoxFlat
 var _style_hover: StyleBoxFlat
 var _style_pressed: StyleBoxFlat
+var _style_ghost: StyleBoxFlat
 var _hovering: bool = false
 var _pressing: bool = false
+var _repeat_active: bool = false
+var _repeat_touch: bool = false
+var _repeat_delay_left: float = 0.0
+var _repeat_accum: float = 0.0
 
 
 func _ready() -> void:
+	set_process(false)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	focus_mode = Control.FOCUS_NONE
@@ -84,6 +99,10 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	if Engine.is_editor_hint() and what == NOTIFICATION_ENTER_TREE:
 		call_deferred("_validate_in_editor")
+		return
+	match what:
+		NOTIFICATION_EXIT_TREE, NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+			end_press()
 
 
 func _validate_in_editor() -> void:
@@ -100,6 +119,10 @@ func _build_styles() -> void:
 	_style_normal = UI_PALETTE.button_style(button_variant, "normal")
 	_style_hover = UI_PALETTE.button_style(button_variant, "hover")
 	_style_pressed = UI_PALETTE.button_style(button_variant, "pressed")
+	_style_ghost = UI_PALETTE.button_style(button_variant, "normal")
+	_style_ghost.bg_color = Color(
+		_style_ghost.bg_color.r, _style_ghost.bg_color.g, _style_ghost.bg_color.b, 0.0
+	)
 
 
 func _apply_label_theme() -> void:
@@ -196,14 +219,78 @@ func _update_icon() -> void:
 
 
 func _apply_disabled() -> void:
-	mouse_filter = Control.MOUSE_FILTER_IGNORE if disabled else Control.MOUSE_FILTER_STOP
+	# Dok traje hold input mora ostati na dugmetu, inače release nikad ne stigne.
+	var block_input := disabled and not _repeat_active
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if block_input else Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_ARROW if disabled else Control.CURSOR_POINTING_HAND
-	modulate = Color(1.0, 1.0, 1.0, 0.45) if disabled else Color.WHITE
+	if disabled:
+		modulate = Color(1.0, 1.0, 1.0, 0.6 if ghost_when_disabled else 0.45)
+	else:
+		modulate = Color.WHITE
 	_apply_panel_style()
 
 
+func begin_press(from_touch: bool = false) -> void:
+	if disabled or SceneRouter.is_input_blocked() or _repeat_active:
+		return
+	_repeat_active = true
+	_repeat_touch = from_touch
+	_repeat_delay_left = auto_repeat_delay
+	_repeat_accum = 0.0
+	set_process(true)
+	_emit_clicked()
+
+
+func end_press() -> void:
+	if not _repeat_active:
+		return
+	_repeat_active = false
+	_repeat_touch = false
+	set_process(false)
+	_apply_disabled()
+	press_ended.emit()
+
+
+func is_holding() -> bool:
+	return _repeat_active
+
+
+func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
+	_tick_repeat(delta)
+
+
+func _tick_repeat(delta: float) -> void:
+	if not _repeat_active:
+		return
+	if disabled or not is_inside_tree() or not is_visible_in_tree():
+		end_press()
+		return
+	if SceneRouter.is_input_blocked() or _pointer_released():
+		end_press()
+		return
+	if _repeat_delay_left > 0.0:
+		_repeat_delay_left -= delta
+		return
+	var interval := 1.0 / maxf(auto_repeat_rate, 0.001)
+	_repeat_accum = minf(_repeat_accum + delta, interval)
+	if _repeat_accum >= interval:
+		_repeat_accum -= interval
+		_emit_clicked()
+
+
+func _pointer_released() -> bool:
+	# Touch hold nema globalni poll — oslanja se na release event.
+	if _repeat_touch:
+		return false
+	return not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
+
+
 func _apply_panel_style() -> void:
-	if disabled:
+	if disabled and ghost_when_disabled:
+		add_theme_stylebox_override("panel", _style_ghost)
+	elif disabled:
 		add_theme_stylebox_override("panel", _style_normal)
 	elif _pressing:
 		add_theme_stylebox_override("panel", _style_pressed)
@@ -223,6 +310,7 @@ func _on_mouse_entered() -> void:
 func _on_mouse_exited() -> void:
 	_hovering = false
 	_pressing = false
+	end_press()
 	_apply_panel_style()
 
 
@@ -241,6 +329,9 @@ func _emit_clicked() -> void:
 func _on_gui_input(event: InputEvent) -> void:
 	if disabled or SceneRouter.is_input_blocked():
 		if event is InputEventMouseButton or event is InputEventScreenTouch:
+			# Hold koji je usput postao disabled mora primiti svoj release.
+			if not event.is_pressed():
+				end_press()
 			accept_event()
 		return
 	if event is InputEventMouseButton:
@@ -250,8 +341,12 @@ func _on_gui_input(event: InputEvent) -> void:
 		if mouse.pressed:
 			_pressing = true
 			_apply_panel_style()
+			if auto_repeat:
+				begin_press(false)
 		else:
-			if _pressing:
+			if auto_repeat:
+				end_press()
+			elif _pressing:
 				_emit_clicked()
 			_pressing = false
 			_apply_panel_style()
@@ -261,8 +356,13 @@ func _on_gui_input(event: InputEvent) -> void:
 		if touch.pressed:
 			_pressing = true
 			_apply_panel_style()
-			_emit_clicked()
+			if auto_repeat:
+				begin_press(true)
+			else:
+				_emit_clicked()
 		else:
+			if auto_repeat:
+				end_press()
 			_pressing = false
 			_apply_panel_style()
 		accept_event()

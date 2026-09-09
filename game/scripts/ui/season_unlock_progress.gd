@@ -18,15 +18,27 @@ const NAME_FONT := 16
 const CAMP_COIN_SIDE := 88.0
 const CAMP_FLOWER_SIDE := 88.0
 const CAMP_COUNT_FONT := 32
-const CAMP_NAME_FONT := 26
+const CAMP_NAME_FONT := 28
 const CAMP_STAR_FONT := 28
 const CAMP_BAR_HEIGHT := 16.0
 const CAMP_VLINE_WIDTH := 5.0
 const CAMP_VLINE_HEIGHT := 110.0
+## Obje kolone dijele iste slotove po redu (zvjezdice/slika/ime/broj/bar), pa
+## lijeva strana dobija prazne spacere tamo gdje desna ima zvjezdice i ime.
 const CAMP_STAR_SLOT_H := 28.0
+const CAMP_NAME_SLOT_H := 38.0
+const CAMP_VALUE_SLOT_H := 44.0
+## Linija ide do dugmeta, jednako odmaknuta gore i dolje kao naslov.
+const CAMP_VLINE_INSET := 18.0
 
 var split_columns: bool = false
+var split_row: HBoxContainer
+var coin_col: VBoxContainer
+var flower_col: VBoxContainer
 var coin_star_spacer: Control
+var coin_name_spacer: Control
+var coin_balance_spacer: Control
+var flower_balance_spacer: Control
 
 var coin_icon: TextureRect
 var coins_label: Label
@@ -132,27 +144,32 @@ func _build_split_row() -> void:
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("separation", 12)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	var coin_col := VBoxContainer.new()
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	coin_col = VBoxContainer.new()
 	coin_col.name = "CoinCol"
 	coin_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coin_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	coin_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	coin_col.size_flags_stretch_ratio = 1.0
 	coin_col.alignment = BoxContainer.ALIGNMENT_CENTER
 	coin_col.add_theme_constant_override("separation", 4)
-	var flower_col := VBoxContainer.new()
+	flower_col = VBoxContainer.new()
 	flower_col.name = "FlowerCol"
 	flower_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	flower_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	flower_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	flower_col.size_flags_stretch_ratio = 1.0
 	flower_col.alignment = BoxContainer.ALIGNMENT_CENTER
 	flower_col.add_theme_constant_override("separation", 4)
 	var vline := ColorRect.new()
 	vline.name = "SectionDivider"
 	vline.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vline.custom_minimum_size = Vector2(2, 80)
-	vline.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vline.custom_minimum_size = Vector2(CAMP_VLINE_WIDTH, CAMP_VLINE_HEIGHT)
+	vline.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	section_divider = vline
 	divider_line = vline
+	split_row = row
+	row.resized.connect(_layout_split)
 	row.add_child(coin_col)
 	row.add_child(vline)
 	row.add_child(flower_col)
@@ -165,9 +182,84 @@ func _build_split_row() -> void:
 	stars_row = RarityStars.make_row(3, CAMP_STAR_FONT)
 	if flower_visual and flower_visual.get_parent() == flower_col:
 		flower_col.add_child(stars_row)
-		flower_col.move_child(stars_row, flower_visual.get_index() + 1)
+		flower_col.move_child(stars_row, flower_visual.get_index())
 	else:
 		flower_col.add_child(stars_row)
+	coin_star_spacer = _make_slot_spacer("CoinStarSlot", CAMP_STAR_SLOT_H)
+	coin_col.add_child(coin_star_spacer)
+	coin_col.move_child(coin_star_spacer, 0)
+	coin_name_spacer = _make_slot_spacer("CoinNameSlot", CAMP_NAME_SLOT_H)
+	coin_col.add_child(coin_name_spacer)
+	if coin_icon and coin_icon.get_parent() == coin_col:
+		coin_col.move_child(coin_name_spacer, coin_icon.get_index() + 1)
+	# Ispod ikone ima više sadržaja nego iznad; balans na vrhu spušta sliku
+	# tačno na vertikalni centar svoje polovine.
+	coin_balance_spacer = _make_slot_spacer("CoinBalanceSlot", 0.0)
+	coin_col.add_child(coin_balance_spacer)
+	coin_col.move_child(coin_balance_spacer, 0)
+	flower_balance_spacer = _make_slot_spacer("FlowerBalanceSlot", 0.0)
+	flower_col.add_child(flower_balance_spacer)
+	flower_col.move_child(flower_balance_spacer, 0)
+	_apply_slot_heights()
+
+
+func _make_slot_spacer(spacer_name: String, height: float) -> Control:
+	var spacer := Control.new()
+	spacer.name = spacer_name
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	spacer.custom_minimum_size = Vector2(0, height)
+	return spacer
+
+
+## Isti slotovi lijevo i desno → slike, brojevi i barovi padaju na istu visinu.
+## Prirodna visina Labela nadjača custom_minimum_size, pa se slot mjeri.
+func _apply_slot_heights() -> void:
+	if not split_columns:
+		return
+	var star_h := CAMP_STAR_SLOT_H
+	if stars_row:
+		star_h = maxf(star_h, stars_row.get_combined_minimum_size().y)
+	if coin_star_spacer:
+		coin_star_spacer.custom_minimum_size.y = star_h
+	var name_h := CAMP_NAME_SLOT_H
+	if flower_name_label:
+		flower_name_label.custom_minimum_size.y = 0.0
+		name_h = maxf(name_h, flower_name_label.get_combined_minimum_size().y)
+		flower_name_label.custom_minimum_size.y = name_h
+	if coin_name_spacer:
+		coin_name_spacer.custom_minimum_size.y = name_h
+	if coins_label:
+		coins_label.custom_minimum_size.y = CAMP_VALUE_SLOT_H
+	if t3_label:
+		t3_label.custom_minimum_size.y = CAMP_VALUE_SLOT_H
+	_layout_split_columns(star_h, name_h)
+
+
+func _layout_split() -> void:
+	_apply_slot_heights()
+	_layout_split_divider()
+
+
+## Balans na vrhu obje kolone = razlika sadržaja ispod i iznad ikone, ali samo
+## koliko ima slobodnog prostora — inače bi kolona prelila karticu.
+func _layout_split_columns(star_h: float, name_h: float) -> void:
+	if coin_balance_spacer == null or flower_balance_spacer == null:
+		return
+	var below := name_h + CAMP_VALUE_SLOT_H + CAMP_BAR_HEIGHT + 12.0
+	var natural := star_h + _flower_side() + name_h + CAMP_VALUE_SLOT_H + CAMP_BAR_HEIGHT + 16.0
+	var row_h := split_row.size.y if split_row else 0.0
+	var balance := clampf(below - star_h - 8.0, 0.0, maxf(row_h - natural, 0.0))
+	if absf(coin_balance_spacer.custom_minimum_size.y - balance) > 0.5:
+		coin_balance_spacer.custom_minimum_size.y = balance
+	if absf(flower_balance_spacer.custom_minimum_size.y - balance) > 0.5:
+		flower_balance_spacer.custom_minimum_size.y = balance
+
+
+func _layout_split_divider() -> void:
+	if not split_columns or divider_line == null or split_row == null:
+		return
+	var height := maxf(CAMP_VLINE_HEIGHT * 0.5, split_row.size.y - CAMP_VLINE_INSET * 2.0)
+	divider_line.custom_minimum_size = Vector2(CAMP_VLINE_WIDTH, height)
 
 
 func _reparent_into(dest: Node, nodes: Array) -> void:
@@ -215,8 +307,7 @@ func _ensure_divider() -> void:
 
 func _layout_divider() -> void:
 	if split_columns:
-		if divider_line:
-			divider_line.custom_minimum_size = Vector2(2, 80)
+		_layout_split_divider()
 		return
 	if section_divider == null or divider_line == null:
 		return
@@ -323,6 +414,7 @@ func _apply_compact_metrics() -> void:
 		flower_name_label.add_theme_font_size_override("font_size", name_px)
 	if stars_row:
 		RarityStars.apply_row(stars_row, 3, CAMP_STAR_FONT if split_columns else name_px)
+	_apply_slot_heights()
 
 
 func _apply_ink(ink: Color) -> void:

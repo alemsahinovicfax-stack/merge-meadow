@@ -10,8 +10,8 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — thirds + link symmetry."
-zadnja_sesija: "CAMP-06 — camp fill, thirds, link symmetry, chip name+count"
-zadnje_azurirano: 2026-09-06
+zadnja_sesija: "CAMP-06 — chip layout, swipe scroll, uža dugmad (Trade 460px), tap=1 / hold=6/s, link slot simetrija"
+zadnje_azurirano: 2026-09-08
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -353,7 +353,7 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 | ID | Status | Napomena | Link |
 |----|--------|----------|------|
-| CAMP-06 | 🔲 u toku | thirds fill, link symmetry, chip name+count | — |
+| CAMP-06 | 🔲 u toku (čeka playtest) | thirds fill, link symmetry, chip name+count; + swipe scroll bez trake, Trade 460px ×3, tap=1 / hold=6/s | — |
 | CAMP-05 | ✅ (dio superseded CAMP-06) | camp row — two-free fixture, chip red+filled stars | — |
 | CAMP-04 | ✅ arhivirano (superseded CAMP-05→06) | camp read | [[_archive/plan-prompts-camp-read\|freeze]] · [[../03-content/_archive/ideje-camp-read\|hub]] |
 | CAMP-03 | ✅ | kamp link — Seeds/Flowers naslov, next-lock → Home | — |

@@ -92,7 +92,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | `DAILY_CHEST_SEEDS` | **3** | random iz unlocked spawn poola |
 | `discovered_blooms` | po `type_id` | priprema za dnevnik/setove |
 | `sprinkler_donations` | 0–2 | legacy save polje; CAMP-01 B **ne** koristi za Upgrade |
-| `EXCHANGE_SEED_COUNT` | `3` | max sjemena po Trade |
+| `EXCHANGE_SEED_COUNT` | `1` | sjemena po Trade tapu; držanje dugmeta trguje 10/s (`TRADE_HOLD_RATE`) i prelazi na sljedeći tip |
 | `SEED_EXCHANGE_COINS_BY_RARITY` | ★1=`1`, ★2=`2`, ★3=`4` | C po sjemeniu |
 | `CRYSTAL_EXCHANGE_COINS_BY_RARITY` | ★1=`5`, ★2=`10`, ★3=`20` | C po flower/crystal |
 

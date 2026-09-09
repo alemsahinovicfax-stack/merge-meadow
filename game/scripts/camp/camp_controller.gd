@@ -5,6 +5,11 @@ const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
 const TEXT_LAYOUT := preload("res://scripts/ui/ui_text_layout.gd")
 const SeedBagChipScript := preload("res://scripts/camp/seed_bag_chip.gd")
 const CrystalStashChipScript := preload("res://scripts/camp/crystal_stash_chip.gd")
+const DRAG_SCROLL := preload("res://scripts/ui/drag_scroll.gd")
+
+const TRADE_HOLD_RATE := 10.0
+## Save ide na otpuštanje, plus periodično da dug hold ne izgubi puno.
+const TRADE_SAVE_EVERY := 30
 
 @onready var root_vbox: VBoxContainer = %RootVBox
 @onready var header_panel: PanelContainer = %HeaderPanel
@@ -23,10 +28,12 @@ const CrystalStashChipScript := preload("res://scripts/camp/crystal_stash_chip.g
 @onready var garden_title: Label = %GardenTitle
 @onready var garden_cliff: Label = %GardenCliff
 @onready var bag_label: Label = %BagLabel
+@onready var seed_bag_scroll: ScrollContainer = %SeedBagScroll
 @onready var seed_bag_grid: GridContainer = %SeedBagGrid
 @onready var crystal_title: Label = %CrystalTitle
 @onready var crystal_cliff: Label = %CrystalCliff
 @onready var crystal_total_label: Label = %CrystalTotalLabel
+@onready var crystal_scroll: ScrollContainer = %CrystalScroll
 @onready var crystal_grid: GridContainer = %CrystalGrid
 @onready var crystal_exchange_button: UiClickButton = %CrystalExchangeButton
 @onready var exchange_button: UiClickButton = %ExchangeButton
@@ -47,6 +54,8 @@ var _selected_trade_type: String = ""
 var _selected_crystal_type: String = ""
 var _force_default_trade_select: bool = false
 var _force_default_crystal_select: bool = false
+var _pending_trade_save: bool = false
+var _trades_since_save: int = 0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -56,6 +65,8 @@ func _ready() -> void:
 	upgrade_multiplier_button.clicked.connect(_on_upgrade_multiplier_pressed)
 	exchange_button.clicked.connect(_on_exchange_pressed)
 	crystal_exchange_button.clicked.connect(_on_crystal_exchange_pressed)
+	_setup_trade_buttons()
+	_setup_drag_scroll()
 	home_button.clicked.connect(_on_main_menu_pressed)
 	collection_button.clicked.connect(_on_collection_pressed)
 	play_button.clicked.connect(_on_play_pressed)
@@ -80,6 +91,56 @@ func _ready() -> void:
 		and GameState.should_prompt_merge_tutorial()
 	):
 		call_deferred("_on_merge_pressed")
+
+func _setup_trade_buttons() -> void:
+	for button in [exchange_button, crystal_exchange_button]:
+		if button == null:
+			continue
+		button.auto_repeat = true
+		button.auto_repeat_rate = TRADE_HOLD_RATE
+		button.ghost_when_disabled = true
+	exchange_button.press_ended.connect(_on_trade_press_ended)
+	crystal_exchange_button.press_ended.connect(_on_trade_press_ended)
+
+
+func _setup_drag_scroll() -> void:
+	if seed_bag_scroll:
+		seed_bag_scroll.gui_input.connect(_on_scroll_gui_input.bind(seed_bag_scroll))
+	if crystal_scroll:
+		crystal_scroll.gui_input.connect(_on_scroll_gui_input.bind(crystal_scroll))
+
+
+func _on_scroll_gui_input(event: InputEvent, scroll: ScrollContainer) -> void:
+	var dy := DRAG_SCROLL.drag_delta(event)
+	if is_zero_approx(dy):
+		return
+	DRAG_SCROLL.apply(scroll, dy)
+	scroll.accept_event()
+
+
+func _exit_tree() -> void:
+	_flush_trade_save()
+
+
+func _flush_trade_save() -> void:
+	if not _pending_trade_save:
+		return
+	_pending_trade_save = false
+	_trades_since_save = 0
+	GameState.save_player_save()
+
+
+func _on_trade_press_ended() -> void:
+	_flush_trade_save()
+	_refresh_ui()
+
+
+func _mark_trade_save() -> void:
+	_pending_trade_save = true
+	_trades_since_save += 1
+	if _trades_since_save >= TRADE_SAVE_EVERY:
+		_flush_trade_save()
+
 
 func _setup_resource_icons() -> void:
 	var coin_tex := PICKUP_ASSETS.get_coin_texture()
@@ -287,16 +348,8 @@ func _next_trade_type_after(entries_before: Array, depleted_type: String) -> Str
 func _refresh_exchange_button() -> void:
 	if exchange_button == null:
 		return
-	var has_select := not _selected_trade_type.is_empty()
-	exchange_button.disabled = not has_select
-	if has_select:
-		var bag_count := int(GameState.seed_bag.get(_selected_trade_type, 0))
-		var take := GameState.seed_exchange_take_count(bag_count)
-		var coins := GameState.seed_exchange_coins_for_take(take, _selected_trade_type)
-		var seed_name: String = GameState.get_seed_display_name(_selected_trade_type)
-		exchange_button.label_text = "Trade %d× %s → %d coins" % [take, seed_name, coins]
-	else:
-		exchange_button.label_text = "Select a seed to trade"
+	exchange_button.disabled = _selected_trade_type.is_empty()
+	exchange_button.label_text = "Trade"
 
 func _rebuild_seed_bag_grid() -> void:
 	if seed_bag_grid == null:
@@ -381,17 +434,8 @@ func _next_crystal_type_after(entries_before: Array, depleted_type: String) -> S
 func _refresh_crystal_exchange_button() -> void:
 	if crystal_exchange_button == null:
 		return
-	var has_select := not _selected_crystal_type.is_empty()
-	crystal_exchange_button.disabled = not has_select
-	if has_select:
-		var crystal_name: String = GameState.get_seed_display_name(_selected_crystal_type)
-		var coins := GameState.crystal_exchange_coins_for_type(_selected_crystal_type)
-		crystal_exchange_button.label_text = "Exchange %s → %d coins" % [
-			crystal_name,
-			coins,
-		]
-	else:
-		crystal_exchange_button.label_text = "Select a flower to exchange"
+	crystal_exchange_button.disabled = _selected_crystal_type.is_empty()
+	crystal_exchange_button.label_text = "Trade"
 
 func _rebuild_crystal_grid() -> void:
 	if crystal_grid == null:
@@ -467,45 +511,103 @@ func _on_upgrade_multiplier_pressed() -> void:
 	GameState.try_upgrade_multiplier(_selected_crystal_type)
 	_refresh_ui()
 
-func _on_exchange_pressed() -> void:
+## Jedno sjeme; kad se tip isprazni, selekcija prelazi na sljedeći (za hold).
+func _trade_step() -> bool:
 	if _selected_trade_type.is_empty():
-		_refresh_ui("Tap a seed to select, then Trade.")
-		return
+		return false
 	var type_id := _selected_trade_type
-	var bag_count := int(GameState.seed_bag.get(type_id, 0))
-	var take := GameState.seed_exchange_take_count(bag_count)
-	if take <= 0:
+	if GameState.seed_exchange_take_count(int(GameState.seed_bag.get(type_id, 0))) <= 0:
 		_selected_trade_type = GameState.first_exchangeable_type_in_bag()
-		_refresh_ui("No seeds left to trade.")
-		return
-	var coins := GameState.seed_exchange_coins_for_take(take, type_id)
+		return false
 	var entries_before: Array = GameState.get_seed_bag_entries()
-	if GameState.exchange_seeds_from_bag(type_id):
-		var seed_name: String = GameState.get_seed_display_name(type_id)
-		if int(GameState.seed_bag.get(type_id, 0)) < 1:
-			_selected_trade_type = _next_trade_type_after(entries_before, type_id)
-		# else keep same type for spam Trade
-		_refresh_ui("Traded %d× %s for %d coins." % [take, seed_name, coins])
+	if not GameState.exchange_seeds_from_bag(type_id, false):
+		return false
+	if int(GameState.seed_bag.get(type_id, 0)) < 1:
+		_selected_trade_type = _next_trade_type_after(entries_before, type_id)
+	_mark_trade_save()
+	return true
 
-func _on_crystal_exchange_pressed() -> void:
+
+func _crystal_step() -> bool:
 	if _selected_crystal_type.is_empty():
-		_refresh_ui("Tap a flower to select, then Exchange.")
-		return
+		return false
 	var crystal_type := _selected_crystal_type
 	if int(GameState.garden_crystal_stash.get(crystal_type, 0)) < 1:
 		var leftover := GameState.get_garden_crystal_entries()
 		_selected_crystal_type = (
 			str(leftover[0].get("type_id", "")) if not leftover.is_empty() else ""
 		)
-		_refresh_ui("No flowers of that type left.")
-		return
+		return false
 	var entries_before: Array = GameState.get_garden_crystal_entries()
-	if GameState.exchange_garden_crystal(crystal_type):
-		var crystal_name: String = GameState.get_seed_display_name(crystal_type)
-		var coins := GameState.crystal_exchange_coins_for_type(crystal_type)
-		if int(GameState.garden_crystal_stash.get(crystal_type, 0)) < 1:
-			_selected_crystal_type = _next_crystal_type_after(entries_before, crystal_type)
-		_refresh_ui("Traded %s flower for %d coins." % [crystal_name, coins])
+	if not GameState.exchange_garden_crystal(crystal_type, false):
+		return false
+	if int(GameState.garden_crystal_stash.get(crystal_type, 0)) < 1:
+		_selected_crystal_type = _next_crystal_type_after(entries_before, crystal_type)
+	_mark_trade_save()
+	return true
+
+
+func _on_exchange_pressed() -> void:
+	if _trade_step():
+		_refresh_trade_light()
+	else:
+		_refresh_exchange_button()
+
+func _on_crystal_exchange_pressed() -> void:
+	if _crystal_step():
+		_refresh_crystal_light()
+	else:
+		_refresh_crystal_exchange_button()
+
+
+## Hold radi 6/s — pun rebuild grida bi 6× u sekundi rušio i gradio sve chipove.
+func _refresh_trade_light() -> void:
+	_refresh_wallet_labels()
+	_sync_chip_counts(seed_bag_grid, GameState.seed_bag)
+	_refresh_seed_chip_selection()
+	_refresh_exchange_button()
+	_refresh_live_chrome()
+
+
+func _refresh_crystal_light() -> void:
+	_refresh_wallet_labels()
+	_sync_chip_counts(crystal_grid, GameState.garden_crystal_stash)
+	_refresh_crystal_chip_selection()
+	_refresh_crystal_exchange_button()
+	_refresh_live_chrome()
+
+
+## Header i link-season prate svaki pojedini trade, ne tek otpuštanje dugmeta.
+## U hub-u je vidljiv hub-ov top bar, a ne Campova ResourceBar.
+func _refresh_live_chrome() -> void:
+	_notify_hub_chrome()
+	if season_link_card and season_link_card.has_method("refresh"):
+		season_link_card.refresh()
+
+
+func _refresh_wallet_labels() -> void:
+	if coins_label:
+		coins_label.text = "%d" % GameState.wallet_coins
+	if seeds_label:
+		seeds_label.text = "%d / %d" % [
+			GameState.sum_seed_bag(GameState.seed_bag),
+			GameState.SEED_BAG_SOFT_CAP,
+		]
+
+
+## Tokom trgovanja broj chipova može samo padati — rebuild nije potreban.
+func _sync_chip_counts(grid: GridContainer, source: Dictionary) -> void:
+	if grid == null:
+		return
+	for child in grid.get_children():
+		if not child.has_method("get_type_id") or not child.has_method("set_count"):
+			continue
+		var count := int(source.get(str(child.call("get_type_id")), 0))
+		if count < 1:
+			grid.remove_child(child)
+			child.queue_free()
+		else:
+			child.call("set_count", count)
 
 
 func _on_collection_pressed() -> void:
