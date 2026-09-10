@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://collectionjournal01"]
+[gd_scene load_steps=4 format=3 uid="uid://collectionjournal01"]
 
 [ext_resource type="Script" path="res://scripts/ui/collection_journal.gd" id="1_journal"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
+[ext_resource type="Texture2D" path="res://assets/ui/title_bloom_album.png" id="3_title"]
 
 [node name="CollectionJournal" type="Control"]
 layout_mode = 3
@@ -19,20 +20,20 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.15, 0.22, 0.17, 1)
+color = Color(1, 0.973, 0.941, 1)
 
 [node name="RootVBox" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
+offset_left = 24.0
 offset_top = 16.0
-offset_right = -16.0
+offset_right = -24.0
 offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="TopBar" type="HBoxContainer" parent="RootVBox"]
 layout_mode = 2
@@ -46,20 +47,18 @@ label_text = ""
 button_icon = "home"
 button_variant = "subtle"
 
-[node name="TitleLabel" type="Label" parent="RootVBox/TopBar"]
+[node name="TitleLabel" type="TextureRect" parent="RootVBox/TopBar"]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(1, 0.92, 0.55, 1)
-theme_override_font_sizes/font_size = 34
-text = "Bloom Album"
-vertical_alignment = 1
+size_flags_vertical = 4
+texture = ExtResource("3_title")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="SummaryLabel" type="Label" parent="RootVBox"]
+[node name="ListTopSpacer" type="Control" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.82, 0.9, 0.84, 1)
-text = "Album: 0 blooms kept"
-horizontal_alignment = 1
-autowrap_mode = 2
 
 [node name="ListScroll" type="ScrollContainer" parent="RootVBox"]
 layout_mode = 2
@@ -71,4 +70,4 @@ vertical_scroll_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
-theme_override_constants/separation = 10
+theme_override_constants/separation = 16

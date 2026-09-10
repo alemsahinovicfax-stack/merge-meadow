@@ -98,7 +98,8 @@ static func get_meadow_modulate(item_id: String) -> Color:
 			return Color.WHITE
 
 
+## Title is now a baked PNG (already gold) — this is a modulate multiplier, not an absolute color.
 static func get_journal_title_color(item_id: String) -> Color:
 	if item_id == "journal_gold":
-		return Color(1.0, 0.88, 0.35, 1.0)
-	return Color(1.0, 0.92, 0.55, 1.0)
+		return Color(0.8, 0.8, 0.8, 1.0)
+	return Color(1.0, 1.0, 1.0, 1.0)

@@ -1,5 +1,5 @@
 class_name CollectionJournalRow
-extends PanelContainer
+extends Control
 
 const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
 const TEXT_LAYOUT := preload("res://scripts/ui/ui_text_layout.gd")
@@ -9,11 +9,14 @@ const BloomIcon := preload("res://scripts/ui/collection_bloom_icon.gd")
 
 const TIER_ICON_SIZE := 64.0
 
+## NEW badge hovers above the card's top-right corner, so it must live outside
+## the PanelContainer (which forces all its children to the same content rect).
+var _panel: PanelContainer
+
 var _entry: Dictionary = {}
 var _built: bool = false
 var _title: Label
 var _stars: Label
-var _caption: Label
 var _new_badge: Label
 var _tier_icons: Array[Control] = []
 var _tier_captions: Array[Label] = []
@@ -34,6 +37,12 @@ func _ready() -> void:
 		_refresh()
 
 
+func _get_minimum_size() -> Vector2:
+	if _panel:
+		return _panel.get_combined_minimum_size()
+	return Vector2.ZERO
+
+
 func get_tier_icon(tier: int) -> Control:
 	var idx := tier - 1
 	if idx < 0 or idx >= _tier_icons.size():
@@ -47,16 +56,20 @@ func _ensure_built() -> void:
 	_built = true
 	custom_minimum_size = Vector2(0, 120)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	clip_contents = false
 
-	add_theme_stylebox_override("panel", UI_PALETTE.rarity_bg_style(1, true))
+	_panel = PanelContainer.new()
+	_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_panel.add_theme_stylebox_override("panel", UI_PALETTE.rarity_bg_style(1, true))
+	add_child(_panel)
 
 	var root := VBoxContainer.new()
 	root.add_theme_constant_override("separation", 8)
 	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	add_child(root)
+	_panel.add_child(root)
 
 	var title_row := HBoxContainer.new()
-	title_row.add_theme_constant_override("separation", 8)
+	title_row.add_theme_constant_override("separation", 10)
 	root.add_child(title_row)
 
 	_title = Label.new()
@@ -66,34 +79,52 @@ func _ensure_built() -> void:
 	_title.add_theme_color_override("font_color", UI_PALETTE.UI_TEXT)
 	title_row.add_child(_title)
 
+	_stars = Label.new()
+	_stars.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_stars.add_theme_font_size_override("font_size", READABILITY.font(TYPO.BODY))
+	_stars.add_theme_color_override("font_color", UI_PALETTE.UI_TEXT)
+	title_row.add_child(_stars)
+
+	# Floats above the panel's top-right corner (outside its bounds) — sibling
+	# of _panel, not a child of it, since PanelContainer forces children to
+	# share one content rect and can't host a freely-anchored overlay.
 	_new_badge = Label.new()
 	_new_badge.text = "NEW"
+	_new_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	TEXT_LAYOUT.caption_label_scroll_readable(_new_badge)
-	_new_badge.add_theme_color_override("font_color", Color(1.0, 0.95, 0.85))
+	_new_badge.add_theme_color_override("font_color", Color(1.0, 0.953, 0.918))
 	var badge_bg := StyleBoxFlat.new()
-	badge_bg.bg_color = Color(0.85, 0.35, 0.28)
-	badge_bg.set_corner_radius_all(8)
-	badge_bg.content_margin_left = 8.0
-	badge_bg.content_margin_right = 8.0
-	badge_bg.content_margin_top = 2.0
-	badge_bg.content_margin_bottom = 2.0
+	badge_bg.bg_color = Color(0.851, 0.478, 0.333)
+	badge_bg.set_corner_radius_all(20)
+	badge_bg.set_border_width_all(2)
+	badge_bg.border_color = Color(0.722, 0.373, 0.243)
+	badge_bg.content_margin_left = 16.0
+	badge_bg.content_margin_right = 16.0
+	badge_bg.content_margin_top = 6.0
+	badge_bg.content_margin_bottom = 6.0
 	_new_badge.add_theme_stylebox_override("normal", badge_bg)
-	title_row.add_child(_new_badge)
-
-	_stars = Label.new()
-	_stars.add_theme_font_size_override("font_size", READABILITY.font(TYPO.BODY))
-	_stars.add_theme_color_override("font_color", Color(0.72, 0.62, 0.2))
-	root.add_child(_stars)
+	_new_badge.anchor_left = 1.0
+	_new_badge.anchor_right = 1.0
+	_new_badge.anchor_top = 0.0
+	_new_badge.anchor_bottom = 0.0
+	_new_badge.offset_left = -22.0
+	_new_badge.offset_right = -22.0
+	_new_badge.offset_top = -16.0
+	_new_badge.offset_bottom = -16.0
+	_new_badge.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_new_badge.grow_vertical = Control.GROW_DIRECTION_BOTH
+	add_child(_new_badge)
 
 	var tier_row := HBoxContainer.new()
 	tier_row.name = "TierIconsRow"
-	tier_row.add_theme_constant_override("separation", 16)
+	tier_row.add_theme_constant_override("separation", 44)
 	tier_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	root.add_child(tier_row)
 
 	for tier in [1, 2, 3]:
 		var col := VBoxContainer.new()
-		col.add_theme_constant_override("separation", 4)
+		col.add_theme_constant_override("separation", 6)
 		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		col.alignment = BoxContainer.ALIGNMENT_CENTER
 		tier_row.add_child(col)
@@ -111,11 +142,6 @@ func _ensure_built() -> void:
 		TEXT_LAYOUT.caption_label_scroll_readable(cap)
 		col.add_child(cap)
 		_tier_captions.append(cap)
-
-	_caption = Label.new()
-	TEXT_LAYOUT.body_label_scroll(_caption)
-	_caption.add_theme_color_override("font_color", Color(0.38, 0.42, 0.38))
-	root.add_child(_caption)
 
 
 func _refresh() -> void:
@@ -146,25 +172,4 @@ func _refresh() -> void:
 		else:
 			cap.add_theme_color_override("font_color", Color(0.55, 0.58, 0.55))
 
-	match state:
-		"locked":
-			_caption.text = "Keep playing to discover this bloom."
-		"seen":
-			_caption.text = "Spotted in runs — merge to T2, then Keep in Album."
-		"album_t2":
-			_caption.text = "In your Album (T2 bloom). Merge to T3 for crystal."
-		"album_t3":
-			_caption.text = "Crystal bloom saved in Album!"
-		_:
-			_caption.text = ""
-
-	if bool(_entry.get("is_new", false)):
-		var new_tier := int(_entry.get("new_tier", 1))
-		if new_tier >= 3:
-			_caption.text = "New crystal in Album!"
-		elif new_tier >= 2:
-			_caption.text = "New bloom kept in Album!"
-		else:
-			_caption.text = "New discovery!"
-
-	add_theme_stylebox_override("panel", UI_PALETTE.rarity_bg_style(rarity, locked_entry))
+	_panel.add_theme_stylebox_override("panel", UI_PALETTE.rarity_bg_style(rarity, locked_entry))

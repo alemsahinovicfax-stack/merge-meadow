@@ -39,13 +39,16 @@ static func rarity_bg_color(rarity: int, locked: bool = false) -> Color:
 static func rarity_bg_style(rarity: int, locked: bool = false) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = rarity_bg_color(rarity, locked)
-	style.set_corner_radius_all(10)
-	style.set_border_width_all(2)
-	style.border_color = Color(OUTLINE.r, OUTLINE.g, OUTLINE.b, 0.16)
-	style.content_margin_left = 10.0
-	style.content_margin_top = 8.0
-	style.content_margin_right = 10.0
-	style.content_margin_bottom = 8.0
+	style.set_corner_radius_all(26)
+	style.set_border_width_all(3)
+	style.border_color = Color(OUTLINE.r, OUTLINE.g, OUTLINE.b, 0.14)
+	style.content_margin_left = 22.0
+	style.content_margin_top = 20.0
+	style.content_margin_right = 22.0
+	style.content_margin_bottom = 20.0
+	style.shadow_color = Color(OUTLINE.r, OUTLINE.g, OUTLINE.b, 0.10)
+	style.shadow_size = 4
+	style.shadow_offset = Vector2(0, 4)
 	return style
 
 

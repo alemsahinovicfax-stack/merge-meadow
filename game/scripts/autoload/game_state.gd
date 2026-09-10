@@ -1209,7 +1209,7 @@ func get_collection_journal_entries() -> Array[Dictionary]:
 			state = "seen"
 		out.append({
 			"type_id": type_id,
-			"display_name": get_seed_display_name(type_id),
+			"display_name": "???" if state == "locked" else get_seed_display_name(type_id),
 			"rarity": get_seed_rarity(type_id),
 			"spawn_unlocked": spawn_unlocked,
 			"discovered": discovered,
@@ -1220,18 +1220,6 @@ func get_collection_journal_entries() -> Array[Dictionary]:
 			"new_tier": int(collection_journal_pending.get(type_id, 0)),
 		})
 	return out
-
-
-func format_collection_journal_summary() -> String:
-	var entries := get_collection_journal_entries()
-	var kept := 0
-	var seen := 0
-	for entry in entries:
-		if str(entry.get("state", "")).begins_with("album"):
-			kept += 1
-		elif str(entry.get("state", "")) != "locked":
-			seen += 1
-	return "Album: %d blooms kept · %d spotted" % [kept, seen]
 
 
 func _halve_seed_bag(bag: Dictionary) -> Dictionary:
