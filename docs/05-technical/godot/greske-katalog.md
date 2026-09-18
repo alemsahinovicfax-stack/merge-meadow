@@ -295,6 +295,30 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** `season_home_smoke` assert filtera; [[../../03-content/ideje-home-hit-targets-tehnika|HOME-02 tehnika]].
 
+## #14 — SurfaceTool mesh "inside-out" (CCW winding iz glTF/three.js navike)
+
+**Datum:** 2026-09-16 (CD capability test, `seed_bag_mesh.gd`)
+
+**Simptom:** Proceduralni mesh izgleda prozirno/šuplje uz `CULL_BACK`, iako su normale tačne i isti model iz `.gltf`/`.obj` izgleda ispravno.
+
+**Uzrok:** Godot koristi **clockwise** front face. glTF, OBJ i three.js koriste counter-clockwise, a Godotovi importeri pri uvozu okreću redoslijed. SurfaceTool/ArrayMesh ne okreću ništa.
+
+**Rješenje:** u builderu dodaj vrhove redom `a, c, b` (normala i dalje `(b−a)×(c−a)` prema van).
+
+**Prevencija:** headless provjera: za svaki trokut `(b−a)×(c−a)` mora biti **suprotan** spremljenoj normali, kao kod uvezenog glTF-a (`_cd_sandbox/_cc_verify/cd_verify_smoke.gd`).
+
+## #15 — Android export ne prihvata scenu s komandne linije
+
+**Datum:** 2026-09-16 (benchmark na emulatoru)
+
+**Simptom:** `adb shell am start ... --esa command_line_params res://.../scena.tscn` → logcat: `ERROR: Scene path was specified on the command line, but this Godot binary was compiled without support for path overrides. Aborting.`
+
+**Uzrok:** export templates su kompajlirani s `disable_path_overrides`. `GodotAppLauncher` alias uz to odbacuje extras, a `GodotApp` nije exported (treba `adb root`).
+
+**Rješenje:** za jednokratni APK privremeno promijeni `application/run/main_scene` u `project.godot`, uradi `--export-debug` u scratch putanju, pa vrati backup i provjeri hash.
+
+**Prevencija:** ne gubi vrijeme na intent extras za izbor scene. Benchmark scena se mora sama ugasiti (`get_tree().quit()`) i ispisati rezultat u konzolu (logcat).
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

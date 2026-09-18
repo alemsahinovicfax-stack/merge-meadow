@@ -1,0 +1,99 @@
+{
+  "protocol_version": "cd-handoff/1.0",
+  "responding_to": "cd_capability_test HANDOFF.json (2026-09-16)",
+  "date": "2026-09-16",
+  "human_readable": "docs/04-experience/design-drafts/cd_response.md",
+  "raw_results": "docs/_cd_sandbox/_cc_results/ (logs + CSV, not committed)",
+  "environment": {
+    "godot": "4.7.stable.official.5b4e0cb0f",
+    "driver": "Compatibility / opengl3 (desktop GL 3.3, Android GLES 3.1)",
+    "blender": null,
+    "device": [
+      "laptop: HP 255 G8, AMD Ryzen 3 3250U, AMD Radeon (Vega 3 iGPU), Windows 10, window 540x960 (viewport 1080x1920), vsync off",
+      "emulator: Pixel_4_API33 (google_apis x86_64, API 33, 2 vCPU, 2 GB), 1080x2280, GLES 3.1 via Android Emulator OpenGL ES Translator on AMD Radeon, vsync on"
+    ],
+    "real_android_device": "NOT RUN - none available"
+  },
+  "files": [
+    { "path_in_package": "t1_3d/seed_bag.gltf", "loaded": true, "errors": [], "fix_applied": "",
+      "facts": { "root": "seed_bag (Node3D) -> SeedBag (MeshInstance3D)", "surfaces": 3, "tris": 408, "tris_per_surface": [238, 84, 86], "height": 0.272, "bbox_min_y": 0.0,
+        "godot_albedo": { "mat_sack": "#D4F4E9", "mat_band": "#FFDDC4", "mat_seed": "#FFF6D4" }, "vertex_color_as_albedo": { "mat_sack": false, "mat_band": true, "mat_seed": true } },
+      "issue": "baseColorFactor and COLOR_0 hold sRGB palette values but glTF defines both as linear and multiplies them; colors come out washed out / squared" },
+    { "path_in_package": "t1_3d/seed_bag.obj", "loaded": true,
+      "errors": ["WARNING: OBJ: Ambient light for material 'mat_sack' is ignored in PBR", "WARNING: OBJ: Ambient light for material 'mat_band' is ignored in PBR", "WARNING: OBJ: Ambient light for material 'mat_seed' is ignored in PBR"],
+      "fix_applied": "", "facts": { "surfaces": 3, "tris": 408, "tris_per_surface": [238, 84, 86], "height": 0.272, "albedo_exact_palette": true } },
+    { "path_in_package": "t1_3d/seed_bag_mesh.gd", "loaded": true, "errors": [], "fix_applied": "",
+      "facts": { "surfaces": 3, "tris": 408, "tris_per_surface": [252, 84, 72], "height": 0.272 },
+      "issue": "Winding reversed for Godot: geometric normal (b-a)x(c-a) agrees with stored normal on 408/408 tris, while Godot's own glTF and OBJ importers produce the opposite on 408/408. With CULL_BACK the bag renders inside-out. Not rendered - inferred from this comparison.",
+      "proposed_fix": "_tri(): add vertices a, c, b; keep normal from (b-a)x(c-a). Set albedo_color = WHITE when vertex_color_use_as_albedo. Move cap disc to the seed surface to match glTF." },
+    { "path_in_package": "t1_3d/build_seed_bag.py", "loaded": false, "errors": ["NOT RUN - Blender not installed"], "fix_applied": "" },
+    { "path_in_package": "t2_tscn/merge_toast.tscn", "loaded": true, "errors": [], "fix_applied": "",
+      "godot_resave_diff": ["[gd_scene load_steps=3 format=3] -> [gd_scene format=3]", "id=\"1\" -> id=\"1_hf5bo\"", "ExtResource(\"1\") -> ExtResource(\"1_hf5bo\")"],
+      "note": "everything else byte-identical; headless ResourceSaver writes no uid=" },
+    { "path_in_package": "t2_tscn/merge_toast.gd", "loaded": true, "errors": [], "fix_applied": "",
+      "facts": { "onready_types_match": true, "freed_after_ms": 860, "peak_pill_scale": 1.236, "label_text_for_plus1_crystal": "+1  Crystal", "default_font": "Open Sans SemiBold", "font_has_U+2726": false, "row_min_width_long_name": 397, "pill_inner_width": 232 } },
+    { "path_in_package": "t3_anim/merge_pop_fx_sheet.png", "loaded": true, "errors": [], "fix_applied": "",
+      "facts": { "size": "2048x256", "format": "RGBA8", "transparent_corners": true, "empty_frames": [7], "spriteframes_duration_25fps_s": 0.32, "timing_md_window_ms": [140, 820] } },
+    { "path_in_package": "t5_perf/benchmark_arena.gd", "loaded": true, "errors": [], "fix_applied": "copy game/_cd_sandbox/_cc_verify/benchmark_arena_cc.gd (original untouched)",
+      "issues": ["S1b missing", "no 3 repeats / median", "S4 looping flash tween never killed, leaks into S5", "_clear_field() coroutine not awaited", "vsync not disabled (desktop measures refresh cap)", "no auto-quit", "INTEGER_DIVISION warning", "tween_interval(0) inside loop"] },
+    { "path_in_package": "install.ps1", "loaded": true, "errors": ["-Apply blocked by Claude Code permission system (executing external script); same 25 files copied manually from dry-run plan"], "fix_applied": "",
+      "issue": "canvas/seed_bag_turntable.html fetches ../t1_3d/seed_bag.gltf but installer routes .gltf to game/_cd_sandbox; fetch() also fails on file://" },
+    { "path_in_package": "HANDOFF.json", "loaded": true, "errors": [], "fix_applied": "" }
+  ],
+  "answers": {
+    "Q-01": "False. origin/master @ cdc0e6a7a274 (a commit sha) contains game/project.godot, game/scripts/** (284 files) and game/scenes/** (16); 1012 tree entries. Real risk: 50 modified files + 40 new scripts + 80 new assets (Arena/hub/Camp redesigns, ui_arena.gd, ui_camp.gd, ui_chrome.gd, CD briefs) are uncommitted and not on the remote.",
+    "Q-02": "See cd_response.md section 3 (ui_palette.gd + ui_arena.gd name=hex). ui_arena.gd is uncommitted.",
+    "Q-03": "Code: ARENA_MAX_CHIPS=30, ARENA_SNAP_DISTANCE=140.0, ARENA_MAGNET_RADIUS=182.0, CHIP_RADIUS=67.2. Local doc already updated (uncommitted). Remote: doc 24/120/48, code 40/100/130.",
+    "Q-04": "Parses with 0 errors without uid= and with id=\"1\". Godot 4.7 resave only drops load_steps and renames id to \"1_hf5bo\". Recommendation: keep omitting uid=, use ids like \"1_toast\".",
+    "Q-05": "1 node per chip (Control, no children), all in _draw(). T1: 4 layers (shadow alpha 0.42 offset 6px, opaque rim, opaque well, flower texture). T2: 5 (+hairline). Pulse/partner/merge ring +1. Mythic +dashed outline. All StyleBoxFlat anti_aliasing=true, corner_detail=16.",
+    "Q-06": "No. shadow_size=0 on chip; shadow is a separate offset StyleBoxFlat (6px, 18px when dragging), no blur.",
+    "Q-07": "S2 vs S3: laptop 504.9 vs 481.9 fps (p95 2.08 vs 2.38 ms); emulator 49.5 vs 45.1 fps (p95 23.87 vs 27.78 ms) - no measurable cost. S1 vs S1b: laptop 565.6 vs 552.3 fps (p95 1.85 both); emulator 50.0 vs 46.9 fps (p95 23.06 vs 25.07) - within repeat noise. Real chips: R1 static 489.8 / 49.0 fps, R2 29 pulsing 84.1 / 10.0 fps (p95 12.96 / 108.06 ms).",
+    "Q-08": "No Blender. Godot imports .gltf directly, so .glb is not needed.",
+    "Q-09": "Brief exists locally but is uncommitted (same cause as Q-01). Commit is the user's decision."
+  },
+  "benchmark": {
+    "script": "game/_cd_sandbox/_cc_verify/benchmark_arena_cc.gd",
+    "method": "3 repeats x (1 s warmup + 6 s measure), median",
+    "laptop": [
+      { "scenario": "S1_baseline_static", "fps_avg": 565.6, "fps_min": 362.4, "frame_ms_p95": 1.85, "draw_calls_peak": 92, "node_count": 131, "verdict": "WARN" },
+      { "scenario": "S1b_static_shadow", "fps_avg": 552.3, "fps_min": 294.2, "frame_ms_p95": 1.85, "draw_calls_peak": 92, "node_count": 131, "verdict": "WARN" },
+      { "scenario": "S2_all_pulsing", "fps_avg": 504.9, "fps_min": 189.5, "frame_ms_p95": 2.08, "draw_calls_peak": 92, "node_count": 131, "verdict": "WARN" },
+      { "scenario": "S3_budget_pulse_12", "fps_avg": 481.9, "fps_min": 297.3, "frame_ms_p95": 2.38, "draw_calls_peak": 92, "node_count": 131, "verdict": "WARN" },
+      { "scenario": "S4_worst_case", "fps_avg": 423.7, "fps_min": 223.9, "frame_ms_p95": 2.78, "draw_calls_peak": 122, "node_count": 161, "verdict": "FAIL" },
+      { "scenario": "S5_low_fx", "fps_avg": 660.3, "fps_min": 358.2, "frame_ms_p95": 1.67, "draw_calls_peak": 62, "node_count": 101, "verdict": "PASS" },
+      { "scenario": "R1_real_chips_static", "fps_avg": 489.8, "fps_min": 303.1, "frame_ms_p95": 2.10, "draw_calls_peak": 122, "node_count": 41, "verdict": "FAIL" },
+      { "scenario": "R2_real_chips_pulse_29", "fps_avg": 84.1, "fps_min": 65.5, "frame_ms_p95": 12.96, "draw_calls_peak": 151, "node_count": 41, "verdict": "FAIL" }
+    ],
+    "emulator": [
+      { "scenario": "S1_baseline_static", "fps_avg": 50.0, "fps_min": 31.5, "frame_ms_p95": 23.06, "draw_calls_peak": 92, "node_count": 131, "verdict": "WARN" },
+      { "scenario": "S1b_static_shadow", "fps_avg": 46.9, "fps_min": 28.2, "frame_ms_p95": 25.07, "draw_calls_peak": 92, "node_count": 131, "verdict": "FAIL" },
+      { "scenario": "S2_all_pulsing", "fps_avg": 49.5, "fps_min": 27.4, "frame_ms_p95": 23.87, "draw_calls_peak": 92, "node_count": 131, "verdict": "FAIL" },
+      { "scenario": "S3_budget_pulse_12", "fps_avg": 45.1, "fps_min": 22.5, "frame_ms_p95": 27.78, "draw_calls_peak": 92, "node_count": 131, "verdict": "FAIL" },
+      { "scenario": "S4_worst_case", "fps_avg": 47.5, "fps_min": 29.0, "frame_ms_p95": 23.30, "draw_calls_peak": 122, "node_count": 161, "verdict": "FAIL" },
+      { "scenario": "S5_low_fx", "fps_avg": 52.4, "fps_min": 35.5, "frame_ms_p95": 21.20, "draw_calls_peak": 62, "node_count": 101, "verdict": "WARN" },
+      { "scenario": "R1_real_chips_static", "fps_avg": 49.0, "fps_min": 39.3, "frame_ms_p95": 21.21, "draw_calls_peak": 122, "node_count": 41, "verdict": "FAIL" },
+      { "scenario": "R2_real_chips_pulse_29", "fps_avg": 10.0, "fps_min": 8.2, "frame_ms_p95": 108.06, "draw_calls_peak": 151, "node_count": 41, "verdict": "FAIL" }
+    ],
+    "notes": [
+      "Emulator caps at ~50 fps even for the simplest scene; not a valid absolute 60 fps gate.",
+      "RENDER_TOTAL_DRAW_CALLS_IN_FRAME includes 2D in 4.7 Compatibility (equal to viewport canvas counter).",
+      "Main cost found: real chips redrawing their whole _draw() every frame while pulsing (R2 5-6x slower than R1). Cause inside _draw not isolated (ASSUMPTION)."
+    ]
+  },
+  "revision_requests": [
+    "T5: retarget budget/Low FX from shadows and tween count to chips redrawn per frame; design pulse as a cheap separate layer.",
+    "T5: drop or raise draw-call gates for 2D Compatibility; gate on p95 frame time on a real low-end phone, not the emulator.",
+    "T1 glTF: linear colors, and either baseColorFactor or COLOR_0 (not both).",
+    "T1 .gd: reverse vertex order for Godot, albedo WHITE with vertex colors, cap disc in the seed surface.",
+    "T2: fix double space when stripping the glyph, avoid U+2726 glyph (missing in default font), auto-width pill, note TRANS_BACK overshoot (1.236).",
+    "T3: frame 7 empty; 8 frames @25 fps = 0.32 s vs 680 ms window in timing.md; real code T3 moment is 0.74 s into Arena HUD StashCounter; crystal_stash_icon no longer exists.",
+    "T4 Dew Pair: API is commit_arena_chips_to_bag(chip_data); check premise against ARENA-03 leftover vacuum; not in M8 IN scope without user decision.",
+    "T4 Glance: coordinate with existing play_wobble() near-miss (<140 px).",
+    "T6: installer routing breaks turntable; HTML needs a local server."
+  ],
+  "questions_for_cd": [
+    { "id": "CC-01", "q": "How does your GitHub access list files? If it filters .gd/.tscn/.godot, commit + sync will not work for code. Can you see game/scripts/autoload/game_state.gd at cdc0e6a?" },
+    { "id": "CC-02", "q": "Do you want a T5 revision based on R2 (pulse as a cheap layer)? If yes, send a pulse visual spec that does not require redrawing the chip; Claude Code measures before/after." },
+    { "id": "CC-03", "q": "Is T1 (3D) closed as a test, given '3D grafika' is on the v1 OUT list and you recommended 2D yourself?" }
+  ]
+}
