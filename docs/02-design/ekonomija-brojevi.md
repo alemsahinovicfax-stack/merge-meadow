@@ -95,6 +95,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | `EXCHANGE_SEED_COUNT` | `1` | sjemena po Trade tapu; držanje dugmeta trguje 10/s (`TRADE_HOLD_RATE`) i prelazi na sljedeći tip |
 | `SEED_EXCHANGE_COINS_BY_RARITY` | ★1=`1`, ★2=`2`, ★3=`4` | C po sjemeniu |
 | `CRYSTAL_EXCHANGE_COINS_BY_RARITY` | ★1=`5`, ★2=`10`, ★3=`20` | C po flower/crystal |
+| rezervisano ★3 cvijeće (2026-09-15) | granica = `t3_flowers_required` sljedeće besplatne sezone (★3 tip prethodne; Frost Orchard: 20 Harvest Pumpkin) | Camp Trade: držanje staje prije nego tip padne ispod granice; tap prodaje po 1 i ispod nje. Sjemenke i stanje bez sljedeće sezone nemaju granicu. Uslov otključavanja: 500 C + 20 ★3 (`seasons.json`) |
 
 ### Rarity → gdje se sadi
 

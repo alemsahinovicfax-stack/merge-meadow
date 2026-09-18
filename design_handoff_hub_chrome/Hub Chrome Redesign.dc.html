@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #EDEAE5; }
+  a { color: #2D3436; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { color: #A8724A; }
+</style>
+</helmet>
+
+<section style="display:flex;flex-direction:column;gap:120px;padding:80px;background:#EDEAE5;font-family:Nunito,system-ui,sans-serif;color:#2D3436">
+
+  <div style="display:flex;gap:64px;align-items:flex-start;width:2404px">
+    <div style="width:1680px;flex:0 0 auto">
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Merge Meadow · meta hub</div>
+      <h1 style="margin:18px 0 0;font:900 88px/1.02 Nunito,sans-serif;letter-spacing:-.02em">Hub chrome — header i footer</h1>
+      <p style="margin:28px 0 0;max-width:1100px;font:600 30px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Jedan univerzalan chrome za svih 5 swipe stranica. Artboard <strong>1080×1920 px</strong>, sve mjere u px te baze — prenos 1:1 u Godot. Dva smjera su <a href="#1a">1a</a> i <a href="#1b">1b</a>; sve ispod njih je isporuka za preporučeni smjer.</p>
+    </div>
+    <div style="width:660px;flex:0 0 auto;background:#1A241E;border-radius:24px;padding:40px 44px;box-sizing:border-box">
+      <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.16em;color:#FFB88C;text-transform:uppercase">Preporuka</div>
+      <div style="margin-top:16px;font:900 46px/1.1 Nunito,sans-serif;color:#FFF8F0">Smjer B — tamni livadski chrome</div>
+      <ul style="margin:24px 0 0;padding-left:28px;font:600 24px/1.55 Nunito,sans-serif;color:rgba(255,248,240,.86)">
+        <li>Tijelo trake nosi kontrast prema <em>svim</em> svijetlim stranicama (8,9–15,0:1) — nijedna sezonska nijansa Home polja ga ne može dostići.</li>
+        <li>Pastelni chipovi su svijetli po prirodi: na tamnoj traci sami postaju kontrast (6,4–9,0:1 s tamnim ciframa), bez debelog outlinea.</li>
+        <li>Hub pozadina je već <code>#1F2B24</code> — traka se stapa sa safe areom, nema tamne „rupe“ iznad notcha.</li>
+        <li>Smjer A na Journalu ima traku iste boje kao stranica; odvaja ih samo tvrda linija — čita se kao šav, ne kao okvir.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:80px;align-items:flex-start">
+
+    <div id="1a" style="display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="width:64px;height:64px;border-radius:18px;background:#2D3436;color:#FFF8F0;display:grid;place-items:center;font:800 28px/1 Nunito,sans-serif">1a</div>
+        <div>
+          <div style="font:900 44px/1 Nunito,sans-serif">A — svijetli chrome</div>
+          <div style="margin-top:8px;font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A">warm white #FFF8F0 · rub #2D3436 @ 72 %</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:40px">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Journal · #FFF8F0</div>
+          <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+            <dc-import name="HubScreen" theme="light" page-bg="#FFF8F0" active="{{ 1 }}" hint-size="1080px,1920px"></dc-import>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Camp · #2E4733</div>
+          <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+            <dc-import name="HubScreen" theme="light" page-bg="#2E4733" active="{{ 3 }}" hint-size="1080px,1920px"></dc-import>
+          </div>
+        </div>
+      </div>
+      <p style="margin:0;max-width:2200px;font:600 26px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Radi na tamnim stranicama i formalno prolazi na svijetlim (rub 5,1:1), ali chipovi se od trake odvajaju samo borderom (1,3:1) pa traže tvrd outline, a 323 px svijetlog chroma se bori s pastelnom ilustracijom stranice.</p>
+    </div>
+
+    <div id="1b" style="display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="width:64px;height:64px;border-radius:18px;background:#1A241E;color:#FFB88C;display:grid;place-items:center;font:800 28px/1 Nunito,sans-serif">1b</div>
+        <div>
+          <div style="font:900 44px/1 Nunito,sans-serif">B — tamni livadski chrome <span style="color:#A8724A">· preporuka</span></div>
+          <div style="margin-top:8px;font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A">chrome deep #1A241E · rub #FFF8F0 @ 55 %</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:40px">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Journal · #FFF8F0</div>
+          <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+            <dc-import name="HubScreen" theme="dark" page-bg="#FFF8F0" active="{{ 1 }}" hint-size="1080px,1920px"></dc-import>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Camp · #2E4733</div>
+          <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+            <dc-import name="HubScreen" theme="dark" page-bg="#2E4733" active="{{ 3 }}" hint-size="1080px,1920px"></dc-import>
+          </div>
+        </div>
+      </div>
+      <p style="margin:0;max-width:2200px;font:600 26px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Tijelo trake nosi svijetle stranice, svijetli rub od 3 px nosi tamne (4,2–4,9:1). Chipovi u bojama valuta pale se na tamnom, a peach je slobodan za jedinu CTA ulogu — aktivan tab.</p>
+    </div>
+
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;flex-direction:column;gap:44px">
+    <div>
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Isporuka 1</div>
+      <h2 style="margin:14px 0 0;font:900 60px/1 Nunito,sans-serif">Spec sheet — Header</h2>
+    </div>
+
+    <div style="display:flex;gap:64px;align-items:flex-start">
+      <div style="width:1200px;flex:0 0 auto;display:flex;flex-direction:column;gap:0">
+        <div style="display:flex;gap:0;align-items:stretch">
+          <div style="width:120px;flex:0 0 auto;display:flex;flex-direction:column;font:600 20px/1 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:right;padding-right:16px;box-sizing:border-box">
+            <div style="height:20px;display:flex;align-items:center;justify-content:flex-end">20</div>
+            <div style="height:100px;display:flex;align-items:center;justify-content:flex-end;color:#2D3436">100</div>
+            <div style="height:20px;display:flex;align-items:center;justify-content:flex-end">20</div>
+            <div style="height:3px;position:relative"><div style="position:absolute;right:0;top:-1px;height:2px;width:28px;background:#A8724A"></div></div>
+          </div>
+          <div style="width:1080px;flex:0 0 auto;background:#FFF8F0">
+            <dc-import name="HubScreen" part="header" theme="dark" hint-size="1080px,143px"></dc-import>
+          </div>
+        </div>
+        <div style="display:flex;margin-left:120px;width:1080px;border-top:2px solid rgba(45,52,54,.3);font:600 20px/1 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A">
+          <div style="width:20px;height:38px;border-right:2px solid rgba(45,52,54,.3)"></div>
+          <div style="width:296px;height:38px;border-right:2px solid rgba(45,52,54,.3);display:grid;place-items:center;color:#2D3436">296</div>
+          <div style="width:16px;height:38px;border-right:2px solid rgba(45,52,54,.3)"></div>
+          <div style="width:296px;height:38px;border-right:2px solid rgba(45,52,54,.3);display:grid;place-items:center;color:#2D3436">296</div>
+          <div style="width:16px;height:38px;border-right:2px solid rgba(45,52,54,.3)"></div>
+          <div style="width:296px;height:38px;border-right:2px solid rgba(45,52,54,.3);display:grid;place-items:center;color:#2D3436">296</div>
+          <div style="width:20px;height:38px;border-right:2px solid rgba(45,52,54,.3)"></div>
+          <div style="width:100px;height:38px;border-right:2px solid rgba(45,52,54,.3);display:grid;place-items:center;color:#2D3436">100</div>
+          <div style="width:20px;height:38px"></div>
+        </div>
+        <div style="margin-left:120px;width:1080px;margin-top:12px;font:600 20px/1.5 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A">padding 20 · gap 16 · gap prije SettingsButton 20 · ukupno 1080 &nbsp;·&nbsp; <span style="color:#A8724A">vertikalno 20 + 100 + 20 + rub 3 = 143</span></div>
+
+        <div style="margin-left:120px;width:1080px;margin-top:56px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase;margin-bottom:18px">Ista traka iznad tamne stranice</div>
+          <div style="background:#2E4733">
+            <dc-import name="HubScreen" part="header" theme="dark" hint-size="1080px,143px"></dc-import>
+          </div>
+          <div style="height:120px;background:#2E4733;display:grid;place-items:center;font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;color:rgba(255,248,240,.5)">Camp #2E4733 — rub 3 px nosi odvajanje (4,2:1)</div>
+        </div>
+      </div>
+
+      <div style="width:820px;flex:0 0 auto;display:flex;flex-direction:column;gap:36px">
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">Header <span style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A">— sloj Header</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Visina (bez safe area)</span><span>140 + 3 rub = 143 px</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Površina</span><span>#1A241E · 100 %</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Rub prema stranici</span><span>3 px #FFF8F0 @ 55 %</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Uglovi</span><span>0 — traka je full-bleed</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Sjena</span><span>0, 6, 14 · #141A16 @ 34 %</span></div>
+        </div>
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">Chip valute <span style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A">— CoinChip · SeedChip · DiamondChip</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Okvir</span><span>296 × 100 · radius 20</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Border</span><span>2 px #2D3436 @ 14 %</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Padding</span><span>L 18 · R 20 · gap 12</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Fill — Coin</span><span>coin gold #FFD56B</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Fill — Seed</span><span>mint #A8E6CF</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Fill — Diamond</span><span>lavanda #D4A5FF</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Ikona</span><span>56 × 56 · #2D3436 silueta</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Broj</span><span>Nunito 800 · 48 px · #2D3436</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Broj — poravnanje</span><span>desno · tabular · max 190 px</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Kontrast cifara</span><span>9,0 · 9,0 · 6,4 : 1</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Interakcija</span><span>nema — chip nije dugme</span></div>
+        </div>
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">SettingsButton</div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Okvir · hit-zona</span><span>100 × 100 · 140 × 140</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Fill · border</span><span>#FFF8F0 @ 10 % · 2 px @ 38 %</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Ikona</span><span>54 px zupčanik · #FFF8F0</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Pritisnut</span><span>fill @ 20 % · scale 0,96</span></div>
+        </div>
+        <div style="background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:30px 34px">
+          <div style="font:800 28px/1 Nunito,sans-serif;margin-bottom:14px">Format broja — predlog</div>
+          <div style="font:800 54px/1 Nunito,sans-serif;font-variant-numeric:tabular-nums">12,450 · 999,999</div>
+          <p style="margin:16px 0 0;font:600 24px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Separator hiljada do 6 cifara, kompakt (<code>1.2M</code>) tek od 7. Coins i seeds su potrošni resursi — igrač mora znati ima li dovoljno, a <code>12.4K</code> skriva 400 novčića. 999,999 na 48 px staje u 186 od 190 px slota.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;flex-direction:column;gap:44px">
+    <div>
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Isporuka 2</div>
+      <h2 style="margin:14px 0 0;font:900 60px/1 Nunito,sans-serif">Spec sheet — Footer</h2>
+    </div>
+
+    <div style="display:flex;gap:64px;align-items:flex-start">
+      <div style="width:1200px;flex:0 0 auto;display:flex;flex-direction:column;gap:40px">
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">1 · Neaktivni + aktivan (Tab_Home)</div>
+          <div style="display:flex">
+            <div style="width:120px;flex:0 0 auto;display:flex;flex-direction:column;font:600 20px/1 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:right;padding-right:16px;box-sizing:border-box">
+              <div style="height:16px;position:relative"><div style="position:absolute;right:0;top:7px;height:2px;width:28px;background:#A8724A"></div></div>
+              <div style="height:4px"></div>
+              <div style="height:152px;display:flex;align-items:center;justify-content:flex-end;color:#2D3436">152</div>
+              <div style="height:8px"></div>
+            </div>
+            <div style="width:1080px;flex:0 0 auto;background:#E6F2DB">
+              <div style="height:70px"></div>
+              <dc-import name="HubScreen" part="footer" theme="dark" active="{{ 2 }}" hint-size="1080px,180px"></dc-import>
+            </div>
+          </div>
+          <div style="display:flex;margin-left:120px;width:1080px;border-top:2px solid rgba(45,52,54,.3);font:600 20px/1 'IBM Plex Mono',ui-monospace,monospace">
+            <div style="width:10px;height:36px;border-right:2px solid rgba(45,52,54,.3)"></div>
+            <div style="width:196px;height:36px;border-right:2px solid rgba(45,52,54,.3);display:grid;place-items:center">196</div>
+            <div style="width:20px;height:36px;border-right:2px solid rgba(45,52,54,.3)"></div>
+            <div style="width:196px;height:36px;border-right:2px solid rgba(45,52,54,.3);display:grid;place-items:center">196</div>
+            <div style="width:20px;height:36px;border-right:2px solid rgba(45,52,54,.3)"></div>
+            <div style="width:196px;height:36px;border-right:2px solid rgba(45,52,54,.3);display:grid;place-items:center">196</div>
+            <div style="width:20px;height:36px;border-right:2px solid rgba(45,52,54,.3)"></div>
+            <div style="width:196px;height:36px;border-right:2px solid rgba(45,52,54,.3);display:grid;place-items:center">196</div>
+            <div style="width:20px;height:36px;border-right:2px solid rgba(45,52,54,.3)"></div>
+            <div style="width:196px;height:36px;border-right:2px solid rgba(45,52,54,.3);display:grid;place-items:center">196</div>
+            <div style="width:10px;height:36px"></div>
+          </div>
+          <div style="margin-left:120px;width:1080px;font:600 20px/1.5 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A">slot 216 · tile 196 · gutter 10 — hit-zona je cijeli slot 216 × 180 &nbsp;·&nbsp; <span style="color:#A8724A">vertikalno rub 3 + 5 + indikator 8 + 4 + tile 152 + 8 = 180</span></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">2 · Pritisnut neaktivan (Tab_Camp)</div>
+          <div style="margin-left:120px;width:1080px;background:#E6F2DB">
+            <div style="height:70px"></div>
+            <dc-import name="HubScreen" part="footer" theme="dark" active="{{ 2 }}" pressed="{{ 3 }}" hint-size="1080px,180px"></dc-import>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">3 · Badge (TabBadge na Tab_Journal)</div>
+          <div style="margin-left:120px;width:1080px;background:#E6F2DB">
+            <div style="height:70px"></div>
+            <dc-import name="HubScreen" part="footer" theme="dark" active="{{ 2 }}" badge-on="{{ 1 }}" badge-count="3" hint-size="1080px,180px"></dc-import>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">4 · Navigacija zaključana (Arena merge sesija)</div>
+          <div style="margin-left:120px;width:1080px;background:#293D2E">
+            <div style="height:70px"></div>
+            <dc-import name="HubScreen" part="footer" theme="dark" active="{{ 4 }}" locked="{{ true }}" hint-size="1080px,180px"></dc-import>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">5 · Swipe u toku — 50 % između Home i Camp</div>
+          <div style="margin-left:120px;width:1080px;background:#E6F2DB">
+            <div style="height:70px"></div>
+            <dc-import name="HubScreen" part="footer" theme="dark" active="{{ 2 }}" swipe-at="{{ 2.5 }}" hint-size="1080px,180px"></dc-import>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="width:820px;flex:0 0 auto;display:flex;flex-direction:column;gap:36px">
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">Footer <span style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A">— sloj Footer</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Visina (bez safe area)</span><span>180 px</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Površina · rub · sjena</span><span>isti kao Header</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Slot taba</span><span>216 × 180 (hit)</span></div>
+        </div>
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">Tab — stanja</div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Neaktivan</span><span>bez fill · ink #FFF8F0 @ 82 %</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Aktivan</span><span>peach #FFB88C · radius 20</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Aktivan — ink</span><span>#2D3436 · label 800</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Pritisnut</span><span>#FFF8F0 @ 12 % · scale 0,96</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Aktivan pritisnut</span><span>peach deep #E8A374</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Ikona · label</span><span>52 px · Nunito 700 / 40 px</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">ActiveIndicator</span><span>196 × 8 · radius 4 · peach</span></div>
+        </div>
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">TabBadge</div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Okvir</span><span>min 44 × 44 · radius 22</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Fill · border</span><span>#FFCCD5 · 3 px #1A241E</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Pozicija</span><span>tile top-right · −8 / +2</span></div>
+        </div>
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">NavLockPill</div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Okvir</span><span>h 64 · radius 20 · y −36</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Fill · border · ink</span><span>#1A241E · #E8C44A · #E8C44A</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Uz to</span><span>gornji rub → gold · ostali tabovi 60 %</span></div>
+        </div>
+        <div style="background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:30px 34px">
+          <div style="font:800 28px/1 Nunito,sans-serif;margin-bottom:14px">Aktivan tab — 4 signala</div>
+          <p style="margin:0;font:600 24px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Peach ispuna (9,5:1 prema traci — jasna i u grayscale-u) · puna visina tile-a naspram praznih susjeda · obrnut ink (tamno na svijetlom umjesto svijetlo na tamnom) · ActiveIndicator na gornjem rubu. Zaključano stanje ostavlja aktivan tab čitljivim da igrač ne izgubi orijentaciju.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;flex-direction:column;gap:44px">
+    <div>
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Isporuka 3</div>
+      <h2 style="margin:14px 0 0;font:900 60px/1 Nunito,sans-serif">Šest ekrana — isti chrome, svih 5 stranica</h2>
+      <p style="margin:20px 0 0;max-width:1400px;font:600 26px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Bez safe area, da se vide čiste mjere trake. Sadržaj stranica nije dizajniran — puna pozadinska boja i sivi placeholder blokovi.</p>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start">
+
+      <div data-screen-label="Shop" style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Shop · #B8E0F5 · 11,4:1</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="HubScreen" theme="dark" page-bg="#B8E0F5" active="{{ 0 }}" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div data-screen-label="Journal" style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Journal · #FFF8F0 · 15,0:1</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="HubScreen" theme="dark" page-bg="#FFF8F0" active="{{ 1 }}" badge-on="{{ 1 }}" badge-count="3" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div data-screen-label="Home karusel" style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Home karusel · #243329 · rub 4,9:1</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="HubScreen" theme="dark" page-bg="#243329" active="{{ 2 }}" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div data-screen-label="Home polje" style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Home polje · #E6F2DB · 13,7:1</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="HubScreen" theme="dark" page-bg="#E6F2DB" active="{{ 2 }}" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div data-screen-label="Camp" style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Camp · #2E4733 · rub 4,2:1</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="HubScreen" theme="dark" page-bg="#2E4733" active="{{ 3 }}" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div data-screen-label="Arena" style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Arena · #293D2E · rub 4,6:1</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="HubScreen" theme="dark" page-bg="#293D2E" active="{{ 4 }}" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;flex-direction:column;gap:44px">
+    <div>
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Isporuka 4</div>
+      <h2 style="margin:14px 0 0;font:900 60px/1 Nunito,sans-serif">Edge case</h2>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">6 cifara na sva tri chipa · bez safe area</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="HubScreen" theme="dark" page-bg="#FFF8F0" active="{{ 1 }}" coins="999,999" seeds="999,999" diamonds="999,999" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Safe area 90 / 50 · Moonlit Warren #B8BDFF</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="HubScreen" theme="dark" page-bg="#B8BDFF" active="{{ 2 }}" safe-top="{{ 90 }}" safe-bottom="{{ 50 }}" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Zaključana navigacija · Arena · safe area</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="HubScreen" theme="dark" page-bg="#293D2E" active="{{ 4 }}" locked="{{ true }}" safe-top="{{ 90 }}" safe-bottom="{{ 50 }}" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Swipe u toku · Home → Camp 50 %</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="HubScreen" theme="dark" page-bg="#E6F2DB" active="{{ 2 }}" swipe-at="{{ 2.5 }}" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div style="width:900px;flex:0 0 auto;display:flex;flex-direction:column;gap:32px">
+        <div style="background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:32px 36px">
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:16px">Kompakt — samo od 7 cifara</div>
+          <div style="display:flex;gap:20px;align-items:center;font:800 44px/1 Nunito,sans-serif;font-variant-numeric:tabular-nums">
+            <div style="height:100px;box-sizing:border-box;border-radius:20px;background:#FFD56B;border:2px solid rgba(45,52,54,.14);display:flex;align-items:center;gap:12px;padding:0 20px 0 18px"><img src="icons/icon_coin.svg" alt="" style="width:56px;height:56px" /><span>999,999</span></div>
+            <div style="height:100px;box-sizing:border-box;border-radius:20px;background:#FFD56B;border:2px solid rgba(45,52,54,.14);display:flex;align-items:center;gap:12px;padding:0 20px 0 18px"><img src="icons/icon_coin.svg" alt="" style="width:56px;height:56px" /><span>1.2M</span></div>
+          </div>
+          <p style="margin:18px 0 0;font:600 24px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Alternativa <code>12.4K</code> od 5 cifara je odbačena: skriva stotine u resursu koji se troši. Ako se ekonomija ipak popne preko milion, kompakt se uključuje samo tada i broj ostaje u istom slotu.</p>
+        </div>
+        <div style="background:#1A241E;border-radius:20px;padding:32px 36px">
+          <div style="font:800 30px/1 Nunito,sans-serif;color:#FFF8F0;margin-bottom:16px">Safe area — bez „rupe“</div>
+          <p style="margin:0;font:600 24px/1.5 Nunito,sans-serif;color:rgba(255,248,240,.86);text-wrap:pretty">Površina trake se produžava u notch (0–100 px) i gesture bar (0–60 px); sadržaj ostaje u 140 / 180 px. Kako je chrome iste familije kao hub pozadina <code>#1F2B24</code>, prelaz je nevidljiv čak i ako se safe area promijeni na uređaju.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;flex-direction:column;gap:44px">
+    <div>
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Isporuka 5</div>
+      <h2 style="margin:14px 0 0;font:900 60px/1 Nunito,sans-serif">Ikone — SVG, jednobojne, tintljive iz koda</h2>
+      <p style="margin:20px 0 0;max-width:1400px;font:600 26px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">viewBox 128 × 128, jedna boja <code>#2D3436</code>, bez strokea u geometriji osim u ručki torbe i kvačici katanca. Svijetle varijante (<code>_light</code>) su isti fajl u <code>#FFF8F0</code> — u Godotu nisu potrebne, tint ide iz koda.</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px">
+      <div style="width:260px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:20px"><img src="icons/tab_shop.svg" alt="" style="width:104px;height:104px" /><div style="font:600 20px/1.4 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:center">tab_shop.svg</div></div>
+      <div style="width:260px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:20px"><img src="icons/tab_journal.svg" alt="" style="width:104px;height:104px" /><div style="font:600 20px/1.4 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:center">tab_journal.svg</div></div>
+      <div style="width:260px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:20px"><img src="icons/tab_home.svg" alt="" style="width:104px;height:104px" /><div style="font:600 20px/1.4 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:center">tab_home.svg</div></div>
+      <div style="width:260px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:20px"><img src="icons/tab_camp.svg" alt="" style="width:104px;height:104px" /><div style="font:600 20px/1.4 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:center">tab_camp.svg</div></div>
+      <div style="width:260px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:20px"><img src="icons/tab_arena.svg" alt="" style="width:104px;height:104px" /><div style="font:600 20px/1.4 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:center">tab_arena.svg</div></div>
+      <div style="width:260px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:20px"><img src="icons/icon_diamond.svg" alt="" style="width:104px;height:104px" /><div style="font:600 20px/1.4 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:center">icon_diamond.svg<br>novi asset</div></div>
+      <div style="width:260px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:20px"><img src="icons/icon_coin.svg" alt="" style="width:104px;height:104px" /><div style="font:600 20px/1.4 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:center">icon_coin.svg<br>chrome silueta</div></div>
+      <div style="width:260px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:20px"><img src="icons/icon_seed.svg" alt="" style="width:104px;height:104px" /><div style="font:600 20px/1.4 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:center">icon_seed.svg<br>chrome silueta</div></div>
+      <div style="width:260px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:20px"><img src="icons/icon_settings.svg" alt="" style="width:104px;height:104px" /><div style="font:600 20px/1.4 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:center">icon_settings.svg</div></div>
+      <div style="width:260px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:28px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:20px"><img src="icons/icon_lock.svg" alt="" style="width:104px;height:104px" /><div style="font:600 20px/1.4 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A;text-align:center">icon_lock.svg</div></div>
+    </div>
+    <p style="margin:0;max-width:1600px;font:600 26px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Coin i seed u chromeu su siluete, ne gameplay art: boja valute je već u ispuni chipa, pa druga boja u ikoni samo smanjuje čitljivost na 56 px. Postojeći <code>coin.png</code> (plav) i <code>seed.png</code> (narandžast) ostaju za pickupe u runu — nisu u paleti i ne pripadaju chromeu.</p>
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;gap:80px;align-items:flex-start;flex-wrap:wrap">
+    <div style="width:1080px;flex:0 0 auto">
+      <h2 style="margin:0;font:900 48px/1 Nunito,sans-serif">Slojevi → Godot</h2>
+      <div style="margin-top:28px">
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:12px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span>Header</span><span style="color:#8A837A">140 + 3 px · #1A241E</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:12px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span>CoinChip · SeedChip · DiamondChip</span><span style="color:#8A837A">296 × 100 · r 20</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:12px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span>SettingsButton</span><span style="color:#8A837A">100 × 100 · hit 140</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:12px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span>Footer</span><span style="color:#8A837A">180 px · #1A241E</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:12px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span>Tab_Shop … Tab_Arena</span><span style="color:#8A837A">slot 216 · tile 196 × 152</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:12px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span>ActiveIndicator</span><span style="color:#8A837A">196 × 8 · tween position.x</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:12px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span>TabBadge</span><span style="color:#8A837A">44 × 44 · #FFCCD5</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:12px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span>NavLockPill</span><span style="color:#8A837A">novi sloj · h 64 · #E8C44A</span></div>
+      </div>
+      <p style="margin:28px 0 0;font:600 24px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Sve je <code>StyleBoxFlat</code>: ravna boja, radius, border 2 px, jedna drop sjena. Bez blura, gradijenata i maski. Nove konstante za <code>ui_palette.gd</code>: <code>chrome_deep #1A241E</code> (tamnija varijanta <code>#1F2B24</code>), <code>peach_deep #E8A374</code> (tamnija varijanta <code>#FFB88C</code>).</p>
+    </div>
+
+    <div style="width:1080px;flex:0 0 auto">
+      <h2 style="margin:0;font:900 48px/1 Nunito,sans-serif">Van zadatka — ideje, nisu u mockupu</h2>
+      <ul style="margin:28px 0 0;padding-left:32px;font:600 25px/1.6 Nunito,sans-serif;color:#55504A">
+        <li><strong>Tap na chip → Shop:</strong> ne bih. Chip je informacija; kad postane put do kupovine, Pillar 2 se tiho krivi. Ako baš treba, samo diamond chip.</li>
+        <li><strong>Count-up broja</strong> (0,25 s tween + scale 1,0→1,08→1,0 na ikoni) na promjenu vrijednosti — jedina animacija koju predlažem u headeru.</li>
+        <li><strong>Badge i za Camp</strong> kad je daily spreman: slot je generički, boja ostaje <code>#FFCCD5</code> da badge nikad ne znači „akcija“ nego „novo“.</li>
+        <li><strong>Nunito za cijelu igru,</strong> ne samo chrome — cifre su mu ujednačene i tabular varijanta radi u Godot Labelu.</li>
+        <li><strong>Gumeni otpor na krajevima</strong> mogao bi dobiti vizuelni odjek: ActiveIndicator se rastegne za 8 px pri Shop/Arena ivici.</li>
+      </ul>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+</body>
+</html>

@@ -67,6 +67,13 @@ func get_pages_host() -> Control:
 	return _pages_host
 
 
+## Živa pozicija u stranicama (npr. 2.4 usred swipea Home → Camp) — hub ActiveIndicator.
+func get_scroll_page() -> float:
+	if _pages_host == null or _page_width < 1.0:
+		return float(current_page)
+	return -_pages_host.position.x / _page_width
+
+
 ## Public align helper (smoke + callers) — never leave host between pages.
 func ensure_aligned(animated: bool = false) -> void:
 	_ensure_page_aligned(animated)
@@ -109,6 +116,9 @@ func _layout_page_slots() -> void:
 		child.custom_minimum_size = Vector2(_page_width, size.y)
 		child.size = Vector2(_page_width, size.y)
 		child.position = Vector2(_page_width * i, 0.0)
+		# Dekor koji namjerno izlazi van stranice (brda Arene, brežuljci Home)
+		# inače se crta preko susjedne stranice — npr. preko Camp Trade bara.
+		child.clip_contents = true
 
 
 func _get_base_offset() -> float:

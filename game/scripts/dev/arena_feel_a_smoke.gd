@@ -71,12 +71,13 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("Pip must not be a pest eat target")
 		return
-	var bg := arena.get_node_or_null("Bg") as ColorRect
+	# Bg je ArenaMeadowBg (crtana livada); `color` = ciljna nijansa po broju T3.
+	var bg := arena.get_node_or_null("Bg") as Control
 	if bg == null:
 		_restore_save(backup)
 		_fail("Bg missing")
 		return
-	if not bg.color.is_equal_approx(BG_BASE):
+	if not Color(bg.get("color")).is_equal_approx(BG_BASE):
 		_restore_save(backup)
 		_fail("Bg should start at base meadow color")
 		return
@@ -94,7 +95,7 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("session T3 count expected 2")
 		return
-	if bg.color.is_equal_approx(BG_BASE):
+	if Color(bg.get("color")).is_equal_approx(BG_BASE):
 		_restore_save(backup)
 		_fail("Bg tint should move after T3s")
 		return
@@ -103,7 +104,7 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("reset should clear T3 count")
 		return
-	if not bg.color.is_equal_approx(BG_BASE):
+	if not Color(bg.get("color")).is_equal_approx(BG_BASE):
 		_restore_save(backup)
 		_fail("reset should restore base Bg color")
 		return

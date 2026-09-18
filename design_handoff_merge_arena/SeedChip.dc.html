@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div data-layer="{{ layer }}" style="{{ rootStyle }}">
+  <div data-layer="ChipShadow" style="{{ shadowStyle }}"></div>
+  <div data-layer="ChipRing" style="{{ ringStyle }}"></div>
+  <div data-layer="ChipBody" style="{{ bodyStyle }}">
+    <div data-layer="ChipWell" style="{{ wellStyle }}"></div>
+    <div data-layer="ChipHairline" style="{{ hairStyle }}"></div>
+    <img data-layer="FlowerArt" src="{{ flowerSrc }}" alt="" style="{{ flowerStyle }}" />
+    <div data-layer="MythicNubs" style="{{ nubStyle }}"></div>
+  </div>
+  <div data-layer="ChompWedge" style="{{ chompStyle }}"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:240,&quot;height&quot;:240},&quot;tier&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[1,2],&quot;default&quot;:1,&quot;tsType&quot;:&quot;1|2&quot;},&quot;dir&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;A&quot;,&quot;B&quot;],&quot;default&quot;:&quot;B&quot;,&quot;tsType&quot;:&quot;'A'|'B'&quot;},&quot;flower&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;clover&quot;,&quot;poppy&quot;,&quot;buttercup&quot;,&quot;bluebell&quot;,&quot;aster&quot;,&quot;marigold&quot;,&quot;snowdrop&quot;,&quot;rose&quot;],&quot;default&quot;:&quot;clover&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;hardOutline&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;mythic&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;idle&quot;,&quot;drag&quot;,&quot;partner&quot;,&quot;pulse&quot;,&quot;merging&quot;,&quot;eaten&quot;,&quot;flying&quot;],&quot;default&quot;:&quot;idle&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;size&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:134,&quot;min&quot;:60,&quot;max&quot;:260,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;}}">
+const CREAM = '#FFF8F0';
+const CREAM_EDGE = '#CBC2B6';      // warm white, 20 % tamnije
+const WELL = '#22342A';            // livada #293D2E, 20 % tamnije
+const WELL_EDGE = '#16211B';
+const GOLD = '#FFD56B';
+const GOLD_EDGE = '#D6A82F';       // coin gold, 20 % tamnije
+const PULSE = '#F2D940';
+
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const size = p.size ?? 134;
+    const k = size / 134;
+    const px = n => (n * k).toFixed(1) + 'px';
+    const tier = p.tier ?? 1;
+    const dir = (p.dir ?? 'B').toUpperCase();
+    const mythic = !!p.mythic;
+    const state = p.state ?? 'idle';
+    const t2 = tier === 2;
+    const radius = t2 ? px(38) : '50%';
+
+    let scale = 1, rot = 0, alpha = 1, lift = 0;
+    if (state === 'drag') { scale = 1.12; rot = -3; lift = 14; }
+    else if (state === 'merging') { scale = 1.28; }
+    else if (state === 'eaten') { scale = 0.62; alpha = 0.4; }
+    else if (state === 'flying') { scale = 0.34; alpha = 0.85; }
+    else if (state === 'partner') { scale = 1.04; }
+
+    const rootStyle = 'position:relative;width:' + px(134) + ';height:' + px(134) +
+      ';flex:0 0 auto;transform:scale(' + scale + ') rotate(' + rot + 'deg);opacity:' + alpha;
+
+    const shadowDrop = state === 'drag' ? 18 : 6;
+    const shadowStyle = 'position:absolute;inset:0;border-radius:' + radius +
+      ';background:#14201A;opacity:' + (state === 'drag' ? 0.34 : 0.42) +
+      ';transform:translateY(' + px(shadowDrop) + ')';
+
+    // pair pulse / magnet ring
+    let ringStyle = 'display:none';
+    if (state === 'pulse' || state === 'partner') {
+      const rc = state === 'pulse' ? PULSE : GOLD;
+      const grow = state === 'partner' ? 20 : 14;
+      ringStyle = 'position:absolute;left:' + px(-grow / 2) + ';top:' + px(-grow / 2) +
+        ';width:' + px(134 + grow) + ';height:' + px(134 + grow) +
+        ';border-radius:' + (t2 ? px(38 + grow / 2) : '50%') +
+        ';border:' + px(state === 'partner' ? 7 : 6) + ' solid ' + rc +
+        ';opacity:' + (state === 'partner' ? 1 : 0.8);
+    } else if (state === 'merging') {
+      ringStyle = 'position:absolute;left:' + px(-26) + ';top:' + px(-26) +
+        ';width:' + px(186) + ';height:' + px(186) + ';border-radius:50%;border:' + px(10) +
+        ' solid #FFF5D1;opacity:.55';
+    }
+
+    const bodyFill = mythic ? GOLD : CREAM;
+    const bodyEdge = mythic ? GOLD_EDGE : (dir === 'A' ? 'rgba(45,52,54,.55)' : CREAM_EDGE);
+    const edgeW = dir === 'A' ? 4 : 3;
+    const bodyStyle = 'position:absolute;inset:0;box-sizing:border-box;border-radius:' + radius +
+      ';background:' + bodyFill + ';border:' + px(edgeW) + ' solid ' + bodyEdge +
+      ';display:grid;place-items:center';
+
+    // Smjer B: tamni "well" nosi kontrast prema svakoj boji cvijeta
+    const inset = t2 ? 15 : 11;
+    const wellStyle = dir === 'B'
+      ? 'position:absolute;inset:' + px(inset) + ';box-sizing:border-box;border-radius:' +
+        (t2 ? px(26) : '50%') + ';background:' + WELL + ';border:' + px(2) + ' solid ' + WELL_EDGE
+      : 'display:none';
+
+    // T2 dobija dodatni unutrašnji prsten — razlika i bez boje
+    let hairStyle = 'display:none';
+    if (t2) {
+      hairStyle = dir === 'B'
+        ? 'position:absolute;inset:' + px(7) + ';border-radius:' + px(32) + ';border:' + px(3) +
+          ' solid ' + (mythic ? GOLD_EDGE : CREAM_EDGE)
+        : 'position:absolute;inset:' + px(12) + ';border-radius:' + px(28) + ';border:' + px(3) +
+          ' solid rgba(45,52,54,.35)';
+    }
+
+    const fname = p.flower ?? 'clover';
+    const fsize = t2 ? 84 : 78;
+    const flowerStyle = 'position:relative;width:' + px(fsize) + ';height:' + px(fsize) +
+      ';display:block';
+
+    const nubStyle = mythic
+      ? 'position:absolute;inset:' + px(-7) + ';border-radius:' + (t2 ? px(45) : '50%') +
+        ';border:' + px(4) + ' dashed ' + GOLD_EDGE + ';opacity:.9'
+      : 'display:none';
+
+    const chompStyle = state === 'eaten'
+      ? 'position:absolute;right:' + px(-4) + ';top:' + px(30) + ';width:' + px(54) + ';height:' + px(54) +
+        ';background:#FFCCD5;border:' + px(3) + ' solid #E89AAA;border-radius:50% 0 50% 50%'
+      : 'display:none';
+
+    return {
+      layer: t2 ? 'SeedChip_T2' : 'SeedChip_T1',
+      rootStyle, shadowStyle, ringStyle, bodyStyle, wellStyle, hairStyle,
+      flowerSrc: 'flowers/ph_' + fname + (p.hardOutline ? '_hard' : '') + '.svg',
+      flowerStyle, nubStyle, chompStyle
+    };
+  }
+}
+</script>
+</body>
+</html>

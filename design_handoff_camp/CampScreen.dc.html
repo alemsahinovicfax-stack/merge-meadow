@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="CampScreen" style="{{ rootStyle }}">
+  <dc-import name="HubScreen" part="header" theme="dark" page-bg="#2E4733" coins="{{ coins }}" seeds="{{ seedTotal }}" diamonds="12" hint-size="1080px,143px"></dc-import>
+  <div data-layer="CampPage" style="{{ pageStyle }}">
+    <div data-layer="ContentStack" style="{{ stackStyle }}">
+
+      <div data-layer="SeasonHero" style="{{ heroWrapStyle }}">
+        <dc-import name="SeasonLink" tint="{{ seasonTint }}" state="{{ seasonState }}" coins="{{ seasonCoins }}" flowers="{{ seasonFlowers }}" hint-size="1032px,422px"></dc-import>
+      </div>
+
+      <sc-for list="{{ sections }}" as="s" hint-placeholder-count="2">
+        <div data-layer="{{ s.layer }}" style="{{ s.style }}">
+          <div data-layer="SectionHead" style="{{ s.headStyle }}">
+            <div style="{{ s.accentStyle }}"></div>
+            <div style="{{ s.titleStyle }}">{{ s.title }}</div>
+            <div style="{{ s.subStyle }}">{{ s.sub }}</div>
+            <div style="flex:1"></div>
+            <div data-layer="ScrollHint" style="{{ s.hintStyle }}">{{ s.hintText }}</div>
+            <div data-layer="ArenaShortcut" style="{{ s.headShortcutStyle }}">{{ s.shortcut }}</div>
+          </div>
+
+          <div data-layer="StashTabs" style="{{ s.tabsWrapStyle }}">
+            <sc-for list="{{ s.tabs }}" as="t" hint-placeholder-count="2">
+              <div data-layer="{{ t.layer }}" style="{{ t.style }}">
+                <div style="{{ t.iconWrapStyle }}">
+                  <div style="{{ t.wellStyle }}"></div>
+                  <img src="{{ t.icon }}" alt="" style="{{ t.iconStyle }}" />
+                </div>
+                <div style="{{ t.textWrapStyle }}">
+                  <div style="{{ t.topRowStyle }}">
+                    <div style="{{ t.labelStyle }}">{{ t.label }}</div>
+                    <div style="{{ t.countStyle }}">{{ t.count }}</div>
+                  </div>
+                  <div style="{{ t.subStyle }}">{{ t.sub }}</div>
+                </div>
+              </div>
+            </sc-for>
+            <div data-layer="ArenaShortcut" style="{{ s.shortcutStyle }}">{{ s.shortcut }}</div>
+          </div>
+
+          <div data-layer="ChipGrid" style="{{ s.gridStyle }}">
+            <sc-for list="{{ s.chips }}" as="c" hint-placeholder-count="4">
+              <div data-layer="{{ c.layer }}" style="{{ c.root }}">
+                <div data-layer="ChipRow" style="{{ c.row }}">
+                  <div data-layer="ArtFrame" style="{{ c.frame }}">
+                    <div data-layer="ArtWell" style="{{ c.well }}"></div>
+                    <img data-layer="FlowerArt" src="{{ c.artSrc }}" alt="" style="{{ c.artS }}" />
+                  </div>
+                  <div data-layer="ChipBody" style="{{ c.body }}">
+                    <div data-layer="NameBlock" style="{{ c.nameBlock }}">
+                      <div data-layer="ChipName" style="{{ c.nameS }}">{{ c.label }}</div>
+                      <div data-layer="RarityPips" style="{{ c.pipsS }}">{{ c.pips }}</div>
+                    </div>
+                    <div data-layer="ReservedBadge" style="{{ c.badge }}">
+                      <img src="icons/icon_lock.svg" alt="" style="{{ c.lock }}" />
+                      <div style="{{ c.badgeTextS }}">{{ c.badgeLabel }}</div>
+                    </div>
+                    <div data-layer="PillRow" style="{{ c.pillRow }}">
+                      <div data-layer="CountPill" style="{{ c.countS }}">
+                        <img src="{{ c.countIcon }}" alt="" style="{{ c.countIconS }}" />
+                        <div style="{{ c.countNum }}">{{ c.count }}</div>
+                      </div>
+                      <div data-layer="PricePill" style="{{ c.priceS }}">
+                        <img src="icons/icon_coin.svg" alt="" style="{{ c.coinS }}" />
+                        <div style="{{ c.priceNum }}">{{ c.price }}</div>
+                        <div style="{{ c.eachS }}">each</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div data-layer="SelectMark" style="{{ c.mark }}"></div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div data-layer="EmptyState" style="{{ s.emptyStyle }}">
+            <div style="{{ s.emptyArtStyle }}">
+              <img src="{{ s.emptyIcon }}" alt="" style="{{ s.emptyIconStyle }}" />
+            </div>
+            <div style="{{ s.emptyTitleStyle }}">{{ s.emptyTitle }}</div>
+            <div style="{{ s.emptyBodyStyle }}">{{ s.emptyBody }}</div>
+            <div data-layer="EmptyCta" style="{{ s.emptyCtaStyle }}">{{ s.emptyCta }}</div>
+          </div>
+
+          <dc-import name="TradeBar" kind="{{ s.tKind }}" label="{{ s.tLabel }}" art="{{ s.tArt }}" rarity="{{ s.tRarity }}" price="{{ s.tPrice }}" state="{{ s.tState }}" gain="{{ s.tGain }}" hold-pct="{{ s.tHoldPct }}" warn-season="{{ s.tWarnSeason }}" warn-left="{{ s.tWarnLeft }}" need="{{ s.tNeed }}" w="{{ s.tW }}" hint-size="992px,152px"></dc-import>
+        </div>
+      </sc-for>
+
+      <div data-layer="SeasonStrip" style="{{ stripWrapStyle }}">
+        <dc-import name="SeasonLink" compact="{{ true }}" h="{{ stripH }}" tint="{{ seasonTint }}" state="{{ seasonState }}" coins="{{ seasonCoins }}" flowers="{{ seasonFlowers }}" hint-size="1032px,157px"></dc-import>
+      </div>
+
+    </div>
+  </div>
+  <dc-import name="HubScreen" part="footer" theme="dark" page-bg="#2E4733" active="{{ 3 }}" hint-size="1080px,180px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;dir&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;tabs&quot;,&quot;shelves&quot;],&quot;default&quot;:&quot;tabs&quot;,&quot;tsType&quot;:&quot;'tabs'|'shelves'&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;tab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;seeds&quot;,&quot;flowers&quot;],&quot;default&quot;:&quot;seeds&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;seedSet&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;six&quot;,&quot;one&quot;,&quot;none&quot;,&quot;twenty&quot;],&quot;default&quot;:&quot;six&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;flowerSet&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;four&quot;,&quot;none&quot;,&quot;twenty&quot;],&quot;default&quot;:&quot;four&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;short&quot;,&quot;ready&quot;,&quot;unlocking&quot;,&quot;none&quot;],&quot;default&quot;:&quot;short&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;tradeState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;idle&quot;,&quot;tap&quot;,&quot;hold&quot;,&quot;switch&quot;,&quot;warn&quot;,&quot;holdstop&quot;,&quot;disabled&quot;],&quot;default&quot;:&quot;idle&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;sel&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:19,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;State&quot;},&quot;tint&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;frost&quot;,&quot;lantern&quot;,&quot;amber&quot;],&quot;default&quot;:&quot;frost&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Season&quot;},&quot;seasonCoins&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:320,&quot;min&quot;:0,&quot;max&quot;:500,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Season&quot;},&quot;seasonFlowers&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:0,&quot;max&quot;:20,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Season&quot;},&quot;coins&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;320&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Season&quot;}}">
+const NUN = 'Nunito,system-ui,sans-serif';
+const PANEL = '#FFF8F0', PEDGE = 'rgba(45,52,54,.16)', INK = '#2D3436', MUTED = '#555C5E';
+const MINT = '#A8E6CF', GOLD = '#FFD56B', GOLD_EDGE = '#D6A82F', CREAM_EDGE = '#CBC2B6', PEACH = '#FFB88C';
+const WELL = '#22342A', WELL_EDGE = '#16211B';
+const RB = { 1: ['#B8D4F0', '#93AAC0'], 2: ['#E0C4FF', '#B39DCC'], 3: ['#FFE8B8', '#CCBA93'] };
+const TINTS = { frost: ['#C5D5E8', '#9FB4CC', 'Frost Orchard'], lantern: ['#C9B8E0', '#A193B3', 'Lantern Meadow'], amber: ['#E8C48A', '#BA9D6E', 'Amber Canopy'] };
+
+const SEEDS = [
+  ['Meadow Clover', 'clover', 1, 12, 1],
+  ['Field Daisy', 'daisy', 1, 4, 1],
+  ['Sun Buttercup', 'buttercup', 1, 9, 1],
+  ['Wild Tulip', 'tulip', 2, 6, 2],
+  ['Tall Sunflower', 'sunflower', 2, 3, 2],
+  ['Harvest Pumpkin', 'pumpkin', 3, 2, 4]
+];
+const FLOWERS = [
+  ['Meadow Clover', 'clover', 1, 3, 5],
+  ['Field Daisy', 'daisy', 1, 2, 5],
+  ['Wild Tulip', 'tulip', 2, 1, 10],
+  ['Harvest Pumpkin', 'pumpkin', 3, 12, 20]
+];
+const MANY = ['Meadow Clover', 'Field Daisy', 'Sun Buttercup', 'Wild Tulip', 'Tall Sunflower', 'Paper Lantern Bloom',
+  'Frost Snowdrop', 'Silver Aconite', 'Dawn Poppy', 'Hedge Bramble', 'Moss Bell', 'Rain Lily',
+  'Ember Thistle', 'Amber Fern', 'Night Iris', 'Lantern Rose', 'Copper Reed', 'Harvest Pumpkin',
+  'Gilded Aster', 'Winter Holly'];
+const ARTS = ['clover', 'daisy', 'buttercup', 'tulip', 'sunflower', 'pumpkin', 'frost_snowdrop', 'silver_aconite'];
+
+class Component extends DCLogic {
+  rgb(h) { return [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)); }
+  hx(a) { return '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join(''); }
+  sc(h, f) { return this.hx(this.rgb(h).map(v => v * f)); }
+  tn(h, t) { return this.hx(this.rgb(h).map(v => v + (255 - v) * t)); }
+
+  chip(row, kind, w, state, extra) {
+    const o = Object.assign({ reserved: false, have: 12, need: 20, tint: 'frost', wide: false }, extra || {});
+    const seed = kind === 'seed';
+    const r = Math.max(1, Math.min(3, row[2]));
+    const st = state || 'idle';
+    const res = !!o.reserved, wide = !!o.wide, floor = !!o.atFloor;
+    const base = RB[r], tint = TINTS[o.tint];
+
+    let bg = base[0], edge = base[1], ink = INK, bw = 2, pad = 14, lift = 0, shadow = '0 6px 14px rgba(20,26,22,.24)';
+    if (st === 'selected') { bg = this.tn(base[0], 0.14); edge = PEACH; bw = 5; pad = 11; lift = -3; shadow = '0 10px 18px rgba(20,26,22,.30)'; }
+    else if (st === 'pressed') { bg = this.sc(base[0], 0.92); edge = PEACH; bw = 5; pad = 11; shadow = '0 3px 7px rgba(20,26,22,.26)'; }
+    else if (st === 'disabled') { bg = '#E4E4E0'; edge = '#B6B6B2'; ink = '#5C5C58'; shadow = '0 4px 9px rgba(20,26,22,.16)'; }
+
+    const h = (res && !wide) ? 244 : 176;
+    const art = seed ? 66 : 70;
+    return {
+      _w: w, _h: h,
+      layer: seed ? 'SeedChip' : 'FlowerChip',
+      _w: w, _h: h,
+      label: row[0], count: String(row[3]), price: String(row[4]),
+      pips: '★'.repeat(r) + '☆'.repeat(3 - r),
+      artSrc: 'flowers/ph_' + row[1] + '.svg',
+      countIcon: seed ? 'icons/icon_seed.svg' : 'icons/icon_crystal.svg',
+      root: ['position:relative;box-sizing:border-box;flex:0 0 auto;overflow:hidden',
+        'width:' + w + 'px;height:' + h + 'px;border-radius:20px',
+        'background:' + bg + ';border:' + bw + 'px solid ' + edge,
+        'padding:' + pad + 'px;display:flex;flex-direction:column',
+        'box-shadow:' + shadow, 'transform:translateY(' + lift + 'px)'].join(';'),
+      row: 'flex:1;min-height:0;display:flex;align-items:center;gap:14px',
+      frame: ['position:relative;flex:0 0 auto;box-sizing:border-box;width:104px;height:104px',
+        'border-radius:' + (seed ? '50%' : '26px'),
+        'background:' + (seed ? PANEL : GOLD),
+        'border:3px solid ' + (seed ? CREAM_EDGE : GOLD_EDGE),
+        'display:grid;place-items:center'].join(';'),
+      well: 'position:absolute;inset:10px;box-sizing:border-box;border-radius:' + (seed ? '50%' : '18px') + ';background:' + WELL + ';border:2px solid ' + WELL_EDGE,
+      artS: 'position:relative;display:block;width:' + art + 'px;height:' + art + 'px',
+      body: 'flex:1;min-width:0;display:flex;gap:' + (wide ? 20 : 6) + 'px;' +
+        (wide ? 'flex-direction:row;align-items:center' : 'flex-direction:column;justify-content:center;gap:6px'),
+      nameBlock: (wide ? 'flex:0 1 300px' : 'flex:1') + ';min-width:0;display:flex;flex-direction:column;gap:4px',
+      nameS: 'font:800 40px/1.05 ' + NUN + ';color:' + ink + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      pipsS: 'font:800 32px/1 ' + NUN + ';letter-spacing:.04em;color:' + ink,
+      badge: res
+        ? 'flex:0 0 auto;box-sizing:border-box;height:56px;padding:0 16px;border-radius:14px;background:' + (floor ? '#FFE8B8' : tint[0]) + ';border:' + (floor ? '3px solid ' + GOLD_EDGE : '2px solid ' + tint[1]) + ';display:flex;align-items:center;gap:10px;' + (wide ? '' : 'align-self:stretch;')
+        : 'display:none',
+      lock: 'width:32px;height:32px;display:block;flex:0 0 auto',
+      badgeTextS: 'font:800 ' + (floor ? 34 : 38) + 'px/1 ' + NUN + ';color:#1A1A14;white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      badgeLabel: floor ? 'Hold stops here' : 'Kept · ' + o.have + ' / ' + o.need,
+      pillRow: 'flex:0 0 auto;display:flex;gap:10px;align-items:center',
+      countS: 'box-sizing:border-box;height:62px;padding:0 14px;border-radius:14px;background:rgba(255,248,240,.70);border:2px solid rgba(45,52,54,.20);display:flex;align-items:center;gap:10px',
+      countIconS: 'width:32px;height:32px;display:block;flex:0 0 auto',
+      countNum: 'font:900 48px/1 ' + NUN + ';font-variant-numeric:tabular-nums;color:' + ink,
+      priceS: 'box-sizing:border-box;height:62px;padding:0 12px;border-radius:14px;background:#FFE8B8;border:2px solid ' + GOLD_EDGE + ';display:flex;align-items:center;gap:8px',
+      coinS: 'width:34px;height:34px;display:block;flex:0 0 auto',
+      priceNum: 'font:900 46px/1 ' + NUN + ';font-variant-numeric:tabular-nums;color:' + INK,
+      eachS: 'font:700 30px/1 ' + NUN + ';color:' + INK,
+      mark: (st === 'selected' || st === 'pressed')
+        ? 'position:absolute;inset:0;border-radius:15px;border:4px solid rgba(45,52,54,.55);pointer-events:none'
+        : 'display:none'
+    };
+  }
+
+  contentH(chips) {
+    let total = 0, rowW = 0, rowH = 0;
+    chips.forEach(c => {
+      if (rowW && rowW + 14 + c._w > 992) { total += rowH + 14; rowW = 0; rowH = 0; }
+      rowW = rowW ? rowW + 14 + c._w : c._w;
+      rowH = Math.max(rowH, c._h);
+    });
+    return total + rowH;
+  }
+
+  seedRows(set) {
+    if (set === 'none') return [];
+    if (set === 'one') return [SEEDS[0]];
+    if (set === 'twenty') return MANY.map((n, i) => [n, ARTS[i % 8], (i % 3) + 1, 2 + (i * 7) % 30, [1, 2, 4][i % 3]]);
+    return SEEDS;
+  }
+
+  section(cfg) {
+    const head = cfg.tabs ? 132 : 70;
+    const tradeH = (cfg.tState === 'warn' || cfg.tState === 'holdstop') ? 224 : 152;
+    const empty = cfg.chips.length === 0;
+    if (empty) cfg.h = 36 + head + 28 + 400 + tradeH;
+    const seedKind = cfg.kind === 'seed';
+    const gridH = cfg.h - 36 - head - 28 - tradeH;
+    const overflows = this.contentH(cfg.chips) > gridH || (cfg.total || 0) > cfg.chips.length;
+    const hint = (cfg.total && !cfg.tabs) ? cfg.total + ' types' : '';
+
+    const tabs = (cfg.tabs || []).map(t => ({
+      layer: t.active ? 'TabActive' : 'TabInactive',
+      label: t.label, sub: t.sub, count: String(t.count), icon: t.icon,
+      style: ['flex:1;min-width:0;box-sizing:border-box;height:132px;border-radius:20px',
+        'background:' + (t.active ? PEACH : 'rgba(45,52,54,.06)'),
+        'border:' + (t.active ? '4px solid #E8A374' : '2px solid rgba(45,52,54,.18)'),
+        'display:flex;align-items:center;gap:14px;padding:0 18px'].join(';'),
+      iconWrapStyle: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:84px;height:84px;border-radius:' +
+        (t.seed ? '50%' : '22px') + ';background:' + (t.seed ? PANEL : GOLD) + ';border:3px solid ' +
+        (t.seed ? CREAM_EDGE : GOLD_EDGE) + ';display:grid;place-items:center',
+      wellStyle: 'display:none',
+      iconStyle: 'position:relative;display:block;width:48px;height:48px',
+      textWrapStyle: 'flex:1;min-width:0;display:flex;flex-direction:column;gap:8px',
+      topRowStyle: 'display:flex;align-items:center;gap:14px',
+      labelStyle: 'flex:0 0 auto;font:900 46px/1 ' + NUN + ';color:' + (t.active ? INK : '#4A5153') + ';white-space:nowrap',
+      subStyle: 'flex:0 0 auto;font:700 38px/1 ' + NUN + ';color:' + (t.active ? INK : '#555C5E') + ';white-space:nowrap',
+      countStyle: 'flex:0 0 auto;box-sizing:border-box;height:60px;min-width:88px;padding:0 16px;border-radius:14px;background:' +
+        (t.active ? 'rgba(255,248,240,.80)' : 'rgba(45,52,54,.08)') + ';border:2px solid rgba(45,52,54,.20);display:grid;place-items:center;font:900 46px/1 ' +
+        NUN + ';font-variant-numeric:tabular-nums;color:' + (t.active ? INK : '#4A5153')
+    }));
+
+    return {
+      layer: cfg.layer,
+      style: ['position:relative;box-sizing:border-box;flex:0 0 auto;overflow:hidden',
+        'width:1032px;height:' + cfg.h + 'px;border-radius:26px',
+        'background:' + PANEL + ';border:2px solid ' + PEDGE,
+        'box-shadow:0 8px 16px rgba(20,26,22,.26)',
+        'padding:18px;display:flex;flex-direction:column;gap:14px'].join(';'),
+      headStyle: cfg.tabs ? 'display:none' : 'flex:0 0 auto;height:' + head + 'px;display:flex;align-items:center;gap:14px',
+      accentStyle: 'flex:0 0 auto;width:10px;height:52px;border-radius:5px;background:' + (seedKind ? MINT : GOLD),
+      titleStyle: 'font:900 52px/1 ' + NUN + ';color:' + INK + ';white-space:nowrap',
+      subStyle: 'font:700 38px/1 ' + NUN + ';color:' + MUTED + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      title: cfg.title || '', sub: cfg.sub || '',
+      shortcutStyle: (cfg.shortcut && cfg.tabs)
+        ? 'flex:0 0 auto;box-sizing:border-box;width:190px;height:132px;border-radius:20px;background:' + MINT + ';border:3px solid #7FC9AC;display:flex;align-items:center;justify-content:center;font:900 40px/1 ' + NUN + ';color:' + INK + ';white-space:nowrap'
+        : 'display:none',
+      headShortcutStyle: (cfg.shortcut && !cfg.tabs)
+        ? 'flex:0 0 auto;box-sizing:border-box;height:' + head + 'px;padding:0 20px;border-radius:18px;background:' + MINT + ';border:2px solid #7FC9AC;display:flex;align-items:center;font:800 38px/1 ' + NUN + ';color:' + INK + ';white-space:nowrap'
+        : 'display:none',
+      shortcut: cfg.shortcut || '',
+      tabsWrapStyle: cfg.tabs ? 'flex:0 0 auto;height:132px;display:flex;gap:14px;align-items:stretch' : 'display:none',
+      tabs,
+      gridStyle: empty ? 'display:none' : 'flex:0 0 auto;height:' + gridH + 'px;display:flex;flex-wrap:wrap;gap:14px;align-content:flex-start;overflow:hidden',
+      chips: cfg.chips,
+      hintStyle: hint
+        ? 'flex:0 0 auto;box-sizing:border-box;height:62px;padding:0 20px;border-radius:16px;background:rgba(45,52,54,.88);display:flex;align-items:center;font:800 36px/1 ' + NUN + ';color:' + PANEL + ';white-space:nowrap;box-shadow:0 4px 10px rgba(20,26,22,.35)'
+        : 'display:none',
+      hintText: hint,
+      emptyStyle: empty
+        ? 'flex:0 0 400px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px'
+        : 'display:none',
+      emptyArtStyle: 'flex:0 0 auto;box-sizing:border-box;width:110px;height:110px;border-radius:' + (seedKind ? '50%' : '26px') +
+        ';background:rgba(45,52,54,.05);border:4px dashed rgba(45,52,54,.28);display:grid;place-items:center',
+      emptyIcon: seedKind ? 'icons/icon_seed.svg' : 'icons/icon_crystal.svg',
+      emptyIconStyle: 'width:54px;height:54px;display:block;opacity:.34',
+      emptyTitleStyle: 'flex:0 0 auto;font:900 48px/1 ' + NUN + ';color:' + INK + ';text-align:center',
+      emptyTitle: cfg.emptyTitle || '',
+      emptyBodyStyle: 'flex:0 0 auto;max-width:800px;font:700 36px/1.25 ' + NUN + ';color:' + MUTED + ';text-align:center;text-wrap:pretty',
+      emptyBody: cfg.emptyBody || '',
+      emptyCtaStyle: 'flex:0 0 auto;box-sizing:border-box;height:110px;padding:0 36px;border-radius:20px;background:' + MINT +
+        ';border:3px solid #7FC9AC;display:flex;align-items:center;font:900 46px/1 ' + NUN + ';color:' + INK + ';white-space:nowrap',
+      emptyCta: cfg.emptyCta || '',
+      tKind: cfg.kind, tLabel: cfg.tLabel, tArt: cfg.tArt, tRarity: cfg.tRarity, tPrice: cfg.tPrice,
+      tState: cfg.tState, tGain: cfg.tGain || '1', tHoldPct: cfg.tHoldPct ?? 0.62, tNeed: cfg.tNeed ?? 20,
+      tWarnSeason: 'frost', tWarnLeft: cfg.tWarnLeft ?? 8, tW: 992
+    };
+  }
+
+  renderVals() {
+    const p = this.props;
+    const tabsDir = (p.dir ?? 'shelves') === 'tabs';
+    const seedSet = p.seedSet ?? 'six';
+    const flowerSet = p.flowerSet ?? 'four';
+    const seasonState = p.season ?? 'short';
+    const noSeason = seasonState === 'none';
+    const sel = p.sel ?? 0;
+    const tab = p.tab ?? 'seeds';
+    const tState = p.tradeState ?? 'idle';
+
+    const seedRows = this.seedRows(seedSet);
+    const flowerRows = flowerSet === 'none' ? [] : (flowerSet === 'twenty' ? this.seedRows('twenty') : FLOWERS);
+    const seedTotal = seedRows.reduce((a, r) => a + r[3], 0);
+
+    const sections = [];
+    let stackGap = 10, stripH = 157;
+
+    if (tabsDir) {
+      stackGap = 20;
+      const onSeeds = tab === 'seeds';
+      const rows = onSeeds ? seedRows : flowerRows;
+      const kind = onSeeds ? 'seed' : 'flower';
+      let chips = rows.slice(0, 8).map((r, i) => this.chip(r, kind, 489,
+        i === sel ? (tState === 'tap' || tState === 'pressed' ? 'pressed' : 'selected') : 'idle',
+        (!onSeeds && r[0] === 'Harvest Pumpkin')
+          ? { reserved: true, have: tState === 'holdstop' ? 20 : r[3], need: 20, atFloor: tState === 'holdstop' }
+          : null));
+      const selRow = rows[Math.min(sel, Math.max(0, rows.length - 1))];
+      const barH = (tState === 'warn' || tState === 'holdstop') && rows.length ? 224 : 152;
+      const maxGrid = 1597 - 48 - 20 - 422 - 36 - 132 - 28 - barH;
+      let gridH = 0, shown = 0;
+      for (let i = 0; i < chips.length; i += 2) {
+        const rowH = Math.max(chips[i]._h, chips[i + 1] ? chips[i + 1]._h : 0);
+        const next = gridH ? gridH + 14 + rowH : rowH;
+        if (next > maxGrid) break;
+        gridH = next; shown = Math.min(chips.length, i + 2);
+      }
+      chips = chips.slice(0, shown);
+      const secH = 36 + 132 + 14 + gridH + 14 + barH;
+      sections.push(this.section({
+        layer: onSeeds ? 'SeedsSection' : 'FlowersSection', kind,
+        h: secH, chips,
+        tabs: [
+          { label: 'Seeds', sub: 'Arena fuel', count: seedRows.length, icon: 'icons/icon_seed.svg', seed: true, active: onSeeds },
+          { label: 'Flowers', sub: 'reward', count: flowerRows.length, icon: 'icons/icon_crystal.svg', seed: false, active: !onSeeds }
+        ],
+        total: rows.length, shortcut: onSeeds ? 'Merge ↗' : '',
+        emptyTitle: onSeeds ? 'Your bag is empty' : 'No flowers yet',
+        emptyBody: onSeeds
+          ? 'Seeds come back with you from a run. Play the meadow to fill the bag — the Arena merges them into flowers.'
+          : 'Flowers grow when you merge seeds all the way to tier 3 in the Arena.',
+        emptyCta: onSeeds ? 'Play a run ↗' : 'Merge in Arena ↗',
+        tLabel: selRow ? selRow[0] : '', tArt: selRow ? selRow[1] : 'clover',
+        tRarity: selRow ? selRow[2] : 1, tPrice: selRow ? selRow[4] : 1,
+        tState: rows.length === 0 ? 'disabled' : tState, tNeed: 20,
+        tGain: p.gain ?? (selRow ? String(selRow[4]) : '1'),
+        tHoldPct: p.holdPct, tWarnLeft: 8
+      }));
+    } else {
+      const seedChips = seedRows.slice(0, 4).map((r, i) =>
+        this.chip(r, 'seed', 489, i === sel ? (tState === 'tap' || tState === 'pressed' ? 'pressed' : 'selected') : 'idle'));
+      const flowerPick = flowerRows.filter(r => r[0] !== 'Harvest Pumpkin').slice(0, 3)
+        .concat(flowerRows.filter(r => r[0] === 'Harvest Pumpkin'));
+      const flowerChips = flowerPick.map((r, i) =>
+        this.chip(r, 'flower', 489, i === 0 ? 'selected' : 'idle',
+          r[0] === 'Harvest Pumpkin' ? { reserved: true, have: r[3], need: 20 } : null));
+
+      let seedsH = 36 + 70 + 28 + (seedChips.length === 0 ? 0 : 366) + 152;
+      let flowersH = 36 + 70 + 28 + (flowerChips.length === 0 ? 0 : 434) + 152;
+      if (seedChips.length === 0) seedsH = 686;
+      if (flowerChips.length === 0) flowersH = 686;
+      if (noSeason) { stackGap = 30; const extra = (1597 - 48 - 30 - seedsH - flowersH) / 2; seedsH += Math.floor(extra); flowersH += Math.ceil(extra); }
+      else { stripH = 1597 - 48 - 20 - seedsH - flowersH; }
+
+      sections.push(this.section({
+        layer: 'SeedsSection', kind: 'seed', h: seedsH, chips: seedChips,
+        title: 'Seeds', sub: '· fuel for the Arena', shortcut: 'Merge ↗',
+        total: seedRows.length,
+        emptyTitle: 'Your bag is empty',
+        emptyBody: 'Seeds come back with you from a run. Play the meadow to fill the bag.',
+        emptyCta: 'Play a run ↗',
+        tLabel: seedRows[sel] ? seedRows[sel][0] : '', tArt: seedRows[sel] ? seedRows[sel][1] : 'clover',
+        tRarity: seedRows[sel] ? seedRows[sel][2] : 1, tPrice: seedRows[sel] ? seedRows[sel][4] : 1,
+        tState: seedChips.length === 0 ? 'disabled' : tState,
+        tGain: p.gain ?? (seedRows[sel] ? String(seedRows[sel][4]) : '1'), tHoldPct: p.holdPct
+      }));
+      sections.push(this.section({
+        layer: 'FlowersSection', kind: 'flower', h: flowersH, chips: flowerChips,
+        title: 'Flowers', sub: '· reward & currency', total: flowerRows.length,
+        emptyTitle: 'No flowers yet',
+        emptyBody: 'Flowers grow when you merge seeds all the way to tier 3 in the Arena.',
+        emptyCta: 'Merge in Arena ↗',
+        tLabel: flowerRows[0] ? flowerRows[0][0] : '', tArt: flowerRows[0] ? flowerRows[0][1] : 'clover',
+        tRarity: flowerRows[0] ? flowerRows[0][2] : 1, tPrice: flowerRows[0] ? flowerRows[0][4] : 5,
+        tState: flowerChips.length === 0 ? 'disabled' : 'idle', tGain: '5'
+      }));
+    }
+
+    return {
+      sections,
+      coins: p.coins ?? '320',
+      seedTotal: String(seedTotal),
+      seasonTint: p.tint ?? 'frost',
+      seasonState: noSeason ? 'short' : seasonState,
+      seasonCoins: p.seasonCoins ?? 320,
+      seasonFlowers: p.seasonFlowers ?? 12,
+      stripH,
+      rootStyle: 'width:1080px;height:1920px;flex:0 0 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#2E4733;font-family:' + NUN + ';-webkit-font-smoothing:antialiased',
+      pageStyle: 'flex:0 0 auto;height:1597px;box-sizing:border-box;padding:24px;overflow:hidden',
+      stackStyle: 'height:100%;display:flex;flex-direction:column;gap:' + stackGap + 'px' + (tabsDir ? ';justify-content:space-between' : ''),
+      heroWrapStyle: (tabsDir && !noSeason) ? 'flex:0 0 auto' : 'display:none',
+      stripWrapStyle: (!tabsDir && !noSeason) ? 'flex:0 0 auto' : 'display:none'
+    };
+  }
+}
+</script>
+</body>
+</html>

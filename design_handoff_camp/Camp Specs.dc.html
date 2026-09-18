@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body { margin: 0; background: #1A241E; }
+a { color: #FFB88C; text-decoration: none; border-bottom: 1px solid rgba(255,184,140,.45); }
+a:hover { color: #FFD56B; border-bottom-color: rgba(255,213,107,.6); }
+</style>
+</helmet>
+<section style="box-sizing:border-box;width:2560px;padding:72px 80px 110px;display:flex;flex-direction:column;gap:56px;background:#1A241E;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0">
+
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:1600px">
+    <div style="font:800 22px/1 Nunito,system-ui,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,248,240,.55)">Camp redesign · component specs (§7.4–7.6)</div>
+    <div style="font:900 58px/1.05 Nunito,system-ui,sans-serif">Chip, Trade, Season — every state at size</div>
+    <div style="display:flex;gap:20px;margin-top:8px">
+      <a href="Camp%20Redesign.dc.html" style="box-sizing:border-box;height:74px;padding:0 28px;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.30);display:flex;align-items:center;font:800 28px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">← Two directions</a>
+      <a href="Camp%20States.dc.html" style="box-sizing:border-box;height:74px;padding:0 28px;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.30);display:flex;align-items:center;font:800 28px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">← Required states</a>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:26px">
+    <div style="font:900 46px/1 Nunito,system-ui,sans-serif">Chip spec sheet</div>
+    <div style="font:700 28px/1.4 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.74);max-width:1600px;text-wrap:pretty">489 × 176 px (2 columns, 14 px gap). Seed = round cream rim + dark well, count in seeds. Flower = square gold rim + dark well, count in crystals. Rarity is stars, never colour alone — ★☆☆ / ★★☆ / ★★★ read on a grayscale screenshot. The price pill always carries the word "each".</div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <sc-for list="{{ chipCols }}" as="col" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:14px;flex:0 0 auto;width:440px">
+          <div style="font:900 30px/1 Nunito,system-ui,sans-serif">{{ col.title }}</div>
+          <div style="font:700 23px/1.3 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.68);height:92px;text-wrap:pretty">{{ col.note }}</div>
+          <div style="width:440px;height:{{ col.boxH }};overflow:hidden">
+            <div style="width:489px;transform:scale(.9);transform-origin:top left;display:flex;flex-direction:column;gap:14px">
+              <sc-for list="{{ col.chips }}" as="c" hint-placeholder-count="3">
+                <dc-import name="CampChip" kind="{{ c.kind }}" rarity="{{ c.rarity }}" label="{{ c.label }}" art="{{ c.art }}" count="{{ c.count }}" price="{{ c.price }}" state="{{ c.state }}" reserved="{{ c.reserved }}" at-floor="{{ c.atFloor }}" have="{{ c.have }}" need="{{ c.need }}" hint-size="489px,176px"></dc-import>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="height:3px;background:rgba(255,248,240,.14);border-radius:2px"></div>
+
+  <div style="display:flex;flex-direction:column;gap:26px">
+    <div style="font:900 46px/1 Nunito,system-ui,sans-serif">Trade — tap, hold, auto-switch</div>
+    <div style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start">
+      <sc-for list="{{ trades }}" as="t" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:14px;flex:0 0 auto;width:1090px">
+          <div style="font:900 32px/1 Nunito,system-ui,sans-serif">{{ t.title }}</div>
+          <div style="font:700 24px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.70);height:72px;text-wrap:pretty">{{ t.note }}</div>
+          <div style="width:1090px;height:{{ t.boxH }}">
+            <div style="width:992px;transform:scale(1.09);transform-origin:top left">
+              <dc-import name="TradeBar" kind="{{ t.kind }}" label="{{ t.label }}" art="{{ t.art }}" rarity="{{ t.rarity }}" price="{{ t.price }}" state="{{ t.state }}" gain="{{ t.gain }}" hold-pct="{{ t.holdPct }}" warn-left="{{ t.warnLeft }}" hint-size="992px,152px"></dc-import>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="height:3px;background:rgba(255,248,240,.14);border-radius:2px"></div>
+
+  <div style="display:flex;flex-direction:column;gap:26px">
+    <div style="font:900 46px/1 Nunito,system-ui,sans-serif">Next season — three beats, three tints</div>
+    <div style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start">
+      <sc-for list="{{ seasons }}" as="s" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:14px;flex:0 0 auto;width:1032px">
+          <div style="font:900 32px/1 Nunito,system-ui,sans-serif">{{ s.title }}</div>
+          <div style="font:700 24px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.70);height:72px;text-wrap:pretty">{{ s.note }}</div>
+          <dc-import name="SeasonLink" tint="{{ s.tint }}" state="{{ s.state }}" coins="{{ s.coins }}" flowers="{{ s.flowers }}" compact="{{ s.compact }}" h="{{ s.h }}" hint-size="1032px,422px"></dc-import>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="height:3px;background:rgba(255,248,240,.14);border-radius:2px"></div>
+
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:1;min-width:900px;box-sizing:border-box;padding:34px 38px;border-radius:24px;background:rgba(255,248,240,.06);border:2px solid rgba(255,248,240,.14)">
+      <div style="font:900 34px/1 Nunito,system-ui,sans-serif;margin-bottom:20px">Animation table (tween only)</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <sc-for list="{{ anims }}" as="a" hint-placeholder-count="7">
+          <div style="display:flex;gap:18px;align-items:baseline;font:700 24px/1.3 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82)">
+            <div style="flex:0 0 250px;font-weight:900;color:#FFD56B">{{ a.what }}</div>
+            <div style="flex:0 0 200px;font-variant-numeric:tabular-nums">{{ a.time }}</div>
+            <div style="flex:0 0 180px;color:rgba(255,248,240,.62)">{{ a.ease }}</div>
+            <div style="flex:1;text-wrap:pretty">{{ a.detail }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="flex:0 0 620px;box-sizing:border-box;padding:34px 38px;border-radius:24px;background:rgba(255,248,240,.06);border:2px solid rgba(255,248,240,.14)">
+      <div style="font:900 34px/1 Nunito,system-ui,sans-serif;margin-bottom:20px">Assets to export</div>
+      <div style="display:flex;flex-direction:column;gap:12px;font:700 24px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82)">
+        <sc-for list="{{ assets }}" as="a" hint-placeholder-count="6">
+          <div style="text-wrap:pretty">{{ a }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      chipCols: [
+        {
+          title: 'Seed · idle', boxH: '520px',
+          note: 'Not selected. Rarity background stays, border is the quiet 2 px outline.',
+          chips: [
+            { kind: 'seed', rarity: 1, label: 'Meadow Clover', art: 'clover', count: 12, price: 1, state: 'idle', reserved: false },
+            { kind: 'seed', rarity: 2, label: 'Wild Tulip', art: 'tulip', count: 6, price: 2, state: 'idle', reserved: false },
+            { kind: 'seed', rarity: 3, label: 'Harvest Pumpkin', art: 'pumpkin', count: 2, price: 4, state: 'idle', reserved: false }
+          ]
+        },
+        {
+          title: 'Seed · selected', boxH: '520px',
+          note: 'The one type Trade will sell: 5 px peach border, 14 % lighter fill, lifted 3 px.',
+          chips: [
+            { kind: 'seed', rarity: 1, label: 'Meadow Clover', art: 'clover', count: 12, price: 1, state: 'selected', reserved: false },
+            { kind: 'seed', rarity: 2, label: 'Wild Tulip', art: 'tulip', count: 6, price: 2, state: 'selected', reserved: false },
+            { kind: 'seed', rarity: 3, label: 'Harvest Pumpkin', art: 'pumpkin', count: 2, price: 4, state: 'selected', reserved: false }
+          ]
+        },
+        {
+          title: 'Seed · pressed', boxH: '520px',
+          note: 'Finger down: fill 8 % darker, no lift. Returns to selected on release.',
+          chips: [
+            { kind: 'seed', rarity: 1, label: 'Meadow Clover', art: 'clover', count: 12, price: 1, state: 'pressed', reserved: false },
+            { kind: 'seed', rarity: 2, label: 'Wild Tulip', art: 'tulip', count: 6, price: 2, state: 'pressed', reserved: false },
+            { kind: 'seed', rarity: 3, label: 'Harvest Pumpkin', art: 'pumpkin', count: 2, price: 4, state: 'pressed', reserved: false }
+          ]
+        },
+        {
+          title: 'Flower · idle & selected', boxH: '520px',
+          note: 'Gold square rim, crystal count. Same states, different object — reward, not fuel.',
+          chips: [
+            { kind: 'flower', rarity: 1, label: 'Meadow Clover', art: 'clover', count: 3, price: 5, state: 'idle', reserved: false },
+            { kind: 'flower', rarity: 2, label: 'Wild Tulip', art: 'tulip', count: 1, price: 10, state: 'selected', reserved: false },
+            { kind: 'flower', rarity: 3, label: 'Silver Aconite', art: 'silver_aconite', count: 4, price: 20, state: 'idle', reserved: false }
+          ]
+        },
+        {
+          title: 'Flower · kept for a season', boxH: '920px',
+          note: 'The ★3 the next season needs: a lock badge in the season tint plus kept / needed. Row 3 is the same chip at the floor — badge turns amber and reads Hold stops · 20 / 20. Last row: nothing left to sell.',
+          chips: [
+            { kind: 'flower', rarity: 3, label: 'Harvest Pumpkin', art: 'pumpkin', count: 12, price: 20, state: 'idle', reserved: true, have: 12, need: 20 },
+            { kind: 'flower', rarity: 3, label: 'Harvest Pumpkin', art: 'pumpkin', count: 12, price: 20, state: 'selected', reserved: true, have: 12, need: 20 },
+            { kind: 'flower', rarity: 3, label: 'Harvest Pumpkin', art: 'pumpkin', count: 20, price: 20, state: 'selected', reserved: true, atFloor: true, have: 20, need: 20 },
+            { kind: 'flower', rarity: 1, label: 'Field Daisy', art: 'daisy', count: 0, price: 5, state: 'disabled', reserved: false }
+          ]
+        }
+      ],
+      trades: [
+        { title: 'Idle', boxH: '180px', note: 'Shows what is selected, its rarity and the rate per piece. The button says how holding behaves before you try it.', kind: 'seed', label: 'Meadow Clover', art: 'clover', rarity: 1, price: 1, state: 'idle', gain: '1', holdPct: 0, warnLeft: 8 },
+        { title: 'Tap = 1', boxH: '180px', note: '+1 coin pops above the button and flies to the header coin chip. One tap, one seed, one number.', kind: 'seed', label: 'Meadow Clover', art: 'clover', rarity: 1, price: 1, state: 'tap', gain: '1', holdPct: 0, warnLeft: 8 },
+        { title: 'Hold = 10 / s', boxH: '180px', note: 'The button fills left to right while held and the pop counts up instead of repeating. Releasing saves.', kind: 'seed', label: 'Meadow Clover', art: 'clover', rarity: 1, price: 1, state: 'hold', gain: '30', holdPct: 0.62, warnLeft: 8 },
+        { title: 'Auto-switch', boxH: '180px', note: 'The held type ran out, so selection moved to the next type on its own and the hold keeps going. The mint flash names what happened.', kind: 'seed', label: 'Field Daisy', art: 'daisy', rarity: 1, price: 1, state: 'switch', gain: '1', holdPct: 0, warnLeft: 8 },
+        { title: 'Selling a kept flower', boxH: '260px', note: 'Allowed, but the pink strip says exactly what it costs you: Frost Orchard still needs 8 of these. Rule unchanged — see the proposals on the first page.', kind: 'flower', label: 'Harvest Pumpkin', art: 'pumpkin', rarity: 3, price: 20, state: 'warn', gain: '20', holdPct: 0, warnLeft: 8 },
+        { title: 'Hold stopped (new rule)', boxH: '260px', note: 'The next sale would take the ★3 below what the next season keeps, so the hold ends itself: amber strip, fill frozen where it stopped, button becomes Tap to sell 1. No dialog, no block.', kind: 'flower', label: 'Harvest Pumpkin', art: 'pumpkin', rarity: 3, price: 20, state: 'holdstop', gain: '20', holdPct: 0.34, warnLeft: 1 },
+        { title: 'Disabled', boxH: '180px', note: 'Empty bag or empty stash: the bar stays in place and explains itself instead of vanishing.', kind: 'seed', label: '', art: 'clover', rarity: 1, price: 1, state: 'disabled', gain: '1', holdPct: 0, warnLeft: 8 }
+      ],
+      seasons: [
+        { title: 'Not enough yet', note: 'Both bars, both gaps spelled out under the button: 180 more coins and 8 more flowers. Tapping the card goes to Home, nothing is spent.', tint: 'frost', state: 'short', coins: 320, flowers: 12, compact: false, h: 168 },
+        { title: 'Ready', note: 'Both conditions met: the button turns UI gold and names the price it will spend.', tint: 'frost', state: 'ready', coins: 500, flowers: 20, compact: false, h: 168 },
+        { title: 'Unlocking', note: 'After the 0.4 s jump to Home: coin-gold burst, past-tense copy, spent amounts shown once.', tint: 'frost', state: 'unlocking', coins: 500, flowers: 20, compact: false, h: 168 },
+        { title: 'Lantern Meadow tint', note: 'Same card, next season in line — #C9B8E0, dark ink.', tint: 'lantern', state: 'short', coins: 140, flowers: 5, compact: false, h: 168 },
+        { title: 'Amber Canopy tint', note: 'Last free season — #E8C48A, dark ink.', tint: 'amber', state: 'short', coins: 460, flowers: 17, compact: false, h: 168 },
+        { title: 'Compact strip (used in 1a)', note: 'Same data at 157 px: name, both numbers, both bars, Unlock. Used when the page already spends its height on two shelves.', tint: 'frost', state: 'short', coins: 320, flowers: 12, compact: true, h: 157 }
+      ],
+      anims: [
+        { what: 'Chip select', time: '120 ms', ease: 'ease-out', detail: 'Border 2 → 5 px peach, fill +14 %, y −3 px. The previous chip reverses over the same 120 ms.' },
+        { what: 'Chip press', time: '80 ms', ease: 'linear', detail: 'Fill ×0.92, lift released. On release → selected state.' },
+        { what: 'Trade tap pop', time: '90 ms + 260 ms fly', ease: 'ease-out → ease-in', detail: '"+N" scales 0.7 → 1 above the button, then travels to the header coin chip and fades over the last 80 ms.' },
+        { what: 'Hold fill', time: 'continuous', ease: 'linear', detail: 'Fill width follows the 10 / s repeat; resets to 0 over 140 ms on release.' },
+        { what: 'Auto-switch flash', time: '200 ms', ease: 'ease-out', detail: 'Mint plate behind the new name fades in, holds 600 ms, fades out. Bar art and price cross-fade over 120 ms.' },
+        { what: 'Unlock burst', time: '420 ms', ease: 'ease-out', detail: 'Cream ring scales 0.2 → 1 at 60 % opacity and fades; button fill UI gold → coin gold over 200 ms.' },
+        { what: 'Tab change (1b)', time: '160 ms', ease: 'ease-out', detail: 'List cross-fades and slides 24 px; tab tile fill and border animate to peach.' },
+        { what: 'Hold stop', time: '140 ms', ease: 'ease-out', detail: 'Repeat ends, fill freezes in place and desaturates to #FFDCC2, amber strip slides down 60 px, button copy cross-fades to Tap to sell 1. Chip badge fill and border animate to amber over the same 140 ms.' }
+      ],
+      assets: [
+        'icon_seed.svg — bag count, seed chip pill, Seeds tab',
+        'Lists scroll by drag; the head pill states how many types exist',
+        'icon_crystal.svg — flower count pill, Flowers tab',
+        'icon_coin.svg — price pill, coin progress, trade pop',
+        'icon_lock.svg — kept-for-season badge, warning strip',
+        'ph_*.svg — existing flower illustration set (8 placeholders used here)',
+        'No new drawn art: rims, wells, pills and bars are flat StyleBoxFlat shapes'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

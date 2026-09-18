@@ -173,17 +173,14 @@ func _assert_flowers_clear_chrome(home: Node, field: Node, label: String) -> Str
 	var basket_chrome: Control = home.get_node_or_null("%BasketCard") as Control
 	var chip: Control = home.get_node_or_null("%SeasonNameChip") as Control
 	var play_row: Control = home.get_node_or_null("%PlayRow") as Control
-	var settings: Control = home.get_node_or_null("%SettingsButton") as Control
-	if settings == null:
-		settings = home.get_node_or_null("SettingsButton") as Control
 	var upgrades: Control = home.get_node_or_null("%FieldUpgradeStack") as Control
-	for node in [daily, basket_chrome, settings, chip, play_row, upgrades]:
+	for node in [daily, basket_chrome, chip, play_row, upgrades]:
 		var control: Control = node as Control
 		if control == null or not control.visible:
 			continue
 		chrome.append(control)
 	if chrome.is_empty():
-		return "%s expected Daily/Basket/Settings/chip/PlayRow for chrome check" % label
+		return "%s expected Daily/Basket/chip/PlayRow for chrome check" % label
 	var margin := 12.0
 	for flower in _field_flowers(field):
 		var fr: Rect2 = (flower as Control).get_global_rect()
@@ -197,9 +194,6 @@ func _assert_flowers_clear_chrome(home: Node, field: Node, label: String) -> Str
 func _assert_field_upgrades_open(home: Node, label: String) -> String:
 	if home == null:
 		return "%s field upgrades missing home" % label
-	var settings: Control = home.get_node_or_null("%SettingsButton") as Control
-	if settings == null:
-		settings = home.get_node_or_null("SettingsButton") as Control
 	var stack: Control = home.get_node_or_null("%FieldUpgradeStack") as Control
 	var magnet: Control = home.get_node_or_null("%MagnetButton") as Control
 	var loot: Control = home.get_node_or_null("%LootBoostButton") as Control
@@ -211,8 +205,6 @@ func _assert_field_upgrades_open(home: Node, label: String) -> String:
 		return "%s MagnetButton should be visible" % label
 	if loot == null or not loot.is_visible_in_tree():
 		return "%s LootBoostButton should be visible" % label
-	if settings and magnet.global_position.y + 0.5 < settings.get_global_rect().end.y:
-		return "%s Magnet should sit below Settings" % label
 	if loot.global_position.y <= magnet.global_position.y:
 		return "%s Loot Boost should sit below Magnet" % label
 	var mag_t := magnet_title.text if magnet_title else ""

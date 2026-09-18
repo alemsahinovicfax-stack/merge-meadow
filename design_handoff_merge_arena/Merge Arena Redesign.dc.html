@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #EDEAE5; }
+  a { color: #2D3436; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { color: #A8724A; }
+</style>
+</helmet>
+
+<section style="width:7000px;box-sizing:border-box;display:flex;flex-direction:column;gap:120px;padding:80px;background:#EDEAE5;font-family:Nunito,system-ui,sans-serif;color:#2D3436">
+
+  <div style="display:flex;gap:64px;align-items:flex-start;width:2600px">
+    <div style="width:1780px;flex:0 0 auto">
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Merge Meadow · 5. stranica huba</div>
+      <h1 style="margin:18px 0 0;font:900 88px/1.02 Nunito,sans-serif;letter-spacing:-.02em">Merge Arena — redizajn</h1>
+      <p style="margin:28px 0 0;max-width:1500px;font:600 26px/1.5 Nunito,sans-serif;color:#8A837A;text-wrap:pretty">Cvijeće u svim artboardima je <strong>placeholder</strong> — 6 latica, <code>stroke 4,0 %</code> širine i centar <code>4,2 %</code> / <code>#FFE8B8</code>, preuzeto iz <code>seed_clover.svg</code>; <code>type_id</code>-jevi i imena su iz rostera (§6 flower briefa). Pravo cvijeće je poseban zadatak.</p>
+<p style="margin:20px 0 0;max-width:1500px;font:600 30px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Artboard <strong>1080 × 1920</strong>, Arena <strong>1080 × 1597</strong> između zadatog headera (143) i footera (180). Sve mjere u px te baze. Dva smjera su <a href="#1a">1a</a> i <a href="#1b">1b</a> — razlikuju se samo po kontejneru sjemenke; sve ostalo (HUD, vreća, Muncher, pozadina) je zajedničko i prikazano ispod za preporučeni smjer.</p>
+    </div>
+    <div style="width:756px;flex:0 0 auto;background:#1A241E;border-radius:24px;padding:40px 44px;box-sizing:border-box">
+      <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.16em;color:#FFB88C;text-transform:uppercase">Preporuka</div>
+      <div style="margin-top:16px;font:900 46px/1.1 Nunito,sans-serif;color:#FFF8F0">Smjer B — sadnica (rim + well)</div>
+      <ul style="margin:24px 0 0;padding-left:28px;font:600 24px/1.55 Nunito,sans-serif;color:rgba(255,248,240,.86)">
+        <li>Kontejner mora istovremeno nositi kontrast <em>prema tamnoj livadi</em> i <em>ispod svake boje cvijeta</em>. Jedna boja to ne može — B razdvaja posao: cream rim nosi siluetu, tamni well nosi cvijet.</li>
+        <li>Mjereno na isporučenom <code>seed_clover.svg</code>: latice Meadow Clovera ★1 su <code>#A8E6CF</code> i <code>#7FD4A8</code> — na cream jastučiću (A) to je <strong>1,34:1</strong> i <strong>1,68:1</strong>, na wellu (B) <strong>9,3:1</strong> i <strong>7,5:1</strong>. Smjer A gubi masu cvijeta na <em>postojećem</em> Country Bloom artu, ne na hipotetskom.</li>
+        <li>T1 krug / T2 zaobljeni kvadrat radi u oba smjera i čita se u grayscale-u.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:80px;align-items:flex-start">
+
+    <div id="1a" style="display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="width:64px;height:64px;border-radius:18px;background:#2D3436;color:#FFF8F0;display:grid;place-items:center;font:800 28px/1 Nunito,sans-serif">1a</div>
+        <div>
+          <div style="font:900 44px/1 Nunito,sans-serif">A — svijetli jastučić</div>
+          <div style="margin-top:8px;font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A">puni cream <code>#FFF8F0</code> + outline <code>#2D3436</code> @ 55 %</div>
+        </div>
+      </div>
+      <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+        <dc-import name="ArenaScreen" scene="round" dir="A" hint-size="1080px,1920px"></dc-import>
+      </div>
+      <div style="width:1080px;box-sizing:border-box;padding:28px 24px;border-radius:20px;background:#293D2E">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:rgba(255,248,240,.6);text-transform:uppercase;margin-bottom:20px">8 boja cvijeta na istom kontejneru</div>
+        <div style="font:700 24px/1 Nunito,sans-serif;color:rgba(255,248,240,.75);margin-bottom:12px">outline po flower briefu — „~20 % tamniji od fill-a, 2–4 px"</div>
+        <div style="display:flex;flex-wrap:wrap;gap:18px">
+          <dc-import name="SeedChip" dir="A" flower="clover" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="tulip" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="buttercup" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="frost_snowdrop" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="silver_aconite" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="pumpkin" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="daisy" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="sunflower" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+        </div>
+        <div style="margin-top:14px;font:700 26px/1.4 Nunito,sans-serif;color:#FFCCD5">↑ 7. slijeva (Field Daisy ★1): outline <code>#CCC6C0</code> na cream jastučiću = <strong>1,6:1</strong> — cvijet nestaje.</div>
+        <div style="height:2px;background:rgba(255,248,240,.2);margin:28px 0 24px"></div>
+        <div style="font:700 24px/1 Nunito,sans-serif;color:rgba(255,248,240,.75);margin-bottom:12px">outline kao u <code>seed_clover.svg</code> — tvrdi <code>#2D3436</code>, 3,2 px @ 80</div>
+        <div style="display:flex;flex-wrap:wrap;gap:18px">
+          <dc-import name="SeedChip" dir="A" flower="clover" hardOutline="{{ true }}" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="tulip" hardOutline="{{ true }}" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="buttercup" hardOutline="{{ true }}" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="frost_snowdrop" hardOutline="{{ true }}" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="silver_aconite" hardOutline="{{ true }}" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="pumpkin" hardOutline="{{ true }}" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="daisy" hardOutline="{{ true }}" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="A" flower="sunflower" hardOutline="{{ true }}" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+        </div>
+        <div style="margin-top:14px;font:700 26px/1.4 Nunito,sans-serif;color:#A8E6CF">↑ s tvrdim outlineom silueta drži <strong>12,0:1</strong> — ali samo silueta, ne masa cvijeta.</div>
+      </div>
+      <div style="width:1080px;box-sizing:border-box;background:#FFF8F0;border:3px solid #E8A374;border-radius:20px;padding:30px 34px">
+        <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">Odlučujuće: mjereno na isporučenom <code>seed_clover.svg</code></div>
+        <p style="margin:0 0 18px;font:600 25px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Outline je sporno pitanje (dva izvora se ne slažu — vidi ispod), ali <strong>fill latica nije</strong>. Meadow Clover ★1 se isporučuje u <code>#A8E6CF</code> i <code>#7FD4A8</code>:</p>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">#A8E6CF na cream jastučiću (A)</span><span style="color:#B5442C">1,34 : 1</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">#7FD4A8 na cream jastučiću (A)</span><span style="color:#B5442C">1,68 : 1</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">#A8E6CF na wellu (B)</span><span>9,3 : 1</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">#7FD4A8 na wellu (B)</span><span>7,5 : 1</span></div>
+        <p style="margin:18px 0 0;font:600 25px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Na smjeru A masa cvijeta se stapa s jastučićem i pod <em>bilo kojom</em> konvencijom outlinea — tvrdi outline spašava siluetu, ne tijelo. Zato preporuka ne zavisi od toga kako se outline razriješi.</p>
+      </div>
+      <p style="margin:0;width:1080px;font:600 26px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Otvoreno pitanje outlinea: <code>seeds-flowers-cd-brief.md</code> §2 propisuje „outline ~20 % tamniji od fill-a, 2–4 px", dok jedini isporučeni asset <code>seed_clover.svg</code> koristi tvrdi <code>#2D3436</code> @ 3,2 px / 80. Treba ga razriješiti prije nego cvijeće za 7 preostalih sezona krene u produkciju — ali ne blokira izbor kontejnera.</p>
+    </div>
+
+    <div id="1b" style="display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="width:64px;height:64px;border-radius:18px;background:#1A241E;color:#FFB88C;display:grid;place-items:center;font:800 28px/1 Nunito,sans-serif">1b</div>
+        <div>
+          <div style="font:900 44px/1 Nunito,sans-serif">B — sadnica: rim + well <span style="color:#A8724A">· preporuka</span></div>
+          <div style="margin-top:8px;font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A">cream rim <code>#FFF8F0</code> + well <code>#22342A</code> (livada, 20 % tamnije)</div>
+        </div>
+      </div>
+      <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+        <dc-import name="ArenaScreen" scene="round" dir="B" hint-size="1080px,1920px"></dc-import>
+      </div>
+      <div style="width:1080px;box-sizing:border-box;padding:28px 24px;border-radius:20px;background:#293D2E">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:rgba(255,248,240,.6);text-transform:uppercase;margin-bottom:20px">8 boja cvijeta na istom kontejneru</div>
+        <div style="display:flex;flex-wrap:wrap;gap:18px">
+          <dc-import name="SeedChip" dir="B" flower="clover" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="B" flower="tulip" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="B" flower="buttercup" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="B" flower="frost_snowdrop" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="B" flower="silver_aconite" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="B" flower="pumpkin" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="B" flower="daisy" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+          <dc-import name="SeedChip" dir="B" flower="sunflower" size="{{ 112 }}" hint-size="112px,112px"></dc-import>
+        </div>
+        <div style="margin-top:18px;font:700 26px/1.4 Nunito,sans-serif;color:#A8E6CF">↑ svih 8 drži ≥ 4,6:1 prema wellu — uključujući Field Daisy (12,5:1); najslabiji je Silver Aconite (6,7:1).</div>
+      </div>
+      <p style="margin:0;width:1080px;font:600 26px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Cream rim od 14–18 px je jedina svijetla masa na tamnoj livadi, pa se polje čita kao mreža „sadnica". Well je ista livadska zelena, 20 % tamnija — cvijet uvijek sjedi na tamnoj podlozi bez obzira na sezonu.</p>
+    </div>
+
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;flex-direction:column;gap:44px">
+    <div>
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Isporuka 2 · 7</div>
+      <h2 style="margin:14px 0 0;font:900 60px/1 Nunito,sans-serif">Prazna Arena, tutorijal, puno polje, overlay</h2>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start">
+
+      <div data-screen-label="Prazna Arena" style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Prazna · prvi pogled poslije runa</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="ArenaScreen" scene="empty" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div data-screen-label="Tutorijal" style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Tutorijal · prvi put</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="ArenaScreen" scene="tutorial" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div data-screen-label="Puno polje" style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">30 / 30 · test gustine</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="ArenaScreen" scene="full" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div data-screen-label="Overlay" style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">You need more seeds!</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+          <dc-import name="ArenaScreen" scene="overlay" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+
+      <div style="width:900px;flex:0 0 auto;display:flex;flex-direction:column;gap:32px">
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">Vertikalni budžet <span style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;color:#8A837A">— 1597 px</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">ArenaHud</span><span>y 0 · h 120</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">HintLine</span><span>y 120 · h 128 (2 reda)</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Playfield</span><span>y 248 · h 1133</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">DoneButton</span><span>y 1397 · h 140</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Zona NavLockPill</span><span>y 1561–1597 · čisto 24 px</span></div>
+        </div>
+        <div style="background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:30px 34px">
+          <div style="font:800 28px/1 Nunito,sans-serif;margin-bottom:14px">Nalaz: 30 sjemenki traži rešetku</div>
+          <p style="margin:0;font:600 24px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Na 1080 × 1133 px, s keepout zonama za vreću, Pipa i gnijezdo, ostaje <strong>40 legalnih pozicija</strong> pri minimalnom razmaku centara od 142,8 px. Slučajni spawn (dart throwing) puca iznad ~22 sjemenke. Prikazani raspored je <strong>heksagonalna rešetka, korak 150 px, jitter ± 3,5 px</strong> — jedini koji pouzdano primi 30. Za ≤ 24 koristi se korak 164 px i jitter ± 9 px (organskije). Preporuka: <code>ARENA_MAX_CHIPS</code> ostaje 30, ali spawn ide na rešetku.</p>
+        </div>
+        <div style="background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:30px 34px">
+          <div style="font:800 28px/1 Nunito,sans-serif;margin-bottom:14px">Odluke na otvorena pitanja</div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:10px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Naslov „Merge Arena"</span><span>ukinut · +52 px polju</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:10px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">StashCounter</span><span>da · gore desno</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:10px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Veličina sjemenke</span><span>ostaje 134 px</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:10px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Muncher</span><span>56 → 104 px</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:10px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Pozadina</span><span>2 PNG sloja + crossfade</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:10px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Kraći tekstovi</span><span>da · tabela niže</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;flex-direction:column;gap:44px">
+    <div>
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Isporuka 3</div>
+      <h2 style="margin:14px 0 0;font:900 60px/1 Nunito,sans-serif">SeedChip — spec i stanja</h2>
+    </div>
+    <div style="display:flex;gap:64px;align-items:flex-start">
+      <div style="width:1360px;flex:0 0 auto;background:#293D2E;border-radius:24px;padding:44px;box-sizing:border-box;display:flex;flex-direction:column;gap:48px">
+        <div style="display:flex;gap:56px;align-items:flex-end">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:18px">
+            <dc-import name="SeedChip" tier="{{ 1 }}" flower="clover" size="{{ 180 }}" hint-size="180px,180px"></dc-import>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">T1 · krug</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:18px">
+            <dc-import name="SeedChip" tier="{{ 2 }}" flower="clover" size="{{ 180 }}" hint-size="180px,180px"></dc-import>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">T2 · zaobljeni kvadrat</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:18px">
+            <dc-import name="SeedChip" tier="{{ 1 }}" flower="sunflower" mythic="{{ true }}" size="{{ 180 }}" hint-size="180px,180px"></dc-import>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">★3 T1 · gold rim</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:18px">
+            <dc-import name="SeedChip" tier="{{ 2 }}" flower="sunflower" mythic="{{ true }}" size="{{ 180 }}" hint-size="180px,180px"></dc-import>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">★3 T2</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:18px;filter:grayscale(1)">
+            <div style="display:flex;gap:20px">
+              <dc-import name="SeedChip" tier="{{ 1 }}" flower="buttercup" size="{{ 130 }}" hint-size="130px,130px"></dc-import>
+              <dc-import name="SeedChip" tier="{{ 2 }}" flower="buttercup" size="{{ 130 }}" hint-size="130px,130px"></dc-import>
+            </div>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">grayscale — razlika ostaje</div>
+          </div>
+        </div>
+        <div style="height:2px;background:rgba(255,248,240,.2)"></div>
+        <div style="display:flex;flex-wrap:wrap;gap:56px 60px;align-items:flex-end">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <dc-import name="SeedChip" flower="silver_aconite" state="idle" size="{{ 150 }}" hint-size="150px,150px"></dc-import>
+            <div style="font:700 24px/1 Nunito,sans-serif;color:#FFF8F0">miruje</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <dc-import name="SeedChip" flower="silver_aconite" state="drag" size="{{ 150 }}" hint-size="150px,150px"></dc-import>
+            <div style="font:700 24px/1 Nunito,sans-serif;color:#FFF8F0">vuče se</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <dc-import name="SeedChip" flower="silver_aconite" state="pulse" size="{{ 150 }}" hint-size="150px,150px"></dc-import>
+            <div style="font:700 24px/1 Nunito,sans-serif;color:#FFF8F0">par pulsira</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <dc-import name="SeedChip" flower="silver_aconite" state="partner" size="{{ 150 }}" hint-size="150px,150px"></dc-import>
+            <div style="font:700 24px/1 Nunito,sans-serif;color:#FFF8F0">magnet-partner</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <dc-import name="SeedChip" flower="silver_aconite" state="merging" size="{{ 150 }}" hint-size="150px,150px"></dc-import>
+            <div style="font:700 24px/1 Nunito,sans-serif;color:#FFF8F0">spajanje</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <dc-import name="SeedChip" flower="silver_aconite" state="eaten" size="{{ 150 }}" hint-size="150px,150px"></dc-import>
+            <div style="font:700 24px/1 Nunito,sans-serif;color:#FFF8F0">pojedena</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <dc-import name="SeedChip" flower="silver_aconite" state="flying" size="{{ 150 }}" hint-size="150px,150px"></dc-import>
+            <div style="font:700 24px/1 Nunito,sans-serif;color:#FFF8F0">leti u vreću</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:900px;flex:0 0 auto;display:flex;flex-direction:column;gap:36px">
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">Geometrija</div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Prečnik</span><span>134 px (nepromijenjen)</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">T1 oblik · rim</span><span>krug · rub 3 + cream 11 = 14</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">T2 oblik · rim</span><span>r 38 · rub 3 + cream 15 = 18</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Rim fill · rub</span><span>#FFF8F0 · 3 px #CBC2B6</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Well fill · rub</span><span>#22342A · 2 px #16211B</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Cvijet</span><span>T1 78 px · T2 84 px</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">★3</span><span>rim #FFD56B · dashed #D6A82F</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Sjena</span><span>0, 6 · #14201A @ 42 % · bez blura</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Min. razmak centara</span><span>142,8 px (nepromijenjen)</span></div>
+        </div>
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">Stanja</div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">vuče se</span><span>scale 1,12 · rot −3° · sjena 18</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">par pulsira</span><span>prsten 6 px #F2D940 @ 45–80 %</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">magnet-partner</span><span>prsten 7 px #FFD56B · scale 1,04</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">spajanje</span><span>scale 1,28 + prsten #FFF5D1</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">pojedena</span><span>scale 0,62 · alpha 40 % · #FFCCD5 zalogaj</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">leti u vreću</span><span>scale 0,34 · alpha 85 %</span></div>
+        </div>
+        <div style="background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:30px 34px">
+          <div style="font:800 28px/1 Nunito,sans-serif;margin-bottom:14px">Bez natpisa na sjemenki</div>
+          <p style="margin:0;font:600 24px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Tier nosi <strong>oblik</strong> (krug / r 38) i <strong>debljina rima</strong> (11 / 15 px), ★3 <strong>gold rim + dashed prsten</strong>. Nikakav tekst — svaki natpis koji staje na 134 px chip pada na ~18 px (≈ 6,5 sp), što je ispod minimuma od 38 px iz §4.1 i isti defekt koji §3.3 #5 prijavljuje za današnji <code>T2</code> natpis.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;flex-direction:column;gap:44px">
+    <div>
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Isporuka 4 · 5</div>
+      <h2 style="margin:14px 0 0;font:900 60px/1 Nunito,sans-serif">SeedBag i Muncher — sva stanja</h2>
+    </div>
+    <div style="display:flex;gap:64px;align-items:flex-start;flex-wrap:wrap">
+
+      <div style="width:1300px;flex:0 0 auto;background:#293D2E;border-radius:24px;padding:40px;box-sizing:border-box">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:rgba(255,248,240,.6);text-transform:uppercase;margin-bottom:28px">SeedBag · 214 × 178 · hit-zona 280 × 250</div>
+        <div style="display:flex;flex-wrap:wrap;gap:30px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><dc-import name="ArenaScreen" isolate="bag" bag="empty" hint-size="340px,320px"></dc-import><div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">prazna</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><dc-import name="ArenaScreen" isolate="bag" bag="one" bagCount="{{ 1 }}" hint-size="340px,320px"></dc-import><div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">1 sjeme</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><dc-import name="ArenaScreen" isolate="bag" bag="open" bagCount="{{ 34 }}" hint-size="340px,320px"></dc-import><div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">otvorena · 3 tipa</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><dc-import name="ArenaScreen" isolate="bag" bag="pour" bagCount="{{ 22 }}" hint-size="340px,320px"></dc-import><div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">izbacivanje</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><dc-import name="ArenaScreen" isolate="bag" bag="punch" bagCount="{{ 30 }}" hint-size="340px,320px"></dc-import><div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">punch 1,14×</div></div>
+        </div>
+      </div>
+
+      <div style="width:1300px;flex:0 0 auto;background:#293D2E;border-radius:24px;padding:40px;box-sizing:border-box">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:rgba(255,248,240,.6);text-transform:uppercase;margin-bottom:28px">Muncher · 104 px (bio 56) · MuncherNest 210 × 104</div>
+        <div style="display:flex;flex-wrap:wrap;gap:24px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><dc-import name="ArenaScreen" isolate="muncher" muncher="nest" hint-size="320px,260px"></dc-import><div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">spava u gnijezdu</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><dc-import name="ArenaScreen" isolate="muncher" muncher="wake" hint-size="320px,260px"></dc-import><div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">budi se</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><dc-import name="ArenaScreen" isolate="muncher" muncher="hunt" hint-size="320px,260px"></dc-import><div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">lovi</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><dc-import name="ArenaScreen" isolate="muncher" muncher="eat" hint-size="320px,260px"></dc-import><div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">jede</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><dc-import name="ArenaScreen" isolate="muncher" muncher="frozen" hint-size="320px,260px"></dc-import><div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">zamrznut · ledena ljuska</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><dc-import name="ArenaScreen" isolate="muncher" muncher="sleep" hint-size="320px,260px"></dc-import><div style="font:700 26px/1 Nunito,sans-serif;color:#FFF8F0">spava na mjestu</div></div>
+        </div>
+      </div>
+
+      <div style="width:900px;flex:0 0 auto;display:flex;flex-direction:column;gap:32px">
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">SeedBag</div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Tijelo · rub</span><span>#9E7A52 · 5 px #735738</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Vrat</span><span>118 × 34 · #B89466</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Brojač</span><span>84 px krug · 44 px cifra</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Pozicija</span><span>x 540 · 40 px iznad dna polja</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Keepout za sjemenke</span><span>± 185 px bočno · 200 px iznad</span></div>
+        </div>
+        <div>
+          <div style="font:800 30px/1 Nunito,sans-serif;margin-bottom:14px">Muncher</div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Budan · spava</span><span>#8C61B8 · #7A579E</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Zamrznut</span><span>#A6D1FA + heks. ljuska 140 px</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Oči</span><span>otvorene 14 px · zatvorene 20 × 5</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Usta (jede)</span><span>38 × 28 · #FFCCD5</span></div>
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:11px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">Bez boje se razlikuje</span><span>oči · ljuska · zzz · gnijezdo</span></div>
+        </div>
+        <div style="background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:30px 34px">
+          <p style="margin:0;font:600 24px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty"><code>ARENA_PEST_EAT_RADIUS</code> (36 px) je odvojen od vizuelnog radiusa, pa rast s 56 na 104 px ne mijenja balans — samo pomjeri provjeru sudara na centar, ne na ivicu.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;flex-direction:column;gap:44px">
+    <div>
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Isporuka 6 · 10</div>
+      <h2 style="margin:14px 0 0;font:900 60px/1 Nunito,sans-serif">HUD komponente i pozadina</h2>
+    </div>
+    <div style="display:flex;gap:56px;align-items:flex-start;flex-wrap:wrap">
+
+      <div style="width:1220px;flex:0 0 auto;background:#293D2E;border-radius:24px;padding:44px;box-sizing:border-box;display:flex;flex-direction:column;gap:36px">
+        <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center">
+          <div data-layer="DailyTask" style="display:flex;align-items:center;gap:14px;height:76px;padding:0 26px 0 20px;border-radius:20px;box-sizing:border-box;background:#FFF8F0;border:3px solid #CBC2B6"><img src="icons/icon_target.svg" alt="" style="width:44px;height:44px" /><div style="font:800 40px/1 Nunito,sans-serif;color:#2D3436">Merge T2 1/3</div></div>
+          <div style="display:flex;align-items:center;gap:14px;height:76px;padding:0 26px 0 20px;border-radius:20px;box-sizing:border-box;background:#A8E6CF;border:3px solid #7FBFA3"><img src="icons/icon_check.svg" alt="" style="width:44px;height:44px" /><div style="font:800 40px/1 Nunito,sans-serif;color:#2D3436;text-decoration:line-through;text-decoration-thickness:3px">Merge T2 3/3</div></div>
+          <div data-layer="StashCounter" style="display:flex;align-items:center;gap:12px;height:76px;padding:0 24px 0 20px;border-radius:20px;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box"><img src="flowers/ph_crystal.svg" alt="" style="width:48px;height:48px" /><div style="font:800 48px/1 Nunito,sans-serif;color:#2D3436">7</div></div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">
+          <div data-layer="ComboMeter" style="height:78px;padding:0 30px;border-radius:20px;background:#FFEAA7;border:3px solid #E0C97F;box-sizing:border-box;display:grid;place-items:center;font:900 46px/1 Nunito,sans-serif;color:#2D3436">Combo 2</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px">
+            <div style="height:78px;padding:0 30px;border-radius:20px;background:#FFD56B;border:3px solid #D6A82F;box-sizing:border-box;display:grid;place-items:center;font:900 46px/1 Nunito,sans-serif;color:#2D3436">Combo 5</div>
+            <div style="display:flex;align-items:center;gap:10px;height:60px;padding:0 20px;border-radius:16px;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box"><img src="icons/icon_coin.svg" alt="" style="width:40px;height:40px" /><div style="font:900 40px/1 Nunito,sans-serif;color:#2D3436">+2</div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div data-layer="HintLine" style="align-self:center;max-width:1000px;padding:14px 30px;border-radius:20px;background:rgba(22,33,27,.72);font:700 38px/1.2 Nunito,sans-serif;color:#FFF8F0;text-align:center">Poured 12 — drag matching seeds together!</div>
+          <div style="align-self:center;max-width:1000px;padding:14px 30px;border-radius:20px;background:rgba(22,33,27,.72);font:700 38px/1.2 Nunito,sans-serif;color:#FFF8F0;text-align:center;text-wrap:pretty">Paper Lantern Bloom crystal → stash. Muncher frozen 2s.</div>
+          <div style="align-self:center;max-width:1000px;padding:14px 30px;border-radius:20px;background:rgba(22,33,27,.72);font:700 38px/1.2 Nunito,sans-serif;color:#FFF8F0;text-align:center">Arena full — merge some seeds first.</div>
+          <div style="align-self:center;font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;color:rgba(255,248,240,.55)">najduža poruka → 2 reda · rezervisano 128 px, layout ne skače</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:32px">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Pozadina · 0 × T3</div>
+          <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+            <dc-import name="ArenaScreen" scene="round" t3="{{ 0 }}" chips="{{ 8 }}" combo="{{ 0 }}" chrome="{{ false }}" hint-size="1080px,1597px"></dc-import>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">Pozadina · 4 × T3</div>
+          <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)">
+            <dc-import name="ArenaScreen" scene="round" t3="{{ 4 }}" chips="{{ 8 }}" combo="{{ 0 }}" chrome="{{ false }}" hint-size="1080px,1597px"></dc-import>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;flex-direction:column;gap:44px">
+    <div>
+      <div style="font:600 24px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8A837A;text-transform:uppercase">Isporuka 11</div>
+      <h2 style="margin:14px 0 0;font:900 60px/1 Nunito,sans-serif">T3 trenutak — storyboard</h2>
+      <p style="margin:20px 0 0;max-width:1500px;font:600 26px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Rješava „kristal nestane" (§3.3 #10): igrač vidi kuda ide i koliko ih ima. Ukupno 0,74 s od pusti-prst do punch-a brojača.</p>
+    </div>
+    <div style="display:flex;gap:40px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">1 · 0,00 s — burst</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)"><dc-import name="ArenaScreen" scene="round" chips="{{ 6 }}" combo="{{ 0 }}" chrome="{{ false }}" crystalFly="{{ 0.02 }}" hint="Clover crystal → stash. Muncher frozen 2s." muncher="frozen" hint-size="1080px,1597px"></dc-import></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">2 · 0,22 s — kristal kreće</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)"><dc-import name="ArenaScreen" scene="round" chips="{{ 6 }}" combo="{{ 0 }}" chrome="{{ false }}" crystalFly="{{ 0.38 }}" hint="Clover crystal → stash. Muncher frozen 2s." muncher="frozen" hint-size="1080px,1597px"></dc-import></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">3 · 0,56 s — pred brojačem</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)"><dc-import name="ArenaScreen" scene="round" chips="{{ 6 }}" combo="{{ 0 }}" chrome="{{ false }}" crystalFly="{{ 0.88 }}" hint="Clover crystal → stash. Muncher frozen 2s." muncher="frozen" hint-size="1080px,1597px"></dc-import></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:600 22px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.1em;color:#8A837A;text-transform:uppercase">4 · 0,74 s — brojač +1, livada bujnija</div>
+        <div style="border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(45,52,54,.2)"><dc-import name="ArenaScreen" scene="round" chips="{{ 6 }}" combo="{{ 0 }}" chrome="{{ false }}" t3="{{ 2 }}" hint="Clover crystal → stash. Muncher frozen 2s." muncher="frozen" hint-size="1080px,1597px"></dc-import></div>
+      </div>
+
+      <div style="width:1000px;flex:0 0 auto">
+        <div style="font:800 34px/1 Nunito,sans-serif;margin-bottom:20px">Tabela animacija</div>
+        <sc-for list="{{ anims }}" as="a" hint-placeholder-count="10">
+          <div style="display:flex;gap:20px;padding:11px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace">
+            <span style="flex:1;min-width:0">{{ a.what }}</span>
+            <span style="width:230px;flex:0 0 auto;text-align:right;color:#8A837A">{{ a.dur }}</span>
+            <span style="width:190px;flex:0 0 auto;text-align:right;color:#8A837A">{{ a.ease }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:2px;background:rgba(45,52,54,.16)"></div>
+
+  <div style="display:flex;gap:80px;align-items:flex-start;flex-wrap:wrap">
+
+    <div style="width:1180px;flex:0 0 auto">
+      <h2 style="margin:0;font:900 48px/1 Nunito,sans-serif">Tekstovi — stari → novi</h2>
+      <p style="margin:18px 0 24px;font:600 24px/1.5 Nunito,sans-serif;color:#55504A;text-wrap:pretty">Kraće je čitljivije na 38 px. Najduža nova poruka je 55 znakova i staje u 2 reda.</p>
+      <sc-for list="{{ copy }}" as="c" hint-placeholder-count="8">
+        <div style="display:flex;gap:20px;padding:13px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 22px/1.35 'IBM Plex Mono',ui-monospace,monospace">
+          <span style="flex:1;min-width:0;color:#8A837A;text-decoration:line-through">{{ c.old }}</span>
+          <span style="flex:1;min-width:0">{{ c.neu }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="width:1000px;flex:0 0 auto">
+      <h2 style="margin:0;font:900 48px/1 Nunito,sans-serif">Slojevi → Godot</h2>
+      <div style="margin-top:24px">
+        <sc-for list="{{ layers }}" as="l" hint-placeholder-count="12">
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:12px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span>{{ l.name }}</span><span style="color:#8A837A;text-align:right">{{ l.node }}</span></div>
+        </sc-for>
+      </div>
+      <h2 style="margin:52px 0 0;font:900 48px/1 Nunito,sans-serif">Isporuka 12 — asseti</h2>
+      <div style="margin-top:24px">
+        <sc-for list="{{ assets }}" as="a" hint-placeholder-count="10">
+          <div style="display:flex;justify-content:space-between;gap:24px;padding:12px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span>{{ a.f }}</span><span style="color:#8A837A;text-align:right">{{ a.s }}</span></div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="width:1000px;flex:0 0 auto;display:flex;flex-direction:column;gap:32px">
+      <div>
+        <h2 style="margin:0;font:900 48px/1 Nunito,sans-serif">Van zadatka — ideje</h2>
+        <ul style="margin:24px 0 0;padding-left:32px;font:600 25px/1.6 Nunito,sans-serif;color:#55504A">
+          <li><strong>„Sort by type" dugme:</strong> ne bih. Rešetkasti spawn već grupiše slično po redovima, a dugme koje preslaže polje ukida vrijednost magneta.</li>
+          <li><strong>Dugi pritisak na sjemenku</strong> → kratko osvijetli sve iste na polju (isti efekt kao pair pulse, bez vučenja). Pomaže kad je 30 na polju.</li>
+          <li><strong>Muncher nosi ukradenu sjemenku</strong> 0,3 s prije nego je pojede — daje igraču prozor da je „spasi" mergeom i pretvara pritisak u priliku.</li>
+          <li><strong>StashCounter tap</strong> → mali tooltip „spend in Camp", bez navigacije (navigacija je zaključana).</li>
+        </ul>
+      </div>
+      <div style="background:#1A241E;border-radius:20px;padding:32px 36px">
+        <div style="font:800 30px/1 Nunito,sans-serif;color:#FFF8F0;margin-bottom:16px">Šta ovaj dizajn rješava iz §3.3</div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:9px 0;border-bottom:1px solid rgba(255,248,240,.14);font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace;color:rgba(255,248,240,.86)"><span>1 Done pod pillom</span><span style="color:#A8E6CF">140 px · 24 px čisto</span></div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:9px 0;border-bottom:1px solid rgba(255,248,240,.14);font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace;color:rgba(255,248,240,.86)"><span>2 Polje se smanjilo</span><span style="color:#A8E6CF">HUD 248 · rešetka za 30</span></div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:9px 0;border-bottom:1px solid rgba(255,248,240,.14);font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace;color:rgba(255,248,240,.86)"><span>3 HUD skače</span><span style="color:#A8E6CF">fiksne visine · combo pluta</span></div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:9px 0;border-bottom:1px solid rgba(255,248,240,.14);font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace;color:rgba(255,248,240,.86)"><span>4 Naslov duplira tab</span><span style="color:#A8E6CF">ukinut</span></div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:9px 0;border-bottom:1px solid rgba(255,248,240,.14);font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace;color:rgba(255,248,240,.86)"><span>5 Sjemenke se slabo čitaju</span><span style="color:#A8E6CF">rim + well · oblik po tieru</span></div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:9px 0;border-bottom:1px solid rgba(255,248,240,.14);font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace;color:rgba(255,248,240,.86)"><span>6 Muncher placeholder</span><span style="color:#A8E6CF">104 px · 6 stanja · gnijezdo</span></div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:9px 0;border-bottom:1px solid rgba(255,248,240,.14);font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace;color:rgba(255,248,240,.86)"><span>8 Pip sitan u uglu</span><span style="color:#A8E6CF">150 px · uz vreću</span></div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:9px 0;border-bottom:1px solid rgba(255,248,240,.14);font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace;color:rgba(255,248,240,.86)"><span>10 Kristal nestane</span><span style="color:#A8E6CF">StashCounter + let</span></div>
+        <div style="display:flex;justify-content:space-between;gap:20px;padding:9px 0;font:600 22px/1.3 'IBM Plex Mono',ui-monospace,monospace;color:rgba(255,248,240,.86)"><span>11 Overlay na bilo koji tap</span><span style="color:#A8E6CF">„Back to Camp" 140 px</span></div>
+      </div>
+      <div style="background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:20px;padding:30px 34px">
+        <div style="font:800 28px/1 Nunito,sans-serif;margin-bottom:14px">Nove nijanse (sve izvedene)</div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:10px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">#22342A well</span><span>livada #293D2E, 20 % tamnije</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:10px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">#CBC2B6 rim edge</span><span>warm white, 20 % tamnije</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:10px 0;border-bottom:1px solid rgba(45,52,54,.14);font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">#D6A82F gold edge</span><span>coin gold, 20 % tamnije</span></div>
+        <div style="display:flex;justify-content:space-between;gap:24px;padding:10px 0;font:600 23px/1.3 'IBM Plex Mono',ui-monospace,monospace"><span style="color:#8A837A">#E8A374 peach edge</span><span>peach, 20 % tamnije (već u chromeu)</span></div>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      anims: [
+        { what: 'Pour — sjemenka izlijeće iz vreće', dur: '0,42 s · razmak 0,04', ease: 'back out' },
+        { what: 'Vreća punch', dur: '0,08 + 0,12 s', ease: 'cubic' },
+        { what: 'Drag lift', dur: '0,12 s', ease: 'cubic out' },
+        { what: 'Magnet privlačenje', dur: 'lerp 0,18 s', ease: '—' },
+        { what: 'Pair pulse (loop)', dur: '0,70 s', ease: 'sine' },
+        { what: 'Merge pop → T2', dur: '0,26 s · 1,0→1,3→1,0', ease: 'back out' },
+        { what: 'Promašaj — wobble', dur: '0,30 s · ± 6°', ease: 'elastic' },
+        { what: 'T3 burst prsten', dur: '0,22 s · 0,4→1,9', ease: 'cubic out' },
+        { what: 'T3 kristal → StashCounter', dur: '0,52 s · scale 1→0,45', ease: 'cubic in' },
+        { what: 'StashCounter punch', dur: '0,18 s · 1,0→1,16→1,0', ease: 'back' },
+        { what: 'Muncher bob (lovi)', dur: '0,60 s · ± 5 px', ease: 'sine' },
+        { what: 'Muncher chomp', dur: '0,50 s · 2 ×', ease: 'sine' },
+        { what: 'Freeze ljuska in / out', dur: '0,18 s / 0,25 s', ease: 'back out / cubic' },
+        { what: 'Combo pill in / out', dur: '0,20 s / 0,18 s', ease: 'back / cubic' },
+        { what: 'Vacuum let u vreću', dur: '0,38 s · razmak 0,05', ease: 'cubic in' },
+        { what: 'Clear bljesak', dur: '0,40 s', ease: 'cubic' },
+        { what: 'Meadow crossfade (po T3)', dur: '0,60 s', ease: 'linear' },
+        { what: 'Pip reakcija', dur: '0,28 s · 1,0→1,18→1,0', ease: 'back' },
+        { what: 'Done press', dur: '0,08 s · scale 0,97', ease: 'cubic' }
+      ],
+      copy: [
+        { old: 'Tap bag to pour seeds. Drag matching seeds together.', neu: 'Tap the bag. Drag matching seeds together.' },
+        { old: 'Pour seeds — watch the muncher! Merge to T3 to freeze it.', neu: 'Watch the muncher — a T3 merge freezes it.' },
+        { old: 'Tap the bag below — seeds jump into the arena!', neu: 'Tap the bag — seeds jump in!' },
+        { old: 'Tap bag again to pour more (up to 30 on field).', neu: 'Tap again for more — 30 max.' },
+        { old: 'Merge T1→T2→T3. T3 crystals go to garden stash.', neu: 'T3 crystals go to your garden stash.' },
+        { old: 'Poured 12 seeds — drag matching ones together!', neu: 'Poured 12 — drag matching seeds together!' },
+        { old: 'Muncher woke up — merge fast! T3 merge freezes it 2s.', neu: "Muncher's awake — a T3 freezes it 2s." },
+        { old: 'Merged to T2 — keep merging!', neu: 'Nice — T2! Keep going.' },
+        { old: 'Clover crystal → garden stash! Muncher frozen 2s.', neu: 'Clover crystal → stash. Muncher frozen 2s.' },
+        { old: 'Arena full (30/30) — merge some seeds first!', neu: 'Arena full — merge some seeds first.' },
+        { old: 'Bag is empty. / Nothing to pour.', neu: 'Bag is empty.' },
+        { old: 'Out of seeds — tap Done or pour again when you have more.', neu: 'Out of seeds — tap Done, or run for more.' },
+        { old: 'No seeds left — tap Done to return to camp.', neu: 'No seeds left — tap Done.' }
+      ],
+      layers: [
+        { name: 'ArenaHud', node: 'RootVBox/TopBar → fiksnih 120 px' },
+        { name: 'DailyTask', node: 'DailyLabel → pill 76 px' },
+        { name: 'StashCounter', node: 'novi · get_garden_crystal_total()' },
+        { name: 'HintLine', node: 'InfoLabel → fiksnih 128 px' },
+        { name: 'ComboMeter', node: 'ComboLabel → pluta u Playfieldu' },
+        { name: 'Playfield', node: 'RootVBox/Playfield · 1080 × 1133' },
+        { name: 'SeedChip_T1 / _T2', node: 'arena_seed_chip.gd _draw()' },
+        { name: 'SeedBag', node: 'arena_seed_bag.gd · BAG_SIZE 214 × 178' },
+        { name: 'Muncher / MuncherNest', node: 'arena_pest.gd · radius 52' },
+        { name: 'ArenaPip', node: 'Playfield/ArenaPip · 150 px' },
+        { name: 'DoneButton', node: 'FooterBar/DoneButton · 140 px' },
+        { name: 'T3Burst', node: '_on_chip_released() · tier = MAX' },
+        { name: 'NeedMoreSeedsOverlay', node: '$NeedMoreSeedsOverlay + CTA' },
+        { name: 'MeadowBg', node: '$Bg → TextureRect + crossfade' }
+      ],
+      assets: [
+        { f: 'seed_rim_t1.svg', s: '134 × 134 · krug' },
+        { f: 'seed_rim_t2.svg', s: '134 × 134 · r 38' },
+        { f: 'seed_rim_mythic_t1.svg / _t2.svg', s: '134 × 134 · gold' },
+        { f: 'bag_body.svg / bag_body_empty.svg', s: '214 × 178 / 214 × 126' },
+        { f: 'bag_neck.svg', s: '118 × 34' },
+        { f: 'muncher_body.svg', s: '104 × 104 · oči i usta kodom' },
+        { f: 'muncher_frost.svg', s: '140 × 140 · heksagon' },
+        { f: 'muncher_nest.svg', s: '210 × 104' },
+        { f: 'meadow_base.png', s: '1080 × 1133 · modulate po T3' },
+        { f: 'meadow_lush.png', s: '1080 × 1133 · alpha crossfade' },
+        { f: 'icon_crystal.svg', s: '128 × 128 · StashCounter' },
+        { f: 'icon_target.svg / icon_check.svg', s: '128 × 128 · DailyTask' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -152,7 +152,7 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("Done handler missing")
 		return
-	var daily := arena.get_node_or_null("RootVBox/DailyLabel")
+	var daily := arena.get_node_or_null("RootVBox/ArenaHud/Row/DailyTask/HBox/DailyLabel")
 	if daily == null:
 		_restore_save(backup)
 		_fail("DailyLabel missing")

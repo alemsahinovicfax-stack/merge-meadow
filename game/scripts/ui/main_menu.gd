@@ -12,7 +12,6 @@ const LOCKED_SEED_MODULATE := Color(0.45, 0.45, 0.45, 1)
 enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 
 @onready var tutorial_hint: Label = %TutorialHint
-@onready var settings_button: UiClickButton = %SettingsButton
 @onready var field_upgrade_stack: VBoxContainer = %FieldUpgradeStack
 @onready var magnet_title: Label = %MagnetTitle
 @onready var magnet_button: UiClickButton = %MagnetButton
@@ -71,8 +70,6 @@ func _ready() -> void:
 		var dim := basket_picker_overlay.get_node_or_null("Dim") as Control
 		if dim:
 			dim.gui_input.connect(_on_picker_dim_gui_input)
-	if settings_button:
-		settings_button.clicked.connect(_on_settings_pressed)
 	if magnet_button:
 		magnet_button.clicked.connect(_on_field_magnet_pressed)
 	if loot_boost_button:
@@ -123,10 +120,8 @@ func _setup_typography() -> void:
 
 
 func _setup_safe_area() -> void:
-	if settings_button:
-		SAFE_AREA.apply_top_margin(settings_button, 8.0)
-		SAFE_AREA.apply_horizontal_margins(settings_button)
 	if field_upgrade_stack:
+		SAFE_AREA.apply_top_margin(field_upgrade_stack, 8.0)
 		SAFE_AREA.apply_horizontal_margins(field_upgrade_stack)
 	if home_top_stack:
 		SAFE_AREA.apply_top_margin(home_top_stack, 8.0)
@@ -202,7 +197,6 @@ func _sync_field_hub_swipe_chrome() -> void:
 	for node in [
 		daily_chest_card,
 		basket_card,
-		settings_button,
 		season_name_chip,
 		play_row,
 		field_upgrade_stack,
@@ -294,12 +288,6 @@ func _on_endless_play_pressed() -> void:
 	SceneRouter.change_to(GameState.SCENE_RUN)
 
 
-func _on_settings_pressed() -> void:
-	if tutorial_hint:
-		tutorial_hint.text = "Settings coming soon."
-		tutorial_hint.visible = true
-
-
 func _refresh_field_upgrades() -> void:
 	if field_upgrade_stack == null:
 		return
@@ -307,7 +295,6 @@ func _refresh_field_upgrades() -> void:
 	field_upgrade_stack.visible = open
 	if not open:
 		return
-	_layout_field_upgrades_below_settings()
 	_apply_field_upgrade_button(
 		magnet_button,
 		GameState.magnet_level,
@@ -318,24 +305,6 @@ func _refresh_field_upgrades() -> void:
 		GameState.multiplier_level,
 		GameState.MULTIPLIER_MAX_LEVEL
 	)
-	call_deferred("_layout_field_upgrades_below_settings")
-
-
-func _layout_field_upgrades_below_settings() -> void:
-	if field_upgrade_stack == null or settings_button == null:
-		return
-	if not field_upgrade_stack.visible:
-		return
-	var parent := field_upgrade_stack.get_parent() as Control
-	if parent == null:
-		return
-	var below := settings_button.get_global_rect().end.y + 8.0
-	var local_top := (parent.get_global_transform_with_canvas().affine_inverse() * Vector2(0.0, below)).y
-	field_upgrade_stack.offset_top = local_top
-	var min_h := field_upgrade_stack.get_combined_minimum_size().y
-	if min_h < 80.0:
-		min_h = 152.0
-	field_upgrade_stack.offset_bottom = field_upgrade_stack.offset_top + min_h
 
 
 func _apply_field_upgrade_button(btn: UiClickButton, level: int, max_level: int) -> void:
@@ -483,12 +452,6 @@ func _hide_reward_overlay() -> void:
 
 func _on_reward_ok_pressed() -> void:
 	_hide_reward_overlay()
-
-
-func set_meta_hub_mode(_enabled: bool) -> void:
-	# Bug-022: Settings stays on Home (top-right) in hub mode.
-	if settings_button:
-		settings_button.visible = true
 
 
 func refresh_for_meta_hub() -> void:

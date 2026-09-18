@@ -6,6 +6,8 @@ extends PanelContainer
 
 signal clicked
 signal press_ended
+## Hold je zaustavljen guardom (`repeat_guard`); pritisak traje do otpuštanja.
+signal repeat_blocked
 
 const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
 const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
@@ -21,7 +23,7 @@ const READABILITY := preload("res://scripts/ui/ui_readability.gd")
 		font_size = value
 		_update_label()
 
-@export_enum("secondary", "primary", "accent", "subtle", "gold", "price") var button_variant: String = "secondary":
+@export_enum("secondary", "primary", "accent", "subtle", "gold", "price", "cta") var button_variant: String = "secondary":
 	set(value):
 		button_variant = value
 		_build_styles()
@@ -59,6 +61,12 @@ const READABILITY := preload("res://scripts/ui/ui_readability.gd")
 ## Kad je disabled: providna ispuna umjesto zatamnjenja cijelog dugmeta.
 @export var ghost_when_disabled: bool = false
 
+## Pita se prije svakog auto-tika (ne prije prvog klika). `false` zaustavlja
+## ponavljanje do kraja ovog pritiska — tap ide netaknut.
+var repeat_guard: Callable = Callable()
+## `true` dok traje emit klika koji je došao iz auto-repeat-a.
+var last_click_was_repeat: bool = false
+
 var disabled: bool = false:
 	set(value):
 		disabled = value
@@ -77,6 +85,7 @@ var _repeat_active: bool = false
 var _repeat_touch: bool = false
 var _repeat_delay_left: float = 0.0
 var _repeat_accum: float = 0.0
+var _repeat_blocked: bool = false
 
 
 func _ready() -> void:
@@ -128,7 +137,11 @@ func _build_styles() -> void:
 func _apply_label_theme() -> void:
 	if _label == null:
 		return
-	var ink := UI_PALETTE.GOLD_INK if button_variant == "gold" else UI_PALETTE.UI_TEXT
+	var ink := UI_PALETTE.UI_TEXT
+	if button_variant == "gold":
+		ink = UI_PALETTE.GOLD_INK
+	elif button_variant == "cta":
+		ink = UI_PALETTE.OUTLINE
 	_label.add_theme_color_override("font_color", ink)
 
 
@@ -237,7 +250,9 @@ func begin_press(from_touch: bool = false) -> void:
 	_repeat_touch = from_touch
 	_repeat_delay_left = auto_repeat_delay
 	_repeat_accum = 0.0
+	_repeat_blocked = false
 	set_process(true)
+	last_click_was_repeat = false
 	_emit_clicked()
 
 
@@ -253,6 +268,10 @@ func end_press() -> void:
 
 func is_holding() -> bool:
 	return _repeat_active
+
+
+func is_repeat_blocked() -> bool:
+	return _repeat_active and _repeat_blocked
 
 
 func _process(delta: float) -> void:
@@ -273,11 +292,19 @@ func _tick_repeat(delta: float) -> void:
 	if _repeat_delay_left > 0.0:
 		_repeat_delay_left -= delta
 		return
+	if _repeat_blocked:
+		return
 	var interval := 1.0 / maxf(auto_repeat_rate, 0.001)
 	_repeat_accum = minf(_repeat_accum + delta, interval)
 	if _repeat_accum >= interval:
 		_repeat_accum -= interval
+		if repeat_guard.is_valid() and not bool(repeat_guard.call()):
+			_repeat_blocked = true
+			repeat_blocked.emit()
+			return
+		last_click_was_repeat = true
 		_emit_clicked()
+		last_click_was_repeat = false
 
 
 func _pointer_released() -> bool:

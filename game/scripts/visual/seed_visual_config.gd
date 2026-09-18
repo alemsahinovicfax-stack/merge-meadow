@@ -1,10 +1,24 @@
 class_name SeedVisualConfig
 extends RefCounted
 
-## Boje i proceduralni crtež: Bloom 7 paleta; ostali catalog id-evi hash HSV fallback.
+## Boje i proceduralni crtež: Country Bloom 6 imaju bespoke paletu; ostali
+## catalog id-evi dobiju paletu iz sezonske nijanse (SEASON_HUE) + mali
+## per-type hue jitter, umjesto čistog hasha — sezone ostaju vizuelno
+## dosljedne, tipovi unutar sezone i dalje razlikuju nijansu.
 
 const STEM := Color(0.35, 0.62, 0.32, 1.0)
 const LEAF := Color(0.42, 0.76, 0.38, 1.0)
+
+## docs/04-experience/design-drafts/seeds-flowers-cd-brief.md §5 — akcent po sezoni.
+const SEASON_HUE: Dictionary = {
+	"frost_orchard": 0.55,
+	"lantern_meadow": 0.10,
+	"amber_canopy": 0.06,
+	"moonlit_warren": 0.65,
+	"coral_tide": 0.97,
+	"starfall_glade": 0.78,
+	"ember_fen": 0.02,
+}
 
 const PALETTES: Dictionary = {
 	"clover": {
@@ -49,15 +63,19 @@ const PALETTES: Dictionary = {
 static func palette(type_id: String) -> Dictionary:
 	if PALETTES.has(type_id):
 		return PALETTES[type_id]
-	return _hashed_palette(type_id)
+	return _seasonal_palette(type_id)
 
 
-static func _hashed_palette(type_id: String) -> Dictionary:
-	var hue := float(absi(type_id.hash()) % 360) / 360.0
-	var petal := Color.from_hsv(hue, 0.52, 0.92)
-	var center := Color.from_hsv(fmod(hue + 0.08, 1.0), 0.62, 0.78)
-	var seed := Color.from_hsv(hue, 0.48, 0.82)
-	var crystal := Color.from_hsv(fmod(hue + 0.18, 1.0), 0.55, 0.95)
+static func _seasonal_palette(type_id: String) -> Dictionary:
+	var base_hue: float = SEASON_HUE.get(SeedCatalog.season_id_for(type_id), -1.0)
+	if base_hue < 0.0:
+		base_hue = float(absi(type_id.hash()) % 360) / 360.0
+	var jitter := (float(absi(type_id.hash()) % 100) / 100.0 - 0.5) * 0.08
+	var hue := fmod(base_hue + jitter + 1.0, 1.0)
+	var petal := Color.from_hsv(hue, 0.55, 0.92)
+	var center := Color.from_hsv(fmod(hue + 0.08, 1.0), 0.65, 0.78)
+	var seed := Color.from_hsv(hue, 0.48, 0.85)
+	var crystal := Color.from_hsv(fmod(hue + 0.15, 1.0), 0.55, 0.96)
 	return {
 		"petal": petal,
 		"center": center,
@@ -99,4 +117,21 @@ static func draw_run_seed(canvas: CanvasItem, type_id: String) -> void:
 			canvas.draw_line(Vector2(0, -14), Vector2(0, -6), STEM, 3.0)
 			canvas.draw_circle(Vector2(0, -16), 4.0, LEAF)
 		_:
-			canvas.draw_circle(Vector2.ZERO, 8.0, pal.center)
+			_draw_generic_run_seed(canvas, pal, SeedCatalog.rarity(type_id))
+
+
+## Rarity → kompleksnost (seeds-flowers-cd-brief.md §4): ★ malo latica jedne
+## boje, ★★ više latica dvotonski, ★★★ najviše latica + dvotonski.
+static func _draw_generic_run_seed(canvas: CanvasItem, pal: Dictionary, rarity: int) -> void:
+	var petal_count := 4
+	if rarity >= 2:
+		petal_count = 6
+	if rarity >= 3:
+		petal_count = 8
+	for i in petal_count:
+		var a := float(i) / petal_count * TAU
+		var petal_color: Color = pal.petal
+		if rarity >= 2 and i % 2 == 1:
+			petal_color = pal.petal.lightened(0.12)
+		canvas.draw_circle(Vector2(cos(a), sin(a)) * 13.0, 5.0, petal_color)
+	canvas.draw_circle(Vector2.ZERO, 7.0, pal.center)

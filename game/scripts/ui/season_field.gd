@@ -168,11 +168,8 @@ func _chrome_controls() -> Array[Control]:
 	var basket: Control = root.get_node_or_null("%BasketCard") as Control
 	var chip: Control = root.get_node_or_null("%SeasonNameChip") as Control
 	var play_row: Control = root.get_node_or_null("%PlayRow") as Control
-	var settings: Control = root.get_node_or_null("%SettingsButton") as Control
-	if settings == null:
-		settings = root.get_node_or_null("SettingsButton") as Control
 	var upgrades: Control = root.get_node_or_null("%FieldUpgradeStack") as Control
-	for node in [daily, basket, settings, chip, play_row, upgrades]:
+	for node in [daily, basket, chip, play_row, upgrades]:
 		var chrome: Control = node as Control
 		if chrome == null or not chrome.visible:
 			continue

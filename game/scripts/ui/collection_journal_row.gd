@@ -7,7 +7,7 @@ const READABILITY := preload("res://scripts/ui/ui_readability.gd")
 const TYPO := preload("res://scripts/ui/ui_typography.gd")
 const BloomIcon := preload("res://scripts/ui/collection_bloom_icon.gd")
 
-const TIER_ICON_SIZE := 64.0
+const TIER_ICON_SIZE := 128.0
 
 ## NEW badge hovers above the card's top-right corner, so it must live outside
 ## the PanelContainer (which forces all its children to the same content rect).

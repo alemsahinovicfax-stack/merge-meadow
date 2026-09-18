@@ -4,24 +4,42 @@ const MetaHubPagesScript := preload("res://scripts/meta/meta_hub_pages.gd")
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
 const TEXT_LAYOUT := preload("res://scripts/ui/ui_text_layout.gd")
 const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
+const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
 
-@onready var swipe_pager: Control = $RootVBox/SwipePager
+## Settings ekran je D0-P — do tada kratka poruka ispod headera (kao ranije na Home).
+const SETTINGS_TOAST_TEXT := "Settings coming soon."
+const SETTINGS_TOAST_HOLD := 1.6  # s
+const SETTINGS_TOAST_GAP := 24.0  # px ispod headera
+
+@onready var swipe_pager: SwipePager = $RootVBox/SwipePager
 @onready var top_bar: MarginContainer = $RootVBox/TopBar
+@onready var top_bar_panel: PanelContainer = $RootVBox/TopBar/Panel
+@onready var coin_chip: PanelContainer = $RootVBox/TopBar/Panel/HBox/CoinChip
+@onready var seed_chip: PanelContainer = $RootVBox/TopBar/Panel/HBox/SeedChip
+@onready var diamond_chip: PanelContainer = $RootVBox/TopBar/Panel/HBox/DiamondChip
 @onready var coins_label: Label = $RootVBox/TopBar/Panel/HBox/CoinChip/HBox/CoinsLabel
 @onready var seeds_label: Label = $RootVBox/TopBar/Panel/HBox/SeedChip/HBox/SeedsLabel
 @onready var diamonds_label: Label = $RootVBox/TopBar/Panel/HBox/DiamondChip/HBox/DiamondsLabel
 @onready var coin_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/CoinChip/HBox/CoinIcon
 @onready var seed_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/SeedChip/HBox/SeedIcon
 @onready var diamond_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/DiamondChip/HBox/DiamondIcon
-@onready var page_tabs: HBoxContainer = $RootVBox/PageIndicator/NavPanel/Margin/VBox/TabsRow
+@onready var settings_button: HubIconButton = $RootVBox/TopBar/Panel/HBox/SettingsButton
 @onready var nav_panel: PanelContainer = $RootVBox/PageIndicator/NavPanel
+@onready var page_tabs: HBoxContainer = $RootVBox/PageIndicator/NavPanel/Content/TabsRow
+@onready var active_indicator: Panel = $RootVBox/PageIndicator/NavPanel/Content/ActiveIndicator
+@onready var nav_lock_pill: PanelContainer = $RootVBox/PageIndicator/NavPanel/Content/NavLockPill
+@onready var nav_lock_icon: TextureRect = $RootVBox/PageIndicator/NavPanel/Content/NavLockPill/HBox/LockIcon
+@onready var nav_lock_label: Label = $RootVBox/PageIndicator/NavPanel/Content/NavLockPill/HBox/LockLabel
 
-var _tab_buttons: Array[UiClickButton] = []
+var _tabs: Array[HubTab] = []
 var _pages_loaded: Array[bool] = []
 var _arena_page: Control = null
 var _tabs_enabled: bool = true
 var _nav_locked: bool = false
 var _current_page: int = MetaHubPagesScript.MAIN
+var _safe_insets: Vector4 = Vector4.ZERO
+var _settings_toast: PanelContainer = null
+var _settings_toast_tween: Tween = null
 
 
 func _ready() -> void:
@@ -43,35 +61,72 @@ func _ready() -> void:
 	swipe_pager.start_page = start
 	swipe_pager.current_page = start
 	call_deferred("_finish_boot", start)
-	_setup_nav_bar()
+	_setup_chrome()
 	refresh_top_bar()
 
 
-func _setup_nav_bar() -> void:
-	if top_bar:
-		SAFE_AREA.apply_top_margin(top_bar, 8.0)
-		SAFE_AREA.apply_horizontal_margins(top_bar)
-	if nav_panel:
-		SAFE_AREA.apply_bottom_margin(nav_panel, 6.0)
+func _process(_delta: float) -> void:
+	_sync_active_indicator()
+
+
+func _setup_chrome() -> void:
+	_safe_insets = SAFE_AREA.get_insets(get_viewport())
+	top_bar_panel.add_theme_stylebox_override("panel", _header_style())
+	_setup_chip(coin_chip, coin_icon, coins_label, UiChrome.COIN_GOLD)
+	_setup_chip(seed_chip, seed_icon, seeds_label, UiPalette.MINT)
+	_setup_chip(diamond_chip, diamond_icon, diamonds_label, UiPalette.LAVENDER)
 	_setup_resource_icons()
-	if coins_label:
-		TEXT_LAYOUT.header_chip_count(coins_label)
-	if seeds_label:
-		TEXT_LAYOUT.header_chip_count(seeds_label)
-	if diamonds_label:
-		TEXT_LAYOUT.header_chip_count(diamonds_label)
+	settings_button.set_icon(UI_ASSETS.get_chrome_icon("icon_settings_light"))
+	settings_button.clicked.connect(_on_settings_pressed)
+	_setup_nav_lock_pill()
+	_apply_nav_lock_visuals()
 
 
+func _setup_chip(chip: PanelContainer, icon: TextureRect, label: Label, fill: Color) -> void:
+	chip.add_theme_stylebox_override("panel", UiChrome.chip_style(fill))
+	chip.custom_minimum_size.y = UiChrome.CHIP_H
+	icon.custom_minimum_size = Vector2(UiChrome.CHIP_ICON_SIZE, UiChrome.CHIP_ICON_SIZE)
+	TEXT_LAYOUT.header_chip_count(label)
+
+
+## Chrome siluete iz CD-a; pickup sprite je fallback ako import fali (greske-katalog #6).
 func _setup_resource_icons() -> void:
-	var coin_tex := PICKUP_ASSETS.get_coin_texture()
-	if coin_icon and coin_tex:
-		coin_icon.texture = coin_tex
-	var seed_tex := PICKUP_ASSETS.get_seed_texture()
-	if seed_icon and seed_tex:
-		seed_icon.texture = seed_tex
-	var diamond_tex := PICKUP_ASSETS.get_diamond_texture()
-	if diamond_icon and diamond_tex:
-		diamond_icon.texture = diamond_tex
+	coin_icon.texture = _chrome_icon_or("icon_coin", PICKUP_ASSETS.get_coin_texture())
+	seed_icon.texture = _chrome_icon_or("icon_seed", PICKUP_ASSETS.get_seed_texture())
+	diamond_icon.texture = _chrome_icon_or("icon_diamond", PICKUP_ASSETS.get_diamond_texture())
+
+
+func _chrome_icon_or(icon_name: String, fallback: Texture2D) -> Texture2D:
+	var tex := UI_ASSETS.get_chrome_icon(icon_name)
+	return tex if tex != null else fallback
+
+
+func _setup_nav_lock_pill() -> void:
+	nav_lock_pill.add_theme_stylebox_override("panel", UiChrome.lock_pill_style())
+	nav_lock_icon.custom_minimum_size = Vector2(UiChrome.LOCK_ICON_SIZE, UiChrome.LOCK_ICON_SIZE)
+	nav_lock_icon.texture = UI_ASSETS.get_chrome_icon("icon_lock")
+	nav_lock_label.add_theme_font_size_override("font_size", UiChrome.LOCK_FONT_SIZE)
+	nav_lock_label.add_theme_font_override(
+		"font", UiChrome.heavy_font(UiChrome.EMBOLDEN_800, UiChrome.LOCK_GLYPH_SPACING)
+	)
+	nav_lock_label.add_theme_color_override("font_color", UiPalette.GOLD)
+
+
+## Traka se produžava u safe area (notch gore, gesture bar dolje) — bez tamne "rupe".
+func _header_style() -> StyleBoxFlat:
+	var style := UiChrome.chrome_style(true)
+	style.content_margin_top = _safe_insets.x
+	style.content_margin_left = UiChrome.HEADER_PAD_LEFT + _safe_insets.w
+	style.content_margin_right = _safe_insets.y
+	return style
+
+
+func _footer_style(locked: bool) -> StyleBoxFlat:
+	var style := UiChrome.chrome_style(false, locked)
+	style.content_margin_left = _safe_insets.w
+	style.content_margin_right = _safe_insets.y
+	style.content_margin_bottom = _safe_insets.z
+	return style
 
 
 func _finish_boot(start: int) -> void:
@@ -113,7 +168,7 @@ func set_swipe_enabled(enabled: bool) -> void:
 
 func set_tabs_enabled(enabled: bool) -> void:
 	_tabs_enabled = enabled
-	for tab in _tab_buttons:
+	for tab in _tabs:
 		tab.disabled = not enabled
 
 
@@ -123,6 +178,7 @@ func set_nav_locked(locked: bool) -> void:
 	_nav_locked = locked
 	set_swipe_enabled(not locked)
 	set_tabs_enabled(not locked)
+	_apply_nav_lock_visuals()
 
 
 func is_nav_locked() -> bool:
@@ -139,6 +195,8 @@ func _on_page_changed(index: int) -> void:
 	_update_tab_highlight(index)
 	refresh_top_bar()
 	_refresh_embedded_page(index)
+	# Journal briše "novo" tek u refresh_for_meta_hub, pa badge ide poslije.
+	_refresh_tab_badges()
 	_notify_arena_page_active(index == MetaHubPagesScript.ARENA)
 
 
@@ -229,22 +287,30 @@ func _build_tabs() -> void:
 		return
 	for child in page_tabs.get_children():
 		child.queue_free()
-	_tab_buttons.clear()
+	_tabs.clear()
 	for i in MetaHubPagesScript.PAGE_COUNT:
-		var tab := UiClickButton.new()
-		tab.label_text = MetaHubPagesScript.PAGE_LABELS[i]
-		tab.font_size = 17
-		tab.button_variant = "subtle"
-		tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var label_text: String = MetaHubPagesScript.PAGE_LABELS[i]
+		var icon_name: String = MetaHubPagesScript.PAGE_ICONS[i]
+		var tab := HubTab.new()
+		tab.name = "Tab_%s" % label_text
+		tab.setup(
+			label_text,
+			UI_ASSETS.get_chrome_icon(icon_name),
+			UI_ASSETS.get_chrome_icon(icon_name + "_light")
+		)
 		tab.clicked.connect(_on_tab_pressed.bind(i))
 		page_tabs.add_child(tab)
-		_tab_buttons.append(tab)
+		_tabs.append(tab)
 
 
 func _on_tab_pressed(index: int) -> void:
 	if not _tabs_enabled:
 		return
 	go_to_page(index)
+
+
+func _on_settings_pressed() -> void:
+	_show_settings_toast()
 
 
 func _notify_arena_page_active(active: bool) -> void:
@@ -262,21 +328,111 @@ func _exit_tree() -> void:
 
 
 func _update_tab_highlight(index: int) -> void:
-	for i in _tab_buttons.size():
-		var tab := _tab_buttons[i]
-		tab.button_variant = "primary" if i == index else "subtle"
+	for i in _tabs.size():
+		_tabs[i].set_active(i == index)
+	_apply_tab_dim()
+
+
+## Zaključano (Arena sesija): gold rub, NavLockPill, neaktivni tabovi 60 %; aktivan ostaje pun peach.
+func _apply_nav_lock_visuals() -> void:
+	nav_panel.add_theme_stylebox_override("panel", _footer_style(_nav_locked))
+	active_indicator.add_theme_stylebox_override("panel", UiChrome.indicator_style(_nav_locked))
+	nav_lock_pill.visible = _nav_locked
+	if _nav_locked:
+		_layout_nav_lock_pill()
+	_apply_tab_dim()
+
+
+func _apply_tab_dim() -> void:
+	for i in _tabs.size():
+		var dim := _nav_locked and i != _current_page
+		_tabs[i].modulate.a = UiChrome.LOCKED_TAB_ALPHA if dim else 1.0
+
+
+func _layout_nav_lock_pill() -> void:
+	var content := nav_lock_pill.get_parent() as Control
+	if content == null:
+		return
+	var pill_size := nav_lock_pill.get_combined_minimum_size()
+	nav_lock_pill.size = pill_size
+	nav_lock_pill.position = Vector2(
+		floorf((content.size.x - pill_size.x) * 0.5),
+		-float(UiChrome.LOCK_PILL_RISE + UiChrome.CHROME_EDGE_W)
+	)
+
+
+## Indikator prati živu poziciju pagera — i povlačenje prstom i snap tween.
+func _sync_active_indicator() -> void:
+	if active_indicator == null or page_tabs == null:
+		return
+	var slot_w := page_tabs.size.x / float(MetaHubPagesScript.PAGE_COUNT)
+	if slot_w < 1.0:
+		return
+	var scroll_page := clampf(
+		swipe_pager.get_scroll_page(), 0.0, float(MetaHubPagesScript.PAGE_COUNT - 1)
+	)
+	var pos := Vector2(
+		page_tabs.position.x + scroll_page * slot_w + (slot_w - UiChrome.INDICATOR_W) * 0.5,
+		UiChrome.INDICATOR_TOP
+	)
+	if active_indicator.position.is_equal_approx(pos):
+		return
+	active_indicator.position = pos
+	active_indicator.size = Vector2(UiChrome.INDICATOR_W, UiChrome.INDICATOR_H)
 
 
 func refresh_top_bar() -> void:
 	if coins_label:
-		coins_label.text = str(GameState.wallet_coins)
-		TEXT_LAYOUT.ink(coins_label)
+		coins_label.text = UiChrome.format_count(GameState.wallet_coins)
 	if seeds_label:
-		seeds_label.text = str(GameState.sum_seed_bag_only())
-		TEXT_LAYOUT.ink(seeds_label)
+		seeds_label.text = UiChrome.format_count(GameState.sum_seed_bag_only())
 	if diamonds_label:
-		diamonds_label.text = str(GameState.get_diamonds())
-		TEXT_LAYOUT.ink(diamonds_label)
+		diamonds_label.text = UiChrome.format_count(GameState.get_diamonds())
+	_refresh_tab_badges()
+
+
+func _refresh_tab_badges() -> void:
+	if _tabs.size() <= MetaHubPagesScript.COLLECTION:
+		return
+	_tabs[MetaHubPagesScript.COLLECTION].set_badge_count(
+		GameState.count_collection_journal_news()
+	)
+
+
+func _show_settings_toast() -> void:
+	if _settings_toast == null:
+		_settings_toast = _build_settings_toast()
+	if _settings_toast_tween != null and _settings_toast_tween.is_valid():
+		_settings_toast_tween.kill()
+	var toast_size := _settings_toast.get_combined_minimum_size()
+	_settings_toast.size = toast_size
+	_settings_toast.position = Vector2(
+		floorf((size.x - toast_size.x) * 0.5),
+		top_bar.position.y + top_bar.size.y + SETTINGS_TOAST_GAP
+	)
+	_settings_toast.modulate.a = 0.0
+	_settings_toast.visible = true
+	var tween := create_tween()
+	tween.tween_property(_settings_toast, "modulate:a", 1.0, 0.15)
+	tween.tween_interval(SETTINGS_TOAST_HOLD)
+	tween.tween_property(_settings_toast, "modulate:a", 0.0, 0.25)
+	tween.tween_callback(_settings_toast.hide)
+	_settings_toast_tween = tween
+
+
+func _build_settings_toast() -> PanelContainer:
+	var toast := PanelContainer.new()
+	toast.name = "SettingsToast"
+	toast.visible = false
+	toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	toast.add_theme_stylebox_override("panel", UiChrome.toast_style())
+	var label := Label.new()
+	label.text = SETTINGS_TOAST_TEXT
+	label.add_theme_font_size_override("font_size", UiChrome.TOAST_FONT_SIZE)
+	label.add_theme_color_override("font_color", UiPalette.UI_TEXT)
+	toast.add_child(label)
+	add_child(toast)
+	return toast
 
 
 func _show_swipe_hint_if_needed() -> void:

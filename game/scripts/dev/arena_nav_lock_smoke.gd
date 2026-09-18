@@ -64,6 +64,11 @@ func _run() -> void:
 		push_error("arena_nav_lock_smoke: expected hub nav locked after pour")
 		quit(1)
 		return
+	var pill := hub.get_node_or_null("RootVBox/PageIndicator/NavPanel/Content/NavLockPill") as Control
+	if pill == null or not pill.visible:
+		push_error("arena_nav_lock_smoke: NavLockPill should show while nav locked")
+		quit(1)
+		return
 	# Tabs must not switch away while locked.
 	var page_before := MetaHubPages.ARENA
 	if hub.has_method("go_to_page"):
@@ -81,6 +86,10 @@ func _run() -> void:
 		await process_frame
 	if hub.has_method("is_nav_locked") and bool(hub.call("is_nav_locked")):
 		push_error("arena_nav_lock_smoke: hub still locked after Done")
+		quit(1)
+		return
+	if pill.visible:
+		push_error("arena_nav_lock_smoke: NavLockPill should hide after Done")
 		quit(1)
 		return
 	print("arena_nav_lock_smoke OK")

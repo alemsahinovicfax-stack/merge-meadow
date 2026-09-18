@@ -4,6 +4,7 @@ extends RefCounted
 const TYPO := preload("res://scripts/ui/ui_typography.gd")
 const READABILITY := preload("res://scripts/ui/ui_readability.gd")
 const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
+const UI_CHROME := preload("res://scripts/visual/ui_chrome.gd")
 
 
 static func ink(label: Label) -> void:
@@ -83,15 +84,16 @@ static func stat_label(label: Label) -> void:
 
 
 static func header_chip_count(label: Label) -> void:
-	## Hub pastel chips — dark ink, no clip/ellipsis so the number stays visible.
+	## Hub chrome chip — 48 px heavy, tamni ink, desno poravnat; bez clip/ellipsis da broj ostane vidljiv.
 	if label == null:
 		return
-	label.add_theme_font_size_override("font_size", 28)
+	label.add_theme_font_size_override("font_size", UI_CHROME.NUMBER_FONT_SIZE)
+	label.add_theme_font_override("font", UI_CHROME.heavy_font(UI_CHROME.EMBOLDEN_800))
+	label.add_theme_color_override("font_color", UI_PALETTE.OUTLINE)
 	label.clip_text = false
 	label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
-	label.custom_minimum_size = Vector2(maxi(int(label.custom_minimum_size.x), 40), 0)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	ink(label)
 
 
 static func body_label_readable(label: Label) -> void:

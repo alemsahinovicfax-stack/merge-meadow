@@ -4,6 +4,12 @@ extends RefCounted
 ## Biljke u kamp gredicama — T1 sadnica, T2 cvijet, T3 crystal po tipu.
 
 const CONFIG := preload("res://scripts/visual/seed_visual_config.gd")
+const FLOWER_ASSETS := preload("res://scripts/visual/flower_assets.gd")
+
+## Flower SVGs share one 256px canvas with the stem base at y=244; this rect
+## lands that base on the procedural stem base (+26) at the same plant height.
+const TEX_SIZE := 66.0
+const TEX_TOP := -36.9
 
 const SOIL := Color(0.42, 0.28, 0.18, 1.0)
 const SOIL_EDGE := Color(0.32, 0.2, 0.12, 0.9)
@@ -21,6 +27,14 @@ static func draw_bed_soil(canvas: CanvasItem, rect: Rect2, selected: bool) -> vo
 
 static func draw_plant(canvas: CanvasItem, center: Vector2, type_id: String, tier: int) -> void:
 	if tier <= 0:
+		return
+	var tex := FLOWER_ASSETS.get_texture(type_id, tier)
+	if tex != null:
+		canvas.draw_texture_rect(
+			tex,
+			Rect2(center + Vector2(-TEX_SIZE * 0.5, TEX_TOP), Vector2(TEX_SIZE, TEX_SIZE)),
+			false
+		)
 		return
 	if tier >= 3:
 		_draw_crystal(canvas, center, type_id)
@@ -78,7 +92,18 @@ static func _draw_sprout(canvas: CanvasItem, center: Vector2, type_id: String) -
 			canvas.draw_circle(center + Vector2(0.0, 0.0), 9.0, pal.seed)
 			canvas.draw_line(center + Vector2(0.0, -10.0), center + Vector2(0.0, -4.0), CONFIG.STEM, 3.0)
 		_:
-			canvas.draw_circle(center + Vector2(0.0, -4.0), 7.0, pal.seed)
+			_draw_generic_sprout(canvas, center, pal, SeedCatalog.rarity(type_id))
+
+
+## Rarity → kompleksnost (seeds-flowers-cd-brief.md §4), primijenjeno i na T1
+## tako da rarity bude prepoznatljiv i prije nego cvijet dostigne bloom/crystal.
+static func _draw_generic_sprout(canvas: CanvasItem, center: Vector2, pal: Dictionary, rarity: int) -> void:
+	canvas.draw_circle(center + Vector2(0.0, -6.0), 6.0, pal.seed)
+	if rarity >= 2:
+		canvas.draw_circle(center + Vector2(-6.0, 1.0), 4.0, pal.seed.lightened(0.1))
+		canvas.draw_circle(center + Vector2(6.0, 1.0), 4.0, pal.seed.lightened(0.1))
+	if rarity >= 3:
+		canvas.draw_circle(center + Vector2(0.0, -14.0), 3.5, pal.center)
 
 
 static func _draw_bloom(canvas: CanvasItem, center: Vector2, type_id: String) -> void:
@@ -113,10 +138,32 @@ static func _draw_bloom(canvas: CanvasItem, center: Vector2, type_id: String) ->
 			canvas.draw_line(center + Vector2(0.0, -20.0), center + Vector2(0.0, -8.0), CONFIG.STEM, 4.0)
 			canvas.draw_circle(center + Vector2(0.0, -22.0), 5.0, CONFIG.LEAF)
 		_:
-			for i in 6:
-				var a := float(i) / 6.0 * TAU
-				canvas.draw_circle(center + Vector2(cos(a), sin(a)) * 13.0 + Vector2(0, -6), 6.0, pal.petal)
-			canvas.draw_circle(center + Vector2(0.0, -6.0), 8.0, pal.center)
+			_draw_generic_bloom(canvas, center, pal, SeedCatalog.rarity(type_id))
+
+
+static func _draw_generic_bloom(canvas: CanvasItem, center: Vector2, pal: Dictionary, rarity: int) -> void:
+	var petal_count := 5
+	var radius := 13.0
+	if rarity >= 2:
+		petal_count = 7
+	if rarity >= 3:
+		petal_count = 10
+		radius = 15.0
+	for i in petal_count:
+		var a := float(i) / petal_count * TAU
+		var petal_color: Color = pal.petal
+		if rarity >= 2 and i % 2 == 1:
+			petal_color = pal.petal.lightened(0.14)
+		canvas.draw_circle(center + Vector2(cos(a), sin(a)) * radius + Vector2(0, -6), 7.0, petal_color)
+	canvas.draw_circle(center + Vector2(0.0, -6.0), 8.0, pal.center)
+	if rarity >= 3:
+		for i in petal_count:
+			var a := float(i) / petal_count * TAU + (PI / petal_count)
+			canvas.draw_circle(
+				center + Vector2(cos(a), sin(a)) * (radius + 7.0) + Vector2(0, -6),
+				4.0,
+				pal.petal.darkened(0.12)
+			)
 
 
 static func _draw_crystal(canvas: CanvasItem, center: Vector2, type_id: String) -> void:
@@ -126,3 +173,6 @@ static func _draw_crystal(canvas: CanvasItem, center: Vector2, type_id: String) 
 		canvas.draw_circle(center + offset, 10.0, crystal)
 	canvas.draw_circle(center + Vector2(0.0, -8.0), 10.0, Color(1.0, 0.95, 0.75, 1.0))
 	canvas.draw_arc(center + Vector2(0.0, -8.0), 14.0, 0.0, TAU, 24, crystal.lightened(0.2), 3.0)
+	if SeedCatalog.rarity(type_id) >= 3:
+		for offset in [Vector2(-20.0, -18.0), Vector2(20.0, -18.0), Vector2(0.0, 14.0)]:
+			canvas.draw_circle(center + offset, 3.0, Color(1.0, 1.0, 1.0, 0.85))

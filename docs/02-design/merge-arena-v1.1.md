@@ -210,9 +210,10 @@ Zadrži / premjesti:
 
 | Konstanta | Draft | Napomena |
 |-----------|-------|----------|
-| `ARENA_MAX_CHIPS` | 24 | T1 na ekranu; višak ostaje u bag |
-| `ARENA_MAGNET_RADIUS` | 120 px | @ 1080×1920 ref |
-| `ARENA_SNAP_DISTANCE` | 48 px | |
+| `ARENA_MAX_CHIPS` | 30 | T1 na ekranu; višak ostaje u bag. 2026-09-10: 40→30 uz 1.4× čipove (mjereno: pun pour od 30 bez preklapanja na 1080×1582 hub polju) |
+| `ARENA_MAGNET_RADIUS` | 182 px | @ 1080×1920 ref; 1.4× uz čip |
+| `ARENA_SNAP_DISTANCE` | 140 px | 1.4× uz čip |
+| `ArenaSeedChip.CHIP_RADIUS` | 67.2 px | 2026-09-10: 48→67.2 (`DISPLAY_SCALE` 1.4); `CHIP_MIN_DIST` = 2R + 6·1.4 = 142.8 |
 | `BLOOM_INBOX_MAX` | 12 | soft cap; toast „inbox full — Keep or Donate“ |
 
 ---

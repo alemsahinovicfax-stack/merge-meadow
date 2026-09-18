@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://mergearena01"]
+[gd_scene load_steps=5 format=3 uid="uid://mergearena01"]
 
 [ext_resource type="Script" path="res://scripts/camp/merge_arena_controller.gd" id="1_arena"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
 [ext_resource type="Script" path="res://scripts/visual/pip_placeholder_control.gd" id="3_pip"]
+[ext_resource type="Script" path="res://scripts/camp/arena_meadow_bg.gd" id="4_meadow"]
 
 [node name="MergeArena" type="Control"]
 layout_mode = 3
@@ -13,7 +14,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_arena")
 
-[node name="Bg" type="ColorRect" parent="."]
+[node name="Bg" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,121 +22,209 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.16, 0.24, 0.18, 1)
+script = ExtResource("4_meadow")
 
 [node name="RootVBox" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_bottom = -72.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
 
-[node name="TopBar" type="HBoxContainer" parent="RootVBox"]
+[node name="ArenaHud" type="MarginContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
-theme_override_constants/separation = 12
+mouse_filter = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_right = 24
 
-[node name="BackButton" type="PanelContainer" parent="RootVBox/TopBar"]
-custom_minimum_size = Vector2(120, 52)
+[node name="Row" type="HBoxContainer" parent="RootVBox/ArenaHud"]
 layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "Camp"
-font_size = 20
-button_variant = "subtle"
+mouse_filter = 2
+theme_override_constants/separation = 20
 
-[node name="Title" type="Label" parent="RootVBox/TopBar"]
+[node name="DailyTask" type="PanelContainer" parent="RootVBox/ArenaHud/Row"]
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="HBox" type="HBoxContainer" parent="RootVBox/ArenaHud/Row/DailyTask"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="DailyIcon" type="TextureRect" parent="RootVBox/ArenaHud/Row/DailyTask/HBox"]
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DailyLabel" type="Label" parent="RootVBox/ArenaHud/Row/DailyTask/HBox"]
+layout_mode = 2
+size_flags_vertical = 4
+text = "Merge T2 0/3"
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="RootVBox/ArenaHud/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 28
-text = "Merge Arena"
-horizontal_alignment = 1
+mouse_filter = 2
+
+[node name="StashCounter" type="PanelContainer" parent="RootVBox/ArenaHud/Row"]
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="HBox" type="HBoxContainer" parent="RootVBox/ArenaHud/Row/StashCounter"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="StashIcon" type="TextureRect" parent="RootVBox/ArenaHud/Row/StashCounter/HBox"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StashLabel" type="Label" parent="RootVBox/ArenaHud/Row/StashCounter/HBox"]
+layout_mode = 2
+size_flags_vertical = 4
+text = "0"
 vertical_alignment = 1
 
-[node name="ComboLabel" type="Label" parent="RootVBox/TopBar"]
-visible = false
-custom_minimum_size = Vector2(120, 52)
+[node name="HintLine" type="CenterContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 128)
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "Combo"
-horizontal_alignment = 1
-vertical_alignment = 1
+mouse_filter = 2
 
-[node name="InfoLabel" type="Label" parent="RootVBox"]
+[node name="HintPill" type="PanelContainer" parent="RootVBox/HintLine"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+mouse_filter = 2
+
+[node name="InfoLabel" type="Label" parent="RootVBox/HintLine/HintPill"]
+layout_mode = 2
 text = "Drag matching seeds together."
-autowrap_mode = 2
 horizontal_alignment = 1
-
-[node name="DailyLabel" type="Label" parent="RootVBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Merge T2 0/3"
-horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Playfield" type="Control" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 400)
 layout_mode = 2
 size_flags_vertical = 3
-custom_minimum_size = Vector2(0, 400)
 
 [node name="ArenaPip" type="Control" parent="RootVBox/Playfield"]
 z_index = 4
-custom_minimum_size = Vector2(72, 72)
+custom_minimum_size = Vector2(150, 150)
 layout_mode = 0
-offset_left = 12.0
-offset_top = 8.0
-offset_right = 84.0
-offset_bottom = 80.0
+offset_left = 30.0
+offset_top = 900.0
+offset_right = 180.0
+offset_bottom = 1050.0
 mouse_filter = 2
 script = ExtResource("3_pip")
 companion_id = "pip"
 follow_active_companion = false
 
-[node name="InboxPanel" type="PanelContainer" parent="RootVBox"]
+[node name="ComboMeter" type="VBoxContainer" parent="RootVBox/Playfield"]
 visible = false
-layout_mode = 2
-custom_minimum_size = Vector2(0, 0)
+z_index = 55
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -420.0
+offset_top = 18.0
+offset_right = -24.0
+offset_bottom = 170.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_constants/separation = 12
 
-[node name="VBox" type="VBoxContainer" parent="RootVBox/InboxPanel"]
+[node name="ComboPill" type="PanelContainer" parent="RootVBox/Playfield/ComboMeter"]
+custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
+size_flags_horizontal = 8
+mouse_filter = 2
 
-[node name="InboxTitle" type="Label" parent="RootVBox/InboxPanel/VBox"]
+[node name="ComboLabel" type="Label" parent="RootVBox/Playfield/ComboMeter/ComboPill"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Bloom inbox"
+text = "Combo 2"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="InboxScroll" type="ScrollContainer" parent="RootVBox/InboxPanel/VBox"]
+[node name="ComboBonus" type="PanelContainer" parent="RootVBox/Playfield/ComboMeter"]
+visible = false
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 2
+size_flags_horizontal = 8
+mouse_filter = 2
 
-[node name="InboxRow" type="HBoxContainer" parent="RootVBox/InboxPanel/VBox/InboxScroll"]
+[node name="HBox" type="HBoxContainer" parent="RootVBox/Playfield/ComboMeter/ComboBonus"]
 layout_mode = 2
-size_flags_horizontal = 3
+mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="FooterBar" type="MarginContainer" parent="."]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -72.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 8
+[node name="CoinIcon" type="TextureRect" parent="RootVBox/Playfield/ComboMeter/ComboBonus/HBox"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
-[node name="DoneButton" type="PanelContainer" parent="FooterBar"]
-custom_minimum_size = Vector2(0, 56)
+[node name="BonusLabel" type="Label" parent="RootVBox/Playfield/ComboMeter/ComboBonus/HBox"]
+layout_mode = 2
+text = "+2"
+vertical_alignment = 1
+
+[node name="TutorialCue" type="VBoxContainer" parent="RootVBox/Playfield"]
+visible = false
+z_index = 56
+layout_mode = 0
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="CuePanel" type="PanelContainer" parent="RootVBox/Playfield/TutorialCue"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CueLabel" type="Label" parent="RootVBox/Playfield/TutorialCue/CuePanel"]
+layout_mode = 2
+text = "Tap the bag to pour seeds. Drag matching seeds together."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="CueArrow" type="Control" parent="RootVBox/Playfield/TutorialCue"]
+custom_minimum_size = Vector2(52, 30)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+
+[node name="DoneRow" type="MarginContainer" parent="RootVBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 60
+
+[node name="DoneButton" type="PanelContainer" parent="RootVBox/DoneRow"]
+custom_minimum_size = Vector2(0, 140)
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("2_uibtn")
 label_text = "Done"
-font_size = 24
-button_variant = "primary"
+font_size = 52
+button_variant = "cta"
 
 [node name="NeedMoreSeedsOverlay" type="Control" parent="."]
 unique_name_in_owner = true
@@ -147,7 +236,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 
 [node name="Dim" type="ColorRect" parent="NeedMoreSeedsOverlay"]
 layout_mode = 1
@@ -157,46 +245,50 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.06, 0.08, 0.07, 0.72)
+color = Color(0.059, 0.078, 0.071, 0.82)
 
 [node name="Panel" type="PanelContainer" parent="NeedMoreSeedsOverlay"]
+custom_minimum_size = Vector2(940, 0)
 layout_mode = 1
 anchors_preset = 8
-anchor_left = 0.08
-anchor_top = 0.16
-anchor_right = 0.92
-anchor_bottom = 0.84
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 
 [node name="VBox" type="VBoxContainer" parent="NeedMoreSeedsOverlay/Panel"]
 layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 30
 
 [node name="NeedMoreSeedsTitle" type="Label" parent="NeedMoreSeedsOverlay/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.972549, 0.941176, 1)
-theme_override_font_sizes/font_size = 28
 text = "You need more seeds!"
 horizontal_alignment = 1
 autowrap_mode = 3
-clip_text = false
-size_flags_vertical = 0
-mouse_filter = 2
+
+[node name="NeedMoreSeedsSubtitle" type="Label" parent="NeedMoreSeedsOverlay/Panel/VBox"]
+layout_mode = 2
+text = "Every type needs 4 seeds to reach T3. Run again to collect more."
+horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="NeedMoreSeedsScroll" type="ScrollContainer" parent="NeedMoreSeedsOverlay/Panel/VBox"]
 layout_mode = 2
-size_flags_vertical = 3
-mouse_filter = 2
 horizontal_scroll_mode = 0
 
 [node name="NeedMoreSeedsList" type="VBoxContainer" parent="NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 16
 
+[node name="BackToCampButton" type="PanelContainer" parent="NeedMoreSeedsOverlay/Panel/VBox"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+script = ExtResource("2_uibtn")
+label_text = "Back to Camp"
+font_size = 50
+button_variant = "cta"

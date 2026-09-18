@@ -14,8 +14,12 @@ const PRICE_BG := Color("#FFE8B8")
 const UI_TEXT := Color("#4A4A4A")
 const ICON_MODULATE := Color("#2D3436")
 
+const PEACH_EDGE := Color("#E8A374")
+
 const CORNER_RADIUS := 12
 const CORNER_RADIUS_PANEL := 20
+## "cta" — veliko akciono dugme (Arena Done, Back to Camp): radius 26, peach rub, tvrda sjena.
+const CORNER_RADIUS_CTA := 26
 
 ## Pastel rarity chip/row backgrounds (Bug-030).
 const RARITY_BG_1 := Color("#B8D4F0")
@@ -65,6 +69,8 @@ static func button_style(variant: String, state: String) -> StyleBoxFlat:
 			bg = GOLD if state == "normal" else GOLD.lightened(0.06) if state == "hover" else GOLD.darkened(0.07)
 		"price":
 			bg = PRICE_BG if state == "normal" else PRICE_BG.lightened(0.05) if state == "hover" else PRICE_BG.darkened(0.06)
+		"cta":
+			bg = PEACH if state == "normal" else PEACH.lightened(0.05) if state == "hover" else PEACH_EDGE
 		_:
 			bg = MINT if state == "normal" else MINT.lightened(0.05) if state == "hover" else MINT.darkened(0.06)
 
@@ -84,6 +90,13 @@ static func button_style(variant: String, state: String) -> StyleBoxFlat:
 		style.content_margin_top = 12.0
 		style.content_margin_right = 16.0
 		style.content_margin_bottom = 12.0
+	if variant == "cta":
+		style.set_corner_radius_all(CORNER_RADIUS_CTA)
+		style.set_border_width_all(3)
+		style.border_color = PEACH_EDGE
+		style.shadow_color = Color(0.059, 0.078, 0.071, 0.4)
+		style.shadow_size = 1
+		style.shadow_offset = Vector2(0, 6)
 	return style
 
 

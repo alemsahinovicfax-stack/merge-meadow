@@ -204,14 +204,21 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("wallet must not change on overlay, got %d" % int(gs.get("wallet_coins")))
 		return
-	if overlay.get_signal_connection_list("gui_input").is_empty():
+	# Redizajn (design_handoff_merge_arena): overlay se zatvara samo preko "Back to Camp".
+	var back_btn := arena.get_node_or_null("NeedMoreSeedsOverlay/Panel/VBox/BackToCampButton") as Control
+	if back_btn == null or not back_btn.is_visible_in_tree():
 		_restore_save(backup)
-		_fail("overlay gui_input should go to Done/Camp")
+		_fail("overlay should offer a Back to Camp CTA")
 		return
-	var tap := InputEventMouseButton.new()
-	tap.pressed = true
-	tap.button_index = MOUSE_BUTTON_LEFT
-	arena.call("_on_need_more_overlay_gui_input", tap)
+	if not overlay.get_signal_connection_list("gui_input").is_empty():
+		_restore_save(backup)
+		_fail("overlay must not close on any tap — only Back to Camp")
+		return
+	arena.call("_on_back_to_camp_pressed")
+	if overlay.visible:
+		_restore_save(backup)
+		_fail("Back to Camp should hide the overlay")
+		return
 
 	_restore_save(backup)
 	if FileAccess.file_exists(SAVE_PATH):

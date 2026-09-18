@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div data-layer="SeasonLink" style="{{ rootStyle }}">
+  <div data-layer="UnlockBurst" style="{{ burstStyle }}"></div>
+  <div data-layer="SeasonHead" style="{{ headStyle }}">
+    <div style="{{ headTextStyle }}">
+      <div data-layer="SeasonEyebrow" style="{{ eyebrowStyle }}">{{ eyebrow }}</div>
+      <div data-layer="SeasonName" style="{{ nameStyle }}">{{ seasonName }}</div>
+    </div>
+    <div data-layer="HomeHint" style="{{ hintStyle }}">{{ hintText }}</div>
+  </div>
+  <div data-layer="SeasonProgress" style="{{ progStyle }}">
+    <div data-layer="CoinProgress" style="{{ colStyle }}">
+      <div style="{{ valRowStyle }}">
+        <img src="icons/icon_coin.svg" alt="" style="{{ iconStyle }}" />
+        <div style="{{ valStyle }}">{{ coinVal }}</div>
+      </div>
+      <div style="{{ capStyle }}">{{ coinCap }}</div>
+      <div data-layer="CoinBar" style="{{ barStyle }}"><div style="{{ coinFillStyle }}"></div></div>
+    </div>
+    <div data-layer="SplitLine" style="{{ splitStyle }}"></div>
+    <div data-layer="FlowerProgress" style="{{ colStyle }}">
+      <div style="{{ valRowStyle }}">
+        <div data-layer="ArtFrame" style="{{ frameStyle }}">
+          <div style="{{ wellStyle }}"></div>
+          <img src="{{ artSrc }}" alt="" style="{{ artStyle }}" />
+        </div>
+        <div style="{{ valStyle }}">{{ flowerVal }}</div>
+      </div>
+      <div style="{{ capStyle }}">{{ flowerCap }}</div>
+      <div data-layer="FlowerBar" style="{{ barStyle }}"><div style="{{ flowerFillStyle }}"></div></div>
+    </div>
+  </div>
+  <div data-layer="UnlockButton" style="{{ btnStyle }}">
+    <div style="{{ btnLabelStyle }}">{{ btnLabel }}</div>
+    <div style="{{ btnSubStyle }}">{{ btnSub }}</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1032,&quot;height&quot;:422},&quot;tint&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;frost&quot;,&quot;lantern&quot;,&quot;amber&quot;],&quot;default&quot;:&quot;frost&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;short&quot;,&quot;ready&quot;,&quot;unlocking&quot;],&quot;default&quot;:&quot;short&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;coins&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:320,&quot;min&quot;:0,&quot;max&quot;:500,&quot;tsType&quot;:&quot;number&quot;},&quot;coinsNeed&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:500,&quot;min&quot;:1,&quot;max&quot;:999,&quot;tsType&quot;:&quot;number&quot;},&quot;flowers&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:0,&quot;max&quot;:20,&quot;tsType&quot;:&quot;number&quot;},&quot;flowersNeed&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:20,&quot;min&quot;:1,&quot;max&quot;:99,&quot;tsType&quot;:&quot;number&quot;},&quot;flowerName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Harvest Pumpkin&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;flowerArt&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;pumpkin&quot;,&quot;sunflower&quot;,&quot;clover&quot;,&quot;frost_snowdrop&quot;,&quot;silver_aconite&quot;],&quot;default&quot;:&quot;pumpkin&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;compact&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;h&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:168,&quot;min&quot;:140,&quot;max&quot;:260,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;w&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1032,&quot;min&quot;:600,&quot;max&quot;:1032,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;}}">
+const TINTS = {
+  frost: ['#C5D5E8', '#9FB4CC', 'Frost Orchard'],
+  lantern: ['#C9B8E0', '#A193B3', 'Lantern Meadow'],
+  amber: ['#E8C48A', '#BA9D6E', 'Amber Canopy']
+};
+const CREAM = '#FFF8F0', CREAM_EDGE = '#CBC2B6', WELL = '#22342A', WELL_EDGE = '#16211B';
+const GOLD = '#FFD56B', GOLD_EDGE = '#D6A82F', UIGOLD = '#E8C44A', UIGOLD_EDGE = '#BA9D3B';
+const DARKINK = '#1A1A14', INK2 = '#2D3436', NUN = 'Nunito,system-ui,sans-serif';
+
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const t = TINTS[p.tint ?? 'frost'];
+    const compact = !!p.compact;
+    const st = p.state ?? 'short';
+    const coins = p.coins ?? 320, coinsNeed = p.coinsNeed ?? 500;
+    const fl = p.flowers ?? 12, flNeed = p.flowersNeed ?? 20;
+    const ready = st === 'ready' || st === 'unlocking';
+    const cPct = Math.min(1, coins / coinsNeed), fPct = Math.min(1, fl / flNeed);
+    const h = compact ? (p.h ?? 168) : 422;
+    const pad = compact ? (h < 170 ? 14 : 20) : 22;
+
+    let bFill = 'rgba(255,248,240,.55)', bEdge = 'rgba(26,26,20,.30)', bInk = '#44443A';
+    if (st === 'ready') { bFill = UIGOLD; bEdge = UIGOLD_EDGE; bInk = '#2D3436'; }
+    if (st === 'unlocking') { bFill = GOLD; bEdge = GOLD_EDGE; bInk = '#2D3436'; }
+
+    let btnLabel = 'Unlock', btnSub = 'needs ' + Math.max(0, coinsNeed - coins) + ' more coins and ' + Math.max(0, flNeed - fl) + ' more flowers';
+    if (st === 'ready') { btnLabel = 'Unlock ' + t[2]; btnSub = 'spends ' + coinsNeed + ' coins and ' + flNeed + ' flowers'; }
+    if (st === 'unlocking') { btnLabel = t[2] + ' unlocked'; btnSub = 'spent ' + coinsNeed + ' coins and ' + flNeed + ' flowers'; }
+    if (compact) { btnLabel = 'Unlock'; btnSub = ready ? 'ready' : Math.max(0, coinsNeed - coins) + ' · ' + Math.max(0, flNeed - fl); }
+
+    const barBg = 'rgba(26,26,20,.20)';
+    return {
+      seasonName: t[2],
+      eyebrow: 'Next free season',
+      hintText: 'Details ↗',
+      coinVal: coins + ' / ' + coinsNeed,
+      flowerVal: fl + ' / ' + flNeed,
+      coinCap: 'Coins',
+      flowerCap: (p.flowerName ?? 'Harvest Pumpkin') + ' ★★★',
+      artSrc: 'flowers/ph_' + (p.flowerArt ?? 'pumpkin') + '.svg',
+      btnLabel, btnSub,
+      rootStyle: ['position:relative;box-sizing:border-box;flex:0 0 auto;overflow:hidden',
+        'width:' + (p.w ?? 1032) + 'px;height:' + h + 'px;border-radius:26px',
+        'background:' + t[0] + ';border:3px solid ' + t[1],
+        'box-shadow:0 8px 16px rgba(20,26,22,.26)',
+        'padding:' + pad + 'px;display:flex;gap:' + (compact ? 18 : 12) + 'px',
+        compact ? 'flex-direction:row;align-items:center' : 'flex-direction:column',
+        'font-family:' + NUN].join(';'),
+      burstStyle: st === 'unlocking'
+        ? 'position:absolute;left:50%;top:50%;width:' + (compact ? 260 : 520) + 'px;height:' + (compact ? 260 : 520) + 'px;margin:' + (compact ? '-130px 0 0 -130px' : '-260px 0 0 -260px') + ';border-radius:50%;border:14px solid rgba(255,245,209,.55);pointer-events:none'
+        : 'display:none',
+      headStyle: compact
+        ? 'flex:0 0 auto;width:300px;display:flex;flex-direction:column;gap:6px;justify-content:center'
+        : 'flex:0 0 auto;height:100px;display:flex;align-items:center;gap:20px',
+      headTextStyle: 'flex:1;min-width:0;display:flex;flex-direction:column;gap:' + (compact ? 4 : 6) + 'px',
+      eyebrowStyle: 'font:700 38px/1 ' + NUN + ';color:#3D3D33' + (compact ? ';display:none' : ''),
+      nameStyle: 'font:900 ' + (compact ? 46 : 56) + 'px/1 ' + NUN + ';color:' + DARKINK + ';white-space:nowrap',
+      hintStyle: compact ? 'display:none' : 'flex:0 0 auto;box-sizing:border-box;height:72px;padding:0 22px;border-radius:16px;background:rgba(255,248,240,.72);border:2px solid rgba(26,26,20,.28);display:flex;align-items:center;font:800 38px/1 ' + NUN + ';color:' + DARKINK + ';white-space:nowrap',
+      progStyle: 'flex:1;min-width:0;display:flex;align-items:center;gap:' + (compact ? 16 : 20) + 'px',
+      colStyle: 'flex:1;min-width:0;display:flex;flex-direction:column;gap:8px',
+      valRowStyle: 'display:flex;align-items:center;gap:12px',
+      iconStyle: 'width:48px;height:48px;display:block;flex:0 0 auto',
+      valStyle: 'font:900 ' + (compact ? 42 : 48) + 'px/1 ' + NUN + ';font-variant-numeric:tabular-nums;color:' + DARKINK,
+      capStyle: 'font:700 38px/1 ' + NUN + ';color:#3D3D33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis' + (compact ? ';display:none' : ''),
+      barStyle: 'height:18px;border-radius:9px;background:' + barBg + ';overflow:hidden',
+      coinFillStyle: 'height:100%;width:' + (cPct * 100).toFixed(1) + '%;background:' + GOLD,
+      flowerFillStyle: 'height:100%;width:' + (fPct * 100).toFixed(1) + '%;background:' + CREAM,
+      splitStyle: 'flex:0 0 auto;width:5px;height:' + (compact ? 88 : 112) + 'px;border-radius:3px;background:rgba(26,26,20,.22)',
+      frameStyle: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:52px;height:52px;border-radius:14px;background:' + GOLD + ';border:2px solid ' + GOLD_EDGE + ';display:grid;place-items:center',
+      wellStyle: 'position:absolute;inset:6px;box-sizing:border-box;border-radius:9px;background:' + WELL + ';border:1px solid ' + WELL_EDGE,
+      artStyle: 'position:relative;display:block;width:32px;height:32px',
+      btnStyle: ['position:relative;flex:0 0 auto;box-sizing:border-box;border-radius:20px',
+        compact ? 'width:250px;height:124px' : 'width:100%;height:132px',
+        'background:' + bFill + ';border:3px solid ' + bEdge,
+        'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px'].join(';'),
+      btnLabelStyle: 'font:900 ' + (compact ? 44 : 50) + 'px/1 ' + NUN + ';color:' + bInk + ';white-space:nowrap',
+      btnSubStyle: 'font:700 38px/1 ' + NUN + ';color:' + (ready ? INK2 : '#44443A') + ';white-space:nowrap'
+    };
+  }
+}
+</script>
+</body>
+</html>

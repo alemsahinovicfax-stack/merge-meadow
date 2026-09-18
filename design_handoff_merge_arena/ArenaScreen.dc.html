@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="ArenaScreen" style="{{ rootStyle }}">
+
+  <sc-if value="{{ chrome }}" hint-placeholder-val="{{ true }}">
+    <dc-import name="HubScreen" part="header" theme="dark" coins="{{ coins }}" hint-size="1080px,143px"></dc-import>
+  </sc-if>
+
+  <div data-layer="ArenaPage" style="{{ pageStyle }}">
+
+    <div data-layer="MeadowBg" style="{{ bgWrap }}">
+      <div style="{{ hillFar }}"></div>
+      <div style="{{ hillNear }}"></div>
+      <sc-for list="{{ tufts }}" as="t" hint-placeholder-count="8">
+        <div style="{{ t.style }}"></div>
+      </sc-for>
+      <sc-for list="{{ blooms }}" as="b" hint-placeholder-count="4">
+        <div style="{{ b.style }}"></div>
+      </sc-for>
+    </div>
+
+    <div data-layer="ArenaHud" style="{{ hudWrap }}">
+      <div data-layer="DailyTask" style="{{ dailyStyle }}">
+        <img src="{{ dailyIcon }}" alt="" style="width:44px;height:44px;flex:0 0 auto" />
+        <div style="{{ dailyTextStyle }}">{{ dailyText }}</div>
+      </div>
+      <div data-layer="StashCounter" style="display:flex;align-items:center;gap:12px;height:76px;padding:0 24px 0 20px;border-radius:20px;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box">
+        <img src="flowers/ph_crystal.svg" alt="" style="width:48px;height:48px;flex:0 0 auto" />
+        <div style="font:800 48px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">{{ stash }}</div>
+      </div>
+    </div>
+
+    <div data-layer="HintLine" style="{{ hintWrap }}">
+      <div style="max-width:1000px;padding:14px 30px;border-radius:20px;background:rgba(22,33,27,.72);font:700 38px/1.2 Nunito,sans-serif;color:#FFF8F0;text-align:center;text-wrap:pretty">{{ hint }}</div>
+    </div>
+
+    <div data-layer="Playfield" style="{{ playWrap }}">
+
+      <div data-layer="MuncherNest" style="{{ nestStyle }}">
+        <div style="position:absolute;inset:14px 18px 8px;border-radius:50%;background:#6E5238;border:4px solid #543E2A;box-sizing:border-box"></div>
+      </div>
+
+      <div data-layer="Muncher" style="{{ muncherWrap }}">
+        <div style="{{ muncherBody }}">
+          <div style="{{ earL }}"></div>
+          <div style="{{ earR }}"></div>
+          <div style="position:absolute;left:0;right:0;top:38px;display:flex;justify-content:center;gap:20px">
+            <div style="{{ eye }}"></div>
+            <div style="{{ eye }}"></div>
+          </div>
+          <div style="{{ mouth }}"></div>
+        </div>
+        <div data-layer="FrostShell" style="{{ ice }}"></div>
+        <div data-layer="Zzz" style="{{ zzz }}">z z z</div>
+      </div>
+
+      <sc-for list="{{ chips }}" as="c" hint-placeholder-count="12">
+        <div style="{{ c.pos }}">
+          <dc-import name="SeedChip" tier="{{ c.tier }}" dir="{{ dir }}" flower="{{ c.flower }}" mythic="{{ c.mythic }}" state="{{ c.state }}" hint-size="134px,134px"></dc-import>
+        </div>
+      </sc-for>
+
+      <div data-layer="ArenaPip" style="{{ pipWrap }}">
+        <div style="font:900 40px/1 Nunito,sans-serif;color:#FFF8F0">PIP</div>
+        <div style="font:700 20px/1.2 Nunito,sans-serif;color:rgba(255,248,240,.8);text-align:center">art<br>postoji</div>
+      </div>
+
+      <div data-layer="SeedBag" style="{{ bagWrap }}">
+        <div style="{{ bagPeek }}">
+          <img src="flowers/ph_tulip.svg" alt="" style="width:64px;height:64px;margin-right:-10px;transform:rotate(-16deg)" />
+          <img src="flowers/ph_buttercup.svg" alt="" style="width:74px;height:74px" />
+          <img src="flowers/ph_frost_snowdrop.svg" alt="" style="width:64px;height:64px;margin-left:-10px;transform:rotate(16deg)" />
+        </div>
+        <div style="{{ bagBody }}">
+          <div style="position:absolute;left:50%;top:-16px;transform:translateX(-50%);width:118px;height:34px;border-radius:17px;background:#B89466;border:4px solid #7A5C3C;box-sizing:border-box"></div>
+        </div>
+        <div data-layer="BagCount" style="{{ bagCountStyle }}">{{ bagCount }}</div>
+        <div data-layer="PourArc" style="{{ pourStyle }}">
+          <img src="flowers/ph_clover.svg" alt="" style="width:56px;height:56px;transform:translateY(38px) rotate(-20deg)" />
+          <img src="flowers/ph_silver_aconite.svg" alt="" style="width:62px;height:62px;transform:translateY(-16px)" />
+          <img src="flowers/ph_pumpkin.svg" alt="" style="width:56px;height:56px;transform:translateY(38px) rotate(20deg)" />
+        </div>
+      </div>
+
+      <div data-layer="ComboMeter" style="{{ comboWrap }}">
+        <div style="{{ comboPill }}">{{ comboText }}</div>
+        <div style="{{ comboBonus }}">
+          <img src="icons/icon_coin.svg" alt="" style="width:40px;height:40px" />
+          <div style="font:900 40px/1 Nunito,sans-serif;color:#2D3436">+2</div>
+        </div>
+      </div>
+
+      <div data-layer="T3Burst" style="{{ burstWrap }}">
+        <div style="{{ burstRing }}"></div>
+        <img src="flowers/ph_crystal.svg" alt="" style="{{ burstCrystal }}" />
+      </div>
+
+      <div data-layer="TutorialCue" style="{{ tutWrap }}">
+        <div style="padding:20px 32px;border-radius:24px;background:#FFF8F0;border:4px solid #CBC2B6;box-sizing:border-box;font:800 40px/1.25 Nunito,sans-serif;color:#2D3436;text-align:center;max-width:760px;text-wrap:pretty">{{ tutText }}</div>
+        <div style="width:0;height:0;border-left:26px solid transparent;border-right:26px solid transparent;border-top:30px solid #FFF8F0"></div>
+      </div>
+
+    </div>
+
+    <div data-layer="DoneButton" style="{{ doneStyle }}">Done</div>
+
+    <div data-layer="NeedMoreSeedsOverlay" style="{{ overlayWrap }}">
+      <div style="width:940px;padding:48px 48px 44px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid rgba(45,52,54,.14);box-shadow:0 14px 0 rgba(15,20,18,.45);display:flex;flex-direction:column;gap:30px">
+        <div style="font:900 58px/1.1 Nunito,sans-serif;color:#2D3436;text-align:center">You need more seeds!</div>
+        <div style="font:700 38px/1.3 Nunito,sans-serif;color:#4A4A4A;text-align:center;text-wrap:pretty">Every type needs 4 seeds to reach T3. Run again to collect more.</div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <sc-for list="{{ needList }}" as="n" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:22px;height:108px;padding:0 26px;box-sizing:border-box;border-radius:20px;background:{{ n.bg }};border:2px solid rgba(45,52,54,.14)">
+              <img src="{{ n.icon }}" alt="" style="width:72px;height:72px;flex:0 0 auto" />
+              <div style="flex:1;min-width:0;font:800 40px/1.25 Nunito,sans-serif;color:#2D3436;white-space:nowrap;text-overflow:ellipsis">{{ n.name }}</div>
+              <div style="font:900 44px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">{{ n.count }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="height:140px;border-radius:26px;background:#FFB88C;border:3px solid #E8A374;box-sizing:border-box;display:grid;place-items:center;font:900 52px/1 Nunito,sans-serif;color:#2D3436">Back to Camp</div>
+      </div>
+    </div>
+
+  </div>
+
+  <sc-if value="{{ chrome }}" hint-placeholder-val="{{ true }}">
+    <dc-import name="HubScreen" part="footer" theme="dark" active="{{ 4 }}" locked="{{ locked }}" hint-size="1080px,180px"></dc-import>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;round&quot;,&quot;empty&quot;,&quot;tutorial&quot;,&quot;full&quot;,&quot;overlay&quot;],&quot;default&quot;:&quot;round&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Scena&quot;},&quot;dir&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;A&quot;,&quot;B&quot;],&quot;default&quot;:&quot;B&quot;,&quot;tsType&quot;:&quot;'A'|'B'&quot;,&quot;section&quot;:&quot;Scena&quot;},&quot;chrome&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scena&quot;},&quot;isolate&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;muncher&quot;,&quot;bag&quot;],&quot;default&quot;:&quot;none&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Scena&quot;},&quot;t3&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:null,&quot;min&quot;:0,&quot;max&quot;:4,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;chips&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:null,&quot;min&quot;:0,&quot;max&quot;:30,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;combo&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:null,&quot;min&quot;:0,&quot;max&quot;:9,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;muncher&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;nest&quot;,&quot;wake&quot;,&quot;hunt&quot;,&quot;eat&quot;,&quot;frozen&quot;,&quot;sleep&quot;],&quot;default&quot;:null,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;bag&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;empty&quot;,&quot;one&quot;,&quot;open&quot;,&quot;pour&quot;,&quot;punch&quot;],&quot;default&quot;:null,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;bagCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:null,&quot;min&quot;:0,&quot;max&quot;:40,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;locked&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;dailyDone&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;hint&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:null,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Tekst&quot;},&quot;daily&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Merge T2 1/3&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Tekst&quot;},&quot;tutText&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:null,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Tekst&quot;},&quot;crystalFly&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:null,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;T3 storyboard&quot;}}">
+const SCENES = {
+  round:    { chips: 20, muncher: 'hunt',  bag: 'open',  bagCount: 18, combo: 3, locked: true,  t3: 1, stash: 7,
+              hint: 'Poured 12 seeds — drag matching ones together!' },
+  empty:    { chips: 0,  muncher: 'nest',  bag: 'open',  bagCount: 34, combo: 0, locked: false, t3: 0, stash: 6,
+              hint: 'Tap the bag — seeds jump into the arena!' },
+  tutorial: { chips: 0,  muncher: 'nest',  bag: 'open',  bagCount: 34, combo: 0, locked: false, t3: 0, stash: 0,
+              hint: 'Tap the bag — seeds jump into the arena!' },
+  full:     { chips: 30, muncher: 'hunt',  bag: 'open',  bagCount: 4,  combo: 0, locked: true,  t3: 2, stash: 8,
+              hint: 'Arena full (30/30) — merge some seeds first!' },
+  overlay:  { chips: 0,  muncher: 'sleep', bag: 'empty', bagCount: 3,  combo: 0, locked: true,  t3: 0, stash: 6,
+              hint: 'No seeds left — tap Done to return to camp.' }
+};
+
+const FLOWERS = ['clover', 'daisy', 'buttercup', 'tulip', 'sunflower', 'pumpkin', 'frost_snowdrop', 'silver_aconite'];
+const NAMES = { clover: 'Meadow Clover', daisy: 'Field Daisy', buttercup: 'Buttercup Lane',
+                tulip: 'Barn Tulip', sunflower: 'Sunfence', pumpkin: 'Harvest Pumpkin',
+                frost_snowdrop: 'Frost Snowdrop', silver_aconite: 'Silver Aconite' };
+
+class Component extends DCLogic {
+  rng(seed) {
+    let a = seed | 0;
+    return () => {
+      a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  lerpHex(a, b, t) {
+    const p = h => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16));
+    const A = p(a), B = p(b);
+    return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  }
+
+  // Rešetkasti spawn: jedini raspored koji pouzdano primi 30 sjemenki na 1080 x 1165
+  slots(n) {
+    const dense = n > 24;
+    const S = dense ? 150 : 164;
+    const RS = S * 0.866;
+    const x0 = 83, x1 = 997, y0 = 83, y1 = 1050;
+    const cols = Math.floor((x1 - x0) / S) + 1;
+    const rows = Math.floor((y1 - y0) / RS) + 1;
+    const ox = x0 + (x1 - x0 - (cols - 1) * S) / 2;
+    const oy = y0 + (y1 - y0 - (rows - 1) * RS) / 2;
+    const out = [];
+    for (let r = 0; r < rows; r++) {
+      const odd = r % 2 === 1;
+      const c0 = odd ? S / 2 : 0;
+      const cn = odd ? cols - 1 : cols;
+      for (let c = 0; c < cn; c++) {
+        const x = ox + c0 + c * S, y = oy + r * RS;
+        if (x > 355 && x < 725 && y > 744) continue;   // keepout: SeedBag
+        if (x < 300 && y > 860) continue;              // keepout: ArenaPip
+        if (x > 700 && y < 130) continue;              // keepout: ComboMeter
+        if (x > 430 && x < 650 && y < 140) continue;   // keepout: MuncherNest
+        out.push([x, y]);
+      }
+    }
+    return { out, jitter: dense ? 3.5 : 9 };
+  }
+
+  renderVals() {
+    const p = this.props;
+    const sc = SCENES[p.scene ?? 'round'] ?? SCENES.round;
+    const pick = (k) => p[k] ?? sc[k];
+
+    const dir = (p.dir ?? 'B').toUpperCase();
+    const t3 = pick('t3');
+    const chipCount = pick('chips');
+    const combo = pick('combo');
+    const muncher = pick('muncher');
+    const bag = pick('bag');
+    const locked = pick('locked');
+    const tutorial = (p.scene ?? 'round') === 'tutorial';
+    const overlay = (p.scene ?? 'round') === 'overlay';
+    const iso = p.isolate ?? 'none';
+    const chrome = iso === 'none' ? (p.chrome ?? true) : false;
+
+    const meadow = this.lerpHex('#293D2E', '#335C38', Math.min(1, t3 / 4));
+    const ISO = { muncher: [320, 260], bag: [340, 320] };
+    const isoBox = ISO[iso];
+    const rootStyle = isoBox
+      ? 'width:' + isoBox[0] + 'px;height:' + isoBox[1] + 'px;flex:0 0 auto;position:relative;font-family:Nunito,system-ui,sans-serif;--meadow:' + meadow
+      : 'width:1080px;flex:0 0 auto;display:flex;flex-direction:column;position:relative;' +
+        'font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:#1A241E;--meadow:' + meadow;
+    const pageStyle = isoBox
+      ? 'width:' + isoBox[0] + 'px;height:' + isoBox[1] + 'px;position:relative;overflow:visible;background:transparent'
+      : 'width:1080px;height:1597px;flex:0 0 auto;position:relative;overflow:hidden;font-family:Nunito,system-ui,sans-serif;background:var(--meadow)';
+    const HIDE = 'display:none';
+    const bgWrap = isoBox ? HIDE : 'position:absolute;inset:0;overflow:hidden';
+    const hudWrap = isoBox ? HIDE : 'position:absolute;left:0;top:0;width:1080px;height:120px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 24px;box-sizing:border-box;z-index:4';
+    const hintWrap = isoBox ? HIDE : 'position:absolute;left:0;top:120px;width:1080px;height:128px;display:flex;align-items:center;justify-content:center;padding:0 40px;box-sizing:border-box;z-index:4';
+    const playWrap = isoBox
+      ? 'position:absolute;inset:0'
+      : 'position:absolute;left:0;top:248px;width:1080px;height:1133px;z-index:2';
+    const pipWrap = isoBox ? HIDE : 'position:absolute;left:30px;bottom:26px;width:150px;height:150px;border-radius:34px;background:rgba(255,248,240,.14);border:4px dashed rgba(255,248,240,.55);box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;z-index:3';
+
+    // --- pozadina: ravni slojevi, bujniji sa svakim T3 ---
+    const hillFar = 'position:absolute;left:-80px;right:-80px;bottom:190px;height:420px;border-radius:50% 50% 0 0;background:' +
+      this.lerpHex('#22342A', '#2E5233', Math.min(1, t3 / 4));
+    const hillNear = 'position:absolute;left:-120px;right:-120px;bottom:-60px;height:430px;border-radius:46% 46% 0 0;background:' +
+      this.lerpHex('#2F4636', '#3C6B40', Math.min(1, t3 / 4));
+
+    const rt = this.rng(9021);
+    const tufts = [];
+    const tuftN = 10 + t3 * 6;
+    for (let i = 0; i < tuftN; i++) {
+      const x = 20 + rt() * 1040, y = 300 + rt() * 1250, h = 30 + rt() * 34;
+      tufts.push({ style: 'position:absolute;left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) + 'px;width:' +
+        (h * 0.5).toFixed(0) + 'px;height:' + h.toFixed(0) + 'px;background:' +
+        this.lerpHex('#334C3A', '#4A8250', Math.min(1, t3 / 4)) +
+        ';clip-path:polygon(50% 0%,100% 100%,0% 100%);opacity:.85' });
+    }
+    const blooms = [];
+    for (let i = 0; i < t3 * 5; i++) {
+      const x = 30 + rt() * 1020, y = 340 + rt() * 1200, s = 14 + rt() * 12;
+      const col = ['#FFEAA7', '#FFCCD5', '#B8E0F5', '#D4A5FF'][i % 4];
+      blooms.push({ style: 'position:absolute;left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) + 'px;width:' +
+        s.toFixed(0) + 'px;height:' + s.toFixed(0) + 'px;border-radius:50%;background:' + col + ';opacity:.9' });
+    }
+
+    // --- sjemenke ---
+    const { out, jitter } = this.slots(chipCount);
+    const rc = this.rng(4417);
+    const order = out.map((s, i) => [s, rc()]).sort((a, b) => a[1] - b[1]).slice(0, chipCount);
+    const chips = order.map(([s], i) => {
+      const j = () => (rc() - 0.5) * 2 * jitter;
+      const tier = rc() < 0.32 ? 2 : 1;
+      const mythic = rc() < 0.07;
+      let state = 'idle';
+      if (p.scene === 'round' || p.scene == null) {
+        if (i === 3) state = 'drag';
+        else if (i === 7) state = 'partner';
+        else if (i === 11 || i === 15) state = 'pulse';
+      }
+      return {
+        pos: 'position:absolute;left:' + (s[0] + j()).toFixed(0) + 'px;top:' + (s[1] + j()).toFixed(0) +
+          'px;margin:-67px 0 0 -67px;z-index:' + (state === 'drag' ? 6 : 2),
+        tier, mythic, state,
+        flower: FLOWERS[Math.floor(rc() * FLOWERS.length)]
+      };
+    });
+
+    // --- Muncher ---
+    const MPOS = { nest: [540, 62], wake: [540, 96], hunt: [432, 486], eat: [640, 660], frozen: [508, 542], sleep: [470, 610] };
+    const MPOS_ISO = { nest: [160, 130], wake: [160, 122], hunt: [160, 140], eat: [160, 140], frozen: [160, 140], sleep: [160, 150] };
+    const mp = iso === 'muncher' ? MPOS_ISO[muncher] : (MPOS[muncher] ?? MPOS.hunt);
+    const asleep = muncher === 'nest' || muncher === 'sleep';
+    const frozen = muncher === 'frozen';
+    const bodyCol = frozen ? '#A6D1FA' : (asleep ? '#7A579E' : '#8C61B8');
+    const bodyEdge = frozen ? '#6FA8DC' : (asleep ? '#61457E' : '#6F4D93');
+    const M = 104;
+
+    const muncherWrap = 'position:absolute;left:' + mp[0] + 'px;top:' + mp[1] +
+      'px;margin:-52px 0 0 -52px;width:' + M + 'px;height:' + M + 'px;z-index:5;transform:rotate(' +
+      (muncher === 'hunt' ? -6 : 0) + 'deg)';
+    const muncherBody = 'position:absolute;inset:0;border-radius:50%;background:' + bodyCol +
+      ';border:4px solid ' + bodyEdge + ';box-sizing:border-box';
+    const ear = (side) => 'position:absolute;top:-14px;' + side + ':10px;width:30px;height:30px;border-radius:50%;background:' +
+      bodyCol + ';border:4px solid ' + bodyEdge + ';box-sizing:border-box';
+    const eye = asleep
+      ? 'width:20px;height:5px;border-radius:3px;background:#2D3436'
+      : 'width:' + (muncher === 'wake' ? 18 : 14) + 'px;height:' + (muncher === 'wake' ? 18 : 14) +
+        'px;border-radius:50%;background:#2D3436';
+    const mouth = muncher === 'eat'
+      ? 'position:absolute;left:50%;top:60px;transform:translateX(-50%);width:38px;height:28px;border-radius:0 0 17px 17px;background:#FFCCD5;border:3px solid #E89AAA;box-sizing:border-box'
+      : 'position:absolute;left:50%;top:66px;transform:translateX(-50%);width:18px;height:9px;border-radius:0 0 8px 8px;background:#5C3F7E';
+
+    // zamrznut = ledena ljuska (oblik), ne samo boja
+    const ice = frozen
+      ? 'position:absolute;left:-18px;top:-18px;width:140px;height:140px;background:rgba(232,246,255,.42);border:4px solid #DCF0FF;box-sizing:border-box;clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)'
+      : 'display:none';
+    const zzz = asleep
+      ? 'position:absolute;left:96px;top:-34px;font:900 32px/1 Nunito,sans-serif;color:#FFF8F0;letter-spacing:.14em;white-space:nowrap'
+      : 'display:none';
+    const nestLeft = iso === 'muncher' ? 160 : 540, nestTop = iso === 'muncher' ? 136 : 62;
+    const nestStyle = (muncher === 'nest' || muncher === 'wake')
+      ? 'position:absolute;left:' + nestLeft + 'px;top:' + nestTop + 'px;margin:-52px 0 0 -105px;width:210px;height:104px;border-radius:50%;background:#9E7A52;border:5px solid #735738;box-sizing:border-box;z-index:4'
+      : 'display:none';
+
+    // --- vreća ---
+    const bagCount = pick('bagCount');
+    const pouring = bag === 'pour';
+    const bagHidden = iso === 'muncher';
+    const bagWrap = 'position:absolute;left:' + (iso === 'bag' ? 170 : 540) + 'px;bottom:' + (iso === 'bag' ? 30 : 40) + 'px;margin-left:-140px;width:280px;height:250px;z-index:5;' +
+      'display:flex;align-items:flex-end;justify-content:center;transform:rotate(' +
+      (pouring ? -12 : (bag === 'open' ? 2 : 0)) + 'deg) scale(' + (bag === 'punch' ? 1.14 : 1) + ')';
+    const bagH = bag === 'empty' ? 126 : 178;
+    const bagBody = 'position:relative;width:214px;height:' + bagH + 'px;background:#9E7A52;border:5px solid #735738;' +
+      'box-sizing:border-box;border-radius:44% 44% 46% 46% / 30% 30% 56% 56%';
+    const bagPeek = (bag === 'open' || bag === 'one')
+      ? 'position:absolute;left:50%;transform:translateX(-50%);bottom:' + (bagH - 26) +
+        'px;display:flex;align-items:flex-end;z-index:-1'
+      : 'display:none';
+    const bagCountStyle = bag === 'empty'
+      ? 'display:none'
+      : 'position:absolute;right:6px;bottom:2px;width:84px;height:84px;border-radius:50%;background:#FFF8F0;border:4px solid #CBC2B6;box-sizing:border-box;display:grid;place-items:center;font:900 44px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums';
+    const pourStyle = pouring
+      ? 'position:absolute;left:50%;top:-104px;transform:translateX(-50%);display:flex;align-items:center;gap:26px'
+      : 'display:none';
+
+    // --- combo ---
+    const big = combo >= 5;
+    const comboWrap = combo >= 2
+      ? 'position:absolute;right:24px;top:18px;display:flex;flex-direction:column;align-items:flex-end;gap:12px;z-index:6'
+      : 'display:none';
+    const comboPill = 'height:78px;padding:0 30px;border-radius:20px;background:' + (big ? '#FFD56B' : '#FFEAA7') +
+      ';border:3px solid ' + (big ? '#D6A82F' : '#E0C97F') +
+      ';box-sizing:border-box;display:grid;place-items:center;font:900 46px/1 Nunito,sans-serif;color:#2D3436;white-space:nowrap';
+    const comboBonus = big
+      ? 'display:flex;align-items:center;gap:10px;height:60px;padding:0 20px;border-radius:16px;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box'
+      : 'display:none';
+
+    // --- T3 burst (storyboard kadrovi) ---
+    const fly = p.crystalFly;
+    const burstWrap = fly == null ? 'display:none'
+      : 'position:absolute;inset:0;z-index:7;pointer-events:none';
+    const bx = 560 + (980 - 560) * fly, by = 640 + (-260 - 640) * fly;
+    const bs = 1 - 0.55 * fly;
+    const burstRing = fly < 0.35
+      ? 'position:absolute;left:' + bx + 'px;top:' + by + 'px;margin:-130px 0 0 -130px;width:260px;height:260px;border-radius:50%;border:12px solid #FFF5D1;opacity:' +
+        (0.75 - fly * 1.6).toFixed(2)
+      : 'display:none';
+    const burstCrystal = 'position:absolute;left:' + bx.toFixed(0) + 'px;top:' + by.toFixed(0) +
+      'px;margin:-70px 0 0 -70px;width:140px;height:140px;transform:scale(' + bs.toFixed(2) + ')';
+
+    // --- Done ---
+    const doneStyle = isoBox ? HIDE : 'position:absolute;left:20px;top:1397px;width:1040px;height:140px;border-radius:26px;background:#FFB88C;' +
+      'border:3px solid #E8A374;box-sizing:border-box;display:grid;place-items:center;font:900 54px/1 Nunito,sans-serif;color:#2D3436;' +
+      'box-shadow:0 6px 0 rgba(15,20,18,.4);z-index:6';
+
+    // --- dnevni zadatak ---
+    const dailyDone = !!p.dailyDone;
+    const dailyText = p.daily ?? 'Merge T2 1/3';
+    const dailyStyle = 'display:flex;align-items:center;gap:14px;height:76px;padding:0 26px 0 20px;border-radius:20px;box-sizing:border-box;background:' +
+      (dailyDone ? '#A8E6CF' : '#FFF8F0') + ';border:3px solid ' + (dailyDone ? '#7FBFA3' : '#CBC2B6');
+    const dailyTextStyle = 'font:800 40px/1 Nunito,sans-serif;color:#2D3436;white-space:nowrap' +
+      (dailyDone ? ';text-decoration:line-through;text-decoration-thickness:3px' : '');
+
+    // --- overlay ---
+    const needList = ['clover', 'daisy', 'buttercup', 'tulip'].map((f, i) => ({
+      icon: 'flowers/ph_' + f + '.svg',
+      name: NAMES[f],
+      count: [3, 2, 3, 1][i] + '/4',
+      bg: ['#B8D4F0', '#B8D4F0', '#B8D4F0', '#E0C4FF'][i]
+    }));
+
+    return {
+      rootStyle, pageStyle, bgWrap, hudWrap, hintWrap, playWrap, pipWrap,
+      chrome, locked, dir,
+      coins: p.coins ?? '12,450',
+      hillFar, hillNear, tufts: isoBox ? [] : tufts, blooms: isoBox ? [] : blooms, chips: isoBox ? [] : chips,
+      stash: String(pick('stash')),
+      hint: p.hint ?? sc.hint,
+      dailyText, dailyStyle, dailyTextStyle,
+      dailyIcon: dailyDone ? 'icons/icon_check.svg' : 'icons/icon_target.svg',
+      nestStyle: iso === 'bag' ? HIDE : nestStyle,
+      muncherWrap: iso === 'bag' ? HIDE : muncherWrap,
+      muncherBody, earL: ear('left'), earR: ear('right'), eye, mouth, ice, zzz,
+      bagWrap: bagHidden ? HIDE : bagWrap, bagBody, bagPeek: bagHidden ? HIDE : bagPeek,
+      bagCount: String(bagCount), bagCountStyle: bagHidden ? HIDE : bagCountStyle,
+      pourStyle: bagHidden ? HIDE : pourStyle,
+      comboWrap: isoBox ? HIDE : comboWrap, comboPill, comboBonus, comboText: 'Combo ' + (combo || 2),
+      burstWrap, burstRing, burstCrystal,
+      doneStyle,
+      tutWrap: tutorial
+        ? 'position:absolute;left:50%;bottom:330px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;z-index:7'
+        : 'display:none',
+      tutText: p.tutText ?? 'Tap the bag to pour seeds. Drag matching seeds together.',
+      overlayWrap: overlay
+        ? 'position:absolute;inset:0;background:rgba(15,20,18,.82);display:flex;align-items:center;justify-content:center;z-index:9'
+        : 'display:none',
+      needList
+    };
+  }
+}
+</script>
+</body>
+</html>

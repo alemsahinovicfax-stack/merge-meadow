@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div data-layer="TradeBarWrap" style="{{ wrapStyle }}">
+  <div data-layer="TradeFeedback" style="{{ fbStyle }}">
+    <div style="{{ fbTextStyle }}">{{ fbText }}</div>
+    <img src="icons/icon_coin.svg" alt="" style="{{ fbCoinStyle }}" />
+  </div>
+  <div data-layer="TradeBar" style="{{ rootStyle }}">
+    <div data-layer="ReservedWarning" style="{{ warnStyle }}">
+      <img src="icons/icon_lock.svg" alt="" style="{{ warnLockStyle }}" />
+      <div style="{{ warnTextStyle }}">{{ warnText }}</div>
+    </div>
+    <div data-layer="TradeRow" style="{{ rowStyle }}">
+      <div data-layer="ArtFrame" style="{{ frameStyle }}">
+        <div data-layer="ArtWell" style="{{ wellStyle }}"></div>
+        <img data-layer="FlowerArt" src="{{ artSrc }}" alt="" style="{{ artStyle }}" />
+      </div>
+      <div data-layer="TradeInfo" style="{{ infoStyle }}">
+        <div data-layer="SelectedLabel" style="{{ labelStyle }}">{{ label }}</div>
+        <div data-layer="SelectedValue" style="{{ subStyle }}">{{ sub }}</div>
+      </div>
+      <div data-layer="TradeButton" style="{{ btnStyle }}">
+        <div data-layer="HoldFill" style="{{ holdStyle }}"></div>
+        <div style="{{ btnInnerStyle }}">
+          <div style="{{ btnLabelStyle }}">{{ btnLabel }}</div>
+          <div style="{{ btnSubStyle }}">{{ btnSub }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:992,&quot;height&quot;:152},&quot;kind&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;seed&quot;,&quot;flower&quot;],&quot;default&quot;:&quot;seed&quot;,&quot;tsType&quot;:&quot;'seed'|'flower'&quot;},&quot;label&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Meadow Clover&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;art&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;clover&quot;,&quot;daisy&quot;,&quot;buttercup&quot;,&quot;tulip&quot;,&quot;sunflower&quot;,&quot;pumpkin&quot;,&quot;frost_snowdrop&quot;,&quot;silver_aconite&quot;],&quot;default&quot;:&quot;clover&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;rarity&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[1,2,3],&quot;default&quot;:1,&quot;tsType&quot;:&quot;1|2|3&quot;},&quot;price&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1,&quot;min&quot;:1,&quot;max&quot;:20,&quot;tsType&quot;:&quot;number&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;idle&quot;,&quot;tap&quot;,&quot;hold&quot;,&quot;switch&quot;,&quot;warn&quot;,&quot;holdstop&quot;,&quot;disabled&quot;],&quot;default&quot;:&quot;idle&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;gain&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;1&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;holdPct&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.62,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.02,&quot;tsType&quot;:&quot;number&quot;},&quot;warnSeason&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;frost&quot;,&quot;lantern&quot;,&quot;amber&quot;],&quot;default&quot;:&quot;frost&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;warnLeft&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8,&quot;min&quot;:1,&quot;max&quot;:20,&quot;tsType&quot;:&quot;number&quot;},&quot;need&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:20,&quot;min&quot;:1,&quot;max&quot;:99,&quot;tsType&quot;:&quot;number&quot;},&quot;w&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:992,&quot;min&quot;:600,&quot;max&quot;:1032,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;}}">
+const CREAM = '#FFF8F0', CREAM_EDGE = '#CBC2B6', WELL = '#22342A', WELL_EDGE = '#16211B';
+const GOLD = '#FFD56B', GOLD_EDGE = '#D6A82F', PEACH = '#FFB88C', PEACH_EDGE = '#E8A374';
+const INK = '#2D3436', PINK = '#FFCCD5', PINK_EDGE = '#E89AAA', MINT = '#A8E6CF';
+const NUN = 'Nunito,system-ui,sans-serif';
+const SEASONS = { frost: 'Frost Orchard', lantern: 'Lantern Meadow', amber: 'Amber Canopy' };
+
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const seed = (p.kind ?? 'seed') === 'seed';
+    const st = p.state ?? 'idle';
+    const w = p.w ?? 992;
+    const warn = st === 'warn';
+    const stop = st === 'holdstop';
+    const dis = st === 'disabled';
+    const hold = st === 'hold';
+    const tap = st === 'tap';
+    const sw = st === 'switch';
+    const r = Math.max(1, Math.min(3, p.rarity ?? 1));
+    const pips = '★'.repeat(r) + '☆'.repeat(3 - r);
+    const h = 152 + ((warn || stop) ? 72 : 0);
+
+    let fill = PEACH, fEdge = PEACH_EDGE, bInk = INK;
+    if (dis) { fill = 'rgba(45,52,54,.10)'; fEdge = 'rgba(45,52,54,.22)'; bInk = '#5C6264'; }
+    else if (hold) { fill = PEACH_EDGE; }
+    else if (stop) { fill = '#FFF3E6'; fEdge = PEACH_EDGE; }
+
+    let btnSub = 'hold 10 / s';
+    if (dis) btnSub = 'nothing to trade';
+    else if (hold) btnSub = '10 / s';
+    else if (warn) btnSub = 'sells reserved';
+    else if (sw) btnSub = 'hold 10 / s';
+    if (stop) btnSub = 'no hold for this one';
+
+    let sub = pips + ' · ' + (p.price ?? 1) + ' coin each';
+    if (stop) sub = pips + ' · ' + (p.need ?? 20) + ' of ' + (p.need ?? 20) + ' kept';
+    if (dis) sub = 'pick a type to trade';
+    else if (sw) sub = 'empty — switched here';
+
+    const art = seed ? 56 : 60;
+    return {
+      label: dis ? 'Nothing selected' : (p.label ?? 'Meadow Clover'),
+      sub,
+      artSrc: 'flowers/ph_' + (p.art ?? 'clover') + '.svg',
+      btnLabel: hold ? 'Trading' : (stop ? 'Tap to sell 1' : 'Trade'),
+      btnSub,
+      wrapStyle: 'position:relative;width:' + w + 'px;height:' + h + 'px;flex:0 0 auto;font-family:' + NUN,
+      rootStyle: ['position:absolute;inset:0;box-sizing:border-box;border-radius:20px',
+        'background:' + CREAM + ';border:2px solid rgba(45,52,54,.18)',
+        'box-shadow:0 6px 14px rgba(20,26,22,.24)',
+        'padding:16px;display:flex;flex-direction:column;gap:12px'].join(';'),
+      warnStyle: (warn || stop)
+        ? 'flex:0 0 auto;box-sizing:border-box;height:60px;padding:0 18px;border-radius:14px;background:' + (stop ? '#FFE8B8' : PINK) + ';border:2px solid ' + (stop ? GOLD_EDGE : PINK_EDGE) + ';display:flex;align-items:center;gap:12px'
+        : 'display:none',
+      warnLockStyle: 'width:32px;height:32px;display:block;flex:0 0 auto',
+      warnTextStyle: 'font:800 38px/1 ' + NUN + ';color:#2D3436;white-space:nowrap',
+      warnText: stop
+        ? 'Hold stopped · ' + (SEASONS[p.warnSeason ?? 'frost']) + ' keeps ' + (p.need ?? 20) + ' of these'
+        : (SEASONS[p.warnSeason ?? 'frost']) + ' needs ' + (p.warnLeft ?? 8) + ' more of these',
+      rowStyle: 'flex:0 0 auto;height:120px;display:flex;align-items:center;gap:18px',
+      frameStyle: ['position:relative;flex:0 0 auto;box-sizing:border-box;width:88px;height:88px',
+        'border-radius:' + (seed ? '50%' : '22px'),
+        'background:' + (seed ? CREAM : GOLD),
+        'border:3px solid ' + (seed ? CREAM_EDGE : GOLD_EDGE),
+        'display:grid;place-items:center;opacity:' + (dis ? 0.4 : 1)].join(';'),
+      wellStyle: 'position:absolute;inset:9px;box-sizing:border-box;border-radius:' + (seed ? '50%' : '15px') + ';background:' + WELL + ';border:2px solid ' + WELL_EDGE,
+      artStyle: 'position:relative;display:block;width:' + art + 'px;height:' + art + 'px',
+      infoStyle: 'flex:1;min-width:0;display:flex;flex-direction:column;gap:8px',
+      labelStyle: 'font:800 40px/1 ' + NUN + ';color:' + (dis ? '#5C6264' : INK) + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      subStyle: 'font:700 38px/1 ' + NUN + ';color:' + (sw ? '#2D3436' : '#555C5E') + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis' + (sw ? ';background:' + MINT + ';border-radius:10px;padding:4px 12px;align-self:flex-start' : ''),
+      btnStyle: ['position:relative;flex:0 0 auto;box-sizing:border-box;width:430px;height:120px;border-radius:20px',
+        'background:' + fill + ';border:3px solid ' + fEdge + ';overflow:hidden',
+        'transform:scale(' + (tap ? 0.97 : 1) + ')'].join(';'),
+      holdStyle: (hold || stop)
+        ? 'position:absolute;left:0;top:0;bottom:0;width:' + Math.round((p.holdPct ?? 0.62) * 100) + '%;background:' + (stop ? '#FFDCC2' : PEACH)
+        : 'display:none',
+      btnInnerStyle: 'position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px',
+      btnLabelStyle: 'font:900 50px/1 ' + NUN + ';color:' + bInk,
+      btnSubStyle: 'font:700 38px/1 ' + NUN + ';color:' + (dis ? bInk : INK),
+      fbStyle: (tap || hold)
+        ? 'position:absolute;right:16px;top:-20px;z-index:3;box-sizing:border-box;height:58px;padding:0 18px;border-radius:16px;background:' + GOLD + ';border:3px solid ' + GOLD_EDGE + ';display:flex;align-items:center;gap:8px;box-shadow:0 6px 14px rgba(20,26,22,.28)'
+        : 'display:none',
+      fbTextStyle: 'font:900 38px/1 ' + NUN + ';font-variant-numeric:tabular-nums;color:' + INK,
+      fbText: '+' + (p.gain ?? 1),
+      fbCoinStyle: 'width:30px;height:30px;display:block'
+    };
+  }
+}
+</script>
+</body>
+</html>

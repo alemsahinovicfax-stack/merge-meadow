@@ -1,6 +1,9 @@
 extends SceneTree
 
-## CAMP-06 — tap = 1 sjeme, hold = 6/s, i prelazak na sljedeći tip dok se drži.
+## CAMP-06 / design_handoff_camp — tap = 1 sjeme, hold = 10/s, prelazak na
+## sljedeci tip dok se drzi; Trade dugme "Trade / hold 10 / s" → "Trading".
+
+var _backup: String = ""
 
 
 func _initialize() -> void:
@@ -9,6 +12,7 @@ func _initialize() -> void:
 
 func _fail(msg: String) -> void:
 	push_error("camp_trade_hold_smoke: %s" % msg)
+	CampSmokeUtil.restore_save(self, _backup)
 	quit(1)
 
 
@@ -27,15 +31,14 @@ func _assert_live_chrome(camp: Node, gs: Node) -> String:
 	var link_card := camp.get_node_or_null("%SeasonLinkCard") as CanvasItem
 	var link_coins := camp.get_node_or_null("%SeasonLinkCoins") as Label
 	if link_card and link_card.visible and link_coins:
-		if not link_coins.text.begins_with(want_coins):
-			return (
-				"season link coins must update mid-hold, label='%s' wallet=%s"
-				% [link_coins.text, want_coins]
-			)
+		var want_link := str(mini(int(gs.get("wallet_coins")), 500))
+		if not link_coins.text.begins_with(want_link):
+			return "season link coins must update mid-hold, label='%s' wallet=%s" % [link_coins.text, want_coins]
 	return ""
 
 
 func _run() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	var err := change_scene_to_file("res://scenes/camp/camp_scene.tscn")
 	if err != OK:
 		_fail("camp load failed %d" % err)
@@ -48,17 +51,15 @@ func _run() -> void:
 		_fail("camp/GameState missing")
 		return
 	var button := camp.get_node_or_null("%ExchangeButton")
-	if button == null:
-		_fail("ExchangeButton missing")
+	var bar := camp.get_node_or_null("%ExchangeBar")
+	if button == null or bar == null:
+		_fail("ExchangeButton / ExchangeBar missing")
 		return
 	if not bool(button.get("auto_repeat")):
 		_fail("Trade button must have auto_repeat on")
 		return
-	if not bool(button.get("ghost_when_disabled")):
-		_fail("Trade button must ghost when disabled")
-		return
-	if str(button.get("label_text")) != "Trade":
-		_fail("Trade button label must be 'Trade' got '%s'" % str(button.get("label_text")))
+	if not button.get("repeat_guard") is Callable or not (button.get("repeat_guard") as Callable).is_valid():
+		_fail("Trade button must have a repeat_guard (reserved flower floor)")
 		return
 
 	gs.set("seed_bag", {"clover": 24})
@@ -66,6 +67,9 @@ func _run() -> void:
 	camp.set("_force_default_trade_select", true)
 	camp.call("_refresh_garden_card")
 	await process_frame
+	if str(button.call("get_title")) != "Trade" or str(button.call("get_sub")) != "hold 10 / s":
+		_fail("Trade button must read 'Trade / hold 10 / s' got '%s / %s'" % [button.call("get_title"), button.call("get_sub")])
+		return
 
 	# Tap = tačno jedno sjeme.
 	button.call("begin_press", true)
@@ -77,6 +81,9 @@ func _run() -> void:
 	if not bool(button.call("is_holding")):
 		_fail("button should be holding after begin_press")
 		return
+	if str(bar.call("get_state")) != "idle":
+		_fail("first tap is not a hold yet, state=%s" % str(bar.call("get_state")))
+		return
 
 	# Unutar početnog delaya ponavljanje još ne kreće.
 	button.call("_tick_repeat", float(button.get("auto_repeat_delay")))
@@ -86,7 +93,7 @@ func _run() -> void:
 		_fail("repeat must not fire during the hold delay")
 		return
 
-	# Save je odgođen dok traje hold (inače 6 zapisa na disk u sekundi).
+	# Save je odgođen dok traje hold (inače 10 zapisa na disk u sekundi).
 	if not bool(camp.get("_pending_trade_save")):
 		_fail("hold must defer the save")
 		return
@@ -104,6 +111,12 @@ func _run() -> void:
 	if int(bag.get("clover", 0)) != 23 - rate:
 		_fail("1s hold must trade %d, clover got %s" % [rate, str(bag.get("clover"))])
 		return
+	if str(bar.call("get_state")) != "hold" or str(button.call("get_title")) != "Trading":
+		_fail("repeat must show hold state 'Trading', state=%s title=%s" % [bar.call("get_state"), button.call("get_title")])
+		return
+	if int(bar.call("get_gain")) != rate + 1:
+		_fail("TradeFeedback must sum the hold (+%d), gain=%s" % [rate + 1, str(bar.call("get_gain"))])
+		return
 
 	# Header i link-season prate hold uživo — bez čekanja na otpuštanje.
 	var chrome_err := _assert_live_chrome(camp, gs)
@@ -118,6 +131,9 @@ func _run() -> void:
 		return
 	if bool(camp.get("_pending_trade_save")):
 		_fail("release must flush the save")
+		return
+	if int(bar.call("get_gain")) != 0 or str(bar.call("get_state")) != "idle":
+		_fail("release must hand +N to the header and return to idle")
 		return
 
 	# Kad se tip isprazni tokom holda, trgovanje se nastavlja sljedećim tipom.
@@ -137,6 +153,9 @@ func _run() -> void:
 	if str(camp.get("_selected_trade_type")) != "tulip":
 		_fail("selection must advance to tulip got %s" % str(camp.get("_selected_trade_type")))
 		return
+	if str(bar.call("get_value_text")) != "empty — switched here":
+		_fail("auto switch must flash 'empty — switched here', got '%s'" % str(bar.call("get_value_text")))
+		return
 	button.call("_tick_repeat", float(button.get("auto_repeat_delay")))
 	for _k in 2:
 		button.call("_tick_repeat", interval)
@@ -148,5 +167,18 @@ func _run() -> void:
 	button.call("end_press")
 	await process_frame
 
+	# Prazna vreca: Trade bar ostaje, dugme disabled.
+	gs.set("seed_bag", {})
+	camp.set("_force_default_trade_select", true)
+	camp.call("_refresh_garden_card")
+	await process_frame
+	if not bool(button.get("disabled")) or str(bar.call("get_state")) != "disabled":
+		_fail("empty bag must disable Trade (bar stays)")
+		return
+	if not (bar as Control).visible or str(button.call("get_sub")) != "nothing to trade":
+		_fail("disabled Trade bar must stay visible with 'nothing to trade'")
+		return
+
 	print("camp_trade_hold_smoke OK")
+	CampSmokeUtil.restore_save(self, _backup)
 	quit(0)

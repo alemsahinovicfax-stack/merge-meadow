@@ -1,6 +1,9 @@
 extends SceneTree
 
-## CAMP-01 B — Flowers spend for Sprinkler / Loot Boost.
+## CAMP-01 B — Flowers spend for Sprinkler / Loot Boost (GameState API).
+## Dugmad za upgrade zive na Home polju; Camp vise nema UpgradeCards.
+
+var _backup: String = ""
 
 
 func _initialize() -> void:
@@ -9,10 +12,16 @@ func _initialize() -> void:
 
 func _fail(msg: String) -> void:
 	push_error("camp_donate_smoke: %s" % msg)
+	CampSmokeUtil.restore_save(self, _backup)
 	quit(1)
 
 
 func _run() -> void:
+	_backup = CampSmokeUtil.backup_save()
+	var gs := get_root().get_node_or_null("GameState")
+	if gs == null:
+		_fail("GameState missing")
+		return
 	var err := change_scene_to_file("res://scenes/camp/camp_scene.tscn")
 	if err != OK:
 		_fail("camp scene load failed %d" % err)
@@ -20,33 +29,14 @@ func _run() -> void:
 	for _i in 12:
 		await process_frame
 	var camp := current_scene as Control
-	if camp == null or not str(camp.scene_file_path).ends_with("camp_scene.tscn"):
-		_fail("wrong scene")
+	if camp == null:
+		_fail("camp scene missing")
 		return
-	var gs := get_root().get_node_or_null("GameState")
-	if gs == null:
-		_fail("GameState missing")
-		return
-	var upgrade_cards := camp.get_node_or_null("%UpgradeCards") as Control
-	if upgrade_cards == null:
-		_fail("UpgradeCards missing")
-		return
-	if upgrade_cards.visible:
-		_fail("UpgradeCards should stay hidden")
+	if camp.get_node_or_null("%UpgradeCards") != null:
+		_fail("UpgradeCards should be removed from Camp (upgrades live on Home field)")
 		return
 
 	_reset_upgrade_state(gs, {"clover": 2}, 0, 0)
-	camp.set("_selected_crystal_type", "")
-	camp.call("_refresh_ui")
-	await process_frame
-	upgrade_cards = camp.get_node_or_null("%UpgradeCards") as Control
-	if upgrade_cards == null or upgrade_cards.visible:
-		_fail("UpgradeCards should stay hidden after refresh")
-		return
-	var sprinkler_btn := camp.get_node("%UpgradeButton")
-	if sprinkler_btn == null or bool(sprinkler_btn.get("disabled")):
-		_fail("2 clover should enable Sprinkler Upgrade")
-		return
 	if not bool(gs.call("try_upgrade_magnet", "")):
 		_fail("try_upgrade_magnet with 2 clover failed")
 		return
@@ -59,76 +49,36 @@ func _run() -> void:
 		return
 
 	_reset_upgrade_state(gs, {"clover": 1}, 0, 0)
-	camp.call("_refresh_ui")
-	await process_frame
-	sprinkler_btn = camp.get_node("%UpgradeButton")
-	if sprinkler_btn == null or not bool(sprinkler_btn.get("disabled")):
-		_fail("1 clover should disable Sprinkler Upgrade")
-		return
 	if bool(gs.call("try_upgrade_magnet", "")):
 		_fail("try_upgrade_magnet should fail with 1 flower")
 		return
-	if int(gs.get("magnet_level")) != 0:
-		_fail("magnet should stay 0 with 1 flower")
-		return
 	stash = gs.get("garden_crystal_stash")
-	if int(stash.get("clover", 0)) != 1:
-		_fail("1 clover stash should be unchanged")
+	if int(gs.get("magnet_level")) != 0 or int(stash.get("clover", 0)) != 1:
+		_fail("failed magnet upgrade must not change level or stash")
 		return
 
 	_reset_upgrade_state(gs, {"clover": 2}, 0, 0)
-	camp.call("_refresh_ui")
-	await process_frame
-	var loot_btn := camp.get_node("%UpgradeMultiplierButton")
-	if loot_btn == null or bool(loot_btn.get("disabled")):
-		_fail("2 clover should enable Loot Boost Upgrade")
-		return
 	if not bool(gs.call("try_upgrade_multiplier", "")):
 		_fail("try_upgrade_multiplier with 2 clover failed")
 		return
-	if int(gs.get("multiplier_level")) != 1:
-		_fail("multiplier_level expected 1")
-		return
 	stash = gs.get("garden_crystal_stash")
-	if int(stash.get("clover", 0)) != 0:
-		_fail("clover stash should be 0 after loot upgrade")
+	if int(gs.get("multiplier_level")) != 1 or int(stash.get("clover", 0)) != 0:
+		_fail("loot upgrade should reach 1 and spend 2 clover")
 		return
 
 	_reset_upgrade_state(gs, {"clover": 1}, 0, 0)
-	if bool(gs.call("try_upgrade_multiplier", "")):
+	if bool(gs.call("try_upgrade_multiplier", "")) or int(gs.get("multiplier_level")) != 0:
 		_fail("try_upgrade_multiplier should fail with 1 flower")
-		return
-	if int(gs.get("multiplier_level")) != 0:
-		_fail("multiplier should stay 0 with 1 flower")
 		return
 
 	var max_lv := 4
 	_reset_upgrade_state(gs, {"clover": 5}, max_lv, 0)
-	camp.call("_refresh_ui")
-	await process_frame
-	sprinkler_btn = camp.get_node("%UpgradeButton")
-	if sprinkler_btn == null or not bool(sprinkler_btn.get("disabled")):
-		_fail("max magnet should disable Upgrade")
-		return
 	if bool(gs.call("try_upgrade_magnet", "")):
 		_fail("try_upgrade_magnet at max should fail")
 		return
-	if int(gs.get("magnet_level")) != max_lv:
-		_fail("max magnet level changed")
-		return
 	stash = gs.get("garden_crystal_stash")
-	if int(stash.get("clover", 0)) != 5:
+	if int(gs.get("magnet_level")) != max_lv or int(stash.get("clover", 0)) != 5:
 		_fail("maxed upgrade must not spend flowers")
-		return
-
-	camp.call("_refresh_ui")
-	await process_frame
-	var sprinkler_cap := camp.get_node("%SprinklerCaption") as Label
-	var loot_cap := camp.get_node("%MultiplierCaption") as Label
-	var sprinkler_text := sprinkler_cap.text if sprinkler_cap else ""
-	var loot_text := loot_cap.text if loot_cap else ""
-	if sprinkler_text.contains("donate in Arena") or loot_text.contains("donate in Arena"):
-		_fail("caption still says donate in Arena")
 		return
 
 	_reset_upgrade_state(gs, {"clover": 3, "daisy": 2}, 0, 0)
@@ -147,6 +97,7 @@ func _run() -> void:
 		return
 
 	print("camp_donate_smoke OK")
+	CampSmokeUtil.restore_save(self, _backup)
 	quit(0)
 
 

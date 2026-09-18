@@ -1,10 +1,12 @@
-[gd_scene load_steps=13 format=3 uid="uid://c8campscene01"]
+[gd_scene load_steps=10 format=3 uid="uid://c8campscene01"]
 
 [ext_resource type="Script" path="res://scripts/camp/camp_controller.gd" id="1_camp"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
 [ext_resource type="Script" path="res://scripts/camp/season_link_card.gd" id="3_slink"]
-[ext_resource type="Script" path="res://scripts/ui/season_unlock_progress.gd" id="4_progress"]
-[ext_resource type="Script" path="res://scripts/ui/home_basket_picker_icon.gd" id="5_flower"]
+[ext_resource type="Script" path="res://scripts/camp/camp_button.gd" id="4_cbtn"]
+[ext_resource type="Script" path="res://scripts/camp/camp_art_frame.gd" id="5_art"]
+[ext_resource type="Script" path="res://scripts/camp/camp_trade_bar.gd" id="6_trade"]
+[ext_resource type="Script" path="res://scripts/camp/camp_stash_tab.gd" id="7_tab"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top"]
 bg_color = Color(0.12, 0.2, 0.14, 0.92)
@@ -15,109 +17,7 @@ content_margin_top = 8.0
 content_margin_right = 12.0
 content_margin_bottom = 8.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
-bg_color = Color(0.96, 0.98, 0.95, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.176, 0.204, 0.212, 0.14)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-content_margin_left = 14.0
-content_margin_top = 12.0
-content_margin_right = 14.0
-content_margin_bottom = 12.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toast"]
-bg_color = Color(1, 0.94, 0.82, 0.92)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.176, 0.204, 0.212, 0.15)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-content_margin_left = 12.0
-content_margin_top = 10.0
-content_margin_right = 12.0
-content_margin_bottom = 10.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_daily_ready"]
-bg_color = Color(1, 0.78, 0.48, 0.95)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.85, 0.55, 0.15, 0.55)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-content_margin_left = 14.0
-content_margin_top = 12.0
-content_margin_right = 14.0
-content_margin_bottom = 12.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_daily_claimed"]
-bg_color = Color(0.55, 0.62, 0.56, 0.72)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.176, 0.204, 0.212, 0.18)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-content_margin_left = 14.0
-content_margin_top = 12.0
-content_margin_right = 14.0
-content_margin_bottom = 12.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chest_body"]
-bg_color = Color(0.62, 0.38, 0.16, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.35, 0.2, 0.08, 0.7)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chest_lid"]
-bg_color = Color(0.92, 0.72, 0.28, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.55, 0.38, 0.1, 0.65)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward"]
-bg_color = Color(1, 0.973, 0.941, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.176, 0.204, 0.212, 0.16)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-content_margin_left = 24.0
-content_margin_top = 22.0
-content_margin_right = 24.0
-content_margin_bottom = 22.0
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_none"]
 
 [node name="CampScene" type="Control"]
 layout_mode = 3
@@ -136,7 +36,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.18, 0.28, 0.2, 1)
+color = Color(0.180392, 0.278431, 0.2, 1)
 
 [node name="RootVBox" type="VBoxContainer" parent="."]
 unique_name_in_owner = true
@@ -147,6 +47,7 @@ anchor_bottom = 1.0
 offset_bottom = -72.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/separation = 0
 
 [node name="HeaderPanel" type="PanelContainer" parent="RootVBox"]
@@ -171,16 +72,10 @@ label_text = ""
 button_icon = "home"
 button_variant = "subtle"
 
-[node name="CampTitle" type="Label" parent="RootVBox/HeaderPanel/VBox/TopBar"]
-unique_name_in_owner = true
-visible = false
+[node name="TopBarSpacer" type="Control" parent="RootVBox/HeaderPanel/VBox/TopBar"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(1, 0.92, 0.55, 1)
-theme_override_font_sizes/font_size = 34
-text = ""
-horizontal_alignment = 1
-vertical_alignment = 1
+mouse_filter = 2
 
 [node name="CollectionButton" type="PanelContainer" parent="RootVBox/HeaderPanel/VBox/TopBar"]
 unique_name_in_owner = true
@@ -246,13 +141,6 @@ theme_override_font_sizes/font_size = 26
 text = "0"
 vertical_alignment = 1
 
-[node name="CoinsCaption" type="Label" parent="RootVBox/HeaderPanel/VBox/ResourceBar/CoinsRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.82, 0.7, 1)
-theme_override_font_sizes/font_size = 16
-text = "coins"
-vertical_alignment = 1
-
 [node name="SeedsRow" type="HBoxContainer" parent="RootVBox/HeaderPanel/VBox/ResourceBar"]
 layout_mode = 2
 theme_override_constants/separation = 6
@@ -274,375 +162,423 @@ theme_override_font_sizes/font_size = 26
 text = "0 / 40"
 vertical_alignment = 1
 
-[node name="SeedsCaption" type="Label" parent="RootVBox/HeaderPanel/VBox/ResourceBar/SeedsRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.9, 0.72, 1)
-theme_override_font_sizes/font_size = 16
-text = "seeds"
-vertical_alignment = 1
-
-[node name="MainScroll" type="ScrollContainer" parent="RootVBox"]
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-vertical_scroll_mode = 0
-
-[node name="ContentMargin" type="MarginContainer" parent="RootVBox/MainScroll"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="Content" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="StatusToast" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
+[node name="CampPage" type="MarginContainer" parent="RootVBox"]
 unique_name_in_owner = true
-visible = false
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="ContentStack" type="VBoxContainer" parent="RootVBox/CampPage"]
+unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_toast")
+theme_override_constants/separation = 0
 
-[node name="StatusLabel" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/StatusToast"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
-theme_override_font_sizes/font_size = 20
-text = ""
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="GardenCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 1.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_card")
-
-[node name="GardenVBox" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 6
-
-[node name="GardenTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Seeds"
-horizontal_alignment = 1
-
-[node name="GardenCliff" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
+[node name="SeasonLinkCard" type="PanelContainer" parent="RootVBox/CampPage/ContentStack"]
 unique_name_in_owner = true
 visible = false
+custom_minimum_size = Vector2(0, 422)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = ""
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="BagLabel" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Seeds: 0 / 40"
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="SeedBagScroll" type="ScrollContainer" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-vertical_scroll_mode = 3
-
-[node name="SeedBagGrid" type="GridContainer" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox/SeedBagScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
-columns = 2
-
-[node name="ExchangeButton" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/GardenCard/GardenVBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(460, 64)
-layout_mode = 2
-size_flags_horizontal = 4
-script = ExtResource("2_uibtn")
-label_text = "Trade"
-font_size = 32
-button_variant = "price"
-
-[node name="CrystalCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 1.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_card")
-
-[node name="CrystalVBox" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 6
-
-[node name="CrystalTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Flowers"
-horizontal_alignment = 1
-
-[node name="CrystalCliff" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = ""
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="CrystalTotalLabel" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Flowers: 0"
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="CrystalScroll" type="ScrollContainer" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-vertical_scroll_mode = 3
-
-[node name="CrystalGrid" type="GridContainer" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox/CrystalScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
-columns = 2
-
-[node name="CrystalExchangeButton" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/CrystalCard/CrystalVBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(460, 64)
-layout_mode = 2
-size_flags_horizontal = 4
-script = ExtResource("2_uibtn")
-label_text = "Trade"
-font_size = 32
-button_variant = "price"
-
-[node name="SeasonLinkCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 1.0
-mouse_filter = 0
 script = ExtResource("3_slink")
 
-[node name="SeasonLinkVBox" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard"]
+[node name="SeasonLinkVBox" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard"]
 layout_mode = 2
-size_flags_vertical = 3
 mouse_filter = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
-[node name="SeasonLinkTitle" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox"]
-unique_name_in_owner = true
+[node name="SeasonHead" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox"]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 mouse_filter = 2
-theme_override_font_sizes/font_size = 36
-text = "Frost Orchard"
-horizontal_alignment = 1
+theme_override_constants/separation = 20
 
-[node name="SeasonLinkInset" type="MarginContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox"]
+[node name="SeasonHeadText" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead"]
 layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 2
-size_flags_vertical = 3
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_right = 0
-
-[node name="SeasonLinkInner" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 8
-
-[node name="SeasonUnlockProgress" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-mouse_filter = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 alignment = 1
-script = ExtResource("4_progress")
 
-[node name="SeasonLinkCoinIcon" type="TextureRect" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+[node name="SeasonEyebrow" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead/SeasonHeadText"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "Next free season"
+
+[node name="SeasonLinkTitle" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead/SeasonHeadText"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Frost Orchard"
+
+[node name="HomeHint" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HomeHintLabel" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead/HomeHint"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Details ↗"
+vertical_alignment = 1
+
+[node name="SeasonProgress" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 20
+
+[node name="CoinProgress" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="CoinValRow" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress"]
 layout_mode = 2
 mouse_filter = 2
-size_flags_horizontal = 4
+theme_override_constants/separation = 12
+
+[node name="SeasonLinkCoinIcon" type="TextureRect" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress/CoinValRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SeasonLinkCoins" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+[node name="SeasonLinkCoins" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress/CoinValRow"]
 unique_name_in_owner = true
 layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 18
+size_flags_vertical = 4
 text = "0 / 500"
-horizontal_alignment = 1
 
-[node name="SeasonLinkCoinsBar" type="ProgressBar" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+[node name="SeasonCoinCap" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
-mouse_filter = 2
-max_value = 500.0
-value = 0.0
-show_percentage = false
+text = "Coins"
 
-[node name="SectionDivider" type="Control" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+[node name="SeasonLinkCoinsBar" type="ProgressBar" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 mouse_filter = 2
+max_value = 500.0
+show_percentage = false
+
+[node name="SeasonSplitLine" type="Panel" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(5, 112)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="FlowerProgress" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress"]
+unique_name_in_owner = true
+layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="Line" type="ColorRect" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress/SectionDivider"]
-layout_mode = 0
 mouse_filter = 2
-color = Color(0.1, 0.1, 0.1, 0.35)
+theme_override_constants/separation = 8
+alignment = 1
 
-[node name="SeasonLinkFlower" type="Control" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
-custom_minimum_size = Vector2(92, 92)
+[node name="FlowerValRow" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress"]
 layout_mode = 2
 mouse_filter = 2
-size_flags_horizontal = 4
-script = ExtResource("5_flower")
+theme_override_constants/separation = 12
 
-[node name="SeasonLinkStars" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+[node name="SeasonLinkFlower" type="Control" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress/FlowerValRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
+size_flags_vertical = 4
 mouse_filter = 2
-theme_override_font_sizes/font_size = 16
-text = "★★★"
-horizontal_alignment = 1
+script = ExtResource("5_art")
 
-[node name="SeasonLinkFlowerName" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+[node name="SeasonLinkT3" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress/FlowerValRow"]
 unique_name_in_owner = true
 layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 16
-text = "Harvest Pumpkin"
-horizontal_alignment = 1
-
-[node name="SeasonLinkT3" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
-unique_name_in_owner = true
-layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 18
+size_flags_vertical = 4
 text = "0 / 20"
-horizontal_alignment = 1
 
-[node name="SeasonLinkT3Bar" type="ProgressBar" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner/SeasonUnlockProgress"]
+[node name="SeasonLinkFlowerName" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+text = "Harvest Pumpkin ★★★"
+
+[node name="SeasonLinkT3Bar" type="ProgressBar" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 mouse_filter = 2
 max_value = 20.0
-value = 0.0
 show_percentage = false
 
-[node name="SeasonLinkSpacer" type="Control" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner"]
-visible = false
+[node name="SeasonLinkUnlock" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 132)
+layout_mode = 2
+script = ExtResource("4_cbtn")
+
+[node name="StackGap" type="Control" parent="RootVBox/CampPage/ContentStack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="StashSection" type="PanelContainer" parent="RootVBox/CampPage/ContentStack"]
+unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 
-[node name="SeasonLinkUnlock" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/SeasonLinkCard/SeasonLinkVBox/SeasonLinkInset/SeasonLinkInner"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(460, 64)
+[node name="SectionVBox" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/StashSection"]
 layout_mode = 2
-size_flags_horizontal = 4
-mouse_filter = 0
-script = ExtResource("2_uibtn")
-label_text = "Unlock"
-font_size = 32
-button_variant = "gold"
+mouse_filter = 2
+theme_override_constants/separation = 14
 
-[node name="UpgradeCards" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content"]
+[node name="StashTabs" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 132)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="SeedsTab" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/StashTabs"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("7_tab")
+
+[node name="FlowersTab" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/StashTabs"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("7_tab")
+
+[node name="MergeShortcut" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/StashTabs"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(190, 132)
+layout_mode = 2
+script = ExtResource("4_cbtn")
+
+[node name="StashScroll" type="ScrollContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 556)
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="StashLists" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/StashScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="SeedBagGrid" type="GridContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/StashScroll/StashLists"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="CrystalGrid" type="GridContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/StashScroll/StashLists"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="EmptyState" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="EmptyArt" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/EmptyState"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+
+[node name="EmptyIcon" type="TextureRect" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/EmptyState/EmptyArt"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.34)
+custom_minimum_size = Vector2(54, 54)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EmptyTitle" type="Label" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/EmptyState"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Your bag is empty"
+horizontal_alignment = 1
+
+[node name="EmptyBody" type="Label" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/EmptyState"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(800, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="EmptyCta" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/EmptyState"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+size_flags_horizontal = 4
+script = ExtResource("4_cbtn")
+
+[node name="ExchangeBar" type="Control" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 152)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("6_trade")
+
+[node name="TradePanel" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TradeVBox" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="ReservedWarning" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="WarnRow" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/ReservedWarning"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="WarnIcon" type="TextureRect" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/ReservedWarning/WarnRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WarnLabel" type="Label" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/ReservedWarning/WarnRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="TradeRow" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+
+[node name="TradeArt" type="Control" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/TradeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(88, 88)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("5_art")
+
+[node name="TradeInfo" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/TradeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="SelectedLabel" type="Label" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/TradeRow/TradeInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="SelectedValue" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/TradeRow/TradeInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_none")
+
+[node name="SelectedValueLabel" type="Label" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/TradeRow/TradeInfo/SelectedValue"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ExchangeButton" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/TradeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(430, 120)
+layout_mode = 2
+size_flags_vertical = 4
+script = ExtResource("4_cbtn")
+auto_repeat = true
+auto_repeat_rate = 10.0
+
+[node name="TradeFeedback" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar"]
+unique_name_in_owner = true
+visible = false
+z_index = 5
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -140.0
+offset_top = -20.0
+offset_right = -16.0
+offset_bottom = 38.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="FeedbackRow" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradeFeedback"]
+layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 8
 
-[node name="SprinklerCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_card")
-
-[node name="SprinklerVBox" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards/SprinklerCard"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="SprinklerLabel" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards/SprinklerCard/SprinklerVBox"]
+[node name="FeedbackLabel" type="Label" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradeFeedback/FeedbackRow"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "Sprinkler  Lv 0/4"
-autowrap_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+text = "+1"
 
-[node name="SprinklerCaption" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards/SprinklerCard/SprinklerVBox"]
+[node name="FeedbackCoin" type="TextureRect" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradeFeedback/FeedbackRow"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Spend 2 flowers"
-autowrap_mode = 2
-
-[node name="UpgradeButton" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards/SprinklerCard/SprinklerVBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "Upgrade"
-font_size = 20
-
-[node name="LootCard" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_card")
-
-[node name="LootVBox" type="VBoxContainer" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards/LootCard"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="MultiplierLabel" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards/LootCard/LootVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "Loot Boost  Lv 0/4"
-autowrap_mode = 2
-
-[node name="MultiplierCaption" type="Label" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards/LootCard/LootVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Spend 2 flowers"
-autowrap_mode = 2
-
-[node name="UpgradeMultiplierButton" type="PanelContainer" parent="RootVBox/MainScroll/ContentMargin/Content/UpgradeCards/LootCard/LootVBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "Upgrade"
-font_size = 20
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="FooterBar" type="MarginContainer" parent="."]
 unique_name_in_owner = true
@@ -683,4 +619,3 @@ label_text = "Play"
 font_size = 28
 button_icon = "play"
 button_variant = "primary"
-

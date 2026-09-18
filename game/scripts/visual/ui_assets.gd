@@ -1,10 +1,13 @@
 class_name UiAssets
 extends RefCounted
 
-## UI ikone — Figma play + Kenney game-icons (CC0).
+## UI ikone — Figma play + Kenney game-icons (CC0) + hub chrome SVG (Claude Design).
 
 const ICON_PLAY_PATH := "res://assets/ui/icon_play.png"
 const KENNEY_DIR := "res://assets/ui/kenney/"
+const CHROME_DIR := "res://assets/ui/chrome/"
+const ARENA_DIR := "res://assets/ui/arena/"
+const CAMP_DIR := "res://assets/ui/camp/"
 const BUTTON_ICON_SIZE := 32.0
 const HUD_ICON_SIZE := 24.0
 
@@ -29,6 +32,21 @@ static func get_kenney_icon(name: String) -> Texture2D:
 	if file_name.is_empty():
 		return null
 	return _load_icon(KENNEY_DIR + file_name)
+
+
+## Hub chrome ikona po imenu fajla bez .svg — npr. "tab_home", "tab_home_light", "icon_coin".
+static func get_chrome_icon(icon_name: String) -> Texture2D:
+	return _load_icon(CHROME_DIR + icon_name + ".svg")
+
+
+## Merge Arena HUD ikone — "icon_crystal", "icon_target", "icon_check".
+static func get_arena_icon(icon_name: String) -> Texture2D:
+	return _load_icon(ARENA_DIR + icon_name + ".svg")
+
+
+## Camp ikone — "icon_merge_arrow", "icon_reserved", "icon_hold_stop".
+static func get_camp_icon(icon_name: String) -> Texture2D:
+	return _load_icon(CAMP_DIR + icon_name + ".svg")
 
 
 static func _load_icon(path: String) -> Texture2D:

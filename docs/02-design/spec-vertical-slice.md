@@ -49,10 +49,10 @@ Prijelazi idu kroz `GameState.go_to_*` / `SceneRouter`. Stanje između scena ču
 | Camp | 3 | `camp_scene.tscn` |
 | Arena | 4 | `merge_arena.tscn` |
 
-- Swipe lijevo/desno ili tabovi; shared top bar prikazuje coin/seed ikone (`pickups/coin.png`, `pickups/seed.png`) + brojeve (bez riječi). Page ResourceBar skriven kad je stranica ugrađena u hub.
-- Page dots (○/●) uklonjeni — navigacija preko tabova + caption.
-- Ugrađene stranice imaju `meta_hub_embedded = true`; Back/Home gumbi skriveni gdje dupliciraju hub navigaciju.
-- **Settings** gumb na hubu: placeholder poruka (puni ekran → D0-P).
+- Swipe lijevo/desno ili tabovi. **Hub chrome** (smjer B iz Claude Designa, 2026-09-11): tamna traka `#1A241E` gore i dolje, ista na svih 5 stranica — [[../04-experience/design-drafts/hub-header-footer-cd-brief|brief + implementacija]].
+- **Header:** coin · seed · diamond chip (chrome SVG ikona + broj bez riječi, `UiChrome.format_count`) + **Settings** (placeholder toast; puni ekran → D0-P). Page ResourceBar skriven kad je stranica ugrađena u hub.
+- **Footer:** 5 tabova (ikona + labela), aktivan = peach tile, `ActiveIndicator` prati swipe; Journal badge za nova otkrića; tokom Arena sesije nav lock (gold rub + "ROUND IN PROGRESS"). Page dots i caption uklonjeni (Bug-019).
+- Ugrađene stranice imaju `meta_hub_embedded = true`; Back/Home/Settings gumbi stranica skriveni gdje dupliciraju hub chrome.
 
 **Gotovo kad:** sve 5 stranica učitava bez crasha; navigacija ne gubi stanje; Play iz Home/Camp pokreće run.
 
@@ -133,12 +133,10 @@ Prikaz: naslov (Failed/Complete), boja trake, `+N Coins/Seeds`, status s **X →
 - **To Camp** na loot ekranu: `deposit_loot_to_camp()` → ako ima sjemena, **Merge Arena**, inače **Camp**.
 
 ### Kamp UI
-- **Layout (D0-P / Bug-008 / Bug-012):** zone Daily → Garden (bag + seed trade) → Crystal stash → Upgrades → Run prep → Footer Merge/Play. Merge i dalje u Areni, ne na gridu.
-- **Sprinkler (magnet):** donate T2 bloomovi → `magnet_level` (0–4), veći domet u runu.
-- **Loot Boost:** donate T3 → `multiplier_level` (0–4), ×1.0–×2.0 u runu.
-- **Exchange:** 3× isti tip iz baga → coins (Garden kartica, select tipa); crystal exchange: zasebna Crystal stash kartica (select tipa, 1→coins); seed trade ostaje u Garden kartici.
-- **Daily chest**, **loadout basket** (1 slot, +5% spawn šanse).
-- Footer: **Merge** → arena; **Play** → svjež run.
+- **Izgled** (smjer 1b iz Claude Designa, 2026-09-16): hero kartica sljedeće besplatne sezone gore (Coins + ★3 cvijet, Unlock troši odmah pa Home; tap na karticu → Home bez trošenja); dolje sekcija s tabovima **Seeds · Flowers** (+ prečica **Merge** → Arena), grid chipova i **jedan Trade bar** — [[../04-experience/design-drafts/camp-cd-brief|brief + implementacija]].
+- **Trade:** tap = 1 komad, držanje = 10/s s auto prelazom na sljedeći tip; kursevi u [[ekonomija-brojevi]]. ★3 cvijeće koje sljedeća sezona traži nosi `Kept · N / 20` i **držanje staje na granici** (tap prodaje dalje).
+- **Upgradei** (Magnet / Loot Boost, 2 cvijeta po nivou) su na Home polju, ne u Campu. **Daily chest** i **basket** su na Home.
+- U hubu nema Campovog headera/footera; standalone scena zadržava Merge / Play.
 
 ### Merge (Arena — §4b)
 Merge T1→T2→T3 radi u **Merge Arena**, ne na gridu u kampu. Max tier = `MAX_MERGE_TIER` (3).
@@ -146,7 +144,7 @@ Merge T1→T2→T3 radi u **Merge Arena**, ne na gridu u kampu. Max tier = `MAX_
 | Play | → svjež Run |
 |------|-------------|
 
-**Gotovo kad:** bag prima loot; upgrade donate radi; Merge/Play navigacija ispravna; status toast + Garden cliff vode igrača.
+**Gotovo kad:** bag prima loot; Trade (tap/držanje, granica za ★3) radi na oba taba; Merge prečica i prazna stanja vode igrača; Unlock sljedeće sezone troši 500 + 20 i vodi na Home.
 
 ---
 
@@ -154,12 +152,13 @@ Merge T1→T2→T3 radi u **Merge Arena**, ne na gridu u kampu. Max tier = `MAX_
 
 **Scena:** `scenes/camp/merge_arena.tscn` · **skripta:** `scripts/camp/merge_arena_controller.gd`
 
-- Drag-and-drop chipovi iz **seed bag**; merge isti tip + tier → tier+1.
-- **Pest** jede T1/T2; T3 freeze.
-- **Bloom inbox:** Keep (album) / Donate (sprinkler/multiplier progress).
-- Povratak → Camp hub stranica.
+- Tap na vreću → sjemenke (tipovi s ≥ 4 u vreći) na polje, max 30, rešetkasti spawn; drag + magnet, merge isti tip + tier → tier+1.
+- **T3** odmah napušta polje → garden stash (+ Journal T3); kristal leti u StashCounter. Bloom inbox / Donate / Keep u Areni **uklonjeni** (FLOW-A).
+- **Muncher** jede T1/T2; T3 ga zamrzne 2 s. Combo (+2 coina na 5), dnevni Arena zadatak u HUD-u.
+- Tokom runde hub navigacija zaključana; **Done** (jedini izlaz) vraća ostatke u vreću i ide na Camp stranicu.
+- Izgled: smjer B iz Claude Designa (2026-09-12) — [[../04-experience/design-drafts/merge-arena-cd-brief|brief + implementacija]].
 
-**Gotovo kad:** T1→T3 lanac radi; Keep/Donate ažuriraju album i donate brojače.
+**Gotovo kad:** T1→T3 lanac radi; T3 ide u garden stash i Journal; 30 sjemenki staje bez preklapanja; Done nije pod NavLockPillom.
 
 ---
 

@@ -132,6 +132,12 @@ func claim_daily() -> String:
 	return "Arena streak %d" % daily_streak
 
 
+## Zadatak odradjen danas (bez obzira da li je badge vec preuzet na Home).
+func is_daily_complete() -> bool:
+	ensure_daily_task()
+	return daily_progress >= daily_goal
+
+
 func get_daily_hud_text() -> String:
 	ensure_daily_task()
 	var n := mini(daily_progress, daily_goal)

@@ -4,6 +4,8 @@ extends SceneTree
 ## Bug-006: assert redoslijed Shop → Journal → Home → Camp → Arena.
 
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
+const UI_CHROME := preload("res://scripts/visual/ui_chrome.gd")
+const CHROME_ROW := "RootVBox/PageIndicator/NavPanel/Content"
 
 
 func _initialize() -> void:
@@ -66,10 +68,7 @@ func _step() -> void:
 	hub.go_to_page(MetaHubPages.SHOP, false)
 	for _i in 20:
 		await process_frame
-	var caption := hub.get_node_or_null(
-		"RootVBox/PageIndicator/NavPanel/Margin/VBox/CaptionLabel"
-	)
-	if caption != null:
+	if hub.find_child("CaptionLabel", true, false) != null:
 		push_error("meta_hub_flow_smoke: CaptionLabel should be removed (Bug-019)")
 		quit(1)
 		return
@@ -134,8 +133,17 @@ func _step() -> void:
 	if hub.has_method("refresh_top_bar"):
 		hub.call("refresh_top_bar")
 	await process_frame
-	var want_coins := str(int(gs.get("wallet_coins")))
-	var want_seeds := str(int(gs.call("sum_seed_bag_only")))
+	var format_cases := [[0, "0"], [999, "999"], [12450, "12,450"], [999999, "999,999"], [1234567, "1.2M"]]
+	for fc in format_cases:
+		if UI_CHROME.format_count(int(fc[0])) != String(fc[1]):
+			push_error(
+				"meta_hub_flow_smoke: format_count(%d) got '%s' expected '%s'"
+				% [int(fc[0]), UI_CHROME.format_count(int(fc[0])), String(fc[1])]
+			)
+			quit(1)
+			return
+	var want_coins := UI_CHROME.format_count(int(gs.get("wallet_coins")))
+	var want_seeds := UI_CHROME.format_count(int(gs.call("sum_seed_bag_only")))
 	if coins_label.text != want_coins:
 		push_error(
 			"meta_hub_flow_smoke: CoinsLabel got '%s' expected '%s'"
@@ -168,6 +176,12 @@ func _step() -> void:
 		push_error("meta_hub_flow_smoke: camp ResourceBar should be hidden in hub")
 		quit(1)
 		return
+	# Brda Arene / brežuljci Home ne smiju se crtati preko susjedne stranice (Camp Trade bar).
+	for page in host.get_children():
+		if page is Control and not (page as Control).clip_contents:
+			push_error("meta_hub_flow_smoke: page %s must clip its contents" % page.name)
+			quit(1)
+			return
 	if camp.get_node_or_null("%DailyChestCard") != null:
 		push_error("meta_hub_flow_smoke: camp DailyChestCard should be removed (Bug-022)")
 		quit(1)
@@ -192,12 +206,34 @@ func _step() -> void:
 		push_error("meta_hub_flow_smoke: Home ShopButton should be removed")
 		quit(1)
 		return
-	if home.get_node_or_null("SettingsButton") == null:
-		push_error("meta_hub_flow_smoke: Home SettingsButton missing")
+	# Hub chrome: Settings živi u headeru (odluka 2026-09-10), ne na Home.
+	if home.find_child("SettingsButton", true, false) != null:
+		push_error("meta_hub_flow_smoke: Home SettingsButton should be removed (hub header owns it)")
 		quit(1)
 		return
-	if hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/SettingsButton") != null:
-		push_error("meta_hub_flow_smoke: hub TopBar SettingsButton should be removed")
+	var hub_settings := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/SettingsButton") as Control
+	if hub_settings == null or not hub_settings.is_visible_in_tree():
+		push_error("meta_hub_flow_smoke: hub header SettingsButton missing")
+		quit(1)
+		return
+	var tabs_row := hub.get_node_or_null(CHROME_ROW + "/TabsRow")
+	if tabs_row == null or tabs_row.get_child_count() != MetaHubPages.PAGE_COUNT:
+		push_error("meta_hub_flow_smoke: footer TabsRow expected %d tabs" % MetaHubPages.PAGE_COUNT)
+		quit(1)
+		return
+	if hub.get_node_or_null(CHROME_ROW + "/ActiveIndicator") == null:
+		push_error("meta_hub_flow_smoke: footer ActiveIndicator missing")
+		quit(1)
+		return
+	var home_tab := tabs_row.get_child(MetaHubPages.MAIN)
+	if not bool(home_tab.call("is_active")):
+		push_error("meta_hub_flow_smoke: Home tab should be active on Home page")
+		quit(1)
+		return
+	var journal_tab := tabs_row.get_child(MetaHubPages.COLLECTION)
+	var news := int(gs.call("count_collection_journal_news"))
+	if int(journal_tab.call("get_badge_count")) != news:
+		push_error("meta_hub_flow_smoke: Journal badge != count_collection_journal_news (%d)" % news)
 		quit(1)
 		return
 	print("meta_hub_flow_smoke OK")

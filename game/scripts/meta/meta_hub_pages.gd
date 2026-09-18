@@ -19,6 +19,15 @@ const PAGE_LABELS: Array[String] = [
 	"Arena",
 ]
 
+## Ikone tabova u res://assets/ui/chrome/ — "<ime>.svg" tamna (na peach), "<ime>_light.svg" svijetla.
+const PAGE_ICONS: Array[String] = [
+	"tab_shop",
+	"tab_journal",
+	"tab_home",
+	"tab_camp",
+	"tab_arena",
+]
+
 const PAGE_SCENES: Array[String] = [
 	"res://scenes/ui/shop_screen.tscn",
 	"res://scenes/ui/collection_journal.tscn",

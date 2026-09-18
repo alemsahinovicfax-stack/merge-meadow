@@ -2,6 +2,8 @@ extends Control
 class_name ArenaPest
 
 ## MA-01b — Muncher pest: spava, jede T1/T2, freeze na T3.
+## Vizual (smjer B, design_handoff_merge_arena): 104 px, usi, oci/usta po stanju, ledena
+## heksagonalna ljuska, zzz, gnijezdo 210 x 104 — svako stanje razlucivo i bez boje.
 
 enum State {
 	SLEEPING_NEST,
@@ -12,7 +14,29 @@ enum State {
 	FROZEN,
 }
 
-const PEST_RADIUS := 28.0
+## Vizuelni radius (clamp u polje). Jedenje ide po GameState.ARENA_PEST_EAT_RADIUS od centra.
+const PEST_RADIUS := UiArena.MUNCHER_VISUAL_R
+const BODY_EDGE_W := 4.0
+const EAR_R := 15.0
+const EAR_OFFSET := Vector2(27.0, -51.0)
+const EYE_Y := -7.0
+const EYE_DX := 17.0
+const EYE_OPEN_D := 14.0
+const EYE_WAKE_D := 18.0
+const EYE_SLEEP := Vector2(20.0, 5.0)
+const EYE_SLEEP_DX := 20.0
+const MOUTH_EAT := Rect2(-19.0, 8.0, 38.0, 28.0)
+const MOUTH_IDLE := Rect2(-9.0, 14.0, 18.0, 9.0)
+const BOB_PERIOD := 0.6
+const BOB_AMP := 5.0
+const HUNT_TILT := -0.105  # -6°
+const CHOMP_PERIOD := 0.25  # 2 x u 0,5 s
+const FREEZE_IN_SEC := 0.18
+const FREEZE_OUT_SEC := 0.25
+const ZZZ_OFFSET := Vector2(44.0, -60.0)
+const ZZZ_FONT_SIZE := 32
+const NEST_EDGE_W := 5.0
+const NEST_INNER_EDGE_W := 4.0
 
 var _state: State = State.SLEEPING_NEST
 var _pest_center: Vector2 = Vector2.ZERO
@@ -22,8 +46,10 @@ var _eat_timer: float = 0.0
 var _freeze_timer: float = 0.0
 var _wake_timer: float = 0.0
 var _target_reeval: float = 0.0
-var _eyes_open: bool = false
-var _wiggle: float = 0.0
+var _bob_t: float = 0.0
+var _chomp_t: float = 0.0
+var _shell: float = 0.0
+var _shell_tween: Tween = null
 
 var _get_edible_chips: Callable
 var _get_keepout_rect: Callable
@@ -48,13 +74,13 @@ func setup(
 
 
 func reset_to_nest() -> void:
+	_release_target()
 	_state = State.SLEEPING_NEST
-	_target_chip = null
 	_eat_timer = 0.0
 	_freeze_timer = 0.0
 	_wake_timer = 0.0
 	_target_reeval = 0.0
-	_eyes_open = false
+	_set_shell(0.0)
 	_pest_center = _nest_center
 	queue_redraw()
 
@@ -72,22 +98,20 @@ func on_seeds_poured(has_chips_on_field: bool) -> void:
 	if _state == State.SLEEPING_NEST or _state == State.SLEEPING_SPOT:
 		_state = State.WAKE_DELAY
 		_wake_timer = GameState.ARENA_PEST_WAKE_DELAY
-		_eyes_open = true
 		queue_redraw()
 
 
 func on_field_chip_count_changed(count: int) -> void:
 	if count <= 0 and _state in [State.HUNTING, State.EATING, State.WAKE_DELAY]:
 		_go_sleep_at_current_spot()
-	elif count > 0 and _state == State.SLEEPING_SPOT:
-		pass
 
 
 func on_t3_created() -> void:
+	_release_target()
 	_state = State.FROZEN
 	_freeze_timer = GameState.ARENA_PEST_T3_FREEZE
-	_target_chip = null
 	_eat_timer = 0.0
+	_tween_shell(1.0, FREEZE_IN_SEC, Tween.TRANS_BACK, Tween.EASE_OUT)
 	queue_redraw()
 
 
@@ -96,7 +120,7 @@ func is_active() -> bool:
 
 
 func tick(delta: float) -> void:
-	_wiggle += delta * 6.0
+	_bob_t += delta
 	match _state:
 		State.SLEEPING_NEST, State.SLEEPING_SPOT:
 			pass
@@ -108,6 +132,7 @@ func tick(delta: float) -> void:
 		State.FROZEN:
 			_freeze_timer -= delta
 			if _freeze_timer <= 0.0:
+				_tween_shell(0.0, FREEZE_OUT_SEC, Tween.TRANS_CUBIC, Tween.EASE_IN)
 				var chips: Array = _get_edible_chips.call() if _get_edible_chips.is_valid() else []
 				if chips.is_empty():
 					_go_sleep_at_current_spot()
@@ -117,6 +142,7 @@ func tick(delta: float) -> void:
 		State.HUNTING:
 			_tick_hunting(delta)
 		State.EATING:
+			_chomp_t += delta
 			_eat_timer -= delta
 			if _eat_timer <= 0.0:
 				_finish_eating()
@@ -151,7 +177,9 @@ func _tick_hunting(delta: float) -> void:
 func _begin_eating() -> void:
 	_state = State.EATING
 	_eat_timer = GameState.ARENA_PEST_EAT_DURATION
-	_eyes_open = true
+	_chomp_t = 0.0
+	if _target_chip != null and is_instance_valid(_target_chip):
+		_target_chip.set_being_eaten(true)
 
 
 func _finish_eating() -> void:
@@ -168,10 +196,16 @@ func _finish_eating() -> void:
 
 
 func _go_sleep_at_current_spot() -> void:
+	_release_target()
 	_state = State.SLEEPING_SPOT
-	_target_chip = null
 	_eat_timer = 0.0
-	_eyes_open = false
+
+
+## Plijen koji je prezivio (freeze, reset) vraca se u normalu.
+func _release_target() -> void:
+	if _target_chip != null and is_instance_valid(_target_chip) and _target_chip.is_being_eaten():
+		_target_chip.set_being_eaten(false)
+	_target_chip = null
 
 
 func _pick_target(force: bool) -> void:
@@ -224,22 +258,111 @@ func _avoid_keepout(center: Vector2) -> Vector2:
 
 
 func _draw() -> void:
-	var bob := sin(_wiggle) * 2.0 if _eyes_open else 0.0
+	var asleep := _state == State.SLEEPING_NEST or _state == State.SLEEPING_SPOT
+	var at_nest := _pest_center.distance_to(_nest_center) < 1.0
+	if _state == State.SLEEPING_NEST or (_state == State.WAKE_DELAY and at_nest):
+		_draw_nest()
+	var hunting := _state == State.HUNTING
+	var bob := sin(_bob_t * TAU / BOB_PERIOD) * BOB_AMP if hunting else 0.0
 	var center := _pest_center + Vector2(0.0, bob)
-	var body_color := Color(0.55, 0.38, 0.72, 1.0)
+	var body := UiArena.MUNCHER_AWAKE
+	var edge := UiArena.MUNCHER_AWAKE_EDGE
 	if _state == State.FROZEN:
-		body_color = Color(0.65, 0.82, 0.98, 1.0)
-	elif not _eyes_open:
-		body_color = Color(0.48, 0.34, 0.62, 1.0)
-	draw_circle(center, PEST_RADIUS, body_color)
-	draw_arc(center, PEST_RADIUS, 0.0, TAU, 32, Color(0.28, 0.18, 0.38, 0.35), 2.0, true)
-	if _eyes_open:
-		draw_circle(center + Vector2(-9.0, -4.0), 5.0, Color(1.0, 1.0, 1.0, 0.95))
-		draw_circle(center + Vector2(9.0, -4.0), 5.0, Color(1.0, 1.0, 1.0, 0.95))
-		draw_circle(center + Vector2(-9.0, -4.0), 2.5, Color(0.12, 0.1, 0.18, 1.0))
-		draw_circle(center + Vector2(9.0, -4.0), 2.5, Color(0.12, 0.1, 0.18, 1.0))
+		body = UiArena.MUNCHER_FROZEN
+		edge = UiArena.MUNCHER_FROZEN_EDGE
+	elif asleep:
+		body = UiArena.MUNCHER_ASLEEP
+		edge = UiArena.MUNCHER_ASLEEP_EDGE
+	draw_set_transform(center, HUNT_TILT if hunting else 0.0, Vector2.ONE)
+	draw_circle(Vector2.ZERO, PEST_RADIUS, body)
+	draw_arc(Vector2.ZERO, PEST_RADIUS - BODY_EDGE_W * 0.5, 0.0, TAU, 48, edge, BODY_EDGE_W, true)
+	for side in [-1.0, 1.0]:
+		var ear := Vector2(EAR_OFFSET.x * side, EAR_OFFSET.y)
+		draw_circle(ear, EAR_R, body)
+		draw_arc(ear, EAR_R - BODY_EDGE_W * 0.5, 0.0, TAU, 24, edge, BODY_EDGE_W, true)
+	_draw_face(asleep)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	if _shell > 0.001:
+		_draw_frost_shell(center)
+	if asleep:
+		draw_string(
+			UiChrome.heavy_font(UiChrome.EMBOLDEN_800), center + ZZZ_OFFSET, "z z z",
+			HORIZONTAL_ALIGNMENT_LEFT, -1, ZZZ_FONT_SIZE, UiPalette.WARM_WHITE
+		)
+
+
+func _draw_face(asleep: bool) -> void:
+	var ink := UiPalette.OUTLINE
+	if asleep:
+		for side in [-1.0, 1.0]:
+			var c := Vector2(EYE_SLEEP_DX * side, EYE_Y)
+			draw_rect(Rect2(c - EYE_SLEEP * 0.5, EYE_SLEEP), ink)
 	else:
-		draw_line(center + Vector2(-10.0, -2.0), center + Vector2(-4.0, -2.0), Color(0.2, 0.14, 0.28, 0.8), 2.0)
-		draw_line(center + Vector2(4.0, -2.0), center + Vector2(10.0, -2.0), Color(0.2, 0.14, 0.28, 0.8), 2.0)
+		var d := EYE_WAKE_D if _state == State.WAKE_DELAY else EYE_OPEN_D
+		for side in [-1.0, 1.0]:
+			draw_circle(Vector2(EYE_DX * side, EYE_Y), d * 0.5, ink)
+	var mouth := StyleBoxFlat.new()
+	mouth.corner_detail = 10
 	if _state == State.EATING:
-		draw_circle(center + Vector2(0.0, 8.0), 6.0, Color(0.95, 0.45, 0.55, 0.85))
+		var open := 0.45 + 0.55 * absf(sin(_chomp_t * PI / CHOMP_PERIOD))
+		var rect := Rect2(MOUTH_EAT.position, Vector2(MOUTH_EAT.size.x, MOUTH_EAT.size.y * open))
+		mouth.bg_color = UiArena.MOUTH
+		mouth.border_color = UiArena.MOUTH_EDGE
+		mouth.set_border_width_all(3)
+		mouth.corner_radius_bottom_left = 17
+		mouth.corner_radius_bottom_right = 17
+		draw_style_box(mouth, rect)
+	else:
+		mouth.bg_color = UiArena.MUNCHER_MOUTH_IDLE
+		mouth.corner_radius_bottom_left = 8
+		mouth.corner_radius_bottom_right = 8
+		draw_style_box(mouth, MOUTH_IDLE)
+
+
+func _draw_frost_shell(center: Vector2) -> void:
+	var r := UiArena.FROST_SHELL_R * (0.8 + 0.2 * _shell)
+	var hex := PackedVector2Array()
+	for p in [
+		Vector2(0.0, -1.0), Vector2(0.86, -0.5), Vector2(0.86, 0.5),
+		Vector2(0.0, 1.0), Vector2(-0.86, 0.5), Vector2(-0.86, -0.5),
+	]:
+		hex.append(center + p * r)
+	draw_colored_polygon(hex, Color(UiArena.FROST_SHELL, UiArena.FROST_SHELL.a * _shell))
+	var outline := hex.duplicate()
+	outline.append(hex[0])
+	draw_polyline(outline, Color(UiArena.FROST_SHELL_EDGE, _shell), 4.0, true)
+
+
+func _draw_nest() -> void:
+	var outer := UiArena.NEST_SIZE
+	_draw_ellipse(_nest_center, outer * 0.5, UiArena.NEST, UiArena.NEST_EDGE, NEST_EDGE_W)
+	# CSS inset 14 / 18 / 8 unutar 210 x 104.
+	var inner := Vector2(outer.x - 36.0, outer.y - 22.0)
+	var inner_c := _nest_center + Vector2(0.0, (14.0 - 8.0) * 0.5)
+	_draw_ellipse(inner_c, inner * 0.5, UiArena.NEST_INNER, UiArena.NEST_INNER_EDGE, NEST_INNER_EDGE_W)
+
+
+func _draw_ellipse(c: Vector2, radii: Vector2, fill: Color, edge: Color, edge_w: float) -> void:
+	var pts := PackedVector2Array()
+	for i in 40:
+		var a := TAU * float(i) / 40.0
+		pts.append(c + Vector2(cos(a) * radii.x, sin(a) * radii.y))
+	draw_colored_polygon(pts, fill)
+	var outline := pts.duplicate()
+	outline.append(pts[0])
+	draw_polyline(outline, edge, edge_w, true)
+
+
+func _tween_shell(target: float, sec: float, trans: Tween.TransitionType, ease_type: Tween.EaseType) -> void:
+	if not is_inside_tree():
+		_set_shell(target)
+		return
+	if _shell_tween != null and _shell_tween.is_valid():
+		_shell_tween.kill()
+	_shell_tween = create_tween()
+	_shell_tween.tween_method(_set_shell, _shell, target, sec).set_trans(trans).set_ease(ease_type)
+
+
+func _set_shell(value: float) -> void:
+	_shell = value
+	queue_redraw()

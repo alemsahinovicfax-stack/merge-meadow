@@ -9,9 +9,11 @@ const SCENE_MERGE_ARENA := "res://scenes/camp/merge_arena.tscn"
 const SCENE_SHOP := "res://scenes/ui/shop_screen.tscn"
 const SCENE_COLLECTION := "res://scenes/ui/collection_journal.tscn"
 
-const ARENA_MAX_CHIPS := 40
-const ARENA_SNAP_DISTANCE := 100.0
-const ARENA_MAGNET_RADIUS := 130.0
+## Tuned for ArenaSeedChip.DISPLAY_SCALE 1.4 (chip radius 67.2): snap/magnet
+## scaled 1.4x from the original 100/130.
+const ARENA_MAX_CHIPS := 30
+const ARENA_SNAP_DISTANCE := 140.0
+const ARENA_MAGNET_RADIUS := 182.0
 
 const ARENA_PEST_SPEED := 85.0
 const ARENA_PEST_EAT_RADIUS := 36.0
@@ -1500,6 +1502,10 @@ func claim_arena_daily() -> String:
 
 func get_arena_daily_hud_text() -> String:
 	return arena_domain.get_daily_hud_text()
+
+
+func is_arena_daily_complete() -> bool:
+	return arena_domain.is_daily_complete()
 
 
 func get_arena_daily_home_line() -> String:
