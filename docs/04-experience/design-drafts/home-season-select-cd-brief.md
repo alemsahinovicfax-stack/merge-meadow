@@ -19,7 +19,7 @@ ai_sažetak: "Home (3. stranica huba) — SAMO scena biranja sezone (SeasonStage
 
 # Home — biranje sezone — Claude Design brief i referenca
 
-> **Status: priprema dizajna — ne mijenja kod.** Obuhvata **samo scenu biranja sezone** (Home dok polje nije otvoreno). **Polje sezone** (SeasonField — livada s cvijećem, Pip, korpa, Magnet / Loot Boost, Play Endless, dugme `Seasons` nazad) dobija **poseban brief kasnije**; ovdje se crta samo *ulaz* u polje. Header/footer (2026-09-11) i Merge Arena (2026-09-12) su već redizajnirani, Camp brief je napisan — Home treba da im se vizuelno pridruži.
+> **Status: priprema dizajna — ne mijenja kod.** Obuhvata **samo scenu biranja sezone** (Home dok polje nije otvoreno). **Polje sezone** (SeasonField — livada s cvijećem, Pip, korpa, Magnet / Loot Boost, Play Endless, dugme `Seasons` nazad) dobija **poseban brief kasnije**; ovdje se crta samo *ulaz* u polje. Header/footer (2026-09-11), Merge Arena (2026-09-12) i Camp (2026-09-16) su već redizajnirani i u igri — Home treba da im se vizuelno pridruži. *Ažurirano 2026-09-18: usklađeno s Camp redizajnom (tok Camp → Home, `UnlockProgress` više nije dijeljen).*
 
 **Home** je prva stranica koju igrač vidi: ovdje bira **u kojoj sezoni igra**, vidi koliko mu fali do sljedeće besplatne sezone i otključava je, pregleda premium sezone, i odavde kreće u igru. Home ima dva režima:
 
@@ -32,11 +32,11 @@ ai_sažetak: "Home (3. stranica huba) — SAMO scena biranja sezone (SeasonStage
 
 | Ko | Šta čita | Zašto |
 |----|----------|-------|
-| **Claude Design** | cijeli fajl kao prilog (§1–§8) | Pravila koja važe, mjere, trenutno stanje, sloboda i ograničenja |
+| **Claude Design** | cijeli fajl iz repoa po putanji, ili kao prilog (§1–§8) | Pravila koja važe, mjere, trenutno stanje, sloboda i ograničenja |
 | **Ti** | §9 | Gotov prompt za copy-paste u CD chat |
 | **Agent (kasnije)** | §3, §5, §10 | Tačne današnje vrijednosti, poznati problemi, mapa "CD sloj → Godot node" |
 
-Postupak: u CD priloži ovaj `.md` fajl, pa zalijepi prompt iz §9. Ako CD projekat nema prethodne radove, priloži i `design_handoff_hub_chrome/HubScreen.dc.html` (okvir) i `design_handoff_merge_arena/SeedChip.dc.html` (vizuelni jezik) — Home treba da izgleda kao ista igra. Kad CD završi, izvezi `.dc.html` + asset fajlove i daj ih agentu.
+Postupak: zalijepi prompt iz §9 u CD. CD čita repo direktno, ali samo **po putanji** (ne može pretraživati foldere), pa su sve putanje navedene u promptu: ovaj fajl, `design_handoff_hub_chrome/HubScreen.dc.html` (okvir), `design_handoff_merge_arena/SeedChip.dc.html` i `design_handoff_camp/CampScreen.dc.html` (vizuelni jezik) — Home treba da izgleda kao ista igra. Ako CD ipak ne može pročitati fajl, priloži ga ručno. Kad CD završi, izvezi `.dc.html` + asset fajlove i daj ih agentu.
 
 ---
 
@@ -48,7 +48,10 @@ Postupak: u CD priloži ovaj `.md` fajl, pa zalijepi prompt iz §9. Ako CD proje
   - **4 besplatne, linearno:** Country Bloom (otključana od starta) → Frost Orchard → Lantern Meadow → Amber Canopy. Svaka sljedeća traži **500 coina + 20 ★3 cvjetova prethodne sezone** (Frost traži Harvest Pumpkin iz Country Blooma itd.). Cvijeće se dobija merge-om u Areni.
   - **4 premium (IAP):** Moonlit Warren, Coral Tide Garden, Starfall Glade, Ember Fen — kupuju se pravim novcem (danas placeholder cijene €2.99 / €3.49).
 - Home je **3. stranica** swipe meta-huba (Shop · Journal · **Home** · Camp · Arena) i **početna** stranica.
-- Camp vodi ovamo: tap na karticu sljedeće sezone u Campu → Home s fokusom na tu sezonu; Unlock u Campu → Home, pa se sezona otključa na Home (animacija otključavanja se vidi ovdje).
+- Camp vodi ovamo. Na vrhu Campa je kartica **sljedeće besplatne sezone** (coini + ★3 cvijet s trakama, dugme Unlock):
+  - **tap na karticu** („Details ↗") → Home, traka besplatnih sezona, **fokus na tu sezonu** (ako je polje sezone bilo otvoreno, zatvara se);
+  - **Unlock u Campu** troši 500 coina + 20 ★3 **odmah, u Campu** (kratak burst na kartici, ~0,9 s), pa prebacuje na Home s fokusom na **upravo otključanu** sezonu. Home tada **ne** ponavlja trenutak otključavanja — dočeka sezonu koja je već otključana.
+  - Trenutak otključavanja na Home se vidi samo kad igrač otključa **na Home**.
 - **Pillar 2** ([[../../01-vision/design-pillars|design-pillars]]): *Fair F2P — core je uvijek besplatan.* Premium sezone su opcionalni sadržaj; besplatni put mora uvijek biti vidljiv i dostižan igrom. **Pillar 3:** napredak (koliko sezona imaš, koliko fali do sljedeće) treba da se *vidi i osjeća*.
 
 ---
@@ -221,6 +224,7 @@ Trenutni izgled je **polazna tačka, ne šablon.** CD ima slobodu u rasporedu, g
   - novi igrač (samo Country Bloom; Frost next lock `0 / 500`, `0 / 20`; tutorial hint);
   - sredina igre (2 otključane, Lantern next lock `320 / 500`, `12 / 20`);
   - spremno za Unlock (zlatno) i trenutak otključavanja;
+  - dolazak iz Campa nakon otključavanja tamo: nova sezona je već otključana i u fokusu (bez drugog trenutka otključavanja; smije kratak „new" akcent);
   - sve besplatne otključane (nema next locka);
   - premium: nekupljena / kupljena / aktivna / coming soon (Ember Fen) / kupovina u toku.
 - **Jasno "u ovoj igraš"** (aktivna sezona) naspram "samo gledam" (fokus).
@@ -334,23 +338,28 @@ Ideje van ovoga (npr. sezonski eventi, pretplata, novi resursi) navedi **odvojen
 
 ## 9. Prompt za Claude Design
 
-> Priloži ovaj fajl u CD, pa kopiraj sve iz bloka ispod.
+> Kopiraj sve iz bloka ispod u CD. Putanje su iz repoa (`master`); ako CD neki fajl ne može pročitati, priloži ga ručno.
 
 ```
 Radim redizajn jednog ekrana mobilne igre: HOME — scena biranja sezone.
 Igra: Merge Meadow — casual F2P merge/runner hibrid, portrait, flat pastel
 cartoon stil (bez pixel-arta, bez 3D, bez retro efekata). Mood: cozy livada.
 
-Uz ovu poruku prilažem fajl "home-season-select-cd-brief.md". To je tvoja
-referenca: pravila koja važe (§2), trenutni raspored s mjerama (§3), šta
+Tvoja referenca je fajl u repou (master):
+  docs/04-experience/design-drafts/home-season-select-cd-brief.md
+U njemu su pravila koja važe (§2), trenutni raspored s mjerama (§3), šta
 danas ne štima (§3.2), šta mora a šta smiješ (§4), paleta i mood boje
 sezona (§5), tehnička ograničenja (§6) i isporuka (§7). Pročitaj ga cijelog
 prije rada — §10 je za kasniji prenos u Godot i možeš ga preskočiti. Ovaj
 prompt je sažetak; ako se nešto razlikuje, važi fajl.
 
-Header/footer huba i Merge Arena su već redizajnirani u ovom projektu (tamna
-traka #1A241E; sjemenka = cream rim + tamni well). Home mora izgledati kao
-ista igra — nastavi taj vizuelni jezik.
+Header/footer huba, Merge Arena i Camp su već redizajnirani u ovom projektu
+(tamna traka #1A241E; sjemenka = cream rim + tamni well). Home mora
+izgledati kao ista igra — nastavi taj vizuelni jezik. Tvoji raniji radovi
+su u repou:
+  design_handoff_hub_chrome/HubScreen.dc.html   (okvir: header + footer)
+  design_handoff_merge_arena/SeedChip.dc.html   (sjemenka, vizuelni jezik)
+  design_handoff_camp/CampScreen.dc.html        (Camp, kartica sljedeće sezone)
 
 VAŽNO: dizajniraš SAMO scenu biranja sezone. Polje sezone (livada s
 cvijećem, Pip, korpa, upgradei, Play Endless) je poseban ekran i radi se
@@ -375,6 +384,10 @@ KAKO RADI (detalji u §2):
   (6 cvjetova). Cijena je string iz store-a (npr. "3,49 KM").
 - AKTIVNA sezona = u njoj se igra (tačno jedna). Tap na otključanu sezonu
   otvara njeno polje (poseban ekran).
+- Camp (susjedni tab) ima karticu sljedeće besplatne sezone. Tap na nju
+  dovodi igrača ovamo s fokusom na tu sezonu. Unlock u Campu troši odmah
+  (burst u Campu), pa prebacuje ovamo: Home dočeka već otključanu sezonu u
+  fokusu — bez drugog trenutka otključavanja (smije kratak "new" akcent).
 - Daily gift kartica (Tap to open / Back tomorrow) je na ovoj sceni.
 
 GDJE ŽIVI: 3. i početna stranica meta-huba (Shop · Journal · Home · Camp ·
@@ -474,7 +487,8 @@ header/footer, Shop, IAP dijalog, cvijeće, lik Pipa, sezonsku ilustraciju
 | `SeasonStage` | `season_stage.tscn` / `season_stage.gd` (`BandColumn` → `PaidBand` / `BandSep` / `FreeBand`, `*Motion`, `Row` / `PaidRow`, `Left/Center/RightSlot`, `Paid*Slot`) | Geste: `_on_stage_gui_input`, `_update_press`, `_handle_tap`, `swap_home_band`, `cycle_free_strip` / `cycle_paid_strip`, `_play_inplace_morph`. Stil: `_apply_card_color`, `_slot_font` |
 | `SeasonCard` / `ActiveBadge` | slotovi u `season_stage.gd` (`_fill_slot`, `_fill_paid_slot`) | Aktivna = `GameState.active_season_id`; fokus = `home_hero_center_id()` |
 | `SeasonRoster` | `FreeRoster` / `PaidRoster` (`season_roster_panel.gd`) u `CenterFill` | Ikone: `collection_bloom_icon.gd`; podaci `SeasonDef.roster` |
-| `UnlockPoster` / `CoinProgress` / `FlowerProgress` / `UnlockButton` | `UnlockGate` (`season_unlock_gate.gd`) + `UnlockProgress` (`season_unlock_progress.gd`) | `season_unlock_progress.gd` je **dijeljen s Camp SeasonLink** (Home stacked, Camp split) — izmjene diraju i Camp. Uslovi: `can_unlock_free`, `unlock_free`, `star3_flower_count_for_unlock` |
+| `UnlockPoster` / `CoinProgress` / `FlowerProgress` / `UnlockButton` | `UnlockGate` (`season_unlock_gate.gd`) + `UnlockProgress` (`season_unlock_progress.gd`) | Od Camp redizajna (2026-09-16) `season_unlock_progress.gd` koristi **samo Home** — Camp ima svoju karticu (`season_link_card.gd`, stilovi u `ui_camp.gd`), pa se `UnlockProgress` može mijenjati slobodno; njegov `split` režim je ostatak starog Campa. Uslovi: `can_unlock_free`, `unlock_free`, `star3_flower_count_for_unlock` |
+| `ArrivalFromCamp` | `season_link_card.gd` (`_go_home`, `_finish_unlock`) | Camp postavlja `set_free_strip_focus(id)` + `set_home_band("free")`, zatvara polje i ide na `MAIN`; nakon Unlocka zove `refresh_for_meta_hub()` na Home. Sezona je tada već otključana |
 | `PremiumCard` / `PriceTag` | `season_pack_card.gd` (`SeasonPackCard`) | **Dijeljen sa Shopom** (2-kolonski grid paketa) — redizajn mijenja i Shop. Podaci: `IAPManager.owns_product`, `get_price_label`, `purchase`, `is_busy` |
 | `SeasonBrowser` | `season_browser.tscn` / `season_browser.gd` | Signal `season_selected` → `season_stage._on_browser_selected` |
 | `PlayButton` | `HomeColumn/PlayRow/PlayButton` | Tok: `main_menu.home_play_action()` → `"run"` / `"open_field"` / `"snap"` |
@@ -483,7 +497,7 @@ header/footer, Shop, IAP dijalog, cvijeće, lik Pipa, sezonsku ilustraciju
 | Boje | `season_card_contrast.gd` | `mood_color`, `title_color`, `text_color`, `make_frame` |
 | Podaci | `GameState` / `economy/seasons.gd` | `strip_left/center/right_id`, `paid_left/center/right_id`, `home_band`, `is_season_playable`, `is_free_selectable`, `next_locked_free_id`, `set_active_season`, `is_test_locked_season`; `SeasonCatalog.free_defs_sorted()` / `paid_defs()`; `SeasonDef.display_name` / `tagline` / `roster` |
 
-**Smoke testovi koje prenos mora proći ili svjesno ažurirati:** `season_home_smoke` (glavni — 3-slot trake, hit-through kartice, gate i roster u `CenterSlot`, zamjena traka, preview tap, kupovina ne krade centar, Frost → Lantern → Amber unlock tok, Browser se ne otvara na preview tap), `season_meadow_smoke` (Play u 3 koraka, ulaz u polje), `season_unlock_smoke`, `season_iap_smoke`, `shop_open_smoke` (`SeasonPackCard` 2-col, 4 paketa), `camp_season_link_smoke` (dijeljeni `UnlockProgress`), `meta_hub_flow_smoke`.
+**Smoke testovi koje prenos mora proći ili svjesno ažurirati:** `season_home_smoke` (glavni — 3-slot trake, hit-through kartice, gate i roster u `CenterSlot`, zamjena traka, preview tap, kupovina ne krade centar, Frost → Lantern → Amber unlock tok, Browser se ne otvara na preview tap), `season_meadow_smoke` (Play u 3 koraka, ulaz u polje), `season_unlock_smoke`, `season_iap_smoke`, `shop_open_smoke` (`SeasonPackCard` 2-col, 4 paketa), `camp_season_link_smoke` (Camp → Home: fokus na sezonu, Unlock u Campu troši odmah pa Home), `meta_hub_flow_smoke`.
 
 **Poznati problemi nađeni pri pisanju briefa:**
 
@@ -492,6 +506,7 @@ header/footer, Shop, IAP dijalog, cvijeće, lik Pipa, sezonsku ilustraciju
 3. **Ember Fen je test-locked** (`TEST_LOCK_LAST_SEASONS`, `TEST_LOCK_PAID_ID` u `economy/seasons.gd`) — UI ga prikazuje kao običnu nekupljenu premium sezonu s cijenom.
 4. **[[../../02-design/spec-vertical-slice|spec-vertical-slice]] § 1 Main Menu je zastario** ("Play → Run") — ne opisuje SeasonStage ni polje; ažurirati pri prenosu.
 5. **Uslovi sezona nisu u GDD-u:** 500 coina + 20 ★3 i IAP cijene žive samo u `game/data/seasons/seasons.json` i `monetization_config.gd` (+ CHECKPOINT / changelog); [[../../02-design/ekonomija-brojevi|ekonomija-brojevi]] ih ne navodi.
+6. **`season_unlock_progress.gd` ima mrtav `split` režim** (koristio ga je stari Camp SeasonLink do 2026-09-16) — ukloniti pri prenosu.
 
 **Gotovo kad (implementacija):**
 
@@ -499,6 +514,7 @@ header/footer, Shop, IAP dijalog, cvijeće, lik Pipa, sezonsku ilustraciju
 - [ ] Rade sva stanja iz §4.1 (novi igrač → sve free otključane; premium 4 stanja)
 - [ ] Aktivna sezona jasno označena; tap na otključanu vodi u polje
 - [ ] Unlock na licu mjesta troši 500 + 20 i pokazuje trenutak otključavanja
+- [ ] Dolazak iz Campa: fokus na traženu sezonu; nakon Unlocka u Campu sezona je već otključana, bez drugog trenutka otključavanja
 - [ ] Hub swipe radi u dogovorenoj zoni
 - [ ] Rarity prepoznatljiv na grayscale screenshotu
 - [ ] Smoke: sve iz liste gore (ažurirane gdje se tok svjesno mijenja)
@@ -510,6 +526,7 @@ header/footer, Shop, IAP dijalog, cvijeće, lik Pipa, sezonsku ilustraciju
 | Datum | Odluka |
 |-------|--------|
 | 2026-09-14 | Brief napisan samo za scenu biranja sezone; polje sezone (SeasonField) dobija poseban brief kasnije. Ekonomija i pravila sezona (§2) su fiksni; CD dizajnira izgled, raspored i geste. Header/footer i Arena (smjer B) su zadati vizuelni jezik. |
+| 2026-09-18 | Usklađeno s Camp redizajnom (2026-09-16): Unlock u Campu troši odmah i prebacuje na Home s već otključanom sezonom u fokusu (novo stanje „dolazak iz Campa" u §4.1); `UnlockProgress` više nije dijeljen s Campom; Camp je dio zadatog vizuelnog jezika. CD čita brief i ranije radove iz repoa po putanji (§0, §9). |
 
 ## Otvorena pitanja (nakon CD-a)
 
@@ -526,7 +543,7 @@ header/footer, Shop, IAP dijalog, cvijeće, lik Pipa, sezonsku ilustraciju
 - [[../_index|Iskustvo]] — roditeljski hub
 - [[hub-header-footer-cd-brief|hub-header-footer-cd-brief]] — okvir u koji Home ulazi
 - [[merge-arena-cd-brief|merge-arena-cd-brief]] — isti format; vizuelni jezik (smjer B)
-- [[camp-cd-brief|camp-cd-brief]] — isti uslovi otključavanja; SeasonLink vodi na Home
+- [[camp-cd-brief|camp-cd-brief]] — isti uslovi otključavanja; kartica sljedeće sezone u Campu vodi na Home (implementirano 2026-09-16)
 - [[journal-cd-brief|journal-cd-brief]] — roster i rarity prikaz cvjetova
 - [[seeds-flowers-cd-brief|seeds-flowers-cd-brief]] — cvijeće i sjemenke (posebna ilustracija)
 - [[../../02-design/spec-vertical-slice|spec-vertical-slice]] — § 0 Meta Hub, § 1 Main Menu
