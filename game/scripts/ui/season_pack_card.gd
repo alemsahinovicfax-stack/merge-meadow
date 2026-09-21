@@ -1,8 +1,8 @@
 class_name SeasonPackCard
 extends UiClickButton
 
-## Shared paid-season card — Shop 2-col grid and Browser Premium row (HOME-04 A).
-## Does not call set_active; parents decide tap (Shop no-op when owned, Browser select).
+## Paid-season card for the Shop 2-col grid (HOME-04 A). Home premium seasons use HomeSeasonCard (2026-09-21).
+## Does not call set_active; the Shop decides what a tap does (no-op when owned).
 
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
 

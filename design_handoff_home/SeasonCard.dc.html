@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="SeasonCard" style="{{ rootStyle }}">
+  <div data-layer="UnlockBurst" style="{{ burstStyle }}"></div>
+  <div data-layer="SeasonArtSlot" style="{{ artSlotStyle }}">
+    <div style="{{ artTagStyle }}">{{ artTag }}</div>
+  </div>
+  <div data-layer="CardHead" style="{{ headStyle }}">
+    <div data-layer="LockBox" style="{{ lockBoxStyle }}">
+      <img src="icons/icon_lock.svg" alt="" style="{{ lockIconStyle }}" />
+    </div>
+    <div data-layer="HeadText" style="{{ headTextStyle }}">
+      <div data-layer="EyebrowRow" style="{{ eyebrowRowStyle }}">
+        <div data-layer="ActiveBadge" style="{{ badgeTopStyle }}">{{ badgeText }}</div>
+        <div data-layer="NewBadge" style="{{ newTopStyle }}">New</div>
+        <div data-layer="Eyebrow" style="{{ eyebrowStyle }}">{{ eyebrow }}</div>
+      </div>
+      <div data-layer="SeasonName" style="{{ nameStyle }}">{{ name }}</div>
+      <div data-layer="StatusLine" style="{{ statusStyle }}">{{ status }}</div>
+    </div>
+    <div data-layer="NewBadge" style="{{ newStyle }}">New</div>
+    <div data-layer="ActiveBadge" style="{{ badgeStyle }}">{{ badgeText }}</div>
+    <div data-layer="StatusChip" style="{{ miniProgStyle }}">{{ miniProgText }}</div>
+    <div data-layer="PriceTag" style="{{ priceStyle }}">{{ price }}</div>
+    <div data-layer="OpenFieldButton" style="{{ openStyle }}">{{ openLabel }}</div>
+  </div>
+  <div data-layer="Tagline" style="{{ taglineStyle }}">{{ tagline }}</div>
+  <div data-layer="SeasonRoster" style="{{ rosterStyle }}">
+    <sc-for list="{{ roster }}" as="f" hint-placeholder-count="6">
+      <div data-layer="RosterSlot" style="{{ f.slot }}">
+        <div data-layer="ArtFrame" style="{{ f.frame }}">
+          <div style="{{ f.well }}"></div>
+          <img src="{{ f.src }}" alt="" style="{{ f.art }}" />
+        </div>
+        <div data-layer="RarityPips" style="{{ f.pipsStyle }}">{{ f.pips }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div data-layer="UnlockPoster" style="{{ posterStyle }}">
+    <div data-layer="NeedLine" style="{{ needStyle }}">{{ needText }}</div>
+    <div data-layer="CoinProgress" style="{{ rowStyle }}">
+      <img src="icons/icon_coin.svg" alt="" style="{{ coinIconStyle }}" />
+      <div style="{{ valStyle }}">{{ coinVal }}</div>
+      <div data-layer="CoinBar" style="{{ barStyle }}"><div style="{{ coinFillStyle }}"></div></div>
+    </div>
+    <div data-layer="FlowerProgress" style="{{ rowStyle }}">
+      <div data-layer="ArtFrame" style="{{ gateFrameStyle }}">
+        <div style="{{ gateWellStyle }}"></div>
+        <img src="{{ gateArtSrc }}" alt="" style="{{ gateArtStyle }}" />
+      </div>
+      <div style="{{ valStyle }}">{{ flowerVal }}</div>
+      <div data-layer="FlowerBar" style="{{ barStyle }}"><div style="{{ flowerFillStyle }}"></div></div>
+    </div>
+    <div data-layer="GateCaption" style="{{ gateCapStyle }}">{{ gateCaption }}</div>
+    <div data-layer="UnlockButton" style="{{ unlockStyle }}">
+      <div style="{{ unlockLabelStyle }}">{{ unlockLabel }}</div>
+      <div style="{{ unlockSubStyle }}">{{ unlockSub }}</div>
+    </div>
+  </div>
+  <div data-layer="CardCta" style="{{ ctaStyle }}">
+    <div style="{{ ctaLabelStyle }}">{{ ctaLabel }}</div>
+    <div style="{{ ctaSubStyle }}">{{ ctaSub }}</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1032,&quot;height&quot;:440},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;frost_orchard&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Season&quot;},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;collapsed&quot;,&quot;expanded&quot;,&quot;nextlock&quot;,&quot;poster&quot;,&quot;premium&quot;,&quot;mini&quot;,&quot;hero&quot;],&quot;default&quot;:&quot;expanded&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;active&quot;,&quot;unlocked&quot;,&quot;next&quot;,&quot;locked&quot;,&quot;ready&quot;,&quot;unlocking&quot;,&quot;premium&quot;,&quot;owned&quot;,&quot;busy&quot;,&quot;soon&quot;],&quot;default&quot;:&quot;active&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;coins&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:320,&quot;min&quot;:0,&quot;max&quot;:500,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Unlock gate&quot;},&quot;coinsNeed&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:500,&quot;min&quot;:1,&quot;max&quot;:999,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Unlock gate&quot;},&quot;flowers&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:0,&quot;max&quot;:20,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Unlock gate&quot;},&quot;flowersNeed&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:20,&quot;min&quot;:1,&quot;max&quot;:99,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Unlock gate&quot;},&quot;price&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Season&quot;},&quot;fresh&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;State&quot;},&quot;w&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1032,&quot;min&quot;:200,&quot;max&quot;:1032,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;h&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:440,&quot;min&quot;:120,&quot;max&quot;:960,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Layout&quot;}}">
+const NUN = 'Nunito,system-ui,sans-serif';
+const PAGE = '#2E4733';
+const CREAM = '#FFF8F0', RIM = '#FFF6D6', DARKINK = '#1A1A14', INK = '#2D3436', SUBINK = '#3D3D33';
+const GOLD = '#FFD56B', GOLD_EDGE = '#D6A82F', UIGOLD = '#E8C44A', UIGOLD_EDGE = '#BA9D3B', PRICEBG = '#FFE8B8';
+const LAV = '#D4A5FF', LAV_EDGE = '#AA84CC';
+const WELL = '#22342A', WELL_EDGE = '#16211B';
+
+// name, tagline, mood, lightCard (dark ink), roster [name, rarity, placeholder art]
+const SEASONS = {
+  country_bloom: { n: 'Country Bloom', t: 'Warm fields, soft petals, home pastures.', m: '#A8E6CF', li: true, r: [['Meadow Clover', 1, 'clover'], ['Field Daisy', 1, 'daisy'], ['Buttercup Lane', 1, 'buttercup'], ['Barn Tulip', 2, 'tulip'], ['Sunfence', 2, 'sunflower'], ['Harvest Pumpkin', 3, 'pumpkin']] },
+  frost_orchard: { n: 'Frost Orchard', t: 'Crisp air, silver blossom.', m: '#C5D5E8', li: true, r: [['Frost Snowdrop', 1, 'frost_snowdrop'], ['Ice Crocus', 1, 'silver_aconite'], ['Silver Aconite', 1, 'clover'], ['Winter Camellia', 2, 'daisy'], ['Hoarfrost Rose', 2, 'tulip'], ['Crystal Peony', 3, 'sunflower']] },
+  lantern_meadow: { n: 'Lantern Meadow', t: 'Dusk lights among tall grass.', m: '#C9B8E0', li: true, r: [['Dusk Firefly Grass', 1, 'clover'], ['Paper Lantern Bloom', 1, 'buttercup'], ['Evening Primrose', 1, 'daisy'], ['Foxfire Lily', 2, 'tulip'], ['Glow Wisteria', 2, 'silver_aconite'], ['Midnight Lotus', 3, 'sunflower']] },
+  amber_canopy: { n: 'Amber Canopy', t: 'Warm late-season light through high leaves.', m: '#E8C48A', li: true, r: [['Copper Leaf', 1, 'clover'], ['Maple Aster', 1, 'daisy'], ['Russet Mallow', 1, 'tulip'], ['Cider Dahlia', 2, 'buttercup'], ['Golden Oak Bloom', 2, 'sunflower'], ['Amber Magnolia', 3, 'pumpkin']] },
+  moonlit_warren: { n: 'Moonlit Warren', t: 'Night blooms under a quiet moon.', m: '#3D3A6B', li: false, p: '€2.99', r: [['Moon Moss', 1, 'clover'], ['Nightshade Petal', 1, 'silver_aconite'], ['Silver Harebell', 1, 'frost_snowdrop'], ['Lunar Orchid', 2, 'tulip'], ['Star Jasmine', 2, 'daisy'], ['Umbral Lily', 3, 'sunflower']] },
+  coral_tide: { n: 'Coral Tide Garden', t: 'Salt breeze and seashell petals.', m: '#E8A090', li: true, p: '€3.49', r: [['Sea Thrift', 1, 'daisy'], ['Salt Daisy', 1, 'clover'], ['Tide Anemone', 1, 'tulip'], ['Coral Hibiscus', 2, 'buttercup'], ['Pearl Waterlily', 2, 'sunflower'], ['Reef Crown', 3, 'pumpkin']] },
+  starfall_glade: { n: 'Starfall Glade', t: 'Petals that catch the night sky.', m: '#6B5B95', li: false, p: '€2.99', r: [['Comet Sprig', 1, 'silver_aconite'], ['Nebula Clover', 1, 'clover'], ['Meteor Daisy', 1, 'daisy'], ['Aurora Tulip', 2, 'tulip'], ['Galaxy Sunburst', 2, 'sunflower'], ['Nova Bloom', 3, 'frost_snowdrop']] },
+  ember_fen: { n: 'Ember Fen', t: 'Low firelight over marsh blooms.', m: '#C45C26', li: false, p: '€3.49', r: [['Marsh Rush', 1, 'clover'], ['Peat Violet', 1, 'silver_aconite'], ['Cinder Buttercup', 1, 'buttercup'], ['Flame Iris', 2, 'tulip'], ['Smoke Lotus', 2, 'daisy'], ['Fenfire Crown', 3, 'pumpkin']] }
+};
+const FREE = ['country_bloom', 'frost_orchard', 'lantern_meadow', 'amber_canopy'];
+const DH = { collapsed: 128, expanded: 440, nextlock: 320, poster: 644, premium: 556, mini: 250, hero: 930 };
+const NAMESZ = { collapsed: 48, expanded: 64, nextlock: 52, poster: 64, premium: 60, mini: 38, hero: 68 };
+
+class Component extends DCLogic {
+  rgb(h) { return [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)); }
+  hx(a) { return '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join(''); }
+  sc(h, f) { return this.hx(this.rgb(h).map(v => v * f)); }
+  mix(a, b, t) { const A = this.rgb(a), B = this.rgb(b); return this.hx(A.map((v, i) => v + (B[i] - v) * t)); }
+
+  renderVals() {
+    const p = this.props;
+    const id = p.season ?? 'frost_orchard';
+    const s = SEASONS[id] || SEASONS.frost_orchard;
+    const v = p.variant ?? 'collapsed';
+    const st = p.state ?? 'unlocked';
+    const w = p.w ?? 1032;
+    const h = p.h ?? DH[v] ?? 128;
+
+    const isCol = v === 'collapsed', isExp = v === 'expanded', isNext = v === 'nextlock';
+    const isPost = v === 'poster', isPrem = v === 'premium', isMini = v === 'mini', isHero = v === 'hero';
+    const active = st === 'active' || !!p.playing, dim = st === 'locked', soon = st === 'soon';
+    const ready = st === 'ready', unlocking = st === 'unlocking';
+
+    const mood = s.m;
+    const fill = dim ? this.mix(this.sc(mood, 0.55), PAGE, 0.45) : (soon ? this.mix(mood, PAGE, 0.44) : mood);
+    const light = (dim || soon) ? false : s.li;
+    const ink = light ? DARKINK : RIM;
+    const sub = light ? SUBINK : 'rgba(255,246,214,.90)';
+    const panel = light ? 'rgba(26,26,20,.13)' : 'rgba(255,248,240,.13)';
+    const panelEdge = light ? 'rgba(26,26,20,.22)' : 'rgba(255,248,240,.28)';
+    const cream = light ? 'rgba(255,248,240,.74)' : 'rgba(255,248,240,.20)';
+    const creamEdge = light ? 'rgba(26,26,20,.26)' : 'rgba(255,248,240,.40)';
+    const pad = isCol ? 18 : (isMini ? 14 : (isNext ? 16 : 18));
+    const radius = isMini ? 20 : 26;
+
+    // free-path neighbours
+    const fi = FREE.indexOf(id);
+    const prev = fi > 0 ? SEASONS[FREE[fi - 1]] : null;
+    const gate = prev ? prev.r[5] : SEASONS.country_bloom.r[5];
+    const gateName = gate[0];
+    const coins = p.coins ?? 320, cNeed = p.coinsNeed ?? 500;
+    const fl = p.flowers ?? 12, fNeed = p.flowersNeed ?? 20;
+    const dC = Math.max(0, cNeed - coins), dF = Math.max(0, fNeed - fl);
+    const gateReady = dC === 0 && dF === 0;
+
+    const showRoster = isExp || isPrem || isHero;
+    const showPoster = isNext || isPost;
+    const showTag = isExp || isPost || isPrem || isHero;
+    const showCta = (isPrem || isHero) && (st === 'premium' || st === 'busy' || soon || st === 'owned');
+
+    let eyebrow = '', status = '', badgeText = '', openLabel = 'Open meadow ↗';
+    if (active) badgeText = 'Playing now';
+    if (isPost) eyebrow = 'Next free season';
+    if (isPrem && !isMini) eyebrow = soon ? 'Premium season' : 'Premium season · one-time';
+    if (isMini) {
+      if (active) status = '';
+      else if (st === 'unlocked') status = 'Unlocked';
+      else if (st === 'next') status = 'Next · ' + coins + '/' + cNeed;
+      else if (dim) status = 'Locked';
+      else if (st === 'owned') status = 'Owned';
+      else if (soon) status = 'Soon';
+    } else if (isCol) {
+      if (active) status = 'Tap to open the meadow ↗';
+      else if (st === 'unlocked') status = 'Unlocked · tap to play here';
+      else if (st === 'next') status = 'Next free season';
+      else if (dim) status = prev ? 'Opens after ' + prev.n : 'Locked';
+      else if (st === 'premium' || st === 'busy') status = 'Premium · preview inside';
+      else if (st === 'owned') status = 'Owned';
+      else if (soon) status = 'Coming soon';
+    }
+
+    const pipsOf = r => '★'.repeat(r) + '☆'.repeat(3 - r);
+    const bigHead = isExp || isPost || isPrem || isHero;
+    const headH = isCol || isMini ? 0 : (isNext ? 72 : 132);
+    const chip = (bg, ed, tk) => 'flex:0 0 auto;box-sizing:border-box;height:60px;padding:0 22px;border-radius:16px;background:' +
+      bg + ';border:3px solid ' + ed + ';display:flex;align-items:center;font:900 38px/1 ' + NUN + ';color:' + tk + ';white-space:nowrap';
+    const rH = h - 2 * pad - headH - 14 - 48 - 14 - (showCta ? 144 : 0) - (isHero ? 354 : 0) - 28;
+    const frameW = Math.max(64, Math.min(isHero ? 124 : 116, rH - 48));
+    const inset = Math.max(7, Math.round(frameW * 0.095));
+    const roster = s.r.map(f => ({
+      slot: 'flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px',
+      frame: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:' + frameW + 'px;height:' + frameW +
+        'px;border-radius:' + Math.round(frameW * 0.22) + 'px;background:' + GOLD + ';border:3px solid ' + GOLD_EDGE + ';display:grid;place-items:center',
+      well: 'position:absolute;inset:' + inset + 'px;box-sizing:border-box;border-radius:' + Math.round(frameW * 0.15) +
+        'px;background:' + WELL + ';border:2px solid ' + WELL_EDGE,
+      src: 'flowers/ph_' + f[2] + '.svg',
+      art: 'position:relative;display:block;width:' + Math.round(frameW * 0.58) + 'px;height:' + Math.round(frameW * 0.58) + 'px',
+      pips: pipsOf(f[1]),
+      pipsStyle: 'font:800 38px/1 ' + NUN + ';letter-spacing:.02em;color:' + ink
+    }));
+
+    let uFill = 'rgba(255,248,240,.55)', uEdge = 'rgba(26,26,20,.30)', uInk = '#44443A';
+    if (ready) { uFill = UIGOLD; uEdge = UIGOLD_EDGE; uInk = INK; }
+    if (unlocking) { uFill = GOLD; uEdge = GOLD_EDGE; uInk = INK; }
+    let uLabel = 'Unlock ' + s.n, uSub = 'needs ' + dC + ' more coins and ' + dF + ' more ' + gateName;
+    if (ready || gateReady) { uLabel = 'Unlock ' + s.n; uSub = 'spends ' + cNeed + ' coins and ' + fNeed + ' ' + gateName; }
+    if (unlocking) { uLabel = s.n + ' unlocked'; uSub = 'spent ' + cNeed + ' coins and ' + fNeed + ' ' + gateName; }
+
+    let needText = 'Need ' + dC + ' more coins and ' + dF + ' more ' + gateName;
+    if (gateReady) needText = 'Both ready — unlock it whenever you like.';
+    if (unlocking) needText = 'Welcome to ' + s.n + '.';
+
+    let ctaFill = LAV, ctaEdge = LAV_EDGE, ctaInk = INK, ctaLabel = 'Get ' + s.n, ctaSub = (p.price ?? s.p ?? '') + ' · one-time, no subscription';
+    if (st === 'busy') { ctaFill = 'rgba(255,248,240,.55)'; ctaEdge = 'rgba(26,26,20,.30)'; ctaInk = '#44443A'; ctaLabel = 'Purchasing…'; ctaSub = 'finish in the store window'; }
+    if (soon) { ctaFill = 'rgba(255,248,240,.16)'; ctaEdge = 'rgba(255,246,214,.40)'; ctaInk = RIM; ctaLabel = 'Coming soon'; ctaSub = 'not for sale yet'; }
+    if (st === 'owned') { ctaFill = cream; ctaEdge = creamEdge; ctaInk = ink; ctaLabel = 'Open meadow ↗'; ctaSub = 'owned — plays like a free season'; }
+
+    const barTrack = light ? 'rgba(26,26,20,.20)' : 'rgba(255,248,240,.22)';
+
+    return {
+      name: s.n, tagline: s.t, eyebrow, status, badgeText,
+      openLabel, price: p.price ?? s.p ?? '',
+      roster,
+      coinVal: coins + ' / ' + cNeed,
+      flowerVal: fl + ' / ' + fNeed,
+      needText, gateCaption: gateName + ' ★★★ · merge it in the Arena',
+      gateArtSrc: 'flowers/ph_' + gate[2] + '.svg',
+      unlockLabel: uLabel, unlockSub: uSub,
+      ctaLabel, ctaSub,
+      artTag: 'SeasonArtSlot · optional 996 × 340',
+      miniProgText: isNext ? 'Next free season' : coins + ' / ' + cNeed + '  ·  ' + fl + ' / ' + fNeed,
+
+      rootStyle: ['position:relative;box-sizing:border-box;flex:0 0 auto;overflow:hidden',
+        'width:' + w + 'px;height:' + h + 'px;border-radius:' + radius + 'px',
+        'background:' + fill,
+        'border:' + (active ? '6px solid ' + RIM : '3px solid ' + (dim || soon ? 'rgba(255,246,214,.34)' : this.sc(mood, 0.8))),
+        'box-shadow:' + (active ? '0 10px 22px rgba(20,26,22,.38)' : '0 8px 16px rgba(20,26,22,.26)'),
+        'padding:' + pad + 'px;display:flex;flex-direction:column;gap:' + (isNext ? 12 : 14) + 'px',
+        'font-family:' + NUN + ';-webkit-font-smoothing:antialiased'].join(';'),
+
+      burstStyle: unlocking
+        ? 'position:absolute;left:50%;top:50%;width:760px;height:760px;margin:-380px 0 0 -380px;border-radius:50%;border:16px solid rgba(255,245,209,.55);pointer-events:none'
+        : 'display:none',
+
+      artSlotStyle: isHero
+        ? 'flex:0 0 340px;box-sizing:border-box;border-radius:20px;background:' + panel + ';border:4px dashed ' + panelEdge + ';display:flex;align-items:flex-end;padding:18px'
+        : 'display:none',
+      artTagStyle: 'font:700 34px/1 ' + NUN + ';color:' + sub,
+
+      headStyle: (isCol ? 'flex:1;min-height:0;display:flex;align-items:center;gap:18px'
+        : isMini ? 'flex:1;min-height:0;display:flex;flex-direction:column;gap:10px'
+          : 'flex:0 0 ' + headH + 'px;display:flex;align-items:center;gap:18px'),
+      lockBoxStyle: (dim || soon) && !isMini
+        ? 'flex:0 0 auto;box-sizing:border-box;width:84px;height:84px;border-radius:22px;background:rgba(26,26,20,.26);border:2px solid rgba(255,246,214,.34);display:grid;place-items:center'
+        : 'display:none',
+      lockIconStyle: 'width:48px;height:48px;display:block',
+      headTextStyle: 'flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;justify-content:center',
+      eyebrowRowStyle: (bigHead && (eyebrow || badgeText || p.fresh))
+        ? 'flex:0 0 60px;display:flex;align-items:center;gap:14px'
+        : 'display:none',
+      badgeTopStyle: (bigHead && badgeText) ? chip(RIM, GOLD_EDGE, INK) : 'display:none',
+      newTopStyle: (bigHead && p.fresh) ? chip('#A8E6CF', '#7FC9AC', INK) : 'display:none',
+      eyebrowStyle: eyebrow ? 'font:700 38px/1 ' + NUN + ';color:' + sub + ';white-space:nowrap' : 'display:none',
+      nameStyle: 'font:900 ' + NAMESZ[v] + 'px/1.02 ' + NUN + ';color:' + ink +
+        (isMini ? ';text-wrap:pretty' : ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis'),
+      statusStyle: status ? 'font:700 40px/1 ' + NUN + ';color:' + sub + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis' : 'display:none',
+
+      badgeStyle: (badgeText && !bigHead)
+        ? 'flex:0 0 auto;box-sizing:border-box;height:' + (isMini ? 60 : 72) + 'px;padding:0 24px;border-radius:18px;background:' + RIM +
+          ';border:3px solid ' + GOLD_EDGE + ';display:flex;align-items:center;font:900 ' + (isMini ? 34 : 40) + 'px/1 ' + NUN + ';color:' + INK + ';white-space:nowrap'
+        : 'display:none',
+      newStyle: (p.fresh && !bigHead)
+        ? 'flex:0 0 auto;box-sizing:border-box;height:72px;padding:0 22px;border-radius:18px;background:#A8E6CF;border:3px solid #7FC9AC;display:flex;align-items:center;font:900 40px/1 ' + NUN + ';color:' + INK
+        : 'display:none',
+      miniProgStyle: ((isCol && st === 'next') || isNext)
+        ? 'flex:0 0 auto;box-sizing:border-box;height:76px;padding:0 22px;border-radius:18px;background:' + cream + ';border:2px solid ' + creamEdge +
+          ';display:flex;align-items:center;font:' + (isNext ? '800 40' : '900 44') + 'px/1 ' + NUN + ';font-variant-numeric:tabular-nums;color:' + ink + ';white-space:nowrap'
+        : 'display:none',
+      priceStyle: ((isCol || isPrem || isHero || isMini) && (st === 'premium' || st === 'busy') && (p.price ?? s.p))
+        ? 'flex:0 0 auto;box-sizing:border-box;height:' + (isMini ? 64 : 96) + 'px;padding:0 ' + (isMini ? 16 : 26) + 'px;border-radius:18px;background:' + PRICEBG +
+          ';border:3px solid ' + GOLD_EDGE + ';display:flex;align-items:center;font:900 ' + (isMini ? 40 : 52) + 'px/1 ' + NUN +
+          ';font-variant-numeric:tabular-nums;color:' + INK + ';white-space:nowrap' + (isMini ? ';align-self:stretch;justify-content:center' : '')
+        : 'display:none',
+      openStyle: (isExp || isHero) && (active || st === 'unlocked')
+        ? 'flex:0 0 auto;box-sizing:border-box;width:360px;height:124px;border-radius:20px;background:' + cream + ';border:3px solid ' + creamEdge +
+          ';display:flex;align-items:center;justify-content:center;font:900 42px/1 ' + NUN + ';color:' + ink + ';white-space:nowrap'
+        : 'display:none',
+
+      taglineStyle: showTag
+        ? 'flex:0 0 48px;font:700 42px/1.12 ' + NUN + ';color:' + sub + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis'
+        : 'display:none',
+
+      rosterStyle: showRoster
+        ? 'flex:1;min-height:0;box-sizing:border-box;border-radius:20px;background:' + panel + ';border:2px solid ' + panelEdge +
+          ';padding:14px 12px;display:flex;align-items:center;gap:12px'
+        : 'display:none',
+
+      posterStyle: showPoster
+        ? 'flex:1;min-height:0;display:flex;flex-direction:column;gap:' + (isPost ? 14 : 12) + 'px'
+        : 'display:none',
+      needStyle: 'flex:0 0 auto;font:800 ' + (isPost ? 44 : 40) + 'px/1.1 ' + NUN + ';color:' + ink + ';text-wrap:pretty',
+      rowStyle: 'flex:' + (isPost ? '1;min-height:0' : '0 0 66px') + ';display:flex;align-items:center;gap:16px',
+      coinIconStyle: 'width:' + (isPost ? 60 : 56) + 'px;height:' + (isPost ? 60 : 56) + 'px;display:block;flex:0 0 auto',
+      valStyle: 'flex:0 0 ' + (isPost ? 300 : 240) + 'px;font:900 ' + (isPost ? 56 : 48) + 'px/1 ' + NUN +
+        ';font-variant-numeric:tabular-nums;white-space:nowrap;color:' + ink,
+      barStyle: 'flex:1;min-width:0;height:' + (isPost ? 26 : 20) + 'px;border-radius:13px;background:' + barTrack + ';overflow:hidden',
+      coinFillStyle: 'height:100%;width:' + (Math.min(1, coins / cNeed) * 100).toFixed(1) + '%;background:' + GOLD,
+      flowerFillStyle: 'height:100%;width:' + (Math.min(1, fl / fNeed) * 100).toFixed(1) + '%;background:' + CREAM,
+      gateFrameStyle: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:' + (isPost ? 60 : 56) + 'px;height:' + (isPost ? 60 : 56) +
+        'px;border-radius:18px;background:' + GOLD + ';border:3px solid ' + GOLD_EDGE + ';display:grid;place-items:center',
+      gateWellStyle: 'position:absolute;inset:8px;box-sizing:border-box;border-radius:11px;background:' + WELL + ';border:2px solid ' + WELL_EDGE,
+      gateArtStyle: 'position:relative;display:block;width:' + (isPost ? 40 : 30) + 'px;height:' + (isPost ? 40 : 30) + 'px',
+      gateCapStyle: isPost ? 'flex:0 0 auto;font:700 38px/1 ' + NUN + ';color:' + sub : 'display:none',
+      unlockStyle: isPost
+        ? 'flex:0 0 140px;box-sizing:border-box;border-radius:20px;background:' + uFill + ';border:3px solid ' + uEdge +
+          ';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px'
+        : 'display:none',
+      unlockLabelStyle: 'font:900 52px/1 ' + NUN + ';color:' + uInk + ';white-space:nowrap',
+      unlockSubStyle: 'font:700 38px/1 ' + NUN + ';color:' + (ready || unlocking ? INK : '#44443A') + ';white-space:nowrap',
+
+      ctaStyle: showCta
+        ? 'flex:0 0 130px;box-sizing:border-box;border-radius:20px;background:' + ctaFill + ';border:3px solid ' + ctaEdge +
+          ';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px'
+        : 'display:none',
+      ctaLabelStyle: 'font:900 48px/1 ' + NUN + ';color:' + ctaInk + ';white-space:nowrap',
+      ctaSubStyle: 'font:700 38px/1 ' + NUN + ';color:' + (soon ? 'rgba(255,246,214,.86)' : ctaInk) + ';white-space:nowrap'
+    };
+  }
+}
+</script>
+</body>
+</html>

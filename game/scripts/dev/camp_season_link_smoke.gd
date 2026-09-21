@@ -186,9 +186,10 @@ func _run() -> void:
 		return
 	stage.call("refresh")
 	await process_frame
-	var gate: Control = stage.get_node_or_null("%UnlockGate") as Control
-	if gate == null or not gate.visible:
-		_fail("Home UnlockGate should be visible on locked Frost")
+	# Home (design_handoff_home): fokusirani next lock = puni unlock poster na kartici.
+	var frost_card: Control = stage.call("get_card", S2) as Control
+	if frost_card == null or not frost_card.visible or str(frost_card.get("variant")) != "poster":
+		_fail("Home should open the Frost unlock poster after the Camp card tap")
 		return
 
 	_go_page(hub, MetaHubPages.CAMP)

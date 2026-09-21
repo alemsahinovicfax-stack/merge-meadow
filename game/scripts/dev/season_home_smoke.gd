@@ -1,9 +1,13 @@
 extends SceneTree
 
-## HOME-B / HOME-02 — 3-slot free strip; hit-through cards; P11 sheet; paid grant does not steal center.
+## Home — biranje sezone, smjer 1a Season Trail (design_handoff_home, 2026-09-21).
+## Kolona kartica (harmonika), unlock s prstenom, premium sekcija i kupovina,
+## dolazak iz Campa, Play = run odmah, daily gift. Backup/restore pravog save-a.
 
-const SAVE_PATH := "user://player_save.json"
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
+
+var _backup := ""
+var _failed := false
 
 
 func _initialize() -> void:
@@ -14,23 +18,26 @@ func _gs() -> Node:
 	return get_root().get_node_or_null("GameState")
 
 
+func _iap() -> Node:
+	return get_root().get_node_or_null("IAPManager")
+
+
 func _fail(msg: String) -> void:
+	if _failed:
+		return
+	_failed = true
 	push_error("season_home_smoke: %s" % msg)
+	CampSmokeUtil.restore_save(self, _backup)
 	quit(1)
 
 
-func _label_has_ellipsis(ctrl: Control) -> bool:
-	if ctrl == null:
-		return false
-	for node in ctrl.find_children("*", "Label", true, false):
-		var t := (node as Label).text
-		if t.find("…") >= 0 or t.find("...") >= 0:
-			return true
-	return false
+func _frames(n: int) -> void:
+	for _i in n:
+		await process_frame
 
 
-func _rgb_equal(a: Color, b: Color) -> bool:
-	return is_equal_approx(a.r, b.r) and is_equal_approx(a.g, b.g) and is_equal_approx(a.b, b.b)
+func _wait(sec: float) -> void:
+	await create_timer(sec).timeout
 
 
 func _today() -> String:
@@ -38,93 +45,35 @@ func _today() -> String:
 	return "%04d-%02d-%02d" % [int(d.year), int(d.month), int(d.day)]
 
 
-func _caption_has_arena(text: String) -> bool:
-	return text.find("Arena streak") >= 0 or text.find("Arena daily") >= 0
+func _card(stage: Node, id: String) -> Control:
+	return stage.call("get_card", id) as Control
 
 
-func _assert_home_daily_gift(home: Node, gs: Node) -> String:
-	gs.set("last_daily_chest_day", "")
-	if home.has_method("_refresh_chest_card"):
-		home.call("_refresh_chest_card")
-	var caption: Label = home.get_node_or_null("%DailyCaption") as Label
-	if caption == null:
-		return "DailyCaption missing"
-	if caption.text != "Tap to open":
-		return "ready DailyCaption expected Tap to open got %s" % caption.text
-	if home.has_method("is_chest_attention_active") and not bool(home.call("is_chest_attention_active")):
-		return "ready daily chest should blink/shake"
-	if _caption_has_arena(caption.text):
-		return "ready DailyCaption must not mention arena"
-	gs.set("arena_daily_day", _today())
-	gs.set("arena_daily_kind", "merge_t2")
-	gs.set("arena_daily_goal", 3)
-	gs.set("arena_daily_progress", 3)
-	gs.set("arena_daily_claimed_day", "")
-	gs.set("arena_daily_streak", 7)
-	if not home.has_method("_finish_chest_claim"):
-		return "home missing _finish_chest_claim"
-	home.call("_finish_chest_claim")
-	if int(gs.get("arena_daily_streak")) != 7:
-		return "claim_daily_chest must not bump arena_daily_streak"
-	if caption.text != "Back tomorrow":
-		return "claimed DailyCaption expected Back tomorrow got %s" % caption.text
-	if home.has_method("is_chest_attention_active") and bool(home.call("is_chest_attention_active")):
-		return "claimed daily chest should stop attention"
-	if _caption_has_arena(caption.text):
-		return "claimed DailyCaption must not mention arena"
-	if home.has_method("_on_daily_chest_pressed"):
-		home.call("_on_daily_chest_pressed")
-	if int(gs.get("arena_daily_streak")) != 7:
-		return "claimed Daily tap must not bump arena_daily_streak"
-	var reward_title: Label = home.get_node_or_null("%RewardTitle") as Label
-	if reward_title == null:
-		return "RewardTitle missing"
-	if reward_title.text.find("Come back tomorrow") < 0:
-		return "claimed overlay title expected Come back tomorrow got %s" % reward_title.text
-	if reward_title.text == "Arena daily!":
-		return "claimed Daily overlay must not be Arena daily"
-	var reward_body: Label = home.get_node_or_null("%RewardBody") as Label
-	if reward_body == null:
-		return "RewardBody missing"
-	if reward_body.text.find("already opened today") < 0:
-		return "claimed overlay body expected already opened today got %s" % reward_body.text
-	if reward_body.text.findn("come back tomorrow") >= 0:
-		return "claimed overlay body must not repeat come back tomorrow got %s" % reward_body.text
-	var already := str(gs.call("claim_daily_chest"))
-	if already.findn("come back tomorrow") >= 0:
-		return "claim_daily_chest already-claimed must not say come back tomorrow got %s" % already
-	if already.find("already opened today") < 0:
-		return "claim_daily_chest already-claimed expected already opened today got %s" % already
-	if home.has_method("_hide_reward_overlay"):
-		home.call("_hide_reward_overlay")
-	return ""
+func _rgb_near(a: Color, b: Color) -> bool:
+	return absf(a.r - b.r) < 0.01 and absf(a.g - b.g) < 0.01 and absf(a.b - b.b) < 0.01
 
 
-func _assert_open_field_hub_swipe(home: Node, swipe: Node, field: Control) -> String:
-	if swipe == null or not swipe.has_method("should_block_hub_swipe_at"):
-		return "SwipePager missing should_block_hub_swipe_at"
-	var mid_ctrl := field
-	if mid_ctrl == null or not mid_ctrl.visible:
-		mid_ctrl = home.get_node_or_null("%SeasonStage") as Control
-	if mid_ctrl == null:
-		return "SeasonField/Stage missing for swipe check"
-	var mid: Vector2 = mid_ctrl.get_global_rect().get_center()
-	if bool(swipe.call("should_block_hub_swipe_at", mid)):
-		return "field mid should not block hub swipe"
-	var chrome: Control = home.get_node_or_null("%DailyChestCard") as Control
-	if chrome == null or not chrome.visible:
-		chrome = home.get_node_or_null("%PlayRow") as Control
-	if chrome == null:
-		return "Daily/PlayRow missing for swipe chrome check"
-	var chrome_mid: Vector2 = chrome.get_global_rect().get_center()
-	if not bool(swipe.call("should_block_hub_swipe_at", chrome_mid)):
-		return "Daily or PlayRow should block hub swipe"
-	return ""
+func _star3_for(gs: Node, season_id: String) -> String:
+	return str(gs.call("star3_type_id_for_season", season_id))
+
+
+## Svi vidljivi elementi kolone + razmaci; otvorena kartica mora popuniti kolonu.
+func _trail_used(stage: Node) -> float:
+	var list := stage.get_node("%TrailList") as VBoxContainer
+	var sep := list.get_theme_constant("separation")
+	var used := 0.0
+	var shown := 0
+	for c in list.get_children():
+		var ctrl := c as Control
+		if ctrl == null or not ctrl.visible:
+			continue
+		used += ctrl.size.y
+		shown += 1
+	return used + float(sep * maxi(shown - 1, 0))
 
 
 func _run() -> void:
-	if FileAccess.file_exists(SAVE_PATH):
-		DirAccess.remove_absolute(SAVE_PATH)
+	_backup = CampSmokeUtil.backup_save()
 	var gs := _gs()
 	if gs == null:
 		_fail("GameState missing")
@@ -133,806 +82,385 @@ func _run() -> void:
 	gs.set("garden_crystal_stash", {})
 	gs.set("skip_debug_season_unlock", true)
 	gs.call("reset_seasons_to_s1")
+	gs.call("clear_owned_paid_seasons")
 	gs.set("tutorial_complete", true)
+	var iap := _iap()
+	if iap and iap.has_method("reset_purchases_for_dev"):
+		iap.call("reset_purchases_for_dev")
 
-	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
-	if err != OK:
-		_fail("hub load failed %d" % err)
+	if change_scene_to_file("res://scenes/meta/meta_hub.tscn") != OK:
+		_fail("hub load failed")
 		return
-	for _i in 16:
-		await process_frame
-
-	var hubs := get_nodes_in_group("meta_hub")
-	if hubs.is_empty():
-		_fail("no meta_hub")
-		return
-	var hub: Node = hubs[0]
-	if hub.has_method("go_to_page"):
-		hub.call("go_to_page", MetaHubPages.MAIN, false)
-	for _j in 12:
-		await process_frame
-
+	await _frames(16)
+	var hub: Node = get_nodes_in_group("meta_hub")[0]
+	hub.call("go_to_page", MetaHubPages.MAIN, false)
+	await _frames(12)
 	var swipe := hub.get_node_or_null("RootVBox/SwipePager")
-	if swipe == null:
-		_fail("SwipePager missing")
-		return
-	if int(swipe.get("current_page")) != MetaHubPages.MAIN:
-		_fail("expected Home page")
-		return
-
-	var host: Node = swipe.call("get_pages_host") if swipe.has_method("get_pages_host") else null
-	var home: Node = host.get_node_or_null("Page_%d" % MetaHubPages.MAIN) if host else null
+	var host: Node = swipe.call("get_pages_host")
+	var home: Node = host.get_node_or_null("Page_%d" % MetaHubPages.MAIN)
 	if home == null:
 		_fail("Home page missing")
 		return
-	if home.get_node_or_null("%HomeTitle") != null:
-		_fail("HomeTitle should be removed")
-		return
-	if home.get_node_or_null("%EasyButton") != null or home.get_node_or_null("HomeColumn/EndlessSection/DifficultyRow") != null:
-		_fail("Difficulty row should be removed")
-		return
-	if home.get_node_or_null("%PlayButton") == null:
-		_fail("PlayButton missing")
-		return
-	var endless_btn: Control = home.get_node_or_null("%EndlessPlayButton") as Control
-	if endless_btn == null:
-		_fail("EndlessPlayButton missing")
-		return
-	if endless_btn.visible:
-		_fail("carousel EndlessPlayButton should be hidden after tutorial")
-		return
-	var seasons_row_home: Control = home.get_node_or_null("%SeasonsRowButton") as Control
-	if seasons_row_home == null:
-		_fail("SeasonsRowButton missing")
-		return
-	if seasons_row_home.visible:
-		_fail("carousel SeasonsRowButton should be hidden")
-		return
-	var basket_home: Control = home.get_node_or_null("%BasketCard") as Control
-	if basket_home and basket_home.visible:
-		_fail("carousel BasketCard should be hidden")
-		return
-	var daily_err := _assert_home_daily_gift(home, gs)
-	if not daily_err.is_empty():
-		_fail(daily_err)
-		return
-	var play_btn_home: Control = home.get_node_or_null("%PlayButton") as Control
-	if play_btn_home == null:
-		_fail("PlayButton missing")
-		return
-	if not is_equal_approx(play_btn_home.custom_minimum_size.y, 96.0):
-		_fail("carousel Play min height expected 96 got %s" % str(play_btn_home.custom_minimum_size))
-		return
-	var pip_portrait: Control = home.get_node_or_null("%PipPortrait") as Control
-	if pip_portrait == null:
-		_fail("PipPortrait missing")
-		return
-	if pip_portrait.visible:
-		_fail("PipPortrait should be hidden")
-		return
+	home.call("refresh_for_meta_hub")
+	await _frames(4)
 	var stage: Node = home.get_node_or_null("%SeasonStage")
 	if stage == null:
 		_fail("SeasonStage missing")
 		return
-	if stage is Control and (stage as Control).mouse_filter != Control.MOUSE_FILTER_STOP:
-		_fail("SeasonStage must STOP so it receives strip input")
-		return
-	var motion: Control = stage.get_node_or_null("%StripMotion") as Control
-	if motion == null or motion.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-		_fail("StripMotion must IGNORE")
-		return
-	var row_n: Control = motion.get_node_or_null("Row") as Control
-	if row_n == null or row_n.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-		_fail("Row must IGNORE so cards do not eat swipe")
-		return
-	for slot_name in ["%LeftSlot", "%CenterSlot", "%RightSlot"]:
-		var slot_n: Control = stage.get_node_or_null(slot_name) as Control
-		if slot_n == null or slot_n.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-			_fail("%s must IGNORE" % slot_name)
+
+	# --- struktura: stari dvotrakasti stage, Browser i sheet su obrisani ---
+	for gone in ["%BandColumn", "%PaidBand", "%FreeBand", "%SeasonBrowser", "%SeasonUnlockSheet", "%UnlockGate"]:
+		if stage.get_node_or_null(gone) != null:
+			_fail("%s should be removed" % gone)
 			return
-	var paid_band: Control = stage.get_node_or_null("%PaidBand") as Control
-	var free_band: Control = stage.get_node_or_null("%FreeBand") as Control
-	if paid_band == null or not paid_band.visible or paid_band.size.y <= 0.0:
-		_fail("PaidBand must be visible with height")
-		return
-	if free_band == null or not free_band.visible or free_band.size.y <= 0.0:
-		_fail("FreeBand must be visible with height")
-		return
-	var stage_ctrl_early := stage as Control
-	if stage_ctrl_early == null or stage_ctrl_early.size.y <= 260.0:
-		_fail("SeasonStage should be taller than single-strip")
-		return
-	if str(gs.get("home_band")) != "free":
-		_fail("new game home_band should be free")
-		return
-	if stage.has_method("swap_home_band"):
-		stage.call("swap_home_band", "paid", "coral_tide")
-		await process_frame
-		await process_frame
-	if str(gs.get("home_band")) != "paid":
-		_fail("LIFE-A setup: expected paid band")
-		return
-	if bool(gs.call("is_season_playable", "coral_tide")):
-		_fail("LIFE-A: coral_tide should be unowned")
-		return
-	if str(home.call("home_play_action")) != "snap":
-		_fail("LIFE-A unowned paid: home_play_action should be snap")
-		return
-	home.call("_on_play_pressed")
-	await process_frame
-	await process_frame
-	if bool(gs.get("home_season_field_open")):
-		_fail("LIFE-A paid Play should not open field")
-		return
-	if str(gs.get("home_band")) != "free":
-		_fail("LIFE-A paid Play should snap home_band to free")
-		return
-	if str(gs.call("home_hero_center_id")) != "country_bloom":
-		_fail("LIFE-A paid Play should snap to Bloom")
-		return
-	if current_scene and str(current_scene.scene_file_path).find("run_scene") >= 0:
-		_fail("LIFE-A paid Play should not enter run")
-		return
-	gs.call("set_paid_strip_focus", "moonlit_warren")
-	if stage.has_method("swap_home_band"):
-		stage.call("swap_home_band", "free", "country_bloom")
-		await process_frame
-		await process_frame
-	if stage.has_method("refresh"):
-		stage.call("refresh")
-	await process_frame
-	var paid_row: Control = stage.get_node_or_null("%PaidRow") as Control
-	if paid_row == null or paid_row.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-		_fail("PaidRow must IGNORE")
-		return
-	for paid_slot_name in ["%PaidLeftSlot", "%PaidCenterSlot", "%PaidRightSlot"]:
-		var paid_slot_n: Control = stage.get_node_or_null(paid_slot_name) as Control
-		if paid_slot_n == null or paid_slot_n.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-			_fail("%s must IGNORE" % paid_slot_name)
+	for gone in ["DecorMoundLeft", "DecorMoundRight", "%PlayThemeBadge", "%PipPortrait"]:
+		if home.get_node_or_null(gone) != null:
+			_fail("%s should be removed" % gone)
 			return
-	var paid_left: Control = stage.get_node_or_null("%PaidLeftSlot") as Control
-	if paid_left == null or paid_left.visible:
-		_fail("Paid left slot should be hidden on new game")
+	if not stage.get_node("%SeasonTrail") is ScrollContainer:
+		_fail("SeasonTrail must be a ScrollContainer")
 		return
-	var paid_center_title: Label = stage.get_node_or_null("%PaidCenterTitle") as Label
-	if paid_center_title == null or paid_center_title.text.find("Moonlit") < 0:
-		_fail("Paid center expected Moonlit got '%s'" % (paid_center_title.text if paid_center_title else "null"))
+	if (stage as Control).is_in_group("block_hub_swipe"):
+		_fail("1a: SeasonStage must not block hub swipe")
 		return
-	if paid_center_title.text.find("🔒") < 0 and paid_center_title.text.find("€") < 0:
-		_fail("Unowned paid center should show lock or price")
+	var stage_mid := (stage as Control).get_global_rect().get_center()
+	if bool(swipe.call("should_block_hub_swipe_at", stage_mid)):
+		_fail("1a: hub swipe must pass over the season trail")
 		return
-	var paid_right_title: Label = stage.get_node_or_null("%PaidRightTitle") as Label
-	if paid_right_title == null or paid_right_title.text.find("Coral") < 0:
-		_fail("Paid right expected Coral got '%s'" % (paid_right_title.text if paid_right_title else "null"))
-		return
-	if gs.call("get_season_def", "amber_canopy") == null:
-		_fail("amber_canopy missing from catalog")
-		return
-	if gs.call("get_season_def", "starfall_glade") == null or gs.call("get_season_def", "ember_fen") == null:
-		_fail("new paid seasons missing from catalog")
-		return
-	var center: Label = stage.get_node_or_null("%CenterTitle") as Label
-	if center == null or center.text.find("Country Bloom") < 0:
-		_fail("Center expected Country Bloom got '%s'" % (center.text if center else "null"))
-		return
-	var left_slot: Control = stage.get_node_or_null("%LeftSlot") as Control
-	if left_slot == null or left_slot.visible:
-		_fail("Left slot should be hidden on new game")
-		return
-	var right: Label = stage.get_node_or_null("%RightTitle") as Label
-	if right == null or right.text.find("Frost Orchard") < 0:
-		_fail("Right expected Frost Orchard got '%s'" % (right.text if right else "null"))
-		return
-	if right.text.find("🔒") < 0:
-		_fail("Right slot should be locked on new game")
+	var bg := home.get_node_or_null("Background") as ColorRect
+	if bg == null or not _rgb_near(bg.color, UiHome.PAGE_BG):
+		_fail("Home background must be #2E4733 like Camp")
 		return
 
-	var center_slot: Control = stage.get_node_or_null("%CenterSlot") as Control
-	var paid_center_slot: Control = stage.get_node_or_null("%PaidCenterSlot") as Control
-	var right_slot: Control = stage.get_node_or_null("%RightSlot") as Control
-	if center_slot and stage.has_method("_handle_tap"):
-		var to_local: Transform2D = (stage as Control).get_global_transform().affine_inverse()
-		var tap_at: Vector2 = to_local * center_slot.get_global_rect().get_center()
-		stage.call("_handle_tap", tap_at)
-		await process_frame
-		var browser_open: Node = stage.get_node_or_null("%SeasonBrowser")
-		if browser_open and bool(browser_open.get("visible")):
-			_fail("Playable center tap should open field, not Browser")
-			return
-		if not bool(gs.get("home_season_field_open")):
-			_fail("Playable center tap should open season field")
-			return
-		var field_ctrl: Control = stage.get_node_or_null("%SeasonField") as Control
-		var field_swipe_err := _assert_open_field_hub_swipe(home, swipe, field_ctrl)
-		if not field_swipe_err.is_empty():
-			_fail(field_swipe_err)
-			return
-		if stage.has_method("close_season_field"):
-			stage.call("close_season_field")
-		await process_frame
+	# --- stranica: TopRow 130, ProgressIndicator 420, Play 1032 x 156 + cip ---
+	var top_row := home.get_node_or_null("%TopRow") as Control
+	var gift := home.get_node_or_null("%DailyChestCard") as Control
+	var progress := home.get_node_or_null("%ProgressIndicator") as Control
+	if top_row == null or gift == null or progress == null or gift.get_parent() != top_row:
+		_fail("TopRow must hold DailyChestCard + ProgressIndicator")
+		return
+	if not is_equal_approx(top_row.size.y, UiHome.TOP_ROW_H):
+		_fail("TopRow height %s expected 130" % str(top_row.size.y))
+		return
+	if not is_equal_approx(progress.size.x, UiHome.PROGRESS_W):
+		_fail("ProgressIndicator width %s expected 420" % str(progress.size.x))
+		return
+	if str(progress.call("get_text")) != "1 / 4":
+		_fail("progress expected 1 / 4 got %s" % str(progress.call("get_text")))
+		return
+	var play := home.get_node_or_null("%PlayButton") as Control
+	if play == null or not is_equal_approx(play.size.y, UiHome.PLAY_H) or absf(play.size.x - 1032.0) > 1.0:
+		_fail("Play must be 1032 x 156, got %s" % str(play.size if play else Vector2.ZERO))
+		return
+	if str(home.call("get_play_chip_text")) != "Country Bloom":
+		_fail("Play chip expected Country Bloom got '%s'" % str(home.call("get_play_chip_text")))
+		return
+	if str(home.call("home_play_action")) != "run":
+		_fail("Play must start a run directly (decision 2026-09-21)")
+		return
+	var column := home.get_node_or_null("%HomeColumn") as Control
+	if not is_equal_approx(column.offset_left, 24.0) or not is_equal_approx(column.offset_top, 24.0):
+		_fail("HomeColumn must sit on padding 24")
+		return
+	if top_row.get_global_rect().end.y > (stage as Control).get_global_rect().position.y:
+		_fail("TopRow must sit above the trail")
+		return
 
-	if stage.has_method("cycle_free_strip"):
-		stage.call("cycle_free_strip", 1)
-	await create_timer(0.35).timeout
-	if str(gs.get("focus_season_id")) != "frost_orchard":
-		_fail("next-lock swipe should center Frost Orchard")
+	# --- novi igrac: Bloom otvorena i aktivna, Frost next lock, dalje zakljucano ---
+	var bloom := _card(stage, "country_bloom")
+	var frost := _card(stage, "frost_orchard")
+	var lantern := _card(stage, "lantern_meadow")
+	var amber := _card(stage, "amber_canopy")
+	if bloom == null or frost == null or lantern == null or amber == null:
+		_fail("free season cards missing")
+		return
+	if str(bloom.get("variant")) != UiHome.EXPANDED or not bool(bloom.call("is_active")):
+		_fail("new player: Country Bloom must be expanded + active")
+		return
+	if not bool(bloom.call("has_roster")) or not bool(bloom.call("has_open_button")) or not bool(bloom.call("has_playing_badge")):
+		_fail("active card needs roster, Open meadow and Playing now")
+		return
+	if float(bloom.call("roster_art_side")) < 64.0 or float(bloom.call("roster_art_side")) > 116.0:
+		_fail("roster art frame must be 64..116, got %s" % str(bloom.call("roster_art_side")))
+		return
+	if str(frost.get("variant")) != UiHome.NEXTLOCK or str(frost.get("state")) != UiHome.ST_NEXT:
+		_fail("new player: Frost must be the compact next lock")
+		return
+	if str(frost.call("get_chip_text")) != "Next free season":
+		_fail("next lock chip expected 'Next free season' got '%s'" % str(frost.call("get_chip_text")))
+		return
+	if str(frost.call("get_need_text")) != "Need 500 more coins and 20 more Harvest Pumpkin":
+		_fail("next lock need line got '%s'" % str(frost.call("get_need_text")))
+		return
+	if str(lantern.get("state")) != UiHome.ST_LOCKED or not bool(lantern.call("has_lock")):
+		_fail("Lantern must be locked with LockBox")
+		return
+	if str(lantern.call("get_status_text")) != "Opens after Frost Orchard":
+		_fail("Lantern status got '%s'" % str(lantern.call("get_status_text")))
+		return
+	var locked_fill := UiHome.locked_fill(UiHome.mood("lantern_meadow"))
+	if not _rgb_near(Color(lantern.call("get_fill_color")), locked_fill):
+		_fail("locked fill must be derived from mood")
+		return
+	if int(bloom.call("get_border_width")) != UiHome.CARD_BORDER_ACTIVE:
+		_fail("active card border must be 6")
+		return
+	var header := stage.call("get_premium_header") as Control
+	if header == null or bool(stage.call("is_premium_open")):
+		_fail("premium section must start closed on the free path")
+		return
+	if str(header.call("get_chevron_text")) != "4  ↓" or str(header.call("get_note_text")) != "Free path never needs them":
+		_fail("closed premium row text wrong")
+		return
+	if _card(stage, "coral_tide") != null and _card(stage, "coral_tide").visible:
+		_fail("premium cards must be hidden while the section is closed")
+		return
+	var trail := stage.get_node("%SeasonTrail") as Control
+	if absf(_trail_used(stage) - trail.size.y) > 2.0:
+		_fail("open card must fill the trail: used %.0f vs %.0f" % [_trail_used(stage), trail.size.y])
+		return
+
+	# --- tap na zakljucanu iza next locka = odbijanje, fokus se ne mijenja ---
+	stage.call("tap_card", "lantern_meadow")
+	await _frames(2)
+	if str(stage.call("focused_card_id")) != "country_bloom":
+		_fail("tap past next lock must bounce")
+		return
+
+	# --- tap na next lock = puni poster, Unlock mutno dok ne stigne oboje ---
+	stage.call("tap_card", "frost_orchard")
+	await _wait(0.35)
+	if str(frost.get("variant")) != UiHome.POSTER:
+		_fail("tap next lock must open the poster")
+		return
+	if bool(frost.call("is_unlock_enabled")):
+		_fail("Unlock must be disabled at 0 / 500")
+		return
+	if str(frost.call("get_unlock_sub")) != "needs 500 more coins and 20 more Harvest Pumpkin":
+		_fail("unlock sub got '%s'" % str(frost.call("get_unlock_sub")))
+		return
+	if str(bloom.get("variant")) != UiHome.COLLAPSED or str(bloom.call("get_status_text")) != "Tap to open the meadow ↗":
+		_fail("collapsed active card must say Tap to open the meadow ↗")
+		return
+	if not bool(bloom.call("has_playing_badge")):
+		_fail("collapsed active card keeps Playing now")
+		return
+
+	# --- spremno: 500 coina + 20 Harvest Pumpkin ---
+	gs.set("wallet_coins", 500)
+	gs.set("garden_crystal_stash", {_star3_for(gs, "country_bloom"): 20})
+	stage.call("refresh")
+	await _frames(2)
+	if str(frost.get("state")) != UiHome.ST_READY or not bool(frost.call("is_unlock_enabled")):
+		_fail("Frost must be ready with gold Unlock")
+		return
+	if str(frost.call("get_need_text")) != "Both ready — unlock it whenever you like.":
+		_fail("ready need line got '%s'" % str(frost.call("get_need_text")))
+		return
+	if str(frost.call("get_unlock_sub")) != "spends 500 coins and 20 Harvest Pumpkin":
+		_fail("ready unlock sub got '%s'" % str(frost.call("get_unlock_sub")))
+		return
+
+	# --- trenutak otkljucavanja: odmah trosi, prsten, pa otvorena sezona s "New" ---
+	frost.emit_signal("unlock_pressed", "frost_orchard")
+	await _frames(1)
+	if int(gs.get("wallet_coins")) != 0 or not bool(gs.call("is_season_playable", "frost_orchard")):
+		_fail("Unlock must spend immediately")
+		return
+	if str(frost.get("state")) != UiHome.ST_UNLOCKING or str(frost.call("get_unlock_title")) != "Frost Orchard unlocked":
+		_fail("unlocking frame expected 'Frost Orchard unlocked' got '%s'" % str(frost.call("get_unlock_title")))
+		return
+	var burst := frost.get_node_or_null("UnlockBurst") as Control
+	if burst == null or not burst.visible:
+		_fail("UnlockBurst ring must play")
+		return
+	if bool(frost.call("has_new_badge")):
+		_fail("New must wait until the ring is done")
+		return
+	if str(home.call("get_play_chip_text")) != "Frost Orchard":
+		_fail("Play chip must switch to the unlocked season right away")
+		return
+	await _wait(1.2)
+	if str(frost.get("variant")) != UiHome.EXPANDED or not bool(frost.call("is_active")):
+		_fail("after unlock Frost must be the open active season")
+		return
+	if not bool(frost.call("has_new_badge")):
+		_fail("fresh unlock must show New")
+		return
+	if str(lantern.get("variant")) != UiHome.NEXTLOCK:
+		_fail("Lantern must become the next lock")
+		return
+	if str(progress.call("get_text")) != "2 / 4" or str(home.call("get_play_chip_text")) != "Frost Orchard":
+		_fail("progress / play chip must follow the unlock")
+		return
+
+	# --- tap na otkljucanu zatvorenu = izaberi i otvori ---
+	stage.call("tap_card", "country_bloom")
+	await _wait(0.35)
+	if str(gs.get("active_season_id")) != "country_bloom" or str(bloom.get("variant")) != UiHome.EXPANDED:
+		_fail("tap on unlocked card must select + expand it")
+		return
+	if str(home.call("get_play_chip_text")) != "Country Bloom":
+		_fail("play chip must follow the active season")
+		return
+
+	# --- tap na otvorenu aktivnu = polje sezone; nazad vraca kolonu ---
+	stage.call("tap_card", "country_bloom")
+	await _frames(3)
+	if not bool(gs.get("home_season_field_open")) or str(gs.get("home_season_field_id")) != "country_bloom":
+		_fail("tap on open active card must open the season field")
+		return
+	if trail.visible or not (stage.get_node("%SeasonField") as Control).visible:
+		_fail("field open: trail hidden, field visible")
+		return
+	if top_row.visible:
+		_fail("field open: TopRow hides (field keeps its own chrome)")
+		return
+	if not is_equal_approx(play.custom_minimum_size.y, 96.0):
+		_fail("field open: Play returns to the 96 px field button")
+		return
+	stage.call("close_season_field")
+	await _frames(3)
+	if not trail.visible or not top_row.visible:
+		_fail("close field: trail + TopRow must come back")
+		return
+
+	# --- premium: otvori sekciju, pregled prije kupovine, coming soon ---
+	stage.call("toggle_premium")
+	await _wait(0.35)
+	var coral := _card(stage, "coral_tide")
+	var ember := _card(stage, "ember_fen")
+	if not bool(stage.call("is_premium_open")) or coral == null or not coral.visible:
+		_fail("premium toggle must show premium cards")
+		return
+	if str(header.call("get_note_text")) != "Preview before you buy" or str(header.call("get_chevron_text")) != "↑":
+		_fail("open premium header text wrong")
+		return
+	if str(coral.call("get_status_text")) != "Premium · preview inside" or str(coral.call("get_price_text")).is_empty():
+		_fail("collapsed premium needs status + price tag")
+		return
+	if str(ember.get("state")) != UiHome.ST_SOON or str(ember.call("get_status_text")) != "Coming soon" or not bool(ember.call("has_lock")):
+		_fail("Ember Fen must be a Coming soon card with lock")
+		return
+	var soon_fill := UiHome.soon_fill(UiHome.mood("ember_fen"))
+	if not _rgb_near(Color(ember.call("get_fill_color")), soon_fill):
+		_fail("coming soon fill must be derived from mood")
+		return
+	stage.call("tap_card", "coral_tide")
+	await _wait(0.35)
+	if str(coral.get("variant")) != UiHome.PREMIUM or str(gs.get("home_band")) != "paid":
+		_fail("tap premium must open its preview")
+		return
+	if str(coral.call("get_cta_title")) != "Get Coral Tide Garden" or not bool(coral.call("is_cta_enabled")):
+		_fail("premium CTA expected 'Get Coral Tide Garden' got '%s'" % str(coral.call("get_cta_title")))
+		return
+	if not bool(coral.call("has_roster")):
+		_fail("premium preview shows the 6-flower roster")
+		return
+	if coral.size.y < 555.0:
+		_fail("premium preview keeps its 556 px height when the list scrolls, got %s" % str(coral.size.y))
 		return
 	if str(gs.get("active_season_id")) != "country_bloom":
-		_fail("next-lock cycle must not set_active")
+		_fail("previewing premium must not change the active season")
 		return
-	if not bool(gs.call("is_free_selectable", "frost_orchard")):
-		_fail("Frost should be free-selectable as next-lock")
-		return
-	var gate: Control = stage.get_node_or_null("%UnlockGate") as Control
-	if gate == null or not gate.visible:
-		_fail("next-lock center should show Unlock gate")
-		return
-	var frost_coin: TextureRect = stage.get_node_or_null("%UnlockCoinIcon") as TextureRect
-	var frost_flower: Label = stage.get_node_or_null("%UnlockFlowerName") as Label
-	var frost_coins: Label = stage.get_node_or_null("%UnlockGateCoins") as Label
-	if frost_coin == null or frost_coin.texture == null:
-		_fail("Frost unlock poster coin icon missing texture")
-		return
-	if frost_flower == null or frost_flower.text.findn("Harvest Pumpkin") < 0:
-		_fail("Frost poster flower should be Harvest Pumpkin, got '%s'" % (frost_flower.text if frost_flower else ""))
-		return
-	if frost_coins == null or frost_coins.text.find("Coins") >= 0:
-		_fail("Frost coins label must be n / need, got '%s'" % (frost_coins.text if frost_coins else ""))
-		return
-	if gate.anchor_left >= 0.5:
-		_fail("UnlockGate must sit in the lower-center half, not the right corner")
-		return
-	if gate.anchor_top < 0.54 or gate.anchor_top >= 0.70:
-		_fail("UnlockGate must sit in the lower band, got anchor_top=%s" % gate.anchor_top)
-		return
-	var unlock_progress: Control = stage.get_node_or_null("%UnlockProgress") as Control
-	if unlock_progress == null or unlock_progress.get_node_or_null("SectionDivider") == null:
-		_fail("UnlockProgress must have SectionDivider")
-		return
-	if frost_coin.custom_minimum_size.x > 44.0:
-		_fail("Unlock coin side must be <= 44, got %s" % frost_coin.custom_minimum_size.x)
-		return
-	var frost_flower_visual: Control = unlock_progress.get_node_or_null("FlowerVisual") as Control
-	if frost_flower_visual == null or frost_flower_visual.custom_minimum_size.x < 88.0:
-		_fail(
-			"Unlock flower min side must be >= 88, got %s"
-			% (frost_flower_visual.custom_minimum_size.x if frost_flower_visual else 0.0)
-		)
-		return
-	var gate_panel := gate.get_theme_stylebox("panel")
-	if gate_panel is StyleBoxFlat:
-		var flat := gate_panel as StyleBoxFlat
-		if flat.bg_color.a > 0.01:
-			_fail("UnlockGate panel must be frameless, bg alpha=%s" % flat.bg_color.a)
-			return
-		if flat.border_width_left > 0 or flat.border_width_top > 0 or flat.border_width_right > 0 or flat.border_width_bottom > 0:
-			_fail("UnlockGate panel must have no border")
-			return
-	elif gate_panel != null and not (gate_panel is StyleBoxEmpty):
-		_fail("UnlockGate panel must be empty or transparent flat")
-		return
-	if center.text.find("🔒") < 0 or center.text.find("Frost Orchard") < 0:
-		_fail("locked Frost center must show lock and name, got '%s'" % center.text)
-		return
-	if center.vertical_alignment != VERTICAL_ALIGNMENT_CENTER:
-		_fail("locked CenterTitle must stay vertically centered")
-		return
-	var frost_roster: Control = stage.get_node_or_null("%FreeRoster") as Control
-	if frost_roster != null and frost_roster.visible:
-		_fail("FreeRoster must hide on locked next-lock Frost")
-		return
-	if gate.get_parent() == stage:
-		_fail("UnlockGate must not be a Stage overlay")
-		return
-	var gate_walk: Node = gate
-	var gate_in_center := false
-	while gate_walk:
-		if gate_walk.name == "CenterSlot":
-			gate_in_center = true
-			break
-		gate_walk = gate_walk.get_parent()
-	if not gate_in_center:
-		_fail("UnlockGate must live inside CenterSlot")
-		return
-	if gate.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-		_fail("UnlockGate must IGNORE so swipe passes")
-		return
-	var gate_btn: Control = stage.get_node_or_null("%UnlockGateButton") as Control
-	if gate_btn == null or gate_btn.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-		_fail("disabled Unlock button should IGNORE")
-		return
-	stage.call("cycle_free_strip", -1)
-	await create_timer(0.35).timeout
-	if str(gs.get("focus_season_id")) != "country_bloom":
-		_fail("cycle back should restore Country Bloom")
-		return
-	if int(swipe.get("current_page")) != MetaHubPages.MAIN:
-		_fail("hub page changed after cycle_free_strip")
-		return
-	if stage.get_node_or_null("%SeasonRoster") != null:
-		_fail("Stage overlay SeasonRoster must be removed")
-		return
-	var roster: Control = stage.get_node_or_null("%FreeRoster") as Control
-	if roster == null or roster.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-		_fail("FreeRoster must IGNORE")
-		return
-	var roster_walk: Node = roster
-	var roster_in_center := false
-	while roster_walk:
-		if roster_walk.name == "CenterSlot":
-			roster_in_center = true
-			break
-		roster_walk = roster_walk.get_parent()
-	if not roster_in_center:
-		_fail("FreeRoster must live inside CenterSlot")
-		return
-	if not roster.visible:
-		_fail("FreeRoster should show on free-hero Bloom")
-		return
-	if roster.has_method("rarity3_display") and str(roster.call("rarity3_display")) != "Harvest Pumpkin":
-		_fail("Bloom roster ★★★ expected Harvest Pumpkin")
-		return
-	if _label_has_ellipsis(roster):
-		_fail("Bloom roster names must not use ellipsis")
-		return
-	if center.vertical_alignment != VERTICAL_ALIGNMENT_CENTER:
-		_fail("CenterTitle must be vertically centered")
-		return
-	if not is_equal_approx(center.anchor_bottom, 1.0):
-		_fail("CenterTitle must fill the hero card (not top-only)")
-		return
-	await process_frame
-	if roster.position.x < 0.0:
-		_fail("FreeRoster must not clip left, position.x=%s" % roster.position.x)
-		return
-	var center_fill: Control = roster.get_parent() as Control
-	if center_fill == null or center_fill.name != "CenterFill":
-		_fail("FreeRoster parent must be CenterFill")
-		return
-	if roster.size.x <= 260.0:
-		_fail("FreeRoster should be wider than 260px, got %s" % roster.size.x)
-		return
-	if roster.size.x < 0.70 * center_fill.size.x:
-		_fail("FreeRoster width %s must be >= 0.70 of CenterFill %s" % [roster.size.x, center_fill.size.x])
-		return
-	var bloom_roster_bg := Color.BLACK
-	if roster.has_method("panel_bg_color"):
-		bloom_roster_bg = roster.call("panel_bg_color") as Color
 
-	var stage_ctrl := stage as Control
-	if stage_ctrl and swipe.has_method("should_block_hub_swipe_at"):
-		var mid := stage_ctrl.get_global_rect().get_center()
-		if not bool(swipe.call("should_block_hub_swipe_at", mid)):
-			_fail("Stage rect should block hub swipe")
-			return
+	# --- kupovina (stub 0,9 s): Purchasing… pa kupljena i aktivna ---
+	coral.emit_signal("cta_pressed", "coral_tide")
+	await _frames(2)
+	if str(coral.get("state")) != UiHome.ST_BUSY or str(coral.call("get_cta_title")) != "Purchasing…" or bool(coral.call("is_cta_enabled")):
+		_fail("purchase in progress must show disabled Purchasing…")
+		return
+	await _wait(1.3)
+	if not bool(gs.call("is_season_playable", "coral_tide")) or str(gs.get("active_season_id")) != "coral_tide":
+		_fail("purchase must grant + activate Coral Tide")
+		return
+	if str(coral.get("state")) != UiHome.ST_OWNED or str(coral.call("get_cta_title")) != "Open meadow ↗":
+		_fail("owned premium CTA expected 'Open meadow ↗' got '%s'" % str(coral.call("get_cta_title")))
+		return
+	if not bool(coral.call("has_new_badge")):
+		_fail("fresh purchase must show New")
+		return
+	if str(home.call("get_play_chip_text")) != "Coral Tide Garden":
+		_fail("play chip must follow the purchased season")
+		return
+	stage.call("tap_card", "ember_fen")
+	await _wait(0.35)
+	if str(ember.call("get_cta_title")) != "Coming soon" or bool(ember.call("is_cta_enabled")):
+		_fail("Ember Fen CTA must be disabled Coming soon")
+		return
 
+	# --- zatvori premium dok je fokus tamo = fokus nazad na besplatni put ---
+	stage.call("toggle_premium")
+	await _wait(0.35)
+	if bool(stage.call("is_premium_open")) or str(gs.get("home_band")) != "free":
+		_fail("closing premium must return focus to the free path")
+		return
+
+	# --- dolazak iz Campa: sezona vec otkljucana, fokus + New, bez prstena ---
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"pumpkin": 20})
-	if not stage.has_method("open_unlock_sheet"):
-		_fail("open_unlock_sheet missing")
+	gs.set("garden_crystal_stash", {_star3_for(gs, "frost_orchard"): 20})
+	if not bool(gs.call("unlock_free", "lantern_meadow")):
+		_fail("Lantern unlock for Camp arrival failed")
 		return
-	stage.call("open_unlock_sheet", "frost_orchard")
-	await process_frame
-	var sheet: Node = stage.get_node_or_null("%SeasonUnlockSheet")
-	if sheet == null or not bool(sheet.get("visible")):
-		_fail("Unlock sheet should be visible")
+	gs.call("set_free_strip_focus", "lantern_meadow")
+	gs.call("set_home_band", "free")
+	home.call("refresh_for_meta_hub")
+	await _frames(3)
+	if str(lantern.get("variant")) != UiHome.EXPANDED or not bool(lantern.call("has_new_badge")):
+		_fail("arrival from Camp: Lantern open with New")
 		return
-	var browser: Node = stage.get_node_or_null("%SeasonBrowser")
-	if browser and bool(browser.get("visible")):
-		_fail("P11: Browser must stay closed on teaser/sheet open")
-		return
-	if sheet.has_method("_on_unlock_pressed"):
-		sheet.call("_on_unlock_pressed")
-	for _k in 8:
-		await process_frame
-	if stage.has_method("cycle_free_strip"):
-		stage.call("cycle_free_strip", -1)
-		await create_timer(0.35).timeout
-		stage.call("cycle_free_strip", 1)
-		await create_timer(0.35).timeout
-	if str(gs.get("paid_strip_focus_id")) != "moonlit_warren":
-		_fail("cycle_free must not change paid_strip_focus_id")
-		return
-	if str(gs.get("active_season_id")) != "frost_orchard":
-		_fail("unlock did not auto-switch active")
-		return
-	if str(gs.get("focus_season_id")) != "frost_orchard":
-		_fail("unlock did not move strip focus to S2")
-		return
-	if center.text.find("Frost Orchard") < 0:
-		_fail("Center after unlock expected Frost Orchard got '%s'" % center.text)
-		return
-	var left: Label = stage.get_node_or_null("%LeftTitle") as Label
-	if left_slot == null or not left_slot.visible:
-		_fail("Left slot should show S1 after unlock")
-		return
-	if left == null or left.text.find("Country Bloom") < 0:
-		_fail("Left expected Country Bloom got '%s'" % (left.text if left else "null"))
-		return
-	if left.text.find("🔒") >= 0:
-		_fail("Left unlocked S1 must not be locked")
-		return
-	if right.text.find("Lantern Meadow") < 0:
-		_fail("Right after S2 expected Lantern Meadow got '%s'" % right.text)
-		return
-	if right.text.find("🔒") < 0:
-		_fail("S3 should stay locked")
+	var lantern_burst := lantern.get_node_or_null("UnlockBurst") as Control
+	if lantern_burst != null and lantern_burst.visible:
+		_fail("arrival from Camp must not replay the unlock ring")
 		return
 
-	if stage.has_method("swap_home_band"):
-		stage.call("swap_home_band", "paid", "coral_tide")
-		await create_timer(0.35).timeout
-	else:
-		_fail("swap_home_band missing")
-		return
-	if str(gs.get("home_band")) != "paid":
-		_fail("swap_home_band should set home_band paid")
-		return
-	if paid_center_title.text.find("Coral") < 0:
-		_fail("Paid center after swap expected Coral got '%s'" % paid_center_title.text)
-		return
-	if str(gs.get("active_season_id")) != "frost_orchard":
-		_fail("unowned Coral swap must not set_active")
-		return
-	var browser_after_swap: Node = stage.get_node_or_null("%SeasonBrowser")
-	if browser_after_swap and bool(browser_after_swap.get("visible")):
-		_fail("swap_home_band must not open Browser")
-		return
-	if stage.has_method("cycle_free_strip"):
-		stage.call("cycle_free_strip", -1)
-		await create_timer(0.35).timeout
-		if str(gs.get("paid_strip_focus_id")) != "coral_tide":
-			_fail("cycle_free while paid-hero must not change paid_strip_focus")
-			return
-		stage.call("cycle_free_strip", 1)
-		await create_timer(0.35).timeout
-	if paid_center_slot and stage.has_method("_handle_tap"):
-		var to_hero: Transform2D = (stage as Control).get_global_transform().affine_inverse()
-		var hero_tap: Vector2 = to_hero * paid_center_slot.get_global_rect().get_center()
-		stage.call("_handle_tap", hero_tap)
-		await process_frame
-		if browser_after_swap == null or not bool(browser_after_swap.get("visible")):
-			_fail("Hero paid center tap should open Browser")
-			return
-		if browser_after_swap.has_method("close"):
-			browser_after_swap.call("close")
-		await process_frame
-	if right_slot and stage.has_method("_handle_tap"):
-		var to_lock: Transform2D = (stage as Control).get_global_transform().affine_inverse()
-		var lock_tap: Vector2 = to_lock * right_slot.get_global_rect().get_center()
-		stage.call("_handle_tap", lock_tap)
-		await create_timer(0.35).timeout
-		if str(gs.get("home_band")) != "free":
-			_fail("locked free preview tap should swap to free-hero")
-			return
-		if str(gs.get("focus_season_id")) != "lantern_meadow":
-			_fail("next-lock preview tap should center lantern_meadow")
-			return
-		if sheet != null and bool(sheet.get("visible")):
-			_fail("next-lock must not open Unlock sheet")
-			return
-		if stage.has_method("cycle_free_strip"):
-			stage.call("cycle_free_strip", -1)
-			await create_timer(0.35).timeout
-		if str(gs.get("focus_season_id")) != "frost_orchard":
-			_fail("cycle back from lantern should restore frost")
-			return
-	if int(swipe.get("current_page")) != MetaHubPages.MAIN:
-		_fail("hub page changed after paid swap")
-		return
-
-	if not bool(gs.call("grant_paid_season", "moonlit_warren")):
-		_fail("grant_paid_season moonlit failed")
-		return
-	if stage.has_method("refresh"):
-		stage.call("refresh")
-	await process_frame
-	if str(gs.get("active_season_id")) != "moonlit_warren":
-		_fail("paid grant should set active")
-		return
-	if str(gs.get("focus_season_id")) != "frost_orchard":
-		_fail("paid grant must not change strip_focus")
-		return
-	if str(gs.get("home_band")) != "free":
-		_fail("paid grant must not change home_band")
-		return
-	if center.text.find("Frost Orchard") < 0:
-		_fail("Center must stay Frost after paid grant got '%s'" % center.text)
-		return
-	if center.text.find("Moonlit") >= 0:
-		_fail("Paid must not appear on free Home strip")
-		return
-	if paid_center_title.text.find("Moonlit") < 0:
-		_fail("Paid band center should stay Moonlit after grant")
-		return
-	if paid_center_title.text.find("🔒") >= 0 or paid_center_title.text.find("€") >= 0:
-		_fail("Owned Moonlit should not show lock/price")
-		return
-	if paid_right_title.text.find("Coral") < 0:
-		_fail("Coral should remain on paid right")
-		return
-	if paid_right_title.text.find("🔒") < 0 and paid_right_title.text.find("€") < 0:
-		_fail("Unowned Coral should stay locked/priced")
-		return
-	if home.has_method("_refresh_menu"):
-		home.call("_refresh_menu")
-	await process_frame
-	var badge: Label = home.get_node_or_null("%PlayThemeBadge") as Label
-	if badge != null and badge.visible:
-		_fail("PlayThemeBadge should stay hidden")
-		return
-	if bool(gs.call("is_season_playable", "amber_canopy")):
-		_fail("amber_canopy should not be playable")
-		return
-	if bool(gs.call("grant_paid_season", "ember_fen")):
-		_fail("ember_fen grant should fail while test-locked")
-		return
-	if int(swipe.get("current_page")) != MetaHubPages.MAIN:
-		_fail("hub page changed after unlock")
-		return
-
-	if stage.has_method("_on_browser_selected"):
-		stage.call("_on_browser_selected", "moonlit_warren")
-		await create_timer(0.35).timeout
-		if str(gs.get("home_band")) != "paid":
-			_fail("Browser select paid should swap home_band")
-			return
-		if str(gs.get("paid_strip_focus_id")) != "moonlit_warren":
-			_fail("Browser select should center paid season")
-			return
-		if paid_center_title.text.find("Moonlit") < 0:
-			_fail("Browser select should show Moonlit as paid hero center")
-			return
-		if paid_center_title.vertical_alignment != VERTICAL_ALIGNMENT_CENTER:
-			_fail("PaidCenterTitle must be vertically centered")
-			return
-		var moon_roster: Control = stage.get_node_or_null("%PaidRoster") as Control
-		if moon_roster == null or not moon_roster.visible:
-			_fail("PaidRoster should show on Moonlit paid-hero")
-			return
-		if moon_roster.has_method("panel_bg_color"):
-			var moon_bg: Color = moon_roster.call("panel_bg_color")
-			if _rgb_equal(moon_bg, bloom_roster_bg):
-				_fail("Moonlit roster bg RGB should differ from Bloom")
-				return
-		stage.call("swap_home_band", "free", "frost_orchard")
-		await create_timer(0.35).timeout
-		if str(gs.get("home_band")) != "free":
-			_fail("restore free-hero before preview tap")
-			return
-
-	if paid_center_slot and stage.has_method("_handle_tap"):
-		var to_paid: Transform2D = (stage as Control).get_global_transform().affine_inverse()
-		var paid_tap: Vector2 = to_paid * paid_center_slot.get_global_rect().get_center()
-		stage.call("_handle_tap", paid_tap)
-		await create_timer(0.35).timeout
-		if str(gs.get("home_band")) != "paid":
-			_fail("tap paid preview should swap home_band to paid")
-			return
-		var browser_preview: Node = stage.get_node_or_null("%SeasonBrowser")
-		if browser_preview and bool(browser_preview.get("visible")):
-			_fail("Preview center tap must not open Browser")
-			return
-		if center_slot and stage.has_method("_handle_tap"):
-			var free_tap: Vector2 = to_paid * center_slot.get_global_rect().get_center()
-			stage.call("_handle_tap", free_tap)
-			await create_timer(0.35).timeout
-		if str(gs.get("home_band")) != "free":
-			_fail("tap free preview should swap home_band back to free")
-			return
-
-	gs.call("debug_unlock_all_seasons")
-	if bool(gs.call("is_season_playable", "amber_canopy")):
-		_fail("debug_unlock_all must skip amber_canopy")
-		return
-	if bool(gs.call("is_season_playable", "ember_fen")):
-		_fail("debug_unlock_all must skip ember_fen")
-		return
-	if bool(gs.call("is_season_playable", "lantern_meadow")):
-		_fail("debug_unlock_all must skip lantern_meadow")
-		return
-	if not bool(gs.call("is_free_selectable", "lantern_meadow")):
-		_fail("lantern_meadow should stay selectable after debug skip")
-		return
-	if bool(gs.call("grant_paid_season", "ember_fen")):
-		_fail("ember_fen grant should still fail after debug")
-		return
-	if stage.has_method("cycle_free_strip"):
-		stage.call("cycle_free_strip", 1)
-		await create_timer(0.35).timeout
-	if str(gs.get("focus_season_id")) != "lantern_meadow":
-		_fail("cycle onto lantern should work after debug skip")
-		return
-	if str(gs.get("active_season_id")) == "lantern_meadow":
-		_fail("lantern next-lock must not become active")
-		return
-	if stage.has_method("_select_focused_or_last_playable"):
-		stage.call("_select_focused_or_last_playable")
-		await process_frame
-		if str(gs.get("active_season_id")) != "frost_orchard":
-			_fail("swipe-down on lantern should select last playable frost")
-			return
-		if str(gs.get("focus_season_id")) != "lantern_meadow":
-			_fail("swipe-down select must keep lantern strip focus")
-			return
-	gs.set("wallet_coins", 499)
-	gs.set("garden_crystal_stash", {"crystal_peony": 20})
-	if stage.has_method("refresh"):
-		stage.call("refresh")
-	await process_frame
-	if bool(gs.call("can_unlock_free", "lantern_meadow")):
-		_fail("lantern must stay locked with 499c")
-		return
-	if gate_btn == null or gate_btn.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-		_fail("Unlock with 499c should IGNORE")
-		return
-	if str(gate_btn.get("button_variant")) != "subtle":
-		_fail("Unlock with 499c should stay subtle, got %s" % str(gate_btn.get("button_variant")))
-		return
-	var coins_lbl: Label = stage.get_node_or_null("%UnlockGateCoins") as Label
-	var seeds_lbl: Label = stage.get_node_or_null("%UnlockGateT3") as Label
-	var coin_icon: TextureRect = stage.get_node_or_null("%UnlockCoinIcon") as TextureRect
-	var flower_name: Label = stage.get_node_or_null("%UnlockFlowerName") as Label
-	if coins_lbl == null or coins_lbl.text.find("Coins") >= 0:
-		_fail("Lantern coins label must not say Coins, got '%s'" % (coins_lbl.text if coins_lbl else ""))
-		return
-	if coins_lbl.text.find("/ 500") < 0:
-		_fail("Lantern coins bar should show / 500")
-		return
-	if seeds_lbl == null or seeds_lbl.text.find("/ 20") < 0:
-		_fail("Lantern star-3 count should show / 20")
-		return
-	if seeds_lbl.text.find("★★★") >= 0:
-		_fail("Lantern count label should not include stars, got '%s'" % seeds_lbl.text)
-		return
-	if coin_icon == null or coin_icon.texture == null:
-		_fail("Unlock poster coin icon missing texture")
-		return
-	if flower_name == null or flower_name.text.findn("Crystal Peony") < 0:
-		_fail("Lantern poster flower should be Crystal Peony, got '%s'" % (flower_name.text if flower_name else ""))
-		return
-	if roster != null and roster.visible:
-		_fail("FreeRoster must hide on locked Lantern")
-		return
-	if center.text.find("🔒") < 0 or center.text.find("Lantern Meadow") < 0:
-		_fail("locked Lantern center must show lock and name, got '%s'" % center.text)
-		return
+	# --- sve 4 free: nema next locka, premium sekcija otvorena sama ---
 	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"crystal_peony": 20})
-	if stage.has_method("refresh"):
-		stage.call("refresh")
-	await process_frame
-	if not bool(gs.call("can_unlock_free", "lantern_meadow")):
-		_fail("lantern should be unlockable with 500c/20 Frost star-3")
+	gs.set("garden_crystal_stash", {_star3_for(gs, "lantern_meadow"): 20})
+	if not bool(gs.call("unlock_free", "amber_canopy")):
+		_fail("Amber unlock failed")
 		return
-	if gate == null or not gate.visible:
-		_fail("lantern center should show Unlock gate with resources")
+	var fresh_stage := stage
+	fresh_stage.set("_premium_user_set", false)
+	home.call("refresh_for_meta_hub")
+	await _frames(3)
+	if str(progress.call("get_text")) != "4 / 4":
+		_fail("all free: progress 4 / 4")
 		return
-	if gate_btn == null or gate_btn.mouse_filter != Control.MOUSE_FILTER_STOP:
-		_fail("ready Unlock button should STOP")
+	if not bool(stage.call("is_premium_open")):
+		_fail("all free: premium section opens by default")
 		return
-	if str(gate_btn.get("button_variant")) != "gold":
-		_fail("ready Unlock should be gold, got %s" % str(gate_btn.get("button_variant")))
-		return
-	if gate.has_method("_on_unlock_clicked"):
-		gate.call("_on_unlock_clicked")
-	await process_frame
-	if not bool(gs.call("is_season_playable", "lantern_meadow")):
-		_fail("inline Unlock should grant lantern_meadow")
-		return
-	if str(gs.get("active_season_id")) != "lantern_meadow":
-		_fail("inline Unlock should set active lantern")
-		return
-	if gate.visible:
-		_fail("Unlock gate should hide after lantern grant")
-		return
-	if roster == null or not roster.visible:
-		_fail("FreeRoster should show after lantern unlock")
-		return
-	if roster.has_method("has_entry") and not bool(roster.call("has_entry", "Paper Lantern Bloom")):
-		_fail("Lantern roster expected Paper Lantern Bloom")
-		return
-	if _label_has_ellipsis(roster):
-		_fail("Lantern roster names must not use ellipsis")
-		return
-	if stage.has_method("cycle_free_strip"):
-		stage.call("cycle_free_strip", 1)
-		await create_timer(0.35).timeout
-	if str(gs.get("focus_season_id")) != "amber_canopy":
-		_fail("next-lock Amber should become center after lantern grant")
-		return
-	if str(gs.get("active_season_id")) == "amber_canopy":
-		_fail("amber next-lock must not become active")
-		return
-	if gate == null or not gate.visible:
-		_fail("amber center should show Unlock gate")
-		return
-	if roster != null and roster.visible:
-		_fail("FreeRoster must hide on locked Amber")
-		return
-	if coins_lbl == null or coins_lbl.text.find("/ 500") < 0:
-		_fail("Amber coins bar should show / 500")
-		return
-	if gate_btn == null or gate_btn.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-		_fail("disabled Amber Unlock should IGNORE without 500c/20 T3")
-		return
-	if str(gate_btn.get("button_variant")) != "subtle":
-		_fail("disabled Amber Unlock should stay subtle")
-		return
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"midnight_lotus": 20})
-	if stage.has_method("refresh"):
-		stage.call("refresh")
-	await process_frame
-	if not bool(gs.call("can_unlock_free", "amber_canopy")):
-		_fail("amber should be unlockable with 500c/20 Lantern star-3")
-		return
-	if gate_btn.mouse_filter != Control.MOUSE_FILTER_STOP:
-		_fail("ready Amber Unlock button should STOP")
-		return
-	if str(gate_btn.get("button_variant")) != "gold":
-		_fail("ready Amber Unlock should be gold")
-		return
-	if gate.has_method("_on_unlock_clicked"):
-		gate.call("_on_unlock_clicked")
-	await process_frame
-	if not bool(gs.call("is_season_playable", "amber_canopy")):
-		_fail("inline Unlock should grant amber_canopy")
-		return
-	if str(gs.get("active_season_id")) != "amber_canopy":
-		_fail("inline Unlock should set active amber")
-		return
-	if gate.visible:
-		_fail("Unlock gate should hide after amber grant")
-		return
-	if roster == null or not roster.visible:
-		_fail("FreeRoster should show after amber unlock")
-		return
-	if roster.has_method("has_entry") and not bool(roster.call("has_entry", "Golden Oak Bloom")):
-		_fail("Amber roster expected Golden Oak Bloom")
-		return
-	if _label_has_ellipsis(roster):
-		_fail("Amber roster names must not use ellipsis")
-		return
-	if roster.has_method("panel_bg_color"):
-		var amber_bg: Color = roster.call("panel_bg_color")
-		if amber_bg.is_equal_approx(bloom_roster_bg):
-			_fail("Amber roster bg should differ from Bloom")
-			return
-	if stage.has_method("cycle_paid_strip"):
-		stage.call("swap_home_band", "paid", "coral_tide")
-		await create_timer(0.35).timeout
-		var paid_roster: Control = stage.get_node_or_null("%PaidRoster") as Control
-		if paid_roster == null or not paid_roster.visible:
-			_fail("PaidRoster should show on Coral paid-hero")
-			return
-		var paid_walk: Node = paid_roster
-		var roster_in_paid := false
-		while paid_walk:
-			if paid_walk.name == "PaidCenterSlot":
-				roster_in_paid = true
-				break
-			paid_walk = paid_walk.get_parent()
-		if not roster_in_paid:
-			_fail("PaidRoster must live inside PaidCenterSlot")
-			return
-		if roster != null and roster.visible:
-			_fail("FreeRoster must hide while paid-hero")
-			return
-		if paid_roster.has_method("rarity3_display") and str(paid_roster.call("rarity3_display")) != "Reef Crown":
-			_fail("Coral unowned roster ★★★ expected Reef Crown")
-			return
-		if _label_has_ellipsis(paid_roster):
-			_fail("Coral roster names must not use ellipsis")
-			return
-		if paid_roster.has_method("panel_bg_color"):
-			var coral_bg: Color = paid_roster.call("panel_bg_color")
-			if coral_bg.is_equal_approx(bloom_roster_bg):
-				_fail("Coral roster bg should differ from Bloom")
-				return
-		if gate != null and gate.visible:
-			_fail("paid unowned must not show coin Unlock gate")
+	for id in ["country_bloom", "frost_orchard", "lantern_meadow", "amber_canopy"]:
+		var c := _card(stage, id)
+		if str(c.get("variant")) == UiHome.NEXTLOCK or str(c.get("variant")) == UiHome.POSTER:
+			_fail("all free: no next lock card")
 			return
 
+	# --- daily gift + tutorial ---
+	gs.set("last_daily_chest_day", "")
+	home.call("_refresh_chest_card")
+	var caption := home.get_node_or_null("%DailyCaption") as Label
+	if caption == null or caption.text != "Tap to open" or not bool(home.call("is_chest_attention_active")):
+		_fail("ready daily gift: Tap to open + attention")
+		return
+	home.call("_finish_chest_claim")
+	if caption.text != "Back tomorrow" or bool(home.call("is_chest_attention_active")):
+		_fail("claimed daily gift: Back tomorrow, no attention")
+		return
+	gs.set("tutorial_complete", false)
+	home.call("refresh_for_meta_hub")
+	await _frames(3)
+	var hint := home.get_node_or_null("%TutorialHintPanel") as Control
+	if hint == null or not hint.visible or gift.visible:
+		_fail("tutorial: hint visible, daily gift hidden")
+		return
+	if absf(progress.size.x - top_row.size.x) > 1.0:
+		_fail("tutorial: ProgressIndicator takes the whole row")
+		return
+	if hint.get_global_rect().end.y > play.get_global_rect().position.y:
+		_fail("tutorial hint must float above Play")
+		return
+
+	CampSmokeUtil.restore_save(self, _backup)
 	print("season_home_smoke OK")
 	quit(0)

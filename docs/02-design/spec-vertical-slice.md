@@ -62,12 +62,18 @@ Prijelazi idu kroz `GameState.go_to_*` / `SceneRouter`. Stanje između scena ču
 
 **Scena:** `scenes/main_menu.tscn` · **skripta:** `scripts/ui/main_menu.gd`
 
+Home (3. stranica huba) — biranje sezone, smjer 1a Season Trail (2026-09-21, [[../04-experience/design-drafts/home-season-select-cd-brief|brief]]).
+
 | Element | Ponašanje |
 |---------|-----------|
-| Play | → Run scena. Ako `tutorial_seen == false`, prvo `mark_tutorial_seen()`. |
-| Tutorial hint | Vidljiv **samo** dok `tutorial_seen == false`. |
+| TopRow | Daily gift (flex) + „N / 4 free seasons“ (420 px); bez gifta (prije kraja tutoriala) napredak zauzima cijeli red |
+| Kolona sezona | Besplatni put redom, pa red „Premium seasons“ i premium kartice. Tačno jedna kartica otvorena (harmonika, tween visine 0,22 s); tap na otključanu = izaberi, tap na otvorenu aktivnu ili „Open meadow ↗“ = polje sezone, tap na next lock = unlock poster (Unlock troši 500 coina + 20 ★3 na licu mjesta), iza next locka = odbijanje |
+| Premium | Pregled prije kupovine (6 cvjetova, tagline); „Get {season} · cijena · one-time“; Ember Fen = „Coming soon“; Shop zadržava svoju karticu (`SeasonPackCard`) |
+| Play | **Pokreće run u aktivnoj sezoni odmah** (1 korak); čip na dugmetu nosi ime aktivne sezone. U polju sezone ostaje Seasons · Play · Play Endless |
+| Tutorial hint | Plutajući panel iznad Playa dok `tutorial_complete == false` |
+| Hub swipe | Kolona se lista vertikalno; na Home ništa ne blokira hub swipe |
 
-**Gotovo kad:** Play pokreće svjež run; hint nestaje nakon prvog Play.
+**Gotovo kad:** Play pokreće run u aktivnoj sezoni; polje sezone se otvara samo s kartice; `season_home_smoke` + `season_meadow_smoke` prolaze.
 
 ---
 

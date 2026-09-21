@@ -319,6 +319,18 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** ne gubi vrijeme na intent extras za izbor scene. Benchmark scena se mora sama ugasiti (`get_tree().quit()`) i ispisati rezultat u konzolu (logcat).
 
+## #16 — `queue_free` + novi child u `configure()` = beskonačna petlja resize-a i crash
+
+**Datum:** 2026-09-21 (Home redizajn, `HomePremiumHeader`)
+
+**Simptom:** meta hub pada već u prvom frejmu: stotine redova `Object was deleted while awaiting a callback.`, pa `CrashHandlerException: signal 11`. Sama Home scena, učitana bez huba, radi.
+
+**Uzrok:** `configure()` je brisao tačkice s `queue_free()` i odmah dodavao nove. Stare žive do kraja frejma, pa je red svakim pozivom bio širi za 264 px. ScrollContainer s `horizontal_scroll_mode = DISABLED` preuzima širinu sadržaja → `resized` → `_refresh_trail()` → `configure()` → još širi red … zauvijek u istom frejmu.
+
+**Rješenje:** djeca se ponovo koriste (sakrij višak, dodaj samo ako fali), a `_on_trail_resized` osvježava samo kad se promijeni visina (širina ne mijenja raspored).
+
+**Prevencija:** u kodu koji se zove iz `resized` nikad `queue_free` + `add_child` istog sadržaja; ako baš mora, `remove_child` prije `queue_free`. Pri sumnji: privremeni brojač poziva s `Engine.get_process_frames()` odmah pokaže petlju u jednom frejmu.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

@@ -1,0 +1,290 @@
+{
+  "$schema_version": "1.0",
+  "generated": "2026-09-21",
+  "source": "design_handoff_home/HomeScreen.dc.html + SeasonCard.dc.html",
+  "brief": "docs/04-experience/design-drafts/home-season-select-cd-brief.md",
+  "direction": "1a Season Trail (preporuka CD-a)",
+  "note": "Sve mjere su u px baze 1080 x 1920 i prenose se 1:1. Boje su sRGB hex; alpha je zapisana odvojeno gdje postoji.",
+
+  "meta": {
+    "base": { "w": 1080, "h": 1920 },
+    "header": { "h": 143, "given": true, "source": "design_handoff_hub_chrome/HubScreen.dc.html" },
+    "page": { "w": 1080, "h": 1597, "y": 143 },
+    "footer": { "h": 180, "given": true, "active_tab_index": 2 },
+    "minimums": { "touch": 120, "text": 38, "number": 44 },
+    "page_bg": "#2E4733",
+    "page_bg_note": "usklađeno s Campom; danas je u kodu #243329 — traži potvrdu"
+  },
+
+  "tokens": {
+    "palette": {
+      "mint": "#A8E6CF", "mint_edge": "#7FC9AC",
+      "lavender": "#D4A5FF", "lavender_edge": "#AA84CC",
+      "peach": "#FFB88C", "peach_edge": "#E8A374",
+      "coin_gold": "#FFD56B", "coin_gold_edge": "#D6A82F",
+      "ui_gold": "#E8C44A", "ui_gold_edge": "#BA9D3B",
+      "price_bg": "#FFE8B8",
+      "warm_white": "#FFF8F0",
+      "active_rim": "#FFF6D6",
+      "ink": "#1A1A14", "ink_soft": "#3D3D33", "ink_disabled": "#44443A",
+      "outline": "#2D3436",
+      "chrome": "#1A241E",
+      "well": "#22342A", "well_edge": "#16211B",
+      "gift_ready": "#FFC77A", "gift_taken": "#6E7A6B", "gift_taken_edge": "#4E5A4C",
+      "rarity_1": "#B8D4F0", "rarity_2": "#E0C4FF", "rarity_3": "#FFE8B8"
+    },
+    "alpha_fills": {
+      "panel_on_light": "rgba(26,26,20,0.13)", "panel_edge_on_light": "rgba(26,26,20,0.22)",
+      "panel_on_dark": "rgba(255,248,240,0.13)", "panel_edge_on_dark": "rgba(255,248,240,0.28)",
+      "cream_on_light": "rgba(255,248,240,0.74)", "cream_edge_on_light": "rgba(26,26,20,0.26)",
+      "cream_on_dark": "rgba(255,248,240,0.20)", "cream_edge_on_dark": "rgba(255,248,240,0.40)",
+      "hub_panel": "rgba(255,248,240,0.12)", "hub_panel_edge": "rgba(255,248,240,0.30)",
+      "chip_quiet": "rgba(255,248,240,0.16)", "chip_quiet_edge": "rgba(255,246,214,0.40)",
+      "bar_track_on_light": "rgba(26,26,20,0.20)", "bar_track_on_dark": "rgba(255,248,240,0.22)",
+      "bar_empty": "rgba(255,248,240,0.22)",
+      "lock_box": "rgba(26,26,20,0.26)", "lock_box_edge": "rgba(255,246,214,0.34)",
+      "locked_border": "rgba(255,246,214,0.34)",
+      "disabled_fill": "rgba(255,248,240,0.55)", "disabled_edge": "rgba(26,26,20,0.30)",
+      "burst_ring": "rgba(255,245,209,0.55)",
+      "sub_on_dark": "rgba(255,246,214,0.90)"
+    },
+    "radius": [12, 13, 14, 16, 18, 20, 22, 26],
+    "border": { "hairline": 2, "normal": 3, "strong": 4, "active": 6 },
+    "shadow": {
+      "card": { "x": 0, "y": 8, "blur": 16, "color": "rgba(20,26,22,0.26)" },
+      "card_active": { "x": 0, "y": 10, "blur": 22, "color": "rgba(20,26,22,0.38)" },
+      "cta": { "x": 0, "y": 8, "blur": 16, "color": "rgba(20,26,22,0.30)" },
+      "gift": { "x": 0, "y": 6, "blur": 14, "color": "rgba(20,26,22,0.26)" }
+    },
+    "outline_rule": "border kartice = mood boja x 0.8 (linearno po kanalu)",
+    "font": {
+      "family_in_game": "default sans",
+      "family_in_mockup": "Nunito",
+      "weights": { "regular": 700, "bold": 800, "black": 900 },
+      "sizes": { "eyebrow": 38, "status": 40, "tagline": 42, "pips": 38, "number_small": 44, "number": 48, "number_big": 56, "name_min": 38, "name_max": 68, "play": 64 }
+    }
+  },
+
+  "season_colors": {
+    "_comment": "iz season_card_contrast.gd; title = tamni ink ili cream po svjetlini",
+    "country_bloom":  { "mood": "#A8E6CF", "title": "ink",   "kind": "free",    "order": 1 },
+    "frost_orchard":  { "mood": "#C5D5E8", "title": "ink",   "kind": "free",    "order": 2 },
+    "lantern_meadow": { "mood": "#C9B8E0", "title": "ink",   "kind": "free",    "order": 3 },
+    "amber_canopy":   { "mood": "#E8C48A", "title": "ink",   "kind": "free",    "order": 4 },
+    "moonlit_warren": { "mood": "#3D3A6B", "title": "cream", "kind": "premium", "order": 5 },
+    "coral_tide":     { "mood": "#E8A090", "title": "ink",   "kind": "premium", "order": 6 },
+    "starfall_glade": { "mood": "#6B5B95", "title": "cream", "kind": "premium", "order": 7 },
+    "ember_fen":      { "mood": "#C45C26", "title": "cream", "kind": "premium", "order": 8, "test_locked": true }
+  },
+
+  "derived_fills": {
+    "_comment": "izračunato u kodu, ne hardkodirati po sezoni",
+    "unlocked": "mood",
+    "active": "mood",
+    "next": "mood",
+    "locked": "lerp(mood * 0.55, page_bg, 0.45)",
+    "coming_soon": "lerp(mood, page_bg, 0.44)",
+    "border_normal": "mood * 0.8",
+    "border_locked_or_soon": "rgba(255,246,214,0.34)",
+    "border_active": "#FFF6D6 @ 6px"
+  },
+
+  "layout": {
+    "HomeBody": { "rect": [0, 143, 1080, 1597], "padding": 24, "gap": 16, "type": "VBoxContainer" },
+    "TopRow": { "h": 130, "gap": 16, "type": "HBoxContainer" },
+    "DailyGiftCard": { "w": "flex", "h": 130, "radius": 20, "border": 3, "padding_x": 24, "gap": 20, "icon": 84, "icon_radius": 18, "title_size": 38, "sub_size": 48 },
+    "ProgressIndicator": { "w": 420, "h": 130, "radius": 20, "border": 2, "padding_x": 24, "gap": 14, "number_size": 56, "label_size": 38, "segment": { "h": 18, "radius": 9, "border": 2, "gap": 10 } },
+    "ProgressIndicator_full": { "w": 1032, "when": "DailyGiftCard skriven (prije kraja tutoriala)" },
+    "SeasonStage": { "rect": [24, 289, 1032, 1231], "gap": 14, "type": "ScrollContainer > VBoxContainer", "block_hub_swipe": false },
+    "PremiumSection": { "w": 1032, "h_standalone": 155, "h_with_cards": 90, "radius_standalone": 26, "radius_with_cards": 20, "border": 2, "padding_x": 24, "gap": 20, "title_size": 48, "note_size": 38, "dot": { "size": 56, "radius": 16, "border": 2, "gap": 10 }, "chevron": { "h": 76, "radius": 18, "border": 2, "font": 40 } },
+    "PlayButton": { "rect": [24, 1536, 1032, 156], "radius": 26, "border": 4, "fill": "peach", "border_color": "peach_edge", "shadow": "cta", "label_size": 64, "label": "▶  Play", "action": "pokreće run u aktivnoj sezoni ODMAH", "SeasonNameChip": { "h": 88, "radius": 18, "border": 2, "font": 40, "fill": "rgba(255,248,240,0.80)", "border_color": "rgba(45,52,54,0.26)", "align": "desni kraj dugmeta", "content": "SeasonDef.display_name aktivne sezone", "reads_as": "Play · {season}", "note": "ime je u čipu, ne u labeli, da dugačka imena (Coral Tide Garden) ne skraćuju riječ Play" } },
+    "TutorialHint": { "anchor": "iznad PlayButtona", "bottom": 196, "radius": 20, "border": 3, "padding": [20, 24], "font": 40, "fill": "active_rim", "border_color": "coin_gold_edge", "shadow": "cta" },
+    "HubSwipeZone": { "rect": [0, 143, 1080, 1597], "blocks": false, "note": "cijela stranica propušta hub swipe — grupa block_hub_swipe je PRAZNA u smjeru 1a" }
+  },
+
+  "SeasonCard": {
+    "w": 1032,
+    "variants": {
+      "collapsed": { "h": 128, "padding": 18, "gap": 14, "name": 48, "head": "fill" },
+      "expanded":  { "h": 440, "padding": 18, "gap": 14, "name": 64, "head": 132, "roster": true, "tagline": true },
+      "nextlock":  { "h": 320, "padding": 16, "gap": 12, "name": 52, "head": 72,  "poster": "compact" },
+      "poster":    { "h": 644, "padding": 18, "gap": 14, "name": 64, "head": 132, "poster": "full", "tagline": true },
+      "premium":   { "h": 556, "padding": 18, "gap": 14, "name": 60, "head": 132, "roster": true, "tagline": true, "cta": true },
+      "hero":      { "h": 965, "padding": 18, "gap": 14, "name": 68, "head": 132, "roster": true, "tagline": true, "art_slot": 340, "only_in": "1b Season Shelf" }
+    },
+    "shell": { "radius": 26, "border_normal": 3, "border_active": 6, "shadow": "card", "shadow_active": "card_active" },
+    "children": {
+      "LockBox": { "size": 84, "radius": 22, "border": 2, "icon": 48, "when": "locked | coming_soon" },
+      "EyebrowRow": { "h": 60, "gap": 14, "when": "variant != collapsed" },
+      "ActiveBadge": { "h_in_row": 60, "radius_in_row": 16, "font_in_row": 38, "h_collapsed": 72, "radius_collapsed": 18, "font_collapsed": 40, "border": 3, "fill": "active_rim", "border_color": "coin_gold_edge", "text": "Playing now" },
+      "NewBadge": { "h": 60, "radius": 16, "border": 3, "font": 38, "fill": "mint", "border_color": "mint_edge", "text": "New", "ttl_s": 3 },
+      "StatusChip": { "h": 76, "radius": 18, "border": 2, "font_collapsed": 44, "font_nextlock": 40, "tabular_nums": true },
+      "PriceTag": { "h": 96, "radius": 18, "border": 3, "font": 52, "fill": "price_bg", "border_color": "coin_gold_edge", "tabular_nums": true, "content": "IAPManager.get_price_label() — proizvoljan string" },
+      "OpenFieldButton": { "w": 360, "h": 124, "radius": 20, "border": 3, "font": 42, "text": "Open meadow ↗" },
+      "Tagline": { "h": 48, "font": 42, "ellipsis": true, "source": "SeasonDef.tagline" },
+      "SeasonArtSlot": { "h": 340, "radius": 20, "border": "4 dashed", "note": "prazan slot; thumbnail_path je danas prazan za svih 8" }
+    },
+    "SeasonRoster": {
+      "radius": 20, "border": 2, "padding": [14, 12], "gap": 12, "count": 6,
+      "ArtFrame": { "size": 116, "size_hero": 124, "radius_ratio": 0.22, "fill": "coin_gold", "border": 3, "border_color": "coin_gold_edge" },
+      "Well": { "inset_ratio": 0.095, "radius_ratio": 0.15, "fill": "well", "border": 2, "border_color": "well_edge" },
+      "Art": { "size_ratio": 0.58, "source": "collection_bloom_icon.gd / SeasonDef.roster" },
+      "RarityPips": { "font": 38, "glyphs": ["★☆☆", "★★☆", "★★★"], "note": "rarity čitljiv bez boje" }
+    },
+    "UnlockPoster": {
+      "NeedLine": { "font_full": 44, "font_compact": 40, "wrap": true },
+      "CoinProgress": { "icon": 60, "value_w": 300, "value_font": 56, "bar": { "h": 26, "radius": 13 }, "fill": "coin_gold" },
+      "FlowerProgress": { "frame": 60, "value_w": 300, "value_font": 56, "bar": { "h": 26, "radius": 13 }, "fill": "warm_white" },
+      "GateCaption": { "font": 38, "text": "{flower} ★★★ · merge it in the Arena" },
+      "UnlockButton": {
+        "h": 140, "radius": 20, "border": 3, "label_font": 52, "sub_font": 38, "min_touch_ok": true,
+        "states": {
+          "blocked": { "fill": "disabled_fill", "border_color": "disabled_edge", "ink": "ink_disabled", "input": false },
+          "ready":   { "fill": "ui_gold",  "border_color": "ui_gold_edge",  "ink": "outline", "input": true },
+          "spent":   { "fill": "coin_gold", "border_color": "coin_gold_edge", "ink": "outline", "input": false }
+        }
+      },
+      "UnlockBurst": { "diameter": 760, "border": 16, "color": "burst_ring", "node": "Sprite2D", "asset": "pulse_ring.png", "animates": ["scale", "modulate:a"], "no_redraw": true }
+    },
+    "CardCta": {
+      "h": 130, "radius": 20, "border": 3, "label_font": 48, "sub_font": 38,
+      "states": {
+        "premium": { "fill": "lavender", "border_color": "lavender_edge", "label": "Get {season}", "sub": "{price} · one-time, no subscription" },
+        "busy":    { "fill": "disabled_fill", "border_color": "disabled_edge", "label": "Purchasing…", "sub": "finish in the store window", "input": false },
+        "soon":    { "fill": "chip_quiet", "border_color": "chip_quiet_edge", "label": "Coming soon", "sub": "not for sale yet", "input": false },
+        "owned":   { "fill": "cream_on_light|cream_on_dark", "label": "Open meadow ↗", "sub": "owned — plays like a free season" }
+      }
+    },
+    "states": ["active", "unlocked", "next", "locked", "ready", "unlocking", "premium", "owned", "busy", "soon"]
+  },
+
+  "SeasonShelf": {
+    "only_in": "1b Season Shelf",
+    "rect": [24, 1270, 1032, 250],
+    "gap": 14,
+    "block_hub_swipe": true,
+    "chip": { "w": 232, "h": 250, "radius": 20, "padding": 14, "gap": 8, "border_normal": 3, "border_active": 5, "name_font": 38, "status_font": 34, "badge": { "h": 56, "radius": 14, "font": 32 }, "price": { "h": 64, "radius": 14, "font": 40 } }
+  },
+
+  "scenes": {
+    "mid":             { "label": "sredina igre (P1.1)", "coins": 320, "seeds": 48, "free_done": 2, "active": "frost_orchard", "focus": "frost_orchard", "next_lock": { "id": "lantern_meadow", "coins": 320, "flowers": 12 }, "gift": "ready" },
+    "new":             { "label": "novi igrač (P1.2)", "coins": 0, "seeds": 6, "free_done": 1, "active": "country_bloom", "focus": "country_bloom", "next_lock": { "id": "frost_orchard", "coins": 0, "flowers": 0 }, "gift": "hidden", "hint": true },
+    "ready":           { "label": "spremno za unlock (P1.3 kadar 1)", "coins": 500, "seeds": 61, "free_done": 2, "active": "frost_orchard", "focus": "lantern_meadow", "next_lock": { "id": "lantern_meadow", "coins": 500, "flowers": 20 } },
+    "unlocking":       { "label": "trenutak otključavanja (P1.3 kadar 2)", "coins": 0, "seeds": 61, "free_done": 3, "focus": "lantern_meadow", "burst": true },
+    "unlocked":        { "label": "poslije unlocka = dolazak iz Campa (P1.3 kadar 3)", "coins": 0, "seeds": 61, "free_done": 3, "active": "lantern_meadow", "focus": "lantern_meadow", "new_badge": true, "next_lock": { "id": "amber_canopy", "coins": 0, "flowers": 0 } },
+    "allfree":         { "label": "sve 4 free otključane (P1.5)", "coins": 1240, "seeds": 128, "free_done": 4, "active": "amber_canopy", "focus": "amber_canopy", "next_lock": null, "gift": "taken" },
+    "premium_locked":  { "label": "premium nekupljena (P1.4)", "focus": "coral_tide", "card_state": "premium" },
+    "premium_busy":    { "label": "kupovina u toku (P1.4)", "focus": "coral_tide", "card_state": "busy" },
+    "premium_owned":   { "label": "premium kupljena i aktivna (P1.4)", "active": "moonlit_warren", "focus": "moonlit_warren", "card_state": "owned" },
+    "premium_soon":    { "label": "coming soon (P1.4)", "focus": "ember_fen", "card_state": "soon" },
+    "overview":        { "label": "pregled svih sezona — zamjena za Browser (P1.7)", "all_collapsed": true }
+  },
+
+  "animations": [
+    { "what": "Kartica se otvara / zatvara", "target": "custom_minimum_size:y", "dur_s": 0.22, "ease": "EASE_OUT", "trans": "TRANS_CUBIC" },
+    { "what": "Skrol do fokusirane kartice", "target": "ScrollContainer.scroll_vertical", "dur_s": 0.25, "ease": "EASE_OUT" },
+    { "what": "Barovi napretka", "target": "size:x", "dur_s": 0.35, "ease": "EASE_OUT" },
+    { "what": "Unlock prsten", "target": "Sprite2D scale 0.6→1.25 + modulate:a 0.9→0", "dur_s": 0.9, "ease": "EASE_OUT", "asset": "pulse_ring.png" },
+    { "what": "Unlock dugme mutno→zlatno", "target": "StyleBoxFlat.bg_color", "dur_s": 0.18, "ease": "LINEAR" },
+    { "what": "Čip New", "target": "modulate:a 0→1, pa fade out", "dur_s": 0.3, "hold_s": 3.0 },
+    { "what": "Daily gift puls", "target": "scale 1.0→1.03", "dur_s": 1.2, "loop": true, "existing": "UiAttention" },
+    { "what": "Pritisak", "target": "scale 0.97", "dur_s": 0.08, "note": "isto kao Arena i Camp" },
+    { "what": "Premium Purchasing…", "target": "modulate:a 0.55↔0.85", "dur_s": 0.8, "loop": true }
+  ],
+
+  "strings_en": {
+    "playing_now": "Playing now",
+    "tap_open_meadow": "Tap to open the meadow ↗",
+    "open_meadow": "Open meadow ↗",
+    "unlocked_tap": "Unlocked · tap to play here",
+    "next_free": "Next free season",
+    "opens_after": "Opens after {season}",
+    "need_both": "Need {coins} more coins and {flowers} more {flower}",
+    "both_ready": "Both ready — unlock it whenever you like.",
+    "unlock_season": "Unlock {season}",
+    "unlock_cost": "spends {coins} coins and {flowers} {flower}",
+    "unlock_done": "{season} unlocked",
+    "unlock_spent": "spent {coins} coins and {flowers} {flower}",
+    "gate_caption": "{flower} ★★★ · merge it in the Arena",
+    "new": "New",
+    "premium_seasons": "Premium seasons",
+    "premium_note_row": "Free path never needs them",
+    "premium_note_head": "Preview before you buy",
+    "premium_eyebrow": "Premium season · one-time",
+    "get_season": "Get {season}",
+    "get_sub": "{price} · one-time, no subscription",
+    "purchasing": "Purchasing…",
+    "purchasing_sub": "finish in the store window",
+    "coming_soon": "Coming soon",
+    "coming_soon_sub": "not for sale yet",
+    "owned": "Owned",
+    "owned_sub": "owned — plays like a free season",
+    "progress": "{done} / {total}",
+    "progress_label": "free seasons",
+    "daily_gift": "Daily gift",
+    "gift_ready": "Tap to open",
+    "gift_taken": "Back tomorrow",
+    "play": "Play",
+    "play_season_chip": "{season}",
+    "play_reads_as": "Play · {season}",
+    "tutorial_hint": "First run: tap Play. Seeds you bring back become flowers in the Arena."
+  },
+
+  "assets": {
+    "existing": [
+      "design_handoff_home/icons/icon_coin.svg",
+      "design_handoff_home/icons/icon_lock.svg",
+      "design_handoff_home/flowers/ph_*.svg"
+    ],
+    "new": [
+      { "path": "icon_gift.svg", "size": "84x84", "note": "u mockupu složen od tri ravna oblika — može ostati StyleBoxFlat + dvije trake" },
+      { "path": "pulse_ring.png", "size": "256x256", "note": "postoji iz cd_capability_test/t5_perf" }
+    ],
+    "optional": [
+      { "path": "season_art/{season_id}.png", "size": "996x340", "note": "SeasonArtSlot; dizajn radi i bez njih" }
+    ],
+    "everything_else": "StyleBoxFlat — bez blura, gradijenata, maski i 3D rotacija"
+  },
+
+  "godot_map": {
+    "HomePage": { "node": "main_menu.tscn", "script": "main_menu.gd", "children": ["Background", "HomeTopStack", "HomeColumn"], "remove": ["DecorMoundLeft", "DecorMoundRight"], "remove_note": "brežuljci zamijenjeni ravnom pozadinom #2E4733" },
+    "SeasonStage": { "node": "season_stage.tscn", "script": "season_stage.gd", "replaces": ["BandColumn", "PaidBand", "BandSep", "FreeBand", "*Motion", "Row", "PaidRow", "Left/Center/RightSlot", "Paid*Slot"], "becomes": "ScrollContainer > VBoxContainer > SeasonCard * n + PremiumSection", "drop_functions": ["swap_home_band", "cycle_free_strip", "cycle_paid_strip", "_play_inplace_morph"], "keep_functions": ["_apply_card_color"] },
+    "SeasonCard": { "node": "nova season_card.tscn", "note": "jedan node umjesto _fill_slot / _fill_paid_slot; visina je jedini layout state", "data": ["GameState.active_season_id", "is_season_playable", "is_free_selectable", "next_locked_free_id", "is_test_locked_season"] },
+    "ActiveBadge": { "node": "SeasonCard/CardHead/EyebrowRow/ActiveBadge", "data": "GameState.active_season_id == season_id" },
+    "SeasonRoster": { "node": "SeasonCard/SeasonRoster", "script": "season_roster_panel.gd", "data": "SeasonDef.roster", "icons": "collection_bloom_icon.gd", "change": "6 kolona (HBox) umjesto 6 redova; ArtFrame 116 px" },
+    "UnlockPoster": { "node": "SeasonCard/UnlockPoster", "script": "season_unlock_gate.gd", "data": ["can_unlock_free", "unlock_free", "star3_flower_count_for_unlock"] },
+    "CoinProgress": { "node": "SeasonCard/UnlockPoster/CoinProgress", "script": "season_unlock_progress.gd", "remove": "split režim (mrtav od Camp redizajna)" },
+    "FlowerProgress": { "node": "SeasonCard/UnlockPoster/FlowerProgress", "script": "season_unlock_progress.gd" },
+    "UnlockButton": { "node": "SeasonCard/UnlockPoster/UnlockButton", "variants": ["subtle (blocked)", "gold (ready)"], "note": "48 px -> 140 px" },
+    "PremiumCard": { "node": "SeasonCard s variant=premium", "script": "season_pack_card.gd", "warning": "dijeljen sa Shopom — Shop naslijeđuje ovaj izgled", "data": ["IAPManager.owns_product", "get_price_label", "purchase", "is_busy"] },
+    "PriceTag": { "node": "SeasonCard/CardHead/PriceTag", "note": "cijena izlazi iz 🔒 labele u svoj tag" },
+    "SeasonBrowser": { "node": "season_browser.tscn", "action": "DELETE", "reason": "kolona koja se skroluje jeste pregled svih sezona", "also_delete": ["SeasonUnlockSheet (mrtav, §10 t.1)"], "smoke_update": ["season_home_smoke", "season_unlock_smoke"] },
+    "ProgressIndicator": { "node": "HomeBody/TopRow/ProgressIndicator", "new": true, "data": "SeasonCatalog.free_defs_sorted() + is_season_playable" },
+    "PlayButton": { "node": "HomeColumn/PlayRow/PlayButton", "children": ["Label", "SeasonNameChip"], "flow_old": "main_menu.home_play_action() -> run | open_field | snap", "flow_decided": "uvijek \"run\" u GameState.active_season_id — bez open_field i snap grana", "decided_on": "2026-09-21", "chip_data": "SeasonCatalog def(GameState.active_season_id).display_name", "field_entry": "tap na karticu aktivne sezone ili OpenFieldButton (\"Open meadow ↗\") — jedini put u SeasonField", "smoke_update": ["season_meadow_smoke"], "note": "PlayThemeBadge (danas uvijek skriven) se briše — SeasonNameChip ga zamjenjuje" },
+    "DailyGiftCard": { "node": "HomeTopStack/DailyChestCard", "script": "_refresh_chest_card", "keep": "UiAttention puls", "change": "premješten u TopRow, 130 px visine" },
+    "HubSwipeZone": { "group": "block_hub_swipe", "direction_1a": "grupa je PRAZNA — cijela stranica propušta hub swipe", "direction_1b": "samo SeasonShelf (1032x250) je u grupi", "api": "swipe_pager.should_block_hub_swipe_at()" },
+    "ArrivalFromCamp": { "script": "season_link_card.gd", "calls": ["set_free_strip_focus(id)", "refresh_for_meta_hub()"], "drop": "set_home_band(\"free\")", "note": "sezona je već otključana — Home ne ponavlja burst, samo čip New" },
+    "Colors": { "script": "season_card_contrast.gd", "functions": ["mood_color", "title_color", "text_color", "make_frame"], "extend": "dodati locked_fill() i soon_fill() po derived_fills" }
+  },
+
+  "smoke_tests": {
+    "must_update": [
+      { "name": "season_home_smoke", "why": "nema više 3-slot traka, zamjene traka, preview tapa ni Browsera" },
+      { "name": "season_meadow_smoke", "why": "ako Play ide direktno u run (prijedlog), pada 'Play u 3 koraka'" },
+      { "name": "camp_season_link_smoke", "why": "Home više ne prima set_home_band" },
+      { "name": "shop_open_smoke", "why": "SeasonPackCard mijenja izgled" }
+    ],
+    "should_pass_unchanged": ["season_unlock_smoke", "season_iap_smoke", "meta_hub_flow_smoke"]
+  },
+
+  "decisions": [
+    { "date": "2026-09-21", "what": "Play na Home pokreće run u aktivnoj sezoni odmah (1 korak umjesto 3); na dugmetu stoji ime te sezone (SeasonNameChip). Polje sezone se otvara tapom na karticu aktivne sezone ili na \"Open meadow ↗\". season_meadow_smoke se mijenja pri prenosu." }
+  ],
+
+  "open_decisions": [
+    "Brisanje SeasonBrowsera i mrtvog SeasonUnlockSheeta?",
+    "Pozadina Home #2E4733 (usklađeno s Campom) umjesto #243329?",
+    "Ember Fen: Coming soon kartica ili sakriti do izlaska?",
+    "PremiumCard je dijeljen sa Shopom — prihvatiti da Shop naslijeđuje izgled?"
+  ]
+}

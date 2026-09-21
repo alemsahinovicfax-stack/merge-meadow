@@ -9,6 +9,14 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-09-22
+
+- **Brief: Home — polje sezone (Claude Design)** — pravila polja iz koda (korpa +5 %, Magnet / Loot Boost 4 nivoa × 2 cvijeta, Play / Play Endless, livada i Pip), današnji raspored, 11 problema i gotov prompt. Novi format: CD dobija slobodu da unaprijedi dizajn i isporučuje **jedan dizajn** bez varijanti, uz paket spreman za Godot (`design_handoff_home_field/godot/field_export.json` u šemi Home paketa, zip u chatu); [[../04-experience/design-drafts/home-field-cd-brief|brief]]
+
+## 2026-09-21
+
+- **Home redizajn — biranje sezone (Claude Design, smjer 1a Season Trail)** — iz `design_handoff_home/`: dvije trake s 3 slota zamijenjene jednom vertikalnom kolonom kartica (harmonika: tačno jedna otvorena, tween visine 0,22 s) — besplatni put redom, red „Premium seasons“ (tačkice mood boja, „4 ↓“) i premium kartice ispod; kartica sezone u 5 varijanti (zatvorena · otvorena s rosterom od 6 cvjetova i „Open meadow ↗“ · kompaktni next lock · puni unlock poster · premium pregled) i 10 stanja, zaključane i coming-soon boje se računaju iz mood boje; Unlock na posteru troši odmah uz prsten i „New“ čip; dolazak iz Campa dočekuje otključanu sezonu s „New“; premium kupovina („Get {season} · cijena · one-time“ → „Purchasing…“ → kupljena i aktivna); **Play pokreće run u aktivnoj sezoni odmah** (čip s imenom sezone), polje sezone samo s kartice; TopRow = Daily gift + „N / 4 free seasons“; pozadina `#2E4733` kao Camp; na Home ništa ne blokira hub swipe. Obrisani Browser, mrtav `SeasonUnlockSheet`, unlock gate/progress (s `split` režimom), roster panel, brežuljci, `PlayThemeBadge`. Shop zadržava `SeasonPackCard`; Ember Fen = Coming soon kartica. Polje sezone zadržava raspored (daily gift je sada samo na biranju). Novi `season_home_smoke`, ažurirani `season_meadow_smoke` / `camp_season_link_smoke` (oba season smokea čuvaju pravi save); [[../04-experience/design-drafts/home-season-select-cd-brief|brief + odstupanja]] · [[../04-experience/design-drafts/home-season-select-izvjestaj|izvještaj]]
+
 ## 2026-09-16
 
 - **CD capability test — provjera paketa** — CD paket instaliran u `game/_cd_sandbox/` + `docs/_cd_sandbox/` (ne commitati); headless provjera (glTF/OBJ ✅, SurfaceTool mesh obrnut winding, `.tscn` bez `uid` ✅) i benchmark na laptopu + emulatoru Pixel_4_API33. Glavni nalaz: pulsiranje pravih arena chipova (`_process → queue_redraw` cijelog chipa) 29 chipova = 84 fps laptop / **10 fps emulator** (statično 490 / 49), dok sjene i broj tweenova ne koštaju mjerljivo; [[../04-experience/design-drafts/cd-capability-test-izvjestaj|izvještaj]] · [[../04-experience/design-drafts/cd_response|odgovor za CD]] · greske-katalog #14, #15

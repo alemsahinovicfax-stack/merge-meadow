@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="HomePage" style="{{ rootStyle }}">
+
+  <div data-layer="Header" style="{{ headerStyle }}">
+    <div style="height:140px;display:flex;align-items:center;gap:16px;padding:0 20px;box-sizing:border-box">
+      <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="3">
+        <div data-layer="{{ chip.layer }}" style="{{ chip.style }}">
+          <img src="{{ chip.icon }}" alt="" style="width:56px;height:56px;flex:0 0 auto" />
+          <div style="flex:1;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums;letter-spacing:-.01em">{{ chip.value }}</div>
+        </div>
+      </sc-for>
+      <div data-layer="SettingsButton" style="width:100px;height:100px;box-sizing:border-box;margin-left:4px;flex:0 0 auto;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center">
+        <img src="icons/icon_settings_light.svg" alt="" style="width:54px;height:54px" />
+      </div>
+    </div>
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+  </div>
+
+  <div data-layer="HomeBody" style="{{ bodyStyle }}">
+    <div data-layer="TopRow" style="{{ topRowStyle }}">
+      <div data-layer="DailyGiftCard" style="{{ giftStyle }}">
+        <div data-layer="GiftIcon" style="{{ giftIconStyle }}">
+          <div style="{{ giftRibbonV }}"></div>
+          <div style="{{ giftRibbonH }}"></div>
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;justify-content:center">
+          <div style="{{ giftTitleStyle }}">Daily gift</div>
+          <div style="{{ giftSubStyle }}">{{ giftSub }}</div>
+        </div>
+      </div>
+      <div data-layer="ProgressIndicator" style="{{ progStyle }}">
+        <div style="display:flex;align-items:baseline;gap:14px">
+          <div style="{{ progNumStyle }}">{{ progNum }}</div>
+          <div style="{{ progLabStyle }}">free seasons</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <sc-for list="{{ segs }}" as="g" hint-placeholder-count="4">
+            <div style="{{ g.s }}"></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div data-layer="SeasonStage" style="{{ stageStyle }}">
+      <sc-for list="{{ items }}" as="c" hint-placeholder-count="4">
+
+        <sc-if value="{{ c.isHeader }}" hint-placeholder-val="{{ false }}">
+          <div data-layer="PremiumSection" style="{{ c.root }}">
+            <div data-layer="PremiumDots" style="{{ c.dotsWrap }}">
+              <sc-for list="{{ c.dots }}" as="d" hint-placeholder-count="4">
+                <div style="{{ d.s }}"></div>
+              </sc-for>
+            </div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;justify-content:center">
+              <div style="{{ c.titleS }}">Premium seasons</div>
+              <div style="{{ c.noteS }}">{{ c.note }}</div>
+            </div>
+            <div data-layer="PremiumChevron" style="{{ c.chevS }}">{{ c.chev }}</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ c.isCard }}" hint-placeholder-val="{{ true }}">
+          <div data-layer="SeasonCard" style="{{ c.root }}">
+            <div data-layer="UnlockBurst" style="{{ c.burst }}"></div>
+            <div data-layer="SeasonArtSlot" style="{{ c.artSlot }}">
+              <div style="{{ c.artTagS }}">{{ c.artTag }}</div>
+            </div>
+            <div data-layer="CardHead" style="{{ c.head }}">
+              <div data-layer="LockBox" style="{{ c.lockBox }}">
+                <img src="icons/icon_lock.svg" alt="" style="width:48px;height:48px;display:block" />
+              </div>
+              <div data-layer="HeadText" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;justify-content:center">
+                <div data-layer="EyebrowRow" style="{{ c.eyebrowRow }}">
+                  <div data-layer="ActiveBadge" style="{{ c.badgeTop }}">{{ c.badgeText }}</div>
+                  <div data-layer="NewBadge" style="{{ c.newTop }}">New</div>
+                  <div data-layer="Eyebrow" style="{{ c.eyebrowS }}">{{ c.eyebrow }}</div>
+                </div>
+                <div data-layer="SeasonName" style="{{ c.nameS }}">{{ c.name }}</div>
+                <div data-layer="StatusLine" style="{{ c.statusS }}">{{ c.status }}</div>
+              </div>
+              <div data-layer="ActiveBadge" style="{{ c.badgeRow }}">{{ c.badgeText }}</div>
+              <div data-layer="StatusChip" style="{{ c.chipS }}">{{ c.chipText }}</div>
+              <div data-layer="PriceTag" style="{{ c.priceS }}">{{ c.price }}</div>
+              <div data-layer="OpenFieldButton" style="{{ c.openS }}">Open meadow ↗</div>
+            </div>
+            <div data-layer="Tagline" style="{{ c.taglineS }}">{{ c.tagline }}</div>
+            <div data-layer="SeasonRoster" style="{{ c.rosterS }}">
+              <sc-for list="{{ c.flowers }}" as="f" hint-placeholder-count="6">
+                <div data-layer="RosterSlot" style="{{ f.slot }}">
+                  <div data-layer="ArtFrame" style="{{ f.frame }}">
+                    <div style="{{ f.well }}"></div>
+                    <img src="{{ f.src }}" alt="" style="{{ f.art }}" />
+                  </div>
+                  <div data-layer="RarityPips" style="{{ f.pipsStyle }}">{{ f.pips }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div data-layer="UnlockPoster" style="{{ c.posterS }}">
+              <div data-layer="NeedLine" style="{{ c.needS }}">{{ c.needText }}</div>
+              <div data-layer="CoinProgress" style="{{ c.rowS }}">
+                <img src="icons/icon_coin.svg" alt="" style="{{ c.coinIconS }}" />
+                <div style="{{ c.valS }}">{{ c.coinVal }}</div>
+                <div data-layer="CoinBar" style="{{ c.barS }}"><div style="{{ c.coinFillS }}"></div></div>
+              </div>
+              <div data-layer="FlowerProgress" style="{{ c.rowS }}">
+                <div data-layer="ArtFrame" style="{{ c.gateFrameS }}">
+                  <div style="{{ c.gateWellS }}"></div>
+                  <img src="{{ c.gateArtSrc }}" alt="" style="{{ c.gateArtS }}" />
+                </div>
+                <div style="{{ c.valS }}">{{ c.flowerVal }}</div>
+                <div data-layer="FlowerBar" style="{{ c.barS }}"><div style="{{ c.flowerFillS }}"></div></div>
+              </div>
+              <div data-layer="GateCaption" style="{{ c.gateCapS }}">{{ c.gateCaption }}</div>
+              <div data-layer="UnlockButton" style="{{ c.unlockS }}">
+                <div style="{{ c.unlockLabelS }}">{{ c.unlockLabel }}</div>
+                <div style="{{ c.unlockSubS }}">{{ c.unlockSub }}</div>
+              </div>
+            </div>
+            <div data-layer="CardCta" style="{{ c.ctaS }}">
+              <div style="{{ c.ctaLabelS }}">{{ c.ctaLabel }}</div>
+              <div style="{{ c.ctaSubS }}">{{ c.ctaSub }}</div>
+            </div>
+          </div>
+        </sc-if>
+
+      </sc-for>
+    </div>
+
+    <div data-layer="SeasonShelf" style="{{ shelfStyle }}">
+      <sc-for list="{{ shelfItems }}" as="m" hint-placeholder-count="0">
+        <div data-layer="SeasonChip" style="{{ m.root }}">
+          <div data-layer="ChipTop" style="{{ m.top }}">
+            <img src="icons/icon_lock.svg" alt="" style="{{ m.lock }}" />
+            <div data-layer="ActiveBadge" style="{{ m.badge }}">{{ m.badgeText }}</div>
+          </div>
+          <div data-layer="SeasonName" style="{{ m.nameS }}">{{ m.name }}</div>
+          <div data-layer="StatusLine" style="{{ m.statusS }}">{{ m.status }}</div>
+          <div data-layer="PriceTag" style="{{ m.priceS }}">{{ m.price }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div data-layer="TutorialHint" style="{{ hintStyle }}">{{ hintText }}</div>
+
+    <div data-layer="PlayButton" style="{{ playStyle }}">
+      <div style="{{ playLabelStyle }}">▶  Play</div>
+      <div style="{{ playChipStyle }}">{{ playChip }}</div>
+    </div>
+
+    <sc-for list="{{ zoneList }}" as="z" hint-placeholder-count="0">
+      <div data-layer="{{ z.layer }}" style="{{ z.s }}">
+        <div style="{{ z.ts }}">{{ z.t }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div data-layer="Footer" style="{{ footerStyle }}">
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+    <div style="position:relative;height:177px">
+      <div data-layer="ActiveIndicator" style="position:absolute;top:5px;left:442px;width:196px;height:8px;border-radius:4px;background:#FFB88C"></div>
+      <div style="position:absolute;left:0;right:0;top:17px;height:152px;display:flex">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+          <div data-layer="{{ t.layer }}" style="flex:1;min-width:0;display:flex;justify-content:center">
+            <div style="{{ t.tile }}">
+              <img src="{{ t.icon }}" alt="" style="{{ t.iconS }}" />
+              <div style="{{ t.label }}">{{ t.text }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;dir&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;trail&quot;,&quot;shelf&quot;],&quot;default&quot;:&quot;trail&quot;,&quot;tsType&quot;:&quot;'trail'|'shelf'&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;mid&quot;,&quot;new&quot;,&quot;ready&quot;,&quot;unlocking&quot;,&quot;unlocked&quot;,&quot;allfree&quot;,&quot;premium_locked&quot;,&quot;premium_owned&quot;,&quot;premium_soon&quot;,&quot;premium_busy&quot;,&quot;overview&quot;,&quot;specs&quot;],&quot;default&quot;:&quot;mid&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;zones&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Layout&quot;},&quot;bare&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Layout&quot;}}">
+// Kartica je 1:1 ista kao SeasonCard.dc.html (kanonski spec jedne kartice) —
+// ovdje je uvučena u ekran da stranica ne mora mount-ati 6 pod-komponenti po artboardu.
+const NUN = 'Nunito,system-ui,sans-serif';
+const PAGE = '#2E4733', RIM = '#FFF6D6', INK = '#2D3436', DARKINK = '#1A1A14', SUBINK = '#3D3D33';
+const CREAM = '#FFF8F0', GOLD = '#FFD56B', GOLD_EDGE = '#D6A82F', UIGOLD = '#E8C44A', UIGOLD_EDGE = '#BA9D3B';
+const PRICEBG = '#FFE8B8', PEACH = '#FFB88C', PEACH_EDGE = '#E8A374', MINT = '#A8E6CF';
+const LAV = '#D4A5FF', LAV_EDGE = '#AA84CC', WELL = '#22342A', WELL_EDGE = '#16211B';
+
+const SEASONS = {
+  country_bloom: { n: 'Country Bloom', t: 'Warm fields, soft petals, home pastures.', m: '#A8E6CF', li: true, r: [['Meadow Clover', 1, 'clover'], ['Field Daisy', 1, 'daisy'], ['Buttercup Lane', 1, 'buttercup'], ['Barn Tulip', 2, 'tulip'], ['Sunfence', 2, 'sunflower'], ['Harvest Pumpkin', 3, 'pumpkin']] },
+  frost_orchard: { n: 'Frost Orchard', t: 'Crisp air, silver blossom.', m: '#C5D5E8', li: true, r: [['Frost Snowdrop', 1, 'frost_snowdrop'], ['Ice Crocus', 1, 'silver_aconite'], ['Silver Aconite', 1, 'clover'], ['Winter Camellia', 2, 'daisy'], ['Hoarfrost Rose', 2, 'tulip'], ['Crystal Peony', 3, 'sunflower']] },
+  lantern_meadow: { n: 'Lantern Meadow', t: 'Dusk lights among tall grass.', m: '#C9B8E0', li: true, r: [['Dusk Firefly Grass', 1, 'clover'], ['Paper Lantern Bloom', 1, 'buttercup'], ['Evening Primrose', 1, 'daisy'], ['Foxfire Lily', 2, 'tulip'], ['Glow Wisteria', 2, 'silver_aconite'], ['Midnight Lotus', 3, 'sunflower']] },
+  amber_canopy: { n: 'Amber Canopy', t: 'Warm late-season light through high leaves.', m: '#E8C48A', li: true, r: [['Copper Leaf', 1, 'clover'], ['Maple Aster', 1, 'daisy'], ['Russet Mallow', 1, 'tulip'], ['Cider Dahlia', 2, 'buttercup'], ['Golden Oak Bloom', 2, 'sunflower'], ['Amber Magnolia', 3, 'pumpkin']] },
+  moonlit_warren: { n: 'Moonlit Warren', t: 'Night blooms under a quiet moon.', m: '#3D3A6B', li: false, p: '€2.99', r: [['Moon Moss', 1, 'clover'], ['Nightshade Petal', 1, 'silver_aconite'], ['Silver Harebell', 1, 'frost_snowdrop'], ['Lunar Orchid', 2, 'tulip'], ['Star Jasmine', 2, 'daisy'], ['Umbral Lily', 3, 'sunflower']] },
+  coral_tide: { n: 'Coral Tide Garden', t: 'Salt breeze and seashell petals.', m: '#E8A090', li: true, p: '€3.49', r: [['Sea Thrift', 1, 'daisy'], ['Salt Daisy', 1, 'clover'], ['Tide Anemone', 1, 'tulip'], ['Coral Hibiscus', 2, 'buttercup'], ['Pearl Waterlily', 2, 'sunflower'], ['Reef Crown', 3, 'pumpkin']] },
+  starfall_glade: { n: 'Starfall Glade', t: 'Petals that catch the night sky.', m: '#6B5B95', li: false, p: '€2.99', r: [['Comet Sprig', 1, 'silver_aconite'], ['Nebula Clover', 1, 'clover'], ['Meteor Daisy', 1, 'daisy'], ['Aurora Tulip', 2, 'tulip'], ['Galaxy Sunburst', 2, 'sunflower'], ['Nova Bloom', 3, 'frost_snowdrop']] },
+  ember_fen: { n: 'Ember Fen', t: 'Low firelight over marsh blooms.', m: '#C45C26', li: false, p: '€3.49', r: [['Marsh Rush', 1, 'clover'], ['Peat Violet', 1, 'silver_aconite'], ['Cinder Buttercup', 1, 'buttercup'], ['Flame Iris', 2, 'tulip'], ['Smoke Lotus', 2, 'daisy'], ['Fenfire Crown', 3, 'pumpkin']] }
+};
+const FREE = ['country_bloom', 'frost_orchard', 'lantern_meadow', 'amber_canopy'];
+const PREMIUM = ['moonlit_warren', 'coral_tide', 'starfall_glade', 'ember_fen'];
+const TABS = [['Tab_Shop', 'Shop', 'shop'], ['Tab_Journal', 'Journal', 'journal'], ['Tab_Home', 'Home', 'home'], ['Tab_Camp', 'Camp', 'camp'], ['Tab_Arena', 'Arena', 'arena']];
+const TOP = 130, GAP = 16, PLAY = 156, TRAIL = 1231, TG = 14;
+
+class Component extends DCLogic {
+  rgb(h) { return [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)); }
+  hx(a) { return '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join(''); }
+  sc(h, f) { return this.hx(this.rgb(h).map(v => v * f)); }
+  mix(a, b, t) { const A = this.rgb(a), B = this.rgb(b); return this.hx(A.map((v, i) => v + (B[i] - v) * t)); }
+
+  card(cfg) {
+    const id = cfg.season, s = SEASONS[id], v = cfg.variant, st = cfg.state;
+    const w = cfg.w || 1032, h = cfg.h;
+    const isCol = v === 'collapsed', isExp = v === 'expanded', isNext = v === 'nextlock';
+    const isPost = v === 'poster', isPrem = v === 'premium', isHero = v === 'hero';
+    const active = st === 'active' || !!cfg.playing, dim = st === 'locked', soon = st === 'soon';
+    const ready = st === 'ready', unlocking = st === 'unlocking';
+
+    const mood = s.m;
+    const fill = dim ? this.mix(this.sc(mood, 0.55), PAGE, 0.45) : (soon ? this.mix(mood, PAGE, 0.44) : mood);
+    const light = (dim || soon) ? false : s.li;
+    const ink = light ? DARKINK : RIM;
+    const sub = light ? SUBINK : 'rgba(255,246,214,.90)';
+    const panel = light ? 'rgba(26,26,20,.13)' : 'rgba(255,248,240,.13)';
+    const panelEdge = light ? 'rgba(26,26,20,.22)' : 'rgba(255,248,240,.28)';
+    const cream = light ? 'rgba(255,248,240,.74)' : 'rgba(255,248,240,.20)';
+    const creamEdge = light ? 'rgba(26,26,20,.26)' : 'rgba(255,248,240,.40)';
+    const pad = isNext ? 16 : 18;
+
+    const fi = FREE.indexOf(id);
+    const prev = fi > 0 ? SEASONS[FREE[fi - 1]] : null;
+    const gate = prev ? prev.r[5] : SEASONS.country_bloom.r[5];
+    const gateName = gate[0];
+    const coins = cfg.coins ?? 320, cNeed = 500, fl = cfg.flowers ?? 12, fNeed = 20;
+    const dC = Math.max(0, cNeed - coins), dF = Math.max(0, fNeed - fl);
+    const gateReady = dC === 0 && dF === 0;
+
+    const showRoster = isExp || isPrem || isHero;
+    const showPoster = isNext || isPost;
+    const showTag = isExp || isPost || isPrem || isHero;
+    const showCta = (isPrem || isHero) && (st === 'premium' || st === 'busy' || soon || st === 'owned');
+    const bigHead = isExp || isPost || isPrem || isHero;
+    const headH = isCol ? 0 : (isNext ? 72 : 132);
+
+    let eyebrow = '', status = '', badgeText = '';
+    if (active) badgeText = 'Playing now';
+    if (isPost) eyebrow = 'Next free season';
+    if (isPrem) eyebrow = soon ? 'Premium season' : 'Premium season · one-time';
+    if (isCol) {
+      if (active) status = 'Tap to open the meadow ↗';
+      else if (st === 'unlocked') status = 'Unlocked · tap to play here';
+      else if (st === 'next') status = 'Next free season';
+      else if (dim) status = prev ? 'Opens after ' + prev.n : 'Locked';
+      else if (st === 'premium' || st === 'busy') status = 'Premium · preview inside';
+      else if (st === 'owned') status = 'Owned';
+      else if (soon) status = 'Coming soon';
+    }
+
+    const chipTxt = isNext ? 'Next free season' : coins + ' / ' + cNeed + '  ·  ' + fl + ' / ' + fNeed;
+    const chipOn = (isCol && st === 'next') || isNext;
+    const chip = (bg, ed, tk) => 'flex:0 0 auto;box-sizing:border-box;height:60px;padding:0 22px;border-radius:16px;background:' +
+      bg + ';border:3px solid ' + ed + ';display:flex;align-items:center;font:900 38px/1 ' + NUN + ';color:' + tk + ';white-space:nowrap';
+
+    const rH = h - 2 * pad - headH - 14 - 48 - 14 - (showCta ? 144 : 0) - (isHero ? 354 : 0) - 28;
+    const fw = Math.max(64, Math.min(isHero ? 124 : 116, rH - 48));
+    const inset = Math.max(7, Math.round(fw * 0.095));
+    const flowers = s.r.map(f => ({
+      slot: 'flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px',
+      frame: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:' + fw + 'px;height:' + fw + 'px;border-radius:' +
+        Math.round(fw * 0.22) + 'px;background:' + GOLD + ';border:3px solid ' + GOLD_EDGE + ';display:grid;place-items:center',
+      well: 'position:absolute;inset:' + inset + 'px;box-sizing:border-box;border-radius:' + Math.round(fw * 0.15) +
+        'px;background:' + WELL + ';border:2px solid ' + WELL_EDGE,
+      src: 'flowers/ph_' + f[2] + '.svg',
+      art: 'position:relative;display:block;width:' + Math.round(fw * 0.58) + 'px;height:' + Math.round(fw * 0.58) + 'px',
+      pips: '★'.repeat(f[1]) + '☆'.repeat(3 - f[1]),
+      pipsStyle: 'font:800 38px/1 ' + NUN + ';letter-spacing:.02em;color:' + ink
+    }));
+
+    let uFill = 'rgba(255,248,240,.55)', uEdge = 'rgba(26,26,20,.30)', uInk = '#44443A';
+    if (ready) { uFill = UIGOLD; uEdge = UIGOLD_EDGE; uInk = INK; }
+    if (unlocking) { uFill = GOLD; uEdge = GOLD_EDGE; uInk = INK; }
+    let uLabel = 'Unlock ' + s.n, uSub = 'needs ' + dC + ' more coins and ' + dF + ' more ' + gateName;
+    if (ready || gateReady) uSub = 'spends ' + cNeed + ' coins and ' + fNeed + ' ' + gateName;
+    if (unlocking) { uLabel = s.n + ' unlocked'; uSub = 'spent ' + cNeed + ' coins and ' + fNeed + ' ' + gateName; }
+
+    let needText = 'Need ' + dC + ' more coins and ' + dF + ' more ' + gateName;
+    if (gateReady) needText = 'Both ready — unlock it whenever you like.';
+    if (unlocking) needText = 'Welcome to ' + s.n + '.';
+
+    let ctaFill = LAV, ctaEdge = LAV_EDGE, ctaInk = INK;
+    let ctaLabel = 'Get ' + s.n, ctaSub = (cfg.price || s.p || '') + ' · one-time, no subscription';
+    if (st === 'busy') { ctaFill = 'rgba(255,248,240,.55)'; ctaEdge = 'rgba(26,26,20,.30)'; ctaInk = '#44443A'; ctaLabel = 'Purchasing…'; ctaSub = 'finish in the store window'; }
+    if (soon) { ctaFill = 'rgba(255,248,240,.16)'; ctaEdge = 'rgba(255,246,214,.40)'; ctaInk = RIM; ctaLabel = 'Coming soon'; ctaSub = 'not for sale yet'; }
+    if (st === 'owned') { ctaFill = cream; ctaEdge = creamEdge; ctaInk = ink; ctaLabel = 'Open meadow ↗'; ctaSub = 'owned — plays like a free season'; }
+
+    const barTrack = light ? 'rgba(26,26,20,.20)' : 'rgba(255,248,240,.22)';
+    const NAMESZ = { collapsed: 48, expanded: 64, nextlock: 52, poster: 64, premium: 60, hero: 68 };
+
+    return {
+      isCard: true, isHeader: false, isLabel: false, label: '', labelS: 'display:none', name: s.n, tagline: s.t, eyebrow, status, badgeText,
+      price: cfg.price || s.p || '', chipText: chipTxt,
+      flowers, coinVal: coins + ' / ' + cNeed, flowerVal: fl + ' / ' + fNeed,
+      needText, gateCaption: gateName + ' ★★★ · merge it in the Arena',
+      gateArtSrc: 'flowers/ph_' + gate[2] + '.svg',
+      unlockLabel: uLabel, unlockSub: uSub, ctaLabel, ctaSub,
+      artTag: 'SeasonArtSlot · optional 996 × 340',
+
+      root: ['position:relative;box-sizing:border-box;flex:0 0 auto;overflow:hidden',
+        'width:' + w + 'px;height:' + h + 'px;border-radius:26px;background:' + fill,
+        'border:' + (active ? '6px solid ' + RIM : '3px solid ' + (dim || soon ? 'rgba(255,246,214,.34)' : this.sc(mood, 0.8))),
+        'box-shadow:' + (active ? '0 10px 22px rgba(20,26,22,.38)' : '0 8px 16px rgba(20,26,22,.26)'),
+        'padding:' + pad + 'px;display:flex;flex-direction:column;gap:' + (isNext ? 12 : 14) + 'px'].join(';'),
+      burst: unlocking
+        ? 'position:absolute;left:50%;top:50%;width:760px;height:760px;margin:-380px 0 0 -380px;border-radius:50%;border:16px solid rgba(255,245,209,.55);pointer-events:none'
+        : 'display:none',
+      artSlot: isHero
+        ? 'flex:0 0 340px;box-sizing:border-box;border-radius:20px;background:' + panel + ';border:4px dashed ' + panelEdge + ';display:flex;align-items:flex-end;padding:18px'
+        : 'display:none',
+      artTagS: 'font:700 34px/1 ' + NUN + ';color:' + sub,
+      head: isCol ? 'flex:1;min-height:0;display:flex;align-items:center;gap:18px'
+        : 'flex:0 0 ' + headH + 'px;display:flex;align-items:center;gap:18px',
+      lockBox: (dim || soon)
+        ? 'flex:0 0 auto;box-sizing:border-box;width:84px;height:84px;border-radius:22px;background:rgba(26,26,20,.26);border:2px solid rgba(255,246,214,.34);display:grid;place-items:center'
+        : 'display:none',
+      eyebrowRow: (bigHead && (eyebrow || badgeText || cfg.fresh))
+        ? 'flex:0 0 60px;display:flex;align-items:center;gap:14px' : 'display:none',
+      badgeTop: (bigHead && badgeText) ? chip(RIM, GOLD_EDGE, INK) : 'display:none',
+      newTop: (bigHead && cfg.fresh) ? chip(MINT, '#7FC9AC', INK) : 'display:none',
+      eyebrowS: eyebrow ? 'font:700 38px/1 ' + NUN + ';color:' + sub + ';white-space:nowrap' : 'display:none',
+      nameS: 'font:900 ' + NAMESZ[v] + 'px/1.02 ' + NUN + ';color:' + ink + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      statusS: status ? 'font:700 40px/1 ' + NUN + ';color:' + sub + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis' : 'display:none',
+      badgeRow: (badgeText && !bigHead)
+        ? 'flex:0 0 auto;box-sizing:border-box;height:72px;padding:0 24px;border-radius:18px;background:' + RIM +
+          ';border:3px solid ' + GOLD_EDGE + ';display:flex;align-items:center;font:900 40px/1 ' + NUN + ';color:' + INK + ';white-space:nowrap'
+        : 'display:none',
+      chipS: chipOn
+        ? 'flex:0 0 auto;box-sizing:border-box;height:76px;padding:0 22px;border-radius:18px;background:' + cream + ';border:2px solid ' + creamEdge +
+          ';display:flex;align-items:center;font:' + (isNext ? '800 40' : '900 44') + 'px/1 ' + NUN + ';font-variant-numeric:tabular-nums;color:' + ink + ';white-space:nowrap'
+        : 'display:none',
+      priceS: ((isCol || isPrem || isHero) && (st === 'premium' || st === 'busy') && (cfg.price || s.p))
+        ? 'flex:0 0 auto;box-sizing:border-box;height:96px;padding:0 26px;border-radius:18px;background:' + PRICEBG +
+          ';border:3px solid ' + GOLD_EDGE + ';display:flex;align-items:center;font:900 52px/1 ' + NUN +
+          ';font-variant-numeric:tabular-nums;color:' + INK + ';white-space:nowrap'
+        : 'display:none',
+      openS: (isExp || isHero) && (active || st === 'unlocked')
+        ? 'flex:0 0 auto;box-sizing:border-box;width:360px;height:124px;border-radius:20px;background:' + cream + ';border:3px solid ' + creamEdge +
+          ';display:flex;align-items:center;justify-content:center;font:900 42px/1 ' + NUN + ';color:' + ink + ';white-space:nowrap'
+        : 'display:none',
+      taglineS: showTag
+        ? 'flex:0 0 48px;font:700 42px/1.12 ' + NUN + ';color:' + sub + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis'
+        : 'display:none',
+      rosterS: showRoster
+        ? 'flex:1;min-height:0;box-sizing:border-box;border-radius:20px;background:' + panel + ';border:2px solid ' + panelEdge +
+          ';padding:14px 12px;display:flex;align-items:center;gap:12px'
+        : 'display:none',
+      posterS: showPoster ? 'flex:1;min-height:0;display:flex;flex-direction:column;gap:' + (isPost ? 14 : 12) + 'px' : 'display:none',
+      needS: 'flex:0 0 auto;font:800 ' + (isPost ? 44 : 40) + 'px/1.1 ' + NUN + ';color:' + ink + ';text-wrap:pretty',
+      rowS: 'flex:' + (isPost ? '1;min-height:0' : '0 0 66px') + ';display:flex;align-items:center;gap:16px',
+      coinIconS: 'width:' + (isPost ? 60 : 56) + 'px;height:' + (isPost ? 60 : 56) + 'px;display:block;flex:0 0 auto',
+      valS: 'flex:0 0 ' + (isPost ? 300 : 240) + 'px;font:900 ' + (isPost ? 56 : 48) + 'px/1 ' + NUN +
+        ';font-variant-numeric:tabular-nums;white-space:nowrap;color:' + ink,
+      barS: 'flex:1;min-width:0;height:' + (isPost ? 26 : 20) + 'px;border-radius:13px;background:' + barTrack + ';overflow:hidden',
+      coinFillS: 'height:100%;width:' + (Math.min(1, coins / cNeed) * 100).toFixed(1) + '%;background:' + GOLD,
+      flowerFillS: 'height:100%;width:' + (Math.min(1, fl / fNeed) * 100).toFixed(1) + '%;background:' + CREAM,
+      gateFrameS: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:' + (isPost ? 60 : 56) + 'px;height:' + (isPost ? 60 : 56) +
+        'px;border-radius:18px;background:' + GOLD + ';border:3px solid ' + GOLD_EDGE + ';display:grid;place-items:center',
+      gateWellS: 'position:absolute;inset:8px;box-sizing:border-box;border-radius:11px;background:' + WELL + ';border:2px solid ' + WELL_EDGE,
+      gateArtS: 'position:relative;display:block;width:' + (isPost ? 34 : 30) + 'px;height:' + (isPost ? 34 : 30) + 'px',
+      gateCapS: isPost ? 'flex:0 0 auto;font:700 38px/1 ' + NUN + ';color:' + sub : 'display:none',
+      unlockS: isPost
+        ? 'flex:0 0 140px;box-sizing:border-box;border-radius:20px;background:' + uFill + ';border:3px solid ' + uEdge +
+          ';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px'
+        : 'display:none',
+      unlockLabelS: 'font:900 52px/1 ' + NUN + ';color:' + uInk + ';white-space:nowrap',
+      unlockSubS: 'font:700 38px/1 ' + NUN + ';color:' + (ready || unlocking ? INK : '#44443A') + ';white-space:nowrap',
+      ctaS: showCta
+        ? 'flex:0 0 130px;box-sizing:border-box;border-radius:20px;background:' + ctaFill + ';border:3px solid ' + ctaEdge +
+          ';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px'
+        : 'display:none',
+      ctaLabelS: 'font:900 48px/1 ' + NUN + ';color:' + ctaInk + ';white-space:nowrap',
+      ctaSubS: 'font:700 38px/1 ' + NUN + ';color:' + (soon ? 'rgba(255,246,214,.86)' : ctaInk) + ';white-space:nowrap'
+    };
+  }
+
+  header(mode) {
+    return {
+      isCard: false, isHeader: true, isLabel: false, label: '', labelS: 'display:none',
+      note: mode === 'row' ? 'Free path never needs them' : 'Preview before you buy',
+      chev: mode === 'row' ? '4  ↓' : '↓',
+      dots: PREMIUM.map(s => ({ s: 'width:56px;height:56px;border-radius:16px;background:' + SEASONS[s].m + ';border:2px solid rgba(255,248,240,.34)' })),
+      root: 'flex:0 0 ' + (mode === 'row' ? 155 : 90) + 'px;box-sizing:border-box;border-radius:' + (mode === 'row' ? 26 : 20) +
+        'px;background:rgba(255,248,240,.12);border:2px solid rgba(255,248,240,.30);padding:0 24px;display:flex;align-items:center;gap:20px',
+      dotsWrap: mode === 'row' ? 'flex:0 0 auto;display:flex;gap:10px' : 'display:none',
+      titleS: 'font:900 48px/1 ' + NUN + ';color:' + RIM,
+      noteS: 'font:700 38px/1 ' + NUN + ';color:rgba(255,246,214,.82);white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      chevS: 'flex:0 0 auto;box-sizing:border-box;height:76px;padding:0 22px;border-radius:18px;background:rgba(255,248,240,.16);border:2px solid rgba(255,246,214,.40);display:flex;align-items:center;font:900 40px/1 ' + NUN + ';color:' + RIM + ';white-space:nowrap'
+    };
+  }
+
+  scene(name) {
+    const C = (season, variant, state, h, e) => Object.assign({ season, variant, state, h, coins: 320, flowers: 12 }, e || {});
+    switch (name) {
+      case 'new': return {
+        free: [C('country_bloom', 'expanded', 'active', 440, { grow: 1 }),
+          C('frost_orchard', 'nextlock', 'next', 320, { coins: 0, flowers: 0 }),
+          C('lantern_meadow', 'collapsed', 'locked', 128), C('amber_canopy', 'collapsed', 'locked', 128)],
+        prem: [], premMode: 'row', gift: 'hidden', coins: '0', seeds: '6', done: 1,
+        play: 'Country Bloom', hint: 'First run: tap Play. Seeds you bring back become flowers in the Arena.'
+      };
+      case 'ready': return {
+        free: [C('country_bloom', 'collapsed', 'unlocked', 128), C('frost_orchard', 'collapsed', 'active', 128),
+          C('lantern_meadow', 'poster', 'ready', 644, { coins: 500, flowers: 20, grow: 1 }),
+          C('amber_canopy', 'collapsed', 'locked', 128)],
+        prem: [], premMode: 'row', coins: '500', seeds: '61', done: 2, play: 'Frost Orchard'
+      };
+      case 'unlocking': return {
+        free: [C('country_bloom', 'collapsed', 'unlocked', 128), C('frost_orchard', 'collapsed', 'unlocked', 128),
+          C('lantern_meadow', 'poster', 'unlocking', 644, { coins: 500, flowers: 20, grow: 1 }),
+          C('amber_canopy', 'collapsed', 'locked', 128)],
+        prem: [], premMode: 'row', coins: '0', seeds: '61', done: 3, play: 'Lantern Meadow'
+      };
+      case 'unlocked': return {
+        free: [C('country_bloom', 'collapsed', 'unlocked', 128), C('frost_orchard', 'collapsed', 'unlocked', 128),
+          C('lantern_meadow', 'expanded', 'active', 440, { fresh: true, grow: 1 }),
+          C('amber_canopy', 'nextlock', 'next', 320, { coins: 0, flowers: 0 })],
+        prem: [], premMode: 'row', coins: '0', seeds: '61', done: 3, play: 'Lantern Meadow'
+      };
+      case 'allfree': return {
+        free: [C('country_bloom', 'collapsed', 'unlocked', 128), C('frost_orchard', 'collapsed', 'unlocked', 128),
+          C('lantern_meadow', 'collapsed', 'unlocked', 128), C('amber_canopy', 'expanded', 'active', 440, { grow: 1 })],
+        prem: [C('moonlit_warren', 'collapsed', 'premium', 128), C('coral_tide', 'collapsed', 'premium', 128)],
+        premMode: 'head', gift: 'taken', coins: '1,240', seeds: '128', done: 4, play: 'Amber Canopy'
+      };
+      case 'premium_locked': case 'premium_busy': case 'premium_owned': case 'premium_soon': {
+        const map = { premium_locked: ['coral_tide', 'premium'], premium_busy: ['coral_tide', 'busy'], premium_owned: ['moonlit_warren', 'owned'], premium_soon: ['ember_fen', 'soon'] };
+        const m = map[name], owned = name === 'premium_owned';
+        return {
+          free: [C('country_bloom', 'collapsed', 'unlocked', 128),
+            C('frost_orchard', 'collapsed', owned ? 'unlocked' : 'active', 128),
+            C('lantern_meadow', 'collapsed', 'next', 128), C('amber_canopy', 'collapsed', 'locked', 128)],
+          prem: [C(m[0], 'premium', m[1], 556, { grow: 1, playing: owned })],
+          premMode: 'head', coins: '320', seeds: '48', done: 2, play: owned ? 'Moonlit Warren' : 'Frost Orchard'
+        };
+      }
+      case 'overview': return {
+        free: [C('country_bloom', 'collapsed', 'unlocked', 128), C('frost_orchard', 'collapsed', 'active', 128),
+          C('lantern_meadow', 'collapsed', 'next', 128), C('amber_canopy', 'collapsed', 'locked', 128)],
+        prem: [C('moonlit_warren', 'collapsed', 'premium', 128), C('coral_tide', 'collapsed', 'premium', 128),
+          C('starfall_glade', 'collapsed', 'premium', 128), C('ember_fen', 'collapsed', 'soon', 128)],
+        premMode: 'head', coins: '320', seeds: '48', done: 2, play: 'Frost Orchard'
+      };
+      case 'specs': return {
+        specs: [
+          ['aktivna i otvorena · 440', C('frost_orchard', 'expanded', 'active', 440)],
+          ['tek otključana, čip New · 440', C('lantern_meadow', 'expanded', 'active', 440, { fresh: true })],
+          ['next lock zatvoren, kompaktni napredak · 320', C('lantern_meadow', 'nextlock', 'next', 320)],
+          ['next lock otvoren, nije spremno · 644', C('lantern_meadow', 'poster', 'next', 644)],
+          ['spremno za unlock — UI gold #E8C44A · 644', C('lantern_meadow', 'poster', 'ready', 644, { coins: 500, flowers: 20 })],
+          ['trenutak otključavanja — coin gold + prsten · 644', C('lantern_meadow', 'poster', 'unlocking', 644, { coins: 500, flowers: 20 })],
+          ['premium otvorena, pregled prije kupovine · 556', C('coral_tide', 'premium', 'premium', 556)],
+          ['premium kupljena i aktivna · 556', C('moonlit_warren', 'premium', 'owned', 556, { playing: true })],
+          ['duga cijena „3,49 KM" — tag se širi, ime se skraćuje · 128', C('starfall_glade', 'collapsed', 'premium', 128, { price: '3,49 KM' })]
+        ],
+        free: [], prem: [], premMode: 'none', coins: '320', seeds: '48', done: 2, play: 'Frost Orchard'
+      };
+      default: return {
+        free: [C('country_bloom', 'collapsed', 'unlocked', 128), C('frost_orchard', 'expanded', 'active', 440, { grow: 1 }),
+          C('lantern_meadow', 'nextlock', 'next', 320), C('amber_canopy', 'collapsed', 'locked', 128)],
+        prem: [], premMode: 'row', coins: '320', seeds: '48', done: 2, play: 'Frost Orchard'
+      };
+    }
+  }
+
+  renderVals() {
+    const p = this.props;
+    const shelf = (p.dir ?? 'trail') === 'shelf';
+    const sc = this.scene(p.scene ?? 'mid');
+    const heroH = 1549 - TOP - GAP - 250 - GAP - PLAY - GAP;
+
+    const bare = !!p.bare;
+    let cards = [];
+    if (sc.specs) {
+      sc.specs.forEach(pair => {
+        cards.push({
+          isLabel: true, isCard: false, isHeader: false, label: pair[0],
+          labelS: 'flex:0 0 auto;padding-top:14px;font:800 34px/1.2 ' + NUN + ';color:rgba(255,246,214,.82)'
+        });
+        cards.push(this.card(pair[1]));
+      });
+    } else if (shelf) {
+      cards = [this.card({ season: 'frost_orchard', variant: 'hero', state: 'active', h: heroH })];
+    } else if (bare) {
+      cards = sc.free.map(c => this.card(c));
+      if (sc.premMode !== 'none') cards.push(this.header(sc.premMode));
+      sc.prem.forEach(c => cards.push(this.card(c)));
+    } else {
+      const premH = sc.premMode === 'row' ? 155 : 90;
+      const all = sc.free.concat(sc.prem);
+      const used = all.reduce((a, c) => a + c.h, 0) + premH + all.length * TG;
+      const g = all.find(c => c.grow);
+      if (g) g.h = g.h + (TRAIL - used);
+      cards = sc.free.map(c => this.card(c));
+      cards.push(this.header(sc.premMode));
+      sc.prem.forEach(c => cards.push(this.card(c)));
+    }
+
+    const shelfItems = !shelf ? [] : FREE.concat(PREMIUM).map((id, i) => {
+      const s = SEASONS[id];
+      const st = i === 1 ? 'active' : (i === 0 ? 'unlocked' : (i === 2 ? 'next' : (i === 3 ? 'locked' : (id === 'ember_fen' ? 'soon' : 'premium'))));
+      const dim = st === 'locked' || st === 'soon';
+      const fill = dim ? this.mix(this.sc(s.m, 0.55), PAGE, 0.45) : s.m;
+      const light = dim ? false : s.li;
+      const ink = light ? DARKINK : RIM, sub = light ? SUBINK : 'rgba(255,246,214,.9)';
+      const txt = { active: '', unlocked: 'Unlocked', next: 'Next', locked: 'Locked', premium: '', soon: 'Soon' }[st];
+      return {
+        name: s.n, status: txt, badgeText: 'Playing now', price: s.p || '',
+        root: 'position:relative;box-sizing:border-box;flex:0 0 auto;width:272px;height:250px;border-radius:20px;background:' + fill +
+          ';border:' + (st === 'active' ? '5px solid ' + RIM : '3px solid ' + (dim ? 'rgba(255,246,214,.34)' : this.sc(s.m, 0.8))) +
+          ';box-shadow:0 8px 16px rgba(20,26,22,.26);padding:14px;display:flex;flex-direction:column;gap:8px',
+        top: 'flex:0 0 auto;display:flex;align-items:center;gap:8px;min-height:8px',
+        lock: dim ? 'width:40px;height:40px;display:block' : 'display:none',
+        badge: st === 'active'
+          ? 'box-sizing:border-box;height:62px;padding:0 14px;border-radius:14px;background:' + RIM + ';border:2px solid ' + GOLD_EDGE +
+            ';display:flex;align-items:center;font:900 38px/1 ' + NUN + ';color:' + INK + ';white-space:nowrap'
+          : 'display:none',
+        nameS: 'flex:1;min-height:0;font:900 38px/1.08 ' + NUN + ';color:' + ink + ';text-wrap:pretty;overflow:hidden',
+        statusS: txt ? 'font:700 38px/1 ' + NUN + ';color:' + sub + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis' : 'display:none',
+        priceS: (st === 'premium' && s.p)
+          ? 'box-sizing:border-box;height:70px;border-radius:14px;background:' + PRICEBG + ';border:2px solid ' + GOLD_EDGE +
+            ';display:flex;align-items:center;justify-content:center;font:900 46px/1 ' + NUN + ';color:' + INK
+          : 'display:none'
+      };
+    });
+
+    const gift = sc.gift ?? 'ready';
+    const giftFill = gift === 'taken' ? '#6E7A6B' : '#FFC77A';
+
+    const zones = [];
+    if (p.zones) {
+      const stageY = 24 + TOP + GAP;
+      zones.push(['HubSwipeZone', 0, 0, 1080, 1597, MINT, shelf
+        ? 'HubSwipeZone — hub swipe radi svuda OSIM u polici ispod'
+        : 'HubSwipeZone — cijela stranica propušta hub swipe lijevo / desno']);
+      if (shelf) {
+        zones.push(['SeasonStage', 24, stageY, 1032, heroH, PEACH, 'Hero — tap = polje sezone']);
+        zones.push(['SeasonShelfSwipe', 24, stageY + heroH + GAP, 1032, 250, UIGOLD, 'Polica — vodoravni swipe bira sezonu · BLOKIRA hub swipe (grupa block_hub_swipe)']);
+        zones.push(['PlayButton', 24, stageY + heroH + GAP + 250 + GAP, 1032, PLAY, GOLD, 'Play — run kreće odmah']);
+      } else {
+        zones.push(['SeasonStage', 24, stageY, 1032, TRAIL, PEACH, 'SeasonStage — vertikalni scroll · tap kartice = fokus (tween visine 0,22 s)']);
+        let y = stageY;
+        sc.free.forEach(c => {
+          if (c.variant === 'expanded' || c.variant === 'poster') {
+            zones.push(['SeasonCard', 24, y, 1032, c.h, RIM, c.variant === 'poster'
+              ? 'Fokusirani next lock — samo Unlock troši'
+              : 'Aktivna kartica — tap = polje sezone (SeasonField)']);
+          }
+          y += c.h + TG;
+        });
+        zones.push(['PlayButton', 24, stageY + TRAIL + GAP, 1032, PLAY, GOLD, 'Play — run kreće odmah u aktivnoj sezoni']);
+      }
+    }
+
+    return {
+      items: cards, shelfItems,
+      chips: [['CoinChip', 'icons/icon_coin.svg', GOLD, sc.coins], ['SeedChip', 'icons/icon_seed.svg', MINT, sc.seeds], ['DiamondChip', 'icons/icon_diamond.svg', LAV, '12']]
+        .map(c => ({
+          layer: c[0], icon: c[1], value: c[3],
+          style: 'flex:1;min-width:0;height:100px;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:12px;padding:0 20px 0 18px;background:' +
+            c[2] + ';border:2px solid rgba(45,52,54,.14)'
+        })),
+      tabs: TABS.map((t, i) => {
+        const on = i === 2;
+        return {
+          layer: t[0], text: t[1],
+          icon: 'icons/tab_' + t[2] + (on ? '' : '_light') + '.svg',
+          tile: 'position:relative;width:196px;height:152px;box-sizing:border-box;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:' +
+            (on ? PEACH : 'transparent') + ';border:2px solid ' + (on ? 'rgba(45,52,54,.14)' : 'transparent'),
+          iconS: 'width:52px;height:52px;opacity:' + (on ? 1 : 0.82),
+          label: 'font:' + (on ? 800 : 700) + ' 40px/1 ' + NUN + ';color:' + (on ? INK : 'rgba(255,248,240,.82)')
+        };
+      }),
+      segs: [0, 1, 2, 3].map(i => ({
+        s: 'flex:1;height:18px;border-radius:9px;box-sizing:border-box;background:' + (i < sc.done ? MINT : 'rgba(255,248,240,.22)') +
+          (i < sc.done ? ';border:2px solid #7FC9AC' : '')
+      })),
+      zoneList: zones.map(z => ({
+        layer: z[0], t: z[6],
+        s: 'position:absolute;box-sizing:border-box;left:' + z[1] + 'px;top:' + z[2] + 'px;width:' + z[3] + 'px;height:' + z[4] +
+          'px;border:5px dashed ' + z[5] + ';border-radius:20px;background:rgba(20,26,22,.30);display:flex;padding:12px;align-items:' +
+          (z[0] === 'HubSwipeZone' ? 'flex-end' : 'flex-start'),
+        ts: 'box-sizing:border-box;max-width:940px;padding:10px 18px;border-radius:14px;background:' + z[5] +
+          ';font:800 34px/1.1 ' + NUN + ';color:' + DARKINK + ';text-wrap:pretty'
+      })),
+
+      progNum: sc.done + ' / 4',
+      giftSub: gift === 'taken' ? 'Back tomorrow' : 'Tap to open',
+      hintText: sc.hint ?? '',
+      playChip: sc.play,
+
+      headerStyle: bare ? 'display:none' : 'flex:0 0 auto;position:relative;z-index:2;background:#1A241E;box-shadow:0 6px 14px rgba(20,26,22,.34)',
+      footerStyle: bare ? 'display:none' : 'flex:0 0 auto;position:relative;z-index:2;background:#1A241E;box-shadow:0 -6px 14px rgba(20,26,22,.34)',
+      rootStyle: 'width:1080px;' + (bare ? '' : 'height:1920px;overflow:hidden;') +
+        'flex:0 0 auto;position:relative;display:flex;flex-direction:column;background:' + PAGE +
+        ';font-family:' + NUN + ';-webkit-font-smoothing:antialiased',
+      bodyStyle: 'position:relative;flex:0 0 auto;' + (bare ? '' : 'height:1597px;overflow:hidden;') +
+        'box-sizing:border-box;padding:24px;display:flex;flex-direction:column;gap:' + GAP + 'px',
+      topRowStyle: bare ? 'display:none' : 'flex:0 0 ' + TOP + 'px;display:flex;gap:' + GAP + 'px;align-items:stretch',
+      giftStyle: gift === 'hidden' ? 'display:none'
+        : 'flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:' + giftFill + ';border:3px solid ' +
+          (gift === 'taken' ? '#4E5A4C' : GOLD_EDGE) + ';box-shadow:0 6px 14px rgba(20,26,22,.26);display:flex;align-items:center;gap:20px;padding:0 24px',
+      giftIconStyle: 'position:relative;flex:0 0 auto;width:84px;height:84px;border-radius:18px;background:' +
+        (gift === 'taken' ? '#5C6759' : GOLD) + ';border:3px solid ' + (gift === 'taken' ? '#48523F' : GOLD_EDGE),
+      giftRibbonV: 'position:absolute;left:50%;top:-3px;bottom:-3px;width:16px;margin-left:-8px;background:' + (gift === 'taken' ? '#8A9487' : CREAM),
+      giftRibbonH: 'position:absolute;top:50%;left:-3px;right:-3px;height:16px;margin-top:-8px;background:' + (gift === 'taken' ? '#8A9487' : CREAM),
+      giftTitleStyle: 'font:700 38px/1 ' + NUN + ';color:' + (gift === 'taken' ? 'rgba(255,248,240,.88)' : SUBINK),
+      giftSubStyle: 'font:900 48px/1 ' + NUN + ';color:' + (gift === 'taken' ? CREAM : DARKINK),
+      progStyle: 'flex:0 0 ' + (gift === 'hidden' ? 1032 : 420) + 'px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.12);border:2px solid rgba(255,248,240,.30);padding:0 24px;display:flex;flex-direction:column;justify-content:center;gap:14px',
+      progNumStyle: 'font:900 56px/1 ' + NUN + ';font-variant-numeric:tabular-nums;color:' + RIM + ';white-space:nowrap',
+      progLabStyle: 'font:700 38px/1 ' + NUN + ';color:rgba(255,246,214,.86);white-space:nowrap',
+      stageStyle: bare
+        ? 'flex:0 0 auto;display:flex;flex-direction:column;gap:' + TG + 'px'
+        : 'flex:' + (shelf ? '0 0 auto' : '1') + ';min-height:0;display:flex;flex-direction:column;gap:' + TG + 'px;overflow:hidden',
+      shelfStyle: shelf ? 'flex:0 0 250px;display:flex;gap:14px;align-items:stretch;overflow:hidden' : 'display:none',
+      hintStyle: sc.hint
+        ? 'position:absolute;left:24px;right:24px;bottom:' + (24 + PLAY + GAP) + 'px;box-sizing:border-box;border-radius:20px;background:' + RIM +
+          ';border:3px solid ' + GOLD_EDGE + ';padding:20px 24px;font:800 40px/1.15 ' + NUN + ';color:' + INK + ';text-wrap:pretty;box-shadow:0 8px 16px rgba(20,26,22,.30)'
+        : 'display:none',
+      playStyle: bare ? 'display:none' : 'flex:0 0 ' + PLAY + 'px;box-sizing:border-box;border-radius:26px;background:' + PEACH + ';border:4px solid ' + PEACH_EDGE +
+        ';box-shadow:0 8px 16px rgba(20,26,22,.30);display:flex;align-items:center;justify-content:space-between;padding:0 32px',
+      playLabelStyle: 'font:900 64px/1 ' + NUN + ';color:' + INK,
+      playChipStyle: 'box-sizing:border-box;height:88px;padding:0 26px;border-radius:18px;background:rgba(255,248,240,.80);border:2px solid rgba(45,52,54,.26);display:flex;align-items:center;font:800 40px/1 ' + NUN + ';color:' + INK + ';white-space:nowrap'
+    };
+  }
+}
+</script>
+</body>
+</html>

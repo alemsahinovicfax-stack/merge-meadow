@@ -1,6 +1,6 @@
 ---
 type: dizajn
-status: draft
+status: aktivan
 milestone: "—"
 tags: [dizajn, ui, home, sezone, claude-design, mockup]
 povezano:
@@ -14,12 +14,14 @@ povezano:
   - design-pillars
   - art-direction
   - pristupacnost
-ai_sažetak: "Home (3. stranica huba) — SAMO scena biranja sezone (SeasonStage: free/premium trake, roster, unlock poster, Browser, Play, Daily gift): pravila iz koda koja ostaju fiksna, raspored i mjere, šta ne štima, šta CD mora a šta smije, gotov prompt i mapa za prenos u Godot. Polje sezone (SeasonField) je van ovog briefa."
+ai_sažetak: "Home (3. stranica huba) — SAMO scena biranja sezone (SeasonStage: free/premium trake, roster, unlock poster, Browser, Play, Daily gift): pravila iz koda koja ostaju fiksna, raspored i mjere, šta ne štima, šta CD mora a šta smije, gotov prompt i mapa za prenos u Godot. Polje sezone (SeasonField) je van ovog briefa. Implementirano 2026-09-21 (smjer 1a Season Trail)."
 ---
 
 # Home — biranje sezone — Claude Design brief i referenca
 
-> **Status: priprema dizajna — ne mijenja kod.** Obuhvata **samo scenu biranja sezone** (Home dok polje nije otvoreno). **Polje sezone** (SeasonField — livada s cvijećem, Pip, korpa, Magnet / Loot Boost, Play Endless, dugme `Seasons` nazad) dobija **poseban brief kasnije**; ovdje se crta samo *ulaz* u polje. Header/footer (2026-09-11), Merge Arena (2026-09-12) i Camp (2026-09-16) su već redizajnirani i u igri — Home treba da im se vizuelno pridruži. *Ažurirano 2026-09-18: usklađeno s Camp redizajnom (tok Camp → Home, `UnlockProgress` više nije dijeljen).*
+> **Status: implementirano 2026-09-21** — smjer 1a Season Trail iz CD paketa `design_handoff_home/`; vidi [§ Implementacija](#implementacija-2026-09-21).
+>
+> **Prvobitno: priprema dizajna — ne mijenja kod.** Obuhvata **samo scenu biranja sezone** (Home dok polje nije otvoreno). **Polje sezone** (SeasonField — livada s cvijećem, Pip, korpa, Magnet / Loot Boost, Play Endless, dugme `Seasons` nazad) dobija **poseban brief kasnije**; ovdje se crta samo *ulaz* u polje. Header/footer (2026-09-11), Merge Arena (2026-09-12) i Camp (2026-09-16) su već redizajnirani i u igri — Home treba da im se vizuelno pridruži. *Ažurirano 2026-09-18: usklađeno s Camp redizajnom (tok Camp → Home, `UnlockProgress` više nije dijeljen).*
 
 **Home** je prva stranica koju igrač vidi: ovdje bira **u kojoj sezoni igra**, vidi koliko mu fali do sljedeće besplatne sezone i otključava je, pregleda premium sezone, i odavde kreće u igru. Home ima dva režima:
 
@@ -526,17 +528,50 @@ header/footer, Shop, IAP dijalog, cvijeće, lik Pipa, sezonsku ilustraciju
 | Datum | Odluka |
 |-------|--------|
 | 2026-09-14 | Brief napisan samo za scenu biranja sezone; polje sezone (SeasonField) dobija poseban brief kasnije. Ekonomija i pravila sezona (§2) su fiksni; CD dizajnira izgled, raspored i geste. Header/footer i Arena (smjer B) su zadati vizuelni jezik. |
+| 2026-09-21 | CD isporuka: smjer **1a Season Trail**. Play pokreće run odmah (ime sezone u čipu); Browser i `SeasonUnlockSheet` obrisani; pozadina `#2E4733` kao Camp; Ember Fen = Coming soon kartica; Shop zadržava `SeasonPackCard` (premium kartica na Home je nova, nije dijeljena). Implementirano isti dan. |
 | 2026-09-18 | Usklađeno s Camp redizajnom (2026-09-16): Unlock u Campu troši odmah i prebacuje na Home s već otključanom sezonom u fokusu (novo stanje „dolazak iz Campa" u §4.1); `UnlockProgress` više nije dijeljen s Campom; Camp je dio zadatog vizuelnog jezika. CD čita brief i ranije radove iz repoa po putanji (§0, §9). |
 
 ## Otvorena pitanja (nakon CD-a)
 
-- [ ] Dvije trake ili jedan raspored (lista / mapa / tabovi)?
-- [ ] Browser ostaje ili se spaja sa scenom?
-- [ ] Šta `Play` radi na sceni biranja (direktno run ili polje)?
-- [ ] Zona za hub swipe vs gesta za sezone?
-- [ ] Sezonske ilustracije — ko ih crta i kada (danas `thumbnail_path` prazan)?
-- [ ] Brisanje mrtvog `SeasonUnlockSheet` pri prenosu?
-- [ ] Ember Fen: "Coming soon" oznaka ili sakriti do izlaska?
+- [x] Dvije trake ili jedan raspored? → **jedna vertikalna kolona** (1a Season Trail)
+- [x] Browser ostaje ili se spaja sa scenom? → **obrisan**; kolona sa svim karticama je pregled svih sezona
+- [x] Šta `Play` radi na sceni biranja? → **run odmah u aktivnoj sezoni**; polje samo s kartice
+- [x] Zona za hub swipe vs gesta za sezone? → kolona se lista vertikalno, **grupa `block_hub_swipe` na Home je prazna**
+- [ ] Sezonske ilustracije — ko ih crta i kada (danas `thumbnail_path` prazan)? Slot 996 × 340 postoji samo u 1b (nije prenesen)
+- [x] Brisanje mrtvog `SeasonUnlockSheet` pri prenosu? → **obrisan**
+- [x] Ember Fen: "Coming soon" oznaka ili sakriti do izlaska? → **Coming soon kartica**
+- [ ] Ilustracije cvijeća za 7 sezona (roster danas crta proceduralni placeholder osim Country Blooma)
+- [x] Brief za polje sezone (SeasonField) → [[home-field-cd-brief]] (2026-09-22)
+
+## Implementacija (2026-09-21)
+
+Izvor: `design_handoff_home/` (README, `godot/home_export.json`, `godot/ui_home.gd`, `HomeScreen.dc.html`, `SeasonCard.dc.html`). Gdje se `ui_home.gd` iz paketa i HTML razlikuju, prati se HTML.
+
+| Fajl | Šta |
+|------|-----|
+| `scripts/visual/ui_home.gd` (`UiHome`) | tokeni, visine varijanti, stanja, StyleBoxFlat fabrike; zaključane / coming-soon boje i tamni ili svijetli tekst se računaju iz mood boje (`SeasonCardContrast`) |
+| `scripts/ui/home_season_card.gd` (`HomeSeasonCard`) | jedna kartica za sve: 5 varijanti (collapsed 128 · expanded 440 · nextlock 320 · poster 644 · premium 556) × 10 stanja; roster preko `CampArtFrame`, dugmad `CampButton` |
+| `scripts/ui/home_premium_header.gd` | red „Premium seasons“ (155 zatvoren / 90 otvoren) |
+| `scripts/ui/home_progress_indicator.gd` | „N / 4 free seasons“ + segmenti (broj = besplatne sezone iz `seasons.json`) |
+| `scripts/ui/home_bar.gd`, `home_unlock_burst.gd` | trake napretka; prsten otključavanja (crta se jednom, animira scale + alpha) |
+| `scenes/ui/season_stage.tscn` + `season_stage.gd` | `SeasonTrail` (ScrollContainer) → `TrailList`; fokus harmonike, tapovi, unlock, premium kupovina, „New“; `SeasonField` nepromijenjen |
+| `scenes/main_menu.tscn` + `main_menu.gd` | TopRow (Daily gift + napredak), Play 1032 × 156 s čipom sezone, plutajući tutorial hint, pozadina `#2E4733`; polje sezone zadržava stari raspored |
+| obrisano | `season_browser`, `season_unlock_sheet`, `season_unlock_gate`, `season_unlock_progress` (s mrtvim `split` režimom), `season_roster_panel`, `DecorMoundLeft/Right`, `PipPortrait`, `Tagline`, `PlayThemeBadge` |
+| smoke | novi `season_home_smoke` (harmonika, unlock, premium kupovina, dolazak iz Campa, daily gift); ažurirani `season_meadow_smoke`, `camp_season_link_smoke`; oba season smokea sada čuvaju i vraćaju pravi save |
+
+**Odstupanja od paketa:**
+
+1. Cvijeće u rosteru crta igra (`FlowerAssets` / proceduralni placeholder), ne CD-ovi `ph_*.svg`; okvir je Camp `CampArtFrame` (isti gold rim + tamni well).
+2. Prsten otključavanja je `draw_arc` jednom + tween scale/alpha umjesto `pulse_ring.png` — isti princip bez redrawa, bez novog asseta.
+3. Play: ikona iz `UiAssets` umjesto znaka „▶“ (default font ga nema).
+4. Otvoren premium red pokazuje „↑“ (CD crta „↓“ i kad je otvoren; tap zatvara).
+5. Zatvorena kartica: vertikalni padding 17 − border, da 48 + 6 + 40 px teksta stane u 128 (HTML je tu prelazio nekoliko px).
+6. Visine: otvorena kartica popunjava kolonu (kao `g.h` u HTML-u) i smije se smanjiti do svog minimuma samo ako kolona time stane; kartica čiji tekst treba dva reda („Need … Harvest Pumpkin“ — naš font je širi od Nunita) raste umjesto da reže tekst.
+7. „New“ se pojavljuje poslije prstena (kadar 3), ne za vrijeme trenutka otključavanja.
+8. Daily gift živi u TopRow-u biranja sezone, pa je u polju sezone skriven; korpa u polju je zato na vrhu lijevo. Ostatak polja je nepromijenjen do njegovog briefa.
+9. `home_band` ostaje kao interni „fokus je na premium sekciji“ — Camp i dalje zove `set_home_band("free")` (CD je predlagao da se izbaci; nije potrebno).
+10. `open_season_field()` bez argumenta otvara fokusiranu sezonu (kao prije), s argumentom tačno tu sezonu.
+11. Daily gift zadržava postojeći `UiAttention` efekat (CD navodi puls 1,0 → 1,03).
 
 ## Povezano
 

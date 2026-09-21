@@ -1,50 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://c8mainmenu01"]
+[gd_scene load_steps=9 format=3 uid="uid://c8mainmenu01"]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
-[ext_resource type="Script" path="res://scripts/visual/pip_placeholder_control.gd" id="2_pip_ui"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="3_uibtn"]
 [ext_resource type="Script" path="res://scripts/ui/home_basket_visual.gd" id="4_basket_vis"]
 [ext_resource type="PackedScene" path="res://scenes/ui/season_stage.tscn" id="5_stage"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_daily_ready"]
-bg_color = Color(1, 0.78, 0.48, 0.95)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.85, 0.55, 0.15, 0.55)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-content_margin_left = 14.0
-content_margin_top = 12.0
-content_margin_right = 14.0
-content_margin_bottom = 12.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chest_body"]
-bg_color = Color(0.62, 0.38, 0.16, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.35, 0.2, 0.08, 0.7)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chest_lid"]
-bg_color = Color(0.92, 0.72, 0.28, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.55, 0.38, 0.1, 0.65)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+[ext_resource type="Script" path="res://scripts/camp/camp_button.gd" id="6_campbtn"]
+[ext_resource type="Script" path="res://scripts/ui/home_progress_indicator.gd" id="7_progress"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_basket"]
 bg_color = Color(0.78, 0.9, 0.72, 0.95)
@@ -95,7 +56,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.14, 0.2, 0.16, 1)
+color = Color(0.180392, 0.278431, 0.2, 1)
 
 [node name="FieldBackdrop" type="ColorRect" parent="."]
 unique_name_in_owner = true
@@ -109,35 +70,6 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.9, 0.95, 0.86, 1)
 
-[node name="DecorMoundLeft" type="ColorRect" parent="."]
-mouse_filter = 2
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = -40.0
-offset_top = -220.0
-offset_right = 280.0
-offset_bottom = 40.0
-grow_vertical = 0
-color = Color(0.18, 0.28, 0.2, 0.55)
-
-[node name="DecorMoundRight" type="ColorRect" parent="."]
-mouse_filter = 2
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -300.0
-offset_top = -180.0
-offset_right = 40.0
-offset_bottom = 50.0
-grow_horizontal = 0
-grow_vertical = 0
-color = Color(0.16, 0.26, 0.18, 0.5)
-
 [node name="HomeTopStack" type="VBoxContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
@@ -147,71 +79,6 @@ offset_top = 24.0
 offset_right = 360.0
 offset_bottom = 360.0
 theme_override_constants/separation = 8
-
-[node name="DailyChestCard" type="PanelContainer" parent="HomeTopStack"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(336, 104)
-layout_mode = 2
-mouse_filter = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_daily_ready")
-
-[node name="DailyHBox" type="HBoxContainer" parent="HomeTopStack/DailyChestCard"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 14
-
-[node name="ChestVisual" type="Control" parent="HomeTopStack/DailyChestCard/DailyHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(72, 72)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="ChestBody" type="Panel" parent="HomeTopStack/DailyChestCard/DailyHBox/ChestVisual"]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -44.0
-grow_horizontal = 2
-grow_vertical = 0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_chest_body")
-
-[node name="ChestLid" type="Panel" parent="HomeTopStack/DailyChestCard/DailyHBox/ChestVisual"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 4.0
-offset_top = 4.0
-offset_right = -4.0
-offset_bottom = 32.0
-grow_horizontal = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_chest_lid")
-
-[node name="DailyVBox" type="VBoxContainer" parent="HomeTopStack/DailyChestCard/DailyHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_constants/separation = 4
-alignment = 1
-
-[node name="DailyTitle" type="Label" parent="HomeTopStack/DailyChestCard/DailyHBox/DailyVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.29, 0.22, 0.1, 1)
-theme_override_font_sizes/font_size = 26
-text = "Daily gift"
-autowrap_mode = 2
-
-[node name="DailyCaption" type="Label" parent="HomeTopStack/DailyChestCard/DailyHBox/DailyVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.28, 0.16, 1)
-theme_override_font_sizes/font_size = 18
-text = "Tap to open"
-autowrap_mode = 2
 
 [node name="BasketCard" type="PanelContainer" parent="HomeTopStack"]
 unique_name_in_owner = true
@@ -338,41 +205,95 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 48.0
-offset_top = 380.0
-offset_right = -48.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
 offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 16
 
-[node name="PipPortrait" type="Control" parent="HomeColumn"]
+[node name="TopRow" type="HBoxContainer" parent="HomeColumn"]
 unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(64, 64)
+custom_minimum_size = Vector2(0, 130)
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 0
-script = ExtResource("2_pip_ui")
+mouse_filter = 2
+theme_override_constants/separation = 16
 
-[node name="Tagline" type="Label" parent="HomeColumn"]
-visible = false
-layout_mode = 2
-theme_override_colors/font_color = Color(0.88, 0.94, 0.9, 1)
-theme_override_font_sizes/font_size = 24
-text = "Help Pip bring color back to the meadow."
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="TutorialHint" type="Label" parent="HomeColumn"]
+[node name="DailyChestCard" type="PanelContainer" parent="HomeColumn/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
-theme_override_font_sizes/font_size = 26
-text = "First run: swipe left/right to change lanes."
-horizontal_alignment = 1
-autowrap_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 0
+
+[node name="DailyHBox" type="HBoxContainer" parent="HomeColumn/TopRow/DailyChestCard"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 20
+
+[node name="GiftIcon" type="Panel" parent="HomeColumn/TopRow/DailyChestCard/DailyHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="RibbonV" type="ColorRect" parent="HomeColumn/TopRow/DailyChestCard/DailyHBox/GiftIcon"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -8.0
+offset_top = -3.0
+offset_right = 8.0
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.972549, 0.941176, 1)
+
+[node name="RibbonH" type="ColorRect" parent="HomeColumn/TopRow/DailyChestCard/DailyHBox/GiftIcon"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -3.0
+offset_top = -8.0
+offset_right = 3.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.972549, 0.941176, 1)
+
+[node name="DailyVBox" type="VBoxContainer" parent="HomeColumn/TopRow/DailyChestCard/DailyHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="DailyTitle" type="Label" parent="HomeColumn/TopRow/DailyChestCard/DailyHBox/DailyVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Daily gift"
+
+[node name="DailyCaption" type="Label" parent="HomeColumn/TopRow/DailyChestCard/DailyHBox/DailyVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Tap to open"
+
+[node name="ProgressIndicator" type="PanelContainer" parent="HomeColumn/TopRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("7_progress")
 
 [node name="SeasonStage" parent="HomeColumn" instance=ExtResource("5_stage")]
 unique_name_in_owner = true
@@ -401,10 +322,9 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 96)
 layout_mode = 2
 size_flags_horizontal = 4
-script = ExtResource("3_uibtn")
+script = ExtResource("6_campbtn")
 label_text = "Play"
 font_size = 40
-button_icon = "play"
 button_variant = "primary"
 
 [node name="EndlessPlayButton" type="PanelContainer" parent="HomeColumn/PlayRow"]
@@ -419,15 +339,27 @@ font_size = 28
 button_icon = "play"
 button_variant = "accent"
 
-[node name="PlayThemeBadge" type="Label" parent="HomeColumn"]
+[node name="TutorialHintPanel" type="PanelContainer" parent="."]
 unique_name_in_owner = true
 visible = false
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -196.0
+offset_right = -24.0
+offset_bottom = -196.0
+grow_horizontal = 2
+grow_vertical = 0
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.92, 0.88, 0.72, 1)
-theme_override_font_sizes/font_size = 22
-text = "Theme: Moonlit Warren"
-horizontal_alignment = 1
+
+[node name="TutorialHint" type="Label" parent="TutorialHintPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "First run: tap Play. Seeds you bring back become flowers in the Arena."
+autowrap_mode = 3
 
 [node name="RewardOverlay" type="Control" parent="."]
 unique_name_in_owner = true

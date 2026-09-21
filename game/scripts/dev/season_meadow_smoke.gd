@@ -6,7 +6,8 @@ extends SceneTree
 const SAVE_PATH := "user://player_save.json"
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
 const BLOOM_PASTEL := Color(0.90, 0.95, 0.86, 1.0)
-const HOME_DARK := Color(0.14, 0.2, 0.16, 1.0)
+## Home pozadina = Camp #2E4733 (design_handoff_home, 2026-09-21).
+const HOME_DARK := Color(0.180392, 0.278431, 0.2, 1.0)
 
 
 func _initialize() -> void:
@@ -17,8 +18,12 @@ func _gs() -> Node:
 	return get_root().get_node_or_null("GameState")
 
 
+var _backup := ""
+
+
 func _fail(msg: String) -> void:
 	push_error("season_meadow_smoke: %s" % msg)
+	CampSmokeUtil.restore_save(self, _backup)
 	quit(1)
 
 
@@ -176,7 +181,7 @@ func _assert_flowers_clear_chrome(home: Node, field: Node, label: String) -> Str
 	var upgrades: Control = home.get_node_or_null("%FieldUpgradeStack") as Control
 	for node in [daily, basket_chrome, chip, play_row, upgrades]:
 		var control: Control = node as Control
-		if control == null or not control.visible:
+		if control == null or not control.is_visible_in_tree():
 			continue
 		chrome.append(control)
 	if chrome.is_empty():
@@ -250,7 +255,8 @@ func _assert_open_field_hub_swipe(home: Node, swipe: Node, field: Control) -> St
 	if bool(swipe.call("should_block_hub_swipe_at", mid)):
 		return "field mid should not block hub swipe"
 	var chrome: Control = home.get_node_or_null("%DailyChestCard") as Control
-	if chrome == null or not chrome.visible:
+	# Daily gift zivi u TopRow-u koji je u polju sezone skriven.
+	if chrome == null or not chrome.is_visible_in_tree():
 		chrome = home.get_node_or_null("%PlayRow") as Control
 	if chrome == null:
 		return "Daily/PlayRow missing for swipe chrome check"
@@ -261,6 +267,7 @@ func _assert_open_field_hub_swipe(home: Node, swipe: Node, field: Control) -> St
 
 
 func _run() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
 	var gs := _gs()
@@ -302,17 +309,17 @@ func _run() -> void:
 		_fail("SeasonStage missing")
 		return
 
-	var band: Control = stage.get_node_or_null("%BandColumn") as Control
+	var band: Control = stage.get_node_or_null("%SeasonTrail") as Control
 	var field: Control = stage.get_node_or_null("%SeasonField") as Control
 	var seasons: Node = stage.get_node_or_null("%SeasonsButton")
 	if band == null or field == null:
-		_fail("BandColumn or SeasonField missing")
+		_fail("SeasonTrail or SeasonField missing")
 		return
 	if bool(gs.get("home_season_field_open")):
 		_fail("default field should be closed")
 		return
 	if not band.visible:
-		_fail("default BandColumn should be visible")
+		_fail("default SeasonTrail should be visible")
 		return
 	if field.visible:
 		_fail("default SeasonField should be hidden")
@@ -326,8 +333,9 @@ func _run() -> void:
 	if not bool(gs.call("can_open_home_season_field")):
 		_fail("Bloom center should can_open")
 		return
-	if str(home.call("home_play_action")) != "open_field":
-		_fail("carousel Bloom: home_play_action should be open_field")
+	# Odluka 2026-09-21: Play na biranju sezone odmah pokrece run.
+	if str(home.call("home_play_action")) != "run":
+		_fail("trail Bloom: home_play_action should be run")
 		return
 	var basket: Control = home.get_node_or_null("%BasketCard") as Control
 	var play_row: Node = home.get_node_or_null("%PlayRow")
@@ -368,14 +376,9 @@ func _run() -> void:
 	if play_btn_carousel == null:
 		_fail("PlayButton missing")
 		return
-	if not is_equal_approx(play_btn_carousel.custom_minimum_size.y, 96.0):
-		_fail("carousel Play min height expected 96 got %s" % str(play_btn_carousel.custom_minimum_size))
-		return
-	if seasons_row.custom_minimum_size != play_btn_carousel.custom_minimum_size:
-		_fail("carousel Seasons min size should match Play")
-		return
-	if endless_btn.custom_minimum_size != play_btn_carousel.custom_minimum_size:
-		_fail("carousel Endless min size should match Play")
+	# Biranje sezone: veliki Play (156) s cipom sezone; Seasons/Endless su skriveni.
+	if not is_equal_approx(play_btn_carousel.custom_minimum_size.y, 156.0):
+		_fail("trail Play min height expected 156 got %s" % str(play_btn_carousel.custom_minimum_size))
 		return
 	var name_chip: Control = home.get_node_or_null("%SeasonNameChip") as Control
 	if name_chip and name_chip.visible:
@@ -386,11 +389,12 @@ func _run() -> void:
 		_fail(carousel_up_err)
 		return
 
-	home.call("_on_play_pressed")
+	# Polje se otvara tapom na otvorenu aktivnu karticu (ne vise preko Playa).
+	stage.call("tap_card", "country_bloom")
 	await process_frame
 	await process_frame
 	if not bool(gs.get("home_season_field_open")):
-		_fail("Play on Bloom should open field")
+		_fail("tap on active Bloom card should open field")
 		return
 	if str(gs.get("home_season_field_id")) != "country_bloom":
 		_fail("field_id expected country_bloom got %s" % str(gs.get("home_season_field_id")))
@@ -399,7 +403,7 @@ func _run() -> void:
 		_fail("Bloom open: home_play_action should be run")
 		return
 	if band.visible:
-		_fail("BandColumn should hide when field open")
+		_fail("SeasonTrail should hide when field open")
 		return
 	if not field.visible:
 		_fail("SeasonField should show when open")
@@ -520,7 +524,11 @@ func _run() -> void:
 	if backdrop.size.y <= (stage as Control).size.y:
 		_fail("FieldBackdrop should extend beyond SeasonStage")
 		return
-	if daily and not backdrop.get_global_rect().has_point(daily.global_position + daily.size * 0.5):
+	# Daily gift je u TopRow-u biranja sezone; u polju je skriven (2026-09-21).
+	if daily and daily.is_visible_in_tree():
+		_fail("Bloom open: Daily gift belongs to the season picker, not the field")
+		return
+	if daily and daily.is_visible_in_tree() and not backdrop.get_global_rect().has_point(daily.global_position + daily.size * 0.5):
 		_fail("FieldBackdrop should cover Daily")
 		return
 	if play_btn and not backdrop.get_global_rect().has_point(play_btn.global_position + play_btn.size * 0.5):
@@ -538,7 +546,7 @@ func _run() -> void:
 	if play_row != null and basket.get_parent() == play_row:
 		_fail("Bloom open: BasketCard must not sit under PlayRow")
 		return
-	if daily:
+	if daily and daily.is_visible_in_tree():
 		if basket.get_global_rect().position.y + 0.5 < daily.get_global_rect().end.y:
 			_fail("Bloom open: BasketCard should sit below Daily")
 			return
@@ -619,7 +627,7 @@ func _run() -> void:
 		_fail("close should clear flag")
 		return
 	if not band.visible:
-		_fail("BandColumn should show after close")
+		_fail("SeasonTrail should show after close")
 		return
 	if field.visible:
 		_fail("SeasonField should hide after close")
@@ -811,52 +819,26 @@ func _run() -> void:
 	if bool(gs.get("home_season_field_open")):
 		_fail("locked open must not set flag")
 		return
-	if str(home.call("home_play_action")) != "snap":
-		_fail("lantern hero: home_play_action should be snap")
+	# Play ne ovisi o fokusu: i s fokusom na zakljucanoj sezoni pokrece aktivnu (run).
+	if str(home.call("home_play_action")) != "run":
+		_fail("locked focus: home_play_action should still be run")
 		return
-	home.call("_on_play_pressed")
+	if str(home.call("get_play_chip_text")) != "Country Bloom":
+		_fail("locked focus: Play chip should name the active season")
+		return
+	stage.call("tap_card", "coral_tide")
 	await process_frame
 	await process_frame
 	if bool(gs.get("home_season_field_open")):
-		_fail("lantern Play should not open field")
+		_fail("unowned premium tap must not open the field")
 		return
-	if str(gs.call("home_hero_center_id")) != str(gs.get("active_season_id")):
-		_fail("lantern Play should snap hero to active_season_id")
+	if str(gs.get("active_season_id")) != "country_bloom":
+		_fail("unowned premium preview must not change the active season")
 		return
-	if str(gs.call("home_hero_center_id")) != "country_bloom":
-		_fail("lantern Play should snap to Bloom")
-		return
-	if current_scene and str(current_scene.scene_file_path).find("run_scene") >= 0:
-		_fail("lantern Play should not enter run")
-		return
-	if stage.has_method("swap_home_band"):
-		stage.call("swap_home_band", "paid", "coral_tide")
-		await process_frame
-		await process_frame
-	if str(gs.get("home_band")) != "paid":
-		_fail("LIFE-A setup: expected paid band for coral")
-		return
-	if bool(gs.call("is_season_playable", "coral_tide")):
-		_fail("coral_tide should be unowned")
-		return
-	if str(home.call("home_play_action")) != "snap":
-		_fail("unowned paid: home_play_action should be snap")
-		return
-	home.call("_on_play_pressed")
-	await process_frame
-	await process_frame
-	if bool(gs.get("home_season_field_open")):
-		_fail("unowned paid Play should not open field")
-		return
-	if str(gs.get("home_band")) != "free":
-		_fail("unowned paid Play should snap home_band to free")
-		return
-	if str(gs.call("home_hero_center_id")) != "country_bloom":
-		_fail("unowned paid Play should snap to Bloom")
-		return
-	if current_scene and str(current_scene.scene_file_path).find("run_scene") >= 0:
-		_fail("unowned paid Play should not enter run")
+	if str(home.call("get_play_chip_text")) != "Country Bloom":
+		_fail("unowned premium preview: Play chip stays on Bloom")
 		return
 
+	CampSmokeUtil.restore_save(self, _backup)
 	print("season_meadow_smoke OK")
 	quit(0)

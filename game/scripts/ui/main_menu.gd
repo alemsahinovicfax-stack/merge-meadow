@@ -8,10 +8,19 @@ const UiAttention := preload("res://scripts/ui/ui_attention.gd")
 const PICKER_ROW_MIN_HEIGHT := 128.0
 const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
 const LOCKED_SEED_MODULATE := Color(0.45, 0.45, 0.45, 1)
+## HomeColumn: biranje sezone = padding 24 (design_handoff_home); polje sezone
+## zadrzava stari raspored dok ne dobije svoj brief (lijevo, vrh, desno, dno).
+const TRAIL_COLUMN_OFFSETS := Vector4(24, 24, -24, -24)
+const FIELD_COLUMN_OFFSETS := Vector4(48, 380, -48, -24)
+const FIELD_COLUMN_SEPARATION := 12
+const PLAY_ICON_TRAIL := 56.0
+const PLAY_ICON_FIELD := 44.0
+const FIELD_PLAY_SIZE := Vector2(320, 96)
 
 enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 
 @onready var tutorial_hint: Label = %TutorialHint
+@onready var tutorial_hint_panel: PanelContainer = %TutorialHintPanel
 @onready var field_upgrade_stack: VBoxContainer = %FieldUpgradeStack
 @onready var magnet_title: Label = %MagnetTitle
 @onready var magnet_button: UiClickButton = %MagnetButton
@@ -23,14 +32,17 @@ enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 @onready var basket_visual: Control = %BasketVisual
 @onready var basket_title: Label = %BasketTitle
 @onready var basket_caption: Label = %BasketCaption
-@onready var play_button: UiClickButton = %PlayButton
-@onready var play_theme_badge: Label = %PlayThemeBadge
+@onready var play_button: CampButton = %PlayButton
 @onready var seasons_row_button: UiClickButton = %SeasonsRowButton
 @onready var endless_play_button: UiClickButton = %EndlessPlayButton
 @onready var daily_chest_card: PanelContainer = %DailyChestCard
 @onready var daily_title: Label = %DailyTitle
 @onready var daily_caption: Label = %DailyCaption
-@onready var chest_visual: Control = %ChestVisual
+@onready var gift_icon: Panel = %GiftIcon
+@onready var gift_ribbon_v: ColorRect = %RibbonV
+@onready var gift_ribbon_h: ColorRect = %RibbonH
+@onready var top_row: HBoxContainer = %TopRow
+@onready var progress_indicator: HomeProgressIndicator = %ProgressIndicator
 @onready var reward_overlay: Control = %RewardOverlay
 @onready var reward_title: Label = %RewardTitle
 @onready var reward_body: Label = %RewardBody
@@ -44,14 +56,14 @@ enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 @onready var season_stage: Control = %SeasonStage
 @onready var field_backdrop: ColorRect = %FieldBackdrop
 @onready var season_name_chip: UiClickButton = %SeasonNameChip
-@onready var decor_mound_left: ColorRect = $DecorMoundLeft
-@onready var decor_mound_right: ColorRect = $DecorMoundRight
 
 var _chest_ui_state: ChestUiState = ChestUiState.LOCKED
 var _chest_pulsing: bool = false
 var _chest_pulse_t: float = 0.0
-var _style_daily_ready: StyleBox = null
-var _style_daily_claimed: StyleBox = null
+var _play_spacer: Control = null
+var _play_chip: PanelContainer = null
+var _play_chip_label: Label = null
+var _field_safe_shift: float = 0.0
 var _basket_locked: bool = false
 var _basket_attention: UiAttention = UiAttention.new()
 var _chest_attention: UiAttention = UiAttention.new()
@@ -87,24 +99,19 @@ func _ready() -> void:
 			basket_card.resized.connect(_on_basket_card_resized)
 		_on_basket_card_resized()
 		_basket_attention.bind(basket_card, UiAttention.Kind.BASKET)
-	_cache_daily_styles()
+	_setup_play_button()
 	_setup_typography()
 	_setup_safe_area()
 	if OS.is_debug_build() and not GameState.skip_debug_season_unlock:
 		GameState.debug_playtest_two_free()
-	var pip_portrait: Control = get_node_or_null("%PipPortrait") as Control
-	if pip_portrait:
-		pip_portrait.visible = false
 	_refresh_menu()
 	_refresh_chest_card()
 	_refresh_basket_card()
 
 
 func _setup_typography() -> void:
-	if daily_title:
-		TEXT_LAYOUT.card_title_scroll(daily_title)
-	if daily_caption:
-		TEXT_LAYOUT.caption_label_scroll(daily_caption)
+	UiHome.style(tutorial_hint, UiHome.FONT_HINT, UiHome.INK, UiHome.W_BOLD)
+	tutorial_hint_panel.add_theme_stylebox_override("panel", UiHome.tutorial_hint())
 	if basket_title:
 		TEXT_LAYOUT.card_title_scroll(basket_title)
 	if basket_caption:
@@ -128,22 +135,10 @@ func _setup_safe_area() -> void:
 		SAFE_AREA.apply_horizontal_margins(home_top_stack)
 	if season_name_chip:
 		SAFE_AREA.apply_top_margin(season_name_chip, 8.0)
-	if home_column:
-		SAFE_AREA.apply_bottom_margin(home_column, 8.0)
+	# Polje sezone: stari raspored je bio pomjeren za safe area + 8 px; biranje
+	# sezone stoji tacno na paddingu 24 (hub footer vec pokriva safe area).
+	_field_safe_shift = SAFE_AREA.get_insets(get_viewport()).z + 8.0
 
-
-func _cache_daily_styles() -> void:
-	if daily_chest_card == null:
-		return
-	var current := daily_chest_card.get_theme_stylebox("panel")
-	if current:
-		_style_daily_ready = current
-		_style_daily_claimed = current.duplicate()
-		if _style_daily_claimed is StyleBoxFlat:
-			var claimed := _style_daily_claimed as StyleBoxFlat
-			claimed.bg_color = Color(0.55, 0.62, 0.56, 0.72)
-			claimed.border_color = Color(0.176, 0.204, 0.212, 0.18)
-			claimed.set_border_width_all(2)
 
 
 func _process(delta: float) -> void:
@@ -159,9 +154,10 @@ func _exit_tree() -> void:
 
 func _refresh_menu() -> void:
 	var hub := GameState.tutorial_complete
-	tutorial_hint.visible = not hub
-	play_button.label_text = "Play"
-	_refresh_play_theme_badge()
+	tutorial_hint.text = "First run: tap Play. Seeds you bring back become flowers in the Arena."
+	tutorial_hint_panel.visible = not hub
+	refresh_play_chip()
+	refresh_progress_indicator()
 	_refresh_basket_card()
 	_refresh_field_upgrades()
 	_refresh_endless_button()
@@ -178,10 +174,7 @@ func sync_field_backdrop() -> void:
 		if open:
 			field_backdrop.color = SeasonTheme.home_field_tint(GameState.home_season_field_id)
 			field_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if decor_mound_left:
-		decor_mound_left.visible = not open
-	if decor_mound_right:
-		decor_mound_right.visible = not open
+	_apply_mode_layout(open)
 	_sync_loadout_to_open_season()
 	_refresh_basket_card()
 	_refresh_endless_button()
@@ -250,32 +243,107 @@ func _refresh_seasons_row_button() -> void:
 	)
 
 
-func _refresh_play_theme_badge() -> void:
-	if play_theme_badge == null:
-		return
-	play_theme_badge.visible = false
-
-
+## Odluka 2026-09-21: Play pokrece run u aktivnoj sezoni odmah (1 korak umjesto 3).
+## Polje sezone se otvara samo tapom na aktivnu karticu ili "Open meadow ↗".
 func home_play_action() -> String:
-	if GameState.home_season_field_open:
-		return "run"
-	if GameState.is_season_playable(GameState.home_hero_center_id()):
-		return "open_field"
-	return "snap"
+	return "run"
 
 
 func _on_play_pressed() -> void:
-	var action := home_play_action()
-	if action == "run":
-		GameState.begin_campaign_run()
-		SceneRouter.change_to(GameState.SCENE_RUN)
+	var id := GameState.active_season_id
+	if id.is_empty() or not GameState.is_season_playable(id):
+		GameState.set_active_season(SeasonCatalog.DEFAULT_SEASON_ID)
+	GameState.begin_campaign_run()
+	SceneRouter.change_to(GameState.SCENE_RUN)
+
+
+## Play na biranju sezone: 1032 x 156, peach, ikona + "Play" lijevo, cip s imenom
+## aktivne sezone desno ("Play · Country Bloom"). U polju sezone ostaje staro dugme.
+func _setup_play_button() -> void:
+	var row := play_button.get_node_or_null("ContentRow") as HBoxContainer
+	if row == null:
 		return
-	if action == "open_field":
-		if season_stage and season_stage.has_method("open_season_field"):
-			season_stage.call("open_season_field")
+	_play_spacer = Control.new()
+	_play_spacer.name = "PlaySpacer"
+	_play_spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_play_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(_play_spacer)
+	_play_chip = PanelContainer.new()
+	_play_chip.name = "PlaySeasonChip"
+	_play_chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_play_chip.custom_minimum_size.y = UiHome.PLAY_CHIP_H
+	_play_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_play_chip.add_theme_stylebox_override("panel", UiHome.play_chip())
+	row.add_child(_play_chip)
+	_play_chip_label = Label.new()
+	_play_chip_label.name = "Text"
+	UiHome.style(_play_chip_label, UiHome.FONT_PLAY_CHIP, UiHome.INK, UiHome.W_BOLD)
+	_play_chip.add_child(_play_chip_label)
+	play_button.set_icon(UiAssets.get_play_icon(), PLAY_ICON_TRAIL)
+	play_button.set_text("Play")
+
+
+func refresh_play_chip() -> void:
+	if _play_chip_label == null:
 		return
-	if season_stage and season_stage.has_method("snap_carousel_to_active"):
-		season_stage.call("snap_carousel_to_active")
+	var def: SeasonDef = GameState.get_season_def(GameState.active_season_id)
+	_play_chip_label.text = def.display_name if def else ""
+
+
+func get_play_chip_text() -> String:
+	return _play_chip_label.text if _play_chip_label and _play_chip.visible else ""
+
+
+func refresh_progress_indicator() -> void:
+	if progress_indicator:
+		progress_indicator.refresh()
+
+
+func _apply_mode_layout(field_open: bool) -> void:
+	if top_row:
+		top_row.visible = not field_open
+	if home_column:
+		var o := FIELD_COLUMN_OFFSETS if field_open else TRAIL_COLUMN_OFFSETS
+		home_column.offset_left = o.x
+		home_column.offset_top = o.y - (_field_safe_shift if field_open else 0.0)
+		home_column.offset_right = o.z
+		home_column.offset_bottom = o.w - (_field_safe_shift if field_open else 0.0)
+		home_column.add_theme_constant_override(
+			"separation", FIELD_COLUMN_SEPARATION if field_open else UiHome.BLOCK_GAP
+		)
+	_apply_play_layout(field_open)
+
+
+func _apply_play_layout(field_open: bool) -> void:
+	if play_button == null:
+		return
+	var row := play_button.get_node_or_null("ContentRow") as HBoxContainer
+	if field_open:
+		play_button.custom_minimum_size = FIELD_PLAY_SIZE
+		play_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		play_button.set_styles(
+			UiPalette.button_style("primary", "normal"), UiPalette.button_style("primary", "pressed")
+		)
+		play_button.set_fonts(40)
+		play_button.set_ink(UiPalette.UI_TEXT)
+		play_button.set_icon(UiAssets.get_play_icon(), PLAY_ICON_FIELD)
+		play_button.set_press_scale(1.0)
+		if row:
+			row.alignment = BoxContainer.ALIGNMENT_CENTER
+	else:
+		play_button.custom_minimum_size = Vector2(0, UiHome.PLAY_H)
+		play_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		play_button.set_styles(UiHome.play_button(false), UiHome.play_button(true))
+		play_button.set_fonts(UiHome.FONT_PLAY)
+		play_button.set_ink(UiHome.INK)
+		play_button.set_icon(UiAssets.get_play_icon(), PLAY_ICON_TRAIL)
+		play_button.set_press_scale(0.97)
+		if row:
+			row.alignment = BoxContainer.ALIGNMENT_BEGIN
+	if _play_spacer:
+		_play_spacer.visible = not field_open
+	if _play_chip:
+		_play_chip.visible = not field_open
 
 
 func _on_endless_play_pressed() -> void:
@@ -337,27 +405,49 @@ func _refresh_chest_card() -> void:
 	if not GameState.tutorial_complete:
 		_chest_ui_state = ChestUiState.LOCKED
 		daily_chest_card.visible = false
+		_fit_progress_indicator(false)
 		_stop_chest_pulse()
 		return
 	daily_chest_card.visible = true
+	_fit_progress_indicator(true)
 	if GameState.can_claim_daily_chest():
 		_chest_ui_state = ChestUiState.READY
-		daily_title.text = "Daily gift"
-		daily_caption.text = "Tap to open"
-		if _style_daily_ready:
-			daily_chest_card.add_theme_stylebox_override("panel", _style_daily_ready)
-		if chest_visual:
-			chest_visual.modulate = Color.WHITE
+		_style_daily_gift(false)
 		_start_chest_pulse()
 	else:
 		_chest_ui_state = ChestUiState.CLAIMED
-		daily_title.text = "Daily gift"
-		daily_caption.text = "Back tomorrow"
-		if _style_daily_claimed:
-			daily_chest_card.add_theme_stylebox_override("panel", _style_daily_claimed)
-		if chest_visual:
-			chest_visual.modulate = Color(0.75, 0.75, 0.75, 1)
+		_style_daily_gift(true)
 		_stop_chest_pulse()
+
+
+## Daily gift u TopRow-u (HomeScreen.dc.html · DailyGiftCard): ikona od tri ravna
+## oblika (kutija + dvije trake), "Daily gift" 38 px + "Tap to open" 48 px.
+func _style_daily_gift(taken: bool) -> void:
+	daily_title.text = "Daily gift"
+	daily_caption.text = "Back tomorrow" if taken else "Tap to open"
+	daily_chest_card.add_theme_stylebox_override("panel", UiHome.daily_gift(taken))
+	UiHome.style(
+		daily_title, UiHome.FONT_GIFT_TITLE,
+		Color(1.0, 0.973, 0.941, 0.88) if taken else UiHome.SUB_INK, UiHome.W_REGULAR
+	)
+	UiHome.style(daily_caption, UiHome.FONT_GIFT_SUB, UiHome.WARM_WHITE if taken else UiHome.DARK_INK, UiHome.W_BLACK)
+	if gift_icon:
+		gift_icon.add_theme_stylebox_override("panel", UiHome.gift_box(taken))
+	var ribbon := UiHome.GIFT_RIBBON_TAKEN if taken else UiHome.WARM_WHITE
+	if gift_ribbon_v:
+		gift_ribbon_v.color = ribbon
+	if gift_ribbon_h:
+		gift_ribbon_h.color = ribbon
+
+
+## Bez Daily gifta (prije kraja tutoriala) ProgressIndicator zauzima cijeli red.
+func _fit_progress_indicator(gift_visible: bool) -> void:
+	if progress_indicator == null:
+		return
+	progress_indicator.custom_minimum_size.x = UiHome.PROGRESS_W if gift_visible else 0.0
+	progress_indicator.size_flags_horizontal = (
+		Control.SIZE_FILL if gift_visible else Control.SIZE_EXPAND_FILL
+	)
 
 
 func _start_chest_pulse() -> void:
@@ -539,7 +629,7 @@ func _on_basket_pressed() -> void:
 	if _basket_locked or not GameState.loadout_enabled():
 		if tutorial_hint:
 			tutorial_hint.text = "Merge your first flower to unlock the basket."
-			tutorial_hint.visible = true
+			tutorial_hint_panel.visible = true
 		return
 	_open_basket_picker()
 
