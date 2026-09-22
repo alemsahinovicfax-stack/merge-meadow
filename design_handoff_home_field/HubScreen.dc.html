@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="HubScreen" style="{{ rootStyle }}">
+
+  <sc-if value="{{ showHeader }}" hint-placeholder-val="{{ true }}"><div data-layer="Header" style="flex:0 0 auto;position:relative;z-index:2;background:var(--chrome);box-shadow:0 6px 14px rgba(20,26,22,.34)">
+    <div style="height:var(--safeTop)"></div>
+    <div style="height:140px;display:flex;align-items:center;gap:16px;padding:0 20px;box-sizing:border-box">
+      <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="3">
+        <div data-layer="{{ chip.layer }}" style="{{ chip.style }}">
+          <img src="{{ chip.icon }}" alt="" style="width:56px;height:56px;flex:0 0 auto" />
+          <div style="flex:1;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums;letter-spacing:-.01em">{{ chip.value }}</div>
+        </div>
+      </sc-for>
+      <div data-layer="SettingsButton" style="width:100px;height:100px;box-sizing:border-box;margin-left:4px;flex:0 0 auto;border-radius:20px;background:var(--btnFill);border:2px solid var(--btnEdge);display:grid;place-items:center">
+        <img src="{{ gearIcon }}" alt="" style="width:54px;height:54px" />
+      </div>
+    </div>
+    <div style="height:3px;background:var(--edge)"></div>
+  </div></sc-if>
+
+  <sc-if value="{{ showPage }}" hint-placeholder-val="{{ true }}"><div data-layer="PageArea" style="flex:1;min-height:0;position:relative;padding:56px 48px;box-sizing:border-box;display:flex;flex-direction:column;gap:40px">
+    <div style="height:210px;border-radius:26px;background:var(--ph)"></div>
+    <div style="display:flex;gap:40px;flex:1;min-height:0">
+      <div style="flex:1;border-radius:26px;background:var(--ph)"></div>
+      <div style="flex:1;border-radius:26px;background:var(--ph)"></div>
+    </div>
+    <div style="height:180px;border-radius:26px;background:var(--ph)"></div>
+    <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:600 26px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;color:var(--phInk);text-transform:uppercase">page content — not designed</div>
+  </div></sc-if>
+
+  <sc-if value="{{ showFooter }}" hint-placeholder-val="{{ true }}"><div data-layer="Footer" style="flex:0 0 auto;position:relative;z-index:2;background:var(--chrome);box-shadow:0 -6px 14px rgba(20,26,22,.34)">
+    <div style="{{ lockPillWrap }}">
+      <div data-layer="NavLockPill" style="display:flex;align-items:center;gap:14px;height:64px;padding:0 28px;border-radius:20px;background:var(--chrome);border:2px solid rgba(232,196,74,.85);box-sizing:border-box">
+        <img src="icons/icon_lock.svg" alt="" style="width:30px;height:30px;flex:0 0 auto" />
+        <div style="font:800 26px/1 Nunito,system-ui,sans-serif;letter-spacing:.08em;color:#E8C44A;white-space:nowrap">ROUND IN PROGRESS</div>
+      </div>
+    </div>
+    <div style="height:3px;background:var(--topEdge)"></div>
+    <div style="position:relative;height:177px">
+      <div data-layer="ActiveIndicator" style="{{ indicatorStyle }}"></div>
+      <div style="position:absolute;left:0;right:0;top:17px;height:152px;display:flex">
+        <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="5">
+          <div data-layer="{{ tab.layer }}" style="{{ tab.slotStyle }}">
+            <div style="{{ tab.tileStyle }}">
+              <img src="{{ tab.icon }}" alt="" style="width:52px;height:52px;opacity:var(--io)" />
+              <div style="{{ tab.labelStyle }}">{{ tab.label }}</div>
+              <div data-layer="TabBadge" style="{{ tab.badgeStyle }}">{{ tab.badge }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="height:var(--safeBottom)"></div>
+  </div></sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;part&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;full&quot;,&quot;header&quot;,&quot;footer&quot;],&quot;default&quot;:&quot;full&quot;,&quot;tsType&quot;:&quot;'full'|'header'|'footer'&quot;,&quot;section&quot;:&quot;Scope&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;,&quot;section&quot;:&quot;Scope&quot;},&quot;pageBg&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#243329&quot;,&quot;options&quot;:[&quot;#FFF8F0&quot;,&quot;#B8E0F5&quot;,&quot;#E6F2DB&quot;,&quot;#2E4733&quot;,&quot;#293D2E&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Scope&quot;},&quot;active&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:2,&quot;min&quot;:0,&quot;max&quot;:4,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;State&quot;},&quot;coins&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;12,450&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Values&quot;},&quot;seeds&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;340&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Values&quot;},&quot;diamonds&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;12&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Values&quot;},&quot;badgeOn&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:-1,&quot;min&quot;:-1,&quot;max&quot;:4,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;State&quot;},&quot;badgeCount&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;3&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;locked&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;State&quot;},&quot;pressed&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:-1,&quot;min&quot;:-1,&quot;max&quot;:4,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;State&quot;},&quot;swipeAt&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:null,&quot;min&quot;:0,&quot;max&quot;:4,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number|null&quot;,&quot;section&quot;:&quot;State&quot;},&quot;safeTop&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:120,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Safe area&quot;},&quot;safeBottom&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:80,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Safe area&quot;}}">
+const TABS = [
+  ['Tab_Shop', 'Shop', 'icons/tab_shop.svg'],
+  ['Tab_Journal', 'Journal', 'icons/tab_journal.svg'],
+  ['Tab_Home', 'Home', 'icons/tab_home.svg'],
+  ['Tab_Camp', 'Camp', 'icons/tab_camp.svg'],
+  ['Tab_Arena', 'Arena', 'icons/tab_arena.svg']
+];
+
+const CUR = [
+  ['CoinChip', 'icons/icon_coin.svg', '#FFD56B'],
+  ['SeedChip', 'icons/icon_seed.svg', '#A8E6CF'],
+  ['DiamondChip', 'icons/icon_diamond.svg', '#D4A5FF']
+];
+
+class Component extends DCLogic {
+  lum(hex) {
+    const v = [1, 3, 5].map(i => {
+      const c = parseInt(hex.substr(i, 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+  }
+
+  renderVals() {
+    const p = this.props;
+    const dark = (p.theme ?? 'dark') === 'dark';
+    const pageBg = p.pageBg ?? '#243329';
+    const lightPage = this.lum(pageBg) > 0.18;
+    const active = p.active ?? 2;
+    const locked = !!p.locked;
+    const pressed = p.pressed ?? -1;
+    const pos = p.swipeAt == null ? active : p.swipeAt;
+    const swiping = p.swipeAt != null;
+
+    const chrome = dark ? '#1A241E' : '#FFF8F0';
+    const edge = dark ? 'rgba(255,248,240,.55)' : 'rgba(45,52,54,.72)';
+    const ink = dark ? '#FFF8F0' : '#4A4A4A';
+
+    const part = p.part ?? 'full';
+    const rootStyle = [
+      'width:1080px;flex:0 0 auto;position:relative;overflow:hidden',
+      part === 'full' ? 'height:1920px' : 'height:auto',
+      'display:flex;flex-direction:column;background:' + pageBg,
+      "font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased",
+      '--chrome:' + chrome,
+      '--edge:' + edge,
+      '--topEdge:' + (locked ? 'rgba(232,196,74,.85)' : edge),
+      '--ink:' + ink,
+      '--btnFill:' + (dark ? 'rgba(255,248,240,.10)' : 'rgba(45,52,54,.06)'),
+      '--btnEdge:' + (dark ? 'rgba(255,248,240,.38)' : 'rgba(45,52,54,.42)'),
+      '--ph:' + (lightPage ? 'rgba(45,52,54,.13)' : 'rgba(255,248,240,.13)'),
+      '--phInk:' + (lightPage ? 'rgba(45,52,54,.42)' : 'rgba(255,248,240,.42)'),
+      '--safeTop:' + (p.safeTop ?? 0) + 'px',
+      '--safeBottom:' + (p.safeBottom ?? 0) + 'px'
+    ].join(';');
+
+    const chipEdge = dark ? 'rgba(45,52,54,.14)' : 'rgba(45,52,54,.40)';
+    const vals = [p.coins ?? '12,450', p.seeds ?? '340', p.diamonds ?? '12'];
+    const chips = CUR.map((c, i) => ({
+      layer: c[0],
+      value: vals[i],
+      icon: c[1],
+      style: 'flex:1;min-width:0;height:100px;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:12px;padding:0 20px 0 18px;background:' +
+        c[2] + ';border:2px solid ' + chipEdge
+    }));
+
+    const tabs = TABS.map((t, i) => {
+      const w = Math.max(0, Math.min(1, 1 - Math.abs(i - pos)));
+      const isActive = w > 0.999 && !swiping;
+      const dim = locked && !isActive ? 0.6 : 1;
+      const isPressed = pressed === i;
+
+      let fill = 'transparent';
+      if (isActive) fill = isPressed ? '#E8A374' : '#FFB88C';
+      else if (w > 0) fill = 'rgba(255,184,140,' + (w * 0.45).toFixed(2) + ')';
+      else if (isPressed) fill = dark ? 'rgba(255,248,240,.12)' : 'rgba(45,52,54,.08)';
+
+      const onPeach = isActive || w > 0.55;
+      const ti = onPeach ? '#2D3436' : (dark ? 'rgba(255,248,240,.82)' : '#4A4A4A');
+      const icon = onPeach || !dark ? t[2] : t[2].replace('.svg', '_light.svg');
+      const border = isActive || w > 0 ? '2px solid rgba(45,52,54,.14)' : '2px solid transparent';
+
+      return {
+        layer: t[0],
+        label: t[1],
+        icon: icon,
+        badge: (p.badgeOn === i ? (p.badgeCount ?? '') : ''),
+        slotStyle: 'flex:1;min-width:0;display:flex;justify-content:center;opacity:' + dim,
+        tileStyle: 'position:relative;width:196px;height:152px;box-sizing:border-box;border-radius:20px;' +
+          'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;' +
+          'background:' + fill + ';border:' + border + ';--io:' + (onPeach ? 1 : 0.82) +
+          (isPressed && !isActive ? ';transform:scale(.96)' : ''),
+        labelStyle: 'font:' + (onPeach ? 800 : 700) + ' 40px/1 Nunito,system-ui,sans-serif;color:' + ti +
+          (onPeach ? '' : ';letter-spacing:.005em'),
+        badgeStyle: p.badgeOn === i
+          ? 'position:absolute;top:-8px;right:2px;min-width:44px;height:44px;padding:0 10px;box-sizing:border-box;border-radius:22px;background:#FFCCD5;border:3px solid ' + chrome + ';display:grid;place-items:center;font:800 26px/1 Nunito,system-ui,sans-serif;color:#2D3436'
+          : 'display:none'
+      };
+    });
+
+    const indLeft = 10 + pos * 216;
+    return {
+      rootStyle, chips, tabs,
+      showHeader: part === 'full' || part === 'header',
+      showPage: part === 'full',
+      showFooter: part === 'full' || part === 'footer',
+      gearIcon: dark ? 'icons/icon_settings_light.svg' : 'icons/icon_settings.svg',
+      indicatorStyle: 'position:absolute;top:5px;left:' + indLeft.toFixed(1) + 'px;width:196px;height:8px;border-radius:4px;background:' +
+        (locked ? 'rgba(255,184,140,.4)' : '#FFB88C'),
+      lockPillWrap: locked
+        ? 'position:absolute;left:0;right:0;top:-36px;display:flex;justify-content:center;z-index:3'
+        : 'display:none'
+    };
+  }
+}
+</script>
+</body>
+</html>

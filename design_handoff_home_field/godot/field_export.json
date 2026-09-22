@@ -1,0 +1,347 @@
+{
+  "$schema_version": "1.0",
+  "generated": "2026-09-22",
+  "source": "design_handoff_home_field/HomeField.dc.html + HomeField Specs.dc.html",
+  "brief": "docs/04-experience/design-drafts/home-field-cd-brief.md",
+  "direction": "jedan dizajn — livada je uokvireni prozor na tamnoj stranici",
+  "note": "Sve mjere su u px baze 1080 x 1920 i prenose se 1:1. Boje su sRGB hex; alpha je zapisana odvojeno gdje postoji. Tokeni koji nisu ovdje se ne mijenjaju — uzimaju se iz design_handoff_home/godot/home_export.json.",
+
+  "meta": {
+    "base": { "w": 1080, "h": 1920 },
+    "header": { "h": 143, "given": true },
+    "page": { "w": 1080, "h": 1597, "y": 143 },
+    "footer": { "h": 180, "given": true, "active_tab_index": 2 },
+    "minimums": { "touch": 120, "text": 38, "number": 44 },
+    "page_bg": "#2E4733",
+    "page_bg_note": "ista kao Home i Camp; polje više NEMA svijetlu pozadinu preko cijele stranice"
+  },
+
+  "tokens": {
+    "_comment": "samo novo ili promijenjeno u odnosu na home_export.json",
+    "new": {
+      "meadow_frame_border": { "color": "#FFF6D6", "width": 6, "radius": 26, "note": "isti rim kao aktivna kartica sezone — zato prelaz radi kao jedan tween" },
+      "meadow_shadow": { "x": 0, "y": 10, "blur": 22, "color": "rgba(20,26,22,0.38)" },
+      "soil_fill": "rgba(26,26,20,0.10)",
+      "soil_edge": "rgba(26,26,20,0.19)",
+      "flower_shadow": "rgba(26,26,20,0.13)",
+      "count_chip_fill": "rgba(255,248,240,0.80)",
+      "count_chip_edge": "rgba(26,26,20,0.26)",
+      "disabled_on_dark_fill": "rgba(255,248,240,0.07)",
+      "disabled_on_dark_edge": "rgba(255,248,240,0.20)",
+      "disabled_on_dark_ink": "rgba(255,248,240,0.68)",
+      "disabled_on_dark_ink_note": "0.68 je minimum koji na #2E4733 još drži 4.5:1",
+      "scrim": "rgba(20,26,22,0.62)",
+      "sheet_bg": "#1A241E",
+      "sheet_edge": "rgba(255,248,240,0.30)"
+    },
+    "reused": {
+      "panel_on_dark": "rgba(255,248,240,0.13)",
+      "panel_edge_on_dark": "rgba(255,248,240,0.28)",
+      "active_rim": "#FFF6D6",
+      "coin_gold": "#FFD56B", "coin_gold_edge": "#D6A82F",
+      "ui_gold": "#E8C44A", "ui_gold_edge": "#BA9D3B",
+      "peach": "#FFB88C", "peach_edge": "#E8A374",
+      "lavender": "#D4A5FF", "lavender_edge": "#AA84CC",
+      "mint": "#A8E6CF", "mint_edge": "#7FC9AC",
+      "well": "#22342A", "well_edge": "#16211B",
+      "ink": "#1A1A14", "ink_soft": "#3D3D33", "outline": "#2D3436",
+      "sub_on_dark": "rgba(255,246,214,0.90)",
+      "chrome": "#1A241E"
+    },
+    "radius": { "meadow": 26, "card": 22, "button": 20, "chip": 16, "chip_lg": 18, "frame_basket": 28, "frame_picker": 24, "frame_cost": 12, "sheet": 32, "segment": 8, "pill": 999 },
+    "border": { "hairline": 2, "normal": 3, "strong": 4, "frame": 6 },
+    "shadow": {
+      "card": { "x": 0, "y": 8, "blur": 16, "color": "rgba(20,26,22,0.26)" },
+      "cta": { "x": 0, "y": 8, "blur": 16, "color": "rgba(20,26,22,0.30)" },
+      "meadow": { "x": 0, "y": 10, "blur": 22, "color": "rgba(20,26,22,0.38)" }
+    },
+    "font": {
+      "family_in_game": "default sans",
+      "family_in_mockup": "Nunito",
+      "sizes": {
+        "season_name": 56, "tagline": 38, "back": 46,
+        "count_value": 48, "count_label": 40, "meadow_note": 40,
+        "basket_eyebrow": 38, "basket_name": 52, "basket_pips": 44, "basket_sub": 38, "basket_button": 46,
+        "upgrade_title": 46, "upgrade_level": 44, "upgrade_effect": 38, "upgrade_cost": 40, "upgrade_have": 38, "upgrade_button": 48,
+        "play": 64, "endless": 48, "endless_sub": 38,
+        "picker_title": 56, "picker_sub": 40, "picker_name": 46, "picker_meta": 40, "picker_chip": 40, "picker_button": 46,
+        "hint": 40
+      }
+    }
+  },
+
+  "derived_fills": {
+    "_comment": "izračunato u kodu, ne hardkodirati po sezoni",
+    "meadow_ground": "SeasonTheme.home_field_tint(season_id) — postojeće vrijednosti ostaju",
+    "meadow_ground_fallback": "lerp(mood, #FFF8F0, 0.45) — samo za sezonu koja nema tint",
+    "meadow_sky": "lerp(meadow_ground, #FFFFFF, 0.30)",
+    "meadow_near": "meadow_ground * 0.93",
+    "meadow_border": "#FFF6D6 @ 6px — isto za svih 8 sezona",
+    "chrome_outside_meadow": "NE zavisi od sezone — panel rgba(255,248,240,0.13) + border 0.28, tekst #FFF6D6",
+    "why": "boju nosi samo livada, pa je kontrast identičan u svih 8 sezona, i u tamnima"
+  },
+
+  "season_meadow": {
+    "_comment": "ground = danasnji home_field_tint; mood je iz home_export.season_colors",
+    "country_bloom": { "ground": "#E6F2DB", "mood": "#A8E6CF" },
+    "frost_orchard": { "ground": "#D1E6FF", "mood": "#C5D5E8" },
+    "lantern_meadow": { "ground": "#EBD6FF", "mood": "#C9B8E0" },
+    "amber_canopy": { "ground": "#FFEBC7", "mood": "#E8C48A" },
+    "moonlit_warren": { "ground": "#B8BDFF", "mood": "#3D3A6B" },
+    "coral_tide": { "ground": "#FFE0D6", "mood": "#E8A090" },
+    "starfall_glade": { "ground": "#DBCCFF", "mood": "#6B5B95" },
+    "ember_fen": { "ground": "#FFC79E", "mood": "#C45C26" }
+  },
+
+  "layout": {
+    "FieldPage": { "rect": [0, 143, 1080, 1597], "fill": "#2E4733", "type": "Control" },
+    "FieldBackdrop": { "rect": [0, 143, 1080, 1597], "fill": "#2E4733", "note": "ravna boja, bez tinta sezone" },
+    "FieldStack": { "rect": [24, 167, 1032, 1549], "gap": 16, "type": "VBoxContainer", "padding": 24,
+      "heights": [124, "flex 605", 180, 192, 192, 176],
+      "heights_note": "124 + 605 + 180 + 192 + 192 + 176 + 5x16 gap = 1549. Visine korpe i nadogradnji su stvarne visine sadrzaja (korpa: 18x2 padding + 136 kolona + 3x2 border = 178 -> 180; nadogradnja: 16x2 + 154 redova + 3x2 = 192), pa Meadow uzima 605, ne 625 — ako deklarisana visina laze, Meadow pojede razliku." },
+    "FieldTopRow": { "rect": [24, 167, 1032, 124], "gap": 16, "type": "HBoxContainer" },
+    "BackButton": { "rect": [24, 167, 300, 124], "radius": 22, "border": 3, "fill": "rgba(255,248,240,0.13)", "border_color": "rgba(255,248,240,0.34)", "font": 46, "ink": "#FFF6D6", "label": "‹  Seasons", "always_visible": true },
+    "FieldTitle": { "rect": [340, 167, 716, 124], "name_font": 56, "name_ink": "#FFF6D6", "tagline_font": 38, "tagline_ink": "rgba(255,246,214,0.90)", "ellipsis": true, "input": false },
+    "Meadow": { "rect": [24, 307, 1032, 605], "radius": 26, "border": 6, "border_color": "#FFF6D6", "shadow": "meadow", "clip": true, "block_hub_swipe": false,
+      "bands": { "sky": [0.00, 0.56], "far": [0.56, 0.78], "near": [0.78, 1.00] },
+      "inner": [1020, 593] },
+    "MeadowCount": { "rect_in_meadow": [18, 18, "auto", 84], "radius": 18, "border": 2, "fill": "rgba(255,248,240,0.80)", "border_color": "rgba(26,26,20,0.26)", "value_font": 48, "label_font": 40, "text": "{grown} / 13 grown" },
+    "MeadowNote": { "when": "grown == 0", "top_pct": 26, "font": 40, "ink": "#3D3D33", "align": "center" },
+    "MeadowPip": { "size": 190, "x_pct": 68, "bottom_pct": 3, "shadow_pill": [120, 26, "rgba(26,26,20,0.14)"], "input": false },
+    "BasketCard": { "rect": [24, 928, 1032, 180], "radius": 22, "border": 3, "padding": 18, "gap": 20, "shadow": "card" },
+    "UpgradeCard_magnet": { "rect": [24, 1124, 1032, 192] },
+    "UpgradeCard_loot": { "rect": [24, 1332, 1032, 192] },
+    "PlayRow": { "rect": [24, 1540, 1032, 176], "gap": 16 },
+    "PlayButton": { "rect": [24, 1540, 656, 176], "rect_no_endless": [24, 1540, 1032, 176], "radius": 26, "border": 4, "fill": "peach", "border_color": "peach_edge", "shadow": "cta", "font": 64, "label": "▶  Play" },
+    "EndlessButton": { "rect": [696, 1540, 360, 176], "radius": 26, "border": 4, "fill": "lavender", "border_color": "lavender_edge", "shadow": "cta", "font": 48, "sub_font": 38, "label": "Endless", "sub": "Hard · no finish line", "visible_when": "tutorial_complete" },
+    "TutorialHint": { "rect": [24, 1500, 1032, "auto"], "anchor": "bottom 216 od dna stranice", "radius": 20, "border": 3, "fill": "#FFF6D6", "border_color": "#D6A82F", "shadow": "cta", "padding": [22, 26], "font": 40, "ink": "#1A1A14" },
+    "BasketPicker": { "scrim_rect": [0, 143, 1080, 1597], "scrim": "rgba(20,26,22,0.62)" },
+    "PickerSheet": { "rect": [0, 432, 1080, 1308], "fill": "#1A241E", "radius_top": 32, "border_top": 3, "border_color": "rgba(255,248,240,0.30)", "padding": [20, 24, 24, 24] },
+    "HubSwipeZone": { "blocks": ["BackButton", "BasketCard", "UpgradeCard_magnet", "UpgradeCard_loot", "PlayButton", "EndlessButton", "BasketPicker"], "passes": ["Meadow", "FieldTitle", "FieldBackdrop"], "note": "livada propušta swipe — u polju nema horizontalnih gesti" }
+  },
+
+  "components": {
+    "Meadow": {
+      "spots": {
+        "count": 13,
+        "format": "[x_pct, bottom_pct, size_px, roster_index, flowers_needed]",
+        "list": [
+          [10, 40, 76, 0, 5], [29, 42, 76, 1, 5], [51, 40, 76, 2, 5], [72, 42, 76, 3, 5], [90, 38, 84, 4, 5],
+          [17, 27, 96, 5, 5], [37, 25, 96, 0, 1], [59, 27, 96, 1, 1], [84, 24, 96, 2, 1],
+          [11, 9, 112, 3, 1], [33, 7, 112, 4, 1], [88, 8, 112, 5, 1], [52, 1, 128, 5, 10]
+        ],
+        "rule": "svaka vrsta ima 2 mjesta (prvo na >=1, drugo na >=5); ★3 ima i treće na >=10. Bliža mjesta traže manje, pa livada raste od igrača prema horizontu.",
+        "data": "GameState.garden_crystal_stash[seed_type_id] za 6 vrsta aktivne sezone",
+        "status": "PRIJEDLOG ZA PRIKAZ — nije nova mehanika; brojevi 1 / 5 / 10 su jedini novi i mogu se mijenjati na jednom mjestu",
+        "fallback": "ako se prijedlog ne prihvati, svih 13 mjesta su uvijek 'grown' i ekran radi isto"
+      },
+      "MeadowFlower": {
+        "grown": { "art": "★1–★3 crtež vrste s tog mjesta", "shadow_pill": ["0.56w", "0.17h", "rgba(26,26,20,0.13)"] },
+        "empty": { "pill": ["0.68w", "0.27h"], "radius": "h/2", "fill": "rgba(26,26,20,0.10)", "border": 3, "border_color": "rgba(26,26,20,0.19)", "note": "prazno mjesto je zemlja, ne blijedi cvijet — blijedi cvijet bi se čitao kao 'imam ga'" },
+        "input": false
+      },
+      "safe_rect": "nije više potreban: chrome je izvan livade, pa se cvjetovi i Pip ne mogu preklopiti s dugmadima"
+    },
+    "BasketCard": {
+      "BasketFrame": { "size": 128, "radius": 28, "fill": "coin_gold", "border": 3, "border_color": "coin_gold_edge", "well_inset": 12, "well_radius": 19, "art": 74, "art_empty": 56 },
+      "text": { "eyebrow": "Basket", "eyebrow_font": 38, "name_font": 52, "pips_font": 44, "sub_font": 38 },
+      "BasketButton": { "w": 260, "h": 136, "radius": 20, "border": 3, "font": 46 },
+      "states": {
+        "empty": { "border": "4px #E8C44A", "art": "icons/icon_seed_light.svg", "name": "Tap to choose", "sub": "One seed falls 5 % more often", "button": { "label": "Choose", "fill": "ui_gold", "border_color": "ui_gold_edge", "ink": "outline" }, "attention": "UiAttention puls — jedini loop na ekranu" },
+        "chosen": { "art": "cvijet odabrane vrste", "name": "{seed}", "pips": "★☆☆ / ★★☆ / ★★★", "sub": "Falls 5 % more often this run", "button": { "label": "Change", "fill": "rgba(255,248,240,0.16)", "border_color": "rgba(255,246,214,0.40)", "ink": "#FFF6D6" } },
+        "locked": { "fill": "rgba(255,248,240,0.06)", "border_color": "rgba(255,248,240,0.18)", "art": "icons/icon_lock.svg", "name": "Basket locked", "sub": "Unlock after your first merge", "button": "hidden", "input": "tap diže TutorialHint" }
+      }
+    },
+    "UpgradeCard": {
+      "w": 1032, "h": 192, "radius": 22, "border": 3, "padding": 16, "gap": 20, "shadow": "card",
+      "left_column": 680,
+      "rows": { "title": 56, "effect": 38, "cost": 52, "gap": 4 },
+      "UpgradeLevel": { "h": 56, "radius": 16, "border": 2, "font": 44, "tabular_nums": true, "text": "Lv {level} / 4", "fill": "rgba(255,248,240,0.14)", "border_color": "rgba(255,246,214,0.36)" },
+      "segments": { "count": 4, "w": 52, "h": 16, "radius": 8, "gap": 8, "filled": { "fill": "mint", "border": 2, "border_color": "mint_edge" }, "empty": { "fill": "rgba(255,248,240,0.20)" } },
+      "effect_line": {
+        "magnet": "Pull radius {40+48*lvl} px → {40+48*(lvl+1)} px",
+        "magnet_max": "Pull radius 232 px · fully upgraded",
+        "loot": "Run loot ×{mul(lvl)} → ×{mul(lvl+1)}",
+        "loot_max": "Run loot ×2.0 · fully upgraded",
+        "mul": [1.0, 1.25, 1.5, 1.75, 2.0]
+      },
+      "UpgradeCost": { "frame": 46, "frame_radius": 12, "well_inset": 5, "art": 26, "main_font": 40, "have_chip": { "h": 48, "radius": 14, "border": 2, "font": 38, "ink": "disabled_on_dark_ink" },
+        "text": "2 × {flower}", "flower_source": "GameState.pick_upgrade_flower_type() — POZVATI PRIJE TAPA, ne poslije",
+        "have_chip_when": "samo kad blokira (have < 2): 'you have 1' ili 'none yet'",
+        "note": "cvijet može biti iz bilo koje sezone, ne samo iz aktivne — to je tačno i namjerno vidljivo" },
+      "UpgradeButton": { "w": 300, "h": 154, "radius": 20, "border": 3, "font": 48 },
+      "states": {
+        "ready": { "fill": "ui_gold", "border_color": "ui_gold_edge", "ink": "outline", "label": "Upgrade", "input": true },
+        "blocked": { "fill": "disabled_on_dark_fill", "border_color": "disabled_on_dark_edge", "ink": "disabled_on_dark_ink", "label": "Need {2-have}", "input": false, "why": "UpgradeCost pokazuje koliko imaš" },
+        "maxed": { "fill": "rgba(255,248,240,0.10)", "border_color": "rgba(255,246,214,0.34)", "ink": "#FFF6D6", "label": "Maxed", "input": false, "cost_line": "Nothing left to buy", "cost_frame": "hidden" },
+        "just_spent": { "card_border": "4px #FFF6D6", "level_chip": { "fill": "coin_gold", "border_color": "coin_gold_edge", "ink": "outline" }, "cost_line": "Spent 2 × {flower}", "duration_s": 0.4 }
+      }
+    },
+    "BasketPicker": {
+      "grabber": { "w": 120, "h": 10, "radius": 5, "fill": "rgba(255,248,240,0.32)" },
+      "title": { "font": 56, "text": "Choose basket seed" },
+      "sub": { "font": 40, "text": "One seed type falls 5 % more often in your run." },
+      "PickerRow": {
+        "w": 1032, "h": 148, "radius": 20, "padding_x": 20, "gap": 20,
+        "frame": 104, "frame_radius": 24, "well_inset": 10, "art": 60, "art_locked": 44,
+        "name_font": 46, "meta_font": 40, "chip": { "h": 72, "radius": 18, "font": 40 },
+        "states": {
+          "row": { "fill": "rgba(255,248,240,0.10)", "border": 2, "border_color": "rgba(255,248,240,0.26)", "meta": "★☆☆  ·  +5 % spawn" },
+          "chosen": { "fill": "rgba(255,248,240,0.16)", "border": 4, "border_color": "#FFF6D6", "chip": "Chosen", "chip_fill": "#FFF6D6", "chip_border": "coin_gold_edge" },
+          "locked": { "fill": "rgba(255,248,240,0.05)", "border": 2, "border_color": "rgba(255,248,240,0.16)", "frame_fill": "rgba(255,248,240,0.10)", "art": "icons/icon_lock.svg", "meta": "★☆☆  ·  not found yet", "chip": "Locked", "input": false }
+        }
+      },
+      "footer": { "buttons": 2, "h": 132, "gap": 32, "radius": 20, "font": 46, "clear": { "label": "Clear basket", "fill": "rgba(255,248,240,0.10)", "border_color": "rgba(255,248,240,0.28)", "ink": "#FFF6D6" }, "close": { "label": "Close", "fill": "#FFF8F0", "border_color": "rgba(45,52,54,0.26)", "ink": "outline" } }
+    }
+  },
+
+  "scenes": {
+    "main":      { "label": "P1.1 sredina igre", "season": "frost_orchard", "tutorial": true, "basket": null, "magnet": 1, "loot": 0, "stash_season": { "frost_snowdrop": 3, "ice_crocus": 5, "silver_aconite": 4, "winter_camellia": 2, "hoarfrost_rose": 1, "crystal_peony": 0 }, "upgrade_flower": { "name": "Meadow Clover", "have": 7 }, "grown": 6, "currency": ["320", "48", "12"] },
+    "basket":    { "label": "P1.2 korpa odabrana", "extends": "main", "basket": "winter_camellia" },
+    "picker":    { "label": "P1.2 picker otvoren", "extends": "basket", "picker": true, "locked_seeds": ["hoarfrost_rose", "crystal_peony"] },
+    "broke":     { "label": "P1.3 nema cvijeća", "extends": "main", "upgrade_flower": { "name": "Meadow Clover", "have": 1 }, "both_blocked": true },
+    "maxed":     { "label": "P1.3 max", "extends": "main", "magnet": 4, "loot": 3 },
+    "upgrading": { "label": "P1.3 kadar 2 — poslije kupovine", "extends": "main", "magnet": 2, "upgrade_flower": { "name": "Meadow Clover", "have": 5 }, "flash": "magnet" },
+    "newbie":    { "label": "P1.4 prije tutoriala", "season": "country_bloom", "tutorial": false, "basket": "locked", "magnet": 0, "loot": 0, "stash_season": {}, "upgrade_flower": null, "grown": 0, "endless": false, "hint": true, "currency": ["0", "6", "0"] },
+    "dark":      { "label": "P1.5 tamna premium sezona", "season": "moonlit_warren", "tutorial": true, "basket": "lunar_orchid", "magnet": 3, "loot": 4, "stash_season": { "moon_moss": 12, "nightshade_petal": 8, "silver_harebell": 6, "lunar_orchid": 5, "star_jasmine": 4, "umbral_lily": 11 }, "upgrade_flower": { "name": "Moon Moss", "have": 12 }, "grown": 12, "currency": ["1,240", "128", "9"] }
+  },
+
+  "animations": [
+    { "what": "Kartica → livada (otvaranje)", "target": "Panel rect (position + size)", "dur_s": 0.28, "ease": "EASE_OUT", "trans": "TRANS_CUBIC" },
+    { "what": "Fill kartice → ground livade", "target": "StyleBoxFlat.bg_color", "dur_s": 0.28, "ease": "LINEAR", "note": "ide paralelno s rectom" },
+    { "what": "Chrome ulazi", "target": "position:y +40 → 0 + modulate:a 0 → 1", "dur_s": 0.18, "ease": "EASE_OUT", "stagger_s": 0.06, "count": 5 },
+    { "what": "Cvjetovi sjedaju", "target": "scale 0.9 → 1.0", "dur_s": 0.20, "ease": "EASE_OUT", "stagger_s": 0.024, "note": "samo pri otvaranju, jednom" },
+    { "what": "Livada → kolona (nazad)", "target": "obrnuto od gornja dva", "dur_s": 0.24, "ease": "EASE_IN_OUT", "note": "prvo chrome (0.12 s), pa rect" },
+    { "what": "Prazna korpa puls", "target": "scale 1.0 → 1.03", "dur_s": 1.2, "loop": true, "existing": "UiAttention", "note": "JEDINI loop na ekranu" },
+    { "what": "Picker sheet ulazi", "target": "position:y +1308 → 0", "dur_s": 0.24, "ease": "EASE_OUT" },
+    { "what": "Scrim", "target": "modulate:a 0 → 0.62", "dur_s": 0.18, "ease": "LINEAR" },
+    { "what": "Nadogradnja kupljena", "target": "segment size:x 0 → 52", "dur_s": 0.22, "ease": "EASE_OUT" },
+    { "what": "Blesak kartice nadogradnje", "target": "StyleBoxFlat.border_color → #FFF6D6 → nazad", "dur_s": 0.16, "dur_out_s": 0.24, "ease": "LINEAR" },
+    { "what": "Pritisak", "target": "scale 0.97", "dur_s": 0.08, "note": "isto kao Arena i Camp" },
+    { "what": "Pip hoda", "target": "position:x, 2 tačke", "dur_s": [3.0, 6.0], "ease": "LINEAR", "note": "sniff i sleep su pauze, bez novog crteža" },
+    { "what": "Pip oblačić (prijedlog)", "target": "modulate:a 0 → 1, hold, out", "dur_s": 0.16, "hold_s": 1.8, "out_s": 0.2 }
+  ],
+
+  "strings_en": {
+    "back_seasons": "‹  Seasons",
+    "grown_count": "{grown} / 13",
+    "grown_label": "grown",
+    "meadow_empty": "Nothing has grown here yet. Bring seeds back from a run.",
+    "basket": "Basket",
+    "basket_empty_name": "Tap to choose",
+    "basket_empty_sub": "One seed falls 5 % more often",
+    "basket_chosen_sub": "Falls 5 % more often this run",
+    "basket_locked_name": "Basket locked",
+    "basket_locked_sub": "Unlock after your first merge",
+    "basket_choose": "Choose",
+    "basket_change": "Change",
+    "picker_title": "Choose basket seed",
+    "picker_sub": "One seed type falls 5 % more often in your run.",
+    "picker_row_meta": "{pips}  ·  +5 % spawn",
+    "picker_row_locked": "{pips}  ·  not found yet",
+    "picker_chosen": "Chosen",
+    "picker_locked": "Locked",
+    "clear_basket": "Clear basket",
+    "close": "Close",
+    "magnet": "Magnet",
+    "loot_boost": "Loot Boost",
+    "level": "Lv {level} / 4",
+    "magnet_effect": "Pull radius {now} px → {next} px",
+    "magnet_effect_max": "Pull radius 232 px · fully upgraded",
+    "loot_effect": "Run loot ×{now} → ×{next}",
+    "loot_effect_max": "Run loot ×2.0 · fully upgraded",
+    "upgrade_cost": "2 × {flower}",
+    "upgrade_cost_none": "2 × any ★1 flower",
+    "upgrade_have": "you have {n}",
+    "upgrade_have_zero": "none yet",
+    "upgrade_spent": "Spent 2 × {flower}",
+    "upgrade_nothing_left": "Nothing left to buy",
+    "upgrade": "Upgrade",
+    "upgrade_need": "Need {n}",
+    "maxed": "Maxed",
+    "play": "▶  Play",
+    "endless": "Endless",
+    "endless_sub": "Hard · no finish line",
+    "tutorial_hint": "Merge your first flower in the Arena to unlock the basket.",
+    "pip_bubble": "Ready when you are."
+  },
+
+  "assets": {
+    "existing": [
+      "design_handoff_home_field/flowers/ph_*.svg (8 placeholdera na 6 slotova svake sezone)",
+      "game/assets/sprites/pip_idle.svg (u paketu: icons/pip_idle.svg) — 190 px u polju",
+      "design_handoff_home_field/icons/icon_lock.svg",
+      "design_handoff_home_field/icons/icon_seed.svg (samo header — glif je #2D3436)",
+      "design_handoff_home_field/icons/icon_seed_light.svg (#FFF6D6 — na tamnom wellu korpe)",
+      "header i footer ikone (zadato)"
+    ],
+    "new": ["icons/icon_seed_light.svg — icon_seed.svg prebojan u #FFF6D6, ista putanja"],
+    "new_note": "nula novih crteža — jedini novi fajl je icons/icon_seed_light.svg, postojeći glif prebojan u #FFF6D6. Svaki panel, mjesto u zemlji, traka, segment, čip i dugme je StyleBoxFlat.",
+    "optional": [
+      { "path": "meadow_bg/{season_id}.png", "size": "1020x593", "note": "prava ilustracija livade zamjenjuje tri ravne trake 1:1; ništa drugo se ne mijenja" }
+    ],
+    "forbidden": "bez blura, gradijenata, maski, čestica, 3D-a i redrawa livade po frameu"
+  },
+
+  "godot_map": {
+    "FieldPage": { "node": "main_menu.tscn", "script": "main_menu.gd", "change": "_apply_mode_layout(true) — FIELD_COLUMN_OFFSETS (48,380,-48,-24) i FIELD_COLUMN_SEPARATION 12 se brišu; polje je VBox s padding 24 i gap 16" },
+    "FieldBackdrop": { "node": "main_menu.tscn FieldBackdrop", "script": "main_menu.gd sync_field_backdrop()", "change": "uvijek #2E4733; tint sezone se više ne nanosi na cijelu stranicu nego na Meadow panel", "remove": ["tint grana u sync_field_backdrop()"] },
+    "Meadow": { "node": "season_stage.tscn %SeasonField/MeadowGround", "script": "season_field.gd", "change": "Panel s meadow_frame StyleBox + 3 ColorRecta (sky/far/near); meadow_safe_rect() se briše jer chrome više nije preko livade", "data": "SeasonTheme.home_field_tint()" },
+    "MeadowFlower": { "node": "season_field_flower.gd", "change": "pozicija iz components.Meadow.spots; vidljiv kad garden_crystal_stash[type] >= need; prazno mjesto je Panel s pill StyleBoxom", "data": "GameState.garden_crystal_stash" },
+    "MeadowPip": { "node": "season_field_pip.gd (MeadowPip)", "change": "72 → 190 px, stoji u prednjoj traci; FSM Walk/Sniff/Sleep ostaje", "optional": "tap → PipBubble (prijedlog)" },
+    "MeadowCount": { "node": "novi Panel u Meadow", "new": true, "data": "broj mjesta koja su izrasla / 13" },
+    "FieldTitle": { "node": "%SeasonNameChip", "change": "UiClickButton → običan Label + tagline; MOUSE_FILTER_IGNORE ostaje", "remove": ["izgled dugmeta (čip je izgledao kao dugme a nije reagovao)"] },
+    "BackButton": { "node": "%SeasonsRowButton", "change": "300 × 124, gore lijevo, VIDLJIV UVIJEK — uklanja se tutorial_complete uslov", "also": "season_stage._try_close_field_on_back() ostaje za sistemski back" },
+    "BasketCard": { "node": "HomeTopStack/BasketCard", "script": "home_basket_visual.gd", "change": "336 × 104 → 1032 × 180; dodan BasketButton i rečenica o efektu", "data": ["GameState.loadout", "_sync_loadout_to_open_season()", "UiAttention.Kind.BASKET"] },
+    "BasketPicker": { "node": "BasketPickerOverlay → PickerPanel", "script": "_rebuild_picker_list()", "change": "centrirani panel 560 → bottom sheet 1080 × 1308; PICKER_ROW_MIN_HEIGHT 128 → 148", "data": ["GameState.set_loadout", "clear_loadout", "is_seed_type_unlocked", "SeedCatalog.types_for_season"] },
+    "UpgradeCard": { "node": "%FieldUpgradeStack/MagnetRow + LootBoostRow", "script": "_refresh_field_upgrades()", "change": "196 px stub → 1032 × 192 kartica s nivoom, efektom, cijenom i razlogom", "data": ["GameState.magnet_level", "multiplier_level", "MAGNET_MAX_LEVEL", "MULTIPLIER_MAX_LEVEL", "UPGRADE_FLOWER_COST", "get_magnet_radius_for_level", "get_loot_multiplier_for_level", "can_spend_flowers_for_upgrade", "try_upgrade_magnet", "try_upgrade_multiplier"] },
+    "UpgradeCost": { "node": "UpgradeCard/CostRow", "new": true, "data": "GameState.pick_upgrade_flower_type()", "warning": "funkcija postoji, ali se danas zove tek pri trošenju — UI je mora zvati pri svakom refreshu da bi cijena bila vidljiva prije tapa (§10 poznati problem 3)" },
+    "PlayButton": { "node": "%PlayButton (CampButton)", "change": "FIELD_PLAY_SIZE 320 × 96 → 656 × 176 (1032 prije tutoriala)" },
+    "EndlessButton": { "node": "%EndlessPlayButton", "change": "320 × 96 → 360 × 176, dodan podnaslov; i dalje EndlessDifficulty.HARD" },
+    "TutorialHint": { "node": "TutorialHintPanel / %TutorialHint", "change": "tekst i pozicija (bottom 216)" },
+    "FieldTransition": { "node": "season_stage.open_season_field() / close_season_field()", "change": "danas instant → tween iz animations tabele; kartica i livada dijele isti shell (1032, radius 26, rim 6 #FFF6D6)" },
+    "hub_swipe": { "group": "block_hub_swipe", "change": "_sync_field_hub_swipe_chrome() drži BackButton, BasketCard, obje UpgradeCard, PlayButton, EndlessButton i picker; Meadow i FieldTitle NISU u grupi" },
+    "delete": [
+      { "what": "SeasonField/SeasonsButton", "why": "mrtav node, uvijek skriven (§10 poznati problem 1)" },
+      { "what": "tint grana u sync_field_backdrop()", "why": "pozadina je uvijek #2E4733" },
+      { "what": "meadow_safe_rect() i _chrome_controls() za livadu", "why": "chrome je izvan livade, nema šta izbjegavati" },
+      { "what": "tutorial_complete uslov na %SeasonsRowButton", "why": "put nazad mora biti vidljiv od prve sekunde" }
+    ]
+  },
+
+  "smoke_tests": {
+    "must_update": [
+      { "name": "season_meadow_smoke", "why": "cvjetovi više nisu uvijek vidljivi (13 mjesta, dio prazan), nema meadow_safe_rect, Seasons je vidljiv prije tutoriala, Play i Endless su nove veličine" },
+      { "name": "home_basket_picker_smoke", "why": "picker je bottom sheet, red je 148 px, dodan je BasketButton na kartici" },
+      { "name": "season_home_smoke", "why": "otvaranje i zatvaranje polja sada ima tween — test mora čekati FieldTransition" }
+    ],
+    "should_pass_unchanged": ["camp_season_link_smoke", "meta_hub_flow_smoke", "season_unlock_smoke"],
+    "new_checks": [
+      "svaki interaktivni Control u polju ima min size >= 120 px",
+      "svaki Label u polju ima font_size >= 38 (brojevi >= 44)",
+      "BackButton.visible == true i prije tutoriala",
+      "UpgradeCost prikazuje ime cvijeta prije tapa za sva 4 stanja",
+      "livada nije u grupi block_hub_swipe"
+    ]
+  },
+
+  "decisions": [
+    { "what": "Livada je uokvireni prozor (1032 × 605, rim 6 px #FFF6D6) na tamnoj #2E4733 stranici, a ne svijetla pozadina preko cijelog ekrana.", "why": "sezona zadržava svoju svijetlu pastelnu boju, a ekran i dalje izgleda kao isti hub kao Home, Camp i Arena." },
+    { "what": "Boju sezone nosi SAMO livada; svi paneli oko nje su sezonski neutralni tamni.", "why": "jedno pravilo kontrasta vrijedi za svih 8 sezona, uključujući Moonlit Warren, Starfall Glade i Ember Fen." },
+    { "what": "Livada pokazuje napredak: 13 mjesta, po dva za svaku vrstu (>=1 i >=5) i treće za ★3 (>=10), raste od igrača prema horizontu.", "why": "novi i stari igrač moraju vidjeti različitu livadu (Pillar 3), a podaci već postoje u garden_crystal_stash." },
+    { "what": "Prazno mjesto je mrlja zemlje, ne blijedi cvijet.", "why": "blijedi cvijet se čita kao 'imam ga malo', a mrlja se čita kao 'ovdje još ništa nije izraslo'." },
+    { "what": "Cijena nadogradnje ima svoj red (UpgradeCost) s okvirom i imenom cvijeta, a koliko ih imaš piše samo kad te blokira.", "why": "kad je nadogradnja dostupna, cijena je dovoljna; kad nije, treba i razlog." },
+    { "what": "Blokirano dugme piše 'Need 1', ne sivo 'Upgrade'.", "why": "razlog pripada kontroli koja odbija, a ne tooltipu." },
+    { "what": "Nazad je pill 300 × 124 '‹ Seasons' gore lijevo, uvijek vidljiv, i nikad najveće dugme na ekranu.", "why": "hijerarhija je Play > Endless > Seasons, a izlaz mora postojati i prije tutoriala." },
+    { "what": "Endless nosi podnaslov 'Hard · no finish line'.", "why": "ime samo po sebi ne kaže šta je, a težina je fiksna Hard." },
+    { "what": "Picker je bottom sheet, ne centrirani overlay.", "why": "dolazi s iste strane kao palac i ostavlja livadu vidljivom iznad sebe." },
+    { "what": "Ime sezone je običan Label u naslovnom redu, ne čip.", "why": "nikad nije reagovalo na tap, pa ne smije izgledati kao dugme." },
+    { "what": "Pip je 190 px i stoji u prednjoj traci; oblačić na tap je prijedlog iza propa.", "why": "maskota na 72 px je bila dekor; na 190 px je stanovnik livade." },
+    { "what": "Prelaz iz kartice u polje je jedan rect tween na istom shellu (1032, radius 26, rim 6 px), plus bg_color iz mood u ground.", "why": "kartica aktivne sezone i okvir livade su namjerno ista geometrija, pa prelaz ne traži novu scenu." },
+    { "what": "Samo jedan element ikad pulsira — prazna korpa.", "why": "29 pulsirajućih čipova je na emulatoru palo na 10 fps." },
+    { "what": "Ground livade ostaje postojeći home_field_tint(); formula lerp(mood, #FFF8F0, 0.45) je samo fallback za novu sezonu.", "why": "postojeće vrijednosti su ručno birane i bolje od bilo koje formule." },
+    { "what": "Pip sprite je u paketu kao icons/pip_idle.svg.", "why": "da lista foldera iz §7.2 ostane tačno onakva kakva je tražena." },
+    { "what": "Prazna korpa koristi icon_seed_light.svg (#FFF6D6), ne icon_seed.svg (#2D3436).", "why": "tamni glif na tamnom wellu (#22342A) se ne vidi, a to je jedini element na ekranu koji traži pažnju." },
+    { "what": "Korpa je 180 px i nadogradnja 192 px — stvarne visine sadržaja, ne okrugao broj.", "why": "Meadow je jedini fleksibilni blok, pa svaku razliku između deklarisane i stvarne visine pojede on i svi y-ovi se pomjere." }
+  ]
+}

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  a { color: #FFD56B; }
+  a:hover { color: #FFF6D6; }
+</style>
+</helmet>
+<div data-layer="HomeField" data-screen-label="{{ sceneLabel }}" style="{{ rootStyle }}">
+
+  <div data-layer="Header" style="flex:0 0 143px;position:relative;z-index:3;background:#1A241E;box-shadow:0 6px 14px rgba(20,26,22,.34)">
+    <div style="height:140px;display:flex;align-items:center;gap:16px;padding:0 20px;box-sizing:border-box">
+      <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="3">
+        <div data-layer="{{ chip.layer }}" style="{{ chip.style }}">
+          <img src="{{ chip.icon }}" alt="" style="width:56px;height:56px;flex:0 0 auto" />
+          <div style="flex:1;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums;letter-spacing:-.01em">{{ chip.value }}</div>
+        </div>
+      </sc-for>
+      <div data-layer="SettingsButton" style="width:100px;height:100px;box-sizing:border-box;margin-left:4px;flex:0 0 auto;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center">
+        <img src="icons/icon_settings_light.svg" alt="" style="width:54px;height:54px" />
+      </div>
+    </div>
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+  </div>
+
+  <div data-layer="FieldPage" style="flex:1;min-height:0;position:relative;overflow:hidden">
+    <div data-layer="FieldBackdrop" style="position:absolute;inset:0;background:#2E4733"></div>
+
+    <div data-layer="FieldStack" style="position:relative;height:100%;box-sizing:border-box;padding:24px;display:flex;flex-direction:column;gap:16px">
+
+      <div data-layer="FieldTopRow" style="flex:0 0 124px;display:flex;align-items:stretch;gap:16px">
+        <div data-layer="BackButton" style="flex:0 0 300px;box-sizing:border-box;border-radius:22px;background:rgba(255,248,240,.13);border:3px solid rgba(255,248,240,.34);display:flex;align-items:center;justify-content:center;gap:12px;font:900 46px/1 Nunito,system-ui,sans-serif;color:#FFF6D6">‹&nbsp;&nbsp;Seasons</div>
+        <div data-layer="FieldTitle" style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:8px">
+          <div style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#FFF6D6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ seasonName }}</div>
+          <div style="font:700 38px/1 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tagline }}</div>
+        </div>
+      </div>
+
+      <div data-layer="Meadow" style="{{ meadowStyle }}">
+        <div data-layer="MeadowSky" style="{{ skyStyle }}"></div>
+        <div data-layer="MeadowFar" style="{{ farStyle }}"></div>
+        <div data-layer="MeadowNear" style="{{ nearStyle }}"></div>
+        <sc-for list="{{ spots }}" as="sp" hint-placeholder-count="13">
+          <div data-layer="MeadowFlower" style="{{ sp.wrap }}">
+            <div style="{{ sp.soil }}"></div>
+            <div style="{{ sp.shade }}"></div>
+            <img src="{{ sp.src }}" alt="" style="{{ sp.art }}" />
+          </div>
+        </sc-for>
+        <div data-layer="MeadowPip" style="{{ pipStyle }}">
+          <div data-layer="PipBubble" style="{{ bubbleStyle }}">Ready when you are.</div>
+          <div style="{{ pipShade }}"></div>
+          <img src="icons/pip_idle.svg" alt="" style="width:190px;height:190px;display:block" />
+        </div>
+        <div data-layer="MeadowCount" style="{{ countStyle }}">
+          <span style="font:900 48px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#1A1A14;white-space:nowrap">{{ grownText }}</span>
+          <span style="font:700 40px/1 Nunito,system-ui,sans-serif;color:#3D3D33;white-space:nowrap">grown</span>
+        </div>
+        <div data-layer="MeadowNote" style="{{ noteStyle }}">Nothing has grown here yet. Bring seeds back from a run.</div>
+      </div>
+
+      <div data-layer="BasketCard" style="{{ basketStyle }}">
+        <div data-layer="BasketFrame" style="{{ bFrame }}">
+          <div style="{{ bWell }}"></div>
+          <img src="{{ bArtSrc }}" alt="" style="{{ bArt }}" />
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px">
+          <div style="{{ bEyebrow }}">Basket</div>
+          <div style="display:flex;align-items:baseline;gap:16px;min-width:0">
+            <span style="{{ bNameStyle }}">{{ bName }}</span>
+            <span style="{{ bPipsStyle }}">{{ bPips }}</span>
+          </div>
+          <div style="{{ bSubStyle }}">{{ bSub }}</div>
+        </div>
+        <div data-layer="BasketButton" style="{{ bBtn }}">{{ bBtnLabel }}</div>
+      </div>
+
+      <sc-for list="{{ upgrades }}" as="u" hint-placeholder-count="2">
+        <div data-layer="UpgradeCard" style="{{ u.card }}">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+            <div style="flex:0 0 56px;display:flex;align-items:center;gap:16px;min-width:0">
+              <div style="{{ u.titleStyle }}">{{ u.title }}</div>
+              <div data-layer="UpgradeLevel" style="{{ u.levelStyle }}">{{ u.levelText }}</div>
+              <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto">
+                <div style="{{ u.s0 }}"></div>
+                <div style="{{ u.s1 }}"></div>
+                <div style="{{ u.s2 }}"></div>
+                <div style="{{ u.s3 }}"></div>
+              </div>
+            </div>
+            <div style="{{ u.effectStyle }}">{{ u.effect }}</div>
+            <div data-layer="UpgradeCost" style="{{ u.costRow }}">
+              <div style="{{ u.costFrame }}">
+                <div style="{{ u.costWell }}"></div>
+                <img src="{{ u.costSrc }}" alt="" style="{{ u.costArt }}" />
+              </div>
+              <span style="{{ u.costMain }}">{{ u.costText }}</span>
+              <span style="{{ u.costChip }}">{{ u.haveText }}</span>
+            </div>
+          </div>
+          <div data-layer="UpgradeButton" style="{{ u.btn }}">{{ u.btnLabel }}</div>
+        </div>
+      </sc-for>
+
+      <div data-layer="PlayRow" style="flex:0 0 176px;display:flex;gap:16px">
+        <div data-layer="PlayButton" style="{{ playStyle }}">▶&nbsp;&nbsp;Play</div>
+        <div data-layer="EndlessButton" style="{{ endlessStyle }}">
+          <div style="font:900 48px/1 Nunito,system-ui,sans-serif;color:#2D3436">Endless</div>
+          <div style="font:700 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Hard · no finish line</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div data-layer="TutorialHint" style="{{ hintStyle }}">Merge your first flower in the Arena to unlock the basket.</div>
+
+    <div data-layer="BasketPicker" style="{{ pickerScrim }}">
+      <div data-layer="PickerSheet" style="position:absolute;left:0;right:0;bottom:0;height:1308px;box-sizing:border-box;background:#1A241E;border-top:3px solid rgba(255,248,240,.30);border-radius:32px 32px 0 0;padding:20px 24px 24px;display:flex;flex-direction:column">
+        <div style="width:120px;height:10px;border-radius:5px;background:rgba(255,248,240,.32);margin:0 auto 22px"></div>
+        <div style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#FFF6D6">Choose basket seed</div>
+        <div style="margin-top:8px;font:700 40px/1 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.90)">One seed type falls 5 % more often in your run.</div>
+        <div style="margin-top:22px;display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ pickerRows }}" as="r" hint-placeholder-count="6">
+            <div data-layer="PickerRow" style="{{ r.row }}">
+              <div style="{{ r.frame }}">
+                <div style="{{ r.well }}"></div>
+                <img src="{{ r.src }}" alt="" style="{{ r.art }}" />
+              </div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                <div style="{{ r.nameStyle }}">{{ r.name }}</div>
+                <div style="{{ r.subStyle }}">{{ r.sub }}</div>
+              </div>
+              <div style="{{ r.chip }}">{{ r.chipText }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:22px;display:flex;gap:32px">
+          <div data-layer="PickerClear" style="flex:1;height:132px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:3px solid rgba(255,248,240,.28);display:flex;align-items:center;justify-content:center;font:900 46px/1 Nunito,system-ui,sans-serif;color:#FFF6D6">Clear basket</div>
+          <div data-layer="PickerClose" style="flex:1;height:132px;box-sizing:border-box;border-radius:20px;background:#FFF8F0;border:3px solid rgba(45,52,54,.26);display:flex;align-items:center;justify-content:center;font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436">Close</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div data-layer="Footer" style="flex:0 0 180px;position:relative;z-index:3;background:#1A241E;box-shadow:0 -6px 14px rgba(20,26,22,.34)">
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+    <div style="position:relative;height:177px">
+      <div data-layer="ActiveIndicator" style="position:absolute;top:5px;left:442px;width:196px;height:8px;border-radius:4px;background:#FFB88C"></div>
+      <div style="position:absolute;left:0;right:0;top:17px;height:152px;display:flex">
+        <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="5">
+          <div data-layer="{{ tab.layer }}" style="flex:1;min-width:0;display:flex;justify-content:center">
+            <div style="{{ tab.tileStyle }}">
+              <img src="{{ tab.icon }}" alt="" style="width:52px;height:52px;opacity:{{ tab.io }}" />
+              <div style="{{ tab.labelStyle }}">{{ tab.label }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;main&quot;,&quot;basket&quot;,&quot;picker&quot;,&quot;broke&quot;,&quot;maxed&quot;,&quot;upgrading&quot;,&quot;newbie&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;main&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;pipTap&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Proposals&quot;}}">
+const NUN = 'Nunito,system-ui,sans-serif';
+const RIM = '#FFF6D6', INK = '#1A1A14', INK2 = '#2D3436', INKSOFT = '#3D3D33';
+const GOLD = '#FFD56B', GOLD_E = '#D6A82F', UIGOLD = '#E8C44A', UIGOLD_E = '#BA9D3B';
+const PEACH = '#FFB88C', PEACH_E = '#E8A374', LAV = '#D4A5FF', LAV_E = '#AA84CC';
+const MINT = '#A8E6CF', MINT_E = '#7FC9AC', WELL = '#22342A', WELL_E = '#16211B';
+const SUB = 'rgba(255,246,214,.90)';
+const PANEL = 'rgba(255,248,240,.13)', PANEL_E = 'rgba(255,248,240,.28)';
+const DIS_F = 'rgba(255,248,240,.07)', DIS_E = 'rgba(255,248,240,.20)', DIS_I = 'rgba(255,248,240,.68)';
+
+// id: name, tagline, mood, meadow ground (SeasonTheme.home_field_tint), roster [name, rarity, placeholder]
+const S = {
+  country_bloom: { n: 'Country Bloom', t: 'Warm fields, soft petals, home pastures.', m: '#A8E6CF', g: '#E6F2DB', r: [['Meadow Clover', 1, 'clover'], ['Field Daisy', 1, 'daisy'], ['Buttercup Lane', 1, 'buttercup'], ['Barn Tulip', 2, 'tulip'], ['Sunfence', 2, 'sunflower'], ['Harvest Pumpkin', 3, 'pumpkin']] },
+  frost_orchard: { n: 'Frost Orchard', t: 'Crisp air, silver blossom.', m: '#C5D5E8', g: '#D1E6FF', r: [['Frost Snowdrop', 1, 'frost_snowdrop'], ['Ice Crocus', 1, 'silver_aconite'], ['Silver Aconite', 1, 'clover'], ['Winter Camellia', 2, 'daisy'], ['Hoarfrost Rose', 2, 'tulip'], ['Crystal Peony', 3, 'sunflower']] },
+  lantern_meadow: { n: 'Lantern Meadow', t: 'Dusk lights among tall grass.', m: '#C9B8E0', g: '#EBD6FF', r: [['Dusk Firefly Grass', 1, 'clover'], ['Paper Lantern Bloom', 1, 'buttercup'], ['Evening Primrose', 1, 'daisy'], ['Foxfire Lily', 2, 'tulip'], ['Glow Wisteria', 2, 'silver_aconite'], ['Midnight Lotus', 3, 'sunflower']] },
+  amber_canopy: { n: 'Amber Canopy', t: 'Warm late-season light through high leaves.', m: '#E8C48A', g: '#FFEBC7', r: [['Copper Leaf', 1, 'clover'], ['Maple Aster', 1, 'daisy'], ['Russet Mallow', 1, 'tulip'], ['Cider Dahlia', 2, 'buttercup'], ['Golden Oak Bloom', 2, 'sunflower'], ['Amber Magnolia', 3, 'pumpkin']] },
+  moonlit_warren: { n: 'Moonlit Warren', t: 'Night blooms under a quiet moon.', m: '#3D3A6B', g: '#B8BDFF', r: [['Moon Moss', 1, 'clover'], ['Nightshade Petal', 1, 'silver_aconite'], ['Silver Harebell', 1, 'frost_snowdrop'], ['Lunar Orchid', 2, 'tulip'], ['Star Jasmine', 2, 'daisy'], ['Umbral Lily', 3, 'sunflower']] },
+  coral_tide: { n: 'Coral Tide Garden', t: 'Salt breeze and seashell petals.', m: '#E8A090', g: '#FFE0D6', r: [['Sea Thrift', 1, 'daisy'], ['Salt Daisy', 1, 'clover'], ['Tide Anemone', 1, 'tulip'], ['Coral Hibiscus', 2, 'buttercup'], ['Pearl Waterlily', 2, 'sunflower'], ['Reef Crown', 3, 'pumpkin']] },
+  starfall_glade: { n: 'Starfall Glade', t: 'Petals that catch the night sky.', m: '#6B5B95', g: '#DBCCFF', r: [['Comet Sprig', 1, 'silver_aconite'], ['Nebula Clover', 1, 'clover'], ['Meteor Daisy', 1, 'daisy'], ['Aurora Tulip', 2, 'tulip'], ['Galaxy Sunburst', 2, 'sunflower'], ['Nova Bloom', 3, 'frost_snowdrop']] },
+  ember_fen: { n: 'Ember Fen', t: 'Low firelight over marsh blooms.', m: '#C45C26', g: '#FFC79E', r: [['Marsh Rush', 1, 'clover'], ['Peat Violet', 1, 'silver_aconite'], ['Cinder Buttercup', 1, 'buttercup'], ['Flame Iris', 2, 'tulip'], ['Smoke Lotus', 2, 'daisy'], ['Fenfire Crown', 3, 'pumpkin']] }
+};
+
+// x % (centre), y % from the meadow floor (base anchor), size px, roster index, flowers owned needed to grow.
+// Near rows need 1 (first of a type), far rows need 5, the ★3 crown spot needs 10 —
+// so the meadow fills from the player's feet towards the horizon.
+const SPOTS = [
+  [10, 40, 76, 0, 5], [29, 42, 76, 1, 5], [51, 40, 76, 2, 5], [72, 42, 76, 3, 5], [90, 38, 84, 4, 5],
+  [17, 27, 96, 5, 5], [37, 25, 96, 0, 1], [59, 27, 96, 1, 1], [84, 24, 96, 2, 1],
+  [11, 9, 112, 3, 1], [33, 7, 112, 4, 1], [88, 8, 112, 5, 1], [52, 1, 128, 5, 10]
+];
+
+const BASE = { s: 'frost_orchard', tut: true, basket: -1, mag: 1, loot: 0, cost: ['Meadow Clover', 'clover', 7], cur: ['320', '48', '12'], c: [3, 5, 4, 2, 1, 0], lockedSeeds: [4, 5] };
+const SCENES = {
+  main: Object.assign({ label: 'P1.1 · mid game' }, BASE),
+  basket: Object.assign({ label: 'P1.2 · basket chosen' }, BASE, { basket: 3 }),
+  picker: Object.assign({ label: 'P1.2 · picker open' }, BASE, { basket: 3, picker: true }),
+  broke: Object.assign({ label: 'P1.3 · no flowers' }, BASE, { cost: ['Meadow Clover', 'clover', 1] }),
+  maxed: Object.assign({ label: 'P1.3 · maxed' }, BASE, { mag: 4, loot: 3 }),
+  upgrading: Object.assign({ label: 'P1.3 · just upgraded' }, BASE, { mag: 2, cost: ['Meadow Clover', 'clover', 5], spent: 0 }),
+  newbie: { label: 'P1.4 · before tutorial', s: 'country_bloom', tut: false, basket: -1, mag: 0, loot: 0, cost: ['', 'clover', 0], cur: ['0', '6', '0'], c: [0, 0, 0, 0, 0, 0], lockedSeeds: [1, 2, 3, 4, 5], hint: true },
+  dark: { label: 'P1.5 · dark premium season', s: 'moonlit_warren', tut: true, basket: 3, mag: 3, loot: 4, cost: ['Moon Moss', 'clover', 12], cur: ['1,240', '128', '9'], c: [12, 8, 6, 5, 4, 11], lockedSeeds: [] }
+};
+
+const TABS = [['Tab_Shop', 'Shop', 'shop'], ['Tab_Journal', 'Journal', 'journal'], ['Tab_Home', 'Home', 'home'], ['Tab_Camp', 'Camp', 'camp'], ['Tab_Arena', 'Arena', 'arena']];
+const CUR = [['CoinChip', 'icons/icon_coin.svg', '#FFD56B'], ['SeedChip', 'icons/icon_seed.svg', '#A8E6CF'], ['DiamondChip', 'icons/icon_diamond.svg', '#D4A5FF']];
+
+class Component extends DCLogic {
+  rgb(h) { return [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)); }
+  hx(a) { return '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join(''); }
+  sc(h, f) { return this.hx(this.rgb(h).map(v => v * f)); }
+  mix(a, b, t) { const A = this.rgb(a), B = this.rgb(b); return this.hx(A.map((v, i) => v + (B[i] - v) * t)); }
+
+  pips(r) { return '★'.repeat(r) + '☆'.repeat(3 - r); }
+
+  upgrade(kind, level, cost, spent) {
+    const max = 4, maxed = level >= max;
+    const title = kind === 'mag' ? 'Magnet' : 'Loot Boost';
+    const rad = l => 40 + 48 * l;
+    const mul = l => ['×1.0', '×1.25', '×1.5', '×1.75', '×2.0'][l];
+    let effect;
+    if (kind === 'mag') effect = maxed ? 'Pull radius ' + rad(4) + ' px · fully upgraded' : 'Pull radius ' + rad(level) + ' px → ' + rad(level + 1) + ' px';
+    else effect = maxed ? 'Run loot ' + mul(4) + ' · fully upgraded' : 'Run loot ' + mul(level) + ' → ' + mul(level + 1);
+
+    const have = cost[2], name = cost[0], enough = have >= 2 && !maxed;
+    const flash = spent === true;
+    const seg = i => 'width:52px;height:16px;border-radius:8px;box-sizing:border-box;' +
+      (i < level ? 'background:' + MINT + ';border:2px solid ' + MINT_E : 'background:rgba(255,248,240,.20)');
+
+    let costText, haveText = '', showFrame = true;
+    if (maxed) { costText = 'Nothing left to buy'; showFrame = false; }
+    else if (flash) { costText = 'Spent 2 × ' + name; showFrame = true; }
+    else if (!name) { costText = '2 × any ★1 flower'; haveText = 'you have none'; showFrame = false; }
+    else { costText = '2 × ' + name; haveText = enough ? '' : (have === 0 ? 'none yet' : 'you have ' + have); }
+
+    let btnLabel = 'Upgrade', bF = UIGOLD, bE = UIGOLD_E, bI = INK2;
+    if (maxed) { btnLabel = 'Maxed'; bF = 'rgba(255,248,240,.10)'; bE = 'rgba(255,246,214,.34)'; bI = RIM; }
+    else if (!enough) { btnLabel = have === 0 ? 'Need 2' : 'Need ' + (2 - have); bF = DIS_F; bE = DIS_E; bI = DIS_I; }
+
+    return {
+      title, effect, levelText: 'Lv ' + level + ' / ' + max, costText, haveText, btnLabel,
+      card: 'flex:0 0 192px;box-sizing:border-box;border-radius:22px;background:' + PANEL +
+        ';border:' + (flash ? '4px solid ' + RIM : '3px solid ' + PANEL_E) +
+        ';box-shadow:0 8px 16px rgba(20,26,22,.26);padding:16px;display:flex;align-items:stretch;gap:20px',
+      titleStyle: 'flex:0 0 auto;font:900 46px/1 ' + NUN + ';color:' + RIM + ';white-space:nowrap',
+      levelStyle: 'flex:0 0 auto;box-sizing:border-box;height:56px;padding:0 20px;border-radius:16px;background:' +
+        (flash ? GOLD : 'rgba(255,248,240,.14)') + ';border:2px solid ' + (flash ? GOLD_E : 'rgba(255,246,214,.36)') +
+        ';display:flex;align-items:center;white-space:nowrap;font:900 44px/1 ' + NUN + ';font-variant-numeric:tabular-nums;color:' + (flash ? INK2 : RIM),
+      s0: seg(0), s1: seg(1), s2: seg(2), s3: seg(3),
+      effectStyle: 'flex:0 0 38px;display:flex;align-items:center;font:700 38px/1 ' + NUN + ';color:' + SUB + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      costRow: 'flex:0 0 52px;display:flex;align-items:center;gap:12px;min-width:0',
+      costFrame: showFrame
+        ? 'position:relative;flex:0 0 auto;box-sizing:border-box;width:46px;height:46px;border-radius:12px;background:' + GOLD + ';border:2px solid ' + GOLD_E + ';display:grid;place-items:center'
+        : 'display:none',
+      costWell: 'position:absolute;inset:5px;box-sizing:border-box;border-radius:8px;background:' + WELL + ';border:2px solid ' + WELL_E,
+      costSrc: 'flowers/ph_' + cost[1] + '.svg',
+      costArt: 'position:relative;display:block;width:26px;height:26px',
+      costMain: 'flex:0 1 auto;min-width:0;font:800 40px/1 ' + NUN + ';color:' + (maxed ? SUB : RIM) + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      costChip: haveText
+        ? 'flex:0 0 auto;box-sizing:border-box;height:48px;padding:0 16px;border-radius:14px;background:rgba(255,248,240,.10);border:2px solid rgba(255,246,214,.30);display:flex;align-items:center;font:700 38px/1 ' + NUN + ';color:' + DIS_I
+        : 'display:none',
+      btn: 'flex:0 0 300px;box-sizing:border-box;border-radius:20px;background:' + bF + ';border:3px solid ' + bE +
+        ';display:flex;align-items:center;justify-content:center;font:900 48px/1 ' + NUN + ';color:' + bI + ';white-space:nowrap'
+    };
+  }
+
+  renderVals() {
+    const p = this.props;
+    const key = p.scene ?? 'main';
+    const sc = SCENES[key] || SCENES.main;
+    const id = (p.season && p.season !== 'auto') ? p.season : sc.s;
+    const s = S[id] || S.frost_orchard;
+    const counts = sc.c;
+
+    const ground = s.g;
+    const sky = this.mix(ground, '#FFFFFF', 0.30);
+    const near = this.sc(ground, 0.93);
+
+    // ── Meadow ────────────────────────────────────────────────────────────
+    let grown = 0;
+    const spots = SPOTS.map(sp => {
+      const have = counts[sp[3]] || 0, isUp = have >= sp[4];
+      if (isUp) grown++;
+      const size = sp[2];
+      return {
+        wrap: 'position:absolute;left:' + sp[0] + '%;bottom:' + sp[1] + '%;transform:translateX(-50%);width:' + size + 'px;height:' + size + 'px',
+        soil: isUp ? 'display:none'
+          : 'position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:' + Math.round(size * 0.68) + 'px;height:' + Math.round(size * 0.27) +
+            'px;box-sizing:border-box;border-radius:999px;background:rgba(26,26,20,.10);border:3px solid rgba(26,26,20,.19)',
+        shade: isUp ? 'position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:' + Math.round(size * 0.56) + 'px;height:' + Math.round(size * 0.17) + 'px;border-radius:999px;background:rgba(26,26,20,.13)' : 'display:none',
+        src: 'flowers/ph_' + s.r[sp[3]][2] + '.svg',
+        art: isUp ? 'position:relative;display:block;width:' + size + 'px;height:' + size + 'px' : 'display:none'
+      };
+    });
+
+    // ── Basket ────────────────────────────────────────────────────────────
+    const bIdx = sc.basket, bLocked = !sc.tut, bSet = bIdx >= 0 && !bLocked;
+    const bFlower = bSet ? s.r[bIdx] : null;
+    const bTint = bLocked ? 'rgba(255,248,240,.06)' : PANEL;
+    const bEdge = bLocked ? 'rgba(255,248,240,.18)' : PANEL_E;
+
+    // ── Upgrades ──────────────────────────────────────────────────────────
+    const upM = this.upgrade('mag', sc.mag, sc.cost, sc.spent === 0);
+    const upL = this.upgrade('loot', sc.loot, sc.cost, false);
+
+    // ── Picker ────────────────────────────────────────────────────────────
+    const locked = sc.lockedSeeds || [];
+    const pickerRows = s.r.map((f, i) => {
+      const isLocked = locked.indexOf(i) >= 0, chosen = i === bIdx && !isLocked;
+      return {
+        row: 'height:148px;box-sizing:border-box;border-radius:20px;padding:0 20px;display:flex;align-items:center;gap:20px;background:' +
+          (isLocked ? 'rgba(255,248,240,.05)' : chosen ? 'rgba(255,248,240,.16)' : 'rgba(255,248,240,.10)') +
+          ';border:' + (chosen ? '4px solid ' + RIM : '2px solid ' + (isLocked ? 'rgba(255,248,240,.16)' : 'rgba(255,248,240,.26)')),
+        frame: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:104px;height:104px;border-radius:24px;background:' +
+          (isLocked ? 'rgba(255,248,240,.10)' : GOLD) + ';border:3px solid ' + (isLocked ? 'rgba(255,246,214,.30)' : GOLD_E) + ';display:grid;place-items:center',
+        well: 'position:absolute;inset:10px;box-sizing:border-box;border-radius:16px;background:' + WELL + ';border:2px solid ' + WELL_E,
+        src: isLocked ? 'icons/icon_lock.svg' : 'flowers/ph_' + f[2] + '.svg',
+        art: 'position:relative;display:block;width:' + (isLocked ? 44 : 60) + 'px;height:' + (isLocked ? 44 : 60) + 'px' + (isLocked ? ';opacity:.75' : ''),
+        name: f[0],
+        nameStyle: 'font:900 46px/1 ' + NUN + ';color:' + (isLocked ? DIS_I : RIM) + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+        sub: isLocked ? this.pips(f[1]) + '  ·  not found yet' : this.pips(f[1]) + '  ·  +5 % spawn',
+        subStyle: 'font:700 40px/1 ' + NUN + ';letter-spacing:.02em;color:' + (isLocked ? 'rgba(255,248,240,.52)' : SUB),
+        chip: chosen
+          ? 'flex:0 0 auto;box-sizing:border-box;height:72px;padding:0 24px;border-radius:18px;background:' + RIM + ';border:3px solid ' + GOLD_E + ';display:flex;align-items:center;font:900 40px/1 ' + NUN + ';color:' + INK2
+          : (isLocked ? 'flex:0 0 auto;box-sizing:border-box;height:72px;padding:0 24px;border-radius:18px;background:rgba(255,248,240,.06);border:2px solid rgba(255,246,214,.26);display:flex;align-items:center;font:800 38px/1 ' + NUN + ';color:' + DIS_I : 'display:none'),
+        chipText: chosen ? 'Chosen' : 'Locked'
+      };
+    });
+
+    // ── Chrome ────────────────────────────────────────────────────────────
+    const chips = CUR.map((c, i) => ({
+      layer: c[0], icon: c[1], value: sc.cur[i],
+      style: 'flex:1;min-width:0;height:100px;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:12px;padding:0 20px 0 18px;background:' + c[2] + ';border:2px solid rgba(45,52,54,.14)'
+    }));
+    const tabs = TABS.map((t, i) => {
+      const on = i === 2;
+      return {
+        layer: t[0], label: t[1], io: on ? 1 : 0.82,
+        icon: 'icons/tab_' + t[2] + (on ? '' : '_light') + '.svg',
+        tileStyle: 'position:relative;width:196px;height:152px;box-sizing:border-box;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:' +
+          (on ? PEACH : 'transparent') + ';border:2px solid ' + (on ? 'rgba(45,52,54,.14)' : 'transparent'),
+        labelStyle: 'font:' + (on ? 800 : 700) + ' 40px/1 ' + NUN + ';color:' + (on ? INK2 : 'rgba(255,248,240,.82)')
+      };
+    });
+
+    const showEndless = sc.tut;
+    const pipTap = !!p.pipTap;
+
+    return {
+      sceneLabel: sc.label,
+      seasonName: s.n, tagline: s.t,
+      grownText: grown + ' / 13',
+      spots, upgrades: [upM, upL], pickerRows, chips, tabs,
+
+      rootStyle: 'width:1080px;height:1920px;flex:0 0 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#2E4733;font-family:' + NUN + ';-webkit-font-smoothing:antialiased',
+
+      meadowStyle: 'position:relative;flex:1 1 auto;min-height:0;overflow:hidden;box-sizing:border-box;border-radius:26px;background:' + ground +
+        ';border:6px solid ' + RIM + ';box-shadow:0 10px 22px rgba(20,26,22,.38)',
+      skyStyle: 'position:absolute;left:0;right:0;top:0;height:56%;background:' + sky,
+      farStyle: 'position:absolute;left:0;right:0;top:56%;height:22%;background:' + ground,
+      nearStyle: 'position:absolute;left:0;right:0;top:78%;bottom:0;background:' + near,
+      pipStyle: 'position:absolute;left:68%;bottom:6%;transform:translateX(-50%);width:190px;height:190px',
+      pipShade: 'position:absolute;left:50%;bottom:6px;transform:translateX(-50%);width:120px;height:26px;border-radius:999px;background:rgba(26,26,20,.14)',
+      bubbleStyle: pipTap
+        ? 'position:absolute;left:50%;bottom:196px;transform:translateX(-50%);box-sizing:border-box;height:84px;padding:0 24px;border-radius:20px;background:#FFF8F0;border:3px solid rgba(45,52,54,.26);display:flex;align-items:center;font:800 40px/1 ' + NUN + ';color:' + INK2 + ';white-space:nowrap'
+        : 'display:none',
+      countStyle: 'position:absolute;left:18px;top:18px;box-sizing:border-box;height:84px;padding:0 22px;border-radius:18px;background:rgba(255,248,240,.80);border:2px solid rgba(26,26,20,.26);display:flex;align-items:center;gap:12px',
+      noteStyle: grown === 0
+        ? 'position:absolute;left:0;right:0;top:26%;text-align:center;font:700 40px/1 ' + NUN + ';color:' + INKSOFT
+        : 'display:none',
+
+      basketStyle: 'flex:0 0 180px;box-sizing:border-box;border-radius:22px;background:' + bTint + ';border:' +
+        (!bLocked && !bSet ? '4px solid ' + UIGOLD : '3px solid ' + bEdge) +
+        ';box-shadow:0 8px 16px rgba(20,26,22,.26);padding:18px;display:flex;align-items:center;gap:20px',
+      bFrame: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:128px;height:128px;border-radius:28px;background:' +
+        (bLocked ? 'rgba(255,248,240,.10)' : GOLD) + ';border:3px solid ' + (bLocked ? 'rgba(255,246,214,.28)' : GOLD_E) + ';display:grid;place-items:center',
+      bWell: 'position:absolute;inset:12px;box-sizing:border-box;border-radius:19px;background:' + WELL + ';border:2px solid ' + WELL_E,
+      // icon_seed.svg is #2D3436 — invisible on the #22342A well. The well stays
+      // (same frame as the chosen flower and the cost art), the glyph goes cream.
+      bArtSrc: bLocked ? 'icons/icon_lock.svg' : (bSet ? 'flowers/ph_' + bFlower[2] + '.svg' : 'icons/icon_seed_light.svg'),
+      bArt: 'position:relative;display:block;width:' + (bSet ? 74 : 56) + 'px;height:' + (bSet ? 74 : 56) + 'px' + (bLocked ? ';opacity:.75' : ''),
+      bEyebrow: 'font:700 38px/1 ' + NUN + ';color:' + (bLocked ? 'rgba(255,248,240,.55)' : SUB),
+      bName: bLocked ? 'Basket locked' : (bSet ? bFlower[0] : 'Tap to choose'),
+      bNameStyle: 'font:900 52px/1 ' + NUN + ';color:' + (bLocked ? DIS_I : RIM) + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      bPips: bSet ? this.pips(bFlower[1]) : '',
+      bPipsStyle: bSet ? 'flex:0 0 auto;font:800 44px/1 ' + NUN + ';letter-spacing:.02em;color:' + RIM : 'display:none',
+      bSub: bLocked ? 'Unlock after your first merge' : (bSet ? 'Falls 5 % more often this run' : 'One seed falls 5 % more often'),
+      bSubStyle: 'font:700 38px/1 ' + NUN + ';color:' + (bLocked ? 'rgba(255,248,240,.52)' : SUB) + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      bBtnLabel: bSet ? 'Change' : 'Choose',
+      bBtn: bLocked ? 'display:none'
+        : 'flex:0 0 260px;align-self:stretch;box-sizing:border-box;border-radius:20px;background:' + (bSet ? 'rgba(255,248,240,.16)' : UIGOLD) +
+          ';border:3px solid ' + (bSet ? 'rgba(255,246,214,.40)' : UIGOLD_E) + ';display:flex;align-items:center;justify-content:center;font:900 46px/1 ' + NUN + ';color:' + (bSet ? RIM : INK2),
+
+      playStyle: 'flex:' + (showEndless ? '0 0 656px' : '1') + ';box-sizing:border-box;border-radius:26px;background:' + PEACH + ';border:4px solid ' + PEACH_E +
+        ';box-shadow:0 8px 16px rgba(20,26,22,.30);display:flex;align-items:center;justify-content:center;font:900 64px/1 ' + NUN + ';color:' + INK2,
+      endlessStyle: showEndless
+        ? 'flex:0 0 360px;box-sizing:border-box;border-radius:26px;background:' + LAV + ';border:4px solid ' + LAV_E +
+          ';box-shadow:0 8px 16px rgba(20,26,22,.30);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px'
+        : 'display:none',
+
+      hintStyle: sc.hint
+        ? 'position:absolute;left:24px;right:24px;bottom:216px;box-sizing:border-box;border-radius:20px;background:' + RIM + ';border:3px solid ' + GOLD_E +
+          ';box-shadow:0 8px 16px rgba(20,26,22,.30);padding:22px 26px;font:800 40px/1.1 ' + NUN + ';color:' + INK + ';text-wrap:pretty'
+        : 'display:none',
+
+      pickerScrim: sc.picker ? 'position:absolute;inset:0;background:rgba(20,26,22,.62);z-index:4' : 'display:none'
+    };
+  }
+}
+</script>
+</body>
+</html>

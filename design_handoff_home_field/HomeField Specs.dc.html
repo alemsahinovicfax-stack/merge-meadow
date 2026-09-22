@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  a { color: #FFD56B; }
+  a:hover { color: #FFF6D6; }
+</style>
+</helmet>
+<div data-layer="FieldSpecs" style="width:3520px;box-sizing:border-box;padding:64px;background:#1A241E;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;gap:72px">
+
+  <div style="display:flex;align-items:flex-end;gap:40px">
+    <div style="flex:1;min-width:0">
+      <div style="font:900 84px/1 Nunito,system-ui,sans-serif;color:#FFF6D6">Home — season field</div>
+      <div style="margin-top:16px;font:700 36px/1.3 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.90);max-width:1800px">One design. Artboard 1080 × 1920, field 1080 × 1597 between header (143) and footer (180). All numbers are px in that base and transfer 1:1. Panels are flat colour + alpha, radius, border, one shadow. Motion is tween only.</div>
+    </div>
+    <div style="flex:0 0 auto;display:flex;gap:16px">
+      <div style="box-sizing:border-box;padding:18px 26px;border-radius:18px;background:rgba(255,248,240,.10);border:2px solid rgba(255,246,214,.30);font:800 32px/1 Nunito,system-ui,sans-serif;color:#FFF6D6">touch ≥ 120</div>
+      <div style="box-sizing:border-box;padding:18px 26px;border-radius:18px;background:rgba(255,248,240,.10);border:2px solid rgba(255,246,214,.30);font:800 32px/1 Nunito,system-ui,sans-serif;color:#FFF6D6">text ≥ 38</div>
+      <div style="box-sizing:border-box;padding:18px 26px;border-radius:18px;background:rgba(255,248,240,.10);border:2px solid rgba(255,246,214,.30);font:800 32px/1 Nunito,system-ui,sans-serif;color:#FFF6D6">numbers ≥ 44</div>
+    </div>
+  </div>
+
+  <div data-layer="SpecStates" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#FFD56B">1 · States (P1)</div>
+    <div style="display:flex;gap:32px;flex-wrap:wrap">
+      <sc-for list="{{ states }}" as="st" hint-placeholder-count="8">
+        <div style="flex:0 0 auto;width:389px;display:flex;flex-direction:column;gap:14px">
+          <div style="width:389px;height:691px;overflow:hidden;border-radius:14px;background:#2E4733">
+            <div style="width:1080px;height:1920px;transform:scale(0.36);transform-origin:top left">
+              <dc-import name="HomeField" scene="{{ st.scene }}" pip-tap="{{ st.pip }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:900 34px/1.1 Nunito,system-ui,sans-serif;color:#FFF6D6">{{ st.title }}</div>
+          <div style="font:700 28px/1.25 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.82)">{{ st.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="SpecMeadowSheet" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#FFD56B">2 · Meadow for all 8 seasons</div>
+    <div style="font:700 34px/1.3 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.90);max-width:2400px">Only the meadow carries the season colour. Every panel around it is the season-neutral dark chrome, so contrast is identical in all eight seasons — including Moonlit Warren, Starfall Glade and Ember Fen. Ground = <code style="color:#FFD56B">SeasonTheme.home_field_tint()</code>, sky = ground → white 30 %, near band = ground × 0.93.</div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap">
+      <sc-for list="{{ seasons }}" as="se" hint-placeholder-count="8">
+        <div style="flex:0 0 auto;width:832px;display:flex;flex-direction:column;gap:12px">
+          <div style="{{ se.frame }}">
+            <div style="{{ se.sky }}"></div>
+            <div style="{{ se.far }}"></div>
+            <div style="{{ se.near }}"></div>
+            <img src="{{ se.f1 }}" alt="" style="position:absolute;left:14%;bottom:8%;width:120px;height:120px" />
+            <img src="{{ se.f2 }}" alt="" style="position:absolute;left:38%;bottom:26%;width:96px;height:96px" />
+            <img src="{{ se.f3 }}" alt="" style="position:absolute;left:86%;bottom:12%;width:120px;height:120px" />
+            <div style="position:absolute;left:60%;bottom:6%;width:150px;height:150px"><img src="icons/pip_idle.svg" alt="" style="width:150px;height:150px;display:block" /></div>
+            <div style="position:absolute;left:18px;top:18px;box-sizing:border-box;height:72px;padding:0 20px;border-radius:16px;background:rgba(255,248,240,.80);border:2px solid rgba(26,26,20,.26);display:flex;align-items:center;gap:10px;font:900 40px/1 Nunito,system-ui,sans-serif;color:#1A1A14;white-space:nowrap">{{ se.count }}</div>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:18px">
+            <div style="font:900 40px/1 Nunito,system-ui,sans-serif;color:#FFF6D6">{{ se.name }}</div>
+            <div style="font:700 30px/1 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.82);font-variant-numeric:tabular-nums">ground {{ se.g }} · mood {{ se.m }} · {{ se.kind }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="SpecTransition" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#FFD56B">3 · FieldTransition — card → field → back</div>
+    <div style="display:flex;gap:48px;align-items:flex-start">
+      <sc-for list="{{ frames }}" as="fr" hint-placeholder-count="3">
+        <div style="flex:0 0 auto;width:540px;display:flex;flex-direction:column;gap:16px">
+          <div style="position:relative;width:540px;height:800px;border-radius:18px;background:#2E4733;border:3px solid rgba(255,248,240,.24);overflow:hidden">
+            <div style="position:absolute;left:0;right:0;top:0;height:60px;background:#1A241E"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;height:76px;background:#1A241E"></div>
+            <div style="{{ fr.cardA }}"></div>
+            <div style="{{ fr.cardB }}"></div>
+            <div style="{{ fr.hero }}"></div>
+            <div style="{{ fr.chrome1 }}"></div>
+            <div style="{{ fr.chrome2 }}"></div>
+            <div style="{{ fr.chrome3 }}"></div>
+          </div>
+          <div style="font:900 34px/1.1 Nunito,system-ui,sans-serif;color:#FFF6D6">{{ fr.title }}</div>
+          <div style="font:700 28px/1.3 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.82)">{{ fr.note }}</div>
+        </div>
+      </sc-for>
+      <div style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.07);border:2px solid rgba(255,248,240,.22);padding:32px 36px">
+        <div style="font:900 40px/1 Nunito,system-ui,sans-serif;color:#FFF6D6">Rule</div>
+        <div style="margin-top:18px;font:700 32px/1.4 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.90)">The active card is already 1032 wide with radius 26 and a 6 px <code style="color:#FFD56B">#FFF6D6</code> rim — the meadow frame is the same shell. Opening the field is one rect tween on that shell plus a bg_color tween from mood to ground; nothing is created or destroyed mid-flight. Chrome (title row, basket, both upgrade cards, play row) fades and slides up 40 px in a 60 ms stagger behind it. Closing reverses in 240 ms, chrome first.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="SpecComponents" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#FFD56B">4 · Blocks and components</div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap">
+      <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="6">
+        <div style="flex:0 0 auto;width:1108px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.07);border:2px solid rgba(255,248,240,.22);padding:28px 32px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:baseline;gap:18px">
+            <div style="font:900 40px/1 Nunito,system-ui,sans-serif;color:#FFF6D6">{{ b.name }}</div>
+            <div style="font:800 30px/1 Nunito,system-ui,sans-serif;color:#FFD56B;font-variant-numeric:tabular-nums">{{ b.rect }}</div>
+          </div>
+          <div style="font:700 30px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.88)">{{ b.spec }}</div>
+          <div style="font:700 30px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.70)">{{ b.states }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="SpecAnimations" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#FFD56B">5 · Animations — all tween, no shader</div>
+    <div style="display:flex;flex-direction:column;gap:0;border-radius:20px;overflow:hidden;border:2px solid rgba(255,248,240,.22)">
+      <div style="display:flex;background:rgba(255,248,240,.14);padding:20px 28px;font:900 30px/1 Nunito,system-ui,sans-serif;color:#FFF6D6">
+        <div style="flex:0 0 520px">What</div>
+        <div style="flex:1;min-width:0">Target property</div>
+        <div style="flex:0 0 240px">Duration</div>
+        <div style="flex:0 0 420px">Easing / note</div>
+      </div>
+      <sc-for list="{{ anims }}" as="a" hint-placeholder-count="10">
+        <div style="{{ a.row }}">
+          <div style="flex:0 0 520px;font:800 30px/1.2 Nunito,system-ui,sans-serif;color:#FFF6D6">{{ a.what }}</div>
+          <div style="flex:1;min-width:0;font:700 30px/1.2 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.88)">{{ a.target }}</div>
+          <div style="flex:0 0 240px;font:800 30px/1.2 Nunito,system-ui,sans-serif;color:#FFD56B;font-variant-numeric:tabular-nums">{{ a.dur }}</div>
+          <div style="flex:0 0 420px;font:700 30px/1.2 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.72)">{{ a.ease }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font:700 32px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.82);max-width:2400px">Only one element ever loops: the empty basket. Pip is a single tween chain on <code style="color:#FFD56B">position:x</code>. Nothing redraws the meadow per frame — the 13 flowers are static <code style="color:#FFD56B">TextureRect</code>s after the opening stagger.</div>
+  </div>
+
+  <div data-layer="SpecAssets" style="display:flex;gap:48px;align-items:flex-start">
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:24px">
+      <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#FFD56B">6 · Assets</div>
+      <sc-for list="{{ assets }}" as="as" hint-placeholder-count="4">
+        <div style="display:flex;gap:20px;align-items:baseline">
+          <div style="flex:0 0 200px;font:800 30px/1.2 Nunito,system-ui,sans-serif;color:#FFD56B">{{ as.kind }}</div>
+          <div style="flex:1;min-width:0;font:700 30px/1.3 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.88)">{{ as.text }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:24px">
+      <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#FFD56B">7 · Layer → Godot node</div>
+      <sc-for list="{{ layers }}" as="ly" hint-placeholder-count="10">
+        <div style="display:flex;gap:20px;align-items:baseline">
+          <div style="flex:0 0 380px;font:800 30px/1.2 Nunito,system-ui,sans-serif;color:#FFF6D6">{{ ly.layer }}</div>
+          <div style="flex:1;min-width:0;font:700 30px/1.3 Nunito,system-ui,sans-serif;color:rgba(255,246,214,.82)">{{ ly.node }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const NUN = 'Nunito,system-ui,sans-serif';
+
+const SEASONS = [
+  ['Country Bloom', '#A8E6CF', '#E6F2DB', 'free', ['clover', 'daisy', 'pumpkin'], '11 / 13'],
+  ['Frost Orchard', '#C5D5E8', '#D1E6FF', 'free', ['frost_snowdrop', 'silver_aconite', 'sunflower'], '6 / 13'],
+  ['Lantern Meadow', '#C9B8E0', '#EBD6FF', 'free', ['clover', 'buttercup', 'sunflower'], '4 / 13'],
+  ['Amber Canopy', '#E8C48A', '#FFEBC7', 'free', ['clover', 'tulip', 'pumpkin'], '2 / 13'],
+  ['Moonlit Warren', '#3D3A6B', '#B8BDFF', 'premium', ['clover', 'frost_snowdrop', 'sunflower'], '12 / 13'],
+  ['Coral Tide Garden', '#E8A090', '#FFE0D6', 'premium', ['daisy', 'tulip', 'pumpkin'], '3 / 13'],
+  ['Starfall Glade', '#6B5B95', '#DBCCFF', 'premium', ['silver_aconite', 'daisy', 'frost_snowdrop'], '5 / 13'],
+  ['Ember Fen', '#C45C26', '#FFC79E', 'premium · soon', ['clover', 'tulip', 'pumpkin'], '0 / 13']
+];
+
+const STATES = [
+  ['main', 'P1.1 · mid game', 'Frost Orchard, after the tutorial. Basket empty (gold rim = the one attention loop), Magnet Lv 1, Loot Boost Lv 0, 7 Meadow Clover in the stash so both upgrades are affordable.'],
+  ['basket', 'P1.2 · basket chosen', 'Winter Camellia ★★☆. The card states the effect in words, not just “+5 %”.'],
+  ['picker', 'P1.2 · picker open', 'Bottom sheet, 6 rows of 148 px, 2 locked. Rarity reads as pips, so it survives grayscale.'],
+  ['broke', 'P1.3 · not enough flowers', 'Same screen, 1 Meadow Clover left. Cost line shows the count, the button says how many are missing.'],
+  ['maxed', 'P1.3 · max level', 'Magnet Lv 4 / 4 — segments full, cost line gone, button reads Maxed and takes no input.'],
+  ['upgrading', 'P1.3 · the moment after', 'Magnet went 1 → 2: card rim flashes cream, level chip goes gold, cost line reads what was spent.'],
+  ['newbie', 'P1.4 · before the tutorial', 'Country Bloom, empty meadow with its own line, basket locked, no Endless, hint above Play. Seasons is visible from the first second.'],
+  ['dark', 'P1.5 · dark premium season', 'Moonlit Warren, bought and active. Chrome is identical — only the meadow changes colour.']
+];
+
+const FRAMES = [
+  ['1 · Season column', 'Tap the active card. It is already 1032 wide, radius 26, 6 px #FFF6D6 rim.', 0],
+  ['2 · 140 ms in', 'The same shell tweens to the meadow rect while its fill crosses from mood to ground. Chrome is 40 px low at α 0.4.', 1],
+  ['3 · Field', 'Shell has landed as Meadow. Chrome settled. Flowers pop in with a 24 ms stagger, once.', 2]
+];
+
+const BLOCKS = [
+  ['FieldStack', 'rect 0,143,1080,1597 · padding 24 · gap 16', 'VBoxContainer. Children in order: FieldTopRow 124, Meadow flex, BasketCard 180, UpgradeCard ×2 192, PlayRow 176 — plus five 16 gaps, exactly 1549. The two card heights are their real content floors (basket 18×2 + 136 + 3×2; upgrade 16×2 + 154 + 3×2), so do not round them: Meadow is the only flexible block and eats any difference.', 'Hub swipe: only BasketCard, UpgradeCard, PlayRow and BackButton are in block_hub_swipe. The meadow passes the gesture through.'],
+  ['BackButton · FieldTitle', '300 × 124 · title flex × 124', 'BackButton: radius 22, fill rgba(255,248,240,.13), border 3 rgba(255,248,240,.34), label “‹  Seasons” 46/900 #FFF6D6. Title: name 56/900 #FFF6D6 + tagline 38/700 rgba(255,246,214,.90), both ellipsis.', 'Always visible — before and after the tutorial. Android back and Esc do the same thing.'],
+  ['Meadow', '1032 × 605 · radius 26 · border 6 #FFF6D6', 'Shadow 0,10,22 rgba(20,26,22,.38). Three flat bands: sky 0–56 %, far 56–78 %, near 78–100 %. MeadowCount chip top-left: h 84, radius 18, fill rgba(255,248,240,.80), border 2 rgba(26,26,20,.26), value 48 tabular + label 40.', '13 MeadowFlower spots (76–128 px) + MeadowPip 190 px. Empty spot = pill 0.68w × 0.27h, fill rgba(26,26,20,.10), border 3 rgba(26,26,20,.19). Grown = flower art + shadow pill rgba(26,26,20,.13).'],
+  ['BasketCard', '1032 × 180 · radius 22 · padding 18', 'Frame 128 (radius 28, gold #FFD56B, border 3 #D6A82F) + well inset 12 (#22342A, border 2 #16211B) + art 74. Text: eyebrow 38, name 52/900, pips 44, sub 38. Button 260 × 136.', 'empty — gold 4 px rim + UiAttention pulse, art = icon_seed_light (#FFF6D6 — the dark icon_seed is invisible on the #22342A well), button “Choose” on #E8C44A · chosen — art = flower, name + pips, button “Change” · locked — fill .06, art = icon_lock, no button, tap raises TutorialHint.'],
+  ['UpgradeCard', '1032 × 192 · radius 22 · padding 16 · gap 20', 'Left column 680: title 46/900 + UpgradeLevel chip (h 56, radius 16, 44 tabular) + 4 segments 52 × 16 r8 (filled #A8E6CF/#7FC9AC, empty rgba(255,248,240,.20)); effect line 38; UpgradeCost 52 with a 46 art frame. Button 300 × 154, radius 20.', 'ready — #E8C44A / #BA9D3B, label “Upgrade” · blocked — fill rgba(255,248,240,.07), border .20, ink .68, label “Need N”, cost chip shows what you hold · maxed — quiet fill, label “Maxed”, cost line replaced by “Nothing left to buy” · just spent — 4 px #FFF6D6 rim, gold level chip, cost reads “Spent 2 × …”.'],
+  ['PlayButton · EndlessButton', '656 × 176 + 360 × 176 · gap 16', 'Play: #FFB88C, border 4 #E8A374, shadow 0,8,16 rgba(20,26,22,.30), label “▶  Play” 64/900 #2D3436. Endless: #D4A5FF, border 4 #AA84CC, label “Endless” 48 + sub “Hard · no finish line” 38.', 'Before the tutorial EndlessButton is hidden and Play fills 1032. Play starts a campaign run in the active season; Endless always sends EndlessDifficulty.HARD.'],
+  ['BasketPicker · PickerRow', 'sheet 1080 × 1308 · row 1032 × 148', 'Scrim rgba(20,26,22,.62). Sheet #1A241E, radius 32 top, border-top 3 rgba(255,248,240,.30), padding 20/24/24. Grabber 120 × 10. Title 56, sub 40. Rows gap 12. Footer: Clear basket + Close, both h 132.', 'row — fill .10, border 2 .26 · chosen — fill .16, border 4 #FFF6D6, chip “Chosen” on #FFF6D6 · locked — fill .05, lock in the frame, sub “★☆☆ · not found yet”, chip “Locked”, no input.'],
+  ['TutorialHint', 'left/right 24 · bottom 216 · radius 20', 'Fill #FFF6D6, border 3 #D6A82F, shadow 0,8,16 rgba(20,26,22,.30), padding 22/26, text 40/800 #1A1A14.', 'Shown while the basket is locked, and on every tap of the locked basket.']
+];
+
+const ANIMS = [
+  ['Card → meadow (open)', 'Panel rect (position + size)', '0.28 s', 'EASE_OUT · TRANS_CUBIC'],
+  ['Card fill → ground', 'StyleBoxFlat.bg_color', '0.28 s', 'LINEAR, runs with the rect'],
+  ['Chrome in', 'position:y +40 → 0, modulate:a 0 → 1', '0.18 s', 'EASE_OUT · 60 ms stagger ×5'],
+  ['Flowers settle', 'scale 0.9 → 1.0', '0.20 s', 'EASE_OUT · 24 ms stagger, once on open'],
+  ['Field → column (back)', 'reverse of the two above', '0.24 s', 'chrome out first (0.12 s), then the rect'],
+  ['Empty basket pulse', 'scale 1.0 → 1.03', '1.2 s', 'loop · existing UiAttention · the only loop on screen'],
+  ['Picker sheet in', 'position:y +1308 → 0', '0.24 s', 'EASE_OUT · scrim alpha 0 → .62 in 0.18 s'],
+  ['Upgrade bought', 'segment size:x 0 → 52', '0.22 s', 'EASE_OUT, then level chip gold 0.16 s'],
+  ['Upgrade card flash', 'border_color → #FFF6D6 → back', '0.16 / 0.24 s', 'LINEAR · marks the level that changed'],
+  ['Press', 'scale 0.97', '0.08 s', 'same as Arena and Camp'],
+  ['Pip walk', 'position:x, 2 waypoints', '3–6 s', 'LINEAR · sniff and sleep are holds, no new art'],
+  ['Pip bubble (proposal)', 'modulate:a 0 → 1, hold, out', '0.16 / 1.8 / 0.2 s', 'EASE_OUT · only on tap']
+];
+
+const ASSETS = [
+  ['existing', 'flowers/ph_*.svg (8 placeholders, mapped to the 6 roster slots of each season) · icons/pip_idle.svg (190 px in the field) · icons/icon_lock.svg (#E8C44A, reads on the dark well) · icons/icon_seed.svg (#2D3436 — header chip only) · header + footer icons.'],
+  ['new', 'one: icons/icon_seed_light.svg — the same seed glyph in #FFF6D6, for the empty basket well. No new drawing: every panel, soil spot, band, segment, chip and button is a StyleBoxFlat.'],
+  ['optional', 'A real illustration per season would replace the three flat bands one-to-one; nothing else changes.'],
+  ['not used', 'No blur, no gradient, no mask, no particles, no 3D, no per-frame redraw of the meadow.']
+];
+
+const LAYERS = [
+  ['FieldPage / FieldBackdrop', 'main_menu.tscn FieldBackdrop + _apply_mode_layout(true) — one flat #2E4733, FIELD_COLUMN_OFFSETS replaced by the padding-24 VBox'],
+  ['Meadow', 'season_stage.tscn %SeasonField → MeadowGround, now a Panel with the frame StyleBox'],
+  ['MeadowFlower', 'season_field_flower.gd — position from SPOTS, visible when stash ≥ need'],
+  ['MeadowPip', 'season_field_pip.gd — same FSM, 72 → 190 px'],
+  ['FieldTitle / BackButton', '%SeasonNameChip becomes a plain Label; %SeasonsRowButton loses its tutorial_complete gate'],
+  ['BasketCard', 'HomeTopStack/BasketCard + home_basket_visual.gd'],
+  ['BasketPicker / PickerRow', 'BasketPickerOverlay → PickerPanel, _rebuild_picker_list(), row min height 128 → 148'],
+  ['UpgradeCard / UpgradeCost / UpgradeLevel', '%FieldUpgradeStack MagnetRow / LootBoostRow — needs pick_upgrade_flower_type() before the tap'],
+  ['PlayButton / EndlessButton', '%PlayButton (CampButton) 656 × 176, %EndlessPlayButton 360 × 176'],
+  ['TutorialHint', 'TutorialHintPanel / %TutorialHint'],
+  ['FieldTransition', 'season_stage.open_season_field() / close_season_field() — today instant, gets the tween above']
+];
+
+class Component extends DCLogic {
+  rgb(h) { return [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)); }
+  hx(a) { return '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join(''); }
+  sc(h, f) { return this.hx(this.rgb(h).map(v => v * f)); }
+  mix(a, b, t) { const A = this.rgb(a), B = this.rgb(b); return this.hx(A.map((v, i) => v + (B[i] - v) * t)); }
+
+  renderVals() {
+    const seasons = SEASONS.map(s => ({
+      name: s[0], m: s[1], g: s[2], kind: s[3], count: s[5],
+      frame: 'position:relative;width:832px;height:420px;overflow:hidden;box-sizing:border-box;border-radius:22px;background:' + s[2] +
+        ';border:5px solid #FFF6D6;box-shadow:0 8px 18px rgba(20,26,22,.38)',
+      sky: 'position:absolute;left:0;right:0;top:0;height:56%;background:' + this.mix(s[2], '#FFFFFF', 0.30),
+      far: 'position:absolute;left:0;right:0;top:56%;height:22%;background:' + s[2],
+      near: 'position:absolute;left:0;right:0;top:78%;bottom:0;background:' + this.sc(s[2], 0.93),
+      f1: 'flowers/ph_' + s[4][0] + '.svg', f2: 'flowers/ph_' + s[4][1] + '.svg', f3: 'flowers/ph_' + s[4][2] + '.svg'
+    }));
+
+    const states = STATES.map(s => ({ scene: s[0], title: s[1], note: s[2], pip: s[0] === 'dark' }));
+
+    const box = (x, y, w, h, fill, border, extra) =>
+      'position:absolute;left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px;box-sizing:border-box;border-radius:' +
+      (extra || 13) + 'px;background:' + fill + ';border:' + border;
+
+    const frames = FRAMES.map(f => {
+      const i = f[2];
+      const heroRect = [[24, 300, 492, 190], [24, 180, 492, 300], [24, 96, 492, 360]][i];
+      const chromeY = [880, 560, 500][i];
+      const chromeA = [0, 0.4, 1][i];
+      const chrome = (dy, h) => chromeA === 0 ? 'display:none'
+        : box(24, chromeY + dy, 492, h, 'rgba(255,248,240,' + (0.13 * chromeA).toFixed(2) + ')', '2px solid rgba(255,248,240,' + (0.28 * chromeA).toFixed(2) + ')');
+      return {
+        title: f[0], note: f[1],
+        cardA: i === 0 ? box(24, 96, 492, 110, 'rgba(197,213,232,.55)', '2px solid rgba(255,248,240,.26)') : 'display:none',
+        cardB: i === 0 ? box(24, 510, 492, 110, 'rgba(201,184,224,.45)', '2px solid rgba(255,248,240,.26)') : 'display:none',
+        hero: box(heroRect[0], heroRect[1], heroRect[2], heroRect[3],
+          [ '#C5D5E8', this.mix('#C5D5E8', '#D1E6FF', 0.5), '#D1E6FF' ][i], '3px solid #FFF6D6', 14),
+        chrome1: chrome(0, 56),
+        chrome2: chrome(70, 60),
+        chrome3: chrome(150, 60)
+      };
+    });
+
+    const blocks = BLOCKS.map(b => ({ name: b[0], rect: b[1], spec: b[2], states: b[3] }));
+    const anims = ANIMS.map((a, i) => ({
+      what: a[0], target: a[1], dur: a[2], ease: a[3],
+      row: 'display:flex;align-items:center;padding:18px 28px;background:' + (i % 2 ? 'rgba(255,248,240,.04)' : 'transparent')
+    }));
+    const assets = ASSETS.map(a => ({ kind: a[0], text: a[1] }));
+    const layers = LAYERS.map(l => ({ layer: l[0], node: l[1] }));
+
+    return { seasons, states, frames, blocks, anims, assets, layers };
+  }
+}
+</script>
+</body>
+</html>
