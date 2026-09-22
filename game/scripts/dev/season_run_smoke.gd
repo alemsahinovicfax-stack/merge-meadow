@@ -91,7 +91,7 @@ func _run() -> void:
 	if m1.is_equal_approx(m2):
 		_fail("BG modulate should change S1 vs frost")
 		return
-	var pickup_bar := run.get_node_or_null("HUD/TopHud/TopHudVBox/TopRow/PickupBar") as Control
+	var pickup_bar := run.get_node_or_null("HUD/TopHud/PickupBar") as Control
 	if pickup_bar == null:
 		_fail("PickupBar missing (run layout)")
 		return

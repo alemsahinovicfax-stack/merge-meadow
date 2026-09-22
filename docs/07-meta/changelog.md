@@ -11,6 +11,8 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
 ## 2026-09-22
 
+- **Run redizajn (Claude Design, smjer A)** — iz `design_handoff_run/`: tamna livada i tri košene staze (pruge idu sa scrollom), HUD 460×156 timer chip + prsten, Pause 128 px, companion / basket / coin+seed brojači (diamond samo kad je > 0), pickupi 96/120/88 s istom kolizijom, prepreke stump+stone (ovratnik, season tint; kolizija ostaje 64×64), magnet prsten iz `get_magnet_radius()`, fail 0,46 s / finish 0,62 s, Quit = fail loot bez revivea. Novi `run_redesign_smoke`; `run_smoke` / `season_run_smoke` prate novi HUD. Mehanika (§2) netaknuta. [[../04-experience/design-drafts/run-cd-brief|brief]]
+
 - **Brief: Run — lane runner (Claude Design)** — pravila iz koda (3 lanea, swipe 0,12 s, 60 s, coin/seed/diamond/prepreka, magnet, Basket +5 %, fail 50% / finish 100%), pun ekran (ne hub chrome), HUD danas, 10 problema, gotov prompt §9; loot ekran van scopea; handoff cilj `design_handoff_run/`; [[../04-experience/design-drafts/run-cd-brief|brief]]
 
 - **Brief: Home — polje sezone (Claude Design)** — pravila polja iz koda (korpa +5 %, Magnet / Loot Boost 4 nivoa × 2 cvijeta, Play / Play Endless, livada i Pip), današnji raspored, 11 problema i gotov prompt. Novi format: CD dobija slobodu da unaprijedi dizajn i isporučuje **jedan dizajn** bez varijanti, uz paket spreman za Godot (`design_handoff_home_field/godot/field_export.json` u šemi Home paketa, zip u chatu); [[../04-experience/design-drafts/home-field-cd-brief|brief]]

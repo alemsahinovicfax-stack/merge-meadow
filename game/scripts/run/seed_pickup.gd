@@ -1,6 +1,6 @@
 extends Area2D
 
-signal collected(type_id: String)
+signal collected(type_id: String, at: Vector2)
 
 const TYPE_CLOVER := "clover"
 
@@ -22,5 +22,5 @@ func collect() -> void:
 	if _collected:
 		return
 	_collected = true
-	collected.emit(type_id)
+	collected.emit(type_id, global_position)
 	queue_free()

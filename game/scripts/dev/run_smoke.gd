@@ -30,21 +30,17 @@ func _test() -> void:
 		push_error("run_smoke: TopHud missing")
 		quit(1)
 		return
-	var pickup_bar := run.get_node_or_null("HUD/TopHud/TopHudVBox/TopRow/PickupBar") as Control
+	var pickup_bar := run.get_node_or_null("HUD/TopHud/PickupBar") as Control
 	if pickup_bar == null:
-		push_error("run_smoke: PickupBar not under TopRow")
+		push_error("run_smoke: PickupBar missing")
 		quit(1)
 		return
 	if is_equal_approx(pickup_bar.anchor_top, 1.0):
 		push_error("run_smoke: PickupBar still bottom-anchored")
 		quit(1)
 		return
-	var coin := run.get_node_or_null(
-		"HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/CoinRow/CoinLabel"
-	) as Label
-	var seed := run.get_node_or_null(
-		"HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/SeedRow/SeedLabel"
-	) as Label
+	var coin := run.get_node_or_null("HUD/TopHud/PickupBar/CoinChip/Row/CoinLabel") as Label
+	var seed := run.get_node_or_null("HUD/TopHud/PickupBar/SeedChip/Row/SeedLabel") as Label
 	if coin == null or seed == null:
 		push_error("run_smoke: counter labels missing")
 		quit(1)

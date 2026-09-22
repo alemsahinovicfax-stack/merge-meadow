@@ -16,7 +16,7 @@ ai_sažetak: "Run (lane runner) — pravila iz koda koja ostaju fiksna, HUD i sv
 
 # Run (lane) — Claude Design brief i referenca
 
-> **Status: brief za CD** — još nije implementiran redizajn. §2–§3 = stanje u kodu danas. Handoff ide u `design_handoff_run/` nakon CD-a.
+> **Status: implementirano 2026-09-22 — smjer A.** §2 pravila ostaju. Handoff: `design_handoff_run/`. Kolizija prepreke ostaje 64×64; v1 motivi su stump + stone.
 
 **Run** je lane runner u kojem igrač swipea lijevo/desno, skuplja coinove i sjemenke, izbjegava prepreke. To je **prva "igračka" petlje** — feel (odgovor swipea, pickup pop, čitljivost prepreke) jednako je važan kao izgled. Nije hub stranica: pun ekran, bez header/footer tabova.
 
@@ -384,11 +384,11 @@ ads/IAP, redizajn Pipa, pun cvjetni atlas. Ideje van zadatka — odvojeno na kra
 
 **Gotovo kad (implementacija):**
 
-- [ ] Mid-run ekran čitljiv na emulatoru; prepreka ≠ pickup na grayscale
-- [ ] HUD stringovi (uključujući Endless) staju; brojevi ≥ 44 px
-- [ ] Swipe i dalje 3 lanea / 0,12 s; magnet i spawn netaknuti
-- [ ] Smokes: postojeći run_* + novi `run_redesign_smoke` po uzoru na arena
-- [ ] Nema mid-run IAP/ads
+- [x] Mid-run ekran: staze, prepreka (masa + ovratnik) ≠ pickup (plutajući krug) — grayscale provjera još ručno na emulatoru
+- [x] HUD stringovi (Endless · Hard + sekunde u dva reda) staju; brojevi ≥ 44 px (`run_redesign_smoke`)
+- [x] Swipe i dalje 3 lanea / 0,12 s; magnet i spawn netaknuti
+- [x] Smokes: postojeći `run_smoke` / `season_run_smoke` + `run_redesign_smoke`
+- [x] Nema mid-run IAP/ads
 
 ---
 
@@ -397,13 +397,14 @@ ads/IAP, redizajn Pipa, pun cvjetni atlas. Ideje van zadatka — odvojeno na kra
 | Datum | Odluka |
 |-------|--------|
 | 2026-09-22 | Brief napisan. Run = pun ekran (ne hub chrome). Loot ekran van scopea. Pravila/brojevi fiksni; CD = izgled + feel. |
+| 2026-09-22 | Handoff smjer A u kodu. Pause: Quit = fail loot (50 %), bez revivea. Fail 0,46 s / finish 0,62 s. v1 prepreke: stump + stone, kolizija i dalje 64×64. |
 
 ## Otvorena pitanja (nakon CD-a)
 
-- [ ] Pause — da / ne; Quit = fail loot ili potvrda?
-- [ ] Fail/finish beat trajanje prije loot scene
-- [ ] Koliko sezonskih varijanti prepreke u v1 (1 set + tint vs 3 motiva)
-- [ ] Smjer A vs B
+- [x] Pause — Quit = fail loot, bez druge potvrde, revive se ne troši
+- [x] Fail 0,46 s / finish 0,62 s prije loot scene
+- [x] v1: stump + stone + `SeasonTheme.obstacle_modulate()`; hay kasnije
+- [x] Smjer A
 
 ## Povezano
 

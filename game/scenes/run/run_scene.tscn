@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://c8runscene01"]
+[gd_scene load_steps=11 format=3 uid="uid://c8runscene01"]
 
 [ext_resource type="Script" path="res://scripts/run/run_controller.gd" id="1_run"]
 [ext_resource type="Script" path="res://scripts/run/player.gd" id="2_player"]
@@ -6,28 +6,15 @@
 [ext_resource type="Script" path="res://scripts/visual/pip_visual.gd" id="4_pip_visual"]
 [ext_resource type="Script" path="res://scripts/visual/lane_background.gd" id="5_lane_bg"]
 [ext_resource type="Script" path="res://scripts/ui/run_pickup_feed.gd" id="6_feed"]
+[ext_resource type="Script" path="res://scripts/run/run_timer_ring.gd" id="7_ring"]
+[ext_resource type="Script" path="res://scripts/run/run_pause_button.gd" id="8_pause"]
+[ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="9_uibtn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(56, 56)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_magnet"]
 radius = 40.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pickup_hud"]
-bg_color = Color(1, 0.98, 0.94, 0.92)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.176, 0.204, 0.212, 0.18)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-content_margin_left = 12.0
-content_margin_top = 8.0
-content_margin_right = 12.0
-content_margin_bottom = 8.0
 
 [node name="RunScene" type="Node2D"]
 script = ExtResource("1_run")
@@ -60,153 +47,394 @@ shape = SubResource("CircleShape2D_magnet")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
-[node name="TopHud" type="MarginContainer" parent="HUD"]
-anchors_preset = 10
+[node name="TopHud" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
-offset_bottom = 280.0
+anchor_bottom = 1.0
 grow_horizontal = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 0
+grow_vertical = 2
+mouse_filter = 2
 
-[node name="TopHudVBox" type="VBoxContainer" parent="HUD/TopHud"]
-layout_mode = 2
-theme_override_constants/separation = 8
+[node name="TimerChip" type="Panel" parent="HUD/TopHud"]
+custom_minimum_size = Vector2(460, 156)
+offset_left = 310.0
+offset_top = 60.0
+offset_right = 770.0
+offset_bottom = 216.0
+mouse_filter = 2
+clip_contents = true
 
-[node name="TopRow" type="HBoxContainer" parent="HUD/TopHud/TopHudVBox"]
-layout_mode = 2
+[node name="Row" type="HBoxContainer" parent="HUD/TopHud/TimerChip"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 12
 alignment = 1
+mouse_filter = 2
 
-[node name="PipBadge" type="HBoxContainer" parent="HUD/TopHud/TopHudVBox/TopRow"]
+[node name="Ring" type="Control" parent="HUD/TopHud/TimerChip/Row"]
+custom_minimum_size = Vector2(104, 104)
 layout_mode = 2
-size_flags_horizontal = 0
-theme_override_constants/separation = 10
+mouse_filter = 2
+script = ExtResource("7_ring")
 
-[node name="PipPortrait" type="Control" parent="HUD/TopHud/TopHudVBox/TopRow/PipBadge"]
-custom_minimum_size = Vector2(48, 48)
+[node name="TextCol" type="VBoxContainer" parent="HUD/TopHud/TimerChip/Row"]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+mouse_filter = 2
+
+[node name="ModeLabel" type="Label" parent="HUD/TopHud/TimerChip/Row/TextCol"]
+custom_minimum_size = Vector2(280, 46)
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 38
+text = ""
+clip_text = true
+vertical_alignment = 1
+
+[node name="SecondsLabel" type="Label" parent="HUD/TopHud/TimerChip/Row/TextCol"]
+custom_minimum_size = Vector2(280, 80)
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 72
+text = "60s"
+clip_text = true
+vertical_alignment = 1
+
+[node name="PauseButton" type="Control" parent="HUD/TopHud"]
+custom_minimum_size = Vector2(128, 128)
+offset_left = 912.0
+offset_top = 74.0
+offset_right = 1040.0
+offset_bottom = 202.0
+script = ExtResource("8_pause")
+
+[node name="CompanionChip" type="Panel" parent="HUD/TopHud"]
+custom_minimum_size = Vector2(268, 120)
+offset_left = 40.0
+offset_top = 232.0
+offset_right = 308.0
+offset_bottom = 352.0
+mouse_filter = 2
+
+[node name="Row" type="HBoxContainer" parent="HUD/TopHud/CompanionChip"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+alignment = 1
+mouse_filter = 2
+
+[node name="PipPortrait" type="Control" parent="HUD/TopHud/CompanionChip/Row"]
+custom_minimum_size = Vector2(88, 88)
+layout_mode = 2
+mouse_filter = 2
 script = ExtResource("3_pip_ui")
 
-[node name="PipName" type="Label" parent="HUD/TopHud/TopHudVBox/TopRow/PipBadge"]
+[node name="PipName" type="Label" parent="HUD/TopHud/CompanionChip/Row"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
-theme_override_colors/font_outline_color = Color(1, 1, 1, 0.9)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 26
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_font_sizes/font_size = 44
 text = "Pip"
 vertical_alignment = 1
 
-[node name="LoadoutLabel" type="Label" parent="HUD/TopHud/TopHudVBox/TopRow/PipBadge"]
-visible = false
+[node name="PickupBar" type="Control" parent="HUD/TopHud"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CoinChip" type="Panel" parent="HUD/TopHud/PickupBar"]
+custom_minimum_size = Vector2(190, 120)
+offset_left = 644.0
+offset_top = 232.0
+offset_right = 834.0
+offset_bottom = 352.0
+mouse_filter = 2
+
+[node name="Row" type="HBoxContainer" parent="HUD/TopHud/PickupBar/CoinChip"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
+mouse_filter = 2
+
+[node name="CoinIcon" type="TextureRect" parent="HUD/TopHud/PickupBar/CoinChip/Row"]
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.36078432, 0.23921569, 0.47843137, 1)
-theme_override_colors/font_outline_color = Color(1, 1, 1, 0.9)
-theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 18
-text = "Basket: Clover"
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinLabel" type="Label" parent="HUD/TopHud/PickupBar/CoinChip/Row"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 56
+text = "0"
 vertical_alignment = 1
 
-[node name="TimerLabel" type="Label" parent="HUD/TopHud/TopHudVBox/TopRow"]
+[node name="SeedChip" type="Panel" parent="HUD/TopHud/PickupBar"]
+custom_minimum_size = Vector2(190, 120)
+offset_left = 850.0
+offset_top = 232.0
+offset_right = 1040.0
+offset_bottom = 352.0
+mouse_filter = 2
+
+[node name="Row" type="HBoxContainer" parent="HUD/TopHud/PickupBar/SeedChip"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
+mouse_filter = 2
+
+[node name="SeedIcon" type="TextureRect" parent="HUD/TopHud/PickupBar/SeedChip/Row"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SeedLabel" type="Label" parent="HUD/TopHud/PickupBar/SeedChip/Row"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 56
+text = "0"
+vertical_alignment = 1
+
+[node name="DiamondChip" type="Panel" parent="HUD/TopHud/PickupBar"]
+visible = false
+custom_minimum_size = Vector2(168, 120)
+offset_left = 872.0
+offset_top = 232.0
+offset_right = 1040.0
+offset_bottom = 352.0
+mouse_filter = 2
+
+[node name="Row" type="HBoxContainer" parent="HUD/TopHud/PickupBar/DiamondChip"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
+mouse_filter = 2
+
+[node name="DiamondIcon" type="TextureRect" parent="HUD/TopHud/PickupBar/DiamondChip/Row"]
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DiamondLabel" type="Label" parent="HUD/TopHud/PickupBar/DiamondChip/Row"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 56
+text = "0"
+vertical_alignment = 1
+
+[node name="BasketBadge" type="Panel" parent="HUD/TopHud"]
+visible = false
+custom_minimum_size = Vector2(268, 76)
+offset_left = 40.0
+offset_top = 364.0
+offset_right = 308.0
+offset_bottom = 440.0
+mouse_filter = 2
+
+[node name="Row" type="HBoxContainer" parent="HUD/TopHud/BasketBadge"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1
+mouse_filter = 2
+
+[node name="BasketIcon" type="TextureRect" parent="HUD/TopHud/BasketBadge/Row"]
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LoadoutLabel" type="Label" parent="HUD/TopHud/BasketBadge/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.2901961, 0.2901961, 0.2901961, 1)
-theme_override_colors/font_outline_color = Color(1, 1, 1, 0.9)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 36
-text = "75s"
-horizontal_alignment = 1
+mouse_filter = 2
+theme_override_font_sizes/font_size = 40
+text = "Clover"
+clip_text = true
 vertical_alignment = 1
 
-[node name="PickupBar" type="PanelContainer" parent="HUD/TopHud/TopHudVBox/TopRow"]
-layout_mode = 2
-size_flags_horizontal = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_pickup_hud")
+[node name="PickupFeed" type="Control" parent="HUD/TopHud"]
+custom_minimum_size = Vector2(440, 150)
+offset_left = 600.0
+offset_top = 386.0
+offset_right = 1040.0
+offset_bottom = 536.0
+mouse_filter = 2
+script = ExtResource("6_feed")
 
-[node name="PickupCounters" type="HBoxContainer" parent="HUD/TopHud/TopHudVBox/TopRow/PickupBar"]
+[node name="TutorialCue" type="Panel" parent="HUD/TopHud"]
+visible = false
+offset_left = 160.0
+offset_top = 1218.0
+offset_right = 920.0
+offset_bottom = 1328.0
+mouse_filter = 2
+
+[node name="TutorialBanner" type="Label" parent="HUD/TopHud/TutorialCue"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 38
+text = "Swipe left / right to change lanes"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="FlyLayer" type="Node2D" parent="HUD"]
+z_index = 10
+
+[node name="FinishBanner" type="Panel" parent="HUD"]
+visible = false
+z_index = 20
+offset_left = 160.0
+offset_top = 690.0
+offset_right = 920.0
+offset_bottom = 910.0
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="HUD/FinishBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="HUD/FinishBanner/VBox"]
 layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 72
+text = "Time!"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="HUD/FinishBanner/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 38
+text = "Full basket — nothing lost"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="FailFlash" type="ColorRect" parent="HUD"]
+visible = false
+z_index = 25
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.909804, 0.545098, 0.545098, 0.26)
+
+[node name="PauseOverlay" type="Control" parent="HUD"]
+visible = false
+z_index = 30
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="HUD/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.086275, 0.129412, 0.105882, 0.82)
+
+[node name="Panel" type="Panel" parent="HUD/PauseOverlay"]
+offset_left = 90.0
+offset_top = 360.0
+offset_right = 990.0
+offset_bottom = 1040.0
+
+[node name="VBox" type="VBoxContainer" parent="HUD/PauseOverlay/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="CoinRow" type="HBoxContainer" parent="HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters"]
+[node name="Title" type="Label" parent="HUD/PauseOverlay/Panel/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
-alignment = 1
-
-[node name="CoinIcon" type="TextureRect" parent="HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/CoinRow"]
-custom_minimum_size = Vector2(28, 28)
-layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="CoinLabel" type="Label" parent="HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/CoinRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.6039216, 0.44705883, 0.03529412, 1)
-theme_override_colors/font_outline_color = Color(1, 1, 1, 0.9)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 28
-text = "0"
+theme_override_font_sizes/font_size = 44
+text = "Paused"
 horizontal_alignment = 1
-vertical_alignment = 1
 
-[node name="SeedRow" type="HBoxContainer" parent="HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters"]
+[node name="Body" type="Label" parent="HUD/PauseOverlay/Panel/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
-alignment = 1
-
-[node name="SeedIcon" type="TextureRect" parent="HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/SeedRow"]
-custom_minimum_size = Vector2(28, 28)
-layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="SeedLabel" type="Label" parent="HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/SeedRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.36078432, 0.23921569, 0.47843137, 1)
-theme_override_colors/font_outline_color = Color(1, 1, 1, 0.9)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 28
-text = "0"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="DiamondRow" type="HBoxContainer" parent="HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters"]
-layout_mode = 2
-theme_override_constants/separation = 6
-alignment = 1
-
-[node name="DiamondIcon" type="TextureRect" parent="HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/DiamondRow"]
-custom_minimum_size = Vector2(28, 28)
-layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="DiamondLabel" type="Label" parent="HUD/TopHud/TopHudVBox/TopRow/PickupBar/PickupCounters/DiamondRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.12, 0.45, 0.55, 1)
-theme_override_colors/font_outline_color = Color(1, 1, 1, 0.9)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 28
-text = "0"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="PickupFeed" type="Label" parent="HUD/TopHud/TopHudVBox"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
-theme_override_font_sizes/font_size = 22
-horizontal_alignment = 2
-script = ExtResource("6_feed")
-
-[node name="TutorialBanner" type="Label" parent="HUD/TopHud/TopHudVBox"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.2901961, 0.2901961, 0.2901961, 0.85)
-theme_override_font_sizes/font_size = 24
-text = "Swipe left / right to change lanes"
+theme_override_font_sizes/font_size = 38
+text = "Quitting keeps half of what you carry. No revive is used."
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="KeepButton" type="PanelContainer" parent="HUD/PauseOverlay/Panel/VBox"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("9_uibtn")
+label_text = "Keep running"
+font_size = 38
+button_variant = "cta"
+
+[node name="QuitButton" type="PanelContainer" parent="HUD/PauseOverlay/Panel/VBox"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("9_uibtn")
+label_text = "Quit to Camp"
+font_size = 38
+button_variant = "subtle"
