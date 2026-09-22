@@ -8,6 +8,7 @@ const KENNEY_DIR := "res://assets/ui/kenney/"
 const CHROME_DIR := "res://assets/ui/chrome/"
 const ARENA_DIR := "res://assets/ui/arena/"
 const CAMP_DIR := "res://assets/ui/camp/"
+const RUN_DIR := "res://assets/ui/run/"
 const BUTTON_ICON_SIZE := 32.0
 const HUD_ICON_SIZE := 24.0
 
@@ -47,6 +48,11 @@ static func get_arena_icon(icon_name: String) -> Texture2D:
 ## Camp ikone — "icon_merge_arrow", "icon_reserved", "icon_hold_stop".
 static func get_camp_icon(icon_name: String) -> Texture2D:
 	return _load_icon(CAMP_DIR + icon_name + ".svg")
+
+
+## Run HUD ikone — "icon_pause", "icon_basket".
+static func get_run_icon(icon_name: String) -> Texture2D:
+	return _load_icon(RUN_DIR + icon_name + ".svg")
 
 
 static func _load_icon(path: String) -> Texture2D:

@@ -1253,7 +1253,8 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 	carry_elapsed = elapsed
 	if failed:
 		last_seed_bag = _halve_seed_bag(scaled_seeds)
-		last_run_coins = int(round(float(scaled_coins) * 0.5))
+		# ceil: 1 coin na failu ne nestane u 0 (round(0.5)==0 na desktopu).
+		last_run_coins = int(ceil(float(scaled_coins) * 0.5))
 	else:
 		last_seed_bag = scaled_seeds.duplicate()
 		last_run_coins = scaled_coins

@@ -11,7 +11,11 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
 ## 2026-09-22
 
+- **Fail loot coini** — `finish_run` na failu koristi `ceil(50%)` kao `_halve_seed_bag`, da 1 coin ne padne na 0 (`round(0.5)==0` na desktopu).
+
 - **Handoff: Home — polje sezone (Claude Design)** — paket u `design_handoff_home_field/`: livada kao uokvireni prozor 1032×605 na `#2E4733`, 13 mjesta (pragovi 1/5/10), jedan dizajn bez varijanti, `godot/field_export.json` + `ui_home_field.gd`; [[../04-experience/design-drafts/home-field-cd-brief|brief]]
+
+- **Run redizajn (Claude Design, smjer A)** — iz `design_handoff_run/`: tamna livada i tri košene staze (pruge idu sa scrollom), HUD 460×156 timer chip + prsten, Pause 128 px, companion / basket / coin+seed brojači (diamond samo kad je > 0), pickupi 96/120/88 s istom kolizijom, prepreke stump+stone (ovratnik, season tint; kolizija ostaje 64×64), magnet prsten iz `get_magnet_radius()`, fail 0,46 s / finish 0,62 s, Quit = fail loot bez revivea. Novi `run_redesign_smoke`; `run_smoke` / `season_run_smoke` prate novi HUD. Mehanika (§2) netaknuta. [[../04-experience/design-drafts/run-cd-brief|brief]]
 
 - **Brief: Run — lane runner (Claude Design)** — pravila iz koda (3 lanea, swipe 0,12 s, 60 s, coin/seed/diamond/prepreka, magnet, Basket +5 %, fail 50% / finish 100%), pun ekran (ne hub chrome), HUD danas, 10 problema, gotov prompt §9; loot ekran van scopea; handoff cilj `design_handoff_run/`; [[../04-experience/design-drafts/run-cd-brief|brief]]
 

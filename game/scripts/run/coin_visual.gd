@@ -1,22 +1,36 @@
 extends Sprite2D
 
-## Novčić u runu — Kenney-style sprite.
+## Novčić u runu — placeholder krug 96 px. Kolizija ostaje r 18 na roditelju.
 
-const ASSETS := preload("res://scripts/visual/pickup_assets.gd")
+var _phase: float = 0.0
 
 
 func _ready() -> void:
-	var tex := ASSETS.get_coin_texture()
-	texture = tex
+	texture = null
 	centered = true
-	if tex != null:
-		scale = Vector2.ONE * ASSETS.run_scale(tex, ASSETS.COIN_RUN_SIZE)
-	else:
-		queue_redraw()
+	_phase = randf() * TAU
+	queue_redraw()
+
+
+func _process(delta: float) -> void:
+	_phase += delta * 2.6
+	position.y = sin(_phase) * 5.0
 
 
 func _draw() -> void:
-	if texture != null:
-		return
-	draw_circle(Vector2.ZERO, 16.0, Color("#FFD56B"))
-	draw_arc(Vector2.ZERO, 16.0, 0.0, TAU, 24, Color("#2D3436"), 2.5)
+	_draw_shadow()
+	var radius := float(UiRun.COIN_SIZE) * 0.5
+	draw_circle(Vector2.ZERO, radius, UiRun.COIN_FILL)
+	draw_arc(Vector2.ZERO, radius - 2.0, 0.0, TAU, 40, UiRun.COIN_EDGE, 5.0, true)
+	draw_circle(Vector2.ZERO, radius * 0.62, UiRun.COIN_INNER)
+	draw_circle(Vector2(-14, -16), 8.0, UiRun.COIN_GLINT)
+
+
+func _draw_shadow() -> void:
+	var size := UiRun.PICKUP_SHADOW_SIZE
+	var center := Vector2(0.0, float(UiRun.PICKUP_SHADOW_OFFSET))
+	var pts := PackedVector2Array()
+	for i in 18:
+		var a := TAU * float(i) / 18.0
+		pts.append(center + Vector2(cos(a) * size.x * 0.5, sin(a) * size.y * 0.5))
+	draw_colored_polygon(pts, UiRun.PICKUP_SHADOW)
