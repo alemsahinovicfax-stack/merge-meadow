@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #141C17; }
+  a { color: #A8E6CF; }
+  a:hover { color: #FFD56B; }
+</style>
+</helmet>
+
+<section data-layer="Turn1" style="display:flex;flex-direction:column;gap:56px;padding:72px;background:#141C17;font-family:Nunito,system-ui,sans-serif">
+
+  <div style="display:flex;flex-direction:column;gap:20px;max-width:1500px">
+    <div style="font:600 26px/1 'JetBrains Mono',monospace;color:#A8E6CF;letter-spacing:.06em">MERGE MEADOW · RUN (LANE RUNNER)</div>
+    <div style="font:900 76px/1.05 Nunito,sans-serif;color:#FFF8F0">Run redizajn — 2 smjera</div>
+    <div style="font:700 32px/1.45 Nunito,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty">Pun ekran 1080 × 1920, bez hub chromea. Pravila iz <span style="color:#FFD56B">§2</span> netaknuta: 60 s, 3 lanea na 25/50/75 %, swipe tween 0,12 s, spawn 1,2 s / 0,7, magnet 40 + 48 × level, fail 50 % / finish 100 % loota. Mijenja se samo izgled i feel.</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <div style="padding:14px 24px;border-radius:20px;background:rgba(168,230,207,.14);border:2px solid rgba(168,230,207,.4);font:700 26px/1 Nunito,sans-serif;color:#A8E6CF">Preporuka: <a href="#1a">smjer A</a></div>
+      <div style="padding:14px 24px;border-radius:20px;background:rgba(255,248,240,.08);border:2px solid rgba(255,248,240,.2);font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.8)">Ergonomija HUD-a ista u oba — razlika je tlo + chrome</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:56px;flex-wrap:wrap;align-items:flex-start">
+
+    <div id="1a" data-layer="DirectionA" style="display:flex;flex-direction:column;gap:24px;padding:36px;border-radius:26px;background:#1B2620;border:3px solid rgba(168,230,207,.34);flex:0 0 auto">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="padding:10px 22px;border-radius:16px;background:#A8E6CF;font:900 30px/1 Nunito,sans-serif;color:#1B2620">1a</div>
+        <div style="font:900 44px/1 Nunito,sans-serif;color:#FFF8F0">Smjer A — košene staze</div>
+      </div>
+      <div style="max-width:1300px;font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.74);text-wrap:pretty">Tamna livada, tri košene staze svijetlije od tla. HUD pluta u krem chipovima — nema trake, Run ne izgleda kao hub stranica. Pastel pickupi drže masu na tamnom tlu (isto mjerenje koje je odlučilo Arenu: <span style="color:#FFD56B">#A8E6CF</span> na kremu 1,34:1, na tamnom 9,3:1).</div>
+      <div style="display:flex;gap:28px">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="width:432px;height:768px;overflow:hidden;border-radius:18px;border:3px solid rgba(255,248,240,.16)">
+            <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:top left">
+              <dc-import name="RunScreen" dir="A" scene="mid" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:800 28px/1 Nunito,sans-serif;color:#FFF8F0">Mid-run · 42s · magnet Lv2</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="width:432px;height:768px;overflow:hidden;border-radius:18px;border:3px solid rgba(255,248,240,.16)">
+            <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:top left">
+              <dc-import name="RunScreen" dir="A" scene="start" coins="{{ 0 }}" seedCount="{{ 0 }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:800 28px/1 Nunito,sans-serif;color:#FFF8F0">Start · prvih 2 s · bez Basketa</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="width:432px;height:768px;overflow:hidden;border-radius:18px;border:3px solid rgba(255,248,240,.16)">
+            <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:top left">
+              <dc-import name="RunScreen" dir="A" scene="tutorial" coins="{{ 3 }}" seedCount="{{ 0 }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:800 28px/1 Nunito,sans-serif;color:#FFF8F0">Tutorial · Pip cue · 45s</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="1b" data-layer="DirectionB" style="display:flex;flex-direction:column;gap:24px;padding:36px;border-radius:26px;background:#1B2620;border:3px solid rgba(255,248,240,.16);flex:0 0 auto">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="padding:10px 22px;border-radius:16px;background:rgba(255,248,240,.18);font:900 30px/1 Nunito,sans-serif;color:#FFF8F0">1b</div>
+        <div style="font:900 44px/1 Nunito,sans-serif;color:#FFF8F0">Smjer B — svijetla livada + tamna traka</div>
+      </div>
+      <div style="max-width:1300px;font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.74);text-wrap:pretty">Zadržava postojeći <span style="font:600 26px 'JetBrains Mono',monospace;color:#FFD56B">lane_background.png</span> ton — svijetle staze, nebo na rubovima. Cijeli HUD ide u jednu tamnu traku <span style="font:600 26px 'JetBrains Mono',monospace;color:#FFD56B">#1A241E</span> iz <span style="font:600 26px 'JetBrains Mono',monospace;color:#FFD56B">UiChrome</span>, pa je čitljivost garantovana na svih 8 sezonskih tintova. Najjeftinije za isporuku.</div>
+      <div style="display:flex;gap:28px">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="width:432px;height:768px;overflow:hidden;border-radius:18px;border:3px solid rgba(255,248,240,.16)">
+            <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:top left">
+              <dc-import name="RunScreen" dir="B" scene="mid" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:800 28px/1 Nunito,sans-serif;color:#FFF8F0">Mid-run · 42s · magnet Lv2</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="width:432px;height:768px;overflow:hidden;border-radius:18px;border:3px solid rgba(255,248,240,.16)">
+            <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:top left">
+              <dc-import name="RunScreen" dir="B" scene="start" coins="{{ 0 }}" seedCount="{{ 0 }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:800 28px/1 Nunito,sans-serif;color:#FFF8F0">Start · prvih 2 s</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="width:432px;height:768px;overflow:hidden;border-radius:18px;border:3px solid rgba(255,248,240,.16)">
+            <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:top left">
+              <dc-import name="RunScreen" dir="B" scene="tutorial" coins="{{ 3 }}" seedCount="{{ 0 }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:800 28px/1 Nunito,sans-serif;color:#FFF8F0">Tutorial · Pip cue · 45s</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px;padding:40px;border-radius:26px;background:rgba(168,230,207,.1);border:3px solid rgba(168,230,207,.3);max-width:1500px">
+    <div style="font:900 40px/1 Nunito,sans-serif;color:#A8E6CF">Zašto A</div>
+    <div style="font:700 30px/1.45 Nunito,sans-serif;color:rgba(255,248,240,.84);text-wrap:pretty">Pickupi su svjetli pastel objekti. Na svijetlom tlu (B) gube masu — to je isti nalaz koji je već izmjeren za Arenu i zbog kojeg je sjemenka dobila tamni well. B to rješava tako da pickupima doda tvrdi outline i sjenu, ali onda Run vizuelno odstupa od Arene. Dodatno, puna tamna traka na vrhu (B) zauzima 372 px i čini da Run izgleda kao hub stranica — jedina stvar koja brief kaže da nije. A daje tamno tlo iz Arene, plutajuće krem chipove i isti sezonski tint mehanizam (<span style="font:600 27px 'JetBrains Mono',monospace;color:#FFD56B">modulate</span> na tlu i preprekama, ne na HUD-u).</div>
+  </div>
+
+</section>
+
+<section data-layer="Specs" style="display:flex;flex-direction:column;gap:48px;padding:0 72px 96px;background:#141C17;font-family:Nunito,system-ui,sans-serif">
+
+  <div data-layer="PickupSpec" style="display:flex;flex-direction:column;gap:32px;padding:44px;border-radius:26px;background:#1B2620;border:3px solid rgba(255,248,240,.14)">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <div style="font:900 44px/1 Nunito,sans-serif;color:#FFF8F0">P1-3 · Pickup spec</div>
+      <div style="font:600 26px/1 'JetBrains Mono',monospace;color:rgba(255,248,240,.5)">CoinPickup · SeedPickup · DiamondPickup</div>
+    </div>
+
+    <div style="display:flex;gap:64px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div style="font:800 32px/1 Nunito,sans-serif;color:#FFD56B">CoinPickup · Ø 96</div>
+        <div style="display:flex;gap:44px;align-items:flex-end">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <div style="position:relative;width:96px;height:120px">
+              <div style="position:absolute;left:16px;top:88px;width:64px;height:18px;border-radius:50%;background:rgba(255,248,240,.16)"></div>
+              <div style="position:absolute;left:0;top:0;width:96px;height:96px;border-radius:50%;background:#FFD56B;border:5px solid #D6A82F;box-sizing:border-box"></div>
+              <div style="position:absolute;left:15px;top:15px;width:66px;height:66px;border-radius:50%;border:6px solid #FFE8B8;box-sizing:border-box"></div>
+              <div style="position:absolute;left:24px;top:20px;width:34px;height:16px;border-radius:50%;background:#FFF3D0;transform:rotate(-24deg)"></div>
+            </div>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">idle · bob ±10</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <div style="position:relative;width:176px;height:176px;display:grid;place-items:center">
+              <div style="position:absolute;width:168px;height:168px;border-radius:50%;border:12px solid rgba(255,245,209,.4);box-sizing:border-box"></div>
+              <div style="position:relative;width:122px;height:122px">
+                <div style="position:absolute;left:0;top:0;width:122px;height:122px;border-radius:50%;background:#FFD56B;border:6px solid #D6A82F;box-sizing:border-box"></div>
+                <div style="position:absolute;left:22px;top:22px;width:78px;height:78px;border-radius:50%;border:9px solid #FFE8B8;box-sizing:border-box"></div>
+              </div>
+            </div>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">collect · scale 1,28</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <div style="position:relative;width:200px;height:120px">
+              <div style="position:absolute;left:0;top:52px;width:44px;height:44px;border-radius:50%;background:#FFD56B;opacity:.22"></div>
+              <div style="position:absolute;left:58px;top:40px;width:48px;height:48px;border-radius:50%;background:#FFD56B;opacity:.46"></div>
+              <div style="position:absolute;left:124px;top:24px;width:56px;height:56px;border-radius:50%;background:#FFD56B;border:4px solid #D6A82F;box-sizing:border-box"></div>
+            </div>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">fly-to-counter · 0,42 s</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div style="font:800 32px/1 Nunito,sans-serif;color:#A8E6CF">SeedPickup · Ø 120 · rim + well · isti objekat kao Arena SeedChip</div>
+        <div style="display:flex;gap:44px;align-items:flex-end">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <div style="position:relative;width:120px;height:132px">
+              <div style="position:absolute;left:0;top:0;width:120px;height:120px;border-radius:50%;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box"></div>
+              <div style="position:absolute;left:18px;top:18px;width:84px;height:84px;border-radius:50%;background:#22342A;border:2px solid #16211B;box-sizing:border-box"></div>
+              <img src="flowers/ph_clover.svg" alt="" style="position:absolute;left:22px;top:22px;width:76px;height:76px" />
+            </div>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">★1 · čist krem rim</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <div style="position:relative;width:120px;height:132px">
+              <div style="position:absolute;left:0;top:0;width:120px;height:120px;border-radius:50%;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box"></div>
+              <div style="position:absolute;left:60px;top:60px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#D4A5FF;transform:rotate(-104deg) translateX(51px)"></div>
+              <div style="position:absolute;left:60px;top:60px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#D4A5FF;transform:rotate(-76deg) translateX(51px)"></div>
+              <div style="position:absolute;left:18px;top:18px;width:84px;height:84px;border-radius:50%;background:#22342A;border:2px solid #16211B;box-sizing:border-box"></div>
+              <img src="flowers/ph_tulip.svg" alt="" style="position:absolute;left:22px;top:22px;width:76px;height:76px" />
+            </div>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">★2 · 2 lavanda pipa</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <div style="position:relative;width:120px;height:132px">
+              <div style="position:absolute;left:0;top:0;width:120px;height:120px;border-radius:50%;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box"></div>
+              <div style="position:absolute;left:60px;top:60px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#D6A82F;transform:rotate(-118deg) translateX(51px)"></div>
+              <div style="position:absolute;left:60px;top:60px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#D6A82F;transform:rotate(-90deg) translateX(51px)"></div>
+              <div style="position:absolute;left:60px;top:60px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#D6A82F;transform:rotate(-62deg) translateX(51px)"></div>
+              <div style="position:absolute;left:18px;top:18px;width:84px;height:84px;border-radius:50%;background:#22342A;border:2px solid #16211B;box-sizing:border-box"></div>
+              <img src="flowers/ph_sunflower.svg" alt="" style="position:absolute;left:22px;top:22px;width:76px;height:76px" />
+            </div>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">★3 · 3 gold pipa</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div style="font:800 32px/1 Nunito,sans-serif;color:#7FDCE8">DiamondPickup · 88 × 88</div>
+        <div style="display:flex;gap:44px;align-items:flex-end">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <div style="position:relative;width:100px;height:120px">
+              <div style="position:absolute;left:-6px;top:-6px;width:100px;height:100px;border-radius:50%;background:rgba(255,248,240,.2)"></div>
+              <div style="position:absolute;left:0;top:0;width:88px;height:88px;background:#2E7F8C;clip-path:polygon(50% 0%,100% 38%,50% 100%,0% 38%)"></div>
+              <div style="position:absolute;left:7px;top:8px;width:74px;height:72px;background:#7FDCE8;clip-path:polygon(50% 0%,100% 38%,50% 100%,0% 38%)"></div>
+              <div style="position:absolute;left:19px;top:16px;width:50px;height:18px;background:#C8F3F8;clip-path:polygon(50% 0%,100% 100%,0% 100%)"></div>
+            </div>
+            <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">idle · 1/300</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;padding:28px;border-radius:20px;background:rgba(255,248,240,.06);border:2px solid rgba(255,248,240,.14)">
+      <div style="font:800 30px/1 Nunito,sans-serif;color:#FFF8F0">Pravilo koje nosi grayscale test</div>
+      <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty">Pickup = svijetli krug ≤ 120 px koji <span style="color:#FFD56B">pluta</span> (odvojena sjena 64 × 18 na +40 px). Prepreka = masa ≥ 176 px sa <span style="color:#FFD56B">ravnom bazom</span> i ovratnikom izgažene trave. Oblik i sjena razlikuju ih i bez boje.</div>
+      <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty">Rijetkost sjemenke nikad ne mijenja <span style="color:#A8E6CF">vanjski krem rub</span> — sjeme uvijek ostaje sjeme. ★ se čita <span style="color:#A8E6CF">brojanjem pipa</span> (0 / 2 / 3, Ø 16 na radiusu 51), ne bojom — pa prolazi i grayscale i daltonizam. Dvije odbačene verzije: zlatni rim (★3 se na 120 px čita kao coin) i pun vs dashed prsten (razlika preslaba na 0,28 × zoomu).</div>
+    </div>
+  </div>
+
+  <div data-layer="ObstacleSpec" style="display:flex;flex-direction:column;gap:32px;padding:44px;border-radius:26px;background:#1B2620;border:3px solid rgba(255,248,240,.14)">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <div style="font:900 44px/1 Nunito,sans-serif;color:#FFF8F0">P1-4 · Obstacle spec</div>
+      <div style="font:600 26px/1 'JetBrains Mono',monospace;color:rgba(255,248,240,.5)">Obstacle + ObstacleCollar · tijelo 176 × 150 u laneu 200</div>
+    </div>
+
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:18px">
+        <div style="position:relative;width:260px;height:230px;border-radius:18px;background:#3A5C41;border:3px solid rgba(255,248,240,.14);box-sizing:border-box">
+          <div style="position:absolute;left:10px;top:158px;width:240px;height:52px;border-radius:50%;background:#C7BE9A;border:3px solid #A79C78;box-sizing:border-box"></div>
+          <div style="position:absolute;left:46px;top:150px;width:168px;height:40px;border-radius:50%;background:rgba(18,28,22,.26)"></div>
+          <div style="position:absolute;left:42px;top:34px;width:176px;height:150px;background:#A9AFA6;border:5px solid #878C85;box-sizing:border-box;border-radius:50% 50% 44% 44% / 58% 58% 42% 42%"></div>
+          <div style="position:absolute;left:74px;top:58px;width:64px;height:28px;border-radius:50%;background:#C4C9C0"></div>
+          <div style="position:absolute;left:150px;top:104px;width:34px;height:20px;border-radius:50%;background:#8E948B"></div>
+        </div>
+        <div style="font:800 30px/1 Nunito,sans-serif;color:#FFF8F0">Stone</div>
+        <div style="font:600 24px/1.4 'JetBrains Mono',monospace;color:rgba(255,248,240,.6);text-align:center">#A9AFA6 / #878C85</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:18px">
+        <div style="position:relative;width:260px;height:230px;border-radius:18px;background:#3A5C41;border:3px solid rgba(255,248,240,.14);box-sizing:border-box">
+          <div style="position:absolute;left:10px;top:158px;width:240px;height:52px;border-radius:50%;background:#C7BE9A;border:3px solid #A79C78;box-sizing:border-box"></div>
+          <div style="position:absolute;left:46px;top:150px;width:168px;height:40px;border-radius:50%;background:rgba(18,28,22,.26)"></div>
+          <div style="position:absolute;left:55px;top:66px;width:150px;height:118px;background:#9E7A52;border:5px solid #735738;box-sizing:border-box;border-radius:16px 16px 24px 24px"></div>
+          <div style="position:absolute;left:55px;top:34px;width:150px;height:60px;border-radius:50%;background:#B89466;border:5px solid #735738;box-sizing:border-box"></div>
+          <div style="position:absolute;left:92px;top:50px;width:76px;height:28px;border-radius:50%;border:4px solid #8A6A46;box-sizing:border-box"></div>
+          <div style="position:absolute;left:118px;top:60px;width:24px;height:10px;border-radius:50%;background:#8A6A46"></div>
+        </div>
+        <div style="font:800 30px/1 Nunito,sans-serif;color:#FFF8F0">Stump</div>
+        <div style="font:600 24px/1.4 'JetBrains Mono',monospace;color:rgba(255,248,240,.6);text-align:center">#9E7A52 / #735738<br>cap #B89466</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:18px">
+        <div style="position:relative;width:260px;height:230px;border-radius:18px;background:#3A5C41;border:3px solid rgba(255,248,240,.14);box-sizing:border-box">
+          <div style="position:absolute;left:10px;top:158px;width:240px;height:52px;border-radius:50%;background:#C7BE9A;border:3px solid #A79C78;box-sizing:border-box"></div>
+          <div style="position:absolute;left:46px;top:150px;width:168px;height:40px;border-radius:50%;background:rgba(18,28,22,.26)"></div>
+          <div style="position:absolute;left:42px;top:50px;width:176px;height:134px;background:#D9C98A;border:5px solid #AEA06A;box-sizing:border-box;border-radius:34px"></div>
+          <div style="position:absolute;left:58px;top:88px;width:144px;height:5px;background:#AEA06A"></div>
+          <div style="position:absolute;left:58px;top:120px;width:144px;height:5px;background:#AEA06A"></div>
+          <div style="position:absolute;left:58px;top:152px;width:144px;height:5px;background:#AEA06A"></div>
+          <div style="position:absolute;left:96px;top:66px;width:68px;height:24px;border-radius:50%;background:#EBDCA6"></div>
+        </div>
+        <div style="font:800 30px/1 Nunito,sans-serif;color:#FFF8F0">Hay bale</div>
+        <div style="font:600 24px/1.4 'JetBrains Mono',monospace;color:rgba(255,248,240,.6);text-align:center">#D9C98A / #AEA06A</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:18px;max-width:520px">
+        <div style="font:800 32px/1 Nunito,sans-serif;color:#FFF8F0">Zašto hay bale, a ne grm</div>
+        <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty">Grm je zelen kao livada: <span style="font:600 26px 'JetBrains Mono',monospace;color:#FFD56B">#4A8250</span> na stazi <span style="font:600 26px 'JetBrains Mono',monospace;color:#FFD56B">#3A5C41</span> daje 1,8:1 — pada na grayscale testu iz §4.1. Sva tri motiva su namjerno <span style="color:#A8E6CF">nezelena</span> i svjetlija od tla, pa silueta uvijek nosi čitljivost. Ovratnik izgažene trave je zajednički sloj i ide u sva tri asseta.</div>
+        <div style="padding:24px;border-radius:20px;background:rgba(232,139,139,.14);border:2px solid rgba(232,139,139,.4);font:700 26px/1.4 Nunito,sans-serif;color:#FFF8F0;text-wrap:pretty"><span style="color:#E88B8B;font-weight:900">Otvoreno · jedina promjena brojeva koju predlažem</span><br>Danas je prepreka 64 × 64 (≈ 24 dp) uz collision 64 × 64. Nacrtano tijelo je 176 × 150. Ako vizual raste a hitbox ne, igrač prolazi kroz ivice. Predlog: collision 150 × 110 (13 px oproštaja po strani). Utiče na težinu — traži tvoju potvrdu.</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="font:800 32px/1 Nunito,sans-serif;color:#FFF8F0">Season tint — <span style="font:600 28px 'JetBrains Mono',monospace;color:#FFD56B">SeasonTheme.obstacle_modulate()</span>, već u kodu</div>
+      <div style="display:flex;gap:32px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+          <div style="position:relative;width:200px;height:170px;border-radius:18px;background:#3A5C41;box-sizing:border-box">
+            <div style="position:absolute;left:25px;top:118px;width:150px;height:36px;border-radius:50%;background:#C7BE9A;border:2px solid #A79C78;box-sizing:border-box"></div>
+            <div style="position:absolute;left:52px;top:52px;width:96px;height:78px;background:#9E7A52;border:4px solid #735738;box-sizing:border-box;border-radius:12px"></div>
+            <div style="position:absolute;left:52px;top:30px;width:96px;height:40px;border-radius:50%;background:#B89466;border:4px solid #735738;box-sizing:border-box"></div>
+          </div>
+          <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.72)">country_bloom · 1,0</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+          <div style="position:relative;width:200px;height:170px;border-radius:18px;background:#2C4A53;box-sizing:border-box">
+            <div style="position:absolute;left:25px;top:118px;width:150px;height:36px;border-radius:50%;background:#95A7AC;border:2px solid #7D8A88;box-sizing:border-box"></div>
+            <div style="position:absolute;left:52px;top:52px;width:96px;height:78px;background:#766C5C;border:4px solid #564D3F;box-sizing:border-box;border-radius:12px"></div>
+            <div style="position:absolute;left:52px;top:30px;width:96px;height:40px;border-radius:50%;background:#8A8272;border:4px solid #564D3F;box-sizing:border-box"></div>
+          </div>
+          <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.72)">frost_orchard · .75/.88/1.12</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+          <div style="position:relative;width:200px;height:170px;border-radius:18px;background:#4A3A24;box-sizing:border-box">
+            <div style="position:absolute;left:25px;top:118px;width:150px;height:36px;border-radius:50%;background:#E4894F;border:2px solid #BF6F3F;box-sizing:border-box"></div>
+            <div style="position:absolute;left:52px;top:52px;width:96px;height:78px;background:#B65830;border:4px solid #843F20;box-sizing:border-box;border-radius:12px"></div>
+            <div style="position:absolute;left:52px;top:30px;width:96px;height:40px;border-radius:50%;background:#D46B3B;border:4px solid #843F20;box-sizing:border-box"></div>
+          </div>
+          <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.72)">ember_fen · 1.15/.72/.58</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="HudSpec" style="display:flex;flex-direction:column;gap:34px;padding:44px;border-radius:26px;background:#1B2620;border:3px solid rgba(255,248,240,.14)">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <div style="font:900 44px/1 Nunito,sans-serif;color:#FFF8F0">P1-5 · HUD komponente</div>
+      <div style="font:600 26px/1 'JetBrains Mono',monospace;color:rgba(255,248,240,.5)">smjer A · 1:1 u bazi 1080</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="font:800 32px/1 Nunito,sans-serif;color:#A8E6CF">TimerChip · fiksno 460 × 156 — kutija se ne mijenja između modova</div>
+      <div style="display:flex;gap:36px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="width:460px;height:156px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;gap:22px;padding:0 28px 0 26px">
+            <div style="position:relative;flex:0 0 auto;width:104px;height:104px;border-radius:50%;background:conic-gradient(from -90deg,#A8E6CF 0 70%,rgba(45,52,54,.16) 70% 100%)">
+              <div style="position:absolute;left:14px;top:14px;width:76px;height:76px;border-radius:50%;background:#FFF8F0"></div>
+            </div>
+            <div style="font:900 72px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">42s</div>
+          </div>
+          <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">normal</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="width:460px;height:156px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;gap:22px;padding:0 28px 0 26px">
+            <div style="position:relative;flex:0 0 auto;width:104px;height:104px;border-radius:50%;background:conic-gradient(from -90deg,#A8E6CF 0 70%,rgba(45,52,54,.16) 70% 100%)">
+              <div style="position:absolute;left:14px;top:14px;width:76px;height:76px;border-radius:50%;background:#FFF8F0"></div>
+            </div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <div style="font:800 38px/1.1 Nunito,sans-serif;color:#4A4A4A;white-space:nowrap">Level 3</div>
+              <div style="font:900 72px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">42s</div>
+            </div>
+          </div>
+          <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">level · <span style="font:600 24px 'JetBrains Mono',monospace">Lv 3 · 42s</span> → 2 reda</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="width:460px;height:156px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;gap:22px;padding:0 28px 0 26px">
+            <div style="position:relative;flex:0 0 auto;width:104px;height:104px;border-radius:50%;background:conic-gradient(from -90deg,#FFB88C 0 12%,rgba(45,52,54,.16) 12% 100%)">
+              <div style="position:absolute;left:14px;top:14px;width:76px;height:76px;border-radius:50%;background:#FFF8F0"></div>
+            </div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <div style="font:800 38px/1.1 Nunito,sans-serif;color:#4A4A4A;white-space:nowrap">Endless · Hard</div>
+              <div style="font:900 72px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">7s</div>
+            </div>
+          </div>
+          <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">endless · najduži string · prsten &lt; 17 % ide peach</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:44px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:800 32px/1 Nunito,sans-serif;color:#A8E6CF">PickupBar · chip 190 × 120</div>
+        <div style="display:flex;gap:16px">
+          <div style="width:190px;height:120px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;justify-content:center;gap:14px">
+            <img src="icons/icon_coin.svg" alt="" style="width:56px;height:56px" />
+            <div style="font:900 56px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">12</div>
+          </div>
+          <div style="width:190px;height:120px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;justify-content:center;gap:14px">
+            <img src="icons/icon_seed.svg" alt="" style="width:56px;height:56px" />
+            <div style="font:900 56px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">5</div>
+          </div>
+          <div style="width:168px;height:120px;box-sizing:border-box;border-radius:26px;background:#B8E0F5;border:3px solid #8FC4DE;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;justify-content:center;gap:14px">
+            <img src="icons/icon_diamond.svg" alt="" style="width:48px;height:48px" />
+            <div style="font:900 56px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">1</div>
+          </div>
+        </div>
+        <div style="max-width:580px;font:700 26px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.7);text-wrap:pretty">Krem = ovaj run (coin, seed). Soft sky = wallet, odmah upisano (diamond) — chip se pojavljuje samo kad je &gt; 0. Visina 120 px = 44 pt hit.</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:800 32px/1 Nunito,sans-serif;color:#A8E6CF">CompanionChip · BasketBadge · PauseButton</div>
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="width:268px;height:120px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;gap:18px;padding:0 26px 0 16px">
+              <div style="flex:0 0 auto;width:88px;height:88px;border-radius:22px;background:#22342A;border:3px dashed rgba(255,248,240,.55);box-sizing:border-box;display:grid;place-items:center;font:900 26px/1 Nunito,sans-serif;color:#FFF8F0">PIP</div>
+              <div style="font:800 44px/1 Nunito,sans-serif;color:#2D3436">Pip</div>
+            </div>
+            <div style="width:268px;height:76px;box-sizing:border-box;border-radius:20px;background:#A8E6CF;border:3px solid #7FBFA3;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;justify-content:center;gap:14px">
+              <img src="icons/icon_basket.svg" alt="" style="width:48px;height:48px" />
+              <div style="font:800 40px/1 Nunito,sans-serif;color:#2D3436">Clover</div>
+            </div>
+          </div>
+          <div style="width:128px;height:128px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:grid;place-items:center">
+            <img src="icons/icon_pause.svg" alt="Pause" style="width:56px;height:56px" />
+          </div>
+        </div>
+        <div style="max-width:520px;font:700 26px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.7);text-wrap:pretty">Portret je placeholder — Pip art postoji, ne redizajnira se. <span style="font:600 25px 'JetBrains Mono',monospace;color:#FFD56B">Basket: Clover</span> → ikona + tip. Pause 128 px hit, gornji desni kut.</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:800 32px/1 Nunito,sans-serif;color:#A8E6CF">PickupFeed — fly-to-counter, ne 5 redova teksta</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:14px;padding:28px;border-radius:20px;background:rgba(255,248,240,.06);border:2px solid rgba(255,248,240,.14)">
+          <div style="display:flex;align-items:center;gap:12px;height:76px;padding:0 22px;border-radius:22px;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box">
+            <img src="icons/icon_coin.svg" alt="" style="width:42px;height:42px" />
+            <div style="font:900 40px/1 Nunito,sans-serif;color:#2D3436">+1</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;height:65px;padding:0 19px;border-radius:22px;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box;opacity:.6;margin-right:26px">
+            <img src="icons/icon_coin.svg" alt="" style="width:36px;height:36px" />
+            <div style="font:900 34px/1 Nunito,sans-serif;color:#2D3436">+1</div>
+          </div>
+          <div style="padding:12px 26px;border-radius:22px;background:rgba(22,33,27,.78);font:700 38px/1.1 Nunito,sans-serif;color:#FFF8F0;white-space:nowrap">Meadow Clover</div>
+        </div>
+        <div style="max-width:480px;font:700 26px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.7);text-wrap:pretty">Coin i diamond: samo leteći <span style="color:#FFD56B">+1</span> chip u brojač. Seed: chip + toast s imenom tipa (1,4 s), max 2 u stacku — ime tipa je jedina informacija koju chip ne nosi.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="MagnetSpec" style="display:flex;flex-direction:column;gap:32px;padding:44px;border-radius:26px;background:#1B2620;border:3px solid rgba(255,248,240,.14)">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <div style="font:900 44px/1 Nunito,sans-serif;color:#FFF8F0">P1-6 · MagnetRing</div>
+      <div style="font:600 26px/1 'JetBrains Mono',monospace;color:rgba(255,248,240,.5)">radius = 40 + 48 × level · formula netaknuta</div>
+    </div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+        <div style="position:relative;width:560px;height:520px;border-radius:18px;background:#3A5C41;border:3px solid rgba(255,248,240,.14);box-sizing:border-box;overflow:hidden">
+          <div style="position:absolute;left:280px;top:300px;width:80px;height:80px;margin:-40px 0 0 -40px;border-radius:50%;box-sizing:border-box;border:4px solid rgba(255,248,240,.2)"></div>
+          <div style="position:absolute;left:280px;top:378px;width:140px;height:34px;margin:-17px 0 0 -70px;border-radius:50%;background:rgba(18,28,22,.34)"></div>
+          <div style="position:absolute;left:280px;top:300px;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:34px;background:rgba(255,248,240,.14);border:4px dashed rgba(255,248,240,.6);box-sizing:border-box;display:grid;place-items:center;font:900 42px/1 Nunito,sans-serif;color:#FFF8F0">PIP</div>
+        </div>
+        <div style="font:800 30px/1 Nunito,sans-serif;color:#FFF8F0">Level 0 · r 40</div>
+        <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">tanak solid prsten @ 20 %</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+        <div style="position:relative;width:560px;height:520px;border-radius:18px;background:#3A5C41;border:3px solid rgba(255,248,240,.14);box-sizing:border-box;overflow:hidden">
+          <div style="position:absolute;left:280px;top:300px;width:272px;height:272px;margin:-136px 0 0 -136px;border-radius:50%;box-sizing:border-box;border:7px dashed rgba(255,248,240,.42);background:rgba(255,248,240,.07)"></div>
+          <div style="position:absolute;left:280px;top:378px;width:140px;height:34px;margin:-17px 0 0 -70px;border-radius:50%;background:rgba(18,28,22,.34)"></div>
+          <div style="position:absolute;left:280px;top:300px;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:34px;background:rgba(255,248,240,.14);border:4px dashed rgba(255,248,240,.6);box-sizing:border-box;display:grid;place-items:center;font:900 42px/1 Nunito,sans-serif;color:#FFF8F0">PIP</div>
+          <div style="position:absolute;left:96px;top:200px;width:72px;height:72px;border-radius:50%;background:#FFD56B;border:4px solid #D6A82F;box-sizing:border-box;opacity:.85"></div>
+        </div>
+        <div style="font:800 30px/1 Nunito,sans-serif;color:#FFF8F0">Level 2 · r 136</div>
+        <div style="font:700 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">dashed 7 px @ 42 % + fill @ 7 % + puls 1,8 s</div>
+      </div>
+      <div style="max-width:520px;display:flex;flex-direction:column;gap:16px">
+        <div style="font:800 32px/1 Nunito,sans-serif;color:#FFF8F0">Zašto prsten uopšte</div>
+        <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty">§3.2 #4: igrač ne vidi šta je kupio. Prsten je jedino mjesto u igri gdje se magnet upgrade vidi — zato je dashed (čita se kao „polje", ne kao objekat) i zato pulsira samo kad je level &gt; 0. Radius u mockupu je doslovno <span style="font:600 26px 'JetBrains Mono',monospace;color:#FFD56B">get_magnet_radius()</span>: 40 / 88 / 136 / 184 / 232.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="EndBeats" style="display:flex;flex-direction:column;gap:32px;padding:44px;border-radius:26px;background:#1B2620;border:3px solid rgba(255,248,240,.14)">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <div style="font:900 44px/1 Nunito,sans-serif;color:#FFF8F0">P1-7 · FailFlash · FinishFlash · PauseOverlay</div>
+      <div style="font:600 26px/1 'JetBrains Mono',monospace;color:rgba(255,248,240,.5)">kadar prije go_to_scene(LOOT)</div>
+    </div>
+    <div style="display:flex;gap:36px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="width:432px;height:768px;overflow:hidden;border-radius:18px;border:3px solid rgba(232,139,139,.4)">
+          <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:top left">
+            <dc-import name="RunScreen" dir="A" scene="fail" coins="{{ 12 }}" seedCount="{{ 5 }}" hint-size="1080px,1920px"></dc-import>
+          </div>
+        </div>
+        <div style="font:800 28px/1 Nunito,sans-serif;color:#FFF8F0">Fail · 0,46 s</div>
+        <div style="max-width:432px;font:700 26px/1.35 Nunito,sans-serif;color:rgba(255,248,240,.7);text-wrap:pretty">Freeze 0,20 s → shake ±14 px → flash <span style="color:#E88B8B">#E88B8B</span> @ 26 % → Pip −13° → 5 tokena se prosipa. Prosipanje je 50 % loota, prikazano a ne napisano.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="width:432px;height:768px;overflow:hidden;border-radius:18px;border:3px solid rgba(168,230,207,.4)">
+          <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:top left">
+            <dc-import name="RunScreen" dir="A" scene="finish" hint-size="1080px,1920px"></dc-import>
+          </div>
+        </div>
+        <div style="font:800 28px/1 Nunito,sans-serif;color:#FFF8F0">Finish · 0,62 s</div>
+        <div style="max-width:432px;font:700 26px/1.35 Nunito,sans-serif;color:rgba(255,248,240,.7);text-wrap:pretty">Prsten na 0 → mint burst iz TimerChipa → banner <span style="color:#A8E6CF">Time!</span> → svijet staje u 0,3 s. Bez uzvičnika panike, bez brojanja bodova — to je loot ekran.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="width:432px;height:768px;overflow:hidden;border-radius:18px;border:3px solid rgba(255,248,240,.24)">
+          <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:top left">
+            <dc-import name="RunScreen" dir="A" scene="pause" hint-size="1080px,1920px"></dc-import>
+          </div>
+        </div>
+        <div style="font:800 28px/1 Nunito,sans-serif;color:#FFF8F0">PauseOverlay</div>
+        <div style="max-width:432px;font:700 26px/1.35 Nunito,sans-serif;color:rgba(255,248,240,.7);text-wrap:pretty">Predlog na otvoreno pitanje: <span style="color:#A8E6CF">Quit to Camp = fail loot (50 %), bez potvrde, bez revivea.</span> Posljedica je napisana u panelu pa druga potvrda samo dodaje klik. Revive ostaje isključivo na loot ekranu.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="LaneDetail" style="display:flex;flex-direction:column;gap:32px;padding:44px;border-radius:26px;background:#1B2620;border:3px solid rgba(255,248,240,.14)">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <div style="font:900 44px/1 Nunito,sans-serif;color:#FFF8F0">P2-8 · LaneField detalj</div>
+      <div style="font:600 26px/1 'JetBrains Mono',monospace;color:rgba(255,248,240,.5)">lane 200 px · pitch 270 px · gap 70 px · centri 270 / 540 / 810</div>
+    </div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="position:relative;width:1080px;height:520px;border-radius:18px;background:#26382C;overflow:hidden;flex:0 0 auto">
+        <div style="position:absolute;left:0;top:0;width:1080px;height:520px;background:radial-gradient(ellipse 320px 130px at 18% 22%,rgba(255,248,240,.05) 0 100%,rgba(0,0,0,0) 100%)"></div>
+        <div style="position:absolute;left:170px;top:0;width:200px;height:520px;box-sizing:border-box;background:#3A5C41;border-left:4px solid rgba(255,248,240,.2);border-right:4px solid rgba(255,248,240,.2);background-image:repeating-linear-gradient(180deg,rgba(255,248,240,.055) 0 58px,rgba(0,0,0,0) 58px 124px)"></div>
+        <div style="position:absolute;left:440px;top:0;width:200px;height:520px;box-sizing:border-box;background:#3A5C41;border-left:4px solid rgba(255,248,240,.2);border-right:4px solid rgba(255,248,240,.2);background-image:repeating-linear-gradient(180deg,rgba(255,248,240,.055) 0 58px,rgba(0,0,0,0) 58px 124px)"></div>
+        <div style="position:absolute;left:710px;top:0;width:200px;height:520px;box-sizing:border-box;background:#3A5C41;border-left:4px solid rgba(255,248,240,.2);border-right:4px solid rgba(255,248,240,.2);background-image:repeating-linear-gradient(180deg,rgba(255,248,240,.055) 0 58px,rgba(0,0,0,0) 58px 124px)"></div>
+        <div style="position:absolute;left:402px;top:0;width:6px;height:520px;background:repeating-linear-gradient(180deg,rgba(255,248,240,.16) 0 46px,rgba(0,0,0,0) 46px 108px)"></div>
+        <div style="position:absolute;left:672px;top:0;width:6px;height:520px;background:repeating-linear-gradient(180deg,rgba(255,248,240,.16) 0 46px,rgba(0,0,0,0) 46px 108px)"></div>
+        <div style="position:absolute;left:40px;top:120px;width:30px;height:54px;background:#436B4A;clip-path:polygon(50% 0%,100% 100%,0% 100%)"></div>
+        <div style="position:absolute;left:96px;top:300px;width:26px;height:46px;background:#436B4A;clip-path:polygon(50% 0%,100% 100%,0% 100%)"></div>
+        <div style="position:absolute;left:986px;top:180px;width:32px;height:58px;background:#436B4A;clip-path:polygon(50% 0%,100% 100%,0% 100%)"></div>
+        <div style="position:absolute;left:1026px;top:400px;width:24px;height:44px;background:#436B4A;clip-path:polygon(50% 0%,100% 100%,0% 100%)"></div>
+        <div style="position:absolute;left:58px;top:236px;width:22px;height:22px;border-radius:50%;background:#7FB98B;opacity:.8"></div>
+        <div style="position:absolute;left:1012px;top:296px;width:20px;height:20px;border-radius:50%;background:#7FB98B;opacity:.8"></div>
+        <div style="position:absolute;left:222px;top:196px;width:96px;height:96px;border-radius:50%;background:#FFD56B;border:5px solid #D6A82F;box-sizing:border-box"></div>
+        <div style="position:absolute;left:239px;top:213px;width:62px;height:62px;border-radius:50%;border:7px solid #FFE8B8;box-sizing:border-box"></div>
+        <div style="position:absolute;left:170px;top:466px;width:740px;height:4px;background:rgba(255,213,107,.6)"></div>
+        <div style="position:absolute;left:170px;top:482px;font:600 24px/1 'JetBrains Mono',monospace;color:#FFD56B">170</div>
+        <div style="position:absolute;left:868px;top:482px;font:600 24px/1 'JetBrains Mono',monospace;color:#FFD56B">910</div>
+      </div>
+      <div style="max-width:520px;display:flex;flex-direction:column;gap:16px">
+        <div style="font:800 32px/1 Nunito,sans-serif;color:#FFF8F0">Tri signala, ne samo boja</div>
+        <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty">1 · staza je svjetlija od tla · 2 · krem rub 4 px @ 20 % s obje strane · 3 · košene pruge svakih 124 px <span style="color:#A8E6CF">samo unutar staze</span>, koje se kreću s <span style="font:600 26px 'JetBrains Mono',monospace;color:#FFD56B">scroll_speed</span> i time pokazuju ramp. Između staza ostaje 70 px tamnog tla — to je ono što ih čini tri, a ne jedno polje. Pruge preko cijele širine su probane pa odbačene: spajaju tri staze u jedno polje.</div>
+        <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty"><span style="color:#A8E6CF;font-weight:900">Parallax:</span> 2 sloja. Daleki = mekane mrlje @ 5 % na 0,35 × brzine. Bliski = čuperci i cvjetići u rubnim pojasima (0…170 i 910…1080) na 1,0 ×. Pruge su treći „sloj" ali žive na samoj stazi.</div>
+        <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty"><span style="color:#A8E6CF;font-weight:900">Reakcijski prostor:</span> entitet je potpuno vidljiv od y ≈ 232 (ispod prvog HUD reda). Do igrača na y = 1574 ima 1342 px ≈ 3,3 s pri 400 px/s. TimerChip prekriva srednju stazu na vrhu, ali samo prvih 0,5 s putanje.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="AnimTable" style="display:flex;flex-direction:column;gap:28px;padding:44px;border-radius:26px;background:#1B2620;border:3px solid rgba(255,248,240,.14)">
+    <div style="display:flex;align-items:baseline;gap:20px">
+      <div style="font:900 44px/1 Nunito,sans-serif;color:#FFF8F0">P2-9 · Tabela animacija</div>
+      <div style="font:600 26px/1 'JetBrains Mono',monospace;color:rgba(255,248,240,.5)">sve su tween na poziciji / skali / alphi — bez shadera</div>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) 150px minmax(0,0.9fr);gap:2px;background:rgba(255,248,240,.1);border-radius:16px;overflow:hidden">
+      <div style="padding:18px 22px;background:#22302A;font:800 26px/1.2 Nunito,sans-serif;color:#A8E6CF">Sloj / pokret</div>
+      <div style="padding:18px 22px;background:#22302A;font:800 26px/1.2 Nunito,sans-serif;color:#A8E6CF">Od → do</div>
+      <div style="padding:18px 22px;background:#22302A;font:800 26px/1.2 Nunito,sans-serif;color:#A8E6CF">Trajanje</div>
+      <div style="padding:18px 22px;background:#22302A;font:800 26px/1.2 Nunito,sans-serif;color:#A8E6CF">Easing</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">PlayerRunner lane swipe</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">x → lane_x</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,12 s</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">quad out · postojeće</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Pickup idle bob</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">y ±10 px, loop</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">1,4 s</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">sine in-out</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Pickup collect pop</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">scale 1 → 1,28</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,10 s</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">back out</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Collect burst ring</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">Ø 96 → 168, a 40 % → 0</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,22 s</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">cubic out</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">PickupFeed fly-to-counter</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">pos → chip, scale 1 → 0,42</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,42 s</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">cubic in</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Counter punch</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">scale 1 → 1,16 → 1</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,16 s</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">back</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Seed toast</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">a 0 → 1, y +14 → 0 · hold 1,4 s</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,16 / 0,30 s</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">cubic out / in</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">MagnetRing puls (lvl &gt; 0)</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">scale 1 → 1,04 · a 42 % → 26 %</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">1,8 s loop</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">sine in-out</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Lane dust (na swipe)</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">3 puffa, Ø 24 → 64, a 24 % → 0</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,40 s</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">cubic out</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">FailFlash · freeze</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">scroll_speed → 0</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,20 s hold</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">—</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">FailFlash · shake + flash</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">±14 px × 4 · #E88B8B 26 % → 0</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,24 / 0,12 s</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">linear</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Loot spill + Pip stumble</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">5 tokena luk 180 px · rot 0 → −13°</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,40 / 0,18 s</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">cubic out / back out</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">FinishFlash burst + banner</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">Ø 200 → 560 · scale ,9 → 1</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,32 / 0,20 s</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">cubic out / back out</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Finish · svijet staje</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">scroll_speed → 0</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,30 s</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">sine out</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">PauseOverlay in</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.78)">a 0 → 82 % · panel y +40 → 0</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:#FFD56B">0,20 s</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">cubic out</div>
+    </div>
+    <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.72);text-wrap:pretty">Ukupno: <span style="color:#E88B8B;font-weight:900">fail 0,46 s</span> · <span style="color:#A8E6CF;font-weight:900">finish 0,62 s</span> prije <span style="font:600 26px 'JetBrains Mono',monospace;color:#FFD56B">go_to_scene(LOOT)</span>. Burst po pickupu je jedan prsten, ne čestice.</div>
+  </div>
+
+  <div data-layer="TextTable" style="display:flex;flex-direction:column;gap:28px;padding:44px;border-radius:26px;background:#1B2620;border:3px solid rgba(255,248,240,.14)">
+    <div style="font:900 44px/1 Nunito,sans-serif;color:#FFF8F0">Tekstovi — stari → novi</div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.1fr);gap:2px;background:rgba(255,248,240,.1);border-radius:16px;overflow:hidden">
+      <div style="padding:18px 22px;background:#22302A;font:800 26px/1.2 Nunito,sans-serif;color:#A8E6CF">Danas</div>
+      <div style="padding:18px 22px;background:#22302A;font:800 26px/1.2 Nunito,sans-serif;color:#A8E6CF">Novo</div>
+      <div style="padding:18px 22px;background:#22302A;font:800 26px/1.2 Nunito,sans-serif;color:#A8E6CF">Zašto</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.8)">Basket: Clover</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">🧺 ikona + Clover</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">badge nosi značenje, prefiks ne</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.8)">Lv 3 · 42s</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Level 3 / 42s (2 reda)</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">brojevi ostaju ≥ 44 px</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.8)">Endless · Easy · 42s</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Endless · Easy / 42s</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">§3.2 #10 — string više ne prelazi</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.8)">+1 Coin</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">leteći +1 chip → brojač</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">pokret govori gdje ide; tekst ne</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.8)">+1 Meadow Clover</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">+1 chip + toast „Meadow Clover"</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">tip je jedina info koju chip ne nosi</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.8)">+1 diamond</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">gem chip → soft sky brojač</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">boja chipa kaže „wallet, odmah"</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.8)">Swipe left / right to change lanes</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Swipe to change lanes</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">u 1 red na 44 px, u Pip bubbleu</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.8)">Coins for the shop!</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Coins for the shop! <span style="color:rgba(255,248,240,.55)">(isto)</span></div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">kratko i jasno — mijenja se samo mjesto</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.55)">— (ne postoji)</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Paused · Keep running · Quit to Camp</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">novi PauseOverlay</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.55)">— (ne postoji)</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 26px/1.3 Nunito,sans-serif;color:#FFF8F0">Time! · Full basket — nothing lost</div>
+      <div style="padding:16px 22px;background:#1B2620;font:700 25px/1.3 Nunito,sans-serif;color:rgba(255,248,240,.7)">FinishFlash, 100 % loot bez brojanja</div>
+    </div>
+  </div>
+
+  <div data-layer="Assets" style="display:flex;flex-direction:column;gap:28px;padding:44px;border-radius:26px;background:#1B2620;border:3px solid rgba(255,248,240,.14)">
+    <div style="font:900 44px/1 Nunito,sans-serif;color:#FFF8F0">P2-10 · Asseti za export</div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 260px minmax(0,1fr);gap:2px;background:rgba(255,248,240,.1);border-radius:16px;overflow:hidden">
+      <div style="padding:18px 22px;background:#22302A;font:800 26px/1.2 Nunito,sans-serif;color:#A8E6CF">Fajl</div>
+      <div style="padding:18px 22px;background:#22302A;font:800 26px/1.2 Nunito,sans-serif;color:#A8E6CF">Veličina</div>
+      <div style="padding:18px 22px;background:#22302A;font:800 26px/1.2 Nunito,sans-serif;color:#A8E6CF">Odredište</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFF8F0">coin_run.svg</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFD56B">96 × 96</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.7)">assets/sprites/run/</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFF8F0">seed_rim_run.svg · _mythic.svg</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFD56B">108 × 108</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.7)">assets/sprites/run/</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFF8F0">seed_well_run.svg</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFD56B">72 × 72</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.7)">assets/sprites/run/</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFF8F0">diamond_run.svg</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFD56B">88 × 88</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.7)">assets/sprites/run/</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFF8F0">obstacle_stone · _stump · _hay .svg</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFD56B">176 × 150</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.7)">assets/sprites/run/</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFF8F0">obstacle_collar.svg</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFD56B">240 × 52</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.7)">assets/sprites/run/</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFF8F0">run_ground.png · run_lane.png</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFD56B">1080 × 1024 · 218 × 512</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.7)">assets/backgrounds/ · tileable</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFF8F0">vignette_fail.png</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFD56B">1080 × 1920 · alpha</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.7)">assets/sprites/run/ · ne shader</div>
+
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:#A8E6CF">icon_pause.svg · icon_basket.svg</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 25px/1.3 'JetBrains Mono',monospace;color:#FFD56B">128 × 128</div>
+      <div style="padding:16px 22px;background:#1E2A24;font:600 24px/1.3 'JetBrains Mono',monospace;color:#A8E6CF">u paketu → assets/ui/run/</div>
+
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.7)">icon_coin · icon_seed · icon_diamond</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 25px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.7)">128 × 128</div>
+      <div style="padding:16px 22px;background:#1B2620;font:600 24px/1.3 'JetBrains Mono',monospace;color:rgba(255,248,240,.7)">već u assets/ui/chrome/</div>
+    </div>
+  </div>
+
+  <div data-layer="Beyond" style="display:flex;flex-direction:column;gap:24px;padding:44px;border-radius:26px;background:rgba(212,165,255,.08);border:3px solid rgba(212,165,255,.3)">
+    <div style="font:900 40px/1 Nunito,sans-serif;color:#D4A5FF">Van zadatka — nije u mockupu</div>
+    <div style="display:flex;flex-direction:column;gap:18px;max-width:1400px">
+      <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.84);text-wrap:pretty"><span style="font-weight:900;color:#FFF8F0">Lane preview traka.</span> 3 tanke tačke na dnu (nikako ne footer) koje pokazuju u kojem si laneu. Pomaže samo prvi run — vjerovatno ne treba.</div>
+      <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.84);text-wrap:pretty"><span style="font-weight:900;color:#FFF8F0">Near-miss feedback.</span> Kad prođeš 40 px od prepreke, ovratnik kratko zasvijetli krem. Bez mehanike, samo „bilo je blizu".</div>
+      <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.84);text-wrap:pretty"><span style="font-weight:900;color:#FFF8F0">Basket streak.</span> Kad Basket tip padne 3 ×, badge dobije mint puls. Vidljiva nagrada za loadout bez novog broja.</div>
+      <div style="font:700 28px/1.4 Nunito,sans-serif;color:rgba(255,248,240,.84);text-wrap:pretty"><span style="font-weight:900;color:#FFF8F0">Ne bih:</span> power-upi mid-run, 4. lane, boss. Svaki od njih dodaje HUD sloj u ekran koji je upravo postao čitljiv, a Pillar 2 ne traži ništa od toga.</div>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+</body>
+</html>
