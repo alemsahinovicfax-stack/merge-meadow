@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="HomePage" style="width:1080px;height:1920px;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#243329;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+
+  <div data-layer="Header" style="flex:0 0 143px;position:relative;z-index:2;background:#1A241E;box-shadow:0 6px 14px rgba(20,26,22,.34)">
+    <div style="height:140px;display:flex;align-items:center;gap:16px;padding:0 20px;box-sizing:border-box">
+      <div data-layer="CoinChip" style="flex:1;min-width:0;height:100px;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:12px;padding:0 20px 0 18px;background:#FFD56B;border:2px solid rgba(45,52,54,.14)">
+        <img src="../assets/icons/icon_coin.svg" alt="" style="width:56px;height:56px">
+        <div style="flex:1;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">{{ wallet }}</div>
+      </div>
+      <div data-layer="SeedChip" style="flex:1;min-width:0;height:100px;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:12px;padding:0 20px 0 18px;background:#A8E6CF;border:2px solid rgba(45,52,54,.14)">
+        <img src="../assets/icons/icon_seed.svg" alt="" style="width:56px;height:56px">
+        <div style="flex:1;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#2D3436">340</div>
+      </div>
+      <div data-layer="DiamondChip" style="flex:1;min-width:0;height:100px;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:12px;padding:0 20px 0 18px;background:#D4A5FF;border:2px solid rgba(45,52,54,.14)">
+        <img src="../assets/icons/icon_diamond.svg" alt="" style="width:56px;height:56px">
+        <div style="flex:1;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#2D3436">12</div>
+      </div>
+      <div data-layer="SettingsButton" style="width:100px;height:100px;margin-left:4px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center">
+        <img src="../assets/icons/icon_settings_light.svg" alt="" style="width:54px;height:54px">
+      </div>
+    </div>
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+  </div>
+
+  <div data-layer="SeasonStage" style="flex:0 0 1597px;position:relative;overflow:hidden">
+
+    <sc-if value="{{ isA }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:24px;top:24px;width:1032px;height:1100px">
+        <dc-import name="SeasonCard" season="{{ focus }}" state="{{ cardState }}" coins="{{ coins }}" flowers="{{ flowers }}" prev-on="{{ prevOn }}" next-on="{{ nextOn }}" hint-size="1032px,1100px"></dc-import>
+      </div>
+
+      <div data-layer="SeasonBrowser" style="position:absolute;left:0;top:1148px;width:1080px;height:222px;box-sizing:border-box;background:#1A241E;border-top:3px solid rgba(255,248,240,.55);border-bottom:3px solid rgba(255,248,240,.55);padding:14px 20px 0">
+        <div style="height:48px;display:flex;align-items:center;gap:20px">
+          <div style="flex:0 0 510px;display:flex;align-items:baseline;gap:14px;font:800 38px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">Free path <span style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#FFD56B">{{ freeCount }}</span></div>
+          <div style="flex:0 0 510px;font:800 38px/1 Nunito,system-ui,sans-serif;color:#D4A5FF">Premium</div>
+        </div>
+        <div data-layer="ProgressIndicator" style="margin-top:10px;display:flex;gap:20px">
+          <div style="display:flex;gap:10px">
+            <sc-for list="{{ freeTokens }}" as="k" hint-placeholder-count="4">
+              <div data-layer="SeasonToken" style="{{ k.style }}">
+                <sc-if value="{{ k.num }}" hint-placeholder-val="{{ true }}"><div style="{{ k.numStyle }}">{{ k.n }}</div></sc-if>
+                <sc-if value="{{ k.lock }}" hint-placeholder-val="{{ false }}"><div style="width:64px;height:64px;border-radius:32px;background:#FFF8F0;display:grid;place-items:center"><img src="../assets/icons/icon_lock.svg" alt="" style="width:40px;height:40px"></div></sc-if>
+                <sc-if value="{{ k.bar }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:10px;right:10px;bottom:10px;height:12px;border-radius:6px;background:rgba(26,36,30,.45);overflow:hidden"><div style="{{ k.barFill }}"></div></div></sc-if>
+                <sc-if value="{{ k.play }}" hint-placeholder-val="{{ false }}"><div data-layer="ActiveDot" style="position:absolute;top:-14px;right:-14px;width:48px;height:48px;border-radius:24px;background:#FFB88C;border:4px solid #1A241E;box-sizing:border-box;display:grid;place-items:center;font:900 22px/1 Nunito,system-ui,sans-serif;color:#2D3436;padding-left:3px">▶</div></sc-if>
+                <sc-if value="{{ k.focus }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:30px;right:30px;bottom:-22px;height:8px;border-radius:4px;background:#FFF8F0"></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:10px">
+            <sc-for list="{{ premTokens }}" as="k" hint-placeholder-count="4">
+              <div data-layer="SeasonToken" style="{{ k.style }}">
+                <sc-if value="{{ k.gem }}" hint-placeholder-val="{{ true }}"><div style="width:64px;height:64px;border-radius:32px;background:#FFF8F0;display:grid;place-items:center"><img src="../assets/icons/icon_diamond.svg" alt="" style="width:40px;height:40px"></div></sc-if>
+                <sc-if value="{{ k.soon }}" hint-placeholder-val="{{ false }}"><div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">Soon</div></sc-if>
+                <sc-if value="{{ k.owned }}" hint-placeholder-val="{{ false }}"><div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">✓</div></sc-if>
+                <sc-if value="{{ k.play }}" hint-placeholder-val="{{ false }}"><div data-layer="ActiveDot" style="position:absolute;top:-14px;right:-14px;width:48px;height:48px;border-radius:24px;background:#FFB88C;border:4px solid #1A241E;box-sizing:border-box;display:grid;place-items:center;font:900 22px/1 Nunito,system-ui,sans-serif;color:#2D3436;padding-left:3px">▶</div></sc-if>
+                <sc-if value="{{ k.focus }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:30px;right:30px;bottom:-22px;height:8px;border-radius:4px;background:#FFF8F0"></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isB }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="SeasonCard" style="{{ bCardStyle }}">
+        <div data-layer="SeasonArt" style="{{ bSlotStyle }}">
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.08) 0 18px,rgba(255,255,255,0) 18px 36px)"></div>
+          <div style="position:absolute;right:22px;bottom:16px;font:600 22px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:#3F4648">season illustration · 996 × 220</div>
+          <div data-layer="ActiveBadge" style="position:absolute;left:22px;top:22px;height:72px;padding:0 26px;border-radius:36px;box-sizing:border-box;display:flex;align-items:center;font:900 38px/1 Nunito,system-ui,sans-serif;letter-spacing:.05em;background:#FFF6D6;color:#2D3436;border:3px solid #2D3436">▶  PLAYING</div>
+          <div style="position:absolute;right:22px;top:22px;display:flex;gap:12px">
+            <sc-for list="{{ bFlowers }}" as="f" hint-placeholder-count="3">
+              <div style="width:120px;height:120px;border-radius:60px;background:#22342A;border:4px solid #FFF8F0;box-sizing:border-box;display:grid;place-items:center">
+                <sc-if value="{{ f.hasImg }}" hint-placeholder-val="{{ false }}"><img src="{{ f.img }}" alt="" style="width:92px;height:92px"></sc-if>
+                <sc-if value="{{ f.noImg }}" hint-placeholder-val="{{ true }}"><div style="{{ f.dot }}"></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font:900 72px/1 Nunito,system-ui,sans-serif;color:#2D3436;letter-spacing:-.015em">{{ bName }}</div>
+          <div style="font:700 38px/1.15 Nunito,system-ui,sans-serif;color:#3F4648">{{ bTag }}</div>
+        </div>
+        <div data-layer="OpenMeadow" style="height:130px;border-radius:26px;background:#FFF8F0;border:3px solid #2D3436;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;padding:0 36px">
+          <div style="font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436">Open meadow</div>
+          <div style="font:800 38px/1 Nunito,system-ui,sans-serif;color:#555C5E">field · upgrades ↗</div>
+        </div>
+      </div>
+
+      <div style="position:absolute;left:24px;right:24px;top:664px;height:44px;display:flex;gap:12px;font:800 38px/1 Nunito,system-ui,sans-serif">
+        <div style="flex:1;display:flex;align-items:baseline;gap:14px;color:#FFF8F0">Free path <span style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#FFD56B">{{ freeCount }}</span></div>
+        <div style="flex:1;color:#D4A5FF">Premium</div>
+      </div>
+      <div data-layer="SeasonBrowser" style="position:absolute;left:24px;top:720px;width:1032px;display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(4,150px);gap:12px">
+        <sc-for list="{{ bTiles }}" as="t" hint-placeholder-count="8">
+          <div data-layer="SeasonTile" style="{{ t.style }}">
+            <div style="{{ t.well }}">
+              <sc-if value="{{ t.num }}" hint-placeholder-val="{{ true }}"><div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">{{ t.n }}</div></sc-if>
+              <sc-if value="{{ t.lock }}" hint-placeholder-val="{{ false }}"><div style="width:72px;height:72px;border-radius:36px;background:#FFF8F0;display:grid;place-items:center"><img src="../assets/icons/icon_lock.svg" alt="" style="width:44px;height:44px"></div></sc-if>
+              <sc-if value="{{ t.gem }}" hint-placeholder-val="{{ false }}"><div style="width:72px;height:72px;border-radius:36px;background:#FFF8F0;display:grid;place-items:center"><img src="../assets/icons/icon_diamond.svg" alt="" style="width:44px;height:44px"></div></sc-if>
+            </div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:12px">
+              <div style="{{ t.nameStyle }}">{{ t.name }}</div>
+              <div style="{{ t.subStyle }}">{{ t.sub }}</div>
+            </div>
+            <sc-if value="{{ t.play }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:-12px;right:-12px;width:48px;height:48px;border-radius:24px;background:#FFB88C;border:4px solid #243329;box-sizing:border-box;display:grid;place-items:center;font:900 22px/1 Nunito,system-ui,sans-serif;color:#2D3436;padding-left:3px">▶</div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="position:absolute;left:24px;top:1394px;width:1032px;height:180px;display:flex;gap:16px">
+      <div data-layer="PlayButton" style="flex:1;border-radius:32px;background:#FFB88C;border:4px solid #E8A374;box-shadow:0 8px 0 #9E6645;box-sizing:border-box;display:flex;align-items:center;gap:30px;padding:0 36px">
+        <div style="width:112px;height:112px;border-radius:56px;background:#FFF8F0;border:3px solid #2D3436;box-sizing:border-box;display:grid;place-items:center;flex:0 0 auto">
+          <div style="width:0;height:0;border-top:24px solid transparent;border-bottom:24px solid transparent;border-left:38px solid #2D3436;margin-left:10px"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+          <div style="font:900 72px/1 Nunito,system-ui,sans-serif;color:#2D3436">Play</div>
+          <div style="font:800 38px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">run in {{ activeName }}</div>
+        </div>
+      </div>
+      <div data-layer="DailyGiftCard" style="flex:0 0 180px;position:relative;border-radius:32px;background:#FFF8F0;border:3px solid #2D3436;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+        <div style="width:84px;height:84px;border-radius:18px;background:#D4A5FF;border:3px solid #2D3436;box-sizing:border-box;position:relative;overflow:hidden">
+          <div style="position:absolute;left:32px;top:0;bottom:0;width:14px;background:#FFF8F0"></div>
+          <div style="position:absolute;top:32px;left:0;right:0;height:14px;background:#FFF8F0"></div>
+        </div>
+        <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Gift</div>
+        <div style="position:absolute;top:-12px;right:-12px;width:48px;height:48px;border-radius:24px;background:#FFCCD5;border:4px solid #243329;box-sizing:border-box"></div>
+      </div>
+    </div>
+
+    <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:0;right:0;top:250px;display:flex;justify-content:center;z-index:3">
+        <div style="{{ toastStyle }}">{{ toast }}</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hint }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="TutorialHint" style="position:absolute;left:24px;top:1394px;width:836px;height:180px;border-radius:32px;border:10px solid rgba(255,245,209,.7);box-sizing:border-box;transform:scale(1.06);z-index:3"></div>
+      <div style="position:absolute;left:60px;top:1196px;z-index:4;display:flex;flex-direction:column;align-items:flex-start">
+        <div style="max-width:760px;padding:26px 34px;border-radius:28px;background:#FFF8F0;border:4px solid #2D3436;box-sizing:border-box;display:flex;flex-direction:column;gap:10px">
+          <div style="font:900 44px/1.05 Nunito,system-ui,sans-serif;color:#2D3436">Tap Play to start your first run</div>
+          <div style="font:800 38px/1.1 Nunito,system-ui,sans-serif;color:#555C5E">The card opens your meadow.</div>
+        </div>
+        <div style="width:0;height:0;margin-left:110px;border-left:26px solid transparent;border-right:26px solid transparent;border-top:30px solid #2D3436"></div>
+      </div>
+    </sc-if>
+  </div>
+
+  <div data-layer="Footer" style="flex:0 0 180px;position:relative;z-index:2;background:#1A241E;box-shadow:0 -6px 14px rgba(20,26,22,.34)">
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+    <div style="position:relative;height:177px">
+      <div data-layer="ActiveIndicator" style="position:absolute;top:5px;left:442px;width:196px;height:8px;border-radius:4px;background:#FFB88C"></div>
+      <div style="position:absolute;left:0;right:0;top:17px;height:152px;display:flex">
+        <div data-layer="Tab_Shop" style="flex:1;display:flex;justify-content:center"><div style="width:196px;height:152px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><img src="../assets/icons/tab_shop_light.svg" alt="" style="width:52px;height:52px;opacity:.82"><div style="font:700 40px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82)">Shop</div></div></div>
+        <div data-layer="Tab_Journal" style="flex:1;display:flex;justify-content:center"><div style="width:196px;height:152px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><img src="../assets/icons/tab_journal_light.svg" alt="" style="width:52px;height:52px;opacity:.82"><div style="font:700 40px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82)">Journal</div></div></div>
+        <div data-layer="Tab_Home" style="flex:1;display:flex;justify-content:center"><div style="width:196px;height:152px;border-radius:20px;box-sizing:border-box;border:2px solid rgba(45,52,54,.14);background:#FFB88C;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><img src="../assets/icons/tab_home.svg" alt="" style="width:52px;height:52px"><div style="font:800 40px/1 Nunito,system-ui,sans-serif;color:#2D3436">Home</div></div></div>
+        <div data-layer="Tab_Camp" style="flex:1;display:flex;justify-content:center"><div style="width:196px;height:152px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><img src="../assets/icons/tab_camp_light.svg" alt="" style="width:52px;height:52px;opacity:.82"><div style="font:700 40px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82)">Camp</div></div></div>
+        <div data-layer="Tab_Arena" style="flex:1;display:flex;justify-content:center"><div style="width:196px;height:152px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><img src="../assets/icons/tab_arena_light.svg" alt="" style="width:52px;height:52px;opacity:.82"><div style="font:700 40px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82)">Arena</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ zones }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="HubSwipeZone" style="position:absolute;inset:0;z-index:10;background:rgba(255,184,140,.34);outline:8px solid #FFB88C;outline-offset:-8px"></div>
+    <div style="position:absolute;left:24px;top:{{ hubLabelTop }}px;z-index:12;padding:16px 26px;border-radius:20px;background:#2D3436;color:#FFB88C;font:900 40px/1 Nunito,system-ui,sans-serif;letter-spacing:.04em">HUB SWIPE  ← →  pages</div>
+    <sc-for list="{{ zoneBoxes }}" as="z" hint-placeholder-count="2">
+      <div style="{{ z.style }}">
+        <div style="padding:16px 26px;border-radius:20px;background:#2D3436;font:900 40px/1.15 Nunito,system-ui,sans-serif;letter-spacing:.04em;text-align:center;color:{{ z.ink }}">{{ z.label }}</div>
+      </div>
+    </sc-for>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;dir&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;A&quot;,&quot;B&quot;],&quot;default&quot;:&quot;A&quot;,&quot;tsType&quot;:&quot;'A'|'B'&quot;},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;mid&quot;,&quot;midNext&quot;,&quot;new&quot;,&quot;ready&quot;,&quot;unlocking&quot;,&quot;after&quot;,&quot;camp&quot;,&quot;farTap&quot;,&quot;premium&quot;,&quot;purchasing&quot;,&quot;owned&quot;,&quot;soon&quot;,&quot;all4&quot;],&quot;default&quot;:&quot;mid&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;zones&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const S = {
+  cb: { name: 'Country Bloom', mood: '#A8E6CF', kind: 'free', n: 1, f: [['clover'],['tulip'],['pumpkin']] },
+  fo: { name: 'Frost Orchard', mood: '#C5D5E8', kind: 'free', n: 2, f: [['frost_snowdrop'],[''],['silver_aconite']] },
+  lm: { name: 'Lantern Meadow', mood: '#C9B8E0', kind: 'free', n: 3 },
+  ac: { name: 'Amber Canopy', mood: '#E8C48A', kind: 'free', n: 4 },
+  mw: { name: 'Moonlit Warren', mood: '#3D3A6B', kind: 'paid', price: '$4.99' },
+  ct: { name: 'Coral Tide Garden', mood: '#E8A090', kind: 'paid', price: '$4.99' },
+  sg: { name: 'Starfall Glade', mood: '#6B5B95', kind: 'paid', price: '$4.99' },
+  ef: { name: 'Ember Fen', mood: '#C45C26', kind: 'paid', soon: true }
+};
+const FREE = ['cb','fo','lm','ac'], PAID = ['mw','ct','sg','ef'];
+const base = { unl: ['cb','fo'], own: [], act: 'fo', focus: 'fo', coins: 320, fl: 12 };
+const SCENES = {
+  mid: base,
+  midNext: { ...base, focus: 'lm' },
+  new: { unl: ['cb'], own: [], act: 'cb', focus: 'cb', coins: 140, fl: 3, hint: true },
+  ready: { ...base, focus: 'lm', coins: 540, fl: 22 },
+  unlocking: { ...base, focus: 'lm', coins: 500, fl: 20, state: 'unlocking' },
+  after: { unl: ['cb','fo','lm'], own: [], act: 'lm', focus: 'lm', coins: 40, fl: 2, toast: 'Lantern Meadow unlocked · now playing' },
+  camp: { unl: ['cb','fo','lm'], own: [], act: 'lm', focus: 'lm', coins: 40, fl: 2, toast: 'Unlocked in Camp · now playing' },
+  farTap: { ...base, toast: 'Unlock Lantern Meadow first', toastDark: true, shake: 'ac' },
+  premium: { ...base, focus: 'mw' },
+  purchasing: { ...base, focus: 'mw', purchasing: true },
+  owned: { ...base, own: ['mw'], act: 'mw', focus: 'mw', toast: 'Moonlit Warren is yours · now playing' },
+  soon: { ...base, focus: 'ef' },
+  all4: { unl: ['cb','fo','lm','ac'], own: [], act: 'ac', focus: 'ac', coins: 1240, fl: 0 }
+};
+const hex = h => [1,3,5].map(i => parseInt(h.substr(i,2),16));
+const toHex = a => '#' + a.map(v => Math.round(v).toString(16).padStart(2,'0')).join('');
+const mix = (a,b,t) => { const x = hex(a), y = hex(b); return toHex(x.map((v,i) => v + (y[i]-v)*t)); };
+const lum = h => { const v = hex(h).map(c => { c/=255; return c <= .03928 ? c/12.92 : Math.pow((c+.055)/1.055,2.4); }); return .2126*v[0]+.7152*v[1]+.0722*v[2]; };
+const fmt = n => n.toLocaleString('en-US');
+
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const dir = p.dir ?? 'A';
+    const sc = SCENES[p.scene] || SCENES.mid;
+    const unl = sc.unl, own = sc.own;
+    const nextLock = FREE.find(id => !unl.includes(id));
+    const status = id => {
+      if (unl.includes(id) || own.includes(id)) return 'open';
+      if (id === nextLock) return 'next';
+      if (S[id].kind === 'free') return 'far';
+      return S[id].soon ? 'soon' : 'paid';
+    };
+    const pct = (Math.min(sc.coins,500)/500 + Math.min(sc.fl,20)/20) / 2;
+    const focusables = FREE.filter(id => status(id) !== 'far').concat(PAID);
+    const fi = focusables.indexOf(sc.focus);
+
+    let cardState = 'active';
+    const fs = status(sc.focus);
+    if (fs === 'next') cardState = sc.state || (sc.coins >= 500 && sc.fl >= 20 ? 'ready' : 'gather');
+    if (fs === 'paid') cardState = sc.purchasing ? 'purchasing' : 'premium';
+    if (fs === 'soon') cardState = 'soon';
+
+    const tokBase = 'position:relative;width:120px;height:120px;border-radius:26px;box-sizing:border-box;display:grid;place-items:center;';
+    const tok = id => {
+      const st = status(id), s = S[id];
+      const fill = st === 'far' ? mix(s.mood,'#1A241E',.62) : st === 'next' ? mix(s.mood,'#3A4A40',.42) : st === 'soon' ? mix(s.mood,'#243329',.55) : s.mood;
+      const isAct = id === sc.act, isFocus = id === sc.focus;
+      const border = isAct ? '6px solid #FFF6D6' : isFocus ? '5px solid #FFF8F0' : '3px solid rgba(255,248,240,.35)';
+      const lift = isFocus ? 'transform:translateY(-6px);' : '';
+      const shake = sc.shake === id ? 'transform:translateX(8px) rotate(3deg);outline:5px solid #FF8A8A;outline-offset:4px;' : '';
+      return {
+        style: tokBase + 'background:' + fill + ';border:' + border + ';' + lift + shake,
+        n: s.n, num: s.kind === 'free' && st === 'open',
+        numStyle: 'font:900 52px/1 Nunito,system-ui,sans-serif;color:' + (lum(fill) < .2 ? '#FFF8F0' : '#2D3436'),
+        lock: st === 'next' || st === 'far',
+        bar: st === 'next', barFill: 'height:100%;border-radius:6px;background:#FFD56B;width:' + (pct*100).toFixed(0) + '%',
+        gem: st === 'paid', soon: st === 'soon', owned: st === 'open' && s.kind === 'paid',
+        play: isAct, focus: isFocus
+      };
+    };
+
+    const act = S[sc.act];
+    const tileBase = 'position:relative;border-radius:24px;box-sizing:border-box;display:flex;align-items:center;gap:16px;padding:0 18px 0 14px;';
+    const bTiles = FREE.concat(PAID).map(id => {
+      const st = status(id), s = S[id];
+      const fill = st === 'far' ? mix(s.mood,'#1A241E',.62) : st === 'next' ? mix(s.mood,'#3A4A40',.42) : st === 'soon' ? mix(s.mood,'#243329',.55) : s.mood;
+      const ink = lum(fill) < .2 ? '#FFF8F0' : '#2D3436';
+      const sub = lum(fill) < .2 ? '#E9E1F0' : '#3F4648';
+      const isAct = id === sc.act;
+      let subText = st === 'open' ? (isAct ? 'Playing' : 'Open') : st === 'next' ? 'Next · ' + Math.round(pct*100) + '% there' : st === 'far' ? 'Locked' : st === 'soon' ? 'Coming soon' : s.price + ' · preview';
+      return {
+        name: s.name, sub: subText, n: s.n,
+        style: tileBase + 'background:' + fill + ';border:' + (isAct ? '6px solid #FFF6D6' : '3px solid rgba(255,248,240,.35)'),
+        well: 'width:118px;height:118px;border-radius:22px;flex:0 0 auto;background:#1A241E;border:3px solid rgba(255,248,240,.4);box-sizing:border-box;display:grid;place-items:center',
+        nameStyle: 'font:900 38px/1 Nunito,system-ui,sans-serif;letter-spacing:-.01em;white-space:nowrap;color:' + ink,
+        subStyle: 'font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap;color:' + sub,
+        num: s.kind === 'free' && st === 'open', lock: st === 'next' || st === 'far', gem: s.kind === 'paid' && st !== 'open',
+        play: isAct
+      };
+    });
+
+    const bFlowers = (act.f || [[''],[''],['']]).map(f => ({
+      hasImg: !!f[0], noImg: !f[0], img: '../assets/flowers/ph_' + f[0] + '.svg',
+      dot: 'width:60px;height:60px;border-radius:30px;background:' + act.mood + ';border:6px solid #FFF8F0;box-sizing:border-box'
+    }));
+
+    const zoneBoxes = dir === 'A' ? [
+      { label: 'SEASON SWIPE  ← →\ntap card = open meadow', ink: '#A8E6CF', style: 'position:absolute;left:24px;top:167px;width:1032px;height:1100px;z-index:11;box-sizing:border-box;border-radius:36px;background:rgba(168,230,207,.55);outline:8px solid #A8E6CF;display:grid;place-items:center;white-space:pre-line' },
+      { label: 'TAP = JUMP · drag = hub', ink: '#D4A5FF', style: 'position:absolute;left:0;top:1291px;width:1080px;height:222px;z-index:11;box-sizing:border-box;background:rgba(212,165,255,.55);outline:8px solid #D4A5FF;outline-offset:-8px;display:grid;place-items:center' }
+    ] : [
+      { label: 'TAP ONLY · no swipe', ink: '#D4A5FF', style: 'position:absolute;left:24px;top:863px;width:1032px;height:636px;z-index:11;box-sizing:border-box;border-radius:24px;background:rgba(212,165,255,.4);outline:8px solid #D4A5FF;display:grid;place-items:center' }
+    ];
+
+    return {
+      isA: dir === 'A', isB: dir === 'B',
+      wallet: fmt(sc.coins),
+      focus: sc.focus, cardState, coins: sc.coins, flowers: sc.fl,
+      prevOn: fi > 0, nextOn: fi < focusables.length - 1,
+      freeCount: unl.length + ' / 4',
+      freeTokens: FREE.map(tok), premTokens: PAID.map(tok),
+      activeName: act.name,
+      hasToast: !!sc.toast, toast: sc.toast || '',
+      toastStyle: 'height:92px;padding:0 40px;border-radius:46px;box-sizing:border-box;display:flex;align-items:center;font:900 40px/1 Nunito,system-ui,sans-serif;white-space:nowrap;border:4px solid #2D3436;' +
+        (sc.toastDark ? 'background:#1A241E;color:#FFF8F0;border-color:#FF8A8A' : 'background:#E8C44A;color:#2D3436'),
+      hint: !!sc.hint && dir === 'A',
+      bCardStyle: 'position:absolute;left:24px;top:24px;width:1032px;height:620px;box-sizing:border-box;border-radius:36px;padding:18px;display:flex;flex-direction:column;gap:20px;background:' + act.mood + ';border:8px solid #FFF6D6;box-shadow:0 10px 0 #121A15',
+      bSlotStyle: 'position:relative;height:220px;flex:0 0 auto;border-radius:26px;overflow:hidden;background:' + mix(act.mood,'#1A241E',.16),
+      bName: act.name, bTag: 'Crisp air, silver blossom.', bFlowers, bTiles,
+      zones: !!p.zones, zoneBoxes, hubLabelTop: dir === 'A' ? 1590 : 1540
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+HomePage (Control, 1080x1597 content between hub header 143 / footer 180)
+└ SeasonStage (Control, clip_contents)
+  ├ SeasonCard (PanelContainer 1032x1100 @ 24,24) [season_card_active | season_card_preview]
+  │ └ VBox (separation 22)
+  │   ├ SeasonArt (Panel, size_flags_v EXPAND_FILL) [season_art_slot]
+  │   │ ├ Illustration (TextureRect, keep_aspect_covered)  <- future art slot 996 x H
+  │   │ ├ ActiveBadge (PanelContainer @ 22,22, h72) [badge_playing | badge_preview | badge_premium]
+  │   │ ├ LockIcon (center, 150 circle)  visible on locked states
+  │   │ ├ PagerPrev (Button 96, bottom-left 20/16, hit 132) [pager_arrow]
+  │   │ └ PagerNext (Button 96, bottom-right 20/16, hit 132) [pager_arrow]
+  │   ├ SeasonTitle (VBox h170): Meta 38/900 · Name 80/900 · Tagline 38/700
+  │   ├ SeasonRoster (GridContainer 3 cols, h-sep 18, v-sep 14)
+  │   │   tile 236 tall (3 shown) | 214 tall x2 rows (premium preview = 6) [roster_tile, roster_well]
+  │   └ Action (one of):
+  │     ├ OpenMeadow (Button h130) [open_meadow_button]         state ACTIVE
+  │     ├ UnlockPoster (VBox sep 12, h316)                      state GATHER/READY/UNLOCKING
+  │     │ ├ CoinProgress (h96) [progress_well + 12px bar]
+  │     │ ├ FlowerProgress (h96) [progress_well + 12px bar]
+  │     │ └ UnlockButton (h140) [unlock_button_ready | unlock_button_disabled]
+  │     ├ PremiumActions (HBox sep 16, h130)                    state PREMIUM/PURCHASING
+  │     │ ├ PriceTag (w300) [price_tag]  text = store price string
+  │     │ └ BuyButton [buy_button | unlock_button_disabled]
+  │     └ InfoBar (h130) "Coming soon" [unlock_button_disabled]  state SOON
+  ├ SeasonBrowser (Panel 1080x222 @ 0,1148) [season_browser_bg + 3px cream lines top/bottom]
+  │ ├ Labels row h48: "Free path N / 4" | "Premium"
+  │ └ ProgressIndicator (HBox sep 20): FreeGroup(4 tokens, sep 10) | PremiumGroup(4 tokens, sep 10)
+  │     SeasonToken 120x120 [season_token_active | _focus | _idle] + ActiveDot 48 [active_dot]
+  │     focus = lift -6px + 8px cream bar 22px below
+  ├ PlayRow (HBox @ 24,1394, h180, sep 16)
+  │ ├ PlayButton (w836) [play_button]  "Play" 72/900 + "run in {active}" 38/800
+  │ └ DailyGiftCard (w180) [daily_gift_card]
+  ├ Toast (centered, top 250, h92) [toast_success | toast_blocked]
+  ├ TutorialHint (first session only)
+  └ HubSwipeZone (debug overlay only, not shipped)

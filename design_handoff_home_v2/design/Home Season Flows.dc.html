@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E6DF;color:#2D3436}a{color:#2E6B52;font-weight:800}a:hover{color:#1A241E}</style>
+</helmet>
+<section data-screen-label="Turn 1" style="padding:80px;display:flex;flex-direction:column;gap:96px;font-family:Nunito,system-ui,sans-serif;color:#2D3436;width:max-content">
+
+  <a href="Home Season Select v2.dc.html" style="font:800 22px/1 Nunito">← Home Season Select v2</a>
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">P1.3 · Unlock ready → moment → after</div>
+    <div style="display:flex;gap:40px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:900 22px/1 Nunito;color:#6B6F66">1 · READY</div>
+        <div style="width:540px;height:960px;overflow:hidden;border-radius:14px;box-shadow:0 18px 40px rgba(20,26,22,.25)"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="SeasonStage" scene="ready" hint-size="1080px,1920px"></dc-import></div></div>
+        <div style="width:540px;font:700 20px/1.45 Nunito;color:#4A4F4C">Both numbers turn coin gold and the button turns UI gold #E8C44A. The unlock happens right here on the card.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:900 22px/1 Nunito;color:#6B6F66">2 · MOMENT · 420 ms</div>
+        <div style="width:540px;height:960px;overflow:hidden;border-radius:14px;box-shadow:0 18px 40px rgba(20,26,22,.25)"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="SeasonStage" scene="unlocking" hint-size="1080px,1920px"></dc-import></div></div>
+        <div style="width:540px;font:700 20px/1.45 Nunito;color:#4A4F4C">A 520 px ring scales from 0.2 to 1 at 55% opacity. The lock turns into a coin, the bars drain in 200 ms, and the mood fill tweens from locked to full.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:900 22px/1 Nunito;color:#6B6F66">3 · AFTER · also the Camp arrival</div>
+        <div style="width:540px;height:960px;overflow:hidden;border-radius:14px;box-shadow:0 18px 40px rgba(20,26,22,.25)"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="SeasonStage" scene="after" hint-size="1080px,1920px"></dc-import></div></div>
+        <div style="width:540px;font:700 20px/1.45 Nunito;color:#4A4F4C">The new season becomes active, Play renames itself and a gold toast shows for 2.4 s. If the unlock came from Camp, the player arrives here with the toast reading <b>Unlocked in Camp · now playing</b>, so there's no second unlock moment.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">P1.4 · Premium</div>
+    <div style="display:flex;gap:40px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:900 22px/1 Nunito;color:#6B6F66">NOT BOUGHT · PREVIEW</div>
+        <div style="width:540px;height:960px;overflow:hidden;border-radius:14px;box-shadow:0 18px 40px rgba(20,26,22,.25)"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="SeasonStage" scene="premium" hint-size="1080px,1920px"></dc-import></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:900 22px/1 Nunito;color:#6B6F66">PURCHASE IN PROGRESS</div>
+        <div style="width:540px;height:960px;overflow:hidden;border-radius:14px;box-shadow:0 18px 40px rgba(20,26,22,.25)"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="SeasonStage" scene="purchasing" hint-size="1080px,1920px"></dc-import></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:900 22px/1 Nunito;color:#6B6F66">BOUGHT · ACTIVE</div>
+        <div style="width:540px;height:960px;overflow:hidden;border-radius:14px;box-shadow:0 18px 40px rgba(20,26,22,.25)"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="SeasonStage" scene="owned" hint-size="1080px,1920px"></dc-import></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:900 22px/1 Nunito;color:#6B6F66">COMING SOON</div>
+        <div style="width:540px;height:960px;overflow:hidden;border-radius:14px;box-shadow:0 18px 40px rgba(20,26,22,.25)"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="SeasonStage" scene="soon" hint-size="1080px,1920px"></dc-import></div></div>
+      </div>
+    </div>
+    <div style="max-width:1400px;font:700 21px/1.5 Nunito;color:#3F4648;text-wrap:pretty">The preview shows all 6 flowers with rarity pills. The price tag is the raw store string and the button is calm lavender: no timer, no strikethrough, no "best value". While the purchase runs, the player can keep playing, because Play still runs the active free season. The dock marks a bought pack with ✓ in place of the gem. Ember Fen shows <b>Coming soon</b> with no price.</div>
+  </div>
+
+  </section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const M = [
+  ['cb','Country Bloom','#A8E6CF'],['fo','Frost Orchard','#C5D5E8'],['lm','Lantern Meadow','#C9B8E0'],['ac','Amber Canopy','#E8C48A'],
+  ['mw','Moonlit Warren','#3D3A6B'],['ct','Coral Tide Garden','#E8A090'],['sg','Starfall Glade','#6B5B95'],['ef','Ember Fen','#C45C26']
+];
+const hex = h => [1,3,5].map(i => parseInt(h.substr(i,2),16));
+const toHex = a => '#' + a.map(v => Math.round(v).toString(16).padStart(2,'0')).join('').toUpperCase();
+const mix = (a,b,t) => { const x = hex(a), y = hex(b); return toHex(x.map((v,i) => v + (y[i]-v)*t)); };
+const lum = h => { const v = hex(h).map(c => { c/=255; return c <= .03928 ? c/12.92 : Math.pow((c+.055)/1.055,2.4); }); return .2126*v[0]+.7152*v[1]+.0722*v[2]; };
+const sw = c => 'height:64px;border-radius:12px;display:grid;place-items:center;font:800 16px/1 ui-monospace,Menlo,monospace;border:2px solid rgba(45,52,54,.15);background:' + c + ';color:' + (lum(c) < .2 ? '#FFF8F0' : '#2D3436');
+
+class Component extends DCLogic {
+  renderVals() {
+    const moods = M.map(([id,name,mood]) => {
+      const slot = mix(mood,'#1A241E',.16), locked = mix(mood,'#3A4A40',.42), far = mix(mood,'#1A241E',.62);
+      const ink = lum(mood) < .2 ? '#FFF8F0' : '#2D3436';
+      return { id, name, mood, slot, locked, far, inkLabel: ink, sw1: sw(mood), sw2: sw(slot), sw3: sw(locked), sw4: sw(far),
+        sw5: 'height:64px;border-radius:12px;display:grid;place-items:center;font:900 18px/1 ui-monospace,Menlo,monospace;background:' + mood + ';color:' + ink + ';border:2px solid rgba(45,52,54,.15)' };
+    });
+    const cardStates = [
+      { season:'fo', state:'active', label:'active', note:'8 px #FFF6D6 rim · ▶ PLAYING · Open meadow' },
+      { season:'lm', state:'gather', coins:320, fl:12, label:'next lock · gathering', note:'UnlockPoster: dark wells, bars 12 px. Button says exactly what is missing.' },
+      { season:'lm', state:'ready', coins:500, fl:20, label:'next lock · ready', note:'Numbers in #FFD56B · UnlockButton #E8C44A, border 4 #9C7A14' },
+      { season:'lm', state:'unlocking', coins:500, fl:20, label:'unlocking', note:'ring 520 · lock → coin · 420 ms' },
+      { season:'ac', state:'far', coins:0, fl:0, label:'far lock (spec only)', note:'Never focused on device. Shown for the tween target and QA.' },
+      { season:'mw', state:'premium', label:'premium · preview', note:'6 flowers · PriceTag #FFE8B8 · BuyButton lavender' },
+      { season:'mw', state:'purchasing', label:'premium · purchasing', note:'Buy disabled, price stays visible' },
+      { season:'ef', state:'soon', label:'coming soon', note:'Mood mixed 55% to the meadow · no price' }
+    ].map(c => ({ coins: 0, fl: 0, ...c }));
+    const layers = ['HomePage','SeasonStage','SeasonCard','ActiveBadge','SeasonRoster','UnlockPoster','CoinProgress','FlowerProgress','UnlockButton','PremiumCard → SeasonCard[premium]','PriceTag','SeasonBrowser','ProgressIndicator','PlayButton','DailyGiftCard','HubSwipeZone'];
+    return { moods, cardStates, layers };
+  }
+}
+</script>
+</body>
+</html>

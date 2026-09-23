@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="SeasonCard" style="{{ rootStyle }}">
+
+  <div data-layer="SeasonArt" style="{{ slotStyle }}">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.08) 0 18px,rgba(255,255,255,0) 18px 36px)"></div>
+    <div style="position:absolute;right:22px;bottom:18px;font:600 22px/1 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--sub)">season illustration · 996 × {{ slotH }}</div>
+
+    <sc-if value="{{ showLock }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:150px;height:150px;border-radius:75px;background:#FFF8F0;border:4px solid #2D3436;box-sizing:border-box;display:grid;place-items:center">
+        <img src="../assets/icons/icon_lock.svg" alt="" style="width:80px;height:80px">
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ unlocking }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:260px;border:28px solid rgba(255,245,209,.55);box-sizing:border-box"></div>
+      <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:150px;height:150px;border-radius:75px;background:#FFD56B;border:4px solid #2D3436;box-sizing:border-box;display:grid;place-items:center">
+        <img src="../assets/icons/icon_coin.svg" alt="" style="width:84px;height:84px">
+      </div>
+    </sc-if>
+
+    <div data-layer="ActiveBadge" style="{{ badgeStyle }}">{{ badgeText }}</div>
+
+    <sc-if value="{{ arrows }}" hint-placeholder-val="{{ true }}">
+      <div data-layer="PagerPrev" style="{{ prevStyle }}"><div style="width:30px;height:30px;border-left:9px solid #FFF8F0;border-bottom:9px solid #FFF8F0;transform:translateX(6px) rotate(45deg)"></div></div>
+      <div data-layer="PagerNext" style="{{ nextStyle }}"><div style="width:30px;height:30px;border-right:9px solid #FFF8F0;border-top:9px solid #FFF8F0;transform:translateX(-6px) rotate(45deg)"></div></div>
+    </sc-if>
+  </div>
+
+  <div data-layer="SeasonTitle" style="flex:0 0 auto;height:170px;display:flex;flex-direction:column;justify-content:space-between">
+    <div style="display:flex;justify-content:space-between;align-items:center;font:900 38px/1 Nunito,system-ui,sans-serif;letter-spacing:.06em;color:var(--sub)">
+      <div>{{ meta }}</div>
+      <div style="letter-spacing:0">{{ rosterCount }}</div>
+    </div>
+    <div style="font:900 80px/1 Nunito,system-ui,sans-serif;letter-spacing:-.015em;color:var(--ink)">{{ name }}</div>
+    <div style="font:700 38px/1.15 Nunito,system-ui,sans-serif;color:var(--sub);text-wrap:pretty">{{ tagline }}</div>
+  </div>
+
+  <div data-layer="SeasonRoster" style="flex:0 0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 18px">
+    <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="3">
+      <div style="{{ t.style }}">
+        <div style="{{ t.pill }}">★{{ t.rarity }}</div>
+        <div style="{{ t.well }}">
+          <sc-if value="{{ t.hasImg }}" hint-placeholder-val="{{ false }}"><img src="{{ t.img }}" alt="" style="width:86%;height:86%"></sc-if>
+          <sc-if value="{{ t.noImg }}" hint-placeholder-val="{{ true }}"><div style="{{ t.dot }}"></div></sc-if>
+        </div>
+        <div style="font:800 38px/1.05 Nunito,system-ui,sans-serif;color:#2D3436;text-align:center;text-wrap:balance;height:80px;display:flex;align-items:center">{{ t.name }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ isActive }}" hint-placeholder-val="{{ true }}">
+    <div data-layer="OpenMeadow" style="flex:0 0 auto;height:130px;border-radius:26px;background:#FFF8F0;border:3px solid #2D3436;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;padding:0 36px">
+      <div style="font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436">Open meadow</div>
+      <div style="font:800 38px/1 Nunito,system-ui,sans-serif;color:#555C5E">field · upgrades ↗</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isGate }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="UnlockPoster" style="flex:0 0 auto;display:flex;flex-direction:column;gap:12px">
+      <div data-layer="CoinProgress" style="height:96px;border-radius:22px;background:#1A241E;border:3px solid rgba(255,248,240,.55);box-sizing:border-box;position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;padding:0 24px 8px 14px">
+        <div style="width:64px;height:64px;border-radius:32px;background:#FFD56B;display:grid;place-items:center;flex:0 0 auto"><img src="../assets/icons/icon_coin.svg" alt="" style="width:44px;height:44px"></div>
+        <div style="flex:1;font:800 38px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">Coins</div>
+        <div style="{{ coinNumStyle }}">{{ coinText }}</div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:12px;background:rgba(255,248,240,.16)"><div style="{{ coinBar }}"></div></div>
+      </div>
+      <div data-layer="FlowerProgress" style="height:96px;border-radius:22px;background:#1A241E;border:3px solid rgba(255,248,240,.55);box-sizing:border-box;position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;padding:0 24px 8px 14px">
+        <div style="width:64px;height:64px;border-radius:32px;background:#22342A;border:2px solid rgba(255,248,240,.4);box-sizing:border-box;display:grid;place-items:center;flex:0 0 auto">
+          <sc-if value="{{ gateHasImg }}" hint-placeholder-val="{{ false }}"><img src="{{ gateImg }}" alt="" style="width:52px;height:52px"></sc-if><sc-if value="{{ gateNoImg }}" hint-placeholder-val="{{ false }}"><div style="{{ gateDot }}"></div></sc-if>
+        </div>
+        <div style="flex:1;min-width:0;font:800 38px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">{{ gateName }} <span style="color:#FFD56B">★3</span></div>
+        <div style="{{ flNumStyle }}">{{ flText }}</div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:12px;background:rgba(255,248,240,.16)"><div style="{{ flBar }}"></div></div>
+      </div>
+      <div data-layer="UnlockButton" style="{{ unlockStyle }}">
+        <div style="font:900 46px/1 Nunito,system-ui,sans-serif">{{ unlockTitle }}</div>
+        <div style="font:800 38px/1 Nunito,system-ui,sans-serif">{{ unlockSub }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isPremium }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="PremiumActions" style="flex:0 0 auto;height:130px;display:flex;gap:16px">
+      <div data-layer="PriceTag" style="flex:0 0 300px;border-radius:26px;background:#FFE8B8;border:3px solid #D6A82F;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+        <div style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#1A1A14;font-variant-numeric:tabular-nums">{{ price }}</div>
+        <div style="font:800 38px/1 Nunito,system-ui,sans-serif;color:#5A4A1E">one-time</div>
+      </div>
+      <div data-layer="BuyButton" style="{{ buyStyle }}">
+        <div style="font:900 46px/1 Nunito,system-ui,sans-serif">{{ buyTitle }}</div>
+        <div style="font:800 38px/1 Nunito,system-ui,sans-serif">{{ buySub }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isInfo }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="InfoBar" style="flex:0 0 auto;height:130px;border-radius:26px;background:rgba(255,248,240,.55);border:3px solid rgba(26,26,20,.3);box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:0 36px;color:#2D3436">
+      <div style="font:900 46px/1 Nunito,system-ui,sans-serif">{{ infoTitle }}</div>
+      <div style="font:800 38px/1 Nunito,system-ui,sans-serif;color:#3D3D33">{{ infoSub }}</div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1032,&quot;height&quot;:1100},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cb&quot;,&quot;fo&quot;,&quot;lm&quot;,&quot;ac&quot;,&quot;mw&quot;,&quot;ct&quot;,&quot;sg&quot;,&quot;ef&quot;],&quot;default&quot;:&quot;fo&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;active&quot;,&quot;gather&quot;,&quot;ready&quot;,&quot;unlocking&quot;,&quot;far&quot;,&quot;premium&quot;,&quot;purchasing&quot;,&quot;soon&quot;],&quot;default&quot;:&quot;active&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;coins&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:320,&quot;min&quot;:0,&quot;max&quot;:500,&quot;tsType&quot;:&quot;number&quot;},&quot;flowers&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:0,&quot;max&quot;:20,&quot;tsType&quot;:&quot;number&quot;},&quot;price&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;$4.99&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;arrows&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;prevOn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;nextOn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const SEASONS = {
+  cb: { name: 'Country Bloom', tag: 'Warm fields, soft petals, home pastures.', mood: '#A8E6CF', kind: 'free', n: 1, r: [['Meadow Clover',1,'clover'],['Field Daisy',1,'daisy'],['Buttercup Lane',1,'buttercup'],['Barn Tulip',2,'tulip'],['Sunfence',2,'sunflower'],['Harvest Pumpkin',3,'pumpkin']] },
+  fo: { name: 'Frost Orchard', tag: 'Crisp air, silver blossom.', mood: '#C5D5E8', kind: 'free', n: 2, r: [['Frost Snowdrop',1,'frost_snowdrop'],['Ice Crocus',1],['Silver Aconite',1,'silver_aconite'],['Winter Camellia',2],['Hoarfrost Rose',2],['Crystal Peony',3]] },
+  lm: { name: 'Lantern Meadow', tag: 'Dusk lights among tall grass.', mood: '#C9B8E0', kind: 'free', n: 3, r: [['Dusk Firefly Grass',1],['Paper Lantern Bloom',1],['Evening Primrose',1],['Foxfire Lily',2],['Glow Wisteria',2],['Midnight Lotus',3]] },
+  ac: { name: 'Amber Canopy', tag: 'Warm late-season light through high leaves.', mood: '#E8C48A', kind: 'free', n: 4, r: [['Copper Leaf',1],['Maple Aster',1],['Russet Mallow',1],['Cider Dahlia',2],['Golden Oak Bloom',2],['Amber Magnolia',3]] },
+  mw: { name: 'Moonlit Warren', tag: 'Night blooms under a quiet moon.', mood: '#3D3A6B', kind: 'paid', r: [['Moon Moss',1],['Nightshade Petal',1],['Silver Harebell',1],['Lunar Orchid',2],['Star Jasmine',2],['Umbral Lily',3]] },
+  ct: { name: 'Coral Tide Garden', tag: 'Salt breeze and seashell petals.', mood: '#E8A090', kind: 'paid', r: [['Sea Thrift',1],['Salt Daisy',1],['Tide Anemone',1],['Coral Hibiscus',2],['Pearl Waterlily',2],['Reef Crown',3]] },
+  sg: { name: 'Starfall Glade', tag: 'Petals that catch the night sky.', mood: '#6B5B95', kind: 'paid', r: [['Comet Sprig',1],['Nebula Clover',1],['Meteor Daisy',1],['Aurora Tulip',2],['Galaxy Sunburst',2],['Nova Bloom',3]] },
+  ef: { name: 'Ember Fen', tag: 'Low firelight over marsh blooms.', mood: '#C45C26', kind: 'paid', r: [['Marsh Rush',1],['Peat Violet',1],['Cinder Buttercup',1],['Flame Iris',2],['Smoke Lotus',2],['Fenfire Crown',3]] }
+};
+const ORDER = ['cb','fo','lm','ac'];
+const hex = h => [1,3,5].map(i => parseInt(h.substr(i,2),16));
+const toHex = a => '#' + a.map(v => Math.round(v).toString(16).padStart(2,'0')).join('').toUpperCase();
+const mix = (a,b,t) => { const x = hex(a), y = hex(b); return toHex(x.map((v,i) => v + (y[i]-v)*t)); };
+const lum = h => { const v = hex(h).map(c => { c/=255; return c <= .03928 ? c/12.92 : Math.pow((c+.055)/1.055,2.4); }); return .2126*v[0]+.7152*v[1]+.0722*v[2]; };
+const PILL = { 1: '#A8E6CF', 2: '#B8E0F5', 3: '#FFD56B' };
+
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const id = SEASONS[p.season] ? p.season : 'fo';
+    const s = SEASONS[id];
+    const st = p.state ?? 'active';
+    const locked = ['gather','ready','far'].includes(st);
+    const soon = st === 'soon';
+    const fill = soon ? mix(s.mood,'#243329',.55) : locked || st === 'unlocking' ? mix(s.mood,'#3A4A40',.42) : s.mood;
+    const dark = lum(fill) < .2;
+    const ink = dark ? '#FFF8F0' : '#2D3436';
+    const sub = dark ? '#E9E1F0' : '#3F4648';
+    const active = st === 'active';
+    const six = s.kind === 'paid' && !active;
+    const coinsNeed = 500, flNeed = 20;
+    const coins = Math.min(p.coins ?? 320, coinsNeed), fl = Math.min(p.flowers ?? 12, flNeed);
+    const coinOk = coins >= coinsNeed, flOk = fl >= flNeed;
+    const prevFree = s.n ? SEASONS[ORDER[s.n - 2]] : null;
+    const gate = prevFree ? prevFree.r[5] : ['Harvest Pumpkin',3,'pumpkin'];
+    const slotFill = mix(fill, '#1A241E', .16);
+
+    const rootStyle = 'position:relative;width:1032px;height:1100px;box-sizing:border-box;border-radius:36px;padding:18px;display:flex;flex-direction:column;gap:22px;overflow:hidden;font-family:Nunito,system-ui,sans-serif;' +
+      'background:' + fill + ';border:' + (active ? '8px solid #FFF6D6' : '4px solid rgba(255,248,240,.5)') + ';box-shadow:0 10px 0 #121A15;--ink:' + ink + ';--sub:' + sub;
+
+    let badgeText = '▶  PLAYING', badgeFill = '#FFF6D6', badgeInk = '#2D3436', badgeEdge = '#2D3436';
+    if (locked || st === 'unlocking') { badgeText = 'PREVIEW · LOCKED'; badgeFill = '#1A241E'; badgeInk = '#FFF8F0'; badgeEdge = 'rgba(255,248,240,.55)'; }
+    if (st === 'premium' || st === 'purchasing') { badgeText = 'PREVIEW · PREMIUM'; badgeFill = '#1A241E'; badgeInk = '#D4A5FF'; badgeEdge = 'rgba(212,165,255,.8)'; }
+    if (soon) { badgeText = 'COMING SOON'; badgeFill = '#1A241E'; badgeInk = '#FFF8F0'; badgeEdge = 'rgba(255,248,240,.55)'; }
+
+    const arrowBase = 'position:absolute;bottom:16px;width:96px;height:96px;border-radius:56px;box-sizing:border-box;display:grid;place-items:center;background:#1A241E;border:3px solid rgba(255,248,240,.6);color:#FFF8F0;';
+    const idx = six ? [0,1,2,3,4,5] : [0,3,5];
+    const tileH = six ? 214 : 236, well = six ? 100 : 118;
+    const tiles = idx.map(i => {
+      const f = s.r[i];
+      return {
+        name: f[0], rarity: f[1], img: f[2] ? '../assets/flowers/ph_' + f[2] + '.svg' : '', hasImg: !!f[2], noImg: !f[2],
+        style: 'position:relative;height:' + tileH + 'px;border-radius:24px;background:#FFF8F0;border:3px solid #E3D9CC;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;padding:0 14px 12px' + (soon ? ';opacity:.8' : ''),
+        well: 'width:' + well + 'px;height:' + well + 'px;border-radius:50%;background:#22342A;border:3px solid #CBC2B6;box-sizing:border-box;display:grid;place-items:center;flex:0 0 auto',
+        dot: 'width:56%;height:56%;border-radius:50%;background:' + (soon ? '#4A5550' : s.mood) + ';border:6px solid ' + mix(s.mood,'#FFF8F0',.55) + ';box-sizing:border-box',
+        pill: 'position:absolute;top:10px;right:10px;height:52px;padding:0 12px;border-radius:16px;background:' + PILL[f[1]] + ';display:flex;align-items:center;white-space:nowrap;font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436'
+      };
+    });
+
+    const btnBase = 'height:140px;border-radius:26px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;color:#2D3436;';
+    const ready = st === 'ready';
+    const bar = (v, n, c) => 'height:100%;width:' + (v / n * 100).toFixed(1) + '%;background:' + c;
+    const numStyle = ok => 'font:900 46px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:' + (ok ? '#FFD56B' : '#FFF8F0');
+
+    let unlockTitle = 'Unlock ' + s.name, unlockSub = 'spends 500 coins + 20 ' + gate[0];
+    let unlockStyle = btnBase + 'background:#E8C44A;border:4px solid #9C7A14';
+    if (st === 'gather') {
+      const parts = [];
+      if (!coinOk) parts.push((coinsNeed - coins) + ' coins');
+      if (!flOk) parts.push((flNeed - fl) + ' flowers');
+      unlockTitle = 'Needs ' + parts.join(' + ');
+      unlockSub = 'run in ' + (prevFree ? prevFree.name : 'Country Bloom') + ' to collect';
+      unlockStyle = btnBase + 'background:rgba(255,248,240,.55);border:3px solid rgba(26,26,20,.3)';
+    }
+    if (st === 'unlocking') { unlockTitle = 'Unlocking…'; unlockSub = 'coins and flowers spent'; unlockStyle = btnBase + 'background:#FFD56B;border:4px solid #9C7A14'; }
+    if (st === 'far') { unlockTitle = 'Unlock ' + (SEASONS[ORDER[s.n - 2]] || s).name + ' first'; unlockSub = 'free seasons open in order'; unlockStyle = btnBase + 'background:rgba(255,248,240,.55);border:3px solid rgba(26,26,20,.3)'; }
+
+    const purchasing = st === 'purchasing';
+    const buyStyle = 'flex:1;border-radius:26px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;color:#2D3436;' +
+      (purchasing ? 'background:rgba(255,248,240,.55);border:3px solid rgba(26,26,20,.3)' : 'background:#D4A5FF;border:4px solid #2D3436');
+
+    const slotH = 1100 - 16 - 36 - 22 * 3 - 170 - (six ? tileH * 2 + 14 : tileH) - (['gather','ready','unlocking','far'].includes(st) ? 316 : 130) - (active ? 0 : 0);
+
+    return {
+      rootStyle,
+      slotH,
+      slotStyle: 'position:relative;flex:1 1 auto;min-height:0;border-radius:26px;overflow:hidden;background:' + slotFill,
+      showLock: locked, unlocking: st === 'unlocking',
+      badgeText,
+      badgeStyle: 'position:absolute;left:22px;top:22px;height:72px;padding:0 26px;border-radius:36px;box-sizing:border-box;display:flex;align-items:center;font:900 38px/1 Nunito,system-ui,sans-serif;letter-spacing:.05em;white-space:nowrap;background:' + badgeFill + ';color:' + badgeInk + ';border:3px solid ' + badgeEdge,
+      arrows: p.arrows ?? true,
+      prevStyle: arrowBase + 'left:20px;opacity:' + ((p.prevOn ?? true) ? 1 : .3),
+      nextStyle: arrowBase + 'right:20px;opacity:' + ((p.nextOn ?? true) ? 1 : .3),
+      meta: s.kind === 'free' ? 'FREE · ' + s.n + ' OF 4' : 'PREMIUM PACK',
+      rosterCount: six ? '6 flowers' : '6 flowers · 3 shown',
+      name: s.name, tagline: s.tag, tiles,
+      isActive: active,
+      isGate: ['gather','ready','unlocking','far'].includes(st),
+      isPremium: st === 'premium' || purchasing,
+      isInfo: soon,
+      coinText: coins + ' / 500', flText: fl + ' / 20',
+      coinNumStyle: numStyle(coinOk), flNumStyle: numStyle(flOk),
+      coinBar: bar(coins, coinsNeed, '#FFD56B'), flBar: bar(fl, flNeed, '#FFF8F0'),
+      gateName: gate[0], gateImg: gate[2] ? '../assets/flowers/ph_' + gate[2] + '.svg' : '', gateHasImg: !!gate[2], gateNoImg: !gate[2], gateDot: 'width:32px;height:32px;border-radius:16px;background:' + (prevFree ? prevFree.mood : '#A8E6CF') + ';border:5px solid #FFF8F0;box-sizing:border-box',
+      unlockTitle, unlockSub, unlockStyle,
+      price: p.price ?? '$4.99',
+      buyStyle,
+      buyTitle: purchasing ? 'Waiting for store…' : 'Get ' + s.name,
+      buySub: purchasing ? 'you can keep playing' : 'yours to keep',
+      infoTitle: 'Coming soon',
+      infoSub: 'no price yet · preview the flowers'
+    };
+  }
+}
+</script>
+</body>
+</html>
