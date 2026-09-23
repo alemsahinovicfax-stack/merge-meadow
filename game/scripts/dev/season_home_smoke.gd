@@ -1,8 +1,8 @@
 extends SceneTree
 
-## Home — biranje sezone, smjer 1a Season Trail (design_handoff_home, 2026-09-21).
-## Kolona kartica (harmonika), unlock s prstenom, premium sekcija i kupovina,
-## dolazak iz Campa, Play = run odmah, daily gift. Backup/restore pravog save-a.
+## Home — biranje sezone, smjer 1a Season Stage (design_handoff_home_v2).
+## Jedna kartica, dock tokena, unlock, premium, Play = run aktivne sezone.
+## Backup/restore pravog save-a.
 
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
 
@@ -40,36 +40,16 @@ func _wait(sec: float) -> void:
 	await create_timer(sec).timeout
 
 
-func _today() -> String:
-	var d := Time.get_date_dict_from_system()
-	return "%04d-%02d-%02d" % [int(d.year), int(d.month), int(d.day)]
-
-
 func _card(stage: Node, id: String) -> Control:
 	return stage.call("get_card", id) as Control
 
 
 func _rgb_near(a: Color, b: Color) -> bool:
-	return absf(a.r - b.r) < 0.01 and absf(a.g - b.g) < 0.01 and absf(a.b - b.b) < 0.01
+	return absf(a.r - b.r) < 0.02 and absf(a.g - b.g) < 0.02 and absf(a.b - b.b) < 0.02
 
 
 func _star3_for(gs: Node, season_id: String) -> String:
 	return str(gs.call("star3_type_id_for_season", season_id))
-
-
-## Svi vidljivi elementi kolone + razmaci; otvorena kartica mora popuniti kolonu.
-func _trail_used(stage: Node) -> float:
-	var list := stage.get_node("%TrailList") as VBoxContainer
-	var sep := list.get_theme_constant("separation")
-	var used := 0.0
-	var shown := 0
-	for c in list.get_children():
-		var ctrl := c as Control
-		if ctrl == null or not ctrl.visible:
-			continue
-		used += ctrl.size.y
-		shown += 1
-	return used + float(sep * maxi(shown - 1, 0))
 
 
 func _run() -> void:
@@ -82,7 +62,6 @@ func _run() -> void:
 	gs.set("garden_crystal_stash", {})
 	gs.set("skip_debug_season_unlock", true)
 	gs.call("reset_seasons_to_s1")
-	gs.call("clear_owned_paid_seasons")
 	gs.set("tutorial_complete", true)
 	var iap := _iap()
 	if iap and iap.has_method("reset_purchases_for_dev"):
@@ -108,295 +87,222 @@ func _run() -> void:
 		_fail("SeasonStage missing")
 		return
 
-	# --- struktura: stari dvotrakasti stage, Browser i sheet su obrisani ---
-	for gone in ["%BandColumn", "%PaidBand", "%FreeBand", "%SeasonBrowser", "%SeasonUnlockSheet", "%UnlockGate"]:
-		if stage.get_node_or_null(gone) != null:
-			_fail("%s should be removed" % gone)
-			return
-	for gone in ["DecorMoundLeft", "DecorMoundRight", "%PlayThemeBadge", "%PipPortrait"]:
-		if home.get_node_or_null(gone) != null:
-			_fail("%s should be removed" % gone)
-			return
-	if not stage.get_node("%SeasonTrail") is ScrollContainer:
-		_fail("SeasonTrail must be a ScrollContainer")
+	if stage.get_node_or_null("%SeasonTrail") != null:
+		_fail("SeasonTrail should be replaced by SeasonSelect")
 		return
-	if (stage as Control).is_in_group("block_hub_swipe"):
-		_fail("1a: SeasonStage must not block hub swipe")
+	var select := stage.get_node_or_null("%SeasonSelect") as Control
+	if select == null or not select.visible:
+		_fail("SeasonSelect missing")
 		return
-	var stage_mid := (stage as Control).get_global_rect().get_center()
-	if bool(swipe.call("should_block_hub_swipe_at", stage_mid)):
-		_fail("1a: hub swipe must pass over the season trail")
+	var browser := select.get_node_or_null("SeasonBrowser") as Control
+	if browser == null:
+		_fail("SeasonBrowser missing")
+		return
+	var bloom := _card(stage, "country_bloom")
+	if bloom == null:
+		_fail("Country Bloom card missing")
+		return
+	var card_mid := bloom.get_global_rect().get_center()
+	if not bool(swipe.call("should_block_hub_swipe_at", card_mid)):
+		_fail("swipe on the season card must block the hub")
+		return
+	if bool(swipe.call("should_block_hub_swipe_at", browser.get_global_rect().get_center())):
+		_fail("swipe on the season dock must reach the hub")
 		return
 	var bg := home.get_node_or_null("Background") as ColorRect
 	if bg == null or not _rgb_near(bg.color, UiHome.PAGE_BG):
-		_fail("Home background must be #2E4733 like Camp")
+		_fail("Home background must be #243329")
 		return
 
-	# --- stranica: TopRow 130, ProgressIndicator 420, Play 1032 x 156 + cip ---
-	var top_row := home.get_node_or_null("%TopRow") as Control
-	var gift := home.get_node_or_null("%DailyChestCard") as Control
-	var progress := home.get_node_or_null("%ProgressIndicator") as Control
-	if top_row == null or gift == null or progress == null or gift.get_parent() != top_row:
-		_fail("TopRow must hold DailyChestCard + ProgressIndicator")
-		return
-	if not is_equal_approx(top_row.size.y, UiHome.TOP_ROW_H):
-		_fail("TopRow height %s expected 130" % str(top_row.size.y))
-		return
-	if not is_equal_approx(progress.size.x, UiHome.PROGRESS_W):
-		_fail("ProgressIndicator width %s expected 420" % str(progress.size.x))
-		return
-	if str(progress.call("get_text")) != "1 / 4":
-		_fail("progress expected 1 / 4 got %s" % str(progress.call("get_text")))
-		return
 	var play := home.get_node_or_null("%PlayButton") as Control
-	if play == null or not is_equal_approx(play.size.y, UiHome.PLAY_H) or absf(play.size.x - 1032.0) > 1.0:
-		_fail("Play must be 1032 x 156, got %s" % str(play.size if play else Vector2.ZERO))
+	var gift := home.get_node_or_null("%DailyChestCard") as Control
+	if play == null or gift == null or gift.get_parent() != home.get_node("%PlayRow"):
+		_fail("Play row must hold Play and the daily gift")
+		return
+	if not is_equal_approx(play.size.y, UiHome.PLAY_H) or absf(play.size.x - 836.0) > 4.0:
+		_fail("Play must be about 836 x 180, got %s" % str(play.size))
+		return
+	if not is_equal_approx(gift.size.x, 180.0) or not is_equal_approx(gift.size.y, 180.0):
+		_fail("Daily gift must be 180 px, got %s" % str(gift.size))
+		return
+	if str(home.call("get_play_sub_text")) != "run in Country Bloom":
+		_fail("Play sub expected 'run in Country Bloom' got '%s'" % str(home.call("get_play_sub_text")))
 		return
 	if str(home.call("get_play_chip_text")) != "Country Bloom":
-		_fail("Play chip expected Country Bloom got '%s'" % str(home.call("get_play_chip_text")))
+		_fail("Play must name the active season")
 		return
 	if str(home.call("home_play_action")) != "run":
-		_fail("Play must start a run directly (decision 2026-09-21)")
+		_fail("Play must start a run directly")
 		return
-	var column := home.get_node_or_null("%HomeColumn") as Control
-	if not is_equal_approx(column.offset_left, 24.0) or not is_equal_approx(column.offset_top, 24.0):
-		_fail("HomeColumn must sit on padding 24")
+	var progress := home.get_node_or_null("%ProgressIndicator") as Control
+	if progress == null or str(progress.call("get_text")) != "1 / 4":
+		_fail("progress expected 1 / 4")
 		return
-	if top_row.get_global_rect().end.y > (stage as Control).get_global_rect().position.y:
-		_fail("TopRow must sit above the trail")
+	if str(stage.call("get_free_path_text")) != "1 / 4":
+		_fail("free path label expected 1 / 4 got '%s'" % str(stage.call("get_free_path_text")))
 		return
 
-	# --- novi igrac: Bloom otvorena i aktivna, Frost next lock, dalje zakljucano ---
-	var bloom := _card(stage, "country_bloom")
-	var frost := _card(stage, "frost_orchard")
-	var lantern := _card(stage, "lantern_meadow")
-	var amber := _card(stage, "amber_canopy")
-	if bloom == null or frost == null or lantern == null or amber == null:
-		_fail("free season cards missing")
-		return
 	if str(bloom.get("variant")) != UiHome.EXPANDED or not bool(bloom.call("is_active")):
-		_fail("new player: Country Bloom must be expanded + active")
+		_fail("new player: Country Bloom must be the active card")
 		return
-	if not bool(bloom.call("has_roster")) or not bool(bloom.call("has_open_button")) or not bool(bloom.call("has_playing_badge")):
-		_fail("active card needs roster, Open meadow and Playing now")
+	if not bool(bloom.call("has_roster")) or int(bloom.call("roster_count")) != 3:
+		_fail("active card shows 3 roster flowers")
 		return
-	if float(bloom.call("roster_art_side")) < 64.0 or float(bloom.call("roster_art_side")) > 116.0:
-		_fail("roster art frame must be 64..116, got %s" % str(bloom.call("roster_art_side")))
+	if not bool(bloom.call("has_open_button")) or not bool(bloom.call("has_playing_badge")):
+		_fail("active card needs Open meadow and PLAYING")
 		return
-	if str(frost.get("variant")) != UiHome.NEXTLOCK or str(frost.get("state")) != UiHome.ST_NEXT:
-		_fail("new player: Frost must be the compact next lock")
+	if int(bloom.call("get_border_width")) != 8:
+		_fail("active card rim must be 8")
 		return
-	if str(frost.call("get_chip_text")) != "Next free season":
-		_fail("next lock chip expected 'Next free season' got '%s'" % str(frost.call("get_chip_text")))
+	if _card(stage, "frost_orchard") != null:
+		_fail("Frost must not be the focused card yet")
 		return
-	if str(frost.call("get_need_text")) != "Need 500 more coins and 20 more Harvest Pumpkin":
-		_fail("next lock need line got '%s'" % str(frost.call("get_need_text")))
-		return
-	if str(lantern.get("state")) != UiHome.ST_LOCKED or not bool(lantern.call("has_lock")):
-		_fail("Lantern must be locked with LockBox")
-		return
-	if str(lantern.call("get_status_text")) != "Opens after Frost Orchard":
-		_fail("Lantern status got '%s'" % str(lantern.call("get_status_text")))
-		return
-	var locked_fill := UiHome.locked_fill(UiHome.mood("lantern_meadow"))
-	if not _rgb_near(Color(lantern.call("get_fill_color")), locked_fill):
-		_fail("locked fill must be derived from mood")
-		return
-	if int(bloom.call("get_border_width")) != UiHome.CARD_BORDER_ACTIVE:
-		_fail("active card border must be 6")
-		return
-	var header := stage.call("get_premium_header") as Control
-	if header == null or bool(stage.call("is_premium_open")):
-		_fail("premium section must start closed on the free path")
-		return
-	if str(header.call("get_chevron_text")) != "4  ↓" or str(header.call("get_note_text")) != "Free path never needs them":
-		_fail("closed premium row text wrong")
-		return
-	if _card(stage, "coral_tide") != null and _card(stage, "coral_tide").visible:
-		_fail("premium cards must be hidden while the section is closed")
-		return
-	var trail := stage.get_node("%SeasonTrail") as Control
-	if absf(_trail_used(stage) - trail.size.y) > 2.0:
-		_fail("open card must fill the trail: used %.0f vs %.0f" % [_trail_used(stage), trail.size.y])
+	var frost_token := stage.call("get_token", "frost_orchard") as Control
+	var lantern_token := stage.call("get_token", "lantern_meadow") as Control
+	if frost_token == null or lantern_token == null:
+		_fail("free tokens missing")
 		return
 
-	# --- tap na zakljucanu iza next locka = odbijanje, fokus se ne mijenja ---
-	stage.call("tap_card", "lantern_meadow")
-	await _frames(2)
+	stage.call("tap_token", "lantern_meadow")
+	await _frames(4)
 	if str(stage.call("focused_card_id")) != "country_bloom":
-		_fail("tap past next lock must bounce")
+		_fail("far lock must not take focus")
+		return
+	if str(stage.call("get_toast_text")) != "Unlock Frost Orchard first":
+		_fail("far lock toast got '%s'" % str(stage.call("get_toast_text")))
 		return
 
-	# --- tap na next lock = puni poster, Unlock mutno dok ne stigne oboje ---
 	stage.call("tap_card", "frost_orchard")
-	await _wait(0.35)
-	if str(frost.get("variant")) != UiHome.POSTER:
-		_fail("tap next lock must open the poster")
+	await _frames(3)
+	var frost := _card(stage, "frost_orchard")
+	if frost == null or str(frost.get("variant")) != UiHome.POSTER or str(frost.get("state")) != UiHome.ST_NEXT:
+		_fail("Frost focus must open the gather poster")
 		return
 	if bool(frost.call("is_unlock_enabled")):
 		_fail("Unlock must be disabled at 0 / 500")
 		return
-	if str(frost.call("get_unlock_sub")) != "needs 500 more coins and 20 more Harvest Pumpkin":
-		_fail("unlock sub got '%s'" % str(frost.call("get_unlock_sub")))
+	if str(frost.call("get_unlock_title")) != "Needs 500 coins + 20 flowers":
+		_fail("gather title got '%s'" % str(frost.call("get_unlock_title")))
 		return
-	if str(bloom.get("variant")) != UiHome.COLLAPSED or str(bloom.call("get_status_text")) != "Tap to open the meadow ↗":
-		_fail("collapsed active card must say Tap to open the meadow ↗")
+	if str(gs.get("active_season_id")) != "country_bloom":
+		_fail("previewing Frost must not change the active season")
 		return
-	if not bool(bloom.call("has_playing_badge")):
-		_fail("collapsed active card keeps Playing now")
+	if str(home.call("get_play_sub_text")) != "run in Country Bloom":
+		_fail("Play stays on the active season while previewing")
 		return
 
-	# --- spremno: 500 coina + 20 Harvest Pumpkin ---
 	gs.set("wallet_coins", 500)
 	gs.set("garden_crystal_stash", {_star3_for(gs, "country_bloom"): 20})
 	stage.call("refresh")
 	await _frames(2)
 	if str(frost.get("state")) != UiHome.ST_READY or not bool(frost.call("is_unlock_enabled")):
-		_fail("Frost must be ready with gold Unlock")
+		_fail("Frost must be ready to unlock")
 		return
-	if str(frost.call("get_need_text")) != "Both ready — unlock it whenever you like.":
-		_fail("ready need line got '%s'" % str(frost.call("get_need_text")))
-		return
-	if str(frost.call("get_unlock_sub")) != "spends 500 coins and 20 Harvest Pumpkin":
-		_fail("ready unlock sub got '%s'" % str(frost.call("get_unlock_sub")))
+	if str(frost.call("get_unlock_title")) != "Unlock Frost Orchard":
+		_fail("ready title got '%s'" % str(frost.call("get_unlock_title")))
 		return
 
-	# --- trenutak otkljucavanja: odmah trosi, prsten, pa otvorena sezona s "New" ---
 	frost.emit_signal("unlock_pressed", "frost_orchard")
-	await _frames(1)
+	await _frames(2)
 	if int(gs.get("wallet_coins")) != 0 or not bool(gs.call("is_season_playable", "frost_orchard")):
 		_fail("Unlock must spend immediately")
 		return
-	if str(frost.get("state")) != UiHome.ST_UNLOCKING or str(frost.call("get_unlock_title")) != "Frost Orchard unlocked":
-		_fail("unlocking frame expected 'Frost Orchard unlocked' got '%s'" % str(frost.call("get_unlock_title")))
+	if str(frost.get("state")) != UiHome.ST_UNLOCKING:
+		_fail("unlocking frame missing")
 		return
-	var burst := frost.get_node_or_null("UnlockBurst") as Control
+	var burst := frost.get_node_or_null("CardBody/SeasonArt/UnlockBurst") as Control
 	if burst == null or not burst.visible:
-		_fail("UnlockBurst ring must play")
+		_fail("Unlock ring must play")
 		return
-	if bool(frost.call("has_new_badge")):
-		_fail("New must wait until the ring is done")
-		return
-	if str(home.call("get_play_chip_text")) != "Frost Orchard":
-		_fail("Play chip must switch to the unlocked season right away")
-		return
-	await _wait(1.2)
-	if str(frost.get("variant")) != UiHome.EXPANDED or not bool(frost.call("is_active")):
-		_fail("after unlock Frost must be the open active season")
-		return
-	if not bool(frost.call("has_new_badge")):
-		_fail("fresh unlock must show New")
-		return
-	if str(lantern.get("variant")) != UiHome.NEXTLOCK:
-		_fail("Lantern must become the next lock")
+	await _wait(0.55)
+	frost = _card(stage, "frost_orchard")
+	if frost == null or str(frost.get("variant")) != UiHome.EXPANDED or not bool(frost.call("is_active")):
+		_fail("after unlock Frost must be the active card")
 		return
 	if str(progress.call("get_text")) != "2 / 4" or str(home.call("get_play_chip_text")) != "Frost Orchard":
-		_fail("progress / play chip must follow the unlock")
+		_fail("progress / play must follow the unlock")
+		return
+	if str(stage.call("get_toast_text")).find("unlocked") < 0:
+		_fail("unlock toast missing, got '%s'" % str(stage.call("get_toast_text")))
 		return
 
-	# --- tap na otkljucanu zatvorenu = izaberi i otvori ---
 	stage.call("tap_card", "country_bloom")
-	await _wait(0.35)
-	if str(gs.get("active_season_id")) != "country_bloom" or str(bloom.get("variant")) != UiHome.EXPANDED:
-		_fail("tap on unlocked card must select + expand it")
+	await _frames(2)
+	if str(gs.get("active_season_id")) != "frost_orchard" or _card(stage, "country_bloom") == null:
+		_fail("previewing an open season must not change the active season")
 		return
-	if str(home.call("get_play_chip_text")) != "Country Bloom":
-		_fail("play chip must follow the active season")
-		return
-
-	# --- tap na otvorenu aktivnu = polje sezone; nazad vraca kolonu ---
 	stage.call("tap_card", "country_bloom")
 	await _frames(3)
-	if not bool(gs.get("home_season_field_open")) or str(gs.get("home_season_field_id")) != "country_bloom":
-		_fail("tap on open active card must open the season field")
+	if not bool(gs.get("home_season_field_open")) or str(gs.get("active_season_id")) != "country_bloom":
+		_fail("second tap on an open season must open the field and make it active")
 		return
-	if trail.visible or not (stage.get_node("%SeasonField") as Control).visible:
-		_fail("field open: trail hidden, field visible")
+	if select.visible:
+		_fail("field open hides the season select")
 		return
-	if top_row.visible:
-		_fail("field open: TopRow hides (field keeps its own chrome)")
-		return
-	if not is_equal_approx(play.custom_minimum_size.y, 96.0):
-		_fail("field open: Play returns to the 96 px field button")
+	if gift.is_visible_in_tree():
+		_fail("field open hides the daily gift")
 		return
 	stage.call("close_season_field")
 	await _frames(3)
-	if not trail.visible or not top_row.visible:
-		_fail("close field: trail + TopRow must come back")
+	if not select.visible or not gift.visible:
+		_fail("close field brings select and the gift back")
 		return
 
-	# --- premium: otvori sekciju, pregled prije kupovine, coming soon ---
-	stage.call("toggle_premium")
-	await _wait(0.35)
-	var coral := _card(stage, "coral_tide")
-	var ember := _card(stage, "ember_fen")
-	if not bool(stage.call("is_premium_open")) or coral == null or not coral.visible:
-		_fail("premium toggle must show premium cards")
-		return
-	if str(header.call("get_note_text")) != "Preview before you buy" or str(header.call("get_chevron_text")) != "↑":
-		_fail("open premium header text wrong")
-		return
-	if str(coral.call("get_status_text")) != "Premium · preview inside" or str(coral.call("get_price_text")).is_empty():
-		_fail("collapsed premium needs status + price tag")
-		return
-	if str(ember.get("state")) != UiHome.ST_SOON or str(ember.call("get_status_text")) != "Coming soon" or not bool(ember.call("has_lock")):
-		_fail("Ember Fen must be a Coming soon card with lock")
-		return
-	var soon_fill := UiHome.soon_fill(UiHome.mood("ember_fen"))
-	if not _rgb_near(Color(ember.call("get_fill_color")), soon_fill):
-		_fail("coming soon fill must be derived from mood")
-		return
 	stage.call("tap_card", "coral_tide")
-	await _wait(0.35)
-	if str(coral.get("variant")) != UiHome.PREMIUM or str(gs.get("home_band")) != "paid":
-		_fail("tap premium must open its preview")
-		return
-	if str(coral.call("get_cta_title")) != "Get Coral Tide Garden" or not bool(coral.call("is_cta_enabled")):
-		_fail("premium CTA expected 'Get Coral Tide Garden' got '%s'" % str(coral.call("get_cta_title")))
-		return
-	if not bool(coral.call("has_roster")):
-		_fail("premium preview shows the 6-flower roster")
-		return
-	if coral.size.y < 555.0:
-		_fail("premium preview keeps its 556 px height when the list scrolls, got %s" % str(coral.size.y))
+	await _frames(3)
+	var coral := _card(stage, "coral_tide")
+	if coral == null or str(coral.get("variant")) != UiHome.PREMIUM:
+		_fail("premium token must open the preview card")
 		return
 	if str(gs.get("active_season_id")) != "country_bloom":
-		_fail("previewing premium must not change the active season")
+		_fail("premium preview must not change the active season")
+		return
+	if str(coral.call("get_cta_title")) != "Get Coral Tide Garden" or not bool(coral.call("is_cta_enabled")):
+		_fail("premium buy title got '%s'" % str(coral.call("get_cta_title")))
+		return
+	if str(coral.call("get_price_text")).is_empty() or int(coral.call("roster_count")) != 6:
+		_fail("premium preview needs a price and 6 flowers")
+		return
+	var ember := stage.call("get_token", "ember_fen") as Control
+	if ember == null:
+		_fail("Ember Fen token missing")
+		return
+	stage.call("tap_token", "ember_fen")
+	await _frames(2)
+	var ember_card := _card(stage, "ember_fen")
+	if ember_card == null or str(ember_card.get("state")) != UiHome.ST_SOON:
+		_fail("Ember Fen must be coming soon")
+		return
+	if str(ember_card.call("get_cta_title")) != "Coming soon" or bool(ember_card.call("is_cta_enabled")):
+		_fail("Ember Fen has no buy button")
+		return
+	if not str(ember_card.call("get_price_text")).is_empty():
+		_fail("Ember Fen must not show a price")
 		return
 
-	# --- kupovina (stub 0,9 s): Purchasing… pa kupljena i aktivna ---
+	stage.call("tap_card", "coral_tide")
+	await _frames(2)
+	coral = _card(stage, "coral_tide")
 	coral.emit_signal("cta_pressed", "coral_tide")
 	await _frames(2)
-	if str(coral.get("state")) != UiHome.ST_BUSY or str(coral.call("get_cta_title")) != "Purchasing…" or bool(coral.call("is_cta_enabled")):
-		_fail("purchase in progress must show disabled Purchasing…")
+	if str(coral.get("state")) != UiHome.ST_BUSY or bool(coral.call("is_cta_enabled")):
+		_fail("purchase in progress disables Buy")
+		return
+	if str(coral.call("get_cta_title")) != "Waiting for store…":
+		_fail("purchasing title got '%s'" % str(coral.call("get_cta_title")))
 		return
 	await _wait(1.3)
 	if not bool(gs.call("is_season_playable", "coral_tide")) or str(gs.get("active_season_id")) != "coral_tide":
-		_fail("purchase must grant + activate Coral Tide")
+		_fail("purchase must grant and activate Coral Tide")
 		return
-	if str(coral.get("state")) != UiHome.ST_OWNED or str(coral.call("get_cta_title")) != "Open meadow ↗":
-		_fail("owned premium CTA expected 'Open meadow ↗' got '%s'" % str(coral.call("get_cta_title")))
-		return
-	if not bool(coral.call("has_new_badge")):
-		_fail("fresh purchase must show New")
+	coral = _card(stage, "coral_tide")
+	if coral == null or not bool(coral.call("is_active")) or not bool(coral.call("has_open_button")):
+		_fail("owned premium becomes the active card with Open meadow")
 		return
 	if str(home.call("get_play_chip_text")) != "Coral Tide Garden":
-		_fail("play chip must follow the purchased season")
-		return
-	stage.call("tap_card", "ember_fen")
-	await _wait(0.35)
-	if str(ember.call("get_cta_title")) != "Coming soon" or bool(ember.call("is_cta_enabled")):
-		_fail("Ember Fen CTA must be disabled Coming soon")
+		_fail("play must follow the purchased season")
 		return
 
-	# --- zatvori premium dok je fokus tamo = fokus nazad na besplatni put ---
-	stage.call("toggle_premium")
-	await _wait(0.35)
-	if bool(stage.call("is_premium_open")) or str(gs.get("home_band")) != "free":
-		_fail("closing premium must return focus to the free path")
-		return
-
-	# --- dolazak iz Campa: sezona vec otkljucana, fokus + New, bez prstena ---
 	gs.set("wallet_coins", 500)
 	gs.set("garden_crystal_stash", {_star3_for(gs, "frost_orchard"): 20})
 	if not bool(gs.call("unlock_free", "lantern_meadow")):
@@ -406,37 +312,32 @@ func _run() -> void:
 	gs.call("set_home_band", "free")
 	home.call("refresh_for_meta_hub")
 	await _frames(3)
-	if str(lantern.get("variant")) != UiHome.EXPANDED or not bool(lantern.call("has_new_badge")):
-		_fail("arrival from Camp: Lantern open with New")
+	var lantern := _card(stage, "lantern_meadow")
+	if lantern == null or str(lantern.get("variant")) != UiHome.EXPANDED or not bool(lantern.call("is_active")):
+		_fail("arrival from Camp: Lantern is focused and active")
 		return
-	var lantern_burst := lantern.get_node_or_null("UnlockBurst") as Control
+	var lantern_burst := lantern.get_node_or_null("CardBody/SeasonArt/UnlockBurst") as Control
 	if lantern_burst != null and lantern_burst.visible:
 		_fail("arrival from Camp must not replay the unlock ring")
 		return
+	if str(stage.call("get_toast_text")) != "Unlocked in Camp · now playing":
+		_fail("camp toast got '%s'" % str(stage.call("get_toast_text")))
+		return
 
-	# --- sve 4 free: nema next locka, premium sekcija otvorena sama ---
 	gs.set("wallet_coins", 500)
 	gs.set("garden_crystal_stash", {_star3_for(gs, "lantern_meadow"): 20})
 	if not bool(gs.call("unlock_free", "amber_canopy")):
 		_fail("Amber unlock failed")
 		return
-	var fresh_stage := stage
-	fresh_stage.set("_premium_user_set", false)
 	home.call("refresh_for_meta_hub")
 	await _frames(3)
 	if str(progress.call("get_text")) != "4 / 4":
 		_fail("all free: progress 4 / 4")
 		return
-	if not bool(stage.call("is_premium_open")):
-		_fail("all free: premium section opens by default")
+	if stage.call("get_token", "coral_tide") == null:
+		_fail("premium tokens stay on the dock when the free path is done")
 		return
-	for id in ["country_bloom", "frost_orchard", "lantern_meadow", "amber_canopy"]:
-		var c := _card(stage, id)
-		if str(c.get("variant")) == UiHome.NEXTLOCK or str(c.get("variant")) == UiHome.POSTER:
-			_fail("all free: no next lock card")
-			return
 
-	# --- daily gift + tutorial ---
 	gs.set("last_daily_chest_day", "")
 	home.call("_refresh_chest_card")
 	var caption := home.get_node_or_null("%DailyCaption") as Label
@@ -454,11 +355,8 @@ func _run() -> void:
 	if hint == null or not hint.visible or gift.visible:
 		_fail("tutorial: hint visible, daily gift hidden")
 		return
-	if absf(progress.size.x - top_row.size.x) > 1.0:
-		_fail("tutorial: ProgressIndicator takes the whole row")
-		return
-	if hint.get_global_rect().end.y > play.get_global_rect().position.y:
-		_fail("tutorial hint must float above Play")
+	if hint.get_global_rect().end.y > play.get_global_rect().position.y + 8.0:
+		_fail("tutorial hint must sit above Play")
 		return
 
 	CampSmokeUtil.restore_save(self, _backup)

@@ -7,7 +7,7 @@ const SAVE_PATH := "user://player_save.json"
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
 const BLOOM_PASTEL := Color(0.90, 0.95, 0.86, 1.0)
 ## Home pozadina = Camp #2E4733 (design_handoff_home, 2026-09-21).
-const HOME_DARK := Color(0.180392, 0.278431, 0.2, 1.0)
+const HOME_DARK := Color("#243329")
 
 
 func _initialize() -> void:
@@ -309,7 +309,7 @@ func _run() -> void:
 		_fail("SeasonStage missing")
 		return
 
-	var band: Control = stage.get_node_or_null("%SeasonTrail") as Control
+	var band: Control = stage.get_node_or_null("%SeasonSelect") as Control
 	var field: Control = stage.get_node_or_null("%SeasonField") as Control
 	var seasons: Node = stage.get_node_or_null("%SeasonsButton")
 	if band == null or field == null:
@@ -377,8 +377,8 @@ func _run() -> void:
 		_fail("PlayButton missing")
 		return
 	# Biranje sezone: veliki Play (156) s cipom sezone; Seasons/Endless su skriveni.
-	if not is_equal_approx(play_btn_carousel.custom_minimum_size.y, 156.0):
-		_fail("trail Play min height expected 156 got %s" % str(play_btn_carousel.custom_minimum_size))
+	if not is_equal_approx(play_btn_carousel.custom_minimum_size.y, 180.0):
+		_fail("trail Play min height expected 180 got %s" % str(play_btn_carousel.custom_minimum_size))
 		return
 	var name_chip: Control = home.get_node_or_null("%SeasonNameChip") as Control
 	if name_chip and name_chip.visible:
