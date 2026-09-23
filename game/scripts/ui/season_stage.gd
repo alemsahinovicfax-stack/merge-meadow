@@ -1,63 +1,70 @@
 extends Control
 
-## Home Season Stage — smjer 1a Season Trail (design_handoff_home).
-## Jedna vertikalna kolona: besplatni put redom, red "Premium seasons", premium
-## kartice ispod. Tacno jedna kartica je otvorena (harmonika); tap mijenja fokus
-## (tween visine 0,22 s). Nema horizontalnih gesti, pa stage NE blokira hub swipe.
-## Polje sezone (SeasonField) zivi u istoj sceni i otvara se tapom na aktivnu karticu.
+## Home Season Stage — smjer 1a Season Stage (design_handoff_home_v2).
+## Jedna kartica + dock od 8 tokena. Fokus nije aktivna sezona.
+## Play (u HomeColumnu) i dalje pali run aktivne sezone. Swipe po kartici
+## lista sezone i ne prolazi u hub; swipe po docku i Play redu ide u hub.
 
-const DRAG_SCROLL := preload("res://scripts/ui/drag_scroll.gd")
-
-@onready var trail: ScrollContainer = %SeasonTrail
-@onready var trail_list: VBoxContainer = %TrailList
+@onready var season_select: Control = %SeasonSelect
 @onready var season_field: Control = %SeasonField
 
-var _cards: Dictionary = {}          # season_id -> HomeSeasonCard
-var _premium_header: HomePremiumHeader
-var _premium_open: bool = false
-var _premium_user_set: bool = false
+var _clip: Control
+var _card: HomeSeasonCard
+var _browser: PanelContainer
+var _free_count: Label
+var _free_row: HBoxContainer
+var _paid_row: HBoxContainer
+var _tokens: Dictionary = {}
+var _toast: PanelContainer
+var _toast_label: Label
+var _toast_token: int = 0
 var _unlocking_id: String = ""
-var _fresh_id: String = ""
 var _buying_id: String = ""
 var _known_playable: Dictionary = {}
 var _known_ready: bool = false
-var _scroll_tween: Tween
+var _suppress_camp: bool = false
+var _sliding: bool = false
 var _unlock_timer: SceneTreeTimer
-var _laid_out_h: float = -1.0
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_premium_header = HomePremiumHeader.new()
-	_premium_header.toggled.connect(_on_premium_toggled)
-	trail_list.add_child(_premium_header)
-	trail.gui_input.connect(_on_trail_gui_input)
-	trail.resized.connect(_on_trail_resized)
+	_build_select()
+	_card.tapped.connect(_on_card_tapped)
+	_card.swiped.connect(_on_swiped)
+	_card.open_field_pressed.connect(_on_open_field_pressed)
+	_card.unlock_pressed.connect(_on_unlock_pressed)
+	_card.cta_pressed.connect(_on_cta_pressed)
+	_card.page_pressed.connect(_on_swiped)
+	resized.connect(_layout)
 	IAPManager.purchase_completed.connect(_on_purchase_done)
 	IAPManager.purchase_failed.connect(_on_purchase_failed)
 	var seasons_btn: Control = get_node_or_null("%SeasonsButton") as Control
 	if seasons_btn:
 		seasons_btn.visible = false
 		seasons_btn.set("label_text", "")
+	_layout()
 	refresh()
 
 
 func refresh() -> void:
 	_detect_fresh()
-	_refresh_trail(false)
+	_ensure_tokens()
+	_apply_tokens()
+	_apply_card()
 	_sync_season_field()
 	_notify_play_chip()
+	_layout()
 
 
 # --- javni API (main_menu, Camp, smoke) ---
 
-## Otvara polje sezone; bez id-a otvara fokusiranu sezonu (ako je igriva), inace aktivnu.
 func open_season_field(season_id: String = "") -> bool:
 	var id := season_id
 	if id.is_empty():
 		id = GameState.home_hero_center_id()
-		if not GameState.is_season_playable(id):
-			id = GameState.active_season_id
+	if not GameState.is_season_playable(id):
+		return false
 	if not _focus_season(id):
 		return false
 	if not GameState.open_home_season_field():
@@ -74,297 +81,451 @@ func close_season_field() -> void:
 
 
 func get_card(season_id: String) -> HomeSeasonCard:
-	return _cards.get(season_id) as HomeSeasonCard
+	if _card == null or _card.season_id != season_id:
+		return null
+	return _card
 
 
-func get_premium_header() -> HomePremiumHeader:
-	return _premium_header
+func get_token(season_id: String) -> HomeSeasonToken:
+	return _tokens.get(season_id) as HomeSeasonToken
 
 
-func is_premium_open() -> bool:
-	return _premium_open
-
-
-## Kartica koja je trenutno otvorena (expanded / poster / premium), ili "".
 func focused_card_id() -> String:
-	for id: String in _cards:
-		var card := _cards[id] as HomeSeasonCard
-		if card.visible and card.variant != UiHome.COLLAPSED and card.variant != UiHome.NEXTLOCK:
-			return id
-	return ""
+	if _card == null or not season_select.visible:
+		return ""
+	return _card.season_id
 
 
 func tap_card(season_id: String) -> void:
-	_on_card_tapped(season_id)
+	if GameState.home_season_field_open or not _unlocking_id.is_empty():
+		return
+	if season_id == _shown_id() and GameState.is_season_playable(season_id):
+		open_season_field(season_id)
+		return
+	_jump_to(season_id, false)
 
 
-func toggle_premium() -> void:
-	_on_premium_toggled()
+func tap_token(season_id: String) -> void:
+	if not _unlocking_id.is_empty():
+		return
+	_jump_to(season_id, false)
 
 
-# --- gradnja kolone ---
+func get_toast_text() -> String:
+	if _toast == null or not _toast.visible:
+		return ""
+	return _toast_label.text
 
-func _refresh_trail(animated: bool) -> void:
-	var anim := animated and is_visible_in_tree()
-	var focus_paid := GameState.home_band == "paid"
-	var focus_id := GameState.home_hero_center_id()
+
+func get_free_path_text() -> String:
+	return _free_count.text if _free_count else ""
+
+
+func is_unlocking() -> bool:
+	return not _unlocking_id.is_empty()
+
+
+# --- izgled ---
+
+func _build_select() -> void:
+	_clip = Control.new()
+	_clip.name = "CardClip"
+	_clip.clip_contents = true
+	_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	season_select.add_child(_clip)
+	_card = HomeSeasonCard.new()
+	_clip.add_child(_card)
+	_browser = PanelContainer.new()
+	_browser.name = "SeasonBrowser"
+	_browser.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	season_select.add_child(_browser)
+	var browser_col := VBoxContainer.new()
+	browser_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	browser_col.add_theme_constant_override("separation", 10)
+	_browser.add_child(browser_col)
+	var labels := HBoxContainer.new()
+	labels.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	labels.custom_minimum_size.y = 48
+	browser_col.add_child(labels)
+	var free_box := HBoxContainer.new()
+	free_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	free_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	free_box.add_theme_constant_override("separation", 14)
+	labels.add_child(free_box)
+	var free_word := Label.new()
+	free_word.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	free_word.text = "Free path"
+	free_word.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	UiHome.style(free_word, 38, Color("#FFF8F0"), UiHome.W_BOLD)
+	free_box.add_child(free_word)
+	_free_count = Label.new()
+	_free_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_free_count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	UiHome.style(_free_count, 44, Color("#FFD56B"), UiHome.W_BLACK)
+	free_box.add_child(_free_count)
+	var prem := Label.new()
+	prem.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	prem.text = "Premium"
+	prem.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	prem.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	UiHome.style(prem, 38, Color("#D4A5FF"), UiHome.W_BOLD)
+	labels.add_child(prem)
+	var tokens := HBoxContainer.new()
+	tokens.name = "ProgressIndicator"
+	tokens.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tokens.add_theme_constant_override("separation", 20)
+	browser_col.add_child(tokens)
+	_free_row = HBoxContainer.new()
+	_free_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_free_row.add_theme_constant_override("separation", 10)
+	tokens.add_child(_free_row)
+	_paid_row = HBoxContainer.new()
+	_paid_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_paid_row.add_theme_constant_override("separation", 10)
+	tokens.add_child(_paid_row)
+	_toast = PanelContainer.new()
+	_toast.name = "Toast"
+	_toast.visible = false
+	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_toast.z_index = 5
+	_toast.custom_minimum_size.y = 92
+	add_child(_toast)
+	_toast_label = Label.new()
+	_toast_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_toast_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_toast.add_child(_toast_label)
+
+
+func _layout() -> void:
+	if _clip == null or not is_node_ready():
+		return
+	var width := size.x
+	var height := season_select.size.y
+	if width < 8.0 or height < 8.0:
+		return
+	var browser_h := 222.0
+	_browser.position = Vector2(0, height - browser_h)
+	_browser.size = Vector2(width, browser_h)
+	var card_top := 24.0
+	var card_h := _browser.position.y - card_top - 24.0
+	_clip.position = Vector2(24, card_top)
+	_clip.size = Vector2(width - 48.0, card_h + 12.0)
+	if not _sliding and not _card.is_gesturing():
+		_card.position = Vector2.ZERO
+	_card.size = Vector2(_clip.size.x, maxf(card_h, 0.0))
+	_place_toast()
+
+
+func _place_toast() -> void:
+	if _toast == null or not _toast.visible:
+		return
+	var toast_size := _toast.get_combined_minimum_size()
+	var w := maxf(toast_size.x, 200.0)
+	_toast.size = Vector2(w, 92)
+	_toast.position = Vector2((size.x - w) * 0.5, 250)
+
+
+# --- podaci ---
+
+func _shown_id() -> String:
+	return GameState.home_hero_center_id()
+
+
+func _focusables() -> Array[String]:
+	var out: Array[String] = []
 	var next_id := GameState.next_locked_free_id()
-	var active_id := GameState.active_season_id
-	var free_defs := SeasonCatalog.free_defs_sorted()
-	var paid_defs := SeasonCatalog.paid_defs()
-	if focus_paid:
-		_premium_open = true
-	elif not _premium_user_set:
-		_premium_open = next_id.is_empty()
+	for def in SeasonCatalog.free_defs_sorted():
+		if GameState.is_season_playable(def.id) or def.id == next_id:
+			out.append(def.id)
+	for def in SeasonCatalog.paid_defs():
+		out.append(def.id)
+	return out
 
-	var order: Array[Control] = []
-	var focused: HomeSeasonCard = null
-	for i in free_defs.size():
-		var def: SeasonDef = free_defs[i]
-		var data := _free_card_data(def, i, focus_paid, focus_id, next_id, active_id)
-		var card := _card_for(def.id)
-		card.configure(data)
-		card.visible = true
-		order.append(card)
-		if data["variant"] != UiHome.COLLAPSED and data["variant"] != UiHome.NEXTLOCK:
-			focused = card
-	var paid_ids: Array[String] = []
-	for def in paid_defs:
-		paid_ids.append(def.id)
-	_premium_header.configure(paid_ids, _premium_open)
-	_premium_header.visible = not paid_defs.is_empty()
-	order.append(_premium_header)
-	for def in paid_defs:
-		var card := _card_for(def.id)
-		card.visible = _premium_open
-		if not _premium_open:
+
+func _neighbor(direction: int) -> String:
+	var ids := _focusables()
+	var index := ids.find(_shown_id())
+	if index < 0:
+		return ""
+	var next_index := index + direction
+	if next_index < 0 or next_index >= ids.size():
+		return ""
+	return ids[next_index]
+
+
+func _is_focusable(season_id: String) -> bool:
+	return _focusables().has(season_id)
+
+
+func _ensure_tokens() -> void:
+	for def in SeasonCatalog.all_defs():
+		if _tokens.has(def.id):
 			continue
-		var data := _paid_card_data(def, focus_paid, focus_id, active_id)
-		card.configure(data)
-		order.append(card)
-		if data["variant"] == UiHome.PREMIUM:
-			focused = card
-	for i in order.size():
-		trail_list.move_child(order[i], i)
-	_apply_heights(order, focused, anim)
-	if anim and focused != null:
-		_scroll_to(focused)
+		var token := HomeSeasonToken.new()
+		token.name = "Token_%s" % def.id
+		token.pressed.connect(_on_token_pressed)
+		_tokens[def.id] = token
+		if def.is_free():
+			_free_row.add_child(token)
+		else:
+			_paid_row.add_child(token)
 
 
-func _free_card_data(
-	def: SeasonDef, index: int, focus_paid: bool, focus_id: String, next_id: String, active_id: String
-) -> Dictionary:
-	var id := def.id
-	var variant := UiHome.COLLAPSED
-	var state := UiHome.ST_LOCKED
-	if GameState.is_season_playable(id):
-		state = UiHome.ST_ACTIVE if id == active_id else UiHome.ST_UNLOCKED
-		if not focus_paid and id == focus_id:
-			variant = UiHome.EXPANDED
-	elif id == next_id:
-		state = UiHome.ST_READY if GameState.can_unlock_free(id) else UiHome.ST_NEXT
-		if not focus_paid and id == focus_id:
-			variant = UiHome.POSTER
-		elif not focus_paid:
-			variant = UiHome.NEXTLOCK
-	if id == _unlocking_id:
-		state = UiHome.ST_UNLOCKING
-		variant = UiHome.POSTER
-	var data := _base_data(def)
-	data["variant"] = variant
-	data["state"] = state
-	data["active"] = state == UiHome.ST_ACTIVE
-	var prev := GameState.previous_free_id_for(id)
-	var prev_def: SeasonDef = GameState.get_season_def(prev) if not prev.is_empty() else null
-	data["prev_name"] = prev_def.display_name if prev_def else ""
-	var gate_type := GameState.star3_type_id_for_season(prev) if not prev.is_empty() else ""
-	data["gate_type_id"] = gate_type
-	data["gate_name"] = GameState.get_seed_display_name(gate_type) if not gate_type.is_empty() else ""
-	data["coins_need"] = def.coins_cost
-	data["flowers_need"] = def.t3_flowers_required
-	if state == UiHome.ST_UNLOCKING:
-		data["coins"] = def.coins_cost
-		data["flowers"] = def.t3_flowers_required
+func _apply_tokens() -> void:
+	var shown := _shown_id()
+	var active_id := GameState.active_season_id
+	var next_id := GameState.next_locked_free_id()
+	var free_defs := SeasonCatalog.free_defs_sorted()
+	var done := 0
+	for def in free_defs:
+		if GameState.is_season_playable(def.id):
+			done += 1
+	_free_count.text = "%d / %d" % [done, free_defs.size()]
+	var browser_style := HomeSeasonStyles.get_style("season_browser_bg")
+	browser_style.content_margin_left = 20
+	browser_style.content_margin_right = 20
+	browser_style.content_margin_top = 14
+	browser_style.content_margin_bottom = 8
+	browser_style.border_width_top = 3
+	browser_style.border_width_bottom = 3
+	browser_style.border_color = Color(1, 0.973, 0.941, 0.55)
+	_browser.add_theme_stylebox_override("panel", browser_style)
+	for def in SeasonCatalog.all_defs():
+		var token := _tokens[def.id] as HomeSeasonToken
+		token.configure(_token_data(def, shown, active_id, next_id))
+
+
+func _token_data(def: SeasonDef, shown: String, active_id: String, next_id: String) -> Dictionary:
+	var mood := SeasonCardContrast.mood_color(def.id)
+	var kind := "number"
+	var fill := mood
+	var show_bar := false
+	var bar_ratio := 0.0
+	if def.is_free():
+		if GameState.is_season_playable(def.id):
+			kind = "number"
+			fill = mood
+		elif def.id == next_id:
+			kind = "lock"
+			fill = SeasonColors.card_fill(mood, SeasonColors.State.GATHER)
+			show_bar = true
+			bar_ratio = _gate_ratio(def)
+		else:
+			kind = "lock"
+			fill = SeasonColors.far_token(mood)
+	elif GameState.is_test_locked_season(def.id):
+		kind = "soon"
+		fill = SeasonColors.card_fill(mood, SeasonColors.State.SOON)
+	elif GameState.is_season_playable(def.id):
+		kind = "check"
+		fill = mood
 	else:
-		data["coins"] = int(GameState.wallet_coins)
-		data["flowers"] = GameState.star3_flower_count_for_unlock(id)
-	return data
+		kind = "gem"
+		fill = mood
+	return {
+		"season_id": def.id,
+		"fill": fill,
+		"kind": kind,
+		"number": def.order,
+		"active": def.id == active_id and GameState.is_season_playable(def.id),
+		"focused": def.id == shown,
+		"show_bar": show_bar,
+		"bar_ratio": bar_ratio,
+	}
 
 
-func _paid_card_data(def: SeasonDef, focus_paid: bool, focus_id: String, active_id: String) -> Dictionary:
-	var id := def.id
-	var state := UiHome.ST_PREMIUM
-	if GameState.is_test_locked_season(id):
-		state = UiHome.ST_SOON
-	elif GameState.is_season_playable(id):
-		state = UiHome.ST_OWNED
-	elif id == _buying_id and IAPManager.is_busy():
-		state = UiHome.ST_BUSY
-	var data := _base_data(def)
-	data["variant"] = UiHome.PREMIUM if focus_paid and id == focus_id else UiHome.COLLAPSED
-	data["state"] = state
-	data["active"] = state == UiHome.ST_OWNED and id == active_id
-	data["price"] = IAPManager.get_price_label(def.iap_product_id) if not def.iap_product_id.is_empty() else ""
-	return data
+func _gate_ratio(def: SeasonDef) -> float:
+	var coins_need := maxi(def.coins_cost, 1)
+	var flowers_need := maxi(def.t3_flowers_required, 1)
+	var coins := clampf(float(GameState.wallet_coins) / float(coins_need), 0.0, 1.0)
+	var flowers := clampf(float(GameState.star3_flower_count_for_unlock(def.id)) / float(flowers_need), 0.0, 1.0)
+	return (coins + flowers) * 0.5
 
 
-func _base_data(def: SeasonDef) -> Dictionary:
+func _apply_card() -> void:
+	var id := _shown_id()
+	var def: SeasonDef = GameState.get_season_def(id)
+	if def == null:
+		return
+	_card.configure(_card_data(def))
+
+
+func _card_data(def: SeasonDef) -> Dictionary:
 	var roster: Array = []
 	for entry in def.roster:
-		roster.append({"id": str(entry.get("id", "")), "rarity": int(entry.get("rarity", 1))})
+		roster.append({
+			"id": str(entry.get("id", "")),
+			"name": str(entry.get("display_name", "")),
+			"rarity": int(entry.get("rarity", 1)),
+		})
+	var state := _state_for(def)
+	var prev := ""
+	var gate_name := ""
+	var gate_type := ""
+	if def.is_free():
+		prev = GameState.previous_free_id_for(def.id)
+	var prev_def: SeasonDef = GameState.get_season_def(prev) if not prev.is_empty() else null
+	if prev_def == null and not def.is_free():
+		prev_def = null
+	if not prev.is_empty():
+		gate_type = GameState.star3_type_id_for_season(prev)
+		gate_name = GameState.get_seed_display_name(gate_type) if not gate_type.is_empty() else ""
+	var coins := int(GameState.wallet_coins)
+	var flowers := GameState.star3_flower_count_for_unlock(def.id) if def.is_free() else 0
+	if state == UiHome.ST_UNLOCKING:
+		coins = def.coins_cost
+		flowers = def.t3_flowers_required
 	return {
 		"season_id": def.id,
 		"name": def.display_name,
 		"tagline": def.tagline,
+		"kind": "free" if def.is_free() else "paid",
+		"free_index": def.order,
+		"free_count": SeasonCatalog.free_defs_sorted().size(),
 		"roster": roster,
-		# "New" dolazi tek poslije prstena (Home Unlock.dc.html, kadar 3).
-		"fresh": def.id == _fresh_id and def.id != _unlocking_id,
+		"state": state,
+		"active": state == UiHome.ST_ACTIVE,
+		"prev_name": prev_def.display_name if prev_def else "",
+		"gate_name": gate_name,
+		"gate_type_id": gate_type,
+		"coins": coins,
+		"coins_need": def.coins_cost,
+		"flowers": flowers,
+		"flowers_need": def.t3_flowers_required,
+		"price": IAPManager.get_price_label(def.iap_product_id) if not def.iap_product_id.is_empty() else "",
+		"prev_on": not _neighbor(-1).is_empty(),
+		"next_on": not _neighbor(1).is_empty(),
 	}
 
 
-func _card_for(season_id: String) -> HomeSeasonCard:
-	var card := _cards.get(season_id) as HomeSeasonCard
-	if card != null:
-		return card
-	card = HomeSeasonCard.new()
-	card.name = "Card_%s" % season_id
-	card.tapped.connect(_on_card_tapped)
-	card.open_field_pressed.connect(_on_open_field_pressed)
-	card.unlock_pressed.connect(_on_unlock_pressed)
-	card.cta_pressed.connect(_on_cta_pressed)
-	card.fresh_done.connect(_on_fresh_done)
-	trail_list.add_child(card)
-	_cards[season_id] = card
-	return card
+func _state_for(def: SeasonDef) -> String:
+	var id := def.id
+	if id == _unlocking_id:
+		return UiHome.ST_UNLOCKING
+	if def.is_free():
+		if GameState.is_season_playable(id):
+			return UiHome.ST_ACTIVE if id == GameState.active_season_id else UiHome.ST_UNLOCKED
+		if id == GameState.next_locked_free_id():
+			return UiHome.ST_READY if GameState.can_unlock_free(id) else UiHome.ST_NEXT
+		return UiHome.ST_LOCKED
+	if GameState.is_test_locked_season(id):
+		return UiHome.ST_SOON
+	if GameState.is_season_playable(id):
+		return UiHome.ST_ACTIVE if id == GameState.active_season_id else UiHome.ST_UNLOCKED
+	if id == _buying_id and IAPManager.is_busy():
+		return UiHome.ST_BUSY
+	return UiHome.ST_PREMIUM
 
 
-## Visina po varijanti (ili vise, ako sadrzaj trazi — npr. "Need …" u dva reda);
-## otvorena kartica uzme ostatak kolone, kao g.h u HomeScreen.dc.html, i smije
-## se smanjiti do svog minimuma (roster na manjem okviru) da kolona stane bez skrola.
-func _apply_heights(order: Array[Control], focused: HomeSeasonCard, animated: bool) -> void:
-	var sep := trail_list.get_theme_constant("separation")
-	var heights: Dictionary = {}
-	var used := 0.0
-	var shown := 0
-	for node in order:
-		if not node.visible:
-			continue
-		shown += 1
-		var h := node.custom_minimum_size.y
-		if node is HomeSeasonCard:
-			var card := node as HomeSeasonCard
-			h = float(UiHome.CARD_H[card.variant])
-			if card != focused:
-				h = maxf(h, card.get_minimum_size().y)
-			heights[card] = h
-		used += h
-	used += float(sep * maxi(shown - 1, 0))
-	if focused != null and heights.has(focused):
-		var fit := float(heights[focused]) + trail.size.y - used
-		# Smanjuje se samo kad kolona time stvarno stane; ako ionako skrola
-		# (npr. otvorena premium lista), kartica zadrzava punu visinu.
-		if fit >= focused.floor_height():
-			heights[focused] = fit
-	for card: HomeSeasonCard in heights:
-		card.set_target_height(float(heights[card]), animated)
+# --- fokus i geste ---
 
-
-func _scroll_to(card: Control) -> void:
-	await get_tree().process_frame
-	if not is_instance_valid(card) or not card.is_inside_tree():
+func _jump_to(season_id: String, animate: bool) -> void:
+	if not _is_focusable(season_id):
+		_reject_far(season_id)
 		return
-	var top := card.position.y
-	var bottom := top + card.custom_minimum_size.y
-	var view := trail.size.y
-	var target := float(trail.scroll_vertical)
-	if top < target:
-		target = top
-	elif bottom > target + view:
-		target = minf(top, bottom - view)
-	if is_equal_approx(target, float(trail.scroll_vertical)):
+	if season_id == _shown_id():
 		return
-	if _scroll_tween:
-		_scroll_tween.kill()
-	_scroll_tween = create_tween()
-	_scroll_tween.tween_property(trail, "scroll_vertical", int(target), UiHome.T_SCROLL) \
-		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if animate:
+		_slide_to(1 if _focusables().find(season_id) > _focusables().find(_shown_id()) else -1, season_id)
+		return
+	_set_focus(season_id)
+	_apply_card()
+	_apply_tokens()
+	_notify_play_chip()
 
 
-# --- tapovi ---
+func _on_token_pressed(season_id: String) -> void:
+	tap_token(season_id)
+
 
 func _on_card_tapped(season_id: String) -> void:
-	if GameState.home_season_field_open or not _unlocking_id.is_empty():
-		return
-	var def: SeasonDef = GameState.get_season_def(season_id)
-	var card := get_card(season_id)
-	if def == null or card == null:
-		return
-	var playable := GameState.is_season_playable(season_id)
-	if def.is_free():
-		if playable and season_id == GameState.active_season_id:
-			open_season_field(season_id)
-			return
-		if playable:
-			GameState.set_active_season(season_id)
-			GameState.set_home_band("free")
-			_after_focus_change()
-			return
-		if season_id == GameState.next_locked_free_id():
-			GameState.set_free_strip_focus(season_id)
-			GameState.set_home_band("free")
-			_after_focus_change()
-			return
-		card.bounce()
-		return
-	if card.variant == UiHome.PREMIUM:
-		if playable and season_id == GameState.active_season_id:
-			open_season_field(season_id)
-		return
-	GameState.set_paid_strip_focus(season_id)
-	GameState.set_home_band("paid")
-	if playable:
-		GameState.set_active_season(season_id)
-	_after_focus_change()
-
-
-func _after_focus_change() -> void:
-	_refresh_trail(true)
-	_notify_play_chip()
+	tap_card(season_id)
 
 
 func _on_open_field_pressed(season_id: String) -> void:
 	open_season_field(season_id)
 
 
-func _on_premium_toggled() -> void:
-	if not _unlocking_id.is_empty():
+func _on_swiped(direction: int) -> void:
+	if GameState.home_season_field_open or not _unlocking_id.is_empty():
 		return
-	_premium_user_set = true
-	_premium_open = not _premium_open
-	if not _premium_open and GameState.home_band == "paid":
-		GameState.set_home_band("free")
-		var active_def: SeasonDef = GameState.get_season_def(GameState.active_season_id)
-		if active_def != null and active_def.is_free():
-			GameState.set_free_strip_focus(active_def.id)
-	_refresh_trail(true)
-	if _premium_open:
-		_scroll_to(_premium_header)
-
-
-func _on_trail_gui_input(event: InputEvent) -> void:
-	var dy := DRAG_SCROLL.drag_delta(event)
-	if is_zero_approx(dy):
+	var nxt := _neighbor(direction)
+	if nxt.is_empty():
+		_sliding = true
+		_card.rubber(direction)
+		if is_inside_tree():
+			get_tree().create_timer(0.3).timeout.connect(func() -> void: _sliding = false, CONNECT_ONE_SHOT)
 		return
-	DRAG_SCROLL.apply(trail, dy)
-	trail.accept_event()
+	_slide_to(direction, nxt)
 
 
-## Visina kolone odredjuje koliko otvorena kartica raste; sirina ne mijenja nista.
-func _on_trail_resized() -> void:
-	if not is_node_ready() or is_equal_approx(trail.size.y, _laid_out_h):
+func _slide_to(direction: int, season_id: String) -> void:
+	if _sliding or not is_inside_tree():
+		_set_focus(season_id)
+		_apply_card()
+		_apply_tokens()
 		return
-	_laid_out_h = trail.size.y
-	_refresh_trail(false)
+	_sliding = true
+	var width := _clip.size.x
+	var tw := create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(_card, "position:x", -float(direction) * width, UiHome.T_PAGE)
+	tw.tween_callback(func() -> void:
+		_set_focus(season_id)
+		_card.position.x = float(direction) * width
+		_apply_card()
+		_apply_tokens()
+		var back := create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		back.tween_property(_card, "position:x", 0.0, UiHome.T_PAGE)
+		back.tween_callback(func() -> void: _sliding = false)
+	)
+
+
+func _set_focus(season_id: String) -> bool:
+	var def: SeasonDef = GameState.get_season_def(season_id)
+	if def == null:
+		return false
+	if def.is_paid():
+		if not GameState.set_paid_strip_focus(season_id):
+			return false
+		GameState.set_home_band("paid")
+		return true
+	if not GameState.set_free_strip_focus(season_id):
+		return false
+	GameState.set_home_band("free")
+	return true
+
+
+func _focus_season(season_id: String) -> bool:
+	return _set_focus(season_id)
+
+
+func _reject_far(season_id: String) -> void:
+	var token := get_token(season_id)
+	if token:
+		token.shake()
+	var prev := GameState.previous_free_id_for(season_id)
+	var prev_def: SeasonDef = GameState.get_season_def(prev) if not prev.is_empty() else null
+	var who := prev_def.display_name if prev_def else "the previous season"
+	_show_toast("Unlock %s first" % who, false)
+
+
+func _show_toast(text: String, success: bool) -> void:
+	var style := HomeSeasonStyles.get_style("toast_success" if success else "toast_blocked")
+	style.content_margin_left = 40
+	style.content_margin_right = 40
+	_toast.add_theme_stylebox_override("panel", style)
+	_toast_label.text = text
+	UiHome.style(_toast_label, 40, UiHome.INK if success else Color("#FFF8F0"), UiHome.W_BLACK)
+	_toast.visible = true
+	_place_toast()
+	_toast_token += 1
+	var token := _toast_token
+	if not is_inside_tree():
+		return
+	get_tree().create_timer(UiHome.T_TOAST if success else 1.8).timeout.connect(func() -> void:
+		if token == _toast_token:
+			_toast.visible = false
+	, CONNECT_ONE_SHOT)
 
 
 # --- unlock ---
@@ -373,57 +534,51 @@ func _on_unlock_pressed(season_id: String) -> void:
 	if not _unlocking_id.is_empty():
 		return
 	if not GameState.unlock_free(season_id):
-		_refresh_trail(false)
+		refresh()
 		return
 	_unlocking_id = season_id
-	_fresh_id = season_id
 	_known_playable[season_id] = true
 	_refresh_top_bar()
-	_refresh_trail(false)
-	var card := get_card(season_id)
-	if card:
-		card.play_unlock_burst()
-	_notify_home_refresh()
+	refresh()
 	_notify_play_chip()
 	if not is_inside_tree():
 		_finish_unlock()
 		return
-	_unlock_timer = get_tree().create_timer(UiHome.T_BURST)
+	_unlock_timer = get_tree().create_timer(UiHome.T_UNLOCK)
 	_unlock_timer.timeout.connect(_finish_unlock, CONNECT_ONE_SHOT)
 
 
 func _finish_unlock() -> void:
+	var id := _unlocking_id
 	_unlocking_id = ""
-	_refresh_trail(true)
+	refresh()
 	_notify_play_chip()
+	var def: SeasonDef = GameState.get_season_def(id)
+	if def:
+		_show_toast("%s unlocked · now playing" % def.display_name, true)
 
 
-func is_unlocking() -> bool:
-	return not _unlocking_id.is_empty()
-
-
-## Nova otkljucana ili kupljena sezona (i dolazak iz Campa) dobija cip "New".
 func _detect_fresh() -> void:
 	var now: Dictionary = {}
 	for def in SeasonCatalog.all_defs():
 		if GameState.is_season_playable(def.id):
 			now[def.id] = true
-	if _known_ready:
-		for id: String in now:
+	var arrival := ""
+	if _known_ready and _unlocking_id.is_empty() and not _suppress_camp:
+		for id in now.keys():
 			if not _known_playable.has(id):
-				_fresh_id = id
+				var def: SeasonDef = GameState.get_season_def(str(id))
+				if def != null and def.is_free() and str(id) == GameState.active_season_id:
+					arrival = str(id)
 	_known_playable = now
 	_known_ready = true
+	if not arrival.is_empty():
+		var def: SeasonDef = GameState.get_season_def(arrival)
+		if def:
+			_show_toast("Unlocked in Camp · now playing", true)
 
 
-func _on_fresh_done(season_id: String) -> void:
-	if season_id != _fresh_id:
-		return
-	_fresh_id = ""
-	_refresh_trail(false)
-
-
-# --- premium kupovina ---
+# --- premium ---
 
 func _on_cta_pressed(season_id: String) -> void:
 	var def: SeasonDef = GameState.get_season_def(season_id)
@@ -438,7 +593,7 @@ func _on_cta_pressed(season_id: String) -> void:
 		return
 	_buying_id = season_id
 	IAPManager.purchase(def.iap_product_id)
-	_refresh_trail(false)
+	_apply_card()
 
 
 func _on_purchase_done(_sku: String) -> void:
@@ -446,38 +601,29 @@ func _on_purchase_done(_sku: String) -> void:
 		return
 	var id := _buying_id
 	_buying_id = ""
+	_suppress_camp = true
 	if GameState.is_season_playable(id):
-		GameState.set_paid_strip_focus(id)
-		GameState.set_home_band("paid")
+		_set_focus(id)
 	_refresh_top_bar()
 	refresh()
+	_suppress_camp = false
+	var def: SeasonDef = GameState.get_season_def(id)
+	if def and GameState.is_season_playable(id):
+		_show_toast("%s is yours · now playing" % def.display_name, true)
 
 
 func _on_purchase_failed(_sku: String, _reason: String) -> void:
 	if _buying_id.is_empty():
 		return
 	_buying_id = ""
-	_refresh_trail(false)
+	_apply_card()
 
 
 # --- polje sezone ---
 
-func _focus_season(season_id: String) -> bool:
-	var def: SeasonDef = GameState.get_season_def(season_id)
-	if def == null or not GameState.is_season_playable(season_id):
-		return false
-	if def.is_paid():
-		GameState.set_paid_strip_focus(season_id)
-		GameState.set_home_band("paid")
-	else:
-		GameState.set_free_strip_focus(season_id)
-		GameState.set_home_band("free")
-	return true
-
-
 func _sync_season_field() -> void:
 	var open := GameState.home_season_field_open
-	trail.visible = not open
+	season_select.visible = not open
 	if season_field:
 		season_field.visible = open
 		season_field.mouse_filter = (
@@ -536,8 +682,6 @@ func _notification(what: int) -> void:
 		_try_close_field_on_back()
 
 
-# --- obavjestenja roditeljima ---
-
 func _notify_home_field_backdrop() -> void:
 	var n: Node = get_parent()
 	while n:
@@ -550,10 +694,6 @@ func _notify_home_field_backdrop() -> void:
 func _notify_play_chip() -> void:
 	if owner and owner.has_method("refresh_play_chip"):
 		owner.call("refresh_play_chip")
-
-
-## Unlock mijenja i ProgressIndicator (2 / 4 → 3 / 4) u TopRow-u.
-func _notify_home_refresh() -> void:
 	if owner and owner.has_method("refresh_progress_indicator"):
 		owner.call("refresh_progress_indicator")
 

@@ -9,6 +9,10 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-09-23
+
+- **Home biranje sezone v2 (Claude Design, smjer 1a Season Stage)** — iz `design_handoff_home_v2/`: jedna kartica (1032 px) umjesto harmonike, dock od 8 tokena (120 px, focus lift, gold bar na sljedećem locku), swipe po kartici 280 ms (guma 40 px na kraju, kartica u `block_hub_swipe`; dock i Play i dalje idu u hub). Fokus nije aktivna sezona: Play uvijek pali run aktivne (`run in {active}`), tap na otvorenu karticu / Open meadow otvara polje i tad postavlja aktivnu. Next lock: Needs / Unlock iz postojećih cijena, prsten 520 px 0,42 s, toast „{name} unlocked · now playing“. Dolazak iz Campa: toast „Unlocked in Camp · now playing“ bez prstena. Premium: 6 cvjetova + cijena iz `IAPManager`, Buy → „Waiting for store…“ → „{name} is yours · now playing“. Ember Fen = Coming soon, bez cijene. Daily gift 180 px u Play redu (836×180). Pozadina Home `#243329`. Daleki lock se trese i kaže „Unlock {prev} first“. Polje sezone, Run, Shop, Journal, Camp mehanika, hub chrome, ekonomija i IAP cijene nisu dirani; cvjetovi ostaju `ArenaChipDraw`. `season_home_smoke` prepisan; `season_meadow_smoke` prati novu pozadinu i Play 180 px. Polje sezone ponovo slaže cvjetove na `resized`, da otvaranje iz biranja ne ostavi ih ispod Play reda.
+
 ## 2026-09-22
 
 - **Fail loot coini** — `finish_run` na failu koristi `ceil(50%)` kao `_halve_seed_bag`, da 1 coin ne padne na 0 (`round(0.5)==0` na desktopu).

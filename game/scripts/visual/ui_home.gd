@@ -33,7 +33,7 @@ const GIFT_TAKEN_EDGE := Color("#4E5A4C")
 const GIFT_BOX_TAKEN := Color("#5C6759")
 const GIFT_BOX_TAKEN_EDGE := Color("#48523F")
 const GIFT_RIBBON_TAKEN := Color("#8A9487")
-const PAGE_BG := Color("#2E4733")        # isto kao Camp (odluka 2026-09-21)
+const PAGE_BG := Color("#243329")        # Home v2 stage (design_handoff_home_v2)
 const BURST := Color(1.0, 0.961, 0.820, 0.55)
 const SUB_ON_DARK := Color(1.0, 0.965, 0.839, 0.90)
 const SHADOW := Color(0.078, 0.102, 0.086, 0.26)
@@ -48,7 +48,7 @@ const TOP_ROW_H := 130
 const PROGRESS_W := 420
 const CARD_W := 1032
 const CARD_GAP := 14
-const PLAY_H := 156
+const PLAY_H := 180
 const PLAY_CHIP_H := 88
 const HINT_BOTTOM := PAGE_PAD + PLAY_H + BLOCK_GAP   # 196
 
@@ -102,8 +102,12 @@ const UNLOCK_BTN_H := 140
 const CTA_H := 130
 const BAR_H_POSTER := 26
 const BAR_H_COMPACT := 20
-const BURST_DIAMETER := 760.0
-const BURST_BORDER := 16.0
+const BURST_DIAMETER := 520.0
+const BURST_BORDER := 28.0
+const T_UNLOCK := 0.42
+const T_PAGE := 0.28
+const T_TOAST := 2.4
+const RUBBER_PX := 40.0
 
 # --- Premium sekcija / TopRow ---
 const PREMIUM_ROW_H := 155

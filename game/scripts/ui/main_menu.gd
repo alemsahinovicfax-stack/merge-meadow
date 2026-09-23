@@ -10,7 +10,8 @@ const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
 const LOCKED_SEED_MODULATE := Color(0.45, 0.45, 0.45, 1)
 ## HomeColumn: biranje sezone = padding 24 (design_handoff_home); polje sezone
 ## zadrzava stari raspored dok ne dobije svoj brief (lijevo, vrh, desno, dno).
-const TRAIL_COLUMN_OFFSETS := Vector4(24, 24, -24, -24)
+const SELECT_COLUMN_OFFSETS := Vector4(0, 0, 0, 0)
+const SELECT_COLUMN_SEPARATION := 24
 const FIELD_COLUMN_OFFSETS := Vector4(48, 380, -48, -24)
 const FIELD_COLUMN_SEPARATION := 12
 const PLAY_ICON_TRAIL := 56.0
@@ -60,9 +61,11 @@ enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 var _chest_ui_state: ChestUiState = ChestUiState.LOCKED
 var _chest_pulsing: bool = false
 var _chest_pulse_t: float = 0.0
-var _play_spacer: Control = null
-var _play_chip: PanelContainer = null
-var _play_chip_label: Label = null
+var _play_mark: Panel = null
+var _play_pad_l: Control = null
+var _play_pad_r: Control = null
+var _play_gap: Control = null
+var _play_season_name: String = ""
 var _field_safe_shift: float = 0.0
 var _basket_locked: bool = false
 var _basket_attention: UiAttention = UiAttention.new()
@@ -154,7 +157,7 @@ func _exit_tree() -> void:
 
 func _refresh_menu() -> void:
 	var hub := GameState.tutorial_complete
-	tutorial_hint.text = "First run: tap Play. Seeds you bring back become flowers in the Arena."
+	tutorial_hint.text = "Tap Play to start your first run.\nThe card opens your meadow."
 	tutorial_hint_panel.visible = not hub
 	refresh_play_chip()
 	refresh_progress_indicator()
@@ -257,41 +260,81 @@ func _on_play_pressed() -> void:
 	SceneRouter.change_to(GameState.SCENE_RUN)
 
 
-## Play na biranju sezone: 1032 x 156, peach, ikona + "Play" lijevo, cip s imenom
-## aktivne sezone desno ("Play · Country Bloom"). U polju sezone ostaje staro dugme.
+## Play na biranju sezone: 836 x 180, "Play" + "run in {active}". Daily gift je 180 px
+## pored njega. U polju sezone ostaje staro dugme.
 func _setup_play_button() -> void:
 	var row := play_button.get_node_or_null("ContentRow") as HBoxContainer
 	if row == null:
 		return
-	_play_spacer = Control.new()
-	_play_spacer.name = "PlaySpacer"
-	_play_spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_play_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(_play_spacer)
-	_play_chip = PanelContainer.new()
-	_play_chip.name = "PlaySeasonChip"
-	_play_chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_play_chip.custom_minimum_size.y = UiHome.PLAY_CHIP_H
-	_play_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_play_chip.add_theme_stylebox_override("panel", UiHome.play_chip())
-	row.add_child(_play_chip)
-	_play_chip_label = Label.new()
-	_play_chip_label.name = "Text"
-	UiHome.style(_play_chip_label, UiHome.FONT_PLAY_CHIP, UiHome.INK, UiHome.W_BOLD)
-	_play_chip.add_child(_play_chip_label)
-	play_button.set_icon(UiAssets.get_play_icon(), PLAY_ICON_TRAIL)
+	var play_row := get_node_or_null("%PlayRow") as HBoxContainer
+	if play_row and daily_chest_card and daily_chest_card.get_parent() != play_row:
+		daily_chest_card.reparent(play_row)
+	if play_row:
+		play_row.add_theme_constant_override("separation", 0)
+		_play_pad_l = Control.new()
+		_play_pad_l.name = "PlayPadLeft"
+		_play_pad_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_play_pad_l.custom_minimum_size.x = 24
+		play_row.add_child(_play_pad_l)
+		play_row.move_child(_play_pad_l, 0)
+		_play_pad_r = Control.new()
+		_play_pad_r.name = "PlayPadRight"
+		_play_pad_r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_play_pad_r.custom_minimum_size.x = 24
+		play_row.add_child(_play_pad_r)
+		_play_gap = Control.new()
+		_play_gap.name = "PlayGiftGap"
+		_play_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_play_gap.custom_minimum_size.x = 16
+		play_row.add_child(_play_gap)
+		if daily_chest_card:
+			play_row.move_child(_play_gap, daily_chest_card.get_index())
+	if daily_chest_card:
+		daily_chest_card.custom_minimum_size = Vector2(180, 180)
+		daily_chest_card.size_flags_horizontal = Control.SIZE_SHRINK_END
+		daily_chest_card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_play_mark = Panel.new()
+	_play_mark.name = "PlayMark"
+	_play_mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_play_mark.custom_minimum_size = Vector2(112, 112)
+	_play_mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var mark := StyleBoxFlat.new()
+	mark.bg_color = Color("#FFF8F0")
+	mark.border_color = UiHome.INK
+	mark.set_border_width_all(3)
+	mark.set_corner_radius_all(56)
+	_play_mark.add_theme_stylebox_override("panel", mark)
+	var mark_icon := TextureRect.new()
+	mark_icon.texture = UiAssets.get_play_icon()
+	mark_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mark_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	mark_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	mark_icon.set_anchors_preset(Control.PRESET_FULL_RECT)
+	mark_icon.offset_left = 32
+	mark_icon.offset_top = 32
+	mark_icon.offset_right = -32
+	mark_icon.offset_bottom = -32
+	_play_mark.add_child(mark_icon)
+	row.add_child(_play_mark)
+	row.move_child(_play_mark, 0)
 	play_button.set_text("Play")
 
 
 func refresh_play_chip() -> void:
-	if _play_chip_label == null:
-		return
 	var def: SeasonDef = GameState.get_season_def(GameState.active_season_id)
-	_play_chip_label.text = def.display_name if def else ""
+	_play_season_name = def.display_name if def else ""
+	if play_button == null or GameState.home_season_field_open:
+		return
+	play_button.set_text("Play", "run in %s" % _play_season_name)
+	_align_play_labels(false)
 
 
 func get_play_chip_text() -> String:
-	return _play_chip_label.text if _play_chip_label and _play_chip.visible else ""
+	return _play_season_name
+
+
+func get_play_sub_text() -> String:
+	return play_button.get_sub() if play_button else ""
 
 
 func refresh_progress_indicator() -> void:
@@ -299,18 +342,38 @@ func refresh_progress_indicator() -> void:
 		progress_indicator.refresh()
 
 
+func _align_play_labels(centered: bool) -> void:
+	var align := HORIZONTAL_ALIGNMENT_CENTER if centered else HORIZONTAL_ALIGNMENT_LEFT
+	for node_name in ["ContentRow/TextCol/Title", "ContentRow/TextCol/Sub"]:
+		var label := play_button.get_node_or_null(node_name) as Label
+		if label:
+			label.horizontal_alignment = align
+
+
 func _apply_mode_layout(field_open: bool) -> void:
-	if top_row:
-		top_row.visible = not field_open
 	if home_column:
-		var o := FIELD_COLUMN_OFFSETS if field_open else TRAIL_COLUMN_OFFSETS
+		var o := FIELD_COLUMN_OFFSETS if field_open else SELECT_COLUMN_OFFSETS
 		home_column.offset_left = o.x
 		home_column.offset_top = o.y - (_field_safe_shift if field_open else 0.0)
 		home_column.offset_right = o.z
 		home_column.offset_bottom = o.w - (_field_safe_shift if field_open else 0.0)
 		home_column.add_theme_constant_override(
-			"separation", FIELD_COLUMN_SEPARATION if field_open else UiHome.BLOCK_GAP
+			"separation", FIELD_COLUMN_SEPARATION if field_open else SELECT_COLUMN_SEPARATION
 		)
+	if top_row:
+		top_row.visible = false
+	if daily_chest_card:
+		var show_gift := GameState.tutorial_complete and not field_open
+		if not show_gift:
+			daily_chest_card.visible = false
+		elif _chest_ui_state != ChestUiState.LOCKED:
+			daily_chest_card.visible = true
+	for pad in [_play_pad_l, _play_pad_r, _play_gap]:
+		if pad:
+			pad.visible = not field_open
+	var play_row := get_node_or_null("%PlayRow") as HBoxContainer
+	if play_row:
+		play_row.add_theme_constant_override("separation", 12 if field_open else 0)
 	_apply_play_layout(field_open)
 
 
@@ -326,24 +389,35 @@ func _apply_play_layout(field_open: bool) -> void:
 		)
 		play_button.set_fonts(40)
 		play_button.set_ink(UiPalette.UI_TEXT)
+		play_button.set_text("Play")
 		play_button.set_icon(UiAssets.get_play_icon(), PLAY_ICON_FIELD)
 		play_button.set_press_scale(1.0)
 		if row:
 			row.alignment = BoxContainer.ALIGNMENT_CENTER
+		if _play_mark:
+			_play_mark.visible = false
+		_align_play_labels(true)
 	else:
 		play_button.custom_minimum_size = Vector2(0, UiHome.PLAY_H)
 		play_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		play_button.set_styles(UiHome.play_button(false), UiHome.play_button(true))
-		play_button.set_fonts(UiHome.FONT_PLAY)
+		var normal := HomeSeasonStyles.get_style("play_button")
+		normal.content_margin_left = 36
+		normal.content_margin_right = 36
+		var pressed := HomeSeasonStyles.get_style("play_button")
+		pressed.content_margin_left = 36
+		pressed.content_margin_right = 36
+		pressed.bg_color = pressed.bg_color.darkened(0.06)
+		play_button.set_styles(normal, pressed)
+		play_button.set_fonts(72, 38)
 		play_button.set_ink(UiHome.INK)
-		play_button.set_icon(UiAssets.get_play_icon(), PLAY_ICON_TRAIL)
+		play_button.set_icon(null, PLAY_ICON_TRAIL)
+		play_button.set_text("Play", "run in %s" % _play_season_name)
 		play_button.set_press_scale(0.97)
 		if row:
 			row.alignment = BoxContainer.ALIGNMENT_BEGIN
-	if _play_spacer:
-		_play_spacer.visible = not field_open
-	if _play_chip:
-		_play_chip.visible = not field_open
+		if _play_mark:
+			_play_mark.visible = true
+		_align_play_labels(false)
 
 
 func _on_endless_play_pressed() -> void:
@@ -408,7 +482,7 @@ func _refresh_chest_card() -> void:
 		_fit_progress_indicator(false)
 		_stop_chest_pulse()
 		return
-	daily_chest_card.visible = true
+	daily_chest_card.visible = not GameState.home_season_field_open
 	_fit_progress_indicator(true)
 	if GameState.can_claim_daily_chest():
 		_chest_ui_state = ChestUiState.READY
@@ -420,20 +494,26 @@ func _refresh_chest_card() -> void:
 		_stop_chest_pulse()
 
 
-## Daily gift u TopRow-u (HomeScreen.dc.html · DailyGiftCard): ikona od tri ravna
-## oblika (kutija + dvije trake), "Daily gift" 38 px + "Tap to open" 48 px.
+## Daily gift u Play redu (design_handoff_home_v2): 180 px, "Gift".
+## Caption ostaje u cvoru radi stanja (Tap to open / Back tomorrow), nije u layoutu.
 func _style_daily_gift(taken: bool) -> void:
-	daily_title.text = "Daily gift"
+	daily_title.text = "Gift"
 	daily_caption.text = "Back tomorrow" if taken else "Tap to open"
-	daily_chest_card.add_theme_stylebox_override("panel", UiHome.daily_gift(taken))
-	UiHome.style(
-		daily_title, UiHome.FONT_GIFT_TITLE,
-		Color(1.0, 0.973, 0.941, 0.88) if taken else UiHome.SUB_INK, UiHome.W_REGULAR
-	)
-	UiHome.style(daily_caption, UiHome.FONT_GIFT_SUB, UiHome.WARM_WHITE if taken else UiHome.DARK_INK, UiHome.W_BLACK)
+	daily_caption.visible = false
+	var style := HomeSeasonStyles.get_style("daily_gift_card")
+	if taken:
+		style.bg_color = UiHome.GIFT_TAKEN
+		style.border_color = UiHome.GIFT_TAKEN_EDGE
+	daily_chest_card.add_theme_stylebox_override("panel", style)
+	UiHome.style(daily_title, 38, Color("#FFF8F0") if taken else UiHome.INK, UiHome.W_BLACK)
 	if gift_icon:
-		gift_icon.add_theme_stylebox_override("panel", UiHome.gift_box(taken))
-	var ribbon := UiHome.GIFT_RIBBON_TAKEN if taken else UiHome.WARM_WHITE
+		var box := StyleBoxFlat.new()
+		box.bg_color = UiHome.GIFT_BOX_TAKEN if taken else Color("#D4A5FF")
+		box.border_color = UiHome.INK
+		box.set_border_width_all(3)
+		box.set_corner_radius_all(18)
+		gift_icon.add_theme_stylebox_override("panel", box)
+	var ribbon := UiHome.GIFT_RIBBON_TAKEN if taken else Color("#FFF8F0")
 	if gift_ribbon_v:
 		gift_ribbon_v.color = ribbon
 	if gift_ribbon_h:

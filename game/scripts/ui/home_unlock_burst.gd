@@ -18,14 +18,13 @@ func play() -> void:
 	if _tween:
 		_tween.kill()
 	visible = true
-	scale = Vector2.ONE * 0.6
-	modulate.a = 0.9
+	scale = Vector2.ONE * 0.2
+	modulate.a = 1.0
 	if not is_inside_tree():
 		return
-	_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_tween.tween_property(self, "scale", Vector2.ONE * 1.25, UiHome.T_BURST)
-	_tween.tween_property(self, "modulate:a", 0.0, UiHome.T_BURST)
-	_tween.chain().tween_callback(func() -> void: visible = false)
+	_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_tween.tween_property(self, "scale", Vector2.ONE, UiHome.T_UNLOCK)
+	_tween.tween_callback(func() -> void: visible = false)
 
 
 func is_playing() -> bool:

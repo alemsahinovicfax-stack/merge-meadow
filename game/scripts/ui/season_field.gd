@@ -44,6 +44,15 @@ var _last_sniff_id: int = 0
 
 func _ready() -> void:
 	_hide_pip_and_stop()
+	resized.connect(_on_resized)
+
+
+func _on_resized() -> void:
+	if _open_season_id.is_empty() or not visible:
+		return
+	if size.x < 8.0 or size.y < 8.0:
+		return
+	_rebuild_flowers(_open_season_id)
 
 
 func apply_season(season_id: String) -> void:
