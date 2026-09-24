@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="BloomRow" style="{{ rootStyle }}">
+  <div data-layer="InfoColumn" style="flex:1;min-width:0;height:150px;display:flex;flex-direction:column;gap:12px">
+    <div data-layer="NameLine" style="flex:0 0 auto;display:flex;align-items:baseline;gap:16px;min-width:0">
+      <div data-layer="BloomName" style="{{ nameStyle }}">{{ name }}</div>
+      <div data-layer="RarityStars" style="{{ starsStyle }}">{{ stars }}</div>
+    </div>
+    <div data-layer="RowCaption" style="{{ captionStyle }}">{{ caption }}</div>
+  </div>
+  <div data-layer="TierStrip" style="flex:0 0 auto;display:flex;gap:18px">
+    <sc-for list="{{ tiers }}" as="t" hint-placeholder-count="3">
+      <div data-layer="{{ t.layer }}" style="width:112px;display:flex;flex-direction:column;align-items:center;gap:8px">
+        <div style="position:relative;width:112px;height:112px">
+          <div data-layer="NewHalo" style="{{ t.haloStyle }}"></div>
+          <div data-layer="{{ t.frameLayer }}" style="{{ t.frameStyle }}">
+            <div data-layer="ArtWell" style="{{ t.wellStyle }}"></div>
+            <img data-layer="BloomArt" src="{{ t.src }}" alt="" style="{{ t.artStyle }}">
+          </div>
+        </div>
+        <div data-layer="TierLabel" style="{{ t.labelStyle }}">{{ t.label }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div data-layer="NewBadge" style="{{ newStyle }}">NEW</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1032,&quot;height&quot;:240},&quot;typeId&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;frost_snowdrop&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;label&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Frost Snowdrop&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;rarity&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[1,2,3],&quot;default&quot;:1,&quot;tsType&quot;:&quot;1|2|3&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;locked&quot;,&quot;seen&quot;,&quot;album_t2&quot;,&quot;album_t3&quot;],&quot;default&quot;:&quot;album_t2&quot;,&quot;tsType&quot;:&quot;'locked'|'seen'|'album_t2'|'album_t3'&quot;},&quot;newTier&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[0,1,2,3],&quot;default&quot;:2,&quot;tsType&quot;:&quot;number&quot;},&quot;season&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;frost_orchard&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;w&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1032,&quot;min&quot;:900,&quot;max&quot;:1032,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;}}">
+const RB = { 1: ['#B8D4F0', '#93AAC0'], 2: ['#E0C4FF', '#B39DCC'], 3: ['#FFE8B8', '#CCBA93'] };
+const LOCKED = ['#E4E4E0', '#B6B6B2'];
+const INK = '#2D3436', CAP_INK = '#3F4547', DIS_INK = '#5C5C58';
+const NUN = 'Nunito,system-ui,sans-serif';
+const TEX = { clover: 1, daisy: 1, buttercup: 1, tulip: 1, sunflower: 1, pumpkin: 1 };
+const SEASON_HUE = { frost_orchard: 0.55, lantern_meadow: 0.10, amber_canopy: 0.06, moonlit_warren: 0.65, coral_tide: 0.97, starfall_glade: 0.78, ember_fen: 0.02 };
+const STEM = [0.35, 0.62, 0.32];
+const CAPTION = {
+  locked: 'Keep playing to discover this bloom.',
+  seen: 'Spotted in runs — merge to T2, then Keep in Album.',
+  album_t2: 'In your Album (T2 bloom). Merge to T3 for crystal.',
+  album_t3: 'Crystal bloom saved in Album!'
+};
+const NEW_CAPTION = { 1: 'New discovery!', 2: 'New bloom kept in Album!', 3: 'New crystal in Album!' };
+
+// camp_plant_draw.gd + seed_visual_config.gd, 1:1 (types without an SVG in assets/sprites/flowers)
+function djb2(s) { let h = 5381; for (const ch of s) h = (Math.imul(h, 33) + ch.codePointAt(0)) >>> 0; return h; }
+function hsv(h, s, v) {
+  const x = ((h * 360) % 360 + 360) % 360 / 60, i = Math.floor(x), f = x - i;
+  const p = v * (1 - s), q = v * (1 - s * f), t = v * (1 - s * (1 - f));
+  return [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][i % 6];
+}
+const lt = (c, a) => c.map(x => x + (1 - x) * a);
+const dk = (c, a) => c.map(x => x * (1 - a));
+const css = (c, a) => 'rgba(' + c.map(x => Math.round(x * 255)).join(',') + ',' + (a ?? 1) + ')';
+function palette(type, season) {
+  const h = djb2(type);
+  let base = SEASON_HUE[season]; if (base == null) base = (h % 360) / 360;
+  const hue = (base + ((h % 100) / 100 - 0.5) * 0.08 + 1) % 1;
+  return { petal: hsv(hue, 0.55, 0.92), center: hsv((hue + 0.08) % 1, 0.65, 0.78), seed: hsv(hue, 0.48, 0.85), crystal: hsv((hue + 0.15) % 1, 0.55, 0.96) };
+}
+function procArt(type, season, r, tier) {
+  const pal = palette(type, season); const o = [];
+  const C = (x, y, rad, c, a) => o.push('<circle cx="' + x.toFixed(2) + '" cy="' + y.toFixed(2) + '" r="' + rad + '" fill="' + css(c, a) + '"/>');
+  const L = (y1, y2, w) => o.push('<line x1="0" y1="' + y1 + '" x2="0" y2="' + y2 + '" stroke="' + css(STEM) + '" stroke-width="' + w + '"/>');
+  if (tier === 1) {
+    L(8, 22, 4); C(0, -6, 6, pal.seed);
+    if (r >= 2) { C(-6, 1, 4, lt(pal.seed, 0.1)); C(6, 1, 4, lt(pal.seed, 0.1)); }
+    if (r >= 3) C(0, -14, 3.5, pal.center);
+  } else if (tier === 2) {
+    L(10, 26, 5);
+    const n = r >= 3 ? 10 : r >= 2 ? 7 : 5, rad = r >= 3 ? 15 : 13;
+    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; C(Math.cos(a) * rad, Math.sin(a) * rad - 6, 7, (r >= 2 && i % 2 === 1) ? lt(pal.petal, 0.14) : pal.petal); }
+    C(0, -6, 8, pal.center);
+    if (r >= 3) for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2 + Math.PI / n; C(Math.cos(a) * (rad + 7), Math.sin(a) * (rad + 7) - 6, 4, dk(pal.petal, 0.12)); }
+  } else {
+    L(12, 28, 5);
+    [[-16, -6], [16, -6], [0, -18], [0, 6]].forEach(p => C(p[0], p[1], 10, pal.crystal));
+    C(0, -8, 10, [1, 0.95, 0.75]);
+    o.push('<circle cx="0" cy="-8" r="14" fill="none" stroke="' + css(lt(pal.crystal, 0.2)) + '" stroke-width="3"/>');
+    if (r >= 3) [[-20, -18], [20, -18], [0, 14]].forEach(p => C(p[0], p[1], 3, [1, 1, 1], 0.85));
+  }
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="-38.89 -40.44 77.78 77.78">' + o.join('') + '</svg>');
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const type = p.typeId ?? 'clover';
+    const r = Math.max(1, Math.min(3, p.rarity ?? 1));
+    const state = p.state ?? 'seen';
+    const locked = state === 'locked';
+    const kept = state === 'album_t3' ? 3 : state === 'album_t2' ? 2 : locked ? 0 : 1;
+    const newTier = locked ? 0 : (p.newTier ?? 0);
+    const w = p.w ?? 1032;
+    const [bg, edge] = locked ? LOCKED : RB[r];
+
+    const tiers = [1, 2, 3].map(tier => {
+      const on = tier <= kept;
+      const crystal = tier === 3;
+      const isNew = on && newTier === tier;
+      const radius = on && crystal ? '30px' : '50%';
+      let src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==', artStyle = 'display:none';
+      if (on) {
+        if (TEX[type]) { src = 'flowers/' + type + '_t' + tier + '.svg'; artStyle = 'position:absolute;left:15.7px;top:13px;width:74.7px;height:74.7px;display:block'; }
+        else { src = procArt(type, p.season ?? '', r, tier); artStyle = 'position:absolute;left:9px;top:9px;width:88px;height:88px;display:block'; }
+      }
+      return {
+        layer: 'TierSlotT' + tier,
+        frameLayer: on ? (crystal ? 'CrystalFrame' : 'BloomFrame') : 'EmptySlot',
+        label: 'T' + tier,
+        src, artStyle,
+        haloStyle: isNew
+          ? 'position:absolute;inset:-9px;box-sizing:border-box;border-radius:' + (crystal ? '39px' : '50%') + ';background:#FFCCD5;border:3px solid ' + INK
+          : 'display:none',
+        frameStyle: on
+          ? 'position:absolute;inset:0;box-sizing:border-box;border-radius:' + radius + ';background:' + (crystal ? '#FFD56B' : '#FFF8F0') + ';border:3px solid ' + (crystal ? '#D6A82F' : '#CBC2B6')
+          : 'position:absolute;inset:0;box-sizing:border-box;border-radius:50%;background:rgba(45,52,54,.05);border:4px solid rgba(45,52,54,.32)',
+        wellStyle: on
+          ? 'position:absolute;inset:7px;box-sizing:border-box;border-radius:' + (crystal ? '20px' : '50%') + ';background:#22342A;border:2px solid #16211B'
+          : 'display:none',
+        labelStyle: 'font:900 32px/34px ' + NUN + ';color:' + (on ? INK : DIS_INK)
+      };
+    });
+
+    return {
+      name: locked ? '???' : (p.label ?? 'Meadow Clover'),
+      stars: '★'.repeat(r) + '☆'.repeat(3 - r),
+      caption: newTier ? NEW_CAPTION[newTier] : CAPTION[state],
+      tiers,
+      rootStyle: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:' + w + 'px;height:200px;border-radius:26px;background:' + bg +
+        ';border:3px solid ' + edge + ';box-shadow:0 4px 6px rgba(45,52,54,.12);padding:0 24px 0 28px;display:flex;align-items:center;gap:24px;font-family:' + NUN + ';-webkit-font-smoothing:antialiased',
+      nameStyle: 'flex:0 1 auto;min-width:0;font:900 44px/48px ' + NUN + ';color:' + (locked ? DIS_INK : INK) + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      starsStyle: 'flex:0 0 auto;font:800 32px/1 ' + NUN + ';letter-spacing:.04em;color:' + (locked ? DIS_INK : INK) + ';white-space:nowrap',
+      captionStyle: 'flex:0 0 auto;height:90px;font:' + (newTier ? 800 : 700) + ' 38px/45px ' + NUN + ';color:' + (locked ? DIS_INK : newTier ? INK : CAP_INK) + ';overflow:hidden;text-wrap:pretty',
+      newStyle: newTier
+        ? 'position:absolute;left:25px;top:-21px;box-sizing:border-box;height:46px;padding:0 18px;border-radius:23px;background:#FFCCD5;border:3px solid ' + INK + ';display:flex;align-items:center;font:900 30px/1 ' + NUN + ';letter-spacing:.06em;color:' + INK + ';box-shadow:0 3px 0 rgba(45,52,54,.22)'
+        : 'display:none'
+    };
+  }
+}
+</script>
+</body>
+</html>

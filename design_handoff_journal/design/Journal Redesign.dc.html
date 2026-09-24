@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body { margin: 0; background: #1A241E; }
+a { color: #FFB88C; text-decoration: none; border-bottom: 1px solid rgba(255,184,140,.45); }
+a:hover { color: #FFD56B; border-bottom-color: rgba(255,213,107,.6); }
+</style>
+</helmet>
+<section id="t1" data-screen-label="Turn 1" style="box-sizing:border-box;width:2280px;padding:72px 80px 96px;display:flex;flex-direction:column;gap:64px;background:#1A241E;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0">
+
+  <div style="display:flex;flex-direction:column;gap:18px;max-width:1720px">
+    <div style="font:800 22px/1 Nunito,system-ui,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,248,240,.55)">Turn 1 · Journal / Bloom Album · Merge Meadow</div>
+    <div style="font:900 68px/1.05 Nunito,system-ui,sans-serif">Two directions for the Bloom Album <span style="font:700 34px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.55)">· 1a recommended</span></div>
+    <div style="font:700 30px/1.4 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.8);text-wrap:pretty">Same rules, same data, same 1080 × 1597 page between the hub header (143) and footer (180). Every seed type in the catalog keeps its own row with three tier slots. What changes: the rows get an identity (name, ★, caption), the four states read from the <em>shape</em> of the slots, NEW survives long enough to be seen, and 48 rows across eight seasons get chapters. Recommendation: <a href="#1a">1a</a>.</div>
+  </div>
+
+  <div style="display:flex;gap:56px;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:18px;flex:0 0 auto">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="box-sizing:border-box;height:52px;padding:0 18px;border-radius:14px;background:rgba(255,248,240,.14);display:grid;place-items:center;font:900 26px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">Today</div>
+        <div style="font:900 32px/1 Nunito,system-ui,sans-serif;white-space:nowrap">In code now</div>
+        <div style="box-sizing:border-box;height:52px;padding:0 18px;border-radius:14px;background:rgba(255,248,240,.12);border:2px solid rgba(255,248,240,.30);display:flex;align-items:center;font:800 26px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82)">Reference</div>
+      </div>
+      <div style="width:648px;height:172px;font:700 25px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.74);text-wrap:pretty">collection_journal.tscn as it renders: cream page, the gold title PNG, rows with name, ★ and three 128 px icons. No summary, no captions — and every NEW pill is cleared the moment the page opens.</div>
+      <div style="width:648px;height:1152px;overflow:hidden;border-radius:26px;box-shadow:0 22px 56px rgba(0,0,0,.45)">
+        <div style="width:1080px;height:1920px;transform:scale(.6);transform-origin:top left">
+          <dc-import name="JournalToday" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+    </div>
+
+    <div id="1a" style="display:flex;flex-direction:column;gap:18px;flex:0 0 auto">
+      <div style="display:flex;align-items:center;gap:14px">
+        <a href="#1a" style="box-sizing:border-box;height:52px;min-width:52px;padding:0 18px;border-radius:14px;background:#FFB88C;border:none;display:grid;place-items:center;font:900 26px/1 Nunito,system-ui,sans-serif;color:#2D3436">1a</a>
+        <div style="font:900 32px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Varijanta A · Pastel hub</div>
+        <div style="box-sizing:border-box;height:52px;padding:0 18px;border-radius:14px;background:#A8E6CF;border:2px solid #7FC9AC;display:flex;align-items:center;font:900 26px/1 Nunito,system-ui,sans-serif;color:#2D3436">Recommended</div>
+      </div>
+      <div style="width:648px;height:172px;font:700 25px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.74);text-wrap:pretty">Today's cream page, finished. A fixed head holds title and summary; seasons become chapters with a kept count. Opening with news scrolls to the first NEW row — Frost Snowdrop (T2) and Ice Crocus (T1), each with a pink halo on the tier that just arrived.</div>
+      <div style="width:648px;height:1152px;overflow:hidden;border-radius:26px;box-shadow:0 22px 56px rgba(0,0,0,.45)">
+        <div style="width:1080px;height:1920px;transform:scale(.6);transform-origin:top left">
+          <dc-import name="JournalScreen" variant="A" scroll="news" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+    </div>
+
+    <div id="1b" style="display:flex;flex-direction:column;gap:18px;flex:0 0 auto">
+      <div style="display:flex;align-items:center;gap:14px">
+        <a href="#1b" style="box-sizing:border-box;height:52px;min-width:52px;padding:0 18px;border-radius:14px;background:#FFB88C;border:none;display:grid;place-items:center;font:900 26px/1 Nunito,system-ui,sans-serif;color:#2D3436">1b</a>
+        <div style="font:900 32px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Varijanta B · Memory book</div>
+        <div style="box-sizing:border-box;height:52px;padding:0 18px;border-radius:14px;background:rgba(255,248,240,.12);border:2px solid rgba(255,248,240,.30);display:flex;align-items:center;font:800 26px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82)">Alternative</div>
+      </div>
+      <div style="width:648px;height:172px;font:700 25px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.74);text-wrap:pretty">The Camp recipe: dark meadow page (#2E4733) with one cream album page that scrolls inside it. The gold title finally has contrast here. Rows are 40 px narrower, so the longest names ellipsize.</div>
+      <div style="width:648px;height:1152px;overflow:hidden;border-radius:26px;box-shadow:0 22px 56px rgba(0,0,0,.45)">
+        <div style="width:1080px;height:1920px;transform:scale(.6);transform-origin:top left">
+          <dc-import name="JournalScreen" variant="B" scroll="news" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:40px">
+    <div style="flex:1;min-width:0;box-sizing:border-box;padding:32px 36px;border-radius:24px;background:rgba(255,248,240,.07);border:2px solid rgba(255,248,240,.16)">
+      <div style="font:900 34px/1 Nunito,system-ui,sans-serif;margin-bottom:16px">Why <a href="#1a">1a</a></div>
+      <div style="font:700 26px/1.5 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.8);text-wrap:pretty">The page is already #FFF8F0 in code, so the transfer is rows, head and a few labels — no new container. Rows get the full 1032 px, so no name in the catalog is cut. It keeps the left of the hub (Shop · Journal) light and the right (Camp · Arena) dark, which is how the swipe already feels. Cost: the gold title PNG has to be set in ink.</div>
+    </div>
+    <div style="flex:1;min-width:0;box-sizing:border-box;padding:32px 36px;border-radius:24px;background:rgba(255,248,240,.04);border:2px solid rgba(255,248,240,.12)">
+      <div style="font:900 34px/1 Nunito,system-ui,sans-serif;margin-bottom:16px">Why <a href="#1b">1b</a> still has a case</div>
+      <div style="font:700 26px/1.5 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.72);text-wrap:pretty">It reads as a keepsake — a book you open — and matches Camp and Arena exactly (meadow page, cream section, same shadow). The existing gold title PNG works unchanged at 5.5 : 1. Cost: one more panel and scroll container, 40 px less row width, and a dark page between two light neighbours.</div>
+    </div>
+  </div>
+
+  <div style="box-sizing:border-box;padding:34px 38px;border-radius:24px;background:rgba(168,230,207,.10);border:2px solid rgba(168,230,207,.34)">
+    <div style="font:900 34px/1 Nunito,system-ui,sans-serif;margin-bottom:18px;color:#A8E6CF">Found in the code — read before transfer</div>
+    <div style="display:flex;flex-direction:column;gap:14px;font:700 25px/1.4 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.84)">
+      <sc-for list="{{ findings }}" as="f" hint-placeholder-count="5">
+        <div style="text-wrap:pretty"><strong style="color:#FFF8F0">{{ f.t }}</strong> {{ f.b }}</div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="height:3px;background:rgba(255,248,240,.14);border-radius:2px"></div>
+
+  <div style="display:flex;flex-direction:column;gap:18px;max-width:1720px">
+    <div style="font:900 52px/1.05 Nunito,system-ui,sans-serif">BloomRow — four states, one layout</div>
+    <div style="font:700 28px/1.4 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty">1:1 at 1080 base. The row never changes size; only fill, slots and caption do. A filled slot is a dark well in a rim (cream = sprout / bloom, gold square = crystal). A missing tier is an empty ring. NEW adds the pill, rewrites the caption and puts a pink halo on the tier that arrived.</div>
+  </div>
+
+  <div style="display:flex;gap:56px;align-items:flex-start">
+    <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:44px">
+      <sc-for list="{{ rowSpecs }}" as="s" hint-placeholder-count="7">
+        <div style="display:flex;gap:36px;align-items:center">
+          <div style="flex:0 0 400px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="box-sizing:border-box;height:44px;padding:0 14px;border-radius:12px;background:{{ s.chip }};display:flex;align-items:center;font:900 24px/1 ui-monospace,Menlo,monospace;color:#2D3436">{{ s.state }}</div>
+              <div style="font:800 24px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.62)">{{ s.extra }}</div>
+            </div>
+            <div style="font:700 23px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.72);text-wrap:pretty">{{ s.when }}</div>
+          </div>
+          <div style="flex:0 0 1032px;padding-top:22px">
+            <dc-import name="BloomRow" type-id="{{ s.typeId }}" label="{{ s.label }}" rarity="{{ s.rarity }}" state="{{ s.rowState }}" new-tier="{{ s.newTier }}" season="{{ s.season }}" hint-size="1032px,200px"></dc-import>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:36px">
+      <div style="box-sizing:border-box;padding:30px 34px;border-radius:24px;background:rgba(255,248,240,.07);border:2px solid rgba(255,248,240,.16)">
+        <div style="font:900 32px/1 Nunito,system-ui,sans-serif;margin-bottom:18px">Anatomy</div>
+        <div style="display:flex;flex-direction:column;gap:12px;font:700 22px/1.4 ui-monospace,Menlo,monospace;color:rgba(255,248,240,.84)">
+          <sc-for list="{{ anatomy }}" as="a" hint-placeholder-count="8">
+            <div style="text-wrap:pretty"><span style="color:#FFD56B">{{ a.k }}</span> {{ a.v }}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="box-sizing:border-box;padding:30px 34px;border-radius:24px;background:#FFF8F0;color:#2D3436">
+        <div style="font:900 32px/1 Nunito,system-ui,sans-serif;margin-bottom:24px">TierSlot · 112 px</div>
+        <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:140px">
+            <div style="position:relative;width:112px;height:112px"><div style="position:absolute;inset:0;box-sizing:border-box;border-radius:50%;background:rgba(45,52,54,.05);border:4px solid rgba(45,52,54,.32)"></div></div>
+            <div style="font:900 24px/1 Nunito,system-ui,sans-serif">EmptySlot</div>
+            <div style="font:700 20px/1.3 Nunito,system-ui,sans-serif;color:#555C5E;text-align:center">ring 4 · ink 32 %<br>fill ink 5 %</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:140px">
+            <div style="position:relative;width:112px;height:112px"><div style="position:absolute;inset:0;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:3px solid #CBC2B6"><div style="position:absolute;inset:7px;box-sizing:border-box;border-radius:50%;background:#22342A;border:2px solid #16211B"></div><img src="flowers/clover_t2.svg" alt="" style="position:absolute;left:15.7px;top:13px;width:74.7px;height:74.7px;display:block"></div></div>
+            <div style="font:900 24px/1 Nunito,system-ui,sans-serif">BloomFrame</div>
+            <div style="font:700 20px/1.3 Nunito,system-ui,sans-serif;color:#555C5E;text-align:center">T1 · T2 · cream rim 3<br>well inset 10</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:140px">
+            <div style="position:relative;width:112px;height:112px"><div style="position:absolute;inset:0;box-sizing:border-box;border-radius:30px;background:#FFD56B;border:3px solid #D6A82F"><div style="position:absolute;inset:7px;box-sizing:border-box;border-radius:20px;background:#22342A;border:2px solid #16211B"></div><img src="flowers/clover_t3.svg" alt="" style="position:absolute;left:15.7px;top:13px;width:74.7px;height:74.7px;display:block"></div></div>
+            <div style="font:900 24px/1 Nunito,system-ui,sans-serif">CrystalFrame</div>
+            <div style="font:700 20px/1.3 Nunito,system-ui,sans-serif;color:#555C5E;text-align:center">T3 · gold r 30<br>well r 20</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:140px">
+            <div style="position:relative;width:112px;height:112px"><div style="position:absolute;inset:-9px;box-sizing:border-box;border-radius:50%;background:#FFCCD5;border:3px solid #2D3436"></div><div style="position:absolute;inset:0;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:3px solid #CBC2B6"><div style="position:absolute;inset:7px;box-sizing:border-box;border-radius:50%;background:#22342A;border:2px solid #16211B"></div><img src="flowers/clover_t2.svg" alt="" style="position:absolute;left:15.7px;top:13px;width:74.7px;height:74.7px;display:block"></div></div>
+            <div style="font:900 24px/1 Nunito,system-ui,sans-serif">NewHalo</div>
+            <div style="font:700 20px/1.3 Nunito,system-ui,sans-serif;color:#555C5E;text-align:center">slot + 9 · #FFCCD5<br>edge 3 ink</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="box-sizing:border-box;padding:30px 34px;border-radius:24px;background:rgba(255,248,240,.07);border:2px solid rgba(255,248,240,.16)">
+        <div style="font:900 32px/1 Nunito,system-ui,sans-serif;margin-bottom:8px">Grayscale test</div>
+        <div style="font:700 22px/1.4 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.72);margin-bottom:22px;text-wrap:pretty">Colour removed: 0, 1, 2 and 3 filled slots plus the square T3 still tell the four states apart.</div>
+        <div style="display:flex;flex-direction:column;gap:14px;filter:grayscale(1)">
+          <sc-for list="{{ grayRows }}" as="s" hint-placeholder-count="4">
+            <div style="width:516px;height:100px;overflow:hidden">
+              <div style="width:1032px;transform:scale(.5);transform-origin:top left">
+                <dc-import name="BloomRow" type-id="{{ s.typeId }}" label="{{ s.label }}" rarity="{{ s.rarity }}" state="{{ s.rowState }}" new-tier="{{ 0 }}" season="{{ s.season }}" hint-size="1032px,200px"></dc-import>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:3px;background:rgba(255,248,240,.14);border-radius:2px"></div>
+
+  <div style="display:flex;flex-direction:column;gap:18px;max-width:1720px">
+    <div style="font:900 52px/1.05 Nunito,system-ui,sans-serif">NEW on the Journal tab</div>
+    <div style="font:700 28px/1.4 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty">Shown from Home, where the player is when news arrives. The badge clears when the Journal opens — the rows keep their NEW pills for that visit (see the snapshot note above).</div>
+  </div>
+
+  <div style="display:flex;gap:56px;align-items:flex-start">
+    <div id="1e" style="display:flex;flex-direction:column;gap:18px;flex:0 0 auto">
+      <div style="display:flex;align-items:center;gap:14px">
+        <a href="#1e" style="box-sizing:border-box;height:52px;min-width:52px;padding:0 18px;border-radius:14px;background:#FFB88C;border:none;display:grid;place-items:center;font:900 26px/1 Nunito,system-ui,sans-serif;color:#2D3436">1e</a>
+        <div style="font:900 32px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Count</div>
+        <div style="box-sizing:border-box;height:52px;padding:0 18px;border-radius:14px;background:#A8E6CF;border:2px solid #7FC9AC;display:flex;align-items:center;font:900 26px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Recommended · already live</div>
+      </div>
+      <div style="width:864px;font:700 25px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.74);text-wrap:pretty">HubTab.set_badge_count(count_collection_journal_news()) — 44 px pink pill, 3 px chrome edge. The number is the number of NEW pills the player will find, and the auto-scroll lands on the first one. Caps at 9+.</div>
+      <div style="width:864px;height:144px;overflow:hidden;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.4)">
+        <div style="width:1080px;transform:scale(.8);transform-origin:top left">
+          <dc-import name="HubScreen" part="footer" theme="dark" active="{{ 2 }}" badge-on="{{ 1 }}" badge-count="2" hint-size="1080px,180px"></dc-import>
+        </div>
+      </div>
+      <div style="display:flex;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="width:420px;height:252px;overflow:hidden;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.4)">
+            <div style="width:1080px;transform:scale(1.4) translateX(-190px);transform-origin:0 0">
+              <dc-import name="HubScreen" part="footer" theme="dark" active="{{ 2 }}" badge-on="{{ 1 }}" badge-count="9+" hint-size="1080px,180px"></dc-import>
+            </div>
+          </div>
+          <div style="font:700 22px/1.3 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.62)">10 or more → 9+ (HubTab.BADGE_MAX)</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="width:420px;height:252px;overflow:hidden;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.4)">
+            <div style="width:1080px;transform:scale(1.4) translateX(-190px);transform-origin:0 0">
+              <dc-import name="HubScreen" part="footer" theme="dark" active="{{ 1 }}" hint-size="1080px,180px"></dc-import>
+            </div>
+          </div>
+          <div style="font:700 22px/1.3 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.62)">Journal open → badge gone</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="1f" style="display:flex;flex-direction:column;gap:18px;flex:0 0 auto">
+      <div style="display:flex;align-items:center;gap:14px">
+        <a href="#1f" style="box-sizing:border-box;height:52px;min-width:52px;padding:0 18px;border-radius:14px;background:#FFB88C;border:none;display:grid;place-items:center;font:900 26px/1 Nunito,system-ui,sans-serif;color:#2D3436">1f</a>
+        <div style="font:900 32px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Dot</div>
+        <div style="box-sizing:border-box;height:52px;padding:0 18px;border-radius:14px;background:rgba(255,248,240,.12);border:2px solid rgba(255,248,240,.30);display:flex;align-items:center;font:800 26px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82)">Alternative</div>
+      </div>
+      <div style="width:864px;font:700 25px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.74);text-wrap:pretty">JournalTabBadge as a 30 px dot on the same corner, same pink and 3 px chrome edge. Calmer chrome, but it says nothing about how much is waiting. One StyleBoxFlat, no Label.</div>
+      <div style="position:relative;width:864px;height:144px;overflow:hidden;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.4)">
+        <div style="position:relative;width:1080px;transform:scale(.8);transform-origin:top left">
+          <dc-import name="HubScreen" part="footer" theme="dark" active="{{ 2 }}" hint-size="1080px,180px"></dc-import>
+          <div data-layer="JournalTabBadge" style="position:absolute;left:390px;top:12px;width:30px;height:30px;box-sizing:border-box;border-radius:15px;background:#FFCCD5;border:3px solid #1A241E;z-index:5"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="position:relative;width:420px;height:252px;overflow:hidden;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.4)">
+            <div style="position:relative;width:1080px;transform:scale(1.4) translateX(-190px);transform-origin:0 0">
+              <dc-import name="HubScreen" part="footer" theme="dark" active="{{ 2 }}" hint-size="1080px,180px"></dc-import>
+              <div style="position:absolute;left:390px;top:12px;width:30px;height:30px;box-sizing:border-box;border-radius:15px;background:#FFCCD5;border:3px solid #1A241E;z-index:5"></div>
+            </div>
+          </div>
+          <div style="font:700 22px/1.3 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.62)">Any count → same dot</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:3px;background:rgba(255,248,240,.14);border-radius:2px"></div>
+
+  <div style="display:flex;flex-direction:column;gap:18px;max-width:1720px">
+    <div style="font:900 52px/1.05 Nunito,system-ui,sans-serif">Golden Album — a real frame <span style="font:700 30px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.55)">· cosmetic, off by default</span></div>
+    <div style="font:700 28px/1.4 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty">Today journal_gold only multiplies the title PNG by 0.8. Equipped, it now gilds the page and sets the title on a gold plaque. Off = <a href="#1a">1a</a> / <a href="#1b">1b</a>. Rows, rarity colours and states are untouched.</div>
+  </div>
+
+  <div style="display:flex;gap:56px;align-items:flex-start">
+    <div id="1c" style="display:flex;flex-direction:column;gap:18px;flex:0 0 auto">
+      <div style="display:flex;align-items:center;gap:14px">
+        <a href="#1c" style="box-sizing:border-box;height:52px;min-width:52px;padding:0 18px;border-radius:14px;background:#FFB88C;border:none;display:grid;place-items:center;font:900 26px/1 Nunito,system-ui,sans-serif;color:#2D3436">1c</a>
+        <div style="font:900 32px/1 Nunito,system-ui,sans-serif;white-space:nowrap">A + GoldenFrame</div>
+      </div>
+      <div style="width:648px;height:136px;font:700 25px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.74);text-wrap:pretty">Frame around the whole page: 3 edge · 7 gold · 3 edge, r 38 — two StyleBoxFlat panels. Rows go to 992 px.</div>
+      <div style="width:648px;height:1152px;overflow:hidden;border-radius:26px;box-shadow:0 22px 56px rgba(0,0,0,.45)">
+        <div style="width:1080px;height:1920px;transform:scale(.6);transform-origin:top left">
+          <dc-import name="JournalScreen" variant="A" golden="{{ true }}" scroll="news" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+    </div>
+    <div id="1d" style="display:flex;flex-direction:column;gap:18px;flex:0 0 auto">
+      <div style="display:flex;align-items:center;gap:14px">
+        <a href="#1d" style="box-sizing:border-box;height:52px;min-width:52px;padding:0 18px;border-radius:14px;background:#FFB88C;border:none;display:grid;place-items:center;font:900 26px/1 Nunito,system-ui,sans-serif;color:#2D3436">1d</a>
+        <div style="font:900 32px/1 Nunito,system-ui,sans-serif;white-space:nowrap">B + GoldenFrame</div>
+      </div>
+      <div style="width:648px;height:136px;font:700 25px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.74);text-wrap:pretty">The album page itself gets the gilded edge; the title moves onto the same plaque. Rows go to 974 px.</div>
+      <div style="width:648px;height:1152px;overflow:hidden;border-radius:26px;box-shadow:0 22px 56px rgba(0,0,0,.45)">
+        <div style="width:1080px;height:1920px;transform:scale(.6);transform-origin:top left">
+          <dc-import name="JournalScreen" variant="B" golden="{{ true }}" scroll="news" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:0;box-sizing:border-box;margin-top:170px;padding:32px 36px;border-radius:24px;background:rgba(255,213,107,.10);border:2px solid rgba(255,213,107,.34)">
+      <div style="font:900 32px/1 Nunito,system-ui,sans-serif;margin-bottom:16px;color:#FFD56B">GoldenFrame in Godot</div>
+      <div style="display:flex;flex-direction:column;gap:12px;font:700 23px/1.45 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82)">
+        <div style="text-wrap:pretty">GoldenFrameEdge — Panel, full page, offsets 12 · draw_center off · border 13 #D6A82F · r 38</div>
+        <div style="text-wrap:pretty">GoldenFrameGold — Panel inside it, offsets 15 · border 7 #FFD56B · r 35</div>
+        <div style="text-wrap:pretty">BloomAlbumTitle — PanelContainer plaque h 92 · #FFD56B · border 3 #D6A82F · r 22 · hard shadow (0, 5) #D6A82F · Label 56 / 900 ink (9 : 1)</div>
+        <div style="text-wrap:pretty">Visible when get_equipped_cosmetic(SLOT_JOURNAL_FRAME) == "journal_gold". get_journal_title_color() is no longer needed.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:3px;background:rgba(255,248,240,.14);border-radius:2px"></div>
+
+  <div style="display:flex;flex-direction:column;gap:18px;max-width:1720px">
+    <div style="font:900 52px/1.05 Nunito,system-ui,sans-serif">The long list</div>
+    <div style="font:700 28px/1.4 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.76);text-wrap:pretty">48 types in 8 seasons ≈ 11,300 px. Rhythm: 20 px between rows, 36 px plus a 60 px chapter head between seasons. Seasons the player has not unlocked carry a lock next to their count, so a run of ??? rows reads as “not unlocked yet”, not as missing.</div>
+  </div>
+
+  <div style="display:flex;gap:56px;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:18px;flex:0 0 auto">
+      <div style="font:900 34px/1 Nunito,system-ui,sans-serif">Early game · top of the list</div>
+      <div style="width:648px;font:700 25px/1.35 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.74);text-wrap:pretty">One kept, two spotted, one NEW. Every row is there from day one — that is what makes it an album to fill.</div>
+      <div style="width:648px;height:1152px;overflow:hidden;border-radius:26px;box-shadow:0 22px 56px rgba(0,0,0,.45)">
+        <div style="width:1080px;height:1920px;transform:scale(.6);transform-origin:top left">
+          <dc-import name="JournalScreen" variant="A" dataset="first" scroll="top" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:18px;flex:0 0 auto">
+      <div style="font:900 34px/1 Nunito,system-ui,sans-serif">Whole list · mid-game · 25 %</div>
+      <div style="position:relative;width:270px;height:2877px;overflow:hidden;border-radius:12px;box-shadow:0 22px 56px rgba(0,0,0,.45)">
+        <div style="width:1080px;transform:scale(.25);transform-origin:top left">
+          <dc-import name="JournalScreen" variant="A" full="{{ true }}" hint-size="1080px,1920px"></dc-import>
+        </div>
+        <div style="position:absolute;left:0;right:0;top:340px;height:356px;box-sizing:border-box;border:4px solid #FFB88C;border-radius:6px"></div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;padding-top:340px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:40px;height:0;border-top:4px solid #FFB88C"></div>
+        <div style="font:900 30px/1 Nunito,system-ui,sans-serif;color:#FFB88C">What <a href="#1a">1a</a> opens on</div>
+      </div>
+      <div style="max-width:680px;font:700 25px/1.4 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.74);text-wrap:pretty">With news, ListScroll.scroll_vertical = first NEW row y − 1.5 rows (330 px), clamped. Without news it opens at the top, as today. Rows are built 6 per frame today — build up to the target row first, then scroll.</div>
+    </div>
+  </div>
+
+  <div style="box-sizing:border-box;padding:34px 38px;border-radius:24px;background:rgba(255,204,213,.10);border:2px solid rgba(255,204,213,.34)">
+    <div style="font:900 34px/1 Nunito,system-ui,sans-serif;margin-bottom:18px;color:#FFCCD5">Separate — needs your decision, not part of the rules</div>
+    <div style="display:flex;flex-direction:column;gap:14px;font:700 25px/1.4 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.84)">
+      <sc-for list="{{ decisions }}" as="d" hint-placeholder-count="5">
+        <div style="text-wrap:pretty">{{ d }}</div>
+      </sc-for>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      findings: [
+        { t: 'The Journal tab badge is already live.', b: 'meta_hub_controller.gd → _refresh_tab_badges() feeds HubTab with count_collection_journal_news(). The brief line “news is shown nowhere in the hub” predates the hub-chrome transfer; Camp’s collection_badge is the dead copy.' },
+        { t: 'NEW never survives opening.', b: 'refresh_for_meta_hub() calls mark_collection_journal_viewed() and then re-applies the rows, so every NEW pill hides in the same frame it would appear. Fix: copy collection_journal_pending before clearing, draw NEW from that copy, drop the copy when the page is left. The rule “NEW clears on open” still holds for the data and the tab badge.' },
+        { t: 'Summary and captions are new UI.', b: 'collection_journal.tscn has no SummaryLabel, rows have no caption Label, and format_collection_journal_summary() does not exist yet. The copy comes from the brief.' },
+        { t: 'The title is a baked PNG.', b: 'title_bloom_album.png is #E8B80A on transparent — 1.8 : 1 on the cream page. 1a sets it in ink (Label, or the same PNG re-baked in #2D3436); 1b keeps the PNG as is.' },
+        { t: 'List order is already by season.', b: 'get_collection_journal_entries() walks SeedCatalog.all_type_ids() in seasons.json order, so chapters need no sorting — SeedCatalog.season_id_for() gives the group, SeasonCatalog the name.' }
+      ],
+      rowSpecs: [
+        { state: 'locked', extra: '#E4E4E0', chip: '#E4E4E0', when: 'Not seen, kept_tier 0. Name is ??? (from data), ★ still shown, three empty rings.', typeId: 'crystal_peony', label: 'Crystal Peony', rarity: 3, rowState: 'locked', newTier: 0, season: 'frost_orchard' },
+        { state: 'seen', extra: '★★ #E0C4FF', chip: '#E0C4FF', when: 'Spotted in a run, not kept. T1 sprout filled, T2 and T3 empty.', typeId: 'tulip', label: 'Barn Tulip', rarity: 2, rowState: 'seen', newTier: 0, season: 'country_bloom' },
+        { state: 'album_t2', extra: '★ #B8D4F0', chip: '#B8D4F0', when: 'kept_tier ≥ 2. T1 and T2 filled, T3 empty.', typeId: 'daisy', label: 'Field Daisy', rarity: 1, rowState: 'album_t2', newTier: 0, season: 'country_bloom' },
+        { state: 'album_t3', extra: '★★★ #FFE8B8', chip: '#FFE8B8', when: 'kept_tier ≥ 3. All filled, T3 in the gold crystal frame.', typeId: 'pumpkin', label: 'Harvest Pumpkin', rarity: 3, rowState: 'album_t3', newTier: 0, season: 'country_bloom' },
+        { state: 'seen + NEW', extra: 'new_tier 1', chip: '#FFCCD5', when: 'Caption → “New discovery!”, halo on T1.', typeId: 'ice_crocus', label: 'Ice Crocus', rarity: 1, rowState: 'seen', newTier: 1, season: 'frost_orchard' },
+        { state: 'album_t2 + NEW', extra: 'new_tier 2', chip: '#FFCCD5', when: 'Caption → “New bloom kept in Album!”, halo on T2.', typeId: 'frost_snowdrop', label: 'Frost Snowdrop', rarity: 1, rowState: 'album_t2', newTier: 2, season: 'frost_orchard' },
+        { state: 'album_t3 + NEW', extra: 'new_tier 3', chip: '#FFCCD5', when: 'Caption → “New crystal in Album!”, halo on the crystal.', typeId: 'sunflower', label: 'Sunfence', rarity: 2, rowState: 'album_t3', newTier: 3, season: 'country_bloom' }
+      ],
+      grayRows: [
+        { typeId: 'crystal_peony', label: 'Crystal Peony', rarity: 3, rowState: 'locked', season: 'frost_orchard' },
+        { typeId: 'tulip', label: 'Barn Tulip', rarity: 2, rowState: 'seen', season: 'country_bloom' },
+        { typeId: 'daisy', label: 'Field Daisy', rarity: 1, rowState: 'album_t2', season: 'country_bloom' },
+        { typeId: 'pumpkin', label: 'Harvest Pumpkin', rarity: 3, rowState: 'album_t3', season: 'country_bloom' }
+      ],
+      anatomy: [
+        { k: 'BloomRow', v: '1032 × 200 · r 26 · border 3 rarity edge · shadow (0,4) ink 12 % · pad L 28 R 24 · gap 24' },
+        { k: 'fill / edge', v: '★1 #B8D4F0/#93AAC0 · ★2 #E0C4FF/#B39DCC · ★3 #FFE8B8/#CCBA93 · locked #E4E4E0/#B6B6B2' },
+        { k: 'InfoColumn', v: '578 × 150 · gap 12' },
+        { k: 'BloomName', v: '44 / 900 · #2D3436 · ellipsis (locked #5C5C58)' },
+        { k: 'RarityStars', v: '32 / 800 · ★★☆ · gap 16 after name' },
+        { k: 'RowCaption', v: '38 / 700 · line 45 · max 2 lines · #3F4547 (NEW 800 #2D3436)' },
+        { k: 'TierStrip', v: '372 × 154 · 3 × 112 + gap 18' },
+        { k: 'TierLabel', v: '32 / 900 · #2D3436 filled · #5C5C58 empty · 8 under slot' },
+        { k: 'NewBadge', v: 'h 46 · r 23 · #FFCCD5 · border 3 ink · 30 / 900 +.06em · x 28 · y −18' },
+        { k: 'list', v: 'row gap 20 · season gap 36 · SeasonHeader 60 (40 / 900 + 36 / 800 count)' }
+      ],
+      decisions: [
+        'Auto-scroll to the first NEW row on open — drawn in 1a as ON. It is behaviour, not layout; without it the page opens at the top and NEW rows can sit below the fold.',
+        'Season chapter heads (SeasonHeader) — optional. Drop them and the rows are unchanged; the list just loses its rhythm and the per-season kept count.',
+        'Golden Album becomes a frame + plaque (1c / 1d). If it stays a title tint only, the SKU name “frame” is the open question.',
+        'Title as a Label assumes Nunito (proposed in the hub-chrome package). Without Nunito, re-bake title_bloom_album.png in #2D3436 for 1a.',
+        'Rows of paid / not-unlocked seasons (Moonlit Warren, Coral Tide Garden …) show as ??? exactly as today — the lock on the chapter head is the only addition.'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

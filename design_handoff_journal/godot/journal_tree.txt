@@ -1,0 +1,73 @@
+JOURNAL / BLOOM ALBUM — node tree (Godot 4, baza 1080 x 1920, px 1:1)
+Default = smjer 1a (Varijanta A). Razlike za B i GoldenFrame su na dnu.
+Stranica živi u MetaHub SwipePager slotu: 1080 x 1597 (header 143 + footer 180 NE mijenjati).
+
+CollectionJournal (Control, full rect)                       scenes/ui/collection_journal.tscn
+├─ Bg (ColorRect)                                            #FFF8F0 (A) · #2E4733 (B)
+├─ JournalPage (Control, full rect)
+│  ├─ PageHead (VBoxContainer)                               x 24 · y 0 · 1032 x 175 · separation 8 · margin top 30
+│  │  ├─ TitleRow (HBoxContainer, separation 18, align center)
+│  │  │  ├─ TitleAccent (Panel)                              10 x 56 · styles/title_accent.tres
+│  │  │  └─ BloomAlbumTitle (Label)                          "Bloom Album" · 60 px / 900 · #2D3436
+│  │  │     (bez Nunito fonta: TextureRect sa title_bloom_album.png re-bake u #2D3436, visina 64)
+│  │  ├─ SummaryLabel (Label)                                38 px / 800 · #555C5E · margin left 28 · UiJournal.summary_text()
+│  │  └─ HeadDivider (Panel)                                 1032 x 3 · na dnu PageHead · styles/head_divider.tres
+│  ├─ ListScroll (ScrollContainer)                           x 24 · y 175 · 1032 x 1422 · horizontal off · vertical SHOW_NEVER*
+│  │  └─ List (VBoxContainer, separation 0)                  širina 1032
+│  │     └─ SeasonGroup × N (VBoxContainer, separation 20)   margin top 16 (prva) / 36 (ostale)
+│  │        ├─ SeasonHeader (HBoxContainer, h 60, separation 18, align center)
+│  │        │  ├─ SeasonName (Label)                         40 px / 900 · #2D3436 · SeasonCatalog display_name
+│  │        │  ├─ SeasonRule (Panel, expand)                 h 3 · styles/season_rule.tres · SIZE_SHRINK_CENTER vertikalno
+│  │        │  ├─ SeasonLock (TextureRect)                   34 x 34 · icon_lock_ink.svg · visible = sezona nije otključana
+│  │        │  └─ SeasonCount (Label)                        36 px / 800 · #555C5E · "4 / 6 kept"
+│  │        └─ BloomRow × 6                                  vidi ispod
+│  └─ ScrollGrabber                                          *ili VScrollBar tema: scroll = StyleBoxEmpty, grabber = styles/scroll_grabber.tres, širina 8, x 1064
+└─ (BackButton ostaje za standalone, sakriven u hubu — kao danas)
+
+BloomRow (Control, custom_minimum_size 0 x 200, size_flags_h EXPAND_FILL, clip_contents false)
+├─ Panel (PanelContainer, full rect)                         1032 x 200 · styles/row_r1|r2|r3|locked.tres (margins 31/23/27/23)
+│  └─ RowHBox (HBoxContainer, separation 24, align center)
+│     ├─ InfoColumn (VBoxContainer, expand, separation 12)   578 x 150
+│     │  ├─ NameLine (HBoxContainer, separation 16)
+│     │  │  ├─ BloomName (Label)                             44 px / 900 · #2D3436 (locked #5C5C58) · OVERRUN_TRIM_ELLIPSIS · "???" za locked
+│     │  │  └─ RarityStars (Label)                           32 px / 800 · "★★☆" · ista boja kao ime
+│     │  └─ RowCaption (Label)                               38 px / 700 · line 45 · max_lines_visible 2 · autowrap WORD_SMART · h 90
+│     │                                                      #3F4547 · NEW: 800 #2D3436 · locked #5C5C58 · UiJournal.caption_for()
+│     └─ TierStrip (HBoxContainer, separation 18)            372 x 154
+│        ├─ TierSlotT1 (VBoxContainer, separation 8)         112 x 154
+│        │  ├─ SlotBox (Control, 112 x 112)
+│        │  │  ├─ NewHalo (Panel)                            130 x 130 na (-9, -9) · styles/tier_halo_bloom|crystal.tres · visible = NEW && tier == new_tier
+│        │  │  ├─ Frame (Panel)                              112 x 112 · styles/tier_empty | tier_frame_bloom | tier_frame_crystal
+│        │  │  ├─ ArtWell (Panel)                            92 x 92 na (10, 10) · styles/tier_well_bloom|crystal · hidden kad je prazan
+│        │  │  └─ BloomArt (collection_bloom_icon.gd)        88 x 88 na (12, 12) · type_id + tier · hidden kad je prazan
+│        │  └─ TierLabel (Label)                             "T1" · 32 px / 900 · #2D3436 popunjen / #5C5C58 prazan · centriran
+│        ├─ TierSlotT2 (isto)
+│        └─ TierSlotT3 (isto; Frame = crystal kad je popunjen: r 30, well r 20)
+└─ NewBadge (PanelContainer, sibling panela — kao danas)     h 46 · pozicija (28, -18) od gornjeg lijevog ugla · styles/new_badge.tres
+   └─ Label "NEW"                                            30 px / 900 · spacing 2 · #2D3436
+
+Popunjen tier: T1 za sve osim locked; T2 ako kept_tier >= 2; T3 ako kept_tier >= 3 (isto pravilo kao collection_journal_row.gd danas).
+BloomArt: collection_bloom_icon.gd radi i dalje — prazan tier se više NE crta kao sivi krug (to je sada Frame "empty"), samo se sakrije.
+
+Vertikalni budžet stranice (A):  PageHead 175 + ListScroll 1422 = 1597
+Horizontalni lanac reda:        3 + 28 + 578 (Info) + 24 + 372 (Strip) + 24 + 3 = 1032  (+ 24 + 24 page padding = 1080)
+TierStrip:                       112 + 18 + 112 + 18 + 112 = 372
+Lista (sadržaj):                 16 + 8 × (60 + 20 + 6×200 + 5×20) + 7 × 36 + 24 = 11 332 px za 48 tipova
+
+JournalTabBadge (hub footer)
+  1e (preporuka): postojeći HubTab badge — ništa novo. meta_hub_controller._refresh_tab_badges() već šalje count_collection_journal_news().
+  1f (alternativa): Panel 30 x 30 · styles/tab_badge_dot.tres · isti ugao kao HubTab badge (tile top-right, offset (-2, -8)) · bez Label
+
+Varijanta B (1b)
+  Bg #2E4733 · PageHead 1032 x 174, centriran: BloomAlbumTitle 60 / 900 #FFD56B (ili postojeći PNG) · SummaryLabel 38 / 800 #FFF8F0 · bez HeadDivider
+  AlbumPage (PanelContainer)  x 24 · y 174 · 1032 x 1399 · styles/album_page_b.tres (margins 20)
+    └─ ListScroll  992 x 1359 · redovi 992 (InfoColumn 538 — najduža imena idu u ellipsis)
+
+GoldenFrame (1c / 1d) — visible kad get_equipped_cosmetic(SLOT_JOURNAL_FRAME) == "journal_gold"
+  A: GoldenFrameEdge (Panel, offsets 12 sa svih strana)  styles/golden_frame_edge.tres (13, r 38, draw_center off), z iznad liste
+     GoldenFrameGold (Panel, offsets 15)                  styles/golden_frame_gold.tres (7, r 35)
+     PageHead 992 x 219: BloomAlbumTitle = PanelContainer plaque h 92 (styles/golden_plaque.tres) + Label 56 / 900 #2D3436, top 40, centriran
+                          SummaryLabel centriran ispod (gap 14) · HeadDivider GOLD_EDGE @ 45 %
+     ListScroll x 44 · y 219 · 992 x 1334
+  B: AlbumPage = styles/album_page_b_gold.tres (13 GOLD_EDGE, r 34) + unutrašnji Panel styles/golden_frame_gold_b.tres (offset 3, 7 COIN_GOLD, r 31)
+     PageHead 1032 x 196: plaque top 26 + SummaryLabel #FFF8F0 · AlbumPage y 196 · h 1377 · ListScroll 974 x 1319

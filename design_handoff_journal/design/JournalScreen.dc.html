@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="JournalScreen" style="{{ rootStyle }}">
+  <sc-if value="{{ chrome }}" hint-placeholder-val="{{ true }}">
+    <dc-import name="HubScreen" part="header" theme="dark" page-bg="{{ pageBg }}" hint-size="1080px,143px"></dc-import>
+  </sc-if>
+  <div data-layer="JournalPage" style="{{ pageStyle }}">
+
+    <sc-if value="{{ bookPanel }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="AlbumPage" style="{{ panelStyle }}">
+        <div data-layer="GoldenFrame" style="{{ panelGoldStyle }}"></div>
+      </div>
+    </sc-if>
+
+    <div data-layer="PageHead" style="{{ headStyle }}">
+      <sc-if value="{{ headLeft }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:8px;padding-top:30px">
+          <div style="display:flex;align-items:center;gap:18px">
+            <div data-layer="TitleAccent" style="flex:0 0 auto;width:10px;height:56px;border-radius:5px;background:#FFD56B"></div>
+            <div data-layer="BloomAlbumTitle" style="font:900 60px/64px Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Bloom Album</div>
+          </div>
+          <div data-layer="SummaryLabel" style="padding-left:28px;font:800 38px/46px Nunito,system-ui,sans-serif;color:#555C5E;white-space:nowrap">{{ summary }}</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ headCenter }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:30px">
+          <div data-layer="BloomAlbumTitle" style="font:900 60px/64px Nunito,system-ui,sans-serif;color:#FFD56B;white-space:nowrap">Bloom Album</div>
+          <div data-layer="SummaryLabel" style="font:800 38px/46px Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">{{ summary }}</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ headPlaque }}" hint-placeholder-val="{{ false }}">
+        <div style="{{ plaqueWrapStyle }}">
+          <div data-layer="BloomAlbumTitle" style="box-sizing:border-box;height:92px;padding:0 44px;border-radius:22px;background:#FFD56B;border:3px solid #D6A82F;box-shadow:0 5px 0 #D6A82F;display:flex;align-items:center;font:900 56px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Bloom Album</div>
+          <div data-layer="SummaryLabel" style="{{ summaryStyle }}">{{ summary }}</div>
+        </div>
+      </sc-if>
+      <div data-layer="HeadDivider" style="{{ dividerStyle }}"></div>
+    </div>
+
+    <div data-layer="ListScroll" style="{{ scrollStyle }}">
+      <div data-layer="List" style="{{ listStyle }}">
+        <sc-for list="{{ groups }}" as="g" hint-placeholder-count="2">
+          <div data-layer="SeasonGroup" style="{{ g.style }}">
+            <div data-layer="SeasonHeader" style="{{ g.headerStyle }}">
+              <div data-layer="SeasonName" style="flex:0 0 auto;font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ g.name }}</div>
+              <div data-layer="SeasonRule" style="flex:1;min-width:24px;height:3px;border-radius:2px;background:rgba(45,52,54,.14)"></div>
+              <img data-layer="SeasonLock" src="icons/icon_lock_ink.svg" alt="" style="{{ g.lockStyle }}">
+              <div data-layer="SeasonCount" style="flex:0 0 auto;font:800 36px/1 Nunito,system-ui,sans-serif;color:#555C5E;font-variant-numeric:tabular-nums;white-space:nowrap">{{ g.count }}</div>
+            </div>
+            <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="6">
+              <sc-if value="{{ r.show }}" hint-placeholder-val="{{ true }}">
+                <dc-import name="BloomRow" type-id="{{ r.typeId }}" label="{{ r.label }}" rarity="{{ r.rarity }}" state="{{ r.state }}" new-tier="{{ r.newTier }}" season="{{ r.season }}" w="{{ r.w }}" hint-size="{{ r.hint }}"></dc-import>
+              </sc-if>
+              <sc-if value="{{ r.hide }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:0 0 auto;height:200px"></div>
+              </sc-if>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div data-layer="ScrollGrabber" style="{{ grabberStyle }}"></div>
+
+    <sc-if value="{{ pageFrame }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="GoldenFrame" style="position:absolute;inset:12px;box-sizing:border-box;border-radius:38px;border:13px solid #D6A82F;pointer-events:none">
+        <div style="position:absolute;inset:-10px;box-sizing:border-box;border-radius:35px;border:7px solid #FFD56B"></div>
+      </div>
+    </sc-if>
+  </div>
+  <sc-if value="{{ chrome }}" hint-placeholder-val="{{ true }}">
+    <dc-import name="HubScreen" part="footer" theme="dark" page-bg="{{ pageBg }}" active="{{ 1 }}" hint-size="1080px,180px"></dc-import>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;A&quot;,&quot;B&quot;],&quot;default&quot;:&quot;A&quot;,&quot;tsType&quot;:&quot;'A'|'B'&quot;,&quot;section&quot;:&quot;Direction&quot;},&quot;golden&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Direction&quot;},&quot;scroll&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;news&quot;,&quot;top&quot;],&quot;default&quot;:&quot;news&quot;,&quot;tsType&quot;:&quot;'news'|'top'|number&quot;,&quot;section&quot;:&quot;State&quot;},&quot;dataset&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;mid&quot;,&quot;first&quot;],&quot;default&quot;:&quot;mid&quot;,&quot;tsType&quot;:&quot;'mid'|'first'&quot;,&quot;section&quot;:&quot;State&quot;},&quot;full&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;State&quot;}}">
+const SEASONS = [
+  ['country_bloom', 'Country Bloom', [['clover', 'Meadow Clover'], ['daisy', 'Field Daisy'], ['buttercup', 'Buttercup Lane'], ['tulip', 'Barn Tulip'], ['sunflower', 'Sunfence'], ['pumpkin', 'Harvest Pumpkin']]],
+  ['frost_orchard', 'Frost Orchard', [['frost_snowdrop', 'Frost Snowdrop'], ['ice_crocus', 'Ice Crocus'], ['silver_aconite', 'Silver Aconite'], ['winter_camellia', 'Winter Camellia'], ['hoarfrost_rose', 'Hoarfrost Rose'], ['crystal_peony', 'Crystal Peony']]],
+  ['lantern_meadow', 'Lantern Meadow', [['dusk_firefly_grass', 'Dusk Firefly Grass'], ['paper_lantern_bloom', 'Paper Lantern Bloom'], ['evening_primrose', 'Evening Primrose'], ['foxfire_lily', 'Foxfire Lily'], ['glow_wisteria', 'Glow Wisteria'], ['midnight_lotus', 'Midnight Lotus']]],
+  ['amber_canopy', 'Amber Canopy', [['copper_leaf', 'Copper Leaf'], ['maple_aster', 'Maple Aster'], ['russet_mallow', 'Russet Mallow'], ['cider_dahlia', 'Cider Dahlia'], ['golden_oak_bloom', 'Golden Oak Bloom'], ['amber_magnolia', 'Amber Magnolia']]],
+  ['moonlit_warren', 'Moonlit Warren', [['moon_moss', 'Moon Moss'], ['nightshade_petal', 'Nightshade Petal'], ['silver_harebell', 'Silver Harebell'], ['lunar_orchid', 'Lunar Orchid'], ['star_jasmine', 'Star Jasmine'], ['umbral_lily', 'Umbral Lily']]],
+  ['coral_tide', 'Coral Tide Garden', [['sea_thrift', 'Sea Thrift'], ['salt_daisy', 'Salt Daisy'], ['tide_anemone', 'Tide Anemone'], ['coral_hibiscus', 'Coral Hibiscus'], ['pearl_waterlily', 'Pearl Waterlily'], ['reef_crown', 'Reef Crown']]],
+  ['starfall_glade', 'Starfall Glade', [['comet_sprig', 'Comet Sprig'], ['nebula_clover', 'Nebula Clover'], ['meteor_daisy', 'Meteor Daisy'], ['aurora_tulip', 'Aurora Tulip'], ['galaxy_sunburst', 'Galaxy Sunburst'], ['nova_bloom', 'Nova Bloom']]],
+  ['ember_fen', 'Ember Fen', [['marsh_rush', 'Marsh Rush'], ['peat_violet', 'Peat Violet'], ['cinder_buttercup', 'Cinder Buttercup'], ['flame_iris', 'Flame Iris'], ['smoke_lotus', 'Smoke Lotus'], ['fenfire_crown', 'Fenfire Crown']]]
+];
+const RARITY = [1, 1, 1, 2, 2, 3];
+const PROGRESS = {
+  mid: {
+    unlocked: ['country_bloom', 'frost_orchard'],
+    state: { clover: 'album_t3', daisy: 'album_t2', buttercup: 'album_t2', tulip: 'seen', sunflower: 'seen', pumpkin: 'album_t3', frost_snowdrop: 'album_t2', ice_crocus: 'seen', silver_aconite: 'seen' },
+    news: { frost_snowdrop: 2, ice_crocus: 1 }
+  },
+  first: {
+    unlocked: ['country_bloom'],
+    state: { clover: 'album_t2', daisy: 'seen', buttercup: 'seen' },
+    news: { clover: 2 }
+  }
+};
+// list geometry (px, 1080 base)
+const LIST_TOP = 16, HEADER_H = 60, HEADER_GAP = 20, ROW_H = 200, ROW_GAP = 20, SEASON_GAP = 36, LIST_BOTTOM = 24;
+const GROUP_H = HEADER_H + HEADER_GAP + 6 * ROW_H + 5 * ROW_GAP;
+const CONTENT_H = LIST_TOP + SEASONS.length * GROUP_H + (SEASONS.length - 1) * SEASON_GAP + LIST_BOTTOM;
+const NUN = 'Nunito,system-ui,sans-serif';
+
+const LAYOUT = {
+  A: { bg: '#FFF8F0', head: [24, 0, 1032, 175], list: [24, 175, 1032, 1422], grab: 1064 },
+  A_gold: { bg: '#FFF8F0', head: [44, 0, 992, 219], list: [44, 219, 992, 1334], grab: 1047 },
+  B: { bg: '#2E4733', head: [24, 0, 1032, 174], list: [44, 194, 992, 1359], grab: 1043, panel: [24, 174, 1032, 1399] },
+  B_gold: { bg: '#2E4733', head: [24, 0, 1032, 196], list: [53, 225, 974, 1319], grab: 1041, panel: [24, 196, 1032, 1377] }
+};
+
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const variant = (p.variant ?? 'A') === 'B' ? 'B' : 'A';
+    const gold = !!p.golden;
+    const full = !!p.full;
+    const L = LAYOUT[variant + (gold ? '_gold' : '')];
+    const prog = PROGRESS[p.dataset ?? 'mid'] || PROGRESS.mid;
+    const [lx, ly, lw, lh] = L.list;
+
+    let kept = 0, spotted = 0, firstNewTop = -1;
+    const rowsBySeason = SEASONS.map(([sid, sname, types], gi) => {
+      const groupTop = LIST_TOP + gi * (GROUP_H + SEASON_GAP);
+      let sKept = 0;
+      const rows = types.map(([id, label], j) => {
+        const state = prog.state[id] || 'locked';
+        if (state === 'album_t2' || state === 'album_t3') { kept++; sKept++; }
+        if (state === 'seen') spotted++;
+        const newTier = prog.news[id] || 0;
+        const top = groupTop + HEADER_H + HEADER_GAP + j * (ROW_H + ROW_GAP);
+        if (newTier && firstNewTop < 0) firstNewTop = top;
+        return { typeId: id, label, rarity: RARITY[j], state, newTier, season: sid, w: lw, hint: lw + 'px,200px', top };
+      });
+      return { sid, sname, rows, groupTop, sKept, open: prog.unlocked.includes(sid) };
+    });
+
+    const maxScroll = Math.max(0, CONTENT_H - lh);
+    let scroll = 0;
+    if (!full) {
+      if (p.scroll === 'news' || p.scroll == null) scroll = firstNewTop < 0 ? 0 : firstNewTop - Math.round(1.5 * (ROW_H + ROW_GAP));
+      else if (typeof p.scroll === 'number') scroll = p.scroll;
+      scroll = Math.max(0, Math.min(maxScroll, scroll));
+    }
+
+    const groups = rowsBySeason.map((g, gi) => {
+      const visible = full || (g.groupTop + GROUP_H > scroll - 300 && g.groupTop < scroll + lh + 300);
+      return {
+        name: g.sname,
+        count: g.sKept + ' / 6 kept',
+        rows: visible ? g.rows.map(r => {
+          const show = full || (r.top + ROW_H > scroll - 20 && r.top < scroll + lh + 20);
+          return Object.assign({}, r, { show, hide: !show });
+        }) : [],
+        style: 'flex:0 0 auto;height:' + GROUP_H + 'px;display:flex;flex-direction:column;gap:' + ROW_GAP + 'px;margin-top:' + (gi === 0 ? LIST_TOP : SEASON_GAP) + 'px',
+        headerStyle: 'flex:0 0 auto;height:' + HEADER_H + 'px;margin-bottom:' + (HEADER_GAP - ROW_GAP) + 'px;display:flex;align-items:center;gap:18px',
+        lockStyle: g.open ? 'display:none' : 'flex:0 0 auto;width:34px;height:34px;display:block;margin-right:-6px'
+      };
+    });
+
+    const grabH = Math.max(64, Math.round(lh * lh / CONTENT_H));
+    const grabTop = ly + Math.round((maxScroll ? scroll / maxScroll : 0) * (lh - grabH));
+    const pageH = full ? L.list[1] + CONTENT_H : 1597;
+    const [hx, hy, hw, hh] = L.head;
+    const panel = L.panel;
+
+    return {
+      chrome: !full,
+      pageBg: L.bg,
+      summary: 'Album: ' + kept + (kept === 1 ? ' bloom' : ' blooms') + ' kept · ' + spotted + ' spotted',
+      groups,
+      headLeft: variant === 'A' && !gold,
+      headCenter: variant === 'B' && !gold,
+      headPlaque: gold,
+      bookPanel: variant === 'B',
+      pageFrame: variant === 'A' && gold,
+      rootStyle: 'width:1080px;height:' + (full ? pageH : 1920) + 'px;flex:0 0 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;background:' + L.bg + ';font-family:' + NUN + ';-webkit-font-smoothing:antialiased',
+      pageStyle: 'position:relative;flex:0 0 auto;height:' + pageH + 'px;background:' + L.bg + ';overflow:hidden',
+      headStyle: 'position:absolute;left:' + hx + 'px;top:' + hy + 'px;width:' + hw + 'px;height:' + hh + 'px;box-sizing:border-box',
+      plaqueWrapStyle: 'display:flex;flex-direction:column;align-items:center;gap:' + (variant === 'A' ? 14 : 12) + 'px;padding-top:' + (variant === 'A' ? 40 : 26) + 'px',
+      summaryStyle: 'font:800 38px/46px ' + NUN + ';color:' + (variant === 'A' ? '#555C5E' : '#FFF8F0') + ';white-space:nowrap',
+      dividerStyle: variant === 'A'
+        ? 'position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:' + (gold ? 'rgba(214,168,47,.45)' : 'rgba(45,52,54,.10)')
+        : 'display:none',
+      panelStyle: panel
+        ? 'position:absolute;left:' + panel[0] + 'px;top:' + panel[1] + 'px;width:' + panel[2] + 'px;height:' + panel[3] + 'px;box-sizing:border-box;border-radius:' + (gold ? 34 : 26) + 'px;background:#FFF8F0;' +
+          (gold ? 'border:13px solid #D6A82F;' : 'border:2px solid rgba(45,52,54,.16);') + 'box-shadow:0 8px 16px rgba(20,26,22,.26)'
+        : 'display:none',
+      panelGoldStyle: gold
+        ? 'position:absolute;inset:-10px;box-sizing:border-box;border-radius:31px;border:7px solid #FFD56B;pointer-events:none'
+        : 'display:none',
+      scrollStyle: 'position:absolute;left:' + lx + 'px;top:' + ly + 'px;width:' + lw + 'px;height:' + (full ? CONTENT_H : lh) + 'px;overflow:hidden',
+      listStyle: 'display:flex;flex-direction:column;transform:translateY(' + (-scroll) + 'px)',
+      grabberStyle: full ? 'display:none' : 'position:absolute;left:' + L.grab + 'px;top:' + grabTop + 'px;width:8px;height:' + grabH + 'px;border-radius:4px;background:rgba(45,52,54,.22)'
+    };
+  }
+}
+</script>
+</body>
+</html>

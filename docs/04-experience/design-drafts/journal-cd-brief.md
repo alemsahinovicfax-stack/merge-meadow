@@ -1,6 +1,6 @@
 ---
 type: dizajn
-status: draft
+status: aktivan
 milestone: "—"
 tags: [dizajn, ui, journal, claude-design, mockup, test]
 povezano:
@@ -8,12 +8,14 @@ povezano:
   - ../ui-i-art-alati
   - ../art-direction
   - ../../06-production/CHECKPOINT
-ai_sažetak: "Journal (Bloom Album) spec napisan od nule po uzoru na Camp/Arena format + gotov prompt za Claude Design — eksperimentalni test prenosa dizajna, van CAMP-06/D0-P koraka."
+ai_sažetak: "Journal (Bloom Album) spec + prompt za Claude Design; CD paket `design_handoff_journal/` (smjer 1a) prenesen u igru 2026-09-23 — vidi § Implementacija."
 ---
 
 # Journal (Bloom Album) — spec + Claude Design brief
 
-> **Status: eksperiment.** Ovo NIJE dio trenutnog CHECKPOINT koraka (D0-P / CAMP-06) i ne mijenja kod u `game/`. Cilj je testirati da li jedan ovako napisan dokument daje Claude Designu dovoljno da napravi koristan mockup za jedan ekran, prije nego se isto uradi za Shop/Home. Ako test uspije, ovaj format se ponavlja za ostale ekrane kao zaseban zadatak — ne automatski.
+> **Status: implementirano 2026-09-23** — smjer 1a (Varijanta A, pastel hub) iz CD paketa `design_handoff_journal/`; vidi [§ Implementacija](#implementacija-2026-09-23) i [[journal-izvjestaj|izvještaj]].
+>
+> **Prvobitno: eksperiment.** Ovo NIJE bio dio tadašnjeg CHECKPOINT koraka (D0-P / CAMP-06) i ne mijenja kod u `game/`. Cilj je testirati da li jedan ovako napisan dokument daje Claude Designu dovoljno da napravi koristan mockup za jedan ekran, prije nego se isto uradi za Shop/Home. Ako test uspije, ovaj format se ponavlja za ostale ekrane kao zaseban zadatak — ne automatski.
 
 Ovaj dokument ima dva dijela:
 
@@ -208,10 +210,36 @@ da ih mogu uporediti jednu pored druge.
 
 ---
 
+## Implementacija (2026-09-23)
+
+Izvor: `design_handoff_journal/` (README, `godot/ui_journal.gd`, `godot/journal_tree.txt`, `design/*.dc.html`). Odabran smjer **1a — Varijanta A, pastel hub**.
+
+| Fajl | Šta |
+|------|-----|
+| `scripts/visual/ui_journal.gd` (`UiJournal`) | paste-ready iz paketa, nepromijenjen: boje, mjere, `row_style`, `tier_frame_style`, `tier_well_style`, `tier_halo_style`, `new_badge_style`, `album_page_style`, `golden_frame_style`, `golden_plaque_style`, `caption_for`, `summary_text`, `row_y` |
+| `scenes/ui/collection_journal.tscn` | `PageHead` 175 (TitleAccent 10 × 56 + „Bloom Album“ + summary + divider) i `ListScroll` ispod; `GoldenPlaque`, `GoldenFrameEdge` / `GoldenFrameGold` za kozmetiku |
+| `scripts/ui/collection_journal.gd` | posjeta: snapshot NEW-a prije `mark_collection_journal_viewed()`, sezonska poglavlja („N / 6 kept“ + lokot), lista se gradi 6 redova po frameu, auto-scroll na prvi NEW (`row_y` − 330), `on_meta_page_left()` gasi NEW |
+| `scripts/ui/collection_journal_row.gd` | red 1032 × 200: ime + ★ (ime ide u ellipsis), caption 2 reda, tri slota 112 (prazan prsten · bloom well · T3 gold kvadrat), NEW pilula (28, −18) i halo na `new_tier` |
+| `scripts/meta/meta_hub_controller.gd` | `_on_page_changed` javlja Journalu da je stranica napuštena |
+| `assets/ui/chrome/icon_lock_ink.svg` (+ `.import`) | lokot u ink za svijetlu podlogu (zaglavlje zaključane sezone) |
+| smoke | novi `journal_new_snapshot_smoke`; ažuriran `collection_journal_smoke` |
+
+**Odstupanja od paketa:**
+
+1. `godot/styles/*.tres` nisu kopirani — stilovi se prave iz `ui_journal.gd` u kodu (paket to nudi kao izbor).
+2. `ListScroll` je `SHOW_NEVER` bez tankog grabbera iz paketa: lista se vuče prstom, bez trake.
+3. Naslov je Label u Nunitu (font je u igri od Home v2), pa `title_bloom_album.png` nije trebalo re-bake-ovati.
+4. Placeholderi `assets/tier/ph_*.svg` se ne koriste — cvijeće crta igra (`CampPlantDraw` / `FlowerAssets`), kako paket i predviđa.
+5. NEW na tabu je opcija 1e (broj), koja je već radila prije prenosa; `tab_dot_style()` (1f) stoji neiskorišten.
+
+**Otvorena pitanja iz paketa:** auto-scroll je uključen; sezonska poglavlja su uključena; Golden Album je frame + plaketa; redovi zaključanih sezona ostaju `???` uz lokot na zaglavlju.
+
+
 ## Povezano
 
 - [[../../02-design/spec-vertical-slice|spec-vertical-slice]] — format po kojem je pisan § 1 (Camp/Arena imaju isti tretman, Shop/Home/Journal nemaju)
 - [[../art-direction|art-direction]] — paleta, stil
 - [[../ui-i-art-alati|ui-i-art-alati]] — kako se asset/dizajn prenosi u Godot nakon što mockup postoji
 - [[../pristupacnost|pristupačnost]] — a11y ograničenja korištena gore
-- [[../../06-production/CHECKPOINT|CHECKPOINT]] — trenutni koraci (ovaj dokument ih ne mijenja)
+- [[../../06-production/CHECKPOINT|CHECKPOINT]] — trenutni koraci
+- [[journal-izvjestaj|journal-izvjestaj]] — izvještaj o prenosu (2026-09-23)

@@ -11,13 +11,28 @@ func _gs() -> Node:
 	return get_root().get_node_or_null("GameState")
 
 
+func _bloom_rows(list: Node) -> Array:
+	var out: Array = []
+	_collect_rows(list, out)
+	return out
+
+
+func _collect_rows(n: Node, out: Array) -> void:
+	for child in n.get_children():
+		if child.has_method("get_tier_icon"):
+			out.append(child)
+		else:
+			_collect_rows(child, out)
+
+
 func _assert_catalog_album(gs: Node, list: VBoxContainer) -> String:
 	var entries: Array = gs.call("get_collection_journal_entries")
 	var catalog_ids: Array = SeedCatalog.all_type_ids()
 	if entries.size() != catalog_ids.size():
 		return "entries %d != catalog %d" % [entries.size(), catalog_ids.size()]
-	if list.get_child_count() != entries.size():
-		return "list rows %d != entries %d" % [list.get_child_count(), entries.size()]
+	var rows := _bloom_rows(list)
+	if rows.size() != entries.size():
+		return "list rows %d != entries %d" % [rows.size(), entries.size()]
 	var frost_state := ""
 	for entry_any in entries:
 		var entry: Dictionary = entry_any
@@ -80,7 +95,7 @@ func _run() -> void:
 		push_error("collection_journal_smoke: journal load failed %d" % err)
 		quit(1)
 		return
-	for _i in 16:
+	for _i in 24:
 		await process_frame
 	var journal := current_scene as Control
 	if journal == null:
@@ -88,7 +103,7 @@ func _run() -> void:
 		quit(1)
 		return
 	var list := journal.get_node_or_null("RootVBox/ListScroll/List") as VBoxContainer
-	if list == null or list.get_child_count() < 1:
+	if list == null or _bloom_rows(list).is_empty():
 		push_error("collection_journal_smoke: journal list empty")
 		quit(1)
 		return
@@ -97,7 +112,7 @@ func _run() -> void:
 		push_error("collection_journal_smoke (catalog): %s" % catalog_msg)
 		quit(1)
 		return
-	var clover_row: Node = list.get_child(0)
+	var clover_row: Node = _bloom_rows(list)[0]
 	if clover_row == null or not clover_row.has_method("get_tier_icon"):
 		push_error("collection_journal_smoke: first row missing get_tier_icon")
 		quit(1)
@@ -115,15 +130,15 @@ func _run() -> void:
 		push_error("collection_journal_smoke: journal reload failed %d" % err)
 		quit(1)
 		return
-	for _j in 16:
+	for _j in 24:
 		await process_frame
 	journal = current_scene as Control
 	list = journal.get_node_or_null("RootVBox/ListScroll/List") as VBoxContainer
-	if list == null or list.get_child_count() < 1:
+	if list == null or _bloom_rows(list).is_empty():
 		push_error("collection_journal_smoke: journal list empty after reload")
 		quit(1)
 		return
-	clover_row = list.get_child(0)
+	clover_row = _bloom_rows(list)[0]
 	msg = _assert_clover_tiers(clover_row, 3)
 	if not msg.is_empty():
 		push_error("collection_journal_smoke (kept=3): %s" % msg)
@@ -149,15 +164,15 @@ func _run() -> void:
 		push_error("collection_journal_smoke: journal reload after stash failed %d" % err)
 		quit(1)
 		return
-	for _k in 16:
+	for _k in 24:
 		await process_frame
 	journal = current_scene as Control
 	list = journal.get_node_or_null("RootVBox/ListScroll/List") as VBoxContainer
-	if list == null or list.get_child_count() < 1:
+	if list == null or _bloom_rows(list).is_empty():
 		push_error("collection_journal_smoke: journal list empty after stash")
 		quit(1)
 		return
-	clover_row = list.get_child(0)
+	clover_row = _bloom_rows(list)[0]
 	msg = _assert_clover_tiers(clover_row, 3)
 	if not msg.is_empty():
 		push_error("collection_journal_smoke (stash→T3): %s" % msg)

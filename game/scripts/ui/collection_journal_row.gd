@@ -1,25 +1,24 @@
 class_name CollectionJournalRow
 extends Control
 
-const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
-const TEXT_LAYOUT := preload("res://scripts/ui/ui_text_layout.gd")
-const READABILITY := preload("res://scripts/ui/ui_readability.gd")
-const TYPO := preload("res://scripts/ui/ui_typography.gd")
+## BloomRow 1032 x 200 (design_handoff_journal · 1a). Info lijevo, tri TierSlot
+## desno. Prazan tier je prsten, ne sivi krug. NEW pilula je sibling panela.
+
 const BloomIcon := preload("res://scripts/ui/collection_bloom_icon.gd")
 
-const TIER_ICON_SIZE := 128.0
-
-## NEW badge hovers above the card's top-right corner, so it must live outside
-## the PanelContainer (which forces all its children to the same content rect).
 var _panel: PanelContainer
-
+var _name: Label
+var _stars: Label
+var _caption: Label
+var _badge: PanelContainer
+var _badge_label: Label
+var _frames: Array[Panel] = []
+var _wells: Array[Panel] = []
+var _icons: Array[Control] = []
+var _halos: Array[Panel] = []
+var _tier_labels: Array[Label] = []
 var _entry: Dictionary = {}
 var _built: bool = false
-var _title: Label
-var _stars: Label
-var _new_badge: Label
-var _tier_icons: Array[Control] = []
-var _tier_captions: Array[Label] = []
 
 
 func apply(entry: Dictionary) -> void:
@@ -37,139 +36,218 @@ func _ready() -> void:
 		_refresh()
 
 
-func _get_minimum_size() -> Vector2:
-	if _panel:
-		return _panel.get_combined_minimum_size()
-	return Vector2.ZERO
-
-
 func get_tier_icon(tier: int) -> Control:
 	var idx := tier - 1
-	if idx < 0 or idx >= _tier_icons.size():
+	if idx < 0 or idx >= _icons.size():
 		return null
-	return _tier_icons[idx]
+	return _icons[idx]
+
+
+func get_caption_text() -> String:
+	return _caption.text if _caption else ""
+
+
+func get_name_text() -> String:
+	return _name.text if _name else ""
+
+
+func is_new_visible() -> bool:
+	return _badge != null and _badge.visible
+
+
+func empty_slot_count() -> int:
+	var n := 0
+	for icon in _icons:
+		if not icon.visible:
+			n += 1
+	return n
 
 
 func _ensure_built() -> void:
 	if _built:
 		return
 	_built = true
-	custom_minimum_size = Vector2(0, 120)
+	custom_minimum_size = Vector2(0, UiJournal.ROW_H)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	clip_contents = false
 
 	_panel = PanelContainer.new()
-	_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_panel.add_theme_stylebox_override("panel", UI_PALETTE.rarity_bg_style(1, true))
+	_panel.name = "Panel"
+	_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_panel)
 
-	var root := VBoxContainer.new()
-	root.add_theme_constant_override("separation", 8)
-	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_panel.add_child(root)
+	var row := HBoxContainer.new()
+	row.name = "RowHBox"
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", UiJournal.ROW_INNER_GAP)
+	_panel.add_child(row)
 
-	var title_row := HBoxContainer.new()
-	title_row.add_theme_constant_override("separation", 10)
-	root.add_child(title_row)
+	var info := VBoxContainer.new()
+	info.name = "InfoColumn"
+	info.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.alignment = BoxContainer.ALIGNMENT_CENTER
+	info.add_theme_constant_override("separation", UiJournal.INFO_GAP)
+	row.add_child(info)
 
-	_title = Label.new()
-	TEXT_LAYOUT.card_title_scroll_readable(_title)
-	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_title.add_theme_color_override("font_color", UI_PALETTE.UI_TEXT)
-	title_row.add_child(_title)
-
+	var name_line := HBoxContainer.new()
+	name_line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	name_line.add_theme_constant_override("separation", UiJournal.NAME_STARS_GAP)
+	info.add_child(name_line)
+	_name = Label.new()
+	_name.name = "BloomName"
+	_name.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_name.clip_text = true
+	_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	name_line.add_child(_name)
 	_stars = Label.new()
-	_stars.size_flags_horizontal = Control.SIZE_SHRINK_END
-	_stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_stars.add_theme_font_size_override("font_size", READABILITY.font(TYPO.BODY))
-	_stars.add_theme_color_override("font_color", UI_PALETTE.UI_TEXT)
-	title_row.add_child(_stars)
+	_stars.name = "RarityStars"
+	_stars.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_stars.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	name_line.add_child(_stars)
+	var name_rest := Control.new()
+	name_rest.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	name_rest.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_line.add_child(name_rest)
+	name_line.resized.connect(_fit_name)
 
-	# Floats above the panel's top-right corner (outside its bounds) — sibling
-	# of _panel, not a child of it, since PanelContainer forces children to
-	# share one content rect and can't host a freely-anchored overlay.
-	_new_badge = Label.new()
-	_new_badge.text = "NEW"
-	_new_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	TEXT_LAYOUT.caption_label_scroll_readable(_new_badge)
-	_new_badge.add_theme_color_override("font_color", Color(1.0, 0.953, 0.918))
-	var badge_bg := StyleBoxFlat.new()
-	badge_bg.bg_color = Color(0.851, 0.478, 0.333)
-	badge_bg.set_corner_radius_all(20)
-	badge_bg.set_border_width_all(2)
-	badge_bg.border_color = Color(0.722, 0.373, 0.243)
-	badge_bg.content_margin_left = 16.0
-	badge_bg.content_margin_right = 16.0
-	badge_bg.content_margin_top = 6.0
-	badge_bg.content_margin_bottom = 6.0
-	_new_badge.add_theme_stylebox_override("normal", badge_bg)
-	_new_badge.anchor_left = 1.0
-	_new_badge.anchor_right = 1.0
-	_new_badge.anchor_top = 0.0
-	_new_badge.anchor_bottom = 0.0
-	_new_badge.offset_left = -22.0
-	_new_badge.offset_right = -22.0
-	_new_badge.offset_top = -16.0
-	_new_badge.offset_bottom = -16.0
-	_new_badge.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_new_badge.grow_vertical = Control.GROW_DIRECTION_BOTH
-	add_child(_new_badge)
+	_caption = Label.new()
+	_caption.name = "RowCaption"
+	_caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_caption.max_lines_visible = UiJournal.CAPTION_MAX_LINES
+	_caption.custom_minimum_size.y = float(UiJournal.CAPTION_LINE * UiJournal.CAPTION_MAX_LINES)
+	info.add_child(_caption)
 
-	var tier_row := HBoxContainer.new()
-	tier_row.name = "TierIconsRow"
-	tier_row.add_theme_constant_override("separation", 44)
-	tier_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	root.add_child(tier_row)
+	var strip := HBoxContainer.new()
+	strip.name = "TierStrip"
+	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	strip.alignment = BoxContainer.ALIGNMENT_CENTER
+	strip.custom_minimum_size = Vector2(UiJournal.SLOT * 3 + UiJournal.SLOT_GAP * 2, UiJournal.SLOT + UiJournal.TIER_LABEL_GAP + UiJournal.TIER_LABEL_FONT)
+	strip.add_theme_constant_override("separation", UiJournal.SLOT_GAP)
+	row.add_child(strip)
 
 	for tier in [1, 2, 3]:
 		var col := VBoxContainer.new()
-		col.add_theme_constant_override("separation", 6)
-		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		col.alignment = BoxContainer.ALIGNMENT_CENTER
-		tier_row.add_child(col)
-
+		col.add_theme_constant_override("separation", UiJournal.TIER_LABEL_GAP)
+		strip.add_child(col)
+		var slot := Control.new()
+		slot.name = "SlotBox"
+		slot.custom_minimum_size = Vector2(UiJournal.SLOT, UiJournal.SLOT)
+		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		col.add_child(slot)
+		var halo := Panel.new()
+		halo.name = "NewHalo"
+		halo.visible = false
+		halo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		halo.position = Vector2(-UiJournal.HALO_GROW, -UiJournal.HALO_GROW)
+		halo.size = Vector2(UiJournal.SLOT + UiJournal.HALO_GROW * 2, UiJournal.SLOT + UiJournal.HALO_GROW * 2)
+		slot.add_child(halo)
+		var frame := Panel.new()
+		frame.name = "Frame"
+		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		frame.size = Vector2(UiJournal.SLOT, UiJournal.SLOT)
+		slot.add_child(frame)
+		var well := Panel.new()
+		well.name = "ArtWell"
+		well.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		well.position = Vector2(UiJournal.WELL_INSET, UiJournal.WELL_INSET)
+		well.size = Vector2(UiJournal.SLOT - UiJournal.WELL_INSET * 2, UiJournal.SLOT - UiJournal.WELL_INSET * 2)
+		slot.add_child(well)
 		var icon: Control = BloomIcon.new()
 		icon.name = "TierIcon%d" % tier
-		icon.custom_minimum_size = Vector2(TIER_ICON_SIZE, TIER_ICON_SIZE)
-		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		col.add_child(icon)
-		_tier_icons.append(icon)
-
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.position = Vector2((UiJournal.SLOT - UiJournal.ART) * 0.5, (UiJournal.SLOT - UiJournal.ART) * 0.5)
+		icon.size = Vector2(UiJournal.ART, UiJournal.ART)
+		icon.custom_minimum_size = icon.size
+		slot.add_child(icon)
 		var cap := Label.new()
+		cap.name = "TierLabel"
 		cap.text = "T%d" % tier
 		cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		TEXT_LAYOUT.caption_label_scroll_readable(cap)
+		cap.custom_minimum_size = Vector2(UiJournal.SLOT, UiJournal.TIER_LABEL_FONT)
 		col.add_child(cap)
-		_tier_captions.append(cap)
+		_halos.append(halo)
+		_frames.append(frame)
+		_wells.append(well)
+		_icons.append(icon)
+		_tier_labels.append(cap)
+
+	_badge = PanelContainer.new()
+	_badge.name = "NewBadge"
+	_badge.visible = false
+	_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_badge.z_index = 2
+	_badge.position = UiJournal.NEW_BADGE_OFFSET
+	_badge.add_theme_stylebox_override("panel", UiJournal.new_badge_style())
+	add_child(_badge)
+	_badge_label = Label.new()
+	_badge_label.text = "NEW"
+	_badge_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_badge.add_child(_badge_label)
 
 
 func _refresh() -> void:
 	var state := str(_entry.get("state", "locked"))
-	var kept_tier := int(_entry.get("kept_tier", 0))
+	var locked := state == "locked"
 	var rarity := int(_entry.get("rarity", 1))
 	var type_id := str(_entry.get("type_id", ""))
-	var locked_entry := state == "locked"
+	var show_new := bool(_entry.get("is_new", false)) and not locked
+	var new_tier := int(_entry.get("new_tier", 0))
+	var filled := UiJournal.filled_tiers(state)
+	var ink := UiJournal.DISABLED_INK if locked else UiJournal.INK
+	var caption_ink := UiJournal.DISABLED_INK if locked else (UiJournal.INK if show_new else UiJournal.CAPTION_INK)
+	var caption_weight := 800 if show_new else 700
 
-	_title.text = str(_entry.get("display_name", "?"))
-	_stars.text = "★".repeat(clampi(rarity, 1, 3))
-	_new_badge.visible = bool(_entry.get("is_new", false))
+	_panel.add_theme_stylebox_override("panel", UiJournal.row_style(rarity, locked))
+	_name.text = str(_entry.get("display_name", "???"))
+	_stars.text = UiJournal.rarity_stars(rarity)
+	_caption.text = UiJournal.caption_for(_entry, show_new)
+	UiStage.style(_name, 900, UiJournal.NAME_FONT, ink)
+	UiStage.style(_stars, 800, UiJournal.STARS_FONT, ink)
+	UiStage.style(_caption, caption_weight, UiJournal.CAPTION_FONT, caption_ink, float(UiJournal.CAPTION_LINE) / float(UiJournal.CAPTION_FONT))
+	for cap in _tier_labels:
+		UiStage.style(cap, 900, UiJournal.TIER_LABEL_FONT, UiJournal.INK)
 
 	for i in 3:
 		var tier := i + 1
-		var unlocked := false
-		if not locked_entry:
-			if tier == 1:
-				unlocked = true
-			else:
-				unlocked = kept_tier >= tier
-		var icon := _tier_icons[i]
+		var on := tier <= filled
+		var crystal := on and tier == 3
+		var kind := "crystal" if crystal else ("bloom" if on else "empty")
+		_frames[i].add_theme_stylebox_override("panel", UiJournal.tier_frame_style(kind))
+		_wells[i].visible = on
+		if on:
+			_wells[i].add_theme_stylebox_override("panel", UiJournal.tier_well_style(crystal))
+		var icon := _icons[i]
+		icon.visible = on
 		if icon.has_method("apply"):
-			icon.call("apply", type_id, tier if unlocked else 0, not unlocked)
-		var cap: Label = _tier_captions[i]
-		if unlocked:
-			cap.add_theme_color_override("font_color", Color(0.22, 0.48, 0.28))
-		else:
-			cap.add_theme_color_override("font_color", Color(0.55, 0.58, 0.55))
+			icon.call("apply", type_id, tier if on else 0, not on)
+		_halos[i].visible = show_new and tier == new_tier
+		if _halos[i].visible:
+			_halos[i].add_theme_stylebox_override("panel", UiJournal.tier_halo_style(crystal))
+		UiStage.style(_tier_labels[i], 900, UiJournal.TIER_LABEL_FONT, UiJournal.INK if on else UiJournal.DISABLED_INK)
 
-	_panel.add_theme_stylebox_override("panel", UI_PALETTE.rarity_bg_style(rarity, locked_entry))
+	_badge.visible = show_new
+	if show_new:
+		UiStage.style(_badge_label, 900, UiJournal.NEW_BADGE_FONT, UiJournal.INK, 1.0, 0.06)
+		_badge.reset_size()
+	_fit_name()
+
+
+## Ime stoji uz zvjezdice; ako ne stane, samo se ime reže.
+func _fit_name() -> void:
+	if _name == null or _stars == null:
+		return
+	var line := _name.get_parent() as Control
+	if line == null or line.size.x < 120.0:
+		return
+	var natural := UiStage.text_w(UiStage.font(900, UiJournal.NAME_FONT), UiJournal.NAME_FONT, _name.text)
+	var max_w := line.size.x - _stars.get_combined_minimum_size().x - float(UiJournal.NAME_STARS_GAP)
+	if max_w < 80.0:
+		return
+	_name.custom_minimum_size.x = minf(natural, max_w)
