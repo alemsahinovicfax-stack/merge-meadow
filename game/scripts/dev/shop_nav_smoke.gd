@@ -1,6 +1,8 @@
 extends SceneTree
 
 ## Smoke: main menu → Shop (SceneRouter), koristi autoload SceneTree.
+## Putanje su literali: staticka referenca na GameState u --script smokeu je
+## ranije vjesala proces (greske-katalog).
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -16,13 +18,13 @@ func _run() -> void:
 		await process_frame
 	var gs := root.get_node_or_null("GameState")
 	if gs:
-		gs.tutorial_complete = true
+		gs.set("tutorial_complete", true)
 	var router := root.get_node_or_null("SceneRouter")
 	if router == null:
 		push_error("shop_nav_smoke: SceneRouter missing")
 		quit(1)
 		return
-	router.change_to(GameState.SCENE_SHOP)
+	router.call("change_to", "res://scenes/ui/shop_screen.tscn")
 	for _i in 40:
 		await process_frame
 	var shop := current_scene

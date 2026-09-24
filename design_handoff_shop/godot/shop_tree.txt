@@ -1,0 +1,44 @@
+ShopScreen (Control, 1080x1597, shop_screen.gd)                  bg #2E4733
+├─ ShopScroll (ScrollContainer, vertical only)
+│  └─ ShopContent (VBox, pad 184/24/64/24, sep 64)
+│     ├─ LooksSection (VBox, sep 20)
+│     │  ├─ SectionTitle (HBox h64: Accent 10x56 gold | Title 56 | Sub 38)
+│     │  └─ CosmeticSlot x3 (PanelContainer card_style(20))
+│     │     ├─ SlotHead (HBox h48: Title 46 | Where 38)
+│     │     └─ CosmeticCard xN (HBox h284, sep 24; 2px hairline between)
+│     │        ├─ CosmeticPreview (Control 440x284, clip, _draw)
+│     │        │  └─ Half x1|2 (lane + Pip | Album page) + LabelChip "Now"/"With it"
+│     │        └─ Info (VBox sep 14)
+│     │           ├─ Name 48 · Desc 38 | ConfirmText | PurchaseStatus
+│     │           └─ ActionRow (HBox h120, sep 14)
+│     │              buy:      PriceTag(coin) | BuyButton "Buy & wear"
+│     │              short:    PriceTag(coin) | BuyButton(disabled) "Need n more"
+│     │              confirm:  CancelButton 150 | BuyButton(confirm) "Buy for ◎ n"
+│     │              owned:    OwnedBadge 76 | EquipButton "Wear it"
+│     │              equipped: OwnedBadge(wearing) 76 | Note 38
+│     ├─ SeasonsSection
+│     │  ├─ SectionTitle (lavender accent)
+│     │  └─ SeasonPackCard x4 (PanelContainer season_card_style)
+│     │     ├─ Top (HBox sep 24)
+│     │     │  ├─ Text (VBox: Eyebrow|OwnedBadge(yours)|ComingSoonTag 60 · Name 60 · Tagline 38)
+│     │     │  └─ SeasonRoster (Grid 3x2, well 96, sep 14)
+│     │     ├─ FinePrint 38
+│     │     ├─ PurchaseStatus (optional)
+│     │     └─ ActionRow (h130, sep 16): PriceTag(money) | BuyButton | OpenOnHome | ComingSoonInfo
+│     ├─ BoostersSection
+│     │  ├─ SectionTitle
+│     │  └─ BoosterCard x2 (card_style(20))
+│     │     ├─ Top (HBox sep 20): IconDisc 112 | Name 48 + Desc/Status | BoosterCount 190x112
+│     │     └─ ActionRow (h130, sep 16): UseButton flex | PriceTag 220 | BuyButton 280/flex
+│     └─ SupportSection
+│        ├─ SectionTitle
+│        ├─ IapCard remove_ads (card_style(24))
+│        ├─ IapCard starter_pack (+ PackContents chips 76)
+│        ├─ RestoreButton h130 (hidden in stub mode)
+│        └─ FairNote 38 centred
+├─ ShopHeaderRow (PanelContainer 1080x160, header_row_style, z 3)
+│  └─ HBox h120 sep 14: JumpChip x4 (shop_jump_chip.gd)
+├─ PurchaseToast (UiChrome.toast_style, top 184, centred, z 4)
+└─ ResetDevButton (editor + stub only)
+
+CoinSpendPop lives in the hub layer (above header chips), x150 y132 of the 1080x1920 base.

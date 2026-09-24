@@ -1,0 +1,1347 @@
+{
+  "$schema_version": "1.0",
+  "generated": "2026-09-23",
+  "source": "design_handoff_shop/design/ShopScreen.dc.html + Shop Specs.dc.html",
+  "brief": "docs/04-experience/design-drafts/shop-cd-brief.md (nije bio na masteru — rađeno po promptu, vidi README § Otvoreno)",
+  "direction": "jedan dizajn (bez varijanti)",
+  "note": "Sve mjere su u px baze 1080 x 1920 i prenose se 1:1. Boje su sRGB hex; alpha je zapisana odvojeno gdje postoji.",
+  "meta": {
+    "base": {
+      "w": 1080,
+      "h": 1920
+    },
+    "header": {
+      "h": 143,
+      "given": true,
+      "source": "design_handoff_hub_chrome/HubScreen.dc.html"
+    },
+    "page": {
+      "w": 1080,
+      "h": 1597,
+      "y": 143
+    },
+    "footer": {
+      "h": 180,
+      "given": true,
+      "active_tab_index": 0
+    },
+    "minimums": {
+      "touch": 120,
+      "text": 38,
+      "price": 44
+    },
+    "page_bg": "#2E4733",
+    "page_bg_note": "isto kao Camp (UiCamp.MEADOW_BG); danas Shop je #B8E0F5",
+    "gestures": "samo vertikalni scroll i tap — horizontalni swipe ide hub pageru"
+  },
+  "tokens": {
+    "palette": {
+      "page": "#2E4733",
+      "chrome": "#1A241E",
+      "cream": "#FFF8F0",
+      "rim": "#FFF6D6",
+      "ink": "#2D3436",
+      "ink_sub": "#555C5E",
+      "ink_disabled": "#5C6264",
+      "ink_on_busy": "#44443A",
+      "price_bg": "#FFE8B8",
+      "price_edge": "#D6A82F",
+      "price_ink": "#1A1A14",
+      "price_sub": "#5A4A1E",
+      "coin_gold": "#FFD56B",
+      "coin_gold_edge": "#D6A82F",
+      "spend_coins": "#E8C44A",
+      "spend_coins_edge": "#BA9D3B",
+      "spend_coins_confirm_edge": "#9C7A14",
+      "spend_coins_pressed": "#D6B23C",
+      "spend_money": "#D4A5FF",
+      "spend_money_edge": "#AA84CC",
+      "spend_money_pressed": "#C293F0",
+      "use": "#A8E6CF",
+      "use_edge": "#7FC9AC",
+      "use_pressed": "#94D6BE",
+      "active": "#FFB88C",
+      "active_edge": "#E8A374",
+      "fail": "#FFCCD5",
+      "fail_edge": "#E89AAA",
+      "booster_disc": "#E0C4FF",
+      "booster_disc_edge": "#B39DCC",
+      "well": "#22342A",
+      "well_edge": "#16211B",
+      "roster_rim": "#CBC2B6",
+      "album_frame": "#E8C44A",
+      "rarity_1": "#B8D4F0",
+      "rarity_2": "#E0C4FF",
+      "rarity_3": "#FFE8B8",
+      "rarity_locked": "#E4E4E0"
+    },
+    "alpha_fills": {
+      "card_edge": "rgba(45,52,54,0.16)",
+      "hairline": "rgba(45,52,54,0.12)",
+      "tag_quiet": "rgba(45,52,54,0.06)",
+      "tag_quiet_edge": "rgba(45,52,54,0.18)",
+      "disabled_on_cream": "rgba(45,52,54,0.10)",
+      "disabled_on_cream_edge": "rgba(45,52,54,0.22)",
+      "cancel": "rgba(45,52,54,0.06)",
+      "cancel_edge": "rgba(45,52,54,0.24)",
+      "count_pill": "rgba(45,52,54,0.06)",
+      "count_pill_edge": "rgba(45,52,54,0.20)",
+      "busy_on_mood": "rgba(255,248,240,0.55)",
+      "busy_on_mood_edge": "rgba(26,26,20,0.30)",
+      "soon_info": "rgba(255,248,240,0.16)",
+      "soon_info_edge": "rgba(255,246,214,0.40)",
+      "soon_border": "rgba(255,246,214,0.34)",
+      "open_on_light": "rgba(255,248,240,0.74)",
+      "open_on_light_edge": "rgba(26,26,20,0.26)",
+      "open_on_dark": "rgba(255,248,240,0.20)",
+      "open_on_dark_edge": "rgba(255,248,240,0.40)",
+      "chip_idle": "rgba(255,248,240,0.10)",
+      "chip_idle_edge": "rgba(255,248,240,0.38)",
+      "header_row_edge": "rgba(255,248,240,0.16)",
+      "restore": "rgba(255,248,240,0.10)",
+      "restore_edge": "rgba(255,248,240,0.38)",
+      "restore_busy": "rgba(255,248,240,0.06)",
+      "restore_busy_edge": "rgba(255,248,240,0.24)",
+      "sub_on_page": "rgba(255,248,240,0.82)",
+      "label_chip": "rgba(26,36,30,0.84)",
+      "label_chip_edge": "rgba(255,248,240,0.40)",
+      "pip_shadow": "rgba(18,28,22,0.28)",
+      "dim_other_buy": "modulate.a 0.5"
+    },
+    "radius": {
+      "card": 26,
+      "button": 20,
+      "preview": 20,
+      "tag": 18,
+      "tag_small": 16,
+      "album_page": 14
+    },
+    "border": {
+      "hairline": 2,
+      "normal": 3,
+      "strong": 4,
+      "album_frame": 10
+    },
+    "shadow": {
+      "card": {
+        "x": 0,
+        "y": 8,
+        "blur": 16,
+        "color": "rgba(20,26,22,0.26)"
+      },
+      "header_row": {
+        "x": 0,
+        "y": 6,
+        "blur": 12,
+        "color": "rgba(20,26,22,0.22)"
+      },
+      "toast": "UiChrome.toast_style()",
+      "coin_pop": {
+        "x": 0,
+        "y": 6,
+        "blur": 12,
+        "color": "rgba(20,26,22,0.30)"
+      }
+    },
+    "outline_rule": "rub season kartice = mood x 0.8 (linearno po kanalu); owned = 4 px #FFF6D6",
+    "font": {
+      "family_in_game": "Nunito (ui_stage.gd) / default + embolden",
+      "family_in_mockup": "Nunito",
+      "weights": {
+        "regular": 700,
+        "bold": 800,
+        "black": 900
+      },
+      "sizes": {
+        "section_title": 56,
+        "section_sub": 38,
+        "slot_title": 46,
+        "item_name": 48,
+        "season_name": 60,
+        "eyebrow": 38,
+        "body": 38,
+        "button": 46,
+        "button_sub": 38,
+        "price": 52,
+        "price_long": 44,
+        "count": 56,
+        "tag": 40,
+        "chip": 42,
+        "status": 38,
+        "toast": 40
+      }
+    }
+  },
+  "layout": {
+    "ShopPage": {
+      "rect": [
+        0,
+        143,
+        1080,
+        1597
+      ],
+      "type": "Control, clip_contents"
+    },
+    "ShopScroll": {
+      "rect": [
+        0,
+        0,
+        1080,
+        1597
+      ],
+      "type": "ScrollContainer (samo vertikalno)",
+      "content_padding": [
+        184,
+        24,
+        64,
+        24
+      ],
+      "section_gap": 64,
+      "note": "184 = ShopHeaderRow 160 + 24"
+    },
+    "ShopHeaderRow": {
+      "rect": [
+        0,
+        0,
+        1080,
+        160
+      ],
+      "sticky": true,
+      "z": 3,
+      "padding": [
+        20,
+        24,
+        0,
+        24
+      ],
+      "bg": "page",
+      "bottom_edge": "2 px header_row_edge",
+      "shadow": "header_row"
+    },
+    "JumpChip": {
+      "count": 4,
+      "h": 120,
+      "gap": 14,
+      "w": "flex (≈247)",
+      "radius": 20,
+      "font": 42,
+      "labels": [
+        "Looks",
+        "Seasons",
+        "Boosters",
+        "Support"
+      ],
+      "active": {
+        "fill": "active",
+        "border": "4 px active_edge",
+        "ink": "ink",
+        "weight": 900
+      },
+      "idle": {
+        "fill": "chip_idle",
+        "border": "2 px chip_idle_edge",
+        "ink": "cream",
+        "weight": 800
+      },
+      "tap": "tween ShopScroll.scroll_vertical do sekcije - 184, 0.28 s cubic out",
+      "spy": "aktivan = zadnja sekcija čiji top <= scroll + 304; na dnu = Support"
+    },
+    "SectionTitle": {
+      "h": 64,
+      "gap": 16,
+      "accent": {
+        "w": 10,
+        "h": 56,
+        "radius": 5,
+        "looks": "coin_gold",
+        "others": "spend_money"
+      },
+      "title": 56,
+      "sub": 38,
+      "sub_ink": "sub_on_page",
+      "texts": {
+        "looks": [
+          "Looks",
+          "for coins · looks only"
+        ],
+        "seasons": [
+          "Seasons",
+          "one-time · theme only"
+        ],
+        "boosters": [
+          "Boosters",
+          "optional helpers · one use each"
+        ],
+        "support": [
+          "Support",
+          "one-time purchases"
+        ]
+      }
+    },
+    "FairNote": {
+      "font": 38,
+      "ink": "sub_on_page",
+      "align": "center",
+      "padding_top": 12,
+      "text": "Everything here is optional. Looks and seasons change how the meadow looks — never how runs, merges or rewards work."
+    }
+  },
+  "components": {
+    "CosmeticSlot": {
+      "w": 1032,
+      "radius": 26,
+      "border": "2 px card_edge",
+      "fill": "cream",
+      "shadow": "card",
+      "padding": 20,
+      "gap": 20,
+      "head": {
+        "h": 48,
+        "title": 46,
+        "where": 38,
+        "gap": 16
+      },
+      "divider": "2 px hairline između kartica",
+      "group_by": "CosmeticCatalog.get_slot()",
+      "slots": {
+        "pip_skin": [
+          "Pip skin",
+          "in runs · wear one"
+        ],
+        "meadow_bg": [
+          "Meadow tint",
+          "run background · wear one"
+        ],
+        "journal_frame": [
+          "Album frame",
+          "Journal page"
+        ]
+      }
+    },
+    "CosmeticCard": {
+      "h": 284,
+      "gap": 24,
+      "columns": [
+        440,
+        524
+      ],
+      "right": {
+        "name": 48,
+        "desc": 38,
+        "gap": 14,
+        "action_row_h": 120,
+        "action_gap": 14
+      },
+      "states": {
+        "buy": {
+          "when": "!owned && coins >= cost",
+          "row": [
+            "PriceTag coin",
+            "BuyButton spend_coins 'Buy & wear'"
+          ]
+        },
+        "short": {
+          "when": "!owned && coins < cost",
+          "row": [
+            "PriceTag coin",
+            "BuyButton disabled 'Need {n} more' / 'earn in runs'"
+          ],
+          "input": false
+        },
+        "confirm": {
+          "when": "1. tap na Buy & wear",
+          "desc_replaced_by": [
+            "Spend {cost} coins? (40/900)",
+            "You'll have {left} left. (38)"
+          ],
+          "row": [
+            "CancelButton 150 'Back'",
+            "BuyButton spend_coins, rub 4 px confirm_edge 'Buy for [coin] {cost}'"
+          ],
+          "timeout": "nema — ostaje dok ne tapneš Back, Buy ili drugi predmet"
+        },
+        "bought": {
+          "when": "buy_cosmetic_with_coins() vratio Purchased",
+          "status": "ok, 2.4 s",
+          "text_by_slot": {
+            "pip_skin": "Bought · Pip wears it now",
+            "meadow_bg": "Bought · your runs use it now",
+            "journal_frame": "Bought · your Album wears it"
+          },
+          "then": "equipped",
+          "also": "CoinSpendPop −{cost}"
+        },
+        "owned": {
+          "when": "owned && !equipped",
+          "row": [
+            "OwnedBadge quiet 76 'Owned'",
+            "EquipButton use 'Wear it'"
+          ]
+        },
+        "equipped": {
+          "when": "is_cosmetic_equipped()",
+          "row": [
+            "OwnedBadge active 76 'Wearing'",
+            "note 38 po slotu"
+          ],
+          "notes": {
+            "pip_skin": "Pip wears this in runs.",
+            "meadow_bg": "Your runs use this tint.",
+            "journal_frame": "Your Bloom Album wears this."
+          }
+        }
+      }
+    },
+    "CosmeticPreview": {
+      "w": 440,
+      "h": 284,
+      "radius": 20,
+      "border": "3 px well_edge",
+      "fill": "well_edge",
+      "clip": true,
+      "halves": "2 (Now | With it) sa 3 px razmakom; 1 kad je predmet opremljen",
+      "label_chip": {
+        "h": 56,
+        "radius": 16,
+        "pad_x": 16,
+        "fill": "label_chip",
+        "border": "2 px label_chip_edge",
+        "font": 38,
+        "weight": 800,
+        "pos": "dole lijevo 10/10",
+        "texts": [
+          "Now",
+          "With it"
+        ]
+      },
+      "lane": {
+        "w": 150,
+        "centered": true,
+        "edge": 4,
+        "mow": {
+          "h": 30,
+          "tops": [
+            14,
+            107,
+            200
+          ],
+          "inset": 4
+        },
+        "tufts": "3 kruga 14/14/16 @ 6 % lijevo y60 i 6 % desno y190",
+        "petals": "12 + 9 @ 8–9 %",
+        "colors": "UiRun.GROUND / LANE / LANE_EDGE / LANE_MOW / TUFT / PETAL, sve x meadow modulate x SeasonTheme.bg_modulate(active)"
+      },
+      "pip": {
+        "no_skin": "PipAssets.get_texture() 156 px, bottom 14",
+        "skin": "PipDraw.draw_pip(canvas, center, 2.3, palette) — box 130 x 132, bottom 32",
+        "shadow": "elipsa 100 x 26 pip_shadow, bottom 24"
+      },
+      "album": {
+        "page": "inset 18, radius 14, cream",
+        "title": "title_bloom_album.png 520 x 40, centriran",
+        "rows": "4 x (36 | 32 s ramom) rarity_1, rarity_2, rarity_3, rarity_locked, radius 10, gap 10",
+        "frame": "journal_gold → rub 10 px album_frame (draw_center=false StyleBox preko stranice) + naslov modulate 0.8 (get_journal_title_color)"
+      },
+      "what_changes": {
+        "pip_skin": "Pip (PipDraw paleta)",
+        "meadow_bg": "staza (modulate)",
+        "journal_frame": "ram oko Album stranice"
+      },
+      "now_side": "trenutno opremljen predmet istog slota; ostali slotovi uvijek kako su opremljeni"
+    },
+    "PriceTag": {
+      "coins": {
+        "min_w": 190,
+        "h": 120,
+        "pad_x": 22,
+        "radius": 20,
+        "fill": "price_bg",
+        "border": "3 px price_edge",
+        "icon": 48,
+        "font": 52,
+        "ink": "price_ink"
+      },
+      "money": {
+        "min_w": 280,
+        "min_w_booster": 220,
+        "h": 130,
+        "pad_x": 26,
+        "radius": 20,
+        "fill": "price_bg",
+        "border": "3 px price_edge",
+        "font": "52 (44 ako string > 7 znakova)",
+        "sub": "one-time | each, 38/800 price_sub",
+        "text": "IAPManager.get_price_label(sku) — proizvoljan store string, npr. '3,49 KM'",
+        "grow": "širina raste sa stringom, nikad clip"
+      }
+    },
+    "BuyButton": {
+      "coins": {
+        "fill": "spend_coins",
+        "border": "3 px spend_coins_edge",
+        "label": "Buy & wear",
+        "font": 46
+      },
+      "coins_confirm": {
+        "border": "4 px spend_coins_confirm_edge",
+        "label": "Buy for [coin 44] {cost}"
+      },
+      "money": {
+        "fill": "spend_money",
+        "border": "3 px spend_money_edge",
+        "label": "46/900",
+        "sub": "38/800"
+      },
+      "busy": {
+        "on_cream": "disabled_on_cream",
+        "on_mood": "busy_on_mood",
+        "label": "Waiting for store…",
+        "sub": "finish in the store window",
+        "anim": "modulate.a 0.55↔0.85, 0.8 s loop — samo ovo dugme",
+        "input": false
+      },
+      "dim": {
+        "when": "IAPManager.is_busy() za drugi sku",
+        "modulate_a": 0.5,
+        "sub": "one purchase at a time",
+        "input": false
+      },
+      "retry": {
+        "when": "status fail na predmetu",
+        "label": "Try again"
+      }
+    },
+    "OwnedBadge": {
+      "h": 76,
+      "radius": 18,
+      "pad_x": 20,
+      "font": 40,
+      "icon": 38,
+      "variants": {
+        "owned": {
+          "fill": "tag_quiet",
+          "border": "2 px tag_quiet_edge",
+          "text": "Owned"
+        },
+        "wearing": {
+          "fill": "active",
+          "border": "3 px active_edge",
+          "text": "Wearing"
+        },
+        "season_yours": {
+          "h": 60,
+          "radius": 16,
+          "fill": "rim",
+          "border": "3 px price_edge",
+          "text": "YOURS",
+          "font": 38,
+          "tracking": 0.04
+        },
+        "iap": {
+          "fill": "use",
+          "border": "3 px use_edge",
+          "texts": {
+            "remove_ads": "Ads are off",
+            "starter_pack": "Claimed"
+          }
+        }
+      },
+      "rule": "tag je 60–76 visok; dugme je 120–130 — nikad obrnuto"
+    },
+    "EquipButton": {
+      "flex": true,
+      "h": 120,
+      "radius": 20,
+      "fill": "use",
+      "border": "3 px use_edge",
+      "label": "Wear it",
+      "font": 46,
+      "pressed": "use_pressed + scale 0.97"
+    },
+    "SeasonPackCard": {
+      "w": 1032,
+      "padding": 24,
+      "gap": 20,
+      "radius": 26,
+      "shadow": "card",
+      "fill": "mood; coming soon = lerp(mood, page_bg, 0.44)",
+      "border": {
+        "normal": "3 px mood x 0.8",
+        "owned": "4 px rim",
+        "soon": "3 px soon_border"
+      },
+      "ink": "lum(fill) < 0.2 → cream / #E9E1F0, inače ink / #3F4648",
+      "top_row": {
+        "left": "flex (eyebrow 60 | name 60/900 | tagline 38)",
+        "gap": 24,
+        "right": "SeasonRoster 316"
+      },
+      "fine_print": "6 flowers for your Album · same runs, same rewards (38/800 sub)",
+      "action_row_h": 130,
+      "states": {
+        "buy": [
+          "eyebrow 'PREMIUM SEASON'",
+          "PriceTag money",
+          "BuyButton money 'Get {season}' / 'yours to keep'"
+        ],
+        "busy": [
+          "PriceTag",
+          "BuyButton busy"
+        ],
+        "dim": [
+          "PriceTag",
+          "BuyButton dim"
+        ],
+        "fail": [
+          "PurchaseStatus fail iznad reda",
+          "BuyButton 'Try again'"
+        ],
+        "owned": [
+          "OwnedBadge season_yours umjesto eyebrowa",
+          "OpenOnHome: open_on_light|dark 'Play it on Home ↗' / 'owned · plays like a free season'"
+        ],
+        "soon": [
+          "ComingSoonTag umjesto eyebrowa",
+          "ComingSoonInfo soon_info 'Not for sale yet' / 'no price until it’s ready'",
+          "bez PriceTaga, bez input-a"
+        ]
+      }
+    },
+    "SeasonRoster": {
+      "cols": 3,
+      "rows": 2,
+      "well": 96,
+      "gap": 14,
+      "well_fill": "well",
+      "well_border": "3 px roster_rim",
+      "dot": 52,
+      "dot_fill": "mood (soon #4A5550)",
+      "dot_ring": "6 px lerp(mood, cream, 0.55) (soon #6B746F)",
+      "soon_alpha": 0.8,
+      "source": "SeasonDef.roster; kad bude arta — collection_bloom_icon.gd u well"
+    },
+    "ComingSoonTag": {
+      "h": 60,
+      "radius": 16,
+      "pad_x": 22,
+      "fill": "chrome",
+      "border": "3 px rgba(255,248,240,0.55)",
+      "text": "COMING SOON",
+      "font": 38,
+      "tracking": 0.05,
+      "when": "GameState.is_test_locked_season(id)"
+    },
+    "BoosterCard": {
+      "w": 1032,
+      "padding": 20,
+      "gap": 20,
+      "radius": 26,
+      "fill": "cream",
+      "border": "2 px card_edge",
+      "shadow": "card",
+      "icon_disc": {
+        "size": 112,
+        "fill": "booster_disc",
+        "border": "3 px booster_disc_edge",
+        "icon": 64
+      },
+      "icons": {
+        "merge_hint": "icon_target.svg",
+        "loot_burst": "icon_seed.svg"
+      },
+      "action_row": {
+        "h": 130,
+        "gap": 16,
+        "use": "flex",
+        "price": "220 min",
+        "buy": "280 (flex kad nema Use)"
+      }
+    },
+    "BoosterCount": {
+      "min_w": 190,
+      "h": 112,
+      "radius": 20,
+      "fill": "count_pill",
+      "border": "2 px count_pill_edge",
+      "label": "You have 38/800 sub",
+      "number": "56/900 tabular",
+      "source": "GameState.get_booster_count(id)"
+    },
+    "UseButton": {
+      "use": {
+        "when": "count > 0",
+        "fill": "use",
+        "label": "Use one",
+        "sub": {
+          "merge_hint": "for your next Arena round",
+          "loot_burst": "+5 seeds now"
+        }
+      },
+      "armed": {
+        "when": "merge_hint && GameState.boosters.merge_hint_active",
+        "label": "Go to Arena ↗",
+        "sub": "hint is ready",
+        "action": "hub → Arena (MetaHubPages.ARENA)"
+      },
+      "full": {
+        "when": "loot_burst && sum_seed_bag >= SEED_BAG_SOFT_CAP",
+        "style": "disabled_on_cream",
+        "label": "Bag is full",
+        "sub": "trade seeds in Camp first",
+        "input": false
+      },
+      "none": {
+        "when": "count == 0",
+        "node": "sakriven"
+      }
+    },
+    "IapCard": {
+      "w": 1032,
+      "padding": 24,
+      "gap": 18,
+      "radius": 26,
+      "fill": "cream",
+      "border": "2 px card_edge",
+      "shadow": "card",
+      "items": {
+        "remove_ads": {
+          "title": "Remove Ads",
+          "buy": "Remove ads",
+          "buy_sub": "for good, on this account"
+        },
+        "starter_pack": {
+          "title": "Starter Pack",
+          "contents": [
+            [
+              "icon_coin",
+              "coin_gold",
+              "+15 coins"
+            ],
+            [
+              "icon_seed",
+              "use",
+              "+8 seeds"
+            ],
+            [
+              "icon_target",
+              "booster_disc",
+              "+1 Merge Hint"
+            ]
+          ],
+          "contents_chip": {
+            "h": 76,
+            "radius": 18,
+            "pad": [
+              0,
+              22,
+              0,
+              14
+            ],
+            "icon": 48,
+            "font": 40,
+            "gap": 14
+          },
+          "buy": "Get the pack",
+          "buy_sub": "once per account"
+        }
+      },
+      "owned_row": "OwnedBadge iap + tekst 38"
+    },
+    "RestoreButton": {
+      "w": 1032,
+      "h": 130,
+      "radius": 20,
+      "fill": "restore",
+      "border": "3 px restore_edge",
+      "label": "Restore purchases 46/900 cream",
+      "sub": "bought before on this store account? 38/700 sub_on_page",
+      "busy": {
+        "fill": "restore_busy",
+        "border": "3 px restore_busy_edge",
+        "label": "Restoring…",
+        "sub": "asking the store"
+      },
+      "visible": "!IAPManager.is_stub_mode()"
+    },
+    "PurchaseStatus": {
+      "min_h": 76,
+      "radius": 18,
+      "pad": [
+        10,
+        20
+      ],
+      "gap": 12,
+      "icon": 40,
+      "font": "38–40/900 + sub 38/700",
+      "kinds": {
+        "ok": [
+          "use",
+          "use_edge",
+          "icon_check"
+        ],
+        "fail": [
+          "fail",
+          "fail_edge",
+          null
+        ],
+        "pending": [
+          "price_bg",
+          "price_edge",
+          null
+        ]
+      },
+      "ok_ttl_s": 2.4,
+      "fail_ttl": "do sljedećeg tapa na tom predmetu",
+      "where": {
+        "cosmetic": "umjesto opisa",
+        "season": "red iznad akcije",
+        "booster": "umjesto opisa",
+        "iap": "iznad reda s cijenom"
+      }
+    },
+    "PurchaseToast": {
+      "style": "UiChrome.toast_style()",
+      "top": 184,
+      "max_w": 960,
+      "icon_disc": {
+        "size": 64,
+        "fill": "use",
+        "border": "3 px use_edge",
+        "icon": 40
+      },
+      "title": 40,
+      "sub": 38,
+      "ttl_s": 2.6,
+      "used_for": [
+        "starter_pack",
+        "remove_ads",
+        "restore",
+        "Go to Arena / Play it on Home (prelaz)"
+      ]
+    },
+    "CoinSpendPop": {
+      "rect": [
+        150,
+        132,
+        "auto",
+        72
+      ],
+      "radius": 36,
+      "fill": "coin_gold",
+      "border": "3 px coin_gold_edge",
+      "icon": 44,
+      "font": 44,
+      "text": "−{cost}",
+      "anim": "y +0 → −40, a 1 → 0, 0.6 s, start 0.1 s poslije kupovine"
+    }
+  },
+  "fail_reasons": {
+    "_comment": "IAPManager.purchase_failed(sku, reason) → PurchaseStatus",
+    "purchase_cancelled": {
+      "kind": "fail",
+      "text": "Cancelled in the store.",
+      "sub": "Nothing was bought."
+    },
+    "purchase_pending": {
+      "kind": "pending",
+      "text": "Payment pending.",
+      "sub": "It unlocks when the store confirms."
+    },
+    "billing_flow_failed": {
+      "kind": "fail",
+      "text": "The store didn’t answer.",
+      "sub": "Nothing was bought — try again."
+    },
+    "ack_failed": {
+      "kind": "pending",
+      "text": "Almost there.",
+      "sub": "The store is confirming — it will unlock."
+    },
+    "purchase_empty": {
+      "kind": "fail",
+      "text": "The store didn’t answer.",
+      "sub": "Nothing was bought — try again."
+    },
+    "missing_product_id": {
+      "kind": "fail",
+      "text": "The store didn’t answer.",
+      "sub": "Nothing was bought — try again."
+    },
+    "missing_token": {
+      "kind": "fail",
+      "text": "The store didn’t answer.",
+      "sub": "Nothing was bought — try again."
+    },
+    "already_owned": {
+      "kind": "none",
+      "action": "refresh — kartica pokaže owned"
+    },
+    "busy": {
+      "kind": "none",
+      "action": "ne može se desiti — druga dugmad su dim"
+    },
+    "test_locked": {
+      "kind": "none",
+      "action": "ne može se desiti — soon nema dugme"
+    },
+    "unknown_sku": {
+      "kind": "fail",
+      "text": "The store didn’t answer.",
+      "sub": "Nothing was bought — try again."
+    }
+  },
+  "scenes": {
+    "mid": {
+      "label": "sredina igre — sva coin stanja",
+      "coins": 180,
+      "seeds": 23,
+      "owned": [
+        "pip_sky",
+        "meadow_sunset",
+        "meadow_lavender"
+      ],
+      "equipped": {
+        "pip_skin": "pip_sky",
+        "meadow_bg": "meadow_lavender"
+      },
+      "boosters": {
+        "merge_hint": 2,
+        "loot_burst": 0
+      },
+      "seasons_owned": [
+        "moonlit_warren"
+      ],
+      "ads_removed": false,
+      "starter_owned": true,
+      "store": true
+    },
+    "newbie": {
+      "label": "novi igrač",
+      "coins": 60,
+      "seeds": 6,
+      "owned": [],
+      "boosters": {
+        "merge_hint": 0,
+        "loot_burst": 0
+      },
+      "seasons_owned": [],
+      "starter_owned": false
+    },
+    "confirm": {
+      "label": "potvrda coin kupovine",
+      "base": "mid",
+      "confirm": "journal_gold"
+    },
+    "bought": {
+      "label": "kupljeno za coine",
+      "base": "mid",
+      "coins": 60,
+      "equipped": {
+        "journal_frame": "journal_gold"
+      },
+      "status": {
+        "journal_gold": "ok"
+      },
+      "coin_pop": "−120"
+    },
+    "season_busy": {
+      "label": "kupovina sezone u toku",
+      "base": "mid",
+      "busy": "season_pack_coral_tide"
+    },
+    "season_fail": {
+      "label": "kupovina sezone neuspjela",
+      "base": "mid",
+      "status": {
+        "season_pack_coral_tide": "purchase_cancelled"
+      }
+    },
+    "season_done": {
+      "label": "sezona kupljena",
+      "base": "mid",
+      "seasons_owned": [
+        "moonlit_warren",
+        "coral_tide"
+      ],
+      "status": {
+        "season_pack_coral_tide": "ok"
+      }
+    },
+    "booster_busy": {
+      "label": "booster u kupovini",
+      "base": "mid",
+      "busy": "booster_loot_burst"
+    },
+    "booster_used": {
+      "label": "Merge Hint aktivan, Loot Burst iskorišten",
+      "base": "mid",
+      "boosters": {
+        "merge_hint": 1,
+        "loot_burst": 0
+      },
+      "merge_hint_active": true,
+      "seeds": 28
+    },
+    "bag_full": {
+      "label": "pun bag + neuspjela kupovina boostera",
+      "base": "mid",
+      "boosters": {
+        "merge_hint": 0,
+        "loot_burst": 3
+      },
+      "seeds": 40,
+      "status": {
+        "merge_hint": "purchase_cancelled"
+      }
+    },
+    "support": {
+      "label": "Support sa Restore",
+      "base": "mid"
+    },
+    "starter_done": {
+      "label": "Starter Pack kupljen",
+      "base": "newbie",
+      "coins": 75,
+      "seeds": 14,
+      "toast": "+15 coins · +8 seeds · +1 Merge Hint"
+    },
+    "pending": {
+      "label": "plaćanje na čekanju",
+      "base": "mid",
+      "status": {
+        "remove_ads": "purchase_pending"
+      }
+    },
+    "restoring": {
+      "label": "restore u toku",
+      "base": "mid",
+      "restoring": true
+    },
+    "restored": {
+      "label": "restore gotov",
+      "base": "mid",
+      "ads_removed": true,
+      "toast": "Purchases restored"
+    },
+    "no_store": {
+      "label": "stub / desktop — bez Restore",
+      "base": "mid",
+      "store": false
+    }
+  },
+  "animations": [
+    {
+      "what": "JumpChip tap → scroll",
+      "target": "ShopScroll.scroll_vertical",
+      "dur_s": 0.28,
+      "ease": "EASE_OUT",
+      "trans": "TRANS_CUBIC"
+    },
+    {
+      "what": "Pritisak dugmeta",
+      "target": "scale 0.97",
+      "dur_s": 0.08,
+      "note": "isto kao Arena / Camp / Home"
+    },
+    {
+      "what": "Buy & wear → confirm red",
+      "target": "modulate:a cross-fade",
+      "dur_s": 0.12
+    },
+    {
+      "what": "Kupljeno — pregled",
+      "target": "CosmeticPreview scale 1.0 → 1.04 → 1.0",
+      "dur_s": 0.22
+    },
+    {
+      "what": "Kupljeno — halves se spoje",
+      "target": "Now half custom_minimum_size.x → 0",
+      "dur_s": 0.2,
+      "ease": "EASE_OUT"
+    },
+    {
+      "what": "CoinSpendPop",
+      "target": "position:y −40 + modulate:a 1 → 0",
+      "dur_s": 0.6,
+      "delay_s": 0.1
+    },
+    {
+      "what": "Header coin chip",
+      "target": "count-down broja",
+      "dur_s": 0.25,
+      "note": "isti tween kao prijedlog count-upa iz hub chrome README"
+    },
+    {
+      "what": "PurchaseStatus in",
+      "target": "modulate:a 0 → 1 + position:y 8 → 0",
+      "dur_s": 0.18
+    },
+    {
+      "what": "PurchaseStatus ok out",
+      "target": "modulate:a → 0",
+      "dur_s": 0.2,
+      "hold_s": 2.4
+    },
+    {
+      "what": "BuyButton busy",
+      "target": "modulate:a 0.55 ↔ 0.85",
+      "dur_s": 0.8,
+      "loop": true,
+      "note": "jedini loop na ekranu"
+    },
+    {
+      "what": "PurchaseToast",
+      "target": "position:y −16 → 0 + a",
+      "dur_s": 0.2,
+      "hold_s": 2.6
+    },
+    {
+      "what": "OwnedBadge pojava",
+      "target": "scale 0.9 → 1.0",
+      "dur_s": 0.16
+    }
+  ],
+  "strings_en": {
+    "jump_looks": "Looks",
+    "jump_seasons": "Seasons",
+    "jump_boosters": "Boosters",
+    "jump_support": "Support",
+    "looks_sub": "for coins · looks only",
+    "seasons_sub": "one-time · theme only",
+    "boosters_sub": "optional helpers · one use each",
+    "support_sub": "one-time purchases",
+    "slot_pip": "Pip skin",
+    "slot_pip_where": "in runs · wear one",
+    "slot_meadow": "Meadow tint",
+    "slot_meadow_where": "run background · wear one",
+    "slot_album": "Album frame",
+    "slot_album_where": "Journal page",
+    "preview_now": "Now",
+    "preview_with": "With it",
+    "buy_wear": "Buy & wear",
+    "need_more": "Need {n} more",
+    "need_more_sub": "earn in runs",
+    "confirm_q": "Spend {cost} coins?",
+    "confirm_sub": "You’ll have {left} left.",
+    "confirm_back": "Back",
+    "confirm_buy": "Buy for {cost}",
+    "owned": "Owned",
+    "wear_it": "Wear it",
+    "wearing": "Wearing",
+    "wearing_now": "Wearing it now",
+    "eq_note_pip": "Pip wears this in runs.",
+    "eq_note_meadow": "Your runs use this tint.",
+    "eq_note_album": "Your Bloom Album wears this.",
+    "bought_pip": "Bought · Pip wears it now",
+    "bought_meadow": "Bought · your runs use it now",
+    "bought_album": "Bought · your Album wears it",
+    "premium_season": "PREMIUM SEASON",
+    "yours": "YOURS",
+    "coming_soon": "COMING SOON",
+    "season_fine": "6 flowers for your Album · same runs, same rewards",
+    "get_season": "Get {season}",
+    "get_sub": "yours to keep",
+    "one_time": "one-time",
+    "each": "each",
+    "play_on_home": "Play it on Home ↗",
+    "play_on_home_sub": "owned · plays like a free season",
+    "not_for_sale": "Not for sale yet",
+    "not_for_sale_sub": "no price until it’s ready",
+    "season_bought": "{season} is yours.",
+    "season_bought_sub": "Pick it on Home.",
+    "waiting": "Waiting for store…",
+    "waiting_sub": "finish in the store window",
+    "one_at_a_time": "one purchase at a time",
+    "try_again": "Try again",
+    "you_have": "You have",
+    "use_one": "Use one",
+    "use_hint_sub": "for your next Arena round",
+    "use_burst_sub": "+5 seeds now",
+    "go_arena": "Go to Arena ↗",
+    "go_arena_sub": "hint is ready",
+    "bag_full": "Bag is full",
+    "bag_full_sub": "trade seeds in Camp first",
+    "buy_one": "Buy 1",
+    "buy_one_sub": "+1 to your stock",
+    "hint_ready": "Hint ready for your next Arena round",
+    "burst_done": "+{n} seeds in your bag",
+    "booster_bought": "+1 {booster} · you have {n}",
+    "merge_hint_desc": "Highlights your next merge pair in the Arena.",
+    "loot_burst_desc": "Adds 5 seeds to your camp bag right away.",
+    "remove_ads": "Remove Ads",
+    "remove_ads_desc": "Turns off the ad between runs. Rewarded videos stay optional — they only play when you tap them.",
+    "remove_ads_buy": "Remove ads",
+    "remove_ads_buy_sub": "for good, on this account",
+    "ads_off": "Ads are off",
+    "ads_off_text": "Thanks for supporting Merge Meadow.",
+    "starter": "Starter Pack",
+    "starter_desc": "A one-time bundle to get going.",
+    "starter_c1": "+15 coins",
+    "starter_c2": "+8 seeds",
+    "starter_c3": "+1 Merge Hint",
+    "starter_buy": "Get the pack",
+    "starter_buy_sub": "once per account",
+    "claimed": "Claimed",
+    "claimed_text": "+15 coins, +8 seeds and 1 Merge Hint were added.",
+    "starter_toast": "+15 coins · +8 seeds · +1 Merge Hint",
+    "starter_toast_sub": "Starter Pack added",
+    "starter_status": "Pack added to your wallet and bag",
+    "restore": "Restore purchases",
+    "restore_sub": "bought before on this store account?",
+    "restoring": "Restoring…",
+    "restoring_sub": "asking the store",
+    "restored": "Purchases restored",
+    "restored_sub_items": "{items} is back on",
+    "restored_none": "Nothing new on this account",
+    "fair_note": "Everything here is optional. Looks and seasons change how the meadow looks — never how runs, merges or rewards work."
+  },
+  "assets": {
+    "existing": [
+      "res://assets/ui/chrome/icon_coin.svg",
+      "res://assets/ui/chrome/icon_seed.svg",
+      "res://assets/ui/arena/icon_check.svg",
+      "res://assets/ui/arena/icon_target.svg",
+      "res://assets/sprites/pip_idle.svg",
+      "res://assets/ui/title_bloom_album.png"
+    ],
+    "new": [],
+    "everything_else": "StyleBoxFlat + _draw() (staza, PipDraw) — bez blura, gradijenata, maski, čestica"
+  },
+  "godot_map": {
+    "ShopPage": {
+      "node": "shop_screen.tscn (root ShopScreen)",
+      "script": "shop_screen.gd",
+      "remove": [
+        "Dim #B8E0F5 → #2E4733",
+        "TopBar",
+        "BackButton",
+        "ResourceBar",
+        "CoinShopPanel/BoosterPanel/SeasonPacksPanel/IapPanel StyleBoxFlat_iap",
+        "StatusLabel"
+      ],
+      "keep": [
+        "ResetDevButton (samo editor + stub)",
+        "set_meta_hub_mode()",
+        "_notify_hub_chrome()"
+      ]
+    },
+    "ShopScroll": {
+      "node": "RootVBox/MainScroll",
+      "change": "ScrollContainer preko cijele stranice; ShopHeaderRow je sibling iznad, ne u VBoxu"
+    },
+    "ShopHeaderRow": {
+      "node": "novi HBoxContainer sa 4 HubPressable",
+      "script": "shop_jump_chip.gd (novi, extends HubPressable)"
+    },
+    "CosmeticSlot / CosmeticCard": {
+      "script": "shop_cosmetic_row.gd → shop_cosmetic_card.gd",
+      "data": [
+        "CosmeticCatalog",
+        "GameState.owns_cosmetic",
+        "is_cosmetic_equipped",
+        "buy_cosmetic_with_coins",
+        "equip_cosmetic",
+        "wallet_coins"
+      ],
+      "signals": [
+        "buy_confirmed(id)",
+        "equip_pressed(id)"
+      ]
+    },
+    "CosmeticPreview": {
+      "script": "shop_cosmetic_preview.gd (novi Control, _draw)",
+      "reuse": [
+        "UiRun boje",
+        "CosmeticCatalog.get_meadow_modulate",
+        "SeasonTheme.bg_modulate",
+        "PipAssets.get_texture",
+        "PipDraw.draw_pip"
+      ],
+      "api_change": "PipDraw.draw_pip(canvas, center, scale, palette_override: Dictionary = {}) — Shop crta skin koji još nije opremljen"
+    },
+    "BoosterCard": {
+      "script": "shop_booster_row.gd",
+      "data": [
+        "get_booster_count",
+        "use_booster",
+        "boosters.merge_hint_active",
+        "sum_seed_bag",
+        "SEED_BAG_SOFT_CAP"
+      ]
+    },
+    "SeasonPackCard": {
+      "script": "season_pack_card.gd",
+      "change": "extends PanelContainer umjesto UiClickButton; tap na karticu ništa, akcija je samo BuyButton / OpenOnHome",
+      "data": [
+        "SeasonCatalog.paid_defs",
+        "SeasonDef.roster",
+        "tagline",
+        "IAPManager.owns_product",
+        "get_price_label",
+        "is_test_locked_season"
+      ]
+    },
+    "OpenOnHome": {
+      "action": "GameState.go_to_meta_home() + Home fokus na season_id (isti put kao Camp SeasonLink)"
+    },
+    "IapCard": {
+      "nodes": [
+        "IapPanel/VBox/RemoveAdsButton + RemoveAdsDesc",
+        "StarterPackButton + StarterPackDesc"
+      ],
+      "change": "jedan IapCard po SKU"
+    },
+    "RestoreButton": {
+      "node": "IapPanel/VBox/RestoreButton",
+      "visible": "not IAPManager.is_stub_mode()"
+    },
+    "PurchaseStatus": {
+      "script": "novi shop_purchase_status.gd (PanelContainer + Label)",
+      "source": [
+        "purchase_completed",
+        "purchase_failed",
+        "restore_completed",
+        "rezultat buy_cosmetic_with_coins / use_booster"
+      ]
+    },
+    "PurchaseToast": {
+      "reuse": "UiChrome.toast_style() — isti čvor kao Settings placeholder toast"
+    }
+  },
+  "smoke_tests": {
+    "must_update": [
+      {
+        "name": "shop_smoke",
+        "why": "nema StatusLabel; poruke su na predmetu"
+      },
+      {
+        "name": "shop_cosmetic_buy_smoke",
+        "why": "kupovina je sada 2 tapa (buy → confirm)"
+      },
+      {
+        "name": "shop_open_smoke",
+        "why": "SeasonPackCard više nije UiClickButton"
+      }
+    ],
+    "should_pass_unchanged": [
+      "shop_nav_smoke",
+      "season_iap_smoke",
+      "meta_hub_smoke",
+      "meta_hub_flow_smoke"
+    ],
+    "new": [
+      "shop_booster_guard_smoke — Use blokiran kad je hint aktivan / bag pun"
+    ]
+  },
+  "decisions": [
+    {
+      "date": "2026-09-23",
+      "what": "Jedan dizajn. Svih 22 odluke u README § Odlučeno."
+    }
+  ],
+  "open_decisions": [
+    "shop-cd-brief.md nije bio na masteru — provjeriti §5 tokene i §7.1 listu stanja kad se pushne",
+    "Journal zlatni ram: preuzeti tačan izgled iz design_handoff_journal kad bude na masteru (ovdje 10 px #E8C44A)",
+    "Pip skin u runu je PipDraw placeholder — prihvatiti ili napraviti slojeviti sprite (README § Van zadatka)"
+  ]
+}

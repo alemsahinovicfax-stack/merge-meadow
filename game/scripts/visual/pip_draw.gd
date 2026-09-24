@@ -12,8 +12,11 @@ const EYE := Color(0.2, 0.25, 0.22, 1.0)
 const NOSE := Color(1.0, 0.55, 0.62, 1.0)
 
 
-static func draw_pip(canvas: CanvasItem, center: Vector2, scale: float = 1.0) -> void:
-	var palette := _resolve_palette()
+## palette_override: Shop crta skin koji jos nije opremljen (design_handoff_shop).
+static func draw_pip(
+	canvas: CanvasItem, center: Vector2, scale: float = 1.0, palette_override: Dictionary = {}
+) -> void:
+	var palette := palette_override if not palette_override.is_empty() else _resolve_palette()
 	var body: Color = palette.get("body", BODY)
 	var ear: Color = palette.get("ear", EAR)
 	var ear_inner: Color = palette.get("ear_inner", EAR_INNER)

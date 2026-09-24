@@ -89,6 +89,21 @@ func get_sub() -> String:
 	return _sub.text if _sub else ""
 
 
+func get_title_label() -> Label:
+	_ensure_camp_content()
+	return _title
+
+
+func get_sub_label() -> Label:
+	_ensure_camp_content()
+	return _sub
+
+
+func get_text_column() -> VBoxContainer:
+	_ensure_camp_content()
+	return _text_col
+
+
 func set_fonts(title_px: int, sub_px: int = UiCamp.FONT_BTN_SUB) -> void:
 	_ensure_camp_content()
 	if _title == null:

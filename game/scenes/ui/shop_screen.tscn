@@ -1,39 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://c8shopscreen01"]
+[gd_scene load_steps=3 format=3 uid="uid://c8shopscreen01"]
 
 [ext_resource type="Script" path="res://scripts/ui/shop_screen.gd" id="1_shop"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iap"]
-bg_color = Color(0.831, 0.769, 0.98, 0.92)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.176, 0.204, 0.212, 0.12)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-content_margin_left = 20.0
-content_margin_top = 16.0
-content_margin_right = 20.0
-content_margin_bottom = 16.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_resource"]
-bg_color = Color(1, 0.973, 0.941, 0.95)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.176, 0.204, 0.212, 0.1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-content_margin_left = 16.0
-content_margin_top = 10.0
-content_margin_right = 16.0
-content_margin_bottom = 10.0
 
 [node name="ShopScreen" type="Control"]
 layout_mode = 3
@@ -42,9 +10,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 script = ExtResource("1_shop")
 
-[node name="Dim" type="ColorRect" parent="."]
+[node name="Bg" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -52,255 +21,68 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.72, 0.88, 0.96, 1)
+color = Color(0.180392, 0.278431, 0.2, 1)
 
-[node name="RootVBox" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = 16.0
-offset_right = -16.0
-offset_bottom = -16.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 12
-
-[node name="TopBar" type="HBoxContainer" parent="RootVBox"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="TitleLabel" type="Label" parent="RootVBox/TopBar"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.29, 0.29, 0.29, 1)
-theme_override_font_sizes/font_size = 34
-text = "Shop"
-vertical_alignment = 1
-
-[node name="BackButton" type="PanelContainer" parent="RootVBox/TopBar"]
-custom_minimum_size = Vector2(120, 52)
-layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "Back"
-font_size = 22
-button_icon = "home"
-button_variant = "subtle"
-
-[node name="ResourceBar" type="PanelContainer" parent="RootVBox"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_resource")
-
-[node name="HBox" type="HBoxContainer" parent="RootVBox/ResourceBar"]
-layout_mode = 2
-theme_override_constants/separation = 24
-alignment = 1
-
-[node name="CoinsRow" type="HBoxContainer" parent="RootVBox/ResourceBar/HBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="WalletIcon" type="TextureRect" parent="RootVBox/ResourceBar/HBox/CoinsRow"]
-custom_minimum_size = Vector2(28, 28)
-layout_mode = 2
-size_flags_vertical = 4
-expand_mode = 1
-stretch_mode = 5
-
-[node name="CoinsLabel" type="Label" parent="RootVBox/ResourceBar/HBox/CoinsRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.38, 0.2, 1)
-theme_override_font_sizes/font_size = 26
-text = "0"
-vertical_alignment = 1
-
-[node name="CoinsCaption" type="Label" parent="RootVBox/ResourceBar/HBox/CoinsRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.45, 0.35, 1)
-theme_override_font_sizes/font_size = 16
-text = "coins"
-vertical_alignment = 1
-
-[node name="SeedsRow" type="HBoxContainer" parent="RootVBox/ResourceBar/HBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="SeedsIcon" type="TextureRect" parent="RootVBox/ResourceBar/HBox/SeedsRow"]
-custom_minimum_size = Vector2(28, 28)
-layout_mode = 2
-size_flags_vertical = 4
-expand_mode = 1
-stretch_mode = 5
-
-[node name="SeedsLabel" type="Label" parent="RootVBox/ResourceBar/HBox/SeedsRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.25, 0.5, 0.28, 1)
-theme_override_font_sizes/font_size = 26
-text = "0 / 40"
-vertical_alignment = 1
-
-[node name="SeedsCaption" type="Label" parent="RootVBox/ResourceBar/HBox/SeedsRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.48, 0.36, 1)
-theme_override_font_sizes/font_size = 16
-text = "seeds"
-vertical_alignment = 1
-
-[node name="MainScroll" type="ScrollContainer" parent="RootVBox"]
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-vertical_scroll_mode = 2
-
-[node name="MainContent" type="VBoxContainer" parent="RootVBox/MainScroll"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-theme_override_constants/separation = 16
-
-[node name="CoinShopPanel" type="PanelContainer" parent="RootVBox/MainScroll/MainContent"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_resource")
-
-[node name="VBox" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent/CoinShopPanel"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="CoinShopTitle" type="Label" parent="RootVBox/MainScroll/MainContent/CoinShopPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.38, 0.2, 1)
-text = "Cosmetics (coins)"
-
-[node name="CoinShopHint" type="Label" parent="RootVBox/MainScroll/MainContent/CoinShopPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
-text = "Cosmetic-only — no gameplay advantage."
-autowrap_mode = 2
-
-[node name="CosmeticsList" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent/CoinShopPanel/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="BoosterPanel" type="PanelContainer" parent="RootVBox/MainScroll/MainContent"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_iap")
-
-[node name="VBox" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent/BoosterPanel"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="BoosterTitle" type="Label" parent="RootVBox/MainScroll/MainContent/BoosterPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.28, 0.45, 1)
-text = "Boosters (consumables)"
-horizontal_alignment = 1
-
-[node name="BoosterHint" type="Label" parent="RootVBox/MainScroll/MainContent/BoosterPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
-text = "Buy with real money — use from inventory."
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="BoostersList" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent/BoosterPanel/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="SeasonPacksPanel" type="PanelContainer" parent="RootVBox/MainScroll/MainContent"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_iap")
-
-[node name="VBox" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent/SeasonPacksPanel"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="SeasonPacksTitle" type="Label" parent="RootVBox/MainScroll/MainContent/SeasonPacksPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.28, 0.45, 1)
-text = "Season packs"
-horizontal_alignment = 1
-
-[node name="SeasonPacksHint" type="Label" parent="RootVBox/MainScroll/MainContent/SeasonPacksPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
-text = "Cosmetic themes. No extra power."
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="SeasonPacksGrid" type="GridContainer" parent="RootVBox/MainScroll/MainContent/SeasonPacksPanel/VBox"]
+[node name="ShopScroll" type="ScrollContainer" parent="."]
 unique_name_in_owner = true
-columns = 2
-layout_mode = 2
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
 
-[node name="IapPanel" type="PanelContainer" parent="RootVBox/MainScroll/MainContent"]
+[node name="ShopPad" type="MarginContainer" parent="ShopScroll"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_iap")
-
-[node name="VBox" type="VBoxContainer" parent="RootVBox/MainScroll/MainContent/IapPanel"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="IapTitle" type="Label" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.28, 0.45, 1)
-text = "Support the game"
-horizontal_alignment = 1
-
-[node name="StatusLabel" type="Label" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.35, 0.35, 1)
-text = "Optional real-money purchases."
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="RemoveAdsButton" type="PanelContainer" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "Remove Ads"
-font_size = 26
-button_variant = "accent"
-
-[node name="RemoveAdsDesc" type="Label" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
-text = "Turn off interstitial ads between runs."
-autowrap_mode = 2
-
-[node name="StarterPackButton" type="PanelContainer" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "Starter Pack"
-font_size = 26
-button_variant = "secondary"
-
-[node name="StarterPackDesc" type="Label" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.42, 0.42, 1)
-text = "One-time boost."
-autowrap_mode = 2
-
-[node name="RestoreButton" type="PanelContainer" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-custom_minimum_size = Vector2(0, 56)
-layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "Restore Purchases"
-font_size = 26
-button_variant = "subtle"
-
-[node name="ResetDevButton" type="PanelContainer" parent="RootVBox/MainScroll/MainContent/IapPanel/VBox"]
-custom_minimum_size = Vector2(0, 56)
-layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "Reset Purchases (dev)"
-font_size = 26
-button_variant = "subtle"
-
-[node name="BottomSpacer" type="Control" parent="RootVBox/MainScroll/MainContent"]
-custom_minimum_size = Vector2(0, 24)
-layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 184
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 64
+
+[node name="ShopContent" type="VBoxContainer" parent="ShopScroll/ShopPad"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 64
+
+[node name="ShopHeaderRow" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+z_index = 3
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 160.0
+grow_horizontal = 2
+mouse_filter = 1
+
+[node name="JumpRow" type="HBoxContainer" parent="ShopHeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="ResetDevButton" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(320, 96)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -344.0
+offset_top = -120.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("2_uibtn")
+label_text = "Reset (dev)"
+font_size = 24
+button_variant = "subtle"

@@ -10,6 +10,8 @@ const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
 const SETTINGS_TOAST_TEXT := "Settings coming soon."
 const SETTINGS_TOAST_HOLD := 1.6  # s
 const SETTINGS_TOAST_GAP := 24.0  # px ispod headera
+const COIN_POP_POS := Vector2(150, 132)  # design_handoff_shop · CoinSpendPop
+const COIN_POP_TIME := 0.6  # s
 
 @onready var swipe_pager: SwipePager = $RootVBox/SwipePager
 @onready var top_bar: MarginContainer = $RootVBox/TopBar
@@ -39,6 +41,8 @@ var _nav_locked: bool = false
 var _current_page: int = MetaHubPagesScript.MAIN
 var _safe_insets: Vector4 = Vector4.ZERO
 var _settings_toast: PanelContainer = null
+var _coin_pop: PanelContainer = null
+var _coin_pop_tween: Tween = null
 var _settings_toast_tween: Tween = null
 
 
@@ -190,6 +194,8 @@ func current_page_index() -> int:
 
 
 func _on_page_changed(index: int) -> void:
+	if _current_page == MetaHubPagesScript.COLLECTION and index != MetaHubPagesScript.COLLECTION:
+		_notify_journal_left()
 	_current_page = index
 	_load_neighbors(index)
 	_update_tab_highlight(index)
@@ -249,8 +255,7 @@ func _configure_embedded_page(page: Control, index: int) -> void:
 		page.set_meta_hub_mode(true)
 	match index:
 		MetaHubPagesScript.SHOP:
-			_hide_node(page, "RootVBox/TopBar")
-			_hide_node(page, "RootVBox/ResourceBar")
+			pass  # Shop (2026-09-23) nema svoj TopBar ni ResourceBar — valute su u hubu
 		MetaHubPagesScript.CAMP:
 			_hide_node(page, "%HomeButton")
 			_hide_node(page, "%SettingsButton")
@@ -258,13 +263,22 @@ func _configure_embedded_page(page: Control, index: int) -> void:
 		MetaHubPagesScript.ARENA:
 			_hide_node(page, "RootVBox/TopBar/BackButton")
 		MetaHubPagesScript.COLLECTION:
-			_hide_node(page, "RootVBox/TopBar/BackButton")
+			_hide_node(page, "%BackButton")
 
 
 func _hide_node(root: Node, path: String) -> void:
 	var node := root.get_node_or_null(path)
 	if node:
 		node.visible = false
+
+
+func _notify_journal_left() -> void:
+	var host: Control = swipe_pager.get_pages_host() as Control if swipe_pager else null
+	if host == null:
+		return
+	var page := host.get_node_or_null("Page_%d" % MetaHubPagesScript.COLLECTION)
+	if page != null and page.has_method("on_meta_page_left"):
+		page.call("on_meta_page_left")
 
 
 func _refresh_embedded_page(index: int) -> void:
@@ -397,6 +411,58 @@ func _refresh_tab_badges() -> void:
 	_tabs[MetaHubPagesScript.COLLECTION].set_badge_count(
 		GameState.count_collection_journal_news()
 	)
+
+
+## Shop javlja potrosnju coina; pop krece ispod coin chipa (design_handoff_shop).
+func show_coin_spend_pop(amount: int) -> void:
+	if amount <= 0:
+		return
+	_show_coin_pop("-%d" % amount)
+
+
+## Arena javlja combo nagradu (+2 na combo 5) — isti pop, samo u plusu.
+func show_coin_earn_pop(amount: int) -> void:
+	if amount <= 0:
+		return
+	_show_coin_pop("+%d" % amount)
+
+
+func _show_coin_pop(text: String) -> void:
+	if _coin_pop == null:
+		_coin_pop = _build_coin_pop()
+	var label := _coin_pop.get_child(0) as Label
+	if label:
+		label.text = text
+	if _coin_pop_tween != null and _coin_pop_tween.is_valid():
+		_coin_pop_tween.kill()
+	_coin_pop.reset_size()
+	var start := Vector2(COIN_POP_POS)
+	if coin_chip != null:
+		start = Vector2(coin_chip.position.x + 26.0, coin_chip.position.y + coin_chip.size.y - 12.0)
+	_coin_pop.position = start
+	_coin_pop.modulate.a = 1.0
+	_coin_pop.visible = true
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(_coin_pop, "position:y", start.y - 40.0, COIN_POP_TIME).set_delay(0.1)
+	tween.tween_property(_coin_pop, "modulate:a", 0.0, COIN_POP_TIME).set_delay(0.1)
+	tween.chain().tween_callback(_coin_pop.hide)
+	_coin_pop_tween = tween
+
+
+func _build_coin_pop() -> PanelContainer:
+	var pop := PanelContainer.new()
+	pop.name = "CoinSpendPop"
+	pop.visible = false
+	pop.z_index = 6
+	pop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pop.add_theme_stylebox_override("panel", UiShop.coin_pop_style())
+	var label := Label.new()
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	UiCamp.style_label(label, UiShop.FONT_PRICE_LONG, UiShop.PRICE_INK)
+	pop.add_child(label)
+	add_child(pop)
+	return pop
 
 
 func _show_settings_toast() -> void:

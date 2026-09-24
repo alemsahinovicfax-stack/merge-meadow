@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#1A241E}a{color:#FFD56B}a:hover{color:#FFE8B8}</style>
+</helmet>
+<div data-layer="ShopScreen" style="width:1080px;height:1920px;flex:0 0 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#2E4733;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+  <dc-import name="HubScreen" part="header" theme="dark" page-bg="#2E4733" coins="{{ coinsText }}" seeds="{{ seedsText }}" diamonds="12" hint-size="1080px,143px"></dc-import>
+
+  <div data-layer="ShopPage" style="position:relative;flex:0 0 1597px;height:1597px;overflow:hidden">
+
+    <div data-layer="ShopScroll" ref="{{ scrollRef }}" onScroll="{{ onScroll }}" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none">
+      <div data-layer="ShopContent" style="padding:184px 24px 64px;display:flex;flex-direction:column;gap:64px">
+
+        <div data-sec="looks" data-layer="LooksSection" style="display:flex;flex-direction:column;gap:20px">
+          <div data-layer="SectionTitle" style="height:64px;display:flex;align-items:center;gap:16px">
+            <div style="flex:0 0 auto;width:10px;height:56px;border-radius:5px;background:#FFD56B"></div>
+            <div style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">Looks</div>
+            <div style="font:700 38px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82);white-space:nowrap">for coins · looks only</div>
+          </div>
+
+          <sc-for list="{{ slots }}" as="g" hint-placeholder-count="3">
+            <div data-layer="CosmeticSlot" style="box-sizing:border-box;background:#FFF8F0;border:2px solid rgba(45,52,54,.16);border-radius:26px;box-shadow:0 8px 16px rgba(20,26,22,.26);padding:20px;display:flex;flex-direction:column;gap:20px">
+              <div style="height:48px;display:flex;align-items:center;gap:16px">
+                <div style="font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ g.title }}</div>
+                <div style="font:700 38px/1 Nunito,system-ui,sans-serif;color:#555C5E;white-space:nowrap">{{ g.where }}</div>
+              </div>
+              <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="2">
+                <div style="display:flex;flex-direction:column;gap:20px">
+                  <sc-if value="{{ it.divider }}" hint-placeholder-val="{{ false }}"><div style="height:2px;background:rgba(45,52,54,.12)"></div></sc-if>
+                  <div data-layer="CosmeticCard" style="height:284px;display:flex;gap:24px">
+
+                    <div data-layer="CosmeticPreview" style="position:relative;flex:0 0 440px;height:284px;box-sizing:border-box;border-radius:20px;overflow:hidden;background:#16211B;border:3px solid #16211B;display:flex;gap:3px">
+                      <sc-for list="{{ it.halves }}" as="h" hint-placeholder-count="2">
+                        <div style="position:relative;flex:1 1 0;min-width:0;overflow:hidden;background:{{ h.ground }}">
+                          <sc-if value="{{ h.isLane }}" hint-placeholder-val="{{ true }}">
+                            <div style="position:absolute;top:0;bottom:0;left:50%;width:150px;margin-left:-75px;box-sizing:border-box;background:{{ h.lane }};border-left:4px solid {{ h.edge }};border-right:4px solid {{ h.edge }}"></div>
+                            <div style="position:absolute;left:50%;width:142px;margin-left:-71px;top:14px;height:30px;background:{{ h.mow }}"></div>
+                            <div style="position:absolute;left:50%;width:142px;margin-left:-71px;top:107px;height:30px;background:{{ h.mow }}"></div>
+                            <div style="position:absolute;left:50%;width:142px;margin-left:-71px;top:200px;height:30px;background:{{ h.mow }}"></div>
+                            <div style="position:absolute;left:6%;top:60px;width:30px;height:26px">
+                              <div style="position:absolute;left:0;top:9px;width:14px;height:14px;border-radius:50%;background:{{ h.tuft }}"></div>
+                              <div style="position:absolute;left:16px;top:9px;width:14px;height:14px;border-radius:50%;background:{{ h.tuft }}"></div>
+                              <div style="position:absolute;left:7px;top:0;width:16px;height:16px;border-radius:50%;background:{{ h.tuft }}"></div>
+                            </div>
+                            <div style="position:absolute;right:6%;top:190px;width:30px;height:26px">
+                              <div style="position:absolute;left:0;top:9px;width:14px;height:14px;border-radius:50%;background:{{ h.tuft }}"></div>
+                              <div style="position:absolute;left:16px;top:9px;width:14px;height:14px;border-radius:50%;background:{{ h.tuft }}"></div>
+                              <div style="position:absolute;left:7px;top:0;width:16px;height:16px;border-radius:50%;background:{{ h.tuft }}"></div>
+                            </div>
+                            <div style="position:absolute;left:8%;top:214px;width:12px;height:12px;border-radius:50%;background:{{ h.petal }}"></div>
+                            <div style="position:absolute;left:8%;top:204px;width:9px;height:9px;margin-left:1px;border-radius:50%;background:{{ h.petal }}"></div>
+                            <div style="position:absolute;right:9%;top:100px;width:12px;height:12px;border-radius:50%;background:{{ h.petal }}"></div>
+                            <div style="position:absolute;right:9%;top:90px;width:9px;height:9px;margin-right:1px;border-radius:50%;background:{{ h.petal }}"></div>
+                            <div style="position:absolute;left:50%;bottom:24px;width:100px;height:26px;margin-left:-50px;border-radius:50%;background:rgba(18,28,22,.28)"></div>
+                            <sc-if value="{{ h.sprite }}" hint-placeholder-val="{{ true }}">
+                              <img src="icons/pip_idle.svg" alt="" style="position:absolute;left:50%;bottom:14px;width:156px;height:156px;margin-left:-78px">
+                            </sc-if>
+                            <sc-if value="{{ h.draw }}" hint-placeholder-val="{{ false }}">
+                              <div data-layer="PipDraw" style="position:absolute;left:50%;bottom:32px;width:130px;height:132px;margin-left:-65px">
+                                <div style="position:absolute;left:10px;top:6px;width:46px;height:46px;border-radius:50%;background:{{ h.ear }}"></div>
+                                <div style="position:absolute;left:74px;top:6px;width:46px;height:46px;border-radius:50%;background:{{ h.ear }}"></div>
+                                <div style="position:absolute;left:20px;top:16px;width:25px;height:25px;border-radius:50%;background:{{ h.inner }}"></div>
+                                <div style="position:absolute;left:85px;top:16px;width:25px;height:25px;border-radius:50%;background:{{ h.inner }}"></div>
+                                <div style="position:absolute;left:12px;top:26px;width:106px;height:106px;box-sizing:border-box;border-radius:50%;background:{{ h.body }};border:5px solid {{ h.outline }}"></div>
+                                <div style="position:absolute;left:39px;top:58px;width:14px;height:14px;border-radius:50%;background:#333F38"></div>
+                                <div style="position:absolute;left:77px;top:58px;width:14px;height:14px;border-radius:50%;background:#333F38"></div>
+                                <div style="position:absolute;left:57px;top:76px;width:16px;height:16px;border-radius:50%;background:#FF8C9E"></div>
+                              </div>
+                            </sc-if>
+                          </sc-if>
+                          <sc-if value="{{ h.plain }}" hint-placeholder-val="{{ false }}">
+                            <div data-layer="AlbumPage" style="position:absolute;left:18px;right:18px;top:18px;bottom:18px;box-sizing:border-box;border-radius:14px;background:#FFF8F0;padding:14px 14px 0;display:flex;flex-direction:column;gap:10px;overflow:hidden">
+                              <div style="position:relative;flex:0 0 40px;overflow:hidden"><img src="icons/title_bloom_album.png" alt="" style="position:absolute;left:50%;top:0;width:520px;height:40px;margin-left:-260px"></div>
+                              <div style="flex:0 0 36px;border-radius:10px;background:#B8D4F0"></div>
+                              <div style="flex:0 0 36px;border-radius:10px;background:#E0C4FF"></div>
+                              <div style="flex:0 0 36px;border-radius:10px;background:#FFE8B8"></div>
+                              <div style="flex:0 0 36px;border-radius:10px;background:#E4E4E0"></div>
+                            </div>
+                          </sc-if>
+                          <sc-if value="{{ h.framed }}" hint-placeholder-val="{{ false }}">
+                            <div data-layer="AlbumPage" style="position:absolute;left:18px;right:18px;top:18px;bottom:18px;box-sizing:border-box;border-radius:14px;background:#FFF8F0;border:10px solid #E8C44A;padding:8px 8px 0;display:flex;flex-direction:column;gap:10px;overflow:hidden">
+                              <div style="position:relative;flex:0 0 40px;overflow:hidden"><img src="icons/title_bloom_album.png" alt="" style="position:absolute;left:50%;top:0;width:520px;height:40px;margin-left:-260px;filter:brightness(.8)"></div>
+                              <div style="flex:0 0 32px;border-radius:10px;background:#B8D4F0"></div>
+                              <div style="flex:0 0 32px;border-radius:10px;background:#E0C4FF"></div>
+                              <div style="flex:0 0 32px;border-radius:10px;background:#FFE8B8"></div>
+                              <div style="flex:0 0 32px;border-radius:10px;background:#E4E4E0"></div>
+                            </div>
+                          </sc-if>
+                          <sc-if value="{{ h.hasLabel }}" hint-placeholder-val="{{ true }}">
+                            <div style="position:absolute;left:10px;bottom:10px;height:56px;padding:0 16px;border-radius:16px;box-sizing:border-box;background:rgba(26,36,30,.84);border:2px solid rgba(255,248,240,.40);display:flex;align-items:center;font:800 38px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">{{ h.label }}</div>
+                          </sc-if>
+                        </div>
+                      </sc-for>
+                    </div>
+
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px">
+                      <div style="font:900 48px/1.2 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.title }}</div>
+                      <sc-if value="{{ it.showDesc }}" hint-placeholder-val="{{ true }}">
+                        <div style="flex:1;min-height:0;font:700 38px/1.15 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">{{ it.desc }}</div>
+                      </sc-if>
+                      <sc-if value="{{ it.isConfirm }}" hint-placeholder-val="{{ false }}">
+                        <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:8px">
+                          <div style="font:900 40px/1.05 Nunito,system-ui,sans-serif;color:#2D3436">{{ it.confirmQ }}</div>
+                          <div style="font:700 38px/1.1 Nunito,system-ui,sans-serif;color:#555C5E">{{ it.confirmSub }}</div>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ it.okOn }}" hint-placeholder-val="{{ false }}">
+                        <div style="flex:1;min-height:0;display:flex;align-items:flex-start">
+                          <div data-layer="PurchaseStatus" style="min-height:76px;max-width:100%;box-sizing:border-box;padding:10px 20px;border-radius:18px;background:#A8E6CF;border:3px solid #7FC9AC;display:flex;align-items:center;gap:12px">
+                            <img src="icons/icon_check.svg" alt="" style="width:40px;height:40px;flex:0 0 auto">
+                            <div style="font:900 38px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ it.okText }}</div>
+                          </div>
+                        </div>
+                      </sc-if>
+
+                      <div style="flex:0 0 120px;height:120px;display:flex;gap:14px;align-items:center">
+                        <sc-if value="{{ it.isBuy }}" hint-placeholder-val="{{ true }}">
+                          <div data-layer="PriceTag" style="flex:0 0 auto;min-width:190px;height:120px;box-sizing:border-box;padding:0 22px;border-radius:20px;background:#FFE8B8;border:3px solid #D6A82F;display:flex;align-items:center;justify-content:center;gap:10px">
+                            <img src="icons/icon_coin.svg" alt="" style="width:48px;height:48px;flex:0 0 auto">
+                            <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#1A1A14;font-variant-numeric:tabular-nums">{{ it.cost }}</div>
+                          </div>
+                          <div data-layer="BuyButton" onClick="{{ it.onBuy }}" style="flex:1;min-width:0;height:120px;box-sizing:border-box;border-radius:20px;background:#E8C44A;border:3px solid #BA9D3B;display:grid;place-items:center;font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436;cursor:pointer;white-space:nowrap" style-active="transform:scale(.97);background:#D6B23C">Buy &amp; wear</div>
+                        </sc-if>
+                        <sc-if value="{{ it.isShort }}" hint-placeholder-val="{{ false }}">
+                          <div data-layer="PriceTag" style="flex:0 0 auto;min-width:190px;height:120px;box-sizing:border-box;padding:0 22px;border-radius:20px;background:#FFE8B8;border:3px solid #D6A82F;display:flex;align-items:center;justify-content:center;gap:10px">
+                            <img src="icons/icon_coin.svg" alt="" style="width:48px;height:48px;flex:0 0 auto">
+                            <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#1A1A14;font-variant-numeric:tabular-nums">{{ it.cost }}</div>
+                          </div>
+                          <div data-layer="BuyButton" style="flex:1;min-width:0;height:120px;box-sizing:border-box;border-radius:20px;background:rgba(45,52,54,.10);border:3px solid rgba(45,52,54,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#5C6264">
+                            <div style="font:900 44px/1 Nunito,system-ui,sans-serif;white-space:nowrap">{{ it.needText }}</div>
+                            <div style="font:700 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">earn in runs</div>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{ it.isConfirm }}" hint-placeholder-val="{{ false }}">
+                          <div data-layer="CancelButton" onClick="{{ it.onCancel }}" style="flex:0 0 150px;height:120px;box-sizing:border-box;border-radius:20px;background:rgba(45,52,54,.06);border:3px solid rgba(45,52,54,.24);display:grid;place-items:center;font:900 42px/1 Nunito,system-ui,sans-serif;color:#2D3436;cursor:pointer" style-active="transform:scale(.97)">Back</div>
+                          <div data-layer="BuyButton" onClick="{{ it.onConfirm }}" style="flex:1;min-width:0;height:120px;box-sizing:border-box;border-radius:20px;background:#E8C44A;border:4px solid #9C7A14;display:flex;align-items:center;justify-content:center;gap:12px;color:#2D3436;cursor:pointer" style-active="transform:scale(.97);background:#D6B23C">
+                            <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Buy for</div>
+                            <img src="icons/icon_coin.svg" alt="" style="width:44px;height:44px;flex:0 0 auto">
+                            <div style="font:900 50px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums">{{ it.cost }}</div>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{ it.isOwned }}" hint-placeholder-val="{{ false }}">
+                          <div data-layer="OwnedBadge" style="flex:0 0 auto;height:76px;box-sizing:border-box;padding:0 20px;border-radius:18px;background:rgba(45,52,54,.06);border:2px solid rgba(45,52,54,.18);display:flex;align-items:center;gap:10px;font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">
+                            <img src="icons/icon_check.svg" alt="" style="width:38px;height:38px;flex:0 0 auto">Owned
+                          </div>
+                          <div data-layer="EquipButton" onClick="{{ it.onEquip }}" style="flex:1;min-width:0;height:120px;box-sizing:border-box;border-radius:20px;background:#A8E6CF;border:3px solid #7FC9AC;display:grid;place-items:center;font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436;cursor:pointer;white-space:nowrap" style-active="transform:scale(.97);background:#94D6BE">Wear it</div>
+                        </sc-if>
+                        <sc-if value="{{ it.isEquipped }}" hint-placeholder-val="{{ false }}">
+                          <div data-layer="OwnedBadge" style="flex:0 0 auto;height:76px;box-sizing:border-box;padding:0 22px;border-radius:18px;background:#FFB88C;border:3px solid #E8A374;display:flex;align-items:center;gap:10px;font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">
+                            <img src="icons/icon_check.svg" alt="" style="width:38px;height:38px;flex:0 0 auto">Wearing
+                          </div>
+                          <div style="flex:1;min-width:0;font:700 38px/1.1 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">{{ it.eqNote }}</div>
+                        </sc-if>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+
+        <div data-sec="seasons" data-layer="SeasonsSection" style="display:flex;flex-direction:column;gap:20px">
+          <div data-layer="SectionTitle" style="height:64px;display:flex;align-items:center;gap:16px">
+            <div style="flex:0 0 auto;width:10px;height:56px;border-radius:5px;background:#D4A5FF"></div>
+            <div style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">Seasons</div>
+            <div style="font:700 38px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82);white-space:nowrap">one-time · theme only</div>
+          </div>
+          <sc-for list="{{ seasons }}" as="s" hint-placeholder-count="4">
+            <div data-layer="SeasonPackCard" style="box-sizing:border-box;border-radius:26px;padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 8px 16px rgba(20,26,22,.26);background:{{ s.fill }};border:{{ s.border }}">
+              <div style="display:flex;gap:24px;align-items:flex-start">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:12px">
+                  <div style="height:60px;display:flex;align-items:center">
+                    <sc-if value="{{ s.eyebrow }}" hint-placeholder-val="{{ true }}">
+                      <div style="font:900 38px/1 Nunito,system-ui,sans-serif;letter-spacing:.06em;color:{{ s.sub }};white-space:nowrap">PREMIUM SEASON</div>
+                    </sc-if>
+                    <sc-if value="{{ s.isOwned }}" hint-placeholder-val="{{ false }}">
+                      <div data-layer="OwnedBadge" style="height:60px;box-sizing:border-box;padding:0 22px;border-radius:16px;background:#FFF6D6;border:3px solid #D6A82F;display:flex;align-items:center;gap:10px;font:900 38px/1 Nunito,system-ui,sans-serif;letter-spacing:.04em;color:#2D3436;white-space:nowrap">
+                        <img src="icons/icon_check.svg" alt="" style="width:36px;height:36px;flex:0 0 auto">YOURS
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ s.isSoon }}" hint-placeholder-val="{{ false }}">
+                      <div data-layer="ComingSoonTag" style="height:60px;box-sizing:border-box;padding:0 22px;border-radius:16px;background:#1A241E;border:3px solid rgba(255,248,240,.55);display:flex;align-items:center;font:900 38px/1 Nunito,system-ui,sans-serif;letter-spacing:.05em;color:#FFF8F0;white-space:nowrap">COMING SOON</div>
+                    </sc-if>
+                  </div>
+                  <div style="font:900 60px/1.02 Nunito,system-ui,sans-serif;letter-spacing:-.01em;color:{{ s.ink }};text-wrap:balance">{{ s.name }}</div>
+                  <div style="font:700 38px/1.15 Nunito,system-ui,sans-serif;color:{{ s.sub }};text-wrap:pretty">{{ s.tag }}</div>
+                </div>
+                <div data-layer="SeasonRoster" style="flex:0 0 316px;display:grid;grid-template-columns:repeat(3,96px);gap:14px">
+                  <sc-for list="{{ s.roster }}" as="f" hint-placeholder-count="6">
+                    <div style="width:96px;height:96px;box-sizing:border-box;border-radius:50%;background:#22342A;border:3px solid #CBC2B6;display:grid;place-items:center;opacity:{{ f.alpha }}">
+                      <div style="width:52px;height:52px;box-sizing:border-box;border-radius:50%;background:{{ f.dot }};border:6px solid {{ f.ring }}"></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="font:800 38px/1.1 Nunito,system-ui,sans-serif;color:{{ s.sub }}">6 flowers for your Album · same runs, same rewards</div>
+
+              <sc-if value="{{ s.okOn }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="PurchaseStatus" style="min-height:76px;box-sizing:border-box;padding:10px 20px;border-radius:18px;background:#A8E6CF;border:3px solid #7FC9AC;display:flex;align-items:center;gap:14px">
+                  <img src="icons/icon_check.svg" alt="" style="width:40px;height:40px;flex:0 0 auto">
+                  <div style="font:900 40px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ s.stText }}</div>
+                  <div style="font:700 38px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ s.stSub }}</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ s.failOn }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="PurchaseStatus" style="min-height:76px;box-sizing:border-box;padding:10px 20px;border-radius:18px;background:#FFCCD5;border:3px solid #E89AAA;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                  <div style="font:900 40px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ s.stText }}</div>
+                  <div style="font:700 38px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ s.stSub }}</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ s.infoOn }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="PurchaseStatus" style="min-height:76px;box-sizing:border-box;padding:10px 20px;border-radius:18px;background:#FFE8B8;border:3px solid #D6A82F;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                  <div style="font:900 40px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ s.stText }}</div>
+                  <div style="font:700 38px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ s.stSub }}</div>
+                </div>
+              </sc-if>
+
+              <div style="height:130px;display:flex;gap:16px">
+                <sc-if value="{{ s.showPrice }}" hint-placeholder-val="{{ true }}">
+                  <div data-layer="PriceTag" style="flex:0 0 auto;min-width:280px;box-sizing:border-box;padding:0 26px;border-radius:20px;background:#FFE8B8;border:3px solid #D6A82F;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+                    <div style="font:900 {{ s.priceSize }}px/1 Nunito,system-ui,sans-serif;color:#1A1A14;font-variant-numeric:tabular-nums;white-space:nowrap">{{ s.price }}</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;color:#5A4A1E">one-time</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ s.isBuy }}" hint-placeholder-val="{{ true }}">
+                  <div data-layer="BuyButton" onClick="{{ s.onBuy }}" style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:#D4A5FF;border:3px solid #AA84CC;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#2D3436;cursor:pointer" style-active="transform:scale(.97);background:#C293F0">
+                    <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">{{ s.buyLabel }}</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">yours to keep</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ s.isBusy }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="BuyButton" style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.55);border:3px solid rgba(26,26,20,.30);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#44443A">
+                    <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Waiting for store…</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">finish in the store window</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ s.isDim }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="BuyButton" style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:#D4A5FF;border:3px solid #AA84CC;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#2D3436;opacity:.5">
+                    <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">{{ s.buyLabel }}</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">one purchase at a time</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ s.isOwned }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="OpenOnHome" onClick="{{ s.onOpen }}" style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;background:{{ s.openBg }};border:3px solid {{ s.openEdge }};color:{{ s.openInk }}" style-active="transform:scale(.97)">
+                    <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Play it on Home ↗</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">owned · plays like a free season</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ s.isSoon }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="ComingSoonInfo" style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.16);border:3px solid rgba(255,246,214,.40);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#FFF6D6">
+                    <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Not for sale yet</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">no price until it’s ready</div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div data-sec="boosters" data-layer="BoostersSection" style="display:flex;flex-direction:column;gap:20px">
+          <div data-layer="SectionTitle" style="height:64px;display:flex;align-items:center;gap:16px">
+            <div style="flex:0 0 auto;width:10px;height:56px;border-radius:5px;background:#D4A5FF"></div>
+            <div style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">Boosters</div>
+            <div style="font:700 38px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82);white-space:nowrap">optional helpers · one use each</div>
+          </div>
+          <sc-for list="{{ boosters }}" as="b" hint-placeholder-count="2">
+            <div data-layer="BoosterCard" style="box-sizing:border-box;background:#FFF8F0;border:2px solid rgba(45,52,54,.16);border-radius:26px;box-shadow:0 8px 16px rgba(20,26,22,.26);padding:20px;display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;gap:20px;align-items:center">
+                <div style="flex:0 0 auto;width:112px;height:112px;box-sizing:border-box;border-radius:50%;background:#E0C4FF;border:3px solid #B39DCC;display:grid;place-items:center">
+                  <sc-if value="{{ b.isHint }}" hint-placeholder-val="{{ false }}"><img src="icons/icon_target.svg" alt="" style="width:64px;height:64px"></sc-if>
+                  <sc-if value="{{ b.isBurst }}" hint-placeholder-val="{{ false }}"><img src="icons/icon_seed.svg" alt="" style="width:64px;height:64px"></sc-if>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+                  <div style="font:900 48px/1.05 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ b.title }}</div>
+                  <sc-if value="{{ b.showDesc }}" hint-placeholder-val="{{ true }}">
+                    <div style="font:700 38px/1.15 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">{{ b.desc }}</div>
+                  </sc-if>
+                  <sc-if value="{{ b.okOn }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex">
+                      <div data-layer="PurchaseStatus" style="min-height:76px;box-sizing:border-box;padding:10px 20px;border-radius:18px;background:#A8E6CF;border:3px solid #7FC9AC;display:flex;align-items:center;gap:12px">
+                        <img src="icons/icon_check.svg" alt="" style="width:40px;height:40px;flex:0 0 auto">
+                        <div style="font:900 38px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ b.stText }}</div>
+                      </div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ b.failOn }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex">
+                      <div data-layer="PurchaseStatus" style="min-height:76px;box-sizing:border-box;padding:10px 20px;border-radius:18px;background:#FFCCD5;border:3px solid #E89AAA;display:flex;align-items:center;gap:12px">
+                        <div style="font:900 38px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ b.stText }}</div>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+                <div data-layer="BoosterCount" style="flex:0 0 auto;min-width:190px;height:112px;box-sizing:border-box;padding:0 20px;border-radius:20px;background:rgba(45,52,54,.06);border:2px solid rgba(45,52,54,.20);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+                  <div style="font:800 38px/1 Nunito,system-ui,sans-serif;color:#555C5E;white-space:nowrap">You have</div>
+                  <div style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">{{ b.count }}</div>
+                </div>
+              </div>
+              <div style="height:130px;display:flex;gap:16px">
+                <sc-if value="{{ b.useOn }}" hint-placeholder-val="{{ true }}">
+                  <div data-layer="UseButton" onClick="{{ b.onUse }}" style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:#A8E6CF;border:3px solid #7FC9AC;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#2D3436;cursor:pointer" style-active="transform:scale(.97);background:#94D6BE">
+                    <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Use one</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">{{ b.useSub }}</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ b.armedOn }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="UseButton" onClick="{{ b.onGo }}" style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:#A8E6CF;border:3px solid #7FC9AC;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#2D3436;cursor:pointer" style-active="transform:scale(.97);background:#94D6BE">
+                    <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Go to Arena ↗</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">hint is ready</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ b.fullOn }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="UseButton" style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:rgba(45,52,54,.10);border:3px solid rgba(45,52,54,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#5C6264">
+                    <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Bag is full</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">trade seeds in Camp first</div>
+                  </div>
+                </sc-if>
+                <div data-layer="PriceTag" style="flex:0 0 auto;min-width:220px;box-sizing:border-box;padding:0 24px;border-radius:20px;background:#FFE8B8;border:3px solid #D6A82F;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+                  <div style="font:900 {{ b.priceSize }}px/1 Nunito,system-ui,sans-serif;color:#1A1A14;font-variant-numeric:tabular-nums;white-space:nowrap">{{ b.price }}</div>
+                  <div style="font:800 38px/1 Nunito,system-ui,sans-serif;color:#5A4A1E">each</div>
+                </div>
+                <sc-if value="{{ b.buyOn }}" hint-placeholder-val="{{ true }}">
+                  <div data-layer="BuyButton" onClick="{{ b.onBuy }}" style="{{ b.buyFlex }};box-sizing:border-box;border-radius:20px;background:#D4A5FF;border:3px solid #AA84CC;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#2D3436;cursor:pointer" style-active="transform:scale(.97);background:#C293F0">
+                    <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Buy 1</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">{{ b.buySub }}</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ b.busyOn }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="BuyButton" style="{{ b.buyFlex }};box-sizing:border-box;border-radius:20px;background:rgba(45,52,54,.10);border:3px solid rgba(45,52,54,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#5C6264">
+                    <div style="font:900 42px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Waiting…</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">in the store</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ b.dimOn }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="BuyButton" style="{{ b.buyFlex }};box-sizing:border-box;border-radius:20px;background:#D4A5FF;border:3px solid #AA84CC;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#2D3436;opacity:.5">
+                    <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Buy 1</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">{{ b.buySub }}</div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div data-sec="support" data-layer="SupportSection" style="display:flex;flex-direction:column;gap:20px">
+          <div data-layer="SectionTitle" style="height:64px;display:flex;align-items:center;gap:16px">
+            <div style="flex:0 0 auto;width:10px;height:56px;border-radius:5px;background:#D4A5FF"></div>
+            <div style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">Support</div>
+            <div style="font:700 38px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82);white-space:nowrap">one-time purchases</div>
+          </div>
+          <sc-for list="{{ iaps }}" as="p" hint-placeholder-count="2">
+            <div data-layer="IapCard" style="box-sizing:border-box;background:#FFF8F0;border:2px solid rgba(45,52,54,.16);border-radius:26px;box-shadow:0 8px 16px rgba(20,26,22,.26);padding:24px;display:flex;flex-direction:column;gap:18px">
+              <div style="font:900 48px/1.05 Nunito,system-ui,sans-serif;color:#2D3436">{{ p.title }}</div>
+              <sc-if value="{{ p.showDesc }}" hint-placeholder-val="{{ true }}">
+                <div style="font:700 38px/1.15 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">{{ p.desc }}</div>
+              </sc-if>
+              <sc-if value="{{ p.hasContents }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="PackContents" style="display:flex;gap:14px;flex-wrap:wrap">
+                  <div style="height:76px;box-sizing:border-box;padding:0 22px 0 14px;border-radius:18px;background:#FFD56B;border:3px solid #D6A82F;display:flex;align-items:center;gap:10px;font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap"><img src="icons/icon_coin.svg" alt="" style="width:48px;height:48px">+15 coins</div>
+                  <div style="height:76px;box-sizing:border-box;padding:0 22px 0 14px;border-radius:18px;background:#A8E6CF;border:3px solid #7FC9AC;display:flex;align-items:center;gap:10px;font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap"><img src="icons/icon_seed.svg" alt="" style="width:48px;height:48px">+8 seeds</div>
+                  <div style="height:76px;box-sizing:border-box;padding:0 22px 0 14px;border-radius:18px;background:#E0C4FF;border:3px solid #B39DCC;display:flex;align-items:center;gap:10px;font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap"><img src="icons/icon_target.svg" alt="" style="width:48px;height:48px">+1 Merge Hint</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ p.okOn }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex">
+                  <div data-layer="PurchaseStatus" style="min-height:76px;box-sizing:border-box;padding:10px 20px;border-radius:18px;background:#A8E6CF;border:3px solid #7FC9AC;display:flex;align-items:center;gap:12px">
+                    <img src="icons/icon_check.svg" alt="" style="width:40px;height:40px;flex:0 0 auto">
+                    <div style="font:900 40px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ p.stText }}</div>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ p.failOn }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="PurchaseStatus" style="min-height:76px;box-sizing:border-box;padding:10px 20px;border-radius:18px;background:#FFCCD5;border:3px solid #E89AAA;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                  <div style="font:900 40px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ p.stText }}</div>
+                  <div style="font:700 38px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ p.stSub }}</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ p.infoOn }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="PurchaseStatus" style="min-height:76px;box-sizing:border-box;padding:10px 20px;border-radius:18px;background:#FFE8B8;border:3px solid #D6A82F;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                  <div style="font:900 40px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ p.stText }}</div>
+                  <div style="font:700 38px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ p.stSub }}</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ p.isBuyRow }}" hint-placeholder-val="{{ true }}">
+                <div style="height:130px;display:flex;gap:16px">
+                  <div data-layer="PriceTag" style="flex:0 0 auto;min-width:280px;box-sizing:border-box;padding:0 26px;border-radius:20px;background:#FFE8B8;border:3px solid #D6A82F;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+                    <div style="font:900 {{ p.priceSize }}px/1 Nunito,system-ui,sans-serif;color:#1A1A14;font-variant-numeric:tabular-nums;white-space:nowrap">{{ p.price }}</div>
+                    <div style="font:800 38px/1 Nunito,system-ui,sans-serif;color:#5A4A1E">one-time</div>
+                  </div>
+                  <sc-if value="{{ p.isBuy }}" hint-placeholder-val="{{ true }}">
+                    <div data-layer="BuyButton" onClick="{{ p.onBuy }}" style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:#D4A5FF;border:3px solid #AA84CC;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#2D3436;cursor:pointer" style-active="transform:scale(.97);background:#C293F0">
+                      <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">{{ p.buyLabel }}</div>
+                      <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">{{ p.buySub }}</div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ p.isBusy }}" hint-placeholder-val="{{ false }}">
+                    <div data-layer="BuyButton" style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:rgba(45,52,54,.10);border:3px solid rgba(45,52,54,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#5C6264">
+                      <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">Waiting for store…</div>
+                      <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">finish in the store window</div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ p.isDim }}" hint-placeholder-val="{{ false }}">
+                    <div data-layer="BuyButton" style="flex:1;min-width:0;box-sizing:border-box;border-radius:20px;background:#D4A5FF;border:3px solid #AA84CC;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#2D3436;opacity:.5">
+                      <div style="font:900 46px/1 Nunito,system-ui,sans-serif;white-space:nowrap">{{ p.buyLabel }}</div>
+                      <div style="font:800 38px/1 Nunito,system-ui,sans-serif;white-space:nowrap">one purchase at a time</div>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{ p.isOwned }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:18px">
+                  <div data-layer="OwnedBadge" style="flex:0 0 auto;height:76px;box-sizing:border-box;padding:0 22px;border-radius:18px;background:#A8E6CF;border:3px solid #7FC9AC;display:flex;align-items:center;gap:10px;font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">
+                    <img src="icons/icon_check.svg" alt="" style="width:38px;height:38px;flex:0 0 auto">{{ p.ownedBadge }}
+                  </div>
+                  <div style="flex:1;min-width:0;font:700 38px/1.15 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">{{ p.ownedText }}</div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+
+          <sc-if value="{{ restoreIdle }}" hint-placeholder-val="{{ true }}">
+            <div data-layer="RestoreButton" onClick="{{ onRestore }}" style="height:130px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:3px solid rgba(255,248,240,.38);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#FFF8F0;cursor:pointer" style-active="transform:scale(.98);background:rgba(255,248,240,.18)">
+              <div style="font:900 46px/1 Nunito,system-ui,sans-serif">Restore purchases</div>
+              <div style="font:700 38px/1 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82)">bought before on this store account?</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ restoreBusy }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="RestoreButton" style="height:130px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.06);border:3px solid rgba(255,248,240,.24);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:rgba(255,248,240,.82)">
+              <div style="font:900 46px/1 Nunito,system-ui,sans-serif">Restoring…</div>
+              <div style="font:700 38px/1 Nunito,system-ui,sans-serif">asking the store</div>
+            </div>
+          </sc-if>
+
+          <div data-layer="FairNote" style="padding:12px 24px 0;font:700 38px/1.25 Nunito,system-ui,sans-serif;color:rgba(255,248,240,.82);text-align:center;text-wrap:pretty">Everything here is optional. Looks and seasons change how the meadow looks — never how runs, merges or rewards work.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div data-layer="ShopHeaderRow" style="position:absolute;left:0;top:0;right:0;height:160px;z-index:3;box-sizing:border-box;padding:20px 24px 0;background:#2E4733;border-bottom:2px solid rgba(255,248,240,.16);box-shadow:0 6px 12px rgba(20,26,22,.22)">
+      <div style="height:120px;display:flex;gap:14px">
+        <sc-for list="{{ jumps }}" as="j" hint-placeholder-count="4">
+          <sc-if value="{{ j.active }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="JumpChip" onClick="{{ j.go }}" style="flex:1 1 0;min-width:0;box-sizing:border-box;border-radius:20px;background:#FFB88C;border:4px solid #E8A374;display:grid;place-items:center;font:900 42px/1 Nunito,system-ui,sans-serif;color:#2D3436;cursor:pointer;white-space:nowrap">{{ j.label }}</div>
+          </sc-if>
+          <sc-if value="{{ j.idle }}" hint-placeholder-val="{{ true }}">
+            <div data-layer="JumpChip" onClick="{{ j.go }}" style="flex:1 1 0;min-width:0;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center;font:800 42px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;cursor:pointer;white-space:nowrap" style-active="transform:scale(.97)">{{ j.label }}</div>
+          </sc-if>
+        </sc-for>
+      </div>
+    </div>
+
+    <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:0;right:0;top:184px;z-index:4;display:flex;justify-content:center;pointer-events:none">
+        <div data-layer="PurchaseToast" style="max-width:960px;box-sizing:border-box;padding:18px 28px;border-radius:20px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);box-shadow:0 4px 8px rgba(45,52,54,.10),0 10px 24px rgba(20,26,22,.35);display:flex;align-items:center;gap:18px">
+          <div style="flex:0 0 auto;width:64px;height:64px;border-radius:50%;background:#A8E6CF;border:3px solid #7FC9AC;box-sizing:border-box;display:grid;place-items:center"><img src="icons/icon_check.svg" alt="" style="width:40px;height:40px"></div>
+          <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+            <div style="font:900 40px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ toastText }}</div>
+            <div style="font:700 38px/1.1 Nunito,system-ui,sans-serif;color:#555C5E">{{ toastSub }}</div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <dc-import name="HubScreen" part="footer" theme="dark" page-bg="#2E4733" active="{{ 0 }}" hint-size="1080px,180px"></dc-import>
+
+  <sc-if value="{{ popOn }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="CoinSpendPop" style="position:absolute;left:150px;top:132px;z-index:6;height:72px;box-sizing:border-box;padding:0 22px 0 14px;border-radius:36px;background:#FFD56B;border:3px solid #D6A82F;box-shadow:0 6px 12px rgba(20,26,22,.30);display:flex;align-items:center;gap:10px;font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">
+      <img src="icons/icon_coin.svg" alt="" style="width:44px;height:44px">{{ popText }}
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;mid&quot;,&quot;newbie&quot;,&quot;confirm&quot;,&quot;bought&quot;,&quot;season_busy&quot;,&quot;season_fail&quot;,&quot;season_done&quot;,&quot;booster_busy&quot;,&quot;booster_used&quot;,&quot;bag_full&quot;,&quot;support&quot;,&quot;starter_done&quot;,&quot;pending&quot;,&quot;restoring&quot;,&quot;restored&quot;,&quot;no_store&quot;],&quot;default&quot;:&quot;mid&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;section&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;looks&quot;,&quot;seasons&quot;,&quot;boosters&quot;,&quot;support&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;price&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;eur&quot;,&quot;km&quot;,&quot;long&quot;],&quot;default&quot;:&quot;eur&quot;,&quot;tsType&quot;:&quot;'eur'|'km'|'long'&quot;,&quot;section&quot;:&quot;Store&quot;},&quot;storeResult&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;success&quot;,&quot;cancel&quot;,&quot;pending&quot;,&quot;error&quot;],&quot;default&quot;:&quot;success&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Store&quot;},&quot;frozen&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;State&quot;}}">
+const WW = '#FFF8F0';
+const COS = [
+  { id: 'pip_blossom', title: 'Pip Blossom', desc: 'Soft pink accents for Pip in runs.', cost: 250, slot: 'pip_skin' },
+  { id: 'pip_sky', title: 'Pip Sky', desc: 'Cool blue palette for Pip.', cost: 200, slot: 'pip_skin' },
+  { id: 'meadow_sunset', title: 'Sunset Meadow', desc: 'Warm golden lane background tint.', cost: 150, slot: 'meadow_bg' },
+  { id: 'meadow_lavender', title: 'Lavender Meadow', desc: 'Soft purple lane mood.', cost: 180, slot: 'meadow_bg' },
+  { id: 'journal_gold', title: 'Golden Album', desc: 'Gold accents on the Bloom Album.', cost: 120, slot: 'journal_frame' }
+];
+const SLOTS = [
+  { id: 'pip_skin', title: 'Pip skin', where: 'in runs · wear one', eqNote: 'Pip wears this in runs.', bought: 'Bought · Pip wears it now' },
+  { id: 'meadow_bg', title: 'Meadow tint', where: 'run background · wear one', eqNote: 'Your runs use this tint.', bought: 'Bought · your runs use it now' },
+  { id: 'journal_frame', title: 'Album frame', where: 'Journal page', eqNote: 'Your Bloom Album wears this.', bought: 'Bought · your Album wears it' }
+];
+// CosmeticCatalog.get_pip_palette() — drawn by PipDraw.draw_pip()
+const PAL = {
+  pip_blossom: { body: '#FAEBF5', ear: '#F2C7E0', inner: '#FFB8D1', outline: 'rgba(140,89,115,.9)' },
+  pip_sky: { body: '#E6F5FF', ear: '#B8DBFA', inner: '#D1EBFF', outline: 'rgba(82,115,158,.9)' }
+};
+// CosmeticCatalog.get_meadow_modulate() — multiplies lane_background
+const MOD = { meadow_sunset: [1.08, 0.94, 0.86], meadow_lavender: [0.94, 0.92, 1.06] };
+const RUN = { ground: '#26382C', lane: '#3A5C41', tuft: '#436B4A', petal: '#7FB98B' };
+const SEASONS = [
+  { sku: 'season_pack_moonlit_warren', id: 'moonlit_warren', name: 'Moonlit Warren', tag: 'Night blooms under a quiet moon.', mood: '#3D3A6B' },
+  { sku: 'season_pack_coral_tide', id: 'coral_tide', name: 'Coral Tide Garden', tag: 'Salt breeze and seashell petals.', mood: '#E8A090' },
+  { sku: 'season_pack_starfall_glade', id: 'starfall_glade', name: 'Starfall Glade', tag: 'Petals that catch the night sky.', mood: '#6B5B95' },
+  { sku: 'season_pack_ember_fen', id: 'ember_fen', name: 'Ember Fen', tag: 'Low firelight over marsh blooms.', mood: '#C45C26', soon: true }
+];
+const BOOSTERS = [
+  { id: 'merge_hint', sku: 'booster_merge_hint', title: 'Merge Hint', desc: 'Highlights your next merge pair in the Arena.', icon: 'icons/icon_target.svg', useSub: 'for your next Arena round' },
+  { id: 'loot_burst', sku: 'booster_loot_burst', title: 'Loot Burst', desc: 'Adds 5 seeds to your camp bag right away.', icon: 'icons/icon_seed.svg', useSub: '+5 seeds now' }
+];
+const PRICES = {
+  eur: { remove_ads: '€3.99', starter_pack: '€1.99', booster_merge_hint: '€0.99', booster_loot_burst: '€0.99', season_pack_moonlit_warren: '€2.99', season_pack_coral_tide: '€3.49', season_pack_starfall_glade: '€2.99', season_pack_ember_fen: '€3.49' },
+  km: { remove_ads: '7,80 KM', starter_pack: '3,89 KM', booster_merge_hint: '1,94 KM', booster_loot_burst: '1,94 KM', season_pack_moonlit_warren: '5,85 KM', season_pack_coral_tide: '6,83 KM', season_pack_starfall_glade: '5,85 KM', season_pack_ember_fen: '6,83 KM' },
+  long: { remove_ads: 'Rp 64.900', starter_pack: 'Rp 32.900', booster_merge_hint: 'Rp 16.500', booster_loot_burst: 'Rp 16.500', season_pack_moonlit_warren: 'Rp 49.900', season_pack_coral_tide: 'Rp 57.900', season_pack_starfall_glade: 'Rp 49.900', season_pack_ember_fen: 'Rp 57.900' }
+};
+const SECS = ['looks', 'seasons', 'boosters', 'support'];
+const SEC_LABEL = { looks: 'Looks', seasons: 'Seasons', boosters: 'Boosters', support: 'Support' };
+const FAIL = {
+  cancel: { k: 'fail', t: 'Cancelled in the store.', s: 'Nothing was bought.' },
+  pending: { k: 'info', t: 'Payment pending.', s: 'It unlocks when the store confirms.' },
+  error: { k: 'fail', t: 'The store didn’t answer.', s: 'Nothing was bought — try again.' }
+};
+
+const BASE = () => ({
+  coins: 180, seeds: 23,
+  owned: { pip_sky: 1, meadow_sunset: 1, meadow_lavender: 1 },
+  equipped: { pip_skin: 'pip_sky', meadow_bg: 'meadow_lavender', journal_frame: '' },
+  boosters: { merge_hint: 2, loot_burst: 0 }, armed: false, bagFull: false,
+  seasons: { moonlit_warren: 1 }, ads: false, starter: true, store: true,
+  busy: '', restoring: false, confirm: '', status: {}, toast: null, pop: '', section: 'looks'
+});
+const NEWBIE = { coins: 60, seeds: 6, owned: {}, equipped: { pip_skin: '', meadow_bg: '', journal_frame: '' }, boosters: { merge_hint: 0, loot_burst: 0 }, seasons: {}, starter: false };
+const SCENES = {
+  mid: {},
+  newbie: NEWBIE,
+  confirm: { confirm: 'journal_gold', section: 'looks_album' },
+  bought: { coins: 60, owned: { pip_sky: 1, meadow_sunset: 1, meadow_lavender: 1, journal_gold: 1 }, equipped: { pip_skin: 'pip_sky', meadow_bg: 'meadow_lavender', journal_frame: 'journal_gold' }, status: { journal_gold: { k: 'ok', t: 'Bought · your Album wears it' } }, pop: '−120', section: 'looks_album' },
+  season_busy: { busy: 'season_pack_coral_tide', section: 'seasons' },
+  season_fail: { status: { season_pack_coral_tide: FAIL.cancel }, section: 'seasons' },
+  season_done: { seasons: { moonlit_warren: 1, coral_tide: 1 }, status: { season_pack_coral_tide: { k: 'ok', t: 'Coral Tide Garden is yours.', s: 'Pick it on Home.' } }, section: 'seasons' },
+  booster_busy: { busy: 'booster_loot_burst', section: 'boosters' },
+  booster_used: { boosters: { merge_hint: 1, loot_burst: 0 }, armed: true, seeds: 28, status: { loot_burst: { k: 'ok', t: '+5 seeds in your bag' } }, section: 'boosters' },
+  bag_full: { boosters: { merge_hint: 0, loot_burst: 3 }, bagFull: true, seeds: 40, status: { merge_hint: { k: 'fail', t: 'Cancelled in the store · nothing bought' } }, section: 'boosters' },
+  support: { section: 'support' },
+  starter_done: Object.assign({}, NEWBIE, { coins: 75, seeds: 14, boosters: { merge_hint: 1, loot_burst: 0 }, starter: true, status: { starter_pack: { k: 'ok', t: 'Pack added to your wallet and bag' } }, toast: { t: '+15 coins · +8 seeds · +1 Merge Hint', s: 'Starter Pack added' }, section: 'support' }),
+  pending: { status: { remove_ads: FAIL.pending }, section: 'support' },
+  restoring: { restoring: true, section: 'support' },
+  restored: { ads: true, toast: { t: 'Purchases restored', s: 'Remove Ads is back on' }, section: 'support' },
+  no_store: { store: false, section: 'support' }
+};
+
+const hex = h => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16));
+const toHex = a => '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('').toUpperCase();
+const mix = (a, b, t) => { const x = hex(a), y = hex(b); return toHex(x.map((v, i) => v + (y[i] - v) * t)); };
+const modc = (h, m) => toHex(hex(h).map((v, i) => v * m[i]));
+const scale = (h, f) => toHex(hex(h).map(v => v * f));
+const lum = h => { const v = hex(h).map(c => { c /= 255; return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); }); return .2126 * v[0] + .7152 * v[1] + .0722 * v[2]; };
+const fmt = n => Number(n).toLocaleString('en-US');
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.timers = [];
+    this.scrollEl = null;
+    this.scrollRef = el => { this.scrollEl = el; };
+    this.lastScene = props.scene;
+    this.lastSection = props.section;
+    this.state = this.fromScene(props.scene);
+  }
+
+  fromScene(name) {
+    const s = Object.assign(BASE(), SCENES[name] || {});
+    s.active = (s.section || 'looks').split('_')[0];
+    return s;
+  }
+
+  componentDidMount() { this.jumpSoon(); }
+  componentWillUnmount() { this.timers.forEach(clearTimeout); }
+  componentDidUpdate() {
+    const sc = this.props.scene, se = this.props.section;
+    if (sc !== this.lastScene) { this.lastScene = sc; this.lastSection = se; this.setState(this.fromScene(sc), () => this.jumpSoon()); }
+    else if (se !== this.lastSection) { this.lastSection = se; this.jumpSoon(); }
+  }
+
+  later(fn, ms) { const t = setTimeout(fn, ms); this.timers.push(t); }
+
+  jumpSoon() {
+    const want = this.props.section && this.props.section !== 'auto' ? this.props.section : this.state.section;
+    requestAnimationFrame(() => this.jumpTo(want, false));
+    this.later(() => this.jumpTo(want, false), 350);
+  }
+
+  jumpTo(id, smooth) {
+    const el = this.scrollEl;
+    if (!el) return;
+    let top = 0;
+    if (id === 'looks_album') {
+      const cards = el.querySelectorAll('[data-layer="CosmeticSlot"]');
+      const last = cards[cards.length - 1];
+      if (last) top = last.offsetTop - 184 - 360;
+    } else {
+      const sec = el.querySelector('[data-sec="' + id + '"]');
+      if (sec && id !== 'looks') top = sec.offsetTop - 184;
+    }
+    if (smooth) el.scrollTo({ top, behavior: 'smooth' }); else if (Math.abs(el.scrollTop - top) > 1) el.scrollTop = top;
+    const act = id.split('_')[0];
+    if (act !== this.state.active) this.setState({ active: act });
+  }
+
+  onScroll = () => {
+    const el = this.scrollEl;
+    if (!el) return;
+    const y = el.scrollTop + 184 + 120;
+    let act = 'looks';
+    SECS.forEach(id => { const s = el.querySelector('[data-sec="' + id + '"]'); if (s && s.offsetTop <= y) act = id; });
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 4) act = 'support';
+    if (act !== this.state.active) this.setState({ active: act });
+  };
+
+  setStatus(key, st, clearMs) {
+    this.setState(s => ({ status: Object.assign({}, s.status, { [key]: st }) }));
+    if (clearMs && !this.props.frozen) this.later(() => this.setState(s => { const n = Object.assign({}, s.status); delete n[key]; return { status: n }; }), clearMs);
+  }
+  toast(t, s) {
+    this.setState({ toast: { t, s } });
+    if (!this.props.frozen) this.later(() => this.setState({ toast: null }), 2600);
+  }
+
+  buyCoins(c) {
+    const S = this.state;
+    if (S.coins < c.cost) return;
+    const slot = SLOTS.find(x => x.id === c.slot);
+    this.setState(s => ({
+      coins: s.coins - c.cost, confirm: '', pop: '−' + c.cost,
+      owned: Object.assign({}, s.owned, { [c.id]: 1 }),
+      equipped: Object.assign({}, s.equipped, { [c.slot]: c.id })
+    }));
+    this.setStatus(c.id, { k: 'ok', t: slot.bought }, 2400);
+    if (!this.props.frozen) this.later(() => this.setState({ pop: '' }), 1100);
+  }
+
+  equip(c) {
+    this.setState(s => ({ equipped: Object.assign({}, s.equipped, { [c.slot]: c.id }) }));
+    this.setStatus(c.id, { k: 'ok', t: 'Wearing it now' }, 2000);
+  }
+
+  iap(sku, key, grant) {
+    if (this.state.busy) return;
+    this.setState(s => { const n = Object.assign({}, s.status); delete n[key]; return { busy: sku, status: n }; });
+    this.later(() => {
+      const r = this.props.storeResult || 'success';
+      this.setState({ busy: '' });
+      if (r === 'success') grant();
+      else this.setStatus(key, FAIL[r] || FAIL.error, 0);
+    }, 1400);
+  }
+
+  useBooster(b) {
+    const S = this.state;
+    const n = (S.boosters[b.id] || 0) - 1;
+    if (n < 0) return;
+    const boosters = Object.assign({}, S.boosters, { [b.id]: n });
+    if (b.id === 'merge_hint') {
+      this.setState({ boosters, armed: true });
+      this.setStatus(b.id, { k: 'ok', t: 'Hint ready for your next Arena round' }, 2400);
+    } else {
+      const add = Math.max(0, Math.min(5, 40 - S.seeds));
+      this.setState({ boosters, seeds: S.seeds + add, bagFull: S.seeds + add >= 40 });
+      this.setStatus(b.id, { k: 'ok', t: '+' + add + ' seeds in your bag' }, 2400);
+    }
+  }
+
+  renderVals() {
+    const S = this.state;
+    const P = PRICES[this.props.price] || PRICES.eur;
+    const priceSize = str => str.length > 7 ? 44 : 52;
+    const eq = S.equipped;
+
+    const lane = id => {
+      const m = MOD[id] || [1, 1, 1];
+      return { ground: modc(RUN.ground, m), lane: modc(RUN.lane, m), edge: modc(mix(RUN.lane, WW, .20), m), mow: modc(mix(RUN.lane, WW, .055), m), tuft: modc(RUN.tuft, m), petal: modc(RUN.petal, m) };
+    };
+    const half = (slot, applyId, label) => {
+      const album = slot === 'journal_frame';
+      const pipId = slot === 'pip_skin' ? applyId : eq.pip_skin;
+      const L = lane(slot === 'meadow_bg' ? applyId : eq.meadow_bg);
+      const pal = PAL[pipId];
+      return Object.assign({}, L, {
+        label, hasLabel: !!label, isLane: !album,
+        ground: album ? '#22342A' : L.ground,
+        sprite: !album && !pal, draw: !album && !!pal,
+        body: pal ? pal.body : '', ear: pal ? pal.ear : '', inner: pal ? pal.inner : '', outline: pal ? pal.outline : '',
+        framed: album && applyId === 'journal_gold', plain: album && applyId !== 'journal_gold'
+      });
+    };
+
+    const slots = SLOTS.map(g => ({
+      title: g.title, where: g.where,
+      items: COS.filter(c => c.slot === g.id).map((c, i) => {
+        const owned = !!S.owned[c.id];
+        const cur = eq[c.slot] || '';
+        const isEq = owned && cur === c.id;
+        let mode = 'short';
+        if (isEq) mode = 'equipped';
+        else if (owned) mode = 'owned';
+        else if (S.confirm === c.id) mode = 'confirm';
+        else if (S.coins >= c.cost) mode = 'buy';
+        const st = S.status[c.id];
+        const okOn = !!st && st.k === 'ok';
+        return {
+          title: c.title, desc: c.desc, cost: String(c.cost), divider: i > 0,
+          halves: isEq ? [half(c.slot, c.id, '')] : [half(c.slot, cur, 'Now'), half(c.slot, c.id, 'With it')],
+          showDesc: mode !== 'confirm' && !okOn, okOn, okText: okOn ? st.t : '',
+          isBuy: mode === 'buy', isShort: mode === 'short', isConfirm: mode === 'confirm', isOwned: mode === 'owned', isEquipped: mode === 'equipped',
+          needText: 'Need ' + (c.cost - S.coins) + ' more',
+          confirmQ: 'Spend ' + c.cost + ' coins?',
+          confirmSub: 'You’ll have ' + (S.coins - c.cost) + ' left.',
+          eqNote: g.eqNote,
+          onBuy: () => this.setState({ confirm: c.id }),
+          onCancel: () => this.setState({ confirm: '' }),
+          onConfirm: () => this.buyCoins(c),
+          onEquip: () => this.equip(c)
+        };
+      })
+    }));
+
+    const seasons = SEASONS.map(d => {
+      const owned = !!S.seasons[d.id], soon = !!d.soon;
+      const fill = soon ? mix(d.mood, '#2E4733', .44) : d.mood;
+      const light = !soon && lum(fill) >= .2;
+      const busy = S.busy === d.sku, dim = !!S.busy && !busy;
+      const mode = soon ? 'soon' : owned ? 'owned' : busy ? 'busy' : dim ? 'dim' : 'buy';
+      const st = S.status[d.sku];
+      const price = P[d.sku];
+      return {
+        name: d.name, tag: d.tag, fill,
+        ink: light ? '#2D3436' : '#FFF8F0', sub: light ? '#3F4648' : '#E9E1F0',
+        border: owned ? '4px solid #FFF6D6' : soon ? '3px solid rgba(255,246,214,.34)' : '3px solid ' + scale(d.mood, .8),
+        roster: [0, 1, 2, 3, 4, 5].map(() => ({ dot: soon ? '#4A5550' : d.mood, ring: soon ? '#6B746F' : mix(d.mood, WW, .55), alpha: soon ? .8 : 1 })),
+        eyebrow: mode === 'buy' || mode === 'busy' || mode === 'dim',
+        isOwned: mode === 'owned', isSoon: mode === 'soon', isBuy: mode === 'buy', isBusy: mode === 'busy', isDim: mode === 'dim',
+        showPrice: mode === 'buy' || mode === 'busy' || mode === 'dim',
+        price, priceSize: priceSize(price),
+        buyLabel: st && st.k === 'fail' ? 'Try again' : 'Get ' + d.name,
+        okOn: !!st && st.k === 'ok', failOn: !!st && st.k === 'fail', infoOn: !!st && st.k === 'info',
+        stText: st ? st.t : '', stSub: st && st.s ? st.s : '',
+        openBg: light ? 'rgba(255,248,240,.74)' : 'rgba(255,248,240,.20)',
+        openEdge: light ? 'rgba(26,26,20,.26)' : 'rgba(255,248,240,.40)',
+        openInk: light ? '#1A1A14' : '#FFF6D6',
+        onBuy: () => this.iap(d.sku, d.sku, () => {
+          this.setState(s => ({ seasons: Object.assign({}, s.seasons, { [d.id]: 1 }) }));
+          this.setStatus(d.sku, { k: 'ok', t: d.name + ' is yours.', s: 'Pick it on Home.' }, 3000);
+        }),
+        onOpen: () => this.toast('Opening Home', d.name + ' is focused there')
+      };
+    });
+
+    const boosters = BOOSTERS.map(b => {
+      const count = S.boosters[b.id] || 0;
+      const armed = b.id === 'merge_hint' && S.armed;
+      const full = b.id === 'loot_burst' && S.bagFull && count > 0;
+      const useOn = !armed && !full && count > 0;
+      const busy = S.busy === b.sku, dim = !!S.busy && !busy;
+      const st = S.status[b.id];
+      const price = P[b.sku];
+      const hasLeft = armed || full || useOn;
+      return {
+        title: b.title, desc: b.desc, isHint: b.id === 'merge_hint', isBurst: b.id === 'loot_burst', count: String(count), useSub: b.useSub,
+        useOn, armedOn: armed, fullOn: full,
+        buyOn: !busy && !dim, busyOn: busy, dimOn: dim,
+        buyFlex: hasLeft ? 'flex:0 0 280px' : 'flex:1;min-width:0',
+        buySub: '+1 to your stock',
+        price, priceSize: priceSize(price),
+        showDesc: !st, okOn: !!st && st.k === 'ok', failOn: !!st && st.k !== 'ok', stText: st ? st.t : '',
+        onUse: () => this.useBooster(b),
+        onGo: () => this.toast('Opening Arena', 'The hint shows on your next merge'),
+        onBuy: () => this.iap(b.sku, b.id, () => {
+          const n = (this.state.boosters[b.id] || 0) + 1;
+          this.setState(s => ({ boosters: Object.assign({}, s.boosters, { [b.id]: n }) }));
+          this.setStatus(b.id, { k: 'ok', t: '+1 ' + b.title + ' · you have ' + n }, 2400);
+        })
+      };
+    });
+
+    const iapDefs = [
+      { sku: 'remove_ads', title: 'Remove Ads', desc: 'Turns off the ad between runs. Rewarded videos stay optional — they only play when you tap them.', owned: S.ads, buyLabel: 'Remove ads', buySub: 'for good, on this account', ownedBadge: 'Ads are off', ownedText: 'Thanks for supporting Merge Meadow.',
+        grant: () => { this.setState({ ads: true }); this.toast('Ads are off', 'Rewarded videos stay optional'); } },
+      { sku: 'starter_pack', title: 'Starter Pack', desc: 'A one-time bundle to get going.', contents: true, owned: S.starter, buyLabel: 'Get the pack', buySub: 'once per account', ownedBadge: 'Claimed', ownedText: '+15 coins, +8 seeds and 1 Merge Hint were added.',
+        grant: () => {
+          this.setState(s => ({ starter: true, coins: s.coins + 15, seeds: Math.min(40, s.seeds + 8), boosters: Object.assign({}, s.boosters, { merge_hint: (s.boosters.merge_hint || 0) + 1 }) }));
+          this.setStatus('starter_pack', { k: 'ok', t: 'Pack added to your wallet and bag' }, 2400);
+          this.toast('+15 coins · +8 seeds · +1 Merge Hint', 'Starter Pack added');
+        } }
+    ];
+    const iaps = iapDefs.map(d => {
+      const busy = S.busy === d.sku, dim = !!S.busy && !busy;
+      const st = S.status[d.sku];
+      const price = P[d.sku];
+      const okOn = !!st && st.k === 'ok';
+      return {
+        title: d.title, desc: d.desc, hasContents: !!d.contents && !d.owned,
+        showDesc: !d.owned, isOwned: !!d.owned && !okOn, isBuyRow: !d.owned,
+        isBuy: !busy && !dim, isBusy: busy, isDim: dim,
+        price, priceSize: priceSize(price),
+        buyLabel: st && st.k === 'fail' ? 'Try again' : d.buyLabel, buySub: d.buySub,
+        ownedBadge: d.ownedBadge, ownedText: d.ownedText,
+        okOn, failOn: !!st && st.k === 'fail', infoOn: !!st && st.k === 'info',
+        stText: st ? st.t : '', stSub: st && st.s ? st.s : '',
+        onBuy: () => this.iap(d.sku, d.sku, d.grant)
+      };
+    });
+
+    return {
+      coinsText: fmt(S.coins), seedsText: String(S.seeds),
+      scrollRef: this.scrollRef, onScroll: this.onScroll,
+      jumps: SECS.map(id => ({ label: SEC_LABEL[id], active: S.active === id, idle: S.active !== id, go: () => this.jumpTo(id, true) })),
+      slots, seasons, boosters, iaps,
+      restoreIdle: S.store && !S.restoring, restoreBusy: S.store && S.restoring,
+      onRestore: () => {
+        this.setState({ restoring: true });
+        this.later(() => { this.setState({ restoring: false }); this.toast('Purchases restored', 'Nothing new on this account'); }, 1400);
+      },
+      toastOn: !!S.toast, toastText: S.toast ? S.toast.t : '', toastSub: S.toast ? S.toast.s : '',
+      popOn: !!S.pop, popText: S.pop
+    };
+  }
+}
+</script>
+</body>
+</html>

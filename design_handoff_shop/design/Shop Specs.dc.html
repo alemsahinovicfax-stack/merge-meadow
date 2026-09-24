@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Open+Sans:wght@600&display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#E9E2D6}a{color:#8A5A12}a:hover{color:#2D3436}</style>
+</helmet>
+<div data-layer="ShopSpecs" style="width:2096px;box-sizing:border-box;padding:80px;background:#E9E2D6;font-family:Nunito,system-ui,sans-serif;color:#2D3436;display:flex;flex-direction:column;gap:72px">
+
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:1500px">
+    <div style="font:900 30px/1 Nunito,system-ui,sans-serif;letter-spacing:.12em;color:#7A6A4E">MERGE MEADOW · SHOP · HANDOFF</div>
+    <div style="font:900 88px/1 Nunito,system-ui,sans-serif;letter-spacing:-.02em">Shop — states &amp; specs</div>
+    <div style="font:700 34px/1.35 Nunito,system-ui,sans-serif;color:#4A5153;text-wrap:pretty">One design. Page 1080 × 1597 between the given header (143) and footer (180). Base 1080 × 1920, all values in px of that base (1:1 into Godot). Every screen below is the live ShopScreen.dc.html with a fixed scene — open that file alone to click through the flows.</div>
+    <div style="align-self:flex-start;padding:18px 26px;border-radius:18px;background:#FFE8B8;border:3px solid #D6A82F;font:800 30px/1.3 Nunito,system-ui,sans-serif;color:#5A4A1E;max-width:1500px">docs/04-experience/design-drafts/shop-cd-brief.md, design_handoff_journal/ and ui_stage.gd / ui_journal.gd are not on master yet — this design follows the prompt, the game code (shop_screen.gd, cosmetic_catalog.gd, monetization_config.gd, iap_manager.gd, ui_camp.gd, ui_home.gd, ui_chrome.gd) and the Camp / Home v2 / Hub handoffs. See README § Open.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif">1 · Before → after</div>
+    <div style="display:flex;gap:64px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="font:800 30px/1 Nunito,system-ui,sans-serif;color:#4A5153">Today — shop_screen.tscn, hub mode</div>
+        <div style="width:540px;height:960px;overflow:hidden;border-radius:24px;box-shadow:0 10px 30px rgba(20,26,22,.25)">
+          <div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0">
+            <div data-layer="ShopToday" style="width:1080px;height:1920px;display:flex;flex-direction:column;background:#B8E0F5;overflow:hidden;font-family:'Open Sans',system-ui,sans-serif;font-weight:600">
+              <dc-import name="HubScreen" part="header" theme="dark" page-bg="#B8E0F5" coins="180" seeds="23" diamonds="12" hint-size="1080px,143px"></dc-import>
+              <div style="flex:0 0 1597px;height:1597px;overflow:hidden;box-sizing:border-box;padding:16px 16px 0;display:flex;flex-direction:column;gap:16px;color:#4A4A4A">
+                <div style="box-sizing:border-box;background:rgba(255,248,240,.95);border:2px solid rgba(45,52,54,.10);border-radius:14px;padding:10px 16px;display:flex;flex-direction:column;gap:12px">
+                  <div style="font-size:32px;line-height:1.36">Cosmetics (coins)</div>
+                  <div style="font-size:20px;line-height:1.36">Cosmetic-only — no gameplay advantage.</div>
+                  <sc-for list="{{ todayCos }}" as="r" hint-placeholder-count="5">
+                    <div style="min-height:100px;display:flex;gap:12px;align-items:center">
+                      <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+                        <div style="font-size:28px;line-height:1.36">{{ r.t }}</div>
+                        <div style="font-size:22px;line-height:1.36;color:#666B66">{{ r.d }}</div>
+                      </div>
+                      <div style="{{ r.btn }}">{{ r.b }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="box-sizing:border-box;background:rgba(212,196,250,.92);border:2px solid rgba(45,52,54,.12);border-radius:16px;padding:16px 20px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:32px;line-height:1.36;text-align:center">Boosters (consumables)</div>
+                  <div style="font-size:20px;line-height:1.36;text-align:center">Buy with real money — use from inventory.</div>
+                  <sc-for list="{{ todayBoost }}" as="r" hint-placeholder-count="2">
+                    <div style="min-height:108px;display:flex;flex-direction:column;gap:8px">
+                      <div style="display:flex;gap:8px;align-items:baseline"><div style="font-size:28px;line-height:1.36">{{ r.t }}</div><div style="font-size:22px;color:#595E8C">{{ r.c }}</div></div>
+                      <div style="font-size:22px;line-height:1.36;color:#6B667A">{{ r.d }}</div>
+                      <div style="display:flex;gap:8px">
+                        <div style="{{ r.use }}">Use</div>
+                        <div style="flex:1;height:56px;border-radius:3px;background:rgba(26,26,26,.6);color:#DFDFDF;display:grid;place-items:center;font-size:26px">{{ r.buy }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="box-sizing:border-box;background:rgba(212,196,250,.92);border:2px solid rgba(45,52,54,.12);border-radius:16px;padding:16px 20px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:32px;line-height:1.36;text-align:center">Season packs</div>
+                  <div style="font-size:20px;line-height:1.36;text-align:center">Cosmetic themes. No extra power.</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <sc-for list="{{ todayPacks }}" as="r" hint-placeholder-count="4">
+                      <div style="{{ r.s }}">{{ r.t }}<br>{{ r.p }}</div>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="box-sizing:border-box;background:rgba(212,196,250,.92);border:2px solid rgba(45,52,54,.12);border-radius:16px;padding:16px 20px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:32px;line-height:1.36;text-align:center">Support the game</div>
+                  <div style="font-size:24px;line-height:1.36;text-align:center">Optional real-money purchases — Fair F2P.</div>
+                  <div style="height:72px;border-radius:12px;background:#D4A5FF;border:2px solid rgba(45,52,54,.14);display:grid;place-items:center;font-size:28px">Remove Ads — €3.99</div>
+                  <div style="font-size:24px;line-height:1.36">Turn off interstitial ads between runs. Rewarded videos stay optional.</div>
+                  <div style="height:72px;border-radius:12px;background:#A8E6CF;border:2px solid rgba(45,52,54,.14);display:grid;place-items:center;font-size:28px;opacity:.45">Starter Pack — Owned</div>
+                  <div style="font-size:24px;line-height:1.36">One-time: +15 coins, +8 clover seeds, +1 Merge Hint booster.</div>
+                  <div style="height:56px;border-radius:12px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);display:grid;place-items:center;font-size:28px">Restore Purchases</div>
+                </div>
+              </div>
+              <dc-import name="HubScreen" part="footer" theme="dark" page-bg="#B8E0F5" active="{{ 0 }}" hint-size="1080px,180px"></dc-import>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="font:800 30px/1 Nunito,system-ui,sans-serif;color:#4A5153">New — ShopScreen, scene "mid"</div>
+        <div style="width:540px;height:960px;overflow:hidden;border-radius:24px;box-shadow:0 10px 30px rgba(20,26,22,.25)">
+          <div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0">
+            <dc-import name="ShopScreen" scene="mid" frozen="{{ true }}" hint-size="1080px,1920px"></dc-import>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:22px;padding-top:46px">
+        <sc-for list="{{ fixes }}" as="f" hint-placeholder-count="6">
+          <div style="display:flex;gap:18px;align-items:flex-start">
+            <div style="flex:0 0 auto;width:52px;height:52px;border-radius:50%;background:#2D3436;color:#FFF8F0;display:grid;place-items:center;font:900 28px/1 Nunito,system-ui,sans-serif">{{ f.n }}</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="font:900 32px/1.15 Nunito,system-ui,sans-serif">{{ f.t }}</div>
+              <div style="font:700 28px/1.35 Nunito,system-ui,sans-serif;color:#4A5153;text-wrap:pretty">{{ f.d }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif">2 · States</div>
+    <div style="font:700 30px/1.35 Nunito,system-ui,sans-serif;color:#4A5153;max-width:1600px">Tap a state to load it into the live screen. Ids match the <span style="font-family:ui-monospace,Menlo,monospace">scene</span> prop of ShopScreen and <span style="font-family:ui-monospace,Menlo,monospace">scenes</span> in godot/shop_export.json. The screen scrolls to the part that changes.</div>
+    <div style="display:flex;gap:56px;align-items:flex-start">
+      <div data-layer="StateViewer" style="flex:0 0 auto;width:756px;height:1344px;overflow:hidden;border-radius:26px;box-shadow:0 10px 30px rgba(20,26,22,.25);background:#2E4733">
+        <div style="width:1080px;height:1920px;transform:scale(.7);transform-origin:0 0">
+          <dc-import name="ShopScreen" scene="{{ cur.scene }}" section="{{ cur.section }}" price="{{ cur.price }}" frozen="{{ true }}" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+      <div style="flex:1;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px">
+        <sc-for list="{{ states }}" as="s" hint-placeholder-count="8">
+          <div data-layer="StatePick" onClick="{{ s.pick }}" style="box-sizing:border-box;padding:22px 26px;border-radius:22px;cursor:pointer;display:flex;flex-direction:column;gap:10px;background:{{ s.bg }};border:3px solid {{ s.edge }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="font:900 24px/1 ui-monospace,Menlo,monospace;color:#7A6A4E;white-space:nowrap">{{ s.id }}</div>
+              <div style="font:900 30px/1.1 Nunito,system-ui,sans-serif;color:#2D3436">{{ s.title }}</div>
+            </div>
+            <div style="font:700 26px/1.35 Nunito,system-ui,sans-serif;color:#4A5153;text-wrap:pretty">{{ s.note }}</div>
+          </div>
+              </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif">3 · Parts</div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px">
+      <sc-for list="{{ parts }}" as="p" hint-placeholder-count="9">
+        <div style="background:#FFF8F0;border:2px solid rgba(45,52,54,.14);border-radius:26px;padding:30px 34px;display:flex;flex-direction:column;gap:14px">
+          <div style="font:900 26px/1 ui-monospace,Menlo,monospace;color:#7A6A4E">{{ p.layer }}</div>
+          <sc-for list="{{ p.lines }}" as="l" hint-placeholder-count="4">
+            <div style="font:700 26px/1.35 Nunito,system-ui,sans-serif;color:#2D3436;text-wrap:pretty">{{ l }}</div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif">4 · Colour roles</div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px">
+      <sc-for list="{{ swatches }}" as="w" hint-placeholder-count="12">
+        <div style="width:300px;display:flex;flex-direction:column;gap:10px">
+          <div style="height:120px;border-radius:20px;background:{{ w.c }};border:3px solid {{ w.e }}"></div>
+          <div style="font:900 26px/1 ui-monospace,Menlo,monospace">{{ w.c }} / {{ w.e }}</div>
+          <div style="font:700 26px/1.3 Nunito,system-ui,sans-serif;color:#4A5153">{{ w.r }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const BTN = 'flex:0 0 168px;height:60px;border-radius:3px;display:grid;place-items:center;font-size:26px;';
+const ON = BTN + 'background:rgba(26,26,26,.6);color:#DFDFDF';
+const OFF = BTN + 'background:rgba(26,26,26,.3);color:rgba(223,223,223,.5)';
+const PACK = 'height:120px;border-radius:12px;border:2px solid rgba(45,52,54,.14);display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;line-height:1.36;';
+
+class Component extends DCLogic {
+  state = { pick: 0 };
+  renderVals() {
+    const out = this.vals();
+    const cur = out.states[this.state.pick] || out.states[0];
+    out.cur = cur;
+    out.states = out.states.map((s, i) => Object.assign({}, s, {
+      bg: i === this.state.pick ? '#FFB88C' : '#FFF8F0',
+      edge: i === this.state.pick ? '#E8A374' : 'rgba(45,52,54,.14)',
+      pick: () => this.setState({ pick: i })
+    }));
+    return out;
+  }
+  vals() {
+    return {
+      todayCos: [
+        { t: 'Pip Blossom', d: 'Soft pink accents for Pip in runs.', b: '250 coins', btn: OFF },
+        { t: 'Pip Sky', d: 'Cool blue palette for Pip.', b: 'Equipped', btn: OFF },
+        { t: 'Sunset Meadow', d: 'Warm golden lane background tint.', b: 'Equip', btn: ON },
+        { t: 'Lavender Meadow', d: 'Soft purple lane mood.', b: 'Equipped', btn: OFF },
+        { t: 'Golden Album', d: 'Gold accents on the Bloom Album.', b: '120 coins', btn: ON }
+      ],
+      todayBoost: [
+        { t: 'Merge Hint', c: '×2', d: 'Consumable — highlights your next merge pair in the arena.', use: 'flex:1;height:56px;border-radius:3px;background:rgba(26,26,26,.6);color:#DFDFDF;display:grid;place-items:center;font-size:26px', buy: 'Buy €0.99' },
+        { t: 'Loot Burst', c: '×0', d: 'Consumable — instantly adds 5 seeds to your camp bag.', use: 'flex:1;height:56px;border-radius:3px;background:rgba(26,26,26,.3);color:rgba(223,223,223,.5);display:grid;place-items:center;font-size:26px', buy: 'Buy €0.99' }
+      ],
+      todayPacks: [
+        { t: 'Moonlit Warren', p: 'Owned', s: PACK + 'background:#FFB88C' },
+        { t: 'Coral Tide Garden', p: '€3.49', s: PACK + 'background:#D4A5FF' },
+        { t: 'Starfall Glade', p: '€2.99', s: PACK + 'background:#D4A5FF' },
+        { t: 'Ember Fen', p: '€3.49', s: PACK + 'background:#D4A5FF' }
+      ],
+      fixes: [
+        { n: '1', t: 'Same game as Home, Camp and Arena', d: 'Meadow page #2E4733 (Camp), cream cards, mood-coloured season cards, Nunito. No lavender panels, no Godot default buttons.' },
+        { n: '2', t: 'Look before you buy', d: 'Every cosmetic shows Now | With it, drawn by the game: lane_background colours × meadow modulate, PipDraw with the skin palette, a mini Album page with the gold frame.' },
+        { n: '3', t: 'Readable, thumb-sized', d: 'Text ≥ 38, prices ≥ 44 (52 default), every control ≥ 120 tall. Tags are 60–76 tall so they never look like buttons.' },
+        { n: '4', t: 'Feedback on the item', d: 'Coin buys confirm on the card, then a status strip, a −N coin pop and the card switches to Wearing. Bundles and restore add a toast.' },
+        { n: '5', t: 'Currency is always visible', d: 'Gold = coins, lavender = real money. Section subtitles say “for coins · looks only”, “one-time · theme only”.' },
+        { n: '6', t: 'Seasons show what you get', d: '6-flower roster, tagline, “same runs, same rewards”. Ember Fen has no price and no button. Owned = “Play it on Home ↗”, not a dead button.' }
+      ],
+      states: [
+        { id: 'mid', title: 'Looks — every coin state', note: 'Short on coins (Pip Blossom), Wearing (Pip Sky, Lavender), Owned (Sunset), can buy (Golden Album, scroll).', scene: 'mid', section: 'auto', price: 'eur' },
+        { id: 'confirm', title: 'Coin buy — confirm on card', note: 'First tap on Buy & wear turns the row into Back | Buy for 120 and shows the balance after.', scene: 'confirm', section: 'auto', price: 'eur' },
+        { id: 'bought', title: 'Coin buy — done', note: 'Status strip, preview collapses to one view, badge Wearing, −120 pop flies to the coin chip.', scene: 'bought', section: 'auto', price: 'eur' },
+        { id: 'newbie', title: 'New player', note: '60 coins, nothing owned: all Now halves show classic Pip on the default meadow.', scene: 'newbie', section: 'auto', price: 'eur' },
+        { id: 'mid · seasons', title: 'Seasons — owned / buy / soon', note: 'Moonlit owned, Coral + Starfall for sale, Ember Fen coming soon without price.', scene: 'mid', section: 'seasons', price: 'eur' },
+        { id: 'season_busy', title: 'Season — purchasing', note: 'Store dialog is open. Only this button changes; other real-money buttons dim to 50 % and ignore taps.', scene: 'season_busy', section: 'auto', price: 'eur' },
+        { id: 'season_fail', title: 'Season — failed', note: 'Pink strip on the card until the next tap. Button says Try again.', scene: 'season_fail', section: 'auto', price: 'eur' },
+        { id: 'season_done', title: 'Season — bought', note: 'Card turns Yours with a cream rim; action becomes Play it on Home ↗.', scene: 'season_done', section: 'auto', price: 'eur' },
+        { id: 'mid · boosters', title: 'Boosters — 2 and 0', note: 'Use one only exists when you have one. With 0 the Buy button takes the whole row.', scene: 'mid', section: 'boosters', price: 'eur' },
+        { id: 'booster_busy', title: 'Booster — purchasing', note: 'Same busy pattern as seasons.', scene: 'booster_busy', section: 'auto', price: 'eur' },
+        { id: 'booster_used', title: 'Booster — used', note: 'Merge Hint armed → Go to Arena ↗ (no second hint wasted). Loot Burst: +5 seeds on card, seed chip counts up.', scene: 'booster_used', section: 'auto', price: 'eur' },
+        { id: 'bag_full', title: 'Booster — bag full, buy failed', note: 'Loot Burst can’t be used into a full bag. Failed booster buy keeps the count.', scene: 'bag_full', section: 'auto', price: 'eur' },
+        { id: 'support', title: 'Support — Restore available', note: 'Remove Ads for sale, Starter Pack claimed, Restore on real store only.', scene: 'support', section: 'auto', price: 'eur' },
+        { id: 'starter_done', title: 'Starter Pack — bought', note: 'Toast lists what was added; header chips count up.', scene: 'starter_done', section: 'auto', price: 'eur' },
+        { id: 'pending', title: 'Payment pending', note: 'Amber strip — not an error, the store will confirm later.', scene: 'pending', section: 'auto', price: 'eur' },
+        { id: 'restoring', title: 'Restore — in progress', note: 'Restore turns quiet; all real-money buttons keep working after it ends.', scene: 'restoring', section: 'auto', price: 'eur' },
+        { id: 'restored', title: 'Restore — done', note: 'Toast names what came back.', scene: 'restored', section: 'auto', price: 'eur' },
+        { id: 'no_store', title: 'No store (stub / desktop)', note: 'Restore is not drawn at all — no dead button. Fair note closes the page.', scene: 'no_store', section: 'auto', price: 'eur' },
+        { id: 'price km', title: 'Store string “5,85 KM”', note: 'PriceTag grows with the string, min 280.', scene: 'mid', section: 'seasons', price: 'km' },
+        { id: 'price long', title: 'Long store string', note: '“Rp 57.900” — over 7 chars drops to 44 px, never lower.', scene: 'season_busy', section: 'seasons', price: 'long' }
+      ],
+      parts: [
+        { layer: 'ShopHeaderRow', lines: ['1080 × 160, sticky over ShopScroll. Pad 20 / 24.', '4 JumpChip, h 120, gap 14, r 20, font 42.', 'Active: #FFB88C, 4 px #E8A374. Idle: cream 10 %, 2 px cream 38 %.', 'Tap = tween scroll 0.28 s cubic out. Scroll-spy sets the active chip.'] },
+        { layer: 'SectionTitle', lines: ['h 64. Accent 10 × 56 r 5 (gold = coins, lavender = real money).', 'Title 56 / 900 #FFF8F0, sub 38 / 700 cream 82 %.', 'Sections 64 apart, content pad 184 top (under header row) / 24 sides.'] },
+        { layer: 'CosmeticSlot + CosmeticCard', lines: ['Slot: cream card r 26, 2 px ink 16 %, shadow 0 8 16 @ 26 %, pad 20, gap 20.', 'Slot head 46 / 900 + 38 / 700. Cards split by a 2 px hairline.', 'Card row h 284: preview 440 | 24 | column 524 (name 48, desc 38, action row 120).'] },
+        { layer: 'CosmeticPreview', lines: ['440 × 284, r 20, 3 px #16211B, clip. Two halves with a 3 px gap, or one when equipped.', 'Lane 150 wide: GROUND / LANE / LANE_EDGE / LANE_MOW / TUFT / PETAL × meadow modulate (× season modulate in game).', 'Pip: pip_idle.svg when no skin, PipDraw.draw_pip(palette) with a skin. Album: cream page, 10 px #E8C44A frame.', 'Label chip “Now” / “With it”: h 56, r 16, #1A241E @ 84 %.'] },
+        { layer: 'PriceTag · BuyButton', lines: ['PriceTag #FFE8B8, 3 px #D6A82F, r 20. Coins: icon 48 + 52 / 900. Money: store string 52 / 900 (44 if > 7 chars) + “one-time” / “each” 38.', 'Coin buy #E8C44A / #BA9D3B, confirm edge 4 px #9C7A14.', 'Money buy #D4A5FF / #AA84CC. Busy: cream 55 % / ink 30 %, “Waiting for store…”.'] },
+        { layer: 'OwnedBadge · EquipButton', lines: ['Tags are h 60–76, never 120 — they read as labels.', 'Owned: ink 6 % fill, 2 px ink 18 %. Wearing: #FFB88C / #E8A374. Season Yours: #FFF6D6 / #D6A82F.', 'EquipButton / UseButton: #A8E6CF / #7FC9AC, h 120–130, 46 / 900.'] },
+        { layer: 'SeasonPackCard', lines: ['1032 wide, pad 24, r 26, fill = mood (Ember: mood → page 44 %). Border mood × 0.8, owned 4 px #FFF6D6.', 'Left: eyebrow 38 / 900 · name 60 / 900 · tagline 38. Right: SeasonRoster 3 × 2 wells 96, gap 14.', 'Ink cream on dark moods (lum < 0.2), #2D3436 on light.', 'ComingSoonTag h 60 #1A241E; action = quiet info, no price.'] },
+        { layer: 'BoosterCard · BoosterCount', lines: ['Icon disc 112 #E0C4FF / #B39DCC, icon 64.', 'BoosterCount 190 × 112: “You have” 38 + number 56 / 900.', 'Row h 130: UseButton flex | PriceTag 220 | BuyButton 280 (flex when no Use).'] },
+        { layer: 'PurchaseStatus · PurchaseToast', lines: ['Status h ≥ 76, r 18: ok #A8E6CF / #7FC9AC + check, fail #FFCCD5 / #E89AAA, pending #FFE8B8 / #D6A82F. Text 38–40 / 900.', 'ok fades after 2.4 s; fail stays until the next tap on that item.', 'Toast = UiChrome.toast_style(), top 184 of page, 2.6 s. Only for things that change outside the card.'] }
+      ],
+      swatches: [
+        { c: '#2E4733', e: '#2E4733', r: 'Page (Camp meadow)' },
+        { c: '#FFF8F0', e: '#D5CEC6', r: 'Cream card' },
+        { c: '#FFE8B8', e: '#D6A82F', r: 'PriceTag · pending strip' },
+        { c: '#E8C44A', e: '#BA9D3B', r: 'Spend coins' },
+        { c: '#D4A5FF', e: '#AA84CC', r: 'Spend real money' },
+        { c: '#A8E6CF', e: '#7FC9AC', r: 'Wear / Use · success' },
+        { c: '#FFB88C', e: '#E8A374', r: 'Active chip · Wearing' },
+        { c: '#FFCCD5', e: '#E89AAA', r: 'Failed' },
+        { c: '#E0C4FF', e: '#B39DCC', r: 'Booster icon disc' },
+        { c: '#22342A', e: '#CBC2B6', r: 'Roster well' },
+        { c: '#1A241E', e: '#8C918D', r: 'Coming soon tag' },
+        { c: '#FFF6D6', e: '#D6A82F', r: 'Season owned rim / badge' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
