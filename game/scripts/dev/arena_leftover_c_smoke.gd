@@ -102,9 +102,9 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("hide helper missing")
 		return
-	if not arena.has_method("_on_done_pressed"):
+	if not arena.has_method("_end_session_to_camp"):
 		_restore_save(backup)
-		_fail("Done path missing")
+		_fail("session exit missing")
 		return
 
 	await _show_stuck_overlay(arena, gs)
@@ -148,12 +148,12 @@ func _run() -> void:
 		_fail("stuck bag should show overlay again")
 		return
 
-	arena.call("_on_done_pressed")
+	arena.call("_end_session_to_camp")
 	overlay = _overlay_of(arena)
 	list = _list_of(arena)
 	if overlay == null or overlay.visible:
 		_restore_save(backup)
-		_fail("Done must hide overlay before Camp")
+		_fail("Back to Camp must hide the overlay first")
 		return
 	if list == null or list.get_child_count() != 0:
 		_restore_save(backup)
@@ -161,7 +161,7 @@ func _run() -> void:
 		return
 	if not _field_chips(arena).is_empty():
 		_restore_save(backup)
-		_fail("Done should leave 0 chips, got %d" % _field_chips(arena).size())
+		_fail("Back to Camp should leave 0 chips, got %d" % _field_chips(arena).size())
 		return
 	arena.call("set_arena_page_active", true)
 	overlay = _overlay_of(arena)

@@ -12,12 +12,10 @@ const RIM_EDGE := Color("#CBC2B6")  # warm white, 20 % tamnije
 const GOLD_EDGE := Color("#D6A82F")  # coin gold, 20 % tamnije
 const PEACH_EDGE := Color("#E8A374")  # peach, 20 % tamnije
 const COIN_GOLD := Color("#FFD56B")
-const PASTEL_YELLOW := Color("#FFEAA7")
 const PULSE_GOLD := Color("#F2D940")
 const FLASH := Color("#FFF5D1")
 const CHIP_SHADOW := Color(0.078, 0.125, 0.102, 0.42)
 const CHIP_SHADOW_DRAG := Color(0.078, 0.125, 0.102, 0.34)
-const HINT_BG := Color(0.086, 0.129, 0.106, 0.72)
 const OVERLAY_DIM := Color(0.059, 0.078, 0.071, 0.82)
 ## Livada — iste vrijednosti kao prije redizajna (arena_feel_a_smoke ih poredi tacno).
 const MEADOW_BASE := Color(0.16, 0.24, 0.18, 1.0)
@@ -44,16 +42,9 @@ const FROST_SHELL_EDGE := Color("#DCF0FF")
 const MOUTH := Color("#FFCCD5")
 const MOUTH_EDGE := Color("#E89AAA")
 
-# --- Vertikalni budzet: 120 + 128 + Playfield + (16 + 140 + 60) ---
-const HUD_H := 120
-const HINT_H := 128
-const HINT_MAX_W := 1000
-const HINT_PAD_X := 30
-const HINT_PAD_Y := 10
-const HINT_FONT_SIZE := 38
-const DONE_H := 140
-const DONE_GAP_TOP := 16
-const DONE_GAP_BOTTOM := 60  # 24 cisto + 36 px koliko NavLockPill izviruje
+# --- Vertikalni budzet: Playfield uzima cijelu stranicu osim donjeg pojasa ---
+## NavLockPill viri 36 px iznad footera; 44 px ga drzi dalje od vrece i Pipa.
+const FIELD_BOTTOM_GAP := 44
 
 # --- SeedChip ---
 const CHIP_T2_RADIUS := 38
@@ -78,29 +69,31 @@ const BAG_NECK_SIZE := Vector2(118, 34)
 const BAG_HIT := Vector2(280, 250)
 const BAG_COUNTER_R := 42.0
 const BAG_BOTTOM_GAP := 40.0
-## Keepout relativno na (centar vrece, dno vrece) — na 1080 x 1133: x 355–725, y > 744.
+## Keepout relativno na (centar vrece, dno vrece) — stit oko vrece, siri od same vrece.
 const BAG_KEEPOUT := Rect2(-185, -349, 370, 520)
 const MUNCHER_VISUAL_R := 52.0
 const FROST_SHELL_R := 70.0
 const NEST_SIZE := Vector2(210, 104)
-const NEST_Y := 62.0
-## Spawn keepout gnijezda i combo metra (samo spawn — to su overlayi, ne prepreke).
+## Gnijezdo je 2026-09-24 otislo ~200 px gore (HUD red je otpao); nize od ovoga
+## header odsijece "zzz" iznad usnulog munchera.
+const NEST_Y := 108.0
+## Spawn keepout gnijezda (samo spawn — gnijezdo je overlay, ne prepreka).
 const NEST_KEEPOUT_HALF_W := 110.0
-const NEST_KEEPOUT_BOTTOM := 140.0
-const COMBO_KEEPOUT_W := 380.0
-const COMBO_KEEPOUT_BOTTOM := 130.0
+const NEST_KEEPOUT_BOTTOM := 190.0
+## Meta leta T3 kristala — gornji desni ugao polja, gdje je stajao stash brojac.
+const CRYSTAL_EXIT_INSET := Vector2(120, 90)
 const PIP_SIZE := 150.0
 const PIP_INSET := Vector2(30, 26)  # od lijevog ruba i dna polja
 const PIP_KEEPOUT_GROW := Vector2(120, 97)
 
 # --- Rešetkasti spawn (hex) ---
-## Na 1080 x 1133 s keepoutima ostaje ~39 pozicija pri min. razmaku 142,8 px;
-## slucajni spawn puca iznad ~22 sjemenke, pa 30 na polju trazi rešetku.
+## Polje je 1080 x 1553 (cijela hub stranica) — s keepoutima ostaje ~60 pozicija pri
+## min. razmaku 142,8 px; slucajni spawn puca iznad ~22 sjemenke, pa rešetka nosi pour.
 const GRID_STEP_DENSE := 150.0
 const GRID_STEP_LOOSE := 164.0
 const GRID_JITTER_DENSE := 3.5
 const GRID_JITTER_LOOSE := 9.0
-const GRID_DENSE_ABOVE := 24
+const GRID_DENSE_ABOVE := 32
 
 static var _styles: Dictionary = {}
 
@@ -209,37 +202,6 @@ static func chip_well_inset(tier: int) -> int:
 
 static func chip_corner_radius(tier: int) -> float:
 	return float(_chip_radius(tier))
-
-
-## Combo pill. Od 5 dobija zlatnu varijantu.
-static func combo_style(combo: int) -> StyleBoxFlat:
-	var big := combo >= 5
-	var s := _round(20)
-	s.bg_color = COIN_GOLD if big else PASTEL_YELLOW
-	s.border_color = GOLD_EDGE if big else Color("#E0C97F")
-	s.set_border_width_all(3)
-	_pad(s, 30, 0)
-	return s
-
-
-## HUD pill (DailyTask, StashCounter, combo bonus). `done` = zavrsen dnevni zadatak.
-static func hud_pill_style(done: bool = false, pad_left: float = 20.0, pad_right: float = 26.0) -> StyleBoxFlat:
-	var s := _round(20)
-	s.bg_color = UiPalette.MINT if done else UiPalette.WARM_WHITE
-	s.border_color = Color("#7FBFA3") if done else RIM_EDGE
-	s.set_border_width_all(3)
-	s.content_margin_left = pad_left
-	s.content_margin_right = pad_right
-	s.content_margin_top = 0.0
-	s.content_margin_bottom = 0.0
-	return s
-
-
-static func hint_pill_style() -> StyleBoxFlat:
-	var s := _round(20)
-	s.bg_color = HINT_BG
-	_pad(s, HINT_PAD_X, HINT_PAD_Y)
-	return s
 
 
 static func cue_style() -> StyleBoxFlat:

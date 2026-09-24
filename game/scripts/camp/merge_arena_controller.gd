@@ -42,25 +42,12 @@ const NEED_ROW_GAP := 16.0
 const NEED_TITLE_FONT_SIZE := 58
 const NEED_BODY_FONT_SIZE := 38
 
-## Tekstovi — tabela "stari → novi" iz design_handoff_merge_arena.
-const HINT_TUTORIAL := "Tap the bag. Drag matching seeds together."
-const HINT_TUTORIAL_EMPTY := "Tap the bag — seeds jump in!"
-const HINT_PEST_TUTORIAL := "Watch the muncher — a T3 merge freezes it."
-const HINT_POUR_MORE := "Tap again for more — %d max."
-const HINT_T3_STASH := "T3 crystals go to your garden stash."
-const HINT_POURED := "Poured %d — drag matching seeds together!"
-const HINT_PEST_AWAKE := "Muncher's awake — a T3 freezes it 2s."
-const HINT_MERGED_T2 := "Nice — T2! Keep going."
-const HINT_CRYSTAL := "%s crystal → stash. Muncher frozen 2s."
-const HINT_FULL := "Arena full — merge some seeds first."
-const HINT_BAG_EMPTY := "Bag is empty."
-const HINT_OUT_PEST := "Out of seeds — tap Done, or run for more."
-const HINT_OUT := "No seeds left — tap Done."
+## Jedini tekst koji je ostao u areni — prolazna poruka u oblacicu iznad vrece.
+const CUE_PEST_AWAKE := "Muncher's awake — a T3 freezes it 2s."
 
 @onready var meadow_bg: ArenaMeadowBg = $Bg
 @onready var playfield: Control = $RootVBox/Playfield
 @onready var arena_pip: Control = $RootVBox/Playfield/ArenaPip
-@onready var done_button: UiClickButton = $RootVBox/DoneRow/DoneButton
 @onready var need_more_overlay: Control = $NeedMoreSeedsOverlay
 @onready var need_more_panel: PanelContainer = $NeedMoreSeedsOverlay/Panel
 @onready var need_more_title: Label = $NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsTitle
@@ -90,10 +77,10 @@ var _vacuum_flies: Array[Control] = []
 var _vacuum_fly_tweens: Array[Tween] = []
 var _vacuum_fly_stagger: int = 0
 var _bag_punch_tween: Tween = null
-var _hud: ArenaHud = null
+var _cue: ArenaCue = null
 var _rng := RandomNumberGenerator.new()
-## T3 kristali u letu ka StashCounteru — brojac ih pokaze tek kad stignu.
-var _stash_pending: int = 0
+## Sesija traje dok ima sjemenki na polju; kraj je prazno polje (spojeno ili pojedeno).
+var _session_open: bool = false
 var _combo_bonus: int = 0
 var _fx_nodes: Array[Node] = []
 
@@ -101,8 +88,7 @@ var _fx_nodes: Array[Node] = []
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_rng.randomize()
-	_hud = ArenaHud.new(self)
-	done_button.clicked.connect(_on_done_pressed)
+	_cue = ArenaCue.new(self)
 	back_to_camp_button.clicked.connect(_on_back_to_camp_pressed)
 	_style_need_more_overlay()
 	playfield.resized.connect(_layout_playfield_chrome)
@@ -128,17 +114,14 @@ func _deferred_boot() -> void:
 	_layout_playfield_chrome()
 	_apply_meadow_tint()
 	_apply_merge_hint_if_ready()
-	_apply_pest_tutorial_if_ready()
-	_update_hint()
+	_update_tutorial_cue()
 	_refresh_bag()
-	_refresh_daily_hud()
-	_refresh_stash_counter()
 
 
 func _apply_merge_hint_if_ready() -> void:
 	if not GameState.merge_hint_booster_active:
 		return
-	_set_hint(GameState.get_merge_hint_message(_chip_data))
+	_cue.show_message(GameState.get_merge_hint_message(_chip_data))
 	GameState.consume_merge_hint_booster()
 
 
@@ -167,8 +150,8 @@ func _layout_playfield_chrome() -> void:
 	_layout_bag()
 	_layout_arena_pip()
 	_layout_pest_nest()
-	if _hud and playfield:
-		_hud.layout_tutorial(playfield.size)
+	if _cue and playfield:
+		_cue.layout(playfield.size)
 
 
 func _layout_arena_pip() -> void:
@@ -301,12 +284,6 @@ func _play_clear_field_vfx() -> void:
 	)
 
 
-func _apply_pest_tutorial_if_ready() -> void:
-	if not GameState.should_show_arena_pest_tutorial():
-		return
-	_set_hint(HINT_PEST_TUTORIAL)
-
-
 func _setup_pest() -> void:
 	if _pest != null:
 		return
@@ -347,11 +324,12 @@ func _pest_eat_chip(chip: ArenaSeedChip) -> void:
 	_remove_chip(chip)
 	_resolve_t3_starved_types()
 	_resolve_stranded_t2()
-	_update_hint()
+	_update_tutorial_cue()
 	_refresh_bag()
 	_try_auto_refill()
 	_resolve_t3_starved_types()
 	_maybe_play_clear_vfx()
+	call_deferred("_end_session_if_settled")
 
 
 func _notify_meta_swipe_lock(locked: bool) -> void:
@@ -394,6 +372,8 @@ func set_arena_page_active(active: bool) -> void:
 		_sync_hub_nav_lock()
 	else:
 		_hide_need_more_overlay()
+		if _pest and not _session_open:
+			_pest.reset_to_nest()
 		# Stay locked only while session lives; tabs should already block leave.
 		_sync_hub_nav_lock()
 
@@ -405,8 +385,7 @@ func set_meta_hub_mode(_enabled: bool) -> void:
 
 func refresh_for_meta_hub() -> void:
 	_refresh_bag()
-	_update_hint()
-	_refresh_daily_hud()
+	_update_tutorial_cue()
 	_sync_hub_nav_lock()
 
 
@@ -421,20 +400,20 @@ func register_arena_combo_merge() -> void:
 		_combo_coin_granted_this_streak = true
 		if _combo_bonus > 0 and GameState.meta_hub_active and is_inside_tree():
 			get_tree().call_group("meta_hub", "refresh_top_bar")
+			get_tree().call_group("meta_hub", "show_coin_earn_pop", _combo_bonus)
 	if _combo_count >= COMBO_COIN_THRESHOLD:
 		GameState.note_arena_daily_event("combo_5")
 	if _combo_count >= COMBO_HUD_MIN:
 		_react_arena_pip()
-	_refresh_combo_hud()
-	_refresh_daily_hud()
 
 
 func get_combo_count() -> int:
 	return _combo_count
 
 
-func is_combo_hud_visible() -> bool:
-	return _hud != null and _hud.is_combo_shown()
+## Smoke/hub: sesija traje dok ima sjemenki na polju — dotle je swipe zakljucan.
+func is_session_open() -> bool:
+	return _session_open
 
 
 func _clear_combo() -> void:
@@ -442,33 +421,6 @@ func _clear_combo() -> void:
 	_combo_window_left = 0.0
 	_combo_coin_granted_this_streak = false
 	_combo_bonus = 0
-	_refresh_combo_hud()
-
-
-func _refresh_combo_hud() -> void:
-	if _hud == null:
-		return
-	if _combo_count >= COMBO_HUD_MIN:
-		_hud.show_combo(_combo_count, _combo_bonus)
-	else:
-		_hud.hide_combo()
-
-
-func _refresh_daily_hud() -> void:
-	if _hud == null:
-		return
-	_hud.refresh_daily(GameState.get_arena_daily_hud_text(), GameState.is_arena_daily_complete())
-
-
-func _refresh_stash_counter() -> void:
-	if _hud == null:
-		return
-	_hud.set_stash(maxi(0, GameState.get_garden_crystal_total() - _stash_pending))
-
-
-func _set_hint(text: String) -> void:
-	if _hud:
-		_hud.set_hint(text)
 
 
 func _on_chip_drag_started(chip: ArenaSeedChip) -> void:
@@ -585,30 +537,57 @@ func _get_dragging_chip() -> ArenaSeedChip:
 	return null
 
 
+## Bez trake s porukama odbijen tap javlja sama vreca (punch), ne tekst.
 func _on_bag_clicked() -> void:
 	var slots := _arena_slots_available()
 	if slots <= 0:
-		_set_hint(HINT_FULL)
+		_punch_seed_bag()
 		_refresh_bag()
 		return
 	var bag_count := GameState.sum_seed_bag_only()
 	if bag_count <= 0:
-		_set_hint(HINT_BAG_EMPTY)
+		_punch_seed_bag()
 		_refresh_bag()
 		return
+	_start_session_if_needed()
 	var poured := _pour_available_seeds()
 	if poured <= 0:
 		if _bag_has_pourable_set():
-			_set_hint(HINT_BAG_EMPTY)
+			_punch_seed_bag()
 		else:
 			_show_need_more_seeds_overlay()
 		_refresh_bag()
 		return
 	if GameState.should_show_arena_pest_tutorial():
-		_set_hint(HINT_PEST_AWAKE)
+		_cue.show_message(CUE_PEST_AWAKE)
 		GameState.mark_arena_pest_tutorial_shown()
-	else:
-		_set_hint(HINT_POURED % poured)
+
+
+## Prvi pour na prazno polje otvara sesiju: hub se zakljuca, lockovi i livada se resetuju.
+func _start_session_if_needed() -> void:
+	if _session_open or not _chips.is_empty():
+		return
+	_session_open = true
+	GameState.clear_arena_pour_locks()
+	_reset_session_feel()
+	if _pest:
+		_pest.reset_to_nest()
+
+
+## Sesija se ne prekida rucno — gasi se sama kad polje ostane prazno (sve spojeno ili
+## pojedeno). Tek tada `_is_session_active()` pusti swipe po hubu.
+func _end_session_if_settled() -> void:
+	if not _session_open or _auto_pouring:
+		return
+	if not _chips.is_empty() or not _vacuum_flies.is_empty():
+		return
+	_session_open = false
+	GameState.commit_arena_chips_to_bag(_chip_data)
+	_clear_combo()
+	_clear_pair_pulses()
+	_update_tutorial_cue()
+	_refresh_bag()
+	_sync_hub_nav_lock()
 
 
 func _bag_has_pourable_set() -> bool:
@@ -670,9 +649,9 @@ func _fit_need_more_scroll() -> void:
 	need_more_scroll.custom_minimum_size.y = clampf(rows_h, 0.0, maxf(max_h, ArenaNeedRow.ROW_H))
 
 
-## Overlay se zatvara samo preko "Back to Camp" (ne tap bilo gdje) — isti izlaz kao Done.
+## Overlay se zatvara samo preko "Back to Camp" (ne tap bilo gdje).
 func _on_back_to_camp_pressed() -> void:
-	_on_done_pressed()
+	_end_session_to_camp()
 
 
 func _arena_slots_available() -> int:
@@ -707,7 +686,7 @@ func _pour_available_seeds() -> int:
 		_pest.on_seeds_poured(not _chips.is_empty())
 	_resolve_t3_starved_types()
 	_resolve_stranded_t2()
-	_update_hint()
+	_update_tutorial_cue()
 	_refresh_bag()
 	return pulled.size()
 
@@ -757,7 +736,7 @@ func _physical_keepouts() -> Array[Rect2]:
 	return out
 
 
-## Spawn izbjegava i gnijezdo i combo metar (to su overlayi, ne prepreke).
+## Spawn izbjegava gnijezdo (overlay, ne prepreka) — combo keepout je otpao s pilulom.
 func _spawn_keepouts() -> Array[Rect2]:
 	var out := _physical_keepouts()
 	var field := playfield.size
@@ -765,10 +744,6 @@ func _spawn_keepouts() -> Array[Rect2]:
 	out.append(Rect2(
 		field.x * 0.5 - UiArena.NEST_KEEPOUT_HALF_W, -above,
 		UiArena.NEST_KEEPOUT_HALF_W * 2.0, above + UiArena.NEST_KEEPOUT_BOTTOM
-	))
-	out.append(Rect2(
-		field.x - UiArena.COMBO_KEEPOUT_W, -above,
-		UiArena.COMBO_KEEPOUT_W + above, above + UiArena.COMBO_KEEPOUT_BOTTOM
 	))
 	return out
 
@@ -965,37 +940,34 @@ func _on_chip_released(chip: ArenaSeedChip) -> void:
 				GameState.note_arena_daily_event("merge_t2")
 			elif new_tier >= GameState.MAX_MERGE_TIER:
 				GameState.note_arena_daily_event("make_t3")
-			_refresh_daily_hud()
-			var name: String = GameState.get_seed_display_name(chip.type_id)
 			if new_tier >= GameState.MAX_MERGE_TIER:
 				_add_session_t3()
 				if _pest:
 					_pest.on_t3_created()
 				GameState.stash_garden_crystal(chip.type_id)
 				_play_t3_moment(chip.type_id, merged_center)
-				_set_hint(HINT_CRYSTAL % name)
 				_remove_chip(chip)
 				_resolve_t3_starved_types()
 				_resolve_stranded_t2()
-				_update_hint()
+				_update_tutorial_cue()
 				_refresh_bag()
 				_try_auto_refill()
 				_resolve_t3_starved_types()
 				_maybe_play_clear_vfx()
+				call_deferred("_end_session_if_settled")
 				return
 			else:
-				_set_hint(HINT_MERGED_T2)
 				chip.play_merge_pop()
 			_resolve_overlaps(chip)
 			_resolve_t3_starved_types()
 			_resolve_stranded_t2()
-			_update_hint()
+			_update_tutorial_cue()
 			_refresh_bag()
 			_try_auto_refill()
 			_resolve_t3_starved_types()
 			_maybe_play_clear_vfx()
+			call_deferred("_end_session_if_settled")
 			return
-		_set_hint(str(result.get("msg", "No merge.")))
 	elif _has_near_miss(chip):
 		chip.play_wobble()
 	_resolve_overlaps(chip)
@@ -1003,6 +975,7 @@ func _on_chip_released(chip: ArenaSeedChip) -> void:
 	_resolve_t3_starved_types()
 	_resolve_stranded_t2()
 	_refresh_bag()
+	call_deferred("_end_session_if_settled")
 
 
 ## Pusten blizu sjemenke s kojom ne moze (drugi tip ili tier) — wobble kao feedback.
@@ -1015,11 +988,9 @@ func _has_near_miss(chip: ArenaSeedChip) -> bool:
 	return false
 
 
-## T3 trenutak (0,74 s): burst prsten, kristal leti u StashCounter, punch brojaca.
-## Tweenovi su vezani za ring/ghost pa se gase s njima (Done usred leta).
+## T3 trenutak (0,74 s): burst prsten, pa kristal odleti u gornji desni ugao polja
+## (gdje je stajao stash brojac) i nestane. Tweenovi su vezani za ring/ghost.
 func _play_t3_moment(type_id: String, at_local: Vector2) -> void:
-	_stash_pending += 1
-	_refresh_stash_counter()
 	var origin := at_local + playfield.global_position - global_position
 	var ring := Panel.new()
 	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1041,9 +1012,9 @@ func _play_t3_moment(type_id: String, at_local: Vector2) -> void:
 	ghost.setup(type_id, GameState.MAX_MERGE_TIER, origin)
 	ghost.z_index = 71
 	_fx_nodes.append(ghost)
-	var target := origin
-	if _hud:
-		target = _hud.get_stash_icon_center_global() - global_position
+	var target := playfield.position + Vector2(
+		playfield.size.x - UiArena.CRYSTAL_EXIT_INSET.x, UiArena.CRYSTAL_EXIT_INSET.y
+	)
 	var fly := ghost.create_tween()
 	fly.tween_interval(T3_RING_SEC)
 	fly.tween_property(ghost, "position", target - ghost.size * 0.5, T3_FLY_SEC).set_trans(
@@ -1052,15 +1023,12 @@ func _play_t3_moment(type_id: String, at_local: Vector2) -> void:
 	fly.parallel().tween_property(ghost, "scale", Vector2.ONE * T3_FLY_END_SCALE, T3_FLY_SEC).set_trans(
 		Tween.TRANS_CUBIC
 	).set_ease(Tween.EASE_IN)
+	fly.parallel().tween_property(ghost, "modulate:a", 0.0, T3_FLY_SEC * 0.5).set_delay(T3_FLY_SEC * 0.5)
 	fly.tween_callback(_on_t3_crystal_arrived.bind(ghost))
 
 
 func _on_t3_crystal_arrived(ghost: Node) -> void:
 	_free_fx(ghost)
-	_stash_pending = maxi(0, _stash_pending - 1)
-	_refresh_stash_counter()
-	if _hud:
-		_hud.punch_stash()
 
 
 func _free_fx(node: Node) -> void:
@@ -1132,6 +1100,7 @@ func _on_vacuum_fly_arrived(ghost: Control, tw: Tween) -> void:
 	if is_instance_valid(ghost):
 		ghost.queue_free()
 	_punch_seed_bag()
+	call_deferred("_end_session_if_settled")
 
 
 func _punch_seed_bag() -> void:
@@ -1168,7 +1137,6 @@ func _kill_vacuum_flies() -> void:
 		if is_instance_valid(node):
 			node.queue_free()
 	_fx_nodes.clear()
-	_stash_pending = 0
 
 
 func _type_t1_eq(type_id: String) -> int:
@@ -1305,7 +1273,9 @@ func _refresh_bag() -> void:
 	_repel_chips_from_bag()
 
 
-func _on_done_pressed() -> void:
+## Jedini rucni izlaz koji je ostao — "Back to Camp" iz "You need more seeds" overlaya.
+func _end_session_to_camp() -> void:
+	_session_open = false
 	_hide_need_more_overlay()
 	_reset_session_feel()
 	_clear_combo()
@@ -1328,24 +1298,8 @@ func _clear_field_chips() -> void:
 	_chip_data.clear()
 
 
-func _update_hint() -> void:
-	var tutorial := GameState.should_prompt_merge_tutorial()
-	if _hud:
-		_hud.set_tutorial_visible(tutorial and _chips.is_empty())
-	if GameState.merge_hint_booster_active:
-		_set_hint(GameState.get_merge_hint_message(_chip_data))
+## Oblacic iznad vrece stoji samo dok tutorial traje i polje je prazno.
+func _update_tutorial_cue() -> void:
+	if _cue == null:
 		return
-	var bag := GameState.sum_seed_bag_only()
-	if tutorial:
-		_set_hint(HINT_TUTORIAL_EMPTY if _chips.is_empty() else HINT_TUTORIAL)
-	elif bag >= 2 and _chips.is_empty():
-		_set_hint(HINT_TUTORIAL_EMPTY)
-	elif bag > 0 and _chips.size() < GameState.ARENA_MAX_CHIPS:
-		_set_hint(HINT_POUR_MORE % GameState.ARENA_MAX_CHIPS)
-	elif not _chips.is_empty():
-		_set_hint(HINT_T3_STASH)
-	elif bag <= 0 and _chips.is_empty():
-		if _pest and _pest.is_active():
-			_set_hint(HINT_OUT_PEST)
-		else:
-			_set_hint(HINT_OUT)
+	_cue.set_tutorial_visible(GameState.should_prompt_merge_tutorial() and _chips.is_empty())

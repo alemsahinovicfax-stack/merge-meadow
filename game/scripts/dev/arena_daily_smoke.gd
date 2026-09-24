@@ -148,18 +148,14 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("arena scene missing")
 		return
-	if not arena.has_method("_on_done_pressed"):
+	if not arena.has_method("_end_session_to_camp"):
 		_restore_save(backup)
-		_fail("Done handler missing")
+		_fail("session exit missing")
 		return
-	var daily := arena.get_node_or_null("RootVBox/ArenaHud/Row/DailyTask/HBox/DailyLabel")
-	if daily == null:
+	# HUD pilula dnevnog zadatka uklonjena 2026-09-24 — logika mora raditi i bez prikaza.
+	if arena.get_node_or_null("RootVBox/ArenaHud") != null:
 		_restore_save(backup)
-		_fail("DailyLabel missing")
-		return
-	if not (daily is Label):
-		_restore_save(backup)
-		_fail("DailyLabel is not a Label")
+		_fail("ArenaHud row should be gone")
 		return
 	_restore_save(backup)
 	if FileAccess.file_exists(SAVE_PATH):

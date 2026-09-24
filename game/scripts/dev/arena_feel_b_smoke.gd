@@ -61,9 +61,9 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("is_clear_of_pairs missing")
 		return
-	if not arena.has_method("_on_done_pressed"):
+	if not arena.has_method("_end_session_to_camp"):
 		_restore_save(backup)
-		_fail("Done handler missing")
+		_fail("session exit missing")
 		return
 	arena.call("_spawn_poured_chips", [
 		{"chip_id": 9201, "type_id": "clover", "tier": 1},

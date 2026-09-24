@@ -67,9 +67,9 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("arena missing auto-refill API")
 		return
-	if not arena.has_method("_on_done_pressed"):
+	if not arena.has_method("_end_session_to_camp"):
 		_restore_save(backup)
-		_fail("Done path missing")
+		_fail("session exit missing")
 		return
 
 	var spawn: Array = []

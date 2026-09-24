@@ -493,6 +493,8 @@ kupovinu. Ideje van zadatka (npr. "Sort" dugme) navedi odvojeno na kraju.
 
 ## Implementacija (2026-09-12)
 
+> Dio ovoga je izmijenjen 2026-09-24 — HUD, traka s porukama i Done su uklonjeni, vidi [[#Izmjena (2026-09-24) — arena je samo polje|§ Izmjena]] niže.
+
 | Fajl | Uloga |
 |------|-------|
 | `game/scripts/visual/ui_arena.gd` | Boje, mjere, stilovi, `spawn_slots()` (hex rešetka) — iz CD `ui_arena.gd`, dopunjen |
@@ -520,12 +522,32 @@ kupovinu. Ideje van zadatka (npr. "Sort" dugme) navedi odvojeno na kraju.
 7. **`arena_pest_smoke`** iz README-a ne postoji — umjesto njega novi `arena_redesign_smoke` uz postojećih 16.
 8. **Van zadatka, nije urađeno:** tap na StashCounter, long-press na sjemenku, Muncher koji nosi sjemenku 0,3 s.
 
+## Izmjena (2026-09-24) — arena je samo polje
+
+HUD red, traka s porukama i `Done` dugme su uklonjeni: pojeli su 464 px stranice, a nosili su informacije koje se ili nigdje ne koriste (dnevni zadatak se u igri ne preuzima) ili igraču ništa ne mijenjaju. **Mehanika je netaknuta** — nestao je samo prikaz.
+
+| Prije | Sada |
+|-------|------|
+| `ArenaHud` 120 px (DailyTask lijevo, StashCounter desno) | nema; dnevni zadatak i garden stash se i dalje broje u `GameState` |
+| `HintLine` 128 px (13 poruka) | nema; ostaje samo oblačić iznad vreće (tutorial prvog puta + Merge Hint booster) |
+| `ComboMeter` gore desno + spawn keepout 380 × 130 | nema; combo i dalje broji i na 5 daje coine — javljaju Pip i „+N" pop kod coin chipa |
+| `Done` 140 px + 76 px razmaka | nema; sesija se gasi sama |
+| Playfield 1133 px | **1553 px** (sve osim 44 px pojasa u kojem viri NavLockPill) |
+| Gnijezdo munchera 310 px od vrha stranice | **108 px** (više ne može — header odsijeca „zzz") |
+
+**Kraj sesije bez dugmeta.** Nav lock ostaje: dok ima sjemenki na polju, hub se ne swipe-a. Prvi tap na vreću otvara sesiju (`_start_session_if_needed` — čisti pour lockove i livadu), a `_end_session_if_settled` je zatvara kad polje ostane prazno: ili si sve spojio pa je ostatak odletio natrag u vreću, ili je muncher pojeo sve. Muncher jede dok god ima T1/T2 na polju (spava samo kad nema hrane), pa polje uvijek dođe do kraja. Jedini ručni izlaz je „Back to Camp" u „You need more seeds" overlayu (`_end_session_to_camp`).
+
+**Ostali feedback bez HUD-a:** T3 kristal leti u gornji desni ugao polja i nestaje (`CRYSTAL_EXIT_INSET`); odbijen tap na vreću (polje puno, vreća prazna) javlja punch vreće umjesto teksta.
+
+**Datoteke:** novi `arena_cue.gd` (zamijenio `arena_hud.gd`), `ui_arena.gd` (`FIELD_BOTTOM_GAP`, `CRYSTAL_EXIT_INSET`, bez HUD/hint/Done/combo konstanti), `merge_arena.tscn`, `merge_arena_controller.gd`, `meta_hub_controller.show_coin_earn_pop()`. Testovi: novi `arena_session_end_smoke`, prepisani `arena_redesign_smoke` i `arena_nav_lock_smoke`, očišćeni `arena_combo_smoke` i `arena_daily_smoke`.
+
 ## Odluke
 
 | Datum | Odluka |
 |-------|--------|
 | 2026-09-11 | Brief napisan. Pravila i brojevi Arene (§2) su fiksni; CD dizajnira izgled i osjećaj. Header/footer (smjer B) su zadati. |
 | 2026-09-12 | Odabran **smjer B** (cream rim + tamni well) i prenesen. Naslov ukinut; StashCounter uveden; overlay samo preko CTA; tekstovi prema tabeli stari → novi; "Sort" dugme ne (CD). |
+| 2026-09-24 | Arena ostaje samo polje: HUD, traka s porukama i Done uklonjeni (vizual, ne mehanika). Sesija se završava sama kad polje ostane prazno; combo nagradu javlja „+N" pop kod coin chipa. |
 
 ## Otvorena pitanja (nakon CD-a)
 

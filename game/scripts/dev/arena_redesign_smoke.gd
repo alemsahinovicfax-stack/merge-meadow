@@ -1,13 +1,13 @@
 extends SceneTree
 
-## Merge Arena redizajn (smjer B, design_handoff_merge_arena) na visini hub stranice (1597):
-## budzet HUD/hint/Done, Done ne dira NavLockPill, 30 sjemenki bez preklapanja i van keepout
-## zona (rešetka), T3 kristal stize u StashCounter, najduza poruka staje u 2 reda.
+## Merge Arena bez HUD-a, trake s porukama i Done dugmeta (2026-09-24) na visini hub
+## stranice (1597): polje uzima sve osim donjeg pojasa za NavLockPill, vreca i Pip su
+## nisko ali iznad pilule, 30 sjemenki bez preklapanja i van keepout zona, T3 kristal
+## odleti i ocisti se za sobom.
 
 const SAVE_PATH := "user://player_save.json"
 const HUB_PAGE := Vector2(1080.0, 1597.0)
 const TOLERANCE := 1.5
-const LONG_HINT := "Paper Lantern Bloom crystal → stash. Muncher frozen 2s."
 
 var _failed: bool = false
 
@@ -32,41 +32,37 @@ func _run() -> void:
 	for _i in 8:
 		await process_frame
 	_check_layout(arena)
-	await _check_hint(arena)
 	await _check_full_pour(arena, gs)
 	await _check_t3_moment(arena, gs)
 	_finish(backup, gs)
 
 
 func _check_layout(arena: Control) -> void:
-	if arena.get_node_or_null("RootVBox/TopBar") != null:
-		_fail("old TopBar/title should be gone")
-	_expect_near("ArenaHud height", _h(arena, "RootVBox/ArenaHud"), UiArena.HUD_H)
-	_expect_near("HintLine height", _h(arena, "RootVBox/HintLine"), UiArena.HINT_H)
-	var done := arena.get_node_or_null("RootVBox/DoneRow/DoneButton") as Control
-	if done == null:
-		_fail("DoneButton missing")
+	for gone in ["RootVBox/TopBar", "RootVBox/ArenaHud", "RootVBox/HintLine", "RootVBox/DoneRow",
+			"RootVBox/Playfield/ComboMeter"]:
+		if arena.get_node_or_null(gone) != null:
+			_fail("%s should be gone" % gone)
+	var field := arena.get_node_or_null("RootVBox/Playfield") as Control
+	if field == null:
+		_fail("Playfield missing")
 		return
-	if done.size.y < UiArena.DONE_H - TOLERANCE:
-		_fail("Done hit height %.1f < %d" % [done.size.y, UiArena.DONE_H])
-	var gap: float = HUB_PAGE.y - (done.get_global_rect().end.y - arena.global_position.y)
-	if gap < UiArena.DONE_GAP_BOTTOM - TOLERANCE:
-		_fail("Done must keep %d px above the footer (pill zone), got %.1f" % [UiArena.DONE_GAP_BOTTOM, gap])
-	var expected_field := HUB_PAGE.y - UiArena.HUD_H - UiArena.HINT_H \
-		- (UiArena.DONE_GAP_TOP + UiArena.DONE_H + UiArena.DONE_GAP_BOTTOM)
-	_expect_near("Playfield height", _h(arena, "RootVBox/Playfield"), expected_field)
-
-
-func _check_hint(arena: Control) -> void:
-	arena.call("_set_hint", LONG_HINT)
-	for _i in 3:
-		await process_frame
-	var pill := arena.get_node_or_null("RootVBox/HintLine/HintPill") as Control
-	if pill == null:
-		_fail("HintPill missing")
+	_expect_near("Playfield height", field.size.y, HUB_PAGE.y - UiArena.FIELD_BOTTOM_GAP)
+	_expect_near("Playfield top", field.position.y, 0.0)
+	var pip := arena.get_node_or_null("RootVBox/Playfield/ArenaPip") as Control
+	if pip == null:
+		_fail("ArenaPip missing")
 		return
-	if pill.size.y > UiArena.HINT_H + 8.0:
-		_fail("longest hint should fit 2 lines in %d px, pill is %.1f" % [UiArena.HINT_H, pill.size.y])
+	# Vreca i Pip smiju nisko, ali ne u pojas gdje NavLockPill viri iznad footera.
+	var pip_gap: float = HUB_PAGE.y - (field.position.y + pip.position.y + pip.size.y)
+	if pip_gap < float(UiArena.FIELD_BOTTOM_GAP) - TOLERANCE:
+		_fail("Pip must keep %d px above the footer, got %.1f" % [UiArena.FIELD_BOTTOM_GAP, pip_gap])
+	var bag := field.get_node_or_null("SeedBag") as Control
+	if bag == null:
+		_fail("SeedBag missing")
+		return
+	var bag_gap: float = HUB_PAGE.y - (field.position.y + bag.position.y + UiArena.BAG_HIT.y)
+	if bag_gap < float(UiArena.FIELD_BOTTOM_GAP) - TOLERANCE:
+		_fail("bag must keep %d px above the footer, got %.1f" % [UiArena.FIELD_BOTTOM_GAP, bag_gap])
 
 
 func _check_full_pour(arena: Control, gs: Node) -> void:
@@ -114,11 +110,6 @@ func _check_t3_moment(arena: Control, gs: Node) -> void:
 	var after := int(gs.call("get_garden_crystal_total"))
 	if after != before + 1:
 		_fail("T3 should add 1 crystal to the stash (%d → %d)" % [before, after])
-	var stash := arena.get_node_or_null("RootVBox/ArenaHud/Row/StashCounter/HBox/StashLabel") as Label
-	if stash == null or stash.text != UiChrome.format_count(after):
-		_fail("StashCounter should show %d after the crystal lands, got %s" % [after, stash.text if stash else "null"])
-	if int(arena.get("_stash_pending")) != 0:
-		_fail("no crystal should still be in flight")
 	for child in arena.get_children():
 		if child.name.begins_with("VacuumFly"):
 			_fail("T3 ghost left behind after landing")

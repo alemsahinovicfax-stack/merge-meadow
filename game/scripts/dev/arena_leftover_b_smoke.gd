@@ -80,9 +80,9 @@ func _run() -> void:
 	var arena := await _boot_arena(backup)
 	if arena == null:
 		return
-	if not arena.has_method("_on_done_pressed"):
+	if not arena.has_method("_end_session_to_camp"):
 		_restore_save(backup)
-		_fail("Done path missing")
+		_fail("session exit missing")
 		return
 	var overlay := _overlay_of(arena)
 	if overlay == null:

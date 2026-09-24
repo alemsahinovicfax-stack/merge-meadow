@@ -1,6 +1,7 @@
 extends SceneTree
 
-## ARENA-01 COMB-A — combo HUD, daily coin cap, pair pulse, pest does not reset.
+## ARENA-01 COMB-A — combo brojanje, daily coin cap, pair pulse, pest does not reset.
+## Combo pilula je uklonjena 2026-09-24 — ostaje samo mehanika i Pip reakcija.
 
 
 const SAVE_PATH := "user://player_save.json"
@@ -111,18 +112,14 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("two merges expected combo 2")
 		return
-	if not bool(arena.call("is_combo_hud_visible")):
+	if arena.get_node_or_null("RootVBox/Playfield/ComboMeter") != null:
 		_restore_save(backup)
-		_fail("HUD should show from combo 2")
+		_fail("ComboMeter pill should be gone")
 		return
 	await create_timer(2.0).timeout
 	if int(arena.call("get_combo_count")) != 0:
 		_restore_save(backup)
 		_fail("timeout should clear combo")
-		return
-	if bool(arena.call("is_combo_hud_visible")):
-		_restore_save(backup)
-		_fail("HUD should hide after timeout")
 		return
 	var wallet_before := int(gs.get("wallet_coins"))
 	for _n in 5:
