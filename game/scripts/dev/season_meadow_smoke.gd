@@ -138,22 +138,22 @@ func _assert_play_row_equal(home: Node) -> String:
 	var endless_n: Control = home.get_node_or_null("%EndlessPlayButton") as Control
 	if seasons_n == null or play_n == null or endless_n == null:
 		return "PlayRow children missing"
-	var ms: Vector2 = play_n.custom_minimum_size
-	if seasons_n.custom_minimum_size != ms or endless_n.custom_minimum_size != ms:
-		return "PlayRow min sizes differ play=%s seasons=%s endless=%s" % [
-			str(ms), str(seasons_n.custom_minimum_size), str(endless_n.custom_minimum_size)
-		]
-	if not is_equal_approx(seasons_n.size.y, play_n.size.y) or not is_equal_approx(endless_n.size.y, play_n.size.y):
-		return "PlayRow heights differ play=%.0f seasons=%.0f endless=%.0f" % [
-			play_n.size.y, seasons_n.size.y, endless_n.size.y
-		]
+	if play_n.custom_minimum_size.y < 176.0:
+		return "Play min height expected >= 176 got %s" % str(play_n.custom_minimum_size)
+	if endless_n.custom_minimum_size.y < 176.0:
+		return "Endless min height expected >= 176 got %s" % str(endless_n.custom_minimum_size)
+	if seasons_n.custom_minimum_size.x < 300.0 or seasons_n.custom_minimum_size.y < 120.0:
+		return "Seasons min size expected >= 300x120 got %s" % str(seasons_n.custom_minimum_size)
 	return ""
 
 
 func _assert_flowers(field: Node, pool: Array, label: String) -> String:
+	var spots := 0
+	if field.has_method("get_meadow_spot_count"):
+		spots = int(field.call("get_meadow_spot_count"))
+	if spots != 13:
+		return "%s spot count %d expected 13" % [label, spots]
 	var flowers: Array = _field_flowers(field)
-	if flowers.size() < 12 or flowers.size() > 14:
-		return "%s flower count %d expected 12-14" % [label, flowers.size()]
 	var pool_set: Dictionary = {}
 	for type_id in pool:
 		pool_set[str(type_id)] = true
@@ -167,6 +167,8 @@ func _assert_flowers(field: Node, pool: Array, label: String) -> String:
 			return "%s flower plant_tier expected 3 got %s" % [label, str(flower.get("plant_tier"))]
 	if _has_arena_chip(field):
 		return "%s must not instance ArenaSeedChip" % label
+	if field.has_method("meadow_safe_rect"):
+		return "%s meadow_safe_rect should be removed" % label
 	return ""
 
 
@@ -226,9 +228,8 @@ func _assert_field_upgrades_open(home: Node, label: String) -> String:
 	]
 	if blob.find("Sprinkler") >= 0:
 		return "%s upgrade chrome must not say Sprinkler" % label
-	for bad in ["px", "×", "x1", "x2"]:
-		if blob.find(bad) >= 0:
-			return "%s upgrade chrome must not contain %s" % [label, bad]
+	if blob.find("Need") < 0 and blob.find("Upgrade") < 0 and blob.find("Maxed") < 0:
+		return "%s upgrade button should show Upgrade/Need/Maxed" % label
 	return ""
 
 
@@ -277,6 +278,14 @@ func _run() -> void:
 	gs.set("skip_debug_season_unlock", true)
 	gs.call("reset_seasons_to_s1")
 	gs.set("tutorial_complete", true)
+	var stash: Dictionary = {}
+	for season_id in ["country_bloom", "frost_orchard"]:
+		var def: SeasonDef = gs.call("get_season_def", season_id)
+		if def == null:
+			continue
+		for type_id in def.seed_type_ids:
+			stash[str(type_id)] = 5
+	gs.set("garden_crystal_stash", stash)
 
 	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
 	if err != OK:
@@ -309,17 +318,17 @@ func _run() -> void:
 		_fail("SeasonStage missing")
 		return
 
-	var band: Control = stage.get_node_or_null("%SeasonTrail") as Control
+	var band: Control = stage.get_node_or_null("%SelectLayer") as Control
 	var field: Control = stage.get_node_or_null("%SeasonField") as Control
 	var seasons: Node = stage.get_node_or_null("%SeasonsButton")
 	if band == null or field == null:
-		_fail("SeasonTrail or SeasonField missing")
+		_fail("SelectLayer or SeasonField missing")
 		return
 	if bool(gs.get("home_season_field_open")):
 		_fail("default field should be closed")
 		return
 	if not band.visible:
-		_fail("default SeasonTrail should be visible")
+		_fail("default SelectLayer should be visible")
 		return
 	if field.visible:
 		_fail("default SeasonField should be hidden")
@@ -359,8 +368,12 @@ func _run() -> void:
 	if seasons_row.visible:
 		_fail("carousel SeasonsRowButton should be hidden")
 		return
-	if play_row != null and seasons_row.get_parent() != play_row:
-		_fail("SeasonsRowButton parent should be PlayRow")
+	var field_top: Node = home.get_node_or_null("%FieldTopRow")
+	if field_top == null:
+		_fail("FieldTopRow missing")
+		return
+	if seasons_row.get_parent() != field_top and (play_row == null or seasons_row.get_parent() != play_row):
+		_fail("SeasonsRowButton parent should be FieldTopRow")
 		return
 	var endless_btn: Control = home.get_node_or_null("%EndlessPlayButton") as Control
 	if endless_btn == null:
@@ -376,9 +389,9 @@ func _run() -> void:
 	if play_btn_carousel == null:
 		_fail("PlayButton missing")
 		return
-	# Biranje sezone: veliki Play (156) s cipom sezone; Seasons/Endless su skriveni.
-	if not is_equal_approx(play_btn_carousel.custom_minimum_size.y, 156.0):
-		_fail("trail Play min height expected 156 got %s" % str(play_btn_carousel.custom_minimum_size))
+	# Biranje sezone: Play 180 + "run in {active}"; Seasons/Endless su skriveni.
+	if play_btn_carousel.custom_minimum_size.y < 176.0:
+		_fail("select Play min height expected 180 got %s" % str(play_btn_carousel.custom_minimum_size))
 		return
 	var name_chip: Control = home.get_node_or_null("%SeasonNameChip") as Control
 	if name_chip and name_chip.visible:
@@ -393,6 +406,11 @@ func _run() -> void:
 	stage.call("tap_card", "country_bloom")
 	await process_frame
 	await process_frame
+	for _tw in 12:
+		if stage.has_method("is_field_transitioning") and bool(stage.call("is_field_transitioning")):
+			await process_frame
+		else:
+			break
 	if not bool(gs.get("home_season_field_open")):
 		_fail("tap on active Bloom card should open field")
 		return
@@ -403,7 +421,7 @@ func _run() -> void:
 		_fail("Bloom open: home_play_action should be run")
 		return
 	if band.visible:
-		_fail("SeasonTrail should hide when field open")
+		_fail("SelectLayer should hide when field open")
 		return
 	if not field.visible:
 		_fail("SeasonField should show when open")
@@ -501,12 +519,8 @@ func _run() -> void:
 	var backdrop: ColorRect = home.get_node_or_null("%FieldBackdrop") as ColorRect
 	var home_bg: ColorRect = home.get_node_or_null("Background") as ColorRect
 	var daily: Control = home.get_node_or_null("%DailyChestCard") as Control
-	var daily_caption: Label = home.get_node_or_null("%DailyCaption") as Label
-	if daily_caption == null:
-		_fail("DailyCaption missing")
-		return
-	if daily_caption.text.find("Arena streak") >= 0 or daily_caption.text.find("Arena daily") >= 0:
-		_fail("Bloom DailyCaption must not mention arena")
+	if not daily is HomeGiftCard:
+		_fail("DailyChestCard must be the v2 Gift card")
 		return
 	var play_btn: Control = home.get_node_or_null("%PlayButton") as Control
 	if backdrop == null:
@@ -515,8 +529,8 @@ func _run() -> void:
 	if not backdrop.visible:
 		_fail("Bloom open: FieldBackdrop should be visible")
 		return
-	if not backdrop.color.is_equal_approx(BLOOM_PASTEL):
-		_fail("Bloom FieldBackdrop should be pastel")
+	if not backdrop.color.is_equal_approx(HOME_DARK):
+		_fail("Bloom FieldBackdrop should stay page dark #2E4733")
 		return
 	if backdrop.mouse_filter != Control.MOUSE_FILTER_IGNORE:
 		_fail("FieldBackdrop must IGNORE")
@@ -524,7 +538,7 @@ func _run() -> void:
 	if backdrop.size.y <= (stage as Control).size.y:
 		_fail("FieldBackdrop should extend beyond SeasonStage")
 		return
-	# Daily gift je u TopRow-u biranja sezone; u polju je skriven (2026-09-21).
+	# Daily gift je u Play redu biranja sezone; u polju je skriven.
 	if daily and daily.is_visible_in_tree():
 		_fail("Bloom open: Daily gift belongs to the season picker, not the field")
 		return
@@ -550,11 +564,15 @@ func _run() -> void:
 		if basket.get_global_rect().position.y + 0.5 < daily.get_global_rect().end.y:
 			_fail("Bloom open: BasketCard should sit below Daily")
 			return
-	if absf(basket.custom_minimum_size.x - 336.0) > 1.0 or absf(basket.custom_minimum_size.y - 104.0) > 1.0:
-		_fail("Bloom open: Basket min size expected 336x104 got %s" % str(basket.custom_minimum_size))
+	if basket.custom_minimum_size.y < 178.0:
+		_fail("Bloom open: Basket min height expected >= 180 got %s" % str(basket.custom_minimum_size))
 		return
-	if absf(basket.size.x - 336.0) > 12.0 or absf(basket.size.y - 104.0) > 12.0:
-		_fail("Bloom open: Basket size expected ~336x104 got %s" % str(basket.size))
+	if basket.size.y < 170.0:
+		_fail("Bloom open: Basket height expected ~180 got %s" % str(basket.size))
+		return
+	var basket_btn: Control = home.get_node_or_null("%BasketButton") as Control
+	if basket_btn == null:
+		_fail("Bloom open: BasketButton missing")
 		return
 	if not seasons_row.visible:
 		_fail("Bloom open: SeasonsRowButton should be visible")
@@ -627,7 +645,7 @@ func _run() -> void:
 		_fail("close should clear flag")
 		return
 	if not band.visible:
-		_fail("SeasonTrail should show after close")
+		_fail("SelectLayer should show after close")
 		return
 	if field.visible:
 		_fail("SeasonField should hide after close")
@@ -635,8 +653,8 @@ func _run() -> void:
 	if backdrop.visible:
 		_fail("close should hide FieldBackdrop")
 		return
-	if home_bg == null or not home_bg.color.is_equal_approx(HOME_DARK):
-		_fail("close: Home Background should stay dark green")
+	if home_bg == null or not home_bg.color.is_equal_approx(UiStage.PAGE_BG):
+		_fail("close: Home Background should be the season-select #243329")
 		return
 	if basket.visible:
 		_fail("close should hide BasketCard")
@@ -667,23 +685,33 @@ func _run() -> void:
 	if not bool(stage.call("open_season_field")):
 		_fail("open Frost field failed")
 		return
+	for _ftw in 12:
+		if stage.has_method("is_field_transitioning") and bool(stage.call("is_field_transitioning")):
+			await process_frame
+		else:
+			break
 	await process_frame
 	await process_frame
 	if str(gs.get("home_season_field_id")) != "frost_orchard":
 		_fail("field_id expected frost_orchard got %s" % str(gs.get("home_season_field_id")))
 		return
-	var ground: ColorRect = stage.get_node_or_null("%MeadowGround") as ColorRect
-	if ground == null:
-		_fail("MeadowGround missing")
-		return
-	if ground.color.is_equal_approx(BLOOM_PASTEL) or ground.color.is_equal_approx(Color.WHITE):
+	var ground_color := Color.WHITE
+	if field.has_method("get_ground_color"):
+		ground_color = field.call("get_ground_color")
+	else:
+		var ground: ColorRect = stage.get_node_or_null("%MeadowGround") as ColorRect
+		if ground == null:
+			_fail("MeadowGround missing")
+			return
+		ground_color = ground.color
+	if ground_color.is_equal_approx(BLOOM_PASTEL) or ground_color.is_equal_approx(Color.WHITE):
 		_fail("Frost MeadowGround tint should differ from Bloom")
 		return
 	if not backdrop.visible:
 		_fail("Frost open: FieldBackdrop should be visible")
 		return
-	if backdrop.color.is_equal_approx(BLOOM_PASTEL) or backdrop.color.is_equal_approx(Color.WHITE):
-		_fail("Frost FieldBackdrop tint should differ from Bloom")
+	if not backdrop.color.is_equal_approx(HOME_DARK):
+		_fail("Frost FieldBackdrop should stay page dark #2E4733")
 		return
 	var frost_def: SeasonDef = gs.call("get_season_def", "frost_orchard")
 	var frost_pool: Array = frost_def.seed_type_ids if frost_def else []
@@ -810,16 +838,35 @@ func _run() -> void:
 		stage.call("refresh")
 	await process_frame
 	await process_frame
+	# v2: daleki lock ne smije zadrzati fokus — clamp ide na aktivnu (Bloom).
+	if str(gs.get("focus_season_id")) == "lantern_meadow":
+		_fail("far lock lantern should lose focus after refresh")
+		return
+	if str(gs.get("focus_season_id")) != "country_bloom":
+		_fail("after lantern clamp, focus should be active Bloom got %s" % str(gs.get("focus_season_id")))
+		return
+	if bool(stage.call("open_season_field", "lantern_meadow")):
+		_fail("open locked lantern field should return false")
+		return
+	if bool(gs.get("home_season_field_open")):
+		_fail("locked lantern open must not set flag")
+		return
+	if not bool(gs.call("set_free_strip_focus", "frost_orchard")):
+		_fail("next-lock frost should take focus")
+		return
+	if stage.has_method("refresh"):
+		stage.call("refresh")
+	await process_frame
 	if bool(gs.call("can_open_home_season_field")):
-		_fail("locked lantern should not can_open")
+		_fail("next-lock frost should not can_open")
 		return
 	if bool(gs.call("open_home_season_field")):
-		_fail("open locked lantern should return false")
+		_fail("open next-lock frost should return false")
 		return
 	if bool(gs.get("home_season_field_open")):
 		_fail("locked open must not set flag")
 		return
-	# Play ne ovisi o fokusu: i s fokusom na zakljucanoj sezoni pokrece aktivnu (run).
+	# Play ne ovisi o fokusu: i s fokusom na sljedecem locku pokrece aktivnu (run).
 	if str(home.call("home_play_action")) != "run":
 		_fail("locked focus: home_play_action should still be run")
 		return

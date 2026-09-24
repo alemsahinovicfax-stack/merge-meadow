@@ -1,12 +1,9 @@
 class_name SeasonField
 extends Control
 
-## HOME-14 LIFE-C/D — 12–14 flowers in meadow_safe_rect; MeadowPip Walk/Sniff/Sleep.
+## Home field meadow — framed window, 13 stash-gated spots, Pip FSM.
 
 const FLOWER_SCRIPT := preload("res://scripts/ui/season_field_flower.gd")
-const FLOWER_COUNT := 13
-const CHROME_PAD := 12.0
-const PIP_SIDE := 72.0
 const PIP_MIN_MOVE := 80.0
 const PIP_WALK_SPEED := 70.0
 const PIP_WALK_MIN := 2.2
@@ -18,57 +15,57 @@ const PIP_WEIGHT_SNIFF := 0.25
 const PIP_WEIGHT_SLEEP := 0.25
 
 enum _PipState { NONE, WALK, SNIFF, SLEEP }
-const FLOWER_SLOTS: Array[Vector2] = [
-	Vector2(0.14, 0.12),
-	Vector2(0.38, 0.12),
-	Vector2(0.62, 0.12),
-	Vector2(0.86, 0.12),
-	Vector2(0.26, 0.36),
-	Vector2(0.50, 0.36),
-	Vector2(0.74, 0.36),
-	Vector2(0.12, 0.58),
-	Vector2(0.38, 0.58),
-	Vector2(0.62, 0.58),
-	Vector2(0.88, 0.58),
-	Vector2(0.32, 0.80),
-	Vector2(0.68, 0.80),
-]
 
-@onready var meadow_ground: ColorRect = $MeadowGround
+@onready var meadow_ground: Panel = $MeadowGround
 @onready var meadow_pip: Control = $MeadowPip
+@onready var meadow_count: PanelContainer = $MeadowCount
+@onready var meadow_note: Label = $MeadowNote
+
 var _open_season_id: String = ""
 var _wander_tween: Tween = null
 var _pip_state: int = _PipState.NONE
 var _last_sniff_id: int = 0
+var _spot_count: int = 0
+var _grown_count: int = 0
+var _band_sky: ColorRect
+var _band_far: ColorRect
+var _band_near: ColorRect
+var _laid_out_size: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	clip_contents = true
+	_ensure_bands()
 	_hide_pip_and_stop()
+	if meadow_count:
+		meadow_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if meadow_note:
+		meadow_note.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	resized.connect(_on_resized)
 
 
 func apply_season(season_id: String) -> void:
 	_open_season_id = season_id
-	if meadow_ground:
-		meadow_ground.color = SeasonTheme.home_field_tint(season_id)
+	_apply_meadow_fill(season_id)
 	_rebuild_flowers(season_id)
 	call_deferred("_rebuild_flowers_deferred", season_id)
 
 
-func meadow_safe_rect() -> Rect2:
-	var bounds := _meadow_bounds()
-	if bounds.size.x < 8.0 or bounds.size.y < 8.0:
-		return bounds
-	var safe := bounds
-	for chrome in _chrome_controls():
-		var local := _global_rect_to_local(chrome.get_global_rect()).grow(CHROME_PAD)
-		safe = _carve_aabb(safe, local)
-	var half := SeasonFieldFlower.FLOWER_SIDE * 0.5
-	safe = safe.grow(-half)
-	if safe.size.x < 8.0 or safe.size.y < 8.0:
-		var min_size := Vector2(8.0, 8.0)
-		var center := bounds.get_center()
-		return Rect2(center - min_size * 0.5, min_size)
-	return safe
+func get_meadow_spot_count() -> int:
+	return _spot_count
+
+
+func get_meadow_grown_count() -> int:
+	return _grown_count
+
+
+func get_ground_color() -> Color:
+	if meadow_ground:
+		var sb := meadow_ground.get_theme_stylebox("panel") as StyleBoxFlat
+		if sb:
+			return sb.bg_color
+	return Color.WHITE
 
 
 func clear_flowers() -> void:
@@ -77,12 +74,19 @@ func clear_flowers() -> void:
 			continue
 		remove_child(child)
 		child.queue_free()
+	_spot_count = 0
+	_grown_count = 0
 
 
 func dismiss_flowers() -> void:
 	_open_season_id = ""
+	_laid_out_size = Vector2.ZERO
 	_hide_pip_and_stop()
 	clear_flowers()
+	if meadow_count:
+		meadow_count.visible = false
+	if meadow_note:
+		meadow_note.visible = false
 
 
 func is_pip_wandering() -> bool:
@@ -98,6 +102,28 @@ func is_pip_alive() -> bool:
 	)
 
 
+func settle_flowers() -> void:
+	var flowers: Array = []
+	for child in get_children():
+		if child.is_in_group("meadow_flower") and child is Control:
+			flowers.append(child)
+	if not flowers.is_empty():
+		UiHomeField.tween_flowers_settle(flowers)
+
+
+func _on_resized() -> void:
+	_layout_bands()
+	_place_pip_home()
+	if meadow_count:
+		meadow_count.position = Vector2(18, 18)
+	if _open_season_id.is_empty():
+		return
+	if size.distance_to(_laid_out_size) < 8.0:
+		return
+	_laid_out_size = size
+	_rebuild_flowers(_open_season_id)
+
+
 func _rebuild_flowers_deferred(season_id: String) -> void:
 	if _open_season_id != season_id:
 		return
@@ -106,7 +132,77 @@ func _rebuild_flowers_deferred(season_id: String) -> void:
 
 func _is_shell_child(child: Node) -> bool:
 	var n := str(child.name)
-	return n == "MeadowGround" or n == "SeasonsButton" or n == "MeadowPip"
+	return (
+		n == "MeadowGround"
+		or n == "MeadowSky"
+		or n == "MeadowFar"
+		or n == "MeadowNear"
+		or n == "SeasonsButton"
+		or n == "MeadowPip"
+		or n == "MeadowCount"
+		or n == "MeadowNote"
+	)
+
+
+func _ensure_bands() -> void:
+	if meadow_ground == null:
+		return
+	_band_sky = meadow_ground.get_node_or_null("MeadowSky") as ColorRect
+	_band_far = meadow_ground.get_node_or_null("MeadowFar") as ColorRect
+	_band_near = meadow_ground.get_node_or_null("MeadowNear") as ColorRect
+	if _band_sky == null:
+		_band_sky = _make_band("MeadowSky")
+		meadow_ground.add_child(_band_sky)
+	if _band_far == null:
+		_band_far = _make_band("MeadowFar")
+		meadow_ground.add_child(_band_far)
+	if _band_near == null:
+		_band_near = _make_band("MeadowNear")
+		meadow_ground.add_child(_band_near)
+
+
+func _make_band(band_name: String) -> ColorRect:
+	var band := ColorRect.new()
+	band.name = band_name
+	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return band
+
+
+func _apply_meadow_fill(season_id: String) -> void:
+	var ground := SeasonTheme.home_field_tint(season_id)
+	if meadow_ground:
+		var sb := UiHomeField.meadow_frame(season_id)
+		sb.bg_color = ground
+		meadow_ground.add_theme_stylebox_override("panel", sb)
+		meadow_ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ensure_bands()
+	if _band_sky:
+		_band_sky.color = UiHomeField.meadow_sky(ground)
+	if _band_far:
+		_band_far.color = ground
+	if _band_near:
+		_band_near.color = UiHomeField.meadow_near(ground)
+	_layout_bands()
+
+
+func _layout_bands() -> void:
+	if meadow_ground == null:
+		return
+	var inner := meadow_ground.size
+	if inner.x < 8.0:
+		inner = size
+	var y0 := 0.0
+	var y1 := inner.y * float(UiHomeField.MEADOW_BANDS[0])
+	var y2 := inner.y * float(UiHomeField.MEADOW_BANDS[1])
+	if _band_sky:
+		_band_sky.position = Vector2.ZERO
+		_band_sky.size = Vector2(inner.x, y1)
+	if _band_far:
+		_band_far.position = Vector2(0.0, y1)
+		_band_far.size = Vector2(inner.x, y2 - y1)
+	if _band_near:
+		_band_near.position = Vector2(0.0, y2)
+		_band_near.size = Vector2(inner.x, maxf(0.0, inner.y - y2))
 
 
 func _rebuild_flowers(season_id: String) -> void:
@@ -120,23 +216,68 @@ func _rebuild_flowers(season_id: String) -> void:
 		return
 	var def: SeasonDef = GameState.get_season_def(season_id)
 	if def == null or def.seed_type_ids.is_empty():
+		_refresh_meadow_chrome(0)
 		_restart_wander()
 		return
 	var pool: Array[String] = def.seed_type_ids
-	var safe := meadow_safe_rect()
-	var count := clampi(FLOWER_COUNT, 12, mini(14, FLOWER_SLOTS.size()))
-	for i in count:
-		var type_id := str(pool[i % pool.size()])
-		var flower: SeasonFieldFlower = FLOWER_SCRIPT.new()
-		add_child(flower)
-		flower.setup(type_id, 3)
-		flower.z_index = 0
-		var slot: Vector2 = FLOWER_SLOTS[i]
-		var pos := safe.position + slot * safe.size
-		pos.x = clampf(pos.x, safe.position.x, maxf(safe.position.x, safe.end.x - flower.size.x))
-		pos.y = clampf(pos.y, safe.position.y, maxf(safe.position.y, safe.end.y - flower.size.y))
-		flower.position = pos
+	var stash: Dictionary = GameState.garden_crystal_stash
+	_spot_count = UiHomeField.MEADOW_SPOTS.size()
+	_grown_count = 0
+	for i in _spot_count:
+		var spec: Array = UiHomeField.MEADOW_SPOTS[i]
+		var x_pct := float(spec[0])
+		var bottom_pct := float(spec[1])
+		var side := float(spec[2])
+		var roster_i := clampi(int(spec[3]), 0, pool.size() - 1)
+		var need := int(spec[4])
+		var type_id := str(pool[roster_i])
+		var have := int(stash.get(type_id, 0))
+		var pos := _spot_position(bounds, x_pct, bottom_pct, side)
+		if have >= need:
+			var flower: SeasonFieldFlower = FLOWER_SCRIPT.new()
+			flower.name = "MeadowSpot_%d" % i
+			add_child(flower)
+			flower.setup_spot(type_id, side, 3)
+			flower.position = pos
+			_grown_count += 1
+		else:
+			var soil := Panel.new()
+			soil.name = "MeadowSoil_%d" % i
+			soil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			soil.custom_minimum_size = Vector2(side * 0.68, side * 0.27)
+			soil.size = soil.custom_minimum_size
+			soil.position = Vector2(
+				pos.x + (side - soil.size.x) * 0.5,
+				pos.y + side - soil.size.y
+			)
+			soil.add_theme_stylebox_override("panel", UiHomeField.soil_spot(int(soil.size.y)))
+			add_child(soil)
+	_refresh_meadow_chrome(_grown_count)
 	_restart_wander()
+
+
+func _spot_position(bounds: Rect2, x_pct: float, bottom_pct: float, side: float) -> Vector2:
+	var x := bounds.position.x + bounds.size.x * (x_pct / 100.0) - side * 0.5
+	var y := bounds.position.y + bounds.size.y * (1.0 - bottom_pct / 100.0) - side
+	var max_x := maxf(bounds.position.x, bounds.end.x - side)
+	var max_y := maxf(bounds.position.y, bounds.end.y - side)
+	return Vector2(clampf(x, bounds.position.x, max_x), clampf(y, bounds.position.y, max_y))
+
+
+func _refresh_meadow_chrome(grown: int) -> void:
+	if meadow_count:
+		meadow_count.visible = true
+		meadow_count.add_theme_stylebox_override("panel", UiHomeField.meadow_count())
+		var value := meadow_count.get_node_or_null("CountRow/Value") as Label
+		var caption := meadow_count.get_node_or_null("CountRow/Caption") as Label
+		if value:
+			value.text = "%d / 13" % grown
+		if caption:
+			caption.text = "grown"
+	if meadow_note:
+		meadow_note.visible = grown <= 0
+		if grown <= 0:
+			meadow_note.text = "Play a run — blooms you merge will grow here."
 
 
 func _meadow_bounds() -> Rect2:
@@ -144,83 +285,6 @@ func _meadow_bounds() -> Rect2:
 	if bounds.x < 8.0 and meadow_ground:
 		bounds = meadow_ground.size
 	return Rect2(Vector2.ZERO, bounds)
-
-
-func _chrome_root() -> Node:
-	var n: Node = get_parent()
-	while n:
-		if (
-			n.get_node_or_null("%DailyChestCard") != null
-			and n.get_node_or_null("%SeasonNameChip") != null
-			and n.get_node_or_null("%PlayRow") != null
-		):
-			return n
-		n = n.get_parent()
-	return null
-
-
-func _chrome_controls() -> Array[Control]:
-	var out: Array[Control] = []
-	var root := _chrome_root()
-	if root == null:
-		return out
-	var daily: Control = root.get_node_or_null("%DailyChestCard") as Control
-	var basket: Control = root.get_node_or_null("%BasketCard") as Control
-	var chip: Control = root.get_node_or_null("%SeasonNameChip") as Control
-	var play_row: Control = root.get_node_or_null("%PlayRow") as Control
-	var upgrades: Control = root.get_node_or_null("%FieldUpgradeStack") as Control
-	for node in [daily, basket, chip, play_row, upgrades]:
-		var chrome: Control = node as Control
-		if chrome == null or not chrome.visible:
-			continue
-		out.append(chrome)
-	return out
-
-
-func _global_rect_to_local(global_rect: Rect2) -> Rect2:
-	var inv := get_global_transform_with_canvas().affine_inverse()
-	var corners: Array[Vector2] = [
-		inv * global_rect.position,
-		inv * (global_rect.position + Vector2(global_rect.size.x, 0.0)),
-		inv * (global_rect.position + Vector2(0.0, global_rect.size.y)),
-		inv * (global_rect.position + global_rect.size),
-	]
-	var min_x := corners[0].x
-	var min_y := corners[0].y
-	var max_x := corners[0].x
-	var max_y := corners[0].y
-	for i in range(1, corners.size()):
-		min_x = minf(min_x, corners[i].x)
-		min_y = minf(min_y, corners[i].y)
-		max_x = maxf(max_x, corners[i].x)
-		max_y = maxf(max_y, corners[i].y)
-	return Rect2(min_x, min_y, max_x - min_x, max_y - min_y)
-
-
-func _carve_aabb(safe: Rect2, blocker: Rect2) -> Rect2:
-	var hit := safe.intersection(blocker)
-	if hit.size.x <= 0.0 or hit.size.y <= 0.0:
-		return safe
-	var next := safe
-	if hit.size.y <= hit.size.x:
-		var safe_mid := safe.position.y + safe.size.y * 0.5
-		var hit_mid := hit.position.y + hit.size.y * 0.5
-		if hit_mid >= safe_mid:
-			next.size.y = maxf(0.0, blocker.position.y - safe.position.y)
-		else:
-			var new_top := blocker.position.y + blocker.size.y
-			next.size.y = maxf(0.0, safe.end.y - new_top)
-			next.position.y = new_top
-	else:
-		var safe_mid := safe.position.x + safe.size.x * 0.5
-		var hit_mid := hit.position.x + hit.size.x * 0.5
-		if hit_mid >= safe_mid:
-			next.size.x = maxf(0.0, blocker.position.x - safe.position.x)
-		else:
-			var new_left := blocker.position.x + blocker.size.x
-			next.size.x = maxf(0.0, safe.end.x - new_left)
-			next.position.x = new_left
-	return next
 
 
 func _hide_pip_and_stop() -> void:
@@ -237,6 +301,18 @@ func _stop_wander() -> void:
 		_wander_tween = null
 
 
+func _place_pip_home() -> void:
+	if meadow_pip == null or _open_season_id.is_empty():
+		return
+	var bounds := _meadow_bounds()
+	var sz := _pip_size()
+	var x := bounds.size.x * (float(UiHomeField.PIP_X_PCT) / 100.0) - sz.x * 0.5
+	var y := bounds.size.y * (1.0 - float(UiHomeField.PIP_BOTTOM_PCT) / 100.0) - sz.y
+	meadow_pip.custom_minimum_size = Vector2(UiHomeField.PIP_SIZE, UiHomeField.PIP_SIZE)
+	meadow_pip.size = meadow_pip.custom_minimum_size
+	meadow_pip.position = _clamp_pip_pos(Vector2(x, y))
+
+
 func _restart_wander() -> void:
 	_stop_wander()
 	_last_sniff_id = 0
@@ -245,18 +321,19 @@ func _restart_wander() -> void:
 		return
 	meadow_pip.visible = true
 	meadow_pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	meadow_pip.position = _clamp_pip_pos(meadow_pip.position)
+	meadow_pip.z_index = 20
+	_place_pip_home()
 	_enter_pip_state(_PipState.WALK)
 
 
 func _pip_size() -> Vector2:
 	if meadow_pip and meadow_pip.size.x >= 8.0:
 		return meadow_pip.size
-	return Vector2(PIP_SIDE, PIP_SIDE)
+	return Vector2(UiHomeField.PIP_SIZE, UiHomeField.PIP_SIZE)
 
 
 func _clamp_pip_pos(pos: Vector2) -> Vector2:
-	var safe := meadow_safe_rect()
+	var safe := _meadow_bounds()
 	var sz := _pip_size()
 	var max_x := maxf(safe.position.x, safe.end.x - sz.x)
 	var max_y := maxf(safe.position.y, safe.end.y - sz.y)
@@ -275,7 +352,7 @@ func _meadow_flowers() -> Array[Control]:
 
 
 func _random_safe_pip_pos() -> Vector2:
-	var safe := meadow_safe_rect()
+	var safe := _meadow_bounds()
 	var sz := _pip_size()
 	var max_x := maxf(safe.position.x, safe.end.x - sz.x)
 	var max_y := maxf(safe.position.y, safe.end.y - sz.y)

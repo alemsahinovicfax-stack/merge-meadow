@@ -216,6 +216,13 @@ func _run() -> void:
 	if not basket_card.visible:
 		_fail("Bloom field: BasketCard should be visible")
 		return
+	var basket_btn := home.get_node_or_null("%BasketButton") as Control
+	if basket_btn == null:
+		_fail("Bloom field: BasketButton missing")
+		return
+	if basket_btn.custom_minimum_size.y < 120.0:
+		_fail("Bloom field: BasketButton hit < 120")
+		return
 	if basket_card.get_parent() != stack:
 		_fail("Bloom field: BasketCard should stay under HomeTopStack")
 		return

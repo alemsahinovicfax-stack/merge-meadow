@@ -430,7 +430,7 @@ zadatka navedi odvojeno na kraju, ne u glavnom mockupu.
 
 - [x] Varijanta A ili B (ili miks)? → **B**, tamni livadski chrome
 - [x] Tap na chip valute → Shop? → **ne** (preporuka CD-a, Pillar 2)
-- [ ] Custom rounded font — CD predlaže **Nunito** (OFL, 700/800/900) za cijelu igru; zasad default font + embolden
+- [ ] Custom rounded font — CD predlaže **Nunito** (OFL, 700/800/900) za cijelu igru; Nunito je uveden za Home biranje sezone (HOME-20, `UiStage.font()`), ostatak igre i hub chrome još default font + embolden
 - [ ] Badge i za druge tabove (npr. Camp kad je daily spreman)? — `HubTab.set_badge_count()` je generički, spojen je samo Journal
 - [x] Ikone tabova: finalne iz CD-a ili placeholder? → finalne SVG iz CD-a
 - [ ] Count-up animacija broja u headeru (CD prijedlog: 0,25 s + pop ikone) — nije implementirano

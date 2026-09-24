@@ -1,727 +1,769 @@
 class_name HomeSeasonCard
-extends PanelContainer
+extends Control
 
-## Kartica sezone na Home (design_handoff_home · SeasonCard / HomeScreen.dc.html).
-## Jedna scena za sve: varijanta je visina + vidljivost djece, stanje je boja i tekst.
-## Kartica samo prikazuje podatke; SeasonStage odlucuje sta tap znaci.
+## Kartica sezone 1032 x 1100 (design_handoff_home_v2 · SeasonCard.dc.html):
+## SeasonArt (flex), SeasonTitle 170, SeasonRoster 236 / 2 x 214 i jedna akcija
+## po stanju. Kartica samo crta; SeasonStage prima dodir i hit_part() kaze sta
+## je pogodjeno, pa press_part() salje signal.
 
 signal tapped(season_id: String)
 signal open_field_pressed(season_id: String)
 signal unlock_pressed(season_id: String)
 signal cta_pressed(season_id: String)
-signal fresh_done(season_id: String)
+signal page_pressed(delta: int)
 
-const DRAG_SCROLL := preload("res://scripts/ui/drag_scroll.gd")
-const PRESS_SCALE := 0.97
-const PRESS_SEC := 0.08
+const ST_ACTIVE := "active"
+const ST_OPEN := "open"
+const ST_GATHER := "gather"
+const ST_READY := "ready"
+const ST_UNLOCKING := "unlocking"
+const ST_FAR := "far"
+const ST_PREMIUM := "premium"
+const ST_PURCHASING := "purchasing"
+const ST_SOON := "soon"
+const GATE_STATES: Array[String] = [ST_GATHER, ST_READY, ST_UNLOCKING, ST_FAR]
+
+const PART_NONE := ""
+const PART_CARD := "card"
+const PART_PREV := "prev"
+const PART_NEXT := "next"
+const PART_OPEN := "open"
+const PART_UNLOCK := "unlock"
+const PART_BUY := "buy"
+
+const PH_DIR := "res://assets/ui/home/flowers/ph_"
+const ARROW_EDGE := Color(1.0, 0.973, 0.941, 0.6)
+const WELL_EDGE_55 := Color(1.0, 0.973, 0.941, 0.55)
+const ICON_EDGE_40 := Color(1.0, 0.973, 0.941, 0.4)
+const PREVIEW_RIM := Color(1.0, 0.973, 0.941, 0.5)
+const BADGE_EDGE := Color(1.0, 0.973, 0.941, 0.55)
+const BADGE_EDGE_PREMIUM := Color(0.831, 0.647, 1.0, 0.8)
+const DISABLED_ARROW := 0.3
+const SOON_TILE := 0.8
+
+static var _art_cache: Dictionary = {}
+static var _mono: Font = null
 
 var season_id: String = ""
-var variant: String = UiHome.COLLAPSED
-var state: String = UiHome.ST_UNLOCKED
+var state: String = ST_ACTIVE
 var _data: Dictionary = {}
-var _fresh_shown: bool = false
-var _pressing: bool = false
-var _drag_dist: float = 0.0
-var _press_tween: Tween
-var _fresh_tween: Tween
-var _busy_tween: Tween
-var _bounce_tween: Tween
-var _height_tween: Tween
+var _pressed_part: String = PART_NONE
+var _unlock_t: float = 1.0
+var _drain_t: float = 1.0
+var _anim: Tween
 
-var _burst: HomeUnlockBurst
-var _body: VBoxContainer
-var _head: HBoxContainer
-var _lock_box: PanelContainer
-var _head_text: VBoxContainer
-var _eyebrow_row: HBoxContainer
-var _badge_top: PanelContainer
-var _new_badge: PanelContainer
-var _eyebrow: Label
-var _name: Label
-var _status: Label
-var _badge_row: PanelContainer
-var _status_chip: PanelContainer
-var _price_tag: PanelContainer
-var _open_button: CampButton
-var _tagline: Label
-var _roster: PanelContainer
-var _roster_row: HBoxContainer
-var _roster_frames: Array[CampArtFrame] = []
-var _roster_pips: Array[Label] = []
-var _roster_slots: Array[VBoxContainer] = []
-var _poster: VBoxContainer
-var _need: Label
-var _coin_row: HBoxContainer
-var _coin_icon: TextureRect
-var _coin_value: Label
-var _coin_bar: HomeBar
-var _flower_row: HBoxContainer
-var _gate_frame: CampArtFrame
-var _flower_value: Label
-var _flower_bar: HomeBar
-var _gate_caption: Label
-var _unlock_button: CampButton
-var _cta: CampButton
+var _rim: int = UiStage.RIM_ACTIVE
+var _art := Rect2()
+var _title := Rect2()
+var _roster := Rect2()
+var _action := Rect2()
+var _tiles: Array[Rect2] = []
+var _shown: Array[Dictionary] = []
+var _prev := Rect2()
+var _next := Rect2()
+var _coin_row := Rect2()
+var _flower_row := Rect2()
+var _unlock_btn := Rect2()
+var _price := Rect2()
+var _buy := Rect2()
 
 
 func _init() -> void:
 	name = "SeasonCard"
-	clip_contents = true
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_build()
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	size = UiStage.CARD.size
+	custom_minimum_size = UiStage.CARD.size
 
 
-func _ready() -> void:
-	resized.connect(_on_resized)
-	_open_button.clicked.connect(func() -> void: open_field_pressed.emit(season_id))
-	_unlock_button.clicked.connect(func() -> void: unlock_pressed.emit(season_id))
-	_cta.clicked.connect(func() -> void: cta_pressed.emit(season_id))
-	_on_resized()
-	_apply()
-
-
-## data: season_id, variant, state, active, fresh, name, tagline, prev_name, roster,
-## coins, coins_need, flowers, flowers_need, gate_type_id, gate_name, price.
+## data: season_id, state, name, tagline, kind (free|paid), order, roster
+## [{id, name, rarity}], coins, coins_need, flowers, flowers_need, gate_type_id,
+## gate_name, gate_mood, prev_name, price, prev_on, next_on.
 func configure(data: Dictionary) -> void:
-	var was_fresh := bool(_data.get("fresh", false))
 	_data = data
 	season_id = str(data.get("season_id", ""))
-	variant = str(data.get("variant", UiHome.COLLAPSED))
-	state = str(data.get("state", UiHome.ST_UNLOCKED))
-	if not bool(data.get("fresh", false)) or not was_fresh:
-		_fresh_shown = false
-	if is_node_ready():
-		_apply()
+	state = str(data.get("state", ST_ACTIVE))
+	if state != ST_UNLOCKING:
+		_stop_anim()
+	_layout()
+	queue_redraw()
 
 
-## Visina iz stagea (varijanta + dio praznog prostora ako je ova kartica fokus).
-func set_target_height(h: float, animated: bool) -> void:
-	_fit_roster(h)
-	if _height_tween:
-		_height_tween.kill()
-		_height_tween = null
-	if not animated or not is_inside_tree() or is_equal_approx(custom_minimum_size.y, h):
-		custom_minimum_size = Vector2(0.0, h)
-		return
-	_height_tween = create_tween()
-	_height_tween.tween_property(self, "custom_minimum_size:y", h, UiHome.T_CARD) \
-		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-
-
-## Najniza visina bez rezanja sadrzaja (roster na najmanjem okviru cvijeta).
-func floor_height() -> float:
-	var h := get_minimum_size().y
-	if _roster.visible and not _roster_frames.is_empty():
-		h -= maxf(_roster_frames[0].frame_side - UiHome.ART_MIN, 0.0)
-	return h
-
-
-func play_unlock_burst() -> void:
-	_burst.play()
-
-
-func bounce() -> void:
-	if _bounce_tween:
-		_bounce_tween.kill()
-	modulate.a = 1.0
+func play_unlock() -> void:
+	_stop_anim()
+	_unlock_t = 0.0
+	_drain_t = 0.0
+	queue_redraw()
 	if not is_inside_tree():
+		_unlock_t = 1.0
+		_drain_t = 1.0
 		return
-	_bounce_tween = create_tween().set_trans(Tween.TRANS_SINE)
-	_bounce_tween.tween_property(self, "modulate:a", 0.55, UiHome.T_BOUNCE * 0.5).set_ease(Tween.EASE_OUT)
-	_bounce_tween.tween_property(self, "modulate:a", 1.0, UiHome.T_BOUNCE * 0.5).set_ease(Tween.EASE_IN)
+	_anim = create_tween().set_parallel(true)
+	_anim.tween_method(_set_unlock_t, 0.0, 1.0, UiStage.T_UNLOCK).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_anim.tween_method(_set_drain_t, 0.0, 1.0, UiStage.T_DRAIN)
 
 
-# --- getteri (smoke) ---
+func is_unlock_playing() -> bool:
+	return _anim != null and _anim.is_valid() and _anim.is_running()
+
+
+func set_pressed_part(part: String) -> void:
+	if _pressed_part == part:
+		return
+	_pressed_part = part
+	queue_redraw()
+
+
+## Dio kartice pod tackom `p` (lokalne koordinate kartice).
+func hit_part(p: Vector2) -> String:
+	if not Rect2(Vector2.ZERO, size).has_point(p):
+		return PART_NONE
+	if _hit_rect(_prev).has_point(p):
+		return PART_PREV if _on("prev_on") else PART_NONE
+	if _hit_rect(_next).has_point(p):
+		return PART_NEXT if _on("next_on") else PART_NONE
+	if has_open_button() and _action.has_point(p):
+		return PART_OPEN
+	if is_gate() and _unlock_btn.has_point(p):
+		return PART_UNLOCK
+	if _is_premium_actions() and _buy.has_point(p):
+		return PART_BUY
+	return PART_CARD
+
+
+func press_part(part: String) -> void:
+	match part:
+		PART_PREV:
+			page_pressed.emit(-1)
+		PART_NEXT:
+			page_pressed.emit(1)
+		PART_OPEN:
+			open_field_pressed.emit(season_id)
+		PART_UNLOCK:
+			if state == ST_READY:
+				unlock_pressed.emit(season_id)
+		PART_BUY:
+			if state == ST_PREMIUM:
+				cta_pressed.emit(season_id)
+		PART_CARD:
+			tapped.emit(season_id)
+
+
+# --- getteri (stage + smoke) ---
 
 func is_active() -> bool:
-	return state == UiHome.ST_ACTIVE or bool(_data.get("active", false))
+	return state == ST_ACTIVE
 
 
-func get_status_text() -> String:
-	return _status.text if _status.visible else ""
+func is_gate() -> bool:
+	return state in GATE_STATES
 
 
-func get_chip_text() -> String:
-	return (_status_chip.get_child(0) as Label).text if _status_chip.visible else ""
-
-
-func get_price_text() -> String:
-	return (_price_tag.get_child(0) as Label).text if _price_tag.visible else ""
-
-
-func get_need_text() -> String:
-	return _need.text if _poster.visible else ""
-
-
-func get_unlock_title() -> String:
-	return _unlock_button.get_title() if _unlock_button.visible else ""
-
-
-func get_unlock_sub() -> String:
-	return _unlock_button.get_sub() if _unlock_button.visible else ""
-
-
-func is_unlock_enabled() -> bool:
-	return _unlock_button.visible and not _unlock_button.disabled
-
-
-func get_cta_title() -> String:
-	return _cta.get_title() if _cta.visible else ""
-
-
-func is_cta_enabled() -> bool:
-	return _cta.visible and not _cta.disabled
+func is_six() -> bool:
+	return state in [ST_PREMIUM, ST_PURCHASING, ST_SOON]
 
 
 func has_open_button() -> bool:
-	return _open_button.visible
-
-
-func has_playing_badge() -> bool:
-	return _badge_top.visible or _badge_row.visible
-
-
-func has_new_badge() -> bool:
-	return _new_badge.visible
+	return state == ST_ACTIVE or state == ST_OPEN
 
 
 func has_lock() -> bool:
-	return _lock_box.visible
+	return state in [ST_GATHER, ST_READY, ST_FAR]
 
 
 func has_roster() -> bool:
-	return _roster.visible
+	return not _shown.is_empty()
 
 
-func roster_art_side() -> float:
-	return _roster_frames[0].frame_side if not _roster_frames.is_empty() else 0.0
+func shown_flower_count() -> int:
+	return _shown.size()
+
+
+func shown_flower_names() -> PackedStringArray:
+	var out := PackedStringArray()
+	for entry in _shown:
+		out.append(str(entry.get("name", "")))
+	return out
+
+
+func get_badge_text() -> String:
+	return str(_badge()[0])
+
+
+func has_playing_badge() -> bool:
+	return state == ST_ACTIVE
+
+
+func get_meta_text() -> String:
+	if str(_data.get("kind", "free")) == "paid":
+		return "PREMIUM PACK"
+	return "FREE · %d OF %d" % [int(_data.get("order", 1)), int(_data.get("free_total", 4))]
+
+
+func get_count_text() -> String:
+	var total := (_data.get("roster", []) as Array).size()
+	return "%d flowers" % total if is_six() else "%d flowers · %d shown" % [total, _shown.size()]
+
+
+func get_unlock_title() -> String:
+	return str(_unlock_texts()[0]) if is_gate() else ""
+
+
+func get_unlock_sub() -> String:
+	return str(_unlock_texts()[1]) if is_gate() else ""
+
+
+func is_unlock_enabled() -> bool:
+	return state == ST_READY
+
+
+func get_buy_title() -> String:
+	if not _is_premium_actions():
+		return ""
+	return "Waiting for store…" if state == ST_PURCHASING else "Get %s" % _name()
+
+
+func get_buy_sub() -> String:
+	if not _is_premium_actions():
+		return ""
+	return "you can keep playing" if state == ST_PURCHASING else "yours to keep"
+
+
+func is_buy_enabled() -> bool:
+	return state == ST_PREMIUM
+
+
+func get_price_text() -> String:
+	return str(_data.get("price", "")) if _is_premium_actions() else ""
+
+
+func get_info_title() -> String:
+	return "Coming soon" if state == ST_SOON else ""
+
+
+func get_coin_text() -> String:
+	return "%d / %d" % [_coins(), _int("coins_need")] if is_gate() else ""
+
+
+func get_flower_text() -> String:
+	return "%d / %d" % [_flowers(), _int("flowers_need")] if is_gate() else ""
 
 
 func get_fill_color() -> Color:
-	return (get_theme_stylebox("panel") as StyleBoxFlat).bg_color
+	return _fill()
 
 
-func get_border_width() -> int:
-	return (get_theme_stylebox("panel") as StyleBoxFlat).border_width_left
+func get_rim_width() -> int:
+	return _rim
 
 
-# --- gradnja ---
-
-func _build() -> void:
-	_burst = HomeUnlockBurst.new()
-	_burst.name = "UnlockBurst"
-	add_child(_burst)
-	_body = VBoxContainer.new()
-	_body.name = "CardBody"
-	_body.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_body)
-
-	_head = _hbox("CardHead", 18)
-	_body.add_child(_head)
-	_lock_box = PanelContainer.new()
-	_lock_box.name = "LockBox"
-	_lock_box.custom_minimum_size = Vector2(UiHome.LOCK_BOX, UiHome.LOCK_BOX)
-	_lock_box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_lock_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_lock_box.add_theme_stylebox_override("panel", UiHome.lock_box())
-	var lock_icon := _icon_rect("LockIcon", UiAssets.get_chrome_icon("icon_lock"), UiHome.LOCK_ICON)
-	lock_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	lock_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_lock_box.add_child(lock_icon)
-	_head.add_child(_lock_box)
-
-	_head_text = VBoxContainer.new()
-	_head_text.name = "HeadText"
-	_head_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_head_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_head_text.alignment = BoxContainer.ALIGNMENT_CENTER
-	_head.add_child(_head_text)
-	_eyebrow_row = _hbox("EyebrowRow", 14)
-	_eyebrow_row.custom_minimum_size.y = UiHome.CHIP_H
-	_head_text.add_child(_eyebrow_row)
-	_badge_top = _chip("ActiveBadge", UiHome.CHIP_H)
-	_eyebrow_row.add_child(_badge_top)
-	_new_badge = _chip("NewBadge", UiHome.CHIP_H)
-	_eyebrow_row.add_child(_new_badge)
-	_eyebrow = _label("Eyebrow")
-	_eyebrow.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_eyebrow_row.add_child(_eyebrow)
-	_name = _label("SeasonName")
-	UiHome.ellipsis(_name)
-	_head_text.add_child(_name)
-	_status = _label("StatusLine")
-	UiHome.ellipsis(_status)
-	_head_text.add_child(_status)
-
-	_badge_row = _chip("PlayingBadge", UiHome.BADGE_ROW_H)
-	_head.add_child(_badge_row)
-	_status_chip = _chip("StatusChip", UiHome.STATUS_CHIP_H)
-	_head.add_child(_status_chip)
-	_price_tag = _chip("PriceTag", UiHome.PRICE_TAG_H)
-	_head.add_child(_price_tag)
-	_open_button = _button("OpenFieldButton")
-	_open_button.custom_minimum_size = UiHome.OPEN_BTN
-	_open_button.size_flags_horizontal = Control.SIZE_SHRINK_END
-	_open_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_head.add_child(_open_button)
-
-	_tagline = _label("Tagline")
-	_tagline.custom_minimum_size.y = UiHome.TAGLINE_H
-	UiHome.ellipsis(_tagline)
-	_body.add_child(_tagline)
-
-	_roster = PanelContainer.new()
-	_roster.name = "SeasonRoster"
-	_roster.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_roster.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_body.add_child(_roster)
-	_roster_row = _hbox("RosterRow", UiHome.ROSTER_GAP)
-	_roster.add_child(_roster_row)
-
-	_poster = VBoxContainer.new()
-	_poster.name = "UnlockPoster"
-	_poster.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_poster.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_body.add_child(_poster)
-	_need = _label("NeedLine")
-	_need.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_poster.add_child(_need)
-	_coin_row = _hbox("CoinProgress", 16)
-	_poster.add_child(_coin_row)
-	_coin_icon = _icon_rect("CoinIcon", UiAssets.get_chrome_icon("icon_coin"), 60)
-	_coin_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_coin_row.add_child(_coin_icon)
-	_coin_value = _label("CoinValue")
-	_coin_value.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_coin_row.add_child(_coin_value)
-	_coin_bar = _bar("CoinBar")
-	_coin_row.add_child(_coin_bar)
-	_flower_row = _hbox("FlowerProgress", 16)
-	_poster.add_child(_flower_row)
-	_gate_frame = CampArtFrame.new()
-	_gate_frame.name = "GateArt"
-	_gate_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_flower_row.add_child(_gate_frame)
-	_flower_value = _label("FlowerValue")
-	_flower_value.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_flower_row.add_child(_flower_value)
-	_flower_bar = _bar("FlowerBar")
-	_flower_row.add_child(_flower_bar)
-	_gate_caption = _label("GateCaption")
-	UiHome.ellipsis(_gate_caption)
-	_poster.add_child(_gate_caption)
-	_unlock_button = _button("UnlockButton")
-	_unlock_button.custom_minimum_size.y = UiHome.UNLOCK_BTN_H
-	_poster.add_child(_unlock_button)
-
-	_cta = _button("CardCta")
-	_cta.custom_minimum_size.y = UiHome.CTA_H
-	_body.add_child(_cta)
+func get_part_rect(part: String) -> Rect2:
+	match part:
+		PART_PREV:
+			return _prev
+		PART_NEXT:
+			return _next
+		PART_OPEN:
+			return _action if has_open_button() else Rect2()
+		PART_UNLOCK:
+			return _unlock_btn if is_gate() else Rect2()
+		PART_BUY:
+			return _buy if _is_premium_actions() else Rect2()
+		"art":
+			return _art
+		"title":
+			return _title
+		"roster":
+			return _roster
+		"action":
+			return _action
+	return Rect2()
 
 
-func _ensure_roster_slots(count: int) -> void:
-	while _roster_slots.size() < count:
-		var slot := VBoxContainer.new()
-		slot.name = "RosterSlot%d" % _roster_slots.size()
-		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		slot.alignment = BoxContainer.ALIGNMENT_CENTER
-		slot.add_theme_constant_override("separation", UiHome.ROSTER_SLOT_GAP)
-		var frame := CampArtFrame.new()
-		frame.name = "ArtFrame"
-		frame.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		slot.add_child(frame)
-		var pips := _label("RarityPips")
-		pips.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		slot.add_child(pips)
-		_roster_row.add_child(slot)
-		_roster_slots.append(slot)
-		_roster_frames.append(frame)
-		_roster_pips.append(pips)
+# --- raspored (SeasonCard.dc.html · flex column, gap 22) ---
+
+func _layout() -> void:
+	_rim = UiStage.RIM_ACTIVE if state == ST_ACTIVE else UiStage.RIM_PREVIEW
+	var inset := float(_rim) + UiStage.CARD_PAD
+	var content := Rect2(inset, inset, size.x - inset * 2.0, size.y - inset * 2.0)
+	var six := is_six()
+	var roster_h := UiStage.TILE_H_SIX * 2.0 + UiStage.TILE_ROW_GAP if six else UiStage.TILE_H
+	var action_h := UiStage.ACTION_H
+	if is_gate():
+		action_h = UiStage.GATE_ROW_H * 2.0 + UiStage.GATE_GAP * 2.0 + UiStage.UNLOCK_H
+	var gap := UiStage.CARD_GAP
+	var art_h := content.size.y - gap * 3.0 - UiStage.TITLE_H - roster_h - action_h
+	_art = Rect2(content.position, Vector2(content.size.x, art_h))
+	_title = Rect2(content.position.x, _art.end.y + gap, content.size.x, UiStage.TITLE_H)
+	_roster = Rect2(content.position.x, _title.end.y + gap, content.size.x, roster_h)
+	_action = Rect2(content.position.x, _roster.end.y + gap, content.size.x, action_h)
+
+	_shown = _pick_roster(six)
+	_tiles.clear()
+	var tile_h := UiStage.TILE_H_SIX if six else UiStage.TILE_H
+	var tile_w := (content.size.x - UiStage.TILE_COL_GAP * 2.0) / 3.0
+	for i in _shown.size():
+		var col := i % 3
+		var row := floori(i / 3.0)
+		_tiles.append(Rect2(
+			_roster.position.x + float(col) * (tile_w + UiStage.TILE_COL_GAP),
+			_roster.position.y + float(row) * (tile_h + UiStage.TILE_ROW_GAP),
+			tile_w, tile_h
+		))
+
+	var arrow_y := _art.end.y - 16.0 - UiStage.ARROW_D
+	_prev = Rect2(_art.position.x + 20.0, arrow_y, UiStage.ARROW_D, UiStage.ARROW_D)
+	_next = Rect2(_art.end.x - 20.0 - UiStage.ARROW_D, arrow_y, UiStage.ARROW_D, UiStage.ARROW_D)
+
+	_coin_row = Rect2(_action.position, Vector2(_action.size.x, UiStage.GATE_ROW_H))
+	_flower_row = Rect2(_action.position.x, _coin_row.end.y + UiStage.GATE_GAP, _action.size.x, UiStage.GATE_ROW_H)
+	_unlock_btn = Rect2(_action.position.x, _flower_row.end.y + UiStage.GATE_GAP, _action.size.x, UiStage.UNLOCK_H)
+	_price = Rect2(_action.position, Vector2(UiStage.PRICE_W, UiStage.ACTION_H))
+	var buy_x := _price.end.x + 16.0
+	_buy = Rect2(buy_x, _action.position.y, _action.end.x - buy_x, UiStage.ACTION_H)
 
 
-# --- primjena podataka (HomeScreen.dc.html · card()) ---
-
-func _apply() -> void:
-	var v := variant
-	var st := state
-	var is_col := v == UiHome.COLLAPSED
-	var is_exp := v == UiHome.EXPANDED
-	var is_next := v == UiHome.NEXTLOCK
-	var is_post := v == UiHome.POSTER
-	var is_prem := v == UiHome.PREMIUM
-	var active := is_active()
-	var soon := st == UiHome.ST_SOON
-	var dim := st == UiHome.ST_LOCKED
-	var light := UiHome.card_light(season_id, st)
-	var ink := UiHome.ink(light)
-	var sub := UiHome.sub_ink(light)
-	var big_head := is_exp or is_post or is_prem
-	var fresh := bool(_data.get("fresh", false))
-	var display_name := str(_data.get("name", season_id))
-
-	add_theme_stylebox_override("panel", UiHome.season_card(season_id, st, v, active))
-	_body.add_theme_constant_override("separation", UiHome.CARD_SEP[v])
-	_head.custom_minimum_size.y = UiHome.HEAD_H[v]
-	_head.size_flags_vertical = Control.SIZE_EXPAND_FILL if is_col else Control.SIZE_FILL
-	_head_text.add_theme_constant_override("separation", 6 if is_col else 8)
-
-	var eyebrow := ""
-	if is_post:
-		eyebrow = "Next free season"
-	elif is_prem:
-		eyebrow = "Premium season" if soon else "Premium season · one-time"
-	var badge := "Playing now" if active else ""
-	var status := ""
-	if is_col:
-		status = _collapsed_status(st, active)
-
-	_lock_box.visible = dim or soon
-	_eyebrow_row.visible = big_head and (not eyebrow.is_empty() or not badge.is_empty() or fresh)
-	_style_chip(_badge_top, "Playing now", UiHome.eyebrow_chip(UiHome.RIM, UiHome.COIN_GOLD_EDGE), UiHome.FONT_CHIP, UiHome.INK)
-	_badge_top.visible = big_head and not badge.is_empty()
-	_style_chip(_new_badge, "New", UiHome.eyebrow_chip(UiHome.MINT, UiHome.MINT_EDGE), UiHome.FONT_CHIP, UiHome.INK)
-	_new_badge.visible = big_head and fresh
-	_eyebrow.text = eyebrow
-	_eyebrow.visible = not eyebrow.is_empty()
-	UiHome.style(_eyebrow, UiHome.FONT_EYEBROW, sub, UiHome.W_REGULAR)
-	_name.text = display_name
-	UiHome.style(_name, UiHome.NAME_PX[v], ink, UiHome.W_BLACK)
-	_status.text = status
-	_status.visible = not status.is_empty()
-	UiHome.style(_status, UiHome.FONT_STATUS, sub, UiHome.W_REGULAR)
-
-	_style_chip(_badge_row, "Playing now", UiHome.badge_row(), UiHome.FONT_BADGE_ROW, UiHome.INK)
-	_badge_row.visible = not badge.is_empty() and not big_head
-	var chip_on := (is_col and st == UiHome.ST_NEXT) or is_next
-	var chip_text := "Next free season" if is_next else "%d / %d  ·  %d / %d" % [
-		_int("coins"), _int("coins_need"), _int("flowers"), _int("flowers_need")
-	]
-	_style_chip(
-		_status_chip, chip_text, UiHome.status_chip(light),
-		UiHome.FONT_STATUS_CHIP_NEXT if is_next else UiHome.FONT_STATUS_CHIP, ink
-	)
-	_status_chip.visible = chip_on
-	var price := str(_data.get("price", ""))
-	_style_chip(_price_tag, price, UiHome.price_tag(), UiHome.FONT_PRICE, UiHome.INK)
-	_price_tag.visible = (
-		(is_col or is_prem) and (st == UiHome.ST_PREMIUM or st == UiHome.ST_BUSY) and not price.is_empty()
-	)
-	_open_button.visible = is_exp and (active or st == UiHome.ST_UNLOCKED)
-	_open_button.set_styles(UiHome.open_button(light))
-	_open_button.set_text("Open meadow ↗")
-	_open_button.set_fonts(UiHome.FONT_OPEN)
-	_open_button.set_ink(ink)
-
-	_tagline.visible = is_exp or is_post or is_prem
-	_tagline.text = str(_data.get("tagline", ""))
-	UiHome.style(_tagline, UiHome.FONT_TAGLINE, sub, UiHome.W_REGULAR)
-
-	_roster.visible = is_exp or is_prem
-	if _roster.visible:
-		_apply_roster(light, ink)
-
-	_poster.visible = is_next or is_post
-	if _poster.visible:
-		_apply_poster(is_post, st, light, ink, sub, display_name)
-	else:
-		_unlock_button.visible = false
-
-	_apply_cta(is_prem, st, light, display_name)
-	_apply_fresh(big_head and fresh)
-	_fit_roster(custom_minimum_size.y)
-
-
-func _collapsed_status(st: String, active: bool) -> String:
-	if active:
-		return "Tap to open the meadow ↗"
-	match st:
-		UiHome.ST_UNLOCKED:
-			return "Unlocked · tap to play here"
-		UiHome.ST_NEXT:
-			return "Next free season"
-		UiHome.ST_LOCKED:
-			var prev := str(_data.get("prev_name", ""))
-			return "Opens after %s" % prev if not prev.is_empty() else "Locked"
-		UiHome.ST_PREMIUM, UiHome.ST_BUSY:
-			return "Premium · preview inside"
-		UiHome.ST_OWNED:
-			return "Owned"
-		UiHome.ST_SOON:
-			return "Coming soon"
-	return ""
-
-
-func _apply_roster(light: bool, ink: Color) -> void:
-	_roster.add_theme_stylebox_override("panel", UiHome.roster_panel(light))
+## 3 cvijeta = prvi ★1, prvi ★2 i ★3 (idx 0, 3, 5 u katalogu); preview = svih 6.
+func _pick_roster(six: bool) -> Array[Dictionary]:
 	var roster: Array = _data.get("roster", [])
-	_ensure_roster_slots(roster.size())
-	for i in _roster_slots.size():
-		var show := i < roster.size()
-		_roster_slots[i].visible = show
-		if not show:
-			continue
-		var entry: Dictionary = roster[i]
-		_roster_frames[i].set_art(false, str(entry.get("id", "")), 3)
-		_roster_pips[i].text = UiCamp.pips(int(entry.get("rarity", 1)))
-		UiHome.style(_roster_pips[i], UiHome.PIPS_PX, ink, UiHome.W_BOLD)
+	var out: Array[Dictionary] = []
+	if six:
+		for entry in roster:
+			out.append(entry)
+		return out
+	for rarity in [1, 2, 3]:
+		for entry in roster:
+			if int((entry as Dictionary).get("rarity", 1)) == rarity:
+				out.append(entry)
+				break
+	return out
 
 
-func _apply_poster(is_post: bool, st: String, light: bool, ink: Color, sub: Color, display_name: String) -> void:
-	var coins := _int("coins")
-	var coins_need := _int("coins_need")
-	var flowers := _int("flowers")
-	var flowers_need := _int("flowers_need")
+func _hit_rect(r: Rect2) -> Rect2:
+	var grow := (UiStage.ARROW_HIT - UiStage.ARROW_D) * 0.5
+	return r.grow(grow)
+
+
+# --- crtanje ---
+
+func _draw() -> void:
+	var fill := _fill()
+	var ink := SeasonColors.ink(fill)
+	var sub := SeasonColors.sub_ink(fill)
+	var body := Rect2(Vector2.ZERO, size)
+	draw_style_box(UiStage.box(UiStage.CARD_DROP, UiStage.CARD_RADIUS), Rect2(0.0, UiStage.CARD_DROP_Y, size.x, size.y))
+	var rim_color := UiStage.RIM if state == ST_ACTIVE else UiStage.over(fill, PREVIEW_RIM)
+	draw_style_box(UiStage.box(fill, UiStage.CARD_RADIUS, _rim, rim_color), body)
+	_draw_art(fill, sub)
+	_draw_title(ink, sub)
+	_draw_roster(fill)
+	if has_open_button():
+		_draw_open_meadow()
+	elif is_gate():
+		_draw_gate(fill)
+	elif _is_premium_actions():
+		_draw_premium(fill)
+	elif state == ST_SOON:
+		_draw_info(fill)
+
+
+func _draw_art(fill: Color, sub: Color) -> void:
+	var r := _art
+	draw_style_box(UiStage.box(SeasonColors.art_slot(fill), UiStage.ART_RADIUS), r)
+	var clip := UiStage.rounded_rect_points(r, float(UiStage.ART_RADIUS))
+	UiStage.draw_stripes(self, r, clip, UiStage.STRIPE)
+	_draw_slot_label(r, sub)
+	var center := r.get_center()
+	if state == ST_UNLOCKING:
+		_draw_ring(center, clip)
+		_draw_disc(center, UiStage.COIN, UiAssets.get_chrome_icon("icon_coin"), 84.0)
+	elif has_lock():
+		_draw_disc(center, UiStage.CREAM, UiAssets.get_chrome_icon("icon_lock"), 80.0)
+	_draw_badge(r)
+	var slot := SeasonColors.art_slot(fill)
+	_draw_arrow(_prev, true, _on("prev_on"), slot)
+	_draw_arrow(_next, false, _on("next_on"), slot)
+
+
+## "season illustration · 996 × H" (22 px mono) dok ne stigne ilustracija.
+func _draw_slot_label(r: Rect2, color: Color) -> void:
+	var mono := _mono_font()
+	var text := "SEASON ILLUSTRATION · 996 × %d" % _slot_label_h()
+	var w := mono.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x
+	var top := r.end.y - 18.0 - 22.0
+	var base := top + (22.0 + mono.get_ascent(22) - mono.get_descent(22)) * 0.5
+	draw_string(mono, Vector2(r.end.x - 22.0 - w, base), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, color)
+
+
+## Visina iz formule u SeasonCard.dc.html (tekst placeholdera, ne stvarni rect).
+func _slot_label_h() -> int:
+	var tiles := UiStage.TILE_H_SIX * 2.0 + UiStage.TILE_ROW_GAP if is_six() else UiStage.TILE_H
+	var action := 316.0 if is_gate() else UiStage.ACTION_H
+	return roundi(1100.0 - 16.0 - 36.0 - UiStage.CARD_GAP * 3.0 - UiStage.TITLE_H - tiles - action)
+
+
+func _draw_disc(center: Vector2, fill: Color, icon: Texture2D, icon_side: float) -> void:
+	var d := UiStage.LOCK_D
+	draw_style_box(UiStage.box(fill, int(d * 0.5), 4, UiStage.INK), Rect2(center - Vector2(d, d) * 0.5, Vector2(d, d)))
+	if icon:
+		draw_texture_rect(icon, Rect2(center - Vector2(icon_side, icon_side) * 0.5, Vector2(icon_side, icon_side)), false)
+
+
+## Prsten 520 px (rub 28) raste od 0,2 do 1; overflow:hidden reze ga na slotu.
+func _draw_ring(center: Vector2, clip: PackedVector2Array) -> void:
+	var s := lerpf(0.2, 1.0, _unlock_t)
+	var outer := UiStage.RING_D * 0.5 * s
+	var inner := outer - UiStage.RING_W * s
+	var steps := 72
+	for i in steps:
+		var a0 := TAU * float(i) / float(steps)
+		var a1 := TAU * float(i + 1) / float(steps)
+		var quad := PackedVector2Array([
+			center + Vector2(cos(a0), sin(a0)) * outer,
+			center + Vector2(cos(a1), sin(a1)) * outer,
+			center + Vector2(cos(a1), sin(a1)) * inner,
+			center + Vector2(cos(a0), sin(a0)) * inner,
+		])
+		UiStage.draw_clipped(self, quad, clip, UiStage.RING)
+
+
+func _draw_badge(r: Rect2) -> void:
+	var spec := _badge()
+	var text := str(spec[0])
+	var play := bool(spec[1])
+	var f := UiStage.font(900, 38, 1.0, 0.05)
+	var icon_w := 50.0 if play else 0.0
+	var w := 3.0 + UiStage.BADGE_PAD + icon_w + UiStage.text_w(f, 38, text) + UiStage.BADGE_PAD + 3.0
+	var br := Rect2(r.position + Vector2(22.0, 22.0), Vector2(w, UiStage.BADGE_H))
+	draw_style_box(UiStage.box(spec[2], int(UiStage.BADGE_H * 0.5), 3, spec[4]), br)
+	var top := br.position.y + (UiStage.BADGE_H - 38.0) * 0.5
+	var base := UiStage.baseline(f, 38, top)
+	var x := br.position.x + 3.0 + UiStage.BADGE_PAD
+	if play:
+		UiStage.draw_play(self, Rect2(x + 1.0, base - 13.3 - 15.0, 29.0, 30.0), spec[3])
+	draw_string(f, Vector2(x + icon_w, base), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 38, spec[3])
+
+
+## [tekst, ▶, fill, ink, rub] — ActiveBadge iz SeasonCard.dc.html.
+func _badge() -> Array:
+	var dark := UiStage.CHROME
+	match state:
+		ST_ACTIVE:
+			return ["PLAYING", true, UiStage.RIM, UiStage.INK, UiStage.INK]
+		ST_OPEN:
+			var label := "PREVIEW · OWNED" if str(_data.get("kind", "free")) == "paid" else "PREVIEW · UNLOCKED"
+			return [label, false, dark, UiStage.CREAM, UiStage.over(dark, BADGE_EDGE)]
+		ST_PREMIUM, ST_PURCHASING:
+			return ["PREVIEW · PREMIUM", false, dark, UiStage.LAVENDER, UiStage.over(dark, BADGE_EDGE_PREMIUM)]
+		ST_SOON:
+			return ["COMING SOON", false, dark, UiStage.CREAM, UiStage.over(dark, BADGE_EDGE)]
+	return ["PREVIEW · LOCKED", false, dark, UiStage.CREAM, UiStage.over(dark, BADGE_EDGE)]
+
+
+## Iskljucena strelica ima `opacity:.3` na cijeloj grupi: krug i rub su 30 %
+## preko slota, a chevron dobija gotovu boju (cream 30 % preko slota).
+func _draw_arrow(r: Rect2, left: bool, enabled: bool, slot: Color) -> void:
+	var a := 1.0 if enabled else DISABLED_ARROW
+	var bg := UiStage.CHROME
+	var edge := UiStage.over(bg, ARROW_EDGE)
+	var s := UiStage.box(Color(bg, a), int(UiStage.ARROW_D * 0.5), 3, Color(edge, a))
+	if enabled and _pressed_part == (PART_PREV if left else PART_NEXT):
+		s.bg_color = bg.lightened(0.12)
+	draw_style_box(s, r)
+	var chevron := UiStage.CREAM if enabled else slot.lerp(UiStage.CREAM, DISABLED_ARROW)
+	UiStage.draw_chevron(self, r.get_center(), left, chevron)
+
+
+func _draw_title(ink: Color, sub: Color) -> void:
+	var t := _title
+	var f_meta := UiStage.font(900, 38, 1.0, 0.06)
+	draw_string(f_meta, Vector2(t.position.x, UiStage.baseline(f_meta, 38, t.position.y)), get_meta_text(), HORIZONTAL_ALIGNMENT_LEFT, -1, 38, sub)
+	var f_count := UiStage.font(900, 38)
+	var count := get_count_text()
+	var cw := UiStage.text_w(f_count, 38, count)
+	draw_string(f_count, Vector2(t.end.x - cw, UiStage.baseline(f_count, 38, t.position.y)), count, HORIZONTAL_ALIGNMENT_LEFT, -1, 38, sub)
+	var tag_h := 38.0 * 1.15
+	var gap := (UiStage.TITLE_H - 38.0 - 80.0 - tag_h) * 0.5
+	var f_name := UiStage.font(900, 80, 1.0, -0.015)
+	draw_string(f_name, Vector2(t.position.x, UiStage.baseline(f_name, 80, t.position.y + 38.0 + gap)), _name(), HORIZONTAL_ALIGNMENT_LEFT, t.size.x, 80, ink)
+	var f_tag := UiStage.font(700, 38, 1.15)
+	var tag_top := t.end.y - f_tag.get_height(38)
+	draw_string(f_tag, Vector2(t.position.x, UiStage.baseline(f_tag, 38, tag_top)), str(_data.get("tagline", "")), HORIZONTAL_ALIGNMENT_LEFT, t.size.x, 38, sub)
+
+
+func _draw_roster(fill: Color) -> void:
+	var six := is_six()
+	var soon := state == ST_SOON
+	var mood := SeasonColors.mood_of(season_id)
+	var well_d := UiStage.WELL_D_SIX if six else UiStage.WELL_D
+	var f_name := UiStage.font(800, 38, 1.05)
+	var f_pill := UiStage.font(900, 40)
+	var ink := _tile_color(UiStage.INK, fill, soon)
+	for i in _tiles.size():
+		var tile := _tiles[i]
+		var entry := _shown[i]
+		draw_style_box(UiStage.box(_tile_color(UiStage.CREAM, fill, soon), 24, 3, _tile_color(UiStage.TILE_EDGE, fill, soon)), tile)
+		var rarity := clampi(int(entry.get("rarity", 1)), 1, 3)
+		var digit := str(rarity)
+		var pill_w := 47.0 + UiStage.text_w(f_pill, 40, digit) + 12.0
+		var pill := Rect2(tile.end.x - 13.0 - pill_w, tile.position.y + 13.0, pill_w, 52.0)
+		draw_style_box(UiStage.box(_tile_color(UiStage.PILL[rarity], fill, soon), 16), pill)
+		UiStage.draw_star(self, Vector2(pill.position.x + 28.75, pill.get_center().y - 2.0), 16.0, ink)
+		draw_string(f_pill, Vector2(pill.position.x + 47.0, UiStage.baseline(f_pill, 40, pill.position.y + 6.0)), digit, HORIZONTAL_ALIGNMENT_LEFT, -1, 40, ink)
+		var well := Rect2(tile.get_center().x - well_d * 0.5, tile.end.y - 103.0 - well_d, well_d, well_d)
+		draw_style_box(UiStage.box(_tile_color(UiStage.WELL, fill, soon), int(well_d * 0.5), 3, _tile_color(UiStage.TILE_WELL_EDGE, fill, soon)), well)
+		var inner := well_d - 6.0
+		var tex := _flower_art(str(entry.get("id", "")))
+		if tex != null:
+			var side := inner * 0.86
+			draw_texture_rect(tex, Rect2(well.get_center() - Vector2(side, side) * 0.5, Vector2(side, side)), false, Color(1, 1, 1, SOON_TILE if soon else 1.0))
+		else:
+			var dot := inner * 0.56
+			var dot_fill := UiStage.SOON_DOT if soon else mood
+			draw_style_box(
+				UiStage.box(_tile_color(dot_fill, fill, soon), int(dot * 0.5), 6, _tile_color(SeasonColors.dot_edge(mood), fill, soon)),
+				Rect2(well.get_center() - Vector2(dot, dot) * 0.5, Vector2(dot, dot))
+			)
+		var max_w := tile.size.x - 6.0 - 28.0
+		var lines := UiStage.balance_lines(str(entry.get("name", "")), f_name, 38, max_w)
+		var line_h := f_name.get_height(38)
+		var box_top := tile.end.y - 15.0 - 80.0
+		var top := box_top + (80.0 - line_h * float(lines.size())) * 0.5
+		for line in lines:
+			var lw := UiStage.text_w(f_name, 38, line)
+			draw_string(f_name, Vector2(tile.get_center().x - lw * 0.5, UiStage.baseline(f_name, 38, top)), line, HORIZONTAL_ALIGNMENT_LEFT, -1, 38, ink)
+			top += line_h
+
+
+## Coming-soon plocica ima `opacity:.8` na cijeloj grupi: svaka boja 20 % ka ispuni kartice.
+func _tile_color(c: Color, fill: Color, soon: bool) -> Color:
+	return fill.lerp(c, SOON_TILE) if soon else c
+
+
+func _draw_open_meadow() -> void:
+	var r := _action
+	var fill := UiStage.CREAM.darkened(0.05) if _pressed_part == PART_OPEN else UiStage.CREAM
+	draw_style_box(UiStage.box(fill, 26, 3, UiStage.INK), r)
+	var f_title := UiStage.font(900, 46)
+	draw_string(f_title, Vector2(r.position.x + 39.0, UiStage.baseline(f_title, 46, r.position.y + (r.size.y - 46.0) * 0.5)), "Open meadow", HORIZONTAL_ALIGNMENT_LEFT, -1, 46, UiStage.INK)
+	var f_sub := UiStage.font(800, 38)
+	var base := UiStage.baseline(f_sub, 38, r.position.y + (r.size.y - 38.0) * 0.5)
+	var arrow := Rect2(r.end.x - 39.0 - 2.5 - 22.5, base - 23.0, 22.5, 23.0)
+	UiStage.draw_ne_arrow(self, arrow, 3.6, UiStage.INK_SOFT)
+	var text := "field · upgrades"
+	var w := UiStage.text_w(f_sub, 38, text)
+	draw_string(f_sub, Vector2(arrow.position.x - 14.5 - w, base), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 38, UiStage.INK_SOFT)
+
+
+func _draw_gate(fill: Color) -> void:
+	var need_c := _int("coins_need")
+	var need_f := _int("flowers_need")
+	var coin_ratio := float(_coins()) / maxf(float(need_c), 1.0)
+	var flower_ratio := float(_flowers()) / maxf(float(need_f), 1.0)
+	if state == ST_UNLOCKING:
+		coin_ratio *= 1.0 - _drain_t
+		flower_ratio *= 1.0 - _drain_t
+	_draw_well(_coin_row, coin_ratio, UiStage.COIN)
+	_draw_well(_flower_row, flower_ratio, UiStage.CREAM)
+	var f_label := UiStage.font(800, 38)
+	var f_num := UiStage.font(900, 46)
+	var cy := _coin_row.position.y + 44.0
+	var coin_disc := Rect2(_coin_row.position.x + 17.0, cy - 32.0, 64.0, 64.0)
+	draw_style_box(UiStage.box(UiStage.COIN, 32), coin_disc)
+	var coin_icon := UiAssets.get_chrome_icon("icon_coin")
+	if coin_icon:
+		draw_texture_rect(coin_icon, Rect2(coin_disc.get_center() - Vector2(22, 22), Vector2(44, 44)), false)
+	draw_string(f_label, Vector2(coin_disc.end.x + 18.0, UiStage.baseline(f_label, 38, cy - 19.0)), "Coins", HORIZONTAL_ALIGNMENT_LEFT, -1, 38, UiStage.CREAM)
+	_draw_number(get_coin_text(), _coins() >= need_c, _coin_row, cy, f_num)
+
+	var fy := _flower_row.position.y + 44.0
+	var flower_disc := Rect2(_flower_row.position.x + 17.0, fy - 32.0, 64.0, 64.0)
+	draw_style_box(UiStage.box(UiStage.WELL, 32, 2, UiStage.over(UiStage.WELL, ICON_EDGE_40)), flower_disc)
+	var gate_tex := _flower_art(str(_data.get("gate_type_id", "")))
+	if gate_tex:
+		draw_texture_rect(gate_tex, Rect2(flower_disc.get_center() - Vector2(26, 26), Vector2(52, 52)), false)
+	else:
+		var gate_mood: Color = _data.get("gate_mood", Color("#A8E6CF"))
+		draw_style_box(UiStage.box(gate_mood, 16, 5, UiStage.CREAM), Rect2(flower_disc.get_center() - Vector2(16, 16), Vector2(32, 32)))
+	var gate_name := str(_data.get("gate_name", ""))
+	var name_x := flower_disc.end.x + 18.0
+	var base := UiStage.baseline(f_label, 38, fy - 19.0)
+	var name_text := gate_name + " "
+	draw_string(f_label, Vector2(name_x, base), name_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 38, UiStage.CREAM)
+	var star_x := name_x + UiStage.text_w(f_label, 38, name_text)
+	UiStage.draw_star(self, Vector2(star_x + 14.5, base - 13.5), 14.5, UiStage.COIN)
+	draw_string(f_label, Vector2(star_x + 30.0, base), "3", HORIZONTAL_ALIGNMENT_LEFT, -1, 38, UiStage.COIN)
+	_draw_number(get_flower_text(), _flowers() >= need_f, _flower_row, fy, f_num)
+
+	var btn := _unlock_btn
+	var style: StyleBoxFlat
+	match state:
+		ST_READY:
+			style = UiStage.box(UiStage.GOLD, 26, 4, UiStage.GOLD_EDGE)
+			if _pressed_part == PART_UNLOCK:
+				style.bg_color = UiStage.GOLD.darkened(0.08)
+		ST_UNLOCKING:
+			style = UiStage.box(UiStage.COIN, 26, 4, UiStage.GOLD_EDGE)
+		_:
+			style = UiStage.box(UiStage.MUTED_FILL, 26, 3, _muted_edge(fill))
+	draw_style_box(style, btn)
+	var texts := _unlock_texts()
+	_draw_two_lines(btn, str(texts[0]), str(texts[1]), UiStage.INK, UiStage.INK, 10.0)
+
+
+func _draw_well(r: Rect2, ratio: float, bar: Color) -> void:
+	draw_style_box(UiStage.box(UiStage.CHROME, 22, 3, UiStage.over(UiStage.CHROME, WELL_EDGE_55)), r)
+	var inner := r.grow(-3.0)
+	var clip := UiStage.rounded_rect_points(inner, 19.0)
+	var track := Rect2(inner.position.x, inner.end.y - 12.0, inner.size.x, 12.0)
+	UiStage.draw_clipped(self, UiStage.rect_points(track), clip, UiStage.BAR_TRACK)
+	var w := track.size.x * clampf(ratio, 0.0, 1.0)
+	if w > 0.5:
+		UiStage.draw_clipped(self, UiStage.rect_points(Rect2(track.position, Vector2(w, 12.0))), clip, bar)
+
+
+func _draw_number(text: String, ok: bool, row: Rect2, cy: float, f: Font) -> void:
+	var w := UiStage.text_w(f, 46, text)
+	draw_string(f, Vector2(row.end.x - 27.0 - w, UiStage.baseline(f, 46, cy - 23.0)), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 46, UiStage.COIN if ok else UiStage.CREAM)
+
+
+func _draw_premium(fill: Color) -> void:
+	draw_style_box(UiStage.box(UiStage.PRICE_BG, 26, 3, UiStage.PRICE_EDGE), _price)
+	var f_price := UiStage.font(900, 56)
+	var f_sub := UiStage.font(800, 38)
+	var top := _price.position.y + (_price.size.y - 56.0 - 6.0 - 38.0) * 0.5
+	var price := get_price_text()
+	draw_string(f_price, Vector2(_price.get_center().x - UiStage.text_w(f_price, 56, price) * 0.5, UiStage.baseline(f_price, 56, top)), price, HORIZONTAL_ALIGNMENT_LEFT, -1, 56, UiStage.INK_DEEP)
+	draw_string(f_sub, Vector2(_price.get_center().x - UiStage.text_w(f_sub, 38, "one-time") * 0.5, UiStage.baseline(f_sub, 38, top + 62.0)), "one-time", HORIZONTAL_ALIGNMENT_LEFT, -1, 38, UiStage.PRICE_SUB)
+	var style: StyleBoxFlat
+	if state == ST_PURCHASING:
+		style = UiStage.box(UiStage.MUTED_FILL, 26, 3, _muted_edge(fill))
+	else:
+		style = UiStage.box(UiStage.LAVENDER, 26, 4, UiStage.INK)
+		if _pressed_part == PART_BUY:
+			style.bg_color = UiStage.LAVENDER.darkened(0.08)
+	draw_style_box(style, _buy)
+	_draw_two_lines(_buy, get_buy_title(), get_buy_sub(), UiStage.INK, UiStage.INK, 10.0)
+
+
+func _draw_info(fill: Color) -> void:
+	var r := _action
+	draw_style_box(UiStage.box(UiStage.MUTED_FILL, 26, 3, _muted_edge(fill)), r)
+	var f_title := UiStage.font(900, 46)
+	var f_sub := UiStage.font(800, 38)
+	var top := r.position.y + (r.size.y - 46.0 - 8.0 - 38.0) * 0.5
+	draw_string(f_title, Vector2(r.position.x + 39.0, UiStage.baseline(f_title, 46, top)), "Coming soon", HORIZONTAL_ALIGNMENT_LEFT, -1, 46, UiStage.INK)
+	draw_string(f_sub, Vector2(r.position.x + 39.0, UiStage.baseline(f_sub, 38, top + 54.0)), "no price yet · preview the flowers", HORIZONTAL_ALIGNMENT_LEFT, -1, 38, UiStage.INFO_SUB)
+
+
+## Naslov 46/900 + podnaslov 38/800, centrirani u koloni (dugmad 130–140).
+func _draw_two_lines(r: Rect2, title: String, sub: String, title_ink: Color, sub_ink: Color, gap: float) -> void:
+	var f_title := UiStage.font(900, 46)
+	var f_sub := UiStage.font(800, 38)
+	var top := r.position.y + (r.size.y - 46.0 - gap - 38.0) * 0.5
+	var cx := r.get_center().x
+	draw_string(f_title, Vector2(cx - UiStage.text_w(f_title, 46, title) * 0.5, UiStage.baseline(f_title, 46, top)), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 46, title_ink)
+	draw_string(f_sub, Vector2(cx - UiStage.text_w(f_sub, 38, sub) * 0.5, UiStage.baseline(f_sub, 38, top + 46.0 + gap)), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 38, sub_ink)
+
+
+# --- podaci ---
+
+func _unlock_texts() -> Array:
+	var name := _name()
 	var gate := str(_data.get("gate_name", ""))
-	var d_coins := maxi(0, coins_need - coins)
-	var d_flowers := maxi(0, flowers_need - flowers)
-	var gate_ready := d_coins == 0 and d_flowers == 0
-	var unlocking := st == UiHome.ST_UNLOCKING
-	_poster.add_theme_constant_override("separation", 14 if is_post else 12)
-
-	var need := "Need %d more coins and %d more %s" % [d_coins, d_flowers, gate]
-	if gate_ready:
-		need = "Both ready — unlock it whenever you like."
-	if unlocking:
-		need = "Welcome to %s." % display_name
-	_need.text = need
-	UiHome.style(_need, UiHome.FONT_NEED if is_post else UiHome.FONT_NEED_COMPACT, ink, UiHome.W_BOLD)
-
-	var icon_side := 60.0 if is_post else 56.0
-	var value_w := 300.0 if is_post else 240.0
-	var value_px := UiHome.FONT_VALUE if is_post else UiHome.FONT_VALUE_COMPACT
-	var bar_h := UiHome.BAR_H_POSTER if is_post else UiHome.BAR_H_COMPACT
-	for row in [_coin_row, _flower_row]:
-		var r := row as HBoxContainer
-		r.size_flags_vertical = Control.SIZE_EXPAND_FILL if is_post else Control.SIZE_FILL
-		r.custom_minimum_size.y = icon_side if is_post else 66.0
-	_coin_icon.custom_minimum_size = Vector2(icon_side, icon_side)
-	_coin_value.text = "%d / %d" % [coins, coins_need]
-	_coin_value.custom_minimum_size.x = value_w
-	UiHome.style(_coin_value, value_px, ink, UiHome.W_BLACK)
-	_coin_bar.custom_minimum_size.y = bar_h
-	_coin_bar.set_colors(UiHome.bar_track(light), UiHome.COIN_GOLD)
-	_coin_bar.set_ratio(float(coins) / maxf(float(coins_need), 1.0), is_inside_tree())
-
-	_gate_frame.configure_frame(icon_side, 18, 3, 8.0, 11, 2, 34.0 if is_post else 30.0)
-	_gate_frame.set_art(false, str(_data.get("gate_type_id", "")), 3)
-	_flower_value.text = "%d / %d" % [flowers, flowers_need]
-	_flower_value.custom_minimum_size.x = value_w
-	UiHome.style(_flower_value, value_px, ink, UiHome.W_BLACK)
-	_flower_bar.custom_minimum_size.y = bar_h
-	_flower_bar.set_colors(UiHome.bar_track(light), UiHome.WARM_WHITE)
-	_flower_bar.set_ratio(float(flowers) / maxf(float(flowers_need), 1.0), is_inside_tree())
-
-	_gate_caption.visible = is_post
-	_gate_caption.text = "%s ★★★ · merge it in the Arena" % gate
-	UiHome.style(_gate_caption, UiHome.FONT_CAPTION, sub, UiHome.W_REGULAR)
-
-	_unlock_button.visible = is_post
-	if not is_post:
-		return
-	var ready := st == UiHome.ST_READY
-	var btn_state := st if ready or unlocking else UiHome.ST_LOCKED
-	var title := "Unlock %s" % display_name
-	var btn_sub := "needs %d more coins and %d more %s" % [d_coins, d_flowers, gate]
-	if ready or gate_ready:
-		btn_sub = "spends %d coins and %d %s" % [coins_need, flowers_need, gate]
-	if unlocking:
-		title = "%s unlocked" % display_name
-		btn_sub = "spent %d coins and %d %s" % [coins_need, flowers_need, gate]
-	var btn_style := UiHome.unlock_button(btn_state)
-	_unlock_button.set_styles(btn_style, btn_style)
-	_unlock_button.set_text(title, btn_sub)
-	_unlock_button.set_fonts(UiHome.FONT_UNLOCK, UiHome.FONT_BTN_SUB)
-	_unlock_button.set_ink(UiHome.unlock_ink(btn_state))
-	_unlock_button.disabled = not ready
+	var need_c := _int("coins_need")
+	var need_f := _int("flowers_need")
+	match state:
+		ST_READY:
+			return ["Unlock %s" % name, "spends %d coins + %d %s" % [need_c, need_f, gate]]
+		ST_UNLOCKING:
+			return ["Unlocking…", "coins and flowers spent"]
+		ST_FAR:
+			return ["Unlock %s first" % str(_data.get("prev_name", "")), "free seasons open in order"]
+	var parts := PackedStringArray()
+	if _coins() < need_c:
+		parts.append("%d coins" % (need_c - _coins()))
+	if _flowers() < need_f:
+		parts.append("%d flowers" % (need_f - _flowers()))
+	return ["Needs %s" % " + ".join(parts), "run in %s to collect" % str(_data.get("prev_name", ""))]
 
 
-func _apply_cta(is_prem: bool, st: String, light: bool, display_name: String) -> void:
-	var show := is_prem and st in [UiHome.ST_PREMIUM, UiHome.ST_BUSY, UiHome.ST_SOON, UiHome.ST_OWNED]
-	_cta.visible = show
-	if _busy_tween:
-		_busy_tween.kill()
-		_busy_tween = null
-	_cta.modulate.a = 1.0
-	if not show:
-		return
-	var title := "Get %s" % display_name
-	var sub := "%s · one-time, no subscription" % str(_data.get("price", ""))
-	match st:
-		UiHome.ST_BUSY:
-			title = "Purchasing…"
-			sub = "finish in the store window"
-		UiHome.ST_SOON:
-			title = "Coming soon"
-			sub = "not for sale yet"
-		UiHome.ST_OWNED:
-			title = "Open meadow ↗"
-			sub = "owned — plays like a free season"
-	var style := UiHome.cta_button(st, light)
-	_cta.set_styles(style, style)
-	_cta.set_text(title, sub)
-	_cta.set_fonts(UiHome.FONT_CTA, UiHome.FONT_BTN_SUB)
-	_cta.set_ink(UiHome.cta_ink(st, light))
-	_cta.disabled = st == UiHome.ST_BUSY or st == UiHome.ST_SOON
-	if st == UiHome.ST_BUSY and is_inside_tree():
-		_cta.modulate.a = 0.85
-		_busy_tween = create_tween().set_loops()
-		_busy_tween.tween_property(_cta, "modulate:a", 0.55, UiHome.T_BUSY_PULSE * 0.5)
-		_busy_tween.tween_property(_cta, "modulate:a", 0.85, UiHome.T_BUSY_PULSE * 0.5)
+func _fill() -> Color:
+	var mood := SeasonColors.mood_of(season_id)
+	if state == ST_UNLOCKING:
+		return SeasonColors.locked_fill(mood).lerp(mood, _unlock_t)
+	return SeasonColors.card_fill(mood, state)
 
 
-## Cip "New" posle otkljucavanja: 0,3 s pojava, 3 s stoji, pa nestaje.
-func _apply_fresh(show: bool) -> void:
-	if not show:
-		if _fresh_tween:
-			_fresh_tween.kill()
-			_fresh_tween = null
-		_new_badge.modulate.a = 1.0
-		return
-	if _fresh_shown:
-		return
-	_fresh_shown = true
-	if not is_inside_tree():
-		return
-	_new_badge.modulate.a = 0.0
-	_fresh_tween = create_tween()
-	_fresh_tween.tween_property(_new_badge, "modulate:a", 1.0, UiHome.T_NEW_IN)
-	_fresh_tween.tween_interval(UiHome.T_NEW_HOLD)
-	_fresh_tween.tween_property(_new_badge, "modulate:a", 0.0, UiHome.T_NEW_IN)
-	_fresh_tween.tween_callback(func() -> void: fresh_done.emit(season_id))
+## Rub mutnog dugmeta: cream 55 % pa rgba(26,26,20,.3) preko ispune kartice.
+func _muted_edge(fill: Color) -> Color:
+	return UiStage.over(UiStage.over(fill, UiStage.MUTED_FILL), UiStage.MUTED_EDGE)
 
 
-## Okvir cvijeta u rosteru: najvise 116 px, koliko stane u visinu kartice.
-func _fit_roster(h: float) -> void:
-	if not _roster.visible:
-		return
-	var p := float(UiHome.CARD_PAD[variant])
-	var border := float(UiHome.CARD_BORDER_ACTIVE if is_active() else UiHome.CARD_BORDER)
-	var sep := float(UiHome.CARD_SEP[variant])
-	var used := 2.0 * (p + border) + float(UiHome.HEAD_H[variant]) + sep + UiHome.TAGLINE_H + sep
-	if _cta.visible:
-		used += UiHome.CTA_H + sep
-	var inner := h - used - 2.0 * (UiHome.ROSTER_PAD_V + UiHome.ROSTER_BORDER)
-	var side := clampf(inner - UiHome.ROSTER_SLOT_GAP - UiHome.PIPS_PX, UiHome.ART_MIN, UiHome.ART_MAX)
-	side = floorf(side)
-	for frame in _roster_frames:
-		frame.configure_frame(
-			side, int(round(side * 0.22)), 3, maxf(7.0, round(side * 0.095)),
-			int(round(side * 0.15)), 2, round(side * 0.58)
-		)
+func _is_premium_actions() -> bool:
+	return state == ST_PREMIUM or state == ST_PURCHASING
 
 
-# --- input: tap vs skrol (kao Camp chip) ---
-
-func _gui_input(event: InputEvent) -> void:
-	var dy := DRAG_SCROLL.drag_delta(event)
-	if not is_zero_approx(dy):
-		_drag_dist += absf(dy)
-		if _drag_dist >= DRAG_SCROLL.TAP_SLOP and _pressing:
-			_pressing = false
-			_press_to(1.0)
-		DRAG_SCROLL.apply(DRAG_SCROLL.find_scroll(self), dy)
-		accept_event()
-		return
-	var down := false
-	if event is InputEventMouseButton:
-		var mb := event as InputEventMouseButton
-		if mb.button_index != MOUSE_BUTTON_LEFT:
-			return
-		down = mb.pressed
-	elif event is InputEventScreenTouch:
-		down = (event as InputEventScreenTouch).pressed
-	else:
-		return
-	if down:
-		_pressing = true
-		_drag_dist = 0.0
-		_press_to(PRESS_SCALE)
-	else:
-		var was_tap := _pressing and _drag_dist < DRAG_SCROLL.TAP_SLOP
-		_pressing = false
-		_press_to(1.0)
-		if was_tap:
-			tapped.emit(season_id)
-	accept_event()
+func _name() -> String:
+	return str(_data.get("name", season_id))
 
 
-func _press_to(target: float) -> void:
-	if _press_tween:
-		_press_tween.kill()
-	if not is_inside_tree():
-		scale = Vector2.ONE * target
-		return
-	_press_tween = create_tween()
-	_press_tween.tween_property(self, "scale", Vector2.ONE * target, PRESS_SEC)
+func _coins() -> int:
+	return mini(_int("coins"), _int("coins_need"))
 
 
-func _on_resized() -> void:
-	pivot_offset = size * 0.5
+func _flowers() -> int:
+	return mini(_int("flowers"), _int("flowers_need"))
 
-
-# --- helperi ---
 
 func _int(key: String) -> int:
 	return int(_data.get(key, 0))
 
 
-func _hbox(node_name: String, sep: int) -> HBoxContainer:
-	var b := HBoxContainer.new()
-	b.name = node_name
-	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	b.add_theme_constant_override("separation", sep)
-	return b
+func _on(key: String) -> bool:
+	return bool(_data.get(key, false))
 
 
-func _label(node_name: String) -> Label:
-	var l := Label.new()
-	l.name = node_name
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	return l
+func _set_unlock_t(v: float) -> void:
+	_unlock_t = v
+	queue_redraw()
 
 
-func _chip(node_name: String, h: float) -> PanelContainer:
-	var p := PanelContainer.new()
-	p.name = node_name
-	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p.custom_minimum_size.y = h
-	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var l := _label("Text")
-	p.add_child(l)
-	return p
+func _set_drain_t(v: float) -> void:
+	_drain_t = v
+	queue_redraw()
 
 
-func _style_chip(chip: PanelContainer, text: String, style: StyleBoxFlat, px: int, color: Color) -> void:
-	chip.add_theme_stylebox_override("panel", style)
-	var l := chip.get_child(0) as Label
-	l.text = text
-	UiHome.style(l, px, color, UiHome.W_BLACK)
+func _stop_anim() -> void:
+	if _anim:
+		_anim.kill()
+		_anim = null
+	_unlock_t = 1.0
+	_drain_t = 1.0
 
 
-func _icon_rect(node_name: String, tex: Texture2D, side: float) -> TextureRect:
-	var t := TextureRect.new()
-	t.name = node_name
-	t.texture = tex
-	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	t.custom_minimum_size = Vector2(side, side)
-	return t
+## Art cvijeta: igrin SVG (FlowerAssets T3), pa placeholder iz handoffa, pa tacka.
+static func _flower_art(type_id: String) -> Texture2D:
+	if type_id.is_empty():
+		return null
+	if _art_cache.has(type_id):
+		return _art_cache[type_id] as Texture2D
+	var tex := FlowerAssets.get_texture(type_id, 3)
+	if tex == null:
+		var path := PH_DIR + type_id + ".svg"
+		if ResourceLoader.exists(path):
+			tex = load(path) as Texture2D
+	_art_cache[type_id] = tex
+	return tex
 
 
-func _bar(node_name: String) -> HomeBar:
-	var b := HomeBar.new()
-	b.name = node_name
-	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	return b
-
-
-func _button(node_name: String) -> CampButton:
-	var b := CampButton.new()
-	b.name = node_name
-	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	return b
+static func _mono_font() -> Font:
+	if _mono != null:
+		return _mono
+	var sys := SystemFont.new()
+	sys.font_names = PackedStringArray(["Consolas", "Menlo", "DejaVu Sans Mono", "Droid Sans Mono", "monospace"])
+	sys.font_weight = 600
+	var fv := FontVariation.new()
+	fv.base_font = sys
+	fv.spacing_glyph = 2
+	_mono = fv
+	return _mono

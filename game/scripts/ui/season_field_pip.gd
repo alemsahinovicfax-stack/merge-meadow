@@ -2,7 +2,7 @@ extends Control
 
 ## HOME-14 LIFE-D — decorative Pip on SeasonField. IGNORE; FSM lives on SeasonField.
 
-const PIP_SIDE := 72.0
+const PIP_SIDE := 190.0
 
 
 func _ready() -> void:

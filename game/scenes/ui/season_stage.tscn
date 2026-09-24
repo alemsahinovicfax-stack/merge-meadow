@@ -1,18 +1,18 @@
-[gd_scene load_steps=5 format=3 uid="uid://seasonstage01"]
+[gd_scene load_steps=6 format=3 uid="uid://seasonstage01"]
 
 [ext_resource type="Script" path="res://scripts/ui/season_stage.gd" id="1_stage"]
+[ext_resource type="Script" path="res://scripts/ui/season_browser.gd" id="2_browser"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="6_uibtn"]
 [ext_resource type="Script" path="res://scripts/ui/season_field.gd" id="7_field"]
 [ext_resource type="Script" path="res://scripts/ui/season_field_pip.gd" id="8_pip"]
 
 [node name="SeasonStage" type="Control"]
-custom_minimum_size = Vector2(0, 416)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 script = ExtResource("1_stage")
 
-[node name="SeasonTrail" type="ScrollContainer" parent="."]
+[node name="SelectLayer" type="Control" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -20,16 +20,51 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
-horizontal_scroll_mode = 0
-vertical_scroll_mode = 3
+mouse_filter = 2
 
-[node name="TrailList" type="VBoxContainer" parent="SeasonTrail"]
+[node name="CardClip" type="Control" parent="SelectLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 1032.0
+offset_bottom = 1100.0
+mouse_filter = 0
+
+[node name="CardHost" type="Control" parent="SelectLayer/CardClip"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SeasonBrowser" type="Control" parent="SelectLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -24.0
+offset_top = 1124.0
+offset_right = 1056.0
+offset_bottom = 1346.0
+script = ExtResource("2_browser")
+
+[node name="StageToast" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 30
+layout_mode = 0
+offset_left = 300.0
+offset_top = 226.0
+offset_right = 732.0
+offset_bottom = 318.0
+mouse_filter = 2
+
+[node name="StageToastLabel" type="Label" parent="StageToast"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_constants/separation = 14
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="SeasonField" type="Control" parent="."]
 unique_name_in_owner = true
@@ -45,7 +80,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("7_field")
 
-[node name="MeadowGround" type="ColorRect" parent="SeasonField"]
+[node name="MeadowGround" type="Panel" parent="SeasonField"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -54,7 +89,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.9, 0.95, 0.86, 1)
 
 [node name="SeasonsButton" type="PanelContainer" parent="SeasonField"]
 unique_name_in_owner = true
@@ -79,11 +113,56 @@ button_variant = "secondary"
 unique_name_in_owner = true
 visible = false
 z_index = 20
-custom_minimum_size = Vector2(72, 72)
+custom_minimum_size = Vector2(190, 190)
 layout_mode = 0
 offset_left = 20.0
 offset_top = 120.0
-offset_right = 92.0
-offset_bottom = 192.0
+offset_right = 210.0
+offset_bottom = 310.0
 mouse_filter = 2
 script = ExtResource("8_pip")
+
+[node name="MeadowCount" type="PanelContainer" parent="SeasonField"]
+unique_name_in_owner = true
+visible = false
+z_index = 8
+layout_mode = 0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = 280.0
+offset_bottom = 102.0
+mouse_filter = 2
+
+[node name="CountRow" type="HBoxContainer" parent="SeasonField/MeadowCount"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Value" type="Label" parent="SeasonField/MeadowCount/CountRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.102, 0.102, 0.078, 1)
+theme_override_font_sizes/font_size = 48
+text = "0 / 13"
+
+[node name="Caption" type="Label" parent="SeasonField/MeadowCount/CountRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.239, 0.239, 0.2, 1)
+theme_override_font_sizes/font_size = 40
+text = "grown"
+
+[node name="MeadowNote" type="Label" parent="SeasonField"]
+unique_name_in_owner = true
+visible = false
+z_index = 8
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 150.0
+offset_bottom = 220.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.239, 0.239, 0.2, 1)
+theme_override_font_sizes/font_size = 40
+text = "Play a run — blooms you merge will grow here."
+horizontal_alignment = 1
+autowrap_mode = 2
