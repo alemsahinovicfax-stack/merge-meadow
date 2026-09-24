@@ -331,6 +331,54 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** u kodu koji se zove iz `resized` nikad `queue_free` + `add_child` istog sadržaja; ako baš mora, `remove_child` prije `queue_free`. Pri sumnji: privremeni brojač poziva s `Engine.get_process_frames()` odmah pokaže petlju u jednom frejmu.
 
+## #17 — Home se izlijeva van ekrana (min. širina djeteta razvuče VBox)
+
+**Datum:** 2026-09-23 (HOME-20, Season Stage v2)
+
+**Simptom:** cijela Home kolona 1286 px umjesto 1032 — kartica, dock i Play red izlaze 103 px lijevo i desno.
+
+**Uzrok:** stari "Daily gift" sadržaj (ikona + dva teksta u redu) imao je minimalnu širinu 438 px; `PlayRow` (836 + 12 + 438) je prisilio `HomeColumn` na svoju min. širinu, a kontejneri je ne smanjuju ispod nje.
+
+**Rješenje:** Gift je sada custom `Control` od tačno 180 × 180 (crta sadržaj u `_draw()`), stage je apsolutni raspored iz `SeasonStage.dc.html`.
+
+**Prevencija:** `season_home_smoke` provjerava tačne rectove i da nijedna vidljiva kontrola Home stranice ne izlazi iz 1080 × 1597.
+
+## #18 — Nunito variable: `variation_opentype = {"wght": 900}` ne radi
+
+**Datum:** 2026-09-23 (HOME-20)
+
+**Simptom:** sve težine iste širine kao default (200); tekst tanak.
+
+**Uzrok:** `FontVariation.variation_opentype` ne prepoznaje string ključ `"wght"`.
+
+**Rješenje:** int tag `0x77676874` (ili ime ose `"weight"`) — `UiStage.AXIS_WEIGHT`.
+
+**Prevencija:** kod novog variable fonta izmjeri `get_string_size` za 400 i 900; moraju se razlikovati.
+
+## #19 — `move_child(a, b.get_index())` stavi `a` IZA `b` kad ide naprijed
+
+**Datum:** 2026-09-23 (HOME-19 polje sezone)
+
+**Simptom:** u polju sezone redoslijed livada → Play → nadogradnje → korpa umjesto livada → korpa → nadogradnje → Play.
+
+**Uzrok:** `move_child` prvo ukloni dijete pa ga ubaci na indeks; kad se pomjera unaprijed, indeks cilja je već pomaknut za 1.
+
+**Rješenje:** red djece je u `.tscn`; runtime pomjeranje uklonjeno.
+
+**Prevencija:** raspored drži u sceni; ako baš treba `move_child` unaprijed, cilj je `b.get_index() - 1`.
+
+## #20 — skok na sekciju u `ScrollContainer`: pozicija djeteta već sadrži skrol
+
+**Datum:** 2026-09-24 (Shop chipovi Looks · Seasons · Boosters · Support)
+
+**Simptom:** prvi tap na chip odskroluje tačno, svaki sljedeći stane prekratko (Support je pokazivao kraj sezona).
+
+**Uzrok:** `ScrollContainer` skroluje tako što pomjera svoje dijete, pa `pad.position.y` postaje `-scroll`. Cilj je računat kao `sekcija.position.y + pad.position.y`, što je oduzimalo već preskrolanu visinu.
+
+**Rješenje:** cilj se računa samo iz sadržaja (`sekcija.position.y + content.position.y`), bez pozicije skrolovanog kontejnera — isto i za scroll-spy.
+
+**Prevencija:** za `scroll_vertical` koristi koordinate unutar sadržaja; ako baš treba globalno, oduzmi `scroll.global_position.y` i dodaj trenutni `scroll_vertical`.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

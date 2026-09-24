@@ -19,6 +19,8 @@ ai_sažetak: "Camp (4. stranica huba) — brief za Claude Design i zapis prenosa
 
 > **Status: implementirano 2026-09-16** — smjer 1b (tabovi + hero sezona) iz Claude Design handoffa (`design_handoff_camp/`). §2–§3 opisuju stanje **prije** prenosa i ostaju kao zapis; trenutno stanje, novo pravilo držanja i odstupanja su u [[#Implementacija (2026-09-16)|§ Implementacija]]. Prenos zamjenjuje CAMP-06 raspored — CAMP-06 u CHECKPOINT-u zatvoriti nakon playtesta.
 
+> **Druga runda (2026-09-24):** [[camp-v2-cd-brief|camp-v2-cd-brief]] — čišćenje teksta i rasporeda (bez „Next free season" i „Details", manji Unlock, sekcija prikovana uz karticu, bez Merge prečice i podnaslova tabova, veći art u karticama, kraći Trade bar).
+
 **Camp** je igračeva "ostava i radionica": ovdje vidi šta je skupio (sjemenke iz runova, T3 cvijeće iz Arene), pretvara višak u coine i prati koliko mu fali do sljedeće besplatne sezone. Merge se **ne** radi ovdje (to je Arena), a upgradei se **ne** kupuju ovdje (to je Home polje).
 
 ## 0. Kako koristiti ovaj fajl

@@ -9,9 +9,9 @@ povezano:
 ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmatter prvo; prva [ ] u aktivnoj sekciji je sljedeći korak."
 aktivna_sekcija: D
 b0_aktivan: false
-sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — thirds + link symmetry."
-zadnja_sesija: "CAMP-06 — chip layout, swipe scroll, uža dugmad (Trade 460px), tap=1 / hold=6/s, link slot simetrija"
-zadnje_azurirano: 2026-09-08
+sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
+zadnja_sesija: "ARENA — polje bez HUD-a, trake s porukama i Done dugmeta; sesija se zatvara sama kad polje ostane prazno"
+zadnje_azurirano: 2026-09-24
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -37,7 +37,7 @@ sljedeca_runda_dokumentacije: "Prije store (D0/D4) — listing/ASO; inače samo 
 | Polje | Vrijednost |
 |-------|------------|
 | **Milestone** | **M8** — Launch prep (Sekcija D) |
-| **Podfaza** | `d0-prelaunch` — **CAMP-06 u toku**; sve ostalo ✅. Puna tablica traka: [[#Aktivne trake (feature ID)\|Aktivne trake]] niže. |
+| **Podfaza** | `d0-prelaunch` — **JOURNAL ✅**; CAMP-06 čeka playtest. Puna tablica traka: [[#Aktivne trake (feature ID)\|Aktivne trake]] niže. |
 | **Igra** | Merge Meadow — hybrid casual lane run + merge kamp |
 | **Engine** | Godot 4.x (HP laptop / Windows) |
 | **Save** | Lokalni JSON (`user://player_save.json`) — **bez** server/baze u v1 |
@@ -343,9 +343,9 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-**Sada radimo:** CAMP-06 — camp fill (thirds; no Pip's Garden; link symmetry; chip name+count)
+**Sada radimo:** D0-P / playtest — CAMP-06 čeka playtest; cijeli hub je redizajniran (Shop 2026-09-24), a Arena je od 2026-09-24 samo polje (bez HUD-a, trake s porukama i Done dugmeta)
 
-**Nakon CAMP-06:** D0-P / playtest (swipe sezona treba kliziti; tap centar = Browser; Play Endless = Hard) → [[plan-arhitektura-refaktor|kod arhitektura refaktor]]
+**Nakon playtesta:** D0-P (SFX, art, Settings) → D0-M → Play internal
 
 **Ne** plaćati Play Console dok D0 nije ✅.
 
@@ -353,7 +353,13 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 | ID | Status | Napomena | Link |
 |----|--------|----------|------|
-| CAMP-06 | 🔲 u toku (čeka playtest) | thirds fill, link symmetry, chip name+count; + swipe scroll bez trake, Trade 460px ×3, tap=1 / hold=6/s | — |
+| ARENA-04 | ✅ | Prostor umjesto HUD-a — uklonjeni daily/stash pilule, traka s porukama, combo pilula i Done; polje 1553 px, muncher gore, vreća i Pip dolje; sesija se gasi kad polje ostane prazno | — |
+| SHOP | ✅ | Redizajn 1 dizajn — 4 sekcije u skrolu + sticky chipovi, pregled kozmetike „Now / With it“, kupovina za coine u 2 tapa, poruke na kartici, season kartice s rosterom | `design_handoff_shop/` |
+| JOURNAL | ✅ | Bloom Album 1a — red 1032×200, poglavlja sezona, NEW cijelu posjetu, auto-scroll, Golden Album frame | `design_handoff_journal/` |
+| HOME-20 | ✅ | Home Season Stage v2 — 1:1 po `SeasonStage.dc.html`: kartica 1032×1100, dock 1080×222, Play 836×180 + Gift 180; Nunito; razlika vs dizajn 2–3 % piksela | `design_handoff_home_v2/` |
+| HOME-19b | 🔲 | Polje sezone još nije 1:1 s `design_handoff_home_field/` (kartice nadogradnji, korpa); redoslijed popravljen | `design_handoff_home_field/` |
+| HOME-19 | ✅ | Home field CD — livada 1032×605, 13 mjesta, korpa 180, picker sheet, Seasons pill, Play 656×176 | `design_handoff_home_field/` |
+| CAMP-06 | 🔲 čeka playtest | thirds fill, link symmetry, chip name+count; + swipe scroll bez trake, Trade 460px ×3, tap=1 / hold=6/s | — |
 | CAMP-05 | ✅ (dio superseded CAMP-06) | camp row — two-free fixture, chip red+filled stars | — |
 | CAMP-04 | ✅ arhivirano (superseded CAMP-05→06) | camp read | [[_archive/plan-prompts-camp-read\|freeze]] · [[../03-content/_archive/ideje-camp-read\|hub]] |
 | CAMP-03 | ✅ | kamp link — Seeds/Flowers naslov, next-lock → Home | — |
