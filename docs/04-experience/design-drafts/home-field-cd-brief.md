@@ -18,6 +18,8 @@ ai_sažetak: "Home — polje sezone (SeasonField: livada s cvijećem, Pip, korpa
 
 # Home — polje sezone — Claude Design brief i referenca
 
+> **Druga runda (2026-09-25):** [[home-field-v2-cd-brief|home-field-v2-cd-brief]] — livada preuzima cijelu stranicu i postaje pozadina, chrome pluta preko nje: gore lijevo gift chest i korpa istog dizajna, gore desno ulaz u nadogradnje, dolje manji red `Seasons · Play · Endless`.
+
 > **Status: priprema dizajna, kod se ne mijenja.** Brief pokriva samo **polje sezone** (SeasonField), tj. Home dok je polje otvoreno. Biranje sezone (kolona kartica, smjer 1a Season Trail) je redizajnirano i u igri od 2026-09-21 ([[home-season-select-cd-brief]]). Polje treba da mu se vizuelno pridruži.
 >
 > **Razlika od ranijih briefova:** CD ovdje dobija **slobodu da unaprijedi dizajn** i isporučuje **jedan dizajn**, bez smjerova i varijanti za biranje. Paket odmah dolazi u formatu za prenos u Godot (§7).
