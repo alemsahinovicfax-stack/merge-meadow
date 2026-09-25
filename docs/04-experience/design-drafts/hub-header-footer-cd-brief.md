@@ -17,6 +17,8 @@ ai_sažetak: "Hub header (coins·seeds·diamonds·settings) + footer (5 swipe ta
 
 > **Status: implementirano 2026-09-11** — smjer B (tamni livadski chrome) iz Claude Design handoffa (`design_handoff_hub_chrome/`) prenesen u `meta_hub.tscn`. §2 opisuje stanje **prije** prenosa i ostaje kao zapis; trenutno stanje i odstupanja od handoffa su u [[#Implementacija (2026-09-11)|§ Implementacija]] na kraju.
 
+> **Druga runda (2026-09-24):** [[hub-chrome-v2-cd-brief|hub-chrome-v2-cd-brief]] — footer bez teksta i niži, nove intuitivne tab ikone, zajednička ne-zelena boja traka, dijamant u headeru zamijenjen cvijećem, i potpuno nove ikone coina / sjemena / cvijeta za cijelu igru.
+
 **"Chrome"** u ovom dokumentu = stalni UI okvir huba: **header** (gornja traka s valutama i Settings dugmetom) + **footer** (donja navigacija s 5 tabova). Oba su fiksna i ista na svih 5 stranica po kojima se swipea: **Shop · Journal · Home · Camp · Arena**.
 
 ## 0. Kako koristiti ovaj fajl

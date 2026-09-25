@@ -10,7 +10,7 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
-zadnja_sesija: "CAMP v2 — čišćenje iz design_handoff_camp_v2 (manje teksta, sekcija prikovana uz karticu sezone, veći art, manja dugmad)"
+zadnja_sesija: "Brief: Hub chrome pass 2 + ikone valuta (footer bez teksta i niži, ne-zelena traka, cvijeće umjesto dijamanta, nove ikone coina/sjemena/cvijeta za cijelu igru)"
 zadnje_azurirano: 2026-09-24
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
@@ -353,6 +353,7 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 | ID | Status | Napomena | Link |
 |----|--------|----------|------|
+| CHROME-02 | 🔲 brief spreman | Hub chrome pass 2 — footer bez teksta i niži (180 → 132–150), nove tab ikone, zajednička ne-zelena boja traka, treći chip broji cvijeće umjesto dijamanata; + nove ikone coina / sjemena / cvijeta za cijelu igru (i za pickup u runu). Čeka CD paket `design_handoff_hub_chrome_v2/` | [[../04-experience/design-drafts/hub-chrome-v2-cd-brief\|brief]] |
 | CAMP-07 | ✅ | Camp pass 2 — bez „Next free season", „Details", podnaslova tabova, Merge prečice, „1 coin each" i „hold 10/s"; kartica sezone 276, sekcija fiksno 1253 uz nju, art u karticama +45 %, Trade i Unlock 300 × 120 | `design_handoff_camp_v2/` |
 | ARENA-04 | ✅ | Prostor umjesto HUD-a — uklonjeni daily/stash pilule, traka s porukama, combo pilula i Done; polje 1553 px, muncher gore, vreća i Pip dolje; sesija se gasi kad polje ostane prazno | — |
 | SHOP | ✅ | Redizajn 1 dizajn — 4 sekcije u skrolu + sticky chipovi, pregled kozmetike „Now / With it“, kupovina za coine u 2 tapa, poruke na kartici, season kartice s rosterom | `design_handoff_shop/` |
