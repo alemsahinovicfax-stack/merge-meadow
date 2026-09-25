@@ -1,6 +1,6 @@
 ---
 type: dizajn
-status: draft
+status: aktivan
 milestone: "—"
 tags: [dizajn, ui, camp, claude-design, mockup, cleanup]
 povezano:
@@ -304,6 +304,30 @@ navedi odvojeno na kraju README-a.
 | tekst Unlock dugmeta | `UiCamp.unlock_button_text()` + `UNLOCK_BTN_H` |
 
 Smoke testovi koje prenos mora zadržati zelenima: `camp_layout_smoke`, `camp_season_link_smoke`, `camp_trade_select_smoke`, `camp_trade_hold_smoke`, `camp_hold_floor_smoke`, `camp_crystal_select_smoke`, `camp_donate_smoke`, `meta_hub_flow_smoke`.
+
+## Implementacija (2026-09-24)
+
+> Status: **preneseno u igru** iz `design_handoff_camp_v2/`. §3 opisuje stanje **prije** prenosa i ostaje kao zapis.
+
+| Fajl | Šta je urađeno |
+|------|----------------|
+| `game/scripts/visual/ui_camp.gd` | v2 mjere: `SEASON_H` 276, `SECTION_GAP` 20, `SECTION_H` 1253 / `SECTION_H_NO_SEASON` 1549, tabovi 120, chip art 128 (96 / 100), pilule 52, Trade 300 × 120, prazno stanje 120/100. Nove fabrike `coin_bump_style()`, `trade_art_empty_style()`, `hold_fill_ratio()`, `trade_button_icon()`; `unlock_button_text()` i `trade_button_text()` vraćaju jednu riječ. Obrisano: `SECTION_GAP_MIN`, `SECTION_H_DEFAULT`, `GRID_MAX_ROWS`, `home_hint_style()`, `trade_info_text()`, `switch_plate_style()`, `FONT_EACH`, `FONT_BADGE_FLOOR`, `FONT_TAB_SUB`, `SHORTCUT_*`, `HOME_HINT_H`, `UNLOCK_BTN_H`, `EMPTY_BLOCK_H`. |
+| `game/scenes/camp/camp_scene.tscn` | `StackGap` obrisan (`ContentStack.separation = 20`); kartica sezone 276 px s `SeasonHead` = ime + Unlock 300 × 120; obrisani `SeasonEyebrow`, `HomeHint`, `SeasonCoinCap`, `SeasonLinkFlowerName`, `MergeShortcut`, `EmptyBody`, `SelectedValue`; `StashSection` fiksne visine, `StashScroll` i `EmptyState` uzimaju ostatak. |
+| `season_link_card.gd` | Bez natpisa i pločice; Unlock u glavi kartice, jedna riječ + lokot 40 px u „short" stanju. |
+| `camp_stash_tab.gd` | Bez podnaslova; ime lijevo, brojač uz desni rub; red 120 px, ikona 76 / 44. |
+| `camp_stash_chip.gd` | Art 128 px (crtež 96 / 100), tijelo 315 px, pilule 52 px bez „each", `ReservedBadge` u redu pipsa (chip ostaje 176 px i kad je rezervisan). |
+| `camp_trade_bar.gd` | Bez `SelectedValue`; dugme 300 × 120 s jednom riječju i ikonom (lokot / hold-stop); fill = prodani dio gomile; na svaki tik novčić 44 px leti do coin chipa (max 3) i chip dobije prsten; prazan izbor = obris bez crteža. |
+| `camp_controller.gd` | Sekcija uvijek `UiCamp.section_height(hero)`; nema rezanja redova po `grid_budget()`; prazno stanje bez rečenice; `_hold_sold` / `_sellable_left()` hrane fill. |
+| `camp_art_frame.gd` | Prazan okvir (bez tipa i ikone) crta `trade_art_empty_style()` umjesto tamnog wella. |
+| Testovi | Novi `camp_section_fixed_smoke` (sekcija ista za 0 / 1 / 8 / 14 tipova, sa stripom i bez kartice sezone); ažurirani `camp_layout_smoke`, `camp_season_link_smoke`, `camp_trade_select_smoke`, `camp_hold_floor_smoke`, `camp_trade_hold_smoke`, `camp_crystal_select_smoke`, `camp_smoke_util`. Suite 52/52, GUT 33/33. |
+
+**Odstupanja od paketa (svjesna):**
+
+1. **`FONT_BTN_SUB` je ostao** u `UiCamp` — Camp ga više ne koristi, ali `CampButton` dijeli Shop (`ui_shop_buttons.gd`) i tamo podnaslov postoji.
+2. **Duga imena se i dalje skraćuju na kartici** („Harvest Pumpk…" u Seeds tabu) — paket računa s Nunitom, a naš default font je širi na 38 px. U Flowers tabu, gdje su pilule uže, ime staje cijelo.
+3. **`CoinChipBump` prati pravi rect coin chipa** (+6 px) umjesto fiksnog `(12, 15, 312, 116)` — safe-area pomjera header, pa je vezivanje za čvor sigurnije.
+4. **`TradeFeedback` je ostao na staroj kotvi** `(−16, −20)`; paket traži `(−16, −42)`. Pilula i bez toga stoji iznad bara.
+5. **Auto prelaz na sljedeći tip** javlja se pojavom novog imena u baru (fade 0,2 s) umjesto mint pločice — tekst „empty — switched here" je obrisan.
 
 ## Povezano
 

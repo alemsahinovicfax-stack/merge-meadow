@@ -63,8 +63,8 @@ func _run() -> void:
 	if chip == null or not bool(chip.call("is_reserved")) or str(chip.call("get_badge_text")) != "Kept · 20 / 20":
 		_fail("pumpkin above the floor must read 'Kept · 20 / 20', got '%s'" % (str(chip.call("get_badge_text")) if chip else ""))
 		return
-	if not is_equal_approx((chip as Control).custom_minimum_size.y, 244.0):
-		_fail("reserved chip must be 244 px tall")
+	if not is_equal_approx((chip as Control).custom_minimum_size.y, 176.0):
+		_fail("reserved chip must stay 176 px tall (badge sits in the pips row)")
 		return
 	if str(bar.call("get_state")) != "idle":
 		_fail("above the floor the rule is invisible (idle), got %s" % str(bar.call("get_state")))
@@ -87,14 +87,17 @@ func _run() -> void:
 	if str(bar.call("get_state")) != "holdstop":
 		_fail("stopped hold must be holdstop, got %s" % str(bar.call("get_state")))
 		return
-	if str(bar.call("get_warning_text")) != "Hold stopped · Frost Orchard keeps 20 of these":
+	if str(bar.call("get_warning_text")) != "Hold stopped · Frost Orchard keeps 20":
 		_fail("holdstop strip text wrong: '%s'" % str(bar.call("get_warning_text")))
 		return
-	if str(button.call("get_title")) != "Tap to sell 1" or str(button.call("get_sub")) != "no hold for this one":
-		_fail("holdstop button must read 'Tap to sell 1 / no hold for this one'")
+	if str(button.call("get_title")) != "Sell 1" or not str(button.call("get_sub")).is_empty():
+		_fail("holdstop button must read just 'Sell 1', got '%s / %s'" % [
+			str(button.call("get_title")), str(button.call("get_sub"))
+		])
 		return
-	if str(_chip(grid, "pumpkin").call("get_badge_text")) != "Hold stops here":
-		_fail("chip badge at the floor must read 'Hold stops here'")
+	# v2: tekst badgea se ne mijenja na granici, samo stil (amber).
+	if str(_chip(grid, "pumpkin").call("get_badge_text")) != "Kept · 20 / 20":
+		_fail("chip badge at the floor must stay 'Kept · 20 / 20'")
 		return
 	button.call("end_press")
 	await process_frame
@@ -110,8 +113,9 @@ func _run() -> void:
 	if _pumpkin(gs) != 19:
 		_fail("tap below the floor must still sell 1, pumpkin=%d" % _pumpkin(gs))
 		return
-	if str(bar.call("get_state")) != "warn" or str(button.call("get_sub")) != "sells reserved":
-		_fail("below the floor must warn ('sells reserved'), state=%s" % str(bar.call("get_state")))
+	# v2: upozorenje nose boja, lokot i strip iznad reda — ne podnaslov dugmeta.
+	if str(bar.call("get_state")) != "warn" or str(button.call("get_title")) != "Trade":
+		_fail("below the floor must warn (pink Trade), state=%s" % str(bar.call("get_state")))
 		return
 	if str(bar.call("get_warning_text")) != "Frost Orchard needs 1 more of these":
 		_fail("warn strip text wrong: '%s'" % str(bar.call("get_warning_text")))

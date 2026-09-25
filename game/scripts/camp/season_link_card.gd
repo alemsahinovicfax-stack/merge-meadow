@@ -1,22 +1,17 @@
 extends PanelContainer
 
-## Hero kartica sljedece besplatne sezone (design_handoff_camp · SeasonLink).
-## Tap na karticu ("Details ↗") vodi na Home bez trosenja. Unlock trosi odmah
-## (500 coina + 20 ★3), pokaze burst na kartici, pa skace na Home s fokusom na
-## otkljucanu sezonu.
+## Hero kartica sljedece besplatne sezone (design_handoff_camp_v2 · SeasonLinkCard).
+## Tap bilo gdje na kartici vodi na Home bez trosenja — bez "Details" pilule i bez
+## "Next free season" natpisa. Unlock (300 x 120, jedna rijec) stoji desno od imena,
+## trosi odmah (500 coina + 20 ★3), pokaze burst, pa skace na Home s fokusom.
 
-@onready var eyebrow_label: Label = %SeasonEyebrow
 @onready var title_label: Label = %SeasonLinkTitle
-@onready var home_hint: PanelContainer = %HomeHint
-@onready var home_hint_label: Label = %HomeHintLabel
 @onready var coin_icon: TextureRect = %SeasonLinkCoinIcon
 @onready var coins_label: Label = %SeasonLinkCoins
-@onready var coin_cap: Label = %SeasonCoinCap
 @onready var coins_bar: ProgressBar = %SeasonLinkCoinsBar
 @onready var split_line: Panel = %SeasonSplitLine
 @onready var flower_art: CampArtFrame = %SeasonLinkFlower
 @onready var t3_label: Label = %SeasonLinkT3
-@onready var flower_name: Label = %SeasonLinkFlowerName
 @onready var t3_bar: ProgressBar = %SeasonLinkT3Bar
 @onready var unlock_button: CampButton = %SeasonLinkUnlock
 
@@ -34,13 +29,11 @@ func _ready() -> void:
 	custom_minimum_size.y = UiCamp.SEASON_H
 	_ignore_tree(get_node("SeasonLinkVBox") as Control)
 	unlock_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	unlock_button.custom_minimum_size.y = UiCamp.UNLOCK_BTN_H
+	unlock_button.custom_minimum_size = UiCamp.UNLOCK_BTN
 	unlock_button.clicked.connect(_on_unlock_clicked)
 	coin_icon.texture = UiAssets.get_chrome_icon("icon_coin")
 	coin_icon.custom_minimum_size = Vector2(UiCamp.SEASON_ICON, UiCamp.SEASON_ICON)
-	flower_art.configure_frame(UiCamp.SEASON_ART_FRAME, 14, 2, 6.0, 9, 1, UiCamp.SEASON_ART)
-	home_hint.add_theme_stylebox_override("panel", UiCamp.home_hint_style())
-	home_hint.custom_minimum_size.y = UiCamp.HOME_HINT_H
+	flower_art.configure_frame(UiCamp.SEASON_ART_FRAME, 16, 2, 7.0, 10, 1, UiCamp.SEASON_ART)
 	split_line.add_theme_stylebox_override("panel", UiCamp.split_line_style())
 	split_line.custom_minimum_size = Vector2(UiCamp.SEASON_SPLIT_W, UiCamp.SEASON_SPLIT_H)
 	for bar in [coins_bar, t3_bar]:
@@ -49,17 +42,11 @@ func _ready() -> void:
 		(bar as ProgressBar).add_theme_stylebox_override("background", UiCamp.progress_track_style())
 	coins_bar.add_theme_stylebox_override("fill", UiCamp.progress_fill_style(true))
 	t3_bar.add_theme_stylebox_override("fill", UiCamp.progress_fill_style(false))
-	UiCamp.style_label(eyebrow_label, UiCamp.FONT_SEASON_EYEBROW, UiCamp.SEASON_INK, UiCamp.SEMI)
 	UiCamp.style_label(title_label, UiCamp.FONT_SEASON_NAME, UiCamp.DARK_INK)
-	UiCamp.style_label(home_hint_label, UiCamp.FONT_HOME_HINT, UiCamp.DARK_INK)
 	UiCamp.style_label(coins_label, UiCamp.FONT_SEASON_VALUE, UiCamp.DARK_INK)
 	UiCamp.style_label(t3_label, UiCamp.FONT_SEASON_VALUE, UiCamp.DARK_INK)
-	UiCamp.style_label(coin_cap, UiCamp.FONT_SEASON_CAP, UiCamp.SEASON_INK, UiCamp.SEMI)
-	UiCamp.style_label(flower_name, UiCamp.FONT_SEASON_CAP, UiCamp.SEASON_INK, UiCamp.SEMI)
-	flower_name.clip_text = true
-	flower_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	flower_name.custom_minimum_size.x = 1.0
-	unlock_button.set_fonts(UiCamp.FONT_BTN, UiCamp.FONT_BTN_SUB)
+	title_label.custom_minimum_size.x = 1.0
+	unlock_button.set_fonts(UiCamp.FONT_UNLOCK)
 
 
 func get_state() -> String:
@@ -86,7 +73,6 @@ func _show(def: SeasonDef, coins: int, flowers: int) -> void:
 	var coins_need := def.coins_cost
 	var flowers_need := def.t3_flowers_required
 	add_theme_stylebox_override("panel", UiCamp.season_card_style(def.id))
-	eyebrow_label.text = "Next free season"
 	title_label.text = def.display_name
 	coins_label.text = "%d / %d" % [mini(coins, coins_need), coins_need]
 	t3_label.text = "%d / %d" % [mini(flowers, flowers_need), flowers_need]
@@ -97,17 +83,15 @@ func _show(def: SeasonDef, coins: int, flowers: int) -> void:
 	var prev := GameState.previous_free_id_for(def.id)
 	var flower_type := GameState.star3_type_id_for_season(prev) if not prev.is_empty() else ""
 	flower_art.set_art(false, flower_type, 3)
-	flower_name.text = "%s ★★★" % GameState.get_seed_display_name(flower_type) if not flower_type.is_empty() else ""
-	coin_cap.text = "Coins"
-	home_hint_label.text = "Details ↗"
-	var text := UiCamp.unlock_button_text(
-		_state, def.display_name, maxi(coins_need - coins, 0), maxi(flowers_need - flowers, 0),
-		coins_need, flowers_need
-	)
 	var style := UiCamp.unlock_button_style(_state)
 	unlock_button.set_styles(style, style)
-	unlock_button.set_text(text[0], text[1])
+	unlock_button.set_text(UiCamp.unlock_button_text(_state))
 	unlock_button.set_ink(UiCamp.unlock_button_ink(_state))
+	# Lokot kad jos fali — razlika "nedostaje / spremno" ne ovisi samo o boji.
+	unlock_button.set_icon(
+		UiAssets.get_chrome_icon("icon_lock") if _state == UiCamp.SEASON_SHORT else null,
+		UiCamp.UNLOCK_LOCK_ICON
+	)
 	var ready := _state == UiCamp.SEASON_READY
 	unlock_button.disabled = not ready
 	unlock_button.mouse_filter = Control.MOUSE_FILTER_STOP if ready else Control.MOUSE_FILTER_IGNORE

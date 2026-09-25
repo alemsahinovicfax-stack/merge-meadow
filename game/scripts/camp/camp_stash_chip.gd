@@ -1,7 +1,7 @@
 class_name CampStashChip
 extends PanelContainer
 
-## Seeds / Flowers chip (design_handoff_camp · CampChip). Jedan za oba:
+## Seeds / Flowers chip (design_handoff_camp_v2 · CampChip). Jedan za oba:
 ## "seed" = T1 iz vrece (cream krug), "flower" = T3 iz stasha (gold kvadrat).
 ## Tap bira tip za Trade; povlacenje skrola listu.
 
@@ -38,7 +38,6 @@ var _badge_label: Label
 var _count_icon: TextureRect
 var _count_label: Label
 var _price_label: Label
-var _each_label: Label
 var _count_pill: PanelContainer
 var _price_pill: PanelContainer
 var _mark: Panel
@@ -151,7 +150,8 @@ func _ensure_children() -> void:
 	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	body.alignment = BoxContainer.ALIGNMENT_CENTER
 	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	body.add_theme_constant_override("separation", 6)
+	body.custom_minimum_size.x = UiCamp.CHIP_BODY_W
+	body.add_theme_constant_override("separation", 8)
 	row.add_child(body)
 
 	var name_block := VBoxContainer.new()
@@ -176,12 +176,14 @@ func _ensure_children() -> void:
 	_badge.visible = false
 	_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_badge.custom_minimum_size = Vector2(0, UiCamp.BADGE_H)
-	body.add_child(_badge)
+	_badge.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	# Badge stoji u redu pipsa — rezervisan chip je i dalje 176 px visok.
+	name_block.add_child(_badge)
 	var badge_row := HBoxContainer.new()
 	badge_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	badge_row.add_theme_constant_override("separation", 10)
 	_badge.add_child(badge_row)
-	_badge_icon = _make_icon(UiCamp.PILL_ICON)
+	_badge_icon = _make_icon(UiCamp.BADGE_ICON)
 	badge_row.add_child(_badge_icon)
 	_badge_label = Label.new()
 	_badge_label.name = "BadgeLabel"
@@ -234,11 +236,6 @@ func _ensure_children() -> void:
 	_price_label.name = "PriceLabel"
 	_price_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	price_row.add_child(_price_label)
-	_each_label = Label.new()
-	_each_label.name = "EachLabel"
-	_each_label.text = "each"
-	_each_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	price_row.add_child(_each_label)
 
 	_mark = Panel.new()
 	_mark.name = "SelectMark"
@@ -263,7 +260,7 @@ func _apply_all() -> void:
 		return
 	var seed := _kind == "seed"
 	_art.configure_frame(
-		UiCamp.CHIP_ART_FRAME, 26, 3, UiCamp.CHIP_ART_WELL_INSET, 18, 2,
+		UiCamp.CHIP_ART_FRAME, UiCamp.CHIP_ART_FRAME_RADIUS, 3, UiCamp.CHIP_ART_WELL_INSET, 20, 2,
 		UiCamp.CHIP_ART_SEED if seed else UiCamp.CHIP_ART_FLOWER
 	)
 	_art.set_art(seed, _type_id, 1 if seed else 3)
@@ -275,24 +272,24 @@ func _apply_all() -> void:
 		UiAssets.get_chrome_icon("icon_seed") if seed else UiAssets.get_arena_icon("icon_crystal")
 	)
 	UiCamp.style_label(_price_label, UiCamp.FONT_PRICE, UiCamp.INK)
-	UiCamp.style_label(_each_label, UiCamp.FONT_EACH, UiCamp.INK, UiCamp.SEMI)
 	_apply_badge()
 	_apply_style()
 
 
+## Rezervisan chip: badge stoji umjesto pipsa (rezervisano cvijece je uvijek ★3),
+## pa kartica ostaje 176 px kao i svaka druga.
 func _apply_badge() -> void:
 	if _badge == null:
 		return
 	_badge.visible = _reserved
+	_pips_label.visible = not _reserved
 	custom_minimum_size = Vector2(0, UiCamp.CHIP_H_RESERVED if _reserved else UiCamp.CHIP_SIZE.y)
 	if not _reserved:
 		return
 	_badge.add_theme_stylebox_override("panel", UiCamp.reserved_badge_style(_season_id, _at_floor))
 	_badge_icon.texture = UiAssets.get_camp_icon("icon_hold_stop" if _at_floor else "icon_reserved")
 	_badge_label.text = UiCamp.reserved_badge_text(_have, _need, _at_floor)
-	UiCamp.style_label(
-		_badge_label, UiCamp.FONT_BADGE_FLOOR if _at_floor else UiCamp.FONT_BADGE, UiCamp.DARK_INK
-	)
+	UiCamp.style_label(_badge_label, UiCamp.FONT_BADGE, UiCamp.DARK_INK)
 
 
 func _apply_style() -> void:

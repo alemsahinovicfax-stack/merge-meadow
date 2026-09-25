@@ -94,13 +94,12 @@ func _run() -> void:
 	if card.mouse_filter != Control.MOUSE_FILTER_STOP:
 		_fail("SeasonLinkCard must STOP")
 		return
-	if absf(card.size.y - 422.0) > 1.5 or absf(card.size.x - 1032.0) > 1.5:
-		_fail("hero card expected 1032 × 422 got %s" % str(card.size))
+	if absf(card.size.y - 276.0) > 1.5 or absf(card.size.x - 1032.0) > 1.5:
+		_fail("hero card expected 1032 × 276 got %s" % str(card.size))
 		return
 	var title: Label = camp.get_node_or_null("%SeasonLinkTitle") as Label
-	var eyebrow: Label = camp.get_node_or_null("%SeasonEyebrow") as Label
-	if title == null or title.text != "Frost Orchard" or eyebrow == null or eyebrow.text != "Next free season":
-		_fail("hero must read 'Next free season' / 'Frost Orchard'")
+	if title == null or title.text != "Frost Orchard":
+		_fail("hero must read just the season name")
 		return
 	if title.mouse_filter != Control.MOUSE_FILTER_IGNORE:
 		_fail("SeasonLinkTitle must IGNORE")
@@ -122,9 +121,9 @@ func _run() -> void:
 	if coin_icon == null or coin_icon.texture == null:
 		_fail("SeasonLink coin icon missing texture")
 		return
-	var flower_name: Label = camp.get_node_or_null("%SeasonLinkFlowerName") as Label
-	if flower_name == null or flower_name.text.findn("Harvest Pumpkin") < 0 or flower_name.text.find("★★★") < 0:
-		_fail("flower caption should be 'Harvest Pumpkin ★★★', got '%s'" % (flower_name.text if flower_name else ""))
+	# v2: captioni "Coins" i "{cvijet} ★★★" su obrisani — ikona i crtez ih nose.
+	if camp.get_node_or_null("%SeasonLinkFlowerName") != null or camp.get_node_or_null("%SeasonCoinCap") != null:
+		_fail("progress captions must be gone")
 		return
 	var flower_art: Control = camp.get_node_or_null("%SeasonLinkFlower") as Control
 	if absf(_center_y(coin_icon) - _center_y(flower_art)) > 2.0:
@@ -152,11 +151,17 @@ func _run() -> void:
 	if str(card.call("get_state")) != "short":
 		_fail("unaffordable card state should be short")
 		return
-	if str(unlock_btn.call("get_sub")) != "needs 400 more coins and 17 more flowers":
-		_fail("Unlock sub should list what is missing, got '%s'" % str(unlock_btn.call("get_sub")))
+	# v2: jedna rijec, bez podnaslova — koliko fali pisu trake napretka.
+	if str(unlock_btn.call("get_title")) != "Unlock" or not str(unlock_btn.call("get_sub")).is_empty():
+		_fail("short Unlock must read just 'Unlock', got '%s / %s'" % [
+			str(unlock_btn.call("get_title")), str(unlock_btn.call("get_sub"))
+		])
 		return
-	if unlock_btn.size.y < 132.0 - 1.5 or absf(unlock_btn.size.x - 988.0) > 2.0:
-		_fail("Unlock must span the card (988 × 132), got %s" % str(unlock_btn.size))
+	if absf(unlock_btn.size.y - 120.0) > 1.5 or absf(unlock_btn.size.x - 300.0) > 2.0:
+		_fail("Unlock must be 300 × 120, got %s" % str(unlock_btn.size))
+		return
+	if camp.get_node_or_null("%HomeHint") != null or camp.get_node_or_null("%SeasonEyebrow") != null:
+		_fail("Details pill and the eyebrow must be gone")
 		return
 
 	var coins_before: int = int(gs.get("wallet_coins"))
@@ -209,8 +214,8 @@ func _run() -> void:
 	if unlock_btn.mouse_filter != Control.MOUSE_FILTER_STOP or bool(unlock_btn.get("disabled")):
 		_fail("affordable Camp Unlock must be enabled and STOP")
 		return
-	if str(unlock_btn.call("get_title")) != "Unlock Frost Orchard":
-		_fail("ready Unlock should read 'Unlock Frost Orchard', got '%s'" % str(unlock_btn.call("get_title")))
+	if str(unlock_btn.call("get_title")) != "Unlock":
+		_fail("ready Unlock should still read 'Unlock', got '%s'" % str(unlock_btn.call("get_title")))
 		return
 	coins_before = int(gs.get("wallet_coins"))
 	card.call("navigate_to_lock")
@@ -240,7 +245,7 @@ func _run() -> void:
 	if int(stash.get("pumpkin", 0)) != 0 or not bool(gs.call("is_season_playable", S2)):
 		_fail("Unlock should spend 20 pumpkin and grant Frost")
 		return
-	if str(card.call("get_state")) != "unlocking" or str(unlock_btn.call("get_title")) != "Frost Orchard unlocked":
+	if str(card.call("get_state")) != "unlocking" or str(unlock_btn.call("get_title")) != "Unlocked":
 		_fail("card must show the unlocking moment, state=%s title=%s" % [card.call("get_state"), unlock_btn.call("get_title")])
 		return
 	if int(hub.call("current_page_index")) != MetaHubPages.CAMP:

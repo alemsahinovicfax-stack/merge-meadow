@@ -1,8 +1,8 @@
 extends SceneTree
 
-## design_handoff_camp (smjer 1b) — struktura scene, hub chrome i vertikalni
-## budzet 1597 px u stanjima iz README-a (+4 px rub sekcije koji README ne broji):
-## 6 tipova (908), 20 tipova (1098), rezervisano + stop (858), prazno (752), bez sezone.
+## design_handoff_camp_v2 — struktura scene, hub chrome i vertikalni budzet 1597 px:
+## kartica sezone 276, razmak 20, sekcija UVIJEK 1253 (1549 bez kartice) bez obzira
+## na broj tipova. Provjerava i da su Merge precica i StackGap obrisani.
 
 const HUB_PAGE := Vector2(1080.0, 1597.0)
 const TOL := 1.5
@@ -41,8 +41,8 @@ func _run() -> void:
 		return
 
 	var required: Array[String] = [
-		"CampPage", "ContentStack", "SeasonLinkCard", "StackGap", "StashSection", "StashTabs",
-		"SeedsTab", "FlowersTab", "MergeShortcut", "StashScroll", "SeedBagGrid", "CrystalGrid",
+		"CampPage", "ContentStack", "SeasonLinkCard", "StashSection", "StashTabs",
+		"SeedsTab", "FlowersTab", "StashScroll", "SeedBagGrid", "CrystalGrid",
 		"EmptyState", "EmptyCta", "ExchangeBar", "ExchangeButton", "ReservedWarning", "TradeFeedback",
 		"SeasonLinkTitle", "SeasonLinkCoins", "SeasonLinkT3", "SeasonLinkUnlock",
 		"HomeButton", "SettingsButton", "CollectionButton", "ResourceBar", "MergeButton", "PlayButton",
@@ -54,6 +54,9 @@ func _run() -> void:
 	var removed: Array[String] = [
 		"GardenCard", "CrystalCard", "CrystalExchangeButton", "UpgradeCards", "StatusToast",
 		"GardenCliff", "BagLabel", "CrystalTotalLabel", "CrystalCliff", "CompanionTitle", "PipSlot",
+		# v2: rupa u sredini, Merge precica, podnaslovi i captioni.
+		"StackGap", "MergeShortcut", "SeasonEyebrow", "HomeHint", "SeasonCoinCap",
+		"SeasonLinkFlowerName", "EmptyBody", "SelectedValue",
 	]
 	for node_name in removed:
 		if camp.get_node_or_null("%" + node_name) != null:
@@ -86,28 +89,24 @@ func _run() -> void:
 	if str(seeds_tab.call("get_count_text")) != "6" or str(flowers_tab.call("get_count_text")) != "4":
 		_fail("tabs must count types (6 / 4)")
 		return
-	var shortcut := camp.get_node("%MergeShortcut") as Control
-	if not shortcut.visible or absf(shortcut.size.x - 190.0) > TOL or shortcut.size.y < 132.0 - TOL:
-		_fail("Merge shortcut must be 190 × 132 on Seeds, got %s" % str(shortcut.size))
-		return
 	var tab_w := (seeds_tab as Control).size.x
-	if absf(tab_w - 387.0) > TOL:
-		_fail("tab width expected 387 got %s" % str(tab_w))
+	if absf(tab_w - 489.0) > TOL:
+		_fail("tab width expected 489 (two tabs, no Merge) got %s" % str(tab_w))
 		return
 	var chip := (camp.get_node("%SeedBagGrid") as GridContainer).get_child(0) as Control
 	if absf(chip.size.x - 489.0) > TOL or absf(chip.size.y - 176.0) > TOL:
 		_fail("chip expected 489 × 176 got %s" % str(chip.size))
 		return
-	var e := _expect_section(camp, 556.0, 908.0, true, "six seeds")
+	var e := _expect_section(camp, true, "six seeds")
 	if not e.is_empty():
 		_fail(e)
 		return
 	var button := camp.get_node("%ExchangeButton") as Control
-	if button.size.x < 430.0 - TOL or button.size.y < 120.0 - TOL:
-		_fail("Trade button must be >= 430 × 120, got %s" % str(button.size))
+	if absf(button.size.x - 300.0) > TOL or button.size.y < 120.0 - TOL:
+		_fail("Trade button must be 300 x 120, got %s" % str(button.size))
 		return
 
-	# 2) 20 tipova: 4 reda (746), ostatak se skrola.
+	# 2) 20 tipova: sekcija ista, lista skrola.
 	var twenty := {}
 	for type_id in TWENTY:
 		twenty[type_id] = 1
@@ -117,22 +116,19 @@ func _run() -> void:
 	if str(seeds_tab.call("get_count_text")) != "20":
 		_fail("Seeds tab must count 20 types")
 		return
-	e = _expect_section(camp, 746.0, 1098.0, true, "twenty seeds")
+	e = _expect_section(camp, true, "twenty seeds")
 	if not e.is_empty():
 		_fail(e)
 		return
 	var lists := camp.get_node("%StashLists") as Control
 	if lists.size.y <= (camp.get_node("%StashScroll") as Control).size.y:
-		_fail("20 types must overflow the 4-row window (scroll)")
+		_fail("20 types must overflow the list window (scroll)")
 		return
 
-	# 3) Flowers: rezervisan pumpkin (red 244) + stop drzanja (bar 224).
+	# 3) Flowers: rezervisan pumpkin (i dalje 176) + stop drzanja (bar 224).
 	camp.call("_on_tab_pressed", "flowers")
 	camp.call("_on_crystal_chip_pressed", "pumpkin")
 	await _settle()
-	if (camp.get_node("%MergeShortcut") as Control).visible:
-		_fail("Merge shortcut must hide on Flowers")
-		return
 	var bar := camp.get_node("%ExchangeBar")
 	if str(bar.call("get_state")) != "holdstop":
 		_fail("pumpkin at 20/20 must be holdstop, got %s" % str(bar.call("get_state")))
@@ -140,12 +136,12 @@ func _run() -> void:
 	if not (camp.get_node("%ReservedWarning") as Control).visible:
 		_fail("holdstop must show ReservedWarning")
 		return
-	e = _expect_section(camp, 434.0, 858.0, true, "reserved + holdstop")
+	e = _expect_section(camp, true, "reserved + holdstop")
 	if not e.is_empty():
 		_fail(e)
 		return
 
-	# 4) Prazna vreca: blok 400, Trade bar ostaje.
+	# 4) Prazna vreca: sekcija ista visina, Trade bar ostaje.
 	camp.call("_on_tab_pressed", "seeds")
 	gs.set("seed_bag", {})
 	camp.call("refresh_for_meta_hub")
@@ -156,7 +152,7 @@ func _run() -> void:
 	if str(camp.get_node("%EmptyCta").call("get_title")) != "Play a run ↗":
 		_fail("empty bag CTA must read 'Play a run ↗'")
 		return
-	e = _expect_section(camp, -1.0, 752.0, true, "empty bag")
+	e = _expect_section(camp, true, "empty bag")
 	if not e.is_empty():
 		_fail(e)
 		return
@@ -171,12 +167,15 @@ func _run() -> void:
 	camp.call("refresh_for_meta_hub")
 	await _settle()
 	var card := camp.get_node("%SeasonLinkCard") as Control
-	if card.visible or (camp.get_node("%StackGap") as Control).visible:
-		_fail("no next season must hide the hero and the gap")
+	if card.visible:
+		_fail("no next season must hide the hero card")
 		return
 	var section := camp.get_node("%StashSection") as Control
 	if absf(section.global_position.y - (camp.global_position.y + 24.0)) > TOL:
 		_fail("section must move to the top without hero, y=%s" % str(section.global_position.y))
+		return
+	if absf(section.size.y - 1549.0) > TOL:
+		_fail("section without hero must be 1549, got %s" % str(section.size.y))
 		return
 
 	print("camp_layout_smoke OK")
@@ -189,29 +188,27 @@ func _settle() -> void:
 		await process_frame
 
 
-## grid_h < 0 = prazno stanje (grid sakriven).
-func _expect_section(camp: Control, grid_h: float, section_h: float, hero: bool, what: String) -> String:
+## v2: sekcija je uvijek 1253 s karticom sezone — nista ne ovisi o broju tipova.
+func _expect_section(camp: Control, hero: bool, what: String) -> String:
 	var page_top := camp.global_position.y
 	var page_bottom := page_top + HUB_PAGE.y
 	var section := camp.get_node("%StashSection") as Control
-	var scroll := camp.get_node("%StashScroll") as Control
 	var bar := camp.get_node("%ExchangeBar") as Control
 	var card := camp.get_node("%SeasonLinkCard") as Control
-	if grid_h >= 0.0 and absf(scroll.size.y - grid_h) > TOL:
-		return "%s: grid expected %s got %s" % [what, str(grid_h), str(scroll.size.y)]
-	if absf(section.size.y - section_h) > TOL:
-		return "%s: section expected %s got %s" % [what, str(section_h), str(section.size.y)]
+	if absf(section.size.y - 1253.0) > TOL:
+		return "%s: section expected 1253 got %s" % [what, str(section.size.y)]
 	if section.get_global_rect().end.y > page_bottom - 24.0 + TOL:
 		return "%s: section overflows the page (bottom %s)" % [what, str(section.get_global_rect().end.y - page_top)]
 	if bar.get_global_rect().end.y > section.get_global_rect().end.y - 18.0 + TOL:
 		return "%s: Trade bar is cut" % what
 	if hero:
-		if not card.visible or absf(card.size.y - 422.0) > TOL:
-			return "%s: hero must be 422 px" % what
+		if not card.visible or absf(card.size.y - 276.0) > TOL:
+			return "%s: hero must be 276 px" % what
 		if absf(card.global_position.y - (page_top + 24.0)) > TOL:
 			return "%s: hero must sit at y 24" % what
 		if absf(section.get_global_rect().end.y - (page_bottom - 24.0)) > TOL:
 			return "%s: section must sit on the bottom padding" % what
-		if section.global_position.y < card.get_global_rect().end.y + 20.0 - TOL:
-			return "%s: gap hero → section < 20" % what
+		# Sekcija je prikovana uz karticu: tacno 20 px razmaka, nikad rupa.
+		if absf(section.global_position.y - (card.get_global_rect().end.y + 20.0)) > TOL:
+			return "%s: gap hero → section must be exactly 20" % what
 	return ""

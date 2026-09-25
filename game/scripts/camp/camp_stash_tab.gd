@@ -1,8 +1,9 @@
 class_name CampStashTab
 extends PanelContainer
 
-## Tab Seeds | Flowers (design_handoff_camp · StashTabs): ikona u okviru,
-## naslov + broj tipova, podnaslov ("Arena fuel" / "reward").
+## Tab Seeds | Flowers (design_handoff_camp_v2 · StashTabs): ikona u okviru, ime i
+## broj tipova uz desni rub. Bez podnaslova ("Arena fuel" / "reward") i bez Merge
+## precice — red sluzi samo za biranje izmedju dva taba.
 
 signal tab_pressed(kind: String)
 
@@ -18,7 +19,6 @@ var _icon: CampArtFrame
 var _label: Label
 var _count_panel: PanelContainer
 var _count_label: Label
-var _sub: Label
 
 
 func _ready() -> void:
@@ -66,41 +66,28 @@ func _build() -> void:
 	var row := HBoxContainer.new()
 	row.name = "TabRow"
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_theme_constant_override("separation", UiCamp.TAB_GAP)
+	row.add_theme_constant_override("separation", 16)
 	add_child(row)
 	_icon = CampArtFrame.new()
 	_icon.name = "TabIcon"
 	_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_icon)
-	var text_col := VBoxContainer.new()
-	text_col.name = "TextWrap"
-	text_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	text_col.alignment = BoxContainer.ALIGNMENT_CENTER
-	text_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	text_col.add_theme_constant_override("separation", 8)
-	row.add_child(text_col)
-	var top := HBoxContainer.new()
-	top.name = "TopRow"
-	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	top.add_theme_constant_override("separation", UiCamp.TAB_GAP)
-	text_col.add_child(top)
 	_label = Label.new()
 	_label.name = "TabLabel"
 	_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	top.add_child(_label)
+	_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(_label)
 	_count_panel = PanelContainer.new()
 	_count_panel.name = "TabCount"
 	_count_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_count_panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_count_panel.custom_minimum_size = Vector2(UiCamp.TAB_COUNT_MIN_W, UiCamp.TAB_COUNT_H)
-	top.add_child(_count_panel)
+	row.add_child(_count_panel)
 	_count_label = Label.new()
 	_count_label.name = "TabCountLabel"
 	_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_count_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_count_panel.add_child(_count_label)
-	_sub = Label.new()
-	_sub.name = "TabSub"
-	text_col.add_child(_sub)
 
 
 func _apply() -> void:
@@ -114,27 +101,25 @@ func _apply() -> void:
 		UiCamp.TAB_ICON_ART
 	)
 	_label.text = "Seeds" if seed else "Flowers"
-	_sub.text = "Arena fuel" if seed else "reward"
 	_count_label.text = str(_count)
 	add_theme_stylebox_override("panel", UiCamp.tab_style(_active))
 	_count_panel.add_theme_stylebox_override("panel", UiCamp.tab_count_style(_active))
-	UiCamp.style_label(_count_label, UiCamp.FONT_TAB, UiCamp.tab_ink(_active))
-	UiCamp.style_label(_sub, UiCamp.FONT_TAB_SUB, UiCamp.tab_sub_ink(_active), UiCamp.SEMI)
+	UiCamp.style_label(_count_label, UiCamp.FONT_TAB_COUNT, UiCamp.tab_ink(_active))
 	_fit_label()
 
 
-## Uzak tab (387 px kad je "Merge" vidljiv) — naslov se smanjuje do 34 px
-## umjesto da gura broj preko ruba.
+## Tab je sada 489 px (nema Merge precice), ali naslov i dalje pada do 34 px
+## umjesto da gura brojac preko ruba.
 func _fit_label() -> void:
 	if _label == null or size.x <= 0.0:
 		return
 	var box := get_theme_stylebox("panel")
 	var chrome := (box.get_margin(SIDE_LEFT) + box.get_margin(SIDE_RIGHT)) if box else 36.0
-	var avail := size.x - chrome - UiCamp.TAB_ICON - UiCamp.TAB_GAP * 2.0
+	var avail := size.x - chrome - UiCamp.TAB_ICON - 32.0
 	var count_w := maxf(
 		UiCamp.TAB_COUNT_MIN_W,
-		32.0 + UiCamp.tight_font(UiCamp.FONT_TAB).get_string_size(
-			_count_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, UiCamp.FONT_TAB
+		32.0 + UiCamp.tight_font(UiCamp.FONT_TAB_COUNT).get_string_size(
+			_count_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, UiCamp.FONT_TAB_COUNT
 		).x
 	)
 	var px := UiCamp.FONT_TAB

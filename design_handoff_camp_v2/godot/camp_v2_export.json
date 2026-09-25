@@ -1,0 +1,229 @@
+{
+  "$schema_version": "1.0",
+  "generated": "2026-09-24",
+  "source": "design_handoff_camp_v2/design/CampScreen.dc.html + Camp Specs.dc.html",
+  "brief": "docs/04-experience/design-drafts/camp-v2-cd-brief.md",
+  "direction": "jedan dizajn (bez varijanti) — druga runda čišćenja nad design_handoff_camp/",
+  "note": "Sve mjere su u px baze 1080 x 1920 i prenose se 1:1. Boje su sRGB hex; alpha je zapisana odvojeno gdje postoji. Tokeni: samo novi/promijenjeni — ostalo iz ui_camp.gd v1.",
+  "meta": {
+    "base": { "w": 1080, "h": 1920 },
+    "header": { "h": 143, "given": true, "source": "design_handoff_hub_chrome/HubScreen.dc.html" },
+    "page": { "w": 1080, "h": 1597, "y": 143, "padding": 24, "content": [1032, 1549] },
+    "footer": { "h": 180, "given": true, "active_tab_index": 3 },
+    "minimums": { "touch": 120, "text": 34 },
+    "page_bg": "#2E4733",
+    "gestures": "samo vertikalni scroll liste i tap — horizontalni swipe ide hub pageru"
+  },
+  "tokens": {
+    "palette_new": {
+      "tab_inactive": "#F1EBE4",
+      "tab_inactive_edge": "#D9D3CC",
+      "tab_count_inactive": "#E6DFD8",
+      "trade_disabled": "#EAE4DD",
+      "trade_disabled_edge": "#C9C4BE",
+      "coin_bump_ring": "#FFF5D1"
+    },
+    "palette_reused": {
+      "cream": "#FFF8F0", "ink": "#2D3436", "dark_ink": "#1A1A14", "tab_ink": "#4A5153", "disabled_ink": "#5C6264",
+      "peach": "#FFB88C", "peach_edge": "#E8A374", "hold_freeze": "#FFDCC2",
+      "warn_pink": "#FFCCD5", "warn_pink_edge": "#E89AAA", "price_bg": "#FFE8B8",
+      "coin_gold": "#FFD56B", "gold_edge": "#D6A82F", "unlock_gold": "#E8C44A", "unlock_gold_edge": "#BA9D3B",
+      "mint": "#A8E6CF", "mint_edge": "#7FC9AC", "well": "#22342A", "well_edge": "#16211B", "rim": "#CBC2B6",
+      "season_frost": ["#C5D5E8", "#9FB4CC"], "season_lantern": ["#C9B8E0", "#A193B3"], "season_amber": ["#E8C48A", "#BA9D6E"],
+      "rarity_1": ["#B8D4F0", "#93AAC0"], "rarity_2": ["#E0C4FF", "#B39DCC"], "rarity_3": ["#FFE8B8", "#CCBA93"]
+    },
+    "alpha_fills": {
+      "section_edge": "rgba(45,52,54,0.16)",
+      "trade_edge": "rgba(45,52,54,0.18)",
+      "pill_count": "rgba(255,248,240,0.70)",
+      "pill_count_edge": "rgba(45,52,54,0.20)",
+      "unlock_short": "rgba(255,248,240,0.55)",
+      "unlock_short_edge": "rgba(26,26,20,0.30)",
+      "progress_track": "rgba(26,26,20,0.20)",
+      "split_line": "rgba(26,26,20,0.22)",
+      "select_mark": "rgba(45,52,54,0.55)",
+      "burst": "rgba(255,245,209,0.55)"
+    },
+    "radius": { "card": 26, "button": 20, "chip": 20, "art_flower": 28, "pill": 12, "badge": 12, "strip": 14, "tab_count": 14 },
+    "shadow": {
+      "card": { "x": 0, "y": 8, "blur": 16, "color": "rgba(20,26,22,0.26)" },
+      "chip": { "x": 0, "y": 6, "blur": 14, "color": "rgba(20,26,22,0.24)" },
+      "chip_selected": { "x": 0, "y": 10, "blur": 18, "color": "rgba(20,26,22,0.30)" },
+      "unlock_ready": { "x": 0, "y": 6, "blur": 12, "color": "rgba(20,26,22,0.26)" }
+    },
+    "font": {
+      "family_in_mockup": "Nunito", "family_in_game": "default + embolden (UiCamp.tight_font)",
+      "sizes": {
+        "season_name": 56, "season_value": 48, "unlock": 48,
+        "tab": 46, "tab_count": 42,
+        "chip_name": 38, "pips": 34, "badge": 34, "count": 42, "price": 42,
+        "trade_name": 42, "trade_button": 46, "warn": 36, "feedback": 42,
+        "empty_title": 46, "empty_cta": 42
+      }
+    }
+  },
+  "layout": {
+    "CampPage": { "rect": [0, 143, 1080, 1597], "type": "Control, clip_contents" },
+    "ContentStack": { "rect": [24, 24, 1032, 1549], "type": "VBoxContainer", "separation": 20, "note": "StackGap više ne postoji — razmak je separation 20, fiksno" },
+    "SeasonLinkCard": { "rect": [24, 24, 1032, 276], "screen_y": 167 },
+    "StashSection": { "rect": [24, 320, 1032, 1253], "screen_y": 463, "no_season": { "rect": [24, 24, 1032, 1549], "screen_y": 167 } },
+    "StashTabs": { "rect_in_section": [20, 20, 992, 120] },
+    "StashScroll": { "rect_in_section": [20, 154, 992, 913], "h_by_state": { "idle": 913, "warn": 841, "holdstop": 841, "no_season": 1209, "no_season_warn": 1137 } },
+    "TradeBar": { "rect_in_section": [20, 1081, 992, 152], "h_strip": 224, "anchored": "dno sekcije" },
+    "budget_check": "24 + 276 + 20 + 1253 + 24 = 1597; sekcija: 2 + 18 + 120 + 14 + 913 + 14 + 152 + 18 + 2 = 1253"
+  },
+  "components": {
+    "SeasonLinkCard": {
+      "size": [1032, 276], "pad": 22, "border": 3, "radius": 26, "gap": 20, "tap": "→ Home (ništa ne troši)",
+      "children": {
+        "SeasonHead": { "h": 120, "gap": 20, "SeasonName": { "font": 56, "weight": 900, "color": "#1A1A14" } },
+        "UnlockButton": {
+          "size": [300, 120], "radius": 20, "border": 3,
+          "states": {
+            "short": { "bg": "rgba(255,248,240,0.55)", "edge": "rgba(26,26,20,0.30)", "ink": "#44443A", "icon": "icon_lock 40", "text": "Unlock" },
+            "ready": { "bg": "#E8C44A", "edge": "#BA9D3B", "ink": "#2D3436", "shadow": "unlock_ready", "text": "Unlock" },
+            "unlocking": { "bg": "#FFD56B", "edge": "#D6A82F", "ink": "#2D3436", "text": "Unlocked" }
+          }
+        },
+        "SeasonProgress": {
+          "h": 86, "gap": 24,
+          "CoinProgress": { "icon": 48, "value_font": 48, "bar_h": 18, "fill": "#FFD56B" },
+          "SplitLine": [5, 86],
+          "FlowerProgress": { "art_frame": 56, "art": 40, "value_font": 48, "bar_h": 18, "fill": "#FFF8F0" }
+        },
+        "UnlockBurst": { "size": 520, "border": 14, "color": "rgba(255,245,209,0.55)" }
+      }
+    },
+    "StashTabs": {
+      "size": [992, 120], "gap": 14,
+      "tab": {
+        "size": [489, 120], "radius": 20, "pad_x": 18, "gap": 16,
+        "icon_frame": 76, "icon": 44, "label_font": 46, "count": { "h": 56, "min_w": 80, "font": 42, "radius": 14 },
+        "states": {
+          "active": { "bg": "#FFB88C", "edge": "#E8A374", "border": 4, "ink": "#2D3436", "count_bg": "rgba(255,248,240,0.80)" },
+          "inactive": { "bg": "#F1EBE4", "edge": "#D9D3CC", "border": 2, "ink": "#4A5153", "count_bg": "#E6DFD8" }
+        }
+      }
+    },
+    "StashGrid": { "columns": 2, "cell": [489, 176], "gap": 14, "scroll": "vertikalno, peek zadnjeg reda kad ima više", "rows_visible_idle": "4 pune + 153 px peek" },
+    "CampChip": {
+      "size": [489, 176], "radius": 20, "pad": 14, "border": 2, "gap": 14,
+      "ChipArt": { "size": 128, "border": 3, "well_inset": 8, "art_seed": 96, "art_flower": 100, "seed": "krug, cream/#CBC2B6", "flower": "r 28, #FFD56B/#D6A82F" },
+      "ChipBody": { "size": [315, 144], "layout": "space-between: ChipName 38 · RarityPips 34 (h 42) | ReservedBadge 42 · PillRow 52" },
+      "CountPill": { "h": 52, "pad_x": 12, "icon": 30, "font": 42 },
+      "PricePill": { "h": 52, "pad_x": 12, "coin": 32, "font": 42, "each": false },
+      "ReservedBadge": { "h": 42, "pad_x": 12, "icon": 28, "font": 34, "text": "Kept · N / M", "normal": "tint sezone + rub 2", "at_floor": "#FFE8B8 + rub 3 #D6A82F" },
+      "states": {
+        "idle": { "bg": "rarity", "edge": "rarity_edge", "border": 2 },
+        "selected": { "bg": "rarity + 14 % bijele", "edge": "#FFB88C", "border": 5, "pad": 11, "lift": -3, "select_mark": 4 },
+        "pressed": { "bg": "rarity × 0.92", "edge": "#FFB88C", "border": 5, "pad": 11 }
+      }
+    },
+    "TradeBar": {
+      "size": [992, 152], "size_strip": [992, 224], "pad": 14, "radius": 20, "gap": 12,
+      "TradeRow": { "h": 120, "gap": 18 },
+      "TradeArt": { "size": 104, "well_inset": 7, "art_seed": 80, "art_flower": 84, "disabled": "isprekidan rub 4, bez crteža" },
+      "TradeName": { "font": 42, "weight": 800 },
+      "ReservedWarning": { "h": 60, "radius": 14, "pad_x": 18, "icon": 32, "font": 36 },
+      "TradeButton": {
+        "size": [300, 120], "radius": 20, "border": 3, "label_font": 46, "icon": 40,
+        "states": {
+          "idle": { "bg": "#FFB88C", "edge": "#E8A374", "text": "Trade" },
+          "hold": { "bg": "#E8A374", "fill": "#FFB88C", "fill_w": "300 × hold_fill_ratio(sold, sellable_left)", "text": "Trading" },
+          "holdstop": { "bg": "#FFDCC2", "edge": "#E8A374", "icon": "icon_hold_stop", "text": "Sell 1", "strip": "amber" },
+          "warn": { "bg": "#FFCCD5", "edge": "#E89AAA", "icon": "icon_lock", "text": "Trade", "strip": "pink" },
+          "disabled": { "bg": "#EAE4DD", "edge": "#C9C4BE", "ink": "#5C6264", "text": "Trade" }
+        }
+      },
+      "TradeFeedback": { "h": 62, "radius": 18, "pad_x": 20, "coin": 34, "font": 42, "anchor": "gornji desni ugao bara, (−16, −42)" },
+      "FlyCoin": { "size": 44, "max_alive": 3, "path": "TradeButton centar → CoinChip centar (168, 73)" },
+      "CoinChipBump": { "rect": [12, 15, 312, 116], "border": 6, "radius": 26, "color": "#FFF5D1" }
+    },
+    "EmptyState": {
+      "layout": "centrirano u prostoru liste, gap 28",
+      "EmptyArt": { "size": 120, "border": "4 dashed rgba(45,52,54,0.28)", "icon": 56, "icon_alpha": 0.34 },
+      "EmptyTitle": { "font": 46, "weight": 900 },
+      "EmptyCta": { "hit_h": 120, "visual_h": 100, "pad_x": 36, "font": 42, "bg": "#A8E6CF", "edge": "#7FC9AC", "radius": 20 }
+    }
+  },
+  "scenes": {
+    "seeds_full": { "n": 1, "tab": "seeds", "types": 8, "selected": "Meadow Clover ×12", "trade": "idle", "season": "short", "header_coins": 260, "grid_h": 913 },
+    "seeds_few": { "n": 2, "tab": "seeds", "types": 2, "trade": "idle", "season": "short", "section_h": 1253, "note": "sekcija ista visina, bez rupe iznad" },
+    "seeds_empty": { "n": 3, "tab": "seeds", "types": 0, "trade": "disabled", "empty": { "title": "Your bag is empty", "cta": "Play a run ↗" } },
+    "flowers_reserved": { "n": 4, "tab": "flowers", "types": 6, "selected": "Harvest Pumpkin ×12", "badge": "Kept · 12 / 20", "trade": "warn", "strip": "Frost Orchard needs 8 more of these", "grid_h": 841 },
+    "flowers_holdstop": { "n": 5, "tab": "flowers", "selected": "Harvest Pumpkin ×20", "badge": "Kept · 20 / 20 (amber)", "trade": "holdstop", "strip": "Hold stopped · Frost Orchard keeps 20", "button": "Sell 1" },
+    "trade_hold": { "n": 6, "tab": "seeds", "selected": "Meadow Clover 12 → 4", "trade": "hold", "fill": 0.67, "feedback": "+8", "header_coins": 268, "fly_coins": 2 },
+    "season_short": { "n": "7a", "same_as": "seeds_full", "coins": "260 / 500", "flowers": "12 / 20", "unlock": "short" },
+    "season_ready": { "n": "7b", "coins": "500 / 500", "flowers": "20 / 20", "unlock": "ready", "header_coins": 540 },
+    "unlocking": { "n": 8, "unlock": "unlocking", "burst": true, "header_coins": 40, "then": "Home, fokus na sezonu (0,45 s)" },
+    "no_season": { "n": 9, "season_card": false, "section_h": 1549, "tab": "flowers", "types": 14, "grid_h": 1209 },
+    "flowers_empty": { "n": "extra", "tab": "flowers", "types": 0, "empty": { "title": "No flowers yet", "cta": "Merge in Arena ↗" } }
+  },
+  "animations": [
+    { "what": "Chip select", "target": "lift −3 + border 2→5", "dur_s": 0.12 },
+    { "what": "Trade tap", "target": "TradeButton scale 0.97", "dur_s": 0.08 },
+    { "what": "Tap fill hint", "target": "HoldFill w +1/gomila, pa drain na 0", "dur_s": 0.30, "note": "prvi nagovještaj da se dugme puni držanjem" },
+    { "what": "Hold ramp", "target": "HoldFill 0 → hold_fill_ratio; label → Trading", "dur_s": 0.30, "ease": "EASE_OUT" },
+    { "what": "Hold tick 10/s", "target": "FlyCoin 44 px: pozicija bar → CoinChip + scale 1→0.7", "dur_s": 0.26, "note": "max 3 živa; bez čestica" },
+    { "what": "+N pilula", "target": "broj raste po ticku, pop scale 1→1.08→1", "dur_s": 0.09 },
+    { "what": "Coin chip bump", "target": "CoinChipBump alpha 0→1→0 + chip scale 1.04", "dur_s": 0.14 },
+    { "what": "Hold stop", "target": "fill → #FFDCC2, ikona hold_stop, ReservedWarning h 0→60", "dur_s": 0.14 },
+    { "what": "Tab change", "target": "StashScroll modulate:a + position:x 24 px", "dur_s": 0.16 },
+    { "what": "Unlock burst", "target": "UnlockBurst scale 0.6→1 + alpha 0.55→0", "dur_s": 0.42 },
+    { "what": "Unlock linger", "target": "čekanje prije skoka na Home", "dur_s": 0.45 }
+  ],
+  "strings_en": {
+    "unlock": "Unlock",
+    "unlocked": "Unlocked",
+    "tab_seeds": "Seeds",
+    "tab_flowers": "Flowers",
+    "badge": "Kept · {have} / {need}",
+    "trade": "Trade",
+    "trading": "Trading",
+    "sell_one": "Sell 1",
+    "warn_reserved": "{season} needs {left} more of these",
+    "warn_hold_stop": "Hold stopped · {season} keeps {need}",
+    "feedback": "+{n}",
+    "empty_seeds_title": "Your bag is empty",
+    "empty_seeds_cta": "Play a run ↗",
+    "empty_flowers_title": "No flowers yet",
+    "empty_flowers_cta": "Merge in Arena ↗",
+    "removed": ["Next free season", "Details ↗", "needs … more coins and … more flowers", "spends / spent 500 coins and 20 flowers", "Unlock {season}", "{season} unlocked", "Coins", "{flower} ★★★", "Arena fuel", "reward", "Merge ↗", "each", "★☆☆ · 1 coin each", "hold 10 / s", "10 / s", "sells reserved", "no hold for this one", "Tap to sell 1", "Hold stops here", "Nothing selected", "pick a type to trade", "nothing to trade", "empty — switched here", "empty-state body rečenice"]
+  },
+  "assets": {
+    "existing": ["icon_coin.svg", "icon_seed.svg", "icon_crystal.svg", "icon_lock.svg", "icon_hold_stop.svg (v1 Camp paket)"],
+    "new": [],
+    "unused_now": ["icon_merge_arrow.svg (Merge prečica obrisana)", "icon_reserved.svg"],
+    "everything_else": "StyleBoxFlat — bez blura, gradijenata, čestica"
+  },
+  "godot_map": {
+    "SeasonLinkCard": { "node": "RootVBox/CampPage/ContentStack/SeasonLinkCard", "script": "scripts/camp/season_link_card.gd", "remove": ["SeasonEyebrow", "HomeHint", "CoinCap", "FlowerCap", "Unlock podnaslov"], "change": "UnlockButton se seli u SeasonHead (HBox) desno od imena, 300 × 120" },
+    "SeasonProgress": { "node": "SeasonLinkCard/VBox/SeasonProgress", "change": "bez caption reda; visina 86" },
+    "UnlockButton": { "text": "UiCamp.unlock_button_text(state) → String (bio PackedStringArray)", "size": "UiCamp.UNLOCK_BTN" },
+    "StackGap": { "node": "ContentStack/StackGap", "action": "OBRISATI — uzrok rupe (size_flags_vertical = 3). Razmak = ContentStack separation 20." },
+    "StashSection": { "node": "ContentStack/StashSection/SectionVBox", "script": "scripts/camp/camp_controller.gd", "change": "custom_minimum_size.y = UiCamp.section_height(hero_visible); size_flags_vertical = 0" },
+    "StashTabs": { "node": "SectionVBox/StashTabs", "remove": ["%MergeShortcut", "UiCamp.shortcut_style()"] },
+    "SeedsTab / FlowersTab": { "script": "scripts/camp/camp_stash_tab.gd", "remove": ["_sub Label"] },
+    "StashGrid": { "node": "SectionVBox/StashScroll/StashGrid", "change": "StashScroll size_flags_vertical = 3 unutar fiksne sekcije; grid_budget() više ne reže redove" },
+    "CampChip / ChipArt / ReservedBadge": { "script": "scripts/camp/camp_stash_chip.gd", "change": "CHIP_ART_* nove vrijednosti; rezervisan chip 176 — badge zamjenjuje RarityPips; PricePill bez 'each'" },
+    "TradeBar / TradeButton / ReservedWarning / TradeFeedback": { "script": "scripts/camp/camp_trade_bar.gd", "remove": ["SelectedValue", "podnaslov dugmeta", "trade_info_text()"], "add": ["ikona u TradeButtonu (trade_button_icon)", "FlyCoin tween", "CoinChipBump"] },
+    "EmptyState / EmptyCta": { "script": "camp_controller._apply_empty_state()", "remove": ["EmptyBody"], "change": "EmptyState zamjenjuje StashScroll (ne sekciju); CTA 120 hit / 100 vizuelno" }
+  },
+  "smoke_tests": {
+    "must_update": [
+      { "name": "camp_layout_smoke", "why": "SEASON_H 276, sekcija fiksno 1253/1549, nema StackGap; assert: sekcija.y == 320 za 0, 2 i 8 tipova" },
+      { "name": "camp_season_link_smoke", "why": "Unlock tekst je jedna riječ; nema HomeHint" },
+      { "name": "camp_trade_select_smoke", "why": "nema SelectedValue / trade_info_text" },
+      { "name": "camp_hold_floor_smoke", "why": "dugme 'Sell 1' + ikona; badge tekst ostaje 'Kept · 20 / 20'" }
+    ],
+    "should_pass_unchanged": ["camp_trade_hold_smoke", "camp_crystal_select_smoke", "camp_donate_smoke", "meta_hub_flow_smoke"],
+    "new": ["camp_section_fixed_smoke — StashSection.size.y konstantna za 0 / 1 / 8 / 14 tipova i sa/bez stripa"]
+  },
+  "decisions": [
+    { "date": "2026-09-24", "what": "Jedan dizajn. Sve odluke u README § Odlučeno." }
+  ],
+  "open_decisions": [
+    "Rezervisan chip nema pips (badge zauzima red) — pravilo je da je rezervisani uvijek ★3; ako se to promijeni, pips ide na ChipArt",
+    "FlyCoin cilj (168, 73) je centar CoinChip iz hub chromea — provjeriti u igri s pravim safe-area"
+  ]
+}

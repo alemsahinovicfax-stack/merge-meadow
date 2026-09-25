@@ -58,8 +58,8 @@ func _run() -> void:
 	if flowers_tab == null or not bool(flowers_tab.call("is_active")) or str(flowers_tab.call("get_count_text")) != "3":
 		_fail("Flowers tab must be active and count 3 types")
 		return
-	if (camp.get_node("%MergeShortcut") as Control).visible:
-		_fail("Merge shortcut belongs to the Seeds tab only")
+	if camp.get_node_or_null("%MergeShortcut") != null:
+		_fail("Merge shortcut is gone in v2 — the tab row only picks Seeds / Flowers")
 		return
 	if grid.get_child_count() < 3:
 		_fail("CrystalGrid missing chips")

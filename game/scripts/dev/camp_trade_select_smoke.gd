@@ -76,8 +76,12 @@ func _run() -> void:
 		_fail("Trade should enable for daisy leftover")
 		return
 	var bar := camp.get_node_or_null("%ExchangeBar")
-	if bar == null or str(bar.call("get_value_text")).find("1 coin each") < 0:
-		_fail("Trade bar must show price per piece, got '%s'" % (str(bar.call("get_value_text")) if bar else ""))
+	# v2: bar nosi samo ime i dugme; cijena po komadu stoji na kartici predmeta.
+	if bar == null or camp.get_node_or_null("%SelectedValue") != null:
+		_fail("Trade bar must not repeat the price (SelectedValue is gone)")
+		return
+	if str(bar.call("get_button_text")) != "Trade":
+		_fail("idle Trade button must read 'Trade', got '%s'" % str(bar.call("get_button_text")))
 		return
 	var daisy_coin := int(gs.call("seed_exchange_coins_for_take", 1, "daisy"))
 	var coins_before := int(gs.get("wallet_coins"))

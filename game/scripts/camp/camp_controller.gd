@@ -26,11 +26,9 @@ const TRADE_SAVE_EVERY := 30
 @onready var coins_label: Label = %CoinsLabel
 @onready var seeds_label: Label = %SeedsLabel
 @onready var season_link_card: PanelContainer = %SeasonLinkCard
-@onready var stack_gap: Control = %StackGap
 @onready var stash_section: PanelContainer = %StashSection
 @onready var seeds_tab: CampStashTab = %SeedsTab
 @onready var flowers_tab: CampStashTab = %FlowersTab
-@onready var merge_shortcut: CampButton = %MergeShortcut
 @onready var stash_scroll: ScrollContainer = %StashScroll
 @onready var seed_bag_grid: GridContainer = %SeedBagGrid
 @onready var crystal_grid: GridContainer = %CrystalGrid
@@ -38,7 +36,6 @@ const TRADE_SAVE_EVERY := 30
 @onready var empty_art: PanelContainer = %EmptyArt
 @onready var empty_icon: TextureRect = %EmptyIcon
 @onready var empty_title: Label = %EmptyTitle
-@onready var empty_body: Label = %EmptyBody
 @onready var empty_cta: CampButton = %EmptyCta
 @onready var exchange_bar: CampTradeBar = %ExchangeBar
 @onready var exchange_button: CampButton = %ExchangeButton
@@ -55,6 +52,7 @@ var _force_default_crystal_select: bool = false
 var _pending_trade_save: bool = false
 var _trades_since_save: int = 0
 var _hold_repeating: bool = false
+var _hold_sold: int = 0
 var _tab_tween: Tween
 
 
@@ -93,20 +91,12 @@ func _setup_stash() -> void:
 	flowers_tab.setup(UiCamp.TAB_FLOWERS)
 	seeds_tab.tab_pressed.connect(_on_tab_pressed)
 	flowers_tab.tab_pressed.connect(_on_tab_pressed)
-	merge_shortcut.set_styles(UiCamp.shortcut_style(), UiCamp.shortcut_style(true))
-	merge_shortcut.set_fonts(UiCamp.FONT_SHORTCUT)
-	merge_shortcut.set_ink(UiCamp.INK)
-	merge_shortcut.set_text("Merge")
-	merge_shortcut.set_icon(UiAssets.get_camp_icon("icon_merge_arrow"), UiCamp.SHORTCUT_ICON)
-	merge_shortcut.clicked.connect(_on_merge_pressed)
 	empty_cta.set_styles(UiCamp.empty_cta_style(), UiCamp.empty_cta_style(true))
 	empty_cta.set_fonts(UiCamp.FONT_EMPTY_CTA)
 	empty_cta.set_ink(UiCamp.INK)
 	empty_cta.custom_minimum_size.y = UiCamp.EMPTY_CTA_H
 	empty_cta.clicked.connect(_on_empty_cta_pressed)
 	UiCamp.style_label(empty_title, UiCamp.FONT_EMPTY_TITLE, UiCamp.INK)
-	UiCamp.style_label(empty_body, UiCamp.FONT_EMPTY_BODY, UiCamp.SUB_INK, UiCamp.SEMI, 1.25)
-	empty_body.custom_minimum_size.x = UiCamp.EMPTY_BODY_MAX_W
 	stash_scroll.gui_input.connect(_on_scroll_gui_input)
 
 
@@ -274,7 +264,6 @@ func _refresh_stash_view() -> void:
 	flowers_tab.set_active(flowers)
 	seeds_tab.set_count(seed_types)
 	flowers_tab.set_count(flower_types)
-	merge_shortcut.visible = not flowers
 	seed_bag_grid.visible = not flowers
 	crystal_grid.visible = flowers
 	var empty := (flower_types if flowers else seed_types) == 0
@@ -291,45 +280,17 @@ func _apply_empty_state(flowers: bool) -> void:
 	empty_icon.texture = (
 		UiAssets.get_arena_icon("icon_crystal") if flowers else UiAssets.get_chrome_icon("icon_seed")
 	)
+	# Bez rečenice ispod naslova — CTA vec kaze odakle stvari dolaze (v2).
 	empty_title.text = "No flowers yet" if flowers else "Your bag is empty"
-	empty_body.text = (
-		"Flowers grow when you merge seeds all the way to tier 3 in the Arena."
-		if flowers
-		# Kraci tekst iz CD 1a varijante — 1b tekst u default fontu ide u 3 reda (blok > 400).
-		else "Seeds come back with you from a run. Play the meadow to fill the bag."
-	)
 	empty_cta.set_text("Merge in Arena ↗" if flowers else "Play a run ↗")
 
 
-## Grid se pakuje po stvarnoj visini redova (rezervisan chip 244) i reze na
-## broj redova koji staje u 1597 px — nikad ne ulazi u Trade bar.
+## v2: sekcija je uvijek iste visine (1253 s karticom sezone, 1549 bez nje), pa
+## nema rupe u sredini stranice. Lista uzima ostatak i skrola kad ima vise redova.
 func _apply_stash_layout() -> void:
 	var hero := season_link_card.visible
-	stack_gap.visible = hero
-	if not stash_scroll.visible:
-		return
-	var rows := _row_heights(_active_grid())
-	var cap := UiCamp.grid_budget(exchange_bar.get_state(), hero)
-	var height := 0
-	var count := 0
-	for row_h in rows:
-		var next := row_h if count == 0 else height + UiCamp.GRID_GAP + row_h
-		if count >= UiCamp.GRID_MAX_ROWS or (count > 0 and next > cap):
-			break
-		height = next
-		count += 1
-	stash_scroll.custom_minimum_size.y = height
-
-
-func _row_heights(grid: GridContainer) -> Array[int]:
-	var out: Array[int] = []
-	var children := grid.get_children()
-	for i in range(0, children.size(), UiCamp.GRID_COLS):
-		var row_h := 0
-		for j in range(i, mini(i + UiCamp.GRID_COLS, children.size())):
-			row_h = maxi(row_h, int((children[j] as Control).custom_minimum_size.y))
-		out.append(row_h)
-	return out
+	stash_section.custom_minimum_size.y = UiCamp.section_height(hero)
+	stash_section.size_flags_vertical = Control.SIZE_FILL
 
 
 # --- Chipovi ---
@@ -598,17 +559,34 @@ func _on_exchange_pressed() -> void:
 		return
 	if repeat:
 		_hold_repeating = true
+	_hold_sold += 1
 	exchange_bar.add_gain(GameState.wallet_coins - coins_before)
 	var switched := _selected_type() != type_before and not _selected_type().is_empty()
 	_refresh_trade_light()
+	# Fill je prodani dio gomile; tap ga kratko pokaze, drzanje ga puni.
 	if repeat:
-		exchange_bar.on_hold_tick()
+		exchange_bar.on_hold_tick(_hold_sold, _sellable_left())
+	else:
+		exchange_bar.on_tap_hint(_hold_sold, _sellable_left())
 	if switched:
 		exchange_bar.flash_switch()
 
 
+## Koliko se jos komada odabranog tipa smije prodati (rezervisano cvijece ne racuna).
+func _sellable_left() -> int:
+	var type_id := _selected_type()
+	if type_id.is_empty():
+		return 0
+	var have := _count_of(type_id)
+	var reserve := _reserve_for(type_id)
+	if reserve.is_empty():
+		return have
+	return maxi(have - int(reserve.get("need", 0)), 0)
+
+
 func _on_trade_press_ended() -> void:
 	_hold_repeating = false
+	_hold_sold = 0
 	exchange_bar.release_gain()
 	exchange_bar.on_press_ended()
 	_flush_trade_save()

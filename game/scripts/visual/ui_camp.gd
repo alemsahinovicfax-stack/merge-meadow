@@ -32,9 +32,14 @@ const SEASON_INK_DIM := Color("#44443A")   # Unlock kad nedostaje, 8,0:1
 const DISABLED_EDGE := Color("#B6B6B2")
 const DISABLED_INK := Color("#5C5C58")     # 5,3:1 na RARITY_BG_LOCKED
 const TRADE_DISABLED_INK := Color("#5C6264")
+const TAB_INACTIVE_BG := Color("#F1EBE4")       # INK 6 % na krem, puna boja
+const TAB_INACTIVE_EDGE := Color("#D9D3CC")
+const TAB_COUNT_INACTIVE_BG := Color("#E6DFD8")
+const TRADE_DISABLED_BG := Color("#EAE4DD")
+const TRADE_DISABLED_EDGE := Color("#C9C4BE")
+const COIN_BUMP := Color("#FFF5D1")
 const MINT_EDGE := Color("#7FC9AC")        # MINT, 20 % tamnije
 const HOLD_FREEZE := Color("#FFDCC2")      # PEACH desaturisan, zamrznut fill
-const STOP_BTN_BG := Color("#FFF3E6")      # WARM_WHITE + PEACH 8 %
 const WARN_PINK := Color("#FFCCD5")        # prodaja rezervisanog
 const WARN_PINK_EDGE := Color("#E89AAA")
 const BURST := Color(1.0, 0.961, 0.820, 0.55)       # #FFF5D1 @ 55 %
@@ -49,13 +54,14 @@ const SEASON_LANTERN_EDGE := Color("#A193B3")
 const SEASON_AMBER := Color("#E8C48A")
 const SEASON_AMBER_EDGE := Color("#BA9D6E")
 
-# --- Vertikalni budzet: 24 + 422 + (razmak) + sekcija + 24 = 1597 ---
+# --- Vertikalni budzet (v2): 24 + 276 + 20 + 1253 + 24 = 1597 ---
 const PAGE_H := 1597
 const PAGE_PAD := 24
 const CONTENT_H := 1549                # PAGE_H - 2 * PAGE_PAD
-const SEASON_H := 422                  # hero, nikad se ne mijenja
-const SECTION_GAP_MIN := 20
-const SECTION_H_DEFAULT := 908         # 6 tipova, 3 reda (README 904 bez ruba)
+const SEASON_H := 276                  # hero, nikad se ne mijenja (v1: 422)
+const SECTION_GAP := 20                # fiksan razmak; StackGap vise ne postoji
+const SECTION_H := 1253                # CONTENT_H - SEASON_H - SECTION_GAP
+const SECTION_H_NO_SEASON := 1549      # kad nema kartice sezone
 const SECTION_PAD := 18
 ## HTML je border-box (rub unutar 1032); u Godotu content margin ne ukljucuje rub.
 const SECTION_BORDER := 2
@@ -64,80 +70,80 @@ const SECTION_W := 1032
 const SECTION_INNER_W := 992
 
 # --- Sekcija: tabovi, grid, Trade bar ---
-const TABS_H := 132
-const TAB_ICON := 84
-const TAB_ICON_ART := 48
-const TAB_COUNT_H := 60
-const TAB_COUNT_MIN_W := 88
+const TABS_H := 120
+const TAB_ICON := 76
+const TAB_ICON_ART := 44
+const TAB_COUNT_H := 56
+const TAB_COUNT_MIN_W := 80
 const TAB_PAD := 18
 const TAB_GAP := 14
-const SHORTCUT_W := 190
-const SHORTCUT_ICON := 40
 const GRID_COLS := 2
 const GRID_GAP := 14
-const GRID_MAX_ROWS := 4
 const TRADE_H := 152
 const TRADE_H_STRIP := 224             # + ReservedWarning 60 + gap 12
-const TRADE_PAD := 16
+const TRADE_PAD := 14
 const TRADE_ROW_H := 120
-const TRADE_ART := 88
-const TRADE_ART_SEED := 56
-const TRADE_ART_FLOWER := 60
-const TRADE_BTN := Vector2(430, 120)
+const TRADE_ART := 104
+const TRADE_ART_WELL_INSET := 7
+const TRADE_ART_SEED := 80
+const TRADE_ART_FLOWER := 84
+const TRADE_BTN := Vector2(300, 120)
+const TRADE_BTN_ICON := 40
 const WARN_STRIP_H := 60
 const WARN_ICON := 32
-const FEEDBACK_H := 58
+const FEEDBACK_H := 62
 const FEEDBACK_OFFSET := Vector2(-16, -20)   # gornji desni ugao bara
 const FEEDBACK_COIN := 30
-const EMPTY_BLOCK_H := 400
-const EMPTY_ART := 110
-const EMPTY_ART_ICON := 54
-const EMPTY_CTA_H := 110
-const EMPTY_BODY_MAX_W := 800
+## Novcic koji na svaki tik drzanja odleti do coin chipa u headeru (max 3 ziva).
+const FLY_COIN := 44
+const FLY_COIN_MAX := 3
+const COIN_BUMP_RING := 6
+const EMPTY_ART := 120
+const EMPTY_ART_ICON := 56
+const EMPTY_CTA_H := 120            # dodir
+const EMPTY_CTA_VISUAL_H := 100     # panel unutar dodira
+const EMPTY_GAP := 28
 
 # --- Chip ---
 const CHIP_SIZE := Vector2(489, 176)
-const CHIP_H_RESERVED := 244           # + ReservedBadge red
+const CHIP_H_RESERVED := 176           # v2: badge ide u red pipsa, visina ista
 const CHIP_PAD := 14
 const CHIP_PAD_SELECTED := 11          # border 2 -> 5, ukupna sirina ista
 const CHIP_BORDER := 2
 const CHIP_BORDER_SELECTED := 5
-const CHIP_ART_FRAME := 104
-const CHIP_ART_WELL_INSET := 10        # ukljucuje border, ne sabiraj dvaput
-const CHIP_ART_SEED := 66
-const CHIP_ART_FLOWER := 70
+const CHIP_ART_FRAME := 128
+const CHIP_ART_FRAME_RADIUS := 28      # cvijet; sjeme je krug
+const CHIP_ART_WELL_INSET := 8         # ukljucuje border, ne sabiraj dvaput
+const CHIP_ART_SEED := 96
+const CHIP_ART_FLOWER := 100
+const CHIP_BODY_W := 315               # 489 - 2*(14+2) - 128 - 14
 const CHIP_LIFT := 3                   # y pomak kad je odabran
-const PILL_H := 62
+const PILL_H := 52
 const PILL_GAP := 10
-const PILL_ICON := 32
-const PRICE_COIN := 34
-const BADGE_H := 56
-const FONT_CHIP_NAME := 40
-const FONT_PIPS := 32
-const FONT_COUNT := 48
-const FONT_PRICE := 46
-const FONT_EACH := 30
-const FONT_BADGE := 38
-const FONT_BADGE_FLOOR := 34
+const PILL_ICON := 30
+const PRICE_COIN := 32
+const BADGE_H := 42
+const BADGE_ICON := 28
+const FONT_CHIP_NAME := 38
+const FONT_PIPS := 34
+const FONT_COUNT := 42
+const FONT_PRICE := 42
+const FONT_BADGE := 34
 
 # --- Tekst ---
 const FONT_TAB := 46
-const FONT_TAB_SUB := 38
-const FONT_SHORTCUT := 40
-const FONT_TRADE_LABEL := 40
-const FONT_TRADE_SUB := 38
-const FONT_BTN := 50
+const FONT_TAB_COUNT := 42
+const FONT_TRADE_LABEL := 42
+const FONT_BTN := 46
+## Podnaslov na CampButtonu Camp vise ne koristi; Shop ga koristi (ui_shop_buttons).
 const FONT_BTN_SUB := 38
-const FONT_WARN := 38
-const FONT_FEEDBACK := 38
-const FONT_EMPTY_TITLE := 48
-const FONT_EMPTY_BODY := 36
-const FONT_EMPTY_CTA := 46
-const FONT_SEASON_EYEBROW := 38
+const FONT_WARN := 36
+const FONT_FEEDBACK := 42
+const FONT_EMPTY_TITLE := 46
+const FONT_EMPTY_CTA := 42
 const FONT_SEASON_NAME := 56
 const FONT_SEASON_VALUE := 48
-const FONT_SEASON_CAP := 38
-const FONT_HOME_HINT := 38
+const FONT_UNLOCK := 48
 ## Emboldening za 800/900 tezine (Nunito u mockupu, default font u igri).
 const HEAVY := 0.5
 const SEMI := 0.25
@@ -145,17 +151,18 @@ const SEMI := 0.25
 # --- SeasonLink ---
 const SEASON_W := 1032
 const SEASON_PAD := 22
-const SEASON_GAP := 12
-const SEASON_HEAD_H := 100
-const SEASON_PROGRESS_GAP := 20
+const SEASON_GAP := 20
+const SEASON_HEAD_H := 120
+const SEASON_PROGRESS_H := 86
+const SEASON_PROGRESS_GAP := 24
 const SEASON_ICON := 48
-const SEASON_ART_FRAME := 48            # mockup 52; 48 = ikona novcica, isti red
-const SEASON_ART := 30
+const SEASON_ART_FRAME := 56
+const SEASON_ART := 40
 const SEASON_BAR_H := 18
 const SEASON_SPLIT_W := 5
-const SEASON_SPLIT_H := 112
-const HOME_HINT_H := 72
-const UNLOCK_BTN_H := 132
+const SEASON_SPLIT_H := 86
+const UNLOCK_BTN := Vector2(300, 120)
+const UNLOCK_LOCK_ICON := 40
 const BURST_SIZE := 520
 const BURST_BORDER := 14
 
@@ -167,9 +174,12 @@ const T_TAP_FLY := 0.26
 const T_TAP_FADE := 0.08
 const T_HOLD_RESET := 0.14
 const T_AUTO_SWITCH := 0.20
-const T_AUTO_SWITCH_HOLD := 0.60
 const T_HOLD_STOP := 0.14
 const T_TAB_CHANGE := 0.16
+const T_TAP_FILL_DRAIN := 0.30
+const T_HOLD_RAMP := 0.30
+const T_FLY_COIN := 0.26
+const T_COIN_BUMP := 0.14
 const TAB_SLIDE_PX := 24.0
 const T_UNLOCK_BURST := 0.42
 const T_UNLOCK_FILL := 0.20
@@ -203,27 +213,15 @@ static func trade_height(state: String) -> int:
 	return TRADE_H_STRIP if state == TRADE_WARN or state == TRADE_HOLD_STOP else TRADE_H
 
 
-## Visina grida za redove (chip 176, rezervisan 244); zbir s gapovima.
-static func grid_height(row_heights: Array[int]) -> int:
-	if row_heights.is_empty():
-		return 0
-	var total := 0
-	for h in row_heights:
-		total += h
-	return total + GRID_GAP * (row_heights.size() - 1)
+## Sekcija je fiksna (v2): ne zavisi od broja tipova, pa nema rupe u sredini stranice.
+static func section_height(hero_visible: bool) -> int:
+	return SECTION_H if hero_visible else SECTION_H_NO_SEASON
 
 
-## Gornja granica grida da se sekcija zatvori u 1597 px. Bez hero kartice
-## (sve besplatne sezone otkljucane) grid dobija i njenih 442 px.
+## Visina liste unutar fiksne sekcije — ostatak poslije tabova i Trade bara.
 static func grid_budget(state: String, hero_visible: bool = true) -> int:
-	var hero := SEASON_H + SECTION_GAP_MIN if hero_visible else 0
-	return CONTENT_H - hero - 2 * (SECTION_PAD + SECTION_BORDER) - TABS_H - 2 * SECTION_INNER_GAP - trade_height(state)
-
-
-## Visina sekcije za dati grid i stanje Tradea (grid 0 = prazno stanje).
-static func section_height(grid_h: int, state: String) -> int:
-	var body := EMPTY_BLOCK_H if grid_h <= 0 else grid_h
-	return 2 * (SECTION_PAD + SECTION_BORDER) + TABS_H + 2 * SECTION_INNER_GAP + body + trade_height(state)
+	var chrome := 2 * (SECTION_PAD + SECTION_BORDER) + TABS_H + 2 * SECTION_INNER_GAP
+	return section_height(hero_visible) - chrome - trade_height(state)
 
 
 static func season_tint(season_id: String) -> Color:
@@ -429,10 +427,9 @@ static func reserved_badge_style(season_id: String, at_floor: bool) -> StyleBoxF
 	return s
 
 
-## Tekst badgea. "Kept" broji koliko je sacuvano za sezonu (max `need`).
-## Ime sezone nose Trade upozorenje i hero kartica.
-static func reserved_badge_text(have: int, need: int, at_floor: bool) -> String:
-	return "Hold stops here" if at_floor else "Kept · %d / %d" % [mini(have, need), need]
+## Uvijek "Kept · N / M"; na granici se mijenja samo stil (amber), ne tekst.
+static func reserved_badge_text(have: int, need: int, _at_floor: bool = false) -> String:
+	return "Kept · %d / %d" % [mini(have, need), need]
 
 
 ## Overlay koji pojacava odabir (iznad chipa, bez hit-testa).
@@ -453,8 +450,9 @@ static func tab_style(active: bool) -> StyleBoxFlat:
 		s.border_color = UiPalette.PEACH_EDGE
 		s.set_border_width_all(4)
 	else:
-		s.bg_color = alpha(INK, 0.06)
-		s.border_color = alpha(INK, 0.18)
+		# Puna boja umjesto alpha podloge — kontrast teksta ne ovisi o pozadini.
+		s.bg_color = TAB_INACTIVE_BG
+		s.border_color = TAB_INACTIVE_EDGE
 		s.set_border_width_all(2)
 	s.set_corner_radius_all(UiPalette.CORNER_RADIUS_PANEL)
 	s.content_margin_left = TAB_PAD
@@ -473,7 +471,7 @@ static func tab_sub_ink(active: bool) -> Color:
 ## Brojac tipova na tabu.
 static func tab_count_style(active: bool) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
-	s.bg_color = alpha(UiPalette.WARM_WHITE, 0.80) if active else alpha(INK, 0.08)
+	s.bg_color = alpha(UiPalette.WARM_WHITE, 0.80) if active else TAB_COUNT_INACTIVE_BG
 	s.border_color = alpha(INK, 0.20)
 	s.set_border_width_all(2)
 	s.set_corner_radius_all(UiPalette.CORNER_RADIUS + 2)
@@ -514,11 +512,14 @@ static func trade_button_style(state: String) -> StyleBoxFlat:
 			s.bg_color = UiPalette.PEACH_EDGE
 			s.border_color = UiPalette.PEACH_EDGE
 		TRADE_HOLD_STOP:
-			s.bg_color = STOP_BTN_BG
+			s.bg_color = HOLD_FREEZE
 			s.border_color = UiPalette.PEACH_EDGE
+		TRADE_WARN:
+			s.bg_color = WARN_PINK
+			s.border_color = WARN_PINK_EDGE
 		TRADE_DISABLED:
-			s.bg_color = alpha(INK, 0.10)
-			s.border_color = alpha(INK, 0.22)
+			s.bg_color = TRADE_DISABLED_BG
+			s.border_color = TRADE_DISABLED_EDGE
 		_:
 			s.bg_color = UiPalette.PEACH
 			s.border_color = UiPalette.PEACH_EDGE
@@ -529,19 +530,30 @@ static func trade_button_ink(state: String) -> Color:
 	return TRADE_DISABLED_INK if state == TRADE_DISABLED else INK
 
 
-## Tekst dugmeta: [naslov, podnaslov].
-static func trade_button_text(state: String) -> PackedStringArray:
+## Jedna rijec, bez podnaslova — stanje nose boja i ikona.
+static func trade_button_text(state: String) -> String:
 	match state:
 		TRADE_HOLD:
-			return PackedStringArray(["Trading", "10 / s"])
+			return "Trading"
 		TRADE_HOLD_STOP:
-			return PackedStringArray(["Tap to sell 1", "no hold for this one"])
+			return "Sell 1"
+	return "Trade"
+
+
+## Ime ikone na dugmetu ("" = bez ikone). Rjesava ga UiAssets u trade baru.
+static func trade_button_icon(state: String) -> String:
+	match state:
 		TRADE_WARN:
-			return PackedStringArray(["Trade", "sells reserved"])
-		TRADE_DISABLED:
-			return PackedStringArray(["Trade", "nothing to trade"])
-		_:
-			return PackedStringArray(["Trade", "hold 10 / s"])
+			return "icon_lock"
+		TRADE_HOLD_STOP:
+			return "icon_hold_stop"
+	return ""
+
+
+## Fill = prodani dio gomile tokom ovog drzanja (sold / (sold + ostatak)).
+static func hold_fill_ratio(sold: int, sellable_left: int) -> float:
+	var total := sold + sellable_left
+	return 0.0 if total <= 0 else clampf(float(sold) / float(total), 0.0, 1.0)
 
 
 ## Fill koji prati drzanje. Kad drzanje stane, fill se zamrzne u HOLD_FREEZE.
@@ -564,13 +576,8 @@ static func warn_strip_style(stop: bool) -> StyleBoxFlat:
 ## Tekst stripa. `season_name` je citljivo ime sezone, ne id.
 static func warn_strip_text(stop: bool, season_name: String, need: int, left: int) -> String:
 	if stop:
-		return "Hold stopped · %s keeps %d of these" % [season_name, need]
+		return "Hold stopped · %s keeps %d" % [season_name, need]
 	return "%s needs %d more of these" % [season_name, left]
-
-
-## Podnaslov u Trade baru: rarity + cijena po komadu.
-static func trade_info_text(rarity: int, price: int) -> String:
-	return "%s · %d %s each" % [pips(rarity), price, "coin" if price == 1 else "coins"]
 
 
 ## "+N" pop iznad Trade dugmeta, leti do coin chipa u headeru.
@@ -586,18 +593,6 @@ static func feedback_style() -> StyleBoxFlat:
 	return s
 
 
-## Mint plocica iza imena kad je auto prelaz upravo promijenio tip.
-static func switch_plate_style() -> StyleBoxFlat:
-	var s := StyleBoxFlat.new()
-	s.bg_color = UiPalette.MINT
-	s.set_corner_radius_all(10)
-	s.content_margin_left = 12
-	s.content_margin_right = 12
-	s.content_margin_top = 4
-	s.content_margin_bottom = 4
-	return s
-
-
 ## Kartica sljedece sezone (hero, 1032 x 422).
 static func season_card_style(season_id: String) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
@@ -607,18 +602,6 @@ static func season_card_style(season_id: String) -> StyleBoxFlat:
 	s.set_corner_radius_all(UiPalette.CORNER_RADIUS_CTA)
 	s.set_content_margin_all(SEASON_PAD)
 	_shadow(s, SHADOW, 8, 8)
-	return s
-
-
-## "Details ↗" plocica u glavi hero kartice (tap na karticu vodi na Home).
-static func home_hint_style() -> StyleBoxFlat:
-	var s := StyleBoxFlat.new()
-	s.bg_color = alpha(UiPalette.WARM_WHITE, 0.72)
-	s.border_color = alpha(DARK_INK, 0.28)
-	s.set_border_width_all(2)
-	s.set_corner_radius_all(UiPalette.CORNER_RADIUS + 4)
-	s.content_margin_left = 22
-	s.content_margin_right = 22
 	return s
 
 
@@ -669,27 +652,9 @@ static func unlock_button_ink(state: String) -> Color:
 	return SEASON_INK_DIM
 
 
-## Tekst Unlock dugmeta: [naslov, podnaslov]. Zadovoljen uslov se ne ponavlja.
-static func unlock_button_text(
-	state: String, season_name: String, coins_left: int, flowers_left: int, coins_need: int, flowers_need: int
-) -> PackedStringArray:
-	match state:
-		SEASON_READY:
-			return PackedStringArray([
-				"Unlock %s" % season_name,
-				"spends %d coins and %d flowers" % [coins_need, flowers_need],
-			])
-		SEASON_UNLOCKING:
-			return PackedStringArray([
-				"%s unlocked" % season_name,
-				"spent %d coins and %d flowers" % [coins_need, flowers_need],
-			])
-	var parts: PackedStringArray = []
-	if coins_left > 0:
-		parts.append("%d more %s" % [coins_left, "coin" if coins_left == 1 else "coins"])
-	if flowers_left > 0:
-		parts.append("%d more %s" % [flowers_left, "flower" if flowers_left == 1 else "flowers"])
-	return PackedStringArray(["Unlock", "needs " + " and ".join(parts)])
+## Jedna rijec. Koliko fali vec pisu trake napretka iznad dugmeta.
+static func unlock_button_text(state: String) -> String:
+	return "Unlocked" if state == SEASON_UNLOCKING else "Unlock"
 
 
 ## Prsten koji pukne kad sezona bude otkljucana (bez blura, samo border).
@@ -714,9 +679,32 @@ static func empty_art_style(seed: bool) -> StyleBoxFlat:
 	return s
 
 
-## CTA u praznom stanju ("Play a run ↗" / "Merge in Arena ↗").
+## CTA u praznom stanju: panel 100 px unutar 120 px dodira ("Play a run ↗").
 static func empty_cta_style(pressed: bool = false) -> StyleBoxFlat:
 	var s := shortcut_style(pressed)
 	s.content_margin_left = 36
 	s.content_margin_right = 36
+	s.expand_margin_top = -0.5 * (EMPTY_CTA_H - EMPTY_CTA_VISUAL_H)
+	s.expand_margin_bottom = -0.5 * (EMPTY_CTA_H - EMPTY_CTA_VISUAL_H)
+	return s
+
+
+## Prsten preko coin chipa u headeru dok drzanje prodaje (bez blura).
+static func coin_bump_style() -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.draw_center = false
+	s.border_color = COIN_BUMP
+	s.set_border_width_all(COIN_BUMP_RING)
+	s.set_corner_radius_all(26)
+	return s
+
+
+## Prazan TradeArt kad nema sta prodati.
+static func trade_art_empty_style(seed: bool) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = alpha(INK, 0.05)
+	s.border_color = alpha(INK, 0.28)
+	s.set_border_width_all(4)
+	s.set_corner_radius_all(int(TRADE_ART / 2.0) if seed else 24)
+	s.corner_detail = 16
 	return s

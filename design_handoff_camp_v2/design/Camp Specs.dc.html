@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#1A241E}a{color:#A8E6CF}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-layer="CampSpecs" style="box-sizing:border-box;width:2360px;padding:64px;display:flex;flex-direction:column;gap:72px;background:#1A241E;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="font:900 64px/1 Nunito,system-ui,sans-serif">Camp v2 · Specs</div>
+    <div style="font:700 30px/1.3 Nunito,system-ui,sans-serif;color:#C9D6CC;max-width:1500px;text-wrap:pretty">Jedan dizajn. Sve mjere u px baze 1080 × 1920. Svi isječci ispod su živi crteži iz CampScreen.dc.html (prop scene), ne kopije.</div>
+  </div>
+
+  <div data-layer="States" style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">§7.1 — devet stanja</div>
+    <div style="display:flex;flex-wrap:wrap;gap:32px">
+      <sc-for list="{{ thumbs }}" as="t" hint-placeholder-count="9">
+        <div id="{{ t.id }}" style="display:flex;flex-direction:column;gap:12px;width:360px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="box-sizing:border-box;height:40px;min-width:40px;padding:0 10px;border-radius:12px;background:#FFD56B;color:#2D3436;display:grid;place-items:center;font:900 24px/1 Nunito,system-ui,sans-serif">{{ t.n }}</div>
+            <div style="font:800 24px/1.2 Nunito,system-ui,sans-serif;color:#FFF8F0">{{ t.label }}</div>
+          </div>
+          <div style="{{ t.outer }}">
+            <div style="{{ t.inner }}"><dc-import name="CampScreen" scene="{{ t.scene }}" hint-size="1080px,1920px"></dc-import></div>
+          </div>
+          <div style="font:700 22px/1.3 Nunito,system-ui,sans-serif;color:#C9D6CC;text-wrap:pretty">{{ t.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <sc-for list="{{ groups }}" as="g" hint-placeholder-count="4">
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">{{ g.title }}</div>
+      <div style="font:700 26px/1.35 Nunito,system-ui,sans-serif;color:#C9D6CC;max-width:1800px;text-wrap:pretty">{{ g.spec }}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+        <sc-for list="{{ g.crops }}" as="c" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font:800 24px/1 Nunito,system-ui,sans-serif;color:#FFD56B">{{ c.label }}</div>
+            <div style="{{ c.outer }}">
+              <div style="{{ c.inner }}"><dc-import name="CampScreen" scene="{{ c.scene }}" hint-size="1080px,1920px"></dc-import></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:48px">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Vertikalni budžet (1597)</div>
+      <sc-for list="{{ budget }}" as="r" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:380px 1fr 200px;gap:16px;padding:12px 0;border-bottom:2px solid rgba(255,248,240,.12);font:700 26px/1.25 Nunito,system-ui,sans-serif">
+          <div style="font-weight:800;color:#FFF8F0">{{ r.a }}</div>
+          <div style="color:#C9D6CC">{{ r.b }}</div>
+          <div style="text-align:right;font-weight:900;color:#FFD56B;font-variant-numeric:tabular-nums">{{ r.c }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Animacije (tween)</div>
+      <sc-for list="{{ anims }}" as="r" hint-placeholder-count="10">
+        <div style="display:grid;grid-template-columns:300px 1fr 130px;gap:16px;padding:12px 0;border-bottom:2px solid rgba(255,248,240,.12);font:700 26px/1.25 Nunito,system-ui,sans-serif">
+          <div style="font-weight:800;color:#FFF8F0">{{ r.a }}</div>
+          <div style="color:#C9D6CC">{{ r.b }}</div>
+          <div style="text-align:right;font-weight:900;color:#FFD56B;font-variant-numeric:tabular-nums">{{ r.c }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Trade dugme — 5 stanja bez podnaslova</div>
+    <sc-for list="{{ tradeStates }}" as="r" hint-placeholder-count="5">
+      <div style="display:grid;grid-template-columns:260px 320px 1fr;gap:16px;padding:12px 0;border-bottom:2px solid rgba(255,248,240,.12);font:700 26px/1.25 Nunito,system-ui,sans-serif">
+        <div style="font-weight:800;color:#FFF8F0">{{ r.a }}</div>
+        <div style="color:#FFD56B;font-weight:800">{{ r.b }}</div>
+        <div style="color:#C9D6CC">{{ r.c }}</div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  crop(scene, label, x, y, w, h, s) {
+    return {
+      scene, label,
+      outer: 'position:relative;overflow:hidden;width:' + Math.round(w * s) + 'px;height:' + Math.round(h * s) + 'px;border-radius:16px;box-shadow:0 0 0 2px rgba(255,248,240,.16)',
+      inner: 'position:absolute;left:' + (-x * s) + 'px;top:' + (-y * s) + 'px;width:1080px;height:1920px;transform:scale(' + s + ');transform-origin:0 0'
+    };
+  }
+  renderVals() {
+    const T = [
+      ['seeds_full', 'Seeds, puna torba', '8 tipova, 4 reda (746 px); lista skrola od 9. tipa. Odabran Meadow Clover, Trade miran.'],
+      ['seeds_few', 'Seeds, malo sadržaja', '2 tipa. Sekcija ista 1253 px, stoji odmah ispod kartice — prazno je samo unutar liste.'],
+      ['seeds_empty', 'Seeds, prazna torba', 'Ikona + jedna rečenica + CTA 100 (hit 120). Trade onemogućen, bez teksta osim "Trade".'],
+      ['flowers_reserved', 'Flowers, rezervisano', 'Badge Kept · 12 / 20, pink strip iznad reda, dugme pink + lokot.'],
+      ['flowers_holdstop', 'Držanje stalo', 'Amber strip + badge, dugme zamrznuto (HOLD_FREEZE) + ikona hold_stop + "Sell 1".'],
+      ['trade_hold', 'Trade u toku', 'Fill = prodani dio gomile (8 / 12). +8 pilula, novčići lete ka coin chipu, chip pulsira.'],
+      ['season_ready', 'Kartica: spremno', 'Obje trake pune, Unlock zlatno (UiPalette.GOLD) sa sjenom. Kartica: nedostaje = stanje 1.'],
+      ['unlocking', 'Trenutak otključavanja', 'Burst prsten 520 px, dugme "Unlocked", pa skok na Home.'],
+      ['no_season', 'Bez kartice sezone', 'Sekcija 1549 px; 14 tipova cvijeća, lista skrola (peek zadnjeg reda).']
+    ];
+    const thumbs = T.map((t, i) => Object.assign(this.crop(t[0], '', 0, 0, 1080, 1920, 1 / 3), { id: 's' + (i + 1), n: String(i + 1), label: t[1], note: t[2] }));
+    const groups = [
+      { title: 'SeasonLinkCard · 1032 × 276', spec: 'Pad 22 · border 3 · r 26. SeasonHead 120: SeasonName 56/900 lijevo, UnlockButton 300 × 120 · r 20 desno (samo "Unlock"; lokot 40 kad nedostaje; "Unlocked" u trenutku otključavanja). SeasonProgress 86: vrijednost 48/900 + ikona 48 (novčić) / okvir cvijeta 56, traka 18 · r 9. Tap bilo gdje osim dugmeta → Home.',
+        crops: [this.crop('seeds_full', 'short — Unlock neaktivan', 0, 150, 1080, 310, 0.6), this.crop('season_ready', 'ready — Unlock aktivan', 0, 150, 1080, 310, 0.6), this.crop('unlocking', 'unlocking — burst', 0, 150, 1080, 310, 0.6)] },
+      { title: 'StashTabs · 992 × 120', spec: 'Dva taba 489 × 120 · r 20 · gap 14. Okvir ikone 76 (ikona 44), ime 46/900, brojač tipova 56 × ≥80 · r 14 desno. Aktivan PEACH + rub 4 PEACH_EDGE; neaktivan #F1EBE4 + rub 2 #D9D3CC. Bez podnaslova, bez Merge prečice.',
+        crops: [this.crop('seeds_full', 'Seeds aktivan', 24, 463, 1032, 160, 0.6), this.crop('flowers_reserved', 'Flowers aktivan', 24, 463, 1032, 160, 0.6)] },
+      { title: 'CampChip · 489 × 176 (i rezervisan)', spec: 'Pad 14 (odabran 11 + rub 5). ChipArt 128 (bio 104): well inset 8, crtež sjeme 96 / cvijet 100 (bio 66 / 70). ChipBody 315 × 144: ime 38/800 · pips 34 (ili ReservedBadge 42) · PillRow 52 [brojač 42/900][🪙 cijena 42/900]. "each" izbačen. Rezervisan chip ostaje 176 — badge zauzima red pipsa.',
+        crops: [this.crop('seeds_full', 'Sjeme: odabran + miran', 36, 605, 1008, 200, 0.6), this.crop('flowers_reserved', 'Cvijet: Kept · 12 / 20 (odabran)', 36, 985, 1008, 200, 0.6), this.crop('flowers_holdstop', 'Na granici: Kept · 20 / 20 (amber)', 36, 985, 1008, 200, 0.6)] },
+      { title: 'TradeBar · 992 × 152 (224 sa stripom)', spec: 'Pad 14 · r 20. TradeRow 120: TradeArt 104 (crtež 80 / 84), TradeName 42/800, TradeButton 300 × 120 · r 20 (bio 430 × 120). ReservedWarning 60 · r 14 iznad reda. TradeFeedback pilula 62 visine, gornji desni ugao bara.',
+        crops: [this.crop('seeds_full', 'mirno', 24, 1440, 1032, 276, 0.6), this.crop('trade_hold', 'drži se', 24, 1440, 1032, 276, 0.6), this.crop('flowers_holdstop', 'držanje stalo', 24, 1440, 1032, 276, 0.6), this.crop('flowers_reserved', 'dira rezervisano', 24, 1440, 1032, 276, 0.6), this.crop('seeds_empty', 'nema šta prodati', 24, 1440, 1032, 276, 0.6)] },
+      { title: 'EmptyState (oba taba)', spec: 'Centrirano u prostoru liste: okvir 120 isprekidan, naslov 46/900, EmptyCta 100 vizuelno / 120 dodir (MINT, 42/900). Bez rečenice objašnjenja; Trade ostaje onemogućen.',
+        crops: [this.crop('seeds_empty', 'Seeds', 24, 463, 1032, 1253, 0.36), this.crop('flowers_empty', 'Flowers', 24, 463, 1032, 1253, 0.36)] }
+    ];
+    const budget = [
+      ['Page padding', 'gore + dolje', '24 + 24'],
+      ['SeasonLinkCard', 'bila 422', '276'],
+      ['StackGap', 'fiksan (bio size_flags 3 → rupa 215–375)', '20'],
+      ['StashSection', 'fiksna visina = ostatak', '1253'],
+      ['  · pad + border', '2 × (18 + 2)', '40'],
+      ['  · StashTabs', 'bilo 132', '120'],
+      ['  · StashGrid', 'flex, skrola; 913 mirno / 841 sa stripom', '913'],
+      ['  · TradeBar', '152 / 224', '152'],
+      ['  · 2 × gap', '', '28'],
+      ['Bez kartice sezone', 'StashSection = 1549, grid 1209', '1549']
+    ].map(r => ({ a: r[0], b: r[1], c: r[2] }));
+    const anims = [
+      ['Chip select', 'lift −3, rub 2→5 PEACH', '0,12 s'],
+      ['Trade tap', 'scale 0.97, fill skok +1/gomila pa drain', '0,08 / 0,30'],
+      ['Hold ramp', 'fill 0→trenutni % prodanog; label → Trading', '0,30 s'],
+      ['Hold tick (10/s)', 'novčić 44 leti bar → coin chip (max 3 živa)', '0,26 s'],
+      ['+N pilula', 'broj raste po ticku, pop scale 1.08', '0,09 s'],
+      ['Coin chip bump', 'prsten 6 px #FFF5D1 + scale 1.04', '0,14 s'],
+      ['Hold stop', 'fill → HOLD_FREEZE, ikona hold_stop, strip slide-down 60', '0,14 s'],
+      ['Tab change', 'lista fade + slide 24 px', '0,16 s'],
+      ['Unlock burst', 'prsten 0,6→1,0 + alpha 0,55→0', '0,42 s'],
+      ['Unlock linger', 'pa skok na Home', '0,45 s']
+    ].map(r => ({ a: r[0], b: r[1], c: r[2] }));
+    const tradeStates = [
+      ['idle', 'PEACH · "Trade"', 'Tap prodaje 1; fill kratko skoči pa se isprazni — prvi nagovještaj da se dugme puni.'],
+      ['hold', 'PEACH_EDGE + fill PEACH · "Trading"', 'Fill = prodani dio gomile; +N pilula raste; novčići lete u header.'],
+      ['holdstop', 'HOLD_FREEZE + ikona hold_stop · "Sell 1"', 'Amber strip "Hold stopped · Frost Orchard keeps 20"; dalje samo tap.'],
+      ['warn', 'PINK + lokot · "Trade"', 'Pink strip "Frost Orchard needs 8 more of these"; tap prodaje rezervisani.'],
+      ['disabled', '#EAE4DD, ink #5C6264 · "Trade"', 'Prazan isprekidan TradeArt, bez imena.']
+    ].map(r => ({ a: r[0], b: r[1], c: r[2] }));
+    return { thumbs, groups, budget, anims, tradeStates };
+  }
+}
+</script>
+</body>
+</html>

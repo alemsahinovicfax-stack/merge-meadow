@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#1A241E}a{color:#A8E6CF}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-layer="CampScreen" style="width:1080px;height:1920px;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#2E4733;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+  <dc-import name="HubScreen" part="header" theme="dark" page-bg="#2E4733" coins="{{ coins }}" seeds="{{ seedTotal }}" diamonds="12" hint-size="1080px,143px"></dc-import>
+  <div data-layer="CampPage" style="flex:0 0 auto;height:1597px;box-sizing:border-box;padding:24px;display:flex;flex-direction:column;gap:20px;overflow:hidden">
+
+    <sc-if value="{{ hasSeason }}" hint-placeholder-val="{{ true }}">
+      <div data-layer="SeasonLinkCard" style="{{ sc.root }}">
+        <div data-layer="UnlockBurst" style="{{ sc.burst }}"></div>
+        <div data-layer="SeasonHead" style="position:relative;flex:0 0 auto;height:120px;display:flex;align-items:center;gap:20px">
+          <div data-layer="SeasonName" style="flex:1;min-width:0;font:900 56px/1 Nunito,system-ui,sans-serif;color:#1A1A14;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sc.name }}</div>
+          <div data-layer="UnlockButton" style="{{ sc.btn }}">
+            <img src="icons/icon_lock.svg" alt="" style="{{ sc.lockS }}" />
+            <div style="{{ sc.btnLabelS }}">{{ sc.btnLabel }}</div>
+          </div>
+        </div>
+        <div data-layer="SeasonProgress" style="position:relative;flex:0 0 auto;height:86px;display:flex;align-items:center;gap:24px">
+          <div data-layer="CoinProgress" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:12px">
+            <div style="height:56px;display:flex;align-items:center;gap:12px">
+              <img src="icons/icon_coin.svg" alt="" style="width:48px;height:48px;display:block;flex:0 0 auto" />
+              <div style="font:900 48px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#1A1A14;white-space:nowrap">{{ sc.coinVal }}</div>
+            </div>
+            <div style="height:18px;border-radius:9px;background:rgba(26,26,20,.20);overflow:hidden"><div style="{{ sc.coinFill }}"></div></div>
+          </div>
+          <div style="flex:0 0 auto;width:5px;height:86px;border-radius:3px;background:rgba(26,26,20,.22)"></div>
+          <div data-layer="FlowerProgress" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:12px">
+            <div style="height:56px;display:flex;align-items:center;gap:12px">
+              <div data-layer="ProgressArt" style="position:relative;flex:0 0 auto;box-sizing:border-box;width:56px;height:56px;border-radius:14px;background:#FFD56B;border:2px solid #D6A82F;display:grid;place-items:center">
+                <div style="position:absolute;inset:5px;box-sizing:border-box;border-radius:10px;background:#22342A;border:1px solid #16211B"></div>
+                <img src="icons/flowers/ph_pumpkin.svg" alt="" style="position:relative;display:block;width:40px;height:40px" />
+              </div>
+              <div style="font:900 48px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#1A1A14;white-space:nowrap">{{ sc.flowerVal }}</div>
+            </div>
+            <div style="height:18px;border-radius:9px;background:rgba(26,26,20,.20);overflow:hidden"><div style="{{ sc.flowerFill }}"></div></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <div data-layer="StashSection" style="{{ secStyle }}">
+      <div data-layer="StashTabs" style="flex:0 0 auto;height:120px;display:flex;gap:14px">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+          <div data-layer="{{ t.layer }}" style="{{ t.root }}">
+            <div style="{{ t.frame }}"><img src="{{ t.icon }}" alt="" style="width:44px;height:44px;display:block" /></div>
+            <div style="{{ t.labelS }}">{{ t.label }}</div>
+            <div style="{{ t.countS }}">{{ t.count }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div data-layer="StashGrid" style="{{ gridStyle }}">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="6">
+          <div data-layer="CampChip" style="{{ c.root }}">
+            <div data-layer="ChipArt" style="{{ c.frame }}">
+              <div style="{{ c.well }}"></div>
+              <img src="{{ c.art }}" alt="" style="{{ c.artS }}" />
+            </div>
+            <div data-layer="ChipBody" style="flex:1;min-width:0;height:144px;display:flex;flex-direction:column;justify-content:space-between">
+              <div data-layer="ChipName" style="{{ c.nameS }}">{{ c.name }}</div>
+              <div data-layer="RarityPips" style="{{ c.pipsS }}">{{ c.pips }}</div>
+              <div data-layer="ReservedBadge" style="{{ c.badgeS }}">
+                <img src="icons/icon_lock.svg" alt="" style="width:28px;height:28px;display:block;flex:0 0 auto" />
+                <div style="font:800 34px/1 Nunito,system-ui,sans-serif;color:#1A1A14;white-space:nowrap">{{ c.badge }}</div>
+              </div>
+              <div data-layer="PillRow" style="flex:0 0 auto;height:52px;display:flex;gap:10px">
+                <div data-layer="CountPill" style="box-sizing:border-box;height:52px;padding:0 12px;border-radius:12px;background:rgba(255,248,240,.70);border:2px solid rgba(45,52,54,.20);display:flex;align-items:center;gap:8px">
+                  <img src="{{ c.countIcon }}" alt="" style="width:30px;height:30px;display:block;flex:0 0 auto" />
+                  <div style="font:900 42px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#2D3436">{{ c.count }}</div>
+                </div>
+                <div data-layer="PricePill" style="box-sizing:border-box;height:52px;padding:0 12px;border-radius:12px;background:#FFE8B8;border:2px solid #D6A82F;display:flex;align-items:center;gap:8px">
+                  <img src="icons/icon_coin.svg" alt="" style="width:32px;height:32px;display:block;flex:0 0 auto" />
+                  <div style="font:900 42px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#2D3436">{{ c.price }}</div>
+                </div>
+              </div>
+            </div>
+            <div data-layer="SelectMark" style="{{ c.mark }}"></div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="EmptyState" style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px">
+          <div style="{{ emptyFrame }}"><img src="{{ emptyIcon }}" alt="" style="width:56px;height:56px;display:block;opacity:.34" /></div>
+          <div data-layer="EmptyTitle" style="font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436;text-align:center">{{ emptyTitle }}</div>
+          <div data-layer="EmptyCta" style="box-sizing:border-box;height:120px;padding:10px 0;display:flex;align-items:center">
+            <div style="box-sizing:border-box;height:100px;padding:0 36px;border-radius:20px;background:#A8E6CF;border:3px solid #7FC9AC;display:flex;align-items:center;font:900 42px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ emptyCta }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <div data-layer="TradeBar" style="{{ tb.root }}">
+        <div data-layer="ReservedWarning" style="{{ tb.warn }}">
+          <img src="{{ tb.warnIcon }}" alt="" style="width:32px;height:32px;display:block;flex:0 0 auto" />
+          <div style="font:800 36px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tb.warnText }}</div>
+        </div>
+        <div data-layer="TradeRow" style="flex:0 0 auto;height:120px;display:flex;align-items:center;gap:18px">
+          <div data-layer="TradeArt" style="{{ tb.frame }}">
+            <div style="{{ tb.well }}"></div>
+            <img src="{{ tb.art }}" alt="" style="{{ tb.artS }}" />
+          </div>
+          <div data-layer="TradeName" style="flex:1;min-width:0;font:800 42px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tb.name }}</div>
+          <div data-layer="TradeButton" style="{{ tb.btn }}">
+            <div data-layer="HoldFill" style="{{ tb.fill }}"></div>
+            <div style="position:relative;height:100%;display:flex;align-items:center;justify-content:center;gap:12px">
+              <img src="{{ tb.btnIcon }}" alt="" style="{{ tb.btnIconS }}" />
+              <div style="{{ tb.btnLabelS }}">{{ tb.btnLabel }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <dc-import name="HubScreen" part="footer" theme="dark" page-bg="#2E4733" active="{{ 3 }}" hint-size="1080px,180px"></dc-import>
+
+  <sc-if value="{{ showFlight }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="CoinChipBump" style="position:absolute;left:12px;top:15px;width:312px;height:116px;box-sizing:border-box;border-radius:26px;border:6px solid #FFF5D1;pointer-events:none"></div>
+    <img data-layer="FlyCoin" src="icons/icon_coin.svg" alt="" style="position:absolute;left:330px;top:560px;width:44px;height:44px;display:block;opacity:.85;pointer-events:none" />
+    <img data-layer="FlyCoin" src="icons/icon_coin.svg" alt="" style="position:absolute;left:610px;top:1100px;width:52px;height:52px;display:block;pointer-events:none" />
+    <div data-layer="TradeFeedback" style="position:absolute;right:60px;top:1502px;box-sizing:border-box;height:62px;padding:0 20px;border-radius:18px;background:#FFD56B;border:3px solid #D6A82F;display:flex;align-items:center;gap:10px;box-shadow:0 6px 12px rgba(20,26,22,.28)">
+      <div style="font:900 42px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#2D3436">{{ gainText }}</div>
+      <img src="icons/icon_coin.svg" alt="" style="width:34px;height:34px;display:block" />
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;seeds_full&quot;,&quot;seeds_few&quot;,&quot;seeds_empty&quot;,&quot;flowers_reserved&quot;,&quot;flowers_holdstop&quot;,&quot;trade_hold&quot;,&quot;season_ready&quot;,&quot;unlocking&quot;,&quot;no_season&quot;,&quot;flowers_empty&quot;],&quot;default&quot;:&quot;seeds_full&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;tint&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;frost&quot;,&quot;lantern&quot;,&quot;amber&quot;],&quot;default&quot;:&quot;frost&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;}}">
+const INK = '#2D3436', CREAM = '#FFF8F0', CREAM_EDGE = '#CBC2B6', WELL = '#22342A', WELL_EDGE = '#16211B';
+const GOLD = '#FFD56B', GOLD_EDGE = '#D6A82F', UIGOLD = '#E8C44A', UIGOLD_EDGE = '#BA9D3B';
+const PEACH = '#FFB88C', PEACH_EDGE = '#E8A374', PINK = '#FFCCD5', PINK_EDGE = '#E89AAA';
+const HOLD_FREEZE = '#FFDCC2', PRICE_BG = '#FFE8B8';
+const NUN = 'Nunito,system-ui,sans-serif';
+const RB = { 1: ['#B8D4F0', '#93AAC0'], 2: ['#E0C4FF', '#B39DCC'], 3: ['#FFE8B8', '#CCBA93'] };
+const TINTS = { frost: ['#C5D5E8', '#9FB4CC', 'Frost Orchard'], lantern: ['#C9B8E0', '#A193B3', 'Lantern Meadow'], amber: ['#E8C48A', '#BA9D6E', 'Amber Canopy'] };
+
+// [name, art, rarity, count, price]
+const SEEDS = [
+  ['Meadow Clover', 'clover', 1, 12, 1], ['Field Daisy', 'daisy', 1, 4, 1],
+  ['Sun Buttercup', 'buttercup', 1, 9, 1], ['Wild Tulip', 'tulip', 2, 6, 2],
+  ['Tall Sunflower', 'sunflower', 2, 3, 2], ['Frost Snowdrop', 'frost_snowdrop', 2, 5, 2],
+  ['Harvest Pumpkin', 'pumpkin', 3, 2, 4], ['Silver Aconite', 'silver_aconite', 3, 1, 4]
+];
+const FLOWERS = [
+  ['Meadow Clover', 'clover', 1, 3, 5], ['Field Daisy', 'daisy', 1, 2, 5],
+  ['Wild Tulip', 'tulip', 2, 1, 10], ['Tall Sunflower', 'sunflower', 2, 4, 10],
+  ['Harvest Pumpkin', 'pumpkin', 3, 12, 20], ['Silver Aconite', 'silver_aconite', 3, 2, 20]
+];
+const MANY = [
+  ['Meadow Clover', 'clover', 1, 3, 5], ['Field Daisy', 'daisy', 1, 2, 5], ['Sun Buttercup', 'buttercup', 1, 6, 5],
+  ['Wild Tulip', 'tulip', 2, 1, 10], ['Tall Sunflower', 'sunflower', 2, 4, 10], ['Frost Snowdrop', 'frost_snowdrop', 2, 3, 10],
+  ['Harvest Pumpkin', 'pumpkin', 3, 26, 20], ['Silver Aconite', 'silver_aconite', 3, 2, 20], ['Dawn Poppy', 'tulip', 1, 7, 5],
+  ['Moss Bell', 'clover', 2, 2, 10], ['Rain Lily', 'daisy', 2, 5, 10], ['Night Iris', 'silver_aconite', 3, 1, 20],
+  ['Ember Thistle', 'sunflower', 3, 3, 20], ['Copper Reed', 'buttercup', 1, 8, 5]
+];
+
+// tab, seeds rows, flowers rows, sel, trade, season, coins, holdPct, gain, have
+const SCENES = {
+  seeds_full:       { tab: 'seeds', seeds: 8, flowers: 'six', sel: 0, trade: 'idle', season: 'short', coins: 260 },
+  seeds_few:        { tab: 'seeds', seeds: 2, flowers: 'six', sel: 0, trade: 'idle', season: 'short', coins: 260 },
+  seeds_empty:      { tab: 'seeds', seeds: 0, flowers: 'six', sel: 0, trade: 'disabled', season: 'short', coins: 260 },
+  flowers_reserved: { tab: 'flowers', seeds: 8, flowers: 'six', sel: 4, trade: 'warn', season: 'short', coins: 260, have: 12 },
+  flowers_holdstop: { tab: 'flowers', seeds: 8, flowers: 'six', sel: 4, trade: 'holdstop', season: 'short', coins: 380, have: 20 },
+  trade_hold:       { tab: 'seeds', seeds: 8, flowers: 'six', sel: 0, trade: 'hold', season: 'short', coins: 268, holdPct: 0.67, gain: 8, count: 4 },
+  season_ready:     { tab: 'seeds', seeds: 8, flowers: 'six', sel: 0, trade: 'idle', season: 'ready', coins: 540, have: 20 },
+  unlocking:        { tab: 'seeds', seeds: 8, flowers: 'six', sel: 0, trade: 'idle', season: 'unlocking', coins: 40, have: 20 },
+  no_season:        { tab: 'flowers', seeds: 8, flowers: 'many', sel: 0, trade: 'idle', season: 'none', coins: 1240 },
+  flowers_empty:    { tab: 'flowers', seeds: 8, flowers: 'none', sel: 0, trade: 'disabled', season: 'short', coins: 260 }
+};
+
+class Component extends DCLogic {
+  chip(row, seed, selected, res) {
+    const r = row[2], base = RB[r];
+    const floor = res && res.floor;
+    const t = TINTS[res ? res.tint : 'frost'];
+    const bg = selected ? this.tn(base[0], 0.14) : base[0];
+    const edge = selected ? PEACH : base[1], bw = selected ? 5 : 2, pad = selected ? 11 : 14;
+    return {
+      name: row[0], count: String(row[3]), price: String(row[4]),
+      pips: '★'.repeat(r) + '☆'.repeat(3 - r),
+      art: 'icons/flowers/ph_' + row[1] + '.svg',
+      countIcon: seed ? 'icons/icon_seed.svg' : 'icons/icon_crystal.svg',
+      badge: res ? 'Kept · ' + Math.min(res.have, res.need) + ' / ' + res.need : '',
+      root: 'position:relative;box-sizing:border-box;width:489px;height:176px;border-radius:20px;background:' + bg +
+        ';border:' + bw + 'px solid ' + edge + ';padding:' + pad + 'px;display:flex;align-items:center;gap:14px;box-shadow:' +
+        (selected ? '0 10px 18px rgba(20,26,22,.30);transform:translateY(-3px)' : '0 6px 14px rgba(20,26,22,.24)'),
+      frame: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:128px;height:128px;border-radius:' + (seed ? '50%' : '28px') +
+        ';background:' + (seed ? CREAM : GOLD) + ';border:3px solid ' + (seed ? CREAM_EDGE : GOLD_EDGE) + ';display:grid;place-items:center',
+      well: 'position:absolute;inset:8px;box-sizing:border-box;border-radius:' + (seed ? '50%' : '21px') + ';background:' + WELL + ';border:2px solid ' + WELL_EDGE,
+      artS: 'position:relative;display:block;width:' + (seed ? 96 : 100) + 'px;height:' + (seed ? 96 : 100) + 'px',
+      nameS: 'flex:0 0 auto;font:800 38px/1 ' + NUN + ';color:' + INK + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      pipsS: res ? 'display:none' : 'flex:0 0 auto;height:42px;display:flex;align-items:center;font:800 34px/1 ' + NUN + ';letter-spacing:.04em;color:' + INK,
+      badgeS: res ? 'flex:0 0 auto;align-self:flex-start;box-sizing:border-box;height:42px;padding:0 12px;border-radius:12px;display:flex;align-items:center;gap:8px;background:' +
+        (floor ? PRICE_BG : t[0]) + ';border:' + (floor ? '3px solid ' + GOLD_EDGE : '2px solid ' + t[1]) : 'display:none',
+      mark: selected ? 'position:absolute;inset:0;border-radius:15px;border:4px solid rgba(45,52,54,.55);pointer-events:none' : 'display:none'
+    };
+  }
+  tn(h, t) { return '#' + [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)).map(v => Math.round(v + (255 - v) * t).toString(16).padStart(2, '0')).join(''); }
+
+  renderVals() {
+    const p = this.props;
+    const S = SCENES[p.scene ?? 'seeds_full'] || SCENES.seeds_full;
+    const tint = TINTS[p.tint ?? 'frost'];
+    const tintKey = p.tint ?? 'frost';
+    const hasSeason = S.season !== 'none';
+    const onSeeds = S.tab === 'seeds';
+    const seedRows = SEEDS.slice(0, S.seeds).map(r => r.slice());
+    const flowerRows = (S.flowers === 'none' ? [] : S.flowers === 'many' ? MANY : FLOWERS).map(r => r.slice());
+    if (!onSeeds && S.have != null && flowerRows[4]) flowerRows[4][3] = S.have;
+    const rows = onSeeds ? seedRows : flowerRows;
+    if (S.count != null && rows[S.sel]) rows[S.sel][3] = S.count;
+    const isEmpty = rows.length === 0;
+    const trade = S.trade;
+    const warnish = trade === 'warn' || trade === 'holdstop';
+
+    const chips = rows.map((r, i) => {
+      const reserved = hasSeason && !onSeeds && r[0] === 'Harvest Pumpkin';
+      return this.chip(r, onSeeds, i === S.sel, reserved ? { have: r[3], need: 20, floor: trade === 'holdstop', tint: tintKey } : null);
+    });
+
+    // Season card
+    const st = S.season;
+    const coinsHave = Math.min(500, st === 'short' ? 260 : 500), flHave = st === 'short' ? 12 : 20;
+    let bFill = 'rgba(255,248,240,.55)', bEdge = 'rgba(26,26,20,.30)', bInk = '#44443A', btnLabel = 'Unlock';
+    if (st === 'ready') { bFill = UIGOLD; bEdge = UIGOLD_EDGE; bInk = INK; }
+    if (st === 'unlocking') { bFill = GOLD; bEdge = GOLD_EDGE; bInk = INK; btnLabel = 'Unlocked'; }
+    const sc = {
+      name: tint[2],
+      coinVal: coinsHave + ' / 500', flowerVal: flHave + ' / 20',
+      btnLabel,
+      root: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:1032px;height:276px;border-radius:26px;overflow:hidden;background:' + tint[0] +
+        ';border:3px solid ' + tint[1] + ';box-shadow:0 8px 16px rgba(20,26,22,.26);padding:22px;display:flex;flex-direction:column;gap:20px',
+      burst: st === 'unlocking' ? 'position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;border:14px solid rgba(255,245,209,.55);pointer-events:none' : 'display:none',
+      btn: 'flex:0 0 auto;box-sizing:border-box;width:300px;height:120px;border-radius:20px;background:' + bFill + ';border:3px solid ' + bEdge +
+        ';display:flex;align-items:center;justify-content:center;gap:12px' + (st === 'ready' ? ';box-shadow:0 6px 12px rgba(20,26,22,.26)' : ''),
+      lockS: st === 'short' ? 'width:40px;height:40px;display:block;flex:0 0 auto;opacity:.8' : 'display:none',
+      btnLabelS: 'font:900 48px/1 ' + NUN + ';color:' + bInk + ';white-space:nowrap',
+      coinFill: 'height:100%;width:' + (coinsHave / 5).toFixed(1) + '%;background:' + GOLD,
+      flowerFill: 'height:100%;width:' + (flHave * 5) + '%;background:' + CREAM
+    };
+
+    // Tabs
+    const tabs = [
+      { layer: 'SeedsTab', label: 'Seeds', count: seedRows.length, icon: 'icons/icon_seed.svg', seed: true, active: onSeeds },
+      { layer: 'FlowersTab', label: 'Flowers', count: flowerRows.length, icon: 'icons/icon_crystal.svg', seed: false, active: !onSeeds }
+    ].map(t => ({
+      layer: t.layer, label: t.label, count: String(t.count), icon: t.icon,
+      root: 'flex:1;min-width:0;box-sizing:border-box;height:120px;border-radius:20px;display:flex;align-items:center;gap:16px;padding:0 18px;background:' +
+        (t.active ? PEACH : '#F1EBE4') + ';border:' + (t.active ? '4px solid ' + PEACH_EDGE : '2px solid #D9D3CC'),
+      frame: 'flex:0 0 auto;box-sizing:border-box;width:76px;height:76px;border-radius:' + (t.seed ? '50%' : '20px') + ';background:' +
+        (t.seed ? CREAM : GOLD) + ';border:3px solid ' + (t.seed ? CREAM_EDGE : GOLD_EDGE) + ';display:grid;place-items:center',
+      labelS: 'flex:1;min-width:0;font:900 46px/1 ' + NUN + ';color:' + (t.active ? INK : '#4A5153') + ';white-space:nowrap',
+      countS: 'flex:0 0 auto;box-sizing:border-box;height:56px;min-width:80px;padding:0 16px;border-radius:14px;display:grid;place-items:center;font:900 42px/1 ' + NUN +
+        ';font-variant-numeric:tabular-nums;border:2px solid rgba(45,52,54,.20);background:' + (t.active ? 'rgba(255,248,240,.80)' : '#E6DFD8') + ';color:' + (t.active ? INK : '#4A5153')
+    }));
+
+    // Trade bar
+    const selRow = rows[Math.min(S.sel, Math.max(0, rows.length - 1))];
+    const dis = trade === 'disabled' || isEmpty;
+    let bg = PEACH, edge = PEACH_EDGE, ink = INK, btnIcon = '', label = 'Trade', fill = 'display:none';
+    if (trade === 'hold') { bg = PEACH_EDGE; label = 'Trading'; fill = 'position:absolute;left:0;top:0;bottom:0;width:' + Math.round((S.holdPct ?? 0.6) * 100) + '%;background:' + PEACH; }
+    if (trade === 'warn') { bg = PINK; edge = PINK_EDGE; btnIcon = 'icons/icon_lock.svg'; }
+    if (trade === 'holdstop') { bg = HOLD_FREEZE; btnIcon = 'icons/icon_hold_stop.svg'; label = 'Sell 1'; }
+    if (dis) { bg = '#EAE4DD'; edge = '#C9C4BE'; ink = '#5C6264'; }
+    const seedArt = onSeeds;
+    const tb = {
+      name: dis ? '' : (selRow ? selRow[0] : ''),
+      art: selRow && !dis ? 'icons/flowers/ph_' + selRow[1] + '.svg' : 'icons/flowers/ph_clover.svg',
+      warnIcon: trade === 'holdstop' ? 'icons/icon_hold_stop.svg' : 'icons/icon_lock.svg',
+      warnText: trade === 'holdstop' ? 'Hold stopped · ' + tint[2] + ' keeps 20' : tint[2] + ' needs 8 more of these',
+      btnIcon: btnIcon || 'icons/icon_lock.svg', btnLabel: label,
+      root: 'position:relative;flex:0 0 auto;box-sizing:border-box;height:' + (warnish ? 224 : 152) + 'px;border-radius:20px;background:' + CREAM +
+        ';border:2px solid rgba(45,52,54,.18);box-shadow:0 6px 14px rgba(20,26,22,.24);padding:14px;display:flex;flex-direction:column;gap:12px',
+      warn: warnish ? 'flex:0 0 auto;box-sizing:border-box;height:60px;padding:0 18px;border-radius:14px;display:flex;align-items:center;gap:12px;background:' +
+        (trade === 'holdstop' ? PRICE_BG : PINK) + ';border:2px solid ' + (trade === 'holdstop' ? GOLD_EDGE : PINK_EDGE) : 'display:none',
+      frame: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:104px;height:104px;border-radius:' + (seedArt ? '50%' : '24px') +
+        ';display:grid;place-items:center;' + (dis ? 'background:rgba(45,52,54,.05);border:4px dashed rgba(45,52,54,.28)' :
+        'background:' + (seedArt ? CREAM : GOLD) + ';border:3px solid ' + (seedArt ? CREAM_EDGE : GOLD_EDGE)),
+      well: dis ? 'display:none' : 'position:absolute;inset:7px;box-sizing:border-box;border-radius:' + (seedArt ? '50%' : '18px') + ';background:' + WELL + ';border:2px solid ' + WELL_EDGE,
+      artS: dis ? 'display:none' : 'position:relative;display:block;width:' + (seedArt ? 80 : 84) + 'px;height:' + (seedArt ? 80 : 84) + 'px',
+      btn: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:300px;height:120px;border-radius:20px;overflow:hidden;background:' + bg + ';border:3px solid ' + edge,
+      fill,
+      btnIconS: btnIcon && !dis ? 'width:40px;height:40px;display:block;flex:0 0 auto' : 'display:none',
+      btnLabelS: 'font:900 46px/1 ' + NUN + ';color:' + ink + ';white-space:nowrap'
+    };
+
+    const secH = hasSeason ? 1253 : 1549;
+    return {
+      hasSeason, sc, tabs, chips, tb, isEmpty,
+      coins: (S.coins ?? 260).toLocaleString('en-US'),
+      seedTotal: String(seedRows.reduce((a, r) => a + r[3], 0)),
+      secStyle: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:1032px;height:' + secH + 'px;border-radius:26px;background:' + CREAM +
+        ';border:2px solid rgba(45,52,54,.16);box-shadow:0 8px 16px rgba(20,26,22,.26);padding:18px;display:flex;flex-direction:column;gap:14px',
+      gridStyle: isEmpty ? 'display:none' : 'flex:1;min-height:0;display:grid;grid-template-columns:489px 489px;grid-auto-rows:176px;gap:14px;align-content:start;overflow:hidden;padding-top:3px;margin-top:-3px',
+      emptyFrame: 'box-sizing:border-box;width:120px;height:120px;border-radius:' + (onSeeds ? '50%' : '28px') + ';background:rgba(45,52,54,.05);border:4px dashed rgba(45,52,54,.28);display:grid;place-items:center',
+      emptyIcon: onSeeds ? 'icons/icon_seed.svg' : 'icons/icon_crystal.svg',
+      emptyTitle: onSeeds ? 'Your bag is empty' : 'No flowers yet',
+      emptyCta: onSeeds ? 'Play a run ↗' : 'Merge in Arena ↗',
+      showFlight: trade === 'hold',
+      gainText: '+' + (S.gain ?? 1)
+    };
+  }
+}
+</script>
+</body>
+</html>

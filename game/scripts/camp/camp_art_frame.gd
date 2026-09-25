@@ -61,6 +61,10 @@ func _sync_min_size() -> void:
 
 func _draw() -> void:
 	var rect := Rect2((size - Vector2(frame_side, frame_side)) * 0.5, Vector2(frame_side, frame_side))
+	# Prazan okvir (Trade bar bez odabira) — samo obris, bez tamnog wella.
+	if icon == null and type_id.is_empty():
+		draw_style_box(UiCamp.trade_art_empty_style(seed_shape), rect)
+		return
 	draw_style_box(UiCamp.art_frame_style(seed_shape, frame_side, frame_radius, frame_border), rect)
 	if well_inset > 0.0:
 		var well_side := frame_side - well_inset * 2.0

@@ -1,0 +1,57 @@
+camp_scene.tscn — Camp v2 (px baze 1080 x 1920)
+Header (143) i footer (180) dolaze iz hub chromea i nisu ovdje.
+
+CampPage                         Control           1080 x 1597   clip_contents
+└ ContentStack                   VBoxContainer     1032 x 1549   pos (24, 24) · separation 20
+  ├ SeasonLinkCard               PanelContainer    1032 x 276    season_card_style · tap → Home   [skriven kad nema sezone]
+  │ ├ UnlockBurst                Panel             520 x 520     centriran, samo u "unlocking"
+  │ └ VBox                       VBoxContainer     982 x 226     separation 20
+  │   ├ SeasonHead               HBoxContainer     982 x 120     separation 20
+  │   │ ├ SeasonName             Label             flex x 56     56 px / heavy, DARK_INK
+  │   │ └ UnlockButton           HubPressable      300 x 120     unlock_button_style · stop propagation
+  │   │   ├ LockIcon             TextureRect       40 x 40       samo "short"
+  │   │   └ Label                Label             48 px         "Unlock" / "Unlocked"
+  │   └ SeasonProgress           HBoxContainer     982 x 86      separation 24
+  │     ├ CoinProgress           VBoxContainer     flex x 86     [ikona 48 + "260 / 500" 48] + traka 18
+  │     ├ SplitLine              Panel             5 x 86
+  │     └ FlowerProgress         VBoxContainer     flex x 86     [okvir 56 / art 40 + "12 / 20" 48] + traka 18
+  └ StashSection                 PanelContainer    1032 x 1253   section_style · custom_minimum_size.y = UiCamp.section_height()
+    └ SectionVBox                VBoxContainer     992 x 1213    separation 14
+      ├ StashTabs                HBoxContainer     992 x 120     separation 14
+      │ ├ SeedsTab               HubPressable      489 x 120     okvir 76 / ikona 44 · "Seeds" 46 · brojač 56 x ≥80
+      │ └ FlowersTab             HubPressable      489 x 120     isto
+      ├ StashScroll              ScrollContainer   992 x flex    samo vertikalno, size_flags_vertical = 3 (913 / 841 / 1209)
+      │ └ StashGrid              GridContainer     992 x auto    columns 2 · h/v separation 14
+      │   └ CampChip ×N          HubPressable      489 x 176     chip_style (i rezervisan: 176)
+      │     ├ ChipArt            Panel             128 x 128     art_frame_style · well inset 8 · crtež 96 / 100
+      │     ├ ChipBody           VBoxContainer     315 x 144     alignment space-between
+      │     │ ├ ChipName         Label             38 px
+      │     │ ├ RarityPips       Label             34 px         skriven kad je ReservedBadge vidljiv
+      │     │ ├ ReservedBadge    PanelContainer    auto x 42     lokot 28 + "Kept · 12 / 20" 34
+      │     │ └ PillRow          HBoxContainer     auto x 52     CountPill [ikona 30 + 42] · PricePill [novčić 32 + 42]
+      │     └ SelectMark         Panel             489 x 176     select_mark_style, mouse ignore
+      ├ EmptyState               VBoxContainer     992 x flex    zamjenjuje StashScroll kad je lista prazna · separation 28
+      │ ├ EmptyArt               Panel             120 x 120     empty_art_style · ikona 56 @ 34 %
+      │ ├ EmptyTitle             Label             46 px         "Your bag is empty" / "No flowers yet"
+      │ └ EmptyCta               HubPressable      auto x 120    empty_cta_style (vizuelno 100) · "Play a run ↗" / "Merge in Arena ↗"
+      └ TradeBar                 PanelContainer    992 x 152     trade_bar_style · 224 sa stripom
+        └ VBox                   VBoxContainer     960 x auto    separation 12
+          ├ ReservedWarning      PanelContainer    960 x 60      warn_strip_style · ikona 32 + 36 px   [samo warn / holdstop]
+          └ TradeRow             HBoxContainer     960 x 120     separation 18
+            ├ TradeArt           Panel             104 x 104     well inset 7 · crtež 80 / 84 · prazan = trade_art_empty_style
+            ├ TradeName          Label             flex · 42 px  prazno kad je disabled
+            └ TradeButton        HubPressable      300 x 120     trade_button_style · clip_contents
+              ├ HoldFill         Panel             w = 300 * hold_fill_ratio()
+              └ HBox             HBoxContainer     ikona 40 (opciono) + Label 46
+
+Overlay (CanvasLayer iznad chromea, samo dok se drži)
+├ TradeFeedback                  PanelContainer    auto x 62     feedback_style · gornji desni ugao TradeBara (−16, −20 → ovdje right 40 ekrana)
+├ FlyCoin ×≤3                    TextureRect       44 x 44       tween bar → CoinChip, 0,26 s
+└ CoinChipBump                   Panel             312 x 116     coin_bump_style · preko CoinChip (12, 15)
+
+OBRISANO
+- SeasonEyebrow ("Next free season"), CoinCap, FlowerCap, HomeHint ("Details ↗"), Unlock podnaslov
+- %MergeShortcut, podnaslovi tabova (_sub)
+- ChipGrid budžet po redovima, StackGap size_flags_vertical = 3
+- SelectedValue (Trade podnaslov), podnaslov TradeButtona
+- EmptyBody rečenica

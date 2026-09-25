@@ -176,70 +176,61 @@ theme_override_constants/margin_bottom = 24
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 0
+theme_override_constants/separation = 20
 
 [node name="SeasonLinkCard" type="PanelContainer" parent="RootVBox/CampPage/ContentStack"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(0, 422)
+custom_minimum_size = Vector2(0, 276)
 layout_mode = 2
 script = ExtResource("3_slink")
 
 [node name="SeasonLinkVBox" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 20
 
 [node name="SeasonHead" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox"]
-custom_minimum_size = Vector2(0, 100)
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 20
 
-[node name="SeasonHeadText" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead"]
+[node name="SeasonLinkTitle" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_constants/separation = 6
-alignment = 1
-
-[node name="SeasonEyebrow" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead/SeasonHeadText"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Next free season"
-
-[node name="SeasonLinkTitle" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead/SeasonHeadText"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Frost Orchard"
-
-[node name="HomeHint" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead"]
-unique_name_in_owner = true
-layout_mode = 2
 size_flags_vertical = 4
+text = "Frost Orchard"
+clip_text = true
+text_overrun_behavior = 3
 
-[node name="HomeHintLabel" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead/HomeHint"]
+[node name="SeasonLinkUnlock" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonHead"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 120)
 layout_mode = 2
-text = "Details ↗"
-vertical_alignment = 1
+size_flags_horizontal = 8
+size_flags_vertical = 4
+script = ExtResource("4_cbtn")
 
 [node name="SeasonProgress" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 86)
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 24
 
 [node name="CoinProgress" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 alignment = 1
 
 [node name="CoinValRow" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress"]
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 12
@@ -259,11 +250,6 @@ layout_mode = 2
 size_flags_vertical = 4
 text = "0 / 500"
 
-[node name="SeasonCoinCap" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Coins"
-
 [node name="SeasonLinkCoinsBar" type="ProgressBar" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 18)
@@ -274,7 +260,7 @@ show_percentage = false
 
 [node name="SeasonSplitLine" type="Panel" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(5, 112)
+custom_minimum_size = Vector2(5, 86)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
@@ -284,17 +270,18 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 alignment = 1
 
 [node name="FlowerValRow" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress"]
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 12
 
 [node name="SeasonLinkFlower" type="Control" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress/FlowerValRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(48, 48)
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
@@ -306,11 +293,6 @@ layout_mode = 2
 size_flags_vertical = 4
 text = "0 / 20"
 
-[node name="SeasonLinkFlowerName" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Harvest Pumpkin ★★★"
-
 [node name="SeasonLinkT3Bar" type="ProgressBar" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 18)
@@ -319,21 +301,9 @@ mouse_filter = 2
 max_value = 20.0
 show_percentage = false
 
-[node name="SeasonLinkUnlock" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 132)
-layout_mode = 2
-script = ExtResource("4_cbtn")
-
-[node name="StackGap" type="Control" parent="RootVBox/CampPage/ContentStack"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
-size_flags_vertical = 3
-mouse_filter = 2
-
 [node name="StashSection" type="PanelContainer" parent="RootVBox/CampPage/ContentStack"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 1253)
 layout_mode = 2
 mouse_filter = 2
 
@@ -344,7 +314,7 @@ theme_override_constants/separation = 14
 
 [node name="StashTabs" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 132)
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 14
@@ -361,16 +331,10 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("7_tab")
 
-[node name="MergeShortcut" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/StashTabs"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(190, 132)
-layout_mode = 2
-script = ExtResource("4_cbtn")
-
 [node name="StashScroll" type="ScrollContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 556)
 layout_mode = 2
+size_flags_vertical = 3
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 3
 
@@ -403,15 +367,15 @@ columns = 2
 [node name="EmptyState" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(0, 400)
 layout_mode = 2
+size_flags_vertical = 3
 mouse_filter = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 28
 alignment = 1
 
 [node name="EmptyArt" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/EmptyState"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(110, 110)
+custom_minimum_size = Vector2(120, 120)
 layout_mode = 2
 size_flags_horizontal = 4
 mouse_filter = 2
@@ -419,7 +383,7 @@ mouse_filter = 2
 [node name="EmptyIcon" type="TextureRect" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/EmptyState/EmptyArt"]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0.34)
-custom_minimum_size = Vector2(54, 54)
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -433,17 +397,9 @@ layout_mode = 2
 text = "Your bag is empty"
 horizontal_alignment = 1
 
-[node name="EmptyBody" type="Label" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/EmptyState"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(800, 0)
-layout_mode = 2
-size_flags_horizontal = 4
-horizontal_alignment = 1
-autowrap_mode = 3
-
 [node name="EmptyCta" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/EmptyState"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 110)
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 size_flags_horizontal = 4
 script = ExtResource("4_cbtn")
@@ -505,7 +461,7 @@ theme_override_constants/separation = 18
 
 [node name="TradeArt" type="Control" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/TradeRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(88, 88)
+custom_minimum_size = Vector2(104, 104)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
@@ -523,20 +479,9 @@ unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 
-[node name="SelectedValue" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/TradeRow/TradeInfo"]
-unique_name_in_owner = true
-layout_mode = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxEmpty_none")
-
-[node name="SelectedValueLabel" type="Label" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/TradeRow/TradeInfo/SelectedValue"]
-unique_name_in_owner = true
-layout_mode = 2
-mouse_filter = 2
-
 [node name="ExchangeButton" type="PanelContainer" parent="RootVBox/CampPage/ContentStack/StashSection/SectionVBox/ExchangeBar/TradePanel/TradeVBox/TradeRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(430, 120)
+custom_minimum_size = Vector2(300, 120)
 layout_mode = 2
 size_flags_vertical = 4
 script = ExtResource("4_cbtn")

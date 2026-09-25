@@ -1,11 +1,11 @@
 class_name CampTradeBar
 extends Control
 
-## Trade bar (design_handoff_camp · TradeBar): odabrani tip i cijena po komadu,
-## Trade dugme (tap = 1, drzanje = 10/s), strip za rezervisano cvijece i "+N"
-## pop koji na otpustanje leti do coin chipa u headeru. Stanje racuna kontroler.
-
-const FILL_TICKS := 10
+## Trade bar (design_handoff_camp_v2 · TradeBar): odabrani tip i Trade dugme
+## 300 x 120 s jednom rijecju (tap = 1, drzanje = 10/s), strip za rezervisano
+## cvijece i "+N" pop. Bez podnaslova i bez "1 coin each" — cijena stoji na kartici.
+## Drzanje se vidi: fill je prodani dio gomile, a svaki tik posalje novcic prema
+## coin chipu u headeru. Stanje racuna kontroler.
 
 @onready var panel: PanelContainer = $TradePanel
 @onready var warning: PanelContainer = %ReservedWarning
@@ -13,8 +13,6 @@ const FILL_TICKS := 10
 @onready var warn_label: Label = %WarnLabel
 @onready var art: CampArtFrame = %TradeArt
 @onready var selected_label: Label = %SelectedLabel
-@onready var selected_value: PanelContainer = %SelectedValue
-@onready var selected_value_label: Label = %SelectedValueLabel
 @onready var button: CampButton = %ExchangeButton
 @onready var feedback: PanelContainer = %TradeFeedback
 @onready var feedback_label: Label = %FeedbackLabel
@@ -24,8 +22,10 @@ var _state: String = UiCamp.TRADE_DISABLED
 var _info: Dictionary = {}
 var _gain: int = 0
 var _hold_ticks: int = 0
-var _switch_active: bool = false
 var _switch_tween: Tween
+var _fly_coins: Array[Control] = []
+var _bump: Panel = null
+var _bump_tween: Tween
 var _feedback_tween: Tween
 var _strip_tween: Tween
 
@@ -35,12 +35,10 @@ func _ready() -> void:
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_theme_stylebox_override("panel", UiCamp.trade_bar_style())
 	art.configure_frame(UiCamp.TRADE_ART, 22, 3, 9.0, 15, 2, UiCamp.TRADE_ART_SEED)
-	for label in [selected_label, selected_value_label, warn_label]:
+	for label in [selected_label, warn_label]:
 		(label as Label).clip_text = true
 		(label as Label).text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		(label as Label).custom_minimum_size.x = 1.0
-	selected_value.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	selected_value.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	warning.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	warn_icon.custom_minimum_size = Vector2(UiCamp.WARN_ICON, UiCamp.WARN_ICON)
 	UiCamp.style_label(warn_label, UiCamp.FONT_WARN, UiCamp.INK)
@@ -52,7 +50,9 @@ func _ready() -> void:
 	feedback_coin.texture = UiAssets.get_chrome_icon("icon_coin")
 	feedback_coin.custom_minimum_size = Vector2(UiCamp.FEEDBACK_COIN, UiCamp.FEEDBACK_COIN)
 	button.custom_minimum_size = UiCamp.TRADE_BTN
+	button.set_fonts(UiCamp.FONT_BTN)
 	button.set_press_scale(0.97)
+	button.clip_contents = true
 	apply_state(UiCamp.TRADE_DISABLED, {})
 
 
@@ -64,8 +64,12 @@ func get_warning_text() -> String:
 	return warn_label.text if warning.visible else ""
 
 
-func get_value_text() -> String:
-	return selected_value_label.text
+func get_button_text() -> String:
+	return button.get_title()
+
+
+func get_selected_text() -> String:
+	return selected_label.text
 
 
 ## `info`: kind, type_id, label, rarity, price, need, season_name, left.
@@ -78,21 +82,19 @@ func apply_state(state: String, info: Dictionary) -> void:
 	custom_minimum_size.y = UiCamp.trade_height(state)
 
 	if disabled:
-		selected_label.text = "Nothing selected"
+		# Bez imena i bez "Nothing selected" — prazan okvir sam kaze da nema sta prodati.
+		selected_label.text = ""
 		art.set_art(seed, "", 1)
-		art.modulate.a = 0.4
+		art.modulate.a = 0.9
 	else:
 		selected_label.text = str(info.get("label", ""))
 		art.configure_frame(
-			UiCamp.TRADE_ART, 22, 3, 9.0, 15, 2,
+			UiCamp.TRADE_ART, 24, 3, UiCamp.TRADE_ART_WELL_INSET, 17, 2,
 			UiCamp.TRADE_ART_SEED if seed else UiCamp.TRADE_ART_FLOWER
 		)
 		art.set_art(seed, str(info.get("type_id", "")), 1 if seed else 3)
 		art.modulate.a = 1.0
-	UiCamp.style_label(
-		selected_label, UiCamp.FONT_TRADE_LABEL, UiCamp.TRADE_DISABLED_INK if disabled else UiCamp.INK
-	)
-	_refresh_value()
+	UiCamp.style_label(selected_label, UiCamp.FONT_TRADE_LABEL, UiCamp.INK)
 
 	var stop := state == UiCamp.TRADE_HOLD_STOP
 	var strip := stop or state == UiCamp.TRADE_WARN
@@ -108,9 +110,10 @@ func apply_state(state: String, info: Dictionary) -> void:
 
 	var style := UiCamp.trade_button_style(state)
 	button.set_styles(style, style)
-	var text := UiCamp.trade_button_text(state)
-	button.set_text(text[0], text[1])
+	button.set_text(UiCamp.trade_button_text(state))
 	button.set_ink(UiCamp.trade_button_ink(state))
+	var icon_name := UiCamp.trade_button_icon(state)
+	button.set_icon(_button_icon(icon_name), UiCamp.TRADE_BTN_ICON)
 	button.disabled = disabled
 	if stop and prev != UiCamp.TRADE_HOLD_STOP:
 		button.set_hold_fill(button.get_hold_fill(), UiCamp.HOLD_FREEZE)
@@ -120,11 +123,20 @@ func apply_state(state: String, info: Dictionary) -> void:
 		button.reset_hold_fill(UiCamp.T_HOLD_RESET)
 
 
-## Jedan auto-tik drzanja: fill napreduje 1/10 i krug se zatvara svake sekunde.
-func on_hold_tick() -> void:
+## Jedan tik drzanja: fill je prodani dio gomile, a novcic odleti prema headeru.
+func on_hold_tick(sold: int, sellable_left: int) -> void:
 	_hold_ticks += 1
-	var step := _hold_ticks % FILL_TICKS
-	button.set_hold_fill(1.0 if step == 0 else float(step) / FILL_TICKS, UiPalette.PEACH)
+	button.set_hold_fill(UiCamp.hold_fill_ratio(sold, sellable_left), UiPalette.PEACH)
+	_fly_coin()
+
+
+## Tap (bez drzanja): fill kratko skoci pa se isprazni — prvi nagovjestaj da se drzi.
+func on_tap_hint(sold: int, sellable_left: int) -> void:
+	if _state == UiCamp.TRADE_HOLD_STOP:
+		return
+	button.set_hold_fill(UiCamp.hold_fill_ratio(sold, sellable_left), UiPalette.PEACH)
+	button.reset_hold_fill(UiCamp.T_TAP_FILL_DRAIN)
+	_fly_coin()
 
 
 func on_press_ended() -> void:
@@ -133,52 +145,91 @@ func on_press_ended() -> void:
 		button.reset_hold_fill(UiCamp.T_HOLD_RESET)
 
 
-## Auto prelaz: mint plocica "empty — switched here" iza novog imena.
+## Auto prelaz na sljedeci tip kad se odabrani isprazni: novo ime se pojavi umjesto
+## rečenice "empty — switched here".
 func flash_switch() -> void:
-	_switch_active = true
-	_refresh_value()
 	if not is_inside_tree():
 		return
 	if _switch_tween:
 		_switch_tween.kill()
-	selected_value.modulate.a = 0.0
+	selected_label.modulate.a = 0.0
 	_switch_tween = create_tween()
-	_switch_tween.tween_property(selected_value, "modulate:a", 1.0, UiCamp.T_AUTO_SWITCH) \
+	_switch_tween.tween_property(selected_label, "modulate:a", 1.0, UiCamp.T_AUTO_SWITCH) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_switch_tween.tween_interval(UiCamp.T_AUTO_SWITCH_HOLD)
-	_switch_tween.tween_property(selected_value, "modulate:a", 0.0, UiCamp.T_AUTO_SWITCH)
-	_switch_tween.tween_callback(_end_switch)
 
 
-func _end_switch() -> void:
-	_switch_active = false
-	_refresh_value()
-	selected_value.modulate.a = 1.0
+## Novcic 44 px odleti od dugmeta do coin chipa u headeru (max 3 ziva, bez cestica).
+func _fly_coin() -> void:
+	if not is_inside_tree() or _fly_coins.size() >= UiCamp.FLY_COIN_MAX:
+		return
+	var hub := _find_hub()
+	if hub == null:
+		return
+	var chip := hub.get("coin_chip") as Control
+	if chip == null or not is_instance_valid(chip):
+		return
+	var coin := TextureRect.new()
+	coin.name = "FlyCoin"
+	coin.texture = feedback_coin.texture
+	coin.custom_minimum_size = Vector2(UiCamp.FLY_COIN, UiCamp.FLY_COIN)
+	coin.size = coin.custom_minimum_size
+	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	coin.top_level = true
+	coin.z_index = 100
+	coin.pivot_offset = coin.size * 0.5
+	hub.add_child(coin)
+	_fly_coins.append(coin)
+	coin.global_position = button.global_position + button.size * 0.5 - coin.size * 0.5
+	var to := chip.global_position + chip.size * 0.5 - coin.size * 0.5
+	var tw := coin.create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(coin, "global_position", to, UiCamp.T_FLY_COIN) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tw.tween_property(coin, "scale", Vector2.ONE * 0.7, UiCamp.T_FLY_COIN)
+	tw.chain().tween_callback(_on_fly_coin_arrived.bind(coin, chip))
 
 
-func _refresh_value() -> void:
-	var disabled := _state == UiCamp.TRADE_DISABLED
-	var rarity := int(_info.get("rarity", 1))
-	var text := ""
-	if disabled:
-		text = "pick a type to trade"
-	elif _switch_active:
-		text = "empty — switched here"
-	elif _state == UiCamp.TRADE_HOLD_STOP:
-		var need := int(_info.get("need", 0))
-		text = "%s · %d of %d kept" % [UiCamp.pips(rarity), need, need]
-	else:
-		text = UiCamp.trade_info_text(rarity, int(_info.get("price", 1)))
-	selected_value_label.text = text
-	var plate := _switch_active and not disabled
-	selected_value.add_theme_stylebox_override(
-		"panel", UiCamp.switch_plate_style() if plate else StyleBoxEmpty.new()
-	)
-	selected_value.size_flags_horizontal = (
-		Control.SIZE_SHRINK_BEGIN if plate else Control.SIZE_EXPAND_FILL
-	)
-	var ink := UiCamp.INK if plate else (UiCamp.TRADE_DISABLED_INK if disabled else UiCamp.SUB_INK)
-	UiCamp.style_label(selected_value_label, UiCamp.FONT_TRADE_SUB, ink, UiCamp.SEMI)
+func _on_fly_coin_arrived(coin: Control, chip: Control) -> void:
+	_fly_coins.erase(coin)
+	if is_instance_valid(coin):
+		coin.queue_free()
+	_bump_coin_chip(chip)
+
+
+## Prsten preko coin chipa kad novcic stigne — put od dugmeta do brojaca se vidi.
+func _bump_coin_chip(chip: Control) -> void:
+	if chip == null or not is_instance_valid(chip) or not is_inside_tree():
+		return
+	var hub := _find_hub()
+	if hub == null:
+		return
+	if _bump == null or not is_instance_valid(_bump):
+		_bump = Panel.new()
+		_bump.name = "CoinChipBump"
+		_bump.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_bump.add_theme_stylebox_override("panel", UiCamp.coin_bump_style())
+		_bump.top_level = true
+		_bump.z_index = 99
+		hub.add_child(_bump)
+	_bump.size = chip.size + Vector2(12, 12)
+	_bump.global_position = chip.global_position - Vector2(6, 6)
+	_bump.modulate.a = 0.0
+	_bump.visible = true
+	if _bump_tween and _bump_tween.is_valid():
+		_bump_tween.kill()
+	_bump_tween = _bump.create_tween()
+	_bump_tween.tween_property(_bump, "modulate:a", 1.0, UiCamp.T_COIN_BUMP * 0.4)
+	_bump_tween.tween_property(_bump, "modulate:a", 0.0, UiCamp.T_COIN_BUMP * 0.6)
+
+
+func _button_icon(icon_name: String) -> Texture2D:
+	if icon_name.is_empty():
+		return null
+	if icon_name == "icon_lock":
+		return UiAssets.get_chrome_icon("icon_lock")
+	return UiAssets.get_camp_icon(icon_name)
 
 
 func _play_strip_in() -> void:

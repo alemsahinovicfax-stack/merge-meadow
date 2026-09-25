@@ -1,7 +1,7 @@
 extends SceneTree
 
 ## CAMP-06 / design_handoff_camp — tap = 1 sjeme, hold = 10/s, prelazak na
-## sljedeci tip dok se drzi; Trade dugme "Trade / hold 10 / s" → "Trading".
+## sljedeci tip dok se drzi; Trade dugme "Trade" → "Trading" (v2: bez podnaslova).
 
 var _backup: String = ""
 
@@ -67,8 +67,8 @@ func _run() -> void:
 	camp.set("_force_default_trade_select", true)
 	camp.call("_refresh_garden_card")
 	await process_frame
-	if str(button.call("get_title")) != "Trade" or str(button.call("get_sub")) != "hold 10 / s":
-		_fail("Trade button must read 'Trade / hold 10 / s' got '%s / %s'" % [button.call("get_title"), button.call("get_sub")])
+	if str(button.call("get_title")) != "Trade" or not str(button.call("get_sub")).is_empty():
+		_fail("idle Trade button must read just 'Trade', got '%s / %s'" % [button.call("get_title"), button.call("get_sub")])
 		return
 
 	# Tap = tačno jedno sjeme.
@@ -153,8 +153,9 @@ func _run() -> void:
 	if str(camp.get("_selected_trade_type")) != "tulip":
 		_fail("selection must advance to tulip got %s" % str(camp.get("_selected_trade_type")))
 		return
-	if str(bar.call("get_value_text")) != "empty — switched here":
-		_fail("auto switch must flash 'empty — switched here', got '%s'" % str(bar.call("get_value_text")))
+	# v2: prelaz se vidi po novom imenu u baru, bez rečenice.
+	if str(bar.call("get_selected_text")).is_empty():
+		_fail("auto switch must show the new type name")
 		return
 	button.call("_tick_repeat", float(button.get("auto_repeat_delay")))
 	for _k in 2:
@@ -175,8 +176,8 @@ func _run() -> void:
 	if not bool(button.get("disabled")) or str(bar.call("get_state")) != "disabled":
 		_fail("empty bag must disable Trade (bar stays)")
 		return
-	if not (bar as Control).visible or str(button.call("get_sub")) != "nothing to trade":
-		_fail("disabled Trade bar must stay visible with 'nothing to trade'")
+	if not (bar as Control).visible or str(button.call("get_title")) != "Trade":
+		_fail("disabled Trade bar must stay visible with a plain 'Trade' button")
 		return
 
 	print("camp_trade_hold_smoke OK")
