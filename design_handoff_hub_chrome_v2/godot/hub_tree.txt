@@ -1,0 +1,35 @@
+meta_hub.tscn — hub chrome v2 (px baze 1080 x 1920; safe area se dodaje IZVAN navedenih visina)
+
+MetaHub (Control, full rect)
+└─ RootVBox (VBoxContainer, separation 0)
+   ├─ TopBar = Header (PanelContainer, chrome_style(true))            1080 x (safe_top + 143)
+   │  └─ Panel/HBox (HBoxContainer, separation 16, margin left 20)    1080 x 140
+   │     ├─ CoinChip   (PanelContainer, chip_style())                 296 x 100
+   │     │  ├─ Icon   (TextureRect icon_coin.svg, bez modulate)        64 x 64
+   │     │  └─ Count  (Label 48, NUMBER_INK, align right)             190 x 100   gap 10
+   │     ├─ SeedChip   (isto, icon_seed.svg)                          296 x 100
+   │     ├─ FlowerChip (isto, icon_flower.svg; bivši DiamondChip)     296 x 100
+   │     │     Count ← GameState.get_garden_crystal_total()
+   │     └─ SettingsSlot (Control, 124 x 140 — hit-zona)
+   │        └─ SettingsButton (HubIconButton, icon_button_style)      100 x 100 @ x 4
+   │           └─ Icon (icon_settings_light.svg)                       56 x 56
+   ├─ Pager (SwipePager)                                              1080 x 1633 (bilo 1597)
+   │  └─ Shop · Journal · Home · Camp · Arena                         svaka 1080 x 1633
+   └─ PageIndicator = Footer (PanelContainer, chrome_style(false))   1080 x (144 + safe_bottom)
+      └─ NavPanel/Content (Control)                                   1080 x 141 (bilo 177), y 3
+         ├─ ActiveIndicator (Panel, indicator_style)                  72 x 8 @ (slot·216 + 72, 6)
+         ├─ Tabs (HBoxContainer, separation 0)
+         │  ├─ Tab_Shop    (HubTab, hit 216 x 141)
+         │  │  └─ Tile (Panel, tab_style)                             184 x 108 @ (16, 20)
+         │  │     ├─ TabIcon (TextureRect)  aktivan 72 (tab_shop.svg) @ lift −2
+         │  │     │                          neaktivan 64 (tab_shop_light.svg, a .82)
+         │  │     └─ TabBadge (PanelContainer, badge_style)           44 x 44 @ tile top-right (+6, −8)
+         │  ├─ Tab_Journal (isto)   ← badge = count_collection_journal_news()
+         │  ├─ Tab_Home    (isto)
+         │  ├─ Tab_Camp    (isto)
+         │  └─ Tab_Arena   (isto)
+         └─ NavLockPill (PanelContainer, lock_pill_style)             auto x 64, centriran, y −36 − 3
+            ├─ Icon  (icon_lock.svg)                                   34 x 34
+            └─ Label "ROUND IN PROGRESS" (38, #E8C44A, spacing 2)
+
+Uklanja se: HubTab/_label, TAB_ICON_GAP, TAB_LABEL_FONT_SIZE, UiChrome.tab_ink(), chip_style(fill) potpis.

@@ -97,7 +97,7 @@ func _apply() -> void:
 	_icon.configure_frame(UiCamp.TAB_ICON, 22, 3, 0.0, 0, 0, UiCamp.TAB_ICON_ART)
 	_icon.set_icon(
 		seed,
-		UiAssets.get_chrome_icon("icon_seed") if seed else UiAssets.get_arena_icon("icon_crystal"),
+		UiAssets.get_chrome_icon("icon_seed") if seed else UiAssets.get_chrome_icon("icon_flower"),
 		UiCamp.TAB_ICON_ART
 	)
 	_label.text = "Seeds" if seed else "Flowers"

@@ -22,7 +22,7 @@ func _draw() -> void:
 	var side := minf(size.x, size.y)
 	var center := size * 0.5
 	if _type_id.is_empty():
-		var seed_tex := UiAssets.get_chrome_icon("icon_seed_light")
+		var seed_tex := UiAssets.get_chrome_icon("icon_seed")
 		if seed_tex:
 			var art := side * 0.44
 			draw_texture_rect(seed_tex, Rect2(center - Vector2(art, art) * 0.5, Vector2(art, art)), false)

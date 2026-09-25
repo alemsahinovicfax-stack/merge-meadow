@@ -18,13 +18,13 @@ const COIN_POP_TIME := 0.6  # s
 @onready var top_bar_panel: PanelContainer = $RootVBox/TopBar/Panel
 @onready var coin_chip: PanelContainer = $RootVBox/TopBar/Panel/HBox/CoinChip
 @onready var seed_chip: PanelContainer = $RootVBox/TopBar/Panel/HBox/SeedChip
-@onready var diamond_chip: PanelContainer = $RootVBox/TopBar/Panel/HBox/DiamondChip
+@onready var flower_chip: PanelContainer = $RootVBox/TopBar/Panel/HBox/FlowerChip
 @onready var coins_label: Label = $RootVBox/TopBar/Panel/HBox/CoinChip/HBox/CoinsLabel
 @onready var seeds_label: Label = $RootVBox/TopBar/Panel/HBox/SeedChip/HBox/SeedsLabel
-@onready var diamonds_label: Label = $RootVBox/TopBar/Panel/HBox/DiamondChip/HBox/DiamondsLabel
+@onready var flowers_label: Label = $RootVBox/TopBar/Panel/HBox/FlowerChip/HBox/FlowersLabel
 @onready var coin_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/CoinChip/HBox/CoinIcon
 @onready var seed_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/SeedChip/HBox/SeedIcon
-@onready var diamond_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/DiamondChip/HBox/DiamondIcon
+@onready var flower_icon: TextureRect = $RootVBox/TopBar/Panel/HBox/FlowerChip/HBox/FlowerIcon
 @onready var settings_button: HubIconButton = $RootVBox/TopBar/Panel/HBox/SettingsButton
 @onready var nav_panel: PanelContainer = $RootVBox/PageIndicator/NavPanel
 @onready var page_tabs: HBoxContainer = $RootVBox/PageIndicator/NavPanel/Content/TabsRow
@@ -76,9 +76,9 @@ func _process(_delta: float) -> void:
 func _setup_chrome() -> void:
 	_safe_insets = SAFE_AREA.get_insets(get_viewport())
 	top_bar_panel.add_theme_stylebox_override("panel", _header_style())
-	_setup_chip(coin_chip, coin_icon, coins_label, UiChrome.COIN_GOLD)
-	_setup_chip(seed_chip, seed_icon, seeds_label, UiPalette.MINT)
-	_setup_chip(diamond_chip, diamond_icon, diamonds_label, UiPalette.LAVENDER)
+	_setup_chip(coin_chip, coin_icon, coins_label)
+	_setup_chip(seed_chip, seed_icon, seeds_label)
+	_setup_chip(flower_chip, flower_icon, flowers_label)
 	_setup_resource_icons()
 	settings_button.set_icon(UI_ASSETS.get_chrome_icon("icon_settings_light"))
 	settings_button.clicked.connect(_on_settings_pressed)
@@ -86,18 +86,19 @@ func _setup_chrome() -> void:
 	_apply_nav_lock_visuals()
 
 
-func _setup_chip(chip: PanelContainer, icon: TextureRect, label: Label, fill: Color) -> void:
-	chip.add_theme_stylebox_override("panel", UiChrome.chip_style(fill))
+func _setup_chip(chip: PanelContainer, icon: TextureRect, label: Label) -> void:
+	chip.add_theme_stylebox_override("panel", UiChrome.chip_style())
 	chip.custom_minimum_size.y = UiChrome.CHIP_H
 	icon.custom_minimum_size = Vector2(UiChrome.CHIP_ICON_SIZE, UiChrome.CHIP_ICON_SIZE)
 	TEXT_LAYOUT.header_chip_count(label)
 
 
-## Chrome siluete iz CD-a; pickup sprite je fallback ako import fali (greske-katalog #6).
+## Ikone valuta iz CD-a (v2: u boji, nikad tintane); pickup sprite je fallback ako
+## import fali (greske-katalog #6).
 func _setup_resource_icons() -> void:
 	coin_icon.texture = _chrome_icon_or("icon_coin", PICKUP_ASSETS.get_coin_texture())
 	seed_icon.texture = _chrome_icon_or("icon_seed", PICKUP_ASSETS.get_seed_texture())
-	diamond_icon.texture = _chrome_icon_or("icon_diamond", PICKUP_ASSETS.get_diamond_texture())
+	flower_icon.texture = UI_ASSETS.get_chrome_icon("icon_flower")
 
 
 func _chrome_icon_or(icon_name: String, fallback: Texture2D) -> Texture2D:
@@ -400,8 +401,8 @@ func refresh_top_bar() -> void:
 		coins_label.text = UiChrome.format_count(GameState.wallet_coins)
 	if seeds_label:
 		seeds_label.text = UiChrome.format_count(GameState.sum_seed_bag_only())
-	if diamonds_label:
-		diamonds_label.text = UiChrome.format_count(GameState.get_diamonds())
+	if flowers_label:
+		flowers_label.text = UiChrome.format_count(GameState.get_garden_crystal_total())
 	_refresh_tab_badges()
 
 

@@ -7,7 +7,7 @@ const UiAttention := preload("res://scripts/ui/ui_attention.gd")
 const PICKER_ROW_MIN_HEIGHT := 148.0
 const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
 const LOCKED_SEED_MODULATE := Color(0.45, 0.45, 0.45, 1)
-## Biranje sezone: kolona 24 px od rubova, 23 px ispod Play reda (1394 + 180).
+## Biranje sezone: kolona 24 px od rubova, 23 px ispod Play reda (1430 + 180).
 const SELECT_COLUMN_OFFSETS := Vector4(24, 24, -24, -23)
 const FIELD_COLUMN_OFFSETS := Vector4(24, 24, -24, -24)
 const FIELD_PLAY_SIZE := Vector2(656, 176)

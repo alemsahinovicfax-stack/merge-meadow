@@ -29,11 +29,9 @@ const DIAMOND_CHIP_EDGE := Color("#8FC4DE")
 const TOAST_BG := Color(0.086, 0.129, 0.106, 0.78)
 
 # --- Pickup ------------------------------------------------------------
-const COIN_SIZE := 96
+const COIN_SIZE := 96                      # icon_coin.svg; fill/edge ostaju za run_token i feed
 const COIN_FILL := Color("#FFD56B")
 const COIN_EDGE := UiArena.GOLD_EDGE
-const COIN_INNER := Color("#FFE8B8")
-const COIN_GLINT := Color("#FFF3D0")
 
 const SEED_SIZE := 120                    # bio 52 (≈ 19 dp) — necitljivo
 const SEED_WELL := UiArena.SEED_WELL

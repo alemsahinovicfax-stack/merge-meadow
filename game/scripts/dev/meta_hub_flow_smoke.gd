@@ -117,6 +117,16 @@ func _step() -> void:
 	var seed_icon := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/SeedChip/HBox/SeedIcon") as TextureRect
 	var coins_label := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/CoinChip/HBox/CoinsLabel") as Label
 	var seeds_label := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/SeedChip/HBox/SeedsLabel") as Label
+	var flower_icon := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/FlowerChip/HBox/FlowerIcon") as TextureRect
+	var flowers_label := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/FlowerChip/HBox/FlowersLabel") as Label
+	if flower_icon == null or flower_icon.texture == null or flowers_label == null:
+		push_error("meta_hub_flow_smoke: hub FlowerChip missing (v2 replaced DiamondChip)")
+		quit(1)
+		return
+	if hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/DiamondChip") != null:
+		push_error("meta_hub_flow_smoke: DiamondChip should be gone from the header")
+		quit(1)
+		return
 	if coin_icon == null or coin_icon.texture == null:
 		push_error("meta_hub_flow_smoke: hub CoinIcon missing texture")
 		quit(1)
@@ -144,6 +154,14 @@ func _step() -> void:
 			return
 	var want_coins := UI_CHROME.format_count(int(gs.get("wallet_coins")))
 	var want_seeds := UI_CHROME.format_count(int(gs.call("sum_seed_bag_only")))
+	var want_flowers := UI_CHROME.format_count(int(gs.call("get_garden_crystal_total")))
+	if flowers_label.text != want_flowers:
+		push_error(
+			"meta_hub_flow_smoke: FlowersLabel got '%s' expected '%s'"
+			% [flowers_label.text, want_flowers]
+		)
+		quit(1)
+		return
 	if coins_label.text != want_coins:
 		push_error(
 			"meta_hub_flow_smoke: CoinsLabel got '%s' expected '%s'"
@@ -158,9 +176,10 @@ func _step() -> void:
 		)
 		quit(1)
 		return
+	# v2: chip je tamni well, pa je broj krem (v1 je bio tamni ink na pastelnom chipu).
 	var coin_color: Color = coins_label.get_theme_color("font_color")
-	if coin_color.v > 0.85:
-		push_error("meta_hub_flow_smoke: CoinsLabel font too light for pastel chip")
+	if coin_color.v < 0.9:
+		push_error("meta_hub_flow_smoke: CoinsLabel must be cream on the dark chip well")
 		quit(1)
 		return
 	hub.go_to_page(MetaHubPages.CAMP, false)

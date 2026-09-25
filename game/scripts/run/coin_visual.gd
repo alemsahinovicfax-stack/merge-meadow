@@ -1,13 +1,17 @@
 extends Sprite2D
 
-## Novčić u runu — placeholder krug 96 px. Kolizija ostaje r 18 na roditelju.
+## Novčić u runu — ikona icon_coin.svg na 96 px, ista koja stoji u headeru, Campu
+## i Shopu (design_handoff_hub_chrome_v2). Kolizija ostaje r 18 na roditelju.
+## Crta se ručno da sjena ostane ISPOD novčića; Sprite2D.texture bi je prekrio.
 
 var _phase: float = 0.0
+var _tex: Texture2D = null
 
 
 func _ready() -> void:
 	texture = null
 	centered = true
+	_tex = UiAssets.get_chrome_icon("icon_coin")
 	_phase = randf() * TAU
 	queue_redraw()
 
@@ -19,11 +23,13 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	_draw_shadow()
-	var radius := float(UiRun.COIN_SIZE) * 0.5
-	draw_circle(Vector2.ZERO, radius, UiRun.COIN_FILL)
-	draw_arc(Vector2.ZERO, radius - 2.0, 0.0, TAU, 40, UiRun.COIN_EDGE, 5.0, true)
-	draw_circle(Vector2.ZERO, radius * 0.62, UiRun.COIN_INNER)
-	draw_circle(Vector2(-14, -16), 8.0, UiRun.COIN_GLINT)
+	var side := float(UiRun.COIN_SIZE)
+	if _tex == null:
+		# Fallback dok import ne prođe (greske-katalog #6).
+		draw_circle(Vector2.ZERO, side * 0.5, UiRun.COIN_FILL)
+		draw_arc(Vector2.ZERO, side * 0.5 - 2.0, 0.0, TAU, 40, UiRun.COIN_EDGE, 5.0, true)
+		return
+	draw_texture_rect(_tex, Rect2(Vector2(-side, -side) * 0.5, Vector2(side, side)), false)
 
 
 func _draw_shadow() -> void:

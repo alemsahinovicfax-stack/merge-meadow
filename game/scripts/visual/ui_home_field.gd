@@ -43,7 +43,7 @@ const SCRIM            := Color(0.078, 0.102, 0.086, 0.62)
 const SHEET_EDGE       := Color(1, 0.973, 0.941, 0.30)
 
 # ── Layout polja ─────────────────────────────────────────────────────────────
-const PAGE            := Vector2i(1080, 1597)
+const PAGE            := Vector2i(1080, 1633)
 const PAGE_Y          := 143
 const PAGE_PADDING    := 24
 const BLOCK_GAP       := 16

@@ -3,7 +3,7 @@ extends RefCounted
 
 ## Merge Arena — docs/04-experience/design-drafts/merge-arena-cd-brief.md
 ## Dizajn: design_handoff_merge_arena/README.md · smjer B (sadnica: cream rim + tamni well).
-## Sve mjere su u px baze 1080x1920; u hubu Arena ima 1597 px izmedju headera i footera.
+## Sve mjere su u px baze 1080x1920; u hubu Arena ima 1633 px izmedju headera (143) i footera (144).
 
 # --- Boje (izvedene iz ui_palette.gd) ---
 const SEED_WELL := Color("#22342A")  # livada #293D2E, 20 % tamnije

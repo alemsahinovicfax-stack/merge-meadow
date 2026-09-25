@@ -1,8 +1,10 @@
 class_name HubTab
 extends HubPressable
 
-## Tab hub footera — cijeli slot (216 x 177) je hit-zona, tile 196 x 152 nosi stanje.
-## Stanja: neaktivan / aktivan / pritisnut / aktivan pritisnut (UiChrome.tab_style).
+## Tab hub footera — v2: cijeli slot (216 x 141) je hit-zona, tile 184 x 108 nosi
+## stanje, a ikona je jedini sadržaj (labela je uklonjena). Aktivan tab se razlikuje
+## po četiri stvari: peach ploča, ikona u boji, 72 px umjesto 64 i indikator iznad.
+## Ime taba ostaje kao accessible name (tooltip), nevidljivo.
 
 const PRESSED_SCALE := 0.96
 const BADGE_MAX := 9
@@ -15,14 +17,13 @@ var _badge_count: int = 0
 var _styles: Dictionary = {}
 var _tile: PanelContainer = null
 var _icon: TextureRect = null
-var _label: Label = null
 var _badge: PanelContainer = null
 var _badge_label: Label = null
 
 
 func _ready() -> void:
 	super()
-	custom_minimum_size = Vector2(UiChrome.TAB_TILE_W, UiChrome.FOOTER_CONTENT_H)
+	custom_minimum_size = Vector2(UiChrome.TAB_SLOT_W, UiChrome.FOOTER_CONTENT_H)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_build()
 	resized.connect(_layout)
@@ -30,13 +31,12 @@ func _ready() -> void:
 	_refresh_badge()
 
 
-## Ikona: tamna na peach (aktivan), svijetla na traci (neaktivan).
+## Ikona: u boji na peach ploči (aktivan), krem linijska na traci (neaktivan).
 func setup(text: String, icon_dark: Texture2D, icon_light: Texture2D) -> void:
 	_text = text
 	_icon_dark = icon_dark
 	_icon_light = icon_light
-	if _label:
-		_label.text = text
+	tooltip_text = text
 	_apply_state()
 
 
@@ -49,6 +49,10 @@ func set_active(on: bool) -> void:
 
 func is_active() -> bool:
 	return _active
+
+
+func get_tab_text() -> String:
+	return _text
 
 
 func set_badge_count(count: int) -> void:
@@ -71,16 +75,17 @@ func _apply_state() -> void:
 		state = "pressed"
 	_tile.add_theme_stylebox_override("panel", _styles[state])
 	_tile.scale = Vector2.ONE * (PRESSED_SCALE if pressing and not _active else 1.0)
-	_label.add_theme_color_override("font_color", UiChrome.tab_ink(_active))
-	_label.add_theme_font_override(
-		"font", UiChrome.heavy_font(UiChrome.EMBOLDEN_800 if _active else UiChrome.EMBOLDEN_700)
-	)
 	var tex: Texture2D = _icon_dark if _active else _icon_light
 	if tex == null:
 		tex = _icon_light if _active else _icon_dark
 	_icon.texture = tex
 	_icon.visible = tex != null
+	var side := UiChrome.TAB_ICON_SIZE_ACTIVE if _active else UiChrome.TAB_ICON_SIZE
+	_icon.custom_minimum_size = Vector2(side, side)
+	_icon.size = Vector2(side, side)
+	# Ikone su u boji i fiksne — smije se mijenjati samo alpha, nikad RGB.
 	_icon.modulate = Color(1.0, 1.0, 1.0, 1.0 if _active else UiChrome.INACTIVE_INK_ALPHA)
+	_layout()
 
 
 func _build() -> void:
@@ -90,25 +95,13 @@ func _build() -> void:
 	_tile.name = "Tile"
 	_tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_tile)
-	var column := VBoxContainer.new()
-	column.alignment = BoxContainer.ALIGNMENT_CENTER
-	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	column.add_theme_constant_override("separation", UiChrome.TAB_ICON_GAP)
-	_tile.add_child(column)
 	_icon = TextureRect.new()
 	_icon.name = "Icon"
 	_icon.custom_minimum_size = Vector2(UiChrome.TAB_ICON_SIZE, UiChrome.TAB_ICON_SIZE)
-	_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	column.add_child(_icon)
-	_label = Label.new()
-	_label.name = "Label"
-	_label.text = _text
-	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_label.add_theme_font_size_override("font_size", UiChrome.TAB_LABEL_FONT_SIZE)
-	column.add_child(_label)
+	add_child(_icon)
 	_badge = PanelContainer.new()
 	_badge.name = "Badge"
 	_badge.visible = false
@@ -133,6 +126,14 @@ func _layout() -> void:
 	_tile.position = tile_pos
 	_tile.size = Vector2(UiChrome.TAB_TILE_W, UiChrome.TAB_TILE_H)
 	_tile.pivot_offset = _tile.size * 0.5
+	var side := float(UiChrome.TAB_ICON_SIZE_ACTIVE if _active else UiChrome.TAB_ICON_SIZE)
+	var lift := float(UiChrome.TAB_ICON_ACTIVE_LIFT) if _active else 0.0
+	_icon.size = Vector2(side, side)
+	_icon.position = (
+		tile_pos
+		+ (Vector2(UiChrome.TAB_TILE_W, UiChrome.TAB_TILE_H) - Vector2(side, side)) * 0.5
+		+ Vector2(0.0, lift)
+	)
 	if _badge.visible:
 		var badge_size := _badge.get_combined_minimum_size()
 		_badge.size = badge_size

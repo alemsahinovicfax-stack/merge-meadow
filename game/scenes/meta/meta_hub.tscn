@@ -51,10 +51,10 @@ size_flags_vertical = 4
 
 [node name="HBox" type="HBoxContainer" parent="RootVBox/TopBar/Panel/HBox/CoinChip"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="CoinIcon" type="TextureRect" parent="RootVBox/TopBar/Panel/HBox/CoinChip/HBox"]
-custom_minimum_size = Vector2(56, 56)
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
 expand_mode = 1
@@ -75,10 +75,10 @@ size_flags_vertical = 4
 
 [node name="HBox" type="HBoxContainer" parent="RootVBox/TopBar/Panel/HBox/SeedChip"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="SeedIcon" type="TextureRect" parent="RootVBox/TopBar/Panel/HBox/SeedChip/HBox"]
-custom_minimum_size = Vector2(56, 56)
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
 expand_mode = 1
@@ -91,24 +91,24 @@ text = "0"
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="DiamondChip" type="PanelContainer" parent="RootVBox/TopBar/Panel/HBox"]
+[node name="FlowerChip" type="PanelContainer" parent="RootVBox/TopBar/Panel/HBox"]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="HBox" type="HBoxContainer" parent="RootVBox/TopBar/Panel/HBox/DiamondChip"]
+[node name="HBox" type="HBoxContainer" parent="RootVBox/TopBar/Panel/HBox/FlowerChip"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
-[node name="DiamondIcon" type="TextureRect" parent="RootVBox/TopBar/Panel/HBox/DiamondChip/HBox"]
-custom_minimum_size = Vector2(56, 56)
+[node name="FlowerIcon" type="TextureRect" parent="RootVBox/TopBar/Panel/HBox/FlowerChip/HBox"]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
 expand_mode = 1
 stretch_mode = 5
 
-[node name="DiamondsLabel" type="Label" parent="RootVBox/TopBar/Panel/HBox/DiamondChip/HBox"]
+[node name="FlowersLabel" type="Label" parent="RootVBox/TopBar/Panel/HBox/FlowerChip/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0"
@@ -131,14 +131,14 @@ offset_right = 5400.0
 offset_bottom = 1600.0
 
 [node name="PageIndicator" type="MarginContainer" parent="RootVBox"]
-custom_minimum_size = Vector2(0, 180)
+custom_minimum_size = Vector2(0, 144)
 layout_mode = 2
 
 [node name="NavPanel" type="PanelContainer" parent="RootVBox/PageIndicator"]
 layout_mode = 2
 
 [node name="Content" type="Control" parent="RootVBox/PageIndicator/NavPanel"]
-custom_minimum_size = Vector2(0, 177)
+custom_minimum_size = Vector2(0, 141)
 layout_mode = 2
 mouse_filter = 2
 
@@ -174,7 +174,7 @@ theme_override_constants/separation = 14
 alignment = 1
 
 [node name="LockIcon" type="TextureRect" parent="RootVBox/PageIndicator/NavPanel/Content/NavLockPill/HBox"]
-custom_minimum_size = Vector2(30, 30)
+custom_minimum_size = Vector2(34, 34)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2

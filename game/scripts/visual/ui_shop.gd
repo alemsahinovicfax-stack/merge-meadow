@@ -2,8 +2,8 @@ class_name UiShop
 extends RefCounted
 
 ## Shop — design_handoff_shop/README.md · design/ShopScreen.dc.html
-## Sve mjere su u px baze 1080x1920. Shop zauzima 1597 px izmedju headera (143)
-## i footera (180) iz UiChrome. Nijanse su iz ui_palette.gd / ui_camp.gd / ui_home.gd;
+## Sve mjere su u px baze 1080x1920. Shop zauzima 1633 px izmedju headera (143)
+## i footera (144) iz UiChrome. Nijanse su iz ui_palette.gd / ui_camp.gd / ui_home.gd;
 ## nove su samo CONFIRM_EDGE, FAIL_PINK* (= UiCamp.WARN_PINK*) i LABEL_CHIP.
 ## Katalog, cijene i pravila se ne mijenjaju — ovo je samo izgled.
 
@@ -52,7 +52,7 @@ const SHADOW_HEADER := Color(0.078, 0.102, 0.086, 0.22)
 const SHADOW_POP := Color(0.078, 0.102, 0.086, 0.30)
 
 # --- Stranica ---
-const PAGE_H := 1597
+const PAGE_H := 1633
 const PAGE_PAD_X := 24
 const CONTENT_TOP := 184                       # HEADER_ROW_H + 24
 const CONTENT_BOTTOM := 64

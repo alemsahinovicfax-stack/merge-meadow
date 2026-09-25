@@ -2,8 +2,8 @@ class_name UiStage
 extends RefCounted
 
 ## Home Season Stage (design_handoff_home_v2, smjer 1a): mjere, boje, Nunito
-## fontovi i oblici. Mjere su px baze 1080 x 1920; stage = sadrzaj 1080 x 1597
-## izmedju headera (143) i footera (180). Poluprozirni rubovi iz HTML-a se ovdje
+## fontovi i oblici. Mjere su px baze 1080 x 1920; stage = sadrzaj 1080 x 1633
+## izmedju headera (143) i footera (144). Poluprozirni rubovi iz HTML-a se ovdje
 ## racunaju kao neprozirni (CSS crta pozadinu i ispod ruba, StyleBoxFlat ne).
 
 const NUNITO := preload("res://assets/fonts/nunito/Nunito-Variable.ttf")
@@ -46,10 +46,10 @@ const MUTED_EDGE := Color(0.102, 0.102, 0.078, 0.30)
 const PILL := {1: Color("#A8E6CF"), 2: Color("#B8E0F5"), 3: Color("#FFD56B")}
 
 # --- Stage (koordinate SeasonStage = stranica Home) ---
-const STAGE := Vector2(1080, 1597)
-const CARD := Rect2(24, 24, 1032, 1100)
-const DOCK := Rect2(0, 1148, 1080, 222)
-const PLAY_ROW := Rect2(24, 1394, 1032, 180)
+const STAGE := Vector2(1080, 1633)
+const CARD := Rect2(24, 24, 1032, 1136)
+const DOCK := Rect2(0, 1184, 1080, 222)
+const PLAY_ROW := Rect2(24, 1430, 1032, 180)
 const PLAY_W := 836.0
 const GIFT := 180.0
 const ROW_GAP := 16

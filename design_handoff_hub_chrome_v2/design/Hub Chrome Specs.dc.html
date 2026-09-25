@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<meta name="design_doc_mode" content="canvas">
+<style>body{margin:0;background:#E9E2D8}a{color:#6B4F8C}a:hover{color:#2A2233}</style>
+</helmet>
+<div data-layer="Specs" style="width:2600px;padding:80px;box-sizing:border-box;font-family:Nunito,system-ui,sans-serif;color:#2D3436;display:flex;flex-direction:column;gap:88px">
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font:900 72px/1 Nunito,sans-serif;letter-spacing:-.01em">Hub chrome v2 · specs</div>
+    <div style="font:700 30px/1.4 Nunito,sans-serif;color:#555C5E;max-width:1700px;text-wrap:pretty">Dusk plum chrome #2A2233 for both bars · icon-only footer 144 px (was 180, Δ = 36 to every page) · header 143 px unchanged, third chip counts flowers · all px on the 1080 × 1920 base.</div>
+  </div>
+
+  <div data-layer="ChromeColour" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 44px/1 Nunito,sans-serif">1 · Chrome colour</div>
+    <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:28px">
+      <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="3">
+        <div style="background:#FFF8F0;border-radius:26px;overflow:hidden;border:2px solid rgba(45,52,54,.12)">
+          <div style="{{ s.bandStyle }}">
+            <sc-for list="{{ s.pages }}" as="pp">
+              <div style="{{ pp.style }}"></div>
+            </sc-for>
+          </div>
+          <div style="padding:26px 28px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font:900 32px/1 Nunito,sans-serif">{{ s.name }}</span><span style="font:800 26px/1 ui-monospace,Menlo,monospace">{{ s.hex }}</span></div>
+            <div style="font:800 20px/1 Nunito,sans-serif;letter-spacing:.08em;color:{{ s.tagInk }}">{{ s.tag }}</div>
+            <div style="font:700 22px/1.45 Nunito,sans-serif;color:#555C5E;text-wrap:pretty">{{ s.why }}</div>
+            <div style="font:700 19px/1.5 ui-monospace,Menlo,monospace;color:#555C5E">{{ s.nums }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font:700 22px/1.4 Nunito,sans-serif;color:#555C5E">Strips under each swatch = pages it must hold against, left → right: Journal, Shop (#2E4733 in code today), Home field, Moonlit Warren, Camp, Arena, Home carousel. ΔE = CIELAB distance to the dark meadow pages (higher = hue separates better); luminance contrast on dark pages is carried by the 3 px cream rim @ 55 %.</div>
+  </div>
+
+  <div data-layer="Screens" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 44px/1 Nunito,sans-serif">2 · Chrome over all pages (scale 0.36)</div>
+    <div style="display:flex;flex-wrap:wrap;gap:36px">
+      <sc-for list="{{ screens }}" as="sc" hint-placeholder-count="11">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="width:389px;height:691px;overflow:hidden;border-radius:18px;box-shadow:0 8px 20px rgba(20,14,26,.22);position:relative">
+            <div style="width:1080px;height:1920px;transform:scale(.36);transform-origin:0 0">
+              <dc-import name="HubChromeScreen" page="{{ sc.page }}" state="{{ sc.state }}" grayscale="{{ sc.gray }}" swipe-at="{{ sc.swipe }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:800 24px/1.2 Nunito,sans-serif;max-width:389px">{{ sc.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="HeaderSpec" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 44px/1 Nunito,sans-serif">3 · Header — 143 px (140 content + 3 rim), unchanged width chain</div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <sc-for list="{{ headerRows }}" as="h" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:32px">
+          <div style="width:1080px;height:143px;overflow:hidden;position:relative;flex:0 0 auto;border-radius:6px">
+            <dc-import name="HubChromeScreen" page="camp" coins="{{ h.c }}" seeds="{{ h.s }}" flowers="{{ h.f }}" hint-size="1080px,1920px"></dc-import>
+          </div>
+          <div style="font:800 26px/1.3 Nunito,sans-serif">{{ h.label }}</div>
+        </div>
+      </sc-for>
+      <div style="width:1080px;display:flex;height:48px;font:800 20px/48px ui-monospace,Menlo,monospace;text-align:center;color:#2D3436">
+        <div style="width:20px;background:rgba(45,52,54,.10)"></div>
+        <div style="width:296px;background:#D4C6E0">chip 296</div><div style="width:16px;background:rgba(45,52,54,.10)"></div>
+        <div style="width:296px;background:#D4C6E0">chip 296</div><div style="width:16px;background:rgba(45,52,54,.10)"></div>
+        <div style="width:296px;background:#D4C6E0">chip 296</div><div style="width:16px;background:rgba(45,52,54,.10)"></div>
+        <div style="width:124px;background:#FFE8B8">set 124</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;max-width:2000px">
+        <sc-for list="{{ headerNotes }}" as="n" hint-placeholder-count="4">
+          <div style="background:#FFF8F0;border-radius:20px;padding:22px 24px;display:flex;flex-direction:column;gap:8px">
+            <div style="font:900 26px/1.1 Nunito,sans-serif">{{ n.t }}</div>
+            <div style="font:700 21px/1.45 Nunito,sans-serif;color:#555C5E;text-wrap:pretty">{{ n.d }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="FooterSpec" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 44px/1 Nunito,sans-serif">4 · Footer — 144 px, icons only</div>
+    <div style="display:flex;gap:56px;align-items:flex-start;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="font:800 26px/1 Nunito,sans-serif">Tab states (slot 216 × 141 = hit zone)</div>
+        <div style="display:flex;gap:18px;flex-wrap:wrap;max-width:1400px">
+          <sc-for list="{{ tabStates }}" as="ts" hint-placeholder-count="6">
+            <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+              <div style="width:216px;height:141px;background:#2A2233;position:relative;border-radius:8px;outline:2px dashed rgba(45,52,54,.25);outline-offset:4px">
+                <div style="{{ ts.indStyle }}"></div>
+                <div style="{{ ts.slot }}">
+                  <div style="{{ ts.tile }}">
+                    <img src="{{ ts.icon }}" alt="" style="{{ ts.iconStyle }}">
+                    <sc-if value="{{ ts.badge }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute;top:-8px;right:-6px;min-width:44px;height:44px;padding:0 10px;box-sizing:border-box;border-radius:22px;background:#FFCCD5;border:3px solid #2A2233;display:grid;place-items:center;font:800 26px/1 Nunito,sans-serif;color:#2D3436">3</div>
+                    </sc-if>
+                  </div>
+                </div>
+              </div>
+              <div style="font:800 22px/1.2 Nunito,sans-serif;text-align:center;max-width:230px">{{ ts.name }}</div>
+              <div style="font:700 17px/1.35 ui-monospace,Menlo,monospace;color:#555C5E;text-align:center;max-width:230px">{{ ts.spec }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div data-layer="VerticalBudget" style="display:flex;flex-direction:column;gap:16px">
+        <div style="font:800 26px/1 Nunito,sans-serif">Vertical budget</div>
+        <div style="display:flex;gap:20px">
+          <div style="width:120px;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;font:800 16px/1 ui-monospace,Menlo,monospace;color:#2D3436">
+            <sc-for list="{{ budget }}" as="b" hint-placeholder-count="7">
+              <div style="{{ b.style }}"></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;font:700 21px/1 Nunito,sans-serif">
+            <sc-for list="{{ budget }}" as="b" hint-placeholder-count="7">
+              <div style="{{ b.labelStyle }}">{{ b.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="font:700 21px/1.45 Nunito,sans-serif;color:#555C5E;max-width:520px;text-wrap:pretty">Hit zone = the full 216 × 141 slot (≥ 120 ✓). The tile is only the visible plate; the indicator and badge live inside the same 141.</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;max-width:2200px">
+      <sc-for list="{{ footerNotes }}" as="n" hint-placeholder-count="6">
+        <div style="background:#FFF8F0;border-radius:20px;padding:22px 24px;display:flex;flex-direction:column;gap:8px">
+          <div style="font:900 26px/1.1 Nunito,sans-serif">{{ n.t }}</div>
+          <div style="font:700 21px/1.45 Nunito,sans-serif;color:#555C5E;text-wrap:pretty">{{ n.d }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="BeforeAfter" style="display:flex;flex-direction:column;gap:22px">
+    <div style="font:900 44px/1 Nunito,sans-serif">5 · Before / after</div>
+    <div style="display:flex;gap:32px;align-items:flex-end">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font:800 24px/1 Nunito,sans-serif;color:#555C5E">v1 · 180 px · labels</div>
+        <div data-layer="FooterV1" style="width:1080px;height:180px;background:#1A241E;position:relative;border-radius:6px;overflow:hidden">
+          <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+          <div style="position:absolute;top:8px;left:442px;width:196px;height:8px;border-radius:4px;background:#FFB88C"></div>
+          <div style="position:absolute;left:0;right:0;top:20px;height:152px;display:flex">
+            <sc-for list="{{ v1tabs }}" as="v" hint-placeholder-count="5">
+              <div style="width:216px;display:flex;justify-content:center">
+                <div style="{{ v.tile }}">
+                  <img src="{{ v.icon }}" alt="" style="width:52px;height:52px">
+                  <div style="{{ v.label }}">{{ v.name }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="height:180px;display:flex;flex-direction:column;justify-content:space-between;font:900 30px/1 ui-monospace,Menlo,monospace;color:#6B4F8C"><span>↑</span><span>Δ 36</span><span>↓</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:800 24px/1 Nunito,sans-serif;color:#555C5E">v2 · 144 px · icons only</div>
+      <div style="width:1080px;height:144px;overflow:hidden;position:relative;border-radius:6px">
+        <div style="position:absolute;left:0;top:-1776px">
+          <dc-import name="HubChromeScreen" page="home_carousel" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="DeltaTable" style="display:flex;flex-direction:column;gap:22px">
+    <div style="font:900 44px/1 Nunito,sans-serif">6 · Where each page absorbs Δ = 36 (page 1597 → 1633, footer top y 1740 → 1776)</div>
+    <div style="display:flex;flex-direction:column;background:#FFF8F0;border-radius:24px;overflow:hidden;max-width:2200px">
+      <sc-for list="{{ delta }}" as="d" hint-placeholder-count="7">
+        <div style="display:grid;grid-template-columns:260px 1fr 1fr;gap:24px;padding:20px 28px;border-bottom:2px solid rgba(45,52,54,.08);font:700 22px/1.45 Nunito,sans-serif">
+          <div style="font-weight:900">{{ d.page }}</div>
+          <div style="font:700 20px/1.5 ui-monospace,Menlo,monospace">{{ d.consts }}</div>
+          <div style="color:#555C5E;text-wrap:pretty">{{ d.how }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="Animations" style="display:flex;flex-direction:column;gap:22px">
+    <div style="font:900 44px/1 Nunito,sans-serif">7 · Animations (tween only)</div>
+    <div style="display:flex;flex-direction:column;background:#FFF8F0;border-radius:24px;overflow:hidden;max-width:2200px">
+      <sc-for list="{{ anims }}" as="a" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:420px 1fr 200px;gap:24px;padding:18px 28px;border-bottom:2px solid rgba(45,52,54,.08);font:700 22px/1.4 Nunito,sans-serif">
+          <div style="font-weight:900">{{ a.what }}</div>
+          <div style="font:700 20px/1.5 ui-monospace,Menlo,monospace">{{ a.how }}</div>
+          <div style="font:800 20px/1.5 ui-monospace,Menlo,monospace">{{ a.t }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PAGE_STRIP = ['#FFF8F0', '#2E4733', '#E6F2DB', '#B8BDFF', '#2E4733', '#293D2E', '#243329'];
+class Component extends DCLogic {
+  renderVals() {
+    const sw = (name, hex, tag, tagInk, why, nums, big) => ({
+      name, hex, tag, tagInk, why, nums,
+      bandStyle: 'height:' + (big ? 260 : 200) + 'px;background:' + hex + ';display:flex;align-items:flex-end;gap:0;padding:0',
+      pages: PAGE_STRIP.map(c => ({ style: 'flex:1;height:' + (big ? 96 : 72) + 'px;background:' + c + ';border-top:3px solid rgba(255,248,240,.55)' }))
+    });
+    const swatches = [
+      sw('Dusk plum', '#2A2233', 'CHOSEN · UiChrome.CHROME_DEEP', '#6B4F8C', 'Only candidate that sits opposite green on the wheel: it frames Camp/Arena/Home instead of reading as a darker patch of meadow, and it belongs to the palette (lavender #D4A5FF family) so peach, gold, mint and pink all pop on it.', 'vs light pages 8.6–14.5:1 · ΔE to Camp 32 · Arena 27 · carousel 22 · rim vs dark 3.6–4.7:1', true),
+      sw('Dark earth', '#33261E', 'REJECTED', '#9C3B3B', 'Warm and cozy, but brown and dark green collapse into one olive mass at low light — ΔE to the carousel is only 14, barely better than today.', 'ΔE Camp 22 · Arena 18 · carousel 14', false),
+      sw('Neutral ink', '#262A2C', 'REJECTED', '#9C3B3B', 'Separates by being “not a colour”, which reads as system UI, not a meadow game; grey next to green also looks dirty. ΔE to the carousel is 10.', 'ΔE Camp 20 · Arena 15 · carousel 10', false)
+    ];
+    const screens = [
+      ['shop', 'normal', 'Shop · tab 1 active'], ['journal', 'normal', 'Journal · light page (worst case v1)'],
+      ['home_carousel', 'normal', 'Home · season pick (dark)'], ['home_field', 'normal', 'Home · season field (light)'],
+      ['camp', 'normal', 'Camp · dark page (worst case v1)'], ['arena', 'normal', 'Arena'],
+      ['arena', 'locked', 'Arena · nav locked during a round'], ['home_carousel', 'badge', 'Badge on Journal'],
+      ['camp', 'safe_area', 'Safe area · notch +90, gesture +50'], ['journal', 'normal', 'Grayscale · active tab still obvious', true],
+      ['home_carousel', 'normal', 'Swipe in progress · Home → Camp (2.5)', false, 2.5]
+    ].map(s => ({ page: s[0], state: s[1], label: s[2], gray: !!s[3], swipe: s[4] ?? -1 }));
+    const headerRows = [
+      { c: '1,250', s: '34', f: '2', label: 'typical' },
+      { c: '999,999', s: '999,999', f: '999,999', label: 'max before compact (6 digits, 190 px number box)' },
+      { c: '1.2M', s: '48,210', f: '1,304', label: 'compact from 7 digits' }
+    ];
+    const headerNotes = [
+      { t: 'Chip = well, not button', d: 'Fill #1F1926 (chrome, darker), 2 px cream @ 14 %, radius 20, 296 × 100. Recessed and flat — Settings is the only raised tile, so only Settings reads as tappable.' },
+      { t: 'Chip interior', d: 'Pad 14 · icon 64 · gap 10 · number box 190 · pad 18. Number 48 / 800, #FFF8F0, right-aligned, tabular. 16.3:1 on the well.' },
+      { t: 'Colour lives in the icon', d: 'Gold / mint / lavender chip fills are gone: the coin, seed and flower icons are coloured now, so the chip stays neutral and gold-on-gold cannot happen.' },
+      { t: 'SettingsButton', d: 'Slot 124 × 140 (hit), tile 100, cream @ 10 % fill, cream @ 38 % edge, gear 56 (icon_settings_light.svg). Toast unchanged.' }
+    ];
+    const T = (name, spec, o) => Object.assign({ name, spec, badge: false }, o);
+    const tile = (fill, border, extra) => 'position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;display:grid;place-items:center;background:' + fill + ';border:' + border + (extra || '');
+    const on = 'width:72px;height:72px;display:block;transform:translateY(-2px)';
+    const off = 'width:64px;height:64px;display:block;opacity:.82';
+    const ind = a => 'position:absolute;top:6px;left:72px;width:72px;height:8px;border-radius:4px;background:rgba(255,184,140,' + a + ')';
+    const tabStates = [
+      T('Inactive', 'no plate · cream line icon 64 @ .82', { slot: 'position:absolute;inset:0', tile: tile('transparent', '2px solid transparent'), icon: 'icons/tab_camp_light.svg', iconStyle: off, indStyle: 'display:none' }),
+      T('Active', 'peach plate 184×108 · colour icon 72 · indicator 72×8', { slot: 'position:absolute;inset:0', tile: tile('#FFB88C', '2px solid rgba(45,52,54,.14)'), icon: 'icons/tab_home.svg', iconStyle: on, indStyle: ind(1) }),
+      T('Pressed', 'cream @ 12 % plate · scale .96', { slot: 'position:absolute;inset:0', tile: tile('rgba(255,248,240,.12)', '2px solid transparent', ';transform:scale(.96)'), icon: 'icons/tab_arena_light.svg', iconStyle: off, indStyle: 'display:none' }),
+      T('Active · pressed', '#E8A374 plate · scale .96', { slot: 'position:absolute;inset:0', tile: tile('#E8A374', '2px solid rgba(45,52,54,.14)', ';transform:scale(.96)'), icon: 'icons/tab_home.svg', iconStyle: on, indStyle: ind(1) }),
+      T('With badge', '44 pink #FFCCD5 · 3 px chrome ring · top −8, right −6', { slot: 'position:absolute;inset:0', tile: tile('transparent', '2px solid transparent'), icon: 'icons/tab_journal_light.svg', iconStyle: off, indStyle: 'display:none', badge: true }),
+      T('Locked (inactive)', 'slot alpha .6 · indicator .4 · rim gold', { slot: 'position:absolute;inset:0;opacity:.6', tile: tile('transparent', '2px solid transparent'), icon: 'icons/tab_shop_light.svg', iconStyle: off, indStyle: 'display:none' })
+    ];
+    const B = (h, bg, label) => ({ style: 'height:' + h + 'px;background:' + bg, labelStyle: 'height:' + h + 'px;display:flex;align-items:center;white-space:nowrap', label });
+    const budget = [
+      B(3, 'rgba(255,248,240,.9)', '3 · rim (cream @ 55 %)'), B(6, '#2A2233', '6 · top pad'), B(8, '#FFB88C', '8 · ActiveIndicator'),
+      B(6, '#2A2233', '6 · gap'), B(108, '#E8A374', '108 · tile (icon 72)'), B(13, '#2A2233', '13 · bottom pad'), B(0, '#2A2233', '= 144 · + safe area below')
+    ];
+    const footerNotes = [
+      { t: 'Active = 4 signals', d: 'Peach plate · colour icon (inactive are cream line) · icon 72 vs 64 · peach indicator bar. Grayscale: plate L 0.57 vs bar 0.02 — unmistakable.' },
+      { t: 'ActiveIndicator', d: '72 × 8, radius 4, y 6 in content, x = slot·216 + 72. Tracks the pager like v1 (get_scroll_page each frame).' },
+      { t: 'NavLockPill', d: '64 high, rises 36 above the rim, text now 38 px (was 26 — brief minimum). Covers Home/Camp only; the locked active tab is Arena, so indicator stays visible.' },
+      { t: 'TabBadge', d: 'Unchanged size 44 / text 26 (glyph inside a fixed disc, exempt as in v1). Sits at y 12, clear of the indicator (centred, 72 wide).' },
+      { t: 'No labels, still accessible', d: 'Each TabIcon keeps the name as accessibility text (TextureRect.tooltip_text / accessible name) — screen readers still get “Camp”.' },
+      { t: 'Safe area', d: 'Footer background extends down by safe_bottom; content 141 stays on top. Header same, upward by safe_top.' }
+    ];
+    const v1tabs = [['Shop', 'icons/v1/tab_shop_light.svg', false], ['Journal', 'icons/v1/tab_journal_light.svg', false], ['Home', 'icons/v1/tab_home.svg', true], ['Camp', 'icons/v1/tab_camp_light.svg', false], ['Arena', 'icons/v1/tab_arena_light.svg', false]].map(v => ({
+      name: v[0], icon: v[1],
+      tile: 'width:196px;height:152px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;background:' + (v[2] ? '#FFB88C;border:2px solid rgba(45,52,54,.14)' : 'transparent;opacity:.82'),
+      label: 'font:' + (v[2] ? 800 : 700) + ' 40px/1 Nunito,sans-serif;color:' + (v[2] ? '#2D3436' : '#FFF8F0')
+    }));
+    const delta = [
+      { page: 'Camp', consts: 'ui_camp.gd PAGE_H 1597→1633 · CONTENT_H 1549→1585 · SECTION_H 1253→1289 · SECTION_H_NO_SEASON 1549→1585', how: 'The stash section grows by 36; card 489 × 176 unchanged — one more partial row visible in the scroll.' },
+      { page: 'Shop', consts: 'ui_shop.gd PAGE_H 1597→1633', how: 'ShopScroll window grows by 36; header row, cards and paddings unchanged.' },
+      { page: 'Journal', consts: 'ui_journal.gd PAGE_H 1597→1633', how: 'Scroll window grows by 36; row stays 200.' },
+      { page: 'Arena', consts: 'ui_arena.gd playfield = PAGE_H − FIELD_BOTTOM_GAP → 1633 − 44 = 1589 · arena_meadow_bg.gd REF_H', how: 'Playfield grows by 36 at the bottom edge. Spawn grid (150 step) gains no row — 36 goes to the lower margin; bg REF_H follows PAGE_H.' },
+      { page: 'Home · field', consts: 'ui_home_field.gd PAGE (1080, 1597→1633) · PAGE_Y 143', how: 'Meadow is a flex block and fills the 36 itself.' },
+      { page: 'Home · season pick', consts: 'ui_stage.gd STAGE (1080, 1633) · CARD (24, 24, 1032, 1100→1136) · DOCK (0, 1148→1184, 1080, 222) · PLAY_ROW (24, 1394→1430, 1032, 180)', how: 'The season card is the only thing that grows (+36, into its art/ring area between title and tiles); DOCK and PLAY_ROW keep size and shift down 36 so BOTTOM_GAP 23 stays. No gap between blocks changes.' },
+      { page: 'Also', consts: 'home_stage_hint.gd · camp/arena_meadow_bg.gd REF_H · UiChrome.FOOTER_CONTENT_H 177→141', how: 'Anything that hard-codes 1597 or 1740 (footer top) must read the new value — search for both numbers.' }
+    ];
+    const anims = [
+      { what: 'Page change → indicator', how: 'ActiveIndicator.position.x follows pager scroll every frame; snap uses pager tween', t: '0.28 s cubic out' },
+      { what: 'Tab becomes active', how: 'plate modulate:a 0→1 + TabIcon scale 64/72 → 1.0 with 1.06 overshoot, texture swap _light → colour at start', t: '0.18 s back out' },
+      { what: 'Tab press', how: 'tile scale 1 → .96 → 1', t: '0.08 s' },
+      { what: 'Number change in chip', how: 'count-up/down on the label + chip icon scale 1 → 1.12 → 1', t: '0.25 s' },
+      { what: 'Nav lock on / off', how: 'NavLockPill modulate:a + position.y 12 → 0; rim colour cream → gold', t: '0.18 s' },
+      { what: 'Badge appears', how: 'scale 0.6 → 1.0', t: '0.16 s back out' }
+    ];
+    return { swatches, screens, headerRows, headerNotes, tabStates, budget, footerNotes, v1tabs, delta, anims };
+  }
+}
+</script>
+</body>
+</html>

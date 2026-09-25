@@ -98,22 +98,22 @@ func _run() -> void:
 		_fail("stage / dock / PlayRow nodes missing")
 		return
 
-	# --- raspored: SeasonStage.dc.html (stranica 1080 x 1597 od y=143) ---
+	# --- raspored: SeasonStage.dc.html (stranica 1080 x 1633 od y=143; chrome v2) ---
 	var page := swipe.get_global_rect()
-	if not page.is_equal_approx(Rect2(0, 143, 1080, 1597)):
-		_fail("hub content should be 1080 x 1597 at y 143, got %s" % str(page))
+	if not page.is_equal_approx(Rect2(0, 143, 1080, 1633)):
+		_fail("hub content should be 1080 x 1633 at y 143, got %s" % str(page))
 		return
 	var bloom := stage.call("get_card", "country_bloom") as HomeSeasonCard
-	if bloom == null or not bloom.visible or not _rect_is(bloom, Rect2(24, 167, 1032, 1100)):
-		_fail("SeasonCard must be 1032 x 1100 at (24, 167), got %s" % str(bloom.get_global_rect() if bloom else Rect2()))
+	if bloom == null or not bloom.visible or not _rect_is(bloom, Rect2(24, 167, 1032, 1136)):
+		_fail("SeasonCard must be 1032 x 1136 at (24, 167), got %s" % str(bloom.get_global_rect() if bloom else Rect2()))
 		return
-	if not _rect_is(browser, Rect2(0, 1291, 1080, 222)):
-		_fail("SeasonBrowser must be 1080 x 222 at (0, 1291), got %s" % str(browser.get_global_rect()))
+	if not _rect_is(browser, Rect2(0, 1327, 1080, 222)):
+		_fail("SeasonBrowser must be 1080 x 222 at (0, 1327), got %s" % str(browser.get_global_rect()))
 		return
-	if not _rect_is(play_row, Rect2(24, 1537, 1032, 180)):
-		_fail("PlayRow must be 1032 x 180 at (24, 1537), got %s" % str(play_row.get_global_rect()))
+	if not _rect_is(play_row, Rect2(24, 1573, 1032, 180)):
+		_fail("PlayRow must be 1032 x 180 at (24, 1573), got %s" % str(play_row.get_global_rect()))
 		return
-	if not _rect_is(play, Rect2(24, 1537, 836, 180)) or not _rect_is(gift, Rect2(876, 1537, 180, 180)):
+	if not _rect_is(play, Rect2(24, 1573, 836, 180)) or not _rect_is(gift, Rect2(876, 1573, 180, 180)):
 		_fail("Play 836 x 180 + Gift 180 expected, got %s / %s" % [str(play.get_global_rect()), str(gift.get_global_rect())])
 		return
 	if gift.get_parent() != play_row:
@@ -137,8 +137,9 @@ func _run() -> void:
 		_fail("hub swipe must pass over the Play row")
 		return
 	var art := bloom.get_part_rect("art")
-	if absf(art.size.y - 446.0) > TOL or absf(art.position.y - 26.0) > TOL:
-		_fail("active card art slot expected 446 px at y 26, got %s" % str(art))
+	# Chrome v2: kartica je 36 px visa i svih 36 ide u art zonu (446 -> 482).
+	if absf(art.size.y - 482.0) > TOL or absf(art.position.y - 26.0) > TOL:
+		_fail("active card art slot expected 482 px at y 26, got %s" % str(art))
 		return
 
 	# --- novi igrac: Bloom aktivna, Frost next lock, Lantern/Amber daleko ---
@@ -227,8 +228,8 @@ func _run() -> void:
 	if frost.get_unlock_title() != "Needs 500 coins + 20 flowers" or frost.get_unlock_sub() != "run in Country Bloom to collect":
 		_fail("gather button text: '%s' / '%s'" % [frost.get_unlock_title(), frost.get_unlock_sub()])
 		return
-	if frost.is_unlock_enabled() or absf(frost.get_part_rect("art").size.y - 228.0) > TOL:
-		_fail("gather: Unlock disabled, art slot 228 px")
+	if frost.is_unlock_enabled() or absf(frost.get_part_rect("art").size.y - 264.0) > TOL:
+		_fail("gather: Unlock disabled, art slot 264 px")
 		return
 	if not frost_token.focused or not frost_token.is_lifted() or bloom_token.focused:
 		_fail("dock focus must follow the card")
@@ -303,8 +304,8 @@ func _run() -> void:
 	if coral.get_badge_text() != "PREVIEW · PREMIUM" or coral.get_buy_title() != "Get Coral Tide Garden" or coral.get_price_text().is_empty():
 		_fail("premium: badge / 'Get Coral Tide Garden' / price")
 		return
-	if absf(coral.get_part_rect("art").size.y - 248.0) > TOL:
-		_fail("premium art slot 248 px expected, got %s" % str(coral.get_part_rect("art")))
+	if absf(coral.get_part_rect("art").size.y - 284.0) > TOL:
+		_fail("premium art slot 284 px expected, got %s" % str(coral.get_part_rect("art")))
 		return
 	coral.emit_signal("cta_pressed", "coral_tide")
 	await _frames(2)

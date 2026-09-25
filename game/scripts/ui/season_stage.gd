@@ -1,7 +1,7 @@
 extends Control
 
 ## Home Season Stage — pass 2 / 1a (design_handoff_home_v2 · SeasonStage.dc.html).
-## Kartica 1032 x 1100 na (24, 24) stranice, dock 1080 x 222 na (0, 1148),
+## Kartica 1032 x 1136 na (24, 24) stranice, dock 1080 x 222 na (0, 1184) — chrome v2,
 ## toast na 250. Swipe na kartici mijenja fokus i nikad ne ide hubu (na krajevima
 ## rubber-band 40 px); fokus != aktivna sezona. Polje sezone (HOME-19) je u istoj
 ## sceni: kad je otvoreno, SelectLayer je sakriven.

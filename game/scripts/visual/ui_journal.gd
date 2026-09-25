@@ -26,7 +26,7 @@ const NEW_PINK := Color("#FFCCD5")         # = UiChrome.BADGE_PINK — "novo" sv
 const CHROME_DEEP := Color("#1A241E")
 
 # --- Page ---
-const PAGE_H := 1597
+const PAGE_H := 1633
 const PAD_X := 24
 const HEAD_H := 175            # A: 30 + naslov 64 + 8 + summary 46 + 24 + divider 3
 const HEAD_H_B := 174

@@ -3,8 +3,8 @@ extends RefCounted
 
 ## Camp — docs/04-experience/design-drafts/camp-cd-brief.md
 ## Dizajn: design_handoff_camp/README.md · smjer 1b (tabovi + hero sezona)
-## Sve mjere su u px baze 1080x1920. Camp zauzima 1597 px izmedju
-## headera (143) i footera (180) iz UiChrome.
+## Sve mjere su u px baze 1080x1920. Camp zauzima 1633 px izmedju
+## headera (143) i footera (144) iz UiChrome.
 ##
 ## Prenos iz paketa, s ispravkama gdje se ui_camp.gd razilazi s .dc.html crtezom:
 ## - CD je "UI_TEXT" citao kao #2D3436; u ui_palette.gd je to OUTLINE (UI_TEXT je
@@ -54,14 +54,14 @@ const SEASON_LANTERN_EDGE := Color("#A193B3")
 const SEASON_AMBER := Color("#E8C48A")
 const SEASON_AMBER_EDGE := Color("#BA9D6E")
 
-# --- Vertikalni budzet (v2): 24 + 276 + 20 + 1253 + 24 = 1597 ---
-const PAGE_H := 1597
+# --- Vertikalni budzet (v2): 24 + 276 + 20 + 1289 + 24 = 1633 ---
+const PAGE_H := 1633
 const PAGE_PAD := 24
-const CONTENT_H := 1549                # PAGE_H - 2 * PAGE_PAD
+const CONTENT_H := 1585                # PAGE_H - 2 * PAGE_PAD
 const SEASON_H := 276                  # hero, nikad se ne mijenja (v1: 422)
 const SECTION_GAP := 20                # fiksan razmak; StackGap vise ne postoji
-const SECTION_H := 1253                # CONTENT_H - SEASON_H - SECTION_GAP
-const SECTION_H_NO_SEASON := 1549      # kad nema kartice sezone
+const SECTION_H := 1289                # CONTENT_H - SEASON_H - SECTION_GAP
+const SECTION_H_NO_SEASON := 1585      # kad nema kartice sezone
 const SECTION_PAD := 18
 ## HTML je border-box (rub unutar 1032); u Godotu content margin ne ukljucuje rub.
 const SECTION_BORDER := 2

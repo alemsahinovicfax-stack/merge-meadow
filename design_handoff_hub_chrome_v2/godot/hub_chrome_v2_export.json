@@ -1,0 +1,210 @@
+{
+  "$schema_version": "1.0",
+  "generated": "2026-09-25",
+  "source": "design_handoff_hub_chrome_v2/design/HubChromeScreen.dc.html + Hub Chrome Specs.dc.html + Icons.dc.html",
+  "brief": "docs/04-experience/design-drafts/hub-chrome-v2-cd-brief.md",
+  "direction": "jedan dizajn (bez varijanti); 2 odbijene boje chromea samo kao swatch",
+  "note": "Sve mjere su u px baze 1080 x 1920 i prenose se 1:1. Boje su sRGB hex; alpha je zapisana odvojeno gdje postoji.",
+  "meta": {
+    "base": { "w": 1080, "h": 1920 },
+    "header": { "h": 143, "content_h": 140, "edge": 3, "changed": false },
+    "page": { "w": 1080, "h": 1633, "y": 143, "was_h": 1597 },
+    "footer": { "h": 144, "content_h": 141, "edge": 3, "y": 1776, "was_h": 180, "delta": 36 },
+    "safe_area": { "top": "0–100 (mockup 90)", "bottom": "0–60 (mockup 50)", "rule": "pozadina trake se produžava, sadržaj ostaje iste visine" },
+    "minimums": { "touch": 120, "text": 38, "number": 44 },
+    "pages": [
+      { "key": "shop", "index": 0, "bg": "#2E4733", "note": "brief kaže #B8E0F5; ui_shop.gd PAGE_BG je danas #2E4733" },
+      { "key": "journal", "index": 1, "bg": "#FFF8F0" },
+      { "key": "home_carousel", "index": 2, "bg": "#243329" },
+      { "key": "home_field", "index": 2, "bg": "#E6F2DB", "note": "tint po sezoni" },
+      { "key": "camp", "index": 3, "bg": "#2E4733" },
+      { "key": "arena", "index": 4, "bg": "#293D2E" }
+    ]
+  },
+  "tokens": {
+    "palette": {
+      "chrome": "#2A2233",
+      "chip_well": "#1F1926",
+      "cream": "#FFF8F0",
+      "ink": "#2D3436",
+      "active": "#FFB88C",
+      "active_pressed": "#E8A374",
+      "badge": "#FFCCD5",
+      "lock_gold": "#E8C44A",
+      "icon_outline": "#2D3436",
+      "icon_coin_body": "#FFD56B",
+      "icon_coin_edge": "#D6A82F",
+      "icon_coin_face": "#FFE8B8",
+      "icon_coin_glint": "#FFF3D0",
+      "icon_seed_body": "#F2D39B",
+      "icon_seed_crease": "#D9B071",
+      "icon_leaf": "#A8E6CF",
+      "icon_leaf_stem": "#7FD4A8",
+      "icon_petal": "#FFCCD5",
+      "icon_journal_spine": "#AA84CC"
+    },
+    "new_shades": {
+      "#2A2233": "chrome — tamna varijanta lavande #D4A5FF (dusk plum)",
+      "#1F1926": "chip well — #2A2233 tamnije",
+      "#F2D39B": "vreća / sjeme / sto — tamnija varijanta pastel yellow #FFEAA7",
+      "#D9B071": "šav / noge — #F2D39B tamnije",
+      "#FFF3D0": "sjaj — iz UiRun.COIN_GLINT (postojeće)",
+      "#AA84CC": "hrbat knjige — iz shop_export spend_money_edge (postojeće)"
+    },
+    "alpha_fills": {
+      "chrome_edge": "rgba(255,248,240,0.55)",
+      "chrome_edge_locked": "rgba(232,196,74,0.85)",
+      "chip_well_edge": "rgba(255,248,240,0.14)",
+      "settings_fill": "rgba(255,248,240,0.10)",
+      "settings_fill_pressed": "rgba(255,248,240,0.18)",
+      "settings_edge": "rgba(255,248,240,0.38)",
+      "tab_pressed": "rgba(255,248,240,0.12)",
+      "tab_active_edge": "rgba(45,52,54,0.14)",
+      "inactive_icon": "modulate.a 0.82",
+      "locked_slot": "modulate.a 0.6",
+      "indicator_locked": "rgba(255,184,140,0.4)"
+    },
+    "radius": { "chip": 20, "tile": 20, "settings": 20, "indicator": 4, "badge": 22, "lock_pill": 20 },
+    "border": { "chrome_edge": 3, "chip": 2, "tile": 2, "badge": 3, "lock_pill": 2 },
+    "shadow": {
+      "header": { "x": 0, "y": 6, "blur": 14, "color": "rgba(20,14,26,0.34)" },
+      "footer": { "x": 0, "y": -6, "blur": 14, "color": "rgba(20,14,26,0.34)" }
+    },
+    "font": {
+      "family_in_game": "default + embolden (UiChrome.heavy_font)",
+      "family_in_mockup": "Nunito",
+      "sizes": { "chip_number": 48, "lock_pill": 38, "badge": 26 },
+      "weights": { "chip_number": 800, "lock_pill": 800, "badge": 800 }
+    },
+    "contrast": {
+      "chrome_vs_journal": 14.5, "chrome_vs_home_field": 13.15, "chrome_vs_moonlit": 8.55,
+      "rim_vs_camp": 3.6, "rim_vs_arena": 4.13, "rim_vs_carousel": 4.71,
+      "dE_chrome_vs_camp": 32.0, "dE_chrome_vs_arena": 27.2, "dE_chrome_vs_carousel": 22.4,
+      "number_on_well": 16.27, "inactive_icon_on_chrome": 10.15, "peach_tile_vs_chrome": 9.08,
+      "lock_text_on_chrome": 9.04, "badge_ink": 8.97,
+      "grayscale_luminance": { "peach_tile": 0.574, "chrome": 0.019 }
+    }
+  },
+  "layout": {
+    "Header": { "rect": [0, 0, 1080, 143], "grows_up_by": "safe_top", "content": [0, 0, 1080, 140], "edge_bottom": 3 },
+    "HeaderRow": { "padding_left": 20, "gap": 16, "chain": [20, 296, 16, 296, 16, 296, 16, 124], "sum": 1080 },
+    "CoinChip": { "rect": [20, 20, 296, 100] },
+    "SeedChip": { "rect": [332, 20, 296, 100] },
+    "FlowerChip": { "rect": [644, 20, 296, 100] },
+    "ChipInterior": { "pad_left": 14, "icon": 64, "gap": 10, "number_box": 190, "pad_right": 18, "number_align": "right" },
+    "SettingsSlot": { "rect": [956, 0, 124, 140], "button": [4, 20, 100, 100], "icon": 56 },
+    "Page": { "rect": [0, 143, 1080, 1633] },
+    "Footer": { "rect": [0, 1776, 1080, 144], "grows_down_by": "safe_bottom", "edge_top": 3, "content": [0, 3, 1080, 141] },
+    "TabSlot": { "w": 216, "h": 141, "x": "index * 216", "hit": [216, 141] },
+    "TabTile": { "rect_in_slot": [16, 20, 184, 108] },
+    "TabIcon": { "active": 72, "active_lift_y": -2, "inactive": 64, "centered": true },
+    "ActiveIndicator": { "w": 72, "h": 8, "y": 6, "x": "scroll_page * 216 + 72" },
+    "TabBadge": { "size": 44, "anchor": "tile top-right", "offset": [6, -8] },
+    "NavLockPill": { "h": 64, "rise_above_footer": 36, "centered_x": true, "pad_x": 28, "icon": 34, "gap": 14 },
+    "vertical_budget_footer": [
+      { "part": "edge", "h": 3 }, { "part": "top_pad", "h": 6 }, { "part": "indicator", "h": 8 },
+      { "part": "gap", "h": 6 }, { "part": "tile", "h": 108 }, { "part": "bottom_pad", "h": 13 }
+    ]
+  },
+  "components": {
+    "Chip": {
+      "fill": "chip_well", "border": "2 px chip_well_edge", "radius": 20, "tappable": false,
+      "icon": "u boji, bez modulate", "number": { "size": 48, "weight": 800, "ink": "cream", "format": "UiChrome.format_count()" }
+    },
+    "SettingsButton": { "fill": "settings_fill", "pressed": "settings_fill_pressed", "border": "2 px settings_edge", "icon": "icon_settings_light.svg", "tap": "toast (nepromijenjeno)" },
+    "Tab": {
+      "states": {
+        "inactive": { "tile": "transparent", "icon": "tab_<key>_light.svg @ 64, a 0.82" },
+        "active": { "tile": "#FFB88C + 2 px tab_active_edge", "icon": "tab_<key>.svg @ 72, y −2", "indicator": "iznad" },
+        "pressed": { "tile": "tab_pressed", "scale": 0.96 },
+        "active_pressed": { "tile": "#E8A374", "scale": 0.96 },
+        "badge": { "badge": "TabBadge" },
+        "locked": { "slot_alpha": 0.6, "indicator": "indicator_locked", "chrome_edge": "chrome_edge_locked", "pill": true }
+      },
+      "active_signals": ["peach plate", "ikona u boji vs krem linija", "veličina 72 vs 64", "indikator"],
+      "accessible_name": "Shop | Journal | Home | Camp | Arena (tooltip_text / accessibility name, nije vidljivo)"
+    },
+    "NavLockPill": { "fill": "chrome", "border": "2 px chrome_edge_locked", "text": "ROUND IN PROGRESS", "ink": "lock_gold", "size": 38 }
+  },
+  "scenes": {
+    "normal": { "active": "po stranici" },
+    "locked": { "page": "arena", "active": 4, "swipe": false, "tabs": false },
+    "badge": { "tab": "journal", "count": "count_collection_journal_news()" },
+    "safe_area": { "top": 90, "bottom": 50, "page_h": 1493 }
+  },
+  "animations": [
+    { "what": "Indikator prati pager", "target": "ActiveIndicator.position.x", "source": "SwipePager.get_scroll_page() svaki frame", "dur_s": 0.28, "ease": "EASE_OUT", "trans": "TRANS_CUBIC" },
+    { "what": "Tab postaje aktivan", "target": "Tile modulate:a 0→1 + TabIcon scale 0.89→1.06→1.0 + zamjena teksture _light→boja", "dur_s": 0.18, "trans": "TRANS_BACK" },
+    { "what": "Pritisak taba", "target": "Tile scale 0.96", "dur_s": 0.08 },
+    { "what": "Promjena broja", "target": "count-up + ikona chipa scale 1→1.12→1", "dur_s": 0.25 },
+    { "what": "Nav lock", "target": "NavLockPill modulate:a + position:y 12→0; rub cream→gold", "dur_s": 0.18 },
+    { "what": "Badge pojava", "target": "scale 0.6→1.0", "dur_s": 0.16, "trans": "TRANS_BACK" }
+  ],
+  "strings_en": {
+    "lock_pill": "ROUND IN PROGRESS",
+    "tab_shop": "Shop", "tab_journal": "Journal", "tab_home": "Home", "tab_camp": "Camp", "tab_arena": "Arena",
+    "tab_names_note": "samo accessible name, nisu vidljive"
+  },
+  "assets": {
+    "new_or_replaced": [
+      { "file": "icon_coin.svg", "kind": "u boji, fiksna", "variants": 1, "replaces": "chrome/icon_coin.svg + coin_visual.gd _draw() + pickups/coin.png (fallback)" },
+      { "file": "icon_seed.svg", "kind": "u boji, fiksna", "variants": 1, "replaces": "chrome/icon_seed.svg + icon_seed_light.svg (Home korpa)" },
+      { "file": "icon_flower.svg", "kind": "u boji, fiksna", "variants": 1, "replaces": "arena/icon_crystal.svg na mjestima 'cvijeće' (header, Camp)" },
+      { "file": "tab_shop.svg / tab_shop_light.svg", "kind": "boja (aktivan) + krem linija (neaktivan)", "variants": 2 },
+      { "file": "tab_journal.svg / tab_journal_light.svg", "kind": "boja + krem linija", "variants": 2 },
+      { "file": "tab_home.svg / tab_home_light.svg", "kind": "boja + krem linija", "variants": 2 },
+      { "file": "tab_camp.svg / tab_camp_light.svg", "kind": "boja + krem linija", "variants": 2 },
+      { "file": "tab_arena.svg / tab_arena_light.svg", "kind": "boja + krem linija", "variants": 2 },
+      { "file": "icon_settings_light.svg (+ icon_settings.svg)", "kind": "jednobojna, fiksna", "variants": 2, "optional": true }
+    ],
+    "svg_rules": "viewBox 0 0 128 128; ravni fillovi; 0 gradijenata; bez filter/mask/clipPath/text/image; jedan fill-rule evenodd (zupčanik)",
+    "tint_rule": "nijedna ikona se ne tinta RGB-om; smije se samo modulate.a",
+    "kept": ["icon_lock.svg", "icon_diamond.svg (run HUD)", "arena/icon_crystal.svg (Arena ★3 kristal, ako se tamo koristi)"],
+    "deleted": ["tab_*_light.svg v1 i tab_*.svg v1 (zamijenjeni)", "icon_seed_light.svg (Home korpa koristi icon_seed.svg)"]
+  },
+  "godot_map": {
+    "Header": { "node": "RootVBox/TopBar", "style": "UiChrome.chrome_style(true)" },
+    "CoinChip/SeedChip/FlowerChip": { "node": "TopBar/Panel/HBox/*Chip", "script": "meta_hub_controller.gd _setup_chip() — chip_style() bez argumenta, Count font_color NUMBER_INK", "rename": "DiamondChip → FlowerChip", "data": "refresh_top_bar(): FlowerChip ← GameState.get_garden_crystal_total()" },
+    "SettingsButton": { "node": "TopBar/Panel/HBox/SettingsSlot/SettingsButton", "change": "ikona icon_settings_light.svg @ 56" },
+    "Footer": { "node": "RootVBox/PageIndicator", "change": "custom_minimum_size.y 180 → 144; NavPanel/Content 177 → 141" },
+    "Tab_*": { "script": "hub_tab.gd", "remove": ["_label", "TAB_ICON_GAP"], "change": "setup(page_key) učitava obje teksture; set_active() mijenja teksturu + veličinu 64/72 + lift −2; tile 184 x 108 @ (16, 20); hit = cijeli slot 216 x 141", "accessibility": "tooltip_text = PAGE_LABELS[i]" },
+    "TabBadge": { "script": "hub_tab.gd", "change": "BADGE_OFFSET (6, −8)" },
+    "ActiveIndicator": { "node": "NavPanel/Content/ActiveIndicator", "change": "72 x 8 @ y 6; x = get_scroll_page() * 216 + 72" },
+    "NavLockPill": { "change": "LOCK_FONT_SIZE 38, LOCK_ICON_SIZE 34" },
+    "coin_in_run": { "script": "run/coin_visual.gd", "change": "_draw() krug → texture = load(ICON_COIN), scale = 96/128; zadržati bob i _draw_shadow()", "obsolete": "UiRun.COIN_FILL/EDGE/INNER/GLINT" },
+    "pages_delta": {
+      "ui_camp.gd": { "PAGE_H": 1633, "CONTENT_H": 1585, "SECTION_H": 1289, "SECTION_H_NO_SEASON": 1585 },
+      "ui_shop.gd": { "PAGE_H": 1633 },
+      "ui_journal.gd": { "PAGE_H": 1633 },
+      "ui_arena.gd": { "playfield_h": 1589, "FIELD_BOTTOM_GAP": 44 },
+      "camp/arena_meadow_bg.gd": { "REF_H": "prati PAGE_H (1633)" },
+      "ui_home_field.gd": { "PAGE": [1080, 1633], "PAGE_Y": 143 },
+      "ui_stage.gd": { "STAGE": [1080, 1633], "CARD": [24, 24, 1032, 1136], "DOCK": [0, 1184, 1080, 222], "PLAY_ROW": [24, 1430, 1032, 180] },
+      "ui/home_stage_hint.gd": "provjeriti hardkodirane 1597 / 1740"
+    }
+  },
+  "smoke_tests": {
+    "must_update": [
+      { "name": "hub_chrome_smoke", "why": "footer 144, tile 184x108, indikator 72, bez labele, nove ikone, FlowerChip" },
+      { "name": "camp_layout_smoke", "why": "PAGE_H / SECTION_H +36" },
+      { "name": "camp_section_fixed_smoke", "why": "SECTION_H 1289 / 1585" },
+      { "name": "arena_redesign_smoke", "why": "playfield 1589" },
+      { "name": "season_home_smoke", "why": "STAGE / CARD / DOCK / PLAY_ROW" },
+      { "name": "meta_hub_flow_smoke", "why": "DiamondChip → FlowerChip, izvor broja" }
+    ],
+    "should_pass_unchanged": ["swipe_snap_smoke", "meta_hub_smoke", "arena_nav_lock_smoke"],
+    "new": [
+      "hub_chrome_v2_icons_smoke — svih 13 SVG se učitava, nijedan TabIcon nema modulate RGB ≠ bijela",
+      "run_coin_texture_smoke — coin_visual ima texture i ne crta krug"
+    ]
+  },
+  "decisions": [
+    { "date": "2026-09-25", "what": "Chrome #2A2233 dusk plum; odbijeni #33261E i #262A2C (README § Boja chromea)." },
+    { "date": "2026-09-25", "what": "Footer 144 (Δ 36). Svih ostalih odluka: README § Odlučeno." }
+  ],
+  "open_decisions": [
+    "Shop pozadina: brief kaže #B8E0F5, kod #2E4733 — chrome radi na obje, mockup prati kod",
+    "Da li Arena ★3 kristal i dalje koristi icon_crystal.svg ili prelazi na icon_flower.svg",
+    "Brisanje assets/pickups/coin.png i seed.png kad nova ikona preuzme run"
+  ]
+}

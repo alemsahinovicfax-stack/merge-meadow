@@ -398,7 +398,7 @@ func _draw_slot_label(r: Rect2, color: Color) -> void:
 func _slot_label_h() -> int:
 	var tiles := UiStage.TILE_H_SIX * 2.0 + UiStage.TILE_ROW_GAP if is_six() else UiStage.TILE_H
 	var action := 316.0 if is_gate() else UiStage.ACTION_H
-	return roundi(1100.0 - 16.0 - 36.0 - UiStage.CARD_GAP * 3.0 - UiStage.TITLE_H - tiles - action)
+	return roundi(UiStage.CARD.size.y - 16.0 - 36.0 - UiStage.CARD_GAP * 3.0 - UiStage.TITLE_H - tiles - action)
 
 
 func _draw_disc(center: Vector2, fill: Color, icon: Texture2D, icon_side: float) -> void:

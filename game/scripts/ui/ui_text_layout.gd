@@ -84,12 +84,12 @@ static func stat_label(label: Label) -> void:
 
 
 static func header_chip_count(label: Label) -> void:
-	## Hub chrome chip — 48 px heavy, tamni ink, desno poravnat; bez clip/ellipsis da broj ostane vidljiv.
+	## Hub chrome chip — 48 px heavy, krem ink na tamnom wellu, desno poravnat; bez clip/ellipsis.
 	if label == null:
 		return
 	label.add_theme_font_size_override("font_size", UI_CHROME.NUMBER_FONT_SIZE)
 	label.add_theme_font_override("font", UI_CHROME.heavy_font(UI_CHROME.EMBOLDEN_800))
-	label.add_theme_color_override("font_color", UI_PALETTE.OUTLINE)
+	label.add_theme_color_override("font_color", UI_CHROME.NUMBER_INK)
 	label.clip_text = false
 	label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT

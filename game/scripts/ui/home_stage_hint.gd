@@ -3,7 +3,7 @@ extends Control
 
 ## TutorialHint prve sesije (SeasonStage.dc.html · scene "new"): cream prsten
 ## oko Play dugmeta (scale 1.06) koji pulsira i oblacic sa strelicom na (60, 1196).
-## Koordinate su koordinate Home stranice (1080 x 1597).
+## Koordinate su koordinate Home stranice (1080 x 1633).
 
 const TITLE := "Tap Play to start your first run"
 const SUB := "The card opens your meadow."

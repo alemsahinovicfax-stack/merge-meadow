@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cumpmkvg5c8rn"
-path="res://.godot/imported/icon_seed_light.svg-aaecb0ae39b24a06940221cc44a68f95.ctex"
+uid="uid://duwcy67ysl7yj"
+path="res://.godot/imported/icon_flower.svg-bd18748e54d78bcf3210d3ad2f7ff3d0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/chrome/icon_seed_light.svg"
-dest_files=["res://.godot/imported/icon_seed_light.svg-aaecb0ae39b24a06940221cc44a68f95.ctex"]
+source_file="res://assets/ui/chrome/icon_flower.svg"
+dest_files=["res://.godot/imported/icon_flower.svg-bd18748e54d78bcf3210d3ad2f7ff3d0.ctex"]
 
 [params]
 

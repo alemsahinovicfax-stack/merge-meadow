@@ -1,10 +1,10 @@
 extends SceneTree
 
-## design_handoff_camp_v2 — struktura scene, hub chrome i vertikalni budzet 1597 px:
-## kartica sezone 276, razmak 20, sekcija UVIJEK 1253 (1549 bez kartice) bez obzira
+## design_handoff_camp_v2 — struktura scene, hub chrome i vertikalni budzet 1633 px:
+## kartica sezone 276, razmak 20, sekcija UVIJEK 1289 (1585 bez kartice) bez obzira
 ## na broj tipova. Provjerava i da su Merge precica i StackGap obrisani.
 
-const HUB_PAGE := Vector2(1080.0, 1597.0)
+const HUB_PAGE := Vector2(1080.0, 1633.0)
 const TOL := 1.5
 const TWENTY := [
 	"clover", "daisy", "buttercup", "tulip", "sunflower", "pumpkin",
@@ -174,8 +174,8 @@ func _run() -> void:
 	if absf(section.global_position.y - (camp.global_position.y + 24.0)) > TOL:
 		_fail("section must move to the top without hero, y=%s" % str(section.global_position.y))
 		return
-	if absf(section.size.y - 1549.0) > TOL:
-		_fail("section without hero must be 1549, got %s" % str(section.size.y))
+	if absf(section.size.y - 1585.0) > TOL:
+		_fail("section without hero must be 1585, got %s" % str(section.size.y))
 		return
 
 	print("camp_layout_smoke OK")
@@ -188,15 +188,15 @@ func _settle() -> void:
 		await process_frame
 
 
-## v2: sekcija je uvijek 1253 s karticom sezone — nista ne ovisi o broju tipova.
+## v2: sekcija je uvijek 1289 s karticom sezone — nista ne ovisi o broju tipova.
 func _expect_section(camp: Control, hero: bool, what: String) -> String:
 	var page_top := camp.global_position.y
 	var page_bottom := page_top + HUB_PAGE.y
 	var section := camp.get_node("%StashSection") as Control
 	var bar := camp.get_node("%ExchangeBar") as Control
 	var card := camp.get_node("%SeasonLinkCard") as Control
-	if absf(section.size.y - 1253.0) > TOL:
-		return "%s: section expected 1253 got %s" % [what, str(section.size.y)]
+	if absf(section.size.y - 1289.0) > TOL:
+		return "%s: section expected 1289 got %s" % [what, str(section.size.y)]
 	if section.get_global_rect().end.y > page_bottom - 24.0 + TOL:
 		return "%s: section overflows the page (bottom %s)" % [what, str(section.get_global_rect().end.y - page_top)]
 	if bar.get_global_rect().end.y > section.get_global_rect().end.y - 18.0 + TOL:

@@ -269,7 +269,7 @@ func _apply_all() -> void:
 	_count_label.text = str(_count)
 	_price_label.text = str(_price)
 	_count_icon.texture = (
-		UiAssets.get_chrome_icon("icon_seed") if seed else UiAssets.get_arena_icon("icon_crystal")
+		UiAssets.get_chrome_icon("icon_seed") if seed else UiAssets.get_chrome_icon("icon_flower")
 	)
 	UiCamp.style_label(_price_label, UiCamp.FONT_PRICE, UiCamp.INK)
 	_apply_badge()

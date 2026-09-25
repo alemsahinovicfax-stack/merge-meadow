@@ -278,7 +278,7 @@ func _refresh_stash_view() -> void:
 func _apply_empty_state(flowers: bool) -> void:
 	empty_art.add_theme_stylebox_override("panel", UiCamp.empty_art_style(not flowers))
 	empty_icon.texture = (
-		UiAssets.get_arena_icon("icon_crystal") if flowers else UiAssets.get_chrome_icon("icon_seed")
+		UiAssets.get_chrome_icon("icon_flower") if flowers else UiAssets.get_chrome_icon("icon_seed")
 	)
 	# Bez rečenice ispod naslova — CTA vec kaze odakle stvari dolaze (v2).
 	empty_title.text = "No flowers yet" if flowers else "Your bag is empty"

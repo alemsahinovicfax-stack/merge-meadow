@@ -4,10 +4,10 @@ extends SceneTree
 ## prikovana uz karticu sezone (razmak tacno 20 px). Prije v2 je razmak rastao s
 ## 215 na 375 px kad bi sadrzaja bilo manje — to je rupa koju ovaj test cuva.
 
-const HUB_PAGE := Vector2(1080.0, 1597.0)
+const HUB_PAGE := Vector2(1080.0, 1633.0)
 const TOL := 1.5
-const SECTION_H := 1253.0
-const SECTION_H_NO_SEASON := 1549.0
+const SECTION_H := 1289.0
+const SECTION_H_NO_SEASON := 1585.0
 const MANY: Array[String] = [
 	"clover", "daisy", "buttercup", "tulip", "sunflower", "pumpkin",
 	"frost_snowdrop", "ice_crocus", "silver_aconite", "winter_camellia",

@@ -1,6 +1,6 @@
 ---
 type: dizajn
-status: draft
+status: aktivan
 milestone: "—"
 tags: [dizajn, ui, hub, header, footer, ikone, valute, claude-design, mockup]
 povezano:
@@ -15,6 +15,8 @@ ai_sažetak: "Hub chrome pass 2 — brief za Claude Design: footer bez teksta i 
 ---
 
 # Hub chrome pass 2 + ikone valuta — Claude Design brief
+
+> **Status: implementirano 2026-09-25** — paket `design_handoff_hub_chrome_v2/` prenesen u igru; odstupanja su u [[#Implementacija (2026-09-25)|§ Implementacija]] na kraju.
 
 > Chrome je već dizajniran 2026-09-11 ([[hub-header-footer-cd-brief|hub-header-footer-cd-brief]], paket `design_handoff_hub_chrome/`, smjer B). Ovo je **druga runda**: isti okvir, ista navigacija, ali tiši footer, druga boja i — glavni dio — **nove ikone valuta koje idu kroz cijelu igru**, ne samo u header.
 
@@ -426,6 +428,33 @@ headeru. Ideje van zadatka navedi odvojeno na kraju README-a.
 - [ ] Novčić u runu je ikona, ne proceduralni krug
 - [ ] Δ raspoređen: nijedna kartica nije promijenila mjeru, nijedna stranica nema novu rupu
 - [ ] Suite prolazi (posebno smokeovi iz tablice gore) + GUT
+
+## Implementacija (2026-09-25)
+
+Paket: `design_handoff_hub_chrome_v2/` (README § Odlučeno, 26 odluka). Preneseno 1:1 osim odstupanja niže.
+
+| Fajl | Uloga |
+|------|-------|
+| `game/assets/ui/chrome/*.svg` | 13 novih ikona (+ `icon_flower.svg`); `icon_seed_light.svg` obrisan, ostale prepisane |
+| `game/scripts/visual/ui_chrome.gd` | `CHROME_DEEP #2A2233`, `CHIP_WELL`, `NUMBER_INK`, `FOOTER_H 144` / `FOOTER_CONTENT_H 141` / `FOOTER_DELTA 36` / `PAGE_H 1633`, tab tile 184 × 108, ikona 64 / 72, indikator 72 × 8; `chip_style()` bez argumenta, `tab_ink()` / `TAB_ICON_GAP` / `TAB_LABEL_FONT_SIZE` obrisani |
+| `game/scripts/ui/hub_tab.gd` | Bez labele: slot 216 × 141 je hit-zona, tile 184 × 108 na (16, 20), ikona u boji 72 kad je aktivan (podignuta 2 px) i krem linija 64 kad nije, ime u `tooltip_text` |
+| `game/scenes/meta/meta_hub.tscn` + `meta_hub_controller.gd` | `DiamondChip → FlowerChip` (ikona `icon_flower`, broj = `get_garden_crystal_total()`), chip ikone 64 i razmak 10, footer 144 / 141, lock ikona 34 |
+| `game/scripts/ui/ui_text_layout.gd` | `header_chip_count()` boji broj u `NUMBER_INK` (krem na tamnom wellu) |
+| `game/scripts/run/coin_visual.gd` | Novčić u runu je `icon_coin.svg` na 96 px; `UiRun.COIN_INNER` / `COIN_GLINT` obrisani |
+| `ui_camp.gd` · `ui_shop.gd` · `ui_journal.gd` · `ui_stage.gd` · `ui_home_field.gd` · `ui_arena.gd` · `arena_meadow_bg.gd` | Stranica 1597 → **1633**; Camp sekcija 1289 / 1585; Home kartica 1136, dock i Play red 36 px niže |
+| `camp_scene.tscn` · `season_stage.tscn` | `StashSection` 1289; `CardClip` 1136; `SeasonBrowser` 36 px niže |
+| `camp_controller.gd` · `camp_stash_chip.gd` · `camp_stash_tab.gd` · `home_basket_visual.gd` | `arena/icon_crystal` → `chrome/icon_flower`, `icon_seed_light` → `icon_seed` |
+| `game/scripts/dev/hub_chrome_icons_smoke.gd` · `run_coin_texture_smoke.gd` | Nova dva smokea iz `godot/hub_chrome_v2_export.json` |
+
+**Odstupanja od handoffa (svjesna):**
+
+1. **Novčić u runu se crta ručno** (`draw_texture_rect`), ne preko `Sprite2D.texture` + `scale` kako paket kaže. Sprite2D svoju teksturu crta **prije** skriptinog `_draw()`, pa bi `_draw_shadow()` završio **preko** novčića. Ručno crtanje čuva redoslijed; `texture` ostaje `null`, kao kod sjemenke.
+2. **`UiRun.COIN_FILL` i `COIN_EDGE` ostaju** — paket ih briše sva četiri, ali `run_token.gd` (tačka na tokenu) i `run_pickup_feed.gd` („+1" koji leti) i dalje ih koriste. Obrisani su samo `COIN_INNER` i `COIN_GLINT`.
+3. **`assets/pickups/coin.png` i `seed.png` ostaju** — paket ih nudi za brisanje „nakon provjere". Oni su fallback u `PickupAssets` ako import ne prođe (`greske-katalog` #6); 32 KB je jeftinija zaštita nego nevidljiva ikona.
+4. **`arena/icon_crystal.svg` ostaje u repou bez korisnika** — poslije zamjene cvijetom ništa ga ne zove. Fajl stoji jer je kandidat za Arena ★3 kristal (README § Ideje van zadatka).
+5. **Dock na Home biranju sezone pomjeren u sceni**, ne kroz `UiStage.DOCK` — `SeasonBrowser` je apsolutno pozicioniran u `season_stage.tscn` (offset 1124 → 1160). Play red je u VBoxu i sam je pao 36 px, kako paket i predviđa.
+6. **`_slot_label_h()` čita `UiStage.CARD.size.y`** umjesto hardkodirane 1100 — paket to mjesto ne spominje, a ostalo bi zastarjelo pri sljedećoj promjeni visine.
+7. **`hub_chrome_icons_smoke` gleda samo chrome podstablo** — stranice huba nose Kenney ikone koje se legitimno tintaju, pa bi provjera „nijedna ikona nije RGB-tintana" na cijelom hubu lažno padala.
 
 ## Odluke
 

@@ -1,12 +1,12 @@
 extends SceneTree
 
 ## Merge Arena bez HUD-a, trake s porukama i Done dugmeta (2026-09-24) na visini hub
-## stranice (1597): polje uzima sve osim donjeg pojasa za NavLockPill, vreca i Pip su
+## stranice (1633): polje uzima sve osim donjeg pojasa za NavLockPill, vreca i Pip su
 ## nisko ali iznad pilule, 30 sjemenki bez preklapanja i van keepout zona, T3 kristal
 ## odleti i ocisti se za sobom.
 
 const SAVE_PATH := "user://player_save.json"
-const HUB_PAGE := Vector2(1080.0, 1597.0)
+const HUB_PAGE := Vector2(1080.0, 1633.0)
 const TOLERANCE := 1.5
 
 var _failed: bool = false
