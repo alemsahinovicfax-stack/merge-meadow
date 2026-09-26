@@ -181,7 +181,7 @@ theme_override_constants/separation = 20
 [node name="SeasonLinkCard" type="PanelContainer" parent="RootVBox/CampPage/ContentStack"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(0, 276)
+custom_minimum_size = Vector2(0, 318)
 layout_mode = 2
 script = ExtResource("3_slink")
 
@@ -215,29 +215,28 @@ script = ExtResource("4_cbtn")
 
 [node name="SeasonProgress" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 86)
+custom_minimum_size = Vector2(0, 128)
 layout_mode = 2
-size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 24
 
 [node name="CoinProgress" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(310, 128)
 layout_mode = 2
-size_flags_horizontal = 3
 mouse_filter = 2
-theme_override_constants/separation = 12
-alignment = 1
+theme_override_constants/separation = 6
+alignment = 2
 
 [node name="CoinValRow" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress"]
 custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 14
 
 [node name="SeasonLinkCoinIcon" type="TextureRect" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress/CoinValRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(48, 48)
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
@@ -250,50 +249,61 @@ layout_mode = 2
 size_flags_vertical = 4
 text = "0 / 500"
 
-[node name="SeasonLinkCoinsBar" type="ProgressBar" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress"]
+[node name="CoinBarRow" type="MarginContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 70
+
+[node name="SeasonLinkCoinsBar" type="ProgressBar" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/CoinProgress/CoinBarRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 2
 max_value = 500.0
 show_percentage = false
 
 [node name="SeasonSplitLine" type="Panel" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(5, 86)
+custom_minimum_size = Vector2(5, 128)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
 
-[node name="FlowerProgress" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress"]
+[node name="FlowerProgress" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
-theme_override_constants/separation = 12
-alignment = 1
+theme_override_constants/separation = 20
 
-[node name="FlowerValRow" type="HBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress"]
-custom_minimum_size = Vector2(0, 56)
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 12
-
-[node name="SeasonLinkFlower" type="Control" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress/FlowerValRow"]
+[node name="SeasonLinkFlower" type="Control" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(56, 56)
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
 script = ExtResource("5_art")
 
-[node name="SeasonLinkT3" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress/FlowerValRow"]
+[node name="FlowerBody" type="VBoxContainer" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress"]
+custom_minimum_size = Vector2(0, 128)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="SeasonLinkFlowerName" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress/FlowerBody"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Harvest Pumpkin"
+
+[node name="SeasonLinkT3" type="Label" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress/FlowerBody"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
 text = "0 / 20"
 
-[node name="SeasonLinkT3Bar" type="ProgressBar" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress"]
+[node name="SeasonLinkT3Bar" type="ProgressBar" parent="RootVBox/CampPage/ContentStack/SeasonLinkCard/SeasonLinkVBox/SeasonProgress/FlowerProgress/FlowerBody"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
@@ -303,7 +313,7 @@ show_percentage = false
 
 [node name="StashSection" type="PanelContainer" parent="RootVBox/CampPage/ContentStack"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 1289)
+custom_minimum_size = Vector2(0, 1247)
 layout_mode = 2
 mouse_filter = 2
 

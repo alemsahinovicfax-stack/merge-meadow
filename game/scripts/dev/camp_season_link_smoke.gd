@@ -94,8 +94,8 @@ func _run() -> void:
 	if card.mouse_filter != Control.MOUSE_FILTER_STOP:
 		_fail("SeasonLinkCard must STOP")
 		return
-	if absf(card.size.y - 276.0) > 1.5 or absf(card.size.x - 1032.0) > 1.5:
-		_fail("hero card expected 1032 × 276 got %s" % str(card.size))
+	if absf(card.size.y - 318.0) > 1.5 or absf(card.size.x - 1032.0) > 1.5:
+		_fail("hero card expected 1032 × 318 got %s" % str(card.size))
 		return
 	var title: Label = camp.get_node_or_null("%SeasonLinkTitle") as Label
 	if title == null or title.text != "Frost Orchard":
@@ -121,13 +121,27 @@ func _run() -> void:
 	if coin_icon == null or coin_icon.texture == null:
 		_fail("SeasonLink coin icon missing texture")
 		return
-	# v2: captioni "Coins" i "{cvijet} ★★★" su obrisani — ikona i crtez ih nose.
-	if camp.get_node_or_null("%SeasonLinkFlowerName") != null or camp.get_node_or_null("%SeasonCoinCap") != null:
-		_fail("progress captions must be gone")
+	if camp.get_node_or_null("%SeasonCoinCap") != null:
+		_fail("coin caption must stay gone")
 		return
-	var flower_art: Control = camp.get_node_or_null("%SeasonLinkFlower") as Control
-	if absf(_center_y(coin_icon) - _center_y(flower_art)) > 2.0:
-		_fail("coin icon and flower art must share a row")
+	var flower_name: Label = camp.get_node_or_null("%SeasonLinkFlowerName") as Label
+	if flower_name == null or flower_name.text != "Harvest Pumpkin":
+		_fail("flower name expected Harvest Pumpkin, got %s" % (flower_name.text if flower_name else "missing"))
+		return
+	if flower_name.get_theme_font_size("font_size") < 34:
+		_fail("flower name must be >= 34 px")
+		return
+	if flower_name.text_overrun_behavior != TextServer.OVERRUN_NO_TRIMMING or flower_name.clip_text:
+		_fail("flower name must not trim")
+		return
+	var name_w := flower_name.get_theme_font("font").get_string_size(
+		flower_name.text, HORIZONTAL_ALIGNMENT_LEFT, -1, flower_name.get_theme_font_size("font_size")
+	).x
+	if name_w > 471.0:
+		_fail("flower name wider than 471: %.1f" % name_w)
+		return
+	if absf(_center_y(coin_icon) - _center_y(t3_lbl)) > 2.0:
+		_fail("coin icon and flower count must share a row")
 		return
 	if absf(_center_y(coins_bar) - _center_y(t3_bar)) > 2.0:
 		_fail("bars must share a row")

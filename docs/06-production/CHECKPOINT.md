@@ -10,7 +10,7 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
-zadnja_sesija: "Camp: prazan Seeds vodi na polje sezone, Trade bar se krije kad tab nema šta, odabir chipa je trenutan i gornji okvir prvog reda više nije sječen. Čeka se CD zip za karticu sezone (ikona + ime cvijeta)."
+zadnja_sesija: "Camp kartica sezone — ikona 128 i puno ime ★3 cvijeta (Harvest Pumpkin). Kartica 318, sekcija 1247. Unlock i 500+20 netaknuti."
 zadnje_azurirano: 2026-09-26
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"

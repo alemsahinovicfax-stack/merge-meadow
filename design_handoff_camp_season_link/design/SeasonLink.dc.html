@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-layer="CampScreen" style="width:1080px;height:1920px;position:relative;overflow:hidden;background:#2E4733;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+<div style="{{ vars }}">
+
+  <div data-layer="Header" style="position:relative;z-index:2;height:143px;background:#2A2233;box-shadow:0 6px 14px rgba(20,14,26,.34)">
+    <div style="height:140px;display:flex;align-items:center;gap:16px;padding-left:20px;box-sizing:border-box">
+      <div data-layer="CoinChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)">
+        <img src="icons/icon_coin.svg" alt="" style="width:64px;height:64px;flex:0 0 auto;display:block">
+        <div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">{{ hdrCoins }}</div>
+      </div>
+      <div data-layer="SeedChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)">
+        <img src="icons/icon_seed.svg" alt="" style="width:64px;height:64px;flex:0 0 auto;display:block">
+        <div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">42</div>
+      </div>
+      <div data-layer="FlowerChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)">
+        <img src="icons/icon_flower.svg" alt="" style="width:64px;height:64px;flex:0 0 auto;display:block">
+        <div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">{{ hdrFlowers }}</div>
+      </div>
+      <div data-layer="SettingsSlot" style="width:124px;height:140px;flex:0 0 auto;display:flex;align-items:center;padding-left:4px;box-sizing:border-box">
+        <div data-layer="SettingsButton" style="width:100px;height:100px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center">
+          <img src="icons/icon_settings_light.svg" alt="" style="width:56px;height:56px;display:block">
+        </div>
+      </div>
+    </div>
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+  </div>
+
+  <div data-layer="CampPage" style="height:1633px;box-sizing:border-box;padding:24px;display:flex;flex-direction:column;gap:20px;overflow:hidden">
+
+    <div data-layer="SeasonLinkCard" style="position:relative;flex:0 0 auto;box-sizing:border-box;width:1032px;height:318px;border-radius:26px;overflow:hidden;background:var(--tint,#C5D5E8);border:3px solid var(--edge,#9FB4CC);box-shadow:0 8px 16px rgba(20,26,22,.26);padding:22px;display:flex;flex-direction:column;gap:20px">
+      <sc-if value="{{ isUnlocking }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="UnlockBurst" style="position:absolute;left:50%;top:50%;width:var(--bd,264px);height:var(--bd,264px);transform:translate(-50%,-50%);box-sizing:border-box;border-radius:50%;border:14px solid rgba(255,245,209,var(--ba,.36));pointer-events:none"></div>
+      </sc-if>
+
+      <div data-layer="SeasonHead" style="position:relative;flex:0 0 auto;height:120px;display:flex;align-items:center;gap:20px">
+        <div data-layer="SeasonTitle" style="flex:1;min-width:0;font:900 56px/1 Nunito,system-ui,sans-serif;color:#1A1A14;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ title }}</div>
+        <div data-layer="UnlockButton" style="flex:0 0 auto;box-sizing:border-box;width:300px;height:120px;border-radius:20px;background:var(--ubg,rgba(255,248,240,.55));border:3px solid var(--uedge,rgba(26,26,20,.30));box-shadow:var(--ush,none);display:flex;align-items:center;justify-content:center;gap:12px">
+          <sc-if value="{{ showLock }}" hint-placeholder-val="{{ true }}">
+            <img data-layer="LockIcon" src="icons/icon_lock.svg" alt="" style="width:40px;height:40px;display:block;flex:0 0 auto;opacity:.8">
+          </sc-if>
+          <div style="font:900 48px/1 Nunito,system-ui,sans-serif;color:var(--uink,#44443A);white-space:nowrap">{{ btnLabel }}</div>
+        </div>
+      </div>
+
+      <div data-layer="SeasonProgress" style="position:relative;flex:0 0 auto;height:128px;display:flex;gap:24px">
+        <div data-layer="CoinProgress" style="flex:0 0 310px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px">
+          <div style="height:56px;display:flex;align-items:center;gap:14px">
+            <img data-layer="CoinIcon" src="icons/icon_coin.svg" alt="" style="width:56px;height:56px;display:block;flex:0 0 auto">
+            <div data-layer="CoinCount" style="flex:1;min-width:0;height:48px;font:900 48px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#1A1A14;white-space:nowrap">{{ coinVal }}</div>
+          </div>
+          <div data-layer="CoinBar" style="margin-left:70px;height:18px;border-radius:9px;background:rgba(26,26,20,.20);overflow:hidden">
+            <div style="height:100%;width:var(--cw,52%);background:#FFD56B"></div>
+          </div>
+        </div>
+
+        <div data-layer="SplitLine" style="flex:0 0 5px;height:128px;border-radius:3px;background:rgba(26,26,20,.22)"></div>
+
+        <div data-layer="FlowerProgress" style="flex:1;min-width:0;display:flex;gap:20px">
+          <div data-layer="FlowerArt" style="position:relative;flex:0 0 auto;box-sizing:border-box;width:128px;height:128px;border-radius:28px;background:#FFD56B;border:3px solid #D6A82F;overflow:hidden">
+            <div data-layer="ArtBox" style="position:absolute;left:7px;top:7px;width:108px;height:108px">
+              <sc-if value="{{ isPumpkin }}" hint-placeholder-val="{{ true }}">
+                <img src="icons/flowers/pumpkin_t3.svg" alt="Harvest Pumpkin" style="position:absolute;left:-16.8px;top:-21.8px;width:141.1px;height:141.1px;max-width:none;display:block">
+              </sc-if>
+              <sc-if value="{{ isPeony }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="ProcCrystal" style="position:absolute;inset:0">
+                  <div style="position:absolute;left:49.5px;top:86.4px;width:9px;height:28.8px;background:#599E52"></div>
+                  <div style="position:absolute;left:7.2px;top:36px;width:36px;height:36px;border-radius:50%;background:#8A6EF5"></div>
+                  <div style="position:absolute;left:64.8px;top:36px;width:36px;height:36px;border-radius:50%;background:#8A6EF5"></div>
+                  <div style="position:absolute;left:36px;top:14.4px;width:36px;height:36px;border-radius:50%;background:#8A6EF5"></div>
+                  <div style="position:absolute;left:36px;top:57.6px;width:36px;height:36px;border-radius:50%;background:#8A6EF5"></div>
+                  <div style="position:absolute;left:36px;top:32.4px;width:36px;height:36px;border-radius:50%;background:#FFF2BF"></div>
+                  <div style="position:absolute;left:26.1px;top:22.5px;width:55.8px;height:55.8px;box-sizing:border-box;border-radius:50%;border:5.4px solid #A18BF7"></div>
+                  <div style="position:absolute;left:12.6px;top:27px;width:10.8px;height:10.8px;border-radius:50%;background:rgba(255,255,255,.85)"></div>
+                  <div style="position:absolute;left:84.6px;top:27px;width:10.8px;height:10.8px;border-radius:50%;background:rgba(255,255,255,.85)"></div>
+                  <div style="position:absolute;left:48.6px;top:84.6px;width:10.8px;height:10.8px;border-radius:50%;background:rgba(255,255,255,.85)"></div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+          <div data-layer="FlowerBody" style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between">
+            <div data-layer="FlowerName" style="height:42px;font:800 42px/1 Nunito,system-ui,sans-serif;color:#1A1A14;white-space:nowrap">{{ flowerName }}</div>
+            <div data-layer="FlowerCount" style="height:48px;font:900 48px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#1A1A14;white-space:nowrap">{{ flowerVal }}</div>
+            <div data-layer="FlowerBar" style="height:18px;border-radius:9px;background:rgba(26,26,20,.20);overflow:hidden">
+              <div style="height:100%;width:var(--fw,0%);background:#FFF8F0"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div data-layer="StashSection" style="position:relative;flex:0 0 auto;box-sizing:border-box;width:1032px;height:1247px;border-radius:26px;background:#FFF8F0;border:2px solid rgba(45,52,54,.16);box-shadow:0 8px 16px rgba(20,26,22,.26);padding:18px;display:flex;flex-direction:column;gap:14px">
+      <div data-layer="StashTabs" style="flex:0 0 auto;height:120px;display:flex;gap:14px">
+        <div data-layer="SeedsTab" style="flex:1;min-width:0;box-sizing:border-box;height:120px;border-radius:20px;display:flex;align-items:center;gap:16px;padding:0 18px;background:#FFB88C;border:4px solid #E8A374">
+          <div style="flex:0 0 auto;box-sizing:border-box;width:76px;height:76px;border-radius:50%;background:#FFF8F0;border:3px solid #CBC2B6;display:grid;place-items:center"><img src="icons/icon_seed.svg" alt="" style="width:44px;height:44px;display:block"></div>
+          <div style="flex:1;min-width:0;font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Seeds</div>
+          <div style="flex:0 0 auto;box-sizing:border-box;height:56px;min-width:80px;padding:0 16px;border-radius:14px;display:grid;place-items:center;font:900 42px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;border:2px solid rgba(45,52,54,.20);background:rgba(255,248,240,.80);color:#2D3436">8</div>
+        </div>
+        <div data-layer="FlowersTab" style="flex:1;min-width:0;box-sizing:border-box;height:120px;border-radius:20px;display:flex;align-items:center;gap:16px;padding:0 18px;background:#F1EBE4;border:2px solid #D9D3CC">
+          <div style="flex:0 0 auto;box-sizing:border-box;width:76px;height:76px;border-radius:22px;background:#FFD56B;border:3px solid #D6A82F;display:grid;place-items:center"><img src="icons/icon_flower.svg" alt="" style="width:44px;height:44px;display:block"></div>
+          <div style="flex:1;min-width:0;font:900 46px/1 Nunito,system-ui,sans-serif;color:#4A5153;white-space:nowrap">Flowers</div>
+          <div style="flex:0 0 auto;box-sizing:border-box;height:56px;min-width:80px;padding:0 16px;border-radius:14px;display:grid;place-items:center;font:900 42px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;border:2px solid rgba(45,52,54,.20);background:#E6DFD8;color:#4A5153">6</div>
+        </div>
+      </div>
+      <div data-layer="StashBody_unchanged" style="flex:1;min-height:0;box-sizing:border-box;border-radius:20px;border:3px dashed rgba(45,52,54,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font:700 28px/1.2 ui-monospace,Menlo,monospace;letter-spacing:.06em;color:rgba(45,52,54,.55);text-transform:uppercase;text-align:center">
+        <div>Grid + Trade · bez promjene</div>
+        <div>sekcija 1032 × 1247 (−42)</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="Footer" style="position:relative;z-index:2;height:144px;background:#2A2233;box-shadow:0 -6px 14px rgba(20,14,26,.34)">
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+    <div style="position:relative;height:141px;display:flex">
+      <div data-layer="ActiveIndicator" style="position:absolute;top:6px;left:720px;width:72px;height:8px;border-radius:4px;z-index:1;background:#FFB88C"></div>
+      <div data-layer="Tab_Shop" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_shop_light.svg" alt="Shop" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Journal" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_journal_light.svg" alt="Journal" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Home" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_home_light.svg" alt="Home" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Camp" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;background:#FFB88C;border:2px solid rgba(45,52,54,.14);display:grid;place-items:center"><img src="icons/tab_camp.svg" alt="Camp" style="width:72px;height:72px;display:block;transform:translateY(-2px)"></div></div>
+      <div data-layer="Tab_Arena" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_arena_light.svg" alt="Arena" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+    </div>
+  </div>
+</div>
+
+  <sc-if value="{{ guides }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="Guides" style="position:absolute;inset:0;pointer-events:none;z-index:5">
+      <div style="position:absolute;left:24px;top:167px;width:1032px;height:318px;box-sizing:border-box;border:2px dashed #E0457B;border-radius:26px"></div>
+      <div style="position:absolute;left:560px;top:332px;width:471px;height:42px;box-sizing:border-box;border:2px dashed #E0457B"></div>
+      <div style="position:absolute;left:49px;top:336px;padding:6px 10px;border-radius:8px;background:#E0457B;color:#FFFFFF;font:700 24px/1 ui-monospace,Menlo,monospace">h 318 · +42</div>
+      <div style="position:absolute;left:516px;top:485px;height:20px;transform:translateX(-50%);padding:0 10px;background:#E0457B;color:#FFFFFF;font:700 18px/20px ui-monospace,Menlo,monospace">20</div>
+      <div style="position:absolute;left:24px;top:505px;width:1032px;height:1247px;box-sizing:border-box;border:2px dashed #E0457B;border-radius:26px"></div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;short&quot;,&quot;ready&quot;,&quot;peony&quot;,&quot;unlocking&quot;],&quot;default&quot;:&quot;short&quot;,&quot;tsType&quot;:&quot;'short'|'ready'|'peony'|'unlocking'&quot;,&quot;section&quot;:&quot;State&quot;},&quot;burst&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;default&quot;:0.35,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;State&quot;},&quot;guides&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Check&quot;}}">
+const TINTS = { frost: ['#C5D5E8', '#9FB4CC', 'Frost Orchard'], lantern: ['#C9B8E0', '#A193B3', 'Lantern Meadow'] };
+const FLOWERS = { pumpkin: 'Harvest Pumpkin', peony: 'Crystal Peony' };
+// bg, edge, ink, shadow, label — UiCamp.unlock_button_style / _ink / _text
+const BTN = {
+  short: ['rgba(255,248,240,.55)', 'rgba(26,26,20,.30)', '#44443A', 'none', 'Unlock'],
+  ready: ['#E8C44A', '#BA9D3B', '#2D3436', '0 6px 12px rgba(20,26,22,.26)', 'Unlock'],
+  unlocking: ['#FFD56B', '#D6A82F', '#2D3436', 'none', 'Unlocked']
+};
+// 8.1: 1 Fali · 2 Spremno · 3 Drugi cvijet · 4 Trenutak otključavanja
+const SCENES = {
+  short:     { t: 'frost',   coins: 260, fl: 0,  art: 'pumpkin', btn: 'short',     hdr: 260, hf: 27 },
+  ready:     { t: 'frost',   coins: 500, fl: 20, art: 'pumpkin', btn: 'ready',     hdr: 540, hf: 47 },
+  peony:     { t: 'lantern', coins: 380, fl: 4,  art: 'peony',   btn: 'short',     hdr: 380, hf: 31 },
+  unlocking: { t: 'frost',   coins: 500, fl: 20, art: 'pumpkin', btn: 'unlocking', hdr: 40,  hf: 27 }
+};
+
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const S = SCENES[p.scene] || SCENES.short;
+    const T = TINTS[S.t], B = BTN[S.btn];
+    const coins = Math.min(S.coins, 500), fl = Math.min(S.fl, 20);
+    // season_link_card._draw: r = lerp(0.2, 1, t) * BURST_SIZE/2, alpha = 0.55 * (1 - t), line 14
+    const t = Math.max(0, Math.min(1, p.burst ?? 0.35));
+    const r = (0.2 + 0.8 * t) * 260;
+    const vars = [
+      '--tint:' + T[0], '--edge:' + T[1],
+      '--ubg:' + B[0], '--uedge:' + B[1], '--uink:' + B[2], '--ush:' + B[3],
+      '--cw:' + (coins / 5) + '%', '--fw:' + (fl * 5) + '%',
+      '--bd:' + (2 * r + 14).toFixed(1) + 'px', '--ba:' + (0.55 * (1 - t)).toFixed(3)
+    ].join(';');
+    return {
+      vars,
+      title: T[2],
+      btnLabel: B[4],
+      showLock: S.btn === 'short',
+      isUnlocking: S.btn === 'unlocking',
+      coinVal: coins + ' / 500',
+      flowerVal: fl + ' / 20',
+      flowerName: FLOWERS[S.art],
+      isPumpkin: S.art === 'pumpkin',
+      isPeony: S.art === 'peony',
+      hdrCoins: S.hdr.toLocaleString('en-US'),
+      hdrFlowers: String(S.hf),
+      guides: !!p.guides
+    };
+  }
+}
+</script>
+</body>
+</html>

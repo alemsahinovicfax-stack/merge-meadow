@@ -11,6 +11,7 @@ extends PanelContainer
 @onready var coins_bar: ProgressBar = %SeasonLinkCoinsBar
 @onready var split_line: Panel = %SeasonSplitLine
 @onready var flower_art: CampArtFrame = %SeasonLinkFlower
+@onready var flower_name: Label = %SeasonLinkFlowerName
 @onready var t3_label: Label = %SeasonLinkT3
 @onready var t3_bar: ProgressBar = %SeasonLinkT3Bar
 @onready var unlock_button: CampButton = %SeasonLinkUnlock
@@ -33,7 +34,13 @@ func _ready() -> void:
 	unlock_button.clicked.connect(_on_unlock_clicked)
 	coin_icon.texture = UiAssets.get_chrome_icon("icon_coin")
 	coin_icon.custom_minimum_size = Vector2(UiCamp.SEASON_ICON, UiCamp.SEASON_ICON)
-	flower_art.configure_frame(UiCamp.SEASON_ART_FRAME, 16, 2, 0.0, 10, 1, UiCamp.SEASON_ART)
+	flower_art.configure_frame(
+		UiCamp.SEASON_ART_FRAME, UiCamp.SEASON_ART_RADIUS, UiCamp.SEASON_ART_BORDER,
+		0.0, 0, 0, UiCamp.SEASON_ART
+	)
+	flower_name.autowrap_mode = TextServer.AUTOWRAP_OFF
+	flower_name.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+	flower_name.clip_text = false
 	split_line.add_theme_stylebox_override("panel", UiCamp.split_line_style())
 	split_line.custom_minimum_size = Vector2(UiCamp.SEASON_SPLIT_W, UiCamp.SEASON_SPLIT_H)
 	for bar in [coins_bar, t3_bar]:
@@ -83,6 +90,7 @@ func _show(def: SeasonDef, coins: int, flowers: int) -> void:
 	var prev := GameState.previous_free_id_for(def.id)
 	var flower_type := GameState.star3_type_id_for_season(prev) if not prev.is_empty() else ""
 	flower_art.set_art(false, flower_type, 3)
+	_fit_flower_name(GameState.get_seed_display_name(flower_type) if not flower_type.is_empty() else "")
 	var style := UiCamp.unlock_button_style(_state)
 	unlock_button.set_styles(style, style)
 	unlock_button.set_text(UiCamp.unlock_button_text(_state))
@@ -95,6 +103,16 @@ func _show(def: SeasonDef, coins: int, flowers: int) -> void:
 	var ready := _state == UiCamp.SEASON_READY
 	unlock_button.disabled = not ready
 	unlock_button.mouse_filter = Control.MOUSE_FILTER_STOP if ready else Control.MOUSE_FILTER_IGNORE
+
+
+## 42, pa 38, pa 34. Ime se nikad ne reže.
+func _fit_flower_name(text: String) -> void:
+	flower_name.text = text
+	for px in [UiCamp.FONT_SEASON_FLOWER, 38, 34]:
+		UiCamp.style_label(flower_name, px, UiCamp.DARK_INK)
+		var width := UiCamp.tight_font(px).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x
+		if width <= float(UiCamp.SEASON_NAME_W) or px == 34:
+			return
 
 
 func navigate_to_lock() -> void:

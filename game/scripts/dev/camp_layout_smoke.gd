@@ -1,7 +1,7 @@
 extends SceneTree
 
 ## design_handoff_camp_v2 — struktura scene, hub chrome i vertikalni budzet 1633 px:
-## kartica sezone 276, razmak 20, sekcija UVIJEK 1289 (1585 bez kartice) bez obzira
+## kartica sezone 318, razmak 20, sekcija UVIJEK 1247 (1585 bez kartice) bez obzira
 ## na broj tipova. Provjerava i da su Merge precica i StackGap obrisani.
 
 const HUB_PAGE := Vector2(1080.0, 1633.0)
@@ -44,7 +44,7 @@ func _run() -> void:
 		"CampPage", "ContentStack", "SeasonLinkCard", "StashSection", "StashTabs",
 		"SeedsTab", "FlowersTab", "StashScroll", "SeedBagGrid", "CrystalGrid",
 		"EmptyState", "EmptyCta", "ExchangeBar", "ExchangeButton", "ReservedWarning", "TradeFeedback",
-		"SeasonLinkTitle", "SeasonLinkCoins", "SeasonLinkT3", "SeasonLinkUnlock",
+		"SeasonLinkTitle", "SeasonLinkCoins", "SeasonLinkT3", "SeasonLinkUnlock", "SeasonLinkFlowerName",
 		"HomeButton", "SettingsButton", "CollectionButton", "ResourceBar", "MergeButton", "PlayButton",
 	]
 	for node_name in required:
@@ -56,7 +56,7 @@ func _run() -> void:
 		"GardenCliff", "BagLabel", "CrystalTotalLabel", "CrystalCliff", "CompanionTitle", "PipSlot",
 		# v2: rupa u sredini, Merge precica, podnaslovi i captioni.
 		"StackGap", "MergeShortcut", "SeasonEyebrow", "HomeHint", "SeasonCoinCap",
-		"SeasonLinkFlowerName", "EmptyBody", "SelectedValue",
+		"EmptyBody", "SelectedValue",
 	]
 	for node_name in removed:
 		if camp.get_node_or_null("%" + node_name) != null:
@@ -191,22 +191,24 @@ func _settle() -> void:
 		await process_frame
 
 
-## v2: sekcija je uvijek 1289 s karticom sezone — nista ne ovisi o broju tipova.
+## Sekcija je uvijek 1247 s karticom sezone — nista ne ovisi o broju tipova.
 func _expect_section(camp: Control, hero: bool, what: String) -> String:
 	var page_top := camp.global_position.y
 	var page_bottom := page_top + HUB_PAGE.y
 	var section := camp.get_node("%StashSection") as Control
 	var bar := camp.get_node("%ExchangeBar") as Control
 	var card := camp.get_node("%SeasonLinkCard") as Control
-	if absf(section.size.y - 1289.0) > TOL:
-		return "%s: section expected 1289 got %s" % [what, str(section.size.y)]
+	if absf(section.size.y - 1247.0) > TOL:
+		return "%s: section expected 1247 got %s" % [what, str(section.size.y)]
 	if section.get_global_rect().end.y > page_bottom - 24.0 + TOL:
 		return "%s: section overflows the page (bottom %s)" % [what, str(section.get_global_rect().end.y - page_top)]
 	if bar.get_global_rect().end.y > section.get_global_rect().end.y - 18.0 + TOL:
 		return "%s: Trade bar is cut" % what
 	if hero:
-		if not card.visible or absf(card.size.y - 276.0) > TOL:
-			return "%s: hero must be 276 px" % what
+		if not card.visible or absf(card.size.y - 318.0) > TOL:
+			return "%s: hero must be 318 px" % what
+		if absf(section.global_position.y - (page_top + 362.0)) > TOL:
+			return "%s: section y expected 362, got %.1f" % [what, section.global_position.y - page_top]
 		if absf(card.global_position.y - (page_top + 24.0)) > TOL:
 			return "%s: hero must sit at y 24" % what
 		if absf(section.get_global_rect().end.y - (page_bottom - 24.0)) > TOL:

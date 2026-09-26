@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#141A16}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-layer="SeasonLinkSpecs" style="width:2380px;box-sizing:border-box;padding:80px;background:#1B211D;color:#FFF8F0;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;gap:72px">
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div style="font:900 56px/1.1 Nunito,system-ui,sans-serif">SeasonLinkCard — ime i ikona ★3 cvijeta</div>
+    <div style="font:600 28px/1.4 ui-monospace,Menlo,monospace;color:rgba(255,248,240,.72)">Kartica 1032 × 318 (bila 276, +42) · razmak 20 ostaje · StashSection 1247 (bila 1289, −42) · 24 + 318 + 20 + 1247 + 24 = 1633</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Četiri stanja (§8.1)</div>
+    <div style="display:grid;grid-template-columns:1080px 1080px;gap:48px 60px">
+      <div data-layer="State1" style="display:flex;flex-direction:column;gap:16px">
+        <div style="font:800 30px/1.3 Nunito,system-ui,sans-serif">1 · Fali — Frost Orchard · 260 / 500 · Harvest Pumpkin 0 / 20 · Unlock s lokotom</div>
+        <div style="position:relative;width:1080px;height:560px;overflow:hidden;border-radius:12px">
+          <dc-import name="SeasonLink" scene="short" style="position:absolute;left:0;top:-120px" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+      <div data-layer="State2" style="display:flex;flex-direction:column;gap:16px">
+        <div style="font:800 30px/1.3 Nunito,system-ui,sans-serif">2 · Spremno — 500 / 500 · 20 / 20 · Unlock aktivan (zlato + sjena)</div>
+        <div style="position:relative;width:1080px;height:560px;overflow:hidden;border-radius:12px">
+          <dc-import name="SeasonLink" scene="ready" style="position:absolute;left:0;top:-120px" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+      <div data-layer="State3" style="display:flex;flex-direction:column;gap:16px">
+        <div style="font:800 30px/1.3 Nunito,system-ui,sans-serif">3 · Drugi cvijet — Lantern Meadow · 380 / 500 · Crystal Peony 4 / 20</div>
+        <div style="position:relative;width:1080px;height:560px;overflow:hidden;border-radius:12px">
+          <dc-import name="SeasonLink" scene="peony" style="position:absolute;left:0;top:-120px" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+      <div data-layer="State4" style="display:flex;flex-direction:column;gap:16px">
+        <div style="font:800 30px/1.3 Nunito,system-ui,sans-serif">4 · Trenutak otključavanja — burst (t = 0,35 od 0,42 s) · „Unlocked" · ime i ikona ostaju</div>
+        <div style="position:relative;width:1080px;height:560px;overflow:hidden;border-radius:12px">
+          <dc-import name="SeasonLink" scene="unlocking" burst="{{ 0.35 }}" style="position:absolute;left:0;top:-120px" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Mjere djece (px baze, 1:1, koordinate unutar kartice)</div>
+    <div style="display:flex;gap:60px;align-items:flex-start">
+      <div data-layer="Measured" style="position:relative;flex:0 0 auto;width:1080px;height:360px;overflow:hidden;border-radius:12px">
+        <dc-import name="SeasonLink" scene="short" style="position:absolute;left:0;top:-150px" hint-size="1080px,1920px"></dc-import>
+        <div style="position:absolute;inset:0;pointer-events:none;font:800 20px/30px ui-monospace,Menlo,monospace;color:#FFFFFF;text-align:center">
+          <div style="position:absolute;left:49px;top:74px;width:662px;height:56px;box-sizing:border-box;border:2px solid #FF5A8A"><div style="position:absolute;left:-2px;top:-2px;width:30px;height:30px;background:#FF5A8A">1</div></div>
+          <div style="position:absolute;left:731px;top:42px;width:300px;height:120px;box-sizing:border-box;border:2px solid #FF5A8A;border-radius:20px"><div style="position:absolute;left:-2px;top:-2px;width:30px;height:30px;background:#FF5A8A;border-radius:18px 0 0 0">2</div></div>
+          <div style="position:absolute;left:49px;top:182px;width:310px;height:128px;box-sizing:border-box;border:2px solid #FF5A8A"><div style="position:absolute;left:-2px;top:-2px;width:30px;height:30px;background:#FF5A8A">3</div></div>
+          <div style="position:absolute;left:119px;top:234px;width:240px;height:48px;box-sizing:border-box;border:2px dashed #FF5A8A"></div>
+          <div style="position:absolute;left:383px;top:182px;width:5px;height:128px;box-sizing:border-box;outline:2px solid #FF5A8A"><div style="position:absolute;left:-14px;top:-34px;width:30px;height:30px;background:#FF5A8A">4</div></div>
+          <div style="position:absolute;left:412px;top:182px;width:128px;height:128px;box-sizing:border-box;border:2px solid #FF5A8A;border-radius:28px"><div style="position:absolute;left:-2px;top:-2px;width:30px;height:30px;background:#FF5A8A;border-radius:26px 0 0 0">5</div></div>
+          <div style="position:absolute;left:560px;top:182px;width:471px;height:42px;box-sizing:border-box;border:2px solid #FF5A8A"><div style="position:absolute;right:-2px;top:-2px;width:30px;height:30px;background:#FF5A8A">6</div></div>
+          <div style="position:absolute;left:560px;top:234px;width:471px;height:48px;box-sizing:border-box;border:2px solid #FF5A8A"><div style="position:absolute;right:-2px;top:-2px;width:30px;height:30px;background:#FF5A8A">7</div></div>
+          <div style="position:absolute;left:560px;top:292px;width:471px;height:18px;box-sizing:border-box;outline:2px solid #FF5A8A"><div style="position:absolute;right:-2px;top:22px;width:30px;height:30px;background:#FF5A8A">8</div></div>
+        </div>
+      </div>
+      <div data-layer="MeasureTable" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;font:600 24px/1.35 ui-monospace,Menlo,monospace;color:rgba(255,248,240,.88)">
+        <div style="font:800 26px/1.35 ui-monospace,Menlo,monospace;color:#FFF8F0">SeasonLinkCard · (24, 24) u CampPage · 1032 × 318 · pad 22 · rub 3 · r 26 · gap 20 · jedna sjena 0/8/16 @ 26 %</div>
+        <div>SeasonHead 982 × 120 (25, 25) · SeasonProgress 982 × 128 (25, 165) · gap 24</div>
+        <div style="height:2px;background:rgba(255,248,240,.16)"></div>
+        <div>1 SeasonTitle · 25, 57 · 662 × 56 · 56/900 #1A1A14 · kao danas</div>
+        <div>2 UnlockButton · 707, 25 · 300 × 120 · r 20 · rub 3 · lokot 40 · 48/900 · kao danas</div>
+        <div>3 CoinProgress · 25, 165 · 310 × 128 · CoinIcon 56 (25, 213) · CoinCount 48/900 (95, 217 · 240 × 48) · CoinBar (95, 275 · 240 × 18)</div>
+        <div>4 SplitLine · 359, 165 · 5 × 128 · #1A1A14 @ 22 %</div>
+        <div>5 FlowerArt · 388, 165 · 128 × 128 · #FFD56B · rub 3 #D6A82F · r 28 · bez wella · crtež 108 (odrezan po dužoj strani)</div>
+        <div>6 FlowerName · 536, 165 · 471 × 42 · 42/800 #1A1A14 · bez skraćivanja, bez prelamanja</div>
+        <div>7 FlowerCount · 536, 217 · 471 × 48 · 48/900 tabular · „N / 20"</div>
+        <div>8 FlowerBar · 536, 275 · 471 × 18 · r 9 · #1A1A14 @ 20 % · fill #FFF8F0</div>
+        <div style="height:2px;background:rgba(255,248,240,.16)"></div>
+        <div>Poravnanja: centar CoinIcon = centar FlowerCount (y 241) · CoinBar i FlowerBar isti red (y 275–293) · dno FlowerArt = dno FlowerBar (293)</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:60px;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Stranica (1080 × 1920 @ 40 %)</div>
+      <div style="position:relative;width:432px;height:768px;overflow:hidden;border-radius:12px">
+        <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:scale(.4);transform-origin:0 0">
+          <dc-import name="SeasonLink" scene="short" guides="{{ true }}" style="position:absolute;left:0;top:0" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+    </div>
+    <div style="flex:0 0 720px;display:flex;flex-direction:column;gap:18px;padding-top:60px;font:600 26px/1.4 ui-monospace,Menlo,monospace;color:rgba(255,248,240,.88)">
+      <div style="font:800 30px/1.3 Nunito,system-ui,sans-serif;color:#FFF8F0">Vertikalni budžet (header 143 · footer 144 ne mijenjaju se)</div>
+      <div>prije  24 + 276 + 20 + 1289 + 24 = 1633</div>
+      <div>sada   24 + 318 + 20 + 1247 + 24 = 1633</div>
+      <div>SEASON_H 276 → 318 · SECTION_H 1289 → 1247 · SECTION_GAP 20</div>
+      <div>kartica y 167–485 · sekcija y 505–1752 · footer od 1776</div>
+      <div>lista (idle) 949 → 907 · 4 puna reda + 135 px peek petog</div>
+      <div>lista (strip) 877 → 835</div>
+    </div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:22px;padding-top:60px">
+      <div style="font:800 30px/1.3 Nunito,system-ui,sans-serif">FlowerName — širina u mockupu (Nunito 800 · 42 px) naspram 471 px</div>
+      <sc-for list="{{ fit }}" as="f" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;gap:20px;font:600 26px/1.3 ui-monospace,Menlo,monospace;color:rgba(255,248,240,.88)">
+            <div>{{ f.name }} · {{ f.season }}</div>
+            <div>{{ f.val }}</div>
+          </div>
+          <div style="height:14px;border-radius:7px;background:rgba(255,248,240,.14);overflow:hidden"><div style="{{ f.barS }}"></div></div>
+        </div>
+      </sc-for>
+      <div style="font:600 24px/1.45 ui-monospace,Menlo,monospace;color:rgba(255,248,240,.7)">Godot: autowrap off · text_overrun NO_TRIMMING · ako je min. širina &gt; 471 → 38 → 34 px, nikad ellipsis.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const NAMES = [['Harvest Pumpkin', 'Frost Orchard'], ['Crystal Peony', 'Lantern Meadow'], ['Midnight Lotus', 'Amber Canopy']];
+const BUDGET = 471;
+
+class Component extends DCLogic {
+  state = { w: null };
+  componentDidMount() {
+    const font = '800 42px Nunito';
+    const load = document.fonts ? document.fonts.load(font) : Promise.resolve();
+    load.then(() => {
+      const ctx = document.createElement('canvas').getContext('2d');
+      ctx.font = font + ', system-ui, sans-serif';
+      this.setState({ w: NAMES.map(n => Math.ceil(ctx.measureText(n[0]).width)) });
+    });
+  }
+  renderVals() {
+    const w = this.state.w;
+    return {
+      fit: NAMES.map((n, i) => ({
+        name: n[0], season: n[1],
+        val: (w ? w[i] : '…') + ' / ' + BUDGET + ' px',
+        barS: 'height:100%;border-radius:7px;background:#A8E6CF;width:' + (w ? Math.min(100, w[i] / BUDGET * 100).toFixed(1) : 0) + '%'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

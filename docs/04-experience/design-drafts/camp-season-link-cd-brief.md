@@ -15,6 +15,8 @@ ai_sažetak: "Mali redizajn samo kartice sljedeće zaključane sezone u Campu: i
 
 # Camp — kartica sljedeće sezone — Claude Design brief
 
+> **Status: implementirano 2026-09-26** — paket `design_handoff_camp_season_link/` prenesen. Kartica je 318 px, sekcija ispod 1247. Ime je puni `display_name` iz kataloga (Harvest Pumpkin).
+
 > Camp je već u igri ([[camp-v2-cd-brief|pass 2]], paket `design_handoff_camp_v2/`). Ovo **nije** nova runda cijelog ekrana. Mijenja se **samo kartica** koja vodi na sljedeću zaključanu besplatnu sezonu. Sve ispod nje (tabovi, kartice sjemena i cvijeća, Trade, prazno stanje) ostaje kako jeste.
 
 Igrač na toj kartici vidi ime sezone, koliko mu coina fali i `0 / 20`. Ne vidi **koje** cvijeće treba skupiti. Danas tamo stoji ikona od 56 px bez imena.

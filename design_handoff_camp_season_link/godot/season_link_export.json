@@ -1,0 +1,145 @@
+{
+  "$schema_version": "1.0",
+  "generated": "2026-09-26",
+  "source": "design_handoff_camp_season_link/design/SeasonLink.dc.html + SeasonLink Specs.dc.html",
+  "brief": "docs/04-experience/design-drafts/camp-season-link-cd-brief.md",
+  "direction": "jedan dizajn (bez varijanti) — samo SeasonLinkCard; ostatak Campa iz design_handoff_camp_v2/",
+  "note": "Sve mjere su u px baze 1080 x 1920 i prenose se 1:1. Boje sRGB hex; alpha odvojeno. Tokeni: samo novi/promijenjeni — ostalo iz game/scripts/visual/ui_camp.gd.",
+  "meta": {
+    "base": { "w": 1080, "h": 1920 },
+    "header": { "h": 143, "given": true, "source": "game/scripts/visual/ui_chrome.gd (hub chrome v2)" },
+    "page": { "w": 1080, "h": 1633, "y": 143, "padding": 24, "content": [1032, 1585] },
+    "footer": { "h": 144, "given": true, "active_tab_index": 3 },
+    "minimums": { "touch": 120, "text": 34 },
+    "page_bg": "#2E4733"
+  },
+  "tokens": {
+    "changed": {
+      "SEASON_H": { "old": 276, "new": 318 },
+      "SECTION_H": { "old": 1289, "new": 1247, "rule": "CONTENT_H 1585 - SEASON_H - SECTION_GAP 20" },
+      "SEASON_PROGRESS_H": { "old": 86, "new": 128 },
+      "SEASON_SPLIT_H": { "old": 86, "new": 128 },
+      "SEASON_ICON": { "old": 48, "new": 56 },
+      "SEASON_ART_FRAME": { "old": 56, "new": 128, "same_as": "CHIP_ART_FRAME" },
+      "SEASON_ART": { "old": 46, "new": 108, "same_as": "CHIP_ART_FLOWER" }
+    },
+    "new": {
+      "SEASON_ART_RADIUS": 28,
+      "SEASON_ART_BORDER": 3,
+      "SEASON_COIN_COL_W": 310,
+      "SEASON_COIN_ROW_GAP": 14,
+      "SEASON_COIN_BAR_INDENT": 70,
+      "SEASON_VALUE_BAR_GAP": 6,
+      "SEASON_FLOWER_GAP": 20,
+      "SEASON_NAME_W": 471,
+      "FONT_SEASON_FLOWER": 42,
+      "FONT_SEASON_FLOWER_FALLBACK": [38, 34]
+    },
+    "unchanged_reused": {
+      "tint": { "frost": ["#C5D5E8", "#9FB4CC"], "lantern": ["#C9B8E0", "#A193B3"], "amber": ["#E8C48A", "#BA9D6E"] },
+      "dark_ink": "#1A1A14",
+      "art_frame": { "bg": "#FFD56B", "edge": "#D6A82F", "well": false },
+      "progress_track": "rgba(26,26,20,0.20)",
+      "progress_fill_coins": "#FFD56B",
+      "progress_fill_flowers": "#FFF8F0",
+      "split_line": "rgba(26,26,20,0.22)",
+      "unlock": { "short": ["rgba(255,248,240,0.55)", "rgba(26,26,20,0.30)", "#44443A"], "ready": ["#E8C44A", "#BA9D3B", "#2D3436"], "unlocking": ["#FFD56B", "#D6A82F", "#2D3436"] },
+      "burst": { "size": 520, "border": 14, "color": "rgba(255,245,209,0.55)", "dur_s": 0.42, "linger_s": 0.45 },
+      "shadow_card": { "x": 0, "y": 8, "blur": 16, "color": "rgba(20,26,22,0.26)" },
+      "font_sizes": { "season_name": 56, "season_value": 48, "unlock": 48 }
+    }
+  },
+  "layout": {
+    "SeasonLinkCard": { "rect_in_page": [24, 24, 1032, 318], "screen_y": 167, "pad": 22, "border": 3, "radius": 26, "gap": 20, "clip": true },
+    "SeasonHead": { "rect": [25, 25, 982, 120], "gap": 20 },
+    "SeasonTitle": { "rect": [25, 57, 662, 56] },
+    "UnlockButton": { "rect": [707, 25, 300, 120] },
+    "SeasonProgress": { "rect": [25, 165, 982, 128], "gap": 24 },
+    "CoinProgress": { "rect": [25, 165, 310, 128], "align": "dno — red vrijednosti + traka" },
+    "CoinIcon": { "rect": [25, 213, 56, 56] },
+    "CoinCount": { "rect": [95, 217, 240, 48] },
+    "CoinBar": { "rect": [95, 275, 240, 18] },
+    "SplitLine": { "rect": [359, 165, 5, 128] },
+    "FlowerProgress": { "rect": [388, 165, 619, 128], "gap": 20 },
+    "FlowerArt": { "rect": [388, 165, 128, 128], "art_box": [398, 175, 108, 108] },
+    "FlowerBody": { "rect": [536, 165, 471, 128], "align": "space-between" },
+    "FlowerName": { "rect": [536, 165, 471, 42] },
+    "FlowerCount": { "rect": [536, 217, 471, 48] },
+    "FlowerBar": { "rect": [536, 275, 471, 18] },
+    "StashSection": { "rect_in_page": [24, 362, 1032, 1247], "screen_y": 505, "no_season": { "rect_in_page": [24, 24, 1032, 1585] } },
+    "alignment": [
+      "centar CoinIcon (y 241) = centar FlowerCount (y 241)",
+      "CoinBar i FlowerBar: isti red, y 275–293",
+      "dno FlowerArt = dno FlowerBar = 293"
+    ],
+    "budget_check": "24 + 318 + 20 + 1247 + 24 = 1633; kartica: 3 + 22 + 120 + 20 + 128 + 22 + 3 = 318",
+    "grid_effect": { "idle": [949, 907], "strip": [877, 835], "rows_visible_idle": "4 puna + ~135 px peek (bilo 5 punih)" }
+  },
+  "components": {
+    "SeasonLinkCard": {
+      "size": [1032, 318], "tap": "→ Home (ništa ne troši) — kao danas",
+      "children": {
+        "SeasonHead": { "h": 120, "SeasonTitle": { "font": 56, "weight": 900, "color": "#1A1A14", "overrun": "ellipsis (kao danas)" }, "UnlockButton": { "size": [300, 120], "text": "Unlock | Unlocked", "lock_icon": 40, "note": "bez promjene" } },
+        "SeasonProgress": {
+          "h": 128,
+          "CoinProgress": { "w": 310, "icon": 56, "row_gap": 14, "value_font": 48, "bar": [240, 18], "bar_indent": 70, "value_bar_gap": 6 },
+          "SplitLine": [5, 128],
+          "FlowerProgress": {
+            "gap": 20,
+            "FlowerArt": { "node": "CampArtFrame", "frame": 128, "radius": 28, "border": 3, "well_inset": 0, "art": 108, "draw": "ArenaChipDraw.draw_flower(type, 3, 108) — odrezan SVG ili proceduralni fallback" },
+            "FlowerName": { "font": 42, "weight": 800, "embolden": "HEAVY", "color": "#1A1A14", "w_budget": 471, "wrap": false, "overrun": "NO_TRIMMING", "fit": "ako min_size.x > 471 → 38 → 34" },
+            "FlowerCount": { "font": 48, "weight": 900, "tabular": true, "text": "{have} / {need}" },
+            "FlowerBar": { "size": [471, 18], "radius": 9, "fill": "#FFF8F0" }
+          }
+        },
+        "UnlockBurst": { "draw": "season_link_card._draw() — ispod djece, iznad panela", "note": "bez promjene" }
+      }
+    }
+  },
+  "scenes": {
+    "short": { "n": 1, "season": "Frost Orchard", "tint": "frost", "coins": "260 / 500", "flower": "Harvest Pumpkin", "count": "0 / 20", "unlock": "short + lokot", "header_coins": 260 },
+    "ready": { "n": 2, "season": "Frost Orchard", "coins": "500 / 500", "flower": "Harvest Pumpkin", "count": "20 / 20", "unlock": "ready (zlato + sjena)", "header_coins": 540 },
+    "peony": { "n": 3, "season": "Lantern Meadow", "tint": "lantern", "coins": "380 / 500", "flower": "Crystal Peony", "count": "4 / 20", "unlock": "short + lokot", "art": "proceduralni fallback (_draw_crystal)" },
+    "unlocking": { "n": 4, "season": "Frost Orchard", "coins": "500 / 500", "count": "20 / 20", "unlock": "Unlocked, neaktivan", "burst_t_shown": 0.35, "header_coins": 40, "then": "Home, fokus na sezonu" }
+  },
+  "strings_en": {
+    "unlock": "Unlock",
+    "unlocked": "Unlocked",
+    "coin_count": "{have} / {need}",
+    "flower_count": "{have} / {need}",
+    "flower_name": "{display_name} — GameState.get_seed_display_name(star3_type_id_for_season(previous_free))",
+    "examples": { "frost_orchard": "Harvest Pumpkin", "lantern_meadow": "Crystal Peony", "amber_canopy": "Midnight Lotus" },
+    "not_added": ["Details", "Next free season", "Collect 20 of these", "{flower} ★★★", "Coins"]
+  },
+  "godot_map": {
+    "SeasonLinkCard": { "node": "scenes/camp/camp_scene.tscn → SeasonLinkCard", "script": "scripts/camp/season_link_card.gd", "change": "custom_minimum_size.y = UiCamp.SEASON_H (318)" },
+    "SeasonTitle": { "node": "%SeasonLinkTitle", "change": "—" },
+    "UnlockButton": { "node": "%SeasonLinkUnlock", "change": "—" },
+    "CoinProgress": { "node": "SeasonProgress/CoinProgress", "change": "VBox 310 × 128, alignment END, separation 6; red [ %SeasonLinkCoinIcon 56 · %SeasonLinkCoins ] separation 14; %SeasonLinkCoinsBar s lijevim odmakom 70 (MarginContainer ili HBox spacer)" },
+    "SplitLine": { "node": "%SeasonSplitLine", "change": "visina 128" },
+    "FlowerProgress": { "node": "SeasonProgress/FlowerProgress", "change": "HBox (bio VBox), separation 20: FlowerArt + FlowerBody (VBox, space-between)" },
+    "FlowerArt": { "node": "%SeasonLinkFlower (CampArtFrame)", "change": "configure_frame(128, 28, 3, 0.0, 0, 0, 108); set_art(false, flower_type, 3) kao danas" },
+    "FlowerName": { "node": "%SeasonLinkFlowerName (NOVI Label)", "change": "text = GameState.get_seed_display_name(flower_type); UiCamp.style_label(label, 42, DARK_INK); autowrap off; text_overrun_behavior = OVERRUN_NO_TRIMMING; clip_text = false" },
+    "FlowerCount": { "node": "%SeasonLinkT3", "change": "u FlowerBody, bez promjene stila" },
+    "FlowerBar": { "node": "%SeasonLinkT3Bar", "change": "u FlowerBody, širina 471 (fill)" },
+    "StashSection": { "node": "ContentStack/StashSection", "change": "UiCamp.section_height(true) → 1247 automatski kroz SECTION_H" }
+  },
+  "smoke_tests": {
+    "must_update": [
+      { "name": "camp_season_link_smoke", "why": "kartica 1032 × 318; umjesto 'captions must be gone' za %SeasonLinkFlowerName → assert da postoji, text == 'Harvest Pumpkin', font ≥ 34, širina ≤ 471, bez trimminga; 'coin icon and flower art share a row' → 'coin icon and %SeasonLinkT3 share a row'; %SeasonCoinCap i dalje ne postoji" },
+      { "name": "camp_layout_smoke", "why": "StashSection.y u CampPage = 24 + 318 + 20 = 362" },
+      { "name": "camp_section_fixed_smoke", "why": "StashSection.size.y == 1247 s karticom, 1585 bez" }
+    ],
+    "should_pass_unchanged": ["camp_trade_hold_smoke", "camp_crystal_select_smoke", "camp_hold_floor_smoke", "meta_hub_flow_smoke"]
+  },
+  "decisions": [
+    { "date": "2026-09-26", "what": "Jedan dizajn. Sve odluke u README § Odlučeno (po jedna rečenica)." },
+    { "what": "SEASON_H 318 (+42), SECTION_H 1247 (−42), SECTION_GAP 20 ostaje." },
+    { "what": "FlowerArt = okvir chipa (128 / 108), ime 42/800 iznad brojača 48/900, desno od ikone." },
+    { "what": "Boje traka ostaju iz ui_camp.gd, ne iz liste u §6 briefa." }
+  ],
+  "open_decisions": [
+    "Crystal Peony / Midnight Lotus nemaju SVG — boja proceduralnog fallbacka ovisi o hashu tipa (±0,04 nijanse); mockup je približan.",
+    "Širina imena provjerena u Nunitu; u Godotu (default font + embolden) izmjeriti 'Harvest Pumpkin' na 42 px — očekivano ~345 px od 471."
+  ]
+}

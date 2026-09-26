@@ -1,0 +1,34 @@
+camp_scene.tscn — SeasonLinkCard (px baze 1080 x 1920)
+Header (143) i footer (144) dolaze iz hub chromea. Ostatak Campa: design_handoff_camp_v2/godot/camp_tree.txt.
+* = mijenja se · + = novo · bez oznake = kao danas
+
+CampPage                          Control           1080 x 1633   clip_contents
+└ ContentStack                    VBoxContainer     1032 x 1585   pos (24, 24) · separation 20
+  ├ SeasonLinkCard *              PanelContainer    1032 x 318    season_card_style · pad 22 · rub 3 · tap → Home   [skriven kad nema sezone]
+  │ │                                                            _draw(): UnlockBurst prsten 520 / 14, ispod djece
+  │ └ SeasonLinkVBox              VBoxContainer     982 x 268     separation 20
+  │   ├ SeasonHead                HBoxContainer     982 x 120     separation 20
+  │   │ ├ %SeasonLinkTitle        Label             662 x 56      56 px / heavy, DARK_INK · "Frost Orchard"
+  │   │ └ %SeasonLinkUnlock       CampButton        300 x 120     unlock_button_style · lokot 40 samo "short" · "Unlock" / "Unlocked"
+  │   └ SeasonProgress *          HBoxContainer     982 x 128     separation 24
+  │     ├ CoinProgress *          VBoxContainer     310 x 128     alignment END · separation 6
+  │     │ ├ CoinRow               HBoxContainer     310 x 56      separation 14
+  │     │ │ ├ %SeasonLinkCoinIcon * TextureRect     56 x 56       icon_coin (bio 48)
+  │     │ │ └ %SeasonLinkCoins    Label             240 x 48      48 px · "260 / 500"
+  │     │ └ CoinBarRow +          MarginContainer   310 x 18      margin_left 70
+  │     │   └ %SeasonLinkCoinsBar ProgressBar       240 x 18      track #1A1A14 @ 20 % · fill #FFD56B
+  │     ├ %SeasonSplitLine *      Panel             5 x 128       (bio 5 x 86)
+  │     └ FlowerProgress *        HBoxContainer     619 x 128     separation 20 (bio VBox)
+  │       ├ %SeasonLinkFlower *   CampArtFrame      128 x 128     configure_frame(128, 28, 3, 0, 0, 0, 108) · bez wella
+  │       │                                                      crtež = ★3 prethodne besplatne sezone, tier 3, box 108
+  │       └ FlowerBody +          VBoxContainer     471 x 128     alignment: space-between (spacer ili separation 10)
+  │         ├ %SeasonLinkFlowerName + Label         471 x 42      42 px / heavy, DARK_INK · "Harvest Pumpkin" · bez wrapa, bez trimminga
+  │         ├ %SeasonLinkT3       Label             471 x 48      48 px · "0 / 20"
+  │         └ %SeasonLinkT3Bar *  ProgressBar       471 x 18      track #1A1A14 @ 20 % · fill #FFF8F0
+  └ StashSection *                PanelContainer    1032 x 1247   section_height(true) = SECTION_H (bio 1289) · y 362 u CampPage
+    └ … bez promjene (tabovi, lista, Trade, prazno stanje)
+
+Vertikalno u kartici:  3 + 22 + 120 + 20 + 128 + 22 + 3 = 318
+U SeasonProgress:      FlowerName 0–42 · FlowerCount 52–100 · FlowerBar 110–128
+                       CoinIcon 48–104 · CoinCount 52–100 · CoinBar 110–128
+Stranica:              24 + 318 + 20 + 1247 + 24 = 1633

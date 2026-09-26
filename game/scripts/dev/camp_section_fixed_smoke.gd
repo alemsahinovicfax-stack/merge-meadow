@@ -6,7 +6,7 @@ extends SceneTree
 
 const HUB_PAGE := Vector2(1080.0, 1633.0)
 const TOL := 1.5
-const SECTION_H := 1289.0
+const SECTION_H := 1247.0
 const SECTION_H_NO_SEASON := 1585.0
 const MANY: Array[String] = [
 	"clover", "daisy", "buttercup", "tulip", "sunflower", "pumpkin",
