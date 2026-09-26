@@ -1,29 +1,13 @@
-[gd_scene load_steps=11 format=3 uid="uid://c8mainmenu01"]
+[gd_scene load_steps=10 format=3 uid="uid://c8mainmenu01"]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="3_uibtn"]
-[ext_resource type="Script" path="res://scripts/ui/home_basket_visual.gd" id="4_basket_vis"]
 [ext_resource type="PackedScene" path="res://scenes/ui/season_stage.tscn" id="5_stage"]
 [ext_resource type="Script" path="res://scripts/camp/camp_button.gd" id="6_campbtn"]
-[ext_resource type="Script" path="res://scripts/ui/home_field_title.gd" id="8_field_title"]
 [ext_resource type="Script" path="res://scripts/ui/home_gift_card.gd" id="9_gift"]
 [ext_resource type="Script" path="res://scripts/ui/home_stage_hint.gd" id="10_hint"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_basket"]
-bg_color = Color(0.78, 0.9, 0.72, 0.95)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.35, 0.55, 0.32, 0.5)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-content_margin_left = 14.0
-content_margin_top = 12.0
-content_margin_right = 14.0
-content_margin_bottom = 12.0
+[ext_resource type="Script" path="res://scripts/ui/field_basket_button.gd" id="11_basket_btn"]
+[ext_resource type="Script" path="res://scripts/ui/field_upgrades_button.gd" id="12_upgrades_btn"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward"]
 bg_color = Color(1, 0.973, 0.941, 0.98)
@@ -87,191 +71,10 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_constants/separation = 24
 
-[node name="FieldTopRow" type="HBoxContainer" parent="HomeColumn"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 124)
-layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 0
-
-[node name="SeasonsRowButton" type="PanelContainer" parent="HomeColumn/FieldTopRow"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(300, 124)
-layout_mode = 2
-size_flags_horizontal = 4
-script = ExtResource("3_uibtn")
-label_text = "‹  Seasons"
-font_size = 46
-button_variant = "subtle"
-
-[node name="SeasonNameChip" type="VBoxContainer" parent="HomeColumn/FieldTopRow"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(280, 124)
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_constants/separation = 2
-alignment = 1
-script = ExtResource("8_field_title")
-
-[node name="NameLabel" type="Label" parent="HomeColumn/FieldTopRow/SeasonNameChip"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_colors/font_color = Color(1, 0.965, 0.839, 1)
-theme_override_font_sizes/font_size = 56
-text = ""
-text_overrun_behavior = 3
-
-[node name="Tagline" type="Label" parent="HomeColumn/FieldTopRow/SeasonNameChip"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_colors/font_color = Color(1, 0.965, 0.839, 0.9)
-theme_override_font_sizes/font_size = 38
-text = ""
-text_overrun_behavior = 3
-
 [node name="SeasonStage" parent="HomeColumn" instance=ExtResource("5_stage")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-
-[node name="HomeTopStack" type="VBoxContainer" parent="HomeColumn"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-theme_override_constants/separation = 8
-
-[node name="BasketCard" type="PanelContainer" parent="HomeColumn/HomeTopStack"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(1032, 180)
-layout_mode = 2
-mouse_filter = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_basket")
-
-[node name="BasketHBox" type="HBoxContainer" parent="HomeColumn/HomeTopStack/BasketCard"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 14
-
-[node name="BasketVisual" type="Control" parent="HomeColumn/HomeTopStack/BasketCard/BasketHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(128, 128)
-layout_mode = 2
-mouse_filter = 2
-script = ExtResource("4_basket_vis")
-
-[node name="BasketVBox" type="VBoxContainer" parent="HomeColumn/HomeTopStack/BasketCard/BasketHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_constants/separation = 4
-alignment = 1
-
-[node name="BasketTitle" type="Label" parent="HomeColumn/HomeTopStack/BasketCard/BasketHBox/BasketVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 0.28, 0.18, 1)
-theme_override_font_sizes/font_size = 52
-text = "Basket"
-autowrap_mode = 2
-
-[node name="BasketCaption" type="Label" parent="HomeColumn/HomeTopStack/BasketCard/BasketHBox/BasketVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.965, 0.839, 0.9)
-theme_override_font_sizes/font_size = 38
-text = "Tap to choose"
-autowrap_mode = 2
-
-[node name="BasketButton" type="PanelContainer" parent="HomeColumn/HomeTopStack/BasketCard/BasketHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(260, 136)
-layout_mode = 2
-script = ExtResource("3_uibtn")
-label_text = "Choose"
-font_size = 46
-button_variant = "gold"
-
-[node name="FieldUpgradeStack" type="VBoxContainer" parent="HomeColumn"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-mouse_filter = 0
-theme_override_constants/separation = 16
-
-[node name="MagnetRow" type="PanelContainer" parent="HomeColumn/FieldUpgradeStack"]
-custom_minimum_size = Vector2(0, 192)
-layout_mode = 2
-mouse_filter = 0
-
-[node name="MagnetInner" type="HBoxContainer" parent="HomeColumn/FieldUpgradeStack/MagnetRow"]
-layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="MagnetCopy" type="VBoxContainer" parent="HomeColumn/FieldUpgradeStack/MagnetRow/MagnetInner"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 2
-alignment = 1
-
-[node name="MagnetTitle" type="Label" parent="HomeColumn/FieldUpgradeStack/MagnetRow/MagnetInner/MagnetCopy"]
-unique_name_in_owner = true
-layout_mode = 2
-mouse_filter = 0
-theme_override_font_sizes/font_size = 38
-text = "Magnet"
-
-[node name="MagnetButton" type="PanelContainer" parent="HomeColumn/FieldUpgradeStack/MagnetRow/MagnetInner"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 154)
-layout_mode = 2
-size_flags_vertical = 4
-script = ExtResource("3_uibtn")
-label_text = "Upgrade"
-font_size = 48
-button_variant = "gold"
-
-[node name="LootBoostRow" type="PanelContainer" parent="HomeColumn/FieldUpgradeStack"]
-custom_minimum_size = Vector2(0, 192)
-layout_mode = 2
-mouse_filter = 0
-
-[node name="LootInner" type="HBoxContainer" parent="HomeColumn/FieldUpgradeStack/LootBoostRow"]
-layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="LootCopy" type="VBoxContainer" parent="HomeColumn/FieldUpgradeStack/LootBoostRow/LootInner"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 2
-alignment = 1
-
-[node name="LootBoostTitle" type="Label" parent="HomeColumn/FieldUpgradeStack/LootBoostRow/LootInner/LootCopy"]
-unique_name_in_owner = true
-layout_mode = 2
-mouse_filter = 0
-theme_override_font_sizes/font_size = 38
-text = "Loot Boost"
-
-[node name="LootBoostButton" type="PanelContainer" parent="HomeColumn/FieldUpgradeStack/LootBoostRow/LootInner"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 154)
-layout_mode = 2
-size_flags_vertical = 4
-script = ExtResource("3_uibtn")
-label_text = "Upgrade"
-font_size = 48
-button_variant = "gold"
 
 [node name="PlayRow" type="HBoxContainer" parent="HomeColumn"]
 unique_name_in_owner = true
@@ -297,21 +100,10 @@ layout_mode = 2
 size_flags_horizontal = 0
 script = ExtResource("9_gift")
 
-[node name="EndlessPlayButton" type="PanelContainer" parent="HomeColumn/PlayRow"]
+[node name="FieldOverlay" type="Control" parent="."]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(360, 176)
-layout_mode = 2
-size_flags_horizontal = 4
-script = ExtResource("6_campbtn")
-label_text = "Endless"
-font_size = 48
-button_variant = "accent"
-
-[node name="StageHint" type="Control" parent="."]
-unique_name_in_owner = true
-visible = false
-z_index = 30
+z_index = 6
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -319,9 +111,140 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-script = ExtResource("10_hint")
 
-[node name="TutorialHintPanel" type="PanelContainer" parent="."]
+[node name="SeasonLabel" type="Label" parent="FieldOverlay"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 228.0
+offset_top = 36.0
+offset_right = 852.0
+offset_bottom = 92.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.102, 0.102, 0.078, 1)
+theme_override_font_sizes/font_size = 56
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="GrownChip" type="PanelContainer" parent="FieldOverlay"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 380.0
+offset_top = 112.0
+offset_right = 700.0
+offset_bottom = 188.0
+mouse_filter = 2
+
+[node name="Row" type="HBoxContainer" parent="FieldOverlay/GrownChip"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="FieldOverlay/GrownChip/Row"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="FieldOverlay/GrownChip/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.102, 0.102, 0.078, 1)
+theme_override_font_sizes/font_size = 44
+text = "0 / 13"
+vertical_alignment = 1
+
+[node name="Word" type="Label" parent="FieldOverlay/GrownChip/Row"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.333, 0.361, 0.369, 1)
+theme_override_font_sizes/font_size = 38
+text = "grown"
+vertical_alignment = 1
+
+[node name="GiftChest" type="Control" parent="FieldOverlay"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 180)
+layout_mode = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 204.0
+offset_bottom = 204.0
+script = ExtResource("9_gift")
+
+[node name="BasketButton" type="Control" parent="FieldOverlay"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 180)
+layout_mode = 0
+offset_left = 24.0
+offset_top = 220.0
+offset_right = 204.0
+offset_bottom = 400.0
+script = ExtResource("11_basket_btn")
+
+[node name="UpgradesButton" type="Control" parent="FieldOverlay"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 180)
+layout_mode = 0
+offset_left = 876.0
+offset_top = 24.0
+offset_right = 1056.0
+offset_bottom = 204.0
+script = ExtResource("12_upgrades_btn")
+
+[node name="BottomRow" type="Control" parent="FieldOverlay"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 70.0
+offset_top = 1461.0
+offset_right = 1010.0
+offset_bottom = 1609.0
+mouse_filter = 2
+
+[node name="SeasonsRowButton" type="PanelContainer" parent="FieldOverlay/BottomRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(236, 124)
+layout_mode = 0
+offset_top = 16.0
+offset_right = 236.0
+offset_bottom = 140.0
+script = ExtResource("3_uibtn")
+label_text = "‹  Seasons"
+font_size = 40
+button_variant = "subtle"
+
+[node name="FieldPlayButton" type="PanelContainer" parent="FieldOverlay/BottomRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(432, 140)
+layout_mode = 0
+offset_left = 254.0
+offset_right = 686.0
+offset_bottom = 140.0
+script = ExtResource("6_campbtn")
+label_text = "Play"
+font_size = 60
+button_variant = "primary"
+
+[node name="EndlessPlayButton" type="PanelContainer" parent="FieldOverlay/BottomRow"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(236, 124)
+layout_mode = 0
+offset_left = 704.0
+offset_top = 16.0
+offset_right = 940.0
+offset_bottom = 140.0
+script = ExtResource("3_uibtn")
+label_text = "Endless"
+font_size = 40
+button_variant = "accent"
+
+[node name="TutorialHintPanel" type="PanelContainer" parent="FieldOverlay"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -337,11 +260,24 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 
-[node name="TutorialHint" type="Label" parent="TutorialHintPanel"]
+[node name="TutorialHint" type="Label" parent="FieldOverlay/TutorialHintPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "First run: tap Play. Seeds you bring back become flowers in the Arena."
 autowrap_mode = 3
+
+[node name="StageHint" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 30
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("10_hint")
 
 [node name="RewardOverlay" type="Control" parent="."]
 unique_name_in_owner = true
@@ -484,4 +420,132 @@ layout_mode = 2
 script = ExtResource("3_uibtn")
 label_text = "Close"
 font_size = 24
+button_variant = "subtle"
+[node name="UpgradesOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 45
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="Dim" type="ColorRect" parent="UpgradesOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.102, 0.086, 0.118, 0.55)
+
+[node name="UpgradesPanel" type="PanelContainer" parent="UpgradesOverlay"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -922.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="UpgradesVBox" type="VBoxContainer" parent="UpgradesOverlay/UpgradesPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="UpgradesTitle" type="Label" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.102, 0.102, 0.078, 1)
+theme_override_font_sizes/font_size = 56
+text = "Upgrades"
+horizontal_alignment = 1
+
+[node name="UpgradesSub" type="Label" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.333, 0.361, 0.369, 1)
+theme_override_font_sizes/font_size = 40
+text = "Levels stay for every run. Paid in flowers."
+horizontal_alignment = 1
+
+[node name="MagnetRow" type="PanelContainer" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox"]
+custom_minimum_size = Vector2(0, 192)
+layout_mode = 2
+mouse_filter = 0
+
+[node name="MagnetInner" type="HBoxContainer" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox/MagnetRow"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="MagnetCopy" type="VBoxContainer" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox/MagnetRow/MagnetInner"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="MagnetTitle" type="Label" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox/MagnetRow/MagnetInner/MagnetCopy"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 0
+theme_override_font_sizes/font_size = 38
+text = "Magnet"
+
+[node name="MagnetButton" type="PanelContainer" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox/MagnetRow/MagnetInner"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 154)
+layout_mode = 2
+size_flags_vertical = 4
+script = ExtResource("3_uibtn")
+label_text = "Upgrade"
+font_size = 48
+button_variant = "gold"
+
+[node name="LootBoostRow" type="PanelContainer" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox"]
+custom_minimum_size = Vector2(0, 192)
+layout_mode = 2
+mouse_filter = 0
+
+[node name="LootInner" type="HBoxContainer" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox/LootBoostRow"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="LootCopy" type="VBoxContainer" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox/LootBoostRow/LootInner"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="LootBoostTitle" type="Label" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox/LootBoostRow/LootInner/LootCopy"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 0
+theme_override_font_sizes/font_size = 38
+text = "Loot Boost"
+
+[node name="LootBoostButton" type="PanelContainer" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox/LootBoostRow/LootInner"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 154)
+layout_mode = 2
+size_flags_vertical = 4
+script = ExtResource("3_uibtn")
+label_text = "Upgrade"
+font_size = 48
+button_variant = "gold"
+
+[node name="UpgradesCloseButton" type="PanelContainer" parent="UpgradesOverlay/UpgradesPanel/UpgradesVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 132)
+layout_mode = 2
+script = ExtResource("3_uibtn")
+label_text = "Close"
+font_size = 44
 button_variant = "subtle"

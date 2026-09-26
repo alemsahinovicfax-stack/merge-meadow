@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#EFEAE3}a{color:#9E6645}a:hover{color:#2D3436}@keyframes fieldRipple{0%{transform:scale(1);opacity:.7}60%{transform:scale(1.16);opacity:0}100%{transform:scale(1.16);opacity:0}}</style>
+</helmet>
+<div data-layer="FieldSpecs" style="width:2400px;box-sizing:border-box;padding:64px 72px 96px;display:flex;flex-direction:column;gap:72px;font-family:Nunito,system-ui,sans-serif;color:#2D3436;-webkit-font-smoothing:antialiased">
+
+  <div style="display:flex;flex-direction:column;gap:14px;max-width:1500px">
+    <div style="font:700 20px/1 ui-monospace,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase;color:#7A6F66">design_handoff_home_field_v2 · Field Specs</div>
+    <div style="font:900 64px/1.05 Nunito,system-ui,sans-serif">Home — polje sezone, pass 2</div>
+    <div style="font:700 26px/1.4 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">Livada je stranica 1080 × 1633 (bila prozor 1032 × 605, 37 %). Sve kontrole su neprozirne naljepnice s rubom 3 px #2D3436 koje plutaju preko nje — jedno rješenje kontrasta za svih 8 sezona i sve tri trake. Gore lijevo Gift + Basket (isti okvir 180), gore desno ulaz u nadogradnje, dolje Seasons · Play · Endless, Play uvijek u sredini.</div>
+  </div>
+
+  <div data-screen-label="Stanja" style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">1 · Stanja iz §8.1</div>
+    <div style="display:flex;flex-wrap:wrap;gap:32px">
+      <sc-for list="{{ states }}" as="st" hint-placeholder-count="9">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:baseline;gap:10px"><span style="font:700 18px/1 ui-monospace,Menlo,monospace;padding:4px 8px;border-radius:6px;background:#2D3436;color:#FFF8F0">{{ st.id }}</span><span style="font:800 22px/1.2 Nunito,system-ui,sans-serif">{{ st.title }}</span></div>
+          <div style="width:432px;height:768px;overflow:hidden;border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.14);background:#2A2233">
+            <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:0 0">
+              <dc-import name="FieldScreen" scene="{{ st.scene }}" season="{{ st.season }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="width:432px;font:700 19px/1.35 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">{{ st.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-screen-label="Kontrast" style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">2 · Kontrast — jedno rješenje, 8 sezona × 3 trake</div>
+    <div style="display:flex;gap:40px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font:800 22px/1 Nunito,system-ui,sans-serif">Amber Canopy #FFEBC7 — najsvjetlija</div>
+        <div style="width:540px;height:960px;overflow:hidden;border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.14)">
+          <div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldScreen" scene="full" season="amber_canopy" hint-size="1080px,1920px"></dc-import></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font:800 22px/1 Nunito,system-ui,sans-serif">Moonlit Warren #B8BDFF — najtamnija</div>
+        <div style="width:540px;height:960px;overflow:hidden;border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.14)">
+          <div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldScreen" scene="full" season="moonlit_warren" hint-size="1080px,1920px"></dc-import></div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:20px">
+        <div style="font:700 22px/1.45 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">Pravilo: svijetli tekst nikad ne stoji na livadi. Kontrole su neprozirne (krem · peach · lavanda · mint · zlatna) s tamnim tekstom; od livade ih odvaja rub #2D3436. Jedini tekst direktno na livadi je tamni ink #1A1A14 (ime sezone na nebu, poruka prazne livade na daljini). Gornja grupa stoji cijela na nebu, donji red cijeli na prednjoj traci — nijedna kontrola ne prelazi granicu trake.</div>
+        <div style="background:#FFF8F0;border-radius:18px;border:2px solid rgba(45,52,54,.12);overflow:hidden">
+          <div style="display:grid;grid-template-columns:230px repeat(3,1fr) 150px 150px;font:800 18px/1 ui-monospace,Menlo,monospace;letter-spacing:.04em;color:#7A6F66;padding:16px 20px;border-bottom:2px solid rgba(45,52,54,.10)">
+            <div>SEZONA</div><div>NEBO</div><div>DALJINA</div><div>PREDNJA</div><div>RUB min</div><div>INK min</div>
+          </div>
+          <sc-for list="{{ contrast }}" as="c" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:230px repeat(3,1fr) 150px 150px;align-items:center;padding:12px 20px;border-bottom:1px solid rgba(45,52,54,.08);font:800 20px/1 Nunito,system-ui,sans-serif">
+              <div>{{ c.name }}</div>
+              <sc-for list="{{ c.bands }}" as="b" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:44px;border-radius:10px;border:3px solid #2D3436;box-sizing:border-box;background:{{ b.hex }}"></div><div style="display:flex;flex-direction:column;gap:4px"><span style="font:700 16px/1 ui-monospace,Menlo,monospace;color:#555C5E">{{ b.hex }}</span><span>rub {{ b.edge }} · ink {{ b.ink }}</span></div></div>
+              </sc-for>
+              <div style="font:900 22px/1 Nunito,system-ui,sans-serif">{{ c.minEdge }}:1</div>
+              <div style="font:900 22px/1 Nunito,system-ui,sans-serif">{{ c.minInk }}:1</div>
+            </div>
+          </sc-for>
+          <div style="padding:16px 20px;font:800 22px/1.3 Nunito,system-ui,sans-serif;background:#FFF6D6">Najgore: rub #2D3436 {{ worstEdge }}:1 · ink #1A1A14 {{ worstInk }}:1 (oboje {{ worstWhere }}) — cilj ≥ 3:1 za rub, ≥ 4,5:1 za tekst.</div>
+        </div>
+        <div style="background:#FFF8F0;border-radius:18px;border:2px solid rgba(45,52,54,.12);padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div style="font:800 18px/1 ui-monospace,Menlo,monospace;letter-spacing:.04em;color:#7A6F66">TEKST NA NALJEPNICI — ne zavisi od sezone</div>
+          <sc-for list="{{ stickerText }}" as="t" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:16px;font:800 20px/1 Nunito,system-ui,sans-serif"><div style="width:120px;height:44px;border-radius:12px;border:3px solid #2D3436;box-sizing:border-box;display:grid;place-items:center;font:900 20px/1 Nunito,system-ui,sans-serif;background:{{ t.bg }};color:{{ t.fg }}">Aa 38</div><div style="flex:1">{{ t.label }}</div><div style="font:900 22px/1 Nunito,system-ui,sans-serif">{{ t.ratio }}:1</div></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Kutak" style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">3 · Gornji dio — Gift, Basket, Upgrades (1 : 1,6)</div>
+    <div style="display:flex;flex-wrap:wrap;gap:32px">
+      <sc-for list="{{ tops }}" as="t" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font:800 22px/1 Nunito,system-ui,sans-serif">{{ t.title }}</div>
+          <div style="width:675px;height:275px;overflow:hidden;border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.14)">
+            <div style="width:1080px;height:1920px;transform:scale(.625) translateY(-143px);transform-origin:0 0"><dc-import name="FieldScreen" scene="{{ t.scene }}" hint-size="1080px,1920px"></dc-import></div>
+          </div>
+          <div style="width:675px;font:700 19px/1.35 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">{{ t.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;max-width:2250px">
+      <div style="background:#FFF8F0;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;font:700 21px/1.4 Nunito,system-ui,sans-serif">
+        <div style="font:900 26px/1 Nunito,system-ui,sans-serif">GiftChest (24, 24, 180 × 180)</div>
+        <div>Isti DailyGiftCard kao na biranju sezone: krem, rub 3, radius 32, kutija 84 lavanda, "Gift" 38/900. U polju dobija sjenu 0 8 0 ink 28 % kao svaka pritisljiva naljepnica.</div>
+        <div>Roze tačka 48 (rub 4 ink) na (−12, −12) = poklon čeka. Bez tačke = preuzet danas ili tutorial nije gotov (can_claim_daily_chest traži tutorial_complete).</div>
+      </div>
+      <div style="background:#FFF8F0;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;font:700 21px/1.4 Nunito,system-ui,sans-serif">
+        <div style="font:900 26px/1 Nunito,system-ui,sans-serif">BasketButton (24, 220, 180 × 180)</div>
+        <div>Isti okvir kao Gift; okvir 84 zlatni + well #22342A umjesto kutije. Tri stanja: zaključana (fill #EFE8DE, lokot, "Basket" #555C5E) · prazna ("Choose" + icon_seed, ripple — jedini loop) · izabrano (portret + mint pilula "+5 %" 44/900).</div>
+        <div>Ripple: rub 4 ink, scale 1 → 1,16, alpha 0,7 → 0, 1,2 s, ease-out; prestaje čim je sjeme izabrano.</div>
+      </div>
+      <div style="background:#FFF8F0;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;font:700 21px/1.4 Nunito,system-ui,sans-serif">
+        <div style="font:900 26px/1 Nunito,system-ui,sans-serif">UpgradesButton (876, 24, 180 × 180)</div>
+        <div>Ista porodica: mint kvadrat 84 s dvostrukim ︽ (znak za "gore / nivo") + dvije mini trake nivoa, Magnet gore, Loot dolje (4 × 28 × 14, gap 6). Minijatura panela: igrač vidi napredak prije tapa.</div>
+        <div>Zlatna tačka 48 na (−12, −12) lijevo = jedna od nadogradnji se može kupiti sada. Statična, ne pulsira.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Donji red" style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">4 · Donji red — Seasons · Play · Endless (1 : 1,6)</div>
+    <div style="display:flex;flex-wrap:wrap;gap:32px">
+      <sc-for list="{{ bottoms }}" as="b" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font:800 22px/1 Nunito,system-ui,sans-serif">{{ b.title }}</div>
+          <div style="width:675px;height:150px;overflow:hidden;border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.14)">
+            <div style="width:1080px;height:1920px;transform:scale(.625) translateY(-1580px);transform-origin:0 0"><dc-import name="FieldScreen" scene="{{ b.scene }}" hint-size="1080px,1920px"></dc-import></div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="max-width:1400px;background:#FFF8F0;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;font:700 21px/1.45 Nunito,system-ui,sans-serif">
+      <div>Play 432 × 140 (bio 656 × 176, −47 % površine) · Seasons 236 × 124 (bio 300 × 124) · Endless 236 × 124 (bio 360 × 176, −54 %). Razmak 18, dno u y 1601, sjena do 1609, 24 px do footera.</div>
+      <div>Play je u oba reda centriran na x 540 — kad se Endless otključa, ništa se ne pomjera (isti palac, isto mjesto). Endless nosi znak ∞ (dva prstena) umjesto podnaslova "Hard · no finish line"; boja lavanda ostaje.</div>
+      <div>Rezervisana dodirna zona: sve tri ≥ 124 visine; red blokira hub swipe samo na svojih 940 × 148.</div>
+    </div>
+  </div>
+
+  <div data-screen-label="Nadogradnje" style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">5 · UpgradesSheet i BasketSheet (1 : 2)</div>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+      <sc-for list="{{ sheets }}" as="s" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font:800 22px/1 Nunito,system-ui,sans-serif">{{ s.title }}</div>
+          <div style="{{ s.box }}">
+            <div style="{{ s.inner }}"><dc-import name="FieldScreen" scene="{{ s.scene }}" hint-size="1080px,1920px"></dc-import></div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="width:620px;background:#FFF8F0;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:12px;font:700 21px/1.45 Nunito,system-ui,sans-serif">
+        <div style="font:900 26px/1 Nunito,system-ui,sans-serif">Stanja dugmeta nadogradnje</div>
+        <div style="display:flex;gap:14px;align-items:center"><div style="width:180px;height:84px;border-radius:22px;background:#E8C44A;border:3px solid #2D3436;box-shadow:0 5px 0 rgba(26,26,20,.28);box-sizing:border-box;display:grid;place-items:center;font:900 32px/1 Nunito,system-ui,sans-serif">Upgrade</div><div>ready — imaš 2 cvijeta koje igra bira</div></div>
+        <div style="display:flex;gap:14px;align-items:center"><div style="width:180px;height:84px;border-radius:22px;background:#F1EAE0;border:3px solid rgba(45,52,54,.30);box-sizing:border-box;display:grid;place-items:center;font:900 32px/1 Nunito,system-ui,sans-serif;color:#555C5E">Need 1</div><div>blocked — razlog stoji na dugmetu</div></div>
+        <div style="display:flex;gap:14px;align-items:center"><div style="width:180px;height:84px;border-radius:22px;background:#A8E6CF;border:3px solid #2D3436;box-sizing:border-box;display:grid;place-items:center;font:900 32px/1 Nunito,system-ui,sans-serif">Maxed</div><div>maxed — Lv 4 / 4, bez sjene (nije pritisljivo)</div></div>
+        <div style="margin-top:8px">Nivo 0–4: čip "Lv N / 4" (44/900) + 4 segmenta 64 × 18 (mint + rub 2 ink = kupljen nivo).</div>
+        <div>pick_upgrade_flower_type() bira jedan cvijet za obje kartice, pa "Upgrade" i "Need N" ne mogu stajati zajedno — zato su dva ekrana: ready + maxed, pa obje Need 1.</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Keepout" style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">6 · Keepout, 13 mjesta i Pip</div>
+    <div style="display:flex;gap:40px;align-items:flex-start">
+      <div style="width:540px;height:960px;overflow:hidden;border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.14);flex:0 0 auto">
+        <div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldScreen" scene="full13" zones="{{ true }}" hint-size="1080px,1920px"></dc-import></div>
+      </div>
+      <div style="width:540px;height:960px;overflow:hidden;border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.14);flex:0 0 auto">
+        <div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldScreen" scene="first" zones="{{ true }}" hint-size="1080px,1920px"></dc-import></div>
+      </div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:20px">
+        <div style="background:#FFF8F0;border-radius:18px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:80px repeat(7,1fr);padding:14px 20px;font:800 17px/1 ui-monospace,Menlo,monospace;color:#7A6F66;border-bottom:2px solid rgba(45,52,54,.10)"><div>RED</div><div>x %</div><div>y % od poda</div><div>px</div><div>indeks</div><div>prag</div><div>centar x</div><div>baza y</div></div>
+          <sc-for list="{{ spotRows }}" as="r" hint-placeholder-count="13">
+            <div style="display:grid;grid-template-columns:80px repeat(7,1fr);padding:9px 20px;font:800 20px/1 Nunito,system-ui,sans-serif;border-bottom:1px solid rgba(45,52,54,.06)"><div>{{ r.row }}</div><div>{{ r.x }}</div><div>{{ r.y }}</div><div>{{ r.size }}</div><div>{{ r.idx }}</div><div>{{ r.t }}</div><div>{{ r.cx }}</div><div>{{ r.by }}</div></div>
+          </sc-for>
+        </div>
+        <div style="background:#FFF8F0;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:10px;font:700 21px/1.45 Nunito,system-ui,sans-serif">
+          <div>Keepout (stranica): gore lijevo 8, 8, 212 × 408 · gore desno 860, 8, 212 × 212 · ime + čip 212, 20, 656 × 184 (swipe prolazi) · donji red 54, 1445, 972 × 188 · oblačić (samo prije tutoriala) 220, 214, 632 × 216. Nijedno mjesto ne upada: sve baze su između y 735 i 1208.</div>
+          <div>Pip 190: baza u pravougaoniku x 151–929, y 1306–1437 (12–20 % od poda) — ispred svih cvjetova, iznad donjeg reda. Hoda / njuška / spava kao danas, samo u širem pojasu (bio traka nekoliko Pipovih visina).</div>
+          <div>Swipe hub: blokiraju samo naljepnice (Gift, Basket, Upgrades, donji red) = ≈ 13 % stranice; ime sezone i GrownChip su mouse_filter IGNORE.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-screen-label="Prelaz" style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 40px/1 Nunito,system-ui,sans-serif">7 · Prelaz kartica → livada i animacije</div>
+    <div style="display:flex;gap:40px;align-items:flex-start">
+      <div style="position:relative;width:432px;height:653px;flex:0 0 auto;border-radius:12px;background:#D1E6FF;outline:3px dashed #2D3436">
+        <div style="position:absolute;left:10px;top:10px;width:413px;height:454px;box-sizing:border-box;border-radius:14px;border:4px solid #FFF6D6;background:#C5D5E8;box-shadow:0 0 0 2px #2D3436"></div>
+        <div style="position:absolute;left:24px;top:24px;font:800 18px/1.3 ui-monospace,Menlo,monospace;color:#2D3436">kartica 24, 24, 1032 × 1136<br>r 36 · rub 8 · mood</div>
+        <div style="position:absolute;left:24px;bottom:18px;font:800 18px/1.3 ui-monospace,Menlo,monospace;color:#2D3436">meta: 0, 0, 1080 × 1633<br>r 0 · rub 0 · ground</div>
+      </div>
+      <div style="flex:1;min-width:0;background:#FFF8F0;border-radius:18px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:320px 1fr 110px 160px;padding:14px 20px;font:800 17px/1 ui-monospace,Menlo,monospace;color:#7A6F66;border-bottom:2px solid rgba(45,52,54,.10)"><div>ŠTA</div><div>CILJ</div><div>s</div><div>EASE</div></div>
+        <sc-for list="{{ anims }}" as="a" hint-placeholder-count="10">
+          <div style="display:grid;grid-template-columns:320px 1fr 110px 160px;padding:12px 20px;font:700 20px/1.35 Nunito,system-ui,sans-serif;border-bottom:1px solid rgba(45,52,54,.06)"><div style="font-weight:900">{{ a.what }}</div><div>{{ a.target }}</div><div>{{ a.dur }}</div><div>{{ a.ease }}</div></div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SEASONS = [
+  ['Country Bloom', '#E6F2DB'], ['Frost Orchard', '#D1E6FF'], ['Lantern Meadow', '#EBD6FF'], ['Amber Canopy', '#FFEBC7'],
+  ['Moonlit Warren', '#B8BDFF'], ['Coral Tide', '#FFE0D6'], ['Starfall Glade', '#DBCCFF'], ['Ember Fen', '#FFC79E']
+];
+const SPOTS = [
+  ['F', 10, 55, 88, 3, 5], ['F', 26, 54, 88, 0, 5], ['F', 42, 55, 88, 1, 5], ['F', 58, 54, 88, 4, 5], ['F', 74, 55, 88, 2, 5], ['F', 90, 54, 88, 5, 5],
+  ['M', 18, 40, 116, 0, 1], ['M', 50, 42, 116, 1, 1], ['M', 82, 40, 116, 2, 1],
+  ['N', 12, 29, 136, 3, 1], ['N', 66, 28, 136, 4, 1], ['N', 88, 30, 136, 5, 1],
+  ['C', 34, 26, 168, 5, 10]
+];
+
+class Component extends DCLogic {
+  rgb(h) { return [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)); }
+  hx(a) { return '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('').toUpperCase(); }
+  lum(h) { return this.rgb(h).map(c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0); }
+  cr(a, b) { const x = this.lum(a), y = this.lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  f(n) { return n.toFixed(1); }
+
+  renderVals() {
+    let worstEdge = 99, worstInk = 99, worstWhere = '';
+    const contrast = SEASONS.map(([name, g]) => {
+      const G = this.rgb(g);
+      const bands = [this.hx(G.map(v => v + (255 - v) * 0.3)), g.toUpperCase(), this.hx(G.map(v => v * 0.93))];
+      let mE = 99, mI = 99;
+      const out = bands.map(hex => {
+        const e = this.cr(hex, '#2D3436'), i = this.cr(hex, '#1A1A14');
+        mE = Math.min(mE, e); mI = Math.min(mI, i);
+        return { hex, edge: this.f(e), ink: this.f(i) };
+      });
+      if (mE < worstEdge) { worstEdge = mE; worstInk = Math.min(worstInk, mI); worstWhere = name + ', prednja traka'; }
+      worstInk = Math.min(worstInk, mI);
+      return { name, bands: out, minEdge: this.f(mE), minInk: this.f(mI) };
+    });
+    const st = [['#FFF8F0', '#2D3436', 'ink na krem (Gift, Basket, Upgrades, Seasons, čip, sheet)'], ['#FFB88C', '#2D3436', 'ink na peach (Play, Close)'], ['#D4A5FF', '#2D3436', 'ink na lavandi (Endless)'], ['#A8E6CF', '#2D3436', 'ink na mint (+5 %, Maxed)'], ['#E8C44A', '#2D3436', 'ink na zlatnoj (Upgrade)'], ['#F1EAE0', '#555C5E', 'soft ink na isključenom (Need N, zaključani red)'], ['#EFE8DE', '#555C5E', 'soft ink na zaključanoj korpi']];
+    const stickerText = st.map(([bg, fg, label]) => ({ bg, fg, label, ratio: this.f(this.cr(bg, fg)) }));
+
+    const states = [
+      ['1', 'Sve otključano', 'full', 'auto', 'Sjeme izabrano (+5 %), poklon čeka (roze), nadogradnja dostupna (zlatna tačka), Endless vidljiv. 9 / 13.'],
+      ['2', 'Prije prvog mergea', 'first', 'auto', 'Korpa zaključana + oblačić; nema Endlessa, Play ostaje u sredini; Gift bez tačke jer daily traži završen tutorial.'],
+      ['3', 'Korpa prazna', 'basket_empty', 'auto', '"Choose" + ripple oko okvira — jedini loop na ekranu.'],
+      ['4', 'Izbor sjemena', 'picker', 'auto', 'Tipovi trenutne sezone s portretima; izabrani ink rub + "Chosen"; zaključani vidljivi, neaktivni; Clear basket.'],
+      ['5a', 'Nadogradnje · ready + maxed', 'upgrades', 'auto', 'Magnet Lv 1 → Upgrade; Loot Boost Lv 4 / 4 → Maxed.'],
+      ['5b', 'Nadogradnje · Need 1', 'upgrades_need', 'auto', 'Imaš 1 od 2 cvijeta: obje kartice "Need 1", segmenti pokazuju Lv 2 i Lv 0.'],
+      ['6a', 'Livada prazna 0 / 13', 'empty', 'auto', 'Nova sezona: 13 mrlja zemlje + jedna rečenica na daljini, ink na livadi.'],
+      ['6b', 'Livada puna 13 / 13', 'full13', 'auto', 'Kruna ★3 (168) naprijed lijevo od sredine; Pip ispred svih.'],
+      ['8', 'Poklon preuzet', 'claimed', 'auto', 'Isto kao 1, bez roze tačke.']
+    ].map(a => ({ id: a[0], title: a[1], scene: a[2], season: a[3], note: a[4] }));
+
+    const tops = [
+      ['Sve otključano', 'full', 'Gift čeka · +5 % · Upgrades s tačkom; ime sezone na nebu, GrownChip ispod.'],
+      ['Korpa prazna', 'basket_empty', 'Ripple 1,2 s oko okvira; Gift preuzet.'],
+      ['Prije prvog mergea', 'first', 'Zaključana korpa + oblačić sa strelicom na nju; trake nivoa prazne.'],
+      ['Poklon preuzet', 'claimed', 'Ista kartica bez tačke — tap otvara "Come back tomorrow".']
+    ].map(a => ({ title: a[0], scene: a[1], note: a[2] }));
+
+    const bottoms = [{ title: 'Poslije tutoriala — tri dugmeta', scene: 'full' }, { title: 'Prije tutoriala — Endless slot prazan, Play se ne pomjera', scene: 'first' }];
+
+    const sheets = [
+      ['UpgradesSheet · ready + maxed (922)', 'upgrades', 854],
+      ['UpgradesSheet · Need 1', 'upgrades_need', 854],
+      ['BasketSheet (1326)', 'picker', 450]
+    ].map(([title, scene, top]) => ({
+      title, scene,
+      box: 'width:540px;height:' + Math.round((1776 - top) / 2) + 'px;overflow:hidden;border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.14)',
+      inner: 'width:1080px;height:1920px;transform:scale(.5) translateY(-' + top + 'px);transform-origin:0 0'
+    }));
+
+    const spotRows = SPOTS.map(s => ({ row: s[0], x: s[1], y: s[2], size: s[3], idx: s[4], t: '≥ ' + s[5], cx: Math.round(s[1] * 10.8), by: Math.round(1633 - s[2] * 16.33) }));
+
+    const anims = [
+      ['Otvaranje polja', 'isti Panel: rect kartice → 0, 0, 1080 × 1633; radius 36 → 0; rub 8 → 0; bg mood → ground', '0,28', 'OUT · CUBIC'],
+      ['Sadržaj kartice', 'art, naslov, roster, akcija: alpha 1 → 0', '0,12', 'OUT'],
+      ['Trake livade', 'MeadowSky / MeadowNear alpha 0 → 1, start 0,16', '0,18', 'OUT'],
+      ['Cvijeće sjeda', 'scale 0,9 → 1, stagger 0,024 (kao danas)', '0,20', 'OUT'],
+      ['Chrome ulazi', 'alpha 0 → 1 + 16 px klizanje od svog ruba; red: Play, Seasons, Endless, Gift, Basket, Upgrades, ime + čip; stagger 0,06, start 0,22', '0,18', 'OUT'],
+      ['Zatvaranje', 'chrome alpha → 0 zajedno, pa rect nazad na karticu', '0,12 + 0,24', 'IN · CUBIC'],
+      ['Ripple korpe (jedini loop)', 'rub 4 ink: scale 1 → 1,16, alpha 0,7 → 0, pauza do 1,2 s', '1,2 loop', 'OUT'],
+      ['Sheet ulazi', 'y +H → 0; scrim alpha 0 → 0,55', '0,24 / 0,18', 'OUT · CUBIC'],
+      ['Kupljen nivo', 'segment fill 0,22 + kartica rub → 4 px ink 0,16 i nazad 0,24', '0,4', 'OUT'],
+      ['Pritisak naljepnice', 'scale 0,96 + sjena 8 → 2 px', '0,08', 'OUT']
+    ].map(a => ({ what: a[0], target: a[1], dur: a[2], ease: a[3] }));
+
+    return { contrast, worstEdge: this.f(worstEdge), worstInk: this.f(worstInk), worstWhere, stickerText, states, tops, bottoms, sheets, spotRows, anims };
+  }
+}
+</script>
+</body>
+</html>

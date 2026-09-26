@@ -1,17 +1,17 @@
 extends RefCounted
 class_name UiHomeField
-## Tokeni i StyleBoxFlat fabrike za Home — polje sezone (SeasonField).
-## Generisano iz design_handoff_home_field/godot/field_export.json. Biranje sezone
-## (kartica, dock, Play red) je u UiStage. Sve mjere su u px baze 1080 x 1920 i
-## prenose se 1:1.
+## Tokeni i StyleBoxFlat fabrike za Home — polje sezone (SeasonField), pass 2.
+## Generisano iz design_handoff_home_field_v2/godot/home_field_v2_export.json.
+## Livada je cijela stranica 1080 x 1633 (od y 143), a kontrole plutaju preko nje
+## kao neprozirne "naljepnice" s rubom 3 px. Biranje sezone je u UiStage.
+## Sve mjere su u px baze 1080 x 1920 i prenose se 1:1.
 
-# ── Paleta Home ekrana ────────────────────────────────────────────────────────
-const PAGE_BG          := Color("2e4733")
-const CHROME           := Color("1a241e")
+# ── Paleta ────────────────────────────────────────────────────────────────────
+const PAGE_BG          := Color("2e4733")   # vidi se samo dok livada ne sjedne
 const ACTIVE_RIM       := Color("fff6d6")
 const WARM_WHITE       := Color("fff8f0")
 const INK              := Color("1a1a14")
-const INK_SOFT         := Color("3d3d33")
+const INK_SOFT         := Color("555c5e")
 const OUTLINE          := Color("2d3436")
 const COIN_GOLD        := Color("ffd56b")
 const COIN_GOLD_EDGE   := Color("d6a82f")
@@ -23,60 +23,91 @@ const LAVENDER         := Color("d4a5ff")
 const LAVENDER_EDGE    := Color("aa84cc")
 const MINT             := Color("a8e6cf")
 const MINT_EDGE        := Color("7fc9ac")
+const PINK             := Color("ffccd5")
 const WELL             := Color("22342a")
 const WELL_EDGE        := Color("16211b")
 
-# ── Novo u polju ─────────────────────────────────────────────────────────────
+## Naljepnice: neprozirni fill + rub 3 px ink. Rub drzi >= 6,14:1 na svim
+## trakama svih 8 sezona — jedno rjesenje, bez varijante po sezoni.
+const STICKER          := Color("fff8f0")
+const STICKER_EDGE     := Color("2d3436")
+const STICKER_DROP     := Color(0.102, 0.102, 0.078, 0.28)
+const LOCKED_TILE      := Color("efe8de")
+const LOCKED_FRAME     := Color("e3d9cc")
+const DISABLED         := Color("f1eae0")
+const DISABLED_EDGE    := Color(0.176, 0.204, 0.212, 0.30)
+const ROW_FILL         := Color("ffffff")
+const ROW_EDGE         := Color(0.176, 0.204, 0.212, 0.18)
+const SEGMENT_EMPTY    := Color(0.176, 0.204, 0.212, 0.16)
+const SCRIM            := Color(0.102, 0.086, 0.118, 0.55)
+
 const SOIL_FILL        := Color(0.102, 0.102, 0.078, 0.10)
 const SOIL_EDGE        := Color(0.102, 0.102, 0.078, 0.19)
 const FLOWER_SHADOW    := Color(0.102, 0.102, 0.078, 0.13)
-const COUNT_FILL       := Color(1, 0.973, 0.941, 0.80)
-const COUNT_EDGE       := Color(0.102, 0.102, 0.078, 0.26)
-const PANEL_FILL       := Color(1, 0.973, 0.941, 0.13)
-const PANEL_EDGE       := Color(1, 0.973, 0.941, 0.28)
-## Minimum koji na #2E4733 još drži 4.5:1 — ne spuštati.
-const DISABLED_FILL    := Color(1, 0.973, 0.941, 0.07)
-const DISABLED_EDGE    := Color(1, 0.973, 0.941, 0.20)
-const DISABLED_INK     := Color(1, 0.973, 0.941, 0.68)
-const SUB_ON_DARK      := Color(1, 0.965, 0.839, 0.90)
-const SCRIM            := Color(0.078, 0.102, 0.086, 0.62)
-const SHEET_EDGE       := Color(1, 0.973, 0.941, 0.30)
 
-# ── Layout polja ─────────────────────────────────────────────────────────────
+# ── Layout stranice ───────────────────────────────────────────────────────────
 const PAGE            := Vector2i(1080, 1633)
 const PAGE_Y          := 143
-const PAGE_PADDING    := 24
+const MEADOW          := Rect2i(0, 0, 1080, 1633)
 const BLOCK_GAP       := 16
-const TOP_ROW_H       := 124
-const BACK_W          := 300
-const MEADOW          := Vector2i(1032, 605)   # flex: ono što ostane u VBoxu
-const MEADOW_INNER    := Vector2i(1020, 593)
-const BASKET_H        := 180   # 18x2 padding + 136 kolona + 3x2 border = 178
-const UPGRADE_H       := 192   # 16x2 padding + 154 redova + 3x2 border
-const UPGRADE_LEFT_W  := 680
-const UPGRADE_BTN     := Vector2i(300, 154)
-const PLAY_ROW_H      := 176
-const PLAY_W          := 656                   # 1032 dok Endless nije otključan
-const ENDLESS_W       := 360
-const SHEET_H         := 1308
-const PICKER_ROW_H    := 148
 const MIN_TOUCH       := 120
 const MIN_TEXT        := 38
 const MIN_NUMBER      := 44
 
-## Trake livade, kao udio visine: sky 0–56 %, far 56–78 %, near 78–100 %.
-const MEADOW_BANDS := [0.56, 0.78]
+## Trake livade: nebo 0–32 %, daljina 32–68 %, prednja 68–100 %. Gornja grupa
+## kontrola stoji cijela na nebu, donji red cijeli na prednjoj traci.
+const MEADOW_BANDS := [0.32, 0.68]
 
-## 13 mjesta: [x %, y % od poda livade, veličina px, indeks u rosteru, koliko cvjetova treba].
-## Bliža mjesta traže manje, pa livada raste od igrača prema horizontu.
+const TILE            := 180
+const TILE_ICON       := 84
+const GIFT_RECT       := Rect2i(24, 24, 180, 180)
+const BASKET_RECT     := Rect2i(24, 220, 180, 180)
+const UPGRADES_RECT   := Rect2i(876, 24, 180, 180)
+const DOT             := 48
+const DOT_OFFSET      := Vector2i(-12, -12)
+const LEVEL_SEG       := Vector2i(28, 14)
+const LEVEL_SEG_GAP   := 6
+
+const SEASON_LABEL_RECT := Rect2i(228, 36, 624, 56)
+const GROWN_CHIP_Y      := 112
+const GROWN_CHIP_H      := 76
+const HINT_RECT         := Rect2i(236, 230, 600, 184)
+
+const BOTTOM_ROW   := Rect2i(70, 1461, 940, 148)
+const SEASONS_BTN  := Rect2i(70, 1477, 236, 124)
+const PLAY_BTN     := Rect2i(324, 1461, 432, 140)   # centar x 540, ne pomjera se bez Endlessa
+const ENDLESS_BTN  := Rect2i(774, 1477, 236, 124)
+const PLAY_DISC    := 88
+
+const SHEET_BASKET_H   := 1326
+const SHEET_UPGRADES_H := 922
+const PICKER_ROW_H     := 148
+const PICKER_PORTRAIT  := 112
+const UPGRADE_CARD     := Vector2i(1032, 264)
+const UPGRADE_BTN      := Vector2i(272, 128)
+const UPGRADE_SEG      := Vector2i(64, 18)
+
+## Zone koje chrome pokriva — nijedno mjesto ni Pip ne smiju u njih.
+const KEEPOUT := [
+	Rect2i(8, 8, 212, 408),       # Gift + Basket
+	Rect2i(860, 8, 212, 212),     # Upgrades
+	Rect2i(212, 20, 656, 184),    # ime + cip (swipe prolazi)
+	Rect2i(54, 1445, 972, 188),   # donji red
+]
+const KEEPOUT_HINT := Rect2i(220, 214, 632, 216)
+
+## [x %, y % od poda stranice, velicina px, indeks u rosteru, prag]. Crtati ovim
+## redom (nazad → naprijed): 4 dubine, drugi cvijet tipa stoji iza prvog.
 const MEADOW_SPOTS := [
-	[10, 40, 76, 0, 5], [29, 42, 76, 1, 5], [51, 40, 76, 2, 5], [72, 42, 76, 3, 5], [90, 38, 84, 4, 5],
-	[17, 27, 96, 5, 5], [37, 25, 96, 0, 1], [59, 27, 96, 1, 1], [84, 24, 96, 2, 1],
-	[11, 9, 112, 3, 1], [33, 7, 112, 4, 1], [88, 8, 112, 5, 1], [52, 1, 128, 5, 10],
+	[10, 55, 88, 3, 5], [26, 54, 88, 0, 5], [42, 55, 88, 1, 5],
+	[58, 54, 88, 4, 5], [74, 55, 88, 2, 5], [90, 54, 88, 5, 5],
+	[18, 40, 116, 0, 1], [50, 42, 116, 1, 1], [82, 40, 116, 2, 1],
+	[12, 29, 136, 3, 1], [66, 28, 136, 4, 1], [88, 30, 136, 5, 1],
+	[34, 26, 168, 5, 10],
 ]
 const PIP_SIZE := 190
-const PIP_X_PCT := 68
-const PIP_BOTTOM_PCT := 3
+const PIP_BASE_ZONE := Rect2i(151, 1306, 778, 131)
+const PIP_DEFAULT_BASE := Vector2i(756, 1404)
 
 ## Boja livade po sezoni — postojeće vrijednosti iz SeasonTheme.home_field_tint().
 const MEADOW_GROUND := {
@@ -96,6 +127,19 @@ const LOOT_MULTIPLIERS := [1.0, 1.25, 1.5, 1.75, 2.0]
 const UPGRADE_MAX_LEVEL := 4
 const UPGRADE_FLOWER_COST := 2
 const LOADOUT_SPAWN_BONUS_PCT := 5
+
+
+## Baza mjesta u px stranice.
+static func spot_base(spot: Array) -> Vector2:
+	return Vector2(spot[0] * PAGE.x / 100.0, PAGE.y - spot[1] * PAGE.y / 100.0)
+
+
+## Da li rect dira ijednu keepout zonu (koristi smoke test i layout provjere).
+static func hits_keepout(rect: Rect2) -> bool:
+	for zone in KEEPOUT:
+		if rect.intersects(Rect2(zone)):
+			return true
+	return false
 
 
 # ── Izvedene boje ─────────────────────────────────────────────────────────────
@@ -128,17 +172,65 @@ static func _box(fill: Color, radius: int, border: int = 0, border_color: Color 
 		sb.border_color = border_color
 	return sb
 
-static func _shadow(sb: StyleBoxFlat, size: int, offset_y: int, color: Color) -> StyleBoxFlat:
-	sb.shadow_size = size
-	sb.shadow_offset = Vector2(0, offset_y)
-	sb.shadow_color = color
+
+## Naljepnica: neprozirni fill + rub 3 ink. Sjena znaci "pritisni me".
+static func sticker(fill: Color, radius: int, pressable: bool = true) -> StyleBoxFlat:
+	var sb := _box(fill, radius, 3, STICKER_EDGE)
+	sb.corner_detail = 16
+	sb.anti_aliasing = true
+	if pressable:
+		sb.shadow_color = STICKER_DROP
+		sb.shadow_size = 1
+		sb.shadow_offset = Vector2(0, 8)
 	return sb
 
-## Okvir livade. Namjerno ista geometrija kao aktivna kartica sezone
-## (1032, radius 26, rim 6 px) — zato prelaz radi kao jedan rect tween.
-static func meadow_frame(season_id: String, mood: Color = MINT) -> StyleBoxFlat:
-	var sb := _box(meadow_ground(season_id, mood), 26, 6, ACTIVE_RIM)
-	return _shadow(sb, 22, 10, Color(0.078, 0.102, 0.086, 0.38))
+static func pressed_sticker(sb: StyleBoxFlat) -> StyleBoxFlat:
+	var p := sb.duplicate() as StyleBoxFlat
+	p.shadow_offset = Vector2(0, 2)
+	return p
+
+## Plocica gornje grupe (Gift / Basket / Upgrades). state: normal | locked
+static func tile(state: String = "normal") -> StyleBoxFlat:
+	return sticker(LOCKED_TILE if state == "locked" else STICKER, 32)
+
+static func tile_icon(fill: Color) -> StyleBoxFlat:
+	return _box(fill, 18, 3, STICKER_EDGE)
+
+static func tile_well() -> StyleBoxFlat:
+	return _box(WELL, 11)
+
+## Tacka na uglu plocice: roze = poklon ceka, zlatna = nadogradnja se moze kupiti.
+static func corner_dot(fill: Color) -> StyleBoxFlat:
+	return _box(fill, 24, 4, STICKER_EDGE)
+
+static func bonus_pill() -> StyleBoxFlat:
+	return _box(MINT, 18, 2, STICKER_EDGE)
+
+## Jedini loop na ekranu — prsten oko prazne korpe.
+static func attention_ring() -> StyleBoxFlat:
+	var sb := _box(Color(0, 0, 0, 0), 32, 4, STICKER_EDGE)
+	sb.draw_center = false
+	return sb
+
+static func grown_chip() -> StyleBoxFlat:
+	return sticker(STICKER, 38, false)
+
+static func tutorial_hint() -> StyleBoxFlat:
+	return sticker(STICKER, 28, false)
+
+static func seasons_button() -> StyleBoxFlat:
+	return sticker(STICKER, 28)
+
+static func play_button() -> StyleBoxFlat:
+	return sticker(PEACH, 32)
+
+static func endless_button() -> StyleBoxFlat:
+	return sticker(LAVENDER, 28)
+
+static func level_segment(filled: bool, h: int) -> StyleBoxFlat:
+	if filled:
+		return _box(MINT, int(h / 2.0), 2, STICKER_EDGE)
+	return _box(SEGMENT_EMPTY, int(h / 2.0))
 
 ## Prazno mjesto u zemlji — pill, ne blijedi cvijet.
 static func soil_spot(h: int) -> StyleBoxFlat:
@@ -147,67 +239,57 @@ static func soil_spot(h: int) -> StyleBoxFlat:
 static func flower_shadow(h: int) -> StyleBoxFlat:
 	return _box(FLOWER_SHADOW, int(h / 2.0))
 
-## Čip "{n} / 13 grown" gore lijevo u livadi.
-static func meadow_count() -> StyleBoxFlat:
-	return _box(COUNT_FILL, 18, 2, COUNT_EDGE)
+## Bottom sheet — krem (v1 je bio tamni).
+static func picker_sheet() -> StyleBoxFlat:
+	var sb := _box(STICKER, 36)
+	sb.corner_radius_bottom_left = 0
+	sb.corner_radius_bottom_right = 0
+	sb.border_width_top = 3
+	sb.border_color = STICKER_EDGE
+	return sb
 
-## Tihi panel na tamnoj stranici — BackButton, BasketCard, UpgradeCard.
-static func field_panel(radius: int = 22) -> StyleBoxFlat:
-	return _shadow(_box(PANEL_FILL, radius, 3, PANEL_EDGE), 16, 8, Color(0.078, 0.102, 0.086, 0.26))
-
-static func back_button() -> StyleBoxFlat:
-	return _box(PANEL_FILL, 22, 3, Color(1, 0.973, 0.941, 0.34))
-
-## Korpa. state: empty | chosen | locked
-static func basket_card(state: String) -> StyleBoxFlat:
+## Red pickera. state: row | chosen | locked
+static func picker_row(state: String) -> StyleBoxFlat:
 	match state:
-		"empty":
-			return _shadow(_box(PANEL_FILL, 22, 4, UI_GOLD), 16, 8, Color(0.078, 0.102, 0.086, 0.26))
+		"chosen":
+			return _box(ACTIVE_RIM, 24, 4, STICKER_EDGE)
 		"locked":
-			return _shadow(_box(Color(1, 0.973, 0.941, 0.06), 22, 3, Color(1, 0.973, 0.941, 0.18)), 16, 8, Color(0.078, 0.102, 0.086, 0.26))
+			return _box(DISABLED, 24, 3, Color(0.176, 0.204, 0.212, 0.10))
 		_:
-			return field_panel(22)
+			return _box(ROW_FILL, 24, 3, ROW_EDGE)
 
-static func basket_button(chosen: bool) -> StyleBoxFlat:
+static func picker_chip(chosen: bool) -> StyleBoxFlat:
 	if chosen:
-		return _box(Color(1, 0.973, 0.941, 0.16), 20, 3, Color(1, 0.965, 0.839, 0.40))
-	return _box(UI_GOLD, 20, 3, UI_GOLD_EDGE)
+		return _box(STICKER_EDGE, 18)
+	return _box(Color(0, 0, 0, 0), 18, 2, DISABLED_EDGE)
 
-## Kartica nadogradnje. flash = trenutak poslije kupovine (0.4 s).
 static func upgrade_card(flash: bool = false) -> StyleBoxFlat:
 	if flash:
-		return _shadow(_box(PANEL_FILL, 22, 4, ACTIVE_RIM), 16, 8, Color(0.078, 0.102, 0.086, 0.26))
-	return field_panel(22)
+		return _box(ROW_FILL, 28, 4, STICKER_EDGE)
+	return _box(ROW_FILL, 28, 3, ROW_EDGE)
 
-## Čip nivoa "Lv 1 / 4".
-static func upgrade_level(flash: bool = false) -> StyleBoxFlat:
-	if flash:
-		return _box(COIN_GOLD, 16, 2, COIN_GOLD_EDGE)
-	return _box(Color(1, 0.973, 0.941, 0.14), 16, 2, Color(1, 0.965, 0.839, 0.36))
+static func upgrade_level(_flash: bool = false) -> StyleBoxFlat:
+	return _box(ACTIVE_RIM, 16, 2, STICKER_EDGE)
 
 static func upgrade_segment(filled: bool) -> StyleBoxFlat:
-	if filled:
-		return _box(MINT, 8, 2, MINT_EDGE)
-	return _box(Color(1, 0.973, 0.941, 0.20), 8)
+	return level_segment(filled, UPGRADE_SEG.y)
 
 ## Dugme nadogradnje. state: ready | blocked | maxed
 static func upgrade_button(state: String) -> StyleBoxFlat:
 	match state:
 		"ready":
-			return _box(UI_GOLD, 20, 3, UI_GOLD_EDGE)
+			var sb := _box(UI_GOLD, 28, 3, STICKER_EDGE)
+			sb.shadow_color = STICKER_DROP
+			sb.shadow_size = 1
+			sb.shadow_offset = Vector2(0, 6)
+			return sb
 		"maxed":
-			return _box(Color(1, 0.973, 0.941, 0.10), 20, 3, Color(1, 0.965, 0.839, 0.34))
+			return _box(MINT, 28, 3, STICKER_EDGE)
 		_:
-			return _box(DISABLED_FILL, 20, 3, DISABLED_EDGE)
+			return _box(DISABLED, 28, 3, DISABLED_EDGE)
 
 static func upgrade_button_ink(state: String) -> Color:
-	match state:
-		"ready":
-			return OUTLINE
-		"maxed":
-			return ACTIVE_RIM
-		_:
-			return DISABLED_INK
+	return INK_SOFT if state == "blocked" else OUTLINE
 
 ## Tekst dugmeta nadogradnje — razlog stoji na kontroli koja odbija.
 static func upgrade_button_label(state: String, have: int) -> String:
@@ -219,62 +301,29 @@ static func upgrade_button_label(state: String, have: int) -> String:
 		_:
 			return "Need %d" % maxi(1, UPGRADE_FLOWER_COST - have)
 
-## Okvir cvijeta (gold rim + tamni well) — korpa 128, picker 104, cijena 46.
+## Okvir cvijeta u svijetlom jeziku: zlatni fill + rub ink.
 static func art_frame(size: int) -> StyleBoxFlat:
-	var radius := 28 if size >= 120 else (24 if size >= 96 else 12)
-	return _box(COIN_GOLD, radius, 3, COIN_GOLD_EDGE)
+	var radius := 24 if size >= 96 else (18 if size >= 80 else 14)
+	return _box(COIN_GOLD, radius, 3, STICKER_EDGE)
 
 static func art_well(size: int) -> StyleBoxFlat:
 	var radius := 19 if size >= 120 else (16 if size >= 96 else 8)
 	return _box(WELL, radius, 2, WELL_EDGE)
 
 static func art_frame_locked(size: int) -> StyleBoxFlat:
-	var radius := 28 if size >= 120 else (24 if size >= 96 else 12)
-	return _box(Color(1, 0.973, 0.941, 0.10), radius, 3, Color(1, 0.965, 0.839, 0.30))
-
-static func play_button() -> StyleBoxFlat:
-	return _shadow(_box(PEACH, 26, 4, PEACH_EDGE), 16, 8, Color(0.078, 0.102, 0.086, 0.30))
-
-static func endless_button() -> StyleBoxFlat:
-	return _shadow(_box(LAVENDER, 26, 4, LAVENDER_EDGE), 16, 8, Color(0.078, 0.102, 0.086, 0.30))
-
-static func tutorial_hint() -> StyleBoxFlat:
-	return _shadow(_box(ACTIVE_RIM, 20, 3, COIN_GOLD_EDGE), 16, 8, Color(0.078, 0.102, 0.086, 0.30))
-
-## Bottom sheet pickera.
-static func picker_sheet() -> StyleBoxFlat:
-	var sb := _box(CHROME, 32)
-	sb.corner_radius_bottom_left = 0
-	sb.corner_radius_bottom_right = 0
-	sb.border_width_top = 3
-	sb.border_color = SHEET_EDGE
-	return sb
-
-## Red pickera. state: row | chosen | locked
-static func picker_row(state: String) -> StyleBoxFlat:
-	match state:
-		"chosen":
-			return _box(Color(1, 0.973, 0.941, 0.16), 20, 4, ACTIVE_RIM)
-		"locked":
-			return _box(Color(1, 0.973, 0.941, 0.05), 20, 2, Color(1, 0.973, 0.941, 0.16))
-		_:
-			return _box(Color(1, 0.973, 0.941, 0.10), 20, 2, Color(1, 0.973, 0.941, 0.26))
-
-static func picker_chip(chosen: bool) -> StyleBoxFlat:
-	if chosen:
-		return _box(ACTIVE_RIM, 18, 3, COIN_GOLD_EDGE)
-	return _box(Color(1, 0.973, 0.941, 0.06), 18, 2, Color(1, 0.965, 0.839, 0.26))
+	var radius := 24 if size >= 96 else (18 if size >= 80 else 14)
+	return _box(LOCKED_FRAME, radius, 3, Color(0.176, 0.204, 0.212, 0.30))
 
 
 # ── Tekstovi koji se računaju ────────────────────────────────────────────────
 static func magnet_effect(level: int) -> String:
 	if level >= UPGRADE_MAX_LEVEL:
-		return "Pull radius %d px · fully upgraded" % magnet_radius(UPGRADE_MAX_LEVEL)
+		return "Pull radius %d px" % magnet_radius(UPGRADE_MAX_LEVEL)
 	return "Pull radius %d px → %d px" % [magnet_radius(level), magnet_radius(level + 1)]
 
 static func loot_effect(level: int) -> String:
 	if level >= UPGRADE_MAX_LEVEL:
-		return "Run loot ×2.0 · fully upgraded"
+		return "Run loot ×2.0"
 	return "Run loot ×%s → ×%s" % [str(loot_multiplier(level)), str(loot_multiplier(level + 1))]
 
 static func level_text(level: int) -> String:
@@ -287,12 +336,15 @@ static func cost_text(flower_name: String) -> String:
 		return "2 × any ★1 flower"
 	return "%d × %s" % [UPGRADE_FLOWER_COST, flower_name]
 
-static func have_text(have: int) -> String:
-	if have >= UPGRADE_FLOWER_COST:
-		return ""          # dostupno — broj ne treba
-	if have <= 0:
-		return "none yet"
-	return "you have %d" % have
+## Natpis na korpi. state: locked | empty | chosen
+static func basket_label(state: String) -> String:
+	match state:
+		"locked":
+			return "Basket"
+		"empty":
+			return "Choose"
+		_:
+			return "+%d %%" % LOADOUT_SPAWN_BONUS_PCT
 
 static func rarity_pips(rarity: int) -> String:
 	var r := clampi(rarity, 1, 3)
@@ -302,41 +354,70 @@ static func rarity_pips(rarity: int) -> String:
 # ── Animacije ────────────────────────────────────────────────────────────────
 const ANIM := {
 	"field_open": 0.28,
-	"field_close": 0.24,
+	"card_content_out": 0.12,
+	"bands_in_delay": 0.16,
+	"bands_in": 0.18,
+	"chrome_delay": 0.22,
 	"chrome_in": 0.18,
 	"chrome_stagger": 0.06,
+	"chrome_slide": 16.0,
+	"chrome_out": 0.12,
+	"field_close": 0.24,
+	"attention": 1.2,
+	"attention_scale": 1.16,
 	"flower_settle": 0.20,
 	"flower_stagger": 0.024,
 	"sheet_in": 0.24,
 	"scrim_in": 0.18,
-	"segment_fill": 0.22,
-	"card_flash_in": 0.16,
-	"card_flash_out": 0.24,
 	"press": 0.08,
-	"basket_pulse": 1.2,
 	"pip_bubble_in": 0.16,
 	"pip_bubble_hold": 1.8,
 }
 
-## Kartica sezone → okvir livade. Isti Panel, samo rect + bg_color.
-static func tween_open_field(shell: Control, to_rect: Rect2, ground: Color) -> Tween:
+## Kartica sezone → cijela stranica. Isti Panel: rect + radius + rub + bg_color.
+static func tween_open_field(shell: Control, ground: Color) -> Tween:
 	var t := shell.create_tween().set_parallel(true)
-	t.tween_property(shell, "position", to_rect.position, ANIM.field_open) \
+	t.tween_property(shell, "position", Vector2(MEADOW.position), ANIM.field_open) \
 		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	t.tween_property(shell, "size", to_rect.size, ANIM.field_open) \
+	t.tween_property(shell, "size", Vector2(MEADOW.size), ANIM.field_open) \
 		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	var sb: StyleBoxFlat = shell.get_theme_stylebox("panel")
-	t.tween_property(sb, "bg_color", ground, ANIM.field_open)
+	if sb:
+		t.tween_property(sb, "bg_color", ground, ANIM.field_open)
+		t.tween_method(func(v: float) -> void: sb.set_corner_radius_all(int(v)), 36.0, 0.0, ANIM.field_open)
+		t.tween_method(func(v: float) -> void: sb.set_border_width_all(int(v)), 8.0, 0.0, ANIM.field_open)
 	return t
 
-## Chrome ulazi iza livade: fade, bez pomaka — VBox djeca ne smiju dobiti ručni position.
-static func tween_chrome_in(blocks: Array) -> void:
-	for i in blocks.size():
-		var c: Control = blocks[i]
+## Chrome plovi: fade + 16 px od svog ruba. `from_top` = gornja grupa (klizi dolje).
+## Redoslijed: Play, Seasons, Endless, Gift, Basket, Upgrades, ime + čip.
+static func tween_chrome_in(items: Array, from_top: Array) -> void:
+	for i in items.size():
+		var c: Control = items[i]
+		if c == null or not c.visible:
+			continue
+		var home := c.position
+		var top: bool = i < from_top.size() and bool(from_top[i])
+		var dy: float = -ANIM.chrome_slide if top else ANIM.chrome_slide
 		c.modulate.a = 0.0
-		var t := c.create_tween()
-		t.tween_interval(ANIM.chrome_stagger * float(i))
-		t.tween_property(c, "modulate:a", 1.0, ANIM.chrome_in).set_ease(Tween.EASE_OUT)
+		c.position = home + Vector2(0.0, dy)
+		var t := c.create_tween().set_parallel(true)
+		var delay: float = ANIM.chrome_delay + ANIM.chrome_stagger * float(i)
+		t.tween_property(c, "modulate:a", 1.0, ANIM.chrome_in).set_delay(delay).set_ease(Tween.EASE_OUT)
+		t.tween_property(c, "position", home, ANIM.chrome_in).set_delay(delay).set_ease(Tween.EASE_OUT)
+
+## Jedini loop na ekranu: ripple oko prazne korpe. Zaustaviti kad se sjeme izabere.
+static func tween_attention(ring: Control) -> Tween:
+	ring.pivot_offset = ring.size * 0.5
+	var t := ring.create_tween().set_loops()
+	t.tween_callback(func() -> void:
+		ring.scale = Vector2.ONE
+		ring.modulate.a = 0.7
+	)
+	t.tween_property(ring, "scale", Vector2.ONE * float(ANIM.attention_scale), ANIM.attention * 0.6) \
+		.set_ease(Tween.EASE_OUT)
+	t.parallel().tween_property(ring, "modulate:a", 0.0, ANIM.attention * 0.6).set_ease(Tween.EASE_OUT)
+	t.tween_interval(ANIM.attention * 0.4)
+	return t
 
 ## Cvjetovi sjedaju jednom, pri otvaranju. Poslije toga livada je statična.
 static func tween_flowers_settle(flowers: Array) -> void:

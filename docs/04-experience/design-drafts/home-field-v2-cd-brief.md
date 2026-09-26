@@ -1,6 +1,6 @@
 ---
 type: dizajn
-status: draft
+status: aktivan
 milestone: "—"
 tags: [dizajn, ui, home, polje, sezona, claude-design, mockup]
 povezano:
@@ -15,6 +15,8 @@ ai_sažetak: "Home polje sezone pass 2 — brief za Claude Design: livada preuzi
 ---
 
 # Home — polje sezone, pass 2 — Claude Design brief
+
+> **Status: implementirano 2026-09-25** — paket `design_handoff_home_field_v2/` prenesen u igru; odstupanja su u [[#Implementacija (2026-09-25)|§ Implementacija]] na kraju.
 
 > Polje je već dizajnirano 2026-09-22 ([[home-field-cd-brief|home-field-cd-brief]], paket `design_handoff_home_field/`). Ovo je **druga runda**: iste mehanike, isti sadržaj, ali obrnut odnos — livada prestaje biti prozor i postaje **stranica**, a sve kontrole plutaju preko nje.
 
@@ -358,6 +360,33 @@ cvijeća i Pipa. Ideje van zadatka navedi odvojeno na kraju README-a.
 - [ ] Swipe po livadi i dalje lista hub; kontrole ga blokiraju
 - [ ] Prelaz s kartice sezone u polje i nazad bez skoka
 - [ ] Suite prolazi (`season_meadow_smoke`, `home_basket_picker_smoke`, `season_home_smoke`) + GUT
+
+## Implementacija (2026-09-25)
+
+Paket: `design_handoff_home_field_v2/` (README § Odlučeno, 26 odluka). Preneseno 1:1 osim odstupanja niže.
+
+| Fajl | Uloga |
+|------|-------|
+| `game/scripts/visual/ui_home_field.gd` | v2 tokeni: `MEADOW` = cijela stranica, `MEADOW_BANDS [0.32, 0.68]`, nova `MEADOW_SPOTS` (4 dubine), `PIP_BASE_ZONE`, `KEEPOUT`, `TILE 180`, rectovi Gifta / korpe / nadogradnji, donji red, oba sheeta; fabrike `sticker()` / `tile()` / `corner_dot()` / `attention_ring()` / `level_segment()` / `grown_chip()`; obrisani `meadow_frame()`, `field_panel()`, `back_button()`, `basket_card()`, `basket_button()`, `have_text()`, `PANEL_*`, `DISABLED_*`, `SUB_ON_DARK`, `TOP_ROW_H`, `BACK_W`, `BASKET_H`, `UPGRADE_H`, `PLAY_ROW_H`, `PLAY_W`, `ENDLESS_W`, `MEADOW_INNER` |
+| `game/scripts/ui/season_field.gd` | Livada bez okvira; mjesta iz nove tablice, crtaju se nazad → naprijed; Pip u pojasu `PIP_BASE_ZONE`; broj izraslih ide overlayu signalom `grown_changed` |
+| `game/scenes/main_menu.tscn` | Novi `FieldOverlay` (SeasonLabel, GrownChip, GiftChest, BasketButton, UpgradesButton, TutorialHint, BottomRow) i `UpgradesOverlay`; obrisani `FieldTopRow`, `HomeTopStack`/`BasketCard`, stalni `FieldUpgradeStack` |
+| `game/scripts/ui/field_basket_button.gd` | **Novo** — plocica korpe 180 × 180 u tri stanja (lokot · sjeme + prsten paznje · portret + „+5 %"), shake kad je zaključana |
+| `game/scripts/ui/field_upgrades_button.gd` | **Novo** — plocica nadogradnji: ︽ znak, dvije trake nivoa 4 × (28 × 14), zlatna tacka kad se moze kupiti |
+| `game/scripts/ui/main_menu.gd` | Kolona u polju pokriva cijelu stranicu (`FIELD_COLUMN_OFFSETS` 0), overlay preuzima raspored; novi `_open_upgrades_sheet()` / `_close_upgrades_sheet()` / `_refresh_upgrades_button()` / `_refresh_grown_chip()` / `_style_field_bottom_row()`; Gift se vise ne gasi u polju |
+| `game/scripts/ui/season_stage.gd` | Prelaz: kartica (radius 36, rub 8) → cijela stranica (radius 0, rub 0) |
+| `game/scripts/ui/home_gift_card.gd` · `home_basket_visual.gd` | `drop` (tvrda sjena) za instancu u polju; omjeri portreta 60 / sjemena 56 u wellu 70 |
+| `game/scripts/dev/home_field_overlay_smoke.gd` | **Novo** — livada 1080 × 1633, rectovi kontrola, block_hub_swipe, keepout za 13 mjesta i Pipa, oba sheeta, tacno jedan loop |
+
+**Odstupanja od handoffa (svjesna):**
+
+1. **`FieldOverlay` je dijete `MainMenu`-a, ne `SeasonStage`-a.** `SeasonStage` je instancirana scena, a `MainMenu` **jeste** stranica — koordinate iz paketa važe 1:1 i bez diranja instance.
+2. **Nema zajedničkog `SheetLayer`-a.** `BasketPickerOverlay` već živi u korijenu `MainMenu`-a i radi; `UpgradesOverlay` je dodan pored njega po istom obrascu umjesto da se oba sele pod `SeasonStage`.
+3. **Play u polju je zaseban čvor `FieldPlayButton`.** Paket kaže da `%PlayButton` seli u overlay, ali to je **isti čvor** koji nosi Play na biranju sezone (836 × 180 u `HomeColumn/PlayRow`) — selidba bi ostavila taj ekran bez Play dugmeta. Rješenje je isto ono koje je paket izabrao za Gift (odluka 6): druga instanca, jedan zajednički handler.
+4. **`MeadowCount` čvor je obrisan iz livade.** Paket stavlja `GrownChip` u overlay ali ostavlja brojač u livadi; livada sada emituje `grown_changed`, a čip crta overlay.
+5. **`home_basket_visual.gd` je zadržan** i koristi se unutar plocice (omjeri prilagodeni wellu 70) umjesto novog crtanja — tako T3 putanja koju smoke čuva ostaje ista.
+6. **Endless nosi „∞ Endless" kao tekst**, ne crtani dvostruki prsten — znak postoji u Nunitu, a crtanje bi tražilo još jednu skriptu za dugme koje je inače obično.
+7. **`icon_seed_light.svg` je već bio obrisan** u chrome v2 (paket ga navodi u § Šta se briše).
+8. **`ui_attention.gd` je ostao bez korisnika** — jedini loop je sada `tween_attention()` unutar `FieldBasketButton`.
 
 ## Odluke
 

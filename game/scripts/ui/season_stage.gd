@@ -737,16 +737,19 @@ func _spawn_open_shell(from_rect: Rect2) -> void:
 	shell.name = "FieldOpenShell"
 	shell.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	shell.z_index = 4
-	var sb := UiHomeField.meadow_frame(GameState.home_season_field_id)
+	# v2: kartica (radius 36, rub 8) se razvuce u cijelu stranicu (radius 0, rub 0).
+	var ground := SeasonTheme.home_field_tint(GameState.home_season_field_id)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = ground.lerp(UiHomeField.WARM_WHITE, 0.25)
+	sb.set_corner_radius_all(36)
+	sb.set_border_width_all(8)
+	sb.border_color = UiHomeField.ACTIVE_RIM
 	shell.add_theme_stylebox_override("panel", sb)
 	add_child(shell)
 	var inv := get_global_transform_with_canvas().affine_inverse()
 	shell.position = inv * from_rect.position
 	shell.size = from_rect.size
-	var dest := Rect2(Vector2.ZERO, size)
-	if dest.size.x < 8.0:
-		dest.size = Vector2(UiHomeField.MEADOW)
-	var t := UiHomeField.tween_open_field(shell, dest, SeasonTheme.home_field_tint(GameState.home_season_field_id))
+	var t := UiHomeField.tween_open_field(shell, ground)
 	t.finished.connect(func() -> void:
 		if is_instance_valid(shell):
 			shell.queue_free()

@@ -10,7 +10,7 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
-zadnja_sesija: "Brief: Home polje sezone pass 2 (livada kao stranica, chest + korpa gore lijevo, nadogradnje gore desno, manji red Seasons · Play · Endless)"
+zadnja_sesija: "Brief plant-frame za CD — okvir sjemena/cvijeta (Arena tanji rub + deblji hint, Journal/Camp bez zelenog wella, Run bez okvira). Kod vraćen, čeka zip."
 zadnje_azurirano: 2026-09-25
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
@@ -343,7 +343,7 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-**Sada radimo:** D0-P / playtest — CAMP-06 čeka playtest; cijeli hub je redizajniran, a 2026-09-24/25 su očišćeni Arena (bez HUD-a i Done dugmeta), Camp (pass 2) i hub chrome (pass 2 — trake, footer bez teksta, nove ikone valuta)
+**Sada radimo:** D0-P / playtest — CAMP-06 čeka playtest; cijeli hub je redizajniran, a 2026-09-24/25 su očišćeni Arena, Camp (pass 2), hub chrome (pass 2) i Home polje sezone (pass 2 — livada kao stranica)
 
 **Nakon playtesta:** D0-P (SFX, art, Settings) → D0-M → Play internal
 
@@ -353,7 +353,7 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 | ID | Status | Napomena | Link |
 |----|--------|----------|------|
-| HOME-21 | 🔲 brief spreman | Home polje sezone pass 2 — livada preuzima cijelu stranicu (danas 606 od 1633), chrome pluta: chest + korpa gore lijevo, nadogradnje gore desno, dolje manji red `Seasons · Play · Endless`. Čeka CD paket `design_handoff_home_field_v2/` | [[../04-experience/design-drafts/home-field-v2-cd-brief\|brief]] |
+| HOME-21 | ✅ | Home polje sezone pass 2 — livada je cijela stranica (bila 606 od 1633), chrome pluta: Gift + korpa 180 gore lijevo (isti okvir), nadogradnje gore desno u sheetu, donji red `Seasons 236 · Play 432 · Endless 236`; 13 mjesta u 4 dubine i Pip van keepouta | `design_handoff_home_field_v2/` |
 | CHROME-02 | ✅ | Hub chrome pass 2 — dusk plum `#2A2233` umjesto zelene, footer 144 px bez teksta (dodir 216 × 141), treći chip broji cvijeće umjesto dijamanata; nove ikone coina / sjemena / cvijeta kroz cijelu igru (i pickup u runu); stranica 1597 → 1633 bez promjene kartica | `design_handoff_hub_chrome_v2/` |
 | CAMP-07 | ✅ | Camp pass 2 — bez „Next free season", „Details", podnaslova tabova, Merge prečice, „1 coin each" i „hold 10/s"; kartica sezone 276, sekcija fiksno 1253 uz nju, art u karticama +45 %, Trade i Unlock 300 × 120 | `design_handoff_camp_v2/` |
 | ARENA-04 | ✅ | Prostor umjesto HUD-a — uklonjeni daily/stash pilule, traka s porukama, combo pilula i Done; polje 1553 px, muncher gore, vreća i Pip dolje; sesija se gasi kad polje ostane prazno | — |

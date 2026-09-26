@@ -9,6 +9,13 @@ var claimable: bool = false:
 		claimable = value
 		queue_redraw()
 
+## U polju sezone kartica dobija tvrdu sjenu naljepnice (0 8 0) — na biranju
+## sezone stoji na kartici i sjena joj ne treba.
+var drop: bool = false:
+	set(value):
+		drop = value
+		queue_redraw()
+
 
 func _init() -> void:
 	custom_minimum_size = Vector2(UiStage.GIFT, UiStage.GIFT)
@@ -18,7 +25,12 @@ func _init() -> void:
 
 func _draw() -> void:
 	var r := Rect2(Vector2.ZERO, size)
-	draw_style_box(UiStage.box(UiStage.CREAM, 32, 3, UiStage.INK), r)
+	var card := UiStage.box(UiStage.CREAM, 32, 3, UiStage.INK)
+	if drop:
+		card.shadow_color = UiHomeField.STICKER_DROP
+		card.shadow_size = 1
+		card.shadow_offset = Vector2(0, 8)
+	draw_style_box(card, r)
 	var top := (size.y - 84.0 - 10.0 - 38.0) * 0.5
 	var gift := Rect2((size.x - 84.0) * 0.5, top, 84.0, 84.0)
 	draw_style_box(UiStage.box(UiStage.LAVENDER, 18), gift)

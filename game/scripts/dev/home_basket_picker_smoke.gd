@@ -169,38 +169,38 @@ func _run() -> void:
 		home.call("_refresh_basket_card")
 	elif home.has_method("_refresh_basket_button"):
 		home.call("_refresh_basket_button")
-	var basket_card := home.get_node_or_null("%BasketCard") as Control
+	# v2: korpa je plocica 180 u FieldOverlayu, ispod Gifta.
+	var basket_card := home.get_node_or_null("%BasketButton") as Control
 	if basket_card == null:
-		_fail("BasketCard missing")
+		_fail("BasketButton missing")
 		return
-	if basket_card.visible:
-		_fail("carousel BasketCard should be hidden")
+	var field_overlay := home.get_node_or_null("%FieldOverlay") as Control
+	if field_overlay == null:
+		_fail("FieldOverlay missing")
 		return
-	var stack := home.get_node_or_null("%HomeTopStack")
-	if stack == null:
-		_fail("HomeTopStack missing")
+	if basket_card.is_visible_in_tree():
+		_fail("carousel Basket tile should be hidden")
 		return
-	if basket_card.get_parent() != stack:
-		_fail("BasketCard parent should be HomeTopStack")
+	if basket_card.get_parent() != field_overlay:
+		_fail("Basket tile parent should be FieldOverlay")
 		return
 	if home.get_node_or_null("%DailyChestCard") == null:
 		_fail("DailyChestCard missing")
 		return
-	if home.get_node_or_null("Panel/VBox/BasketButton") != null:
-		_fail("BasketButton still under Panel/VBox")
+	if home.get_node_or_null("%GiftChest") == null:
+		_fail("GiftChest missing in the field overlay")
 		return
-	if home.get_node_or_null("%BasketVisual") == null:
-		_fail("BasketVisual missing")
+	if basket_card.find_child("BasketVisual", true, false) == null:
+		_fail("BasketVisual missing inside the tile")
 		return
 	if home.get_node_or_null("%BasketPickerOverlay") == null:
 		_fail("BasketPickerOverlay missing")
 		return
-	var play_row := home.get_node_or_null("%PlayRow")
-	if play_row != null and basket_card.get_parent() == play_row:
-		_fail("BasketCard must not sit under PlayRow")
-		return
 	if home.get_node_or_null("%PlayButton") == null:
 		_fail("PlayButton missing")
+		return
+	if home.get_node_or_null("%FieldPlayButton") == null:
+		_fail("FieldPlayButton missing")
 		return
 	if not bool(gs.call("can_open_home_season_field")):
 		_fail("Bloom should can_open")
@@ -213,21 +213,18 @@ func _run() -> void:
 	if str(gs.get("home_season_field_id")) != "country_bloom":
 		_fail("field_id expected country_bloom got %s" % str(gs.get("home_season_field_id")))
 		return
-	if not basket_card.visible:
-		_fail("Bloom field: BasketCard should be visible")
+	if not basket_card.is_visible_in_tree():
+		_fail("Bloom field: Basket tile should be visible")
 		return
-	var basket_btn := home.get_node_or_null("%BasketButton") as Control
-	if basket_btn == null:
-		_fail("Bloom field: BasketButton missing")
+	if basket_card.size.y < 120.0:
+		_fail("Bloom field: Basket touch height < 120")
 		return
-	if basket_btn.custom_minimum_size.y < 120.0:
-		_fail("Bloom field: BasketButton hit < 120")
+	var gift_tile := home.get_node_or_null("%GiftChest") as Control
+	if gift_tile == null or not gift_tile.is_visible_in_tree():
+		_fail("Bloom field: GiftChest should be visible")
 		return
-	if basket_card.get_parent() != stack:
-		_fail("Bloom field: BasketCard should stay under HomeTopStack")
-		return
-	if play_row != null and basket_card.get_parent() == play_row:
-		_fail("Bloom field: BasketCard must not sit under PlayRow")
+	if absf(gift_tile.size.x - basket_card.size.x) > 1.5:
+		_fail("Gift and Basket must share the tile size")
 		return
 	if not home.has_method("_on_basket_type_picked"):
 		_fail("missing _on_basket_type_picked")

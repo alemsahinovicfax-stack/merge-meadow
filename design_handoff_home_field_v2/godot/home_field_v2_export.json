@@ -1,0 +1,890 @@
+{
+  "$schema_version": "1.0",
+  "generated": "2026-09-25",
+  "source": "design_handoff_home_field_v2/design/FieldScreen.dc.html + Field Specs.dc.html",
+  "brief": "docs/04-experience/design-drafts/home-field-v2-cd-brief.md",
+  "direction": "jedan dizajn (bez varijanti)",
+  "note": "Sve mjere su px baze 1080 x 1920, prenos 1:1. Koordinate kontrola su u prostoru stranice (0,0 = gornji lijevi ugao stranice, y 143 na ekranu).",
+  "meta": {
+    "base": {
+      "w": 1080,
+      "h": 1920
+    },
+    "header": {
+      "h": 143,
+      "from": "hub_chrome_v2"
+    },
+    "page": {
+      "w": 1080,
+      "h": 1633,
+      "y": 143
+    },
+    "footer": {
+      "h": 144,
+      "y": 1776,
+      "from": "hub_chrome_v2"
+    },
+    "minimums": {
+      "touch": 120,
+      "text": 38,
+      "number": 44
+    },
+    "font": "Nunito (UiStage.font) — polje prelazi na font biranja sezone jer dijeli GiftChest"
+  },
+  "tokens": {
+    "palette": {
+      "ink": "#2D3436",
+      "ink_deep": "#1A1A14",
+      "ink_soft": "#555C5E",
+      "cream": "#FFF8F0",
+      "active_rim": "#FFF6D6",
+      "peach": "#FFB88C",
+      "lavender": "#D4A5FF",
+      "mint": "#A8E6CF",
+      "coin_gold": "#FFD56B",
+      "ui_gold": "#E8C44A",
+      "pink": "#FFCCD5",
+      "well": "#22342A",
+      "disabled": "#F1EAE0",
+      "locked_tile": "#EFE8DE",
+      "locked_frame": "#E3D9CC",
+      "row": "#FFFFFF",
+      "chrome": "#2A2233"
+    },
+    "new_shades": {
+      "#EFE8DE": "zaključana korpa — krem tamnije",
+      "#F1EAE0": "isključeno dugme / zaključani red — krem tamnije",
+      "#555C5E": "postojeći UiStage.INK_SOFT"
+    },
+    "alpha_fills": {
+      "sticker_drop": "rgba(26,26,20,0.28) · 0 8 0 (tvrda, shadow_size 1)",
+      "button_drop_in_sheet": "rgba(26,26,20,0.28) · 0 6 0",
+      "scrim": "rgba(26,22,30,0.55)",
+      "soil_fill": "rgba(26,26,20,0.10)",
+      "soil_edge": "rgba(26,26,20,0.19)",
+      "flower_shadow": "rgba(26,26,20,0.13)",
+      "segment_empty": "rgba(45,52,54,0.16)",
+      "row_edge": "rgba(45,52,54,0.18)",
+      "disabled_edge": "rgba(45,52,54,0.30)",
+      "grabber": "rgba(45,52,54,0.28)"
+    },
+    "radius": {
+      "tile": 32,
+      "tile_icon": 18,
+      "button_secondary": 28,
+      "play": 32,
+      "grown_chip": 38,
+      "hint": 28,
+      "sheet_top": 36,
+      "sheet_row": 24,
+      "upgrade_card": 28,
+      "dot": 24
+    },
+    "border": {
+      "sticker": 3,
+      "dot": 4,
+      "ripple": 4,
+      "chosen_row": 4,
+      "level_chip": 2,
+      "segment": 2
+    },
+    "meadow": {
+      "bands": [
+        0.32,
+        0.68
+      ],
+      "sky": "ground.lerp(WHITE, 0.30)",
+      "near": "ground * 0.93",
+      "ground_by_season": {
+        "country_bloom": "#E6F2DB",
+        "frost_orchard": "#D1E6FF",
+        "lantern_meadow": "#EBD6FF",
+        "amber_canopy": "#FFEBC7",
+        "moonlit_warren": "#B8BDFF",
+        "coral_tide": "#FFE0D6",
+        "starfall_glade": "#DBCCFF",
+        "ember_fen": "#FFC79E"
+      }
+    },
+    "contrast": {
+      "bands": {
+        "country_bloom": {
+          "sky": {
+            "hex": "#EEF6E6",
+            "edge": 11.45,
+            "ink": 15.78
+          },
+          "far": {
+            "hex": "#E6F2DB",
+            "edge": 10.92,
+            "ink": 15.05
+          },
+          "near": {
+            "hex": "#D6E1CC",
+            "edge": 9.36,
+            "ink": 12.9
+          }
+        },
+        "frost_orchard": {
+          "sky": {
+            "hex": "#DFEEFF",
+            "edge": 10.76,
+            "ink": 14.82
+          },
+          "far": {
+            "hex": "#D1E6FF",
+            "edge": 9.95,
+            "ink": 13.71
+          },
+          "near": {
+            "hex": "#C2D6ED",
+            "edge": 8.54,
+            "ink": 11.76
+          }
+        },
+        "lantern_meadow": {
+          "sky": {
+            "hex": "#F1E2FF",
+            "edge": 10.3,
+            "ink": 14.2
+          },
+          "far": {
+            "hex": "#EBD6FF",
+            "edge": 9.42,
+            "ink": 12.98
+          },
+          "near": {
+            "hex": "#DBC7ED",
+            "edge": 8.09,
+            "ink": 11.15
+          }
+        },
+        "amber_canopy": {
+          "sky": {
+            "hex": "#FFF1D8",
+            "edge": 11.37,
+            "ink": 15.66
+          },
+          "far": {
+            "hex": "#FFEBC7",
+            "edge": 10.85,
+            "ink": 14.94
+          },
+          "near": {
+            "hex": "#EDDBB9",
+            "edge": 9.32,
+            "ink": 12.84
+          }
+        },
+        "moonlit_warren": {
+          "sky": {
+            "hex": "#CDD1FF",
+            "edge": 8.55,
+            "ink": 11.78
+          },
+          "far": {
+            "hex": "#B8BDFF",
+            "edge": 7.1,
+            "ink": 9.79
+          },
+          "near": {
+            "hex": "#ABB0ED",
+            "edge": 6.14,
+            "ink": 8.46
+          }
+        },
+        "coral_tide": {
+          "sky": {
+            "hex": "#FFE9E2",
+            "edge": 10.87,
+            "ink": 14.98
+          },
+          "far": {
+            "hex": "#FFE0D6",
+            "edge": 10.2,
+            "ink": 14.05
+          },
+          "near": {
+            "hex": "#EDD0C7",
+            "edge": 8.72,
+            "ink": 12.02
+          }
+        },
+        "starfall_glade": {
+          "sky": {
+            "hex": "#E6DBFF",
+            "edge": 9.63,
+            "ink": 13.26
+          },
+          "far": {
+            "hex": "#DBCCFF",
+            "edge": 8.51,
+            "ink": 11.73
+          },
+          "near": {
+            "hex": "#CCBEED",
+            "edge": 7.34,
+            "ink": 10.11
+          }
+        },
+        "ember_fen": {
+          "sky": {
+            "hex": "#FFD8BB",
+            "edge": 9.54,
+            "ink": 13.14
+          },
+          "far": {
+            "hex": "#FFC79E",
+            "edge": 8.4,
+            "ink": 11.58
+          },
+          "near": {
+            "hex": "#EDB993",
+            "edge": 7.22,
+            "ink": 9.95
+          }
+        }
+      },
+      "worst_edge": {
+        "ratio": 6.14,
+        "where": "moonlit_warren near"
+      },
+      "worst_ink_on_meadow": {
+        "ratio": 8.46,
+        "where": "moonlit_warren near"
+      },
+      "on_sticker": {
+        "cream_ink": 12.04,
+        "peach_ink": 7.54,
+        "lavender_ink": 6.42,
+        "mint_ink": 8.99,
+        "gold_ink": 7.5,
+        "disabled_soft": 5.71,
+        "locked_basket_soft": 5.61,
+        "soft_on_cream": 6.48,
+        "soft_on_white": 6.82,
+        "cream_on_ink_chip": 12.04
+      },
+      "rule": "svijetli tekst nikad na livadi; kontrole neprozirne + rub 3 px ink; tekst direktno na livadi samo #1A1A14"
+    }
+  },
+  "layout": {
+    "Meadow": {
+      "rect": [
+        0,
+        0,
+        1080,
+        1633
+      ],
+      "radius": 0,
+      "rim": 0,
+      "bands_px": {
+        "sky": [
+          0,
+          523
+        ],
+        "far": [
+          523,
+          1110
+        ],
+        "near": [
+          1110,
+          1633
+        ]
+      }
+    },
+    "SeasonLabel": {
+      "rect": [
+        228,
+        36,
+        624,
+        56
+      ],
+      "font": "900 56",
+      "ink": "#1A1A14",
+      "align": "center",
+      "mouse_filter": "IGNORE"
+    },
+    "GrownChip": {
+      "center_x": 540,
+      "y": 112,
+      "h": 76,
+      "pad": [
+        14,
+        26
+      ],
+      "icon": "icon_flower.svg 48",
+      "number": "900 44",
+      "word": "800 38 #555C5E",
+      "mouse_filter": "IGNORE"
+    },
+    "GiftChest": {
+      "rect": [
+        24,
+        24,
+        180,
+        180
+      ],
+      "same_as": "DailyGiftCard (Home biranje sezone)",
+      "dot": {
+        "size": 48,
+        "offset": [
+          -12,
+          -12
+        ],
+        "anchor": "top-right",
+        "color": "#FFCCD5"
+      }
+    },
+    "BasketButton": {
+      "rect": [
+        24,
+        220,
+        180,
+        180
+      ],
+      "frame": 84,
+      "well_inset": 7,
+      "label_gap": 10
+    },
+    "UpgradesButton": {
+      "rect": [
+        876,
+        24,
+        180,
+        180
+      ],
+      "glyph_box": 84,
+      "bars": {
+        "rows": 2,
+        "segments": 4,
+        "seg": [
+          28,
+          14
+        ],
+        "gap": 6
+      },
+      "dot": {
+        "size": 48,
+        "offset": [
+          -12,
+          -12
+        ],
+        "anchor": "top-left",
+        "color": "#FFD56B"
+      }
+    },
+    "TutorialHint": {
+      "rect": [
+        236,
+        230,
+        600,
+        184
+      ],
+      "pointer": "lijevo, na y 304 (sredina korpe)",
+      "font": "800 40/1.12"
+    },
+    "BottomRow": {
+      "rect": [
+        70,
+        1461,
+        940,
+        148
+      ]
+    },
+    "SeasonsButton": {
+      "rect": [
+        70,
+        1477,
+        236,
+        124
+      ]
+    },
+    "PlayButton": {
+      "rect": [
+        324,
+        1461,
+        432,
+        140
+      ],
+      "disc": 88,
+      "label": "900 60",
+      "center_x": 540,
+      "stays_centered_without_endless": true
+    },
+    "EndlessButton": {
+      "rect": [
+        774,
+        1477,
+        236,
+        124
+      ],
+      "glyph": "dva prstena 30, rub 6, preklop 6",
+      "visible_if": "tutorial_complete"
+    },
+    "BasketSheet": {
+      "rect": [
+        0,
+        307,
+        1080,
+        1326
+      ],
+      "pad": [
+        20,
+        24,
+        28,
+        24
+      ],
+      "row_h": 148,
+      "row_gap": 12,
+      "portrait": 112,
+      "buttons_h": 132
+    },
+    "UpgradesSheet": {
+      "rect": [
+        0,
+        711,
+        1080,
+        922
+      ],
+      "card": [
+        1032,
+        264
+      ],
+      "card_gap": 16,
+      "button": [
+        272,
+        128
+      ],
+      "close_h": 132
+    },
+    "MeadowPip": {
+      "size": 190,
+      "default_base": [
+        756,
+        1404
+      ],
+      "base_zone": [
+        151,
+        1306,
+        778,
+        131
+      ]
+    },
+    "keepout": [
+      {
+        "name": "top_left",
+        "rect": [
+          8,
+          8,
+          212,
+          408
+        ]
+      },
+      {
+        "name": "top_right",
+        "rect": [
+          860,
+          8,
+          212,
+          212
+        ]
+      },
+      {
+        "name": "label_chip",
+        "rect": [
+          212,
+          20,
+          656,
+          184
+        ],
+        "swipe": "pass"
+      },
+      {
+        "name": "bottom_row",
+        "rect": [
+          54,
+          1445,
+          972,
+          188
+        ]
+      },
+      {
+        "name": "hint",
+        "rect": [
+          220,
+          214,
+          632,
+          216
+        ],
+        "only": "prije tutoriala"
+      }
+    ],
+    "MEADOW_SPOTS": {
+      "schema": "[x %, y % od poda, veličina px, indeks u rosteru, prag]",
+      "rows": [
+        [
+          10,
+          55,
+          88,
+          3,
+          5
+        ],
+        [
+          26,
+          54,
+          88,
+          0,
+          5
+        ],
+        [
+          42,
+          55,
+          88,
+          1,
+          5
+        ],
+        [
+          58,
+          54,
+          88,
+          4,
+          5
+        ],
+        [
+          74,
+          55,
+          88,
+          2,
+          5
+        ],
+        [
+          90,
+          54,
+          88,
+          5,
+          5
+        ],
+        [
+          18,
+          40,
+          116,
+          0,
+          1
+        ],
+        [
+          50,
+          42,
+          116,
+          1,
+          1
+        ],
+        [
+          82,
+          40,
+          116,
+          2,
+          1
+        ],
+        [
+          12,
+          29,
+          136,
+          3,
+          1
+        ],
+        [
+          66,
+          28,
+          136,
+          4,
+          1
+        ],
+        [
+          88,
+          30,
+          136,
+          5,
+          1
+        ],
+        [
+          34,
+          26,
+          168,
+          5,
+          10
+        ]
+      ],
+      "was": "[[10,40,76,0,5],[29,42,76,1,5],[51,40,76,2,5],[72,42,76,3,5],[90,38,84,4,5],[17,27,96,5,5],[37,25,96,0,1],[59,27,96,1,1],[84,24,96,2,1],[11,9,112,3,1],[33,7,112,4,1],[88,8,112,5,1],[52,1,128,5,10]]"
+    }
+  },
+  "components": {
+    "Sticker": {
+      "fill": "neprozirno",
+      "border": "3 px ink",
+      "drop": "0 8 0 sticker_drop samo na pritisljivom",
+      "info_variant": "bez sjene (GrownChip, TutorialHint)"
+    },
+    "BasketButton": {
+      "states": {
+        "locked": {
+          "fill": "#EFE8DE",
+          "frame": "#E3D9CC + rub ink 45 %",
+          "icon": "icon_lock.svg 44",
+          "label": "Basket #555C5E",
+          "tap": "shake + TutorialHint"
+        },
+        "empty": {
+          "fill": "cream",
+          "frame": "#FFD56B + well",
+          "icon": "icon_seed.svg 56",
+          "label": "Choose",
+          "loop": "AttentionRing"
+        },
+        "chosen": {
+          "frame": "#FFD56B + well + portret 60",
+          "label": "+5 % u mint pilulici 52, 900 44"
+        }
+      }
+    },
+    "UpgradesButton": {
+      "ready_dot": "has >= 2 cvijeta (pick_upgrade_flower_type() != '') i bar jedna nadogradnja < 4",
+      "tap": "otvara UpgradesSheet"
+    },
+    "UpgradeCard": {
+      "rows": [
+        "naslov 52 + Lv N / 4 (900 44)",
+        "4 segmenta 64 x 18",
+        "efekat 800 44",
+        "cijena: portret 56 + '2 × {name}' 800 44"
+      ],
+      "button": {
+        "ready": "#E8C44A + ink + sjena · Upgrade",
+        "blocked": "#F1EAE0 + rub ink 30 % · Need N · #555C5E",
+        "maxed": "#A8E6CF + ink · Maxed · bez sjene"
+      }
+    },
+    "BasketRow": {
+      "states": {
+        "row": "#FFFFFF + rub ink 18 %",
+        "chosen": "#FFF6D6 + rub 4 ink + čip Chosen (ink / cream)",
+        "locked": "#F1EAE0 + lokot + čip Locked"
+      },
+      "sub": "★☆☆ · +5 % spawn | ★★☆ · not found yet"
+    }
+  },
+  "scenes": {
+    "full": "sve otključano, 9/13",
+    "first": "prije prvog mergea, 0/13, bez Endlessa, bez tačke na Giftu",
+    "basket_empty": "ripple",
+    "picker": "BasketSheet, zaključani 4 i 5",
+    "upgrades": "Magnet Lv1 ready + Loot Lv4 maxed",
+    "upgrades_need": "obje Need 1",
+    "empty": "Lantern Meadow 0/13",
+    "full13": "13/13",
+    "claimed": "Gift bez tačke"
+  },
+  "animations": [
+    {
+      "what": "otvaranje polja",
+      "target": "SeasonField rect → (0,0,1080,1633), corner_radius 36→0, border 8→0, bg_color mood→ground",
+      "dur_s": 0.28,
+      "ease": "EASE_OUT",
+      "trans": "TRANS_CUBIC"
+    },
+    {
+      "what": "sadržaj kartice",
+      "target": "modulate.a 1→0",
+      "dur_s": 0.12
+    },
+    {
+      "what": "trake livade",
+      "target": "MeadowSky/MeadowNear modulate.a 0→1",
+      "delay_s": 0.16,
+      "dur_s": 0.18
+    },
+    {
+      "what": "cvijeće",
+      "target": "scale 0.9→1, stagger 0.024",
+      "dur_s": 0.2
+    },
+    {
+      "what": "chrome in",
+      "target": "modulate.a 0→1 + position 16 px od ruba (gore: y −16, dolje: y +16)",
+      "order": [
+        "PlayButton",
+        "SeasonsButton",
+        "EndlessButton",
+        "GiftChest",
+        "BasketButton",
+        "UpgradesButton",
+        "SeasonLabel+GrownChip"
+      ],
+      "delay_s": 0.22,
+      "stagger_s": 0.06,
+      "dur_s": 0.18
+    },
+    {
+      "what": "zatvaranje",
+      "target": "chrome modulate.a→0 zajedno, pa rect nazad",
+      "dur_s": [
+        0.12,
+        0.24
+      ]
+    },
+    {
+      "what": "AttentionRing (jedini loop)",
+      "target": "scale 1→1.16, modulate.a 0.7→0, pauza do 1.2",
+      "dur_s": 1.2,
+      "loop": true
+    },
+    {
+      "what": "sheet",
+      "target": "position.y +H→0; scrim a 0→0.55",
+      "dur_s": [
+        0.24,
+        0.18
+      ]
+    },
+    {
+      "what": "kupljen nivo",
+      "target": "segment fill 0.22 + rub kartice 4 ink 0.16 → nazad 0.24",
+      "dur_s": 0.4
+    },
+    {
+      "what": "pritisak",
+      "target": "scale 0.96 + sjena 8→2",
+      "dur_s": 0.08
+    }
+  ],
+  "strings_en": {
+    "gift": "Gift",
+    "basket_locked": "Basket",
+    "basket_empty": "Choose",
+    "basket_bonus": "+5 %",
+    "grown": "{n} / 13 grown",
+    "hint": "Merge your first flower in the Arena to unlock the basket.",
+    "meadow_empty": "Nothing has grown here yet. Bring seeds back from a run.",
+    "seasons": "Seasons",
+    "play": "Play",
+    "endless": "Endless",
+    "basket_title": "Basket seed",
+    "basket_sub": "Your pick falls 5 % more often in every run.",
+    "row_sub": "{pips}  ·  +5 % spawn",
+    "row_locked_sub": "{pips}  ·  not found yet",
+    "chosen": "Chosen",
+    "locked": "Locked",
+    "clear": "Clear basket",
+    "close": "Close",
+    "upgrades_title": "Upgrades",
+    "upgrades_sub": "Levels stay for every run. Paid in flowers.",
+    "magnet": "Magnet",
+    "loot": "Loot Boost",
+    "level": "Lv {n} / 4",
+    "magnet_effect": "Pull radius {a} px → {b} px",
+    "magnet_effect_max": "Pull radius 232 px",
+    "loot_effect": "Run loot ×{a} → ×{b}",
+    "loot_effect_max": "Run loot ×2.0",
+    "cost": "2 × {flower}",
+    "cost_unknown": "2 × any ★1 flower",
+    "cost_max": "Nothing left to buy",
+    "upgrade": "Upgrade",
+    "need": "Need {n}",
+    "maxed": "Maxed"
+  },
+  "assets": {
+    "new": [],
+    "used": [
+      "chrome v2: icon_seed.svg (korpa, zamjenjuje icon_seed_light.svg)",
+      "chrome v2: icon_flower.svg (GrownChip)",
+      "icon_lock.svg"
+    ],
+    "note": "glifovi (︽, ‹, ▶, ∞ prstenovi) se crtaju u kodu — UiStage.draw_chevron / draw_play / draw_arc"
+  },
+  "godot_map": {
+    "FieldOverlay": {
+      "node": "NOVO: SeasonStage/FieldOverlay (Control, full rect, mouse_filter IGNORE)",
+      "children": "apsolutne pozicije iz layout"
+    },
+    "Meadow": {
+      "node": "%SeasonField",
+      "change": "meta tweena = cijela stranica; MEADOW_BANDS [0.32,0.68]; MEADOW_SPOTS nova tablica"
+    },
+    "GiftChest": {
+      "node": "FieldOverlay/GiftChest = nova instanca iste scene kao %DailyChestCard (HomeGiftCard); bez runtime reparenta",
+      "script": "home_gift_card.gd + set_drop(true)"
+    },
+    "BasketButton": {
+      "node": "FieldOverlay/BasketButton",
+      "reuse": "HomeBasketVisual u okviru 84",
+      "replaces": "%BasketCard / %BasketButton"
+    },
+    "BasketSheet": {
+      "node": "%BasketPickerOverlay / %PickerPanel",
+      "change": "krem sheet 1326, redovi 148, portret 112"
+    },
+    "UpgradesButton": {
+      "node": "FieldOverlay/UpgradesButton",
+      "data": "magnet_level, multiplier_level, can_spend_flowers_for_upgrade()"
+    },
+    "UpgradesSheet": {
+      "node": "NOVO: SheetLayer/UpgradesSheet",
+      "reuse": "MagnetRow / LootBoostRow iz %FieldUpgradeStack → MagnetCard / LootCard, _apply_upgrade_card()"
+    },
+    "BottomRow": {
+      "node": "FieldOverlay/BottomRow",
+      "reuse": "%SeasonsRowButton, %PlayButton, %EndlessPlayButton premješteni u sceni (ne u runtime)"
+    },
+    "SeasonLabel": {
+      "node": "%SeasonNameChip/NameLabel → FieldOverlay/SeasonLabel",
+      "remove": "Tagline"
+    },
+    "TutorialHint": {
+      "node": "%TutorialHintPanel → FieldOverlay/TutorialHint"
+    },
+    "swipe": {
+      "group": "block_hub_swipe",
+      "members": [
+        "GiftChest",
+        "BasketButton",
+        "UpgradesButton",
+        "BottomRow/*",
+        "SheetLayer (kad je otvoren)"
+      ]
+    }
+  },
+  "smoke_tests": {
+    "must_update": [
+      {
+        "name": "season_meadow_smoke",
+        "why": "livada 1080x1633, trake, nova MEADOW_SPOTS, Pip zona, ništa pod keepoutom, Endless samo poslije tutoriala, Play centriran"
+      },
+      {
+        "name": "home_basket_picker_smoke",
+        "why": "BasketButton 3 stanja, sheet 1326, tipovi samo trenutne sezone"
+      },
+      {
+        "name": "season_home_smoke",
+        "why": "prelaz kartica → stranica, chrome in redoslijed, Gift vidljiv u polju"
+      }
+    ],
+    "new": [
+      "home_field_overlay_smoke — sve kontrole unutar stranice, u block_hub_swipe, nijedno mjesto/Pip u keepoutu, jedan loop (AttentionRing) max"
+    ]
+  },
+  "decisions": [
+    {
+      "date": "2026-09-25",
+      "what": "Livada = cijela stranica; kontrole su neprozirne naljepnice s rubom 3 px ink — jedno rješenje kontrasta za 8 sezona × 3 trake."
+    },
+    {
+      "date": "2026-09-25",
+      "what": "Tagline otpada iz polja; ime sezone ostaje 56 na nebu. Ostale odluke: README § Odlučeno."
+    }
+  ],
+  "open_decisions": [
+    "Obje nadogradnje dijele isti cvijet (pick_upgrade_flower_type) — ako se to promijeni, ready i Need N mogu stajati zajedno bez izmjene dizajna",
+    "Da li Gift na biranju sezone dobija istu sjenu (sada samo u polju)",
+    "Pip u zoni 1306–1437: treba li ga pustiti i dublje među redove (y-sort)"
+  ]
+}

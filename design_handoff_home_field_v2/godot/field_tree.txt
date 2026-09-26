@@ -1,0 +1,44 @@
+MainMenu (Home stranica, 1080 x 1633 od y 143)
+├─ HomeColumn …                                  biranje sezone — ne dira se
+└─ SeasonStage (Control, 1080 x 1633)
+   ├─ %SeasonField (Panel)                       rect tween: kartica (24,24,1032,1136) → (0,0,1080,1633)
+   │  ├─ MeadowSky   (Panel)   0,    0, 1080 x 523     ground.lerp(WHITE, .30)
+   │  ├─ MeadowFar   (Panel)   0,  523, 1080 x 587     ground
+   │  ├─ MeadowNear  (Panel)   0, 1110, 1080 x 523     ground * .93
+   │  ├─ Spots (Control)                          13 x SeasonFieldFlower, MEADOW_SPOTS v2, crtanje nazad → naprijed
+   │  ├─ MeadowNote (Label)  130, 568, 820            samo 0/13, 800 40 #1A1A14
+   │  └─ %MeadowPip (190)                          baza u (151,1306,778,131)
+   ├─ FieldOverlay (Control, full rect, mouse_filter IGNORE)          NOVO
+   │  ├─ SeasonLabel (Label)       228,  36, 624 x 56    900 56 #1A1A14, IGNORE
+   │  ├─ GrownChip (PanelContainer) centar x 540, y 112, h 76, IGNORE
+   │  │  ├─ Icon  icon_flower.svg 48
+   │  │  ├─ Count "9 / 13"  900 44
+   │  │  └─ Word  "grown"   800 38 #555C5E
+   │  ├─ GiftChest (HomeGiftCard, ista scena kao %DailyChestCard)   24, 24, 180 x 180   block_hub_swipe
+   │  │  └─ GiftDot 48 @ (−12,−12) gore desno
+   │  ├─ BasketButton (Button)      24, 220, 180 x 180    block_hub_swipe
+   │  │  ├─ AttentionRing (Panel)    180 x 180, rub 4 ink — jedini loop
+   │  │  ├─ Frame 84 (Panel) + Well + HomeBasketVisual / lokot / icon_seed
+   │  │  └─ Label "Basket" | "Choose" | Pill "+5 %" (52, mint)
+   │  ├─ UpgradesButton (Button)   876, 24, 180 x 180     block_hub_swipe
+   │  │  ├─ Glyph 84 mint + ︽
+   │  │  ├─ MagnetLevel  4 x (28 x 14), gap 6
+   │  │  ├─ LootLevel    4 x (28 x 14), gap 6
+   │  │  └─ UpgradeDot 48 @ (−12,−12) gore lijevo
+   │  ├─ TutorialHint (PanelContainer) 236, 230, 600 x 184   samo !tutorial_complete
+   │  └─ BottomRow (Control)        70, 1461, 940 x 148
+   │     ├─ SeasonsButton   0, 16, 236 x 124   (bio %SeasonsRowButton u FieldTopRow)
+   │     ├─ PlayButton    254,  0, 432 x 140   (%PlayButton)
+   │     └─ EndlessButton 704, 16, 236 x 124   (%EndlessPlayButton, visible = tutorial_complete)
+   └─ SheetLayer (Control, full rect)                                   block_hub_swipe dok je otvoren
+      ├─ Scrim (ColorRect)  rgba(26,22,30,.55)
+      ├─ BasketSheet (%PickerPanel)   0, 307, 1080 x 1326
+      │  ├─ Grabber 120 x 10 · Title 56 · Sub 40
+      │  ├─ %PickerList   6 x BasketRow 1032 x 148, gap 12 (portret 112)
+      │  └─ Buttons  Clear basket | Close   2 x 492 x 132
+      └─ UpgradesSheet               0, 711, 1080 x 922           NOVO
+         ├─ Grabber · Title 56 · Sub 40
+         ├─ MagnetCard 1032 x 264  (MagnetRow)
+         ├─ LootCard   1032 x 264  (LootBoostRow)
+         │  └─ UpgradeButton 272 x 128
+         └─ Close 1032 x 132

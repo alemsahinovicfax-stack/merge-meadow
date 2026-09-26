@@ -1,7 +1,9 @@
 class_name SeasonField
 extends Control
 
-## Home field meadow — framed window, 13 stash-gated spots, Pip FSM.
+## Home field meadow — v2: livada je CIJELA stranica (1080 x 1633), bez okvira.
+## 13 mjesta iz MEADOW_SPOTS (4 dubine, crtaju se nazad → naprijed), Pip FSM u
+## pojasu ispred svih cvjetova. Broj izraslih javlja se overlayu signalom.
 
 const FLOWER_SCRIPT := preload("res://scripts/ui/season_field_flower.gd")
 const PIP_MIN_MOVE := 80.0
@@ -16,9 +18,10 @@ const PIP_WEIGHT_SLEEP := 0.25
 
 enum _PipState { NONE, WALK, SNIFF, SLEEP }
 
+signal grown_changed(grown: int, total: int)
+
 @onready var meadow_ground: Panel = $MeadowGround
 @onready var meadow_pip: Control = $MeadowPip
-@onready var meadow_count: PanelContainer = $MeadowCount
 @onready var meadow_note: Label = $MeadowNote
 
 var _open_season_id: String = ""
@@ -38,8 +41,6 @@ func _ready() -> void:
 	clip_contents = true
 	_ensure_bands()
 	_hide_pip_and_stop()
-	if meadow_count:
-		meadow_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if meadow_note:
 		meadow_note.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	resized.connect(_on_resized)
@@ -83,10 +84,9 @@ func dismiss_flowers() -> void:
 	_laid_out_size = Vector2.ZERO
 	_hide_pip_and_stop()
 	clear_flowers()
-	if meadow_count:
-		meadow_count.visible = false
 	if meadow_note:
 		meadow_note.visible = false
+	grown_changed.emit(0, UiHomeField.MEADOW_SPOTS.size())
 
 
 func is_pip_wandering() -> bool:
@@ -114,8 +114,6 @@ func settle_flowers() -> void:
 func _on_resized() -> void:
 	_layout_bands()
 	_place_pip_home()
-	if meadow_count:
-		meadow_count.position = Vector2(18, 18)
 	if _open_season_id.is_empty():
 		return
 	if size.distance_to(_laid_out_size) < 8.0:
@@ -139,7 +137,6 @@ func _is_shell_child(child: Node) -> bool:
 		or n == "MeadowNear"
 		or n == "SeasonsButton"
 		or n == "MeadowPip"
-		or n == "MeadowCount"
 		or n == "MeadowNote"
 	)
 
@@ -171,7 +168,8 @@ func _make_band(band_name: String) -> ColorRect:
 func _apply_meadow_fill(season_id: String) -> void:
 	var ground := SeasonTheme.home_field_tint(season_id)
 	if meadow_ground:
-		var sb := UiHomeField.meadow_frame(season_id)
+		# v2: bez ruba i radiusa — livada je stranica, ne prozor.
+		var sb := StyleBoxFlat.new()
 		sb.bg_color = ground
 		meadow_ground.add_theme_stylebox_override("panel", sb)
 		meadow_ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -265,19 +263,11 @@ func _spot_position(bounds: Rect2, x_pct: float, bottom_pct: float, side: float)
 
 
 func _refresh_meadow_chrome(grown: int) -> void:
-	if meadow_count:
-		meadow_count.visible = true
-		meadow_count.add_theme_stylebox_override("panel", UiHomeField.meadow_count())
-		var value := meadow_count.get_node_or_null("CountRow/Value") as Label
-		var caption := meadow_count.get_node_or_null("CountRow/Caption") as Label
-		if value:
-			value.text = "%d / 13" % grown
-		if caption:
-			caption.text = "grown"
 	if meadow_note:
 		meadow_note.visible = grown <= 0
 		if grown <= 0:
-			meadow_note.text = "Play a run — blooms you merge will grow here."
+			meadow_note.text = "Nothing has grown here yet. Bring seeds back from a run."
+	grown_changed.emit(grown, UiHomeField.MEADOW_SPOTS.size())
 
 
 func _meadow_bounds() -> Rect2:
@@ -304,13 +294,30 @@ func _stop_wander() -> void:
 func _place_pip_home() -> void:
 	if meadow_pip == null or _open_season_id.is_empty():
 		return
-	var bounds := _meadow_bounds()
-	var sz := _pip_size()
-	var x := bounds.size.x * (float(UiHomeField.PIP_X_PCT) / 100.0) - sz.x * 0.5
-	var y := bounds.size.y * (1.0 - float(UiHomeField.PIP_BOTTOM_PCT) / 100.0) - sz.y
 	meadow_pip.custom_minimum_size = Vector2(UiHomeField.PIP_SIZE, UiHomeField.PIP_SIZE)
 	meadow_pip.size = meadow_pip.custom_minimum_size
-	meadow_pip.position = _clamp_pip_pos(Vector2(x, y))
+	var bounds := _meadow_bounds()
+	var page := Vector2(UiHomeField.PAGE)
+	var base := Vector2(UiHomeField.PIP_DEFAULT_BASE)
+	var home := Vector2(
+		bounds.size.x * (base.x / page.x) - _pip_size().x * 0.5,
+		bounds.size.y * (base.y / page.y) - _pip_size().y
+	)
+	meadow_pip.position = _clamp_pip_pos(home)
+
+
+## Pojas u kojem Pip smije stajati — PIP_BASE_ZONE su koordinate NOGU, pa se
+## pretvaraju u prostor gornjeg lijevog ugla i skaliraju s livadom.
+func _pip_bounds() -> Rect2:
+	var bounds := _meadow_bounds()
+	var page := Vector2(UiHomeField.PAGE)
+	var zone := Rect2(UiHomeField.PIP_BASE_ZONE)
+	var sz := _pip_size()
+	var left := bounds.size.x * (zone.position.x / page.x) - sz.x * 0.5
+	var top := bounds.size.y * (zone.position.y / page.y) - sz.y
+	var w := bounds.size.x * (zone.size.x / page.x)
+	var h := bounds.size.y * (zone.size.y / page.y)
+	return Rect2(Vector2(left, top), Vector2(maxf(w, 1.0), maxf(h, 1.0)))
 
 
 func _restart_wander() -> void:
@@ -333,13 +340,10 @@ func _pip_size() -> Vector2:
 
 
 func _clamp_pip_pos(pos: Vector2) -> Vector2:
-	var safe := _meadow_bounds()
-	var sz := _pip_size()
-	var max_x := maxf(safe.position.x, safe.end.x - sz.x)
-	var max_y := maxf(safe.position.y, safe.end.y - sz.y)
+	var safe := _pip_bounds()
 	return Vector2(
-		clampf(pos.x, safe.position.x, max_x),
-		clampf(pos.y, safe.position.y, max_y)
+		clampf(pos.x, safe.position.x, maxf(safe.position.x, safe.end.x)),
+		clampf(pos.y, safe.position.y, maxf(safe.position.y, safe.end.y))
 	)
 
 
@@ -352,11 +356,11 @@ func _meadow_flowers() -> Array[Control]:
 
 
 func _random_safe_pip_pos() -> Vector2:
-	var safe := _meadow_bounds()
-	var sz := _pip_size()
-	var max_x := maxf(safe.position.x, safe.end.x - sz.x)
-	var max_y := maxf(safe.position.y, safe.end.y - sz.y)
-	return Vector2(randf_range(safe.position.x, max_x), randf_range(safe.position.y, max_y))
+	var safe := _pip_bounds()
+	return Vector2(
+		randf_range(safe.position.x, maxf(safe.position.x, safe.end.x)),
+		randf_range(safe.position.y, maxf(safe.position.y, safe.end.y))
+	)
 
 
 func _pip_pos_for_flower(flower: Control) -> Vector2:

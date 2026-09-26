@@ -5,6 +5,9 @@ extends Control
 const CampPlantDraw := preload("res://scripts/visual/camp_plant_draw.gd")
 
 var _type_id: String = ""
+## v2: well je 70 px, portret 60 i ikona sjemena 56 (design_handoff_home_field_v2).
+var _plant_ratio: float = 0.86
+var _icon_ratio: float = 0.80
 
 
 func _ready() -> void:
@@ -24,12 +27,12 @@ func _draw() -> void:
 	if _type_id.is_empty():
 		var seed_tex := UiAssets.get_chrome_icon("icon_seed")
 		if seed_tex:
-			var art := side * 0.44
+			var art := side * _icon_ratio
 			draw_texture_rect(seed_tex, Rect2(center - Vector2(art, art) * 0.5, Vector2(art, art)), false)
 		else:
 			_draw_empty_basket(center, side)
 		return
-	CampPlantDraw.draw_fitted_plant(self, center, _type_id, 3, side)
+	CampPlantDraw.draw_fitted_plant(self, center, _type_id, 3, side * _plant_ratio)
 
 
 func _draw_empty_basket(center: Vector2, side: float) -> void:
