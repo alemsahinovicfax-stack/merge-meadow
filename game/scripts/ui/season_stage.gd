@@ -26,6 +26,7 @@ var _known_playable: Dictionary = {}
 var _known_ready: bool = false
 var _field_was_open: bool = false
 var _field_tween: Tween
+var _open_shell: Panel
 var _slide_tween: Tween
 var _toast_tween: Tween
 var _unlock_timer: SceneTreeTimer
@@ -92,6 +93,15 @@ func close_season_field() -> void:
 
 func get_card(season_id: String) -> HomeSeasonCard:
 	return _cards.get(season_id) as HomeSeasonCard
+
+
+## Play na biranju: vrati karusel na sezonu u kojoj se igra.
+func focus_playing_season() -> void:
+	var active := GameState.active_season_id
+	if active.is_empty() or active == _shown_id or not _page_ids.has(active):
+		return
+	var dir := 1 if _page_ids.find(active) > _page_ids.find(_shown_id) else -1
+	_slide_to(active, dir)
 
 
 func focused_card_id() -> String:
@@ -714,6 +724,9 @@ func _kill_field_tween() -> void:
 	if _field_tween:
 		_field_tween.kill()
 		_field_tween = null
+	if _open_shell and is_instance_valid(_open_shell):
+		_open_shell.queue_free()
+		_open_shell = null
 
 
 func _play_field_open_motion(from_rect: Rect2 = Rect2()) -> void:
@@ -733,7 +746,10 @@ func _play_field_open_motion(from_rect: Rect2 = Rect2()) -> void:
 
 
 func _spawn_open_shell(from_rect: Rect2) -> void:
+	if _open_shell and is_instance_valid(_open_shell):
+		_open_shell.queue_free()
 	var shell := Panel.new()
+	_open_shell = shell
 	shell.name = "FieldOpenShell"
 	shell.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	shell.z_index = 4
@@ -751,6 +767,8 @@ func _spawn_open_shell(from_rect: Rect2) -> void:
 	shell.size = from_rect.size
 	var t := UiHomeField.tween_open_field(shell, ground)
 	t.finished.connect(func() -> void:
+		if _open_shell == shell:
+			_open_shell = null
 		if is_instance_valid(shell):
 			shell.queue_free()
 	, CONNECT_ONE_SHOT)

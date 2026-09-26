@@ -353,9 +353,9 @@ func _run() -> void:
 	if not bool(gs.call("can_open_home_season_field")):
 		_fail("Bloom center should can_open")
 		return
-	# Odluka 2026-09-21: Play na biranju sezone odmah pokrece run.
-	if str(home.call("home_play_action")) != "run":
-		_fail("trail Bloom: home_play_action should be run")
+	# Na kartici sezone u kojoj se igra, Play otvara polje. Run je tek sljedeći tap.
+	if str(home.call("home_play_action")) != "field":
+		_fail("trail Bloom: home_play_action should open the field")
 		return
 	var play_row: Node = home.get_node_or_null("%PlayRow")
 	var overlay: Control = home.get_node_or_null("%FieldOverlay") as Control
@@ -894,9 +894,9 @@ func _run() -> void:
 	if bool(gs.get("home_season_field_open")):
 		_fail("locked open must not set flag")
 		return
-	# Play ne ovisi o fokusu: i s fokusom na sljedecem locku pokrece aktivnu (run).
-	if str(home.call("home_play_action")) != "run":
-		_fail("locked focus: home_play_action should still be run")
+	# Fokus na zaključanoj sezoni: Play vraća na sezonu u kojoj se igra, ne u run.
+	if str(home.call("home_play_action")) != "focus":
+		_fail("locked focus: home_play_action should return to the playing season")
 		return
 	if str(home.call("get_play_chip_text")) != "Country Bloom":
 		_fail("locked focus: Play chip should name the active season")

@@ -515,7 +515,9 @@ func _draw_roster(fill: Color) -> void:
 		var tex := _flower_art(str(entry.get("id", "")))
 		if tex != null:
 			var side := inner * 0.86
-			draw_texture_rect(tex, Rect2(well.get_center() - Vector2(side, side) * 0.5, Vector2(side, side)), false, Color(1, 1, 1, SOON_TILE if soon else 1.0))
+			CampPlantDraw.draw_cropped_texture(
+				self, well.get_center(), tex, side, Color(1, 1, 1, SOON_TILE if soon else 1.0)
+			)
 		else:
 			var dot := inner * 0.56
 			var dot_fill := UiStage.SOON_DOT if soon else mood
@@ -580,7 +582,7 @@ func _draw_gate(fill: Color) -> void:
 	draw_style_box(UiStage.box(UiStage.WELL, 32, 2, UiStage.over(UiStage.WELL, ICON_EDGE_40)), flower_disc)
 	var gate_tex := _flower_art(str(_data.get("gate_type_id", "")))
 	if gate_tex:
-		draw_texture_rect(gate_tex, Rect2(flower_disc.get_center() - Vector2(26, 26), Vector2(52, 52)), false)
+		CampPlantDraw.draw_cropped_texture(self, flower_disc.get_center(), gate_tex, 52.0)
 	else:
 		var gate_mood: Color = _data.get("gate_mood", Color("#A8E6CF"))
 		draw_style_box(UiStage.box(gate_mood, 16, 5, UiStage.CREAM), Rect2(flower_disc.get_center() - Vector2(16, 16), Vector2(32, 32)))

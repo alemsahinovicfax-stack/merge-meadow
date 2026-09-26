@@ -277,18 +277,34 @@ func _refresh_seasons_row_button() -> void:
 	seasons_row_button.visible = GameState.home_season_field_open
 
 
-## Odluka 2026-09-21: Play pokrece run u aktivnoj sezoni odmah (1 korak umjesto 3).
-## Polje sezone se otvara samo tapom na aktivnu karticu ili "Open meadow ↗".
+## Play: tuđa kartica → nazad na sezonu u kojoj se igra; ta sezona → polje; polje → run.
 func home_play_action() -> String:
-	return "run"
+	if GameState.home_season_field_open:
+		return "run"
+	var shown := ""
+	if season_stage and season_stage.has_method("focused_card_id"):
+		shown = str(season_stage.focused_card_id())
+	var active := GameState.active_season_id
+	if shown.is_empty() or shown == active:
+		return "field"
+	return "focus"
 
 
 func _on_play_pressed() -> void:
-	var id := GameState.active_season_id
-	if id.is_empty() or not GameState.is_season_playable(id):
-		GameState.set_active_season(SeasonCatalog.DEFAULT_SEASON_ID)
-	GameState.begin_campaign_run()
-	SceneRouter.change_to(GameState.SCENE_RUN)
+	match home_play_action():
+		"focus":
+			if season_stage and season_stage.has_method("focus_playing_season"):
+				season_stage.focus_playing_season()
+		"field":
+			var field_id := GameState.active_season_id
+			if season_stage and season_stage.has_method("open_season_field"):
+				season_stage.open_season_field(field_id)
+		_:
+			var id := GameState.active_season_id
+			if id.is_empty() or not GameState.is_season_playable(id):
+				GameState.set_active_season(SeasonCatalog.DEFAULT_SEASON_ID)
+			GameState.begin_campaign_run()
+			SceneRouter.change_to(GameState.SCENE_RUN)
 
 
 ## Play na biranju sezone (SeasonStage.dc.html · PlayButton): 836 x 180, peach,
@@ -309,14 +325,13 @@ func refresh_play_chip() -> void:
 	var def: SeasonDef = GameState.get_season_def(GameState.active_season_id)
 	var active_name := def.display_name if def else ""
 	if play_button and not GameState.home_season_field_open:
-		play_button.set_text("Play", "run in %s" % active_name)
+		play_button.set_text("Play", active_name)
 
 
 func get_play_chip_text() -> String:
 	if play_button == null:
 		return ""
-	var sub := play_button.get_sub()
-	return sub.substr(7) if sub.begins_with("run in ") else sub
+	return play_button.get_sub()
 
 
 ## v2: u polju kolona nestaje s puta (offseti 0) pa livada uzima cijelu stranicu,
@@ -387,7 +402,7 @@ func _apply_play_layout(field_open: bool) -> void:
 		_style_field_bottom_row()
 	else:
 		play_button.custom_minimum_size = Vector2(UiStage.PLAY_W, UiStage.PLAY_ROW.size.y)
-		play_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		play_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		var normal := UiStage.drop(
 			UiStage.pad(UiStage.box(UiStage.PEACH, 32, 4, UiStage.PEACH_EDGE), 40, 4, 40, 4),
 			UiStage.PEACH_DROP, 8.0
@@ -398,7 +413,7 @@ func _apply_play_layout(field_open: bool) -> void:
 		play_button.set_icon(null, 0.0)
 		var def: SeasonDef = GameState.get_season_def(GameState.active_season_id)
 		var active_name := def.display_name if def else ""
-		play_button.set_text("Play", "run in %s" % active_name)
+		play_button.set_text("Play", active_name)
 		if title:
 			UiStage.style(title, 900, 72, UiStage.INK)
 			title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -668,7 +683,8 @@ func _refresh_chest_card() -> void:
 		return
 	# v2: poklon se vidi i u polju — gornja lijeva plocica iznad korpe.
 	var field_open := GameState.home_season_field_open
-	daily_chest_card.visible = not field_open
+	# Poklon je samo na polju sezone. Na biranju sezona kartica ostaje u redu, ali skrivena.
+	daily_chest_card.visible = false
 	if gift_chest:
 		gift_chest.visible = field_open
 	var claimable := false
@@ -725,10 +741,12 @@ func _on_daily_chest_pressed() -> void:
 		)
 		return
 	_chest_ui_state = ChestUiState.OPENING
-	daily_chest_card.claimable = false
+	var card: HomeGiftCard = gift_chest if gift_chest and gift_chest.visible else daily_chest_card
+	card.claimable = false
+	card.pivot_offset = card.size * 0.5
 	var tw := create_tween()
-	tw.tween_property(daily_chest_card, "scale", Vector2(1.05, 1.05), 0.15)
-	tw.tween_property(daily_chest_card, "scale", Vector2.ONE, 0.2)
+	tw.tween_property(card, "scale", Vector2(1.05, 1.05), 0.15)
+	tw.tween_property(card, "scale", Vector2.ONE, 0.2)
 	tw.tween_callback(_finish_chest_claim)
 
 

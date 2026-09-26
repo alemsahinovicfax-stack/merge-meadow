@@ -61,13 +61,22 @@ static func draw_cropped_plant(
 	if tex == null:
 		_draw_procedural_box(canvas, center, type_id, tier, box)
 		return
+	draw_cropped_texture(canvas, center, tex, box)
+
+
+## Isti odrez za bilo koju teksturu (igra ili placeholder na Home kartici).
+static func draw_cropped_texture(
+	canvas: CanvasItem, center: Vector2, tex: Texture2D, box: float, modulate: Color = Color.WHITE
+) -> void:
+	if tex == null or box < 8.0:
+		return
 	var src := _crop_rect(tex)
 	var longer := maxf(src.size.x, src.size.y)
 	if longer < 1.0:
 		return
 	var scale := box / longer
 	var dest_size := src.size * scale
-	canvas.draw_texture_rect_region(tex, Rect2(center - dest_size * 0.5, dest_size), src)
+	canvas.draw_texture_rect_region(tex, Rect2(center - dest_size * 0.5, dest_size), src, modulate)
 
 
 static func _crop_rect(tex: Texture2D) -> Rect2:

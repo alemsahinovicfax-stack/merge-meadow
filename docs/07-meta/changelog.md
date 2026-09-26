@@ -11,6 +11,8 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
 ## 2026-09-26
 
+- **Home: cvijet na kartici, Play u tri koraka, chest samo na polju** — roster i ikona na vratima otključavanja crtaju odrezan cvijet u istom krugu (kartica se ne pomjera). Play na tuđoj kartici (zaključana ili premium) vraća na sezonu u kojoj se igra; na njoj otvara polje; na polju pokreće run. Daily chest je sakriven na biranju sezona i ostaje Gift na polju. Play dugme ostaje 836 × 180.
+
 - **Camp kartica sezone — ikona i ime cvijeta** — iz `design_handoff_camp_season_link/`. Kartica 276 → **318** px, sekcija ispod 1289 → **1247** (stranica i dalje 1633, razmak 20). ★3 cvijet je isti okvir kao u listi (128, crtež 108) plus puno ime iz kataloga (Harvest Pumpkin), font 42 pa 38 pa 34, bez rezanja. Coin ikona 56, traka počinje u ravnini broja. Unlock, cijena 500 + 20 i tap na Home ostaju. `camp_season_link_smoke`, `camp_layout_smoke`, `camp_section_fixed_smoke` OK; [[../04-experience/design-drafts/camp-season-link-cd-brief|brief]]
 
 - **Camp sitnice (bez Claude Designa)** — prazan Seeds tab više ne pali run: „Open meadow ↗" otvara polje aktivne sezone, Play ostaje tamo. Trade bar se sklanja dok je aktivan tab prazan (Seeds i Flowers). Odabir chipa je na pritisak, bez tweena pomaka, a prvi red ima 12 px zraka da gornji okvir odabira ne siječe scroll ispod tabova. Brief za karticu sezone (ikona + ime cvijeta) čeka CD: [[../04-experience/design-drafts/camp-season-link-cd-brief|camp-season-link-cd-brief]]

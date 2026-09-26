@@ -10,7 +10,7 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
-zadnja_sesija: "Camp kartica sezone — ikona 128 i puno ime ★3 cvijeta (Harvest Pumpkin). Kartica 318, sekcija 1247. Unlock i 500+20 netaknuti."
+zadnja_sesija: "Home: odrezan cvijet na karticama, Play vraća na sezonu pa polje pa run, daily chest samo na polju. Slijedi brief za puni redizajn Homea."
 zadnje_azurirano: 2026-09-26
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"

@@ -113,8 +113,11 @@ func _run() -> void:
 	if not _rect_is(play_row, Rect2(24, 1573, 1032, 180)):
 		_fail("PlayRow must be 1032 x 180 at (24, 1573), got %s" % str(play_row.get_global_rect()))
 		return
-	if not _rect_is(play, Rect2(24, 1573, 836, 180)) or not _rect_is(gift, Rect2(876, 1573, 180, 180)):
-		_fail("Play 836 x 180 + Gift 180 expected, got %s / %s" % [str(play.get_global_rect()), str(gift.get_global_rect())])
+	if not _rect_is(play, Rect2(24, 1573, 836, 180)):
+		_fail("Play 836 x 180 expected, got %s" % str(play.get_global_rect()))
+		return
+	if gift.visible:
+		_fail("Daily chest must stay off the season select")
 		return
 	if gift.get_parent() != play_row:
 		_fail("DailyChestCard must sit in PlayRow")
@@ -177,8 +180,8 @@ func _run() -> void:
 	if not bloom.has_open_button() or bloom.hit_part(bloom.get_part_rect("prev").get_center()) != HomeSeasonCard.PART_NONE:
 		_fail("Open meadow expected; prev arrow disabled on the first page")
 		return
-	if str(home.call("get_play_chip_text")) != "Country Bloom" or str(home.call("home_play_action")) != "run":
-		_fail("Play must run in Country Bloom")
+	if str(home.call("get_play_chip_text")) != "Country Bloom" or str(home.call("home_play_action")) != "field":
+		_fail("Play on the playing season must open the field")
 		return
 
 	# --- daleki lock: shake + tamni toast, fokus ostaje ---
@@ -280,15 +283,19 @@ func _run() -> void:
 		_fail("tap on the focused open card must open the field")
 		return
 	if (stage.get_node("%SelectLayer") as Control).visible or gift.visible:
-		_fail("field open: SelectLayer and Gift hidden")
+		_fail("field open: SelectLayer and select chest hidden")
+		return
+	var field_gift := home.get_node_or_null("%GiftChest") as Control
+	if field_gift == null or not field_gift.visible:
+		_fail("field should show the gift chest")
 		return
 	if str(gs.get("active_season_id")) != "country_bloom":
 		_fail("opening the field makes the season active")
 		return
 	stage.call("close_season_field")
 	await _wait(0.3)
-	if not (stage.get_node("%SelectLayer") as Control).visible or not gift.visible:
-		_fail("close field: SelectLayer + Gift back")
+	if not (stage.get_node("%SelectLayer") as Control).visible or gift.visible:
+		_fail("close field: SelectLayer back, daily chest stays hidden")
 		return
 
 	# --- premium: pregled 6 cvjetova, kupovina, Ember soon ---
@@ -312,8 +319,8 @@ func _run() -> void:
 	if coral.state != HomeSeasonCard.ST_PURCHASING or coral.get_buy_title() != "Waiting for store…" or coral.is_buy_enabled():
 		_fail("purchasing: Waiting for store…, Buy disabled")
 		return
-	if str(home.call("home_play_action")) != "run":
-		_fail("Play keeps working while the purchase runs")
+	if str(home.call("home_play_action")) != "focus":
+		_fail("Play on a premium preview must return to the playing season")
 		return
 	await _wait(1.3)
 	if not bool(gs.call("is_season_playable", "coral_tide")) or str(gs.get("active_season_id")) != "coral_tide":
@@ -366,16 +373,26 @@ func _run() -> void:
 			_fail("all free: no lock left (%s)" % id)
 			return
 
-	# --- Daily gift: roze tacka dok je spreman ---
+	# --- Daily gift: samo na polju sezone ---
 	gs.set("last_daily_chest_day", "")
 	home.call("_refresh_chest_card")
-	if not bool(home.call("is_gift_claimable")):
-		_fail("ready daily gift shows the pink dot")
+	if gift.visible or bool(home.call("is_gift_claimable")):
+		_fail("select screen must not show the daily chest")
+		return
+	if not bool(stage.call("open_season_field")):
+		_fail("open field for the daily gift")
+		return
+	await _wait(0.2)
+	var claim_gift := home.get_node_or_null("%GiftChest") as Control
+	if claim_gift == null or not claim_gift.visible or not bool(home.call("is_gift_claimable")):
+		_fail("field gift should show the pink dot")
 		return
 	home.call("_finish_chest_claim")
-	if bool(home.call("is_gift_claimable")) or not gift.visible:
-		_fail("claimed gift: visible, no dot")
+	if bool(home.call("is_gift_claimable")) or not claim_gift.visible:
+		_fail("claimed field gift: visible, no dot")
 		return
+	stage.call("close_season_field")
+	await _wait(0.45)
 	var overlay := home.get_node("%RewardOverlay") as Control
 	overlay.visible = false
 
@@ -388,8 +405,8 @@ func _run() -> void:
 	if stage_hint == null or not stage_hint.visible or hint_panel.visible:
 		_fail("first session: StageHint visible, old hint panel hidden")
 		return
-	if not gift.visible or bool(home.call("is_gift_claimable")):
-		_fail("first session: Gift stays in the row, without the dot")
+	if gift.visible or bool(home.call("is_gift_claimable")):
+		_fail("first session: daily chest stays off the select screen")
 		return
 	spill = _overflow(home, page)
 	if not spill.is_empty():
