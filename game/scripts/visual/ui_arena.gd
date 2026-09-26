@@ -48,16 +48,22 @@ const FIELD_BOTTOM_GAP := 44
 
 # --- SeedChip ---
 const CHIP_T2_RADIUS := 38
-const CHIP_T2_WELL_RADIUS := 26
+const CHIP_T2_WELL_RADIUS := 27
 const RIM_BORDER := 3
-const RIM_BAND_T1 := 11  # vidljiv cream: 14 px
-const RIM_BAND_T2 := 15  # vidljiv cream: 18 px
+const RIM_BAND_T1 := 5   # vidljiv cream: 8 px
+const RIM_BAND_T2 := 8   # vidljiv cream: 11 px
 const WELL_BORDER := 2
-const T2_HAIRLINE_INSET := 7
-const T2_HAIRLINE_RADIUS := 32
-const T2_HAIRLINE_W := 3
-const FLOWER_SIZE_T1 := 78.0
-const FLOWER_SIZE_T2 := 84.0
+const T2_HAIRLINE_INSET := 5
+const T2_HAIRLINE_RADIUS := 33
+const T2_HAIRLINE_W := 2
+## Hint je deblji od cream ruba. StyleBox crta rub unutar recta, pa je
+## HINT_*_OUT koliko prsten viri van čipa (10 / 12), a širina 12 / 14 prelazi rub za 2 px.
+const HINT_PULSE_W := 12.0
+const HINT_PULSE_OUT := 10.0
+const HINT_PARTNER_W := 14.0
+const HINT_PARTNER_OUT := 12.0
+const FLOWER_SIZE_T1 := 80.0
+const FLOWER_SIZE_T2 := 88.0
 const FLOWER_SIZE_T3 := 140.0
 const CHIP_SHADOW_OFFSET := 6.0
 const CHIP_SHADOW_OFFSET_DRAG := 18.0

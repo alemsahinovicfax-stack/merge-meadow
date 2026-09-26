@@ -6,13 +6,7 @@ extends RefCounted
 ## s unutrasnjim prstenom; ★3 gold rim + isprekidan prsten. Bez teksta na sjemenci.
 
 const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
-const FLOWER_ASSETS := preload("res://scripts/visual/flower_assets.gd")
 
-## Proceduralni cvijet (tipovi bez SVG-a): skala blizu one prije redizajna
-## (T1 ~1,72, T2 ~1,23) da sadnice ne izgledaju naduvano u vecem okviru.
-const PROC_EXTENT := {1: 45.0, 2: 68.0, 3: 60.0}
-## Vizuelni centar proceduralne biljke je ~6 px iznad ishodista.
-const PROC_CENTER_Y := -6.0
 const MYTHIC_DASH := 10.0
 const MYTHIC_GAP := 8.0
 const CHOMP_SIZE := 54.0
@@ -41,7 +35,6 @@ static func draw_chip(
 	canvas.draw_style_box(
 		UiArena.chip_shadow_style(tier, dragging), Rect2(rect.position + Vector2(0.0, drop), rect.size)
 	)
-	_draw_ring(canvas, rect, tier, corner, ring, ring_alpha)
 	canvas.draw_style_box(UiArena.chip_rim_style(tier, mythic), rect)
 	canvas.draw_style_box(UiArena.chip_well_style(tier), rect.grow(-UiArena.chip_well_inset(tier)))
 	if tier == 2:
@@ -55,18 +48,13 @@ static func draw_chip(
 		)
 	if chomp:
 		_draw_chomp(canvas, rect)
+	# Hint ide iznad rima: inace cream pojede 2 px kojima prsten prelazi rub.
+	_draw_ring(canvas, rect, tier, corner, ring, ring_alpha)
 
 
-## Cvijet u kvadratnom okviru `box`: SVG (FlowerAssets) ili proceduralni fallback.
+## Cvijet u kutiji `box`: odrezan SVG (vidljivi crtež puni dužu stranu) ili proceduralni fallback.
 static func draw_flower(canvas: CanvasItem, center: Vector2, type_id: String, tier: int, box: float) -> void:
-	var tex := FLOWER_ASSETS.get_texture(type_id, tier)
-	if tex != null:
-		canvas.draw_texture_rect(tex, Rect2(center - Vector2(box, box) * 0.5, Vector2(box, box)), false)
-		return
-	var s := box / float(PROC_EXTENT.get(tier, 60.0))
-	canvas.draw_set_transform(center - Vector2(0.0, PROC_CENTER_Y * s), 0.0, Vector2(s, s))
-	PLANT_DRAW.draw_plant(canvas, Vector2.ZERO, type_id, tier)
-	canvas.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	PLANT_DRAW.draw_cropped_plant(canvas, center, type_id, tier, box)
 
 
 static func draw_dashed_round_rect(
@@ -96,14 +84,17 @@ static func _draw_ring(
 ) -> void:
 	match ring:
 		Ring.PULSE:
-			var grow := 7.0
+			# StyleBox rub je unutar recta: grow 10 + širina 12 = vanjski r 77, unutrašnji r 65.
+			var grow := UiArena.HINT_PULSE_OUT
 			canvas.draw_style_box(
-				UiArena.ring_style(corner + grow, 6.0, Color(UiArena.PULSE_GOLD, 0.8 * alpha)), rect.grow(grow)
+				UiArena.ring_style(corner + grow, UiArena.HINT_PULSE_W, Color(UiArena.PULSE_GOLD, alpha)),
+				rect.grow(grow)
 			)
 		Ring.PARTNER:
-			var grow := 10.0
+			var grow := UiArena.HINT_PARTNER_OUT
 			canvas.draw_style_box(
-				UiArena.ring_style(corner + grow, 7.0, Color(UiArena.COIN_GOLD, alpha)), rect.grow(grow)
+				UiArena.ring_style(corner + grow, UiArena.HINT_PARTNER_W, Color(UiArena.COIN_GOLD, alpha)),
+				rect.grow(grow)
 			)
 		Ring.MERGE:
 			canvas.draw_style_box(

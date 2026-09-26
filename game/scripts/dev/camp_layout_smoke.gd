@@ -141,7 +141,7 @@ func _run() -> void:
 		_fail(e)
 		return
 
-	# 4) Prazna vreca: sekcija ista visina, Trade bar ostaje.
+	# 4) Prazna vreca: sekcija ista visina, Trade bar se sklanja.
 	camp.call("_on_tab_pressed", "seeds")
 	gs.set("seed_bag", {})
 	camp.call("refresh_for_meta_hub")
@@ -149,8 +149,11 @@ func _run() -> void:
 	if not (camp.get_node("%EmptyState") as Control).visible:
 		_fail("empty bag must show EmptyState")
 		return
-	if str(camp.get_node("%EmptyCta").call("get_title")) != "Play a run ↗":
-		_fail("empty bag CTA must read 'Play a run ↗'")
+	if str(camp.get_node("%EmptyCta").call("get_title")) != "Open meadow ↗":
+		_fail("empty bag CTA must read 'Open meadow ↗'")
+		return
+	if (camp.get_node("%ExchangeBar") as Control).visible:
+		_fail("empty bag must hide the Trade bar")
 		return
 	e = _expect_section(camp, true, "empty bag")
 	if not e.is_empty():

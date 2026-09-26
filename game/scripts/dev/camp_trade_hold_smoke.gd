@@ -168,16 +168,13 @@ func _run() -> void:
 	button.call("end_press")
 	await process_frame
 
-	# Prazna vreca: Trade bar ostaje, dugme disabled.
+	# Prazna vreca: Trade bar se sklanja dok nema sta prodati.
 	gs.set("seed_bag", {})
 	camp.set("_force_default_trade_select", true)
 	camp.call("_refresh_garden_card")
 	await process_frame
-	if not bool(button.get("disabled")) or str(bar.call("get_state")) != "disabled":
-		_fail("empty bag must disable Trade (bar stays)")
-		return
-	if not (bar as Control).visible or str(button.call("get_title")) != "Trade":
-		_fail("disabled Trade bar must stay visible with a plain 'Trade' button")
+	if (bar as Control).visible:
+		_fail("empty bag must hide the Trade bar")
 		return
 
 	print("camp_trade_hold_smoke OK")

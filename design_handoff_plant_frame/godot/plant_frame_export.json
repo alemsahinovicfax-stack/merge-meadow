@@ -1,0 +1,111 @@
+{
+  "meta": {
+    "name": "plant_frame",
+    "brief": "docs/04-experience/design-drafts/plant-frame-cd-brief.md",
+    "design": "design/PlantFrame.dc.html",
+    "base": [1080, 1920],
+    "unit": "px baze, prenos 1:1",
+    "date": "2026-09-26"
+  },
+  "tokens": {
+    "cream": "#FFF8F0",
+    "rim_edge": "#CBC2B6",
+    "coin_gold": "#FFD56B",
+    "gold_edge": "#D6A82F",
+    "pulse_gold": "#F2D940",
+    "ink": "#2D3436",
+    "well": "#22342A",
+    "well_edge": "#16211B",
+    "pip_r2": "#D4A5FF",
+    "pip_r3": "#D6A82F",
+    "empty_slot_fill": "rgba(45,52,54,0.05)",
+    "empty_slot_edge": "rgba(45,52,54,0.32)",
+    "pickup_shadow": "rgba(18,28,22,0.30)"
+  },
+  "crop_rule": {
+    "what": "Biljka se crta odrezana na vidljivi crtež (alpha > 0), duža strana = kutija, centrirano.",
+    "godot": "Image.get_used_rect() jednom po texturi (keš), pa draw_texture_rect_region.",
+    "applies_to": ["ArenaPlant", "JournalPlant", "CampPlant", "RunPlant"],
+    "not_applied": ["Home polje", "korpa", "biranje sezone (FIT_FRAC 0.36 ostaje)"],
+    "measured_on_256_canvas": {
+      "clover_t1": {"used_rect": [80.5, 89, 95, 164], "fill_h": 0.641},
+      "clover_t2": {"used_rect": [65.5, 52, 125, 201.5], "fill_h": 0.787},
+      "clover_t3": {"used_rect": [65.5, 52, 138, 201.5], "fill_h": 0.787},
+      "daisy_t1": {"used_rect": [90, 119, 76, 134], "fill_h": 0.523},
+      "daisy_t2": {"used_rect": [62.5, 42.5, 131, 211], "fill_h": 0.824},
+      "daisy_t3": {"used_rect": [62.5, 40.5, 143, 213], "fill_h": 0.832},
+      "tulip_t1": {"used_rect": [83.5, 117, 88, 136], "fill_h": 0.531},
+      "tulip_t2": {"used_rect": [75.5, 62.5, 99.5, 191.5], "fill_h": 0.748},
+      "tulip_t3": {"used_rect": [61.5, 59.5, 139, 194.5], "fill_h": 0.76}
+    }
+  },
+  "components": {
+    "ArenaChip": {
+      "diameter": 134,
+      "t1": {"shape": "circle", "rim_border": 3, "rim_band": 5, "visible_cream": 8, "well_inset": 8, "well_diameter": 118, "well_border": 2, "plant_box": 80},
+      "t2": {"shape": "rounded_square", "radius": 38, "rim_border": 3, "rim_band": 8, "visible_cream": 11, "well_inset": 11, "well_radius": 27, "hairline": {"inset": 5, "width": 2, "radius": 33, "color": "rim_edge"}, "plant_box": 88},
+      "mythic": {"rim_fill": "coin_gold", "rim_edge": "gold_edge", "nubs": {"inset": -7, "width": 4, "style": "dashed", "color": "gold_edge"}},
+      "t3": "kristal bez okvira, FLOWER_SIZE_T3 140 (bez izmjene)",
+      "shadow": {"offset_y": 6, "offset_y_drag": 18, "color": "#14201A", "alpha": 0.42, "alpha_drag": 0.34, "blur": 0},
+      "layers": ["ArenaChip", "ArenaRim", "ArenaWell", "ArenaPlant", "ArenaHint"]
+    },
+    "ArenaHint": {
+      "pulse": {"width": 12, "grow": 20, "outer_r": 77, "inner_r": 65, "color": "pulse_gold", "alpha": 1.0, "z": "iznad rima"},
+      "partner": {"width": 14, "grow": 24, "outer_r": 79, "inner_r": 65, "color": "coin_gold", "chip_scale": 1.04},
+      "t2_radius": "38 + grow / 2",
+      "rule": "širina hinta > vidljivi cream T2 (12 > 11)",
+      "who": "isti type_id i isti tier kao držana sjemenka"
+    },
+    "JournalSlot": {
+      "row": [1032, 200],
+      "slot": 136, "gap": 14, "strip_w": 436,
+      "empty": {"shape": "circle", "fill": "empty_slot_fill", "border": 4, "edge": "empty_slot_edge"},
+      "bloom": {"shape": "circle", "fill": "cream", "border": 3, "edge": "rim_edge", "plant_box": 110},
+      "crystal": {"shape": "rounded_square", "radius": 36, "fill": "coin_gold", "border": 3, "edge": "gold_edge", "plant_box": 110},
+      "halo_new": {"grow": 9, "fill": "#FFCCD5", "border": 3, "edge": "ink"},
+      "well": null,
+      "tier_label": null,
+      "tier_read": "pozicija (1-2-3 slijeva) + crtež (sadnica / cvijet) + zlatni kvadrat za kristal",
+      "layers": ["JournalRow", "JournalSlot", "JournalPlant"]
+    },
+    "CampArt": {
+      "chip": {"card": [489, 176], "frame": 128, "seed": {"shape": "circle", "fill": "cream", "edge": "rim_edge", "plant_box": 104}, "flower": {"shape": "rounded_square", "radius": 28, "fill": "coin_gold", "edge": "gold_edge", "plant_box": 108}},
+      "trade_bar": {"frame": 104, "flower_radius": 24, "seed_plant_box": 84, "flower_plant_box": 88},
+      "season_card": {"frame": 56, "radius": 14, "plant_box": 46},
+      "border": 3,
+      "well": null,
+      "layers": ["CampChip", "CampArt", "CampPlant"]
+    },
+    "RunSeed": {
+      "frame": null,
+      "plant_box": 120,
+      "tier": 1,
+      "collision_radius": 26,
+      "pips": {"size": 22, "border": 3, "border_color": "cream", "radius": 78, "angles": {"1": [], "2": [-104, -76], "3": [-118, -90, -62]}, "color": {"2": "pip_r2", "3": "pip_r3"}},
+      "shadow": {"size": [64, 18], "offset_y": 70, "color": "pickup_shadow"},
+      "layers": ["RunSeed", "RunPlant", "RunPips"]
+    }
+  },
+  "scenes": {
+    "arena_idle": "15 čipova: T1 djetelina/tratinčica/tulipan, T2 ×3, ★3 T1 tulipan; bez prstena",
+    "arena_hint": "držana djetelina T1 (drag scale 1.12, rot −3°); ostale djeteline T1 = pulse prsten; najbliža = partner; djetelina T2 i drugi tipovi bez prstena",
+    "journal": "4 reda: locked, seen (T1), album_t2 (+NEW), album_t3; bez T1/T2/T3 natpisa, bez wella",
+    "camp": "tab Seeds (3 kartice sjemena + Trade bar sa sjemenom) i isječak taba Flowers (2 kartice cvijeta + Trade bar s cvijetom); kartica sezone s ikonom",
+    "run": "2 × ★1 (djetelina, tulipan), 1 × ★2 (tratinčica), 1 × ★3 (djetelina); bez kruga, sjena na tlu"
+  },
+  "animations": {
+    "arena_hint_pulse": {"what": "alpha prstena 1.0 ↔ 0.55", "period_s": 0.9, "tween": "sine in-out", "note": "postojeći ritam, samo deblji prsten"},
+    "arena_partner": {"what": "chip scale 1.0 → 1.04", "duration_s": 0.12, "note": "bez izmjene"}
+  },
+  "decisions": [
+    "Biljka se reže na vidljivi crtež i puni kutiju po visini — T1 i T2 onda imaju istu vidljivu visinu, a tier nosi okvir, ne veličina crteža.",
+    "Arena hint 12 px leži 10 px van čipa i 2 px preko ruba, crta se iznad rima — ne ulazi među susjede (razmak centara 142,8) i ne sakriva biljku.",
+    "Arena T2 zadržava unutrašnji prsten, ali 2 px na insetu 5 — stane u cream od 11 px.",
+    "Arena well ostaje — nosi kontrast svjetlog cvijeća na livadi.",
+    "Journal: slot 136, gap 14 — natpis je oslobodio 42 px visine; info kolona ostaje ~514 px pa caption stane u 2 reda na 38 px.",
+    "Journal T2 nema novi znak (bez nove konstante) — tier se čita iz pozicije slota i crteža.",
+    "Camp okvir ostaje 128 — biljka raste unutra, kartica i tekst se ne pomjeraju.",
+    "Run pipovi idu u krunu iznad biljke (isti uglovi, radius 78), 22 px s cream rubom — bez kruga pip od 16 px nema na čemu da se čita.",
+    "Run sjena se spušta na +70 — bez kruga baza stabljike je na +60, pa sjena ispod nje drži utisak da sadnica pluta."
+  ]
+}

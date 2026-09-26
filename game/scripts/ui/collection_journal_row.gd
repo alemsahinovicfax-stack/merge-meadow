@@ -1,8 +1,8 @@
 class_name CollectionJournalRow
 extends Control
 
-## BloomRow 1032 x 200 (design_handoff_journal · 1a). Info lijevo, tri TierSlot
-## desno. Prazan tier je prsten, ne sivi krug. NEW pilula je sibling panela.
+## BloomRow 1032 x 200. Info lijevo, tri TierSlot desno. Prazan tier je prsten.
+## Nema T1/T2/T3 natpisa ni tamnog wella — biljka sjedi na krem/zlatnom okviru.
 
 const BloomIcon := preload("res://scripts/ui/collection_bloom_icon.gd")
 
@@ -13,10 +13,8 @@ var _caption: Label
 var _badge: PanelContainer
 var _badge_label: Label
 var _frames: Array[Panel] = []
-var _wells: Array[Panel] = []
 var _icons: Array[Control] = []
 var _halos: Array[Panel] = []
-var _tier_labels: Array[Label] = []
 var _entry: Dictionary = {}
 var _built: bool = false
 
@@ -126,21 +124,16 @@ func _ensure_built() -> void:
 	strip.name = "TierStrip"
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	strip.alignment = BoxContainer.ALIGNMENT_CENTER
-	strip.custom_minimum_size = Vector2(UiJournal.SLOT * 3 + UiJournal.SLOT_GAP * 2, UiJournal.SLOT + UiJournal.TIER_LABEL_GAP + UiJournal.TIER_LABEL_FONT)
+	strip.custom_minimum_size = Vector2(UiJournal.SLOT * 3 + UiJournal.SLOT_GAP * 2, UiJournal.SLOT)
 	strip.add_theme_constant_override("separation", UiJournal.SLOT_GAP)
 	row.add_child(strip)
 
 	for tier in [1, 2, 3]:
-		var col := VBoxContainer.new()
-		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		col.alignment = BoxContainer.ALIGNMENT_CENTER
-		col.add_theme_constant_override("separation", UiJournal.TIER_LABEL_GAP)
-		strip.add_child(col)
 		var slot := Control.new()
 		slot.name = "SlotBox"
 		slot.custom_minimum_size = Vector2(UiJournal.SLOT, UiJournal.SLOT)
 		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		col.add_child(slot)
+		strip.add_child(slot)
 		var halo := Panel.new()
 		halo.name = "NewHalo"
 		halo.visible = false
@@ -153,12 +146,6 @@ func _ensure_built() -> void:
 		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		frame.size = Vector2(UiJournal.SLOT, UiJournal.SLOT)
 		slot.add_child(frame)
-		var well := Panel.new()
-		well.name = "ArtWell"
-		well.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		well.position = Vector2(UiJournal.WELL_INSET, UiJournal.WELL_INSET)
-		well.size = Vector2(UiJournal.SLOT - UiJournal.WELL_INSET * 2, UiJournal.SLOT - UiJournal.WELL_INSET * 2)
-		slot.add_child(well)
 		var icon: Control = BloomIcon.new()
 		icon.name = "TierIcon%d" % tier
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -166,17 +153,9 @@ func _ensure_built() -> void:
 		icon.size = Vector2(UiJournal.ART, UiJournal.ART)
 		icon.custom_minimum_size = icon.size
 		slot.add_child(icon)
-		var cap := Label.new()
-		cap.name = "TierLabel"
-		cap.text = "T%d" % tier
-		cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		cap.custom_minimum_size = Vector2(UiJournal.SLOT, UiJournal.TIER_LABEL_FONT)
-		col.add_child(cap)
 		_halos.append(halo)
 		_frames.append(frame)
-		_wells.append(well)
 		_icons.append(icon)
-		_tier_labels.append(cap)
 
 	_badge = PanelContainer.new()
 	_badge.name = "NewBadge"
@@ -211,8 +190,6 @@ func _refresh() -> void:
 	UiStage.style(_name, 900, UiJournal.NAME_FONT, ink)
 	UiStage.style(_stars, 800, UiJournal.STARS_FONT, ink)
 	UiStage.style(_caption, caption_weight, UiJournal.CAPTION_FONT, caption_ink, float(UiJournal.CAPTION_LINE) / float(UiJournal.CAPTION_FONT))
-	for cap in _tier_labels:
-		UiStage.style(cap, 900, UiJournal.TIER_LABEL_FONT, UiJournal.INK)
 
 	for i in 3:
 		var tier := i + 1
@@ -220,9 +197,6 @@ func _refresh() -> void:
 		var crystal := on and tier == 3
 		var kind := "crystal" if crystal else ("bloom" if on else "empty")
 		_frames[i].add_theme_stylebox_override("panel", UiJournal.tier_frame_style(kind))
-		_wells[i].visible = on
-		if on:
-			_wells[i].add_theme_stylebox_override("panel", UiJournal.tier_well_style(crystal))
 		var icon := _icons[i]
 		icon.visible = on
 		if icon.has_method("apply"):
@@ -230,7 +204,6 @@ func _refresh() -> void:
 		_halos[i].visible = show_new and tier == new_tier
 		if _halos[i].visible:
 			_halos[i].add_theme_stylebox_override("panel", UiJournal.tier_halo_style(crystal))
-		UiStage.style(_tier_labels[i], 900, UiJournal.TIER_LABEL_FONT, UiJournal.INK if on else UiJournal.DISABLED_INK)
 
 	_badge.visible = show_new
 	if show_new:

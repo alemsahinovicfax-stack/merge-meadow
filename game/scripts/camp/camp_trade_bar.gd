@@ -34,7 +34,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_theme_stylebox_override("panel", UiCamp.trade_bar_style())
-	art.configure_frame(UiCamp.TRADE_ART, 22, 3, 9.0, 15, 2, UiCamp.TRADE_ART_SEED)
+	art.configure_frame(UiCamp.TRADE_ART, 22, 3, 0.0, 15, 2, UiCamp.TRADE_ART_SEED)
 	for label in [selected_label, warn_label]:
 		(label as Label).clip_text = true
 		(label as Label).text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -89,7 +89,7 @@ func apply_state(state: String, info: Dictionary) -> void:
 	else:
 		selected_label.text = str(info.get("label", ""))
 		art.configure_frame(
-			UiCamp.TRADE_ART, 24, 3, UiCamp.TRADE_ART_WELL_INSET, 17, 2,
+			UiCamp.TRADE_ART, 24, 3, 0.0, 17, 2,
 			UiCamp.TRADE_ART_SEED if seed else UiCamp.TRADE_ART_FLOWER
 		)
 		art.set_art(seed, str(info.get("type_id", "")), 1 if seed else 3)

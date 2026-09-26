@@ -9,6 +9,12 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-09-26
+
+- **Camp sitnice (bez Claude Designa)** — prazan Seeds tab više ne pali run: „Open meadow ↗" otvara polje aktivne sezone, Play ostaje tamo. Trade bar se sklanja dok je aktivan tab prazan (Seeds i Flowers). Odabir chipa je na pritisak, bez tweena pomaka, a prvi red ima 12 px zraka da gornji okvir odabira ne siječe scroll ispod tabova. Brief za karticu sezone (ikona + ime cvijeta) čeka CD: [[../04-experience/design-drafts/camp-season-link-cd-brief|camp-season-link-cd-brief]]
+
+- **Sjeme i cvijet u okviru — preneseno u igru** — iz `design_handoff_plant_frame/`. Arena: cream pojas 14 → 8 px (T1) i 18 → 11 (T2), biljka 80 / 88 odrezana na vidljivi crtež, hint 12 px (10 van čipa, 2 preko ruba) crta se iznad rima; promjer čipa ostaje 134. Journal: slot 112 → 136, art 110, bez T1/T2/T3 i bez zelenog wella, red i dalje 200 px. Camp: kartica 489 × 176 i okvir 128 ostaju, well se ne crta, biljka 104 / 108 (Trade 84 / 88, sezona 46). Run: nema kruga ni wella, sadnica 120, pipovi 22 u kruni, kolizija r 26. Odrez je `draw_cropped_plant`; Home, korpa i biranje sezone i dalje koriste `FIT_FRAC` 0.36. Novi `plant_frame_fit_smoke` drži da biljka stane u okvir, info kolona Journala ostane široka, a čip i kolizija se ne pomjere. Svjesno: sjena sjemenke je `SEED_SHADOW_OFFSET` 70, coin i dijamant ostaju na 40; [[../04-experience/design-drafts/plant-frame-cd-brief|brief]]
+
 ## 2026-09-25
 
 - **Brief: sjeme i cvijet u okviru (Claude Design)** — jedan vizuelni jezik na četiri mjesta, bez izmjene koda. Arena: krem rub tanji, merge-hint deblji od ruba, biljka samo malo veća, promjer čipa 134 ostaje. Journal i Camp: tamnozeleni well (`#22342A`) ne ide uz karticu, biljka puni okvir, T1 sustiže T2/T3; u Journalu van natpisi T1/T2/T3 i okvir raste u visinu natpisa. Run: okvir (krem krug 120 + well 84) ide van, sadnica ostaje prepoznatljiva, pipovi rijetkosti čitljivi, kolizija r 26. Uzrok male biljke: SVG platno 256 ne puni crtež, a Journal/run još skaliraju na 36 %. Paket koji CD vrati: `design_handoff_plant_frame/`; [[../04-experience/design-drafts/plant-frame-cd-brief|brief]]

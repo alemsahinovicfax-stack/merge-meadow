@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E4DC;-webkit-font-smoothing:antialiased}a{color:#2D3436}a:hover{color:#555C5E}</style>
+</helmet>
+<section style="width:1800px;box-sizing:border-box;padding:100px;display:flex;flex-direction:column;gap:80px;font-family:Nunito,system-ui,sans-serif;color:#2D3436">
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font:900 64px/1.1 Nunito,sans-serif">Sjeme i cvijet u okviru — anatomija</div>
+    <div style="font:700 30px/1.4 Nunito,sans-serif;color:#555C5E;max-width:1400px;text-wrap:pretty">Sve mjere u px baze 1080 × 1920, prikaz 1:1. Biljka je nacrtana odrezana na vidljivi crtež: kutija = visina crteža, centrirano. Arena zadržava okvir, Journal i Camp gube tamni well, Run gubi okvir skroz.</div>
+  </div>
+
+  <div data-layer="SpecArena" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 44px/1 Nunito,sans-serif">Arena čip · promjer 134</div>
+    <div style="display:flex;gap:60px;flex-wrap:wrap;padding:60px;border-radius:32px;background:#293D2E">
+      <sc-for list="{{ arena }}" as="a" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:28px;width:220px">
+          <div style="position:relative;width:134px;height:160px">
+            <div data-layer="ArenaChip" style="{{ a.c.rootStyle }}">
+              <div data-layer="ChipShadow" style="{{ a.c.shadowStyle }}"></div>
+              <div data-layer="ArenaRim" style="{{ a.c.rimStyle }}">
+                <div data-layer="ArenaWell" style="{{ a.c.wellStyle }}"></div>
+                <div data-layer="T2Hairline" style="{{ a.c.hairStyle }}"></div>
+                <img data-layer="ArenaPlant" src="{{ a.c.src }}" alt="" style="{{ a.c.plantStyle }}">
+              </div>
+              <div data-layer="MythicNubs" style="{{ a.c.nubStyle }}"></div>
+              <div data-layer="ArenaHint" style="{{ a.c.ringStyle }}"></div>
+            </div>
+          </div>
+          <div style="font:900 28px/1.2 Nunito,sans-serif;color:#FFF8F0;text-align:center">{{ a.title }}</div>
+          <div style="font:700 24px/1.35 Nunito,sans-serif;color:#E4DED6;text-align:center;text-wrap:pretty">{{ a.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="SpecJournal" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 44px/1 Nunito,sans-serif">Journal slot · 136 (bio 112 + natpis)</div>
+    <div style="display:flex;gap:60px;flex-wrap:wrap;padding:60px;border-radius:32px;background:#E0C4FF;border:3px solid #B39DCC">
+      <sc-for list="{{ journal }}" as="s" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:24px;width:220px">
+          <div data-layer="JournalSlot" style="position:relative;width:136px;height:136px">
+            <div data-layer="NewHalo" style="{{ s.haloStyle }}"></div>
+            <div data-layer="{{ s.frameLayer }}" style="{{ s.frameStyle }}">
+              <img data-layer="JournalPlant" src="{{ s.src }}" alt="" style="{{ s.plantStyle }}">
+            </div>
+          </div>
+          <div style="font:900 28px/1.2 Nunito,sans-serif;text-align:center">{{ s.title }}</div>
+          <div style="font:700 24px/1.35 Nunito,sans-serif;color:#3F4547;text-align:center;text-wrap:pretty">{{ s.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="SpecCamp" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 44px/1 Nunito,sans-serif">Camp art · kartica 489 × 176 · Trade bar · kartica sezone</div>
+    <div style="display:flex;gap:60px;flex-wrap:wrap;align-items:flex-end;padding:60px;border-radius:32px;background:#FFF8F0;border:2px solid rgba(45,52,54,.16)">
+      <sc-for list="{{ camp }}" as="s" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:24px;width:200px">
+          <div style="{{ s.bgStyle }}">
+            <div data-layer="CampArt" style="{{ s.artStyle }}"><img data-layer="CampPlant" src="{{ s.src }}" alt="" style="{{ s.plantStyle }}"></div>
+          </div>
+          <div style="font:900 28px/1.2 Nunito,sans-serif;text-align:center">{{ s.title }}</div>
+          <div style="font:700 24px/1.35 Nunito,sans-serif;color:#3F4547;text-align:center;text-wrap:pretty">{{ s.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="SpecRun" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 44px/1 Nunito,sans-serif">Run sadnica · bez okvira · kolizija r 26 (isprekidano)</div>
+    <div style="display:flex;gap:80px;flex-wrap:wrap;padding:80px 60px 60px;border-radius:32px;background:#3A5C41">
+      <sc-for list="{{ run }}" as="r" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:24px;width:240px">
+          <div style="position:relative;width:240px;height:260px">
+            <div data-layer="RunSeed" style="position:absolute;left:120px;top:140px;width:0;height:0">
+              <div data-layer="PickupShadow" style="{{ r.shadow }}"></div>
+              <img data-layer="RunPlant" src="{{ r.src }}" alt="" style="{{ r.plant }}">
+              <div data-layer="RunPips" style="position:absolute;left:0;top:0;width:0;height:0">
+                <sc-for list="{{ r.pips }}" as="p" hint-placeholder-count="0">
+                  <div data-layer="Pip" style="{{ p.style }}"></div>
+                </sc-for>
+              </div>
+              <div data-layer="Collision" style="position:absolute;left:-26px;top:-26px;width:52px;height:52px;box-sizing:border-box;border-radius:50%;border:3px dashed #FFF8F0;opacity:.9"></div>
+            </div>
+          </div>
+          <div style="font:900 28px/1.2 Nunito,sans-serif;color:#FFF8F0;text-align:center">{{ r.title }}</div>
+          <div style="font:700 24px/1.35 Nunito,sans-serif;color:#E4DED6;text-align:center;text-wrap:pretty">{{ r.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="SpecCrop" style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 44px/1 Nunito,sans-serif">Odrez platna 256 × 256 → vidljivi crtež</div>
+    <div style="font:700 28px/1.4 Nunito,sans-serif;color:#555C5E;max-width:1400px;text-wrap:pretty">Kutija se puni po dužoj strani vidljivog crteža (kod svih devet sprite-ova to je visina), centrirano. Dio platna koji crtež popunjava danas:</div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;max-width:1200px">
+      <sc-for list="{{ crops }}" as="k" hint-placeholder-count="9">
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:16px 22px;border-radius:18px;background:#FFF8F0;border:2px solid rgba(45,52,54,.14);font:800 26px/1.2 Nunito,sans-serif"><span>{{ k.name }}</span><span style="color:#555C5E">{{ k.fill }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="SpecTable" style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 44px/1 Nunito,sans-serif">Tabela mjera (px baze 1080)</div>
+    <div style="display:grid;grid-template-columns:260px 420px 220px 220px minmax(0,1fr);border-radius:24px;overflow:hidden;border:2px solid rgba(45,52,54,.16);background:#FFF8F0;font:700 26px/1.3 Nunito,sans-serif">
+      <div style="padding:18px 22px;background:#2D3436;color:#FFF8F0;font-weight:900">Mjesto</div>
+      <div style="padding:18px 22px;background:#2D3436;color:#FFF8F0;font-weight:900">Konstanta</div>
+      <div style="padding:18px 22px;background:#2D3436;color:#FFF8F0;font-weight:900">Danas</div>
+      <div style="padding:18px 22px;background:#2D3436;color:#FFF8F0;font-weight:900">Novo</div>
+      <div style="padding:18px 22px;background:#2D3436;color:#FFF8F0;font-weight:900">Napomena</div>
+      <sc-for list="{{ table }}" as="t" hint-placeholder-count="20">
+        <div style="padding:14px 22px;border-top:2px solid rgba(45,52,54,.08);font-weight:900">{{ t.place }}</div>
+        <div style="padding:14px 22px;border-top:2px solid rgba(45,52,54,.08);font-family:ui-monospace,Menlo,monospace;font-size:22px">{{ t.k }}</div>
+        <div style="padding:14px 22px;border-top:2px solid rgba(45,52,54,.08);color:#555C5E">{{ t.old }}</div>
+        <div style="padding:14px 22px;border-top:2px solid rgba(45,52,54,.08);font-weight:900">{{ t.now }}</div>
+        <div style="padding:14px 22px;border-top:2px solid rgba(45,52,54,.08);color:#3F4547">{{ t.note }}</div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CREAM='#FFF8F0',RIM_EDGE='#CBC2B6',WELL='#22342A',WELL_EDGE='#16211B',GOLD='#FFD56B',GOLD_EDGE='#D6A82F',PULSE='#F2D940',INK='#2D3436';
+const AR={D:134,RIM:3,BAND1:5,BAND2:8,WB:2,T2R:38,T2WR:27,HIN:5,HW:2,HR:33,F1:80,F2:88,PW:12,PG:20,MW:14,MG:24};
+const src=(n,t)=>'flowers/'+n+'_t'+t+'.svg';
+function chip(c){
+  const t2=c.tier===2, rad=t2?AR.T2R+'px':'50%';
+  const inset=AR.RIM+(t2?AR.BAND2:AR.BAND1), box=t2?AR.F2:AR.F1;
+  let ring='display:none';
+  if(c.ring){const g=c.ring==='pulse'?AR.PG:AR.MG,w=c.ring==='pulse'?AR.PW:AR.MW;
+    ring='position:absolute;left:'+(-g/2)+'px;top:'+(-g/2)+'px;width:'+(AR.D+g)+'px;height:'+(AR.D+g)+'px;box-sizing:border-box;border-radius:'+(t2?(AR.T2R+g/2)+'px':'50%')+';border:'+w+'px solid '+(c.ring==='pulse'?PULSE:GOLD);}
+  const e=inset-AR.RIM, hi=AR.HIN-AR.RIM, p=(AR.D-box)/2-AR.RIM;
+  return {
+    rootStyle:'position:absolute;left:0;top:13px;width:134px;height:134px',
+    shadowStyle:'position:absolute;inset:0;border-radius:'+rad+';background:#14201A;opacity:.42;transform:translateY(6px)',
+    rimStyle:'position:absolute;inset:0;box-sizing:border-box;border-radius:'+rad+';background:'+(c.mythic?GOLD:CREAM)+';border:3px solid '+(c.mythic?GOLD_EDGE:RIM_EDGE),
+    wellStyle:'position:absolute;left:'+e+'px;top:'+e+'px;right:'+e+'px;bottom:'+e+'px;box-sizing:border-box;border-radius:'+(t2?AR.T2WR+'px':'50%')+';background:'+WELL+';border:2px solid '+WELL_EDGE,
+    hairStyle:t2?'position:absolute;left:'+hi+'px;top:'+hi+'px;right:'+hi+'px;bottom:'+hi+'px;box-sizing:border-box;border-radius:'+AR.HR+'px;border:'+AR.HW+'px solid '+(c.mythic?GOLD_EDGE:RIM_EDGE):'display:none',
+    src:src(c.f,c.tier),
+    plantStyle:'position:absolute;left:'+p+'px;top:'+p+'px;width:'+box+'px;height:'+box+'px;display:block',
+    nubStyle:c.mythic?'position:absolute;inset:-7px;border-radius:'+(t2?'45px':'50%')+';border:4px dashed '+GOLD_EDGE+';opacity:.9':'display:none',
+    ringStyle:ring
+  };
+}
+const J={SLOT:136,ART:110,CR:36,HALO:9};
+function slot(on,tier,f,isNew){
+  const crystal=tier===3, r=on&&crystal?J.CR+'px':'50%';
+  return {
+    frameLayer:on?(crystal?'CrystalFrame':'BloomFrame'):'EmptySlot',
+    haloStyle:isNew?'position:absolute;inset:-9px;box-sizing:border-box;border-radius:'+(crystal?(J.CR+J.HALO)+'px':'50%')+';background:#FFCCD5;border:3px solid '+INK:'display:none',
+    frameStyle:on?'position:absolute;inset:0;box-sizing:border-box;border-radius:'+r+';background:'+(crystal?GOLD:CREAM)+';border:3px solid '+(crystal?GOLD_EDGE:RIM_EDGE)
+      :'position:absolute;inset:0;box-sizing:border-box;border-radius:50%;background:rgba(45,52,54,.05);border:4px solid rgba(45,52,54,.32)',
+    src:on?src(f,tier):'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+    plantStyle:on?'position:absolute;left:10px;top:10px;width:110px;height:110px;display:block':'display:none'
+  };
+}
+const R={BOX:120,PIP:22,PR:78};
+function rseed(f,r){
+  const ang=r===2?[-104,-76]:r===3?[-118,-90,-62]:[];
+  return {src:src(f,1),
+    shadow:'position:absolute;left:-32px;top:61px;width:64px;height:18px;border-radius:50%;background:rgba(18,28,22,.30)',
+    plant:'position:absolute;left:-60px;top:-60px;width:120px;height:120px;display:block',
+    pips:ang.map(a=>{const q=a*Math.PI/180;return {style:'position:absolute;left:'+(Math.cos(q)*R.PR-11).toFixed(1)+'px;top:'+(Math.sin(q)*R.PR-11).toFixed(1)+'px;width:22px;height:22px;box-sizing:border-box;border-radius:50%;background:'+(r>=3?GOLD_EDGE:'#D4A5FF')+';border:3px solid '+CREAM};})};
+}
+function cart(seed,side,radius,box,f,title,note,bg){
+  return {title,note,src:src(f,seed?1:2),
+    bgStyle:'padding:16px;border-radius:24px;background:'+(bg||'transparent'),
+    artStyle:'width:'+side+'px;height:'+side+'px;box-sizing:border-box;border-radius:'+(seed?'50%':radius+'px')+';background:'+(seed?CREAM:GOLD)+';border:3px solid '+(seed?RIM_EDGE:GOLD_EDGE)+';display:grid;place-items:center',
+    plantStyle:'width:'+box+'px;height:'+box+'px;display:block'};
+}
+const CROPS={clover_t1:.641,clover_t2:.787,clover_t3:.787,daisy_t1:.523,daisy_t2:.824,daisy_t3:.832,tulip_t1:.531,tulip_t2:.748,tulip_t3:.76};
+const TABLE=[
+  ['Arena','RIM_BAND_T1','11 (vidljivo 14)','5 (vidljivo 8)','cream = RIM_BORDER 3 + band'],
+  ['Arena','RIM_BAND_T2','15 (vidljivo 18)','8 (vidljivo 11)','unutrašnji prsten ostaje'],
+  ['Arena','T2_HAIRLINE_INSET · _W · _RADIUS','7 · 3 · 32','5 · 2 · 33','prsten stane u cream od 11'],
+  ['Arena','CHIP_T2_WELL_RADIUS','26','27','well uvučen 11 umjesto 18'],
+  ['Arena','FLOWER_SIZE_T1 · _T2','78 · 84','80 · 88','kutija ODREZANOG crteža'],
+  ['Arena','Ring.PULSE širina · grow','6 · 14','12 · 20','hint > cream (12 > 11)'],
+  ['Arena','Ring.PARTNER širina · grow','7 · 20','14 · 24','magnet, isti jezik'],
+  ['Journal','SLOT · SLOT_GAP','112 · 18','136 · 14','red ostaje 1032 × 200'],
+  ['Journal','ART','88 (× 0,36)','110 (odrezano, bez FIT_FRAC)','T1 = T2 = T3 po visini'],
+  ['Journal','WELL_INSET','10','— (well se briše)','tier_well_style se ne zove'],
+  ['Journal','TIER_LABEL_FONT · _GAP','32 · 8','— (brišu se)','TierLabel čvor van'],
+  ['Journal','kristal radius (literal)','30','36','u tier_frame_style / halo'],
+  ['Camp','CHIP_ART_FRAME','128','128','kartica 489 × 176 ista'],
+  ['Camp','CHIP_ART_WELL_INSET','8','0 (well van)','art_well_style se ne zove'],
+  ['Camp','CHIP_ART_SEED · _FLOWER','96 · 100','104 · 108','odrezano'],
+  ['Camp','TRADE_ART_WELL_INSET','7','0','—'],
+  ['Camp','TRADE_ART_SEED · _FLOWER','80 · 84','84 · 88','okvir 104 isti'],
+  ['Camp','SEASON_ART','40','46','okvir 56 isti'],
+  ['Run','SEED_SIZE','120 (krug)','120 (vizual bez kruga)','kolizija r 26 ista'],
+  ['Run','SEED_WELL_SIZE','84','— (briše se)','nema wella'],
+  ['Run','SEED_FLOWER_SIZE','76 (× 0,36)','120 (odrezano)','biljka je cijeli pickup'],
+  ['Run','SEED_PIP_SIZE · _RADIUS','16 · 51','22 · 78','kruna iznad biljke; cream rub 3'],
+  ['Run','PICKUP_SHADOW_OFFSET','40','70','sjena ispod baze stabljike']
+];
+class Component extends DCLogic {
+  renderVals(){
+    return {
+      arena:[
+        {c:chip({f:'clover',tier:1}),title:'T1 · mir',note:'cream 8 · well Ø118 · biljka 80'},
+        {c:chip({f:'daisy',tier:2}),title:'T2 · mir',note:'r 38 · cream 11 · prsten 2 na 5 · biljka 88'},
+        {c:chip({f:'tulip',tier:1,mythic:true}),title:'★3 T1',note:'zlatni rim + isprekidani rub, isto kao danas'},
+        {c:chip({f:'clover',tier:1,ring:'pulse'}),title:'T1 · hint',note:'prsten 12 #F2D940, 10 van čipa'},
+        {c:chip({f:'clover',tier:2,ring:'pulse'}),title:'T2 · hint',note:'isti prsten, r 48'},
+        {c:chip({f:'clover',tier:1,ring:'partner'}),title:'Magnet',note:'prsten 14 #FFD56B, 12 van'}
+      ],
+      journal:[
+        {...slot(false,1,'clover'),title:'Prazan',note:'prsten 4 · ink 32 %'},
+        {...slot(true,1,'clover'),title:'T1 viđeno',note:'cream krug · biljka 110'},
+        {...slot(true,2,'tulip',true),title:'T2 u albumu',note:'cream krug · + NEW halo 9'},
+        {...slot(true,3,'daisy'),title:'T3 kristal',note:'zlatni r 36 · biljka 110'}
+      ],
+      camp:[
+        cart(true,128,28,104,'clover','Kartica · sjeme','okvir 128 · biljka 104','#B8D4F0'),
+        cart(false,128,28,108,'tulip','Kartica · cvijet','okvir 128 r 28 · biljka 108','#E0C4FF'),
+        cart(true,104,24,84,'daisy','Trade · sjeme','okvir 104 · biljka 84'),
+        cart(false,104,24,88,'daisy','Trade · cvijet','okvir 104 r 24 · biljka 88'),
+        cart(false,56,14,46,'tulip','Sezona','okvir 56 · biljka 46','#C5D5E8')
+      ],
+      run:[
+        {...rseed('clover',1),title:'★1 djetelina',note:'bez pipa'},
+        {...rseed('daisy',2),title:'★2 tratinčica',note:'2 pipa lavanda, −104° / −76°'},
+        {...rseed('tulip',3),title:'★3 tulipan',note:'3 pipa zlatna, −118° / −90° / −62°'}
+      ],
+      crops:Object.entries(CROPS).map(([k,v])=>({name:k,fill:Math.round(v*100)+' % visine'})),
+      table:TABLE.map(r=>({place:r[0],k:r[1],old:r[2],now:r[3],note:r[4]}))
+    };
+  }
+}
+</script>
+</body>
+</html>

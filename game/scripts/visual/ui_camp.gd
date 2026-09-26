@@ -84,9 +84,8 @@ const TRADE_H_STRIP := 224             # + ReservedWarning 60 + gap 12
 const TRADE_PAD := 14
 const TRADE_ROW_H := 120
 const TRADE_ART := 104
-const TRADE_ART_WELL_INSET := 7
-const TRADE_ART_SEED := 80
-const TRADE_ART_FLOWER := 84
+const TRADE_ART_SEED := 84
+const TRADE_ART_FLOWER := 88
 const TRADE_BTN := Vector2(300, 120)
 const TRADE_BTN_ICON := 40
 const WARN_STRIP_H := 60
@@ -113,11 +112,13 @@ const CHIP_BORDER := 2
 const CHIP_BORDER_SELECTED := 5
 const CHIP_ART_FRAME := 128
 const CHIP_ART_FRAME_RADIUS := 28      # cvijet; sjeme je krug
-const CHIP_ART_WELL_INSET := 8         # ukljucuje border, ne sabiraj dvaput
-const CHIP_ART_SEED := 96
-const CHIP_ART_FLOWER := 100
+const CHIP_ART_SEED := 104
+const CHIP_ART_FLOWER := 108
 const CHIP_BODY_W := 315               # 489 - 2*(14+2) - 128 - 14
-const CHIP_LIFT := 3                   # y pomak kad je odabran
+const CHIP_LIFT := 0                   # bez pomaka — gornji rub odabira ostaje u chipu
+## Razmak iznad prvog reda. Scroll reze sve sto viri iznad y=0, a tabovi su
+## odmah iznad, pa bi gornji okvir odabranog chipa inace nestao.
+const GRID_TOP_PAD := 12
 const PILL_H := 52
 const PILL_GAP := 10
 const PILL_ICON := 30
@@ -157,7 +158,7 @@ const SEASON_PROGRESS_H := 86
 const SEASON_PROGRESS_GAP := 24
 const SEASON_ICON := 48
 const SEASON_ART_FRAME := 56
-const SEASON_ART := 40
+const SEASON_ART := 46
 const SEASON_BAR_H := 18
 const SEASON_SPLIT_W := 5
 const SEASON_SPLIT_H := 86
@@ -679,7 +680,7 @@ static func empty_art_style(seed: bool) -> StyleBoxFlat:
 	return s
 
 
-## CTA u praznom stanju: panel 100 px unutar 120 px dodira ("Play a run ↗").
+## CTA u praznom stanju: panel 100 px unutar 120 px dodira ("Open meadow ↗").
 static func empty_cta_style(pressed: bool = false) -> StyleBoxFlat:
 	var s := shortcut_style(pressed)
 	s.content_margin_left = 36

@@ -20,8 +20,6 @@ var _selected: bool = false
 var _pressing: bool = false
 var _drag_dist: float = 0.0
 var _scroll: ScrollContainer
-var _lift: float = 0.0
-var _lift_tween: Tween
 
 var _reserved: bool = false
 var _have: int = 0
@@ -97,20 +95,10 @@ func set_count(count: int) -> void:
 	_apply_style()
 
 
-func set_selected(on: bool, animate: bool = false) -> void:
+func set_selected(on: bool, _animate: bool = false) -> void:
 	if _selected == on:
 		return
 	_selected = on
-	var target := float(UiCamp.CHIP_LIFT) if on else 0.0
-	if _lift_tween:
-		_lift_tween.kill()
-		_lift_tween = null
-	if animate and is_inside_tree():
-		_lift_tween = create_tween()
-		_lift_tween.tween_method(_set_lift, _lift, target, UiCamp.T_CHIP_SELECT) \
-			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	else:
-		_lift = target
 	_apply_style()
 
 
@@ -123,11 +111,6 @@ func set_reserved(on: bool, have: int = 0, need: int = 0, season_id: String = ""
 	_at_floor = at_floor and on
 	_ensure_children()
 	_apply_badge()
-
-
-func _set_lift(value: float) -> void:
-	_lift = value
-	_apply_style()
 
 
 func _ensure_children() -> void:
@@ -260,7 +243,7 @@ func _apply_all() -> void:
 		return
 	var seed := _kind == "seed"
 	_art.configure_frame(
-		UiCamp.CHIP_ART_FRAME, UiCamp.CHIP_ART_FRAME_RADIUS, 3, UiCamp.CHIP_ART_WELL_INSET, 20, 2,
+		UiCamp.CHIP_ART_FRAME, UiCamp.CHIP_ART_FRAME_RADIUS, 3, 0.0, 20, 2,
 		UiCamp.CHIP_ART_SEED if seed else UiCamp.CHIP_ART_FLOWER
 	)
 	_art.set_art(seed, _type_id, 1 if seed else 3)
@@ -297,28 +280,26 @@ func _apply_style() -> void:
 		return
 	if _count < 1:
 		_state = UiCamp.CHIP_DISABLED
-	elif _pressing:
-		_state = UiCamp.CHIP_PRESSED
 	elif _selected:
 		_state = UiCamp.CHIP_SELECTED
+	elif _pressing:
+		_state = UiCamp.CHIP_PRESSED
 	else:
 		_state = UiCamp.CHIP_IDLE
-	var lift := _lift if _state == UiCamp.CHIP_SELECTED else 0.0
-	add_theme_stylebox_override("panel", UiCamp.chip_style(_state, _rarity, lift))
+	add_theme_stylebox_override("panel", UiCamp.chip_style(_state, _rarity, 0.0))
 	var ink := UiCamp.chip_ink(_state)
 	UiCamp.style_label(_name_label, UiCamp.FONT_CHIP_NAME, ink, UiCamp.HEAVY, 1.05)
 	UiCamp.style_label(_pips_label, UiCamp.FONT_PIPS, ink)
 	UiCamp.style_label(_count_label, UiCamp.FONT_COUNT, ink)
 	_mark.visible = _state == UiCamp.CHIP_SELECTED or _state == UiCamp.CHIP_PRESSED
-	_mark.position.y = -lift
+	_mark.position = Vector2.ZERO
 	queue_sort()
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_SORT_CHILDREN and _mark != null:
 		# SelectMark ide preko cijelog chipa (inset 0), ne samo sadrzaja.
-		var lift := _lift if _state == UiCamp.CHIP_SELECTED else 0.0
-		fit_child_in_rect(_mark, Rect2(Vector2(0.0, -lift), size))
+		fit_child_in_rect(_mark, Rect2(Vector2.ZERO, size))
 
 
 func _get_scroll() -> ScrollContainer:
@@ -352,11 +333,10 @@ func _gui_input(event: InputEvent) -> void:
 	if down:
 		_pressing = true
 		_drag_dist = 0.0
+		# Odmah na pritisak — ne ceka otpustanje ni tween.
+		chip_pressed.emit(_type_id)
 		_apply_style()
 	else:
-		var was_tap := _pressing and _drag_dist < DRAG_SCROLL.TAP_SLOP
 		_pressing = false
 		_apply_style()
-		if was_tap:
-			chip_pressed.emit(_type_id)
 	accept_event()

@@ -4,7 +4,7 @@ extends RefCounted
 ## Run (lane runner) — docs/04-experience/design-drafts/run-cd-brief.md
 ## Dizajn: design_handoff_run/README.md · smjer A (kosene staze na tamnoj livadi)
 ## Sve mjere su u px baze 1080x1920. Run je PUN ekran — nema UiChrome header/footer.
-## Dijeljeni hexovi su UiArena konstante (SEED_WELL, RIM_EDGE, GOLD_EDGE, BAG_BODY).
+## Dijeljeni hexovi su UiArena konstante (RIM_EDGE, GOLD_EDGE, BAG_BODY).
 
 # --- Tlo i staze -------------------------------------------------------
 const GROUND := Color("#26382C")          # livada izvan staza
@@ -33,13 +33,12 @@ const COIN_SIZE := 96                      # icon_coin.svg; fill/edge ostaju za 
 const COIN_FILL := Color("#FFD56B")
 const COIN_EDGE := UiArena.GOLD_EDGE
 
-const SEED_SIZE := 120                    # bio 52 (≈ 19 dp) — necitljivo
-const SEED_WELL := UiArena.SEED_WELL
-const SEED_WELL_EDGE := UiArena.SEED_WELL_EDGE
-const SEED_WELL_SIZE := 84
-const SEED_FLOWER_SIZE := 76
-const SEED_PIP_SIZE := 16                 # rijetkost = BROJ pipa, ne boja
-const SEED_PIP_RADIUS := 51
+const SEED_SIZE := 120                    # kutija odrezane sadnice, bez krem kruga
+const SEED_FLOWER_SIZE := 120
+const SEED_PIP_SIZE := 22                 # rijetkost = BROJ pipa, ne boja
+const SEED_PIP_BORDER := 3
+const SEED_PIP_RADIUS := 78
+const SEED_SHADOW_OFFSET := 70            # ispod baze stabljike; coin/dijamant ostaju na PICKUP_SHADOW_OFFSET
 const SEED_PIP_R2 := Color("#D4A5FF")
 const SEED_PIP_R3 := Color("#D6A82F")
 

@@ -133,14 +133,18 @@ func _run() -> void:
 		_fail("daisy leftover expected 1")
 		return
 
-	# Prazan stash: prazno stanje s CTA prema Areni, Trade bar ostaje.
+	# Prazan stash: prazno stanje s CTA prema Areni, Trade bar se sklanja.
 	gs.set("garden_crystal_stash", {})
 	camp.call("_refresh_crystal_card")
 	await process_frame
 	var empty := camp.get_node_or_null("%EmptyState") as Control
 	var cta := camp.get_node_or_null("%EmptyCta")
+	var bar := camp.get_node_or_null("%ExchangeBar") as Control
 	if empty == null or not empty.visible or scroll.visible:
 		_fail("empty stash must show EmptyState instead of the grid")
+		return
+	if bar == null or bar.visible:
+		_fail("empty flower stash must hide the Trade bar")
 		return
 	if cta == null or str(cta.call("get_title")) != "Merge in Arena ↗":
 		_fail("empty stash CTA should read 'Merge in Arena ↗'")

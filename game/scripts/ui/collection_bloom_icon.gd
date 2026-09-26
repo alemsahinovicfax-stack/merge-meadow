@@ -37,4 +37,4 @@ func _draw() -> void:
 		draw_circle(center, side * 0.22, Color(0.55, 0.58, 0.55, 0.35))
 		draw_arc(center, side * 0.22, 0.0, TAU, 24, Color(0.4, 0.42, 0.4, 0.5), 2.0)
 		return
-	PLANT_DRAW.draw_fitted_plant(self, center, type_id, plant_tier, side)
+	PLANT_DRAW.draw_cropped_plant(self, center, type_id, plant_tier, side)

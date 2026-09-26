@@ -1,7 +1,7 @@
 extends Sprite2D
 
-## Sjemenka u runu — isti jezik kao Arena SeedChip (krem rim + tamni well), 120 px.
-## Kolizija ostaje r 26. Rijetkost = broj pipa na rimu.
+## Sjemenka u runu — samo odrezana sadnica, bez okvira. Kolizija ostaje r 26.
+## Rijetkost = broj pipa u kruni iznad sadnice.
 
 const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
 
@@ -32,18 +32,14 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	_draw_shadow()
-	var radius := float(UiRun.SEED_SIZE) * 0.5
-	draw_circle(Vector2.ZERO, radius, UiRun.CHIP_BG)
-	draw_arc(Vector2.ZERO, radius - 2.0, 0.0, TAU, 48, UiRun.CHIP_EDGE, 4.0, true)
-	var well_r := float(UiRun.SEED_WELL_SIZE) * 0.5
-	draw_circle(Vector2.ZERO, well_r, UiRun.SEED_WELL)
-	draw_arc(Vector2.ZERO, well_r - 1.0, 0.0, TAU, 36, UiRun.SEED_WELL_EDGE, 2.0, true)
-	PLANT_DRAW.draw_fitted_plant(self, Vector2.ZERO, _type_id, 1, float(UiRun.SEED_FLOWER_SIZE))
+	PLANT_DRAW.draw_cropped_plant(self, Vector2.ZERO, _type_id, 1, float(UiRun.SEED_FLOWER_SIZE))
 	var rarity := _rarity()
 	var pip_color := UiRun.seed_pip_color(rarity)
-	var pip_r := float(UiRun.SEED_PIP_SIZE) * 0.5
+	var outer := float(UiRun.SEED_PIP_SIZE) * 0.5
+	var inner := outer - float(UiRun.SEED_PIP_BORDER)
 	for pos in UiRun.seed_pip_positions(rarity):
-		draw_circle(pos, pip_r, pip_color)
+		draw_circle(pos, outer, UiRun.CHIP_BG)
+		draw_circle(pos, inner, pip_color)
 
 
 func _rarity() -> int:
@@ -55,7 +51,7 @@ func _rarity() -> int:
 
 func _draw_shadow() -> void:
 	var size := UiRun.PICKUP_SHADOW_SIZE
-	var center := Vector2(0.0, float(UiRun.PICKUP_SHADOW_OFFSET))
+	var center := Vector2(0.0, float(UiRun.SEED_SHADOW_OFFSET))
 	var pts := PackedVector2Array()
 	for i in 18:
 		var a := TAU * float(i) / 18.0

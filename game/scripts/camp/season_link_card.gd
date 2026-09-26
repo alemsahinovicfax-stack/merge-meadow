@@ -33,7 +33,7 @@ func _ready() -> void:
 	unlock_button.clicked.connect(_on_unlock_clicked)
 	coin_icon.texture = UiAssets.get_chrome_icon("icon_coin")
 	coin_icon.custom_minimum_size = Vector2(UiCamp.SEASON_ICON, UiCamp.SEASON_ICON)
-	flower_art.configure_frame(UiCamp.SEASON_ART_FRAME, 16, 2, 7.0, 10, 1, UiCamp.SEASON_ART)
+	flower_art.configure_frame(UiCamp.SEASON_ART_FRAME, 16, 2, 0.0, 10, 1, UiCamp.SEASON_ART)
 	split_line.add_theme_stylebox_override("panel", UiCamp.split_line_style())
 	split_line.custom_minimum_size = Vector2(UiCamp.SEASON_SPLIT_W, UiCamp.SEASON_SPLIT_H)
 	for bar in [coins_bar, t3_bar]:

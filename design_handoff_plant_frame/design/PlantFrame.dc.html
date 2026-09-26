@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E4DC;-webkit-font-smoothing:antialiased}a{color:#2D3436}a:hover{color:#555C5E}</style>
+</helmet>
+<section style="display:flex;flex-wrap:wrap;gap:120px;padding:120px;align-items:flex-start;font-family:Nunito,system-ui,sans-serif">
+
+<sc-if value="{{ show.arena_idle }}" hint-placeholder-val="{{ true }}">
+<div id="1" style="display:flex;flex-direction:column;gap:28px">
+  <div style="font:900 44px/1 Nunito,sans-serif;color:#2D3436">1 · Arena, mir</div>
+  <div data-screen-label="01 Arena mir" style="position:relative;width:1080px;height:1920px;overflow:hidden;background:#293D2E;box-shadow:0 12px 40px rgba(20,32,26,.25)">
+    <div data-layer="HubHeader" style="position:absolute;left:0;top:0;width:1080px;height:143px;background:#1A241E;display:flex;align-items:center;justify-content:center;font:800 34px/1 Nunito,sans-serif;color:#FFF8F0">Header 143 · bez izmjena</div>
+    <div data-layer="Playfield" style="position:absolute;left:0;top:143px;width:1080px;height:1589px">
+      <sc-for list="{{ arenaIdle }}" as="c" hint-placeholder-count="12">
+        <div data-layer="ArenaChip" style="{{ c.rootStyle }}">
+          <div data-layer="ChipShadow" style="{{ c.shadowStyle }}"></div>
+          <div data-layer="ArenaRim" style="{{ c.rimStyle }}">
+            <div data-layer="ArenaWell" style="{{ c.wellStyle }}"></div>
+            <div data-layer="T2Hairline" style="{{ c.hairStyle }}"></div>
+            <img data-layer="ArenaPlant" src="{{ c.src }}" alt="" style="{{ c.plantStyle }}">
+          </div>
+          <div data-layer="MythicNubs" style="{{ c.nubStyle }}"></div>
+          <div data-layer="ArenaHint" style="{{ c.ringStyle }}"></div>
+        </div>
+      </sc-for>
+      <div data-layer="SeedBag" style="position:absolute;left:433px;top:1371px;width:214px;height:178px;box-sizing:border-box;border-radius:60px 60px 44px 44px;background:#9E7A52;border:4px solid #735738"></div>
+      <div data-layer="BagNeck" style="position:absolute;left:481px;top:1351px;width:118px;height:34px;box-sizing:border-box;border-radius:14px;background:#B89466;border:3px solid #7A5C3C"></div>
+    </div>
+    <div data-layer="HubFooter" style="position:absolute;left:0;top:1776px;width:1080px;height:144px;background:#1A241E;display:flex;align-items:center;justify-content:center;font:800 34px/1 Nunito,sans-serif;color:#FFF8F0">Footer 144 · bez izmjena</div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ show.arena_hint }}" hint-placeholder-val="{{ true }}">
+<div id="2" style="display:flex;flex-direction:column;gap:28px">
+  <div style="font:900 44px/1 Nunito,sans-serif;color:#2D3436">2 · Arena, hint (držiš djetelinu T1)</div>
+  <div data-screen-label="02 Arena hint" style="position:relative;width:1080px;height:1920px;overflow:hidden;background:#293D2E;box-shadow:0 12px 40px rgba(20,32,26,.25)">
+    <div data-layer="HubHeader" style="position:absolute;left:0;top:0;width:1080px;height:143px;background:#1A241E;display:flex;align-items:center;justify-content:center;font:800 34px/1 Nunito,sans-serif;color:#FFF8F0">Header 143 · bez izmjena</div>
+    <div data-layer="Playfield" style="position:absolute;left:0;top:143px;width:1080px;height:1589px">
+      <sc-for list="{{ arenaHint }}" as="c" hint-placeholder-count="12">
+        <div data-layer="ArenaChip" style="{{ c.rootStyle }}">
+          <div data-layer="ChipShadow" style="{{ c.shadowStyle }}"></div>
+          <div data-layer="ArenaRim" style="{{ c.rimStyle }}">
+            <div data-layer="ArenaWell" style="{{ c.wellStyle }}"></div>
+            <div data-layer="T2Hairline" style="{{ c.hairStyle }}"></div>
+            <img data-layer="ArenaPlant" src="{{ c.src }}" alt="" style="{{ c.plantStyle }}">
+          </div>
+          <div data-layer="MythicNubs" style="{{ c.nubStyle }}"></div>
+          <div data-layer="ArenaHint" style="{{ c.ringStyle }}"></div>
+        </div>
+      </sc-for>
+      <div data-layer="SeedBag" style="position:absolute;left:433px;top:1371px;width:214px;height:178px;box-sizing:border-box;border-radius:60px 60px 44px 44px;background:#9E7A52;border:4px solid #735738"></div>
+      <div data-layer="BagNeck" style="position:absolute;left:481px;top:1351px;width:118px;height:34px;box-sizing:border-box;border-radius:14px;background:#B89466;border:3px solid #7A5C3C"></div>
+    </div>
+    <div data-layer="HubFooter" style="position:absolute;left:0;top:1776px;width:1080px;height:144px;background:#1A241E;display:flex;align-items:center;justify-content:center;font:800 34px/1 Nunito,sans-serif;color:#FFF8F0">Footer 144 · bez izmjena</div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ show.journal }}" hint-placeholder-val="{{ true }}">
+<div id="3" style="display:flex;flex-direction:column;gap:28px">
+  <div style="font:900 44px/1 Nunito,sans-serif;color:#2D3436">3 · Journal</div>
+  <div data-screen-label="03 Journal" style="position:relative;width:1080px;height:1920px;overflow:hidden;background:#FFF8F0;box-shadow:0 12px 40px rgba(20,32,26,.25)">
+    <div data-layer="HubHeader" style="position:absolute;left:0;top:0;width:1080px;height:143px;background:#1A241E;display:flex;align-items:center;justify-content:center;font:800 34px/1 Nunito,sans-serif;color:#FFF8F0">Header 143 · bez izmjena</div>
+    <div data-layer="JournalPage" style="position:absolute;left:0;top:143px;width:1080px;height:1633px;box-sizing:border-box;padding:30px 24px 0;display:flex;flex-direction:column">
+      <div data-layer="JournalHead" style="display:flex;flex-direction:column;gap:8px;padding-bottom:24px;border-bottom:3px solid rgba(45,52,54,.12)">
+        <div style="display:flex;align-items:center;gap:18px">
+          <div style="width:10px;height:56px;border-radius:5px;background:#FFD56B"></div>
+          <div style="font:900 60px/64px Nunito,sans-serif;color:#2D3436">Bloom Album</div>
+        </div>
+        <div style="font:700 38px/46px Nunito,sans-serif;color:#555C5E">Album: 2 blooms kept · 1 spotted</div>
+      </div>
+      <div data-layer="SeasonHeader" style="margin-top:16px;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 8px">
+        <div style="font:900 40px/1 Nunito,sans-serif;color:#2D3436">Country Bloom</div>
+        <div style="font:800 36px/1 Nunito,sans-serif;color:#555C5E">3 / 6</div>
+      </div>
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:20px">
+        <sc-for list="{{ journalRows }}" as="row" hint-placeholder-count="4">
+          <div data-layer="JournalRow" style="{{ row.rowStyle }}">
+            <div data-layer="InfoColumn" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:baseline;gap:16px;min-width:0">
+                <div data-layer="BloomName" style="{{ row.nameStyle }}">{{ row.name }}</div>
+                <div data-layer="RarityStars" style="{{ row.starsStyle }}">{{ row.stars }}</div>
+              </div>
+              <div data-layer="RowCaption" style="{{ row.captionStyle }}">{{ row.caption }}</div>
+            </div>
+            <div data-layer="TierStrip" style="flex:0 0 auto;display:flex;gap:14px">
+              <sc-for list="{{ row.slots }}" as="s" hint-placeholder-count="3">
+                <div data-layer="JournalSlot" style="position:relative;width:136px;height:136px;flex:0 0 auto">
+                  <div data-layer="NewHalo" style="{{ s.haloStyle }}"></div>
+                  <div data-layer="{{ s.frameLayer }}" style="{{ s.frameStyle }}">
+                    <img data-layer="JournalPlant" src="{{ s.src }}" alt="" style="{{ s.plantStyle }}">
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div data-layer="NewBadge" style="{{ row.newStyle }}">NEW</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div data-layer="HubFooter" style="position:absolute;left:0;top:1776px;width:1080px;height:144px;background:#1A241E;display:flex;align-items:center;justify-content:center;font:800 34px/1 Nunito,sans-serif;color:#FFF8F0">Footer 144 · bez izmjena</div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ show.camp }}" hint-placeholder-val="{{ true }}">
+<div id="4" style="display:flex;flex-direction:column;gap:28px">
+  <div style="font:900 44px/1 Nunito,sans-serif;color:#2D3436">4 · Camp (tab Seeds + isječak taba Flowers)</div>
+  <div style="display:flex;gap:60px;align-items:flex-start">
+  <div data-screen-label="04 Camp" style="position:relative;width:1080px;height:1920px;overflow:hidden;background:#2E4733;box-shadow:0 12px 40px rgba(20,32,26,.25)">
+    <div data-layer="HubHeader" style="position:absolute;left:0;top:0;width:1080px;height:143px;background:#1A241E;display:flex;align-items:center;justify-content:center;font:800 34px/1 Nunito,sans-serif;color:#FFF8F0">Header 143 · bez izmjena</div>
+    <div data-layer="CampPage" style="position:absolute;left:24px;top:167px;width:1032px;display:flex;flex-direction:column;gap:20px">
+      <div data-layer="SeasonLink" style="box-sizing:border-box;height:276px;border-radius:32px;background:#C5D5E8;border:3px solid #9FB4CC;box-shadow:0 8px 8px rgba(20,26,22,.26);padding:22px;display:flex;flex-direction:column;gap:24px">
+        <div style="height:100px;display:flex;align-items:center;gap:20px">
+          <div data-layer="CampArt" style="width:56px;height:56px;flex:0 0 auto;box-sizing:border-box;border-radius:14px;background:#FFD56B;border:3px solid #D6A82F;display:grid;place-items:center">
+            <img data-layer="CampPlant" src="flowers/tulip_t2.svg" alt="" style="width:46px;height:46px;display:block">
+          </div>
+          <div style="flex:1;min-width:0;font:900 56px/1 Nunito,sans-serif;color:#1A1A14">Frost Orchard</div>
+          <div style="width:300px;height:100px;box-sizing:border-box;border-radius:26px;background:rgba(255,248,240,.55);border:3px solid rgba(26,26,20,.3);display:grid;place-items:center;font:900 48px/1 Nunito,sans-serif;color:#44443A">Unlock</div>
+        </div>
+        <div style="display:flex;gap:24px;align-items:center">
+          <div style="flex:1;display:flex;flex-direction:column;gap:14px">
+            <div style="font:900 48px/1 Nunito,sans-serif;color:#3D3D33">320 / 500</div>
+            <div style="height:18px;border-radius:9px;background:rgba(26,26,20,.2)"><div style="width:64%;height:18px;border-radius:9px;background:#FFD56B"></div></div>
+          </div>
+          <div style="width:5px;height:86px;border-radius:3px;background:rgba(26,26,20,.22)"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:14px">
+            <div style="font:900 48px/1 Nunito,sans-serif;color:#3D3D33">4 / 6</div>
+            <div style="height:18px;border-radius:9px;background:rgba(26,26,20,.2)"><div style="width:67%;height:18px;border-radius:9px;background:#FFF8F0"></div></div>
+          </div>
+        </div>
+      </div>
+      <div data-layer="StashSection" style="box-sizing:border-box;height:1289px;border-radius:32px;background:#FFF8F0;border:2px solid rgba(45,52,54,.16);box-shadow:0 8px 8px rgba(20,26,22,.26);padding:18px;display:flex;flex-direction:column;gap:14px">
+        <div data-layer="TabRow" style="height:120px;display:flex;gap:14px">
+          <div style="flex:1;box-sizing:border-box;border-radius:26px;background:#FFB88C;border:4px solid #E8A374;display:flex;align-items:center;justify-content:center;gap:16px;font:900 46px/1 Nunito,sans-serif;color:#2D3436">Seeds<span style="box-sizing:border-box;height:56px;min-width:80px;padding:0 16px;border-radius:16px;background:rgba(255,248,240,.8);border:2px solid rgba(45,52,54,.2);display:inline-flex;align-items:center;justify-content:center;font:900 42px/1 Nunito,sans-serif">3</span></div>
+          <div style="flex:1;box-sizing:border-box;border-radius:26px;background:#F1EBE4;border:2px solid #D9D3CC;display:flex;align-items:center;justify-content:center;gap:16px;font:900 46px/1 Nunito,sans-serif;color:#4A5153">Flowers<span style="box-sizing:border-box;height:56px;min-width:80px;padding:0 16px;border-radius:16px;background:#E6DFD8;border:2px solid rgba(45,52,54,.2);display:inline-flex;align-items:center;justify-content:center;font:900 42px/1 Nunito,sans-serif">2</span></div>
+        </div>
+        <div data-layer="ChipGrid" style="flex:1;min-height:0;display:grid;grid-template-columns:489px 489px;grid-auto-rows:176px;gap:14px;align-content:start">
+          <sc-for list="{{ campSeeds }}" as="c" hint-placeholder-count="3">
+            <div data-layer="CampChip" style="{{ c.style }}">
+              <div data-layer="CampArt" style="{{ c.artStyle }}"><img data-layer="CampPlant" src="{{ c.src }}" alt="" style="{{ c.plantStyle }}"></div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+                <div style="font:900 38px/1 Nunito,sans-serif;color:#2D3436;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</div>
+                <div style="font:800 34px/1 Nunito,sans-serif;color:#2D3436;letter-spacing:.04em">{{ c.pips }}</div>
+                <div style="display:flex;gap:10px">
+                  <div style="box-sizing:border-box;height:52px;padding:0 14px;border-radius:16px;background:rgba(255,248,240,.7);border:2px solid rgba(45,52,54,.2);display:flex;align-items:center;font:900 42px/1 Nunito,sans-serif;color:#2D3436">{{ c.count }}</div>
+                  <div style="box-sizing:border-box;height:52px;padding:0 12px;border-radius:16px;background:#FFF8F0;border:2px solid #D6A82F;display:flex;align-items:center;gap:8px;font:900 42px/1 Nunito,sans-serif;color:#2D3436"><span style="width:32px;height:32px;box-sizing:border-box;border-radius:50%;background:#FFD56B;border:3px solid #D6A82F"></span>{{ c.price }}</div>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div data-layer="TradeBar" style="box-sizing:border-box;height:152px;border-radius:26px;background:#FFF8F0;border:2px solid rgba(45,52,54,.18);box-shadow:0 6px 6px rgba(20,26,22,.24);padding:14px;display:flex;align-items:center;gap:20px">
+          <div data-layer="CampArt" style="width:104px;height:104px;flex:0 0 auto;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:3px solid #CBC2B6;display:grid;place-items:center">
+            <img data-layer="CampPlant" src="flowers/clover_t1.svg" alt="" style="width:84px;height:84px;display:block">
+          </div>
+          <div style="flex:1;min-width:0;font:900 42px/1.1 Nunito,sans-serif;color:#2D3436">Clover seed ×12</div>
+          <div style="width:300px;height:120px;box-sizing:border-box;border-radius:26px;background:#FFB88C;border:3px solid #E8A374;display:grid;place-items:center;font:900 46px/1 Nunito,sans-serif;color:#2D3436">Trade</div>
+        </div>
+      </div>
+    </div>
+    <div data-layer="HubFooter" style="position:absolute;left:0;top:1776px;width:1080px;height:144px;background:#1A241E;display:flex;align-items:center;justify-content:center;font:800 34px/1 Nunito,sans-serif;color:#FFF8F0">Footer 144 · bez izmjena</div>
+  </div>
+  <div data-screen-label="04b Camp Flowers" style="position:relative;width:1080px;height:820px;overflow:hidden;background:#2E4733;box-shadow:0 12px 40px rgba(20,32,26,.25)">
+    <div data-layer="StashSection" style="position:absolute;left:24px;top:24px;width:1032px;box-sizing:border-box;border-radius:32px;background:#FFF8F0;border:2px solid rgba(45,52,54,.16);padding:18px;display:flex;flex-direction:column;gap:14px">
+      <div data-layer="TabRow" style="height:120px;display:flex;gap:14px">
+        <div style="flex:1;box-sizing:border-box;border-radius:26px;background:#F1EBE4;border:2px solid #D9D3CC;display:flex;align-items:center;justify-content:center;gap:16px;font:900 46px/1 Nunito,sans-serif;color:#4A5153">Seeds<span style="box-sizing:border-box;height:56px;min-width:80px;padding:0 16px;border-radius:16px;background:#E6DFD8;border:2px solid rgba(45,52,54,.2);display:inline-flex;align-items:center;justify-content:center;font:900 42px/1 Nunito,sans-serif">3</span></div>
+        <div style="flex:1;box-sizing:border-box;border-radius:26px;background:#FFB88C;border:4px solid #E8A374;display:flex;align-items:center;justify-content:center;gap:16px;font:900 46px/1 Nunito,sans-serif;color:#2D3436">Flowers<span style="box-sizing:border-box;height:56px;min-width:80px;padding:0 16px;border-radius:16px;background:rgba(255,248,240,.8);border:2px solid rgba(45,52,54,.2);display:inline-flex;align-items:center;justify-content:center;font:900 42px/1 Nunito,sans-serif">2</span></div>
+      </div>
+      <div data-layer="ChipGrid" style="display:grid;grid-template-columns:489px 489px;grid-auto-rows:176px;gap:14px">
+        <sc-for list="{{ campFlowers }}" as="c" hint-placeholder-count="2">
+          <div data-layer="CampChip" style="{{ c.style }}">
+            <div data-layer="CampArt" style="{{ c.artStyle }}"><img data-layer="CampPlant" src="{{ c.src }}" alt="" style="{{ c.plantStyle }}"></div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+              <div style="font:900 38px/1 Nunito,sans-serif;color:#2D3436;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</div>
+              <div style="font:800 34px/1 Nunito,sans-serif;color:#2D3436;letter-spacing:.04em">{{ c.pips }}</div>
+              <div style="display:flex;gap:10px">
+                <div style="box-sizing:border-box;height:52px;padding:0 14px;border-radius:16px;background:rgba(255,248,240,.7);border:2px solid rgba(45,52,54,.2);display:flex;align-items:center;font:900 42px/1 Nunito,sans-serif;color:#2D3436">{{ c.count }}</div>
+                <div style="box-sizing:border-box;height:52px;padding:0 12px;border-radius:16px;background:#FFF8F0;border:2px solid #D6A82F;display:flex;align-items:center;gap:8px;font:900 42px/1 Nunito,sans-serif;color:#2D3436"><span style="width:32px;height:32px;box-sizing:border-box;border-radius:50%;background:#FFD56B;border:3px solid #D6A82F"></span>{{ c.price }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div data-layer="TradeBar" style="box-sizing:border-box;height:152px;border-radius:26px;background:#FFF8F0;border:2px solid rgba(45,52,54,.18);box-shadow:0 6px 6px rgba(20,26,22,.24);padding:14px;display:flex;align-items:center;gap:20px">
+        <div data-layer="CampArt" style="width:104px;height:104px;flex:0 0 auto;box-sizing:border-box;border-radius:24px;background:#FFD56B;border:3px solid #D6A82F;display:grid;place-items:center">
+          <img data-layer="CampPlant" src="flowers/tulip_t2.svg" alt="" style="width:88px;height:88px;display:block">
+        </div>
+        <div style="flex:1;min-width:0;font:900 42px/1.1 Nunito,sans-serif;color:#2D3436">Tulip ×4</div>
+        <div style="width:300px;height:120px;box-sizing:border-box;border-radius:26px;background:#FFB88C;border:3px solid #E8A374;display:grid;place-items:center;font:900 46px/1 Nunito,sans-serif;color:#2D3436">Trade</div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ show.run }}" hint-placeholder-val="{{ true }}">
+<div id="5" style="display:flex;flex-direction:column;gap:28px">
+  <div style="font:900 44px/1 Nunito,sans-serif;color:#2D3436">5 · Run (bez okvira)</div>
+  <div data-screen-label="05 Run" style="position:relative;width:1080px;height:1920px;overflow:hidden;background:#26382C;box-shadow:0 12px 40px rgba(20,32,26,.25)">
+    <sc-for list="{{ lanes }}" as="l" hint-placeholder-count="3">
+      <div data-layer="Lane" style="{{ l.style }}"></div>
+    </sc-for>
+    <sc-for list="{{ stripes }}" as="s" hint-placeholder-count="0">
+      <div data-layer="LaneMow" style="{{ s.style }}"></div>
+    </sc-for>
+    <div data-layer="LaneSeam" style="position:absolute;left:403px;top:0;width:4px;height:1920px;border-left:4px dashed rgba(255,248,240,.16);box-sizing:border-box"></div>
+    <div data-layer="LaneSeam" style="position:absolute;left:673px;top:0;width:4px;height:1920px;border-left:4px dashed rgba(255,248,240,.16);box-sizing:border-box"></div>
+    <sc-for list="{{ coins }}" as="c" hint-placeholder-count="2">
+      <div data-layer="CoinPickup" style="{{ c.wrap }}">
+        <div style="{{ c.shadow }}"></div>
+        <div style="{{ c.body }}"></div>
+      </div>
+    </sc-for>
+    <div data-layer="ObstacleStone" style="position:absolute;left:722px;top:1330px;width:176px;height:176px">
+      <div data-layer="ObstacleCollar" style="position:absolute;left:-32px;top:124px;width:240px;height:52px;box-sizing:border-box;border-radius:26px;background:#C7BE9A;border:3px solid #A79C78"></div>
+      <div style="position:absolute;left:0;top:0;width:176px;height:150px;box-sizing:border-box;border-radius:70px 80px 34px 34px;background:#A9AFA6;border:4px solid #878C85"></div>
+      <div style="position:absolute;left:36px;top:26px;width:60px;height:26px;border-radius:13px;background:#C4C9C0"></div>
+    </div>
+    <sc-for list="{{ runSeeds }}" as="r" hint-placeholder-count="4">
+      <div data-layer="RunSeed" style="{{ r.wrap }}">
+        <div data-layer="PickupShadow" style="{{ r.shadow }}"></div>
+        <img data-layer="RunPlant" src="{{ r.src }}" alt="" style="{{ r.plant }}">
+        <div data-layer="RunPips" style="position:absolute;left:0;top:0;width:0;height:0">
+          <sc-for list="{{ r.pips }}" as="p" hint-placeholder-count="0">
+            <div data-layer="Pip" style="{{ p.style }}"></div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+    <div data-layer="Player" style="position:absolute;left:465px;top:1499px;width:150px;height:150px;box-sizing:border-box;border-radius:50%;background:#FFB88C;border:4px solid #E8A374;display:grid;place-items:center;font:900 38px/1 Nunito,sans-serif;color:#2D3436">Pip</div>
+    <div data-layer="TimerChip" style="position:absolute;left:310px;top:60px;width:460px;height:156px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;gap:28px;padding:0 30px">
+      <div style="width:104px;height:104px;box-sizing:border-box;border-radius:50%;border:14px solid #A8E6CF;flex:0 0 auto"></div>
+      <div style="font:900 72px/1 Nunito,sans-serif;color:#2D3436">42s</div>
+    </div>
+    <div data-layer="PauseButton" style="position:absolute;left:912px;top:74px;width:128px;height:128px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;justify-content:center;gap:14px">
+      <div style="width:14px;height:48px;border-radius:5px;background:#2D3436"></div>
+      <div style="width:14px;height:48px;border-radius:5px;background:#2D3436"></div>
+    </div>
+    <div data-layer="CompanionChip" style="position:absolute;left:40px;top:232px;width:268px;height:120px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;gap:18px;padding:0 22px">
+      <div style="width:72px;height:72px;box-sizing:border-box;border-radius:50%;background:#FFB88C;border:3px solid #E8A374"></div>
+      <div style="font:900 44px/1 Nunito,sans-serif;color:#2D3436">Pip</div>
+    </div>
+    <div data-layer="PickupBar" style="position:absolute;right:40px;top:232px;display:flex;gap:16px">
+      <div style="width:190px;height:120px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;justify-content:center;gap:14px">
+        <div style="width:56px;height:56px;box-sizing:border-box;border-radius:50%;background:#FFD56B;border:4px solid #D6A82F"></div>
+        <div style="font:900 56px/1 Nunito,sans-serif;color:#2D3436">18</div>
+      </div>
+      <div style="width:190px;height:120px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;justify-content:center;gap:10px">
+        <img src="flowers/clover_t1.svg" alt="" style="width:64px;height:64px;display:block">
+        <div style="font:900 56px/1 Nunito,sans-serif;color:#2D3436">5</div>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;all&quot;,&quot;arena_idle&quot;,&quot;arena_hint&quot;,&quot;journal&quot;,&quot;camp&quot;,&quot;run&quot;],&quot;default&quot;:&quot;all&quot;,&quot;tsType&quot;:&quot;'all'|'arena_idle'|'arena_hint'|'journal'|'camp'|'run'&quot;}}">
+const CREAM='#FFF8F0',RIM_EDGE='#CBC2B6',WELL='#22342A',WELL_EDGE='#16211B',GOLD='#FFD56B',GOLD_EDGE='#D6A82F',PULSE='#F2D940',INK='#2D3436';
+// Arena — nove vrijednosti (vidi godot/plant_frame.gd)
+const AR={D:134,RIM:3,BAND1:5,BAND2:8,WB:2,T2R:38,T2WR:27,HIN:5,HW:2,HR:33,F1:80,F2:88,PW:12,PG:20,MW:14,MG:24};
+const src=(n,t)=>'flowers/'+n+'_t'+t+'.svg';
+function chip(c){
+  const t2=c.tier===2, rad=t2?AR.T2R+'px':'50%', h=AR.D/2;
+  const tf=c.drag?'translateY(-14px) scale(1.12) rotate(-3deg)':c.ring==='partner'?'scale(1.04)':'none';
+  const inset=AR.RIM+(t2?AR.BAND2:AR.BAND1), box=t2?AR.F2:AR.F1;
+  let ring='display:none';
+  if(c.ring){const g=c.ring==='pulse'?AR.PG:AR.MG,w=c.ring==='pulse'?AR.PW:AR.MW;
+    ring='position:absolute;left:'+(-g/2)+'px;top:'+(-g/2)+'px;width:'+(AR.D+g)+'px;height:'+(AR.D+g)+'px;box-sizing:border-box;border-radius:'+(t2?(AR.T2R+g/2)+'px':'50%')+';border:'+w+'px solid '+(c.ring==='pulse'?PULSE:GOLD);}
+  return {
+    rootStyle:'position:absolute;left:'+(c.x-h)+'px;top:'+(c.y-h)+'px;width:134px;height:134px;transform:'+tf+';z-index:'+(c.drag?5:1),
+    shadowStyle:'position:absolute;inset:0;border-radius:'+rad+';background:#14201A;opacity:'+(c.drag?.34:.42)+';transform:translateY('+(c.drag?18:6)+'px)',
+    rimStyle:'position:absolute;inset:0;box-sizing:border-box;border-radius:'+rad+';background:'+(c.mythic?GOLD:CREAM)+';border:'+AR.RIM+'px solid '+(c.mythic?GOLD_EDGE:RIM_EDGE),
+    wellStyle:'position:absolute;left:'+(inset-AR.RIM)+'px;top:'+(inset-AR.RIM)+'px;right:'+(inset-AR.RIM)+'px;bottom:'+(inset-AR.RIM)+'px;box-sizing:border-box;border-radius:'+(t2?AR.T2WR+'px':'50%')+';background:'+WELL+';border:'+AR.WB+'px solid '+WELL_EDGE,
+    hairStyle:t2?'position:absolute;left:'+(AR.HIN-AR.RIM)+'px;top:'+(AR.HIN-AR.RIM)+'px;right:'+(AR.HIN-AR.RIM)+'px;bottom:'+(AR.HIN-AR.RIM)+'px;box-sizing:border-box;border-radius:'+AR.HR+'px;border:'+AR.HW+'px solid '+(c.mythic?GOLD_EDGE:RIM_EDGE):'display:none',
+    src:src(c.f,c.tier),
+    plantStyle:'position:absolute;left:'+((AR.D-box)/2-AR.RIM)+'px;top:'+((AR.D-box)/2-AR.RIM)+'px;width:'+box+'px;height:'+box+'px;display:block',
+    nubStyle:c.mythic?'position:absolute;inset:-7px;border-radius:'+(t2?'45px':'50%')+';border:4px dashed '+GOLD_EDGE+';opacity:.9':'display:none',
+    ringStyle:ring
+  };
+}
+const FIELD=[
+  {f:'clover',tier:1,x:212,y:300},{f:'daisy',tier:1,x:540,y:300},{f:'tulip',tier:1,x:868,y:300},
+  {f:'clover',tier:2,x:376,y:442},{f:'tulip',tier:1,x:704,y:442,mythic:true},
+  {f:'daisy',tier:1,x:212,y:584},{f:'clover',tier:1,x:540,y:584,id:'held'},{f:'tulip',tier:1,x:868,y:584},
+  {f:'daisy',tier:2,x:376,y:726},{f:'clover',tier:1,x:704,y:726,id:'partner'},
+  {f:'clover',tier:1,x:212,y:868},{f:'daisy',tier:1,x:540,y:868},{f:'tulip',tier:2,x:868,y:868},
+  {f:'daisy',tier:1,x:294,y:1010},{f:'clover',tier:1,x:786,y:1010}
+];
+const RB={1:['#B8D4F0','#93AAC0'],2:['#E0C4FF','#B39DCC'],3:['#FFE8B8','#CCBA93']};
+const NUN='Nunito,system-ui,sans-serif';
+// Journal — slot 136, bez wella, biljka 110
+const J={SLOT:136,ART:110,CR:36,HALO:9};
+function slot(on,tier,f,isNew){
+  const crystal=tier===3, r=on&&crystal?J.CR+'px':'50%';
+  return {
+    frameLayer:on?(crystal?'CrystalFrame':'BloomFrame'):'EmptySlot',
+    haloStyle:isNew?'position:absolute;inset:-'+J.HALO+'px;box-sizing:border-box;border-radius:'+(crystal?(J.CR+J.HALO)+'px':'50%')+';background:#FFCCD5;border:3px solid '+INK:'display:none',
+    frameStyle:on
+      ?'position:absolute;inset:0;box-sizing:border-box;border-radius:'+r+';background:'+(crystal?GOLD:CREAM)+';border:3px solid '+(crystal?GOLD_EDGE:RIM_EDGE)
+      :'position:absolute;inset:0;box-sizing:border-box;border-radius:50%;background:rgba(45,52,54,.05);border:4px solid rgba(45,52,54,.32)',
+    src:on?src(f,tier):'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+    plantStyle:on?'position:absolute;left:'+((J.SLOT-J.ART)/2-3)+'px;top:'+((J.SLOT-J.ART)/2-3)+'px;width:'+J.ART+'px;height:'+J.ART+'px;display:block':'display:none'
+  };
+}
+const CAP={locked:'Keep playing to discover this bloom.',seen:'Spotted in runs — merge to T2, then Keep in Album.',album_t2:'In your Album (T2 bloom). Merge to T3 for crystal.',album_t3:'Crystal bloom saved in Album!'};
+function jrow(d){
+  const locked=d.state==='locked', kept=d.state==='album_t3'?3:d.state==='album_t2'?2:locked?0:1;
+  const [bg,edge]=locked?['#E4E4E0','#B6B6B2']:RB[d.r];
+  const ink=locked?'#5C5C58':INK;
+  return {
+    name:locked?'???':d.name, stars:'★'.repeat(d.r)+'☆'.repeat(3-d.r),
+    caption:d.newTier?'New bloom kept in Album!':CAP[d.state],
+    slots:[1,2,3].map(t=>slot(t<=kept,t,d.f,d.newTier===t)),
+    rowStyle:'position:relative;box-sizing:border-box;width:1032px;height:200px;border-radius:26px;background:'+bg+';border:3px solid '+edge+';box-shadow:0 4px 4px rgba(45,52,54,.12);padding:0 24px 0 28px;display:flex;align-items:center;gap:24px',
+    nameStyle:'flex:0 1 auto;min-width:0;font:900 44px/48px '+NUN+';color:'+ink+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+    starsStyle:'flex:0 0 auto;font:800 34px/1 '+NUN+';letter-spacing:.04em;color:'+ink+';white-space:nowrap',
+    captionStyle:'font:'+(d.newTier?800:700)+' 38px/45px '+NUN+';color:'+(locked?'#5C5C58':d.newTier?INK:'#3F4547')+';max-height:90px;overflow:hidden;text-wrap:pretty',
+    newStyle:d.newTier?'position:absolute;left:28px;top:-21px;box-sizing:border-box;height:46px;padding:0 21px;border-radius:23px;background:#FFCCD5;border:3px solid '+INK+';display:flex;align-items:center;font:900 30px/1 '+NUN+';letter-spacing:.06em;color:'+INK+';box-shadow:0 3px 0 rgba(45,52,54,.22)':'display:none'
+  };
+}
+// Camp — okvir 128 ostaje, bez wella, biljka 104 (sjeme) / 108 (cvijet)
+function cchip(d){
+  const seed=d.seed,[bg,edge]=RB[d.r],sel=!!d.sel,box=seed?104:108;
+  return {
+    name:d.name,pips:'★'.repeat(d.r)+'☆'.repeat(3-d.r),count:'×'+d.n,price:d.p+' each',src:src(d.f,seed?1:2),
+    style:'box-sizing:border-box;width:489px;height:176px;border-radius:26px;background:'+(sel?'color-mix(in srgb,'+bg+' 86%,#fff)':bg)+';border:'+(sel?5:2)+'px solid '+(sel?'#FFB88C':edge)+';padding:'+(sel?11:14)+'px;display:flex;align-items:center;gap:14px;box-shadow:0 '+(sel?10:6)+'px '+(sel?8:6)+'px rgba(20,26,22,'+(sel?.3:.24)+');transform:translateY('+(sel?-3:0)+'px)',
+    artStyle:'width:128px;height:128px;flex:0 0 auto;box-sizing:border-box;border-radius:'+(seed?'50%':'28px')+';background:'+(seed?CREAM:GOLD)+';border:3px solid '+(seed?RIM_EDGE:GOLD_EDGE)+';display:grid;place-items:center',
+    plantStyle:'width:'+box+'px;height:'+box+'px;display:block'
+  };
+}
+// Run — bez okvira: biljka 120, pipovi 22 na r 78, sjena +70
+const R={BOX:120,PIP:22,PR:78,SH:[64,18],SHO:70};
+function rseed(d){
+  const ang=d.r===2?[-104,-76]:d.r===3?[-118,-90,-62]:[];
+  return {
+    src:src(d.f,1),
+    wrap:'position:absolute;left:'+d.x+'px;top:'+d.y+'px;width:0;height:0',
+    shadow:'position:absolute;left:'+(-R.SH[0]/2)+'px;top:'+(R.SHO-R.SH[1]/2)+'px;width:'+R.SH[0]+'px;height:'+R.SH[1]+'px;border-radius:50%;background:rgba(18,28,22,.30)',
+    plant:'position:absolute;left:'+(-R.BOX/2)+'px;top:'+(-R.BOX/2)+'px;width:'+R.BOX+'px;height:'+R.BOX+'px;display:block',
+    pips:ang.map(a=>{const q=a*Math.PI/180,x=Math.cos(q)*R.PR,y=Math.sin(q)*R.PR;
+      return {style:'position:absolute;left:'+(x-R.PIP/2).toFixed(1)+'px;top:'+(y-R.PIP/2).toFixed(1)+'px;width:'+R.PIP+'px;height:'+R.PIP+'px;box-sizing:border-box;border-radius:50%;background:'+(d.r>=3?GOLD_EDGE:'#D4A5FF')+';border:3px solid '+CREAM};})
+  };
+}
+class Component extends DCLogic {
+  renderVals(){
+    const sc=this.props.scene??'all', all=sc==='all';
+    const show={arena_idle:all||sc==='arena_idle',arena_hint:all||sc==='arena_hint',journal:all||sc==='journal',camp:all||sc==='camp',run:all||sc==='run'};
+    const arenaIdle=FIELD.map(c=>chip(c));
+    const arenaHint=FIELD.map(c=>{
+      if(c.id==='held')return chip({...c,x:600,y:650,drag:true});
+      const same=c.f==='clover'&&c.tier===1&&!c.mythic;
+      return chip({...c,ring:c.id==='partner'?'partner':same?'pulse':null});
+    });
+    const journalRows=[
+      {state:'locked',r:1,f:'clover'},
+      {state:'seen',r:1,f:'daisy',name:'Country Daisy'},
+      {state:'album_t2',r:2,f:'tulip',name:'Tulip',newTier:2},
+      {state:'album_t3',r:3,f:'clover',name:'Meadow Clover'}
+    ].map(jrow);
+    const campSeeds=[
+      {seed:true,r:1,f:'clover',name:'Clover seed',n:12,p:3,sel:true},
+      {seed:true,r:1,f:'daisy',name:'Daisy seed',n:7,p:3},
+      {seed:true,r:2,f:'tulip',name:'Tulip seed',n:4,p:6}
+    ].map(cchip);
+    const campFlowers=[
+      {seed:false,r:2,f:'tulip',name:'Tulip',n:4,p:20,sel:true},
+      {seed:false,r:1,f:'daisy',name:'Country Daisy',n:9,p:12}
+    ].map(cchip);
+    const lanes=[270,540,810].map(cx=>({style:'position:absolute;left:'+(cx-100)+'px;top:0;width:200px;height:1920px;box-sizing:border-box;background:#3A5C41;border-left:4px solid rgba(255,248,240,.2);border-right:4px solid rgba(255,248,240,.2)'}));
+    const stripes=[];[270,540,810].forEach(cx=>{for(let k=0;k<16;k++)stripes.push({style:'position:absolute;left:'+(cx-96)+'px;top:'+(k*124+30)+'px;width:192px;height:62px;background:rgba(255,248,240,.055)'});});
+    const coins=[[540,440],[540,560]].map(([x,y])=>({wrap:'position:absolute;left:'+x+'px;top:'+y+'px;width:0;height:0',
+      shadow:'position:absolute;left:-32px;top:31px;width:64px;height:18px;border-radius:50%;background:rgba(18,28,22,.30)',
+      body:'position:absolute;left:-48px;top:-48px;width:96px;height:96px;box-sizing:border-box;border-radius:50%;background:#FFD56B;border:5px solid #D6A82F'}));
+    const runSeeds=[
+      {f:'clover',r:1,x:270,y:620},{f:'tulip',r:1,x:810,y:820},
+      {f:'daisy',r:2,x:540,y:1040},{f:'clover',r:3,x:270,y:1300}
+    ].map(rseed);
+    return {show,arenaIdle,arenaHint,journalRows,campSeeds,campFlowers,lanes,stripes,coins,runSeeds};
+  }
+}
+</script>
+</body>
+</html>

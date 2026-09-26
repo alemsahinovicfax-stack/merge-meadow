@@ -17,6 +17,8 @@ ai_sažetak: "Brief za Claude Design: kako sjeme i cvijet sjede u okviru — tan
 
 # Sjeme i cvijet u okviru — Claude Design brief
 
+> **Status: implementirano 2026-09-26** — paket `design_handoff_plant_frame/` prenesen u igru; odstupanja su u [[#Implementacija (2026-09-26)|§ Implementacija]] na kraju.
+
 > Nije novi ekran. Isti crtež biljke već postoji; ovdje se mijenja **okvir oko njega** na četiri mjesta: Arena, Journal, Camp i Run. Sve što ovdje nije spomenuto ostaje kako jeste.
 
 Igrač spaja sjemenke u Areni, gleda iste biljke u Journalu i Campu, i skuplja ih u runu. Danas okvir jede crtež: bijeli rub je predebeo, tamnozelena podloga ne ide uz karticu, a sama biljka — posebno T1 — ostaje mala u sredini.
@@ -280,6 +282,15 @@ Ideje van zadatka navedi odvojeno na kraju README-a.
 | Odrez platna | `camp_plant_draw.gd` `draw_fitted_plant` (`FIT_FRAC` 0.36) i `arena_chip_draw.gd` `draw_flower` (cijeli texture rect). Home, korpa i biranje sezone i dalje zovu `draw_fitted_plant` — njihove pozive ne mijenjati osim ako dijele helper čije ponašanje ostaje isto kad se ne preda nova kutija. |
 
 Smoke koji prenos mora zadržati zelenim: `collection_journal_smoke`, `journal_new_snapshot_smoke`, `camp_layout_smoke`, `arena_redesign_smoke`, `run_redesign_smoke`.
+
+## Implementacija (2026-09-26)
+
+Paket `design_handoff_plant_frame/` prenesen. Čip ostaje promjer 134, kolizija sjemenke u runu radius 26, Home/korpa/`FIT_FRAC` 0.36 netaknuti. Novi `plant_frame_fit_smoke` provjerava da biljka stane u well i okvir, da Journal info kolona ostane široka, i da se čip i kolizija nisu pomjerili. Uz njega prolaze `collection_journal_smoke`, `journal_new_snapshot_smoke`, `camp_layout_smoke`, `arena_redesign_smoke`, `run_redesign_smoke`.
+
+**Odstupanja (svjesna):**
+
+1. **Hint `grow` u kodu je 10 i 12, ne 20 i 24 iz JSON-a.** StyleBox crta rub unutar recta. Da vanjski radijus bude 77 (pulse) i 79 (partner), a unutrašnji 65 — kako piše u odlukama, „10 px van čipa i 2 px preko ruba“ — `rect.grow` je pola te brojke. Prsten se crta iznad rima.
+2. **Sjena sjemenke je `SEED_SHADOW_OFFSET` 70.** Zajednički `PICKUP_SHADOW_OFFSET` ostaje 40, jer ga dijele novčić i dijamant; podizanje te konstante bi im odvojilo sjenu od tijela.
 
 ## Povezano
 

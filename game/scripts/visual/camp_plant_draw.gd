@@ -16,6 +16,12 @@ const SOIL_EDGE := Color(0.32, 0.2, 0.12, 0.9)
 ## Album / chip fit — same math as collection_bloom_icon (Bug-029).
 const FIT_REF_EXTENT := 28.0
 const FIT_FRAC := 0.36
+const _PROC_EXTENT_T1 := 45.0
+const _PROC_EXTENT_T2 := 68.0
+const _PROC_EXTENT_T3 := 60.0
+const _PROC_CENTER_Y := -6.0
+
+static var _crop_cache: Dictionary = {}
 
 
 static func draw_bed_soil(canvas: CanvasItem, rect: Rect2, selected: bool) -> void:
@@ -42,6 +48,54 @@ static func draw_plant(canvas: CanvasItem, center: Vector2, type_id: String, tie
 		_draw_bloom(canvas, center, type_id)
 	else:
 		_draw_sprout(canvas, center, type_id)
+
+
+## Odrezan crtež: vidljivi piksel (alpha > 0) puni `box` po dužoj strani, centrirano.
+## Home polje, korpa i biranje sezone i dalje zovu draw_fitted_plant (FIT_FRAC).
+static func draw_cropped_plant(
+	canvas: CanvasItem, center: Vector2, type_id: String, tier: int, box: float
+) -> void:
+	if tier <= 0 or box < 8.0:
+		return
+	var tex := FLOWER_ASSETS.get_texture(type_id, tier)
+	if tex == null:
+		_draw_procedural_box(canvas, center, type_id, tier, box)
+		return
+	var src := _crop_rect(tex)
+	var longer := maxf(src.size.x, src.size.y)
+	if longer < 1.0:
+		return
+	var scale := box / longer
+	var dest_size := src.size * scale
+	canvas.draw_texture_rect_region(tex, Rect2(center - dest_size * 0.5, dest_size), src)
+
+
+static func _crop_rect(tex: Texture2D) -> Rect2:
+	var key := tex.resource_path if not tex.resource_path.is_empty() else str(tex.get_instance_id())
+	if _crop_cache.has(key):
+		return _crop_cache[key]
+	var rect := Rect2(Vector2.ZERO, tex.get_size())
+	var image := tex.get_image()
+	if image != null:
+		var used := image.get_used_rect()
+		if used.size.x >= 1 and used.size.y >= 1:
+			rect = Rect2(used)
+	_crop_cache[key] = rect
+	return rect
+
+
+static func _draw_procedural_box(
+	canvas: CanvasItem, center: Vector2, type_id: String, tier: int, box: float
+) -> void:
+	var extent := _PROC_EXTENT_T1
+	if tier == 2:
+		extent = _PROC_EXTENT_T2
+	elif tier >= 3:
+		extent = _PROC_EXTENT_T3
+	var s := box / extent
+	canvas.draw_set_transform(center - Vector2(0.0, _PROC_CENTER_Y * s), 0.0, Vector2(s, s))
+	draw_plant(canvas, Vector2.ZERO, type_id, tier)
+	canvas.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 static func draw_fitted_plant(

@@ -18,8 +18,6 @@ const RARITY_EDGE_3 := Color("#CCBA93")
 const RARITY_EDGE_LOCKED := Color("#B6B6B2")
 const RIM := Color("#FFF8F0")
 const RIM_EDGE := Color("#CBC2B6")
-const WELL := Color("#22342A")
-const WELL_EDGE := Color("#16211B")
 const COIN_GOLD := Color("#FFD56B")
 const GOLD_EDGE := Color("#D6A82F")
 const NEW_PINK := Color("#FFCCD5")         # = UiChrome.BADGE_PINK — "novo" svuda
@@ -61,12 +59,10 @@ const NAME_STARS_GAP := 16
 const ROW_INNER_GAP := 24       # InfoColumn ↔ TierStrip
 
 # --- TierSlot ---
-const SLOT := 112
-const SLOT_GAP := 18
-const WELL_INSET := 10
-const ART := 88                 # box za FlowerAssets / CampPlantDraw (draw_fitted_plant, side = 88)
-const TIER_LABEL_FONT := 32
-const TIER_LABEL_GAP := 8
+const SLOT := 136
+const SLOT_GAP := 14
+const ART := 110                # odrezan crtež, bez tamnog wella
+const CRYSTAL_RADIUS := 36
 const HALO_GROW := 9
 
 # --- NewBadge ---
@@ -165,7 +161,7 @@ static func tier_frame_style(kind: String) -> StyleBoxFlat:
 			s.bg_color = COIN_GOLD
 			s.border_color = GOLD_EDGE
 			s.set_border_width_all(3)
-			s.set_corner_radius_all(30)
+			s.set_corner_radius_all(CRYSTAL_RADIUS)
 		_:
 			s.bg_color = _a(INK, 0.05)
 			s.border_color = _a(INK, 0.32)
@@ -174,21 +170,12 @@ static func tier_frame_style(kind: String) -> StyleBoxFlat:
 	return s
 
 
-static func tier_well_style(crystal: bool) -> StyleBoxFlat:
-	var s := StyleBoxFlat.new()
-	s.bg_color = WELL
-	s.border_color = WELL_EDGE
-	s.set_border_width_all(2)
-	s.set_corner_radius_all(20 if crystal else (SLOT - WELL_INSET * 2) / 2)
-	return s
-
-
 static func tier_halo_style(crystal: bool) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = NEW_PINK
 	s.border_color = INK
 	s.set_border_width_all(3)
-	s.set_corner_radius_all(30 + HALO_GROW if crystal else (SLOT + HALO_GROW * 2) / 2)
+	s.set_corner_radius_all(CRYSTAL_RADIUS + HALO_GROW if crystal else (SLOT + HALO_GROW * 2) / 2)
 	return s
 
 

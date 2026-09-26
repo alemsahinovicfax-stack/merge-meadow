@@ -10,8 +10,8 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
-zadnja_sesija: "Brief plant-frame za CD — okvir sjemena/cvijeta (Arena tanji rub + deblji hint, Journal/Camp bez zelenog wella, Run bez okvira). Kod vraćen, čeka zip."
-zadnje_azurirano: 2026-09-25
+zadnja_sesija: "Camp: prazan Seeds vodi na polje sezone, Trade bar se krije kad tab nema šta, odabir chipa je trenutan i gornji okvir prvog reda više nije sječen. Čeka se CD zip za karticu sezone (ikona + ime cvijeta)."
+zadnje_azurirano: 2026-09-26
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"

@@ -1,9 +1,8 @@
 class_name CampArtFrame
 extends Control
 
-## Okvir za art u Campu (design_handoff_camp · ArtFrame + ArtWell): sjeme = cream
-## krug, cvijet = coin gold zaobljen kvadrat, tamni well kao Arena chip.
-## Crta cvijet (ArenaChipDraw) ili jednobojnu ikonu (tabovi, bez wella).
+## Okvir za art u Campu: sjeme = cream krug, cvijet = coin gold zaobljen kvadrat.
+## Biljka sjedi na okviru (bez tamnog wella) i puni ga odrezanim crtežom.
 
 var seed_shape: bool = true
 var type_id: String = ""
@@ -11,7 +10,7 @@ var tier: int = 1
 var frame_side: float = UiCamp.CHIP_ART_FRAME
 var frame_radius: int = 26
 var frame_border: int = 3
-var well_inset: float = UiCamp.CHIP_ART_WELL_INSET
+var well_inset: float = 0.0
 var well_radius: int = 18
 var well_border: int = 2
 var art_size: float = UiCamp.CHIP_ART_SEED

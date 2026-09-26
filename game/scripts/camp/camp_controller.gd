@@ -97,6 +97,7 @@ func _setup_stash() -> void:
 	empty_cta.custom_minimum_size.y = UiCamp.EMPTY_CTA_H
 	empty_cta.clicked.connect(_on_empty_cta_pressed)
 	UiCamp.style_label(empty_title, UiCamp.FONT_EMPTY_TITLE, UiCamp.INK)
+	_ensure_grid_top_pad()
 	stash_scroll.gui_input.connect(_on_scroll_gui_input)
 
 
@@ -269,9 +270,12 @@ func _refresh_stash_view() -> void:
 	var empty := (flower_types if flowers else seed_types) == 0
 	empty_state.visible = empty
 	stash_scroll.visible = not empty
+	# Nema sta prodati — traka ne stoji prazna ispod praznog taba.
+	exchange_bar.visible = not empty
 	if empty:
 		_apply_empty_state(flowers)
-	_refresh_trade_bar()
+	else:
+		_refresh_trade_bar()
 	_apply_stash_layout()
 
 
@@ -282,7 +286,7 @@ func _apply_empty_state(flowers: bool) -> void:
 	)
 	# Bez rečenice ispod naslova — CTA vec kaze odakle stvari dolaze (v2).
 	empty_title.text = "No flowers yet" if flowers else "Your bag is empty"
-	empty_cta.set_text("Merge in Arena ↗" if flowers else "Play a run ↗")
+	empty_cta.set_text("Merge in Arena ↗" if flowers else "Open meadow ↗")
 
 
 ## v2: sekcija je uvijek iste visine (1253 s karticom sezone, 1549 bez nje), pa
@@ -398,9 +402,9 @@ func _on_crystal_chip_pressed(type_id: String) -> void:
 
 func _refresh_chip_selection() -> void:
 	for chip in seed_bag_grid.get_children():
-		(chip as CampStashChip).set_selected(chip.get_type_id() == _selected_trade_type, true)
+		(chip as CampStashChip).set_selected(chip.get_type_id() == _selected_trade_type)
 	for chip in crystal_grid.get_children():
-		(chip as CampStashChip).set_selected(chip.get_type_id() == _selected_crystal_type, true)
+		(chip as CampStashChip).set_selected(chip.get_type_id() == _selected_crystal_type)
 
 
 ## Tokom trgovanja broj chipova može samo padati — rebuild nije potreban.
@@ -649,7 +653,35 @@ func _on_empty_cta_pressed() -> void:
 	if _on_flowers():
 		_on_merge_pressed()
 	else:
-		_on_play_pressed()
+		_open_current_season_field()
+
+
+## Prazna vreca ne pali run. Otvara polje aktivne sezone; Play je tamo.
+func _open_current_season_field() -> void:
+	var id := GameState.active_season_id
+	if id.is_empty() or not GameState.is_season_playable(id):
+		id = SeasonCatalog.DEFAULT_SEASON_ID
+	if not GameState.set_active_season(id):
+		return
+	var def: SeasonDef = GameState.get_season_def(id)
+	GameState.set_home_band("paid" if def != null and def.is_paid() else "free")
+	if not GameState.open_home_season_field():
+		GameState.go_to_meta_home()
+		return
+	GameState.notify_camp_play()
+	GameState.go_to_meta_home()
+
+
+func _ensure_grid_top_pad() -> void:
+	var lists := seed_bag_grid.get_parent() as VBoxContainer
+	if lists == null or lists.get_node_or_null("ScrollTopPad") != null:
+		return
+	var pad := Control.new()
+	pad.name = "ScrollTopPad"
+	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pad.custom_minimum_size = Vector2(0, UiCamp.GRID_TOP_PAD)
+	lists.add_child(pad)
+	lists.move_child(pad, 0)
 
 
 func _on_merge_pressed() -> void:
