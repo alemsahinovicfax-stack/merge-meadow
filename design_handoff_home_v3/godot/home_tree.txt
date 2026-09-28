@@ -16,12 +16,16 @@ HomeScreen (Control 1080x1920)
 │  │  │  │     ├─ SeasonRoster (HBoxContainer)
 │  │  │  │     │  └─ RosterFlower x3 (Panel disc + TextureRect + Label if missing)
 │  │  │  │     └─ CardStatus
-│  │  │  │        ├─ PipHere | UnlockNeeds(NeedCoins, NeedStars) | UnlockButton
+│  │  │  │        ├─ OpenGate | UnlockNeeds(NeedCoins, NeedStars) | UnlockButton
 │  │  │  │        └─ PriceButton | OwnedChip | SoonChip
-│  │  │  └─ PlayButton (Button 520x180)   modes: Back / Play
+│  │  │  ├─ FieldClip (Control, clip = card rect)  └─ SeasonField (embedded: no bands/label/pip/play until u=1)
+│  │  │  ├─ CardEdge (Panel border 4 → 0)
+│  │  │  ├─ SeasonName (Label, ONE object → SeasonLabel)
+│  │  │  ├─ MeadowPip (ONE object, card → field, walks after open)
+│  │  │  └─ PlayButton (Button 520x180 → 432x140, IS FieldPlayButton)   modes: Back / Play / Run
 │  │  └─ CardNav
 │  │     ├─ PrevSeason / NextSeason (Button 120)
-│  │     └─ SeasonDots (HBoxContainer)
+│  │     └─ SeasonDots (HBoxContainer, indicator only — mouse_filter IGNORE)
 │  └─ FieldPage (Control 1080x1633, alpha 0 until open)
 │     ├─ Meadow (MeadowSky / MeadowFar / MeadowNear)
 │     ├─ MeadowFlowers (13 spots + MeadowPip)

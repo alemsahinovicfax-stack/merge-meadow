@@ -213,8 +213,9 @@ func _step() -> void:
 		push_error("meta_hub_flow_smoke: home page missing")
 		quit(1)
 		return
-	if home.get_node_or_null("%DailyChestCard") == null:
-		push_error("meta_hub_flow_smoke: home DailyChestCard missing")
+	# Home v3: dnevni poklon je samo Gift na polju sezone.
+	if home.get_node_or_null("%GiftChest") == null:
+		push_error("meta_hub_flow_smoke: home GiftChest missing")
 		quit(1)
 		return
 	if home.get_node_or_null("Panel/VBox/CampButton") != null:

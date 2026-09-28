@@ -4,6 +4,9 @@ extends Control
 ## Home field meadow — v2: livada je CIJELA stranica (1080 x 1633), bez okvira.
 ## 13 mjesta iz MEADOW_SPOTS (4 dubine, crtaju se nazad → naprijed), Pip FSM u
 ## pojasu ispred svih cvjetova. Broj izraslih javlja se overlayu signalom.
+## Home v3: dok traje prelaz (apply_reveal u < 1) livada ne crta svoje trake —
+## kartica JESTE livada — a cvijece i napomena ulaze po svojim prozorima. Pip
+## ceka predaju (hold_pip / release_pip): hoda tek kad je prelaz gotov.
 
 const FLOWER_SCRIPT := preload("res://scripts/ui/season_field_flower.gd")
 const PIP_MIN_MOVE := 80.0
@@ -34,6 +37,8 @@ var _band_sky: ColorRect
 var _band_far: ColorRect
 var _band_near: ColorRect
 var _laid_out_size: Vector2 = Vector2.ZERO
+var _reveal_u: float = 1.0
+var _pip_hold: bool = false
 
 
 func _ready() -> void:
@@ -89,6 +94,59 @@ func dismiss_flowers() -> void:
 	grown_changed.emit(0, UiHomeField.MEADOW_SPOTS.size())
 
 
+## Napredak prelaza Homea (0 = kartica, 1 = livada). Trake livade se vide tek
+## na u = 1, u istom frameu u kojem se kartica sakrije (isti pikseli).
+func apply_reveal(u: float) -> void:
+	_reveal_u = clampf(u, 0.0, 1.0)
+	if meadow_ground:
+		meadow_ground.visible = _reveal_u >= 1.0
+	if meadow_note:
+		meadow_note.modulate.a = UiHomeV3.win(_reveal_u, UiHomeV3.NOTE_IN.x, UiHomeV3.NOTE_IN.y)
+	for child in get_children():
+		if not child.has_meta("spot_index"):
+			continue
+		var c := child as Control
+		if c == null:
+			continue
+		if _reveal_u >= 1.0:
+			c.modulate.a = 1.0
+			c.scale = Vector2.ONE
+			continue
+		var start := UiHomeV3.FLOWER_START + float(c.get_meta("spot_index")) * UiHomeV3.FLOWER_STAGGER
+		var a := clampf((_reveal_u - start) / UiHomeV3.FLOWER_FADE, 0.0, 1.0)
+		var k := UiHomeV3.ease_out(clampf((_reveal_u - start) / UiHomeV3.FLOWER_SETTLE, 0.0, 1.0))
+		var sc := lerpf(UiHomeV3.FLOWER_SCALE_FROM, 1.0, k)
+		c.pivot_offset = Vector2(c.size.x * 0.5, c.size.y)
+		c.modulate.a = a
+		c.scale = Vector2(sc, sc)
+
+
+## Pip livade se sakrije i stane; Home crta putujuceg Pipa dok traje prelaz.
+func hold_pip() -> void:
+	_pip_hold = true
+	_hide_pip_and_stop()
+
+
+## Predaja na kraju otvaranja: Pip na kucnim stopalima, pa hodanje.
+func release_pip() -> void:
+	_pip_hold = false
+	_restart_wander()
+
+
+func is_pip_held() -> bool:
+	return _pip_hold
+
+
+## Stopala Pipa u px livade (za zatvaranje — Pip krece odatle).
+func pip_feet() -> Vector2:
+	if meadow_pip == null or not meadow_pip.visible:
+		var page := Vector2(UiHomeField.PAGE)
+		var base := Vector2(UiHomeField.PIP_DEFAULT_BASE)
+		var b := _meadow_bounds().size
+		return Vector2(b.x * base.x / page.x, b.y * base.y / page.y)
+	return meadow_pip.position + Vector2(meadow_pip.size.x * 0.5, meadow_pip.size.y)
+
+
 func is_pip_wandering() -> bool:
 	return _wander_tween != null and _wander_tween.is_running()
 
@@ -100,15 +158,6 @@ func is_pip_alive() -> bool:
 		and meadow_pip.visible
 		and _pip_state != _PipState.NONE
 	)
-
-
-func settle_flowers() -> void:
-	var flowers: Array = []
-	for child in get_children():
-		if child.is_in_group("meadow_flower") and child is Control:
-			flowers.append(child)
-	if not flowers.is_empty():
-		UiHomeField.tween_flowers_settle(flowers)
 
 
 func _on_resized() -> void:
@@ -166,7 +215,7 @@ func _make_band(band_name: String) -> ColorRect:
 
 
 func _apply_meadow_fill(season_id: String) -> void:
-	var ground := SeasonTheme.home_field_tint(season_id)
+	var ground := UiHomeField.meadow_ground(season_id)
 	if meadow_ground:
 		# v2: bez ruba i radiusa — livada je stranica, ne prozor.
 		var sb := StyleBoxFlat.new()
@@ -189,9 +238,9 @@ func _layout_bands() -> void:
 	var inner := meadow_ground.size
 	if inner.x < 8.0:
 		inner = size
-	var y0 := 0.0
-	var y1 := inner.y * float(UiHomeField.MEADOW_BANDS[0])
-	var y2 := inner.y * float(UiHomeField.MEADOW_BANDS[1])
+	# Isti px kao trake kartice Homea: round(h * .32), round(h * .68).
+	var y1 := roundf(inner.y * float(UiHomeField.MEADOW_BANDS[0]))
+	var y2 := roundf(inner.y * float(UiHomeField.MEADOW_BANDS[1]))
 	if _band_sky:
 		_band_sky.position = Vector2.ZERO
 		_band_sky.size = Vector2(inner.x, y1)
@@ -237,6 +286,7 @@ func _rebuild_flowers(season_id: String) -> void:
 			add_child(flower)
 			flower.setup_spot(type_id, side, 3)
 			flower.position = pos
+			flower.set_meta("spot_index", i)
 			_grown_count += 1
 		else:
 			var soil := Panel.new()
@@ -249,8 +299,10 @@ func _rebuild_flowers(season_id: String) -> void:
 				pos.y + side - soil.size.y
 			)
 			soil.add_theme_stylebox_override("panel", UiHomeField.soil_spot(int(soil.size.y)))
+			soil.set_meta("spot_index", i)
 			add_child(soil)
 	_refresh_meadow_chrome(_grown_count)
+	apply_reveal(_reveal_u)
 	_restart_wander()
 
 
@@ -325,6 +377,10 @@ func _restart_wander() -> void:
 	_last_sniff_id = 0
 	if meadow_pip == null:
 		_pip_state = _PipState.NONE
+		return
+	if _pip_hold:
+		_pip_state = _PipState.NONE
+		meadow_pip.visible = false
 		return
 	meadow_pip.visible = true
 	meadow_pip.mouse_filter = Control.MOUSE_FILTER_IGNORE

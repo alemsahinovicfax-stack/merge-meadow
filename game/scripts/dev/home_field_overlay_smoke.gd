@@ -56,7 +56,7 @@ func _run() -> void:
 		_fail("could not open the season field")
 		quit(1)
 		return
-	# Chrome uplovljava 0,22 s + stagger — provjera mora sacekati kraj tweena.
+	# Home v3: prelaz traje 0,56 s — provjera mora sacekati kraj tweena.
 	await create_timer(1.2).timeout
 	await _settle(4)
 
@@ -67,7 +67,7 @@ func _run() -> void:
 	_check_single_loop(home)
 
 	if stage.has_method("close_season_field"):
-		stage.call("close_season_field")
+		stage.call("close_season_field", false)
 	await _settle(4)
 	if _failed:
 		quit(1)
@@ -118,9 +118,11 @@ func _check_controls(home: Control) -> void:
 		if not page.grow(TOL).encloses(ctrl.get_global_rect()):
 			_fail("%s spills off the page" % path)
 
-	# Ime sezone i cip su info — swipe mora proci, pa NISU u block_hub_swipe.
-	for path in ["%SeasonLabel", "%GrownChip"]:
-		var info := home.get_node_or_null(path) as Control
+	# Ime sezone (putujuci SeasonName u SeasonStage) i cip su info — swipe mora
+	# proci, pa NISU u block_hub_swipe.
+	var stage_n := home.get_node_or_null("%SeasonStage")
+	for path in ["%SeasonName", "%GrownChip"]:
+		var info := (stage_n.get_node_or_null(path) if path == "%SeasonName" else home.get_node_or_null(path)) as Control
 		if info == null or not info.is_visible_in_tree():
 			_fail("%s should be visible in the field" % path)
 			continue

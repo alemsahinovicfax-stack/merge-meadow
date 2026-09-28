@@ -6,11 +6,6 @@ const HomeBasketPickerIcon := preload("res://scripts/ui/home_basket_picker_icon.
 const PICKER_ROW_MIN_HEIGHT := 148.0
 const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
 const LOCKED_SEED_MODULATE := Color(0.45, 0.45, 0.45, 1)
-## Biranje sezone: kolona 24 px od rubova, 23 px ispod Play reda (1430 + 180).
-const SELECT_COLUMN_OFFSETS := Vector4(24, 24, -24, -23)
-## v2: u polju kolona pokriva cijelu stranicu — livada je pozadina, ne prozor.
-const FIELD_COLUMN_OFFSETS := Vector4(0, 0, 0, 0)
-const FIELD_PLAY_SIZE := Vector2(656, 176)
 const HINT_PAD := Vector2(27, 23)
 
 enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
@@ -18,14 +13,14 @@ enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 @onready var tutorial_hint: Label = %TutorialHint
 @onready var tutorial_hint_panel: PanelContainer = %TutorialHintPanel
 @onready var field_overlay: Control = %FieldOverlay
-@onready var season_label: Label = %SeasonLabel
+@onready var field_overlay_inner: Control = %FieldOverlayInner
+@onready var top_chrome: Control = %TopChrome
 @onready var grown_chip: PanelContainer = %GrownChip
 @onready var grown_count: Label = %Count
 @onready var gift_chest: HomeGiftCard = %GiftChest
 @onready var field_basket: FieldBasketButton = %BasketButton
 @onready var upgrades_button: FieldUpgradesButton = %UpgradesButton
 @onready var bottom_row: Control = %BottomRow
-@onready var field_play_button: CampButton = %FieldPlayButton
 @onready var upgrades_overlay: Control = %UpgradesOverlay
 @onready var upgrades_panel: PanelContainer = %UpgradesPanel
 @onready var upgrades_vbox: VBoxContainer = %UpgradesVBox
@@ -36,11 +31,8 @@ enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 @onready var magnet_button: UiClickButton = %MagnetButton
 @onready var loot_boost_title: Label = %LootBoostTitle
 @onready var loot_boost_button: UiClickButton = %LootBoostButton
-@onready var home_column: VBoxContainer = %HomeColumn
-@onready var play_button: CampButton = %PlayButton
 @onready var seasons_row_button: UiClickButton = %SeasonsRowButton
 @onready var endless_play_button: UiClickButton = %EndlessPlayButton
-@onready var daily_chest_card: HomeGiftCard = %DailyChestCard
 @onready var stage_hint: HomeStageHint = %StageHint
 @onready var background: ColorRect = $Background
 @onready var reward_overlay: Control = %RewardOverlay
@@ -54,10 +46,9 @@ enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 @onready var picker_clear_button: UiClickButton = %PickerClearButton
 @onready var picker_close_button: UiClickButton = %PickerCloseButton
 @onready var season_stage: Control = %SeasonStage
-@onready var field_backdrop: ColorRect = %FieldBackdrop
 
 var _chest_ui_state: ChestUiState = ChestUiState.LOCKED
-var _play_disc: HomePlayDisc = null
+var _transition_blocker: Control
 var _basket_locked: bool = false
 var _upgrade_flash_kind: String = ""
 var _magnet_effect: Label
@@ -68,15 +59,21 @@ var _loot_effect: Label
 var _loot_level: Label
 var _loot_cost: Label
 var _loot_have: Label
-var _field_blocks_docked: bool = false
 
 
 func _ready() -> void:
-	_dock_field_blocks()
 	_ensure_upgrade_extras()
-	play_button.clicked.connect(_on_play_pressed)
-	if field_play_button:
-		field_play_button.clicked.connect(_on_play_pressed)
+	_ensure_transition_blocker()
+	if season_stage:
+		season_stage.connect("play_run_requested", _start_run)
+		season_stage.call("bind_field_chrome", {
+			"overlay": field_overlay,
+			"inner": field_overlay_inner,
+			"top": top_chrome,
+			"seasons": seasons_row_button,
+			"endless": endless_play_button,
+			"hint": tutorial_hint_panel,
+		})
 	endless_play_button.clicked.connect(_on_endless_play_pressed)
 	if seasons_row_button:
 		seasons_row_button.clicked.connect(_on_seasons_row_pressed)
@@ -105,14 +102,9 @@ func _ready() -> void:
 		loot_boost_button.clicked.connect(_on_field_loot_boost_pressed)
 	if reward_ok_button:
 		reward_ok_button.clicked.connect(_on_reward_ok_pressed)
-	if daily_chest_card:
-		daily_chest_card.gui_input.connect(_on_daily_chest_gui_input)
-		daily_chest_card.resized.connect(_on_daily_chest_resized)
-		_on_daily_chest_resized()
 	if field_basket:
 		field_basket.clicked.connect(_on_basket_pressed)
 	_bind_meadow_signal()
-	_setup_play_button()
 	_setup_typography()
 	_setup_safe_area()
 	if OS.is_debug_build() and not GameState.skip_debug_season_unlock:
@@ -139,30 +131,6 @@ func _setup_typography() -> void:
 
 func _setup_safe_area() -> void:
 	pass
-
-
-## v2: raspored polja je apsolutan u FieldOverlayu, pa se u VBoxu nema sta dokirati.
-func _dock_field_blocks() -> void:
-	_field_blocks_docked = true
-
-
-## Redoslijed iz handoffa: Play, Seasons, Endless, Gift, Basket, Upgrades, ime + cip.
-## `from_top` kaze klizi li element odozgo (gornja grupa) ili odozdo (donji red).
-func play_field_chrome_in() -> void:
-	var items: Array = []
-	var from_top: Array = []
-	for pair in [
-		[field_play_button, false], [seasons_row_button, false], [endless_play_button, false],
-		[gift_chest, true], [field_basket, true], [upgrades_button, true],
-		[season_label, true], [grown_chip, true],
-	]:
-		var node: Control = pair[0] as Control
-		if node and node.visible:
-			items.append(node)
-			from_top.append(bool(pair[1]))
-	if not items.is_empty():
-		UiHomeField.tween_chrome_in(items, from_top)
-
 
 
 func _exit_tree() -> void:
@@ -194,44 +162,34 @@ func _refresh_tutorial_hint() -> void:
 		tutorial_hint_panel.visible = first and open
 
 
+## Home v3: livada (SeasonStage) pokriva stranicu, pa nema tamne pozadine polja;
+## chrome polja je u FieldOverlayu koji SeasonStage klipuje na rect kartice.
 func sync_field_backdrop() -> void:
 	var open := GameState.home_season_field_open
-	if field_backdrop:
-		field_backdrop.visible = open
-		if open:
-			field_backdrop.color = UiHomeField.PAGE_BG
-			field_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_apply_mode_layout(open)
 	_sync_loadout_to_open_season()
 	_refresh_basket_card()
 	_refresh_endless_button()
 	_refresh_seasons_row_button()
-	_refresh_season_name_chip()
 	_refresh_field_upgrades()
 	_sync_field_hub_swipe_chrome()
 
 
 func _sync_field_hub_swipe_chrome() -> void:
 	var open := GameState.home_season_field_open
-	var play_row: Control = get_node_or_null("%PlayRow") as Control
 	for node in [
 		seasons_row_button,
 		field_basket,
 		gift_chest,
 		upgrades_button,
 		bottom_row,
-		field_play_button,
-		play_row,
-		play_button,
 		endless_play_button,
 		basket_picker_overlay,
 		upgrades_overlay,
 	]:
 		_set_block_hub_swipe(node as Control, open)
-	# Ime i cip su info — swipe mora proci kroz njih.
-	_set_block_hub_swipe(season_label, false)
+	# Cip je info — swipe mora proci kroz njega.
 	_set_block_hub_swipe(grown_chip, false)
-	_set_block_hub_swipe(field_backdrop, false)
 	if season_stage:
 		var meadow: Control = season_stage.get_node_or_null("%SeasonField") as Control
 		_set_block_hub_swipe(meadow, false)
@@ -245,17 +203,6 @@ func _set_block_hub_swipe(ctrl: Control, enabled: bool) -> void:
 			ctrl.add_to_group(BLOCK_HUB_SWIPE_GROUP)
 	elif ctrl.is_in_group(BLOCK_HUB_SWIPE_GROUP):
 		ctrl.remove_from_group(BLOCK_HUB_SWIPE_GROUP)
-
-
-## v2: ime sezone je Label na nebu; tagline otpada (stoji na kartici jedan tap nazad).
-func _refresh_season_name_chip() -> void:
-	if season_label == null:
-		return
-	if not GameState.home_season_field_open:
-		season_label.text = ""
-		return
-	var def: SeasonDef = GameState.get_season_def(GameState.home_season_field_id)
-	season_label.text = def.display_name if def else GameState.home_season_field_id
 
 
 func _on_seasons_row_pressed() -> void:
@@ -277,88 +224,48 @@ func _refresh_seasons_row_button() -> void:
 	seasons_row_button.visible = GameState.home_season_field_open
 
 
-## Play: tuđa kartica → nazad na sezonu u kojoj se igra; ta sezona → polje; polje → run.
+## Play: tuđa kartica → nazad na sezonu u kojoj se igra ("focus"); ta sezona →
+## polje ("field"); polje → run. Jedno dugme (SeasonStage · PlayButton).
 func home_play_action() -> String:
-	if GameState.home_season_field_open:
-		return "run"
-	var shown := ""
-	if season_stage and season_stage.has_method("focused_card_id"):
-		shown = str(season_stage.focused_card_id())
-	var active := GameState.active_season_id
-	if shown.is_empty() or shown == active:
+	if season_stage == null:
 		return "field"
-	return "focus"
+	var a := str(season_stage.call("play_action"))
+	return "focus" if a == "back" else a
 
 
-func _on_play_pressed() -> void:
-	match home_play_action():
-		"focus":
-			if season_stage and season_stage.has_method("focus_playing_season"):
-				season_stage.focus_playing_season()
-		"field":
-			var field_id := GameState.active_season_id
-			if season_stage and season_stage.has_method("open_season_field"):
-				season_stage.open_season_field(field_id)
-		_:
-			var id := GameState.active_season_id
-			if id.is_empty() or not GameState.is_season_playable(id):
-				GameState.set_active_season(SeasonCatalog.DEFAULT_SEASON_ID)
-			GameState.begin_campaign_run()
-			SceneRouter.change_to(GameState.SCENE_RUN)
+func get_play_button() -> Control:
+	return season_stage.get_node_or_null("%PlayButton") as Control if season_stage else null
 
 
-## Play na biranju sezone (SeasonStage.dc.html · PlayButton): 836 x 180, peach,
-## cream disk s ▶, "Play" 72/900 i "run in {aktivna}" 38/800. U polju sezone
-## (HOME-19) isto dugme dobija field izgled u _apply_play_layout().
-func _setup_play_button() -> void:
-	var row := play_button.get_node_or_null("ContentRow") as HBoxContainer
-	if row == null:
+func _start_run() -> void:
+	if not GameState.home_season_field_open:
 		return
-	_play_disc = HomePlayDisc.new()
-	row.add_child(_play_disc)
-	var camp_icon := row.get_node_or_null("CampIcon")
-	row.move_child(_play_disc, camp_icon.get_index() if camp_icon else 0)
-	play_button.set_text("Play")
+	var id := GameState.active_season_id
+	if id.is_empty() or not GameState.is_season_playable(id):
+		GameState.set_active_season(SeasonCatalog.DEFAULT_SEASON_ID)
+	GameState.begin_campaign_run()
+	SceneRouter.change_to(GameState.SCENE_RUN)
 
 
 func refresh_play_chip() -> void:
-	var def: SeasonDef = GameState.get_season_def(GameState.active_season_id)
-	var active_name := def.display_name if def else ""
-	if play_button and not GameState.home_season_field_open:
-		play_button.set_text("Play", active_name)
+	pass
 
 
+## Home v3: Play nosi samo „Play" / „Back" — ime sezone je na kartici.
 func get_play_chip_text() -> String:
-	if play_button == null:
-		return ""
-	return play_button.get_sub()
+	return ""
 
 
-## v2: u polju kolona nestaje s puta (offseti 0) pa livada uzima cijelu stranicu,
-## a sve kontrole zive u FieldOverlayu na apsolutnim pozicijama.
+## Chrome polja: vidljiv dok je polje otvoreno (i dok traje zatvaranje — stanje
+## se zatvara tek kad prelaz stigne do kartice).
 func _apply_mode_layout(field_open: bool) -> void:
-	if background:
-		background.color = UiHomeField.PAGE_BG if field_open else UiStage.PAGE_BG
-	if home_column:
-		var o := FIELD_COLUMN_OFFSETS if field_open else SELECT_COLUMN_OFFSETS
-		home_column.offset_left = o.x
-		home_column.offset_top = o.y
-		home_column.offset_right = o.z
-		home_column.offset_bottom = o.w
-		home_column.add_theme_constant_override(
-			"separation", UiHomeField.BLOCK_GAP if field_open else UiStage.BLOCK_GAP
-		)
-	if season_stage:
-		season_stage.custom_minimum_size.y = float(UiHomeField.MEADOW.size.y) if field_open else 0.0
-	var play_row: Control = get_node_or_null("%PlayRow") as Control
-	if play_row:
-		play_row.visible = not field_open
 	if field_overlay:
 		field_overlay.visible = field_open
 	if not field_open:
 		_close_upgrades_sheet()
 	_apply_field_overlay_styles()
-	_apply_play_layout(field_open)
+	if field_open:
+		_style_field_bottom_row()
 	_refresh_chest_card()
 	_refresh_tutorial_hint()
 	_refresh_upgrades_button()
@@ -369,8 +276,6 @@ func _apply_mode_layout(field_open: bool) -> void:
 func _apply_field_overlay_styles() -> void:
 	if field_overlay == null or not field_overlay.visible:
 		return
-	if season_label:
-		season_label.add_theme_font_override("font", UiStage.font(900, 56))
 	if grown_chip:
 		grown_chip.add_theme_stylebox_override(
 			"panel", UiStage.pad(UiHomeField.grown_chip(), 26, 14, 26, 14)
@@ -389,79 +294,33 @@ func _apply_field_overlay_styles() -> void:
 		)
 
 
-func _apply_play_layout(field_open: bool) -> void:
-	if play_button == null:
-		return
-	var row := play_button.get_node_or_null("ContentRow") as HBoxContainer
-	var col := play_button.get_text_column()
-	var title := play_button.get_title_label()
-	var sub := play_button.get_sub_label()
-	if _play_disc:
-		_play_disc.visible = not field_open
-	if field_open:
-		_style_field_bottom_row()
-	else:
-		play_button.custom_minimum_size = Vector2(UiStage.PLAY_W, UiStage.PLAY_ROW.size.y)
-		play_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		var normal := UiStage.drop(
-			UiStage.pad(UiStage.box(UiStage.PEACH, 32, 4, UiStage.PEACH_EDGE), 40, 4, 40, 4),
-			UiStage.PEACH_DROP, 8.0
-		)
-		var pressed := normal.duplicate() as StyleBoxFlat
-		pressed.bg_color = UiStage.PEACH.darkened(0.06)
-		play_button.set_styles(normal, pressed)
-		play_button.set_icon(null, 0.0)
-		var def: SeasonDef = GameState.get_season_def(GameState.active_season_id)
-		var active_name := def.display_name if def else ""
-		play_button.set_text("Play", active_name)
-		if title:
-			UiStage.style(title, 900, 72, UiStage.INK)
-			title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		if sub:
-			UiStage.style(sub, 800, 38, UiStage.INK)
-			sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		play_button.set_press_scale(0.97)
-		if row:
-			row.alignment = BoxContainer.ALIGNMENT_BEGIN
-			row.add_theme_constant_override("separation", 30)
-		if col:
-			col.add_theme_constant_override("separation", 10)
-
-
-## Donji red: Seasons 236 x 124 · Play 432 x 140 (centar x 540) · Endless 236 x 124.
+## Donji red: Seasons 236 x 124 · Play 432 x 140 (centar x 540, JE PlayButton
+## Homea) · Endless 236 x 124. Naljepnica rub 3 + sjenka 8; sadrzaj kao
+## FieldScreen.dc.html: crtani chevron / dva prstena + tekst 38/900.
 func _style_field_bottom_row() -> void:
-	if field_play_button:
-		field_play_button.custom_minimum_size = Vector2(UiHomeField.PLAY_BTN.size)
-		field_play_button.set_styles(
-			UiHomeField.play_button(), UiHomeField.pressed_sticker(UiHomeField.play_button())
-		)
-		field_play_button.set_fonts(60, 38)
-		field_play_button.set_ink(UiHomeField.INK)
-		field_play_button.set_text("Play")
-		field_play_button.set_icon(null, 0.0)
-		field_play_button.set_press_scale(1.0)
-		var f_title := field_play_button.get_title_label()
-		if f_title:
-			f_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			f_title.add_theme_font_override("font", UiStage.font(900, 60))
-	if seasons_row_button:
-		seasons_row_button.custom_minimum_size = Vector2(UiHomeField.SEASONS_BTN.size)
-		seasons_row_button.add_theme_stylebox_override("panel", UiHomeField.seasons_button())
-		seasons_row_button.label_text = "‹  Seasons"
-		seasons_row_button.font_size = 40
-		var back_label := seasons_row_button.get_node_or_null("ContentRow/Label") as Label
-		if back_label:
-			back_label.add_theme_font_override("font", UiStage.font(800, 40))
-			back_label.add_theme_color_override("font_color", UiHomeField.INK)
-	if endless_play_button:
-		endless_play_button.custom_minimum_size = Vector2(UiHomeField.ENDLESS_BTN.size)
-		endless_play_button.add_theme_stylebox_override("panel", UiHomeField.endless_button())
-		endless_play_button.label_text = "∞  Endless"
-		endless_play_button.font_size = 40
-		var e_label := endless_play_button.get_node_or_null("ContentRow/Label") as Label
-		if e_label:
-			e_label.add_theme_font_override("font", UiStage.font(800, 40))
-			e_label.add_theme_color_override("font_color", UiHomeField.INK)
+	_style_sticker_button(seasons_row_button, UiHomeField.SEASONS_BTN.size, UiHomeField.seasons_button(), "Seasons", "chevron", 14)
+	_style_sticker_button(endless_play_button, UiHomeField.ENDLESS_BTN.size, UiHomeField.endless_button(), "Endless", "rings", 12)
+
+
+func _style_sticker_button(btn: UiClickButton, sz: Vector2i, style: StyleBoxFlat, text: String, glyph: String, gap: int) -> void:
+	if btn == null:
+		return
+	btn.custom_minimum_size = Vector2(sz)
+	btn.set_panel_styles(style, UiHomeField.pressed_sticker(style))
+	btn.label_text = text
+	btn.font_size = 38
+	var row := btn.get_node_or_null("ContentRow") as HBoxContainer
+	if row == null:
+		return
+	row.add_theme_constant_override("separation", gap)
+	var label := row.get_node_or_null("Label") as Label
+	if label:
+		UiStage.style(label, 900, 38, UiHomeField.OUTLINE)
+		label.add_theme_font_size_override("font_size", 38)
+	if row.get_node_or_null("Glyph") == null:
+		var g := HomeV3Glyph.new(glyph)
+		row.add_child(g)
+		row.move_child(g, 0)
 
 
 func _on_endless_play_pressed() -> void:
@@ -677,16 +536,12 @@ func _flash_upgrade(kind: String) -> void:
 
 
 func _refresh_chest_card() -> void:
-	if daily_chest_card == null:
+	if gift_chest == null:
 		return
 	if _chest_ui_state == ChestUiState.OPENING:
 		return
-	# v2: poklon se vidi i u polju — gornja lijeva plocica iznad korpe.
-	var field_open := GameState.home_season_field_open
-	# Poklon je samo na polju sezone. Na biranju sezona kartica ostaje u redu, ali skrivena.
-	daily_chest_card.visible = false
-	if gift_chest:
-		gift_chest.visible = field_open
+	# Poklon je samo na polju sezone — gornja lijeva plocica iznad korpe.
+	gift_chest.visible = GameState.home_season_field_open
 	var claimable := false
 	if not GameState.tutorial_complete:
 		_chest_ui_state = ChestUiState.LOCKED
@@ -695,25 +550,16 @@ func _refresh_chest_card() -> void:
 		claimable = true
 	else:
 		_chest_ui_state = ChestUiState.CLAIMED
-	daily_chest_card.claimable = claimable
-	if gift_chest:
-		gift_chest.claimable = claimable
+	gift_chest.claimable = claimable
 
 
 ## Roze tacka na Gift kartici = poklon ceka (DailyGiftCard u dizajnu).
 func is_gift_claimable() -> bool:
-	if GameState.home_season_field_open:
-		return gift_chest != null and gift_chest.visible and gift_chest.claimable
-	return daily_chest_card != null and daily_chest_card.visible and daily_chest_card.claimable
+	return gift_chest != null and gift_chest.visible and gift_chest.claimable
 
 
 func is_basket_attention_active() -> bool:
 	return field_basket != null and field_basket.is_attention_running()
-
-
-func _on_daily_chest_resized() -> void:
-	if daily_chest_card:
-		daily_chest_card.pivot_offset = daily_chest_card.size * 0.5
 
 
 func _on_daily_chest_gui_input(event: InputEvent) -> void:
@@ -725,7 +571,7 @@ func _on_daily_chest_gui_input(event: InputEvent) -> void:
 		tapped = (event as InputEventScreenTouch).pressed
 	if not tapped:
 		return
-	daily_chest_card.accept_event()
+	gift_chest.accept_event()
 	_on_daily_chest_pressed()
 
 
@@ -741,7 +587,7 @@ func _on_daily_chest_pressed() -> void:
 		)
 		return
 	_chest_ui_state = ChestUiState.OPENING
-	var card: HomeGiftCard = gift_chest if gift_chest and gift_chest.visible else daily_chest_card
+	var card: HomeGiftCard = gift_chest
 	card.claimable = false
 	card.pivot_offset = card.size * 0.5
 	var tw := create_tween()
@@ -808,8 +654,43 @@ func _refresh_basket_card() -> void:
 	var type_id := GameState.get_loadout_type()
 	var state := "locked" if _basket_locked else ("empty" if type_id.is_empty() else "chosen")
 	field_basket.apply_state(state, type_id)
-	if not GameState.home_season_field_open:
+	# Jedini loop (prsten oko prazne korpe) radi samo na polju, u = 1 — ne u prelazu.
+	if not GameState.home_season_field_open or _stage_transitioning():
 		field_basket.stop_attention()
+
+
+func _stage_transitioning() -> bool:
+	return season_stage != null and bool(season_stage.call("is_field_transitioning"))
+
+
+## Dok traje prelaz nijedna kontrola polja ne prima dodir (ni hub swipe).
+func _ensure_transition_blocker() -> void:
+	if field_overlay_inner == null or _transition_blocker != null:
+		return
+	_transition_blocker = Control.new()
+	_transition_blocker.name = "TransitionBlocker"
+	_transition_blocker.visible = false
+	_transition_blocker.mouse_filter = Control.MOUSE_FILTER_STOP
+	_transition_blocker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_transition_blocker.add_to_group(BLOCK_HUB_SWIPE_GROUP)
+	field_overlay_inner.add_child(_transition_blocker)
+
+
+## SeasonStage javlja pocetak i kraj prelaza kartica ↔ livada.
+func on_field_transition_started(_opening: bool) -> void:
+	if _transition_blocker:
+		_transition_blocker.visible = true
+	if field_basket:
+		field_basket.stop_attention()
+	_close_basket_picker()
+	_close_upgrades_sheet()
+
+
+func on_field_transition_finished(opened: bool) -> void:
+	if _transition_blocker:
+		_transition_blocker.visible = false
+	if opened:
+		_refresh_basket_card()
 
 
 func _sync_basket_attention() -> void:

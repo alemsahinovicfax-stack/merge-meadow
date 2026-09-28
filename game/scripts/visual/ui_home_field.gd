@@ -149,11 +149,17 @@ static func meadow_ground(season_id: String, mood: Color = MINT) -> Color:
 		return MEADOW_GROUND[season_id]
 	return mood.lerp(WARM_WHITE, 0.45)
 
+## Kanali se zaokruzuju na 8 bita kao u dizajnu — kartica Homea i livada
+## koriste iste funkcije, pa je predaja na kraju prelaza bez šava.
 static func meadow_sky(ground: Color) -> Color:
-	return ground.lerp(Color.WHITE, 0.30)
+	return Color8(
+		roundi(ground.r8 + (255 - ground.r8) * 0.30),
+		roundi(ground.g8 + (255 - ground.g8) * 0.30),
+		roundi(ground.b8 + (255 - ground.b8) * 0.30)
+	)
 
 static func meadow_near(ground: Color) -> Color:
-	return Color(ground.r * 0.93, ground.g * 0.93, ground.b * 0.93)
+	return Color8(roundi(ground.r8 * 0.93), roundi(ground.g8 * 0.93), roundi(ground.b8 * 0.93))
 
 static func magnet_radius(level: int) -> int:
 	return MAGNET_BASE_RADIUS + MAGNET_STEP * level
@@ -352,58 +358,12 @@ static func rarity_pips(rarity: int) -> String:
 
 
 # ── Animacije ────────────────────────────────────────────────────────────────
+## Prelaz kartica ↔ livada (i ulaz cvijeca / chromea) vodi SeasonStage po
+## UiHomeV3 (jedan tween u, 560 / 440 ms). Ovdje ostaje samo jedini loop.
 const ANIM := {
-	"field_open": 0.28,
-	"card_content_out": 0.12,
-	"bands_in_delay": 0.16,
-	"bands_in": 0.18,
-	"chrome_delay": 0.22,
-	"chrome_in": 0.18,
-	"chrome_stagger": 0.06,
-	"chrome_slide": 16.0,
-	"chrome_out": 0.12,
-	"field_close": 0.24,
 	"attention": 1.2,
 	"attention_scale": 1.16,
-	"flower_settle": 0.20,
-	"flower_stagger": 0.024,
-	"sheet_in": 0.24,
-	"scrim_in": 0.18,
-	"press": 0.08,
-	"pip_bubble_in": 0.16,
-	"pip_bubble_hold": 1.8,
 }
-
-## Kartica sezone → cijela stranica. Isti Panel: rect + radius + rub + bg_color.
-static func tween_open_field(shell: Control, ground: Color) -> Tween:
-	var t := shell.create_tween().set_parallel(true)
-	t.tween_property(shell, "position", Vector2(MEADOW.position), ANIM.field_open) \
-		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	t.tween_property(shell, "size", Vector2(MEADOW.size), ANIM.field_open) \
-		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	var sb: StyleBoxFlat = shell.get_theme_stylebox("panel")
-	if sb:
-		t.tween_property(sb, "bg_color", ground, ANIM.field_open)
-		t.tween_method(func(v: float) -> void: sb.set_corner_radius_all(int(v)), 36.0, 0.0, ANIM.field_open)
-		t.tween_method(func(v: float) -> void: sb.set_border_width_all(int(v)), 8.0, 0.0, ANIM.field_open)
-	return t
-
-## Chrome plovi: fade + 16 px od svog ruba. `from_top` = gornja grupa (klizi dolje).
-## Redoslijed: Play, Seasons, Endless, Gift, Basket, Upgrades, ime + čip.
-static func tween_chrome_in(items: Array, from_top: Array) -> void:
-	for i in items.size():
-		var c: Control = items[i]
-		if c == null or not c.visible:
-			continue
-		var home := c.position
-		var top: bool = i < from_top.size() and bool(from_top[i])
-		var dy: float = -ANIM.chrome_slide if top else ANIM.chrome_slide
-		c.modulate.a = 0.0
-		c.position = home + Vector2(0.0, dy)
-		var t := c.create_tween().set_parallel(true)
-		var delay: float = ANIM.chrome_delay + ANIM.chrome_stagger * float(i)
-		t.tween_property(c, "modulate:a", 1.0, ANIM.chrome_in).set_delay(delay).set_ease(Tween.EASE_OUT)
-		t.tween_property(c, "position", home, ANIM.chrome_in).set_delay(delay).set_ease(Tween.EASE_OUT)
 
 ## Jedini loop na ekranu: ripple oko prazne korpe. Zaustaviti kad se sjeme izabere.
 static func tween_attention(ring: Control) -> Tween:
@@ -418,12 +378,3 @@ static func tween_attention(ring: Control) -> Tween:
 	t.parallel().tween_property(ring, "modulate:a", 0.0, ANIM.attention * 0.6).set_ease(Tween.EASE_OUT)
 	t.tween_interval(ANIM.attention * 0.4)
 	return t
-
-## Cvjetovi sjedaju jednom, pri otvaranju. Poslije toga livada je statična.
-static func tween_flowers_settle(flowers: Array) -> void:
-	for i in flowers.size():
-		var f: Control = flowers[i]
-		f.scale = Vector2(0.9, 0.9)
-		var t := f.create_tween()
-		t.tween_interval(ANIM.flower_stagger * i)
-		t.tween_property(f, "scale", Vector2.ONE, ANIM.flower_settle).set_ease(Tween.EASE_OUT)

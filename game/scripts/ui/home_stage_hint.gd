@@ -1,17 +1,17 @@
 class_name HomeStageHint
 extends Control
 
-## TutorialHint prve sesije (SeasonStage.dc.html · scene "new"): cream prsten
-## oko Play dugmeta (scale 1.06) koji pulsira i oblacic sa strelicom na (60, 1196).
-## Koordinate su koordinate Home stranice (1080 x 1633).
+## TutorialHint prve sesije: cream prsten oko Play dugmeta (scale 1.06, pilula)
+## koji pulsira i oblacic centriran na y 836 — izmedju cvijeca i Pipa na kartici
+## Home v3, pa ne pokriva nista od kartice. Koordinate su koordinate stranice.
 
 const TITLE := "Tap Play to start your first run"
 const SUB := "The card opens your meadow."
-const BUBBLE_POS := Vector2(60.0, 1196.0)
-const BUBBLE_MAX_W := 760.0
+const BUBBLE_TOP := 836.0
+const BUBBLE_MAX_W := 960.0
 const PULSE_SEC := 1.4
 
-var target := Rect2(UiStage.PLAY_ROW.position, Vector2(UiStage.PLAY_W, UiStage.PLAY_ROW.size.y))
+var target: Rect2 = UiHomeV3.PLAY_CARD.rect
 var _t: float = 0.0
 
 
@@ -39,7 +39,7 @@ func _draw() -> void:
 	var s := 1.06
 	var ring_rect := Rect2(target.get_center() - target.size * s * 0.5, target.size * s)
 	var wave := 0.5 + 0.5 * cos(_t * TAU / PULSE_SEC)
-	var ring := UiStage.box(Color.TRANSPARENT, roundi(32.0 * s), roundi(10.0 * s), Color(UiStage.HINT_RING, UiStage.HINT_RING.a * lerpf(0.45, 1.0, wave)))
+	var ring := UiStage.box(Color.TRANSPARENT, roundi(ring_rect.size.y * 0.5), roundi(10.0 * s), Color(UiStage.HINT_RING, UiStage.HINT_RING.a * lerpf(0.45, 1.0, wave)))
 	ring.draw_center = false
 	draw_style_box(ring, ring_rect)
 
@@ -53,7 +53,8 @@ func _draw() -> void:
 	inner_w = minf(inner_w, max_text)
 	var title_h := f_title.get_height(44) * float(title_lines.size())
 	var sub_h := f_sub.get_height(38)
-	var bubble := Rect2(BUBBLE_POS, Vector2(inner_w + 68.0 + 8.0, 8.0 + 52.0 + title_h + 10.0 + sub_h))
+	var bubble_w := inner_w + 68.0 + 8.0
+	var bubble := Rect2(Vector2((size.x - bubble_w) * 0.5, BUBBLE_TOP), Vector2(bubble_w, 8.0 + 52.0 + title_h + 10.0 + sub_h))
 	draw_style_box(UiStage.box(UiStage.CREAM, 28, 4, UiStage.INK), bubble)
 	var x := bubble.position.x + 4.0 + 34.0
 	var top := bubble.position.y + 4.0 + 26.0
@@ -62,7 +63,7 @@ func _draw() -> void:
 		top += f_title.get_height(44)
 	top += 10.0
 	draw_string(f_sub, Vector2(x, UiStage.baseline(f_sub, 38, top)), SUB, HORIZONTAL_ALIGNMENT_LEFT, -1, 38, UiStage.INK_SOFT)
-	var ax := bubble.position.x + 110.0
+	var ax := bubble.get_center().x - 26.0
 	var ay := bubble.end.y
 	draw_colored_polygon(PackedVector2Array([
 		Vector2(ax, ay), Vector2(ax + 52.0, ay), Vector2(ax + 26.0, ay + 30.0)

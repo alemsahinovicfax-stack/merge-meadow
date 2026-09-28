@@ -11,7 +11,6 @@ const SAVE_PATH := "user://player_save.json"
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
 const BLOOM_PASTEL := Color(0.90, 0.95, 0.86, 1.0)
 ## Home pozadina = Camp #2E4733 (design_handoff_home, 2026-09-21).
-const HOME_DARK := Color(0.180392, 0.278431, 0.2, 1.0)
 
 
 func _initialize() -> void:
@@ -37,6 +36,17 @@ func _count_named(n: Node, node_name: String) -> int:
 		if str(child.name) == node_name:
 			count += 1
 	return count
+
+
+## Home v3: otvaranje traje 0,56 s, zatvaranje 0,44 s — cekaj kraj prelaza.
+func _wait_transition(stage: Node) -> void:
+	for _i in 240:
+		if stage.has_method("is_field_transitioning") and bool(stage.call("is_field_transitioning")):
+			await create_timer(0.02).timeout
+		else:
+			break
+	await process_frame
+	await process_frame
 
 
 func _field_flowers(field: Node) -> Array:
@@ -139,7 +149,7 @@ func _assert_pip_alive(field: Node, pip: Control, label: String) -> String:
 ## v2: Seasons 236 x 124 · Play 432 x 140 (centar x 540) · Endless 236 x 124.
 func _assert_play_row_equal(home: Node) -> String:
 	var seasons_n: Control = home.get_node_or_null("%SeasonsRowButton") as Control
-	var play_n: Control = home.get_node_or_null("%FieldPlayButton") as Control
+	var play_n: Control = home.call("get_play_button") as Control
 	var endless_n: Control = home.get_node_or_null("%EndlessPlayButton") as Control
 	if seasons_n == null or play_n == null or endless_n == null:
 		return "BottomRow children missing"
@@ -268,8 +278,6 @@ func _assert_open_field_hub_swipe(home: Node, swipe: Node, field: Control) -> St
 	var chrome: Control = home.get_node_or_null("%GiftChest") as Control
 	if chrome == null or not chrome.is_visible_in_tree():
 		chrome = home.get_node_or_null("%BottomRow") as Control
-	if chrome == null or not chrome.is_visible_in_tree():
-		chrome = home.get_node_or_null("%PlayRow") as Control
 	if chrome == null:
 		return "Gift/BottomRow missing for swipe chrome check"
 	var chrome_mid: Vector2 = chrome.get_global_rect().get_center()
@@ -329,26 +337,24 @@ func _run() -> void:
 		_fail("SeasonStage missing")
 		return
 
-	var band: Control = stage.get_node_or_null("%SelectLayer") as Control
+	# Home v3: kartica je biranje; livada (SeasonField) je u FieldClip-u.
+	var band: Control = stage.get_node_or_null("%SeasonCard") as Control
 	var field: Control = stage.get_node_or_null("%SeasonField") as Control
-	var seasons: Node = stage.get_node_or_null("%SeasonsButton")
-	if band == null or field == null:
-		_fail("SelectLayer or SeasonField missing")
+	var clip: Control = stage.get_node_or_null("%FieldClip") as Control
+	if band == null or field == null or clip == null:
+		_fail("SeasonCard / SeasonField / FieldClip missing")
 		return
 	if bool(gs.get("home_season_field_open")):
 		_fail("default field should be closed")
 		return
 	if not band.visible:
-		_fail("default SelectLayer should be visible")
+		_fail("default SeasonCard should be visible")
 		return
-	if field.visible:
-		_fail("default SeasonField should be hidden")
+	if clip.visible:
+		_fail("default FieldClip (meadow) should be hidden")
 		return
-	if _count_named(stage, "SeasonField") != 1:
-		_fail("expected exactly 1 SeasonField child, got %d" % _count_named(stage, "SeasonField"))
-		return
-	if seasons == null:
-		_fail("SeasonsButton missing")
+	if _count_named(clip, "SeasonField") != 1:
+		_fail("expected exactly 1 SeasonField in FieldClip, got %d" % _count_named(clip, "SeasonField"))
 		return
 	if not bool(gs.call("can_open_home_season_field")):
 		_fail("Bloom center should can_open")
@@ -357,7 +363,6 @@ func _run() -> void:
 	if str(home.call("home_play_action")) != "field":
 		_fail("trail Bloom: home_play_action should open the field")
 		return
-	var play_row: Node = home.get_node_or_null("%PlayRow")
 	var overlay: Control = home.get_node_or_null("%FieldOverlay") as Control
 	if overlay == null:
 		_fail("FieldOverlay missing")
@@ -374,11 +379,11 @@ func _run() -> void:
 	if basket == null:
 		_fail("BasketButton missing")
 		return
-	if basket.get_parent() != overlay:
-		_fail("BasketButton parent should be FieldOverlay")
+	if not overlay.is_ancestor_of(basket):
+		_fail("BasketButton should sit in FieldOverlay")
 		return
 	var bottom: Control = home.get_node_or_null("%BottomRow") as Control
-	if bottom == null or bottom.get_parent() != overlay:
+	if bottom == null or not overlay.is_ancestor_of(bottom):
 		_fail("BottomRow should sit in FieldOverlay")
 		return
 	var seasons_row: Control = home.get_node_or_null("%SeasonsRowButton") as Control
@@ -401,17 +406,18 @@ func _run() -> void:
 	if endless_btn.get_parent() != bottom:
 		_fail("EndlessPlayButton parent should be BottomRow")
 		return
-	var play_btn_carousel: Control = home.get_node_or_null("%PlayButton") as Control
+	var play_btn_carousel: Control = home.call("get_play_button") as Control
 	if play_btn_carousel == null:
 		_fail("PlayButton missing")
 		return
-	# Biranje sezone: Play 180 + "run in {active}"; Seasons/Endless su skriveni.
-	if play_btn_carousel.custom_minimum_size.y < 176.0:
-		_fail("select Play min height expected 180 got %s" % str(play_btn_carousel.custom_minimum_size))
+	# Home v3: Play na biranju 520 x 180; Seasons/Endless su skriveni.
+	if absf(play_btn_carousel.size.y - 180.0) > 1.5 or absf(play_btn_carousel.size.x - 520.0) > 1.5:
+		_fail("select Play expected 520 x 180 got %s" % str(play_btn_carousel.size))
 		return
-	var name_label: Control = home.get_node_or_null("%SeasonLabel") as Control
-	if name_label and name_label.is_visible_in_tree():
-		_fail("carousel SeasonLabel should be hidden")
+	# Ime sezone je JEDAN objekat (SeasonName) — na kartici 80 px, na polju 56 px.
+	var name_label: Control = stage.get_node_or_null("%SeasonName") as Control
+	if name_label == null or str(name_label.get("text")) != "Country Bloom":
+		_fail("carousel SeasonName should show Country Bloom")
 		return
 	var carousel_up_err := _assert_field_upgrades_hidden(home, "carousel")
 	if not carousel_up_err.is_empty():
@@ -420,13 +426,7 @@ func _run() -> void:
 
 	# Polje se otvara tapom na otvorenu aktivnu karticu (ne vise preko Playa).
 	stage.call("tap_card", "country_bloom")
-	await process_frame
-	await process_frame
-	for _tw in 12:
-		if stage.has_method("is_field_transitioning") and bool(stage.call("is_field_transitioning")):
-			await process_frame
-		else:
-			break
+	await _wait_transition(stage)
 	if not bool(gs.get("home_season_field_open")):
 		_fail("tap on active Bloom card should open field")
 		return
@@ -437,30 +437,21 @@ func _run() -> void:
 		_fail("Bloom open: home_play_action should be run")
 		return
 	if band.visible:
-		_fail("SelectLayer should hide when field open")
+		_fail("SeasonCard should hide when the field is open (u = 1)")
 		return
-	if not field.visible:
+	if not clip.visible or not field.visible:
 		_fail("SeasonField should show when open")
 		return
-	if _count_named(stage, "SeasonField") != 1:
+	if _count_named(clip, "SeasonField") != 1:
 		_fail("still exactly 1 SeasonField after open")
 		return
-	if seasons == null:
-		_fail("SeasonsButton missing after open")
-		return
-	if (seasons as Control).visible:
-		_fail("Bloom open: SeasonsButton should be hidden")
-		return
-	if str(seasons.get("label_text")).findn("Seasons") >= 0:
-		_fail("SeasonsButton label should be empty")
-		return
-	if name_label == null:
-		_fail("SeasonLabel missing")
-		return
 	if not name_label.is_visible_in_tree():
-		_fail("Bloom open: SeasonLabel should be visible")
+		_fail("Bloom open: SeasonName should be visible")
 		return
-	var bloom_chip := str((name_label as Label).text)
+	if absf(float(name_label.get("top")) - 36.0) > 0.5 or absf(float(name_label.get("px")) - 56.0) > 0.5:
+		_fail("Bloom open: SeasonName should land on the field label (top 36, 56 px)")
+		return
+	var bloom_chip := str(name_label.get("text"))
 	if bloom_chip.find("Country Bloom") < 0:
 		_fail("Bloom label expected Country Bloom got '%s'" % bloom_chip)
 		return
@@ -538,41 +529,12 @@ func _run() -> void:
 		_fail(bloom_pip_err)
 		return
 	var bloom_pip_id := pip.get_instance_id()
-	var backdrop: ColorRect = home.get_node_or_null("%FieldBackdrop") as ColorRect
-	var home_bg: ColorRect = home.get_node_or_null("Background") as ColorRect
-	var daily: Control = home.get_node_or_null("%DailyChestCard") as Control
-	if not daily is HomeGiftCard:
-		_fail("DailyChestCard must be the v2 Gift card")
+	var play_btn: Control = home.call("get_play_button") as Control
+	if play_btn == null or absf(play_btn.size.x - 432.0) > 1.5 or absf(play_btn.size.y - 140.0) > 1.5:
+		_fail("Bloom open: Play should be the 432 x 140 field button")
 		return
-	var play_btn: Control = home.get_node_or_null("%FieldPlayButton") as Control
-	if backdrop == null:
-		_fail("FieldBackdrop missing")
-		return
-	if not backdrop.visible:
-		_fail("Bloom open: FieldBackdrop should be visible")
-		return
-	if not backdrop.color.is_equal_approx(HOME_DARK):
-		_fail("Bloom FieldBackdrop should stay page dark #2E4733")
-		return
-	if backdrop.mouse_filter != Control.MOUSE_FILTER_IGNORE:
-		_fail("FieldBackdrop must IGNORE")
-		return
-	# v2: SeasonStage je cijela stranica, pa backdrop mora biti bar toliki.
-	if backdrop.size.y < (stage as Control).size.y - 1.5:
-		_fail("FieldBackdrop should cover the whole page")
-		return
-	# Daily gift je u Play redu biranja sezone; u polju je skriven.
-	if daily and daily.is_visible_in_tree():
-		_fail("Bloom open: Daily gift belongs to the season picker, not the field")
-		return
-	if daily and daily.is_visible_in_tree() and not backdrop.get_global_rect().has_point(daily.global_position + daily.size * 0.5):
-		_fail("FieldBackdrop should cover Daily")
-		return
-	if play_btn and not backdrop.get_global_rect().has_point(play_btn.global_position + play_btn.size * 0.5):
-		_fail("FieldBackdrop should cover Play")
-		return
-	if home_bg == null or not home_bg.color.is_equal_approx(HOME_DARK):
-		_fail("Home Background should stay dark green")
+	if home.get_node_or_null("%DailyChestCard") != null:
+		_fail("DailyChestCard should be gone — Gift lives on the field")
 		return
 	if not basket.is_visible_in_tree():
 		_fail("Bloom open: BasketButton should be visible")
@@ -654,7 +616,7 @@ func _run() -> void:
 		seasons_row.emit_signal("clicked")
 	elif stage.has_method("close_season_field"):
 		stage.call("close_season_field")
-	await process_frame
+	await _wait_transition(stage)
 	if not _field_flowers(field).is_empty():
 		_fail("close should clear meadow flowers")
 		return
@@ -671,16 +633,10 @@ func _run() -> void:
 		_fail("close should clear flag")
 		return
 	if not band.visible:
-		_fail("SelectLayer should show after close")
+		_fail("SeasonCard should show after close")
 		return
-	if field.visible:
-		_fail("SeasonField should hide after close")
-		return
-	if backdrop.visible:
-		_fail("close should hide FieldBackdrop")
-		return
-	if home_bg == null or not home_bg.color.is_equal_approx(UiStage.PAGE_BG):
-		_fail("close: Home Background should be the season-select #243329")
+	if clip.visible:
+		_fail("FieldClip should hide after close")
 		return
 	if basket.is_visible_in_tree():
 		_fail("close should hide the Basket tile")
@@ -691,8 +647,8 @@ func _run() -> void:
 	if endless_btn.visible:
 		_fail("close should hide EndlessPlayButton")
 		return
-	if name_label.is_visible_in_tree():
-		_fail("close should hide SeasonLabel")
+	if str(name_label.get("text")) != "Country Bloom" or absf(float(name_label.get("top")) - 244.0) > 0.5:
+		_fail("close: SeasonName should be back on the card (top 244)")
 		return
 	var close_up_err := _assert_field_upgrades_hidden(home, "close")
 	if not close_up_err.is_empty():
@@ -711,13 +667,7 @@ func _run() -> void:
 	if not bool(stage.call("open_season_field")):
 		_fail("open Frost field failed")
 		return
-	for _ftw in 12:
-		if stage.has_method("is_field_transitioning") and bool(stage.call("is_field_transitioning")):
-			await process_frame
-		else:
-			break
-	await process_frame
-	await process_frame
+	await _wait_transition(stage)
 	if str(gs.get("home_season_field_id")) != "frost_orchard":
 		_fail("field_id expected frost_orchard got %s" % str(gs.get("home_season_field_id")))
 		return
@@ -732,12 +682,6 @@ func _run() -> void:
 		ground_color = ground.color
 	if ground_color.is_equal_approx(BLOOM_PASTEL) or ground_color.is_equal_approx(Color.WHITE):
 		_fail("Frost MeadowGround tint should differ from Bloom")
-		return
-	if not backdrop.visible:
-		_fail("Frost open: FieldBackdrop should be visible")
-		return
-	if not backdrop.color.is_equal_approx(HOME_DARK):
-		_fail("Frost FieldBackdrop should stay page dark #2E4733")
 		return
 	var frost_def: SeasonDef = gs.call("get_season_def", "frost_orchard")
 	var frost_pool: Array = frost_def.seed_type_ids if frost_def else []
@@ -762,7 +706,7 @@ func _run() -> void:
 	if frost_types == bloom_types:
 		_fail("Frost flower types should differ from Bloom")
 		return
-	if _count_named(stage, "SeasonField") != 1:
+	if _count_named(clip, "SeasonField") != 1:
 		_fail("still exactly 1 SeasonField after Frost open")
 		return
 	var frost_pip: Control = stage.get_node_or_null("%MeadowPip") as Control
@@ -826,9 +770,9 @@ func _run() -> void:
 		_fail("Frost picker must not list clover")
 		return
 	if name_label == null or not name_label.is_visible_in_tree():
-		_fail("Frost open: SeasonLabel should be visible")
+		_fail("Frost open: SeasonName should be visible")
 		return
-	var frost_chip := str((name_label as Label).text)
+	var frost_chip := str(name_label.get("text"))
 	if frost_chip.find("Frost Orchard") < 0:
 		_fail("Frost chip expected Frost Orchard got '%s'" % frost_chip)
 		return
@@ -837,7 +781,7 @@ func _run() -> void:
 		return
 
 	stage.call("close_season_field")
-	await process_frame
+	await _wait_transition(stage)
 	if field.has_method("is_pip_wandering") and bool(field.call("is_pip_wandering")):
 		_fail("Frost close should stop Pip wander")
 		return
@@ -852,9 +796,6 @@ func _run() -> void:
 		return
 	if endless_btn.visible:
 		_fail("Frost close should hide EndlessPlayButton")
-		return
-	if name_label.is_visible_in_tree():
-		_fail("Frost close should hide SeasonLabel")
 		return
 	var frost_close_up_err := _assert_field_upgrades_hidden(home, "Frost close")
 	if not frost_close_up_err.is_empty():
@@ -898,8 +839,9 @@ func _run() -> void:
 	if str(home.call("home_play_action")) != "focus":
 		_fail("locked focus: home_play_action should return to the playing season")
 		return
-	if str(home.call("get_play_chip_text")) != "Country Bloom":
-		_fail("locked focus: Play chip should name the active season")
+	var play_ctrl: Control = home.call("get_play_button") as Control
+	if play_ctrl == null or str(play_ctrl.get("mode")) != "back":
+		_fail("locked focus: Play should show Back + the playing season's disc")
 		return
 	stage.call("tap_card", "coral_tide")
 	await process_frame
@@ -910,8 +852,8 @@ func _run() -> void:
 	if str(gs.get("active_season_id")) != "country_bloom":
 		_fail("unowned premium preview must not change the active season")
 		return
-	if str(home.call("get_play_chip_text")) != "Country Bloom":
-		_fail("unowned premium preview: Play chip stays on Bloom")
+	if str(home.call("home_play_action")) != "focus":
+		_fail("unowned premium preview: Play should return to Bloom")
 		return
 
 	CampSmokeUtil.restore_save(self, _backup)

@@ -41,7 +41,7 @@ const CARD_RECT := Rect2(24, 172, 1032, 1160)
 const CARD_RADIUS := 48
 const CARD_BORDER := 4
 const CARD_SHADOW_Y := 12
-const CARD_BANDS := [0.327, 0.363, 0.31]
+const CARD_BANDS := [0.32, 0.36, 0.32]   # = UiHomeField.MEADOW_BANDS 0.32 / 0.68; px = round(h * 0.32), round(h * 0.68)
 const CARD_NAME_Y := 72
 const CARD_NAME_SIZE := 80
 const ROSTER_TOP := 230
@@ -58,6 +58,9 @@ const NEED_CHIP_H := 120
 const ACTION_BTN_H := 140
 const ARROW_SIZE := 120
 const ARROW_Y := 680 # inside card
+const ARROW_INSET := 28
+const OPEN_GATE := 150
+const DOTS_INTERACTIVE := false   # indicator only
 const DOTS_Y := 1352
 const PLAY_RECT := Rect2(280, 1413, 520, 180)
 const PLAY_LABEL := 76
@@ -72,16 +75,61 @@ const SEASONS_BTN_RECT := Rect2(70, 1477, 236, 124)
 const FIELD_PLAY_RECT := Rect2(324, 1461, 432, 140)
 const ENDLESS_BTN_RECT := Rect2(774, 1477, 236, 124)
 
-# motion
+# motion — round 2 (same numbers as HomeScreen T / FieldScreen W and home_v3_export.json)
 const OPEN_MS := 560
 const CLOSE_MS := 440
 const SWAP_MS := 220
+const SNAP_MS := 180
 const SWAP_OFFSET := 90
-const CHROME_OUT_END := 0.30
-const CARD_TEXT_OUT_END := 0.40
-const FIELD_IN := Vector2(0.55, 0.85)
-const FIELD_CHROME_IN := Vector2(0.72, 1.0)
+const SWIPE_MIN := 60
+const TAP_SLOP := 12
+const RUBBER := 40
+const RUBBER_FACTOR := 0.35
+const SELECT_OUT := Vector2(0.02, 0.30)     # tabs, arrows, dots (u)
+const SELECT_LIFT := 24
+const CONTENT_OUT := Vector2(0.02, 0.40)    # roster, status, lock, premium rim (u)
+const FLOWER_START := 0.20                  # u
+const FLOWER_STAGGER_MS := 12
+const FLOWER_FADE_MS := 100
+const FLOWER_SETTLE_MS := 200
+const FLOWER_SCALE_FROM := 0.9
+const NOTE_IN := Vector2(0.30, 0.60)
+const FIELD_CHROME_IN := Vector2(0.60, 0.92)
+const FIELD_CHROME_Y := 16
 const FIELD_SIDE_SLIDE := 254
+
+# single travelling objects (geometry on eased t = TRANS_CUBIC EASE_IN_OUT)
+const NAME_CARD := {"top": 244, "size": 80, "ls_em": -0.015}
+const NAME_FIELD := {"top": 36, "size": 56, "ls_em": -0.01}
+const PIP_CARD_POS := Vector2(425, 1027)
+const PIP_CARD_SIZE := 230
+const PIP_FIELD_SIZE := 190
+const PIP_HOME_FEET := Vector2(756, 1404)       # = UiHomeField.PIP_DEFAULT_BASE
+const PIP_SHADOW_CARD := Rect2(45, 8, 140, 30)  # left, bottom, w, h
+const PIP_SHADOW_FIELD := Rect2(35, 6, 120, 26)
+const PLAY_CARD := {"rect": Rect2(280, 1413, 520, 180), "border": 4, "shadow_y": 10, "shadow_a": 0.30, "text": 76, "tri_h": 30, "tri_w": 48, "gap": 24, "margin": 8}
+const PLAY_FIELD := {"rect": Rect2(324, 1461, 432, 140), "border": 3, "shadow_y": 8, "shadow_a": 0.28, "text": 64, "tri_h": 26, "tri_w": 42, "gap": 22, "margin": 6}
+
+## UiHomeField.ANIM old -> new (round 2)
+const ANIM_CHANGES := {
+	"field_open": [0.28, 0.56],
+	"card_content_out": [0.12, "u .02-.40"],
+	"bands_in_delay": [0.16, "removed"],
+	"bands_in": [0.18, "removed"],
+	"chrome_delay": [0.22, 0.336],
+	"chrome_in": [0.18, 0.179],
+	"chrome_stagger": [0.06, 0.0],
+	"chrome_out": [0.12, "removed (close = open reversed)"],
+	"field_close": [0.24, 0.44],
+	"flower_settle": [0.20, 0.20],
+	"flower_stagger": [0.024, 0.012],
+}
+
+static func ease_t(u: float) -> float:
+	return 4.0 * u * u * u if u < 0.5 else 1.0 - pow(-2.0 * u + 2.0, 3.0) / 2.0
+
+static func win(u: float, a: float, b: float) -> float:
+	return clampf((u - a) / (b - a), 0.0, 1.0)
 
 enum PlayMode { RETURN_TO_ACTIVE, OPEN_FIELD, START_RUN }
 

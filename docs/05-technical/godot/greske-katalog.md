@@ -379,6 +379,20 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** za `scroll_vertical` koristi koordinate unutar sadržaja; ako baš treba globalno, oduzmi `scroll.global_position.y` i dodaj trenutni `scroll_vertical`.
 
+## #21 — smoke test javi „OK", a skripta se nije ni kompajlirala
+
+**Datum:** 2026-09-28 (Home v3 prenos)
+
+**Simptom:** `godot --headless -s scripts/dev/X_smoke.gd` ispiše „X_smoke OK" i izađe s 0, a iznad stoji `SCRIPT ERROR: Compile Error` (npr. `Identifier not found: GameState` ili `Could not find type "HomeV3Glyph"`).
+
+**Uzrok:** dva odvojena slučaja.
+1. `-s` skripta (`extends SceneTree`) kompajlira se **prije** autoloada. Ako statički koristi klasu (`UiHomeV3.X`, `as HomeV3Card`) koja preko lanca ovisnosti koristi autoload identifikator (`PipDraw` → `GameState`), kompajliranje padne.
+2. Nova `class_name` klasa napravljena izvan editora nije u global class cacheu dok Godot ne odradi import, pa je druge skripte ne vide.
+
+**Rješenje:** u testu učitaj takvu klasu tek u `_run()` (`var V: GDScript = load("res://…/ui_home_v3.gd")`, pa `V.KONSTANTA`), bez statičkih tipova. Poslije nove `class_name` klase pokreni `--headless --import` (ili `godot-import.ps1`).
+
+**Prevencija:** u izlazu testa uvijek traži i `SCRIPT ERROR`, ne samo „OK" (`grep -c "SCRIPT ERROR"` mora biti 0).
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

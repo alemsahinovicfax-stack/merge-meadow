@@ -10,7 +10,7 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
-zadnja_sesija: "Home v3 runda 1 od CD-a testirana: strelice mrtve, prelaz s rupom i dvostrukim Playom. Brief home-v3 dopunjen za rundu 2 (§9–§12, prompt §12)."
+zadnja_sesija: "Home v3 u igri (runda 2 od CD-a): dva taba, kartica = minijatura livade, Play u 3 koraka, prelaz u kojem su ime, Pip i Play jedan objekat. Testirano kadar po kadar uz dizajn; 55/56 smoke OK (ui_button_click pada i na masteru)."
 zadnje_azurirano: 2026-09-28
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
@@ -343,7 +343,7 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 ## Sljedeća akcija (sada)
 
-**Sada radimo:** D0-P / playtest — CAMP-06 čeka playtest; cijeli hub je redizajniran, a 2026-09-24/25 su očišćeni Arena, Camp (pass 2), hub chrome (pass 2) i Home polje sezone (pass 2 — livada kao stranica)
+**Sada radimo:** D0-P / playtest — CAMP-06 čeka playtest; cijeli hub je redizajniran, a 2026-09-24/28 su očišćeni Arena, Camp (pass 2), hub chrome (pass 2), Home polje sezone (pass 2 — livada kao stranica) i Home biranje + prelaz (v3)
 
 **Nakon playtesta:** D0-P (SFX, art, Settings) → D0-M → Play internal
 
@@ -353,6 +353,7 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 | ID | Status | Napomena | Link |
 |----|--------|----------|------|
+| HOME-22 | ✅ | Home v3 — biranje u dva taba (Free / Premium), kartica 1032 × 1160 = minijatura livade (tri trake), strelice + swipe, tačke samo indikator, Play 520 × 180 u 3 koraka („Back" + disk); prelaz 560 / 440 ms jedan tween: ime, Pip i Play su JEDAN objekat, predaja kartica → livada 0 px razlike; dock tokena i Play 836 obrisani | `design_handoff_home_v3/` · [[../04-experience/design-drafts/home-v3-izvjestaj\|izvještaj]] |
 | HOME-21 | ✅ | Home polje sezone pass 2 — livada je cijela stranica (bila 606 od 1633), chrome pluta: Gift + korpa 180 gore lijevo (isti okvir), nadogradnje gore desno u sheetu, donji red `Seasons 236 · Play 432 · Endless 236`; 13 mjesta u 4 dubine i Pip van keepouta | `design_handoff_home_field_v2/` |
 | CHROME-02 | ✅ | Hub chrome pass 2 — dusk plum `#2A2233` umjesto zelene, footer 144 px bez teksta (dodir 216 × 141), treći chip broji cvijeće umjesto dijamanata; nove ikone coina / sjemena / cvijeta kroz cijelu igru (i pickup u runu); stranica 1597 → 1633 bez promjene kartica | `design_handoff_hub_chrome_v2/` |
 | CAMP-07 | ✅ | Camp pass 2 — bez „Next free season", „Details", podnaslova tabova, Merge prečice, „1 coin each" i „hold 10/s"; kartica sezone 276, sekcija fiksno 1253 uz nju, art u karticama +45 %, Trade i Unlock 300 × 120 | `design_handoff_camp_v2/` |

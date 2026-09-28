@@ -163,7 +163,7 @@ func _run() -> void:
 		_fail("SeasonStage missing")
 		return
 	if bool(gs.get("home_season_field_open")) and stage.has_method("close_season_field"):
-		stage.call("close_season_field")
+		stage.call("close_season_field", false)
 		await process_frame
 	if home.has_method("_refresh_basket_card"):
 		home.call("_refresh_basket_card")
@@ -181,11 +181,11 @@ func _run() -> void:
 	if basket_card.is_visible_in_tree():
 		_fail("carousel Basket tile should be hidden")
 		return
-	if basket_card.get_parent() != field_overlay:
-		_fail("Basket tile parent should be FieldOverlay")
+	if not field_overlay.is_ancestor_of(basket_card):
+		_fail("Basket tile should sit in FieldOverlay")
 		return
-	if home.get_node_or_null("%DailyChestCard") == null:
-		_fail("DailyChestCard missing")
+	if home.get_node_or_null("%DailyChestCard") != null:
+		_fail("Home v3: DailyChestCard should be gone (Gift lives on the field)")
 		return
 	if home.get_node_or_null("%GiftChest") == null:
 		_fail("GiftChest missing in the field overlay")
@@ -196,11 +196,12 @@ func _run() -> void:
 	if home.get_node_or_null("%BasketPickerOverlay") == null:
 		_fail("BasketPickerOverlay missing")
 		return
-	if home.get_node_or_null("%PlayButton") == null:
+	# Home v3: jedno Play dugme (SeasonStage) — na polju je ono FieldPlayButton.
+	if home.call("get_play_button") == null:
 		_fail("PlayButton missing")
 		return
-	if home.get_node_or_null("%FieldPlayButton") == null:
-		_fail("FieldPlayButton missing")
+	if home.get_node_or_null("%FieldPlayButton") != null:
+		_fail("FieldPlayButton should be gone — Play is one object")
 		return
 	if not bool(gs.call("can_open_home_season_field")):
 		_fail("Bloom should can_open")
@@ -208,6 +209,12 @@ func _run() -> void:
 	if not bool(stage.call("open_season_field")):
 		_fail("open Bloom field failed")
 		return
+	# Home v3: prsten oko prazne korpe krece tek kad je prelaz gotov (u = 1).
+	for _w in 240:
+		if bool(stage.call("is_field_transitioning")):
+			await create_timer(0.02).timeout
+		else:
+			break
 	await process_frame
 	await process_frame
 	if str(gs.get("home_season_field_id")) != "country_bloom":

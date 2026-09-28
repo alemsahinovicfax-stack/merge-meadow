@@ -1,14 +1,23 @@
 extends SceneTree
 
-## Home — Season Stage pass 2 / 1a (design_handoff_home_v2): raspored 1:1 s
-## SeasonStage.dc.html, stanja kartice, dock, swipe, unlock, premium, Camp dolazak,
-## poklon i tutorial hint.
+## Home v3 (design_handoff_home_v3, runda 2): biranje u dva taba + prelaz u polje.
+## Cuva nalaze iz testiranja rundi 1 i 2: strelice i tabovi primaju PRAVI klik
+## (ne padaju na karticu i ne otvaraju polje), swipe po kartici lista, unos je
+## zakljucan dok traje prelaz, ime / Pip / Play su po JEDAN objekat i vidljivi u
+## svakom kadru, trake kartice = trake livade (predaja bez šava), Pip se vraca sa
+## stopala gdje je odsetao, i na biranju nema loopa.
 
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
 const TOL := 1.5
 
 var _backup := ""
 var _failed := false
+var _page_origin := Vector2.ZERO
+## Ucitano u _run (poslije autoloada) — UiHomeV3 → PipDraw treba GameState.
+var V: GDScript
+var PART_GATE := "gate"
+var PART_UNLOCK := "unlock"
+var PART_BUY := "buy"
 
 
 func _initialize() -> void:
@@ -37,381 +46,374 @@ func _wait(sec: float) -> void:
 	await create_timer(sec).timeout
 
 
-func _rect_is(c: Control, expected: Rect2) -> bool:
+func _settle(stage: Node) -> void:
+	for _i in 300:
+		if bool(stage.call("is_busy")):
+			await create_timer(0.02).timeout
+		else:
+			break
+	await _frames(2)
+
+
+func _rect_is(r: Rect2, expected: Rect2) -> bool:
+	return r.position.distance_to(expected.position) <= TOL \
+		and absf(r.size.x - expected.size.x) <= TOL and absf(r.size.y - expected.size.y) <= TOL
+
+
+func _page_rect(c: Control) -> Rect2:
 	var r := c.get_global_rect()
-	return r.position.distance_to(expected.position) <= TOL and absf(r.size.x - expected.size.x) <= TOL and absf(r.size.y - expected.size.y) <= TOL
+	r.position -= _page_origin
+	return r
 
 
-func _overflow(n: Node, page: Rect2) -> String:
-	for child in n.get_children():
-		var c := child as Control
-		if c != null:
-			if not c.visible:
-				continue
-			var r := c.get_global_rect()
-			if r.size.x > 0.5 and r.size.y > 0.5 and not page.grow(TOL).encloses(r):
-				return "%s %s" % [str(c.get_path()), str(r)]
-		var deeper := _overflow(child, page)
-		if not deeper.is_empty():
-			return deeper
+## Pravi klik (mis) u koordinatama stranice — ide kroz GUI kao prst.
+func _click(page_pos: Vector2) -> void:
+	var p := page_pos + _page_origin
+	var down := InputEventMouseButton.new()
+	down.button_index = MOUSE_BUTTON_LEFT
+	down.pressed = true
+	down.position = p
+	down.global_position = p
+	get_root().push_input(down, true)
+	await process_frame
+	var up := down.duplicate() as InputEventMouseButton
+	up.pressed = false
+	get_root().push_input(up, true)
+	await _frames(2)
+
+
+func _drag(from: Vector2, to: Vector2, steps: int = 8) -> void:
+	var a := from + _page_origin
+	var b := to + _page_origin
+	var down := InputEventMouseButton.new()
+	down.button_index = MOUSE_BUTTON_LEFT
+	down.pressed = true
+	down.position = a
+	down.global_position = a
+	get_root().push_input(down, true)
+	await process_frame
+	for i in steps:
+		var m := InputEventMouseMotion.new()
+		m.button_mask = MOUSE_BUTTON_MASK_LEFT
+		m.position = a.lerp(b, float(i + 1) / float(steps))
+		m.global_position = m.position
+		get_root().push_input(m, true)
+		await process_frame
+	var up := InputEventMouseButton.new()
+	up.button_index = MOUSE_BUTTON_LEFT
+	up.pressed = false
+	up.position = b
+	up.global_position = b
+	get_root().push_input(up, true)
+	await _frames(2)
+
+
+## Pokrene pravi prelaz i u svakom frameu provjeri: napredak ide samo u jednom
+## smjeru, tacno jedan Pip (putujuci ILI livadin), ime i Play uvijek vidljivi,
+## i u svakom kadru postoji ili kartica ili trake livade (nikad prazna stranica).
+func _run_live(stage: Node, field: Control, card: Control, pip: Control, play: Control, name_n: Control, opening: bool) -> String:
+	var meadow_pip := stage.get_node("%MeadowPip") as Control
+	var ground := field.get_node("MeadowGround") as Control
+	if opening:
+		stage.call("open_season_field", str(_gs().get("active_season_id")))
+	else:
+		stage.call("close_season_field")
+	if not bool(stage.call("is_field_transitioning")):
+		return "transition did not start"
+	var last: float = -1.0 if opening else 2.0
+	var frames := 0
+	while bool(stage.call("is_field_transitioning")) and frames < 600:
+		await process_frame
+		frames += 1
+		var u: float = stage.call("transition_u")
+		if (opening and u < last - 0.0001) or (not opening and u > last + 0.0001):
+			return "u went backwards (%.3f after %.3f)" % [u, last]
+		last = u
+		var pips := int(pip.visible) + int(meadow_pip.is_visible_in_tree())
+		if pips != 1:
+			return "u %.3f: %d Pips visible" % [u, pips]
+		if not name_n.visible or not play.visible:
+			return "u %.3f: name / Play hidden" % u
+		if not card.visible and not ground.is_visible_in_tree():
+			return "u %.3f: neither the card nor the meadow is drawn" % u
+		if card.visible and ground.is_visible_in_tree():
+			return "u %.3f: card and meadow bands both drawn (double edges)" % u
+	await _frames(2)
+	if frames < 3:
+		return "transition too short (%d frames)" % frames
 	return ""
 
 
 func _run() -> void:
+	V = load("res://scripts/visual/ui_home_v3.gd")
 	_backup = CampSmokeUtil.backup_save()
 	var gs := _gs()
-	if gs == null:
-		_fail("GameState missing")
-		return
-	gs.set("wallet_coins", 0)
-	gs.set("garden_crystal_stash", {})
 	gs.set("skip_debug_season_unlock", true)
 	gs.call("reset_seasons_to_s1")
 	gs.call("clear_owned_paid_seasons")
+	var unlocked: Array = gs.get("unlocked_seasons")
+	unlocked.append("frost_orchard")
+	unlocked.append("lantern_meadow")
+	gs.call("set_active_season", "lantern_meadow")
+	gs.call("set_free_strip_focus", "lantern_meadow")
+	gs.call("set_home_band", "free")
 	gs.set("tutorial_complete", true)
-	var iap := get_root().get_node_or_null("IAPManager")
-	if iap and iap.has_method("reset_purchases_for_dev"):
-		iap.call("reset_purchases_for_dev")
+	gs.set("wallet_coins", 320)
+	gs.set("garden_crystal_stash", {"midnight_lotus": 14})
+	gs.set("discovered_blooms", {})
+	gs.set("last_daily_chest_day", "")
 
-	if change_scene_to_file("res://scenes/meta/meta_hub.tscn") != OK:
-		_fail("hub load failed")
+	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
+	if err != OK:
+		_fail("hub load failed %d" % err)
 		return
 	await _frames(16)
 	var hub: Node = get_nodes_in_group("meta_hub")[0]
 	hub.call("go_to_page", MetaHubPages.MAIN, false)
 	await _frames(12)
-	var swipe := hub.get_node("RootVBox/SwipePager") as Control
-	var host: Node = swipe.call("get_pages_host")
-	var home := host.get_node_or_null("Page_%d" % MetaHubPages.MAIN) as Control
-	if home == null:
-		_fail("Home page missing")
-		return
+	var swipe: Node = hub.get_node("RootVBox/SwipePager")
+	var home: Control = swipe.call("get_pages_host").get_node("Page_%d" % MetaHubPages.MAIN) as Control
+	var stage: Control = home.get_node("%SeasonStage") as Control
+	_page_origin = home.get_global_rect().position
 	home.call("refresh_for_meta_hub")
 	await _frames(4)
-	var stage := home.get_node_or_null("%SeasonStage") as Control
-	var browser := stage.get_node_or_null("%SeasonBrowser") as SeasonBrowser
-	var clip := stage.get_node_or_null("%CardClip") as Control
-	var play := home.get_node_or_null("%PlayButton") as Control
-	var gift := home.get_node_or_null("%DailyChestCard") as Control
-	var play_row := home.get_node_or_null("%PlayRow") as Control
-	if stage == null or browser == null or clip == null or play == null or gift == null or play_row == null:
-		_fail("stage / dock / PlayRow nodes missing")
-		return
 
-	# --- raspored: SeasonStage.dc.html (stranica 1080 x 1633 od y=143; chrome v2) ---
-	var page := swipe.get_global_rect()
-	if not page.is_equal_approx(Rect2(0, 143, 1080, 1633)):
-		_fail("hub content should be 1080 x 1633 at y 143, got %s" % str(page))
-		return
-	var bloom := stage.call("get_card", "country_bloom") as HomeSeasonCard
-	if bloom == null or not bloom.visible or not _rect_is(bloom, Rect2(24, 167, 1032, 1136)):
-		_fail("SeasonCard must be 1032 x 1136 at (24, 167), got %s" % str(bloom.get_global_rect() if bloom else Rect2()))
-		return
-	if not _rect_is(browser, Rect2(0, 1327, 1080, 222)):
-		_fail("SeasonBrowser must be 1080 x 222 at (0, 1327), got %s" % str(browser.get_global_rect()))
-		return
-	if not _rect_is(play_row, Rect2(24, 1573, 1032, 180)):
-		_fail("PlayRow must be 1032 x 180 at (24, 1573), got %s" % str(play_row.get_global_rect()))
-		return
-	if not _rect_is(play, Rect2(24, 1573, 836, 180)):
-		_fail("Play 836 x 180 expected, got %s" % str(play.get_global_rect()))
-		return
-	if gift.visible:
-		_fail("Daily chest must stay off the season select")
-		return
-	if gift.get_parent() != play_row:
-		_fail("DailyChestCard must sit in PlayRow")
-		return
-	var spill := _overflow(home, page)
-	if not spill.is_empty():
-		_fail("nothing may spill off the Home page: %s" % spill)
-		return
-	var bg := home.get_node("Background") as ColorRect
-	if not bg.color.is_equal_approx(UiStage.PAGE_BG):
-		_fail("Home background must be #243329, got %s" % bg.color.to_html(false))
-		return
-	if not clip.is_in_group("block_hub_swipe"):
-		_fail("CardClip must block hub swipe")
-		return
-	if bool(swipe.call("should_block_hub_swipe_at", browser.get_global_rect().get_center())):
-		_fail("hub swipe must pass over the dock")
-		return
-	if bool(swipe.call("should_block_hub_swipe_at", play.get_global_rect().get_center())):
-		_fail("hub swipe must pass over the Play row")
-		return
-	var art := bloom.get_part_rect("art")
-	# Chrome v2: kartica je 36 px visa i svih 36 ide u art zonu (446 -> 482).
-	if absf(art.size.y - 482.0) > TOL or absf(art.position.y - 26.0) > TOL:
-		_fail("active card art slot expected 482 px at y 26, got %s" % str(art))
-		return
+	var tabs := stage.get_node("%SeasonTabs") as Control
+	var card := stage.get_node("%SeasonCard") as Control
+	var prev := stage.get_node("%PrevSeason") as Control
+	var next := stage.get_node("%NextSeason") as Control
+	var play := stage.get_node("%PlayButton") as Control
+	var name_n := stage.get_node("%SeasonName") as Control
+	var pip := stage.get_node("%TravelPip") as Control
+	var field := stage.get_node("%SeasonField") as Control
+	var clip := stage.get_node("%FieldClip") as Control
 
-	# --- novi igrac: Bloom aktivna, Frost next lock, Lantern/Amber daleko ---
-	if str(stage.call("get_free_path_text")) != "Free path 1 / 4":
-		_fail("dock free path expected 'Free path 1 / 4' got '%s'" % str(stage.call("get_free_path_text")))
-		return
-	var bloom_token := browser.get_token("country_bloom")
-	var frost_token := browser.get_token("frost_orchard")
-	var amber_token := browser.get_token("amber_canopy")
-	var moon_token := browser.get_token("moonlit_warren")
-	if bloom_token == null or frost_token == null or moon_token == null:
-		_fail("dock tokens missing")
-		return
-	if absf(bloom_token.get_global_rect().position.x - 20.0) > TOL or absf(moon_token.get_global_rect().position.x - 550.0) > TOL:
-		_fail("tokens at x 20 (free) and 550 (premium) expected")
-		return
-	if absf(bloom_token.base_position.y + 1291.0 - 1366.0) > TOL or not bloom_token.is_lifted():
-		_fail("focused token row at y 1366, lifted 6 px")
-		return
-	if bloom_token.status != HomeDockToken.S_OPEN or not bloom_token.active or frost_token.status != HomeDockToken.S_NEXT:
-		_fail("dock: Bloom open+active, Frost next lock")
-		return
-	if amber_token.status != HomeDockToken.S_FAR or browser.get_token("ember_fen").status != HomeDockToken.S_SOON:
-		_fail("dock: Amber far lock, Ember soon")
-		return
-	if bloom.state != HomeSeasonCard.ST_ACTIVE or bloom.get_badge_text() != "PLAYING" or bloom.get_rim_width() != 8:
-		_fail("Bloom card must be active with ▶ PLAYING and 8 px rim")
-		return
-	if bloom.shown_flower_names() != PackedStringArray(["Meadow Clover", "Barn Tulip", "Harvest Pumpkin"]):
-		_fail("Bloom roster must show clover / tulip / pumpkin, got %s" % str(bloom.shown_flower_names()))
-		return
-	if bloom.get_meta_text() != "FREE · 1 OF 4" or bloom.get_count_text() != "6 flowers · 3 shown":
-		_fail("title meta/count: '%s' / '%s'" % [bloom.get_meta_text(), bloom.get_count_text()])
-		return
-	if not bloom.has_open_button() or bloom.hit_part(bloom.get_part_rect("prev").get_center()) != HomeSeasonCard.PART_NONE:
-		_fail("Open meadow expected; prev arrow disabled on the first page")
-		return
-	if str(home.call("get_play_chip_text")) != "Country Bloom" or str(home.call("home_play_action")) != "field":
-		_fail("Play on the playing season must open the field")
-		return
+	# --- 1. raspored 1:1 s HomeScreen.dc.html ---
+	if not _rect_is(_page_rect(tabs), V.TABS_RECT):
+		_fail("SeasonTabs expected %s got %s" % [V.TABS_RECT, _page_rect(tabs)]); return
+	if not _rect_is(_page_rect(card), V.CARD_RECT):
+		_fail("SeasonCard expected %s got %s" % [V.CARD_RECT, _page_rect(card)]); return
+	if not _rect_is(_page_rect(play), V.PLAY_CARD["rect"]):
+		_fail("PlayButton expected 520 x 180 at (280, 1413) got %s" % _page_rect(play)); return
+	if not _rect_is(_page_rect(prev), V.PREV_RECT) or not _rect_is(_page_rect(next), V.NEXT_RECT):
+		_fail("arrows expected (52, 852) / (908, 852) 120"); return
+	if str(stage.call("viewed_id")) != "lantern_meadow" or str(stage.call("current_tab")) != "free":
+		_fail("Home should open on the playing season (Lantern, Free tab)"); return
+	if str(stage.call("card_status")) != "active" or not pip.visible:
+		_fail("season you play: Pip on the card"); return
+	if str(home.call("home_play_action")) != "field" or str(play.get("mode")) != "play":
+		_fail("season you play: Play opens the field"); return
+	if field.is_visible_in_tree() and clip.visible:
+		_fail("meadow should be hidden on the season picker"); return
 
-	# --- daleki lock: shake + tamni toast, fokus ostaje ---
-	stage.call("tap_card", "lantern_meadow")
+	# --- 2. strelice: pravi klik mijenja sezonu i NE otvara polje (runda 1, I1) ---
+	await _click((V.NEXT_RECT as Rect2).get_center())
+	await _settle(stage)
+	if bool(gs.get("home_season_field_open")):
+		_fail("tap on › must not open the field"); return
+	if str(stage.call("viewed_id")) != "amber_canopy":
+		_fail("› should show Amber Canopy, got %s" % stage.call("viewed_id")); return
+	if str(stage.call("card_status")) != "locked" or pip.visible:
+		_fail("Amber: locked (chips), no Pip"); return
+	var content: Object = stage.call("get_card_content")
+	if (content.call("chip_rects") as Array).size() != 2 or not bool(content.call("has_lock_badge")):
+		_fail("locked card: two need chips + lock badge"); return
+	if str(content.call("coin_text")) != "320 / 500" or str(content.call("star_text")) != "14 / 20":
+		_fail("need chips expected 320 / 500 and 14 / 20 got %s / %s" % [str(content.call("coin_text")), str(content.call("star_text"))]); return
+	if str(home.call("home_play_action")) != "focus" or str(play.get("mode")) != "back":
+		_fail("browsing locked: Play = Back"); return
+	if next.visible:
+		_fail("last free season: › hidden"); return
+	await _click((V.PREV_RECT as Rect2).get_center())
+	await _settle(stage)
+	await _click((V.PREV_RECT as Rect2).get_center())
+	await _settle(stage)
+	if str(stage.call("viewed_id")) != "frost_orchard" or bool(gs.get("home_season_field_open")):
+		_fail("‹ ‹ should show Frost Orchard without opening"); return
+	if str(stage.call("card_status")) != "open" or pip.visible:
+		_fail("Frost (unlocked, not playing): gate, no Pip (runda 1, I4)"); return
+	if (content.call("part_rect", PART_GATE) as Rect2).size.x < 149.0:
+		_fail("open gate should be 150 px"); return
+	if str(gs.get("active_season_id")) != "lantern_meadow":
+		_fail("browsing must not change the active season"); return
+
+	# --- 3. Play = Back vraca karticu na sezonu u kojoj se igra ---
+	await _click((V.PLAY_CARD["rect"] as Rect2).get_center())
+	await _settle(stage)
+	if str(stage.call("viewed_id")) != "lantern_meadow" or bool(gs.get("home_season_field_open")):
+		_fail("Back should return to Lantern without opening"); return
+
+	# --- 4. swipe po kartici lista; kratak drag se vrati (runda 1, I2) ---
+	await _drag(Vector2(800, 900), Vector2(600, 900))
+	await _settle(stage)
+	if str(stage.call("viewed_id")) != "amber_canopy":
+		_fail("swipe left 200 px should show the next season"); return
+	await _drag(Vector2(300, 900), Vector2(520, 900))
+	await _settle(stage)
+	if str(stage.call("viewed_id")) != "lantern_meadow":
+		_fail("swipe right should show the previous season"); return
+	await _drag(Vector2(540, 900), Vector2(510, 900), 4)
+	await _settle(stage)
+	if str(stage.call("viewed_id")) != "lantern_meadow" or bool(gs.get("home_season_field_open")):
+		_fail("short drag must snap back and not open the field"); return
+	if absf(_page_rect(card).position.x - V.CARD_RECT.position.x) > TOL:
+		_fail("card should snap back to x 24"); return
+
+	# --- 5. tabovi (pravi klik) ---
+	await _click(V.TABS_RECT.position + Vector2(8 + 508 + 254, 62))
+	await _settle(stage)
+	if str(stage.call("current_tab")) != "premium" or str(stage.call("viewed_id")) != "moonlit_warren":
+		_fail("Premium tab should open on Moonlit Warren"); return
+	if str(stage.call("card_status")) != "buy" or (content.call("part_rect", PART_BUY) as Rect2).size.y < 139.0:
+		_fail("Moonlit: price button"); return
+	stage.call("show_season", "ember_fen", false)
 	await _frames(2)
-	if str(stage.call("focused_card_id")) != "country_bloom":
-		_fail("far lock must not take focus")
-		return
-	if not browser.get_token("lantern_meadow").is_shaking() or str(stage.call("get_toast_text")) != "Unlock Frost Orchard first":
-		_fail("far lock tap: shake + 'Unlock Frost Orchard first' toast")
-		return
+	if str(stage.call("card_status")) != "soon":
+		_fail("Ember Fen: coming soon"); return
+	await _click(V.TABS_RECT.position + Vector2(8 + 254, 62))
+	await _settle(stage)
+	if str(stage.call("current_tab")) != "free" or str(stage.call("viewed_id")) != "lantern_meadow":
+		_fail("Free tab should open on the playing season"); return
 
-	# --- swipe na kartici: lijevo = sljedeca (Frost), na krajevima rubber-band ---
-	stage.call("_pointer", Vector2(500, 500), true)
-	stage.call("_drag", Vector2(560, 500))
-	await _frames(1)
-	if bloom.position.x > UiStage.RUBBER + 0.5 or bloom.position.x <= 0.0:
-		_fail("rubber-band at the first page expected (0, 40], got %s" % str(bloom.position.x))
-		return
-	stage.call("_pointer", Vector2(560, 500), false)
-	await _wait(0.35)
-	if bloom.position.x != 0.0 or str(stage.call("focused_card_id")) != "country_bloom":
-		_fail("rubber-band must snap back on Bloom")
-		return
-	stage.call("_pointer", Vector2(700, 500), true)
-	stage.call("_drag", Vector2(500, 500))
-	stage.call("_drag", Vector2(420, 500))
-	await _frames(1)
-	var frost := stage.call("get_card", "frost_orchard") as HomeSeasonCard
-	if not frost.visible or absf(frost.position.x - (1080.0 - 280.0)) > TOL:
-		_fail("neighbor Frost must peek at +1080 during the drag, got %s" % str(frost.position.x))
-		return
-	stage.call("_pointer", Vector2(420, 500), false)
-	await _wait(0.35)
-	if str(stage.call("focused_card_id")) != "frost_orchard" or not frost.visible or bloom.visible:
-		_fail("swipe left must page to Frost")
-		return
-	if int(hub.call("current_page_index")) != MetaHubPages.MAIN:
-		_fail("card swipe must not move the hub")
-		return
-	if str(gs.get("active_season_id")) != "country_bloom" or str(home.call("get_play_chip_text")) != "Country Bloom":
-		_fail("focus != active: Play stays on Country Bloom while previewing Frost")
-		return
-	if frost.state != HomeSeasonCard.ST_GATHER or frost.get_badge_text() != "PREVIEW · LOCKED" or frost.get_rim_width() != 4:
-		_fail("Frost gather: PREVIEW · LOCKED, 4 px rim")
-		return
-	if frost.get_unlock_title() != "Needs 500 coins + 20 flowers" or frost.get_unlock_sub() != "run in Country Bloom to collect":
-		_fail("gather button text: '%s' / '%s'" % [frost.get_unlock_title(), frost.get_unlock_sub()])
-		return
-	if frost.is_unlock_enabled() or absf(frost.get_part_rect("art").size.y - 264.0) > TOL:
-		_fail("gather: Unlock disabled, art slot 264 px")
-		return
-	if not frost_token.focused or not frost_token.is_lifted() or bloom_token.focused:
-		_fail("dock focus must follow the card")
-		return
+	# --- 6. hub swipe: kontrole blokiraju, prazan pojas uz Play ne ---
+	for c in [card, tabs, prev, next, play]:
+		if not bool(swipe.call("should_block_hub_swipe_at", (c as Control).get_global_rect().get_center())):
+			_fail("%s should block the hub swipe" % c.name); return
+	for zone in V.HUB_SWIPE_ZONES:
+		if bool(swipe.call("should_block_hub_swipe_at", (zone as Rect2).get_center() + _page_origin)):
+			_fail("hub swipe zone %s must stay free" % str(zone)); return
 
-	# --- unlock: 500 + 20 ★3, trenutak 420 ms, pa aktivna + toast ---
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {str(gs.call("star3_type_id_for_season", "country_bloom")): 20})
-	stage.call("refresh")
-	await _frames(2)
-	if frost.state != HomeSeasonCard.ST_READY or not frost.is_unlock_enabled():
-		_fail("Frost must be ready")
-		return
-	if frost.get_unlock_title() != "Unlock Frost Orchard" or frost.get_unlock_sub() != "spends 500 coins + 20 Harvest Pumpkin":
-		_fail("ready text: '%s' / '%s'" % [frost.get_unlock_title(), frost.get_unlock_sub()])
-		return
-	frost.emit_signal("unlock_pressed", "frost_orchard")
-	await _frames(1)
-	if int(gs.get("wallet_coins")) != 0 or not bool(gs.call("is_season_playable", "frost_orchard")):
-		_fail("Unlock must spend immediately")
-		return
-	if frost.state != HomeSeasonCard.ST_UNLOCKING or not frost.is_unlock_playing() or frost.get_unlock_title() != "Unlocking…":
-		_fail("unlocking moment expected")
-		return
-	if str(home.call("get_play_chip_text")) != "Frost Orchard":
-		_fail("Play must switch to the unlocked season")
-		return
-	await _wait(0.6)
-	if frost.state != HomeSeasonCard.ST_ACTIVE or str(stage.call("get_toast_text")) != "Frost Orchard unlocked · now playing":
-		_fail("after unlock: Frost active + gold toast, got %s / '%s'" % [frost.state, str(stage.call("get_toast_text"))])
-		return
-	if str(stage.call("get_free_path_text")) != "Free path 2 / 4" or browser.get_token("lantern_meadow").status != HomeDockToken.S_NEXT:
-		_fail("dock after unlock: 2 / 4, Lantern next lock")
-		return
+	# --- 7. biranje nema loopa ---
+	if bool(home.call("is_basket_attention_active")):
+		_fail("season picker must not run a loop"); return
 
-	# --- otkljucana ali ne aktivna: preview, tap otvara polje i postaje aktivna ---
-	stage.call("tap_card", "country_bloom")
-	await _wait(0.35)
-	if bloom.state != HomeSeasonCard.ST_OPEN or bloom.get_badge_text() != "PREVIEW · UNLOCKED":
-		_fail("Bloom preview while Frost is active")
-		return
-	if str(gs.get("active_season_id")) != "frost_orchard":
-		_fail("previewing Bloom must not change the active season")
-		return
-	stage.call("tap_card", "country_bloom")
-	await _wait(0.35)
-	if not bool(gs.get("home_season_field_open")) or str(gs.get("home_season_field_id")) != "country_bloom":
-		_fail("tap on the focused open card must open the field")
-		return
-	if (stage.get_node("%SelectLayer") as Control).visible or gift.visible:
-		_fail("field open: SelectLayer and select chest hidden")
-		return
-	var field_gift := home.get_node_or_null("%GiftChest") as Control
-	if field_gift == null or not field_gift.visible:
-		_fail("field should show the gift chest")
-		return
-	if str(gs.get("active_season_id")) != "country_bloom":
-		_fail("opening the field makes the season active")
-		return
-	stage.call("close_season_field")
-	await _wait(0.3)
-	if not (stage.get_node("%SelectLayer") as Control).visible or gift.visible:
-		_fail("close field: SelectLayer back, daily chest stays hidden")
-		return
-
-	# --- premium: pregled 6 cvjetova, kupovina, Ember soon ---
-	stage.call("tap_card", "coral_tide")
-	await _wait(0.4)
-	var coral := stage.call("get_card", "coral_tide") as HomeSeasonCard
-	if coral == null or not coral.visible or coral.state != HomeSeasonCard.ST_PREMIUM:
-		_fail("Coral Tide premium preview expected")
-		return
-	if coral.shown_flower_count() != 6 or coral.get_count_text() != "6 flowers" or coral.get_meta_text() != "PREMIUM PACK":
-		_fail("premium preview shows all 6 flowers")
-		return
-	if coral.get_badge_text() != "PREVIEW · PREMIUM" or coral.get_buy_title() != "Get Coral Tide Garden" or coral.get_price_text().is_empty():
-		_fail("premium: badge / 'Get Coral Tide Garden' / price")
-		return
-	if absf(coral.get_part_rect("art").size.y - 284.0) > TOL:
-		_fail("premium art slot 284 px expected, got %s" % str(coral.get_part_rect("art")))
-		return
-	coral.emit_signal("cta_pressed", "coral_tide")
-	await _frames(2)
-	if coral.state != HomeSeasonCard.ST_PURCHASING or coral.get_buy_title() != "Waiting for store…" or coral.is_buy_enabled():
-		_fail("purchasing: Waiting for store…, Buy disabled")
-		return
-	if str(home.call("home_play_action")) != "focus":
-		_fail("Play on a premium preview must return to the playing season")
-		return
-	await _wait(1.3)
-	if not bool(gs.call("is_season_playable", "coral_tide")) or str(gs.get("active_season_id")) != "coral_tide":
-		_fail("purchase must grant + activate Coral Tide")
-		return
-	if coral.state != HomeSeasonCard.ST_ACTIVE or str(stage.call("get_toast_text")) != "Coral Tide Garden is yours · now playing":
-		_fail("bought: active card + toast, got %s / '%s'" % [coral.state, str(stage.call("get_toast_text"))])
-		return
-	if browser.get_token("coral_tide").status != HomeDockToken.S_OPEN or str(home.call("get_play_chip_text")) != "Coral Tide Garden":
-		_fail("bought pack: ✓ token + Play renamed")
-		return
-	stage.call("tap_card", "ember_fen")
-	await _wait(0.4)
-	var ember := stage.call("get_card", "ember_fen") as HomeSeasonCard
-	if ember.state != HomeSeasonCard.ST_SOON or ember.get_info_title() != "Coming soon" or ember.hit_part(ember.get_part_rect("next").get_center()) != HomeSeasonCard.PART_NONE:
-		_fail("Ember Fen: Coming soon, last page (next arrow off)")
-		return
-
-	# --- dolazak iz Campa: toast, bez ponovnog unlock trenutka ---
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {str(gs.call("star3_type_id_for_season", "frost_orchard")): 20})
-	if not bool(gs.call("unlock_free", "lantern_meadow")):
-		_fail("Lantern unlock for Camp arrival failed")
-		return
-	gs.call("set_free_strip_focus", "lantern_meadow")
-	gs.call("set_home_band", "free")
-	home.call("refresh_for_meta_hub")
+	# --- 8. prelaz: Play na sezoni u kojoj se igra otvara polje ---
+	await _click((V.PLAY_CARD["rect"] as Rect2).get_center())
+	if not bool(stage.call("is_field_transitioning")):
+		_fail("Play should start the open transition"); return
+	# Unos zakljucan dok traje prelaz (runda 1, I3).
+	await _click(V.TABS_RECT.position + Vector2(8 + 508 + 254, 62))
+	await _click((V.NEXT_RECT as Rect2).get_center())
+	if str(stage.call("current_tab")) != "free" or str(stage.call("viewed_id")) != "lantern_meadow":
+		_fail("tabs / arrows must be locked during the transition"); return
+	var tw: Tween = stage.get("_field_tween")
+	tw.pause()
+	var card_surf: Control = card
+	for i in 21:
+		var u := float(i) / 20.0
+		stage.call("_set_u", u)
+		var e: float = V.ease_t(u)
+		# P1: ime, Pip i Play vidljivi u svakom kadru.
+		if not name_n.visible or str(name_n.get("text")).is_empty():
+			_fail("u %.2f: SeasonName must be visible" % u); return
+		if not pip.visible and u < 1.0:
+			_fail("u %.2f: Pip must be visible" % u); return
+		if not play.visible:
+			_fail("u %.2f: Play must be visible" % u); return
+		# P2–P4: jedan objekat na istom eased t.
+		var want_play: Rect2 = V.play_params(e)["rect"]
+		if not _rect_is(_page_rect(play), want_play):
+			_fail("u %.2f: Play rect %s expected %s" % [u, _page_rect(play), want_play]); return
+		if absf(float(name_n.get("top")) - lerpf(244.0, 36.0, e)) > 0.01:
+			_fail("u %.2f: SeasonName top off the eased t" % u); return
+		# P5: trake kartice = trake livade (round(h * .32), round(h * .68)).
+		if u < 1.0:
+			var h: float = card_surf.size.y
+			var edges: Vector2 = card_surf.call("band_edges")
+			if absf(edges.x - roundf(h * 0.32)) > 0.01 or absf(edges.y - roundf(h * 0.68)) > 0.01:
+				_fail("u %.2f: card bands should be round(h * .32 / .68)" % u); return
+		var ground := field.get_node("MeadowGround") as Control
+		if ground.visible != (u >= 1.0):
+			_fail("u %.2f: meadow bands draw only at u = 1 (card IS the meadow)" % u); return
+	var card_edges: Vector2 = card_surf.call("band_edges")
+	if card_edges != Vector2(523, 1110):
+		_fail("card bands at full page should be 523 / 1110, got %s" % card_edges); return
+	var sky := field.get_node("MeadowGround/MeadowSky") as Control
+	var far := field.get_node("MeadowGround/MeadowFar") as Control
+	if absf(sky.size.y - 523.0) > 0.01 or absf(far.position.y + far.size.y - 1110.0) > 0.01:
+		_fail("meadow bands should be 523 / 1110 (same px as the card)"); return
+	tw.kill()
+	stage.call("_on_field_tween_finished")
 	await _frames(3)
-	var lantern := stage.call("get_card", "lantern_meadow") as HomeSeasonCard
-	if str(stage.call("focused_card_id")) != "lantern_meadow" or lantern.state != HomeSeasonCard.ST_ACTIVE:
-		_fail("Camp arrival: Lantern focused + active")
-		return
-	if lantern.is_unlock_playing() or str(stage.call("get_toast_text")) != "Unlocked in Camp · now playing":
-		_fail("Camp arrival: toast, no second unlock moment")
-		return
+	if not bool(gs.get("home_season_field_open")) or str(gs.get("home_season_field_id")) != "lantern_meadow":
+		_fail("field should be open on Lantern"); return
+	if str(home.call("home_play_action")) != "run":
+		_fail("field open: Play starts the run"); return
+	if not _rect_is(_page_rect(play), V.PLAY_FIELD["rect"]):
+		_fail("field: Play should be FieldPlayButton 432 x 140 at (324, 1461)"); return
+	var meadow_pip := stage.get_node("%MeadowPip") as Control
+	if pip.visible or not meadow_pip.visible:
+		_fail("u = 1: the meadow takes Pip over"); return
+	if not _rect_is(meadow_pip.get_global_rect(), Rect2(V.pip_field_pos(Vector2(UiHomeField.PIP_DEFAULT_BASE)) + _page_origin, Vector2(190, 190))):
+		_fail("meadow Pip should land on the home feet (756, 1404)"); return
+	if not bool(field.call("is_pip_alive")):
+		_fail("Pip should walk once the transition is done"); return
 
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {str(gs.call("star3_type_id_for_season", "lantern_meadow")): 20})
-	if not bool(gs.call("unlock_free", "amber_canopy")):
-		_fail("Amber unlock failed")
-		return
-	home.call("refresh_for_meta_hub")
-	await _frames(3)
-	if str(stage.call("get_free_path_text")) != "Free path 4 / 4":
-		_fail("all free: dock 4 / 4")
-		return
-	for id in ["country_bloom", "frost_orchard", "lantern_meadow", "amber_canopy"]:
-		var c := stage.call("get_card", id) as HomeSeasonCard
-		if c.is_gate() or browser.get_token(id).status != HomeDockToken.S_OPEN:
-			_fail("all free: no lock left (%s)" % id)
-			return
-
-	# --- Daily gift: samo na polju sezone ---
-	gs.set("last_daily_chest_day", "")
-	home.call("_refresh_chest_card")
-	if gift.visible or bool(home.call("is_gift_claimable")):
-		_fail("select screen must not show the daily chest")
-		return
-	if not bool(stage.call("open_season_field")):
-		_fail("open field for the daily gift")
-		return
-	await _wait(0.2)
-	var claim_gift := home.get_node_or_null("%GiftChest") as Control
-	if claim_gift == null or not claim_gift.visible or not bool(home.call("is_gift_claimable")):
-		_fail("field gift should show the pink dot")
-		return
-	home.call("_finish_chest_claim")
-	if bool(home.call("is_gift_claimable")) or not claim_gift.visible:
-		_fail("claimed field gift: visible, no dot")
-		return
+	# --- 9. zatvaranje: Pip krece sa stopala gdje je odsetao ---
+	field.call("_stop_wander")
+	meadow_pip.position = Vector2(300.0 - 95.0, 1330.0 - 190.0)
 	stage.call("close_season_field")
-	await _wait(0.45)
-	var overlay := home.get_node("%RewardOverlay") as Control
-	overlay.visible = false
+	tw = stage.get("_field_tween")
+	tw.pause()
+	stage.call("_set_u", 1.0)
+	var walked := Rect2(Vector2(205, 1140), Vector2(190, 190))
+	if not pip.visible or not (pip.get("rect") as Rect2).is_equal_approx(walked):
+		_fail("close: Pip should start from its walked feet, got %s" % str(pip.get("rect"))); return
+	if meadow_pip.visible:
+		_fail("close: the meadow hands Pip back"); return
+	tw.kill()
+	stage.call("_on_field_tween_finished")
+	await _frames(3)
+	if bool(gs.get("home_season_field_open")) or not card.visible or clip.visible:
+		_fail("close should end on the card"); return
+	if str(stage.call("viewed_id")) != "lantern_meadow" or str(name_n.get("text")) != "Lantern Meadow":
+		_fail("close should land on the playing season"); return
 
-	# --- prva sesija: oblacic + prsten oko Play ---
+	# --- 10. kapija na otkljucanoj sezoni otvara njeno polje i ona postaje aktivna ---
+	stage.call("show_season", "frost_orchard", false)
+	await _frames(2)
+	stage.call("press_part", PART_GATE)
+	await _settle(stage)
+	if not bool(gs.get("home_season_field_open")) or str(gs.get("active_season_id")) != "frost_orchard":
+		_fail("gate should open Frost and make it the playing season"); return
+	stage.call("close_season_field", false)
+	await _frames(2)
+
+	# --- 11. Unlock (500 + 20 ★3) ---
+	gs.set("wallet_coins", 1250)
+	gs.set("garden_crystal_stash", {"midnight_lotus": 20})
+	gs.call("set_active_season", "lantern_meadow")
+	home.call("refresh_for_meta_hub")
+	stage.call("show_season", "amber_canopy", false)
+	await _frames(2)
+	if str(stage.call("card_status")) != "unlock":
+		_fail("Amber with 500 + 20: Unlock button"); return
+	stage.call("press_part", PART_UNLOCK)
+	await _frames(2)
+	if not bool(gs.call("is_season_playable", "amber_canopy")) or str(stage.call("card_status")) != "active":
+		_fail("Unlock should make Amber the playing season"); return
+	if str(stage.call("get_toast_text")) != "Unlocked" or not pip.visible:
+		_fail("Unlock: toast + Pip on the card"); return
+
+	# --- 12. pravi tween (realno vrijeme): invarijante u SVAKOM frameu ---
+	stage.call("show_season", str(gs.get("active_season_id")), false)
+	await _frames(2)
+	var inv_err := await _run_live(stage, field, card, pip, play, name_n, true)
+	if not inv_err.is_empty():
+		_fail("live open: %s" % inv_err); return
+	await _wait(1.2)
+	inv_err = await _run_live(stage, field, card, pip, play, name_n, false)
+	if not inv_err.is_empty():
+		_fail("live close: %s" % inv_err); return
+
+	# --- 13. prva sesija: hint oko Playa, bez loopa na biranju ---
 	gs.set("tutorial_complete", false)
 	home.call("refresh_for_meta_hub")
-	await _frames(3)
-	var stage_hint := home.get_node_or_null("%StageHint") as Control
-	var hint_panel := home.get_node_or_null("%TutorialHintPanel") as Control
-	if stage_hint == null or not stage_hint.visible or hint_panel.visible:
-		_fail("first session: StageHint visible, old hint panel hidden")
-		return
-	if gift.visible or bool(home.call("is_gift_claimable")):
-		_fail("first session: daily chest stays off the select screen")
-		return
-	spill = _overflow(home, page)
-	if not spill.is_empty():
-		_fail("first session: nothing may spill off the page: %s" % spill)
-		return
+	await _frames(2)
+	var hint := home.get_node("%StageHint") as Control
+	if not hint.visible or not _rect_is(Rect2(hint.get("target")), V.PLAY_CARD["rect"]):
+		_fail("first session: StageHint rings the new Play"); return
+	gs.set("tutorial_complete", true)
 
 	CampSmokeUtil.restore_save(self, _backup)
 	print("season_home_smoke OK")

@@ -1,18 +1,25 @@
-[gd_scene load_steps=6 format=3 uid="uid://seasonstage01"]
+[gd_scene load_steps=10 format=3 uid="uid://seasonstage01"]
 
 [ext_resource type="Script" path="res://scripts/ui/season_stage.gd" id="1_stage"]
-[ext_resource type="Script" path="res://scripts/ui/season_browser.gd" id="2_browser"]
-[ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="6_uibtn"]
+[ext_resource type="Script" path="res://scripts/ui/home_v3_tabs.gd" id="2_tabs"]
+[ext_resource type="Script" path="res://scripts/ui/home_v3_card.gd" id="3_card"]
+[ext_resource type="Script" path="res://scripts/ui/home_v3_arrow.gd" id="4_arrow"]
+[ext_resource type="Script" path="res://scripts/ui/home_v3_marks.gd" id="5_marks"]
+[ext_resource type="Script" path="res://scripts/ui/home_v3_play_button.gd" id="6_play"]
 [ext_resource type="Script" path="res://scripts/ui/season_field.gd" id="7_field"]
 [ext_resource type="Script" path="res://scripts/ui/season_field_pip.gd" id="8_pip"]
 
 [node name="SeasonStage" type="Control"]
-layout_mode = 2
-size_flags_horizontal = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_stage")
 
-[node name="SelectLayer" type="Control" parent="."]
+[node name="PageBg" type="ColorRect" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -21,66 +28,45 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+color = Color(0.964706, 0.929412, 1, 1)
 
-[node name="CardClip" type="Control" parent="SelectLayer"]
+[node name="SeasonTabs" type="Control" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
-offset_right = 1032.0
-offset_bottom = 1136.0
-mouse_filter = 0
-
-[node name="CardHost" type="Control" parent="SelectLayer/CardClip"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="SeasonBrowser" type="Control" parent="SelectLayer"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = -24.0
-offset_top = 1160.0
+offset_left = 24.0
+offset_top = 24.0
 offset_right = 1056.0
-offset_bottom = 1382.0
-script = ExtResource("2_browser")
+offset_bottom = 148.0
+script = ExtResource("2_tabs")
 
-[node name="StageToast" type="PanelContainer" parent="."]
+[node name="SeasonCard" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 172.0
+offset_right = 1056.0
+offset_bottom = 1332.0
+script = ExtResource("3_card")
+
+[node name="FieldClip" type="Control" parent="."]
 unique_name_in_owner = true
 visible = false
-z_index = 30
+clip_contents = true
 layout_mode = 0
-offset_left = 300.0
-offset_top = 226.0
-offset_right = 732.0
-offset_bottom = 318.0
+offset_right = 1080.0
+offset_bottom = 1633.0
 mouse_filter = 2
 
-[node name="StageToastLabel" type="Label" parent="StageToast"]
+[node name="SeasonField" type="Control" parent="FieldClip"]
 unique_name_in_owner = true
-layout_mode = 2
-text = ""
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="SeasonField" type="Control" parent="."]
-unique_name_in_owner = true
-visible = false
-z_index = 0
 clip_contents = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1633.0
 mouse_filter = 2
 script = ExtResource("7_field")
 
-[node name="MeadowGround" type="Panel" parent="SeasonField"]
+[node name="MeadowGround" type="Panel" parent="FieldClip/SeasonField"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -90,39 +76,20 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="SeasonsButton" type="PanelContainer" parent="SeasonField"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(220, 64)
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -110.0
-offset_top = 12.0
-offset_right = 110.0
-offset_bottom = 76.0
-grow_horizontal = 2
-mouse_filter = 0
-script = ExtResource("6_uibtn")
-label_text = ""
-font_size = 28
-button_variant = "secondary"
-
-[node name="MeadowPip" type="Control" parent="SeasonField"]
+[node name="MeadowPip" type="Control" parent="FieldClip/SeasonField"]
 unique_name_in_owner = true
 visible = false
 z_index = 20
 custom_minimum_size = Vector2(190, 190)
 layout_mode = 0
-offset_left = 20.0
-offset_top = 120.0
-offset_right = 210.0
-offset_bottom = 310.0
+offset_left = 661.0
+offset_top = 1214.0
+offset_right = 851.0
+offset_bottom = 1404.0
 mouse_filter = 2
 script = ExtResource("8_pip")
 
-[node name="MeadowNote" type="Label" parent="SeasonField"]
+[node name="MeadowNote" type="Label" parent="FieldClip/SeasonField"]
 unique_name_in_owner = true
 visible = false
 z_index = 8
@@ -137,3 +104,100 @@ theme_override_font_sizes/font_size = 40
 text = "Nothing has grown here yet. Bring seeds back from a run."
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="CardNav" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PrevSeason" type="Control" parent="CardNav"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 52.0
+offset_top = 852.0
+offset_right = 172.0
+offset_bottom = 972.0
+script = ExtResource("4_arrow")
+left = true
+
+[node name="NextSeason" type="Control" parent="CardNav"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 908.0
+offset_top = 852.0
+offset_right = 1028.0
+offset_bottom = 972.0
+script = ExtResource("4_arrow")
+left = false
+
+[node name="SeasonDots" type="Control" parent="CardNav"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1633.0
+mouse_filter = 2
+script = ExtResource("5_marks")
+kind = "dots"
+
+[node name="TravelLayer" type="Control" parent="."]
+unique_name_in_owner = true
+z_index = 7
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CardEdge" type="Control" parent="TravelLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1633.0
+mouse_filter = 2
+script = ExtResource("5_marks")
+kind = "edge"
+
+[node name="SeasonName" type="Control" parent="TravelLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1633.0
+mouse_filter = 2
+script = ExtResource("5_marks")
+kind = "name"
+
+[node name="TravelPip" type="Control" parent="TravelLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1633.0
+mouse_filter = 2
+script = ExtResource("5_marks")
+kind = "pip"
+
+[node name="PlayButton" type="Control" parent="TravelLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 280.0
+offset_top = 1413.0
+offset_right = 800.0
+offset_bottom = 1593.0
+script = ExtResource("6_play")
+
+[node name="StageToast" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 30
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1633.0
+mouse_filter = 2
+script = ExtResource("5_marks")
+kind = "toast"

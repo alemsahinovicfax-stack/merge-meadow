@@ -32,7 +32,7 @@
       <div data-layer="MeadowFar" style="position:absolute;left:0;top:523px;width:1080px;height:587px;background:{{ ground }}"></div>
       <div data-layer="MeadowNear" style="position:absolute;left:0;top:1110px;width:1080px;height:523px;background:{{ near }}"></div>
     </div>
-    <div data-layer="MeadowFlowers" style="{{ flowersStyle }}">
+    <div data-layer="MeadowFlowers" style="position:absolute;left:0;top:0;width:1080px;height:1633px">
       <sc-for list="{{ spots }}" as="sp" hint-placeholder-count="13">
         <div data-layer="MeadowFlower" style="{{ sp.wrap }}">
           <div style="{{ sp.soil }}"></div>
@@ -40,16 +40,20 @@
           <img src="{{ sp.src }}" alt="" style="{{ sp.art }}">
         </div>
       </sc-for>
-      <div data-layer="MeadowPip" style="position:absolute;left:661px;top:1214px;width:190px;height:190px">
-        <div style="position:absolute;left:35px;bottom:6px;width:120px;height:26px;border-radius:999px;background:rgba(26,26,20,.14)"></div>
-        <img src="icons/pip_idle.svg" alt="" style="position:relative;display:block;width:190px;height:190px">
-      </div>
+      <sc-if value="{{ showPip }}" hint-placeholder-val="{{ true }}">
+        <div data-layer="MeadowPip" style="position:absolute;left:661px;top:1214px;width:190px;height:190px">
+          <div style="position:absolute;left:35px;bottom:6px;width:120px;height:26px;border-radius:999px;background:rgba(26,26,20,.14)"></div>
+          <img src="icons/pip_idle.svg" alt="" style="position:relative;display:block;width:190px;height:190px">
+        </div>
+      </sc-if>
       <sc-if value="{{ showNote }}" hint-placeholder-val="{{ false }}">
-        <div data-layer="MeadowNote" style="position:absolute;left:130px;top:568px;width:820px;text-align:center;font:800 40px/1.1 Nunito,system-ui,sans-serif;color:#1A1A14;text-wrap:balance">Nothing has grown here yet. Bring seeds back from a run.</div>
+        <div data-layer="MeadowNote" style="{{ noteStyle }}">Nothing has grown here yet. Bring seeds back from a run.</div>
       </sc-if>
     </div>
 
-    <div data-layer="SeasonLabel" style="position:absolute;left:228px;top:36px;width:624px;text-align:center;font:900 56px/1 Nunito,system-ui,sans-serif;letter-spacing:-.01em;color:#1A1A14;white-space:nowrap">{{ seasonName }}</div>
+    <sc-if value="{{ showLabel }}" hint-placeholder-val="{{ true }}">
+      <div data-layer="SeasonLabel" style="position:absolute;left:0;top:36px;width:1080px;text-align:center;font:900 56px/1 Nunito,system-ui,sans-serif;letter-spacing:-.01em;color:#1A1A14;white-space:nowrap">{{ seasonName }}</div>
+    </sc-if>
 
     <div data-layer="TopChrome" style="{{ topStyle }}">
       <div style="position:absolute;left:228px;top:112px;width:624px;display:flex;justify-content:center">
@@ -122,10 +126,12 @@
           <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Endless</div>
         </div>
       </sc-if>
-      <div data-layer="FieldPlayButton" onClick="{{ onPlay }}" style="position:absolute;left:254px;top:0;width:432px;height:140px;box-sizing:border-box;border-radius:70px;background:#FFB88C;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:22px;cursor:pointer;z-index:2">
-        <div style="width:0;height:0;border-top:26px solid transparent;border-bottom:26px solid transparent;border-left:42px solid #2D3436;margin-left:6px"></div>
-        <div style="font:900 64px/1 Nunito,system-ui,sans-serif;color:#2D3436">Play</div>
-      </div>
+      <sc-if value="{{ showPlay }}" hint-placeholder-val="{{ true }}">
+        <div data-layer="FieldPlayButton" onClick="{{ onPlay }}" style="position:absolute;left:254px;top:0;width:432px;height:140px;box-sizing:border-box;border-radius:70px;background:#FFB88C;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:22px;cursor:pointer;z-index:2">
+          <div style="width:0;height:0;border-top:26px solid transparent;border-bottom:26px solid transparent;border-left:42px solid #2D3436;margin-left:6px"></div>
+          <div style="font:900 64px/1 Nunito,system-ui,sans-serif;color:#2D3436">Play</div>
+        </div>
+      </sc-if>
     </div>
 
     <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
@@ -148,14 +154,14 @@
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;amber_canopy&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;gift&quot;,&quot;basket_empty&quot;,&quot;first&quot;],&quot;default&quot;:&quot;gift&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;reveal&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Transition&quot;},&quot;pageOnly&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;},&quot;noBands&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;},&quot;onSeasons&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onPlay&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;amber_canopy&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;gift&quot;,&quot;basket_empty&quot;,&quot;first&quot;],&quot;default&quot;:&quot;gift&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;u&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Transition&quot;},&quot;pageOnly&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;},&quot;embedded&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;},&quot;noBands&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;},&quot;onSeasons&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
 const S = {
   country_bloom: { n: 'Country Bloom', g: '#E6F2DB', r: ['clover', 'daisy', 'buttercup', 'tulip', 'sunflower', 'pumpkin'] },
   frost_orchard: { n: 'Frost Orchard', g: '#D1E6FF', r: ['frost_snowdrop', 'silver_aconite', 'clover', 'daisy', 'tulip', 'sunflower'] },
   lantern_meadow: { n: 'Lantern Meadow', g: '#EBD6FF', r: ['clover', 'buttercup', 'daisy', 'tulip', 'silver_aconite', 'sunflower'] },
   amber_canopy: { n: 'Amber Canopy', g: '#FFEBC7', r: ['clover', 'daisy', 'tulip', 'buttercup', 'sunflower', 'pumpkin'] },
   moonlit_warren: { n: 'Moonlit Warren', g: '#B8BDFF', r: ['clover', 'silver_aconite', 'frost_snowdrop', 'tulip', 'daisy', 'sunflower'] },
-  coral_tide: { n: 'Coral Tide Garden', g: '#FFE0D6', r: ['daisy', 'clover', 'tulip', 'buttercup', 'sunflower', 'pumpkin'] },
+  coral_tide: { n: 'Coral Tide', g: '#FFE0D6', r: ['daisy', 'clover', 'tulip', 'buttercup', 'sunflower', 'pumpkin'] },
   starfall_glade: { n: 'Starfall Glade', g: '#DBCCFF', r: ['silver_aconite', 'clover', 'daisy', 'tulip', 'sunflower', 'frost_snowdrop'] },
   ember_fen: { n: 'Ember Fen', g: '#FFC79E', r: ['clover', 'silver_aconite', 'buttercup', 'tulip', 'daisy', 'pumpkin'] }
 };
@@ -170,11 +176,16 @@ const SCENES = {
   basket_empty: { label: '6 · field · basket empty', tut: true, gift: true, basket: -1, mag: 1, loot: 2, c: [4, 3, 2, 1, 1, 0], cur: ['2,040', '112', '31'] },
   first: { label: '6 · field · before first merge', tut: false, gift: false, basket: -1, mag: 0, loot: 0, c: [0, 0, 0, 0, 0, 0], cur: ['46', '18', '0'] }
 };
+// Timing windows on raw tween progress u (0..1 of OPEN_MS). Same numbers in home_v3_export.json + ui_home_v3.gd.
+const W = { FLOWER_START: 0.20, FLOWER_STAGGER: 12 / 560, FLOWER_SETTLE: 200 / 560, FLOWER_FADE: 100 / 560, NOTE: [0.30, 0.60], CHROME: [0.60, 0.92], SLIDE: 254, CHROME_Y: 16 };
 const INK = '#2D3436';
 const clamp = v => Math.max(0, Math.min(1, v));
+const win = (u, a, b) => clamp((u - a) / (b - a));
+const easeOut = k => 1 - Math.pow(1 - k, 3);
 
 class Component extends DCLogic {
   state = { toast: false };
+  componentWillUnmount() { clearTimeout(this._t); }
   rgb(h) { return [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)); }
   hx(a) { return '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join(''); }
   segs(lvl) {
@@ -184,28 +195,34 @@ class Component extends DCLogic {
     const p = this.props;
     const sc = SCENES[p.scene] || SCENES.gift;
     const s = S[p.season] || S.amber_canopy;
-    const r = clamp(p.reveal ?? 1);
+    const u = clamp(p.u ?? 1);
     const pageOnly = !!p.pageOnly;
+    const embedded = !!p.embedded;
     const g = this.rgb(s.g);
     const sky = this.hx(g.map(v => v + (255 - v) * 0.30));
     const near = this.hx(g.map(v => v * 0.93));
     let grown = 0;
-    const spots = SPOTS.map(sp => {
+    const spots = SPOTS.map((sp, i) => {
       const up = (sc.c[sp[3]] || 0) >= sp[4];
       if (up) grown++;
       const size = sp[2], cx = Math.round(sp[0] * 10.8), by = Math.round(1633 - sp[1] * 16.33);
+      const st = W.FLOWER_START + i * W.FLOWER_STAGGER;
+      const a = clamp((u - st) / W.FLOWER_FADE), k = easeOut(clamp((u - st) / W.FLOWER_SETTLE));
+      const sc9 = 0.9 + 0.1 * k;
       return {
-        wrap: 'position:absolute;left:' + (cx - size / 2) + 'px;top:' + (by - size) + 'px;width:' + size + 'px;height:' + size + 'px',
+        wrap: 'position:absolute;left:' + (cx - size / 2) + 'px;top:' + (by - size) + 'px;width:' + size + 'px;height:' + size + 'px;transform-origin:50% 100%;' + (u >= 1 ? '' : 'opacity:' + a.toFixed(3) + ';transform:scale(' + sc9.toFixed(4) + ')'),
         soil: up ? 'display:none' : 'position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:' + Math.round(size * 0.68) + 'px;height:' + Math.round(size * 0.27) + 'px;box-sizing:border-box;border-radius:999px;background:rgba(26,26,20,.10);border:3px solid rgba(26,26,20,.19)',
         shade: up ? 'position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:' + Math.round(size * 0.56) + 'px;height:' + Math.round(size * 0.17) + 'px;border-radius:999px;background:rgba(26,26,20,.13)' : 'display:none',
         src: 'flowers/ph_' + s.r[sp[3]] + '.svg',
         art: up ? 'position:relative;display:block;width:' + size + 'px;height:' + size + 'px' : 'display:none'
       };
     });
+    const c = win(u, W.CHROME[0], W.CHROME[1]);
+    const ce = easeOut(c);
     const locked = !sc.tut, chosen = !locked && sc.basket >= 0, empty = !locked && !chosen;
-    const attention = empty && r >= 1 ? React.createElement('div', { 'data-layer': 'AttentionRing', style: { position: 'absolute', left: 0, top: 0, width: 180, height: 180, boxSizing: 'border-box', borderRadius: 32, border: '4px solid ' + INK, animation: 'fieldRipple 1.2s ease-out infinite', pointerEvents: 'none' } }) : null;
-    const side = 'position:absolute;top:16px;width:236px;height:124px;box-sizing:border-box;border-radius:28px;border:3px solid ' + INK + ';box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:' + r.toFixed(3) + ';';
-    const slide = (1 - r) * 254;
+    const attention = empty && u >= 1 ? React.createElement('div', { 'data-layer': 'AttentionRing', style: { position: 'absolute', left: 0, top: 0, width: 180, height: 180, boxSizing: 'border-box', borderRadius: 32, border: '4px solid ' + INK, animation: 'fieldRipple 1.2s ease-out infinite', pointerEvents: 'none' } }) : null;
+    const side = 'position:absolute;top:16px;width:236px;height:124px;box-sizing:border-box;border-radius:28px;border:3px solid ' + INK + ';box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;cursor:pointer;' + (u >= 1 ? '' : 'opacity:' + c.toFixed(3) + ';');
+    const slide = (1 - ce) * W.SLIDE;
     return {
       sceneLabel: sc.label + ' · ' + s.n,
       rootStyle: 'width:1080px;height:' + (pageOnly ? 1633 : 1920) + 'px;flex:0 0 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;background:' + (pageOnly ? 'transparent' : '#2A2233') + ';font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased',
@@ -213,21 +230,21 @@ class Component extends DCLogic {
       coins: sc.cur[0], seeds: sc.cur[1], flowers: sc.cur[2],
       meadowStyle: 'position:absolute;left:0;top:0;width:1080px;height:1633px;overflow:hidden;' + (p.noBands ? 'display:none' : ''),
       ground: s.g, sky, near, spots,
-      flowersStyle: 'position:absolute;left:0;top:0;width:1080px;height:1633px;transform-origin:50% 100%;opacity:' + r.toFixed(3) + ';transform:scale(' + (0.96 + 0.04 * r).toFixed(4) + ')',
       showNote: grown === 0,
+      noteStyle: 'position:absolute;left:130px;top:568px;width:820px;text-align:center;font:800 40px/1.1 Nunito,system-ui,sans-serif;color:#1A1A14;text-wrap:balance;opacity:' + win(u, W.NOTE[0], W.NOTE[1]).toFixed(3),
+      showPip: !embedded, showLabel: !embedded, showPlay: !embedded,
       seasonName: s.n, grownText: grown + ' / 13',
-      topStyle: 'position:absolute;left:0;top:0;width:1080px;height:420px;opacity:' + r.toFixed(3) + ';transform:translateY(' + (-16 * (1 - r)).toFixed(1) + 'px)',
+      topStyle: 'position:absolute;left:0;top:0;width:1080px;height:420px;' + (u >= 1 ? '' : 'opacity:' + c.toFixed(3) + ';transform:translateY(' + (-W.CHROME_Y * (1 - ce)).toFixed(2) + 'px)'),
       giftWaiting: !!sc.gift, basketLocked: locked, basketEmpty: empty, basketChosen: chosen,
       basketArt: chosen ? 'flowers/ph_' + s.r[sc.basket] + '.svg' : '',
       attention,
       magSegs: this.segs(sc.mag), lootSegs: this.segs(sc.loot),
       upReady: !!sc.tut,
       endless: !!sc.tut,
-      seasonsStyle: side + 'left:0;background:#FFF8F0;gap:14px;transform:translateX(' + slide.toFixed(1) + 'px)',
-      endlessStyle: side + 'left:704px;background:#D4A5FF;gap:12px;transform:translateX(' + (-slide).toFixed(1) + 'px)',
-      onSeasons: () => { if (p.onSeasons) p.onSeasons(); },
+      seasonsStyle: side + 'left:0;background:#FFF8F0;gap:14px;' + (u >= 1 ? '' : 'transform:translateX(' + slide.toFixed(2) + 'px)'),
+      endlessStyle: side + 'left:704px;background:#D4A5FF;gap:12px;' + (u >= 1 ? '' : 'transform:translateX(' + (-slide).toFixed(2) + 'px)'),
+      onSeasons: () => { if (u >= 1 && p.onSeasons) p.onSeasons(); },
       onPlay: () => {
-        if (p.onPlay) p.onPlay();
         this.setState({ toast: true });
         clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: false }), 1400);
       },

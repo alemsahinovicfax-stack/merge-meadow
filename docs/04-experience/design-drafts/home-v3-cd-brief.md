@@ -11,12 +11,14 @@ povezano:
   - art-direction
   - pristupacnost
   - CHECKPOINT
-ai_sažetak: "Puni redizajn Homea (dva taba, novo Play, prelaz u polje). Runda 1 isporučena 2026-09-28 kao design_handoff_home_v3/, ali test je našao mrtve strelice i prelaz u kojem elementi nestanu pa se ponovo pojave — runda 2 (§9–§12) traži samo te korekcije."
+ai_sažetak: "Puni redizajn Homea (dva taba, novo Play, prelaz u polje). Runda 1 imala mrtve strelice i prelaz s rupom; runda 2 (§9–§12) ih je popravila i 2026-09-28 je prenesena u igru 1:1 (§ Implementacija, home-v3-izvjestaj)."
 ---
 
 # Home — puni redizajn — Claude Design brief
 
-> **Status 2026-09-28: runda 1 isporučena, treba runda 2 (korekcije).** Paket `design_handoff_home_v3/` je u repou, raspakovan i cijeli (29 fajlova). Test u browseru je našao greške u interakciji i u prelazu biranje → polje, vidi [[#9. Runda 2 — nalazi testiranja (2026-09-28)|§9]]. **Za CD sada šalji prompt iz §12**, ne onaj iz §8.
+> **Status 2026-09-28 (kasnije): runda 2 isporučena i implementirana u igri** — vidi [[#Implementacija (2026-09-28)|§ Implementacija]] i [[home-v3-izvjestaj|izvještaj]].
+>
+> ~~**Status 2026-09-28: runda 1 isporučena, treba runda 2 (korekcije).**~~ Paket `design_handoff_home_v3/` je u repou, raspakovan i cijeli (29 fajlova). Test u browseru je našao greške u interakciji i u prelazu biranje → polje, vidi [[#9. Runda 2 — nalazi testiranja (2026-09-28)|§9]]. **Za CD sada šalji prompt iz §12**, ne onaj iz §8.
 
 > Biranje sezona je u igri od 2026-09-21 ([[home-season-select-cd-brief|Season Trail]]), polje sezone od 2026-09-25 ([[home-field-v2-cd-brief|pass 2]]). Ovo je **nova runda cijelog Homea**: biranje i ulaz u polje. Hub header i footer se ne diraju.
 
@@ -394,8 +396,25 @@ stavki iz §11 briefa — svaku provjeri u svom prototipu i napiši da/ne.
 Na kraju mi daj ZIP ZA PREUZIMANJE s cijelim folderom.
 ```
 
+## Implementacija (2026-09-28)
+
+Paket: `design_handoff_home_v3/` (runda 2). Prije prenosa testiran u browseru: strelice, swipe, zaključan unos, Pip samo na aktivnoj i prelaz bez rupe rade. Ostala je jedna greška mocka: `OpenTransition` bez `pointer-events:none` pokriva tabove. U igri je taj kontejner `MOUSE_FILTER_IGNORE`. Detalji, slike Godot ↔ dizajn i video su u [[home-v3-izvjestaj|izvještaju]] i u `home-v3-test/`.
+
+| Fajl | Uloga |
+|------|-------|
+| `game/scripts/visual/ui_home_v3.gd` | **Novo** — tokeni i mjere iz paketa, `ease_t` / `win`, putujući objekti (`PLAY_CARD` → `PLAY_FIELD`, ime, Pip), crtanje (panel sa sjenkom 0 Y 0, isprekidani rub, chevron, kvačica, cvijet, Pip) |
+| `game/scripts/ui/season_stage.gd` + `scenes/ui/season_stage.tscn` | **Prepisano** — tabovi, kartica, strelice, swipe, tačke, Play u tri koraka i prelaz (`_set_u`: kartica, rub, FieldClip, ime, Pip, Play, chrome polja) |
+| `game/scripts/ui/home_v3_card.gd` · `home_v3_card_content.gd` | **Novo** — trake kartice (`round(h·.32/.68)`) i sadržaj (premium rub, lokot, tri diska, status po stanju) |
+| `game/scripts/ui/home_v3_tabs.gd` · `home_v3_arrow.gd` · `home_v3_marks.gd` · `home_v3_play_button.gd` · `home_v3_glyph.gd` | **Novo** — tabovi, strelice, tačke / rub / ime / Pip / toast, Play (i „Back"), znakovi Seasons / Endless |
+| `game/scripts/ui/season_field.gd` · `season_field_pip.gd` · `season_field_flower.gd` | `apply_reveal(u)`: trake samo na `u = 1`, prozori cvijeća i napomene; `hold_pip` / `release_pip` / `pip_feet`; boje iz `UiHomeField.meadow_ground`; Pip iz `pip_idle.svg` sa sjenkom; sjenka cvijeta kao pilula |
+| `game/scenes/main_menu.tscn` · `scripts/ui/main_menu.gd` | Obrisani `HomeColumn`, `PlayRow`, stari `PlayButton`, `DailyChestCard`, `FieldBackdrop`, `SeasonLabel` i `FieldPlayButton`. Chrome polja ide u `FieldOverlay → FieldOverlayInner → TopChrome / BottomRow` (clip = rect kartice). Blokada dodira dok traje prelaz. Prsten korpe tek na `u = 1` |
+| `game/scripts/visual/ui_home_field.gd` | `meadow_sky` / `meadow_near` zaokruženo na 8 bita (isti pikseli kao kartica) |
+| obrisano | `home_season_card.gd`, `season_browser.gd`, `home_dock_token.gd`, `home_play_disc.gd`, `season_colors.gd`; v2 mjere i crteži iz `UiStage` (ostali su fontovi, box i oblici), stari tweenovi prelaza iz `UiHomeField` (`tween_open_field`, `tween_chrome_in`, `tween_flowers_settle`) |
+| `game/scripts/dev/season_home_smoke.gd` | **Prepisano za v3** (vidi izvještaj § Testovi), plus `home_capture.gd` (sva stanja + kadrovi prelaza) i `home_movie.gd` (video toka) |
+
 ## Povezano
 
+- [[home-v3-izvjestaj|home-v3-izvjestaj]] — prenos u igru, provjere, odstupanja
 - [[home-season-select-cd-brief|home-season-select-cd-brief]] — biranje, Season Trail
 - [[home-field-v2-cd-brief|home-field-v2-cd-brief]] — polje, livada kao stranica
 - [[hub-chrome-v2-cd-brief|hub-chrome-v2-cd-brief]] — header i footer

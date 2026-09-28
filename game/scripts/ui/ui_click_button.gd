@@ -314,6 +314,15 @@ func _pointer_released() -> bool:
 	return not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 
 
+## Vlastiti stilovi (npr. naljepnice polja): normal i hover isti, pressed poseban.
+func set_panel_styles(normal: StyleBoxFlat, pressed: StyleBoxFlat) -> void:
+	_style_normal = normal
+	_style_hover = normal
+	_style_pressed = pressed
+	_style_ghost = normal
+	_apply_panel_style()
+
+
 func _apply_panel_style() -> void:
 	if disabled and ghost_when_disabled:
 		add_theme_stylebox_override("panel", _style_ghost)

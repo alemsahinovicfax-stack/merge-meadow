@@ -36,6 +36,8 @@ func setup(seed_type: String, tier: int) -> void:
 func _draw() -> void:
 	if type_id.is_empty() or plant_tier <= 0:
 		return
-	var shadow := Rect2(size * Vector2(0.22, 0.78), size * Vector2(0.56, 0.17))
-	draw_rect(shadow, UiHomeField.FLOWER_SHADOW, true)
+	# Senka = pilula 56 % x 17 %, 2 px od dna (FieldScreen.dc.html · shade).
+	var sh := Vector2(roundf(size.x * 0.56), roundf(size.y * 0.17))
+	var shadow := Rect2(Vector2((size.x - sh.x) * 0.5, size.y - 2.0 - sh.y), sh)
+	draw_style_box(UiStage.box(UiHomeField.FLOWER_SHADOW, roundi(sh.y * 0.5)), shadow)
 	PLANT_DRAW.draw_fitted_plant(self, size * 0.5, type_id, plant_tier, _side)

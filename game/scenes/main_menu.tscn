@@ -3,7 +3,6 @@
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="3_uibtn"]
 [ext_resource type="PackedScene" path="res://scenes/ui/season_stage.tscn" id="5_stage"]
-[ext_resource type="Script" path="res://scripts/camp/camp_button.gd" id="6_campbtn"]
 [ext_resource type="Script" path="res://scripts/ui/home_gift_card.gd" id="9_gift"]
 [ext_resource type="Script" path="res://scripts/ui/home_stage_hint.gd" id="10_hint"]
 [ext_resource type="Script" path="res://scripts/ui/field_basket_button.gd" id="11_basket_btn"]
@@ -44,90 +43,34 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.141176, 0.2, 0.160784, 1)
 
-[node name="FieldBackdrop" type="ColorRect" parent="."]
-unique_name_in_owner = true
-visible = false
-mouse_filter = 2
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.180392, 0.278431, 0.2, 1)
-
-[node name="HomeColumn" type="VBoxContainer" parent="."]
+[node name="SeasonStage" parent="." instance=ExtResource("5_stage")]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = 24.0
-offset_right = -24.0
-offset_bottom = -23.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_constants/separation = 24
-
-[node name="SeasonStage" parent="HomeColumn" instance=ExtResource("5_stage")]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="PlayRow" type="HBoxContainer" parent="HomeColumn"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 180)
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 16
-
-[node name="PlayButton" type="PanelContainer" parent="HomeColumn/PlayRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(836, 180)
-layout_mode = 2
-size_flags_horizontal = 0
-script = ExtResource("6_campbtn")
-label_text = "Play"
-font_size = 40
-button_variant = "primary"
-
-[node name="DailyChestCard" type="Control" parent="HomeColumn/PlayRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(180, 180)
-layout_mode = 2
-size_flags_horizontal = 0
-script = ExtResource("9_gift")
 
 [node name="FieldOverlay" type="Control" parent="."]
 unique_name_in_owner = true
 visible = false
 z_index = 6
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 1633.0
 mouse_filter = 2
 
-[node name="SeasonLabel" type="Label" parent="FieldOverlay"]
+[node name="FieldOverlayInner" type="Control" parent="FieldOverlay"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 228.0
-offset_top = 36.0
-offset_right = 852.0
-offset_bottom = 92.0
+offset_right = 1080.0
+offset_bottom = 1633.0
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.102, 0.102, 0.078, 1)
-theme_override_font_sizes/font_size = 56
-text = ""
-horizontal_alignment = 1
-vertical_alignment = 1
-text_overrun_behavior = 3
 
-[node name="GrownChip" type="PanelContainer" parent="FieldOverlay"]
+[node name="TopChrome" type="Control" parent="FieldOverlay/FieldOverlayInner"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 1080.0
+offset_bottom = 420.0
+mouse_filter = 2
+
+[node name="GrownChip" type="PanelContainer" parent="FieldOverlay/FieldOverlayInner/TopChrome"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 380.0
@@ -136,13 +79,13 @@ offset_right = 700.0
 offset_bottom = 188.0
 mouse_filter = 2
 
-[node name="Row" type="HBoxContainer" parent="FieldOverlay/GrownChip"]
+[node name="Row" type="HBoxContainer" parent="FieldOverlay/FieldOverlayInner/TopChrome/GrownChip"]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="Icon" type="TextureRect" parent="FieldOverlay/GrownChip/Row"]
+[node name="Icon" type="TextureRect" parent="FieldOverlay/FieldOverlayInner/TopChrome/GrownChip/Row"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 size_flags_vertical = 4
@@ -150,7 +93,7 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Count" type="Label" parent="FieldOverlay/GrownChip/Row"]
+[node name="Count" type="Label" parent="FieldOverlay/FieldOverlayInner/TopChrome/GrownChip/Row"]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
@@ -159,7 +102,7 @@ theme_override_font_sizes/font_size = 44
 text = "0 / 13"
 vertical_alignment = 1
 
-[node name="Word" type="Label" parent="FieldOverlay/GrownChip/Row"]
+[node name="Word" type="Label" parent="FieldOverlay/FieldOverlayInner/TopChrome/GrownChip/Row"]
 layout_mode = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.333, 0.361, 0.369, 1)
@@ -167,7 +110,7 @@ theme_override_font_sizes/font_size = 38
 text = "grown"
 vertical_alignment = 1
 
-[node name="GiftChest" type="Control" parent="FieldOverlay"]
+[node name="GiftChest" type="Control" parent="FieldOverlay/FieldOverlayInner/TopChrome"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 180)
 layout_mode = 0
@@ -177,7 +120,7 @@ offset_right = 204.0
 offset_bottom = 204.0
 script = ExtResource("9_gift")
 
-[node name="BasketButton" type="Control" parent="FieldOverlay"]
+[node name="BasketButton" type="Control" parent="FieldOverlay/FieldOverlayInner/TopChrome"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 180)
 layout_mode = 0
@@ -187,7 +130,7 @@ offset_right = 204.0
 offset_bottom = 400.0
 script = ExtResource("11_basket_btn")
 
-[node name="UpgradesButton" type="Control" parent="FieldOverlay"]
+[node name="UpgradesButton" type="Control" parent="FieldOverlay/FieldOverlayInner/TopChrome"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 180)
 layout_mode = 0
@@ -197,7 +140,7 @@ offset_right = 1056.0
 offset_bottom = 204.0
 script = ExtResource("12_upgrades_btn")
 
-[node name="BottomRow" type="Control" parent="FieldOverlay"]
+[node name="BottomRow" type="Control" parent="FieldOverlay/FieldOverlayInner"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 70.0
@@ -206,7 +149,7 @@ offset_right = 1010.0
 offset_bottom = 1609.0
 mouse_filter = 2
 
-[node name="SeasonsRowButton" type="PanelContainer" parent="FieldOverlay/BottomRow"]
+[node name="SeasonsRowButton" type="PanelContainer" parent="FieldOverlay/FieldOverlayInner/BottomRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(236, 124)
 layout_mode = 0
@@ -218,19 +161,7 @@ label_text = "‹  Seasons"
 font_size = 40
 button_variant = "subtle"
 
-[node name="FieldPlayButton" type="PanelContainer" parent="FieldOverlay/BottomRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(432, 140)
-layout_mode = 0
-offset_left = 254.0
-offset_right = 686.0
-offset_bottom = 140.0
-script = ExtResource("6_campbtn")
-label_text = "Play"
-font_size = 60
-button_variant = "primary"
-
-[node name="EndlessPlayButton" type="PanelContainer" parent="FieldOverlay/BottomRow"]
+[node name="EndlessPlayButton" type="PanelContainer" parent="FieldOverlay/FieldOverlayInner/BottomRow"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(236, 124)
@@ -244,7 +175,7 @@ label_text = "Endless"
 font_size = 40
 button_variant = "accent"
 
-[node name="TutorialHintPanel" type="PanelContainer" parent="FieldOverlay"]
+[node name="TutorialHintPanel" type="PanelContainer" parent="FieldOverlay/FieldOverlayInner"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -260,7 +191,7 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 
-[node name="TutorialHint" type="Label" parent="FieldOverlay/TutorialHintPanel"]
+[node name="TutorialHint" type="Label" parent="FieldOverlay/FieldOverlayInner/TutorialHintPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "First run: tap Play. Seeds you bring back become flowers in the Arena."

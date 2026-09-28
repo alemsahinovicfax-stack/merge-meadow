@@ -205,10 +205,15 @@ func _run() -> void:
 		return
 	stage.call("refresh")
 	await process_frame
-	# Home (design_handoff_home_v2): fokusirani next lock = UnlockPoster na kartici.
-	var frost_card: Control = stage.call("get_card", S2) as Control
-	if frost_card == null or not frost_card.visible or not bool(frost_card.call("is_gate")):
-		_fail("Home should open the Frost unlock poster after the Camp card tap")
+	# Home v3: kartica pokazuje Frost s uslovima otkljucavanja (chipovi / Unlock).
+	if str(stage.call("viewed_id")) != S2 or not str(stage.call("card_status")) in ["locked", "unlock"]:
+		_fail("Home should show the Frost unlock card after the Camp card tap, got %s / %s" % [
+			str(stage.call("viewed_id")), str(stage.call("card_status"))
+		])
+		return
+	var clip: Control = stage.get_node_or_null("%FieldClip") as Control
+	if clip == null or clip.visible:
+		_fail("Camp card tap should leave Home on the card, not the meadow")
 		return
 
 	_go_page(hub, MetaHubPages.CAMP)
@@ -273,6 +278,11 @@ func _run() -> void:
 		return
 	if str(gs.get("focus_season_id")) != S2:
 		_fail("Home should focus the unlocked Frost")
+		return
+	var home2: Node = _page(hub, MetaHubPages.MAIN)
+	var stage2: Node = home2.get_node_or_null("%SeasonStage") if home2 else null
+	if stage2 == null or str(stage2.call("viewed_id")) != S2 or str(stage2.call("card_status")) != "active":
+		_fail("Home should show the unlocked Frost as the playing season")
 		return
 
 	_go_page(hub, MetaHubPages.CAMP)

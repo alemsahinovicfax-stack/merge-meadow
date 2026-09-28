@@ -24,7 +24,6 @@
   </div>
 
   <div data-layer="HomePage" style="{{ pageStyle }}">
-
     <div data-layer="SeasonSelect" style="position:absolute;left:0;top:0;width:1080px;height:1633px">
 
       <div data-layer="SeasonTabs" style="{{ tabsStyle }}">
@@ -38,21 +37,18 @@
         </div>
       </div>
 
-      <div data-layer="OpenTransition" style="position:absolute;left:0;top:0;width:1080px;height:1633px;pointer-events:none">
-        <div data-layer="SeasonCard" onClick="{{ onCard }}" style="{{ cardStyle }}">
-          <div data-layer="CardSky" style="position:absolute;left:0;top:0;right:0;height:32.7%;background:{{ sky }}"></div>
-          <div data-layer="CardGround" style="position:absolute;left:0;top:32.7%;right:0;height:36.3%;background:{{ ground }}"></div>
-          <div data-layer="CardNear" style="position:absolute;left:0;top:69%;right:0;bottom:0;background:{{ near }}"></div>
-          <sc-if value="{{ premium }}" hint-placeholder-val="{{ false }}">
-            <div data-layer="PremiumRim" style="{{ rimStyle }}"></div>
-          </sc-if>
+      <div data-layer="OpenTransition" style="position:absolute;left:0;top:0;width:1080px;height:1633px">
+        <div data-layer="SeasonCard" onClick="{{ onCard }}" onPointerDown="{{ onCardDown }}" style="{{ cardStyle }}">
+          <div data-layer="CardSky" style="{{ skyStyle }}"></div>
+          <div data-layer="CardGround" style="{{ groundStyle }}"></div>
+          <div data-layer="CardNear" style="{{ nearStyle }}"></div>
           <div data-layer="CardContent" style="{{ contentStyle }}">
-            <div data-layer="SeasonName" style="position:absolute;left:0;right:0;top:72px;text-align:center;font:900 80px/1 Nunito,system-ui,sans-serif;letter-spacing:-.015em;color:#1A1A14;white-space:nowrap">{{ seasonName }}</div>
-
+            <sc-if value="{{ premium }}" hint-placeholder-val="{{ false }}">
+              <div data-layer="PremiumRim" style="position:absolute;left:14px;top:14px;right:14px;bottom:14px;border-radius:36px;border:8px solid #FFD56B;pointer-events:none"></div>
+            </sc-if>
             <sc-if value="{{ lockBadge }}" hint-placeholder-val="{{ false }}">
               <div data-layer="LockBadge" style="position:absolute;right:40px;top:40px;width:96px;height:96px;box-sizing:border-box;border-radius:48px;background:#FFF8F0;border:4px solid #2D3436;display:grid;place-items:center"><img src="icons/icon_lock.svg" alt="" style="width:48px;height:48px"></div>
             </sc-if>
-
             <div data-layer="SeasonRoster" style="position:absolute;left:0;right:0;top:230px;display:flex;justify-content:center;align-items:flex-start;gap:36px">
               <sc-for list="{{ roster }}" as="f" hint-placeholder-count="3">
                 <div data-layer="RosterFlower" style="{{ f.wrap }}">
@@ -63,12 +59,10 @@
                 </div>
               </sc-for>
             </div>
-
             <div data-layer="CardStatus" style="position:absolute;left:0;right:0;top:830px;height:280px;display:flex;align-items:center;justify-content:center">
-              <sc-if value="{{ stActive }}" hint-placeholder-val="{{ true }}">
-                <div data-layer="PipHere" style="position:relative;width:230px;height:230px">
-                  <div style="position:absolute;left:45px;bottom:8px;width:140px;height:30px;border-radius:999px;background:rgba(26,26,20,.14)"></div>
-                  <img src="icons/pip_idle.svg" alt="" style="position:relative;display:block;width:230px;height:230px">
+              <sc-if value="{{ stOpen }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="OpenGate" data-btn="1" onClick="{{ onGate }}" style="width:150px;height:150px;box-sizing:border-box;border-radius:75px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:flex-end;justify-content:center;padding-bottom:34px;cursor:pointer">
+                  <div style="width:72px;height:62px;box-sizing:border-box;border-radius:36px 36px 0 0;background:#FFB88C;border:4px solid #2D3436;border-bottom:0"></div>
                 </div>
               </sc-if>
               <sc-if value="{{ stLocked }}" hint-placeholder-val="{{ false }}">
@@ -78,14 +72,14 @@
                 </div>
               </sc-if>
               <sc-if value="{{ stUnlock }}" hint-placeholder-val="{{ false }}">
-                <div data-layer="UnlockButton" onClick="{{ onUnlock }}" style="pointer-events:auto;height:140px;box-sizing:border-box;border-radius:70px;background:#FFD56B;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;gap:18px;padding:0 48px 0 36px;cursor:pointer">
+                <div data-layer="UnlockButton" data-btn="1" onClick="{{ onUnlock }}" style="height:140px;box-sizing:border-box;border-radius:70px;background:#FFD56B;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;gap:18px;padding:0 48px 0 36px;cursor:pointer">
                   <img src="icons/icon_lock.svg" alt="" style="width:56px;height:56px"><span style="font:900 54px/1 Nunito,system-ui,sans-serif;color:#2D3436">Unlock</span>
                   <div style="width:3px;height:64px;background:rgba(45,52,54,.35);margin:0 6px"></div>
                   <img src="icons/icon_coin.svg" alt="" style="width:56px;height:56px"><span style="font:900 54px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">500</span>
                 </div>
               </sc-if>
               <sc-if value="{{ stBuy }}" hint-placeholder-val="{{ false }}">
-                <div data-layer="PriceButton" onClick="{{ onBuy }}" style="pointer-events:auto;height:140px;box-sizing:border-box;border-radius:70px;background:#FFD56B;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;gap:18px;padding:0 56px 0 40px;cursor:pointer">
+                <div data-layer="PriceButton" data-btn="1" onClick="{{ onBuy }}" style="height:140px;box-sizing:border-box;border-radius:70px;background:#FFD56B;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;gap:18px;padding:0 56px 0 40px;cursor:pointer">
                   <img src="icons/icon_diamond.svg" alt="" style="width:64px;height:64px"><span style="font:900 60px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">{{ price }}</span>
                 </div>
               </sc-if>
@@ -104,11 +98,30 @@
           </div>
         </div>
 
+        <sc-if value="{{ fieldMounted }}" hint-placeholder-val="{{ false }}">
+          <div data-layer="FieldClip" style="{{ clipStyle }}">
+            <div data-layer="FieldLayer" style="{{ fieldInnerStyle }}">
+              <dc-import name="FieldScreen" season="{{ activeKey }}" scene="{{ fieldScene }}" u="{{ u }}" page-only="{{ true }}" embedded="{{ true }}" no-bands="{{ noBands }}" on-seasons="{{ onSeasons }}" style="width:1080px;height:1633px" hint-size="1080px,1633px"></dc-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <div data-layer="CardEdge" style="{{ edgeStyle }}"></div>
+
+        <div data-layer="SeasonName" style="{{ nameStyle }}">{{ seasonName }}</div>
+
+        <sc-if value="{{ showPip }}" hint-placeholder-val="{{ true }}">
+          <div data-layer="MeadowPip" style="{{ pipStyle }}">
+            <div style="{{ pipShadowStyle }}"></div>
+            <img src="icons/pip_idle.svg" alt="" style="position:relative;display:block;width:100%;height:100%">
+          </div>
+        </sc-if>
+
         <div data-layer="PlayButton" onClick="{{ onPlay }}" style="{{ playStyle }}">
           <sc-if value="{{ playOpens }}" hint-placeholder-val="{{ true }}">
-            <div style="display:flex;align-items:center;gap:24px">
-              <div style="width:0;height:0;border-top:30px solid transparent;border-bottom:30px solid transparent;border-left:48px solid #2D3436;margin-left:8px"></div>
-              <div style="font:900 76px/1 Nunito,system-ui,sans-serif;color:#2D3436">Play</div>
+            <div style="{{ playRowStyle }}">
+              <div style="{{ triStyle }}"></div>
+              <div style="{{ playTextStyle }}">Play</div>
             </div>
           </sc-if>
           <sc-if value="{{ playReturns }}" hint-placeholder-val="{{ false }}">
@@ -123,25 +136,19 @@
 
       <div data-layer="CardNav" style="{{ navStyle }}">
         <sc-if value="{{ hasPrev }}" hint-placeholder-val="{{ true }}">
-          <div data-layer="PrevSeason" onClick="{{ onPrev }}" style="position:absolute;left:28px;top:680px;width:120px;height:120px;box-sizing:border-box;border-radius:60px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center;cursor:pointer"><div style="width:26px;height:26px;border-left:9px solid #2D3436;border-bottom:9px solid #2D3436;transform:rotate(45deg);margin-left:12px"></div></div>
+          <div data-layer="PrevSeason" onClick="{{ onPrev }}" style="position:absolute;left:28px;top:680px;width:120px;height:120px;box-sizing:border-box;border-radius:60px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center;cursor:pointer;pointer-events:auto"><div style="width:26px;height:26px;border-left:9px solid #2D3436;border-bottom:9px solid #2D3436;transform:rotate(45deg);margin-left:12px"></div></div>
         </sc-if>
         <sc-if value="{{ hasNext }}" hint-placeholder-val="{{ true }}">
-          <div data-layer="NextSeason" onClick="{{ onNext }}" style="position:absolute;right:28px;top:680px;width:120px;height:120px;box-sizing:border-box;border-radius:60px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center;cursor:pointer"><div style="width:26px;height:26px;border-right:9px solid #2D3436;border-top:9px solid #2D3436;transform:rotate(45deg);margin-right:12px"></div></div>
+          <div data-layer="NextSeason" onClick="{{ onNext }}" style="position:absolute;right:28px;top:680px;width:120px;height:120px;box-sizing:border-box;border-radius:60px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center;cursor:pointer;pointer-events:auto"><div style="width:26px;height:26px;border-right:9px solid #2D3436;border-top:9px solid #2D3436;transform:rotate(45deg);margin-right:12px"></div></div>
         </sc-if>
-        <div data-layer="SeasonDots" style="position:absolute;left:0;right:0;top:1180px;display:flex;justify-content:center;align-items:center;gap:22px">
+        <div data-layer="SeasonDots" style="position:absolute;left:0;right:0;top:1180px;display:flex;justify-content:center;align-items:center;gap:22px;pointer-events:none">
           <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4"><div style="{{ d.style }}"></div></sc-for>
         </div>
       </div>
     </div>
 
-    <sc-if value="{{ fieldMounted }}" hint-placeholder-val="{{ false }}">
-      <div data-layer="FieldLayer" style="{{ fieldWrapStyle }}">
-        <dc-import name="FieldScreen" season="{{ activeKey }}" scene="{{ fieldScene }}" reveal="{{ reveal }}" page-only="{{ true }}" on-seasons="{{ onSeasons }}" style="width:1080px;height:1633px" hint-size="1080px,1633px"></dc-import>
-      </div>
-    </sc-if>
-
     <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
-      <div data-layer="Toast" style="position:absolute;left:240px;top:1250px;width:600px;height:100px;box-sizing:border-box;border-radius:28px;background:#2D3436;display:grid;place-items:center;font:900 44px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;z-index:6">{{ toast }}</div>
+      <div data-layer="Toast" style="position:absolute;left:240px;top:1250px;width:600px;height:100px;box-sizing:border-box;border-radius:28px;background:#2D3436;display:grid;place-items:center;font:900 44px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;z-index:6;pointer-events:none">{{ toast }}</div>
     </sc-if>
   </div>
 
@@ -158,7 +165,7 @@
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;free_active&quot;,&quot;free_locked&quot;,&quot;free_unlock&quot;,&quot;premium_buy&quot;,&quot;premium_owned&quot;,&quot;premium_soon&quot;],&quot;default&quot;:&quot;free_active&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;tab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;free&quot;,&quot;premium&quot;],&quot;default&quot;:&quot;free&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;openT&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;default&quot;:null,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Transition&quot;},&quot;fieldScene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;gift&quot;,&quot;basket_empty&quot;,&quot;first&quot;],&quot;default&quot;:&quot;gift&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;free_active&quot;,&quot;free_open&quot;,&quot;free_locked&quot;,&quot;free_unlock&quot;,&quot;premium_buy&quot;,&quot;premium_owned&quot;,&quot;premium_soon&quot;],&quot;default&quot;:&quot;free_active&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;tab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;free&quot;,&quot;premium&quot;],&quot;default&quot;:&quot;free&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;openT&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;default&quot;:null,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Transition&quot;},&quot;closeT&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;default&quot;:null,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Transition&quot;},&quot;pipWalked&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Transition&quot;},&quot;fieldScene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;gift&quot;,&quot;basket_empty&quot;,&quot;first&quot;],&quot;default&quot;:&quot;gift&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;}}">
 const SEASONS = {
   country_bloom: { n: 'Country Bloom', g: '#E6F2DB', r: ['clover', 'daisy', 'buttercup'] },
   frost_orchard: { n: 'Frost Orchard', g: '#D1E6FF', r: ['frost_snowdrop', 'silver_aconite', 'clover'] },
@@ -176,82 +183,163 @@ const PRICE = { moonlit_warren: '$4.99', coral_tide: '$4.99', starfall_glade: '$
 const MISSING = { lantern_meadow: ['daisy'] };
 const SCENES = {
   free_active: { label: '1 · Free · season you play', tab: 'free', idx: 2, coins: 320, stars: 14 },
+  free_open: { label: '1b · Free · unlocked, not playing', tab: 'free', idx: 1, coins: 320, stars: 14 },
   free_locked: { label: '2 · Free · browsing locked · Play = Back', tab: 'free', idx: 3, coins: 320, stars: 14 },
   free_unlock: { label: '3a · Free · next season ready to unlock', tab: 'free', idx: 3, coins: 1250, stars: 20 },
   premium_buy: { label: '4a · Premium · for sale', tab: 'premium', idx: 0, coins: 320, stars: 14 },
   premium_owned: { label: '4b · Premium · bought', tab: 'premium', idx: 1, coins: 320, stars: 14 },
   premium_soon: { label: '4c · Premium · Ember coming soon', tab: 'premium', idx: 3, coins: 320, stars: 14 }
 };
-const INK = '#2D3436';
+// One source of truth — same numbers in godot/home_v3_export.json and godot/ui_home_v3.gd.
+const T = { OPEN_MS: 560, CLOSE_MS: 440, SWAP_MS: 220, SNAP_MS: 180, SWIPE_MIN: 60, TAP_SLOP: 12, RUBBER: 40, SWAP_OFFSET: 90, SELECT_OUT: [0.02, 0.30], CONTENT_OUT: [0.02, 0.40], SELECT_LIFT: 24 };
 const CARD = [24, 172, 1032, 1160], PAGE = [0, 0, 1080, 1633];
-const PLAY0 = [280, 1413, 520, 180], PLAY1 = [324, 1461, 432, 140];
+const BANDS = [0.32, 0.68];
+const CARD_R = 48, CARD_B = 4, CARD_SH = 12;
+const NAME0 = { top: 244, size: 80, ls: -0.015 }, NAME1 = { top: 36, size: 56, ls: -0.01 };
+const PIP0 = { x: 425, y: 1027, s: 230, shL: 45, shB: 8, shW: 140, shH: 30 };
+const PIP1 = { s: 190, shL: 35, shB: 6, shW: 120, shH: 26 };
+const PIP_HOME = [756, 1404], PIP_ZONE = [151, 1306, 778, 131], PIP_WALKED = [300, 1330];
+const PLAY0 = { x: 280, y: 1413, w: 520, h: 180, bw: 4, sy: 10, sa: 0.30, fs: 76, th: 30, tl: 48, ml: 8, gap: 24 };
+const PLAY1 = { x: 324, y: 1461, w: 432, h: 140, bw: 3, sy: 8, sa: 0.28, fs: 64, th: 26, tl: 42, ml: 6, gap: 22 };
+const INK = '#2D3436';
 const clamp = v => Math.max(0, Math.min(1, v));
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 const lerp = (a, b, t) => a + (b - a) * t;
-const rect = (a, b, t) => a.map((v, i) => lerp(v, b[i], t));
+const win = (u, a, b) => clamp((u - a) / (b - a));
+const f2 = v => (Math.round(v * 100) / 100).toString();
 
 class Component extends DCLogic {
   state = this.fromScene();
   fromScene() {
     const sc = SCENES[this.props.scene] || SCENES.free_active;
     const tab = this.props.tab || sc.tab;
-    return { tab, idx: tab === sc.tab ? sc.idx : (tab === 'free' ? 2 : 0), coins: sc.coins, stars: sc.stars, active: 'lantern_meadow', unlocked: ['country_bloom', 'frost_orchard', 'lantern_meadow'], owned: ['coral_tide'], t: 0, swap: 1, dir: 0, toast: '' };
+    return { tab, idx: tab === sc.tab ? sc.idx : (tab === 'free' ? 2 : 0), coins: sc.coins, stars: sc.stars, active: 'lantern_meadow', unlocked: ['country_bloom', 'frost_orchard', 'lantern_meadow'], owned: ['coral_tide'], u: 0, moving: false, swap: 1, dir: 0, dragX: 0, toast: '', feet: PIP_HOME, from: null };
   }
-  componentDidUpdate(pp) { if (pp.scene !== this.props.scene || pp.tab !== this.props.tab) this.setState(this.fromScene()); }
-  componentWillUnmount() { cancelAnimationFrame(this._raf); cancelAnimationFrame(this._raf2); clearTimeout(this._tt); }
+  _alive = true;
+  componentDidMount() { this._alive = true; }
+  componentDidUpdate(pp) { if (pp.scene !== this.props.scene || pp.tab !== this.props.tab) { this.stopAll(); this.setState(this.fromScene()); } }
+  componentWillUnmount() { this._alive = false; this.stopAll(); this.detach(); }
+  stopAll() { clearTimeout(this._raf); clearTimeout(this._sraf); clearTimeout(this._draf); this.stopWalk(); clearTimeout(this._tt); }
+  frozen() { return this.props.openT != null || this.props.closeT != null; }
+  busy() { const s = this.state; return this.frozen() || s.moving || s.swap < 1 || !!this._drag; }
+  // setTimeout ticks (not rAF) so the mock also runs in hidden / background previews.
+  run(slot, ms, fn, done) {
+    clearTimeout(this[slot]);
+    const t0 = performance.now();
+    const step = () => {
+      if (!this._alive) return;
+      const k = clamp((performance.now() - t0) / ms);
+      if (slot === '_wraf' && (this.state.moving || this.state.u < 1)) return;
+      fn(k);
+      if (k < 1) this[slot] = setTimeout(step, 16); else if (done) done();
+    };
+    this[slot] = setTimeout(step, 0);
+  }
+  toast(msg) { this.setState({ toast: msg }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: '' }), 1400); }
+  swapTo(tab, idx, dirOverride) {
+    if (this.busy()) return;
+    const s = this.state;
+    if (tab === s.tab && idx === s.idx) return;
+    const dir = dirOverride != null ? dirOverride : (tab !== s.tab ? 0 : Math.sign(idx - s.idx));
+    this.setState({ tab, idx, dir, swap: 0, dragX: 0 });
+    this.run('_sraf', T.SWAP_MS, k => this.setState({ swap: k }));
+  }
+  open(key) {
+    if (this.busy() || this.state.u > 0) return;
+    this.setState({ active: key, moving: true, feet: PIP_HOME, from: null, dragX: 0 });
+    this.run('_raf', T.OPEN_MS, k => this.setState({ u: k }), () => { this.setState({ moving: false, u: 1 }); this.walk(); });
+  }
+  close() {
+    const s = this.state;
+    if (this.busy() || s.u < 1) return;
+    this.stopWalk();
+    const tab = FREE.includes(s.active) ? 'free' : 'premium';
+    this.setState({ tab, idx: (tab === 'free' ? FREE : PREM).indexOf(s.active), swap: 1, dir: 0, dragX: 0, moving: true, from: s.feet });
+    this.run('_raf', T.CLOSE_MS, k => this.setState({ u: 1 - k }), () => this.setState({ moving: false, u: 0, feet: PIP_HOME, from: null }));
+  }
+  walk() {
+    if (!this._alive || this.frozen()) return;
+    const s = this.state;
+    if (s.u < 1 || s.moving) return;
+    const [x0, y0] = s.feet;
+    let d = PIP_HOME;
+    for (let i = 0; i < 8; i++) {
+      d = [PIP_ZONE[0] + Math.random() * PIP_ZONE[2], PIP_ZONE[1] + Math.random() * PIP_ZONE[3]];
+      if (Math.hypot(d[0] - x0, d[1] - y0) >= 80) break;
+    }
+    const ms = Math.max(2.2, Math.min(5.5, Math.hypot(d[0] - x0, d[1] - y0) / 70)) * 1000;
+    this.run('_wraf', ms, k => {
+      if (this.state.moving || this.state.u < 1) return;
+      const e = 0.5 - Math.cos(Math.PI * k) / 2;
+      this.setState({ feet: [lerp(x0, d[0], e), lerp(y0, d[1], e)] });
+    }, () => { this._wt = setTimeout(() => this.walk(), 700 + Math.random() * 1800); });
+  }
+  stopWalk() { clearTimeout(this._wraf); clearTimeout(this._wt); }
+  detach() {
+    if (this._mv) { window.removeEventListener('pointermove', this._mv); window.removeEventListener('pointerup', this._up); window.removeEventListener('pointercancel', this._up); }
+    this._mv = this._up = null;
+  }
+  cardDown(e) {
+    this._suppress = false;
+    if (this.busy() || this.state.u > 0) return;
+    if (e.target && e.target.closest && e.target.closest('[data-btn]')) return;
+    const el = e.currentTarget;
+    const sc = el.getBoundingClientRect().width / (el.offsetWidth || 1) || 1;
+    this._drag = { x: e.clientX, sc, dx: 0, moved: false };
+    this._mv = ev => {
+      const d = this._drag; if (!d) return;
+      d.dx = (ev.clientX - d.x) / d.sc;
+      if (!d.moved && Math.abs(d.dx) < T.TAP_SLOP) return;
+      d.moved = true;
+      const s = this.state;
+      const edge = (d.dx > 0 && s.idx === 0) || (d.dx < 0 && s.idx === 3);
+      this.setState({ dragX: edge ? Math.sign(d.dx) * Math.min(Math.abs(d.dx) * 0.35, T.RUBBER) : d.dx });
+    };
+    this._up = () => {
+      const d = this._drag; this.detach(); this._drag = null;
+      if (!d || !d.moved) return;
+      this._suppress = true;
+      const s = this.state;
+      if (d.dx <= -T.SWIPE_MIN && s.idx < 3) return this.swapTo(s.tab, s.idx + 1, 1);
+      if (d.dx >= T.SWIPE_MIN && s.idx > 0) return this.swapTo(s.tab, s.idx - 1, -1);
+      const x0 = s.dragX;
+      this.run('_draf', T.SNAP_MS, k => this.setState({ dragX: x0 * (1 - ease(k)) }));
+    };
+    window.addEventListener('pointermove', this._mv);
+    window.addEventListener('pointerup', this._up);
+    window.addEventListener('pointercancel', this._up);
+  }
   rgb(h) { return [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)); }
   hx(a) { return '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join(''); }
   tones(h) { const g = this.rgb(h); return { ground: h, sky: this.hx(g.map(v => v + (255 - v) * .30)), near: this.hx(g.map(v => v * .93)), page: this.hx(g.map(v => v + (255 - v) * .55)) }; }
-  tween(key, from, to, ms, done) {
-    cancelAnimationFrame(key === 't' ? this._raf : this._raf2);
-    const t0 = performance.now();
-    const step = now => {
-      const k = clamp((now - t0) / ms);
-      this.setState({ [key]: lerp(from, to, k) });
-      if (k < 1) { const id = requestAnimationFrame(step); key === 't' ? this._raf = id : this._raf2 = id; } else if (done) done();
-    };
-    const id = requestAnimationFrame(step); key === 't' ? this._raf = id : this._raf2 = id;
-  }
-  toast(msg) { this.setState({ toast: msg }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: '' }), 1400); }
-  show(tab, idx) {
-    const s = this.state;
-    const dir = tab !== s.tab ? 0 : Math.sign(idx - s.idx);
-    this.setState({ tab, idx, dir, swap: 0 });
-    this.tween('swap', 0, 1, 220);
-  }
-  open(key) {
-    if (this.state.t > 0) return;
-    this.setState({ active: key });
-    this.tween('t', 0, 1, 560);
-  }
-  close() {
-    const s = this.state; const a = s.active;
-    const tab = FREE.includes(a) ? 'free' : 'premium';
-    this.setState({ tab, idx: (tab === 'free' ? FREE : PREM).indexOf(a), swap: 1 });
-    this.tween('t', 1, 0, 440);
-  }
   renderVals() {
     const p = this.props, s = this.state;
     const sc = SCENES[p.scene] || SCENES.free_active;
+    let u = s.u, from = s.from;
+    if (p.openT != null) { u = clamp(p.openT); from = null; }
+    else if (p.closeT != null) { u = 1 - clamp(p.closeT); from = p.pipWalked ? PIP_WALKED : PIP_HOME; }
+    const e = ease(u);
+    const inField = u >= 1, idle = u <= 0;
     const list = s.tab === 'free' ? FREE : PREM;
     const key = list[s.idx], se = SEASONS[key], tn = this.tones(se.g);
     const premium = s.tab === 'premium';
-    const isFreeUnlocked = s.unlocked.includes(key);
-    const isOwned = s.owned.includes(key);
-    const playable = premium ? isOwned : isFreeUnlocked;
+    const playable = premium ? s.owned.includes(key) : s.unlocked.includes(key);
     const isActive = key === s.active;
     const prevKey = !premium && s.idx > 0 ? FREE[s.idx - 1] : null;
-    const isNext = !premium && !isFreeUnlocked && prevKey && s.unlocked.includes(prevKey);
+    const isNext = !premium && !playable && prevKey && s.unlocked.includes(prevKey);
     const ready = isNext && s.coins >= 500 && s.stars >= 20;
     const status = isActive ? 'active' : playable ? (premium ? 'owned' : 'open') : premium ? (PRICE[key] ? 'buy' : 'soon') : ready ? 'unlock' : 'locked';
-
-    const tRaw = p.openT != null ? clamp(p.openT) : s.t;
-    const t = ease(tRaw);
-    const inField = tRaw >= 1;
-    const cr = rect(CARD, PAGE, t);
-    const sw = ease(s.swap);
-    const rad = lerp(48, 0, t), bw = lerp(4, 0, t);
     const dim = status === 'locked' || status === 'soon';
+
+    const sw = ease(s.swap);
+    const ox = idle ? s.dir * T.SWAP_OFFSET * (1 - sw) + s.dragX : 0;
+    const swapA = idle ? 0.4 + 0.6 * sw : 1;
+    const cr = CARD.map((v, i) => lerp(v, PAGE[i], e));
+    const rad = lerp(CARD_R, 0, e), bw = lerp(CARD_B, 0, e), sh = lerp(CARD_SH, 0, e);
+    const b1 = Math.round(cr[3] * BANDS[0]), b2 = Math.round(cr[3] * BANDS[1]);
+    const selOut = win(u, T.SELECT_OUT[0], T.SELECT_OUT[1]);
+    const contentA = 1 - win(u, T.CONTENT_OUT[0], T.CONTENT_OUT[1]);
+
     const roster = se.r.map((f, i) => {
       const big = i === 1, d = big ? 330 : 260;
       const miss = playable && (MISSING[key] || []).includes(f);
@@ -269,57 +357,76 @@ class Component extends DCLogic {
       const cur = i === s.idx, here = at === s.tab && i === activeIdx;
       return { style: 'height:24px;border-radius:12px;box-sizing:border-box;flex:0 0 auto;width:' + (cur ? 64 : 24) + 'px;background:' + (here ? '#FFB88C' : cur ? INK : 'rgba(45,52,54,.28)') + ';border:' + (here ? '3px solid ' + INK : '0') };
     });
-    const pr = rect(PLAY0, PLAY1, t);
-    const chromeOp = 1 - clamp(tRaw / .3);
-    const need = (ok) => 'height:120px;box-sizing:border-box;border-radius:60px;border:4px solid ' + INK + ';display:flex;align-items:center;gap:14px;padding:0 36px 0 24px;background:' + (ok ? '#A8E6CF' : '#FFF8F0');
+
+    const F = from || (inField ? s.feet : PIP_HOME);
+    const pS = lerp(PIP0.s, PIP1.s, e);
+    const pX = lerp(PIP0.x, F[0] - PIP1.s / 2, e) + ox, pY = lerp(PIP0.y, F[1] - PIP1.s, e);
+    const P = {}; Object.keys(PLAY0).forEach(k => { P[k] = lerp(PLAY0[k], PLAY1[k], e); });
+    const need = ok => 'height:120px;box-sizing:border-box;border-radius:60px;border:4px solid ' + INK + ';display:flex;align-items:center;gap:14px;padding:0 36px 0 24px;background:' + (ok ? '#A8E6CF' : '#FFF8F0');
     const tabBase = 'width:508px;height:108px;box-sizing:border-box;border-radius:54px;display:flex;align-items:center;justify-content:center;gap:16px;cursor:pointer;';
     const on = 'border:3px solid ' + INK + ';box-shadow:0 6px 0 rgba(26,26,20,.22);';
     const act = SEASONS[s.active];
+    const guard = fn => ev => { if (ev && ev.stopPropagation) ev.stopPropagation(); if (this.busy() || !idle) return; fn(); };
+    const rect = r => 'position:absolute;left:' + f2(r[0]) + 'px;top:' + f2(r[1]) + 'px;width:' + f2(r[2]) + 'px;height:' + f2(r[3]) + 'px;';
     return {
-      sceneLabel: tRaw >= 1 ? '5 · Transition · field open' : tRaw > 0 ? '5 · Transition · opening' : sc.label,
+      sceneLabel: inField ? '6 · Field · ' + act.n : u > 0 ? '5 · Transition' : sc.label,
       coinsText: s.coins.toLocaleString('en-US'),
-      pageStyle: 'flex:0 0 1633px;height:1633px;position:relative;overflow:hidden;background:' + tn.page + ';transition:background-color 220ms',
-      tabsStyle: 'position:absolute;left:24px;top:24px;width:1032px;height:124px;box-sizing:border-box;padding:8px;border-radius:62px;background:rgba(45,52,54,.10);display:flex;gap:0;opacity:' + chromeOp.toFixed(3) + ';transform:translateY(' + (-24 * t).toFixed(1) + 'px)',
+      pageStyle: 'flex:0 0 1633px;height:1633px;position:relative;overflow:hidden;background:' + tn.page,
+      tabsStyle: 'position:absolute;left:24px;top:24px;width:1032px;height:124px;box-sizing:border-box;padding:8px;border-radius:62px;background:rgba(45,52,54,.10);display:flex;opacity:' + (1 - selOut).toFixed(3) + ';transform:translateY(' + f2(-T.SELECT_LIFT * selOut) + 'px);' + (idle ? '' : 'pointer-events:none;') + (inField ? 'visibility:hidden' : ''),
       freeTabStyle: tabBase + (premium ? 'background:transparent;border:3px solid transparent' : 'background:#FFF8F0;' + on),
       premTabStyle: tabBase + (premium ? 'background:#FFD56B;' + on : 'background:transparent;border:3px solid transparent'),
-      onFree: () => premium && this.show('free', FREE.indexOf(s.active) >= 0 ? FREE.indexOf(s.active) : 0),
-      onPremium: () => !premium && this.show('premium', PREM.indexOf(s.active) >= 0 ? PREM.indexOf(s.active) : 0),
-      cardStyle: 'pointer-events:auto;position:absolute;left:' + cr[0].toFixed(1) + 'px;top:' + cr[1].toFixed(1) + 'px;width:' + cr[2].toFixed(1) + 'px;height:' + cr[3].toFixed(1) + 'px;box-sizing:border-box;overflow:hidden;border-radius:' + rad.toFixed(1) + 'px;border:' + bw.toFixed(1) + 'px solid ' + INK + ';box-shadow:0 ' + lerp(12, 0, t).toFixed(1) + 'px 0 rgba(26,26,20,.26);cursor:' + (playable ? 'pointer' : 'default') + ';transform:translateX(' + (s.dir * 90 * (1 - sw)).toFixed(1) + 'px);opacity:' + (0.4 + 0.6 * sw).toFixed(3),
-      sky: tn.sky, ground: tn.ground, near: tn.near,
+      onFree: guard(() => premium && this.swapTo('free', at === 'free' ? activeIdx : 0)),
+      onPremium: guard(() => !premium && this.swapTo('premium', at === 'premium' ? activeIdx : 0)),
+      cardStyle: rect([cr[0] + ox, cr[1], cr[2], cr[3]]) + 'box-sizing:border-box;overflow:hidden;border-radius:' + f2(rad) + 'px;box-shadow:0 ' + f2(sh) + 'px 0 rgba(26,26,20,.26);cursor:' + (playable ? 'pointer' : 'default') + ';touch-action:pan-y;user-select:none;opacity:' + swapA.toFixed(3) + ';' + (inField ? 'display:none' : ''),
+      skyStyle: 'position:absolute;left:0;top:0;right:0;height:' + b1 + 'px;background:' + tn.sky,
+      groundStyle: 'position:absolute;left:0;top:' + b1 + 'px;right:0;height:' + (b2 - b1) + 'px;background:' + tn.ground,
+      nearStyle: 'position:absolute;left:0;top:' + b2 + 'px;right:0;bottom:0;background:' + tn.near,
+      contentStyle: 'position:absolute;left:50%;top:0;width:1032px;height:1160px;margin-left:-516px;opacity:' + contentA.toFixed(3) + ';' + (contentA <= 0 ? 'visibility:hidden' : ''),
       premium,
-      rimStyle: 'position:absolute;left:14px;top:14px;right:14px;bottom:14px;border-radius:36px;border:8px solid #FFD56B;pointer-events:none;opacity:' + (1 - clamp(tRaw / .25)).toFixed(3),
-      contentStyle: 'position:absolute;left:50%;top:0;width:1024px;height:1152px;margin-left:-512px;opacity:' + (1 - clamp(tRaw / .4)).toFixed(3),
-      seasonName: se.n,
       lockBadge: status === 'locked' || status === 'unlock' || status === 'buy',
       roster,
-      stActive: status === 'active' || status === 'open', stLocked: status === 'locked', stUnlock: status === 'unlock', stBuy: status === 'buy', stOwned: status === 'owned', stSoon: status === 'soon',
+      stOpen: status === 'open', stLocked: status === 'locked', stUnlock: status === 'unlock', stBuy: status === 'buy', stOwned: status === 'owned', stSoon: status === 'soon',
       needCoinStyle: need(s.coins >= 500), needStarStyle: need(s.stars >= 20),
       coinNeed: Math.min(s.coins, 500) + ' / 500', starNeed: Math.min(s.stars, 20) + ' / 20',
       prevArt: prevKey ? 'flowers/ph_' + SEASONS[prevKey].r[1] + '.svg' : '',
       price: PRICE[key] || '',
-      onCard: () => { if (playable && s.t === 0) this.open(key); },
-      onUnlock: e => { e && e.stopPropagation && e.stopPropagation(); this.setState({ unlocked: s.unlocked.concat(key), coins: s.coins - 500 }); this.toast('Unlocked'); },
-      onBuy: e => { e && e.stopPropagation && e.stopPropagation(); this.setState({ owned: s.owned.concat(key) }); this.toast('Store sheet'); },
-      playOpens: isActive || inField || tRaw > 0,
-      playReturns: !isActive && !inField && tRaw === 0,
-      backDiscStyle: 'width:104px;height:104px;box-sizing:border-box;border-radius:52px;background:' + act.g + ';border:4px solid ' + INK + ';display:grid;place-items:center;overflow:hidden',
-      activeArt: 'flowers/ph_' + act.r[1] + '.svg',
-      playStyle: 'pointer-events:auto;position:absolute;left:' + pr[0].toFixed(1) + 'px;top:' + pr[1].toFixed(1) + 'px;width:' + pr[2].toFixed(1) + 'px;height:' + pr[3].toFixed(1) + 'px;box-sizing:border-box;border-radius:' + (pr[3] / 2).toFixed(1) + 'px;background:#FFB88C;border:4px solid ' + INK + ';box-shadow:0 10px 0 rgba(26,26,20,.30);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;' + (inField ? 'visibility:hidden' : ''),
-      onPlay: () => {
-        if (s.t > 0) return;
-        if (isActive) this.open(key);
-        else this.show(at, activeIdx);
-      },
-      navStyle: 'position:absolute;left:24px;top:172px;width:1032px;height:1300px;pointer-events:none;opacity:' + chromeOp.toFixed(3),
-      hasPrev: s.idx > 0, hasNext: s.idx < 3,
-      onPrev: () => this.show(s.tab, s.idx - 1), onNext: () => this.show(s.tab, s.idx + 1),
-      dots,
-      fieldMounted: tRaw > 0.5,
-      fieldWrapStyle: 'position:absolute;left:0;top:0;width:1080px;height:1633px;z-index:2;opacity:' + clamp((tRaw - .55) / .3).toFixed(3) + ';pointer-events:' + (inField ? 'auto' : 'none'),
+      onCardDown: ev => this.cardDown(ev),
+      onCard: () => { if (this._suppress) { this._suppress = false; return; } if (this.busy() || !idle) return; if (playable) this.open(key); },
+      onGate: guard(() => this.open(key)),
+      onUnlock: guard(() => { this.setState({ unlocked: s.unlocked.concat(key), coins: s.coins - 500 }); this.toast('Unlocked'); }),
+      onBuy: guard(() => { this.setState({ owned: s.owned.concat(key) }); this.toast('Store sheet'); }),
+      fieldMounted: u > 0,
+      clipStyle: rect(cr) + 'overflow:hidden;border-radius:' + f2(rad) + 'px;' + (inField ? '' : 'pointer-events:none'),
+      fieldInnerStyle: 'position:absolute;left:' + f2(-cr[0]) + 'px;top:' + f2(-cr[1]) + 'px;width:1080px;height:1633px',
       activeKey: s.active,
       fieldScene: p.fieldScene || 'gift',
-      reveal: clamp((tRaw - .72) / .28),
+      u,
+      noBands: !inField,
       onSeasons: () => this.close(),
+      edgeStyle: rect([cr[0] + ox, cr[1], cr[2], cr[3]]) + 'box-sizing:border-box;border-radius:' + f2(rad) + 'px;border:' + f2(bw) + 'px solid ' + INK + ';pointer-events:none;opacity:' + swapA.toFixed(3) + ';' + (inField ? 'display:none' : ''),
+      seasonName: u > 0 ? act.n : se.n,
+      nameStyle: 'position:absolute;left:' + f2(ox) + 'px;top:' + f2(lerp(NAME0.top, NAME1.top, e)) + 'px;width:1080px;text-align:center;font-weight:900;font-size:' + f2(lerp(NAME0.size, NAME1.size, e)) + 'px;line-height:1;font-family:Nunito,system-ui,sans-serif;letter-spacing:' + lerp(NAME0.ls, NAME1.ls, e).toFixed(4) + 'em;color:#1A1A14;white-space:nowrap;pointer-events:none;opacity:' + swapA.toFixed(3),
+      showPip: status === 'active' || u > 0,
+      pipStyle: rect([pX, pY, pS, pS]) + 'pointer-events:none;opacity:' + swapA.toFixed(3),
+      pipShadowStyle: 'position:absolute;left:' + f2(lerp(PIP0.shL, PIP1.shL, e)) + 'px;bottom:' + f2(lerp(PIP0.shB, PIP1.shB, e)) + 'px;width:' + f2(lerp(PIP0.shW, PIP1.shW, e)) + 'px;height:' + f2(lerp(PIP0.shH, PIP1.shH, e)) + 'px;border-radius:999px;background:rgba(26,26,20,.14)',
+      playOpens: isActive || !idle,
+      playReturns: !isActive && idle,
+      playStyle: rect([P.x, P.y, P.w, P.h]) + 'box-sizing:border-box;border-radius:' + f2(P.h / 2) + 'px;background:#FFB88C;border:' + f2(P.bw) + 'px solid ' + INK + ';box-shadow:0 ' + f2(P.sy) + 'px 0 rgba(26,26,20,' + P.sa.toFixed(3) + ');display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3',
+      playRowStyle: 'display:flex;align-items:center;gap:' + f2(P.gap) + 'px',
+      triStyle: 'width:0;height:0;border-top:' + f2(P.th) + 'px solid transparent;border-bottom:' + f2(P.th) + 'px solid transparent;border-left:' + f2(P.tl) + 'px solid ' + INK + ';margin-left:' + f2(P.ml) + 'px',
+      playTextStyle: 'font-weight:900;font-size:' + f2(P.fs) + 'px;line-height:1;font-family:Nunito,system-ui,sans-serif;color:' + INK,
+      backDiscStyle: 'width:104px;height:104px;box-sizing:border-box;border-radius:52px;background:' + act.g + ';border:4px solid ' + INK + ';display:grid;place-items:center;overflow:hidden',
+      activeArt: 'flowers/ph_' + act.r[1] + '.svg',
+      onPlay: ev => {
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        if (this.busy()) return;
+        if (inField) return this.toast('Run starts');
+        if (isActive) this.open(key); else this.swapTo(at, activeIdx);
+      },
+      navStyle: 'position:absolute;left:24px;top:172px;width:1032px;height:1300px;pointer-events:none;opacity:' + (1 - selOut).toFixed(3) + ';' + (selOut >= 1 || inField ? 'visibility:hidden' : ''),
+      hasPrev: s.idx > 0, hasNext: s.idx < 3,
+      onPrev: guard(() => this.swapTo(s.tab, s.idx - 1)), onNext: guard(() => this.swapTo(s.tab, s.idx + 1)),
+      dots,
       toast: s.toast
     };
   }

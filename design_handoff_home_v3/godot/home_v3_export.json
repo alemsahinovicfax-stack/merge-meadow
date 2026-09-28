@@ -15,7 +15,8 @@
     "header_h": 143,
     "footer_h": 144,
     "units": "px 1:1",
-    "renderer": "Godot 4 Compatibility (OpenGL)"
+    "renderer": "Godot 4 Compatibility (OpenGL)",
+    "round": 2
   },
   "tokens": {
     "warm_white": "#FFF8F0",
@@ -137,14 +138,24 @@
       "border": 4,
       "shadow_y": 12,
       "bands": [
-        0.327,
-        0.363,
-        0.31
-      ]
+        0.32,
+        0.36,
+        0.32
+      ],
+      "bands_px": "sky round(h*0.32), far to round(h*0.68) — MEADOW_BANDS"
     },
     "SeasonName": {
-      "y": 72,
-      "font": 80
+      "card": {
+        "top": 244,
+        "size": 80,
+        "letter_spacing_em": -0.015
+      },
+      "field": {
+        "top": 36,
+        "size": 56,
+        "letter_spacing_em": -0.01
+      },
+      "center_x": 540
     },
     "SeasonRoster": {
       "top": 230,
@@ -279,6 +290,39 @@
         236,
         124
       ]
+    },
+    "OpenGate": {
+      "size": 150,
+      "center": [
+        540,
+        1142
+      ]
+    },
+    "MeadowPip": {
+      "card": {
+        "pos": [
+          425,
+          1027
+        ],
+        "size": 230
+      },
+      "field": {
+        "feet": [
+          756,
+          1404
+        ],
+        "size": 190,
+        "top_left": [
+          661,
+          1214
+        ]
+      },
+      "walk_zone_feet": [
+        151,
+        1306,
+        778,
+        131
+      ]
     }
   },
   "components": {
@@ -308,8 +352,8 @@
     },
     "SeasonCard": {
       "states": {
-        "active": "Pip 230",
-        "open": "Pip 230 (tap opens)",
+        "active": "Pip (travelling MeadowPip) on card",
+        "open": "OpenGate: 150 disc cream + peach arch 72x62, no text, no Pip; tap opens field and makes season active",
         "locked": "NeedCoins + NeedStars chips, art alpha .5, LockBadge",
         "unlock": "UnlockButton gold, LockBadge",
         "buy": "PriceButton gold + gem, LockBadge",
@@ -367,7 +411,8 @@
           "size": 66
         }
       },
-      "bg": "#FFB88C"
+      "bg": "#FFB88C",
+      "field": "same node becomes FieldPlayButton at u = 1"
     },
     "GiftChest": {
       "dot": {
@@ -383,6 +428,10 @@
     },
     "EndlessButton": {
       "visible": "tutorial_done"
+    },
+    "SeasonDots": {
+      "interactive": false,
+      "note": "indicator only"
     }
   },
   "scenes": {
@@ -433,34 +482,11 @@
   "animations": {
     "open": {
       "ms": 560,
-      "ease": "TRANS_CUBIC EASE_IN_OUT",
+      "progress": "u 0..1 linear; geometry uses e = TRANS_CUBIC EASE_IN_OUT(u)",
       "tracks": [
         {
-          "node": "SeasonTabs,CardNav",
-          "from": 0,
-          "to": 0.3,
-          "alpha": [
-            1,
-            0
-          ],
-          "y": [
-            0,
-            -24
-          ]
-        },
-        {
-          "node": "CardContent",
-          "from": 0,
-          "to": 0.4,
-          "alpha": [
-            1,
-            0
-          ]
-        },
-        {
           "node": "SeasonCard",
-          "from": 0,
-          "to": 1,
+          "on": "e",
           "rect": [
             [
               24,
@@ -479,19 +505,85 @@
             48,
             0
           ],
-          "border": [
-            4,
+          "shadow_y": [
+            12,
             0
           ],
-          "shadow": [
-            12,
+          "bands": "round(h*0.32), round(h*0.68)"
+        },
+        {
+          "node": "CardEdge",
+          "on": "e",
+          "rect": "= SeasonCard",
+          "border": [
+            4,
             0
           ]
         },
         {
+          "node": "FieldClip",
+          "on": "e",
+          "rect": "= SeasonCard",
+          "radius": [
+            48,
+            0
+          ],
+          "note": "clips FieldPage content"
+        },
+        {
+          "node": "SeasonName",
+          "on": "e",
+          "top": [
+            244,
+            36
+          ],
+          "size": [
+            80,
+            56
+          ],
+          "letter_spacing_em": [
+            -0.015,
+            -0.01
+          ],
+          "center_x": 540,
+          "note": "becomes SeasonLabel"
+        },
+        {
+          "node": "MeadowPip",
+          "on": "e",
+          "pos": [
+            [
+              425,
+              1027
+            ],
+            "feet-(95,190)"
+          ],
+          "size": [
+            230,
+            190
+          ],
+          "shadow": {
+            "left": [
+              45,
+              35
+            ],
+            "bottom": [
+              8,
+              6
+            ],
+            "w": [
+              140,
+              120
+            ],
+            "h": [
+              30,
+              26
+            ]
+          }
+        },
+        {
           "node": "PlayButton",
-          "from": 0,
-          "to": 1,
+          "on": "e",
           "rect": [
             [
               280,
@@ -505,66 +597,174 @@
               432,
               140
             ]
+          ],
+          "radius": "h/2",
+          "border": [
+            4,
+            3
+          ],
+          "shadow_y": [
+            10,
+            8
+          ],
+          "shadow_a": [
+            0.3,
+            0.28
+          ],
+          "text": [
+            76,
+            64
+          ],
+          "triangle_half_h": [
+            30,
+            26
+          ],
+          "triangle_w": [
+            48,
+            42
+          ],
+          "gap": [
+            24,
+            22
+          ],
+          "margin_left": [
+            8,
+            6
+          ],
+          "note": "IS FieldPlayButton at u=1"
+        },
+        {
+          "node": "SeasonTabs",
+          "on": "u",
+          "from": 0.02,
+          "to": 0.3,
+          "alpha": [
+            1,
+            0
+          ],
+          "y": [
+            0,
+            -24
           ]
         },
         {
-          "node": "FieldPage",
-          "from": 0.55,
-          "to": 0.85,
+          "node": "CardNav",
+          "on": "u",
+          "from": 0.02,
+          "to": 0.3,
+          "alpha": [
+            1,
+            0
+          ],
+          "y": [
+            0,
+            0
+          ]
+        },
+        {
+          "node": "CardContent",
+          "on": "u",
+          "from": 0.02,
+          "to": 0.4,
+          "alpha": [
+            1,
+            0
+          ]
+        },
+        {
+          "node": "MeadowFlower[i]",
+          "on": "u",
+          "start": "0.20 + i*12ms/560",
+          "alpha": {
+            "ms": 100,
+            "from": 0,
+            "to": 1
+          },
+          "scale": {
+            "ms": 200,
+            "from": 0.9,
+            "to": 1,
+            "ease": "out cubic"
+          }
+        },
+        {
+          "node": "MeadowNote",
+          "on": "u",
+          "from": 0.3,
+          "to": 0.6,
           "alpha": [
             0,
             1
           ]
         },
         {
-          "node": "MeadowFlowers",
-          "from": 0.72,
-          "to": 1,
-          "scale": [
-            0.96,
+          "node": "GiftChest,BasketButton,UpgradesButton,GrownChip (TopChrome)",
+          "on": "u",
+          "from": 0.6,
+          "to": 0.92,
+          "alpha": [
+            0,
             1
           ],
-          "alpha": [
-            0,
-            1
-          ]
-        },
-        {
-          "node": "TopChrome",
-          "from": 0.72,
-          "to": 1,
           "y": [
             -16,
             0
           ],
-          "alpha": [
-            0,
-            1
-          ]
+          "ease": "out cubic"
         },
         {
           "node": "SeasonsButton",
-          "from": 0.72,
-          "to": 1,
+          "on": "u",
+          "from": 0.6,
+          "to": 0.92,
+          "alpha": [
+            0,
+            1
+          ],
           "x_offset": [
             254,
             0
-          ]
+          ],
+          "ease": "out cubic"
         },
         {
           "node": "EndlessButton",
-          "from": 0.72,
-          "to": 1,
+          "on": "u",
+          "from": 0.6,
+          "to": 0.92,
+          "alpha": [
+            0,
+            1
+          ],
           "x_offset": [
             -254,
             0
-          ]
+          ],
+          "ease": "out cubic"
+        },
+        {
+          "node": "Meadow (field bands)",
+          "on": "u",
+          "at": 1,
+          "visible": true,
+          "note": "SeasonCard hidden at same frame — identical pixels"
+        },
+        {
+          "node": "MeadowPip walk",
+          "on": "u",
+          "at": 1,
+          "start": "walk FSM starts only after open finished"
         }
       ]
     },
     "close": {
       "ms": 440,
-      "play": "open reversed"
+      "play": "open tracks reversed (u 1 -> 0)",
+      "exceptions": [
+        "MeadowPip starts from current feet (not home)",
+        "walk stops at tap",
+        "tab + card set to active season before start"
+      ]
     },
     "card_swap": {
       "ms": 220,
@@ -575,7 +775,11 @@
       "alpha": [
         0.4,
         1
-      ]
+      ],
+      "ease": "TRANS_CUBIC EASE_IN_OUT"
+    },
+    "snap_back": {
+      "ms": 180
     },
     "attention_ring": {
       "ms": 1200,
@@ -587,7 +791,8 @@
       "alpha": [
         0.7,
         0
-      ]
+      ],
+      "runs": "u = 1 only"
     }
   },
   "strings_en": {
@@ -612,7 +817,62 @@
     "panels": "StyleBoxFlat",
     "tween": "create_tween().set_parallel()",
     "missing_art": "TextureRect.modulate = Color(0,0,0,0.28)",
-    "page_bg": "ColorRect under SeasonSelect, tween color 220 ms"
+    "page_bg": "ColorRect under SeasonSelect, tween color 220 ms",
+    "anim_changes": {
+      "note": "UiHomeField.ANIM old -> new",
+      "field_open": [
+        0.28,
+        0.56
+      ],
+      "card_content_out": [
+        0.12,
+        "0.011–0.224 (u .02–.40)"
+      ],
+      "bands_in_delay": [
+        0.16,
+        "removed — card is the meadow"
+      ],
+      "bands_in": [
+        0.18,
+        "removed"
+      ],
+      "chrome_delay": [
+        0.22,
+        0.336
+      ],
+      "chrome_in": [
+        0.18,
+        0.179
+      ],
+      "chrome_stagger": [
+        0.06,
+        0
+      ],
+      "chrome_slide": [
+        16,
+        16
+      ],
+      "chrome_out": [
+        0.12,
+        "removed — close = open reversed"
+      ],
+      "field_close": [
+        0.24,
+        0.44
+      ],
+      "flower_settle": [
+        0.2,
+        0.2
+      ],
+      "flower_stagger": [
+        0.024,
+        0.012
+      ],
+      "new_flower_delay": 0.112,
+      "new_select_out": "0.011–0.168 (u .02–.30)",
+      "new_card_swap": 0.22
+    },
+    "single_objects": "SeasonName, MeadowPip, PlayButton are ONE node each: reparent/keep above SeasonField; SeasonField hides its own SeasonLabel / MeadowPip / FieldPlayButton while Home owns them"
   },
   "decisions": [
     "Single card + arrows; card swipe lists seasons, hub swipe on empty band beside Play.",
@@ -621,6 +881,18 @@
     "Play button travels into FieldPlayButton.",
     "Premium = gold tab, gold rim, gold price; Ember dashed Coming soon.",
     "Unlock needs as two chips; mint when met.",
-    "Only loop: basket AttentionRing on field."
-  ]
+    "Only loop: basket AttentionRing on field.",
+    "R2: name, Pip, Play are single travelling objects; field chrome clipped to card rect; card bands 0.32/0.68; chrome stagger removed; open = active season only; OpenGate for unlocked non-active season."
+  ],
+  "interaction": {
+    "busy_guard": "transition running OR swap < 1 OR drag active — blocks tabs, arrows, card, gate, unlock, price, Play, Seasons",
+    "swipe": {
+      "tap_slop": 12,
+      "min": 60,
+      "rubber": 40,
+      "rubber_factor": 0.35,
+      "snap_ms": 180
+    },
+    "arrows": "pointer-events auto + stopPropagation"
+  }
 }
