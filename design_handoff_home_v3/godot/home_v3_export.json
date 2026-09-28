@@ -1,0 +1,626 @@
+{
+  "meta": {
+    "name": "home_v3",
+    "artboard": [
+      1080,
+      1920
+    ],
+    "page": {
+      "size": [
+        1080,
+        1633
+      ],
+      "y": 143
+    },
+    "header_h": 143,
+    "footer_h": 144,
+    "units": "px 1:1",
+    "renderer": "Godot 4 Compatibility (OpenGL)"
+  },
+  "tokens": {
+    "warm_white": "#FFF8F0",
+    "ink": "#2D3436",
+    "ink_deep": "#1A1A14",
+    "ink_soft": "#555C5E",
+    "peach": "#FFB88C",
+    "coin_gold": "#FFD56B",
+    "mint": "#A8E6CF",
+    "lavender": "#D4A5FF",
+    "pink_dot": "#FFCCD5",
+    "tab_track": "rgba(45,52,54,0.10)",
+    "shadow": "rgba(26,26,20,0.26)",
+    "derive": {
+      "sky": "mix(ground, white, 0.30)",
+      "near": "ground * 0.93",
+      "page_bg": "mix(ground, white, 0.55) — NEW light variant"
+    },
+    "seasons": {
+      "country_bloom": {
+        "name": "Country Bloom",
+        "tab": "free",
+        "ground": "#E6F2DB",
+        "sky": "#EEF6E6",
+        "near": "#D6E1CC",
+        "page": "#F4F9EF"
+      },
+      "frost_orchard": {
+        "name": "Frost Orchard",
+        "tab": "free",
+        "ground": "#D1E6FF",
+        "sky": "#DFEEFF",
+        "near": "#C2D6ED",
+        "page": "#EAF4FF"
+      },
+      "lantern_meadow": {
+        "name": "Lantern Meadow",
+        "tab": "free",
+        "ground": "#EBD6FF",
+        "sky": "#F1E2FF",
+        "near": "#DBC7ED",
+        "page": "#F6EDFF"
+      },
+      "amber_canopy": {
+        "name": "Amber Canopy",
+        "tab": "free",
+        "ground": "#FFEBC7",
+        "sky": "#FFF1D8",
+        "near": "#EDDBB9",
+        "page": "#FFF6E6"
+      },
+      "moonlit_warren": {
+        "name": "Moonlit Warren",
+        "tab": "premium",
+        "ground": "#B8BDFF",
+        "sky": "#CDD1FF",
+        "near": "#ABB0ED",
+        "page": "#DFE1FF"
+      },
+      "coral_tide": {
+        "name": "Coral Tide",
+        "tab": "premium",
+        "ground": "#FFE0D6",
+        "sky": "#FFE9E2",
+        "near": "#EDD0C7",
+        "page": "#FFF1ED"
+      },
+      "starfall_glade": {
+        "name": "Starfall Glade",
+        "tab": "premium",
+        "ground": "#DBCCFF",
+        "sky": "#E6DBFF",
+        "near": "#CCBEED",
+        "page": "#EFE8FF"
+      },
+      "ember_fen": {
+        "name": "Ember Fen",
+        "tab": "premium",
+        "ground": "#FFC79E",
+        "sky": "#FFD8BB",
+        "near": "#EDB993",
+        "page": "#FFE6D3"
+      }
+    }
+  },
+  "layout": {
+    "SeasonTabs": {
+      "rect": [
+        24,
+        24,
+        1032,
+        124
+      ],
+      "pad": 8,
+      "radius": 62
+    },
+    "FreeTab": {
+      "size": [
+        508,
+        108
+      ],
+      "radius": 54
+    },
+    "PremiumTab": {
+      "size": [
+        508,
+        108
+      ],
+      "radius": 54
+    },
+    "SeasonCard": {
+      "rect": [
+        24,
+        172,
+        1032,
+        1160
+      ],
+      "radius": 48,
+      "border": 4,
+      "shadow_y": 12,
+      "bands": [
+        0.327,
+        0.363,
+        0.31
+      ]
+    },
+    "SeasonName": {
+      "y": 72,
+      "font": 80
+    },
+    "SeasonRoster": {
+      "top": 230,
+      "discs": [
+        260,
+        330,
+        260
+      ],
+      "gap": 36,
+      "side_offset_y": 70,
+      "art_scale": 0.82
+    },
+    "LockBadge": {
+      "rect": [
+        896,
+        40,
+        96,
+        96
+      ]
+    },
+    "CardStatus": {
+      "top": 830,
+      "h": 280
+    },
+    "PrevSeason": {
+      "rect": [
+        52,
+        852,
+        120,
+        120
+      ]
+    },
+    "NextSeason": {
+      "rect": [
+        908,
+        852,
+        120,
+        120
+      ]
+    },
+    "SeasonDots": {
+      "y": 1352,
+      "h": 24,
+      "current_w": 64,
+      "gap": 22
+    },
+    "PlayButton": {
+      "rect": [
+        280,
+        1413,
+        520,
+        180
+      ],
+      "radius": 90,
+      "border": 4,
+      "shadow_y": 10
+    },
+    "HubSwipeZone": [
+      [
+        0,
+        1392,
+        280,
+        241
+      ],
+      [
+        800,
+        1392,
+        280,
+        241
+      ]
+    ],
+    "FieldPage": {
+      "rect": [
+        0,
+        0,
+        1080,
+        1633
+      ]
+    },
+    "GiftChest": {
+      "rect": [
+        24,
+        24,
+        180,
+        180
+      ]
+    },
+    "BasketButton": {
+      "rect": [
+        24,
+        220,
+        180,
+        180
+      ]
+    },
+    "UpgradesButton": {
+      "rect": [
+        876,
+        24,
+        180,
+        180
+      ]
+    },
+    "BottomRow": {
+      "rect": [
+        70,
+        1461,
+        940,
+        148
+      ]
+    },
+    "SeasonsButton": {
+      "rect": [
+        70,
+        1477,
+        236,
+        124
+      ]
+    },
+    "FieldPlayButton": {
+      "rect": [
+        324,
+        1461,
+        432,
+        140
+      ]
+    },
+    "EndlessButton": {
+      "rect": [
+        774,
+        1477,
+        236,
+        124
+      ]
+    }
+  },
+  "components": {
+    "SeasonTab": {
+      "selected_free": {
+        "bg": "#FFF8F0",
+        "border": "3 ink",
+        "shadow_y": 6
+      },
+      "selected_premium": {
+        "bg": "#FFD56B",
+        "border": "3 ink",
+        "shadow_y": 6
+      },
+      "idle": {
+        "bg": "transparent"
+      },
+      "label": {
+        "size": 46,
+        "weight": 900
+      },
+      "icon": {
+        "free": "icon_seed",
+        "premium": "icon_diamond",
+        "size": 56
+      }
+    },
+    "SeasonCard": {
+      "states": {
+        "active": "Pip 230",
+        "open": "Pip 230 (tap opens)",
+        "locked": "NeedCoins + NeedStars chips, art alpha .5, LockBadge",
+        "unlock": "UnlockButton gold, LockBadge",
+        "buy": "PriceButton gold + gem, LockBadge",
+        "owned": "OwnedChip mint \"Yours\"",
+        "soon": "SoonChip dashed, art alpha .5"
+      },
+      "premium_rim": {
+        "inset": 14,
+        "width": 8,
+        "color": "#FFD56B",
+        "radius": 36
+      }
+    },
+    "RosterFlower": {
+      "disc": "#FFF8F0, border 4 ink",
+      "missing": {
+        "disc": "rgba(255,248,240,.55), dashed 4",
+        "art": "modulate black a .28",
+        "label": {
+          "size": 38,
+          "weight": 900
+        }
+      }
+    },
+    "NeedChip": {
+      "h": 120,
+      "radius": 60,
+      "border": 4,
+      "bg_missing": "#FFF8F0",
+      "bg_met": "#A8E6CF",
+      "text": 46
+    },
+    "UnlockButton": {
+      "h": 140,
+      "radius": 70,
+      "bg": "#FFD56B",
+      "text": 54
+    },
+    "PriceButton": {
+      "h": 140,
+      "radius": 70,
+      "bg": "#FFD56B",
+      "text": 60
+    },
+    "PlayButton": {
+      "modes": {
+        "open": {
+          "icon": "triangle 48x60",
+          "label": "Play",
+          "size": 76
+        },
+        "return": {
+          "icon": "disc 104 in active ground + active art 84 + chevron",
+          "label": "Back",
+          "size": 66
+        }
+      },
+      "bg": "#FFB88C"
+    },
+    "GiftChest": {
+      "dot": {
+        "size": 48,
+        "color": "#FFCCD5",
+        "visible": "daily gift waiting"
+      }
+    },
+    "BasketButton": {
+      "locked_until": "first merge",
+      "bonus": "+5 % spawn",
+      "loop": "AttentionRing 1.2 s when empty (only loop)"
+    },
+    "EndlessButton": {
+      "visible": "tutorial_done"
+    }
+  },
+  "scenes": {
+    "free_active": {
+      "tab": "free",
+      "card": "lantern_meadow",
+      "play": "open"
+    },
+    "free_locked": {
+      "tab": "free",
+      "card": "amber_canopy",
+      "coins": 320,
+      "stars3": 14,
+      "play": "return"
+    },
+    "free_unlock": {
+      "tab": "free",
+      "card": "amber_canopy",
+      "coins": 1250,
+      "stars3": 20,
+      "play": "return"
+    },
+    "premium_buy": {
+      "tab": "premium",
+      "card": "moonlit_warren",
+      "price": "$4.99",
+      "play": "return"
+    },
+    "premium_owned": {
+      "tab": "premium",
+      "card": "coral_tide",
+      "play": "return"
+    },
+    "premium_soon": {
+      "tab": "premium",
+      "card": "ember_fen",
+      "play": "return"
+    },
+    "field_amber": {
+      "season": "amber_canopy",
+      "gift": true
+    },
+    "field_moonlit": {
+      "season": "moonlit_warren",
+      "gift": true
+    }
+  },
+  "animations": {
+    "open": {
+      "ms": 560,
+      "ease": "TRANS_CUBIC EASE_IN_OUT",
+      "tracks": [
+        {
+          "node": "SeasonTabs,CardNav",
+          "from": 0,
+          "to": 0.3,
+          "alpha": [
+            1,
+            0
+          ],
+          "y": [
+            0,
+            -24
+          ]
+        },
+        {
+          "node": "CardContent",
+          "from": 0,
+          "to": 0.4,
+          "alpha": [
+            1,
+            0
+          ]
+        },
+        {
+          "node": "SeasonCard",
+          "from": 0,
+          "to": 1,
+          "rect": [
+            [
+              24,
+              172,
+              1032,
+              1160
+            ],
+            [
+              0,
+              0,
+              1080,
+              1633
+            ]
+          ],
+          "radius": [
+            48,
+            0
+          ],
+          "border": [
+            4,
+            0
+          ],
+          "shadow": [
+            12,
+            0
+          ]
+        },
+        {
+          "node": "PlayButton",
+          "from": 0,
+          "to": 1,
+          "rect": [
+            [
+              280,
+              1413,
+              520,
+              180
+            ],
+            [
+              324,
+              1461,
+              432,
+              140
+            ]
+          ]
+        },
+        {
+          "node": "FieldPage",
+          "from": 0.55,
+          "to": 0.85,
+          "alpha": [
+            0,
+            1
+          ]
+        },
+        {
+          "node": "MeadowFlowers",
+          "from": 0.72,
+          "to": 1,
+          "scale": [
+            0.96,
+            1
+          ],
+          "alpha": [
+            0,
+            1
+          ]
+        },
+        {
+          "node": "TopChrome",
+          "from": 0.72,
+          "to": 1,
+          "y": [
+            -16,
+            0
+          ],
+          "alpha": [
+            0,
+            1
+          ]
+        },
+        {
+          "node": "SeasonsButton",
+          "from": 0.72,
+          "to": 1,
+          "x_offset": [
+            254,
+            0
+          ]
+        },
+        {
+          "node": "EndlessButton",
+          "from": 0.72,
+          "to": 1,
+          "x_offset": [
+            -254,
+            0
+          ]
+        }
+      ]
+    },
+    "close": {
+      "ms": 440,
+      "play": "open reversed"
+    },
+    "card_swap": {
+      "ms": 220,
+      "x_offset": [
+        90,
+        0
+      ],
+      "alpha": [
+        0.4,
+        1
+      ]
+    },
+    "attention_ring": {
+      "ms": 1200,
+      "loop": true,
+      "scale": [
+        1,
+        1.16
+      ],
+      "alpha": [
+        0.7,
+        0
+      ]
+    }
+  },
+  "strings_en": {
+    "tab_free": "Free",
+    "tab_premium": "Premium",
+    "play": "Play",
+    "play_back": "Back",
+    "unlock": "Unlock",
+    "owned": "Yours",
+    "soon": "Coming soon",
+    "gift": "Gift",
+    "basket_locked": "Basket",
+    "basket_empty": "Choose",
+    "grown": "grown",
+    "seasons": "Seasons",
+    "endless": "Endless",
+    "field_empty": "Nothing has grown here yet. Bring seeds back from a run."
+  },
+  "godot_map": {
+    "script": "ui_home_v3.gd (constants)",
+    "scene_root": "SeasonSelect (Control, full page)",
+    "panels": "StyleBoxFlat",
+    "tween": "create_tween().set_parallel()",
+    "missing_art": "TextureRect.modulate = Color(0,0,0,0.28)",
+    "page_bg": "ColorRect under SeasonSelect, tween color 220 ms"
+  },
+  "decisions": [
+    "Single card + arrows; card swipe lists seasons, hub swipe on empty band beside Play.",
+    "Card is a miniature meadow; opening = card rect grows to page.",
+    "Play 520x180 centred; label Back + active disc when card != active.",
+    "Play button travels into FieldPlayButton.",
+    "Premium = gold tab, gold rim, gold price; Ember dashed Coming soon.",
+    "Unlock needs as two chips; mint when met.",
+    "Only loop: basket AttentionRing on field."
+  ]
+}

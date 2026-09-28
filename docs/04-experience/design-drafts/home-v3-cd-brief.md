@@ -11,10 +11,12 @@ povezano:
   - art-direction
   - pristupacnost
   - CHECKPOINT
-ai_sažetak: "Puni redizajn Homea: biranje sezona u dva taba (besplatne / premium), manje teksta, novo Play dugme, daily chest samo na polju, i tranzicija u polje sezone koju CD smije izmijeniti."
+ai_sažetak: "Puni redizajn Homea (dva taba, novo Play, prelaz u polje). Runda 1 isporučena 2026-09-28 kao design_handoff_home_v3/, ali test je našao mrtve strelice i prelaz u kojem elementi nestanu pa se ponovo pojave — runda 2 (§9–§12) traži samo te korekcije."
 ---
 
 # Home — puni redizajn — Claude Design brief
+
+> **Status 2026-09-28: runda 1 isporučena, treba runda 2 (korekcije).** Paket `design_handoff_home_v3/` je u repou, raspakovan i cijeli (29 fajlova). Test u browseru je našao greške u interakciji i u prelazu biranje → polje, vidi [[#9. Runda 2 — nalazi testiranja (2026-09-28)|§9]]. **Za CD sada šalji prompt iz §12**, ne onaj iz §8.
 
 > Biranje sezona je u igri od 2026-09-21 ([[home-season-select-cd-brief|Season Trail]]), polje sezone od 2026-09-25 ([[home-field-v2-cd-brief|pass 2]]). Ovo je **nova runda cijelog Homea**: biranje i ulaz u polje. Hub header i footer se ne diraju.
 
@@ -24,8 +26,8 @@ ai_sažetak: "Puni redizajn Homea: biranje sezona u dva taba (besplatne / premiu
 
 | Ko | Šta čita | Zašto |
 |----|----------|-------|
-| **Claude Design** | cijeli fajl (§1–§8) | Šta mora, šta smije, mjere i isporuka |
-| **Ti** | §9 | Gotov prompt za copy-paste u CD chat |
+| **Claude Design** | §1–§7, pa **§9–§11** | Runda 1: šta mora, šta smije. Runda 2: šta je pokvareno i pravila prelaza |
+| **Ti** | §12 (runda 2) | Gotov prompt za copy-paste u CD chat. §8 je prompt runde 1, već poslan. |
 | **Agent (kasnije)** | §3, §4, §10 | Današnje vrijednosti i mapa u Godot |
 
 **Prije slanja prompta: commitaj i pushaj na `master`** — CD čita fajlove iz repoa po tačnoj putanji.
@@ -128,9 +130,9 @@ design_handoff_home_v3/
 - Vraćanje Playa na „odmah u run“ s kartice.
 - Više varijanti za biranje — jedan dizajn.
 
-## 8. Prompt za Claude Design
+## 8. Prompt za Claude Design — runda 1 (poslan 2026-09-28, ne slati ponovo)
 
-> Kopiraj sve iz bloka ispod u CD. **Prije toga commitaj i pushaj** (vidi §0).
+> Ostaje kao zapis. Za rundu 2 koristi **§12**.
 
 ```
 Radim PUNI redizajn HOME stranice mobilne igre. Home je mjesto gdje igrač
@@ -204,6 +206,192 @@ BottomRow, SeasonsButton, FieldPlayButton, EndlessButton, OpenTransition.
 NE RADI: hub header/footer, Camp, Journal, Shop, Arena, Run, novi art
 cvijeta, daily chest na biranju, Play koji s kartice odmah pali run.
 Ideje van zadatka navedi odvojeno na kraju README-a.
+```
+
+---
+
+## 9. Runda 2 — nalazi testiranja (2026-09-28)
+
+**Paket je cijeli.** Zip `design_handoff_home_v3/` ima 29 fajlova i raspakuje se bez greške. Sve putanje u HTML-u postoje. U repou je na istoj putanji. Greške su **u samom dizajnu**, ne u raspakivanju: CD je sažeo rad bez testiranja.
+
+**Kako je testirano:** `HomeScreen.dc.html` je pokrenut u Chromiumu 1080 × 1920. Klikovi su pravi klikovi mišem na koordinate dugmadi. Za prelaz je sat stranice (`performance.now`) zaustavljen i pomjeran po 28 ms, uz snimak ekrana i neprozirnost svakog sloja u svakom koraku. Kadrovi su u `docs/04-experience/design-drafts/home-v3-test/open-frames.png` i `close-frames.png`.
+
+### 9.1 Interakcija — zašto se sezone ne mogu birati
+
+| # | Nalaz | Uzrok u kodu | Posljedica |
+|---|---|---|---|
+| **I1** | Strelice ‹ › ne rade. | `CardNav` ima `pointer-events:none`, a `PrevSeason` / `NextSeason` to nasljeđuju jer nemaju `pointer-events:auto`. Klik prolazi kroz strelicu na `SeasonCard` ispod. | Na aktivnoj sezoni **tap na strelicu otvara polje**. Na zaključanoj ne radi ništa. Unutar taba se ne može listati. **Ovo je glavni razlog zašto se sezone ne mogu birati.** |
+| **I2** | Swipe po kartici ne lista. | README i § Odlučeno kažu „swipe po kartici lista sezone", ali u HTML-u nema nijednog pointer/drag handlera. | Osim strelica nema drugog načina da se lista. |
+| **I3** | Tap na tab usred prelaza mijenja karticu. | Tabovi, strelice i kartica nemaju zaštitu dok `t` nije 0 (ima je samo `onPlay`). | Tap na Premium u 84. ms otvaranja pretvori karticu u Moonlit (plava) dok se otvara polje Lanterna (lila). Boja skoči usred animacije. |
+| **I4** | Pip stoji na svakoj otključanoj free sezoni. | `stActive: status === 'active' \|\| status === 'open'`. | Frost Orchard (otključana, ne igra se) nosi Pipa, a Pip znači „ti si ovdje". Igrač ne vidi koju sezonu igra. Stanje `open` nema svoj izgled. |
+| **I5** | Tačke ispod kartice nisu dugmad. | Nema handlera, 24 px. | Nije greška ako su samo indikator. Treba to napisati u README, inače će ih agent napraviti kao dugmad. |
+
+### 9.2 Prelaz — zašto elementi nestanu pa se ponovo pojave
+
+Izmjerena otvaranja (560 ms). Vremena su od tapa na Play:
+
+| ms | Šta se vidi |
+|---|---|
+| 0–224 | Ime, cvijeće i Pip na kartici blijede (`CardContent` 0–40 %). Tabovi i strelice blijede. |
+| **224–308** | **Kartica je prazan obojeni pravougaonik.** Nema imena, nema Pipa, nema cvijeća. |
+| 308–476 | `FieldPage` se pojavljuje: trake livade, **ime ponovo** (sada 56 px, gore) i `FieldPlayButton`. |
+| 420–560 | **Pip ponovo**, ali na drugom mjestu (x 540 → 756), i **cvijeće ponovo**, kao 13 drugih cvjetova. Gift, korpa i nadogradnje ulaze. |
+| 560 | Putujući `PlayButton` postaje `visibility:hidden`, a vidi se `FieldPlayButton`. **Skok:** tekst 76 → 64, trokut 48 → 42, rub 4 → 3, sjena 10 → 8. |
+
+Zatvaranje (440 ms) ima iste greške unazad. U 28. ms putujući Play iskoči preko `FieldPlayButton` (tekst 64 → 76). Od 196. do 280. ms kartica je opet prazna, a ime, cvijeće i Pip se vraćaju tek poslije.
+
+| # | Nalaz | Uzrok | Popravak (§10) |
+|---|---|---|---|
+| **T1** | Ime, Pip i cvijeće nestanu pa se ponovo pojave (gore opisano). | Dvije kopije istog objekta (kartica i polje) imaju fade-out i fade-in koji se **ne preklapaju**. Između njih je rupa od 84 ms. | P1, P2, P3 |
+| **T2** | Dva dugmeta Play u istom kadru i skok na kraju. | `PlayButton` putuje na mjesto `FieldPlayButton`, ali ne postaje isti. `FieldPlayButton` se paralelno pojavljuje ispod njega od 308. ms. | P4 |
+| **T3** | Trake se ne poklapaju, iako README kaže da se poklapaju. | Kartica koristi `CARD_BANDS 0.327 / 0.363 / 0.31`, pa je na punoj visini nebo 534 i daljina do 1127. Livada u igri (`UiHomeField.MEADOW_BANDS 0.32 / 0.68`, isto i u `FieldScreen`) ima 523 i 1110. Pri predaji to je skok od **11 i 17 px**. | P5 |
+| **T4** | Duhovi ivica u sredini prelaza. | `FieldPage` sa svojim trakama preko cijele stranice blijedi (308–476 ms) **preko kartice koja još nije puna** (radius, rub 4, uvučena). Dva seta ivica traka i obris kartice vide se kroz poluprozirno polje. `FieldScreen` ima prop `noBands`, ali ga `HomeScreen` ne koristi. | P5 |
+| **T5** | Ime sezone na polju ne prati `reveal`. | `SeasonLabel` nije u `TopChrome`, pa ulazi s cijelom `FieldPage` (55–85 %), a ne s ostalim chromeom. | P2 |
+| **T6** | Export i HTML ne opisuju isto. | `animations.open` nema tragove za ime, Pipa ni `SeasonLabel`. `godot_map` ne kaže koje konstante u `UiHomeField.ANIM` se mijenjaju. Igra danas ima `field_open 0.28`, chrome stagger `0.22 + 0.06·i`, cvijeće `0.9 → 1` sa stagger 24 ms, a zatvaranje je trenutno. | P8 |
+
+## 10. Runda 2 — pravila prelaza (MORA)
+
+Prelaz biranje ↔ polje je **najosjetljiviji dio Homea**. Igrač mora vidjeti **jednu stvar koja se otvara**, a ne dva ekrana koji se smjenjuju. Ova pravila nisu stil. Svako je odgovor na jedan nalaz iz §9.
+
+**P1 — Nijedan kadar bez sadržaja.** U svakom kadru od 0 do 1, i unazad, vide se ime sezone, Pip i Play, svaki s alfom ≥ 0,6. Kartica nikad nije prazan pravougaonik.
+
+**P2 — Ime sezone je jedan objekat.** `SeasonName` (80 px, centar x 540, vrh y 244 na stranici) se **pretvori** u `SeasonLabel` polja (56 px, vrh y 36): pomak plus skala 0,70, na istom eased `t` kao kartica. Nema fade-out pa fade-in. Na t = 1 piksel-identičan je `SeasonLabel`-u.
+
+**P3 — Pip je jedan objekat.** Pip s kartice (230 px, gornji lijevi ugao (425, 1027)) putuje i smanjuje se u `MeadowPip` (190 px na (661, 1214), noge na `PIP_DEFAULT_BASE` (756, 1404)). U igri Pip na polju **hoda** (`season_field.gd`, walk / sniff / sleep). Zato:
+- hodanje počinje tek kad je prelaz gotov;
+- na zatvaranju Pip kreće **s mjesta gdje trenutno stoji**, ne s kućne pozicije.
+
+Nacrtaj oba slučaja u Specs.
+
+**P4 — Play je jedan objekat.** Putujući `PlayButton` uz rect interpolira i **rub, sjenu, veličinu teksta, trokut i razmak**. Na t = 1 piksel-identičan je `FieldPlayButton`-u (danas rub 3, sjena 0 8 0 α .28, tekst 64, trokut 26 / 42, gap 22). Tek tada se predaje. `FieldPlayButton` se ne vidi dok putujući Play postoji, i obrnuto. Isto vrijedi unazad. Ako ti je bolje da oba imaju iste mjere od starta (npr. i polje dobije 76 / rub 4), odluči i zapiši u § Odlučeno.
+
+**P5 — Jedne trake.** Dok prelaz traje, **kartica jeste livada**, a `FieldPage` ne crta svoje trake (`noBands`). Trake kartice koriste **iste razlomke kao igra**: `0.32 / 0.68` visine (`UiHomeField.MEADOW_BANDS`), ne 0.327 / 0.363. Na t = 1 kartica i `Meadow` daju iste piksele, pa predaja nema šav. `FieldPage` ne blijedi preko kartice koja još nije puna.
+
+**P6 — Samo-jednostrani objekti se preklapaju, ne smjenjuju.** Neki objekti postoje samo na jednoj strani:
+- samo na kartici: roster diskovi, statusi, lokot, strelice, tabovi, tačke;
+- samo na polju: 13 cvjetova, Gift, korpa, nadogradnje, čip izraslih, Seasons, Endless.
+
+Ti smiju blijediti. Ali odlazak roster diskova i dolazak cvjetova livade se **preklapaju** (npr. roster 0–35 %, cvijeće 30–80 %), tako da livada nikad nije bez cvijeća i bez diskova u istom trenutku. Cvijeće koristi isti „settle" kao igra (`tween_flowers_settle`: scale 0,9 → 1, stagger 24 ms), ili napiši novu vrijednost i zašto.
+
+**P7 — Unos je zaključan dok prelaz traje.** Od tapa do kraja (oba smjera) tabovi, strelice, kartica, Play i Seasons ne reaguju. Isto vrijedi za promjenu kartice (220 ms). U mocku: jedan `busy` guard za sve handlere.
+
+**P8 — Jedan izvor istine.** `animations.open` i `animations.close` u `home_v3_export.json` nabrajaju **svaki** objekat koji se mijenja (uključujući ime, Pipa, cvijeće, `SeasonLabel`, `FieldPlayButton`) sa `from` / `to` i svojstvima. Vrijednosti su iste kao u HTML-u i u `ui_home_v3.gd`. Plus tabela „`UiHomeField.ANIM` staro → novo" za svaku konstantu koju prelaz mijenja: `field_open`, `chrome_delay`, `chrome_stagger`, `chrome_in`, `flower_settle`, `field_close`. Današnji stagger chromea traje do ≈ 820 ms, duže od tvojih 560. Odluči: skrati ga ili ukini.
+
+**P9 — Test predaje.** Kadar na `openT = 0.99` i kadar na `openT = 1` razlikuju se samo u loopu (prsten korpe), ništa drugo. Isto za zatvaranje.
+
+**P10 — Tempo.** Svi objekti iz P2–P5 koriste **isti eased `t`** (ease in-out cubic) kao kartica, da se kreću zajedno. Dužine 560 / 440 / 220 ms smiju ostati ili se promijeniti, uz rečenicu u § Odlučeno.
+
+### 10.1 Interakcija (MORA)
+
+- **I1:** strelice rade (`pointer-events:auto`) i klik ne prolazi na karticu (`stopPropagation`). Dodir 120.
+- **I2:** swipe po kartici lista sezone unutar taba: prag ~60 px, iste 220 ms kao strelice. Hub swipe ostaje samo u `HubSwipeZone`.
+- **I3:** vidi P7.
+- **I4:** Pip samo na sezoni u kojoj se igra. Otključana sezona u kojoj se ne igra (`open`) dobija svoj izgled, bez teksta i bez Pipa. Na njoj Play je „Back" (korak 1), a tap na karticu otvara njeno polje i ona postaje aktivna (kao u igri, `open_season_field`). Odluči kako se to vidi.
+- **I5:** tačke su samo indikator. Napiši to u README.
+
+## 11. Runda 2 — isporuka
+
+**Ne pravi novi dizajn.** Sve iz runde 1 što nije u §9 ostaje kako jeste: tabovi, kartica, Play, statusi, boje, § Odlučeno. Mijenjaš samo ono što traže §10 i §10.1.
+
+Paket: isti `design_handoff_home_v3/`, iste putanje, **cijeli folder u zipu**.
+
+| Fajl | Šta se mijenja |
+|---|---|
+| `design/HomeScreen.dc.html` | I1–I5, P1–P7, P10 |
+| `design/FieldScreen.dc.html` | samo ako treba za P2–P5 (npr. `SeasonLabel` pod `reveal`, prop za Pip / Play predaju) |
+| `design/Home Specs.dc.html` | **traka kadrova**: otvaranje na `openT` 0, .1, .2 … 1 i zatvaranje isto (11 + 11). Uz to Pip na zatvaranju kad je odšetao od kuće (P3). |
+| `godot/home_v3_export.json` | P8: puni tragovi + tabela ANIM staro → novo; `CARD_BANDS` → 0.32 / 0.36 / 0.32 |
+| `godot/ui_home_v3.gd` | iste vrijednosti kao JSON |
+| `godot/README.md` | red prenosa dopuniti za P2–P4 (jedan objekat, predaja) |
+| `README.md` | nova sekcija **§ Runda 2** sa po jednim redom za svaki ID (I1–I5, T1–T6): šta je promijenjeno. Uz to **§ Samoprovjera** (ispod). |
+
+**§ Samoprovjera** (CD je popuni prije slanja zipa; svaka stavka da/ne):
+
+1. Klik na ‹ i › mijenja sezonu i **ne** otvara polje, na aktivnoj i na zaključanoj kartici.
+2. Swipe po kartici lista sezone.
+3. Tap na tab, strelicu, karticu ili Play za vrijeme prelaza ne radi ništa.
+4. `openT` od 0 do 1 u koracima 0,05: u svakom kadru se vide ime, Pip i Play (P1).
+5. `openT` 0,99 i 1 izgledaju isto (P9). Isto za zatvaranje.
+6. Pip je samo na sezoni u kojoj se igra.
+7. Svaki broj u `animations` postoji isti u HTML-u i u `ui_home_v3.gd`.
+
+## 12. Prompt za Claude Design — runda 2
+
+> Kopiraj sve iz bloka ispod u CD, u **isti chat** gdje je rađena runda 1 ako još postoji (ima kontekst), inače u novi. **Prije toga commitaj i pushaj na `master`** — CD čita brief, paket i kadrove po putanji.
+
+```
+Ovo je RUNDA 2 za Home v3 — samo KOREKCIJE, ne novi dizajn.
+
+Runda 1 (tvoj paket design_handoff_home_v3/) je testirana u browseru
+pravim klikovima i kadar-po-kadar snimkom prelaza. Dizajn nam se sviđa i
+ostaje. Pokvarene su interakcija i prelaz biranje -> polje. Sesija ti je
+prošli put završila sažetkom bez provjere — ovaj put testiraj prije zipa.
+
+Pročitaj po ovim tačnim putanjama (repo, master):
+  docs/04-experience/design-drafts/home-v3-cd-brief.md
+    -> §9 (nalazi s uzrocima), §10 i §10.1 (pravila MORA), §11 (isporuka)
+  docs/04-experience/design-drafts/home-v3-test/open-frames.png
+  docs/04-experience/design-drafts/home-v3-test/close-frames.png
+    -> izmjereni kadrovi tvog prelaza, vidi se rupa i skokovi
+  design_handoff_home_v3/design/HomeScreen.dc.html   (tvoj, polazna tačka)
+  design_handoff_home_v3/design/FieldScreen.dc.html  (tvoj)
+  design_handoff_home_v3/godot/home_v3_export.json   (tvoj)
+Polje sezone kakvo je danas U IGRI — prelaz mora sletjeti tačno u ovo:
+  design_handoff_home_field_v2/design/FieldScreen.dc.html
+  game/scripts/visual/ui_home_field.gd   (MEADOW_BANDS, PIP_*, ANIM,
+                                          tween_chrome_in, tween_flowers_settle)
+  game/scripts/ui/season_field.gd        (Pip hoda: walk/sniff/sleep)
+  game/scripts/ui/season_stage.gd        (_play_field_open_motion)
+Ako se prompt i brief razlikuju, važi brief.
+
+INTERAKCIJA — zašto se sezone ne mogu birati:
+I1 CardNav ima pointer-events:none, strelice to naslijede, klik padne na
+   karticu -> na aktivnoj sezoni strelica OTVARA POLJE. Popravi: strelice
+   primaju klik i ne propuštaju ga kartici.
+I2 Swipe po kartici je u README-u, ali ne postoji. Napravi ga (~60 px).
+I3 Tap na tab usred prelaza promijeni karticu u drugu sezonu. Zaključaj
+   sav unos dok traje prelaz ili promjena kartice.
+I4 Pip stoji na svakoj otključanoj free sezoni (status 'open'). Pip je
+   samo na sezoni u kojoj se igra; 'open' dobija svoj izgled bez teksta.
+I5 Tačke su indikator, ne dugmad — napiši to.
+
+PRELAZ — elementi se pojave, nestanu, pa ponovo pojave:
+- 224–308 ms kartica je prazna: ime, cvijeće i Pip su izblijedili, a
+  polje još nije ušlo. Onda se ime i Pip vrate na DRUGOM mjestu.
+- Play: tvoj putujući PlayButton i FieldPlayButton su dva dugmeta; na
+  560 ms skok (tekst 76->64, rub 4->3, sjena 10->8). Na zatvaranju isto.
+- Trake kartice 0.327/0.363 ne poklapaju livadu igre 0.32/0.68 (skok
+  11 i 17 px), a FieldPage blijedi sa svojim trakama preko kartice koja
+  još nije puna -> duhovi ivica. FieldScreen ima noBands — iskoristi ga.
+
+PRAVILA (detalji u §10 briefa):
+P1 Nijedan kadar bez imena, Pipa i Playa (alfa >= 0,6).
+P2 Ime = JEDAN objekat: 80 px na kartici se pretvori u 56 px SeasonLabel.
+P3 Pip = JEDAN objekat: 230 px s kartice putuje u MeadowPip 190 px
+   (noge 756,1404). Hodanje tek poslije prelaza; nazad kreće s mjesta
+   gdje trenutno stoji.
+P4 Play = JEDAN objekat: na kraju piksel-identičan FieldPlayButton-u,
+   pa predaja. Nikad dva Play dugmeta u kadru.
+P5 Jedne trake: dok traje prelaz kartica JESTE livada (0.32 / 0.68),
+   polje bez svojih traka; na t=1 isti pikseli.
+P6 Roster diskovi odlaze, cvijeće livade dolazi — PREKLOPLJENO, ne
+   jedno pa drugo. Settle kao u igri (0,9 -> 1, stagger 24 ms) ili
+   napiši novu vrijednost.
+P7 Unos zaključan tokom prelaza (oba smjera) i promjene kartice.
+P8 export JSON nabraja SVAKI objekat koji se mijenja; iste vrijednosti
+   u HTML-u i ui_home_v3.gd; tabela UiHomeField.ANIM staro -> novo.
+P9 Kadar openT 0,99 = kadar openT 1 (osim loopa korpe). Isto nazad.
+P10 Ime, Pip, Play i kartica na ISTOM eased t — kreću se zajedno.
+
+NE MIJENJAJ: tabove, izgled kartice, Play, statuse, boje, § Odlučeno,
+hub header/footer, polje (osim onoga što traže P2–P5). Jedno rješenje.
+
+ISPORUKA (§11): isti folder design_handoff_home_v3/, iste putanje.
+Home Specs dobija traku kadrova openT 0, .1 ... 1 za otvaranje i
+zatvaranje, plus Pip koji se vraća s mjesta gdje je odšetao. README
+dobija "§ Runda 2" (po red za I1–I5 i T1–T6) i "§ Samoprovjera" sa 7
+stavki iz §11 briefa — svaku provjeri u svom prototipu i napiši da/ne.
+Na kraju mi daj ZIP ZA PREUZIMANJE s cijelim folderom.
 ```
 
 ## Povezano

@@ -9,6 +9,10 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-09-28
+
+- **Home v3 — runda 1 od CD-a testirana, brief za rundu 2** — paket `design_handoff_home_v3/` je cijeli (29 fajlova) i dodan u repo. Test u browseru je našao dvije vrste grešaka. (1) Strelice ne primaju klik: `CardNav` ima `pointer-events:none`, pa klik padne na karticu i otvori polje. Swipe po kartici ne postoji. Tap na tab usred prelaza mijenja karticu. Pip stoji na svakoj otključanoj sezoni. (2) Prelaz: od 224. do 308. ms kartica je prazna, pa se ime i Pip vrate na drugom mjestu. Dva Play dugmeta s pomakom na kraju. Trake kartice 0.327 / 0.363 ne poklapaju livadu 0.32 / 0.68. Brief dobija §9–§12: nalaze, pravila prelaza P1–P10 (ime, Pip i Play su jedan objekat; jedne trake) i prompt za korekcije. Kadrovi su u `design-drafts/home-v3-test/`; [[../04-experience/design-drafts/home-v3-cd-brief|brief]]
+
 ## 2026-09-26
 
 - **Brief: Home puni redizajn (Claude Design)** — dva taba Free / Premium, manje teksta, novo Play dugme, daily chest samo na polju (već u igri), prelaz u livadu smije se promijeniti. Paket `design_handoff_home_v3/`; [[../04-experience/design-drafts/home-v3-cd-brief|brief]]

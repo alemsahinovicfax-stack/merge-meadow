@@ -1,0 +1,36 @@
+HomeScreen (Control 1080x1920)
+├─ Header                      chrome v2, 143 — unchanged
+├─ HomePage (Control 1080x1633, y 143)
+│  ├─ PageBg (ColorRect)       page_bg(ground), tween 220 ms
+│  ├─ SeasonSelect (Control)
+│  │  ├─ SeasonTabs (Panel)    track
+│  │  │  ├─ FreeTab (Button)   icon_seed + "Free"
+│  │  │  └─ PremiumTab (Button) icon_diamond + "Premium"
+│  │  ├─ OpenTransition (Control)          animated group
+│  │  │  ├─ SeasonCard (Panel, clip)
+│  │  │  │  ├─ CardSky / CardGround / CardNear (ColorRect, anchors by %)
+│  │  │  │  ├─ PremiumRim (Panel, premium only)
+│  │  │  │  └─ CardContent (Control, centred 1024)
+│  │  │  │     ├─ SeasonName (Label 80)
+│  │  │  │     ├─ LockBadge (Panel 96)
+│  │  │  │     ├─ SeasonRoster (HBoxContainer)
+│  │  │  │     │  └─ RosterFlower x3 (Panel disc + TextureRect + Label if missing)
+│  │  │  │     └─ CardStatus
+│  │  │  │        ├─ PipHere | UnlockNeeds(NeedCoins, NeedStars) | UnlockButton
+│  │  │  │        └─ PriceButton | OwnedChip | SoonChip
+│  │  │  └─ PlayButton (Button 520x180)   modes: Back / Play
+│  │  └─ CardNav
+│  │     ├─ PrevSeason / NextSeason (Button 120)
+│  │     └─ SeasonDots (HBoxContainer)
+│  └─ FieldPage (Control 1080x1633, alpha 0 until open)
+│     ├─ Meadow (MeadowSky / MeadowFar / MeadowNear)
+│     ├─ MeadowFlowers (13 spots + MeadowPip)
+│     ├─ SeasonLabel · GrownChip
+│     ├─ GiftChest (180) + GiftDot
+│     ├─ BasketButton (180) + AttentionRing (only loop)
+│     ├─ UpgradesButton (180) + MagnetLevel / LootLevel
+│     └─ BottomRow
+│        ├─ SeasonsButton (236x124)
+│        ├─ FieldPlayButton (432x140)  ← PlayButton lands here
+│        └─ EndlessButton (236x124, tutorial_done)
+└─ Footer                      chrome v2, 144 — unchanged

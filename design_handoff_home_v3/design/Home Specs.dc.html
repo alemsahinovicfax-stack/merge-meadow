@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#EFE8DE}a{color:#2D3436}a:hover{color:#9E6645}@keyframes fieldRipple{0%{transform:scale(1);opacity:.7}60%{transform:scale(1.16);opacity:0}100%{transform:scale(1.16);opacity:0}}</style>
+</helmet>
+<div style="padding:72px;display:flex;flex-direction:column;gap:72px;font-family:Nunito,system-ui,sans-serif;color:#2D3436;background:#EFE8DE;min-width:3000px">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="font:900 64px/1.05 Nunito,sans-serif">Home v3 — Specs</div>
+    <div style="font:700 26px/1.4 Nunito,sans-serif;max-width:1400px;color:#555C5E">Artboard 1080 × 1920 · page 1080 × 1633 from y 143 · all px at 1:1 · frames below at 40 %. Layer names match the Godot tree (home_tree.txt).</div>
+  </div>
+
+  <section data-screen-label="Select states" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 40px/1 Nunito,sans-serif">1–4 · Season select</div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px">
+      <sc-for list="{{ selectFrames }}" as="f" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:14px;width:432px">
+          <div style="width:432px;height:768px;overflow:hidden;border-radius:20px;box-shadow:0 6px 0 rgba(26,26,20,.18)">
+            <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:0 0">
+              <dc-import name="HomeScreen" scene="{{ f.scene }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:900 26px/1.2 Nunito,sans-serif">{{ f.title }}</div>
+          <div style="font:700 22px/1.4 Nunito,sans-serif;color:#555C5E">{{ f.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Transition" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 40px/1 Nunito,sans-serif">5 · OpenTransition — card opens into its meadow</div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+      <sc-for list="{{ transFrames }}" as="f" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:14px;width:432px">
+          <div style="width:432px;height:768px;overflow:hidden;border-radius:20px;box-shadow:0 6px 0 rgba(26,26,20,.18)">
+            <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:0 0">
+              <dc-import name="HomeScreen" scene="free_active" open-t="{{ f.t }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:900 26px/1.2 Nunito,sans-serif">{{ f.title }}</div>
+          <div style="font:700 22px/1.4 Nunito,sans-serif;color:#555C5E">{{ f.note }}</div>
+        </div>
+      </sc-for>
+      <div style="width:620px;display:flex;flex-direction:column;gap:14px;background:#FFF8F0;border:3px solid #2D3436;border-radius:28px;padding:36px;box-sizing:border-box">
+        <div style="font:900 30px/1.1 Nunito,sans-serif">Timing</div>
+        <sc-for list="{{ timing }}" as="r" hint-placeholder-count="7">
+          <div style="display:grid;grid-template-columns:170px 1fr;gap:16px;font:700 22px/1.35 Nunito,sans-serif"><span style="font-weight:900;font-variant-numeric:tabular-nums">{{ r.a }}</span><span>{{ r.b }}</span></div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="Field" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 40px/1 Nunito,sans-serif">6 · Field — Play here starts the run</div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px">
+      <sc-for list="{{ fieldFrames }}" as="f" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:14px;width:432px">
+          <div style="width:432px;height:768px;overflow:hidden;border-radius:20px;box-shadow:0 6px 0 rgba(26,26,20,.18)">
+            <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:0 0">
+              <dc-import name="FieldScreen" season="{{ f.season }}" scene="{{ f.scene }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:900 26px/1.2 Nunito,sans-serif">{{ f.title }}</div>
+          <div style="font:700 22px/1.4 Nunito,sans-serif;color:#555C5E">{{ f.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Anatomy" style="display:grid;grid-template-columns:repeat(3,minmax(0,640px));gap:40px">
+    <div style="display:flex;flex-direction:column;gap:14px;background:#FFF8F0;border:3px solid #2D3436;border-radius:28px;padding:36px">
+      <div style="font:900 30px/1.1 Nunito,sans-serif">PlayButton — three steps</div>
+      <sc-for list="{{ steps }}" as="r" hint-placeholder-count="3">
+        <div style="display:grid;grid-template-columns:48px 1fr;gap:14px;font:700 22px/1.4 Nunito,sans-serif"><span style="width:44px;height:44px;border-radius:22px;background:#FFB88C;border:3px solid #2D3436;box-sizing:border-box;display:grid;place-items:center;font-weight:900">{{ r.n }}</span><span>{{ r.b }}</span></div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;background:#FFF8F0;border:3px solid #2D3436;border-radius:28px;padding:36px">
+      <div style="font:900 30px/1.1 Nunito,sans-serif">Layout (page px)</div>
+      <sc-for list="{{ layout }}" as="r" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:220px 1fr;gap:14px;font:700 22px/1.35 Nunito,sans-serif"><span style="font-weight:900">{{ r.a }}</span><span style="font-variant-numeric:tabular-nums">{{ r.b }}</span></div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;background:#FFF8F0;border:3px solid #2D3436;border-radius:28px;padding:36px">
+      <div style="font:900 30px/1.1 Nunito,sans-serif">Tabs — Free vs Premium</div>
+      <sc-for list="{{ tabs }}" as="r" hint-placeholder-count="6">
+        <div style="font:700 22px/1.4 Nunito,sans-serif">{{ r }}</div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      selectFrames: [
+        { scene: 'free_active', title: '1 · Free · the season you play', note: 'Pip on the card = you play here. Play = triangle + "Play" → opens this meadow. Missing flower shows as silhouette + its name.' },
+        { scene: 'free_locked', title: '2 + 3b · Free · locked, still missing', note: 'Play turns into "Back" with the playing season\'s disc → slides back to Lantern Meadow, never a run. Chips: coins 320 / 500, ★3 of Lantern 14 / 20; each goes mint when met.' },
+                { scene: 'free_unlock', title: '3a · Next season · can unlock', note: 'Both needs met → one gold Unlock · 500 button replaces the chips.' },
+        { scene: 'premium_buy', title: '4a · Premium · for sale', note: 'Gold tab, gold inner rim, gold price button with gem. Price is real money, never coins.' },
+        { scene: 'premium_owned', title: '4b · Premium · bought', note: 'Mint "Yours". Tap card opens it; Play still returns to the playing season.' },
+        { scene: 'premium_soon', title: '4c · Ember Fen · coming soon', note: 'Dashed chip, no price, flowers at 50 %.' }
+      ],
+      transFrames: [
+        { t: 0, title: 't 0 · select', note: 'Tap Play (or the card).' },
+        { t: 0.4, title: 't .40 · card grows', note: 'Card rect → page, radius 48 → 0, text fades. Its 3 colour bands ARE the meadow bands.' },
+        { t: 0.75, title: 't .75 · meadow arrives', note: 'Field fades in over the same colours; Play has slid into the bottom row.' },
+        { t: 1, title: 't 1 · field', note: 'Seasons + Endless slide out from behind Play; Gift, basket, upgrades drop in.' }
+      ],
+      timing: [
+        { a: 'open', b: '560 ms, ease in-out cubic; one Tween, parallel tracks' },
+        { a: '0–30 %', b: 'Tabs, arrows, dots fade out and lift 24 px' },
+        { a: '0–40 %', b: 'Card name, roster, status fade out' },
+        { a: '0–100 %', b: 'SeasonCard rect (24,172,1032,1160) → (0,0,1080,1633); radius 48 → 0; border 4 → 0; shadow 12 → 0' },
+        { a: '0–100 %', b: 'PlayButton (280,1413,520,180) → (324,1461,432,140)' },
+        { a: '55–85 %', b: 'FieldPage modulate.a 0 → 1' },
+        { a: '72–100 %', b: 'Field chrome: flowers scale .96 → 1, top chrome y −16 → 0, Seasons / Endless x ±254 → 0' },
+        { a: 'Seasons', b: 'Same Tween played backwards, 440 ms — the meadow shrinks back into the same card' },
+        { a: 'card swap', b: '220 ms: x ±90 → 0, alpha .4 → 1 (arrows, dots, Back)' }
+      ],
+      fieldFrames: [
+        { season: 'amber_canopy', scene: 'gift', title: 'Amber Canopy · #FFEBC7', note: 'Gift with pink dot, basket +5 %, upgrades, Seasons · Play · Endless.' },
+        { season: 'moonlit_warren', scene: 'gift', title: 'Moonlit Warren · #B8BDFF', note: 'Same chrome on the darkest meadow — ink stays ≥ 4.5 : 1.' },
+        { season: 'amber_canopy', scene: 'first', title: 'Before first merge', note: 'Basket locked, no Endless (tutorial), no pink dot.' }
+      ],
+      steps: [
+        { n: '1', b: 'Card ≠ playing season (locked, for sale, or just another one) → Play shows "Back" + the playing season\'s disc; tap slides back to it.' },
+        { n: '2', b: 'Card = playing season → triangle + "Play"; tap runs OpenTransition into its field.' },
+        { n: '3', b: 'On the field → FieldPlayButton (the same button, moved) starts the run.' }
+      ],
+      layout: [
+        { a: 'SeasonTabs', b: '1032 × 124 at (24, 24), pad 8' },
+        { a: 'FreeTab / PremiumTab', b: '508 × 108 each, r 54' },
+        { a: 'SeasonCard', b: '1032 × 1160 at (24, 172), r 48, border 4, shadow 0 12' },
+        { a: 'Card bands', b: 'sky 0–32.7 % · ground –69 % · near' },
+        { a: 'SeasonRoster', b: 'discs 260 · 330 · 260, gap 36, top 230' },
+        { a: 'Prev / Next', b: '120 × 120 at card y 500' },
+        { a: 'SeasonDots', b: 'y 1352, 24 h, current 64 w' },
+        { a: 'PlayButton', b: '520 × 180 at (280, 1413), r 90' },
+        { a: 'Hub swipe zone', b: 'y 1392–1633 outside Play (x 0–280, 800–1080)' }
+      ],
+      tabs: [
+        'Free tab: cream when selected, seed icon.',
+        'Premium tab: coin-gold #FFD56B when selected, gem icon.',
+        'Premium card: 8 px gold inner rim inset 14.',
+        'Premium status: gold price button / mint Yours / dashed Coming soon.',
+        'Free status: Pip / need chips / gold Unlock · 500.',
+        'Switching tab lands on the playing season if it lives there, else card 1.'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

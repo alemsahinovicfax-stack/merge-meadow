@@ -10,8 +10,8 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
-zadnja_sesija: "Home ispravke u igri (cvijet, Play u 3 koraka, chest samo na polju). Brief home-v3 za CD — puni redizajn biranja i prelaza u polje."
-zadnje_azurirano: 2026-09-26
+zadnja_sesija: "Home v3 runda 1 od CD-a testirana: strelice mrtve, prelaz s rupom i dvostrukim Playom. Brief home-v3 dopunjen za rundu 2 (§9–§12, prompt §12)."
+zadnje_azurirano: 2026-09-28
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
