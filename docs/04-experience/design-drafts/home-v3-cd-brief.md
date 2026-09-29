@@ -11,10 +11,12 @@ povezano:
   - art-direction
   - pristupacnost
   - CHECKPOINT
-ai_sažetak: "Puni redizajn Homea (dva taba, novo Play, prelaz u polje). Runda 1 imala mrtve strelice i prelaz s rupom; runda 2 (§9–§12) ih je popravila i 2026-09-28 je prenesena u igru 1:1 (§ Implementacija, home-v3-izvjestaj)."
+ai_sažetak: "Puni redizajn Homea (dva taba, novo Play, prelaz u polje). Runda 1 imala mrtve strelice i prelaz s rupom; runda 2 (§9–§12) ih je popravila i 2026-09-28 je prenesena u igru 1:1; runda 3 (§13–§14) traži svih šest cvjetova na kartici i zaključanu sezonu pod sivim slojem s katancem."
 ---
 
 # Home — puni redizajn — Claude Design brief
+
+> **Status 2026-09-29: runda 3 (korekcije na kartici) čeka CD** — šalji prompt iz [[#14. Prompt za Claude Design — runda 3|§14]]. Traži se svih šest cvjetova na kartici i sivi sloj + katanac na zaključanoj sezoni.
 
 > **Status 2026-09-28 (kasnije): runda 2 isporučena i implementirana u igri** — vidi [[#Implementacija (2026-09-28)|§ Implementacija]] i [[home-v3-izvjestaj|izvještaj]].
 >
@@ -29,7 +31,7 @@ ai_sažetak: "Puni redizajn Homea (dva taba, novo Play, prelaz u polje). Runda 1
 | Ko | Šta čita | Zašto |
 |----|----------|-------|
 | **Claude Design** | §1–§7, pa **§9–§11** | Runda 1: šta mora, šta smije. Runda 2: šta je pokvareno i pravila prelaza |
-| **Ti** | §12 (runda 2) | Gotov prompt za copy-paste u CD chat. §8 je prompt runde 1, već poslan. |
+| **Ti** | **§14 (runda 3)** | Gotov prompt za copy-paste u CD chat. §8 (runda 1) i §12 (runda 2) su već poslani. |
 | **Agent (kasnije)** | §3, §4, §10 | Današnje vrijednosti i mapa u Godot |
 
 **Prije slanja prompta: commitaj i pushaj na `master`** — CD čita fajlove iz repoa po tačnoj putanji.
@@ -394,6 +396,148 @@ zatvaranje, plus Pip koji se vraća s mjesta gdje je odšetao. README
 dobija "§ Runda 2" (po red za I1–I5 i T1–T6) i "§ Samoprovjera" sa 7
 stavki iz §11 briefa — svaku provjeri u svom prototipu i napiši da/ne.
 Na kraju mi daj ZIP ZA PREUZIMANJE s cijelim folderom.
+```
+
+## 13. Runda 3 — cvijeće na kartici (2026-09-29)
+
+Dizajn iz runde 2 je u igri i ostaje. Ovo su **dvije korekcije na kartici sezone**, ništa drugo se ne dira.
+
+### 13.1 Šta se traži
+
+| # | Zahtjev |
+|---|---|
+| **R1** | **Na kartici se vidi SVIH šest cvjetova sezone**, ne tri. Igrač bira sezonu po tome šta u njoj raste — tri od šest mu ne pokazuju sezonu, nego uzorak. |
+| **R2** | **Zaključana besplatna sezona: preko cvijeća ide sivi sloj i katanac.** Cvijeće se otkriva tek kad se sezona otključa. |
+
+### 13.2 Kako je danas (mjere iz koda)
+
+Kartica je `1032 × 1160` na (24, 172). Zona za cvijeće ide od `ROSTER_TOP 230` do `STATUS_TOP 830` — **600 px visine** unutar kartice.
+
+| Token | Danas |
+|---|---|
+| `ROSTER_DISCS` | `[260, 330, 260]` — srednji veći, bočni spušteni `ROSTER_SIDE_DROP 70` |
+| `ROSTER_GAP` | 36 (ukupna širina reda 922 od 1032) |
+| `ART_FILL` | 0,78 — vidljivi crtež zauzima 78 % diska |
+| izbor tri | prvi ★1, prvi ★2 i ★3 iz rostera |
+| `LOCK_BADGE` | `Rect2(896, 40, 96, 96)` — katanac 48 px **gore desno na kartici** |
+| `DIM_ART` | bijela @ 50 % preko crteža kad je kartica zaključana |
+| strelice | `PREV_RECT (52, 852)` i `NEXT_RECT (908, 852)` — odmah **ispod** zone cvijeća |
+
+Svaka sezona ima **tačno 6 cvjetova** (8 sezona × 6 = 48). To se ne mijenja.
+
+### 13.3 MORA
+
+- **Svih 6 cvjetova vidljivo** na kartici, u svakom stanju (aktivna, otključana, zaključana, premium, coming soon).
+- **Kartica ostaje 1032 × 1160.** Ne diraj `CARD_RECT`, tabove, Play, tačke ni status red (`STATUS_TOP 830`, `STATUS_H 280`) — oni su iz runde 2 i rade.
+- **Cvijeće ne smije doći pod strelice** na y 852 (card-relative 680) ni pod status red.
+- **Zaključana besplatna sezona:** sivi sloj preko cvijeća + katanac. Otkriva se kad se sezona otključa — to je **jedini** trenutak kad cvijeće te sezone postane vidljivo.
+- **Riješi sudar s postojećim „missing" stanjem.** Danas pojedini cvijet koji igrač još nije našao ima svoje stanje (`MISSING_ART` crna @ 28 %, isprekidan disk, ime ispod). Na **zaključanoj** sezoni svih šest je nepoznato, pa se ta dva sloja ne smiju slagati jedan na drugi. Reci u README šta si odlučio: da li zaključano stanje potpuno zamjenjuje „missing", ili se „missing" na zaključanoj kartici uopšte ne crta.
+- **Premium kartice moraju biti dosljedne.** Nekupljena premium sezona je takođe zaključana — reci nosi li isti sivi sloj i katanac, ili se premium razlikuje (i zašto).
+- Tekst koji ostane ≥ 34 px. Kontrast ≥ 4,5:1.
+
+### 13.4 SMIJEŠ (tvoja odluka, napiši razlog u § Odlučeno)
+
+- **Raspored šest cvjetova.** 3 × 2 rešetka, jedan veliki + pet manjih, luk, red od šest — tvoj izbor. Danas srednji disk nosi oko (330 vs 260); ako ta hijerarhija pomaže, zadrži je u nekom obliku; ako smeta, reci zašto je izbacuješ.
+- **Veličine diskova.** 600 × 1032 px je budžet; šest diskova od 330 ne stane, pa nešto mora biti manje. Reci na koliko ideš.
+- **Katanac: jedan preko cijelog bloka cvijeća, ili katančić na svakom cvijetu.** Igrač je tražio „sivi sloj preko cvijeća i katančić u sredini" — to dopušta oboje. Izaberi jedno i obrazloži.
+- **Šta sa `LOCK_BADGE` gore desno** kad katanac dođe na cvijeće — ostaje (dva katanca) ili otpada. Preporuka: ne držati dva.
+- Da li ime cvijeta ostaje ispod diska kad ih je šest (danas `MISSING_NAME 38` samo na „missing").
+
+### 13.5 Isporuka runde 3
+
+**Ne pravi novi dizajn.** Sve iz runde 2 ostaje. Mijenja se samo zona cvijeća na kartici i zaključano stanje.
+
+Paket: isti `design_handoff_home_v3/`, iste putanje, **cijeli folder u zipu**.
+
+| Fajl | Šta se mijenja |
+|---|---|
+| `design/HomeScreen.dc.html` | R1 i R2 u svim stanjima kartice |
+| `design/Home Specs.dc.html` | anatomija nove zone cvijeća s mjerama; šest stanja kartice jedno pored drugog (aktivna · otključana · zaključana · unlock · premium · coming soon) |
+| `godot/home_v3_export.json` | novi `ROSTER_*` tokeni, tokeni zaključanog sloja, `layout.SeasonRoster` |
+| `godot/ui_home_v3.gd` | iste vrijednosti kao JSON |
+| `README.md` | nova sekcija **§ Runda 3** — po jedan red za R1 i R2, plus odluke iz §13.4 |
+
+**§ Samoprovjera runde 3** (popuni prije zipa, svaka stavka da/ne):
+
+1. Svih šest cvjetova se vidi na kartici u svih šest stanja.
+2. Nijedan cvijet ne ulazi u strelice (y 852) ni u status red (y 830 na stranici).
+3. Zaključana besplatna sezona: sivi sloj + katanac; nijedan cvijet se ne prepoznaje.
+4. Otključana sezona: nema ni sivog sloja ni katanca, svih šest se vidi jasno.
+5. Nigdje se ne vide dva katanca na istoj kartici.
+6. Kartica je i dalje tačno 1032 × 1160; tabovi, Play, tačke i status red nepromijenjeni.
+7. Svaki broj u `ui_home_v3.gd` postoji isti u `home_v3_export.json` i u HTML-u.
+
+## 14. Prompt za Claude Design — runda 3
+
+> Kopiraj sve iz bloka ispod u CD, u **isti chat** gdje su rađene runde 1 i 2 ako postoji. **Prije toga commitaj i pushaj na `master`.**
+
+```
+Ovo je RUNDA 3 za Home v3 — samo dvije korekcije na kartici sezone.
+
+Runde 1 i 2 su gotove i runda 2 je prenesena u igru; dizajn nam se sviđa i
+OSTAJE. Ne pravi novi raspored ekrana, ne diraj tabove, Play, tačke, status
+red ni prelaz u polje. Mijenja se samo zona cvijeća na kartici.
+
+Pročitaj po ovim tačnim putanjama (repo, master):
+  docs/04-experience/design-drafts/home-v3-cd-brief.md
+    -> §13 (šta se traži, današnje mjere, MORA i SMIJEŠ, isporuka)
+  design_handoff_home_v3/design/HomeScreen.dc.html   (tvoj, polazna tačka)
+  design_handoff_home_v3/godot/ui_home_v3.gd         (tokeni u igri)
+
+ŠTA SE MIJENJA:
+
+R1 — SVIH ŠEST CVJETOVA NA KARTICI.
+Danas kartica pokazuje tri (ROSTER_DISCS [260, 330, 260]: prvi ★1, prvi ★2
+i ★3). Svaka sezona ima tačno šest cvjetova. Igrač bira sezonu po tome šta
+u njoj raste, pa mu tri od šest ne pokazuju sezonu nego uzorak. Neka se vidi
+svih šest.
+Budžet: kartica ostaje 1032 x 1160, a zona za cvijeće je od ROSTER_TOP 230
+do STATUS_TOP 830 — dakle 600 px visine i 1032 širine. Šest diskova od 330
+ne stane, pa nešto mora biti manje; reci na koliko ideš. Raspored je tvoj
+izbor (3 x 2, jedan veliki + pet manjih, luk, red od šest) — samo napiši
+razlog u README § Odlučeno. Danas srednji disk nosi oko (330 vs 260); ako
+ta hijerarhija pomaže, zadrži je u nekom obliku, ako smeta, reci zašto je
+izbacuješ.
+PAZI: cvijeće ne smije doći pod strelice (PREV_RECT 52,852 i NEXT_RECT
+908,852) ni pod status red.
+
+R2 — ZAKLJUČANA BESPLATNA SEZONA: SIVI SLOJ I KATANAC PREKO CVIJEĆA.
+Cvijeće zaključane sezone se ne vidi: preko njega ide sivi sloj i katanac.
+Otkriva se tek kad se sezona otključa — to je jedini trenutak kad cvijeće
+te sezone postane vidljivo.
+Danas je drugačije: katanac je LOCK_BADGE 96 px gore desno na kartici, a
+crtež je samo prigušen (DIM_ART bijela 50 %) — sezona se i dalje prepozna.
+Odluči i obrazloži: jedan katanac preko cijelog bloka cvijeća ili katančić
+na svakom cvijetu. Takođe reci šta biva s LOCK_BADGE-om gore desno —
+preporuka je da ne ostanu dva katanca na istoj kartici.
+
+DVIJE ZAMKE KOJE MORAŠ RIJEŠITI:
+1. Postoji već stanje "missing" za pojedini cvijet koji igrač nije našao
+   (MISSING_ART crna 28 %, isprekidan disk, ime ispod). Na zaključanoj
+   sezoni svih šest je nepoznato, pa se ta dva sloja ne smiju slagati jedan
+   preko drugog. Reci da li zaključano stanje potpuno zamjenjuje "missing",
+   ili se "missing" na zaključanoj kartici uopšte ne crta.
+2. Nekupljena premium sezona je takođe zaključana. Reci nosi li isti sivi
+   sloj i katanac ili se premium razlikuje — i zašto.
+
+MORA OSTATI: kartica 1032 x 1160; tabovi, Play 520 x 180, tačke, status red
+(STATUS_TOP 830, STATUS_H 280) i prelaz iz runde 2 nepromijenjeni. Tekst
+>= 34 px, kontrast >= 4,5:1. Svih šest cvjetova vidljivo u svih šest stanja
+kartice (aktivna, otključana, zaključana, unlock, premium, coming soon).
+
+TEHNIČKI (Godot 4, OpenGL): artboard 1080 x 1920, sve u px te baze. Paneli
+= ravna boja, radius, rub, jedna sjena. Bez blura i gradijenata. Art cvijeća
+crta igra — ne treba novi art, samo mjere diskova i sloj preko njih.
+
+ISPORUKA (§13.5): isti folder design_handoff_home_v3/, iste putanje, cijeli
+folder u zipu. Mijenjaju se HomeScreen.dc.html, Home Specs.dc.html (anatomija
+nove zone + šest stanja kartice jedno pored drugog), home_v3_export.json,
+ui_home_v3.gd i README.md (nova sekcija § Runda 3). U README popuni i
+§ Samoprovjera runde 3 — sedam stavki iz §13.5, svaka da/ne, provjerene u
+browseru prije nego pošalješ zip.
+
+NE RADI: novi raspored ekrana, druge stranice huba, polje sezone, prelaz,
+novi art cvijeća, više varijanti za biranje.
 ```
 
 ## Implementacija (2026-09-28)

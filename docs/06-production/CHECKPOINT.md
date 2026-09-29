@@ -10,8 +10,8 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
-zadnja_sesija: "Home v3 u igri (runda 2 od CD-a): dva taba, kartica = minijatura livade, Play u 3 koraka, prelaz u kojem su ime, Pip i Play jedan objekat. Testirano kadar po kadar uz dizajn; 55/56 smoke OK (ui_button_click pada i na masteru)."
-zadnje_azurirano: 2026-09-28
+zadnja_sesija: "Journal optimizovan (nema više pune gradnje liste na svaki ulazak) + brief runda 3 za karticu sezone"
+zadnje_azurirano: 2026-09-29
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -353,6 +353,7 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 | ID | Status | Napomena | Link |
 |----|--------|----------|------|
+| HOME-23 | 🔲 brief spreman | Home v3 runda 3 — svih šest cvjetova na kartici (danas tri) i zaključana sezona pod sivim slojem s katancem. Čeka CD paket | [[../04-experience/design-drafts/home-v3-cd-brief\|brief §13–§14]] |
 | HOME-22 | ✅ | Home v3 — biranje u dva taba (Free / Premium), kartica 1032 × 1160 = minijatura livade (tri trake), strelice + swipe, tačke samo indikator, Play 520 × 180 u 3 koraka („Back" + disk); prelaz 560 / 440 ms jedan tween: ime, Pip i Play su JEDAN objekat, predaja kartica → livada 0 px razlike; dock tokena i Play 836 obrisani | `design_handoff_home_v3/` · [[../04-experience/design-drafts/home-v3-izvjestaj\|izvještaj]] |
 | HOME-21 | ✅ | Home polje sezone pass 2 — livada je cijela stranica (bila 606 od 1633), chrome pluta: Gift + korpa 180 gore lijevo (isti okvir), nadogradnje gore desno u sheetu, donji red `Seasons 236 · Play 432 · Endless 236`; 13 mjesta u 4 dubine i Pip van keepouta | `design_handoff_home_field_v2/` |
 | CHROME-02 | ✅ | Hub chrome pass 2 — dusk plum `#2A2233` umjesto zelene, footer 144 px bez teksta (dodir 216 × 141), treći chip broji cvijeće umjesto dijamanata; nove ikone coina / sjemena / cvijeta kroz cijelu igru (i pickup u runu); stranica 1597 → 1633 bez promjene kartica | `design_handoff_hub_chrome_v2/` |
