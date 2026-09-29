@@ -20,7 +20,7 @@ const DOT_IDLE := Color(0.176, 0.204, 0.212, 0.28)
 const DIVIDER := Color(0.176, 0.204, 0.212, 0.35)
 const MISSING_DISC := Color(1.0, 0.973, 0.941, 0.55)
 const MISSING_ART := Color(0.0, 0.0, 0.0, 0.28)
-const DIM_ART := Color(1.0, 1.0, 1.0, 0.5)
+const DIM_ART := Color(1.0, 1.0, 1.0, 0.5)   ## samo „coming soon" (runda 3)
 const CARD_SHADOW := Color(0.102, 0.102, 0.078, 0.26)
 const BTN_SHADOW := Color(0.102, 0.102, 0.078, 0.28)
 const ARROW_SHADOW := Color(0.102, 0.102, 0.078, 0.24)
@@ -42,9 +42,18 @@ const CARD_SHADOW_Y := 12.0
 const BANDS := [0.32, 0.68]
 const NAME_SIZE := 80
 const ROSTER_TOP := 230.0
-const ROSTER_DISCS := [260.0, 330.0, 260.0]
-const ROSTER_GAP := 36.0
-const ROSTER_SIDE_DROP := 70.0
+## Runda 3: kartica nosi svih sest cvjetova, dva reda po tri. Redoslijed je
+## redoslijed rostera: 0–2 = trojka iz runde 2 (1 = potpisni cvijet, „oko"),
+## 3–5 = ostala tri. Zona 230–830, pa nista ne ulazi u strelice ni u status red.
+const ROSTER_EYE := 220.0
+const ROSTER_DISC := 180.0
+const ROSTER_GAP := 48.0
+const ROSTER_SIDE_DROP := 26.0
+const ROSTER_ROW2_TOP := 552.0
+const ROSTER6 := [
+	Rect2(178, 256, 180, 180), Rect2(406, 230, 220, 220), Rect2(674, 256, 180, 180),
+	Rect2(198, 552, 180, 180), Rect2(426, 552, 180, 180), Rect2(654, 552, 180, 180),
+]
 ## Vidljivi cvijet zauzima ~78 % diska (img 82 %, crtez 95 % svog kvadrata).
 const ART_FILL := 0.78
 const MISSING_NAME := 38
@@ -53,8 +62,14 @@ const MISSING_NAME_MAX_W := 300.0
 const PREMIUM_RIM_INSET := 14.0
 const PREMIUM_RIM_WIDTH := 8
 const PREMIUM_RIM_RADIUS := 36
-const LOCK_BADGE := Rect2(896, 40, 96, 96)
-const LOCK_ICON := 48.0
+## Zakljucana besplatna sezona (locked i unlock): ravni veo preko svakog diska,
+## crtez se ne crta. Jedan katanac na bloku — LOCK_BADGE gore desno je ukinut.
+const LOCK_VEIL := Color("#E3D9CC")
+const ROSTER_LOCK := Rect2(456, 436, 120, 120)
+const ROSTER_LOCK_ICON := 60.0
+## Tap na Unlock dize veo disk po disk — jedini trenutak kad se cvijece pokaze.
+const REVEAL_SEC := 0.30
+const REVEAL_STAGGER := 0.04
 const STATUS_TOP := 830.0
 const STATUS_H := 280.0
 const OPEN_GATE := 150.0

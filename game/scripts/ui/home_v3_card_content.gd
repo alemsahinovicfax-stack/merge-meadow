@@ -1,10 +1,14 @@
 class_name HomeV3CardContent
 extends Control
 
-## CardContent (HomeScreen.dc.html): premium rub, lokot, tri cvijeta u diskovima i
-## jedan status po stanju. Ime sezone i Pip NISU ovdje — to su putujuci objekti
-## (SeasonName, MeadowPip) iznad polja. Kartica samo crta; SeasonStage prima
-## dodir, a hit_part() kaze sta je pogodjeno.
+## CardContent (HomeScreen.dc.html): premium rub, svih sest cvjetova sezone u
+## diskovima (dva reda po tri) i jedan status po stanju. Ime sezone i Pip NISU
+## ovdje — to su putujuci objekti (SeasonName, MeadowPip) iznad polja. Kartica
+## samo crta; SeasonStage prima dodir, a hit_part() kaze sta je pogodjeno.
+##
+## Runda 3: zakljucana besplatna sezona (locked i unlock) ima veo preko svakog
+## diska i jedan katanac na bloku — cvijece se ne prepoznaje dok se sezona ne
+## otkljuci. Tap na Unlock dize veo disk po disk (play_reveal).
 
 const ST_ACTIVE := "active"
 const ST_OPEN := "open"
@@ -20,6 +24,8 @@ const PART_GATE := "gate"
 const PART_UNLOCK := "unlock"
 const PART_BUY := "buy"
 
+const DISC_BORDER := 4.0
+
 ## data: season_id, status, premium, roster [{id, name, missing}], coins,
 ## coins_need, stars, stars_need, prev_type, price, buying.
 var data: Dictionary = {}
@@ -32,6 +38,13 @@ var _owned := Rect2()
 var _soon := Rect2()
 var _discs: Array[Rect2] = []
 var _arts: Array[FlowerArt] = []
+var _slot_used: Array[bool] = []
+## Neprozirnost vela po disku (0 = cvijet se vidi, 1 = skriven).
+var _veil := PackedFloat32Array()
+var _veil_node: RosterVeil
+## Napredak podizanja vela u sekundama; < 0 = nema reveala u toku.
+var _reveal_t: float = -1.0
+var _reveal_tween: Tween
 
 
 ## Crtez cvijeta u disku kao zaseban cvor — modulate daje siluetu (crno .28) i
@@ -46,21 +59,116 @@ class FlowerArt extends Control:
 		UiHomeV3.draw_flower(self, size * 0.5, type_id, size.x)
 
 
+## Veo i katanac se crtaju IZNAD crteza. Djeca se crtaju poslije roditelja, pa
+## ovaj cvor mora biti zadnji — inace bi cvijet ostao preko vela.
+class RosterVeil extends Control:
+	const BORDER := 4.0
+
+	var alphas := PackedFloat32Array()
+	var lock_on := false
+
+	func _init() -> void:
+		name = "RosterVeil"
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		size = UiHomeV3.CARD_RECT.size
+
+	func _draw() -> void:
+		for i in mini(alphas.size(), UiHomeV3.ROSTER6.size()):
+			if alphas[i] <= 0.001:
+				continue
+			var inner: Rect2 = (UiHomeV3.ROSTER6[i] as Rect2).grow(-BORDER)
+			draw_circle(
+				inner.get_center(), inner.size.x * 0.5,
+				Color(UiHomeV3.LOCK_VEIL, alphas[i]), true, -1.0, true
+			)
+		if not lock_on:
+			return
+		var b := UiHomeV3.ROSTER_LOCK
+		UiHomeV3.draw_panel(self, b, UiHomeV3.CREAM, b.size.x * 0.5, 4.0, UiHomeV3.INK, 6.0, UiHomeV3.ARROW_SHADOW)
+		var tex := UiAssets.get_chrome_icon("icon_lock")
+		if tex:
+			var side := UiHomeV3.ROSTER_LOCK_ICON
+			draw_texture_rect(tex, Rect2(b.get_center() - Vector2(side, side) * 0.5, Vector2(side, side)), false)
+
+
 func _init() -> void:
 	name = "CardContent"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	size = UiHomeV3.CARD_RECT.size
-	for i in UiHomeV3.ROSTER_DISCS.size():
+	for i in UiHomeV3.ROSTER6.size():
 		var art := FlowerArt.new()
 		art.name = "RosterArt_%d" % i
 		add_child(art)
 		_arts.append(art)
+		_slot_used.append(false)
+		_veil.append(0.0)
+	_veil_node = RosterVeil.new()
+	add_child(_veil_node)
 
 
 func configure(d: Dictionary) -> void:
 	data = d
+	_stop_reveal()
 	_layout()
+	_apply_veil()
 	queue_redraw()
+
+
+## Tap na Unlock: veo se dize disk po disk (300 ms, +40 ms po disku). Zove se
+## POSLIJE configure() sa svjezim podacima, kad sezona vise nije zakljucana.
+func play_reveal() -> void:
+	_stop_reveal()
+	_reveal_t = 0.0
+	_apply_veil()
+	queue_redraw()
+	var total := UiHomeV3.REVEAL_SEC + float(UiHomeV3.ROSTER6.size() - 1) * UiHomeV3.REVEAL_STAGGER
+	_reveal_tween = create_tween()
+	_reveal_tween.tween_method(_set_reveal_t, 0.0, total, total)
+	_reveal_tween.tween_callback(_stop_reveal)
+
+
+func is_revealing() -> bool:
+	return _reveal_t >= 0.0
+
+
+## Neprozirnost vela po disku — za testove i za crtanje imena.
+func veil_alphas() -> PackedFloat32Array:
+	return _veil.duplicate()
+
+
+func _set_reveal_t(t: float) -> void:
+	_reveal_t = t
+	_apply_veil()
+	queue_redraw()
+
+
+func _stop_reveal() -> void:
+	if _reveal_tween:
+		_reveal_tween.kill()
+		_reveal_tween = null
+	if _reveal_t < 0.0:
+		return
+	_reveal_t = -1.0
+	_apply_veil()
+	queue_redraw()
+
+
+## Veo je pun na zakljucanoj sezoni; tokom reveala pada disk po disk.
+func _apply_veil() -> void:
+	var veiled := status() in [ST_LOCKED, ST_UNLOCK]
+	for i in UiHomeV3.ROSTER6.size():
+		var a := 0.0
+		if veiled:
+			a = 1.0
+		elif _reveal_t >= 0.0:
+			var k := (_reveal_t - float(i) * UiHomeV3.REVEAL_STAGGER) / UiHomeV3.REVEAL_SEC
+			a = 1.0 - clampf(k, 0.0, 1.0)
+		_veil[i] = a
+		_arts[i].visible = _slot_used[i] and a < 0.999
+	if _veil_node:
+		_veil_node.alphas = _veil
+		_veil_node.lock_on = status() == ST_LOCKED
+		_veil_node.queue_redraw()
 
 
 func status() -> String:
@@ -114,12 +222,14 @@ func chip_rects() -> Array[Rect2]:
 	return _chips.duplicate() if status() == ST_LOCKED else ([] as Array[Rect2])
 
 
-func has_lock_badge() -> bool:
-	return status() in [ST_LOCKED, ST_UNLOCK, ST_BUY]
+## Jedan katanac na bloku cvijeca — samo na zakljucanoj sezoni. U unlock stanju
+## katanac nosi dugme Unlock, pa kartica nikad nema dva (runda 3).
+func has_roster_lock() -> bool:
+	return status() == ST_LOCKED
 
 
 func is_dim() -> bool:
-	return status() in [ST_LOCKED, ST_SOON]
+	return status() == ST_SOON
 
 
 func missing_names() -> PackedStringArray:
@@ -143,25 +253,18 @@ func star_text() -> String:
 func _layout() -> void:
 	_discs.clear()
 	var roster := _roster()
-	var total := 0.0
-	for d in UiHomeV3.ROSTER_DISCS:
-		total += float(d)
-	total += UiHomeV3.ROSTER_GAP * float(UiHomeV3.ROSTER_DISCS.size() - 1)
-	var x := (size.x - total) * 0.5
-	for i in UiHomeV3.ROSTER_DISCS.size():
-		var d := float(UiHomeV3.ROSTER_DISCS[i])
-		var top := UiHomeV3.ROSTER_TOP + (0.0 if i == 1 else UiHomeV3.ROSTER_SIDE_DROP)
-		_discs.append(Rect2(x, top, d, d))
-		var art := _arts[i]
-		art.position = Vector2(x, top)
-		art.size = Vector2(d, d)
+	for i in UiHomeV3.ROSTER6.size():
+		var r: Rect2 = UiHomeV3.ROSTER6[i]
+		_discs.append(r)
 		var f: Dictionary = roster[i] if i < roster.size() else {}
-		art.visible = not f.is_empty()
+		_slot_used[i] = not f.is_empty()
+		var art := _arts[i]
+		art.position = r.position
+		art.size = r.size
 		art.type_id = str(f.get("id", ""))
 		var miss := bool(f.get("missing", false))
 		art.modulate = UiHomeV3.MISSING_ART if miss else (UiHomeV3.DIM_ART if is_dim() else Color.WHITE)
 		art.queue_redraw()
-		x += d + UiHomeV3.ROSTER_GAP
 	var mid := UiHomeV3.STATUS_TOP + UiHomeV3.STATUS_H * 0.5
 	var cx := size.x * 0.5
 	_gate = Rect2(cx - UiHomeV3.OPEN_GATE * 0.5, mid - UiHomeV3.OPEN_GATE * 0.5, UiHomeV3.OPEN_GATE, UiHomeV3.OPEN_GATE)
@@ -194,10 +297,6 @@ func _draw() -> void:
 		var sb := UiStage.box(Color.TRANSPARENT, UiHomeV3.PREMIUM_RIM_RADIUS, UiHomeV3.PREMIUM_RIM_WIDTH, UiHomeV3.GOLD)
 		sb.draw_center = false
 		draw_style_box(sb, rim)
-	if has_lock_badge():
-		var b := UiHomeV3.LOCK_BADGE
-		UiHomeV3.draw_panel(self, b, UiHomeV3.CREAM, b.size.x * 0.5, 4.0)
-		_icon("icon_lock", b.get_center(), UiHomeV3.LOCK_ICON)
 	_draw_roster()
 	match status():
 		ST_OPEN:
@@ -214,32 +313,59 @@ func _draw() -> void:
 			_draw_soon()
 
 
+## Pod velom je disk obican krem — isprekidani disk i ime cvijeta koji fali
+## pojave se tek kad veo padne (kao u mocku: miss = playable i veo = 0).
 func _draw_roster() -> void:
 	var roster := _roster()
-	var dim := is_dim()
 	for i in mini(roster.size(), _discs.size()):
 		var f: Dictionary = roster[i]
 		var r := _discs[i]
-		var miss := bool(f.get("missing", false))
+		var miss := bool(f.get("missing", false)) and _veil[i] <= 0.001
 		if miss:
 			draw_style_box(UiStage.box(UiHomeV3.MISSING_DISC, roundi(r.size.x * 0.5)), r)
-			UiHomeV3.draw_dashed_round_rect(self, r, r.size.x * 0.5, 4.0, UiHomeV3.INK)
-		else:
-			UiHomeV3.draw_panel(self, r, UiHomeV3.CREAM, r.size.x * 0.5, 4.0)
-		if miss:
+			UiHomeV3.draw_dashed_round_rect(self, r, r.size.x * 0.5, DISC_BORDER, UiHomeV3.INK)
 			_draw_missing_name(str(f.get("name", "")), r)
+		else:
+			UiHomeV3.draw_panel(self, r, UiHomeV3.CREAM, r.size.x * 0.5, DISC_BORDER)
 
 
 ## Ime cvijeta koji fali: 38/900 ispod diska (gap 18). Duga imena igre idu u dva
 ## uravnotezena reda da ne predju na susjedni disk.
 func _draw_missing_name(text: String, disc: Rect2) -> void:
+	var lines := _name_lines(text)
+	var boxes := _name_boxes(text, disc)
+	for i in mini(lines.size(), boxes.size()):
+		UiHomeV3.draw_text(self, 900, UiHomeV3.MISSING_NAME, lines[i], boxes[i].position, UiHomeV3.INK_DEEP)
+
+
+func _name_lines(text: String) -> PackedStringArray:
+	return UiStage.balance_lines(
+		text, UiStage.font(900, UiHomeV3.MISSING_NAME), UiHomeV3.MISSING_NAME, UiHomeV3.MISSING_NAME_MAX_W
+	)
+
+
+## Okviri redova imena ispod diska — isti racun kojim se crtaju.
+func _name_boxes(text: String, disc: Rect2) -> Array[Rect2]:
 	var f := UiStage.font(900, UiHomeV3.MISSING_NAME)
-	var lines := UiStage.balance_lines(text, f, UiHomeV3.MISSING_NAME, UiHomeV3.MISSING_NAME_MAX_W)
+	var out: Array[Rect2] = []
 	var top := disc.end.y + UiHomeV3.MISSING_NAME_GAP
-	for line in lines:
+	for line in _name_lines(text):
 		var w := UiStage.text_w(f, UiHomeV3.MISSING_NAME, line)
-		UiHomeV3.draw_text(self, 900, UiHomeV3.MISSING_NAME, line, Vector2(disc.get_center().x - w * 0.5, top), UiHomeV3.INK_DEEP)
+		out.append(Rect2(disc.get_center().x - w * 0.5, top, w, float(UiHomeV3.MISSING_NAME)))
 		top += float(UiHomeV3.MISSING_NAME)
+	return out
+
+
+## Svi redovi imena koji se sada crtaju — raspored se provjerava nad njima.
+func missing_name_boxes() -> Array[Rect2]:
+	var out: Array[Rect2] = []
+	var roster := _roster()
+	for i in mini(roster.size(), _discs.size()):
+		var f: Dictionary = roster[i]
+		if not bool(f.get("missing", false)) or _veil[i] > 0.001:
+			continue
+		out.append_array(_name_boxes(str(f.get("name", "")), _discs[i]))
+	return out
 
 
 ## Otkljucana sezona u kojoj se ne igra: krem kapija 150 s peach lukom, bez teksta.

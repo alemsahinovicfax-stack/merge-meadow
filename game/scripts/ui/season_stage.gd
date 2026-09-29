@@ -360,26 +360,36 @@ func _card_data(season_id: String) -> Dictionary:
 	}
 
 
-## Tri cvijeta: prvi ★1 lijevo, ★3 u sredini (veliki disk), prvi ★2 desno.
-## Cvijet koji fali (samo na igrivoj sezoni) = jos nikad ubran.
+## Svih sest cvjetova sezone (runda 3). Red 1 = trojka iz runde 2: prvi ★1
+## lijevo, ★3 u sredini (veliki disk, potpisni cvijet), prvi ★2 desno. Red 2 =
+## ostala tri redom iz rostera. Cvijet koji fali (samo na igrivoj sezoni) = jos
+## nikad ubran.
 func _roster(def: SeasonDef, playable: bool) -> Array:
 	var pick: Array = [{}, {}, {}]
 	var slot_of := {1: 0, 3: 1, 2: 2}
+	var rest: Array = []
 	for entry in def.roster:
-		var rarity := clampi(int(entry.get("rarity", 1)), 1, 3)
-		var slot: int = slot_of[rarity]
-		if not (pick[slot] as Dictionary).is_empty():
-			continue
 		var id := str(entry.get("id", ""))
-		pick[slot] = {
+		var row := {
 			"id": id,
 			"name": str(entry.get("display_name", id)),
 			"missing": playable and not _has_flower(id),
 		}
+		var slot: int = slot_of[clampi(int(entry.get("rarity", 1)), 1, 3)]
+		if (pick[slot] as Dictionary).is_empty():
+			pick[slot] = row
+		else:
+			rest.append(row)
+	# Sezona bez nekog stepena rijetkosti: prazno mjesto u prvom redu popuni
+	# sljedeci cvijet, da potpisni ostane u sredini.
+	for i in pick.size():
+		if (pick[i] as Dictionary).is_empty() and not rest.is_empty():
+			pick[i] = rest.pop_front()
 	var out: Array = []
 	for p in pick:
 		if not (p as Dictionary).is_empty():
 			out.append(p)
+	out.append_array(rest)
 	return out
 
 
@@ -824,6 +834,9 @@ func _unlock(season_id: String) -> void:
 	_known_playable[season_id] = true
 	_refresh_top_bar()
 	_refresh_view()
+	# Veo se dize disk po disk — jedini trenutak kad se cvijece sezone pokaze.
+	if season_card and season_card.content and str(viewed_id()) == season_id:
+		season_card.content.play_reveal()
 	_notify_host("refresh_play_chip")
 	_show_toast("Unlocked")
 

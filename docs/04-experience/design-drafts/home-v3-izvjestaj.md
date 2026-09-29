@@ -8,7 +8,7 @@ povezano:
   - home-field-v2-izvjestaj
   - home-season-select-izvjestaj
   - changelog
-ai_sažetak: "Izvještaj o prenosu design_handoff_home_v3 (runda 2) u Godot 2026-09-28: biranje sezone u dva taba, jedna kartica koja je minijatura livade, Play u tri koraka, i prelaz kartica → livada u kojem su ime, Pip i Play po jedan objekat — testiran kadar po kadar uz dizajn."
+ai_sažetak: "Izvještaj o prenosu design_handoff_home_v3 u Godot: runda 2 (2026-09-28) — biranje sezone u dva taba, kartica kao minijatura livade, Play u tri koraka i prelaz u kojem su ime, Pip i Play po jedan objekat; runda 3 (2026-09-29) — svih šest cvjetova na kartici i zaključana sezona pod velom s jednim katancem."
 ---
 
 # Home v3 — izvještaj o prenosu
@@ -31,7 +31,7 @@ Home ima novo biranje sezone i nov prelaz u polje, 1:1 po paketu `design_handoff
 |---|---|
 | **Tabovi** | Staza 1032 × 124 (rgba .10, radius 62). Izabrani tab je krem (Free) ili zlatni (Premium), s rubom 3 i sjenkom 0 6 0. Ikone sjemena i dijamanta 56, tekst 46/900. |
 | **Kartica** | 1032 × 1160 na (24, 172), radius 48, rub 4 i sjenka 0 12 0. Trake su nebo / daljina / prednji plan, na `round(h·.32)` i `round(h·.68)`: iste funkcije boja kao livada (`UiHomeField.meadow_sky/near`, zaokruženo na 8 bita). |
-| **Cvijeće** | Tri diska 260 · 330 · 260 (gap 36, bočni spušteni 70): ★1 lijevo, ★3 u sredini, ★2 desno. Cvijet koji igrač još nema je silueta (crno .28) u isprekidanom disku, s imenom ispod. |
+| **Cvijeće** | Od runde 3 svih šest u dva reda po tri (vidi [[#Runda 3 (2026-09-29)|§ Runda 3]]). ~~Tri diska 260 · 330 · 260 (gap 36, bočni spušteni 70): ★1 lijevo, ★3 u sredini, ★2 desno.~~ Cvijet koji igrač još nema je silueta (crno .28) u isprekidanom disku, s imenom ispod. |
 | **Status** | `active`: Pip na kartici. `open`: krem kapija 150 s peach lukom, bez teksta. `locked`: dva čipa (coin x / 500, ★3 prethodne x / 20), mint kad je uslov ispunjen. `unlock`: zlatno „Unlock · 500". `buy`: zlatna cijena s draguljem. `owned`: mint „Yours". `soon`: isprekidano „Coming soon". Lokot 96 gore desno za locked / unlock / buy, a na premium tabu zlatni unutrašnji rub. |
 | **Strelice i tačke** | Krugovi 120 na (52, 852) i (908, 852). Tačke su na y 1352 (24 / 64 × 24, gap 22). |
 | **Play** | Peach pilula, rub 4, sjenka 0 10 0 α .30, ▶ + „Play" 76/900. U modu „Back" to je disk 104 (boja livade aktivne sezone + njen ★3 cvijet) + ‹ + „Back" 66. |
@@ -82,7 +82,7 @@ Pip hoda tek kad je prelaz gotov. Prsten oko prazne korpe (jedini loop) kreće t
 ## Odstupanja od paketa (namjerna)
 
 - **Klik kroz `OpenTransition`:** vidi „Kako je provjereno". U igri kontejner ne prima dodir, pa tabovi rade.
-- **Tri cvijeta na kartici** su pravi roster sezone: ★1 lijevo, ★3 (potpis) u velikom disku, ★2 desno. U mocku su placeholderi. „Fali" znači da cvijet nikad nije ubran (nema ga u `discovered_blooms`, u albumu ni u zalihi).
+- **Cvijeće na kartici** je pravi roster sezone, ne placeholderi iz mocka. „Fali" znači da cvijet nikad nije ubran (nema ga u `discovered_blooms`, u albumu ni u zalihi). Od runde 3 ih je šest.
 - **Sezone bez SVG crteža** (sve osim Country Blooma) crtaju isti proceduralni cvijet kao livada, pa kartica i polje ostaju isti.
 - **Duga imena cvijeća** (npr. „Paper Lantern Bloom") prelamaju se u dva uravnotežena reda do 300 px, da ne pređu na susjedni disk.
 - **Daleke free sezone** (iza sljedeće) pokazuju iste čipove uslova kao sljedeća. Mock je crtao samo sljedeću.
@@ -113,3 +113,46 @@ Pip hoda tek kad je prelaz gotov. Prsten oko prazne korpe (jedini loop) kreće t
 - **Tokeni sezona:** dock je nestao s Homea. Ako trebaju negdje drugo (polje ili run), to je novi zadatak.
 - **Crteži cvijeća** za sezone osim Country Blooma još ne postoje. Kartica i livada do tada koriste proceduralni cvijet.
 - **Cijena premium sezona** dolazi iz `IAPManager` (lokalna valuta). $4.99 u mocku je placeholder.
+
+## Runda 3 (2026-09-29)
+
+Paket `design_handoff_home_v3/` je stigao ponovo, s dvije korekcije na kartici. Sve ostalo iz runde 2 je nedirnuto.
+
+### Šta se promijenilo
+
+- **Svih šest cvjetova sezone je na kartici**, u dva reda po tri. Gornji red je trojka iz runde 2 — prvi ★1 lijevo (180), potpisni ★3 u sredini (220, spušteni bočni 26), prvi ★2 desno (180). Donji red (180, vrh 552) nosi ostala tri. Razmak 48, sve centrirano u 1032.
+- **Zaključana besplatna sezona je pod velom.** Preko svakog diska ide ravna siva ploha `#E3D9CC` (ista kao zaključana korpa na polju), crtež se ne crta, i nijedan cvijet se ne prepoznaje. Na sredini bloka stoji **jedan** katanac 120.
+- **Tap na „Unlock" diže veo disk po disk** — 300 ms po disku, sljedeći kreće 40 ms kasnije. To je jedini trenutak kad se cvijeće te sezone prvi put vidi.
+- **Lokot gore desno (`LOCK_BADGE` 96) je ukinut.** Kartica nikad ne nosi dva katanca: u stanju „unlock" katanac je na zlatnom dugmetu, u „locked" na bloku cvijeća.
+- **Premium je namjerno drugačiji** — bez vela i bez katanca. Premium se kupuje, pa kartica pokazuje šta se kupuje: šest cvjetova u boji, a zlatni rub i cijena kažu „nije tvoje". Katanac znači „otključava se igrom", zlato „kupuje se". Ember Fen („coming soon") ostaje na 50 %.
+- **Zaključano stanje potpuno zamjenjuje „missing".** Na zaključanoj kartici nema isprekidanih diskova ni imena cvijeća — to se crta samo na sezoni koja se može igrati. (Ovo je bila prva od dvije zamke koje je brief tražio da CD razriješi.)
+
+### Mjere
+
+| Token | Vrijednost |
+|---|---|
+| `ROSTER6` | `(178, 256, 180)` · `(406, 230, 220)` · `(674, 256, 180)` · `(198, 552, 180)` · `(426, 552, 180)` · `(654, 552, 180)` — px kartice |
+| `ROSTER_EYE` / `ROSTER_DISC` | 220 / 180 |
+| `ROSTER_GAP` / `ROSTER_SIDE_DROP` / `ROSTER_ROW2_TOP` | 48 / 26 / 552 |
+| `LOCK_VEIL` | `#E3D9CC` |
+| `ROSTER_LOCK` | `Rect2(456, 436, 120, 120)`, ikona 60, krem s rubom 4 i sjenkom 0 6 0 α .24 |
+| `REVEAL_SEC` / `REVEAL_STAGGER` | 0,30 s / 0,04 s po disku |
+
+Blok cvijeća ide od 230 do 732, imena do 826 — status red počinje na 830, a strelice su na y 680–800 uz same ivice (x ≤ 148 i ≥ 884), pa se ništa ne dodiruje. Kartica je i dalje tačno 1032 × 1160.
+
+### Kako je izvedeno
+
+Veo i katanac se crtaju u zasebnom čvoru `RosterVeil`, koji je **zadnje dijete** sadržaja kartice. Djeca se u Godotu crtaju poslije roditelja, pa bi veo nacrtan u `_draw()` samog sadržaja ostao **ispod** crteža cvijeća — ovako je zaista preko njih. Disk pod velom ostaje običan krem; isprekidani disk i ime pojave se tek kad veo padne, isto kao u mocku (`miss = playable && veil === 0`).
+
+### Testovi
+
+`season_home_smoke` je dopunjen za rundu 3:
+
+- šest diskova, svaki tačno na mjeri iz `ROSTER6`;
+- zaključana sezona: veo na svih šest, nijedan crtež, tačno jedan katanac;
+- igriva sezona: šest crteža, bez vela i bez katanca;
+- nijedan disk i nijedan red imena ne ulazi u strelice ni u status red (mjereno nad stvarnim okvirima teksta, ne nad procjenom);
+- premium na prodaju i „coming soon": šest cvjetova, bez vela i katanca;
+- „Unlock": veo se diže **redom** (prvi disk prije zadnjeg), a poslije 0,5 s nema vela i vidi se svih šest.
+
+Pun skup: **56/56**.

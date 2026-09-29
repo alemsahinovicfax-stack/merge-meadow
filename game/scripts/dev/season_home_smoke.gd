@@ -6,6 +6,9 @@ extends SceneTree
 ## zakljucan dok traje prelaz, ime / Pip / Play su po JEDAN objekat i vidljivi u
 ## svakom kadru, trake kartice = trake livade (predaja bez šava), Pip se vraca sa
 ## stopala gdje je odsetao, i na biranju nema loopa.
+## Runda 3: kartica nosi svih sest cvjetova (dva reda po tri), zakljucana
+## besplatna sezona ih drzi pod velom uz jedan katanac, a tap na Unlock ih
+## otkriva disk po disk.
 
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
 const TOL := 1.5
@@ -58,6 +61,28 @@ func _settle(stage: Node) -> void:
 func _rect_is(r: Rect2, expected: Rect2) -> bool:
 	return r.position.distance_to(expected.position) <= TOL \
 		and absf(r.size.x - expected.size.x) <= TOL and absf(r.size.y - expected.size.y) <= TOL
+
+
+## Crtezi cvijeca koji se zaista crtaju (skriveni su pod punim velom).
+func _arts_drawn(content: Object) -> int:
+	var count := 0
+	for child in (content as Node).get_children():
+		if str(child.name).begins_with("RosterArt_") and (child as CanvasItem).visible:
+			count += 1
+	return count
+
+
+func _veiled(content: Object) -> int:
+	var count := 0
+	for a in content.call("veil_alphas") as PackedFloat32Array:
+		if a > 0.001:
+			count += 1
+	return count
+
+
+## Iz px kartice u px stranice (kartica pocinje na CARD_RECT.position).
+func _on_page(card_local: Rect2) -> Rect2:
+	return Rect2(card_local.position + (V.CARD_RECT as Rect2).position, card_local.size)
 
 
 func _page_rect(c: Control) -> Rect2:
@@ -216,8 +241,18 @@ func _run() -> void:
 	if str(stage.call("card_status")) != "locked" or pip.visible:
 		_fail("Amber: locked (chips), no Pip"); return
 	var content: Object = stage.call("get_card_content")
-	if (content.call("chip_rects") as Array).size() != 2 or not bool(content.call("has_lock_badge")):
-		_fail("locked card: two need chips + lock badge"); return
+	if (content.call("chip_rects") as Array).size() != 2 or not bool(content.call("has_roster_lock")):
+		_fail("locked card: two need chips + one lock over the flowers"); return
+	# Runda 3, R1: sest diskova, tacno na mjerama iz ROSTER6.
+	var discs: Array = content.call("disc_rects")
+	if discs.size() != 6:
+		_fail("card should carry all six flowers, got %d" % discs.size()); return
+	for i in 6:
+		if not _rect_is(discs[i], V.ROSTER6[i]):
+			_fail("disc %d expected %s got %s" % [i, V.ROSTER6[i], discs[i]]); return
+	# Runda 3, R2: veo na svih sest, nijedan crtez, tacno jedan katanac.
+	if _veiled(content) != 6 or _arts_drawn(content) != 0:
+		_fail("locked season: the veil must hide every flower"); return
 	if str(content.call("coin_text")) != "320 / 500" or str(content.call("star_text")) != "14 / 20":
 		_fail("need chips expected 320 / 500 and 14 / 20 got %s / %s" % [str(content.call("coin_text")), str(content.call("star_text"))]); return
 	if str(home.call("home_play_action")) != "focus" or str(play.get("mode")) != "back":
@@ -243,6 +278,25 @@ func _run() -> void:
 	if str(stage.call("viewed_id")) != "lantern_meadow" or bool(gs.get("home_season_field_open")):
 		_fail("Back should return to Lantern without opening"); return
 
+	# --- 3b. runda 3: sest cvjetova stane izmedju strelica i status reda ---
+	if str(stage.call("card_status")) != "active":
+		_fail("should be on the playing season"); return
+	if _veiled(content) != 0 or _arts_drawn(content) != 6:
+		_fail("playable season: six flowers, no veil"); return
+	if bool(content.call("has_roster_lock")):
+		_fail("playable season: no lock"); return
+	var boxes: Array = content.call("missing_name_boxes")
+	if boxes.is_empty():
+		_fail("nothing kept yet: every flower should carry its name"); return
+	var drawn: Array = (content.call("disc_rects") as Array).duplicate()
+	drawn.append_array(boxes)
+	for r: Rect2 in drawn:
+		if r.end.y > V.STATUS_TOP:
+			_fail("flower block reaches %.0f, status row starts at %.0f" % [r.end.y, V.STATUS_TOP]); return
+		for arrow: Rect2 in [V.PREV_RECT, V.NEXT_RECT]:
+			if _on_page(r).intersects(arrow):
+				_fail("flower block %s runs into the arrow %s" % [_on_page(r), arrow]); return
+
 	# --- 4. swipe po kartici lista; kratak drag se vrati (runda 1, I2) ---
 	await _drag(Vector2(800, 900), Vector2(600, 900))
 	await _settle(stage)
@@ -266,10 +320,16 @@ func _run() -> void:
 		_fail("Premium tab should open on Moonlit Warren"); return
 	if str(stage.call("card_status")) != "buy" or (content.call("part_rect", PART_BUY) as Rect2).size.y < 139.0:
 		_fail("Moonlit: price button"); return
+	# Runda 3: premium se kupuje, pa pokazuje sta se kupuje — sest cvjetova u
+	# boji, bez vela i bez katanca (zlato kaze „nije tvoje").
+	if _veiled(content) != 0 or _arts_drawn(content) != 6 or bool(content.call("has_roster_lock")):
+		_fail("premium on sale: six flowers in colour, no veil, no lock"); return
 	stage.call("show_season", "ember_fen", false)
 	await _frames(2)
 	if str(stage.call("card_status")) != "soon":
 		_fail("Ember Fen: coming soon"); return
+	if _veiled(content) != 0 or _arts_drawn(content) != 6 or not bool(content.call("is_dim")):
+		_fail("coming soon: six flowers at 50 %, no veil"); return
 	await _click(V.TABS_RECT.position + Vector2(8 + 254, 62))
 	await _settle(stage)
 	if str(stage.call("current_tab")) != "free" or str(stage.call("viewed_id")) != "lantern_meadow":
@@ -388,12 +448,24 @@ func _run() -> void:
 	await _frames(2)
 	if str(stage.call("card_status")) != "unlock":
 		_fail("Amber with 500 + 20: Unlock button"); return
+	if _veiled(content) != 6 or bool(content.call("has_roster_lock")):
+		_fail("unlock state: veil on all six, lock only on the Unlock button"); return
 	stage.call("press_part", PART_UNLOCK)
 	await _frames(2)
 	if not bool(gs.call("is_season_playable", "amber_canopy")) or str(stage.call("card_status")) != "active":
 		_fail("Unlock should make Amber the playing season"); return
 	if str(stage.call("get_toast_text")) != "Unlocked" or not pip.visible:
 		_fail("Unlock: toast + Pip on the card"); return
+	# Runda 3, R2: veo se dize disk po disk — prvi disk ide prije zadnjeg.
+	if not bool(content.call("is_revealing")):
+		_fail("Unlock should lift the veil disc by disc"); return
+	await _wait(0.12)
+	var mid: PackedFloat32Array = content.call("veil_alphas")
+	if mid[0] >= mid[5] or mid[0] >= 0.999:
+		_fail("reveal should start at the first disc, got %s" % str(mid)); return
+	await _wait(V.REVEAL_SEC + 6.0 * V.REVEAL_STAGGER + 0.2)
+	if bool(content.call("is_revealing")) or _veiled(content) != 0 or _arts_drawn(content) != 6:
+		_fail("after the reveal all six flowers are visible"); return
 
 	# --- 12. pravi tween (realno vrijeme): invarijante u SVAKOM frameu ---
 	stage.call("show_season", str(gs.get("active_season_id")), false)
