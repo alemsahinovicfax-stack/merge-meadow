@@ -26,6 +26,9 @@ const ROWS_PER_FRAME := 6
 @onready var golden_edge: Panel = %GoldenFrameEdge
 @onready var golden_band: Panel = %GoldenFrameGold
 
+## Potpis strukture liste (redoslijed cvjetova + brojaci i lokoti u zaglavljima).
+## Dok se ne promijeni, redovi se NE grade ponovo — samo im se osvjezi sadrzaj.
+var _built_signature: String = ""
 var _pending_entries: Array[Dictionary] = []
 var _slots: Array[Dictionary] = []
 var _build_index: int = 0
@@ -99,7 +102,14 @@ func _begin_visit() -> void:
 	GameState.mark_collection_journal_viewed()
 	_pending_entries = raw
 	_apply_frame()
-	_start_list_build()
+	var sig := _structure_signature(raw)
+	if sig == _built_signature and not _building and _reapply_rows():
+		summary_label.text = UiJournal.summary_text(_pending_entries)
+		call_deferred("_scroll_to_new")
+	else:
+		# _start_list_build() cisti listu (i potpis), pa se potpis upisuje POSLIJE.
+		_start_list_build()
+		_built_signature = sig
 	if is_inside_tree():
 		get_tree().call_group("meta_hub", "refresh_top_bar")
 
@@ -118,6 +128,36 @@ func on_meta_page_left() -> void:
 	for i in built.size():
 		if i < _pending_entries.size():
 			built[i].apply(_pending_entries[i])
+
+
+## Sve od cega ovisi STRUKTURA liste: koji cvjetovi i kojim redom (redovi i grupe),
+## te "N / 6 kept" i lokot u svakom zaglavlju. Napredak unutar reda i "novo" ne
+## ulaze — njih nosi row.apply().
+func _structure_signature(entries: Array[Dictionary]) -> String:
+	var parts := PackedStringArray()
+	for entry in entries:
+		parts.append(str(entry.get("type_id", "")))
+	var counts := _season_counts(entries)
+	for sid in counts:
+		var c: Dictionary = counts[sid]
+		parts.append("%s=%d/%d/%d" % [
+			str(sid),
+			int(c.get("kept", 0)),
+			int(c.get("total", 0)),
+			1 if GameState.is_season_playable(str(sid)) else 0,
+		])
+	return "|".join(parts)
+
+
+## Osvjezi postojece redove umjesto da ih rusimo i gradimo iznova.
+## Vraca false ako lista ne odgovara podacima, pa pozivalac ide na punu gradnju.
+func _reapply_rows() -> bool:
+	var built := _rows()
+	if built.size() != _pending_entries.size():
+		return false
+	for i in built.size():
+		built[i].apply(_pending_entries[i])
+	return true
 
 
 func _rows() -> Array[CollectionJournalRow]:
@@ -246,6 +286,7 @@ func _scroll_to_new() -> void:
 
 
 func _clear_list() -> void:
+	_built_signature = ""
 	if list == null:
 		return
 	for child in list.get_children():

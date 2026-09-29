@@ -179,5 +179,28 @@ func _run() -> void:
 		quit(1)
 		return
 
+	# Ponovni ulazak s istim podacima NE smije rusiti i graditi redove iznova —
+	# to je bilo steckanje pri svakom swipeu na Journal.
+	var before: Array[int] = []
+	for r in _bloom_rows(list):
+		before.append(r.get_instance_id())
+	if journal.has_method("on_meta_page_left"):
+		journal.call("on_meta_page_left")
+	await process_frame
+	if journal.has_method("refresh_for_meta_hub"):
+		journal.call("refresh_for_meta_hub")
+	for _r in 8:
+		await process_frame
+	var after: Array[int] = []
+	for r in _bloom_rows(list):
+		after.append(r.get_instance_id())
+	if before.is_empty() or before != after:
+		push_error(
+			"collection_journal_smoke: revisit rebuilt the list (%d -> %d rows, same ids: %s)"
+			% [before.size(), after.size(), str(before == after)]
+		)
+		quit(1)
+		return
+
 	print("collection_journal_smoke OK")
 	quit(0)
