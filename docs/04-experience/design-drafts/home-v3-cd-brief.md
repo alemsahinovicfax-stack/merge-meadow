@@ -11,12 +11,16 @@ povezano:
   - art-direction
   - pristupacnost
   - CHECKPOINT
-ai_sažetak: "Puni redizajn Homea (dva taba, novo Play, prelaz u polje). Runda 1 imala mrtve strelice i prelaz s rupom; runda 2 (§9–§12) ih je popravila i 2026-09-28 je prenesena u igru 1:1; runda 3 (§13–§14) traži svih šest cvjetova na kartici i zaključanu sezonu pod sivim slojem s katancem."
+ai_sažetak: "Puni redizajn Homea (dva taba, novo Play, prelaz u polje). Runda 1 imala mrtve strelice i prelaz s rupom; runda 2 (§9–§12) ih je popravila i 2026-09-28 je prenesena u igru 1:1; runda 3 (§13–§14) donijela je svih šest cvjetova na kartici i zaključanu sezonu pod velom s jednim katancem, prenesena 2026-09-29; runda 4 (§15–§16) traži da se imena cvijeća prestanu preklapati."
 ---
 
 # Home — puni redizajn — Claude Design brief
 
-> **Status 2026-09-29: runda 3 (korekcije na kartici) čeka CD** — šalji prompt iz [[#14. Prompt za Claude Design — runda 3|§14]]. Traži se svih šest cvjetova na kartici i sivi sloj + katanac na zaključanoj sezoni.
+> **Status 2026-09-29 (kasnije): runda 4 (imena cvijeća) čeka CD** — šalji prompt iz [[#16. Prompt za Claude Design — runda 4|§16]]. Imena se preklapaju na 7 od 8 sezona, najgore 46 px.
+
+> ~~**Status 2026-09-29: runda 3 isporučena i implementirana u igri**~~ — svih šest cvjetova na kartici, zaključana sezona pod velom s jednim katancem. Vidi [[#Implementacija runde 3 (2026-09-29)|§ Implementacija runde 3]] i [[home-v3-izvjestaj|izvještaj]].
+>
+> ~~**Status 2026-09-29: runda 3 (korekcije na kartici) čeka CD.**~~ Prompt je bio §14.
 
 > **Status 2026-09-28 (kasnije): runda 2 isporučena i implementirana u igri** — vidi [[#Implementacija (2026-09-28)|§ Implementacija]] i [[home-v3-izvjestaj|izvještaj]].
 >
@@ -540,6 +544,159 @@ NE RADI: novi raspored ekrana, druge stranice huba, polje sezone, prelaz,
 novi art cvijeća, više varijanti za biranje.
 ```
 
+## 15. Runda 4 — imena cvijeća se preklapaju (2026-09-29)
+
+Runda 3 je u igri i **ostaje**. Šest cvjetova na kartici je tačno ono što smo htjeli. Jedna stvar ne valja: **ime cvijeta ulazi u ime susjednog**, pa se ne može pročitati.
+
+### 15.1 Šta se traži
+
+| # | Zahtjev |
+|---|---|
+| **R1** | **Imena cvijeća na kartici moraju biti čitljiva i ne smiju se dodirivati.** Ni na jednoj sezoni, ni na free ni na premium kartici. Prilagodi dizajn taman toliko da imena stanu — bez dirania kartice, strelica, status reda i ostatka runde 3. |
+
+### 15.2 Zašto se to dešava (izmjereno u igri, 2026-09-29)
+
+Ime se crta **38/900, centrirano ispod svog diska**, i prelama se na najviše 300 px. Ali diskovi su bliži jedan drugom nego što su imena široka:
+
+| | Vrijednost |
+|---|---|
+| Centri diskova, red 1 | x 268 · 516 · 764 → **248 px između centara** |
+| Centri diskova, red 2 | x 288 · 516 · 744 → **228 px između centara** |
+| Najšira imena (38/900) | „Frost Snowdrop" **295**, „Meadow Clover" 285, „Buttercup Lane" 281, „Hoarfrost Rose" 281, „Pearl Waterlily" 281, „Midnight Lotus" 278 |
+
+Ime od 281 px i ime od 267 px centrirana 228 px jedno od drugog preklapaju se **46 px**. To je danas najgori slučaj (Coral Tide, „Tide Anemone" ↔ „Pearl Waterlily").
+
+**Preklapanja: 10, na 7 od 8 sezona.** Samo Ember Fen je čist.
+
+| Sezona | Preklapanja |
+|---|---|
+| Country Bloom | red 2: 15 px |
+| Frost Orchard | red 1: 28 px · red 2: 41 px |
+| Lantern Meadow | red 1: 4 px |
+| Amber Canopy | red 2: 21 px i 11 px |
+| Moonlit Warren | red 2: 16 px i 28 px |
+| Coral Tide | red 2: **46 px** |
+| Starfall Glade | red 2: 24 px |
+| Ember Fen | — |
+
+### 15.3 Koliko prostora zapravo ima (granice za tvoju odluku)
+
+- **Vertikalno nema zaliha.** Ime ispod reda 2 u **dva reda** završava na **826**, a status red počinje na **830** — četiri piksela. **Tri reda nikad ne stanu** (864). Ime ispod srednjeg diska (oko, 220) u dva reda završava na **544**, a red 2 počinje na **552** — osam piksela.
+- **Najduža pojedina riječ** je „Nightshade": **211 px na 38**, 188 na 34, 177 na 32, 166 na 30. Ispod te širine kolona više ne pomaže — riječ se ne da prelomiti.
+- **Donja granica teksta je 34 px** (pravilo iz §2, ne mijenja se bez dogovora). Na 34 nijedno ime ne treba tri reda ni na jednoj razumnoj širini kolone.
+- **Imena se crtaju samo ispod cvijeta koji igrač još nije našao.** Na novoj igri to je svih šest — dakle najgori slučaj je i najčešći.
+- 48 imena ukupno (8 sezona × 6), najduže „Paper Lantern Bloom" (19 znakova).
+
+### 15.4 MORA
+
+- **Nijedno ime ne dodiruje susjedno** ni na jednoj od 8 sezona, kad su svih šest imena prikazana. Ostavi vidljiv razmak, ne nulu.
+- **Ime pripada svom cvijetu** — mora biti očito kojem disku pripada.
+- **Kartica ostaje 1032 × 1160.** Ne diraj tabove, Play, tačke, status red (`STATUS_TOP 830`), strelice (y 680–800 u px kartice, x ≤ 148 i ≥ 884) ni prelaz.
+- **Svih šest cvjetova ostaje vidljivo** u svim stanjima, i veo + katanac na zaključanoj sezoni rade kao u rundi 3.
+- **Tekst ≥ 34 px, kontrast ≥ 4,5 : 1.**
+- Ime ne smije ući u status red ni u strelice, i ne smije pasti preko diska ispod sebe.
+
+### 15.5 SMIJEŠ (tvoja odluka, napiši razlog u § Odlučeno)
+
+- **Veličina i težina imena** (38 → 34, ili druga težina), i širina na kojoj se prelama.
+- **Pomjeranje diskova** unutar zone 230–830: drugi razmak, druge veličine, drugi razmak između redova. `ROSTER6` je tvoj broj.
+- **Gdje ime stoji** — ispod diska, preko dna diska, u pilulici, na dvije linije s drugim proredom. Samo mora ostati očito čije je.
+- **Da li ime uopšte treba svakom cvijetu.** Ako misliš da je šest imena previše za jednu karticu, reci šta stavljaš umjesto toga — ali onda objasni kako igrač sazna ime cvijeta koji mu fali.
+- **Skraćivanje imena nije zabranjeno**, ali ako ideš tim putem reci tačno pravilo (ne „…", nego šta se skraćuje i kako).
+
+### 15.6 Isporuka runde 4
+
+**Ne pravi novi dizajn.** Sve iz rundi 2 i 3 ostaje. Mijenja se samo ono što je potrebno da imena stanu.
+
+Paket: isti `design_handoff_home_v3/`, iste putanje, **cijeli folder u zipu**.
+
+| Fajl | Šta se mijenja |
+|---|---|
+| `design/HomeScreen.dc.html` | imena na svih 8 sezona, u svim stanjima kartice |
+| `design/Home Specs.dc.html` | anatomija imena s mjerama + **sve 8 sezona jedna pored druge sa svih šest imena prikazanih** (to je najgori slučaj) |
+| `godot/home_v3_export.json` | `layout.SeasonRoster` (ako se mijenja) + tokeni imena |
+| `godot/ui_home_v3.gd` | iste vrijednosti kao JSON |
+| `README.md` | nova sekcija **§ Runda 4** — šta je promijenjeno i zašto |
+
+**§ Samoprovjera runde 4** (popuni prije zipa, svaka stavka da/ne, mjereno iz DOM-a na svih 8 sezona sa svih šest imena):
+
+1. Nijedna dva imena se ne dodiruju; najmanji razmak između susjednih imena je ____ px.
+2. Nijedno ime ne ulazi u strelice, u status red, ni preko diska u redu ispod.
+3. Najniža tačka imena je ____, `STATUS_TOP` je 830.
+4. Svih šest cvjetova se i dalje vidi u svih sedam stanja kartice.
+5. Zaključana sezona: veo na svih šest i jedan katanac, kao u rundi 3.
+6. Kartica je i dalje tačno 1032 × 1160; tabovi, Play, tačke, status red i prelaz nisu dirani.
+7. Najmanji tekst na kartici je ____ px (≥ 34).
+
+## 16. Prompt za Claude Design — runda 4
+
+> Kopiraj sve iz bloka ispod u CD, u **isti chat** gdje su rađene runde 1–3 ako postoji. **Prije toga commitaj i pushaj na `master`.**
+
+```
+Ovo je RUNDA 4 za Home v3 — jedna ispravka na kartici sezone.
+
+Runda 3 je u igri i OSTAJE: svih šest cvjetova na kartici, veo i katanac na
+zaključanoj sezoni, sve radi. Ne pravi novi raspored ekrana, ne diraj tabove,
+Play, tačke, status red, strelice ni prelaz u polje.
+
+Pročitaj po ovim tačnim putanjama (repo, master):
+  docs/04-experience/design-drafts/home-v3-cd-brief.md
+    -> §15 (mjerenja, MORA i SMIJEŠ, isporuka)
+  design_handoff_home_v3/design/HomeScreen.dc.html   (tvoj, polazna tačka)
+  design_handoff_home_v3/godot/ui_home_v3.gd         (tokeni u igri)
+
+PROBLEM: imena cvijeća ispod diskova se preklapaju i ne mogu se pročitati.
+
+Mjereno u igri danas. Ime se crta 38/900 centrirano ispod svog diska i
+prelama se na najviše 300 px. Ali centri diskova su bliži nego što su imena
+široka: u redu 1 su 248 px jedan od drugog (x 268, 516, 764), u redu 2 samo
+228 px (x 288, 516, 744). Najšira imena na 38/900: "Frost Snowdrop" 295,
+"Meadow Clover" 285, "Buttercup Lane" 281, "Hoarfrost Rose" 281,
+"Pearl Waterlily" 281, "Midnight Lotus" 278.
+Rezultat: 10 preklapanja na 7 od 8 sezona. Najgore je Coral Tide, red 2,
+"Tide Anemone" i "Pearl Waterlily" — 46 px jedno preko drugog. Samo Ember
+Fen je čist.
+
+KOLIKO PROSTORA IMA (ovo su granice, ne prijedlozi):
+- Vertikalno nema zaliha. Ime ispod reda 2 u DVA reda završava na 826, a
+  status red počinje na 830 — četiri piksela. TRI reda nikad ne stanu (864).
+  Ime ispod srednjeg diska (oko, 220) u dva reda završava na 544, a red 2
+  počinje na 552 — osam piksela.
+- Najduža pojedina riječ je "Nightshade": 211 px na 38, 188 na 34, 177 na 32.
+  Ispod toga uža kolona više ne pomaže, riječ se ne da prelomiti.
+- Donja granica teksta je 34 px (pravilo iz §2). Na 34 nijedno od 48 imena
+  ne treba tri reda.
+- Imena se crtaju SAMO ispod cvijeta koji igrač još nije našao. Na novoj
+  igri to je svih šest — najgori slučaj je i najčešći, pa dizajn mora
+  raditi sa šest imena.
+
+ŠTA SMIJEŠ MIJENJATI (izaberi i obrazloži u README § Odlučeno):
+veličinu i težinu imena i širinu prelamanja; pomjeranje i veličine diskova
+unutar zone 230–830 (ROSTER6 je tvoj broj); gdje ime stoji u odnosu na disk;
+da li svaki cvijet treba ime — ako ga izbacuješ, reci kako igrač sazna ime
+cvijeta koji mu fali. Skraćivanje je dozvoljeno samo uz jasno pravilo.
+
+MORA OSTATI: kartica 1032 x 1160; tabovi, Play 520 x 180, tačke, status red
+(STATUS_TOP 830), strelice (y 680–800 u px kartice, x <= 148 i >= 884) i
+prelaz nepromijenjeni. Svih šest cvjetova vidljivo u svih sedam stanja.
+Veo i katanac zaključane sezone rade kao u rundi 3. Tekst >= 34 px,
+kontrast >= 4,5:1. Ime mora ostati očito vezano za svoj disk.
+
+TEHNIČKI (Godot 4, OpenGL): artboard 1080 x 1920, sve u px te baze. Paneli
+= ravna boja, radius, rub, jedna sjena. Bez blura i gradijenata. Art cvijeća
+crta igra — ne treba novi art.
+
+ISPORUKA (§15.6): isti folder design_handoff_home_v3/, iste putanje, cijeli
+folder u zipu. Mijenjaju se HomeScreen.dc.html, Home Specs.dc.html (anatomija
+imena + SVIH 8 SEZONA jedna pored druge sa svih šest imena prikazanih, jer
+je to najgori slučaj), home_v3_export.json, ui_home_v3.gd i README.md (nova
+sekcija § Runda 4). U README popuni i § Samoprovjera runde 4 — sedam stavki
+iz §15.6, mjereno iz DOM-a, svaka da/ne.
+
+NE RADI: novi raspored ekrana, druge stranice huba, polje sezone, prelaz,
+novi art cvijeća, više varijanti za biranje.
+```
+
 ## Implementacija (2026-09-28)
 
 Paket: `design_handoff_home_v3/` (runda 2). Prije prenosa testiran u browseru: strelice, swipe, zaključan unos, Pip samo na aktivnoj i prelaz bez rupe rade. Ostala je jedna greška mocka: `OpenTransition` bez `pointer-events:none` pokriva tabove. U igri je taj kontejner `MOUSE_FILTER_IGNORE`. Detalji, slike Godot ↔ dizajn i video su u [[home-v3-izvjestaj|izvještaju]] i u `home-v3-test/`.
@@ -555,6 +712,25 @@ Paket: `design_handoff_home_v3/` (runda 2). Prije prenosa testiran u browseru: s
 | `game/scripts/visual/ui_home_field.gd` | `meadow_sky` / `meadow_near` zaokruženo na 8 bita (isti pikseli kao kartica) |
 | obrisano | `home_season_card.gd`, `season_browser.gd`, `home_dock_token.gd`, `home_play_disc.gd`, `season_colors.gd`; v2 mjere i crteži iz `UiStage` (ostali su fontovi, box i oblici), stari tweenovi prelaza iz `UiHomeField` (`tween_open_field`, `tween_chrome_in`, `tween_flowers_settle`) |
 | `game/scripts/dev/season_home_smoke.gd` | **Prepisano za v3** (vidi izvještaj § Testovi), plus `home_capture.gd` (sva stanja + kadrovi prelaza) i `home_movie.gd` (video toka) |
+
+## Implementacija runde 3 (2026-09-29)
+
+Paket je stigao s dvije korekcije i prenesen je isti dan. CD je obje zamke iz §13.3 razriješio i upisao odluke u README paketa.
+
+| Odluka CD-a | Šta znači u igri |
+|---|---|
+| Dva reda po tri, oko (220) u gornjem redu ostaje | `ROSTER6` — šest rectova u px kartice; potpisni cvijet je isti crtež koji nosi disk na „Back" dugmetu |
+| Jedan katanac na bloku, ne šest | `ROSTER_LOCK` 120 na sredini; `LOCK_BADGE` gore desno je obrisan, pa kartica nikad nema dva katanca |
+| Zaključano potpuno zamjenjuje „missing" | na zaključanoj kartici nema isprekidanih diskova ni imena (prva zamka iz §13.3) |
+| Premium bez vela i katanca | zlato kaže „kupuje se", katanac „otključava se igrom"; Ember ostaje na 50 % (druga zamka) |
+| Veo se diže disk po disk na „Unlock" | `play_reveal()` — 300 ms po disku, +40 ms stagger |
+
+| Fajl | Izmjena |
+|------|---------|
+| `game/scripts/visual/ui_home_v3.gd` | `ROSTER6`, `ROSTER_EYE` / `ROSTER_DISC` / `ROSTER_GAP` / `ROSTER_SIDE_DROP` / `ROSTER_ROW2_TOP`, `LOCK_VEIL`, `ROSTER_LOCK`, `REVEAL_SEC` / `REVEAL_STAGGER`; obrisani `ROSTER_DISCS`, `LOCK_BADGE`, `LOCK_ICON` |
+| `game/scripts/ui/home_v3_card_content.gd` | šest diskova iz `ROSTER6`; novi čvor `RosterVeil` (veo + katanac) kao zadnje dijete, da bude iznad crteža; `play_reveal()`; `has_lock_badge()` → `has_roster_lock()`; `is_dim()` samo za „coming soon"; `missing_name_boxes()` za provjeru rasporeda |
+| `game/scripts/ui/season_stage.gd` | `_roster()` vraća svih šest (red 1 = trojka iz runde 2, red 2 = ostatak); `_unlock()` pokreće veo |
+| `game/scripts/dev/season_home_smoke.gd` | provjere runde 3 (vidi izvještaj § Runda 3) |
 
 ## Povezano
 

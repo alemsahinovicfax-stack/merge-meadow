@@ -10,7 +10,7 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
-zadnja_sesija: "Journal optimizovan (nema više pune gradnje liste na svaki ulazak) + brief runda 3 za karticu sezone"
+zadnja_sesija: "Home v3 runda 3 u igri (svih šest cvjetova na kartici, veo + katanac na zaključanoj sezoni, 56/56 smoke) + Journal optimizovan. Playtest našao da se imena cvijeća preklapaju — brief runda 4 spreman za CD."
 zadnje_azurirano: 2026-09-29
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
@@ -353,7 +353,8 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 | ID | Status | Napomena | Link |
 |----|--------|----------|------|
-| HOME-23 | 🔲 brief spreman | Home v3 runda 3 — svih šest cvjetova na kartici (danas tri) i zaključana sezona pod sivim slojem s katancem. Čeka CD paket | [[../04-experience/design-drafts/home-v3-cd-brief\|brief §13–§14]] |
+| HOME-24 | 🔲 brief spreman | Home v3 runda 4 — imena cvijeća se preklapaju (10 preklapanja na 7 od 8 sezona, najgore 46 px). Čeka CD paket | [[../04-experience/design-drafts/home-v3-cd-brief\|brief §15–§16]] |
+| HOME-23 | ✅ | Home v3 runda 3 — kartica nosi svih šest cvjetova (dva reda po tri, `ROSTER6`); zaključana besplatna sezona je pod velom `#E3D9CC` s jednim katancem 120, a „Unlock" ga diže disk po disk (300 ms, +40 ms). `LOCK_BADGE` gore desno ukinut; premium bez vela (kupuje se, ne otključava) | `design_handoff_home_v3/` · [[../04-experience/design-drafts/home-v3-izvjestaj\|izvještaj § Runda 3]] |
 | HOME-22 | ✅ | Home v3 — biranje u dva taba (Free / Premium), kartica 1032 × 1160 = minijatura livade (tri trake), strelice + swipe, tačke samo indikator, Play 520 × 180 u 3 koraka („Back" + disk); prelaz 560 / 440 ms jedan tween: ime, Pip i Play su JEDAN objekat, predaja kartica → livada 0 px razlike; dock tokena i Play 836 obrisani | `design_handoff_home_v3/` · [[../04-experience/design-drafts/home-v3-izvjestaj\|izvještaj]] |
 | HOME-21 | ✅ | Home polje sezone pass 2 — livada je cijela stranica (bila 606 od 1633), chrome pluta: Gift + korpa 180 gore lijevo (isti okvir), nadogradnje gore desno u sheetu, donji red `Seasons 236 · Play 432 · Endless 236`; 13 mjesta u 4 dubine i Pip van keepouta | `design_handoff_home_field_v2/` |
 | CHROME-02 | ✅ | Hub chrome pass 2 — dusk plum `#2A2233` umjesto zelene, footer 144 px bez teksta (dodir 216 × 141), treći chip broji cvijeće umjesto dijamanata; nove ikone coina / sjemena / cvijeta kroz cijelu igru (i pickup u runu); stranica 1597 → 1633 bez promjene kartica | `design_handoff_hub_chrome_v2/` |
