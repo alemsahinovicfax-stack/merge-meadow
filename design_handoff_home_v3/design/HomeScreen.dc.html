@@ -37,7 +37,7 @@
         </div>
       </div>
 
-      <div data-layer="OpenTransition" style="position:absolute;left:0;top:0;width:1080px;height:1633px">
+      <div data-layer="OpenTransition" style="position:absolute;left:0;top:0;width:1080px;height:1633px;pointer-events:none">
         <div data-layer="SeasonCard" onClick="{{ onCard }}" onPointerDown="{{ onCardDown }}" style="{{ cardStyle }}">
           <div data-layer="CardSky" style="{{ skyStyle }}"></div>
           <div data-layer="CardGround" style="{{ groundStyle }}"></div>
@@ -46,18 +46,18 @@
             <sc-if value="{{ premium }}" hint-placeholder-val="{{ false }}">
               <div data-layer="PremiumRim" style="position:absolute;left:14px;top:14px;right:14px;bottom:14px;border-radius:36px;border:8px solid #FFD56B;pointer-events:none"></div>
             </sc-if>
-            <sc-if value="{{ lockBadge }}" hint-placeholder-val="{{ false }}">
-              <div data-layer="LockBadge" style="position:absolute;right:40px;top:40px;width:96px;height:96px;box-sizing:border-box;border-radius:48px;background:#FFF8F0;border:4px solid #2D3436;display:grid;place-items:center"><img src="icons/icon_lock.svg" alt="" style="width:48px;height:48px"></div>
-            </sc-if>
-            <div data-layer="SeasonRoster" style="position:absolute;left:0;right:0;top:230px;display:flex;justify-content:center;align-items:flex-start;gap:36px">
-              <sc-for list="{{ roster }}" as="f" hint-placeholder-count="3">
+            <div data-layer="SeasonRoster" style="position:absolute;left:0;top:0;width:1032px;height:1160px">
+              <sc-for list="{{ roster }}" as="f" hint-placeholder-count="6">
                 <div data-layer="RosterFlower" style="{{ f.wrap }}">
-                  <div style="{{ f.disc }}"><img src="{{ f.src }}" alt="" style="{{ f.art }}"></div>
+                  <div style="{{ f.disc }}"><img src="{{ f.src }}" alt="" style="{{ f.art }}"><div data-layer="LockVeil" style="{{ f.veil }}"></div></div>
                   <sc-if value="{{ f.missing }}" hint-placeholder-val="{{ false }}">
                     <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#1A1A14;white-space:nowrap">{{ f.name }}</div>
                   </sc-if>
                 </div>
               </sc-for>
+              <sc-if value="{{ blockLock }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="RosterLock" style="position:absolute;left:456px;top:436px;width:120px;height:120px;box-sizing:border-box;border-radius:60px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center"><img src="icons/icon_lock.svg" alt="" style="width:60px;height:60px"></div>
+              </sc-if>
             </div>
             <div data-layer="CardStatus" style="position:absolute;left:0;right:0;top:830px;height:280px;display:flex;align-items:center;justify-content:center">
               <sc-if value="{{ stOpen }}" hint-placeholder-val="{{ false }}">
@@ -99,11 +99,11 @@
         </div>
 
         <sc-if value="{{ fieldMounted }}" hint-placeholder-val="{{ false }}">
-          <div data-layer="FieldClip" style="{{ clipStyle }}">
-            <div data-layer="FieldLayer" style="{{ fieldInnerStyle }}">
-              <dc-import name="FieldScreen" season="{{ activeKey }}" scene="{{ fieldScene }}" u="{{ u }}" page-only="{{ true }}" embedded="{{ true }}" no-bands="{{ noBands }}" on-seasons="{{ onSeasons }}" style="width:1080px;height:1633px" hint-size="1080px,1633px"></dc-import>
-            </div>
+        <div data-layer="FieldClip" style="{{ clipStyle }}">
+          <div data-layer="FieldLayer" style="{{ fieldInnerStyle }}">
+            <dc-import name="FieldScreen" season="{{ activeKey }}" scene="{{ fieldScene }}" u="{{ u }}" page-only="{{ true }}" embedded="{{ true }}" no-bands="{{ noBands }}" on-seasons="{{ onSeasons }}" style="width:1080px;height:1633px" hint-size="1080px,1633px"></dc-import>
           </div>
+        </div>
         </sc-if>
 
         <div data-layer="CardEdge" style="{{ edgeStyle }}"></div>
@@ -181,6 +181,22 @@ const FREE = ['country_bloom', 'frost_orchard', 'lantern_meadow', 'amber_canopy'
 const PREM = ['moonlit_warren', 'coral_tide', 'starfall_glade', 'ember_fen'];
 const PRICE = { moonlit_warren: '$4.99', coral_tide: '$4.99', starfall_glade: '$4.99', ember_fen: null };
 const MISSING = { lantern_meadow: ['daisy'] };
+// Round 3: all six flowers. Row 1 = the round-2 trio (signature flower = eye in the middle), row 2 = the other three.
+const SIX = {
+  country_bloom: ['clover', 'daisy', 'buttercup', 'tulip', 'sunflower', 'pumpkin'],
+  frost_orchard: ['frost_snowdrop', 'silver_aconite', 'clover', 'daisy', 'tulip', 'sunflower'],
+  lantern_meadow: ['clover', 'buttercup', 'daisy', 'tulip', 'silver_aconite', 'sunflower'],
+  amber_canopy: ['tulip', 'sunflower', 'pumpkin', 'clover', 'daisy', 'buttercup'],
+  moonlit_warren: ['silver_aconite', 'frost_snowdrop', 'tulip', 'clover', 'daisy', 'sunflower'],
+  coral_tide: ['daisy', 'tulip', 'buttercup', 'clover', 'sunflower', 'pumpkin'],
+  starfall_glade: ['silver_aconite', 'daisy', 'sunflower', 'clover', 'tulip', 'frost_snowdrop'],
+  ember_fen: ['buttercup', 'pumpkin', 'tulip', 'clover', 'silver_aconite', 'daisy']
+};
+// card px: [centre x, top, disc]. Eye 220, others 180, gap 48, row-1 sides drop 26, row 2 at 552.
+// Row 2 spans x 198–834, clear of the arrows (x ≤ 148 / ≥ 884); names end ≤ 826 < STATUS_TOP 830.
+const ROSTER6 = [[268, 256, 180], [516, 230, 220], [764, 256, 180], [288, 552, 180], [516, 552, 180], [744, 552, 180]];
+const VEIL = '#E3D9CC'; // = locked-basket grey on the field
+const REVEAL = { MS: 300, STAGGER: 40 };
 const SCENES = {
   free_active: { label: '1 · Free · season you play', tab: 'free', idx: 2, coins: 320, stars: 14 },
   free_open: { label: '1b · Free · unlocked, not playing', tab: 'free', idx: 1, coins: 320, stars: 14 },
@@ -195,7 +211,7 @@ const T = { OPEN_MS: 560, CLOSE_MS: 440, SWAP_MS: 220, SNAP_MS: 180, SWIPE_MIN: 
 const CARD = [24, 172, 1032, 1160], PAGE = [0, 0, 1080, 1633];
 const BANDS = [0.32, 0.68];
 const CARD_R = 48, CARD_B = 4, CARD_SH = 12;
-const NAME0 = { top: 244, size: 80, ls: -0.015 }, NAME1 = { top: 36, size: 56, ls: -0.01 };
+const NAME0 = { top: 244, size: 80, ls: -0.015, cx: 540 }, NAME1 = { top: 36, size: 56, ls: -0.01, cx: 540 };
 const PIP0 = { x: 425, y: 1027, s: 230, shL: 45, shB: 8, shW: 140, shH: 30 };
 const PIP1 = { s: 190, shL: 35, shB: 6, shW: 120, shH: 26 };
 const PIP_HOME = [756, 1404], PIP_ZONE = [151, 1306, 778, 131], PIP_WALKED = [300, 1330];
@@ -216,10 +232,11 @@ class Component extends DCLogic {
     return { tab, idx: tab === sc.tab ? sc.idx : (tab === 'free' ? 2 : 0), coins: sc.coins, stars: sc.stars, active: 'lantern_meadow', unlocked: ['country_bloom', 'frost_orchard', 'lantern_meadow'], owned: ['coral_tide'], u: 0, moving: false, swap: 1, dir: 0, dragX: 0, toast: '', feet: PIP_HOME, from: null };
   }
   _alive = true;
-  componentDidMount() { this._alive = true; }
+  // warm: mount the (hidden) field shortly after load so the first open frame has the meadow; Specs thumbnails pass warm=false.
+  componentDidMount() { this._alive = true; if (this.props.warm !== false) this._warm = setTimeout(() => this._alive && this.setState({ warm: true }), 300); }
   componentDidUpdate(pp) { if (pp.scene !== this.props.scene || pp.tab !== this.props.tab) { this.stopAll(); this.setState(this.fromScene()); } }
   componentWillUnmount() { this._alive = false; this.stopAll(); this.detach(); }
-  stopAll() { clearTimeout(this._raf); clearTimeout(this._sraf); clearTimeout(this._draf); this.stopWalk(); clearTimeout(this._tt); }
+  stopAll() { clearTimeout(this._raf); clearTimeout(this._sraf); clearTimeout(this._draf); clearTimeout(this._rvraf); this.stopWalk(); clearTimeout(this._tt); }
   frozen() { return this.props.openT != null || this.props.closeT != null; }
   busy() { const s = this.state; return this.frozen() || s.moving || s.swap < 1 || !!this._drag; }
   // setTimeout ticks (not rAF) so the mock also runs in hidden / background previews.
@@ -329,7 +346,7 @@ class Component extends DCLogic {
     const isNext = !premium && !playable && prevKey && s.unlocked.includes(prevKey);
     const ready = isNext && s.coins >= 500 && s.stars >= 20;
     const status = isActive ? 'active' : playable ? (premium ? 'owned' : 'open') : premium ? (PRICE[key] ? 'buy' : 'soon') : ready ? 'unlock' : 'locked';
-    const dim = status === 'locked' || status === 'soon';
+    const dim = status === 'soon';
 
     const sw = ease(s.swap);
     const ox = idle ? s.dir * T.SWAP_OFFSET * (1 - sw) + s.dragX : 0;
@@ -340,14 +357,18 @@ class Component extends DCLogic {
     const selOut = win(u, T.SELECT_OUT[0], T.SELECT_OUT[1]);
     const contentA = 1 - win(u, T.CONTENT_OUT[0], T.CONTENT_OUT[1]);
 
-    const roster = se.r.map((f, i) => {
-      const big = i === 1, d = big ? 330 : 260;
-      const miss = playable && (MISSING[key] || []).includes(f);
+    const veiled = status === 'locked' || status === 'unlock';
+    const rv = s.reveal && s.reveal.key === key ? s.reveal.t : null;
+    const roster = SIX[key].map((f, i) => {
+      const [cx, top, d] = ROSTER6[i];
+      const veil = veiled ? 1 : rv != null ? 1 - clamp((rv - i * REVEAL.STAGGER) / REVEAL.MS) : 0;
+      const miss = playable && veil <= 0 && (MISSING[key] || []).includes(f);
       return {
-        wrap: 'display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:' + (big ? 0 : 70) + 'px',
-        disc: 'width:' + d + 'px;height:' + d + 'px;box-sizing:border-box;border-radius:50%;background:' + (miss ? 'rgba(255,248,240,.55)' : '#FFF8F0') + ';border:4px ' + (miss ? 'dashed' : 'solid') + ' ' + INK + ';display:grid;place-items:center;overflow:hidden',
+        wrap: 'position:absolute;left:' + (cx - d / 2) + 'px;top:' + top + 'px;width:' + d + 'px;display:flex;flex-direction:column;align-items:center;gap:18px',
+        disc: 'position:relative;width:' + d + 'px;height:' + d + 'px;flex:0 0 auto;box-sizing:border-box;border-radius:50%;background:' + (miss ? 'rgba(255,248,240,.55)' : '#FFF8F0') + ';border:4px ' + (miss ? 'dashed' : 'solid') + ' ' + INK + ';display:grid;place-items:center;overflow:hidden',
         src: 'flowers/ph_' + f + '.svg',
-        art: 'width:' + Math.round(d * .82) + 'px;height:' + Math.round(d * .82) + 'px;display:block;' + (miss ? 'filter:brightness(0);opacity:.28' : dim ? 'opacity:.5' : ''),
+        art: 'width:' + Math.round(d * .82) + 'px;height:' + Math.round(d * .82) + 'px;display:' + (veil >= 1 ? 'none' : 'block') + ';' + (miss ? 'filter:brightness(0);opacity:.28' : dim ? 'opacity:.5' : ''),
+        veil: 'position:absolute;left:0;top:0;right:0;bottom:0;background:' + VEIL + ';' + (veil > 0 ? 'opacity:' + veil.toFixed(3) : 'display:none'),
         missing: miss, name: NAMES[f]
       };
     });
@@ -377,13 +398,14 @@ class Component extends DCLogic {
       premTabStyle: tabBase + (premium ? 'background:#FFD56B;' + on : 'background:transparent;border:3px solid transparent'),
       onFree: guard(() => premium && this.swapTo('free', at === 'free' ? activeIdx : 0)),
       onPremium: guard(() => !premium && this.swapTo('premium', at === 'premium' ? activeIdx : 0)),
-      cardStyle: rect([cr[0] + ox, cr[1], cr[2], cr[3]]) + 'box-sizing:border-box;overflow:hidden;border-radius:' + f2(rad) + 'px;box-shadow:0 ' + f2(sh) + 'px 0 rgba(26,26,20,.26);cursor:' + (playable ? 'pointer' : 'default') + ';touch-action:pan-y;user-select:none;opacity:' + swapA.toFixed(3) + ';' + (inField ? 'display:none' : ''),
+      cardStyle: rect([cr[0] + ox, cr[1], cr[2], cr[3]]) + 'box-sizing:border-box;overflow:hidden;border-radius:' + f2(rad) + 'px;box-shadow:0 ' + f2(sh) + 'px 0 rgba(26,26,20,.26);pointer-events:auto;cursor:' + (playable ? 'pointer' : 'default') + ';touch-action:pan-y;user-select:none;opacity:' + swapA.toFixed(3) + ';' + (inField ? 'display:none' : ''),
       skyStyle: 'position:absolute;left:0;top:0;right:0;height:' + b1 + 'px;background:' + tn.sky,
       groundStyle: 'position:absolute;left:0;top:' + b1 + 'px;right:0;height:' + (b2 - b1) + 'px;background:' + tn.ground,
       nearStyle: 'position:absolute;left:0;top:' + b2 + 'px;right:0;bottom:0;background:' + tn.near,
       contentStyle: 'position:absolute;left:50%;top:0;width:1032px;height:1160px;margin-left:-516px;opacity:' + contentA.toFixed(3) + ';' + (contentA <= 0 ? 'visibility:hidden' : ''),
       premium,
-      lockBadge: status === 'locked' || status === 'unlock' || status === 'buy',
+      // one lock per card: on the flower block when locked; in the unlock state the Unlock button carries it
+      blockLock: status === 'locked',
       roster,
       stOpen: status === 'open', stLocked: status === 'locked', stUnlock: status === 'unlock', stBuy: status === 'buy', stOwned: status === 'owned', stSoon: status === 'soon',
       needCoinStyle: need(s.coins >= 500), needStarStyle: need(s.stars >= 20),
@@ -393,10 +415,15 @@ class Component extends DCLogic {
       onCardDown: ev => this.cardDown(ev),
       onCard: () => { if (this._suppress) { this._suppress = false; return; } if (this.busy() || !idle) return; if (playable) this.open(key); },
       onGate: guard(() => this.open(key)),
-      onUnlock: guard(() => { this.setState({ unlocked: s.unlocked.concat(key), coins: s.coins - 500 }); this.toast('Unlocked'); }),
+      onUnlock: guard(() => {
+        const total = REVEAL.MS + 5 * REVEAL.STAGGER;
+        this.setState({ unlocked: s.unlocked.concat(key), coins: s.coins - 500, reveal: { key, t: 0 } });
+        this.run('_rvraf', total, k => this.setState({ reveal: { key, t: k * total } }), () => this.setState({ reveal: null }));
+        this.toast('Unlocked');
+      }),
       onBuy: guard(() => { this.setState({ owned: s.owned.concat(key) }); this.toast('Store sheet'); }),
-      fieldMounted: u > 0,
-      clipStyle: rect(cr) + 'overflow:hidden;border-radius:' + f2(rad) + 'px;' + (inField ? '' : 'pointer-events:none'),
+      fieldMounted: u > 0 || !!s.warm,
+      clipStyle: rect(cr) + 'overflow:hidden;border-radius:' + f2(rad) + 'px;pointer-events:' + (inField ? 'auto' : 'none') + (u > 0 ? '' : ';visibility:hidden'),
       fieldInnerStyle: 'position:absolute;left:' + f2(-cr[0]) + 'px;top:' + f2(-cr[1]) + 'px;width:1080px;height:1633px',
       activeKey: s.active,
       fieldScene: p.fieldScene || 'gift',
@@ -405,13 +432,13 @@ class Component extends DCLogic {
       onSeasons: () => this.close(),
       edgeStyle: rect([cr[0] + ox, cr[1], cr[2], cr[3]]) + 'box-sizing:border-box;border-radius:' + f2(rad) + 'px;border:' + f2(bw) + 'px solid ' + INK + ';pointer-events:none;opacity:' + swapA.toFixed(3) + ';' + (inField ? 'display:none' : ''),
       seasonName: u > 0 ? act.n : se.n,
-      nameStyle: 'position:absolute;left:' + f2(ox) + 'px;top:' + f2(lerp(NAME0.top, NAME1.top, e)) + 'px;width:1080px;text-align:center;font-weight:900;font-size:' + f2(lerp(NAME0.size, NAME1.size, e)) + 'px;line-height:1;font-family:Nunito,system-ui,sans-serif;letter-spacing:' + lerp(NAME0.ls, NAME1.ls, e).toFixed(4) + 'em;color:#1A1A14;white-space:nowrap;pointer-events:none;opacity:' + swapA.toFixed(3),
+      nameStyle: 'position:absolute;left:' + f2(ox + lerp(NAME0.cx, NAME1.cx, e) - 540) + 'px;top:' + f2(lerp(NAME0.top, NAME1.top, e)) + 'px;width:1080px;text-align:center;font-weight:900;font-size:' + f2(lerp(NAME0.size, NAME1.size, e)) + 'px;line-height:1;font-family:Nunito,system-ui,sans-serif;letter-spacing:' + lerp(NAME0.ls, NAME1.ls, e).toFixed(4) + 'em;color:#1A1A14;white-space:nowrap;pointer-events:none;opacity:' + swapA.toFixed(3),
       showPip: status === 'active' || u > 0,
       pipStyle: rect([pX, pY, pS, pS]) + 'pointer-events:none;opacity:' + swapA.toFixed(3),
       pipShadowStyle: 'position:absolute;left:' + f2(lerp(PIP0.shL, PIP1.shL, e)) + 'px;bottom:' + f2(lerp(PIP0.shB, PIP1.shB, e)) + 'px;width:' + f2(lerp(PIP0.shW, PIP1.shW, e)) + 'px;height:' + f2(lerp(PIP0.shH, PIP1.shH, e)) + 'px;border-radius:999px;background:rgba(26,26,20,.14)',
       playOpens: isActive || !idle,
       playReturns: !isActive && idle,
-      playStyle: rect([P.x, P.y, P.w, P.h]) + 'box-sizing:border-box;border-radius:' + f2(P.h / 2) + 'px;background:#FFB88C;border:' + f2(P.bw) + 'px solid ' + INK + ';box-shadow:0 ' + f2(P.sy) + 'px 0 rgba(26,26,20,' + P.sa.toFixed(3) + ');display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3',
+      playStyle: rect([P.x, P.y, P.w, P.h]) + 'box-sizing:border-box;border-radius:' + f2(P.h / 2) + 'px;background:#FFB88C;border:' + f2(P.bw) + 'px solid ' + INK + ';box-shadow:0 ' + f2(P.sy) + 'px 0 rgba(26,26,20,' + P.sa.toFixed(3) + ');display:flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;z-index:3',
       playRowStyle: 'display:flex;align-items:center;gap:' + f2(P.gap) + 'px',
       triStyle: 'width:0;height:0;border-top:' + f2(P.th) + 'px solid transparent;border-bottom:' + f2(P.th) + 'px solid transparent;border-left:' + f2(P.tl) + 'px solid ' + INK + ';margin-left:' + f2(P.ml) + 'px',
       playTextStyle: 'font-weight:900;font-size:' + f2(P.fs) + 'px;line-height:1;font-family:Nunito,system-ui,sans-serif;color:' + INK,

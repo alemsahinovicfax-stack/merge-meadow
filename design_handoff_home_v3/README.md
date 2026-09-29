@@ -5,7 +5,7 @@ Jedan dizajn Homea: biranje sezone (dva taba) i ulaz u polje te sezone. Hub head
 ## Šta otvoriti
 - `design/HomeScreen.dc.html` — biranje, interaktivno. Prop `scene` (free_active · free_open · free_locked · free_unlock · premium_buy · premium_owned · premium_soon), `tab` (free|premium), `openT` / `closeT` (0–1, zamrznut kadar prelaza), `pipWalked` (zatvaranje kad je Pip odšetao). Klik: strelice, tabovi, Play, kartica, Unlock, cijena; na polju Seasons vraća nazad.
 - `design/FieldScreen.dc.html` — polje. Prop `season` (8 ključeva), `scene` (gift · basket_empty · first), `u` (0–1, napredak prelaza); u Homeu se montira kao `embedded` (bez svojih traka, imena, Pipa i Playa — to nosi Home).
-- `design/Home Specs.dc.html` — sva stanja §6.1, trake kadrova otvaranja / zatvaranja / zatvaranja s odšetanim Pipom (`design/frames/`, snimljeno iz HomeScreen), P9 predaja, tri koraka Playa, tajming.
+- `design/Home Specs.dc.html` — runda 3: šest stanja kartice jedno pored drugog + anatomija zone cvijeća; zatim sva stanja §6.1, trake kadrova otvaranja / zatvaranja / zatvaranja s odšetanim Pipom (`design/frames/`, snimljeno iz HomeScreen), P9 predaja, tri koraka Playa, tajming.
 - `godot/` — export JSON, konstante, stablo čvorova, red prenosa.
 
 ## Stanja (§6.1)
@@ -77,7 +77,7 @@ Pip: stopala na otvaranju = kuća (756,1404). Hodanje (walk 70 px/s, 2,2–5,5 s
 |---|---|
 | I1 | PrevSeason / NextSeason imaju `pointer-events:auto` i `stopPropagation`; CardNav je sestra kartice, klik nikad ne padne na nju. Provjereno: ‹ › na aktivnoj i zaključanoj mijenja sezonu, polje se ne otvara. |
 | I2 | Swipe po kartici: pointer down/move/up, tap slop 12, prag **60 px**, kartica prati prst, na krajevima rubber 40 px (0,35 × dx), pa 220 ms swap ili 180 ms snap. Klik poslije drag-a se guta. |
-| I3 | Jedan `busy()` guard (prelaz u toku, swap < 1, drag, zamrznut kadar) za tabove, strelice, karticu, kapiju, Unlock, cijenu, Play i Seasons. Tabovi i strelice su i `pointer-events:none` dok u > 0. |
+| I3 | Jedan `busy()` guard (prelaz u toku, swap < 1, drag, zamrznut kadar) za tabove, strelice, karticu, kapiju, Unlock, cijenu, Play i Seasons. Tabovi su i `pointer-events:none` dok u > 0. |
 | I4 | Pip samo na statusu `active`. Novi status `open` = peach kapija bez teksta; tap → polje te sezone, ona postaje aktivna. |
 | I5 | Tačke su indikator, `pointer-events:none`, bez handlera (§ Odlučeno). |
 | T1 | Ime i Pip više nemaju fade: jedan SeasonName i jedan MeadowPip putuju od kartice do polja. Roster blijedi 2–40 %, cvijeće dolazi od 20 % — preklopljeno. Nijedan kadar bez imena, Pipa i Playa (sve alfa 1). |
@@ -87,17 +87,46 @@ Pip: stopala na otvaranju = kuća (756,1404). Hodanje (walk 70 px/s, 2,2–5,5 s
 | T5 | SeasonLabel polja se ne crta u Homeu; ime nosi putujući SeasonName (P2). |
 | T6 | `home_v3_export.json → animations.open / close` nabraja svaki objekat; `godot_map.anim_changes` = UiHomeField.ANIM staro → novo; iste vrijednosti u HTML-u (`T`, `W`) i `ui_home_v3.gd`. |
 
+**Dopuna 2026-09-29** (nalaz iz prenosa u igru, § Implementacija briefa): `OpenTransition` je pokrivao cijelu stranicu bez `pointer-events:none`, pa tap na Free / Premium nije stizao do taba. Sada grupa ne prima dodir (Godot `MOUSE_FILTER_IGNORE` = `OPEN_TRANSITION_MOUSE_FILTER`); dodir primaju SeasonCard, PlayButton i FieldClip (samo na u = 1). FieldClip ostaje montiran i skriven na u = 0, pa je polje učitano već u prvom kadru otvaranja. Izgled i tajming se ne mijenjaju.
+
 ## § Samoprovjera
-Provjereno u prototipu (pravi klikovi / pointer eventi na HomeScreen, i napredak prelaza kadar po kadar preko `openT` / `closeT` u koracima 0,05, mjereno iz DOM-a).
-1. **da** — ‹ i › mijenjaju sezonu i ne otvaraju polje, na aktivnoj (Lantern → Amber) i na zaključanoj (Amber → Lantern).
-2. **da** — swipe 120 px ulijevo = sljedeća, 150 px udesno = prethodna; kratki drag se vrati.
-3. **da** — tap na Premium, ›, karticu i Play 90 ms poslije starta otvaranja: polje Lanterna se otvori, kartica se ne mijenja; Seasons / Play / tab tokom zatvaranja ne rade ništa.
-4. **da** — openT i closeT (i closeT s odšetanim Pipom) 0 … 1 po 0,05: ime, Pip i Play alfa 1 u svih 63 kadra; nijedan kadar s dva Playa ili dva imena.
-5. **da** — openT .99 vs 1: jedina razlika je vlasnik traka (kartica → Meadow, isti pikseli); closeT .99 vs 1: FieldClip postoji ali je prazan (alfa 0), sve ostalo isto (< 0,5 px).
-6. **da** — Pip samo na Lantern Meadow (aktivna); Frost Orchard (otključana) nosi kapiju.
-7. **da** — brojevi u `animations` isti su u HTML-u (`T` u HomeScreen, `W` u FieldScreen) i u `ui_home_v3.gd`.
+Provjereno 2026-09-29 u `HomeScreen.dc.html` (Chromium), poslije dopune gore. Svaki tap ide na `document.elementFromPoint` na koordinati dugmeta, pa pogađa ono što bi pogodio prst; swipe je niz pointer eventova. Vrijeme je virtualni sat (`performance.now` + `setTimeout`) koji se pomjera kadar po kadar, pa je svaki kadar tačan. Mjereno iz DOM-a, na živom toku (ne na zamrznutom `openT`).
+
+> Ispravka: zip od 28. 9. je ovdje napisao „da" i za tab, ali tab je bio pokriven `OpenTransition`-om i tap nije stizao — ta provjera nije gađala pravu tačku. Sada gađa.
+
+1. **da** — › na aktivnoj (Lantern → Amber), ‹ na zaključanoj (Amber → Lantern) i ‹ na aktivnoj (Lantern → Frost): sezona se promijeni, polje se ne otvori. Tabovi: Premium → Moonlit, Free → Lantern.
+2. **da** — swipe 120 px ulijevo = sljedeća, 150 px udesno = prethodna; 150 px na kraju reda = rubber i nazad; 30 px = snap nazad, polje se ne otvori.
+3. **da** — 90 ms u otvaranje: tab, ›, kartica, Play i ‹ ne rade ništa (otvori se Lantern, bez „Run starts"). 90 ms u zatvaranje: Seasons, Play, tab, ›, kartica ne rade ništa. 60 ms u promjenu kartice: druga strelica i tab ne rade ništa.
+4. **da** — otvaranje i zatvaranje s Pipom koji je 4,5 s hodao, u = 0 … 1 po 0,05 + 0,99 (44 kadra): ime, Pip i Play alfa 1 u svakom; nikad dva Playa, dva imena ni dva Pipa. Roster i cvijeće zajedno na u .25–.35, nikad oboje prazno. Kartica, ime, Pip i Play na istom e (razlika ≤ 0,002).
+5. **da** — 0,99 vs 1: lista svega što se crta (rect, boja, rub, sjena, slika, tekst; 0,5 px) je ista — otvaranje 124 stavke, zatvaranje 76, 0 razlika. Trake kartice = round(h·0,32 / 0,68) u svakom kadru; Meadow se ne crta dok je u < 1.
+6. **da** — Pip samo na Lantern Meadow (aktivna): Country i Frost nose kapiju, Amber i sve četiri premium bez Pipa. Kapija na Frostu otvori Frost; poslije Seasons Pip je na Frostu, a Lantern dobije kapiju.
+7. **da** — svih 118 brojeva iz `animations` postoji u HTML-u (`T` / `W` / keyframes) i u `ui_home_v3.gd` (dodani `NAME_*.cx`, `SWAP_ALPHA_FROM`, `ATTENTION_RING`).
+
+## § Runda 3
+| ID | Šta je promijenjeno |
+|---|---|
+| R1 | Kartica nosi svih šest cvjetova u svakom stanju: dva reda po tri. Red 1 = trojka iz runde 2 (oko 220 u sredini, strane 180 spuštene 26), red 2 = ostala tri (180, vrh 552). Zona 230–830, red 2 x 198–834, pa ništa ne ulazi u strelice ni u status red. |
+| R2 | Zaključana besplatna sezona (locked i unlock): na svakom disku ravni sivi veo `#E3D9CC`, crtež se ne crta, pa se nijedan cvijet ne prepoznaje. Jedan katanac: RosterLock 120 na sredini bloka (locked); u unlock stanju katanac nosi dugme Unlock. Tap na Unlock diže veo disk po disk (300 ms, +40 ms po disku) — to je jedini trenutak kad se cvijeće sezone prvi put vidi. |
+
+**Odlučeno (runda 3):**
+- **Dva reda po tri, oko ostaje:** 600 px visine nosi dva reda s imenima; srednji disk u gornjem redu (220) je potpisni cvijet sezone — isti crtež je na disku dugmeta Back, pa oko povezuje karticu i Play.
+- **Diskovi 220 / 180:** najveće što stane da red 2 ostane između strelica, a ime ispod reda 2 (i u dva reda) završi prije 830.
+- **Jedan katanac na bloku, ne na svakom cvijetu:** sezona se otključava jednom; šest katanaca bi izgledalo kao šest odvojenih kupovina.
+- **LockBadge gore desno otpada:** nigdje dva katanca. U unlock stanju katanac je samo na dugmetu Unlock.
+- **Zaključano potpuno zamjenjuje „missing":** na zaključanoj kartici nema isprekidanih diskova ni imena; „missing" se crta samo na sezoni koja se može igrati.
+- **Premium je drugačiji — bez vela i katanca:** premium se kupuje, pa kartica pokazuje šta se kupuje (šest cvjetova u boji); zlatni rub + cijena kažu „nije tvoje". Katanac znači „otključava se igrom", zlato „kupuje se". Ember (coming soon) ostaje na 50 %.
+- **Ime cvijeta koji fali ostaje** ispod njegovog diska (38, gap 18).
+
+## § Samoprovjera runde 3
+Provjereno 2026-09-29 na svim instancama kartice u `Home Specs.dc.html` (13 kartica, svih 7 stanja), mjereno iz DOM-a.
+1. **da** — šest `RosterFlower` vidljivo na svakoj kartici (aktivna, otključana, zaključana, unlock, premium na prodaju, kupljena, coming soon).
+2. **da** — nijedan disk, crtež ni ime ne siječe PrevSeason / NextSeason; najniža tačka cvijeća je y 904 na stranici, status red počinje na 1002 (kartica 830).
+3. **da** — locked: veo alfa 1 na svih šest, 0 crteža, jedan katanac.
+4. **da** — otključana (Frost, Lantern, kupljena Coral): 0 vela, 0 katanaca, šest crteža. Tap na Unlock: poslije reveala 0 vela, šest crteža, kapija.
+5. **da** — katanaca po kartici: locked 1 (blok), unlock 1 (dugme), sve ostalo 0.
+6. **da** — kartica 1032 × 1160 na (24, 172) u svim stanjima; tabovi, Play, tačke, status red i prelaz nisu dirani.
+7. **da** — novi tokeni (`ROSTER_*`, `ROSTER6`, `LOCK_VEIL`, `ROSTER_LOCK`, `REVEAL_*`) isti u `ui_home_v3.gd`, `home_v3_export.json` (`layout.SeasonRoster`, `LockVeil`, `RosterLock`) i HTML-u (`ROSTER6`, `VEIL`, `REVEAL`).
 
 ## § Ideje van zadatka
 - Kratki „bloom" (scale 1 → 1.06 → 1, 300 ms) na disku cvijeta kad se na polju prvi put ubere taj cvijet — veza polje ↔ kartica.
-- Na Premium kartici long-press na disk otvara pregled svih 6 cvjetova (sad se vide 3).
 - Kad se sljedeća sezona može otključati, peach tačka na njenoj tački u nizu — da igrač zna bez listanja.

@@ -14,9 +14,32 @@
 </helmet>
 <div style="padding:72px;display:flex;flex-direction:column;gap:72px;font-family:Nunito,system-ui,sans-serif;color:#2D3436;background:#EFE8DE;min-width:3400px">
   <div style="display:flex;flex-direction:column;gap:12px">
-    <div style="font:900 64px/1.05 Nunito,sans-serif">Home v3 — Specs · round 2</div>
+    <div style="font:900 64px/1.05 Nunito,sans-serif">Home v3 — Specs · round 3</div>
     <div style="font:700 26px/1.4 Nunito,sans-serif;max-width:1600px;color:#555C5E">Artboard 1080 × 1920 · page 1080 × 1633 from y 143 · all px 1:1. State frames at 40 %, transition strips at 25 % (captured from HomeScreen with props openT / closeT / pipWalked — open HomeScreen and scrub those props to see any frame live).</div>
   </div>
+
+  <section data-screen-label="R3 card states" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 40px/1 Nunito,sans-serif">Round 3 · the card shows all six flowers — six states side by side</div>
+    <div style="display:flex;gap:32px;align-items:flex-start">
+      <sc-for list="{{ cardStates }}" as="c" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:12px;width:433px">
+          <div style="width:433px;height:487px;overflow:hidden;border-radius:20px;position:relative">
+            <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:scale(.42) translate(-24px,-315px);transform-origin:0 0">
+              <dc-import name="HomeScreen" scene="{{ c.scene }}" warm="{{ false }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:900 26px/1.2 Nunito,sans-serif">{{ c.title }}</div>
+          <div style="font:700 22px/1.4 Nunito,sans-serif;color:#555C5E">{{ c.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;background:#FFF8F0;border:3px solid #2D3436;border-radius:28px;padding:36px;max-width:1800px">
+      <div style="font:900 30px/1.1 Nunito,sans-serif">Flower zone anatomy (card px, card 1032 × 1160 at page 24, 172)</div>
+      <sc-for list="{{ anatomy }}" as="r" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;font:700 22px/1.35 Nunito,sans-serif"><span style="font-weight:900;font-variant-numeric:tabular-nums">{{ r.a }}</span><span>{{ r.b }}</span></div>
+      </sc-for>
+    </div>
+  </section>
 
   <section data-screen-label="Select states" style="display:flex;flex-direction:column;gap:28px">
     <div style="font:900 40px/1 Nunito,sans-serif">1–4 · Season select</div>
@@ -25,7 +48,7 @@
         <div style="display:flex;flex-direction:column;gap:14px;width:432px">
           <div style="width:432px;height:768px;overflow:hidden;border-radius:20px;box-shadow:0 6px 0 rgba(26,26,20,.18)">
             <div style="width:1080px;height:1920px;transform:scale(.4);transform-origin:0 0">
-              <dc-import name="HomeScreen" scene="{{ f.scene }}" hint-size="1080px,1920px"></dc-import>
+              <dc-import name="HomeScreen" scene="{{ f.scene }}" warm="{{ false }}" hint-size="1080px,1920px"></dc-import>
             </div>
           </div>
           <div style="font:900 26px/1.2 Nunito,sans-serif">{{ f.title }}</div>
@@ -86,6 +109,24 @@ const STEPS = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1];
 class Component extends DCLogic {
   renderVals() {
     return {
+      cardStates: [
+        { scene: 'free_active', title: 'Active · the season you play', note: 'Six flowers, Pip. A flower not found yet = dashed disc, silhouette, name.' },
+        { scene: 'free_open', title: 'Unlocked · not playing', note: 'Six flowers in full, gate, no Pip.' },
+        { scene: 'free_locked', title: 'Locked', note: 'Grey veil on all six discs, no art underneath, one lock on the block. No “missing” marks.' },
+        { scene: 'free_unlock', title: 'Can unlock', note: 'Same grey veil; the lock lives on the Unlock button, so the block has none. Unlock lifts the veil disc by disc.' },
+        { scene: 'premium_buy', title: 'Premium · for sale', note: 'Six flowers in full colour — you see what you buy. Gold rim + price, no lock.' },
+        { scene: 'premium_soon', title: 'Premium · coming soon', note: 'Six flowers at 50 %, dashed chip, no price, no lock.' }
+      ],
+      anatomy: [
+        { a: 'zone', b: 'y 230 (ROSTER_TOP) → 830 (STATUS_TOP) · two rows of three' },
+        { a: 'row 1 · 180 / 220 / 180', b: 'centres x 268 / 516 / 764 · eye top 230, sides top 256 (drop 26) · gap 48. Eye = the season’s signature flower (the same art as the Back disc on Play)' },
+        { a: 'row 2 · 180 × 3', b: 'top 552, centres x 288 / 516 / 744 → spans x 198–834, clear of the arrows (x ≤ 148 / ≥ 884 at y 680–800)' },
+        { a: 'art', b: 'img 82 % of the disc (ART_FILL .78 visible), border 4 ink' },
+        { a: 'missing name', b: '38 / 900, 18 below its disc; lowest possible end y 826 (two lines under row 2) < 830' },
+        { a: 'locked veil', b: 'flat #E3D9CC (locked-basket grey) over each disc, opacity 1, art not drawn. Missing marks are not drawn on a locked card' },
+        { a: 'RosterLock', b: '120 disc at (456, 436), cream, border 4, shadow 0 6 0 α.24, icon 60 — one lock per card; the old LockBadge (96, top right) is gone' },
+        { a: 'reveal', b: 'on Unlock: veil i opacity 1 → 0 in 300 ms, start i · 40 ms (all six in 500 ms)' }
+      ],
       selectFrames: [
         { scene: 'free_active', title: '1 · Free · the season you play', note: 'Pip only here. Play = ▶ Play → opens this meadow.' },
         { scene: 'free_open', title: '1b · Free · unlocked, not playing', note: 'No Pip, no text: a peach meadow-gate button. Tap gate or card → opens its field and it becomes the season you play. Play = Back.' },

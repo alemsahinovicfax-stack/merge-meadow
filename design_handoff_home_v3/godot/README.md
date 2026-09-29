@@ -12,5 +12,6 @@
    - **FieldClip:** SeasonField je dijete Control-a s `clip_contents` i rectom kartice (radius preko StyleBoxFlat maske ili bez radiusa — razlika je ispod 48 px ugla).
    - **Pip:** `season_field.gd` `_restart_wander()` zvati tek u `finished` otvaranja; na zatvaranju `_stop_wander()` i uzeti `meadow_pip.position` kao početak.
    - **Unos:** `is_field_transitioning()` ili slide/drag → ignoriši tabove, strelice, karticu, Play, Seasons.
+   - **OpenTransition ne prima dodir** (`OPEN_TRANSITION_MOUSE_FILTER` = `MOUSE_FILTER_IGNORE`) — pokriva cijelu stranicu, pa bi inače pojeo tap na tabove. Dodir primaju SeasonCard, PlayButton i FieldClip (samo na u = 1).
 8. FieldPage: postojeći čvorovi iz field v2; `tween_chrome_in` i `tween_flowers_settle` zamijeniti vrijednostima iz `_apply_u` (ANIM_CHANGES: chrome stagger 0, flower stagger 12 ms, start u .20).
 9. Provjeri: tekst ≥ 34, dodir ≥ 120, jedan loop (AttentionRing), bez blura i gradijenata.

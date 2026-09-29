@@ -6,15 +6,15 @@ HomeScreen (Control 1080x1920)
 │  │  ├─ SeasonTabs (Panel)    track
 │  │  │  ├─ FreeTab (Button)   icon_seed + "Free"
 │  │  │  └─ PremiumTab (Button) icon_diamond + "Premium"
-│  │  ├─ OpenTransition (Control)          animated group
+│  │  ├─ OpenTransition (Control, mouse_filter IGNORE)   animated group — never eats taps; SeasonCard / PlayButton / FieldClip (u = 1) take input
 │  │  │  ├─ SeasonCard (Panel, clip)
 │  │  │  │  ├─ CardSky / CardGround / CardNear (ColorRect, anchors by %)
 │  │  │  │  ├─ PremiumRim (Panel, premium only)
 │  │  │  │  └─ CardContent (Control, centred 1024)
 │  │  │  │     ├─ SeasonName (Label 80)
-│  │  │  │     ├─ LockBadge (Panel 96)
 │  │  │  │     ├─ SeasonRoster (HBoxContainer)
-│  │  │  │     │  └─ RosterFlower x3 (Panel disc + TextureRect + Label if missing)
+│  │  │  │     │  ├─ RosterFlower x6 (two rows; Panel disc + TextureRect + LockVeil + Label if missing)
+│  │  │  │     │  └─ RosterLock (Panel 120, status locked only)
 │  │  │  │     └─ CardStatus
 │  │  │  │        ├─ OpenGate | UnlockNeeds(NeedCoins, NeedStars) | UnlockButton
 │  │  │  │        └─ PriceButton | OwnedChip | SoonChip

@@ -159,22 +159,29 @@
     },
     "SeasonRoster": {
       "top": 230,
-      "discs": [
-        260,
-        330,
-        260
-      ],
-      "gap": 36,
-      "side_offset_y": 70,
-      "art_scale": 0.82
+      "round": 3,
+      "count": 6,
+      "eye": 220,
+      "disc": 180,
+      "gap": 48,
+      "side_offset_y": 26,
+      "row2_top": 552,
+      "rects": [[178, 256, 180, 180], [406, 230, 220, 220], [674, 256, 180, 180], [198, 552, 180, 180], [426, 552, 180, 180], [654, 552, 180, 180]],
+      "order": "0..2 = round-2 trio (1 = signature flower, eye), 3..5 = the other three",
+      "art_scale": 0.82,
+      "missing_name_gap": 18,
+      "clear_of": "arrows x <= 148 / >= 884 at y 680-800; lowest name end 826 < STATUS_TOP 830"
     },
-    "LockBadge": {
-      "rect": [
-        896,
-        40,
-        96,
-        96
-      ]
+    "LockVeil": {
+      "color": "#E3D9CC",
+      "on": "every disc when status locked or unlock; art not drawn; missing marks not drawn",
+      "reveal": { "ms": 300, "stagger_ms": 40, "alpha": [1, 0], "when": "Unlock tapped" }
+    },
+    "RosterLock": {
+      "rect": [456, 436, 120, 120],
+      "icon": 60,
+      "fill": "#FFF8F0", "border": 4, "shadow": "0 6 0 a.24",
+      "on": "status locked only (unlock: the Unlock button carries the lock). Replaces LockBadge (896,40,96), which is removed"
     },
     "CardStatus": {
       "top": 830,
@@ -354,9 +361,9 @@
       "states": {
         "active": "Pip (travelling MeadowPip) on card",
         "open": "OpenGate: 150 disc cream + peach arch 72x62, no text, no Pip; tap opens field and makes season active",
-        "locked": "NeedCoins + NeedStars chips, art alpha .5, LockBadge",
-        "unlock": "UnlockButton gold, LockBadge",
-        "buy": "PriceButton gold + gem, LockBadge",
+        "locked": "NeedCoins + NeedStars chips, LockVeil on all six discs, RosterLock",
+        "unlock": "UnlockButton gold (its lock icon is the card's only lock), LockVeil on all six discs",
+        "buy": "PriceButton gold + gem, six flowers in full colour, no lock",
         "owned": "OwnedChip mint \"Yours\"",
         "soon": "SoonChip dashed, art alpha .5"
       },
@@ -893,6 +900,7 @@
       "rubber_factor": 0.35,
       "snap_ms": 180
     },
-    "arrows": "pointer-events auto + stopPropagation"
+    "arrows": "pointer-events auto + stopPropagation",
+    "open_transition": "pointer-events none (Godot MOUSE_FILTER_IGNORE) so the tabs under it stay tappable; SeasonCard and PlayButton take input, FieldClip only at u = 1"
   }
 }

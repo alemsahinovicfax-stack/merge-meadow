@@ -45,9 +45,22 @@ const CARD_BANDS := [0.32, 0.36, 0.32]   # = UiHomeField.MEADOW_BANDS 0.32 / 0.6
 const CARD_NAME_Y := 72
 const CARD_NAME_SIZE := 80
 const ROSTER_TOP := 230
-const ROSTER_DISCS := [260, 330, 260]
-const ROSTER_GAP := 36
-const ROSTER_SIDE_DROP := 70
+# round 3: all six flowers, two rows of three (card px). Replaces ROSTER_DISCS [260, 330, 260] / GAP 36 / SIDE_DROP 70.
+# Order = roster order: 0..2 = round-2 trio (1 = signature flower, the eye), 3..5 = the other three.
+const ROSTER_EYE := 220
+const ROSTER_DISC := 180
+const ROSTER_GAP := 48
+const ROSTER_SIDE_DROP := 26
+const ROSTER_ROW2_TOP := 552
+const ROSTER6 := [Rect2(178, 256, 180, 180), Rect2(406, 230, 220, 220), Rect2(674, 256, 180, 180), Rect2(198, 552, 180, 180), Rect2(426, 552, 180, 180), Rect2(654, 552, 180, 180)]
+const MISSING_NAME_GAP := 18
+# locked free season (status locked + unlock): flat veil on every disc, art not drawn, no missing marks
+const LOCK_VEIL := Color("#E3D9CC")   # = locked basket grey (field)
+const ROSTER_LOCK := Rect2(456, 436, 120, 120)   # status locked only; in unlock the Unlock button carries the lock
+const ROSTER_LOCK_ICON := 60
+# LOCK_BADGE (896, 40, 96) is removed; DIM_ART .5 now only for coming soon
+const REVEAL_MS := 300
+const REVEAL_STAGGER_MS := 40
 const ROSTER_ART_SCALE := 0.82
 const MISSING_ART_MODULATE := Color(0, 0, 0, 0.28)
 const MISSING_NAME_SIZE := 38
@@ -81,6 +94,7 @@ const CLOSE_MS := 440
 const SWAP_MS := 220
 const SNAP_MS := 180
 const SWAP_OFFSET := 90
+const SWAP_ALPHA_FROM := 0.4
 const SWIPE_MIN := 60
 const TAP_SLOP := 12
 const RUBBER := 40
@@ -97,10 +111,12 @@ const NOTE_IN := Vector2(0.30, 0.60)
 const FIELD_CHROME_IN := Vector2(0.60, 0.92)
 const FIELD_CHROME_Y := 16
 const FIELD_SIDE_SLIDE := 254
+const ATTENTION_RING := {"ms": 1200, "scale": 1.16, "alpha": 0.7}   # the only loop, runs at u = 1 only
+const OPEN_TRANSITION_MOUSE_FILTER := Control.MOUSE_FILTER_IGNORE   # group never eats taps (tabs sit under it); SeasonCard / PlayButton / FieldClip (u = 1) take input
 
 # single travelling objects (geometry on eased t = TRANS_CUBIC EASE_IN_OUT)
-const NAME_CARD := {"top": 244, "size": 80, "ls_em": -0.015}
-const NAME_FIELD := {"top": 36, "size": 56, "ls_em": -0.01}
+const NAME_CARD := {"top": 244, "size": 80, "ls_em": -0.015, "cx": 540}
+const NAME_FIELD := {"top": 36, "size": 56, "ls_em": -0.01, "cx": 540}
 const PIP_CARD_POS := Vector2(425, 1027)
 const PIP_CARD_SIZE := 230
 const PIP_FIELD_SIZE := 190
