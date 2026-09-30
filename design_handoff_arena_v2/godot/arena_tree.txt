@@ -1,0 +1,28 @@
+MergeArena (Control, merge_arena_controller.gd)
+├─ Bg (Control, arena_meadow_bg.gd)            ← PREPISATI: crta UiArenaV2.field(active_season_id)
+│   ├─ slojevi: draw_colored_polygon / draw_polyline (polys u % × 1080 / 1633), boja = layer_color(fill, level)
+│   ├─ rasuti elementi: za i u 0..n4-1: scatter_instance → skip avoided → alpha = scatter_alpha(level)
+│   │                   draw_set_transform(pos_px, rot, size × scatter_grow) + SHAPES primitivi (c/e/p/l/a/r)
+│   └─ ComboLight (ColorRect, NOVO)             boja FIELDS[s].combo.light, modulate.a = COMBO_STEPS[n].light
+├─ RootVBox
+│   ├─ Playfield (Control, 1080 × 1589)
+│   │   ├─ ComboRipple (Panel pool × 3, NOVO)   ring_style(999, 10, combo.ring), scale 90/R → 1, alpha .55 → 0, 0,5 s
+│   │   ├─ T3Burst (postojeći _play_t3_moment)  zamjenjuje ComboRipple za T3 merge
+│   │   ├─ SeedChip × ≤30 (arena_seed_chip.gd)  arena_chip_draw.gd: + SeedBase (rim.grow(4), #2D3436) PRIJE sjene i rima
+│   │   ├─ ArenaPip (150, dolje lijevo)         combo ≥2 skok 1,18/0,28 · combo 5 skok 1,26/0,36
+│   │   ├─ SeedBag → SeedBasket (arena_seed_bag.gd)  PREPISATI _draw: ručka, otvor, gomila (BASKET_PILE, basket_visible), pleter, rub, krpa, brojač
+│   │   ├─ MuncherPest (arena_pest.gd)          PREPISATI _draw: glava + 3 segmenta (trag putanje), lice po stanju, gnijezdo (stražnje + prednji rub), led, zzz, „!", mrvice
+│   │   ├─ ComboMark (Label, NOVO)              „×N", font 900, outline 8 #2D3436, veličina iz COMBO_STEPS, tween pop/rise/fade
+│   │   └─ TutorialCue (bez promjene)
+│   └─ BottomGap (44)
+└─ NeedMoreSeedsOverlay (bez promjene)
+MetaHub
+└─ Header/CoinChip                             ComboCoin leti do njega (56 px, 0,5 s); prsten +6 px; postojeći show_coin_earn_pop
+
+Red prenosa
+1. SeedBase na sjemenci (arena_chip_draw.gd, 1 draw_style_box) — radi odmah na današnjoj livadi.
+2. Muncher (arena_pest.gd): trag pozicija za segmente (ring buffer, uzorak svakih 6 px puta), poze iz MUNCHER_POSES, boje MUNCHER_COLORS. Logika, brzine i radius jedenja se NE mijenjaju.
+3. Korpa (arena_seed_bag.gd): BAG_HIT → BASKET_HIT 300 × 280 (y = polje − 40 − 280), get_mouth_position → BASKET_MOUTH, keepout ostaje.
+4. Combo (merge_arena_controller.register_arena_combo_merge): ComboMark + ComboRipple + ComboLight + Pip; na _clear_combo → ComboLight → 0 za 0,35 s.
+5. Livade: arena_meadow_bg.gd čita UiArenaV2.field(GameState.active_season_id). Prvo country_bloom, pa ostale sezone jedna po jedna (svaka je samo zapis u FIELDS — kod je isti).
+6. Smoke: arena_*_smoke + novi arena_v2_fields_smoke (svaka sezona: slojevi ≤ 4, vrste 3–6, nema teksture; SeedBase prisutan; basket_visible(0/1/40) = 0/1/12).

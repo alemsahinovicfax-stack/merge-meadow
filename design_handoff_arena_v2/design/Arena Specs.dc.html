@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-layer="Specs" style="width:2240px;box-sizing:border-box;padding:80px;display:flex;flex-direction:column;gap:96px;background:#1A1420;color:#FFF8F0;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+
+  <section style="display:flex;flex-direction:column;gap:20px">
+    <div style="font:900 72px/1 Nunito,system-ui,sans-serif">Merge Arena v2 — Specs</div>
+    <div style="font:700 30px/1.4 Nunito,system-ui,sans-serif;color:#CFC6D8;max-width:1500px;text-wrap:pretty">Muncher, korpa, osam livada, combo. Sve mjere su px baze 1080 × 1920. Brojevi i kontrast na ovoj stranici računaju se uživo iz <span style="font-family:ui-monospace,Menlo,monospace;color:#FFB88C">arena_v2_data.js</span>.</div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap">
+      <sc-for list="{{ dual }}" as="d" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:16px;padding:18px 24px;border-radius:20px;background:#2A2233;border:2px solid rgba(255,248,240,.14)">
+          <div style="width:44px;height:44px;border-radius:50%;background:{{ d.light }};box-shadow:0 0 0 6px {{ d.ink }}"></div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font:800 28px/1 Nunito,system-ui,sans-serif">{{ d.label }}</div>
+            <div style="font:700 22px/1 ui-monospace,Menlo,monospace;color:#CFC6D8">ink {{ d.ink }} · svijetlo {{ d.light }} · najgore {{ d.worst }} : 1</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font:700 26px/1.4 Nunito,system-ui,sans-serif;color:#CFC6D8;max-width:1500px;text-wrap:pretty">Pravilo dvostrukog ruba: taman vanjski rub + svijetla traka do njega. Za bilo koju boju polja jedna od dvije ivice ima ≥ 3 : 1 — zato kontrast ne ovisi o livadi.</div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif">1 · Muncher — 6 stanja</div>
+    <div style="display:flex;gap:16px">
+      <sc-for list="{{ mStates }}" as="m" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:12px;width:336px">
+          <div style="position:relative;width:336px;height:252px;overflow:hidden;border-radius:26px;background:#7DAA67">
+            <div style="position:absolute;left:0;top:0;transform:scale(.7);transform-origin:0 0"><dc-import name="Muncher" state="{{ m.k }}" dir="{{ 200 }}" hint-size="480px,360px"></dc-import></div>
+          </div>
+          <div style="position:relative;width:336px;height:252px;overflow:hidden;border-radius:26px;background:#7DAA67;filter:grayscale(1)">
+            <div style="position:absolute;left:0;top:0;transform:scale(.7);transform-origin:0 0"><dc-import name="Muncher" state="{{ m.k }}" dir="{{ 200 }}" hint-size="480px,360px"></dc-import></div>
+          </div>
+          <div style="font:900 30px/1 Nunito,system-ui,sans-serif">{{ m.name }}</div>
+          <div style="font:700 22px/1.35 Nunito,system-ui,sans-serif;color:#CFC6D8;text-wrap:pretty">{{ m.how }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font:700 24px/1.4 ui-monospace,Menlo,monospace;color:#CFC6D8">glava r 50 · segmenti r 38 / 32 / 26 · rub 4 px #3E2856 · pjege #FFEAA7 · jede u 36 px od centra glave · 85 px/s · zalogaj 0,5 s (2 × 0,25 s) · budi se 0,3 s · led 2 s (in 0,18 back · out 0,25 cubic)</div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif">2 · Muncher uz sjemenku na svih 8 livada</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <sc-for list="{{ seasons }}" as="s" hint-placeholder-count="8">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="position:relative;width:244px;height:250px;overflow:hidden;border-radius:20px">
+            <div style="position:absolute;left:0;top:-160px"><dc-import name="ArenaField" season="{{ s.id }}" lush="{{ 0 }}" width="{{ 250 }}" hint-size="250px,378px"></dc-import></div>
+            <div style="position:absolute;left:16px;top:120px;transform:scale(.5);transform-origin:0 0"><dc-import name="SeedChip" type="daisy" tier="{{ 1 }}" hint-size="134px,134px"></dc-import></div>
+            <div style="position:absolute;left:56px;top:6px;transform:scale(.5);transform-origin:0 0"><dc-import name="Muncher" state="hunting" dir="{{ 200 }}" hint-size="480px,360px"></dc-import></div>
+          </div>
+          <div style="font:800 22px/1 Nunito,system-ui,sans-serif">{{ s.name }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif">3 · Korpa — 3 stanja</div>
+    <div style="display:flex;gap:40px;align-items:flex-end">
+      <sc-for list="{{ baskets }}" as="b" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:center">
+          <div style="width:340px;height:330px;border-radius:26px;background:#7DAA67;display:grid;place-items:center">
+            <dc-import name="SeedBasket" count="{{ b.c }}" state="{{ b.st }}" hint-size="300px,280px"></dc-import>
+          </div>
+          <div style="font:900 28px/1 Nunito,system-ui,sans-serif">{{ b.name }}</div>
+          <div style="font:700 22px/1 ui-monospace,Menlo,monospace;color:#CFC6D8">{{ b.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font:700 24px/1.4 ui-monospace,Menlo,monospace;color:#CFC6D8">dodir 300 × 280 · centrirana, 40 px iznad dna polja · vidljivo = count ≤ 0 ? 0 : clamp(round(count·12/40), 1, 12) · redovi 5 / 4 / 3 · brojač r 42, 44 px · sipa: −12° oko (150, 272), 0,1 s in + 0,25 s back</div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif">4 · Osam livada — nivo 0 i nivo 4</div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:40px 32px">
+      <sc-for list="{{ seasons }}" as="s" hint-placeholder-count="8">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:6px"><dc-import name="ArenaField" season="{{ s.id }}" lush="{{ 0 }}" width="{{ 240 }}" hint-size="240px,363px"></dc-import><div style="font:700 20px/1 ui-monospace,Menlo,monospace;color:#CFC6D8">nivo 0</div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><dc-import name="ArenaField" season="{{ s.id }}" lush="{{ 4 }}" width="{{ 240 }}" hint-size="240px,363px"></dc-import><div style="font:700 20px/1 ui-monospace,Menlo,monospace;color:#CFC6D8">nivo 4</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:28px;height:28px;border-radius:8px;background:{{ s.mood }};flex:0 0 auto"></div><div style="font:900 32px/1 Nunito,system-ui,sans-serif">{{ s.name }}</div></div>
+          <div style="font:700 22px/1.35 Nunito,system-ui,sans-serif;color:#CFC6D8;text-wrap:pretty">{{ s.place }}</div>
+          <div style="font:700 22px/1.35 Nunito,system-ui,sans-serif;color:#A8E6CF;text-wrap:pretty">Raste: {{ s.lush }}</div>
+          <div style="font:700 20px/1.3 ui-monospace,Menlo,monospace;color:#CFC6D8">{{ s.recipe }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:20px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif">5 · Kontrast (izračunato u browseru)</div>
+    <div style="font:700 24px/1.4 Nunito,system-ui,sans-serif;color:#CFC6D8;max-width:1500px">Najmanji kontrast ruba objekta prema bilo kojoj boji livade na koju može pasti (slojevi + rasuti elementi). „Samo krem" = sjemenka bez SeedBase prstena — zato prsten postoji.</div>
+    <div style="display:grid;grid-template-columns:320px repeat(7,minmax(0,1fr));border-radius:20px;overflow:hidden;border:2px solid rgba(255,248,240,.14)">
+      <sc-for list="{{ headCells }}" as="h" hint-placeholder-count="8">
+        <div style="padding:16px 18px;background:#2A2233;font:800 22px/1.2 Nunito,system-ui,sans-serif;color:#CFC6D8">{{ h }}</div>
+      </sc-for>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+        <div style="padding:14px 18px;border-top:2px solid rgba(255,248,240,.08);font:800 24px/1.2 Nunito,system-ui,sans-serif">{{ r.name }}</div>
+        <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="7">
+          <div style="padding:14px 18px;border-top:2px solid rgba(255,248,240,.08);font:700 24px/1.2 ui-monospace,Menlo,monospace;color:{{ c.col }}">{{ c.v }}</div>
+        </sc-for>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 52px/1 Nunito,system-ui,sans-serif">6 · Combo stepenice</div>
+    <div style="display:flex;gap:24px">
+      <sc-for list="{{ combos }}" as="c" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:12px;width:378px">
+          <div style="position:relative;width:378px;height:520px;overflow:hidden;border-radius:26px">
+            <div style="position:absolute;left:0;top:-120px"><dc-import name="ArenaField" season="{{ c.season }}" lush="{{ 1 }}" width="{{ 378 }}" combo-light="{{ c.light }}" hint-size="378px,572px"></dc-import></div>
+            <sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}">
+              <div data-layer="ComboRipple" style="position:absolute;left:{{ c.rl }}px;top:{{ c.rt }}px;width:{{ c.rd }}px;height:{{ c.rd }}px;box-sizing:border-box;border-radius:50%;border:4px solid #FFE3B8;opacity:.33"></div>
+            </sc-if>
+            <div style="position:absolute;left:52px;top:130px;transform:scale(.35);transform-origin:0 0"><dc-import name="SeedChip" type="clover" tier="{{ 1 }}" hint-size="134px,134px"></dc-import></div>
+            <div style="position:absolute;left:280px;top:370px;transform:scale(.35);transform-origin:0 0"><dc-import name="SeedChip" type="tulip" tier="{{ 1 }}" hint-size="134px,134px"></dc-import></div>
+            <div style="position:absolute;left:166px;top:276px;transform:scale(.35);transform-origin:0 0"><dc-import name="SeedChip" type="daisy" tier="{{ 2 }}" state="{{ c.chip }}" hint-size="134px,134px"></dc-import></div>
+            <sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}">
+              <div data-layer="ComboMark" style="position:absolute;left:189px;top:{{ c.mt }}px;transform:translate(-50%,0);font:900 {{ c.ms }}px/1 Nunito,system-ui,sans-serif;color:{{ c.mf }};-webkit-text-stroke:3px #2D3436;paint-order:stroke fill">×{{ c.n }}</div>
+            </sc-if>
+            <sc-if value="{{ c.gold }}" hint-placeholder-val="{{ false }}">
+              <img src="icons/icon_coin.svg" alt="" style="position:absolute;left:120px;top:150px;width:22px;height:22px">
+            </sc-if>
+          </div>
+          <div style="font:900 32px/1 Nunito,system-ui,sans-serif">{{ c.title }}</div>
+          <div style="font:700 22px/1.35 Nunito,system-ui,sans-serif;color:#CFC6D8;text-wrap:pretty">{{ c.how }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+      <div style="padding:28px;border-radius:26px;background:#2A2233;display:flex;flex-direction:column;gap:12px">
+        <div style="font:900 30px/1 Nunito,system-ui,sans-serif">Vrijeme (prozor 1,4 s)</div>
+        <div style="font:700 22px/1.5 ui-monospace,Menlo,monospace;color:#CFC6D8">t 0,00 merge · ×N pop 0,18 s back<br>t 0,00–0,50 talas r 90 → R, alpha .55 → 0<br>t 0,00–0,20 ComboLight → korak (cubic out)<br>t 0,18–0,48 ×N drži, diže se 50 px<br>t 0,48–0,73 ×N nestaje<br>t 1,40 bez novog merge → ComboLight → 0 za 0,35 s</div>
+      </div>
+      <div style="padding:28px;border-radius:26px;background:#2A2233;display:flex;flex-direction:column;gap:12px">
+        <div style="font:900 30px/1 Nunito,system-ui,sans-serif">Bujnost × combo</div>
+        <div style="font:700 22px/1.5 Nunito,system-ui,sans-serif;color:#CFC6D8;text-wrap:pretty">Bujnost (T3, trajno) mijenja oblike: broj, rast i boju slojeva. Combo (trenutno) mijenja samo svjetlo i kretanje: preklop, talas, kratki naklon. Ne diraju isto svojstvo, pa rade istovremeno. T3 u comboju: burst zamjenjuje talas, bujnost ide svojim crossfadeom 0,6 s.</div>
+      </div>
+      <div style="padding:28px;border-radius:26px;background:#2A2233;display:flex;flex-direction:column;gap:12px">
+        <div style="font:900 30px/1 Nunito,system-ui,sans-serif">Redoslijed slojeva</div>
+        <div style="font:700 22px/1.5 ui-monospace,Menlo,monospace;color:#CFC6D8">MeadowBg (bujnost)<br>ComboLight (combo)<br>ComboRipple · T3Burst<br>SeedChip × 30<br>ArenaPip · SeedBag · Muncher<br>ComboMark · ComboCoin</div>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const MST = [
+  ['sleep_nest', 'Spava u gnijezdu', 'Sklupčan u „C", zatvorene oči, zzz desno (ne gore — header). Prednji rub gnijezda preko tijela.'],
+  ['sleep_spot', 'Spava gdje je stao', 'Ista poza bez gnijezda.'],
+  ['waking', 'Budi se', 'Rep podignut, velike okrugle oči, usta „o", „!" u zvijezdi lijevo.'],
+  ['hunting', 'Lovi', 'Tijelo ispruženo iza glave, obrve u V, zjenice ka meti, iskežen s dva zuba; nagib −6°, njiše 5 px / 0,6 s.'],
+  ['eating', 'Jede', 'Glava 1,08, usta širom (64 × 12–48, 2× u 0,5 s), oči „^ ^", tijelo zbijeno, mrvice latica.'],
+  ['frozen', 'Zaleđen', 'Ledena kocka 200 × 170 s ledenicama i injem, tijelo plavo i ukočeno, zabrinute obrve. Nagrada za T3.']
+];
+class Component extends DCLogic {
+  state = { M: null };
+  componentDidMount() { import('./arena_v2_data.js').then(M => this.setState({ M })); }
+  renderVals() {
+    const M = this.state.M;
+    const f = v => v.toFixed(2);
+    const mStates = MST.map(m => ({ k: m[0], name: m[1], how: m[2] }));
+    const baskets = [
+      { c: 0, st: 'idle', name: 'Prazna', note: 'otvor, bez brojača' },
+      { c: 4, st: 'idle', name: 'Ima sjemena · 4', note: 'vidljivo 1' },
+      { c: 20, st: 'idle', name: 'Ima sjemena · 20', note: 'vidljivo 6' },
+      { c: 40, st: 'idle', name: 'Ima sjemena · 40', note: 'vidljivo 12 — do ručke' },
+      { c: 30, st: 'pour', name: 'Sipa', note: '−12°, cvijeće leti' }
+    ];
+    const combos = [
+      { n: 0, title: 'Combo 0–1', how: 'Nema ničega.' },
+      { n: 2, title: 'Combo 2', how: '×2 52 px · talas r 260 · svjetlo 4 % · Pip skok.' },
+      { n: 3, title: 'Combo 3', how: '×3 58 px · talas r 320 · svjetlo 7 %.' },
+      { n: 4, title: 'Combo 4', how: '×4 64 px · talas r 380 · svjetlo 10 % · naklon elemenata u talasu.' },
+      { n: 5, title: 'Combo 5 (vrhunac)', how: 'Zlatan ×5 70 px · svjetlo 13 % · novčić do coin chipa, prsten na chipu, +N pop · veći skok Pipa. 6–8 drže ovo bez novčića.' }
+    ].map(c => {
+      const st = { 2: [52, 260, 0.04], 3: [58, 320, 0.07], 4: [64, 380, 0.10], 5: [70, 380, 0.13] }[c.n];
+      const k = 0.35, R = st ? (90 + (st[1] - 90) * 0.784) * k : 0;
+      return { ...c, season: 'lantern_meadow', on: !!st, light: st ? st[2] : 0, rl: 189 - R, rt: 299 - R, rd: 2 * R,
+        ms: st ? st[0] * k : 0, mt: st ? 299 - 118 * k - st[0] * k * 0.5 : 0, mf: c.n >= 5 ? '#FFD56B' : '#FFF8F0', gold: c.n >= 5, chip: st ? 'merge' : 'idle' };
+    });
+    if (!M) return { dual: [], mStates, seasons: [], baskets, headCells: [], rows: [], combos };
+    const dual = Object.keys(M.DUAL_EDGE).map(k => { const d = M.DUAL_EDGE[k]; return { label: d.label, ink: d.ink, light: d.light, worst: f(M.worstCase(d.ink, d.light)) }; });
+    const seasons = M.SEASON_KEYS.map(id => {
+      const F = M.FIELDS[id];
+      return { id, name: F.name, mood: F.mood, place: F.place, lush: F.lush, recipe: F.layers.length + ' sloja · ' + F.scatter.length + ' vrsta: ' + F.scatter.map(s => s.id + ' ' + s.n[0] + '→' + s.n[1]).join(', ') };
+    });
+    const headCells = ['Livada', 'Sjemenka L0', 'Sjemenka L4', 'Samo krem L0', 'Muncher', 'Korpa', 'Pip', 'Najgora boja'];
+    const col = v => v >= 3 ? '#A8E6CF' : '#FF9F9F';
+    const rows = M.SEASON_KEYS.map(id => {
+      const s0 = M.minEdgeContrast('seed', id, 0), s4 = M.minEdgeContrast('seed', id, 4), c0 = M.minCreamOnly(id, 0);
+      const mu = Math.min(M.minEdgeContrast('muncher', id, 0).min, M.minEdgeContrast('muncher', id, 4).min);
+      const ba = Math.min(M.minEdgeContrast('basket', id, 0).min, M.minEdgeContrast('basket', id, 4).min);
+      const pi = Math.min(M.minEdgeContrast('pip', id, 0).min, M.minEdgeContrast('pip', id, 4).min);
+      return { name: M.FIELDS[id].name, cells: [
+        { v: f(s0.min), col: col(s0.min) }, { v: f(s4.min), col: col(s4.min) }, { v: f(c0.min), col: '#CFC6D8' },
+        { v: f(mu), col: col(mu) }, { v: f(ba), col: col(ba) }, { v: f(pi), col: col(pi) }, { v: s0.at.name + ' ' + s0.at.hex, col: '#CFC6D8' }
+      ] };
+    });
+    return { dual, mStates, seasons, baskets, headCells, rows, combos };
+  }
+}
+</script>
+</body>
+</html>

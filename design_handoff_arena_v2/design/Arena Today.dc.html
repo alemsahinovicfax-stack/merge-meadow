@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-layer="HubScreen" style="width:1080px;height:1920px;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#293D2E;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+
+  <div data-layer="Header" style="flex:0 0 auto;position:relative;z-index:2;height:143px;background:#2A2233;box-shadow:0 6px 14px rgba(20,14,26,.34)">
+    <div style="height:140px;display:flex;align-items:center;gap:16px;padding-left:20px;box-sizing:border-box">
+      <div data-layer="CoinChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)">
+        <img src="icons/icon_coin.svg" alt="" style="width:64px;height:64px;flex:0 0 auto;display:block">
+        <div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">12,450</div>
+      </div>
+      <div data-layer="SeedChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)">
+        <img src="icons/icon_seed.svg" alt="" style="width:64px;height:64px;flex:0 0 auto;display:block">
+        <div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">340</div>
+      </div>
+      <div data-layer="FlowerChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)">
+        <img src="icons/icon_flower.svg" alt="" style="width:64px;height:64px;flex:0 0 auto;display:block">
+        <div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">27</div>
+      </div>
+      <div data-layer="SettingsSlot" style="width:124px;height:140px;flex:0 0 auto;display:flex;align-items:center;padding-left:4px;box-sizing:border-box">
+        <div data-layer="SettingsButton" style="width:100px;height:100px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center">
+          <img src="icons/icon_settings_light.svg" alt="" style="width:56px;height:56px;display:block">
+        </div>
+      </div>
+    </div>
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+  </div>
+
+  <div data-layer="MergeArena" style="flex:0 0 auto;position:relative;width:1080px;height:1633px;overflow:hidden;background:var(--meadow)">
+    <div data-layer="Bg" style="position:absolute;inset:0">
+      <div data-layer="HillFar" style="position:absolute;left:-80px;top:1023px;width:1240px;height:420px;border-radius:620px 620px 0 0 / 210px 210px 0 0;background:var(--hillFar)"></div>
+      <div data-layer="HillNear" style="position:absolute;left:-120px;top:1263px;width:1320px;height:430px;border-radius:607px 607px 0 0 / 198px 198px 0 0;background:var(--hillNear)"></div>
+      <svg data-layer="Tufts" width="1080" height="1633" viewBox="0 0 1080 1633" style="position:absolute;left:0;top:0;display:block">
+        <sc-for list="{{ tufts }}" as="t" hint-placeholder-count="10">
+          <polygon points="{{ t.pts }}" fill="{{ t.fill }}" fill-opacity="{{ t.a }}"></polygon>
+        </sc-for>
+        <sc-for list="{{ blooms }}" as="b" hint-placeholder-count="0">
+          <circle cx="{{ b.x }}" cy="{{ b.y }}" r="{{ b.r }}" fill="{{ b.fill }}" fill-opacity="0.9"></circle>
+        </sc-for>
+      </svg>
+    </div>
+
+    <div data-layer="Playfield" style="position:absolute;left:0;top:0;width:1080px;height:1589px">
+      <sc-for list="{{ chips }}" as="c" hint-placeholder-count="0">
+        <div data-layer="{{ c.layer }}" style="position:absolute;left:{{ c.x }}px;top:{{ c.y }}px;width:134.4px;height:134.4px;--r:{{ c.r }};--rim:{{ c.rim }};--edge:{{ c.edge }};--wi:{{ c.wi }}px;--wr:{{ c.wr }}">
+          <div data-layer="Shadow" style="position:absolute;left:0;top:6px;width:134.4px;height:134.4px;border-radius:var(--r);background:rgba(20,32,26,.42)"></div>
+          <div data-layer="Rim" style="position:absolute;inset:0;box-sizing:border-box;border-radius:var(--r);background:var(--rim);border:3px solid var(--edge)"></div>
+          <div data-layer="Well" style="position:absolute;inset:var(--wi);box-sizing:border-box;border-radius:var(--wr);background:#22342A;border:2px solid #16211B"></div>
+          <sc-if value="{{ c.t2 }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="Hairline" style="position:absolute;inset:5px;box-sizing:border-box;border-radius:33px;border:2px solid var(--edge)"></div>
+          </sc-if>
+          <div data-layer="Flower" style="position:absolute;left:{{ c.bx }}px;top:{{ c.bx }}px;width:{{ c.box }}px;height:{{ c.box }}px;overflow:hidden">
+            <img src="{{ c.src }}" alt="" style="position:absolute;left:{{ c.il }}px;top:{{ c.it }}px;width:{{ c.is }}px;height:{{ c.is }}px;max-width:none;display:block">
+          </div>
+          <sc-if value="{{ c.mythic }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="MythicRing" style="position:absolute;inset:-7px;box-sizing:border-box;border-radius:var(--r);border:4px dashed rgba(214,168,47,.9)"></div>
+          </sc-if>
+        </div>
+      </sc-for>
+
+      <sc-if value="{{ inNest }}" hint-placeholder-val="{{ true }}">
+        <div data-layer="MuncherNest" style="position:absolute;left:435px;top:56px;width:210px;height:104px;box-sizing:border-box;border-radius:50%;background:#9E7A52;border:5px solid #735738">
+          <div style="position:absolute;left:13px;top:9px;width:174px;height:82px;box-sizing:border-box;border-radius:50%;background:#6E5238;border:4px solid #543E2A"></div>
+        </div>
+      </sc-if>
+      <div data-layer="Muncher" style="position:absolute;left:{{ pestX }}px;top:{{ pestY }}px;width:0;height:0;transform:rotate({{ pestRot }}deg)">
+        <div data-layer="EarL" style="position:absolute;left:-42px;top:-66px;width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:var(--pb);border:4px solid var(--pe)"></div>
+        <div data-layer="EarR" style="position:absolute;left:12px;top:-66px;width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:var(--pb);border:4px solid var(--pe)"></div>
+        <div data-layer="Body" style="position:absolute;left:-52px;top:-52px;width:104px;height:104px;box-sizing:border-box;border-radius:50%;background:var(--pb);border:4px solid var(--pe)"></div>
+        <sc-if value="{{ pestAsleep }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;left:-30px;top:-9.5px;width:20px;height:5px;background:#2D3436"></div>
+          <div style="position:absolute;left:10px;top:-9.5px;width:20px;height:5px;background:#2D3436"></div>
+        </sc-if>
+        <sc-if value="{{ pestAwake }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:-24px;top:-14px;width:14px;height:14px;border-radius:50%;background:#2D3436"></div>
+          <div style="position:absolute;left:10px;top:-14px;width:14px;height:14px;border-radius:50%;background:#2D3436"></div>
+        </sc-if>
+        <div data-layer="Mouth" style="position:absolute;left:-9px;top:14px;width:18px;height:9px;border-radius:0 0 8px 8px;background:#5C3F7E"></div>
+        <sc-if value="{{ pestAsleep }}" hint-placeholder-val="{{ true }}">
+          <div data-layer="Zzz" style="position:absolute;left:44px;top:-86px;font:800 32px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">z z z</div>
+        </sc-if>
+      </div>
+
+      <div data-layer="ArenaPip" style="position:absolute;left:30px;top:1413px;width:150px;height:150px">
+        <img src="icons/pip_idle.svg" alt="Pip" style="width:150px;height:150px;display:block">
+      </div>
+
+      <sc-if value="{{ tutorial }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="TutorialCue" style="position:absolute;left:160px;top:1051px;width:760px;display:flex;flex-direction:column;align-items:center">
+          <div data-layer="CuePanel" style="box-sizing:border-box;width:760px;padding:20px 32px;border-radius:24px;background:#FFF8F0;border:4px solid #CBC2B6;font:800 40px/1.3 Nunito,system-ui,sans-serif;color:#2D3436;text-align:center;text-wrap:pretty">Tap the bag to pour seeds. Drag matching seeds together.</div>
+          <div data-layer="CueArrow" style="width:0;height:0;border-left:26px solid transparent;border-right:26px solid transparent;border-top:30px solid #FFF8F0"></div>
+        </div>
+      </sc-if>
+
+      <div data-layer="SeedBag" style="position:absolute;left:400px;top:1299px;width:280px;height:250px;transform:rotate({{ bagRot }}deg)">
+        <sc-for list="{{ peek }}" as="p" hint-placeholder-count="3">
+          <div data-layer="Peek" style="position:absolute;left:{{ p.x }}px;top:{{ p.y }}px;width:{{ p.s }}px;height:{{ p.s }}px;transform:rotate({{ p.rot }}deg);overflow:hidden">
+            <img src="{{ p.src }}" alt="" style="position:absolute;left:{{ p.il }}px;top:{{ p.it }}px;width:{{ p.is }}px;height:{{ p.is }}px;max-width:none;display:block">
+          </div>
+        </sc-for>
+        <div data-layer="BagBody" style="position:absolute;left:33px;top:{{ bodyTop }}px;width:214px;height:{{ bodyH }}px;box-sizing:border-box;background:#9E7A52;border:5px solid #735738;border-radius:{{ bodyRadius }}"></div>
+        <div data-layer="BagNeck" style="position:absolute;left:81px;top:{{ neckTop }}px;width:118px;height:34px;box-sizing:border-box;border-radius:17px;background:#B89466;border:4px solid #7A5C3C"></div>
+        <sc-if value="{{ hasSeeds }}" hint-placeholder-val="{{ true }}">
+          <div data-layer="BagCounter" style="position:absolute;left:190px;top:164px;width:84px;height:84px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:4px solid #CBC2B6;display:grid;place-items:center;font:800 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">{{ bagCount }}</div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="Footer" style="flex:0 0 auto;position:relative;z-index:2;height:144px;background:#2A2233;box-shadow:0 -6px 14px rgba(20,14,26,.34)">
+    <sc-if value="{{ locked }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:0;right:0;top:-36px;display:flex;justify-content:center;z-index:3">
+        <div data-layer="NavLockPill" style="display:flex;align-items:center;gap:14px;height:64px;padding:0 28px;border-radius:20px;background:#2A2233;border:2px solid rgba(232,196,74,.85);box-sizing:border-box">
+          <img src="icons/icon_lock.svg" alt="" style="width:34px;height:34px;flex:0 0 auto;display:block">
+          <div style="font:800 38px/1 Nunito,system-ui,sans-serif;letter-spacing:.04em;color:#E8C44A;white-space:nowrap">ROUND IN PROGRESS</div>
+        </div>
+      </div>
+    </sc-if>
+    <div style="height:3px;background:var(--footEdge)"></div>
+    <div style="position:relative;height:141px;display:flex;--tabA:{{ tabAlpha }}">
+      <div data-layer="ActiveIndicator" style="position:absolute;top:6px;left:936px;width:72px;height:8px;border-radius:4px;z-index:1;background:var(--ind)"></div>
+      <div data-layer="Tab_Shop" style="width:216px;height:141px;flex:0 0 auto;position:relative;opacity:var(--tabA)"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_shop_light.svg" alt="Shop" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Journal" style="width:216px;height:141px;flex:0 0 auto;position:relative;opacity:var(--tabA)"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_journal_light.svg" alt="Journal" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Home" style="width:216px;height:141px;flex:0 0 auto;position:relative;opacity:var(--tabA)"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_home_light.svg" alt="Home" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Camp" style="width:216px;height:141px;flex:0 0 auto;position:relative;opacity:var(--tabA)"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_camp_light.svg" alt="Camp" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Arena" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;background:#FFB88C;border:2px solid rgba(45,52,54,.14);display:grid;place-items:center"><img src="icons/tab_arena.svg" alt="Arena" style="width:72px;height:72px;display:block;transform:translateY(-2px)"></div></div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;round&quot;,&quot;empty&quot;,&quot;empty_tutorial&quot;],&quot;default&quot;:&quot;round&quot;,&quot;tsType&quot;:&quot;'round'|'empty'|'empty_tutorial'&quot;,&quot;section&quot;:&quot;State&quot;},&quot;lush&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:0,&quot;max&quot;:4,&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;State&quot;}}">
+// Rekreacija Arene iz koda (2026-09-30): arena_meadow_bg.gd, arena_seed_chip.gd + arena_chip_draw.gd,
+// arena_pest.gd, arena_seed_bag.gd, ui_arena.gd, ui_chrome.gd, merge_arena.tscn.
+// Busenje i cvjetici: isti broj/raspon kao LAYOUT_SEED 9021, ali JS rng (Godot RNG se ne ponavlja 1:1).
+const CROP = {"clover_t1":[80,89,96,164],"clover_t2":[65,52,126,202],"daisy_t1":[90,119,76,134],"daisy_t2":[62,42,132,212],"buttercup_t1":[90,125,76,128],"buttercup_t2":[69,52,118,201],"tulip_t1":[83,117,89,136],"tulip_t2":[75,62,100,192],"sunflower_t1":[88,116,80,138],"sunflower_t2":[57,33,142,222],"pumpkin_t1":[85,99,86,154],"pumpkin_t2":[48,75,158,153]};
+function crop(key, box) {
+  const c = CROP[key]; const s = box / Math.max(c[2], c[3]);
+  return { src: 'icons/flowers/' + key + '.svg', is: +(256 * s).toFixed(2), il: +((box - c[2] * s) / 2 - c[0] * s).toFixed(2), it: +((box - c[3] * s) / 2 - c[1] * s).toFixed(2) };
+}
+function hex(a) { return '#' + a.map(v => Math.round(v).toString(16).padStart(2, '0')).join(''); }
+function lerpHex(a, b, t) { const p = x => [1, 3, 5].map(i => parseInt(x.substr(i, 2), 16)); const A = p(a), B = p(b); return hex(A.map((v, i) => v + (B[i] - v) * t)); }
+function rng(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+// Hex resetka UiArena.spawn_slots (korak 164, bounds 83,2 od rubova polja 1080 x 1589) — ovdje bez mijesanja.
+const SLOTS = [[130,84.4],[294,84.4],[786,84.4],[950,84.4],[212,226.4],[376,226.4],[540,226.4],[704,226.4],[868,226.4],[130,368.5],[294,368.5],[458,368.5],[622,368.5],[786,368.5],[950,368.5],[212,510.5],[376,510.5],[540,510.5],[704,510.5],[868,510.5],[130,652.5],[294,652.5],[458,652.5],[622,652.5],[786,652.5],[950,652.5],[212,794.5],[376,794.5],[540,794.5],[704,794.5],[868,794.5],[130,936.5],[294,936.5],[458,936.5],[622,936.5],[786,936.5],[950,936.5],[212,1078.6],[376,1078.6],[540,1078.6],[704,1078.6],[868,1078.6],[130,1220.6],[294,1220.6],[786,1220.6],[950,1220.6]];
+const ROUND = [
+  [1,'clover',1],[4,'daisy',1],[5,'clover',1],[7,'tulip',2],[10,'buttercup',1],[12,'daisy',1],[13,'sunflower',2],[16,'pumpkin',1],
+  [18,'clover',2],[21,'buttercup',1],[23,'tulip',1],[25,'daisy',2],[27,'sunflower',1],[29,'buttercup',1],[31,'clover',1],
+  [33,'pumpkin',2],[35,'tulip',1],[38,'daisy',1],[40,'sunflower',1],[43,'clover',1]
+];
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const state = p.state ?? 'round';
+    const level = Math.max(0, Math.min(4, +(p.lush ?? 0)));
+    const t = level / 4;
+    const round = state === 'round';
+    const r = rng(9021);
+    const tuftsAll = [], bloomsAll = [];
+    for (let i = 0; i < 34; i++) tuftsAll.push([r(), r(), 30 + r() * 34]);
+    for (let i = 0; i < 20; i++) bloomsAll.push([r(), r(), 14 + r() * 12]);
+    const tuftCount = 10 + 6 * level, tuftCol = lerpHex('#334C3A', '#4A8250', t);
+    const tufts = [];
+    tuftsAll.forEach((d, i) => {
+      const a = Math.max(0, Math.min(1, tuftCount - i)); if (a <= 0) return;
+      const x = 20 + d[0] * 1040, y = 300 + d[1] * 1250, h = d[2], tw = h * 0.5;
+      tufts.push({ pts: [[x + tw * 0.5, y], [x + tw, y + h], [x, y + h]].map(q => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join(' '), fill: tuftCol, a: (0.85 * a).toFixed(2) });
+    });
+    const BC = ['#FFEAA7', '#FFCCD5', '#B8E0F5', '#D4A5FF'];
+    const blooms = [];
+    bloomsAll.forEach((d, i) => {
+      const a = Math.max(0, Math.min(1, 5 * level - i)); if (a <= 0) return;
+      const x = 30 + d[0] * 1020, y = 340 + d[1] * 1200;
+      blooms.push({ x: (x + d[2] / 2).toFixed(1), y: (y + d[2] / 2).toFixed(1), r: (d[2] / 2).toFixed(1), fill: BC[i % 4] });
+    });
+    const chips = round ? ROUND.map(([slot, type, tier]) => {
+      const [cx, cy] = SLOTS[slot];
+      const mythic = type === 'pumpkin';
+      const box = tier === 2 ? 88 : 80;
+      const f = crop(type + '_t' + tier, box);
+      return {
+        layer: 'SeedChip_T' + tier, x: (cx - 67.2).toFixed(1), y: (cy - 67.2).toFixed(1),
+        r: tier === 2 ? '38px' : '50%', rim: mythic ? '#FFD56B' : '#FFF8F0', edge: mythic ? '#D6A82F' : '#CBC2B6',
+        wi: tier === 2 ? 11 : 8, wr: tier === 2 ? '27px' : '50%', t2: tier === 2, mythic,
+        box, bx: ((134.4 - box) / 2).toFixed(1), ...f
+      };
+    }) : [];
+    const bagCount = round ? 22 : 38;
+    const peekTypes = round ? ['daisy', 'buttercup', 'tulip'] : ['clover', 'daisy', 'buttercup'];
+    const sizes = [64, 74, 64], rots = [-16, 0, 16];
+    const bodyTop = 250 - 178;
+    const peek = peekTypes.map((ty, i) => {
+      const s = sizes[i]; const f = crop(ty + '_t1', s);
+      const cx = 140 + (i - 1) * 59, cy = bodyTop + 26 - s / 2;
+      return { x: (cx - s / 2).toFixed(1), y: (cy - s / 2).toFixed(1), s, rot: rots[i], ...f };
+    });
+    const pestAsleep = !round;
+    return {
+      vars: '',
+      tufts, blooms, chips,
+      inNest: !round,
+      pestX: round ? 708 : 540, pestY: round ? 432 : 108, pestRot: round ? -6 : 0,
+      pestAsleep, pestAwake: !pestAsleep,
+      tutorial: state === 'empty_tutorial',
+      bagRot: 2, peek, bodyTop, bodyH: 178, neckTop: bodyTop - 16,
+      bodyRadius: '94.2px 94.2px 98.4px 98.4px / 53.4px 53.4px 99.7px 99.7px',
+      hasSeeds: bagCount > 0, bagCount,
+      locked: round, tabAlpha: round ? 0.6 : 1
+    };
+  }
+  componentDidMount() { this.applyVars(); }
+  componentDidUpdate() { this.applyVars(); }
+  applyVars() {
+    const root = document.querySelector('[data-layer="HubScreen"]'); if (!root) return;
+    const level = Math.max(0, Math.min(4, +(this.props.lush ?? 0))), t = level / 4;
+    const round = (this.props.state ?? 'round') === 'round';
+    const asleep = !round;
+    const set = (k, v) => root.style.setProperty(k, v);
+    set('--meadow', lerpHex('#293D2E', '#335C38', t));
+    set('--hillFar', lerpHex('#22342A', '#2E5233', t));
+    set('--hillNear', lerpHex('#2F4636', '#3C6B40', t));
+    set('--pb', asleep ? '#7A579E' : '#8C61B8');
+    set('--pe', asleep ? '#61457E' : '#6F4D93');
+    set('--footEdge', round ? 'rgba(232,196,74,.85)' : 'rgba(255,248,240,.55)');
+    set('--ind', round ? 'rgba(255,184,140,.4)' : '#FFB88C');
+  }
+}
+</script>
+</body>
+</html>

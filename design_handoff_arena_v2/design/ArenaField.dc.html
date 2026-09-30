@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div data-layer="MeadowBg" style="position:relative;overflow:hidden;width:{{ w }}px;height:{{ h }}px;background:{{ base }}">
+  <svg width="{{ w }}" height="{{ h }}" viewBox="0 0 1080 1633" preserveAspectRatio="none" style="position:absolute;left:0;top:0;display:block">
+    <sc-for list="{{ layers }}" as="L" hint-placeholder-count="0">
+      <path d="{{ L.d }}" fill="{{ L.f }}" opacity="{{ L.o }}" stroke="{{ L.s }}" stroke-width="{{ L.sw }}" stroke-linecap="round" stroke-linejoin="round"></path>
+    </sc-for>
+    <sc-for list="{{ items }}" as="p" hint-placeholder-count="0">
+      <path d="{{ p.d }}" fill="{{ p.f }}" stroke="{{ p.s }}" stroke-width="{{ p.sw }}" opacity="{{ p.o }}" stroke-linecap="round" stroke-linejoin="round"></path>
+    </sc-for>
+  </svg>
+  <div data-layer="ComboLight" style="position:absolute;inset:0;pointer-events:none;background:{{ lightColor }};opacity:{{ lightAlpha }};transition:{{ lightTransition }}"></div>
+  <sc-if value="{{ showAvoid }}" hint-placeholder-val="{{ false }}">
+    <sc-for list="{{ avoid }}" as="a" hint-placeholder-count="0">
+      <div style="position:absolute;left:{{ a.x }}px;top:{{ a.y }}px;width:{{ a.w }}px;height:{{ a.h }}px;box-sizing:border-box;border:2px dashed #E0457B"></div>
+    </sc-for>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:540,&quot;height&quot;:817},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;lush&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:4,&quot;step&quot;:0.25,&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;},&quot;width&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:540,&quot;tsType&quot;:&quot;number&quot;},&quot;comboLight&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:0.2,&quot;step&quot;:0.01,&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;},&quot;lightOut&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;showAvoid&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { M: null };
+  componentDidMount() {
+    import('./arena_v2_data.js').then(M => this.setState({ M }));
+  }
+  renderVals() {
+    const p = this.props;
+    const w = +(p.width ?? 1080), h = w * 1633 / 1080;
+    const M = this.state.M;
+    const light = +(p.comboLight ?? 0);
+    if (!M) return { w, h, base: '#2E3A33', layers: [], items: [], lightColor: '#FFFFFF', lightAlpha: 0, lightTransition: 'none', showAvoid: false, avoid: [] };
+    const season = M.FIELDS[p.season] ? p.season : 'country_bloom';
+    const level = Math.max(0, Math.min(4, +(p.lush ?? 0)));
+    const key = season + ':' + level;
+    if (this._key !== key) { this._key = key; this._built = M.buildField(season, level); }
+    const b = this._built;
+    const k = w / 1080, kh = h / 1633;
+    return {
+      w, h, base: b.base, layers: b.layers, items: b.items,
+      lightColor: M.FIELDS[season].combo.light, lightAlpha: light,
+      lightTransition: p.lightOut ? 'opacity .35s cubic-bezier(.65,0,.35,1)' : 'opacity .2s cubic-bezier(.33,1,.68,1)',
+      showAvoid: !!p.showAvoid,
+      avoid: M.AVOID.map(a => ({ x: a[0] * 10.8 * k, y: a[1] * 16.33 * kh, w: a[2] * 10.8 * k, h: a[3] * 16.33 * kh }))
+    };
+  }
+}
+</script>
+</body>
+</html>
