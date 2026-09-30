@@ -255,6 +255,8 @@ func _run() -> void:
 	# Runda 3, R2: veo na svih sest, nijedan crtez, tacno jedan katanac.
 	if _veiled(content) != 6 or _arts_drawn(content) != 0:
 		_fail("locked season: the veil must hide every flower"); return
+	if not (content.call("name_boxes") as Array).is_empty():
+		_fail("locked season: no flower name may show"); return
 	if str(content.call("coin_text")) != "320 / 500" or str(content.call("star_text")) != "14 / 20":
 		_fail("need chips expected 320 / 500 and 14 / 20 got %s / %s" % [str(content.call("coin_text")), str(content.call("star_text"))]); return
 	if str(home.call("home_play_action")) != "focus" or str(play.get("mode")) != "back":
@@ -287,6 +289,9 @@ func _run() -> void:
 		_fail("playable season: six flowers, no veil"); return
 	if bool(content.call("has_roster_lock")):
 		_fail("playable season: no lock"); return
+	# Ime nosi svaki vidljivi cvijet, i onaj koji je igrac vec nasao.
+	if (content.call("name_boxes") as Array).size() != (content.call("name_boxes", true) as Array).size():
+		_fail("playable season: every flower carries its name, not only the missing ones"); return
 	# Najgori slucaj je nova igra: svih sest imena odjednom. Mjeri se na SVAKOJ
 	# sezoni, jer imena su sadrzaj i nova sezona ih lako prelije jedno na drugo.
 	var catalog: GDScript = load("res://scripts/seasons/season_catalog.gd")

@@ -61,6 +61,8 @@ const ROSTER6 := [
 const ART_FILL := 0.78
 ## Runda 4: 34 (bilo 38), 12 ispod diska (bilo 18), prelom na 220 (bilo 300) —
 ## jedan red ako stane, inace dva uravnotezena; tri reda nikad.
+## Imena nose SVI vidljivi cvjetovi, ne samo oni koji fale (odstupanje od
+## paketa); `MISSING_*` su imena tokena iz handoffa i ostaju radi mapiranja.
 const MISSING_NAME := 34
 const MISSING_NAME_GAP := 12.0
 const MISSING_NAME_MAX_W := 220.0

@@ -83,6 +83,7 @@ Pip hoda tek kad je prelaz gotov. Prsten oko prazne korpe (jedini loop) kreće t
 
 - **Klik kroz `OpenTransition`:** vidi „Kako je provjereno". U igri kontejner ne prima dodir, pa tabovi rade.
 - **Cvijeće na kartici** je pravi roster sezone, ne placeholderi iz mocka. „Fali" znači da cvijet nikad nije ubran (nema ga u `discovered_blooms`, u albumu ni u zalihi). Od runde 3 ih je šest.
+- **Ime nosi svaki vidljivi cvijet**, i onaj koji je igrač već našao. Paket crta ime samo ispod cvijeta koji fali, ali tako kartica govori samo šta igraču nedostaje, a ne šta u sezoni raste — a to je ono po čemu se sezona bira. Pod velom (zaključana sezona) i dalje nema nijednog imena.
 - **Sezone bez SVG crteža** (sve osim Country Blooma) crtaju isti proceduralni cvijet kao livada, pa kartica i polje ostaju isti.
 - **Duga imena cvijeća** (npr. „Paper Lantern Bloom") prelamaju se u dva uravnotežena reda do 300 px, da ne pređu na susjedni disk.
 - **Daleke free sezone** (iza sljedeće) pokazuju iste čipove uslova kao sljedeća. Mock je crtao samo sljedeću.
@@ -184,6 +185,12 @@ Korak 240 je najveći koji staje: najšire ime u krajnjoj koloni je **10,8 px** 
 - Ime ispod srednjeg (velikog) diska završava na **530**, donji red počinje na 560 — 30 px umjesto 8.
 - **Nijedno ime se ne izbacuje.** Igrač i dalje vidi ime svakog cvijeta koji mu fali.
 
+### Odstupanje: ime nosi svaki cvijet
+
+Paket crta ime **samo ispod cvijeta koji igrač nije našao**. U igri ga nosi **svaki vidljivi cvijet**, i onaj već nađen: kartica se bira po tome šta u sezoni raste, a ne po tome šta igraču nedostaje. Raspored to podnosi bez ijedne promjene, jer je runda 4 ionako mjerena na najgorem slučaju — svih šest imena odjednom.
+
+Zaključana sezona ostaje nedirnuta: pod velom nema ni imena ni isprekidanih diskova.
+
 ### Pravilo za sadržaj
 
 CD je uz dizajn dao i pravilo koje mora vrijediti za buduće sezone: **svako novo ime cvijeta mora stati u dva reda od najviše 234 px na 34/900.** Danas je najšire „Paper Lantern / Bloom" — 234,4 px. Ovo je `MISSING_NAME_CONTENT_MAX_W` u kodu i smoke ga provjerava, pa se novo predugo ime vidi odmah, a ne tek u playtestu.
@@ -194,6 +201,7 @@ CD je uz dizajn dao i pravilo koje mora vrijediti za buduće sezone: **svako nov
 
 - šest imena u najviše dva reda, nijedna linija šira od 234;
 - nijedna dva imena se ne dodiruju, i najmanji razmak u cijeloj igri je ≥ 14 px;
-- nijedno ime ne ulazi u disk, u strelice ni u status red.
+- nijedno ime ne ulazi u disk, u strelice ni u status red;
+- na zaključanoj sezoni nema nijednog imena, a na igrivoj ga nosi svih šest cvjetova (i nađeni).
 
 Provjereno i mutacijom: kad se vrate vrijednosti runde 3 (38 / 300), smoke pada na prvoj sezoni („Meadow Clover" 285 > 234). Pun skup: **56/56**.

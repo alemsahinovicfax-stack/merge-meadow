@@ -313,25 +313,28 @@ func _draw() -> void:
 			_draw_soon()
 
 
-## Pod velom je disk obican krem — isprekidani disk i ime cvijeta koji fali
-## pojave se tek kad veo padne (kao u mocku: miss = playable i veo = 0).
+## Ime nosi SVAKI cvijet koji se vidi, i nadjen i onaj koji fali — igrac zna
+## sta u sezoni raste, ne samo sta mu jos nedostaje. (Paket crta ime samo ispod
+## cvijeta koji fali; ovo je namjerno odstupanje, vidi izvjestaj.)
+## Pod velom nema ni imena ni isprekidanog diska — zakljucana sezona se ne odaje.
 func _draw_roster() -> void:
 	var roster := _roster()
 	for i in mini(roster.size(), _discs.size()):
 		var f: Dictionary = roster[i]
 		var r := _discs[i]
-		var miss := bool(f.get("missing", false)) and _veil[i] <= 0.001
-		if miss:
+		var shown := _veil[i] <= 0.001
+		if bool(f.get("missing", false)) and shown:
 			draw_style_box(UiStage.box(UiHomeV3.MISSING_DISC, roundi(r.size.x * 0.5)), r)
 			UiHomeV3.draw_dashed_round_rect(self, r, r.size.x * 0.5, DISC_BORDER, UiHomeV3.INK)
-			_draw_missing_name(str(f.get("name", "")), r)
 		else:
 			UiHomeV3.draw_panel(self, r, UiHomeV3.CREAM, r.size.x * 0.5, DISC_BORDER)
+		if shown:
+			_draw_name(str(f.get("name", "")), r)
 
 
-## Ime cvijeta koji fali: 38/900 ispod diska (gap 18). Duga imena igre idu u dva
-## uravnotezena reda da ne predju na susjedni disk.
-func _draw_missing_name(text: String, disc: Rect2) -> void:
+## Ime cvijeta: 34/900 ispod diska (gap 12). Duga imena idu u dva uravnotezena
+## reda do 220 px, da ne predju na susjedno ime.
+func _draw_name(text: String, disc: Rect2) -> void:
 	var lines := _name_lines(text)
 	var boxes := _name_boxes(text, disc)
 	for i in mini(lines.size(), boxes.size()):
@@ -357,16 +360,15 @@ func _name_boxes(text: String, disc: Rect2) -> Array[Rect2]:
 
 
 ## Redovi imena koji se sada crtaju. `include_hidden` daje okvire i za imena
-## koja se trenutno ne crtaju (nadjen cvijet, veo) — to je najgori slucaj
-## rasporeda, sest imena odjednom, i nad njim se provjerava preklapanje.
+## pod velom — to je najgori slucaj rasporeda, sest imena odjednom, i nad njim
+## se provjerava preklapanje.
 func name_boxes(include_hidden: bool = false) -> Array[Rect2]:
 	var out: Array[Rect2] = []
 	var roster := _roster()
 	for i in mini(roster.size(), _discs.size()):
-		var f: Dictionary = roster[i]
-		if not include_hidden and (not bool(f.get("missing", false)) or _veil[i] > 0.001):
+		if not include_hidden and _veil[i] > 0.001:
 			continue
-		out.append_array(_name_boxes(str(f.get("name", "")), _discs[i]))
+		out.append_array(_name_boxes(str((roster[i] as Dictionary).get("name", "")), _discs[i]))
 	return out
 
 
