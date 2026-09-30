@@ -8,7 +8,7 @@ povezano:
   - home-field-v2-izvjestaj
   - home-season-select-izvjestaj
   - changelog
-ai_sažetak: "Izvještaj o prenosu design_handoff_home_v3 u Godot: runda 2 (2026-09-28) — biranje sezone u dva taba, kartica kao minijatura livade, Play u tri koraka i prelaz u kojem su ime, Pip i Play po jedan objekat; runda 3 (2026-09-29) — svih šest cvjetova na kartici i zaključana sezona pod velom s jednim katancem."
+ai_sažetak: "Izvještaj o prenosu design_handoff_home_v3 u Godot: runda 2 (2026-09-28) — biranje sezone u dva taba, kartica kao minijatura livade, Play u tri koraka i prelaz u kojem su ime, Pip i Play po jedan objekat; runda 3 (2026-09-29) — svih šest cvjetova na kartici i zaključana sezona pod velom s jednim katancem; runda 4 (2026-09-30) — imena cvijeća prestala se preklapati."
 ---
 
 # Home v3 — izvještaj o prenosu
@@ -156,3 +156,44 @@ Veo i katanac se crtaju u zasebnom čvoru `RosterVeil`, koji je **zadnje dijete*
 - „Unlock": veo se diže **redom** (prvi disk prije zadnjeg), a poslije 0,5 s nema vela i vidi se svih šest.
 
 Pun skup: **56/56**.
+
+## Runda 4 (2026-09-30)
+
+Playtest runde 3 je našao da **imena cvijeća ulaze jedno u drugo**. Paket je stigao s ispravkom i prenesen je isti dan.
+
+### Šta je bilo krivo
+
+Ime se crtalo **38/900 centrirano ispod svog diska** i prelamalo tek na 300 px — a centri diskova su bili bliži nego što su imena široka: gornji red 248 px, donji samo **228**. Mjerenjem svih 48 imena u igri: **10 preklapanja na 7 od 8 sezona**, najgore **46 px** (Coral Tide, „Tide Anemone" ↔ „Pearl Waterlily"). Samo Ember Fen je slučajno bio čist.
+
+### Šta je CD promijenio
+
+| | Bilo | Sada |
+|---|---|---|
+| Veličina imena | 38/900 | **34/900** (donja granica iz §2) |
+| Razmak ispod diska | 18 | **12** |
+| Prelom | 300 px | **220 px** — jedan red ako stane, inače dva uravnotežena; tri nikad |
+| Kolone | red 1 na 268 / 516 / 764, red 2 na 288 / 516 / 744 | **276 / 516 / 756 u oba reda**, korak 240 |
+| Vrh drugog reda | 552 | **560** |
+
+Korak 240 je najveći koji staje: najšire ime u krajnjoj koloni je **10,8 px** od strelica. Prelom na 220 = disk 180 plus 20 sa svake strane, pa ime i dalje očito pripada svom disku.
+
+### Šta je time dobijeno
+
+- **Najmanji razmak između dva susjedna imena je 36,4 px** (Starfall Glade, „Nova Bloom" ↔ „Aurora Tulip"), umjesto −45,8 px preklapanja.
+- Ime ispod donjeg reda završava na **820**, status red počinje na 830 — 10 px umjesto 4.
+- Ime ispod srednjeg (velikog) diska završava na **530**, donji red počinje na 560 — 30 px umjesto 8.
+- **Nijedno ime se ne izbacuje.** Igrač i dalje vidi ime svakog cvijeta koji mu fali.
+
+### Pravilo za sadržaj
+
+CD je uz dizajn dao i pravilo koje mora vrijediti za buduće sezone: **svako novo ime cvijeta mora stati u dva reda od najviše 234 px na 34/900.** Danas je najšire „Paper Lantern / Bloom" — 234,4 px. Ovo je `MISSING_NAME_CONTENT_MAX_W` u kodu i smoke ga provjerava, pa se novo predugo ime vidi odmah, a ne tek u playtestu.
+
+### Testovi
+
+`season_home_smoke` sada prolazi **kroz svih 8 sezona** i za svaku uzima **najgori slučaj — svih šest imena odjednom** (to je stanje nove igre, jer se ime crta samo ispod cvijeta koji igrač nije našao). Za svaku sezonu provjerava:
+
+- šest imena u najviše dva reda, nijedna linija šira od 234;
+- nijedna dva imena se ne dodiruju, i najmanji razmak u cijeloj igri je ≥ 14 px;
+- nijedno ime ne ulazi u disk, u strelice ni u status red.
+
+Provjereno i mutacijom: kad se vrate vrijednosti runde 3 (38 / 300), smoke pada na prvoj sezoni („Meadow Clover" 285 > 234). Pun skup: **56/56**.

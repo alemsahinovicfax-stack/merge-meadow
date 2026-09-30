@@ -356,13 +356,15 @@ func _name_boxes(text: String, disc: Rect2) -> Array[Rect2]:
 	return out
 
 
-## Svi redovi imena koji se sada crtaju — raspored se provjerava nad njima.
-func missing_name_boxes() -> Array[Rect2]:
+## Redovi imena koji se sada crtaju. `include_hidden` daje okvire i za imena
+## koja se trenutno ne crtaju (nadjen cvijet, veo) — to je najgori slucaj
+## rasporeda, sest imena odjednom, i nad njim se provjerava preklapanje.
+func name_boxes(include_hidden: bool = false) -> Array[Rect2]:
 	var out: Array[Rect2] = []
 	var roster := _roster()
 	for i in mini(roster.size(), _discs.size()):
 		var f: Dictionary = roster[i]
-		if not bool(f.get("missing", false)) or _veil[i] > 0.001:
+		if not include_hidden and (not bool(f.get("missing", false)) or _veil[i] > 0.001):
 			continue
 		out.append_array(_name_boxes(str(f.get("name", "")), _discs[i]))
 	return out

@@ -10,8 +10,8 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
-zadnja_sesija: "Home v3 runda 3 u igri (svih šest cvjetova na kartici, veo + katanac na zaključanoj sezoni, 56/56 smoke) + Journal optimizovan. Playtest našao da se imena cvijeća preklapaju — brief runda 4 spreman za CD."
-zadnje_azurirano: 2026-09-29
+zadnja_sesija: "Home v3 runde 3 i 4 u igri: svih šest cvjetova na kartici, veo + katanac na zaključanoj sezoni, imena cvijeća 34/900 bez preklapanja (smoke prolazi kroz svih 8 sezona sa svih šest imena). Prije toga Journal optimizovan. 56/56."
+zadnje_azurirano: 2026-09-30
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
 godot_launch: "scripts/godot-open.ps1 (--rendering-driver opengl3)"
@@ -353,7 +353,7 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 
 | ID | Status | Napomena | Link |
 |----|--------|----------|------|
-| HOME-24 | 🔲 brief spreman | Home v3 runda 4 — imena cvijeća se preklapaju (10 preklapanja na 7 od 8 sezona, najgore 46 px). Čeka CD paket | [[../04-experience/design-drafts/home-v3-cd-brief\|brief §15–§16]] |
+| HOME-24 | ✅ | Home v3 runda 4 — imena cvijeća 34/900, prelom 220, 12 ispod diska; kolone 276 / 516 / 756 istim korakom 240 u oba reda, drugi red na 560. Najmanji razmak između imena 36,4 px (bilo −46); pravilo za sadržaj: novo ime mora stati u 2 reda ≤ 234 px | `design_handoff_home_v3/` · [[../04-experience/design-drafts/home-v3-izvjestaj\|izvještaj § Runda 4]] |
 | HOME-23 | ✅ | Home v3 runda 3 — kartica nosi svih šest cvjetova (dva reda po tri, `ROSTER6`); zaključana besplatna sezona je pod velom `#E3D9CC` s jednim katancem 120, a „Unlock" ga diže disk po disk (300 ms, +40 ms). `LOCK_BADGE` gore desno ukinut; premium bez vela (kupuje se, ne otključava) | `design_handoff_home_v3/` · [[../04-experience/design-drafts/home-v3-izvjestaj\|izvještaj § Runda 3]] |
 | HOME-22 | ✅ | Home v3 — biranje u dva taba (Free / Premium), kartica 1032 × 1160 = minijatura livade (tri trake), strelice + swipe, tačke samo indikator, Play 520 × 180 u 3 koraka („Back" + disk); prelaz 560 / 440 ms jedan tween: ime, Pip i Play su JEDAN objekat, predaja kartica → livada 0 px razlike; dock tokena i Play 836 obrisani | `design_handoff_home_v3/` · [[../04-experience/design-drafts/home-v3-izvjestaj\|izvještaj]] |
 | HOME-21 | ✅ | Home polje sezone pass 2 — livada je cijela stranica (bila 606 od 1633), chrome pluta: Gift + korpa 180 gore lijevo (isti okvir), nadogradnje gore desno u sheetu, donji red `Seasons 236 · Play 432 · Endless 236`; 13 mjesta u 4 dubine i Pip van keepouta | `design_handoff_home_field_v2/` |

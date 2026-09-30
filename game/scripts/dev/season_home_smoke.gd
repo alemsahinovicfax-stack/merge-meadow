@@ -9,6 +9,8 @@ extends SceneTree
 ## Runda 3: kartica nosi svih sest cvjetova (dva reda po tri), zakljucana
 ## besplatna sezona ih drzi pod velom uz jedan katanac, a tap na Unlock ih
 ## otkriva disk po disk.
+## Runda 4: imena cvijeca se ne preklapaju ni na jednoj od 8 sezona kad su
+## svih sest prikazana — to je najgori slucaj i stanje nove igre.
 
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
 const TOL := 1.5
@@ -278,24 +280,55 @@ func _run() -> void:
 	if str(stage.call("viewed_id")) != "lantern_meadow" or bool(gs.get("home_season_field_open")):
 		_fail("Back should return to Lantern without opening"); return
 
-	# --- 3b. runda 3: sest cvjetova stane izmedju strelica i status reda ---
+	# --- 3b. runde 3 i 4: sest cvjetova i sest imena stanu na svaku karticu ---
 	if str(stage.call("card_status")) != "active":
 		_fail("should be on the playing season"); return
 	if _veiled(content) != 0 or _arts_drawn(content) != 6:
 		_fail("playable season: six flowers, no veil"); return
 	if bool(content.call("has_roster_lock")):
 		_fail("playable season: no lock"); return
-	var boxes: Array = content.call("missing_name_boxes")
-	if boxes.is_empty():
-		_fail("nothing kept yet: every flower should carry its name"); return
-	var drawn: Array = (content.call("disc_rects") as Array).duplicate()
-	drawn.append_array(boxes)
-	for r: Rect2 in drawn:
-		if r.end.y > V.STATUS_TOP:
-			_fail("flower block reaches %.0f, status row starts at %.0f" % [r.end.y, V.STATUS_TOP]); return
-		for arrow: Rect2 in [V.PREV_RECT, V.NEXT_RECT]:
-			if _on_page(r).intersects(arrow):
-				_fail("flower block %s runs into the arrow %s" % [_on_page(r), arrow]); return
+	# Najgori slucaj je nova igra: svih sest imena odjednom. Mjeri se na SVAKOJ
+	# sezoni, jer imena su sadrzaj i nova sezona ih lako prelije jedno na drugo.
+	var catalog: GDScript = load("res://scripts/seasons/season_catalog.gd")
+	var min_gap := INF
+	var min_gap_where := ""
+	for def in catalog.all_defs():
+		var sid := str(def.get("id"))
+		stage.call("show_season", sid, false)
+		await _frames(2)
+		var discs2: Array = content.call("disc_rects")
+		var boxes: Array = content.call("name_boxes", true)
+		if boxes.size() < 6 or boxes.size() > 12:
+			_fail("%s: expected 6 names in at most 2 lines each, got %d boxes" % [sid, boxes.size()]); return
+		for r: Rect2 in boxes:
+			if r.size.x > V.MISSING_NAME_CONTENT_MAX_W + TOL:
+				_fail("%s: a name line is %.0f px wide, the content rule is %.0f" % [
+					sid, r.size.x, V.MISSING_NAME_CONTENT_MAX_W]); return
+			if r.end.y > V.STATUS_TOP:
+				_fail("%s: a name reaches %.0f, the status row starts at %.0f" % [sid, r.end.y, V.STATUS_TOP]); return
+			for arrow: Rect2 in [V.PREV_RECT, V.NEXT_RECT]:
+				if _on_page(r).intersects(arrow):
+					_fail("%s: a name runs into the arrow %s" % [sid, arrow]); return
+			for d: Rect2 in discs2:
+				if r.intersects(d):
+					_fail("%s: a name runs into the disc %s" % [sid, d]); return
+		# Nijedno ime ne dodiruje susjedno — ovo je greska koju je playtest nasao.
+		for i in boxes.size():
+			for j in range(i + 1, boxes.size()):
+				var a: Rect2 = boxes[i]
+				var b: Rect2 = boxes[j]
+				if a.intersects(b):
+					_fail("%s: two names overlap (%s and %s)" % [sid, a, b]); return
+				if absf(a.position.y - b.position.y) > 1.0:
+					continue
+				var gap: float = maxf(b.position.x - a.end.x, a.position.x - b.end.x)
+				if gap < min_gap:
+					min_gap = gap
+					min_gap_where = sid
+	if min_gap < 14.0:
+		_fail("names come within %.1f px of each other (%s)" % [min_gap, min_gap_where]); return
+	stage.call("show_season", "lantern_meadow", false)
+	await _frames(2)
 
 	# --- 4. swipe po kartici lista; kratak drag se vrati (runda 1, I2) ---
 	await _drag(Vector2(800, 900), Vector2(600, 900))

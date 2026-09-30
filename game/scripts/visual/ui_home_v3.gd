@@ -47,18 +47,27 @@ const ROSTER_TOP := 230.0
 ## 3–5 = ostala tri. Zona 230–830, pa nista ne ulazi u strelice ni u status red.
 const ROSTER_EYE := 220.0
 const ROSTER_DISC := 180.0
-const ROSTER_GAP := 48.0
 const ROSTER_SIDE_DROP := 26.0
-const ROSTER_ROW2_TOP := 552.0
+## Runda 4: tri kolone istim korakom u OBA reda (red 2 je imao tjesnji, 228).
+## Siri korak od 240 bi gurnuo najsire ime preko strelica.
+const ROSTER_COLUMNS_X := [276.0, 516.0, 756.0]
+const ROSTER_PITCH := 240.0
+const ROSTER_ROW2_TOP := 560.0
 const ROSTER6 := [
-	Rect2(178, 256, 180, 180), Rect2(406, 230, 220, 220), Rect2(674, 256, 180, 180),
-	Rect2(198, 552, 180, 180), Rect2(426, 552, 180, 180), Rect2(654, 552, 180, 180),
+	Rect2(186, 256, 180, 180), Rect2(406, 230, 220, 220), Rect2(666, 256, 180, 180),
+	Rect2(186, 560, 180, 180), Rect2(426, 560, 180, 180), Rect2(666, 560, 180, 180),
 ]
 ## Vidljivi cvijet zauzima ~78 % diska (img 82 %, crtez 95 % svog kvadrata).
 const ART_FILL := 0.78
-const MISSING_NAME := 38
-const MISSING_NAME_GAP := 18.0
-const MISSING_NAME_MAX_W := 300.0
+## Runda 4: 34 (bilo 38), 12 ispod diska (bilo 18), prelom na 220 (bilo 300) —
+## jedan red ako stane, inace dva uravnotezena; tri reda nikad.
+const MISSING_NAME := 34
+const MISSING_NAME_GAP := 12.0
+const MISSING_NAME_MAX_W := 220.0
+const MISSING_NAME_MAX_LINES := 2
+## Pravilo za sadrzaj: svako NOVO ime cvijeta mora stati u dva reda od <= 234
+## px na 34/900. Cuva ga season_home_smoke nad svih 8 sezona.
+const MISSING_NAME_CONTENT_MAX_W := 234.0
 const PREMIUM_RIM_INSET := 14.0
 const PREMIUM_RIM_WIDTH := 8
 const PREMIUM_RIM_RADIUS := 36

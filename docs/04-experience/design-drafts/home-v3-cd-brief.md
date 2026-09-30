@@ -11,12 +11,14 @@ povezano:
   - art-direction
   - pristupacnost
   - CHECKPOINT
-ai_sažetak: "Puni redizajn Homea (dva taba, novo Play, prelaz u polje). Runda 1 imala mrtve strelice i prelaz s rupom; runda 2 (§9–§12) ih je popravila i 2026-09-28 je prenesena u igru 1:1; runda 3 (§13–§14) donijela je svih šest cvjetova na kartici i zaključanu sezonu pod velom s jednim katancem, prenesena 2026-09-29; runda 4 (§15–§16) traži da se imena cvijeća prestanu preklapati."
+ai_sažetak: "Puni redizajn Homea (dva taba, novo Play, prelaz u polje). Runda 1 imala mrtve strelice i prelaz s rupom; runda 2 (§9–§12) ih je popravila i 2026-09-28 je prenesena u igru 1:1; runda 3 (§13–§14) donijela je svih šest cvjetova na kartici i zaključanu sezonu pod velom s jednim katancem, prenesena 2026-09-29; runda 4 (§15–§16) riješila je preklapanje imena cvijeća, prenesena 2026-09-30."
 ---
 
 # Home — puni redizajn — Claude Design brief
 
-> **Status 2026-09-29 (kasnije): runda 4 (imena cvijeća) čeka CD** — šalji prompt iz [[#16. Prompt za Claude Design — runda 4|§16]]. Imena se preklapaju na 7 od 8 sezona, najgore 46 px.
+> **Status 2026-09-30: runda 4 isporučena i implementirana u igri** — imena 34/900, prelom 220, jednak korak kolona 240 u oba reda. Najmanji razmak između imena je 36,4 px (bilo −46). Vidi [[#Implementacija runde 4 (2026-09-30)|§ Implementacija runde 4]] i [[home-v3-izvjestaj|izvještaj]].
+
+> ~~**Status 2026-09-29 (kasnije): runda 4 (imena cvijeća) čeka CD.**~~ Prompt je bio §16.
 
 > ~~**Status 2026-09-29: runda 3 isporučena i implementirana u igri**~~ — svih šest cvjetova na kartici, zaključana sezona pod velom s jednim katancem. Vidi [[#Implementacija runde 3 (2026-09-29)|§ Implementacija runde 3]] i [[home-v3-izvjestaj|izvještaj]].
 >
@@ -731,6 +733,26 @@ Paket je stigao s dvije korekcije i prenesen je isti dan. CD je obje zamke iz §
 | `game/scripts/ui/home_v3_card_content.gd` | šest diskova iz `ROSTER6`; novi čvor `RosterVeil` (veo + katanac) kao zadnje dijete, da bude iznad crteža; `play_reveal()`; `has_lock_badge()` → `has_roster_lock()`; `is_dim()` samo za „coming soon"; `missing_name_boxes()` za provjeru rasporeda |
 | `game/scripts/ui/season_stage.gd` | `_roster()` vraća svih šest (red 1 = trojka iz runde 2, red 2 = ostatak); `_unlock()` pokreće veo |
 | `game/scripts/dev/season_home_smoke.gd` | provjere runde 3 (vidi izvještaj § Runda 3) |
+
+## Implementacija runde 4 (2026-09-30)
+
+Paket je stigao s jednom ispravkom i prenesen je isti dan. CD je ostao unutar postojeće geometrije — nije micao karticu, strelice ni status red.
+
+| Odluka CD-a | Šta znači u igri |
+|---|---|
+| Ime 34/900 umjesto 38 | 34 je donja granica iz §2; na 38 najšira dvoredna podjela bi bila 262 i ne bi stala u korak kolona |
+| Prelom 220 umjesto 300 | 220 = disk 180 + 20 sa svake strane, pa ime ostaje očito „ispod svog diska"; dva jednoredna imena su uvijek ≥ 20 px razmaknuta |
+| Jednak korak 240 u oba reda | donji red je imao samo 228; širi korak od 240 bi gurnuo najšire ime preko strelica (ostalo je 10,8 px) |
+| Drugi red na 560 (bilo 552) | ime ispod oka završava na 530 (30 px do reda 2), ime ispod reda 2 na 820 (10 px do statusa) — oba veća nego u rundi 3 |
+| Razmak ispod diska 12 (bilo 18) | ime se i dalje čita kao dio svog diska: 12 prema ≥ 30 do diska ispod i ≥ 36 do susjednog imena |
+| Nijedno ime se ne izbacuje | igrač i dalje vidi ime svakog cvijeta koji mu fali |
+| Pravilo za sadržaj: 2 reda × ≤ 234 px na 34/900 | `MISSING_NAME_CONTENT_MAX_W`; smoke ga provjerava na svih 8 sezona, pa se predugo novo ime vidi odmah |
+
+| Fajl | Izmjena |
+|------|---------|
+| `game/scripts/visual/ui_home_v3.gd` | `MISSING_NAME` 38 → 34, `MISSING_NAME_GAP` 18 → 12, `MISSING_NAME_MAX_W` 300 → 220, novi `MISSING_NAME_MAX_LINES` i `MISSING_NAME_CONTENT_MAX_W`; `ROSTER6` na kolone 276 / 516 / 756 i drugi red na 560; `ROSTER_GAP` → `ROSTER_COLUMNS_X` + `ROSTER_PITCH` |
+| `game/scripts/ui/home_v3_card_content.gd` | `missing_name_boxes()` → `name_boxes(include_hidden)` — s `true` daje okvire svih šest imena, i kad se trenutno ne crtaju; to je najgori slučaj nad kojim se mjeri preklapanje |
+| `game/scripts/dev/season_home_smoke.gd` | prolazi kroz svih 8 sezona sa svih šest imena: nijedna dva se ne dodiruju (≥ 14 px), nijedna linija šira od 234, nijedno ime u disku, strelicama ni status redu |
 
 ## Povezano
 
