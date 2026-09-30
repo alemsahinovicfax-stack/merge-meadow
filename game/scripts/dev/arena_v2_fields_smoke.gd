@@ -113,8 +113,8 @@ func _check_arena() -> void:
 	var center := Vector2(540.0, 800.0)
 	arena.call("register_arena_combo_merge", center)
 	arena.call("register_arena_combo_merge", center)
-	var mark := arena.call("get_combo_mark") as Label
-	if mark == null or mark.text != "×2":
+	var mark: Control = arena.call("get_combo_mark")
+	if mark == null or str(mark.get("text")) != "×2":
 		_fail("combo 2 should show ×2 mark")
 		return
 	if arena.get_node_or_null("RootVBox/Playfield/ComboRipple0") == null:
@@ -122,7 +122,7 @@ func _check_arena() -> void:
 		return
 	for _i in 3:
 		arena.call("register_arena_combo_merge", center)
-	if mark.text != "×5":
+	if str(mark.get("text")) != "×5":
 		_fail("combo 5 mark expected")
 		return
 	await create_timer(0.3).timeout

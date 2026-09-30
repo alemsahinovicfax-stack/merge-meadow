@@ -5,6 +5,8 @@ extends Control
 ## crtano iz recepta UiArenaV2.FIELDS — slojevi (poligoni u %) + rasuti elementi (R2 niz, bez RNG-a).
 ## 0 PNG. Bujnost 0 → 4 (T3 u rundi, crossfade 0,6 s) mijenja oblike; combo mijenja samo
 ## svjetlo (ComboLight) i kratki naklon elemenata u krugu talasa.
+## Performanse: geometrija sezone (oblici, indeksi, polozaji) racuna se jednom (_build_cache);
+## po frejmu se samo skaliraju tacke i boje. Crtanje ide najvise jednom po frejmu, iz _process.
 
 const MAX_LEVEL := 4.0
 const CROSSFADE_SEC := 0.6
@@ -31,9 +33,10 @@ var _bow_center: Vector2 = Vector2.ZERO
 var _bow_radius: float = 0.0
 var _bow_t: float = -1.0
 var _colors: Dictionary = {}
-var _mesh_pts := PackedVector2Array()
-var _mesh_cols := PackedColorArray()
-var _mesh_idx := PackedInt32Array()
+## Keš geometrije za trenutnu sezonu i velicinu: [{line: bool, ...}] u redoslijedu crtanja.
+var _chunks: Array = []
+var _cache_size: Vector2 = Vector2.ZERO
+var _dirty: bool = false
 static var _shape_cache: Dictionary = {}
 
 
@@ -46,7 +49,7 @@ func _ready() -> void:
 	_combo_light.modulate.a = 0.0
 	add_child(_combo_light)
 	set_season(GameState.active_season_id if GameState != null else "")
-	resized.connect(queue_redraw)
+	resized.connect(_request_redraw)
 	set_process(false)
 
 
@@ -65,7 +68,8 @@ func set_season(season_id: String) -> void:
 		_layer_tris.append(tris)
 	if _combo_light != null:
 		_combo_light.color = UiArenaV2.col(str(_field["combo"]["light"]))
-	queue_redraw()
+	_cache_size = Vector2.ZERO
+	_request_redraw()
 
 
 func get_season_id() -> String:
@@ -115,78 +119,170 @@ func play_bow(center: Vector2, radius: float) -> void:
 	_bow_center = center
 	_bow_radius = maxf(radius, 1.0)
 	_bow_t = 0.0
-	set_process(true)
+	_request_redraw()
+
+
+## Crtez se trazi ovdje, a obnavlja iz _process — tako tween (koji se vrti poslije _process)
+## ne izazove drugo crtanje u istom frejmu.
+func _request_redraw() -> void:
+	_dirty = true
+	if is_inside_tree():
+		set_process(true)
+	else:
+		queue_redraw()
 
 
 func _process(delta: float) -> void:
-	if _bow_t < 0.0:
+	if _bow_t >= 0.0:
+		_bow_t += delta
+		_dirty = true
+		if _bow_t > float(UiArenaV2.COMBO_BOW["sec"]) + float(UiArenaV2.COMBO_BOW["delay_per_ring"]):
+			_bow_t = -1.0
+	if _dirty:
+		_dirty = false
+		queue_redraw()
+	elif _bow_t < 0.0 and (_tween == null or not _tween.is_valid() or not _tween.is_running()):
 		set_process(false)
-		return
-	_bow_t += delta
-	if _bow_t > float(UiArenaV2.COMBO_BOW["sec"]) + float(UiArenaV2.COMBO_BOW["delay_per_ring"]):
-		_bow_t = -1.0
-		set_process(false)
-	queue_redraw()
 
 
-## Cijela livada ide u jedan mesh (tacke, boje, indeksi) — jedan draw poziv umjesto po jednog
-## za svaki element. Oblici su triangulisani jednom u jedinicnom prostoru (_shape_mesh), a
-## polozaj/rotacija/velicina se primjenjuju na CPU. Izgled je isti kao crtanje primitivima.
+## Cijela livada ide u jedan mesh po dijelu (jedan draw poziv; girlanda je zaseban AA poziv).
 func _draw() -> void:
 	if _field.is_empty():
 		return
-	_mesh_begin()
-	var base := UiArenaV2.layer_color(_field["base"], _level)
-	_add_tris(
-		PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0.0), size, Vector2(0.0, size.y)]),
-		PackedInt32Array([0, 1, 2, 0, 2, 3]), base
-	)
+	if _cache_size != size:
+		_build_cache()
+	for chunk in _chunks:
+		if chunk["line"]:
+			draw_polyline(chunk["pts"], UiArenaV2.layer_color(chunk["fill"], _level), chunk["w"], true)
+			continue
+		# Boje ovise samo o nivou bujnosti — za naklon (combo) se ne racunaju ponovo.
+		if chunk["cols_level"] != _level:
+			var cols := PackedColorArray()
+			for e in chunk["entries"]:
+				_emit_colors(e, cols)
+			chunk["cols"] = cols
+			chunk["cols_level"] = _level
+		var pts := PackedVector2Array()
+		for e in chunk["entries"]:
+			pts.append_array(_entry_points(e))
+		RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), chunk["idx"], pts, chunk["cols"])
+
+
+## Tacke unosa za trenutni nivo i naklon; rasuti element se preracuna samo kad mu se
+## promijeni velicina (tokom naklona to su samo elementi u krugu talasa).
+func _entry_points(e: Dictionary) -> PackedVector2Array:
+	if int(e["k"]) != 2:
+		return e["pts"]
+	var pos: Vector2 = e["pos"]
+	var sc := float(e["size"]) * UiArenaV2.scatter_grow(e["s"], _level) * _bow_scale(pos)
+	if e.get("sc", -1.0) == sc:
+		return e["pts_now"]
+	var xf := Transform2D(0.0, Vector2(sc, sc), 0.0, pos)
+	var out := PackedVector2Array()
+	for part in e["parts"]:
+		out.append_array(xf * (part["pts"] as PackedVector2Array))
+	e["sc"] = sc
+	e["pts_now"] = out
+	return out
+
+
+func _emit_colors(e: Dictionary, cols: PackedColorArray) -> void:
+	match int(e["k"]):
+		0:  # sloj ili pozadina: boja po nivou
+			cols.append_array(_filled(e["n"], UiArenaV2.layer_color(e["fill"], _level)))
+		1:  # oblik fiksne boje (mjesec)
+			cols.append_array(e["cols"])
+		2:  # rasuti element: alpha po nivou
+			var alpha := UiArenaV2.scatter_alpha(e["s"], int(e["i"]), _level)
+			for part in e["parts"]:
+				var c: Color = part["color"]
+				c.a *= alpha
+				cols.append_array(_filled(part["n"], c))
+
+
+func _build_cache() -> void:
+	_cache_size = size
+	_chunks.clear()
+	var chunk := _new_chunk()
+	var base_pts := PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0.0), size, Vector2(0.0, size.y)])
+	_add_entry(chunk, {"k": 0, "pts": base_pts, "n": 4, "fill": _field["base"]}, PackedInt32Array([0, 1, 2, 0, 2, 3]))
 	var layers: Array = _field["layers"]
-	for i in layers.size():
-		_draw_layer(layers[i], _layer_tris[i] if i < _layer_tris.size() else [])
+	for li in layers.size():
+		var layer: Dictionary = layers[li]
+		var kind := str(layer["kind"])
+		if kind == "shape":
+			var at: Array = layer["at"]
+			var pos := Vector2(float(at[0]) * size.x / 100.0, float(at[1]) * size.y / 100.0)
+			var xf := Transform2D(0.0, Vector2.ONE * float(layer["size"]), 0.0, pos)
+			for part in _shape_mesh(str(layer["shape"])):
+				var pal: Array = layer["palette"]
+				var c := _color(str(pal[mini(int(part["ci"]), pal.size() - 1)]))
+				var pts: PackedVector2Array = xf * (part["pts"] as PackedVector2Array)
+				_add_entry(chunk, {"k": 1, "pts": pts, "cols": _filled(pts.size(), c)}, part["idx"])
+			continue
+		var polys: Array = layer["polys"]
+		for k in polys.size():
+			var pts := _pct_points(polys[k], size)
+			if kind == "line":
+				_chunks.append(chunk)
+				_chunks.append({"line": true, "pts": pts, "fill": layer["fill"], "w": float(layer.get("w", 4.0))})
+				chunk = _new_chunk()
+				continue
+			var tris: Array = _layer_tris[li] if li < _layer_tris.size() else []
+			var idx: PackedInt32Array = tris[k] if k < tris.size() else PackedInt32Array()
+			if idx.is_empty():
+				for v in range(1, pts.size() - 1):
+					idx.append_array([0, v, v + 1])
+			_add_entry(chunk, {"k": 0, "pts": pts, "n": pts.size(), "fill": layer["fill"]}, idx)
 	for s in _field["scatter"]:
-		_draw_scatter(s)
-	_mesh_flush()
+		var parts := _shape_mesh(str(s["shape"]))
+		var n: Array = s["n"]
+		for i in int(n[1]):
+			var it := UiArenaV2.scatter_instance(s, i)
+			if bool(it["avoided"]):
+				continue
+			var p: Vector2 = it["pos"]
+			var rot := Transform2D(deg_to_rad(float(it["rot"])), Vector2.ZERO)
+			var pal: Array = it["palette"]
+			var inst_parts: Array = []
+			var idx := PackedInt32Array()
+			var offset := 0
+			for part in parts:
+				var pts: PackedVector2Array = rot * (part["pts"] as PackedVector2Array)
+				inst_parts.append({
+					"pts": pts, "n": pts.size(),
+					"color": _color(str(pal[mini(int(part["ci"]), pal.size() - 1)])),
+				})
+				for v in part["idx"]:
+					idx.append(offset + v)
+				offset += pts.size()
+			var entry := {
+				"k": 2, "s": s, "i": i, "size": float(it["size"]),
+				"pos": Vector2(p.x * size.x / 100.0, p.y * size.y / 100.0), "parts": inst_parts,
+			}
+			_add_entry(chunk, entry, idx, offset)
+	_chunks.append(chunk)
 
 
-func _draw_layer(layer: Dictionary, tris: Array) -> void:
-	var kind := str(layer["kind"])
-	if kind == "shape":
-		var at: Array = layer["at"]
-		var pos := Vector2(float(at[0]) * size.x / 100.0, float(at[1]) * size.y / 100.0)
-		_add_shape(str(layer["shape"]), layer["palette"], pos, 0.0, float(layer["size"]), 1.0)
-		return
-	var col := UiArenaV2.layer_color(layer["fill"], _level)
-	var polys: Array = layer["polys"]
-	for k in polys.size():
-		var pts := _pct_points(polys[k], size)
-		if kind == "line":
-			# Antialiasirana linija (girlanda) ide svojim pozivom, ali redoslijed ostaje.
-			_mesh_flush()
-			draw_polyline(pts, col, float(layer.get("w", 4.0)), true)
-			continue
-		var idx: PackedInt32Array = tris[k] if k < tris.size() else PackedInt32Array()
-		if idx.is_empty():
-			_mesh_flush()
-			draw_colored_polygon(pts, col)
-		else:
-			_add_tris(pts, idx, col)
+func _new_chunk() -> Dictionary:
+	return {"line": false, "entries": [], "idx": PackedInt32Array(), "verts": 0, "cols_level": -1.0}
 
 
-func _draw_scatter(s: Dictionary) -> void:
-	var grow := UiArenaV2.scatter_grow(s, _level)
-	var n: Array = s["n"]
-	for i in int(n[1]):
-		var alpha := UiArenaV2.scatter_alpha(s, i, _level)
-		if alpha <= 0.0:
-			continue
-		var it := UiArenaV2.scatter_instance(s, i)
-		if bool(it["avoided"]):
-			continue
-		var p: Vector2 = it["pos"]
-		var pos := Vector2(p.x * size.x / 100.0, p.y * size.y / 100.0)
-		var sc := float(it["size"]) * grow * _bow_scale(pos)
-		_add_shape(str(s["shape"]), it["palette"], pos, float(it["rot"]), sc, alpha)
+func _add_entry(chunk: Dictionary, entry: Dictionary, idx: PackedInt32Array, verts: int = -1) -> void:
+	var base: int = chunk["verts"]
+	var all_idx: PackedInt32Array = chunk["idx"]
+	for v in idx:
+		all_idx.append(base + v)
+	chunk["idx"] = all_idx
+	chunk["verts"] = base + (verts if verts >= 0 else (entry["pts"] as PackedVector2Array).size())
+	(chunk["entries"] as Array).append(entry)
+
+
+static func _filled(n: int, c: Color) -> PackedColorArray:
+	var out := PackedColorArray()
+	out.resize(n)
+	out.fill(c)
+	return out
 
 
 func _bow_scale(pos: Vector2) -> float:
@@ -198,45 +294,6 @@ func _bow_scale(pos: Vector2) -> float:
 	var delay := d / _bow_radius * float(UiArenaV2.COMBO_BOW["delay_per_ring"])
 	var t := clampf((_bow_t - delay) / float(UiArenaV2.COMBO_BOW["sec"]), 0.0, 1.0)
 	return 1.0 + (float(UiArenaV2.COMBO_BOW["scale"]) - 1.0) * sin(PI * t)
-
-
-## Oblik iz UiArenaV2.SHAPES (jedinica = velicina elementa, y nadole) u mesh livade.
-func _add_shape(shape_id: String, palette: Array, pos: Vector2, rot_deg: float, sc: float, alpha: float) -> void:
-	if sc <= 0.0:
-		return
-	var parts := _shape_mesh(shape_id)
-	if parts.is_empty():
-		return
-	var xf := Transform2D(deg_to_rad(rot_deg), Vector2(sc, sc), 0.0, pos)
-	for part in parts:
-		var ci: int = part["ci"]
-		var c := _color(str(palette[mini(ci, palette.size() - 1)]))
-		c.a *= alpha
-		_add_tris(xf * (part["pts"] as PackedVector2Array), part["idx"], c)
-
-
-func _mesh_begin() -> void:
-	_mesh_pts.clear()
-	_mesh_cols.clear()
-	_mesh_idx.clear()
-
-
-func _add_tris(pts: PackedVector2Array, idx: PackedInt32Array, c: Color) -> void:
-	var base := _mesh_pts.size()
-	_mesh_pts.append_array(pts)
-	var cols := PackedColorArray()
-	cols.resize(pts.size())
-	cols.fill(c)
-	_mesh_cols.append_array(cols)
-	for i in idx:
-		_mesh_idx.append(base + i)
-
-
-func _mesh_flush() -> void:
-	if _mesh_idx.is_empty():
-		return
-	RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), _mesh_idx, _mesh_pts, _mesh_cols)
-	_mesh_begin()
 
 
 ## Oblik triangulisan jednom (jedinicni prostor): [{ci, pts, idx}]. Primitivi:
@@ -343,4 +400,4 @@ func _tween_light(target: float, sec: float, trans: Tween.TransitionType, ease_t
 
 func _set_level(value: float) -> void:
 	_level = value
-	queue_redraw()
+	_request_redraw()

@@ -88,10 +88,11 @@ var _rng := RandomNumberGenerator.new()
 var _session_open: bool = false
 var _combo_bonus: int = 0
 var _fx_nodes: Array[Node] = []
-var _combo_mark: Label = null
+var _combo_mark: ArenaComboMark = null
 var _combo_mark_tween: Tween = null
 var _combo_ripples: Array[Panel] = []
 var _combo_ripple_next: int = 0
+var _combo_ripple_tweens: Array[Tween] = []
 
 
 func _ready() -> void:
@@ -119,6 +120,7 @@ func _deferred_boot() -> void:
 		legacy.visible = false
 	_setup_bag()
 	_setup_pest()
+	_setup_combo_fx()
 	need_more_overlay.visible = false
 	_layout_playfield_chrome()
 	_apply_season_field()
@@ -450,26 +452,34 @@ func _play_combo_feedback(at: Vector2, t3: bool) -> void:
 		meadow_bg.play_bow(bg_at, float(step["ring"]))
 
 
+## „×N" i prstenovi se prave pri pokretanju Arene (ne u frejmu prvog comboa), a slova svih
+## combo velicina se iscrtaju jednom nevidljivo — prvi puls ne steka.
+func _setup_combo_fx() -> void:
+	if _combo_mark == null:
+		_combo_mark = ArenaComboMark.new()
+		_combo_mark.name = "ComboMark"
+		_combo_mark.z_index = 60
+		playfield.add_child(_combo_mark)
+		_combo_mark.prewarm()
+	if _combo_ripples.is_empty():
+		var width := float(UiArenaV2.COMBO_RIPPLE["width"])
+		for i in COMBO_RIPPLE_POOL:
+			var ring := Panel.new()
+			ring.name = "ComboRipple%d" % i
+			ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			ring.visible = false
+			ring.add_theme_stylebox_override("panel", UiArena.ring_style(999.0, width, UiPalette.WARM_WHITE))
+			playfield.add_child(ring)
+			playfield.move_child(ring, 0)
+			_combo_ripples.append(ring)
+
+
 func _show_combo_mark(at: Vector2, gold: bool, font_size: int) -> void:
 	var cfg := UiArenaV2.COMBO_MARK
-	if _combo_mark == null or not is_instance_valid(_combo_mark):
-		_combo_mark = Label.new()
-		_combo_mark.name = "ComboMark"
-		_combo_mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_combo_mark.z_index = 60
-		_combo_mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_combo_mark.add_theme_font_override("font", UiChrome.heavy_font(UiChrome.EMBOLDEN_800))
-		_combo_mark.add_theme_color_override("font_outline_color", UiArenaV2.col(str(cfg["ink"])))
-		_combo_mark.add_theme_constant_override("outline_size", int(cfg["outline"]))
-		playfield.add_child(_combo_mark)
+	_setup_combo_fx()
 	if _combo_mark_tween != null and _combo_mark_tween.is_valid():
 		_combo_mark_tween.kill()
-	_combo_mark.text = "×%d" % _combo_count
-	_combo_mark.add_theme_font_size_override("font_size", font_size)
-	_combo_mark.add_theme_color_override("font_color", UiArenaV2.col(str(cfg["gold" if gold else "fill"])))
-	_combo_mark.reset_size()
-	_combo_mark.size = _combo_mark.get_combined_minimum_size()
-	_combo_mark.pivot_offset = _combo_mark.size * 0.5
+	_combo_mark.show_mark("×%d" % _combo_count, font_size, UiArenaV2.col(str(cfg["gold" if gold else "fill"])))
 	var from_y := at.y + float(cfg["rise_from"]) - _combo_mark.size.y * 0.5
 	var to_y := at.y + float(cfg["rise_to"]) - _combo_mark.size.y * 0.5
 	_combo_mark.position = Vector2(at.x - _combo_mark.size.x * 0.5, from_y)
@@ -489,27 +499,21 @@ func _show_combo_mark(at: Vector2, gold: bool, font_size: int) -> void:
 	_combo_mark_tween.tween_property(_combo_mark, "modulate:a", 0.0, fade).set_delay(pop + hold)
 
 
-func get_combo_mark() -> Label:
+func get_combo_mark() -> ArenaComboMark:
 	return _combo_mark
 
 
 ## Prsten (10 px) od mjesta spajanja, r 90 → R, alpha 0,55 → 0, 0,5 s — crta se ispod sjemenki.
 func _play_combo_ripple(at: Vector2, radius: float) -> void:
 	var cfg := UiArenaV2.COMBO_RIPPLE
-	if _combo_ripples.is_empty():
-		for i in COMBO_RIPPLE_POOL:
-			var ring := Panel.new()
-			ring.name = "ComboRipple%d" % i
-			ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			ring.visible = false
-			ring.add_theme_stylebox_override(
-				"panel", UiArena.ring_style(999.0, float(cfg["width"]), UiPalette.WARM_WHITE)
-			)
-			playfield.add_child(ring)
-			playfield.move_child(ring, 0)
-			_combo_ripples.append(ring)
-	var ring := _combo_ripples[_combo_ripple_next % _combo_ripples.size()]
+	_setup_combo_fx()
+	var slot := _combo_ripple_next % _combo_ripples.size()
+	var ring := _combo_ripples[slot]
 	_combo_ripple_next += 1
+	# Brz combo moze vratiti isti prsten dok mu stari tween jos traje — ugasi ga prvo.
+	if slot < _combo_ripple_tweens.size() and _combo_ripple_tweens[slot] != null \
+			and _combo_ripple_tweens[slot].is_valid():
+		_combo_ripple_tweens[slot].kill()
 	if meadow_bg != null:
 		var ring_color := UiArenaV2.col(str(UiArenaV2.field(meadow_bg.get_season_id())["combo"]["ring"]))
 		(ring.get_theme_stylebox("panel") as StyleBoxFlat).border_color = ring_color
@@ -523,6 +527,9 @@ func _play_combo_ripple(at: Vector2, radius: float) -> void:
 	tw.tween_property(ring, "scale", Vector2.ONE, float(cfg["sec"]))
 	tw.tween_property(ring, "modulate:a", 0.0, float(cfg["sec"]))
 	tw.chain().tween_callback(ring.hide)
+	while _combo_ripple_tweens.size() <= slot:
+		_combo_ripple_tweens.append(null)
+	_combo_ripple_tweens[slot] = tw
 
 
 ## Na combo 5 novcic 56 px leti od spajanja do coin chipa (0,5 s), pa postojeci „+N" pop.
