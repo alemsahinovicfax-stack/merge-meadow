@@ -12,13 +12,18 @@ const CHIP_MIN_DIST := ArenaSeedChip.CHIP_RADIUS * 2.0 + 6.0 * ArenaSeedChip.DIS
 const CHIP_SEPARATION := CHIP_MIN_DIST
 ## Rub polja za centre sjemenki (83 px na 1080 — rešetka iz design_handoff_merge_arena).
 const FIELD_MARGIN := ArenaSeedChip.CHIP_RADIUS + 16.0
-const ARENA_COMBO_WINDOW_SEC := 1.4
+const ARENA_COMBO_WINDOW_SEC := UiArenaV2.COMBO_WINDOW
 const COMBO_HUD_MIN := 2
 const COMBO_COIN_THRESHOLD := 5
 const ARENA_AUTO_REFILL_AT := 12
 const ARENA_TINT_T3_CAP := 4
 const ARENA_PIP_REACT_SCALE := 1.18
 const ARENA_PIP_REACT_SEC := 0.28
+const COMBO_RIPPLE_POOL := 3
+const COMBO_COIN_SIZE := 56.0
+const COMBO_COIN_SEC := 0.5
+const COMBO_CHIP_RING_GROW := 6.0
+const COMBO_CHIP_RING_SEC := 0.3
 const CLEAR_CHIP_SCALE := 1.12
 const CLEAR_VFX_SEC := 0.4
 const CLEAR_FLASH_COLOR := Color(1.0, 0.96, 0.82, 1.0)
@@ -83,6 +88,10 @@ var _rng := RandomNumberGenerator.new()
 var _session_open: bool = false
 var _combo_bonus: int = 0
 var _fx_nodes: Array[Node] = []
+var _combo_mark: Label = null
+var _combo_mark_tween: Tween = null
+var _combo_ripples: Array[Panel] = []
+var _combo_ripple_next: int = 0
 
 
 func _ready() -> void:
@@ -112,6 +121,7 @@ func _deferred_boot() -> void:
 	_setup_pest()
 	need_more_overlay.visible = false
 	_layout_playfield_chrome()
+	_apply_season_field()
 	_apply_meadow_tint()
 	_apply_merge_hint_if_ready()
 	_update_tutorial_cue()
@@ -141,8 +151,8 @@ func _layout_bag() -> void:
 	var field := playfield.size
 	if field.x < 10.0 or field.y < 10.0:
 		return
-	var x := (field.x - UiArena.BAG_HIT.x) * 0.5
-	var y := field.y - UiArena.BAG_BOTTOM_GAP - UiArena.BAG_HIT.y
+	var x := (field.x - UiArenaV2.BASKET_HIT.x) * 0.5
+	var y := field.y - UiArenaV2.BASKET_BOTTOM_GAP - UiArenaV2.BASKET_HIT.y
 	_seed_bag.set_layout_position(Vector2(x, y))
 
 
@@ -176,13 +186,21 @@ func get_session_t3_count() -> int:
 	return _session_t3_count
 
 
+## Livada je mjesto aktivne sezone (UiArenaV2.FIELDS) — mijenja se samo kad nema sesije.
+func _apply_season_field() -> void:
+	if meadow_bg != null and not _session_open:
+		meadow_bg.set_season(GameState.active_season_id)
+
+
 func _apply_meadow_tint(animated: bool = false) -> void:
 	if meadow_bg == null:
 		return
 	meadow_bg.set_t3_level(float(mini(_session_t3_count, ARENA_TINT_T3_CAP)), animated)
 
 
-func _react_arena_pip() -> void:
+func _react_arena_pip(
+	react_scale: float = ARENA_PIP_REACT_SCALE, react_sec: float = ARENA_PIP_REACT_SEC
+) -> void:
 	if arena_pip == null:
 		return
 	if _pip_react_tween != null:
@@ -192,9 +210,9 @@ func _react_arena_pip() -> void:
 	arena_pip.scale = Vector2.ONE
 	_pip_react_tween = create_tween()
 	_pip_react_tween.tween_property(
-		arena_pip, "scale", Vector2(ARENA_PIP_REACT_SCALE, ARENA_PIP_REACT_SCALE), ARENA_PIP_REACT_SEC * 0.45
+		arena_pip, "scale", Vector2(react_scale, react_scale), react_sec * 0.45
 	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_pip_react_tween.tween_property(arena_pip, "scale", Vector2.ONE, ARENA_PIP_REACT_SEC * 0.55).set_trans(
+	_pip_react_tween.tween_property(arena_pip, "scale", Vector2.ONE, react_sec * 0.55).set_trans(
 		Tween.TRANS_BACK
 	).set_ease(Tween.EASE_OUT)
 
@@ -368,6 +386,7 @@ func set_arena_page_active(active: bool) -> void:
 	if active:
 		if playfield:
 			_layout_playfield_chrome()
+		_apply_season_field()
 		_refresh_bag()
 		_sync_hub_nav_lock()
 	else:
@@ -389,22 +408,175 @@ func refresh_for_meta_hub() -> void:
 	_sync_hub_nav_lock()
 
 
-func register_arena_combo_merge() -> void:
+## `at` = mjesto spajanja u koordinatama Playfielda (INF = bez efekta na polju, npr. smoke).
+## `t3` = T3 merge: T3 burst zamjenjuje combo talas (jedan prsten, ne dva).
+func register_arena_combo_merge(at: Vector2 = Vector2.INF, t3: bool = false) -> void:
 	if _combo_window_left > 0.0:
 		_combo_count += 1
 	else:
 		_combo_count = 1
 	_combo_window_left = ARENA_COMBO_WINDOW_SEC
+	var coin_now := false
 	if _combo_count == COMBO_COIN_THRESHOLD and not _combo_coin_granted_this_streak:
 		_combo_bonus = GameState.try_grant_arena_combo_coins()
 		_combo_coin_granted_this_streak = true
 		if _combo_bonus > 0 and GameState.meta_hub_active and is_inside_tree():
 			get_tree().call_group("meta_hub", "refresh_top_bar")
-			get_tree().call_group("meta_hub", "show_coin_earn_pop", _combo_bonus)
+			coin_now = true
 	if _combo_count >= COMBO_COIN_THRESHOLD:
 		GameState.note_arena_daily_event("combo_5")
-	if _combo_count >= COMBO_HUD_MIN:
-		_react_arena_pip()
+	_play_combo_feedback(at, t3)
+	if coin_now and not _fly_combo_coin(at, _combo_bonus):
+		get_tree().call_group("meta_hub", "show_coin_earn_pop", _combo_bonus)
+
+
+## Combo zivi na polju (design_handoff_arena_v2 § Combo): „×N" na mjestu spajanja, talas ispod
+## sjemenki, svjetlo sezone preko livade, od 4 naklon elemenata, Pip skok (na 5 veci).
+func _play_combo_feedback(at: Vector2, t3: bool) -> void:
+	var step := UiArenaV2.combo_step(_combo_count)
+	if step.is_empty():
+		return
+	if meadow_bg != null:
+		meadow_bg.set_combo_light(float(step["light"]))
+	var pip: Array = UiArenaV2.COMBO_PIP[str(step["pip"])]
+	_react_arena_pip(float(pip[0]), float(pip[1]))
+	if at == Vector2.INF or playfield == null or not is_inside_tree():
+		return
+	_show_combo_mark(at, bool(step["gold"]), int(step["mark"]))
+	if not t3:
+		_play_combo_ripple(at, float(step["ring"]))
+	if bool(step["bow"]) and meadow_bg != null:
+		var bg_at := at + playfield.global_position - meadow_bg.global_position
+		meadow_bg.play_bow(bg_at, float(step["ring"]))
+
+
+func _show_combo_mark(at: Vector2, gold: bool, font_size: int) -> void:
+	var cfg := UiArenaV2.COMBO_MARK
+	if _combo_mark == null or not is_instance_valid(_combo_mark):
+		_combo_mark = Label.new()
+		_combo_mark.name = "ComboMark"
+		_combo_mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_combo_mark.z_index = 60
+		_combo_mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_combo_mark.add_theme_font_override("font", UiChrome.heavy_font(UiChrome.EMBOLDEN_800))
+		_combo_mark.add_theme_color_override("font_outline_color", UiArenaV2.col(str(cfg["ink"])))
+		_combo_mark.add_theme_constant_override("outline_size", int(cfg["outline"]))
+		playfield.add_child(_combo_mark)
+	if _combo_mark_tween != null and _combo_mark_tween.is_valid():
+		_combo_mark_tween.kill()
+	_combo_mark.text = "×%d" % _combo_count
+	_combo_mark.add_theme_font_size_override("font_size", font_size)
+	_combo_mark.add_theme_color_override("font_color", UiArenaV2.col(str(cfg["gold" if gold else "fill"])))
+	_combo_mark.reset_size()
+	_combo_mark.size = _combo_mark.get_combined_minimum_size()
+	_combo_mark.pivot_offset = _combo_mark.size * 0.5
+	var from_y := at.y + float(cfg["rise_from"]) - _combo_mark.size.y * 0.5
+	var to_y := at.y + float(cfg["rise_to"]) - _combo_mark.size.y * 0.5
+	_combo_mark.position = Vector2(at.x - _combo_mark.size.x * 0.5, from_y)
+	_combo_mark.scale = Vector2.ZERO
+	_combo_mark.modulate.a = 1.0
+	_combo_mark.visible = true
+	var pop := float(cfg["pop_in"])
+	var hold := float(cfg["hold"])
+	var fade := float(cfg["fade"])
+	_combo_mark_tween = _combo_mark.create_tween().set_parallel(true)
+	_combo_mark_tween.tween_property(_combo_mark, "scale", Vector2.ONE, pop).set_trans(Tween.TRANS_BACK).set_ease(
+		Tween.EASE_OUT
+	)
+	_combo_mark_tween.tween_property(_combo_mark, "position:y", to_y, pop + hold + fade).set_trans(
+		Tween.TRANS_CUBIC
+	).set_ease(Tween.EASE_OUT)
+	_combo_mark_tween.tween_property(_combo_mark, "modulate:a", 0.0, fade).set_delay(pop + hold)
+
+
+func get_combo_mark() -> Label:
+	return _combo_mark
+
+
+## Prsten (10 px) od mjesta spajanja, r 90 → R, alpha 0,55 → 0, 0,5 s — crta se ispod sjemenki.
+func _play_combo_ripple(at: Vector2, radius: float) -> void:
+	var cfg := UiArenaV2.COMBO_RIPPLE
+	if _combo_ripples.is_empty():
+		for i in COMBO_RIPPLE_POOL:
+			var ring := Panel.new()
+			ring.name = "ComboRipple%d" % i
+			ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			ring.visible = false
+			ring.add_theme_stylebox_override(
+				"panel", UiArena.ring_style(999.0, float(cfg["width"]), UiPalette.WARM_WHITE)
+			)
+			playfield.add_child(ring)
+			playfield.move_child(ring, 0)
+			_combo_ripples.append(ring)
+	var ring := _combo_ripples[_combo_ripple_next % _combo_ripples.size()]
+	_combo_ripple_next += 1
+	if meadow_bg != null:
+		var ring_color := UiArenaV2.col(str(UiArenaV2.field(meadow_bg.get_season_id())["combo"]["ring"]))
+		(ring.get_theme_stylebox("panel") as StyleBoxFlat).border_color = ring_color
+	ring.size = Vector2(radius, radius) * 2.0
+	ring.pivot_offset = ring.size * 0.5
+	ring.position = at - ring.size * 0.5
+	ring.scale = Vector2.ONE * (float(cfg["from_r"]) / radius)
+	ring.modulate.a = float(cfg["alpha"])
+	ring.visible = true
+	var tw := ring.create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(ring, "scale", Vector2.ONE, float(cfg["sec"]))
+	tw.tween_property(ring, "modulate:a", 0.0, float(cfg["sec"]))
+	tw.chain().tween_callback(ring.hide)
+
+
+## Na combo 5 novcic 56 px leti od spajanja do coin chipa (0,5 s), pa postojeci „+N" pop.
+## Vraca false ako nema huba / mjesta (pozivalac tad odmah zove pop).
+func _fly_combo_coin(at: Vector2, amount: int) -> bool:
+	if at == Vector2.INF or playfield == null or not is_inside_tree():
+		return false
+	var hub := get_tree().get_first_node_in_group("meta_hub")
+	if hub == null:
+		return false
+	var chip := hub.get("coin_chip") as Control
+	if chip == null or not is_instance_valid(chip):
+		return false
+	var coin := TextureRect.new()
+	coin.name = "ComboCoin"
+	coin.texture = UiAssets.get_chrome_icon("icon_coin")
+	coin.custom_minimum_size = Vector2(COMBO_COIN_SIZE, COMBO_COIN_SIZE)
+	coin.size = coin.custom_minimum_size
+	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	coin.top_level = true
+	coin.z_index = 100
+	add_child(coin)
+	_fx_nodes.append(coin)
+	coin.global_position = playfield.global_position + at - coin.size * 0.5
+	var to := chip.global_position + chip.size * 0.5 - coin.size * 0.5
+	var tw := coin.create_tween()
+	tw.tween_property(coin, "global_position", to, COMBO_COIN_SEC).set_trans(Tween.TRANS_CUBIC).set_ease(
+		Tween.EASE_IN
+	)
+	tw.tween_callback(_on_combo_coin_arrived.bind(coin, chip, amount))
+	return true
+
+
+func _on_combo_coin_arrived(coin: Node, chip: Control, amount: int) -> void:
+	_free_fx(coin)
+	if not is_inside_tree():
+		return
+	get_tree().call_group("meta_hub", "show_coin_earn_pop", amount)
+	if chip == null or not is_instance_valid(chip):
+		return
+	var ring := Panel.new()
+	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ring.top_level = true
+	ring.z_index = 100
+	ring.add_theme_stylebox_override("panel", UiArena.ring_style(999.0, 4.0, UiArena.COIN_GOLD))
+	add_child(ring)
+	_fx_nodes.append(ring)
+	ring.size = chip.size + Vector2.ONE * COMBO_CHIP_RING_GROW * 2.0
+	ring.global_position = chip.global_position - Vector2.ONE * COMBO_CHIP_RING_GROW
+	var tw := ring.create_tween()
+	tw.tween_property(ring, "modulate:a", 0.0, COMBO_CHIP_RING_SEC)
+	tw.tween_callback(_free_fx.bind(ring))
 
 
 func get_combo_count() -> int:
@@ -417,10 +589,13 @@ func is_session_open() -> bool:
 
 
 func _clear_combo() -> void:
+	var had_combo := _combo_count >= COMBO_HUD_MIN
 	_combo_count = 0
 	_combo_window_left = 0.0
 	_combo_coin_granted_this_streak = false
 	_combo_bonus = 0
+	if had_combo and meadow_bg != null:
+		meadow_bg.clear_combo_light()
 
 
 func _on_chip_drag_started(chip: ArenaSeedChip) -> void:
@@ -935,7 +1110,7 @@ func _on_chip_released(chip: ArenaSeedChip) -> void:
 				"tier": new_tier,
 				"pos": merged_center,
 			}
-			register_arena_combo_merge()
+			register_arena_combo_merge(merged_center, new_tier >= GameState.MAX_MERGE_TIER)
 			if new_tier == 2:
 				GameState.note_arena_daily_event("merge_t2")
 			elif new_tier >= GameState.MAX_MERGE_TIER:

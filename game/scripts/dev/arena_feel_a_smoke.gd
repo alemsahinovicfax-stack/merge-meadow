@@ -4,7 +4,6 @@ extends SceneTree
 
 
 const SAVE_PATH := "user://player_save.json"
-const BG_BASE := Color(0.16, 0.24, 0.18, 1.0)
 
 
 func _initialize() -> void:
@@ -71,13 +70,15 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("Pip must not be a pest eat target")
 		return
-	# Bg je ArenaMeadowBg (crtana livada); `color` = ciljna nijansa po broju T3.
+	# Bg je ArenaMeadowBg (livada sezone, Arena v2); `color` = ciljna boja tla po broju T3.
 	var bg := arena.get_node_or_null("Bg") as Control
 	if bg == null:
 		_restore_save(backup)
 		_fail("Bg missing")
 		return
-	if not Color(bg.get("color")).is_equal_approx(BG_BASE):
+	var field: Dictionary = UiArenaV2.field(str(bg.call("get_season_id")))
+	var bg_base := UiArenaV2.layer_color(field["base"], 0.0)
+	if not Color(bg.get("color")).is_equal_approx(bg_base):
 		_restore_save(backup)
 		_fail("Bg should start at base meadow color")
 		return
@@ -95,7 +96,7 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("session T3 count expected 2")
 		return
-	if Color(bg.get("color")).is_equal_approx(BG_BASE):
+	if Color(bg.get("color")).is_equal_approx(bg_base):
 		_restore_save(backup)
 		_fail("Bg tint should move after T3s")
 		return
@@ -104,7 +105,7 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("reset should clear T3 count")
 		return
-	if not Color(bg.get("color")).is_equal_approx(BG_BASE):
+	if not Color(bg.get("color")).is_equal_approx(bg_base):
 		_restore_save(backup)
 		_fail("reset should restore base Bg color")
 		return

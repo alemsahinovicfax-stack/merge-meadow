@@ -17,28 +17,9 @@ const FLASH := Color("#FFF5D1")
 const CHIP_SHADOW := Color(0.078, 0.125, 0.102, 0.42)
 const CHIP_SHADOW_DRAG := Color(0.078, 0.125, 0.102, 0.34)
 const OVERLAY_DIM := Color(0.059, 0.078, 0.071, 0.82)
-## Livada — iste vrijednosti kao prije redizajna (arena_feel_a_smoke ih poredi tacno).
-const MEADOW_BASE := Color(0.16, 0.24, 0.18, 1.0)
-const MEADOW_LUSH := Color(0.20, 0.36, 0.22, 1.0)
-
-const BAG_BODY := Color("#9E7A52")
-const BAG_BODY_EDGE := Color("#735738")
+## Livada, muncher i korpa (Arena v2) su u UiArenaV2 — recept po sezoni, gusjenica, korpa.
+## Stari panj u Runu jos koristi boju vrata vrece.
 const BAG_NECK := Color("#B89466")
-const BAG_NECK_EDGE := Color("#7A5C3C")
-const NEST := Color("#9E7A52")
-const NEST_EDGE := Color("#735738")
-const NEST_INNER := Color("#6E5238")
-const NEST_INNER_EDGE := Color("#543E2A")
-
-const MUNCHER_AWAKE := Color("#8C61B8")
-const MUNCHER_AWAKE_EDGE := Color("#6F4D93")
-const MUNCHER_ASLEEP := Color("#7A579E")
-const MUNCHER_ASLEEP_EDGE := Color("#61457E")
-const MUNCHER_FROZEN := Color("#A6D1FA")
-const MUNCHER_FROZEN_EDGE := Color("#6FA8DC")
-const MUNCHER_MOUTH_IDLE := Color("#5C3F7E")
-const FROST_SHELL := Color(0.91, 0.965, 1.0, 0.42)
-const FROST_SHELL_EDGE := Color("#DCF0FF")
 const MOUTH := Color("#FFCCD5")
 const MOUTH_EDGE := Color("#E89AAA")
 
@@ -68,18 +49,14 @@ const FLOWER_SIZE_T3 := 140.0
 const CHIP_SHADOW_OFFSET := 6.0
 const CHIP_SHADOW_OFFSET_DRAG := 18.0
 
-# --- SeedBag / Muncher / Pip ---
-const BAG_SIZE := Vector2(214, 178)
-const BAG_SIZE_EMPTY := Vector2(214, 126)
-const BAG_NECK_SIZE := Vector2(118, 34)
-const BAG_HIT := Vector2(280, 250)
-const BAG_COUNTER_R := 42.0
-const BAG_BOTTOM_GAP := 40.0
+# --- Korpa / Muncher / Pip ---
+## Korpa (Arena v2): dodir 300 x 280, 40 px iznad dna polja.
+const BAG_HIT := UiArenaV2.BASKET_HIT
+const BAG_BOTTOM_GAP := UiArenaV2.BASKET_BOTTOM_GAP
 ## Keepout relativno na (centar vrece, dno vrece) — stit oko vrece, siri od same vrece.
 const BAG_KEEPOUT := Rect2(-185, -349, 370, 520)
+## Clamp munchera u polje — logika se ne mijenja s gusjenicom (glava r 50).
 const MUNCHER_VISUAL_R := 52.0
-const FROST_SHELL_R := 70.0
-const NEST_SIZE := Vector2(210, 104)
 ## Gnijezdo je 2026-09-24 otislo ~200 px gore (HUD red je otpao); nize od ovoga
 ## header odsijece "zzz" iznad usnulog munchera.
 const NEST_Y := 108.0
@@ -152,6 +129,18 @@ static func chip_rim_style(tier: int, mythic: bool) -> StyleBoxFlat:
 	s.bg_color = COIN_GOLD if mythic else UiPalette.WARM_WHITE
 	s.border_color = GOLD_EDGE if mythic else RIM_EDGE
 	s.set_border_width_all(RIM_BORDER)
+	_styles[key] = s
+	return s
+
+
+## SeedBase (Arena v2): tamni prsten 4 px ispod krem rima — kontrast >= 3 : 1 na svakoj livadi.
+## T1 krug, T2 zaobljen kvadrat r 42 (= 38 + 4). 4 px = (CHIP_MIN_DIST 142,8 - 134,4) / 2.
+static func chip_base_style(tier: int) -> StyleBoxFlat:
+	var key := "base_%d" % tier
+	if _styles.has(key):
+		return _styles[key]
+	var s := _round(UiArenaV2.SEED_BASE_T2_RADIUS if tier == 2 else 999)
+	s.bg_color = UiArenaV2.SEED_BASE
 	_styles[key] = s
 	return s
 

@@ -4,6 +4,7 @@ extends RefCounted
 ## Crtez sjemenke u Areni — dijele ga ArenaSeedChip i ArenaVacuumFly.
 ## Smjer B (design_handoff_merge_arena): cream rim + tamni well; T1 krug, T2 zaobljen kvadrat
 ## s unutrasnjim prstenom; ★3 gold rim + isprekidan prsten. Bez teksta na sjemenci.
+## Arena v2: SeedBase — tamni prsten 4 px ispod rima (pravilo dvostrukog ruba), crta se prvi.
 
 const PLANT_DRAW := preload("res://scripts/visual/camp_plant_draw.gd")
 
@@ -32,6 +33,7 @@ static func draw_chip(
 	var rect := Rect2(center - Vector2(side, side) * 0.5, Vector2(side, side))
 	var corner := UiArena.chip_corner_radius(tier)
 	var drop := UiArena.CHIP_SHADOW_OFFSET_DRAG if dragging else UiArena.CHIP_SHADOW_OFFSET
+	canvas.draw_style_box(UiArena.chip_base_style(tier), rect.grow(UiArenaV2.SEED_BASE_W))
 	canvas.draw_style_box(
 		UiArena.chip_shadow_style(tier, dragging), Rect2(rect.position + Vector2(0.0, drop), rect.size)
 	)

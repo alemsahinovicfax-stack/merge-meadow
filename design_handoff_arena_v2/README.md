@@ -63,7 +63,7 @@ Brief: `docs/04-experience/design-drafts/merge-arena-cd-brief.md` §11. Jedan di
 
 Prva runda (2026-09-12, smjer B) je dala sjemenku (krem rim + tamni well) i raspored; 2026-09-24 HUD i Done su obrisani. Ova runda ne dira sjemenku osim SeedBase prstena, ne vraća HUD ni Done i ne mijenja mehaniku ni ekonomiju.
 
-## § Samoprovjera (mjereno u browseru, Arena Specs)
+## § Samoprovjera (mjereno u browseru, Arena Specs + ArenaScreen u svih 6 stanja na 6 sezona)
 
 | # | Stavka | |
 |---|---|---|

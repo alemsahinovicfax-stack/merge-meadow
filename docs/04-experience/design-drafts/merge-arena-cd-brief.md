@@ -696,6 +696,10 @@ CD je stao na pola paketa (istekao limit). Ove odluke postoje **samo u CD chatu*
 
 **Ostalo CD-u:** popravka performansi (galerija od 16 livada se guši — spajanje oblika po boji), `SeedChip` / `Muncher` / `SeedBasket` komponente, `ArenaScreen.dc.html`, `Arena Specs.dc.html`, `godot/` (export JSON, `ui_arena_v2.gd`, `arena_tree.txt`), README sa § Odlučeno i § Samoprovjerom od 9 stavki, pa zip.
 
+### 11.10 Paket isporučen i u igri (2026-09-30)
+
+Paket `design_handoff_arena_v2/` je stigao kompletan (README s § Odlučeno i § Samoprovjerom, Specs, ArenaScreen, `godot/`) i prenesen je isti dan po redu iz `godot/arena_tree.txt`: SeedBase → muncher → korpa → combo → livade. Podaci su u `game/scripts/visual/ui_arena_v2.gd` (kopija generisanog fajla + `col()` za `rgba(...)` boje). Svih 8 livada je uključeno odjednom — kod je isti za svaku sezonu, razlika je samo zapis u `FIELDS`. Detalji u changelogu 2026-09-30.
+
 ## 12. Prompt za Claude Design — redizajn 2
 
 > Kopiraj sve iz bloka ispod u CD. **Prije toga commitaj i pushaj na `master`.** Priloži i ovaj `.md` fajl.

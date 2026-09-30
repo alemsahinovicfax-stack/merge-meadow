@@ -151,11 +151,11 @@ class Component extends DCLogic {
     let mx = mx0, my = my0;
     const seeds = [];
     let eatSeed = null;
-    if (S.eatSlot != null) { const q = SLOTS[S.eatSlot]; eatSeed = q; mx = q[0] + 20; my = q[1] - 22; }
+    if (S.eatSlot != null) { const q = SLOTS[S.eatSlot]; eatSeed = q; mx = q[0] + 30; my = q[1] - 20; }
     for (let k = 0, i = 0; seeds.length < S.n && k < ORDER.length; k++) {
       const slot = ORDER[k], q = SLOTS[slot];
       const isEat = slot === S.eatSlot;
-      if (!isEat && Math.hypot(q[0] - mx, q[1] - my) < 130) continue;
+      if (!isEat && Math.hypot(q[0] - mx, q[1] - my) < (mSt === 'frozen' ? 175 : 150)) continue;
       const T = TYPES[i++ % TYPES.length];
       const gen = T[0] === 'gen';
       seeds.push({ slot, x: q[0], y: q[1], type: gen ? 'generic' : T[0], tier: T[1], rarity: T[2] || 1, season: gen ? (i % 3 ? season : 'coral_tide') : season, jitter: (i * 0.37) % 1, state: isEat ? 'eaten' : 'idle' });
