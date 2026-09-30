@@ -10,7 +10,7 @@ ai_sažetak: "Operativni hub — jedini izvor istine za fazu/milestone; frontmat
 aktivna_sekcija: D
 b0_aktivan: false
 sljedeci_korak: "D0-P / playtest. CAMP-06 camp fill — čeka playtest."
-zadnja_sesija: "Home v3 runde 3 i 4 u igri: svih šest cvjetova na kartici, veo + katanac na zaključanoj sezoni, imena cvijeća 34/900 bez preklapanja (smoke prolazi kroz svih 8 sezona sa svih šest imena). Prije toga Journal optimizovan. 56/56."
+zadnja_sesija: "Home v3 runde 3 i 4 u igri (svih šest cvjetova na kartici, veo + katanac na zaključanoj sezoni, imena bez preklapanja, 56/56) + Journal optimizovan. Napisan brief za redizajn Arene 2: muncher, korpa, osam livada po sezoni, combo."
 zadnje_azurirano: 2026-09-30
 spec_slice: "docs/02-design/spec-vertical-slice.md (source of truth) + ekonomija-brojevi.md"
 dev_stroj: "HP laptop, Windows, AMD Radeon integrisana — Godot samo OpenGL"
@@ -359,6 +359,7 @@ Cursor rule: `.cursor/rules/scope-guard.mdc`
 | HOME-21 | ✅ | Home polje sezone pass 2 — livada je cijela stranica (bila 606 od 1633), chrome pluta: Gift + korpa 180 gore lijevo (isti okvir), nadogradnje gore desno u sheetu, donji red `Seasons 236 · Play 432 · Endless 236`; 13 mjesta u 4 dubine i Pip van keepouta | `design_handoff_home_field_v2/` |
 | CHROME-02 | ✅ | Hub chrome pass 2 — dusk plum `#2A2233` umjesto zelene, footer 144 px bez teksta (dodir 216 × 141), treći chip broji cvijeće umjesto dijamanata; nove ikone coina / sjemena / cvijeta kroz cijelu igru (i pickup u runu); stranica 1597 → 1633 bez promjene kartica | `design_handoff_hub_chrome_v2/` |
 | CAMP-07 | ✅ | Camp pass 2 — bez „Next free season", „Details", podnaslova tabova, Merge prečice, „1 coin each" i „hold 10/s"; kartica sezone 276, sekcija fiksno 1253 uz nju, art u karticama +45 %, Trade i Unlock 300 × 120 | `design_handoff_camp_v2/` |
+| ARENA-05 | 🔲 brief spreman | Redizajn Arene 2 — muncher kao pravi neprijatelj, nova korpa iz koje viri sjeme, osam livada (po jedna za svaku sezonu, kao recept a ne PNG) i vidljiv combo koji mijenja polje. Čeka CD paket `design_handoff_arena_v2/` | [[../04-experience/design-drafts/merge-arena-cd-brief\|brief §11–§12]] |
 | ARENA-04 | ✅ | Prostor umjesto HUD-a — uklonjeni daily/stash pilule, traka s porukama, combo pilula i Done; polje 1553 px, muncher gore, vreća i Pip dolje; sesija se gasi kad polje ostane prazno | — |
 | SHOP | ✅ | Redizajn 1 dizajn — 4 sekcije u skrolu + sticky chipovi, pregled kozmetike „Now / With it“, kupovina za coine u 2 tapa, poruke na kartici, season kartice s rosterom | `design_handoff_shop/` |
 | JOURNAL | ✅ | Bloom Album 1a — red 1032×200, poglavlja sezona, NEW cijelu posjetu, auto-scroll, Golden Album frame | `design_handoff_journal/` |

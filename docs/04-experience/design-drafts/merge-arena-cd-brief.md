@@ -11,10 +11,12 @@ povezano:
   - art-direction
   - pristupacnost
   - CHECKPOINT
-ai_sažetak: "Merge Arena (5. stranica huba) — pravila iz koda koja ostaju fiksna, raspored i mjere unutar novog hub chromea, šta danas ne štima, šta CD mora a šta smije, gotov prompt za Claude Design i mapa za prenos u Godot."
+ai_sažetak: "Merge Arena (5. stranica huba) — pravila iz koda koja ostaju fiksna, raspored i mjere, gotov prompt za Claude Design i mapa za prenos u Godot. Redizajn 1 (smjer B) je u igri od 2026-09-12; redizajn 2 (§11–§12, 2026-09-30) traži pravog neprijatelja umjesto munchera-smajlija, novu korpu iz koje viri sjeme, osam različitih livada — po jednu za svaku sezonu — i vidljiv combo koji mijenja polje."
 ---
 
 # Merge Arena — Claude Design brief i referenca
+
+> **Status 2026-09-30: redizajn 2 (muncher, korpa, livada po sezoni, combo) čeka CD** — šalji prompt iz [[#12. Prompt za Claude Design — redizajn 2|§12]]. Zadatak je u [[#11. Redizajn 2 (2026-09-30) — muncher, korpa, livada po sezoni, combo|§11]].
 
 > **Status: implementirano 2026-09-12** — smjer B (sadnica: cream rim + tamni well) iz Claude Design handoffa (`design_handoff_merge_arena/`). §2–§3 opisuju stanje **prije** prenosa i ostaju kao zapis; trenutno stanje i odstupanja su u [[#Implementacija (2026-09-12)|§ Implementacija]] na kraju.
 
@@ -25,7 +27,8 @@ ai_sažetak: "Merge Arena (5. stranica huba) — pravila iz koda koja ostaju fik
 | Ko | Šta čita | Zašto |
 |----|----------|-------|
 | **Claude Design** | cijeli fajl kao prilog (§1–§8) | Pravila koja važe, mjere, trenutno stanje, sloboda i ograničenja |
-| **Ti** | §9 | Gotov prompt za copy-paste u CD chat |
+| **Ti** | §12 (redizajn 2) | Gotov prompt za copy-paste u CD chat |
+| ~~Ti~~ | ~~§9~~ | ~~Prompt redizajna 1 — poslan 2026-09-12, ne slati ponovo~~ |
 | **Agent (kasnije)** | §3, §5, §10 | Tačne današnje vrijednosti, poznati problemi, mapa "CD sloj → Godot node" |
 
 Postupak: u CD priloži ovaj `.md` fajl, pa zalijepi prompt iz §9. Ako CD projekat nema header/footer iz prošlog zadatka, priloži i `design_handoff_hub_chrome/HubScreen.dc.html` (ili screenshot igre) da CD vidi okvir u koji Arena ulazi. Kad CD završi, izvezi `.dc.html` + asset fajlove i daj ih agentu.
@@ -488,6 +491,285 @@ kupovinu. Ideje van zadatka (npr. "Sort" dugme) navedi odvojeno na kraju.
 - [ ] Svi tekstovi iz §2.6 staju (i najduži, s imenom sezonskog cvijeta)
 - [ ] Nema pada FPS-a s 30 sjemenki + Muncher + VFX (emulator Pixel_4_API33)
 - [ ] Smoke: svih 16 `arena_*_smoke` + `merge_arena_smoke` + `hub_chrome_smoke` + `meta_hub_flow_smoke`
+
+---
+
+## 11. Redizajn 2 (2026-09-30) — muncher, korpa, livada po sezoni, combo
+
+Arena od 2026-09-24 nema HUD ni Done dugme — **cijela stranica je polje** ([[#Izmjena (2026-09-24) — arena je samo polje|§ Izmjena]]). Mehanika radi. Ono što ne valja je **kako izgleda**: muncher je ljubičasti smajli, vreća sjemena je smiješna, a livada je jedna ista tamnozelena površina bez obzira na to koju sezonu igrač igra.
+
+Ovo je **druga runda redizajna** Arene. Sve iz §2 (pravila koja ostaju fiksna) i dalje vrijedi.
+
+### 11.1 Šta se traži
+
+| # | Zahtjev |
+|---|---|
+| **R1** | **Muncher — pravi neprijatelj.** Danas je ljubičasti krug s ušima, dva oka i ustima — smajli. Treba biti stvorenje koje **guta cvijeće**: prijeteće, ali i dalje u cozy cartoon jeziku igre, ne horor. |
+| **R2** | **Korpa (vreća sjemena) — redizajn.** Danas izgleda smiješno. Uz to: **kad u njoj ima sjemena, sjeme mora viriti iz nje** — količina se vidi i bez brojača. |
+| **R3** | **Livada po sezoni — osam različitih polja.** Pozadina Arene mijenja se prema sezoni koju igrač igra. **Ne isti šablon u drugim bojama** — svaka sezona nosi svoje elemente, svoj horizont, svoj ritam. |
+| **R4** | **Combo — izgled i reakcija polja.** Danas se combo gotovo ne vidi. Treba mu čitljiv prikaz i **polje mora reagovati dok combo traje**. |
+
+### 11.2 Mjere danas (iz koda, 2026-09-30)
+
+> **Ispravka §6:** tamo piše „Arena = 1080 × 1597, footer 180". To je zastarjelo. Poslije hub chrome v2 stranica je **1080 × 1633** (header 143, footer 144), a polje uzima sve osim donjeg pojasa od 44 px za NavLockPill.
+
+| Element | Mjera |
+|---|---|
+| **Playfield** | **1080 × 1589**, počinje na vrhu stranice |
+| Sjemenka (chip) | radius **67,2** (48 × 1,4) → 134 px; T1 krug, T2 zaobljen kvadrat r 53; krem rub `#FFF8F0` + tamni well `#22342A`; cvijet 80 (T1) / 88 (T2) / 140 (T3) |
+| Sjemenki na polju | do **30** odjednom (hex rešetka, korak 150 / 164) |
+| **Muncher** | krug r **52** (104 px) + dvije uši r 15 na (±27, −51); oči, usta; ljubičasta `#8C61B8`, usnula `#7A579E`, zaleđena `#A6D1FA`; ledena heksagonalna ljuska r 70; „z z z" 32 px na (+44, −60) |
+| Gnijezdo | elipsa **210 × 104**, centar na (sredina polja, **y 108**) |
+| **Vreća** | dodir **280 × 250**; tijelo **214 × 178** puna, **214 × 126** prazna; vrat 118 × 34 (diže se 16); brojač krug r **42** dolje desno, tekst 44 |
+| Sjeme koje viri | do **3** cvijeta 64 / 74 / 64, rotirani −16° / 0 / +16°, utonuli 26 px u tijelo — **samo kad ima ≥ 2 sjemena** |
+| Vreća: pozicija | centrirana, **40 px** iznad dna polja; keepout `Rect2(-185, -349, 370, 520)` oko nje |
+| Pip | 150 px, dolje lijevo, 30 od ruba i 26 od dna |
+| **Livada** | ravna boja `#293D2E` → `#335C38`, dva brda, busenje, cvjetići; „bujnost" 0 → 4 po broju T3 u sesiji, crossfade 0,6 s |
+| **Combo** | prozor **1,4 s**; od combo 2 Pip poskoči (1,0 → 1,18 → 1,0 za 0,28 s); na combo 5 sitno zlato + „+N" pop na hub traci. **Na polju nema nikakvog prikaza combo-a** — pilula je obrisana 2026-09-24 skupa s HUD-om |
+
+**Brojevi koje mijenja igra, ne dizajn** (muncher): brzina **85 px/s**, jede sve unutar **36 px** od svog centra, jedenje traje **0,5 s**, T3 ga zaledi **2 s**, budi se **0,3 s** poslije sipanja, metu bira svakih **0,25 s**.
+
+### 11.3 R1 — Muncher
+
+**Šest stanja koja moraju ostati razlučiva, i bez boje** (pravilo iz §2):
+
+| Stanje | Kada | Šta danas kaže |
+|---|---|---|
+| Spava u gnijezdu | polje prazno, on je gore na sredini | zatvorene oči, „z z z", gnijezdo pod njim |
+| Spava gdje je stao | polje se ispraznilo dok je lovio | isto, bez gnijezda |
+| Budi se | 0,3 s poslije sipanja | veće oči |
+| Lovi | ide ka najbližoj sjemenki (T2 mu je draži) | nagib −6°, njiše se gore-dolje 5 px / 0,6 s |
+| Jede | stigao je do sjemenke | usta se otvaraju i zatvaraju 2× u 0,5 s |
+| Zaleđen | igrač je napravio T3 | ledena ljuska, 2 s |
+
+**MORA**
+
+- Sva **šest stanja razlučiva bez boje** (siluetom, oblikom, pozom) — igrač mora znati spava li, lovi li ili jede.
+- **Ne smije se zamijeniti sa sjemenkom.** Sjemenka je krem krug s tamnim wellom, 134 px. Muncher mora biti drugačijeg reda i siluete.
+- **Mora se vidjeti da guta cvijeće** — usta su glavni element, ne dekoracija. Jedenje je 0,5 s i mora izgledati kao zalogaj, ne kao treptaj.
+- **Zaleđeno stanje mora biti očito i lijepo** — to je nagrada igraču za T3.
+- Cozy cartoon, meki outline, bez horora, bez krvi, bez realističnih zuba. Igra je vedra ([[../art-direction|art-direction]]).
+- Mora se čitati na **svih osam livada** iz R3, i na svijetlim i na tamnim.
+- Gnijezdo je na **y 108**, odmah ispod headera — ništa iznad munchera ne smije biti odsječeno.
+
+**SMIJEŠ** (odluči i obrazloži u § Odlučeno)
+
+- **Veličina i silueta.** 104 px je današnji vizual; eat radius je 36 px od centra i ne mijenja se, pa usta treba da budu blizu centra.
+- **Da li je i dalje ljubičast.** Ljubičasta je danas jedina „neprijateljska" boja u igri — ako je mijenjaš, reci šta signalizira opasnost umjesto nje.
+- **Gnijezdo** — oblik, veličina, da li uopšte ostaje kao posebna stvar.
+- **Uši, oči, rep, noge, sjena** — sve je tvoje.
+- Kako izgleda ledena ljuska i „usnulo" stanje.
+
+### 11.4 R2 — Korpa sjemena
+
+Vreća drži do **40** sjemenki. Tap na nju sipa sjeme u polje. Kad ih je ≥ 2, vreća se klati i iz vrata vire tri cvijeta; kad je prazna, tijelo je niže (214 × 126).
+
+**MORA**
+
+- **Dodirna zona ostaje ≥ 280 × 250** i vreća ostaje **centrirana na dnu polja** — to je glavno dugme Arene.
+- **Količina se vidi bez brojača**: koliko sjemena ima, toliko se i vidi da viri. Brojač ostaje kao tačan broj, ali ne smije biti jedini signal.
+- **Tri jasna stanja**: prazna · ima sjemena · sipa (danas nagib −12°, 0,1 s tamo i 0,25 s nazad).
+- Sjeme koje viri koristi **prave crteže cvijeća** iz igre (`FlowerAssets`), ne izmišljene oblike — to su tipovi koje igrač zaista ima.
+- Mora se čitati na svih osam livada.
+
+**SMIJEŠ**
+
+- **Da li je to i dalje vreća.** Igrač je zove „korpa" — ako korpa, sanduk, saksija ili kolica bolje rade, uzmi to i reci zašto.
+- Koliko sjemena viri i kako (3 kao danas, ili više, u slojevima, prelijevanje preko ruba).
+- Gdje stoji brojač i kako izgleda.
+- Da li se puna i skoro prazna vreća razlikuju i po obliku, ne samo po broju.
+
+### 11.5 R3 — Osam livada, jedna po sezoni
+
+Ovo je najveći dio zadatka.
+
+Danas je Arena **jedna tamnozelena livada** za sve. Igrač koji igra Coral Tide i igrač koji igra Ember Fen spajaju sjeme na istoj površini. Polje treba da prati **sezonu koju igrač igra** (`active_season_id`) — istu onu čija se livada vidi na Home kartici.
+
+**Osam sezona i njihov ton** (iz `game/data/seasons/seasons.json`; boja je mood boja sezone iz `UiHomeV3.SEASON_GROUND`):
+
+| Sezona | Tagline | Mood boja | Cvijeće (★1 → ★3) |
+|---|---|---|---|
+| **Country Bloom** | Warm fields, soft petals, home pastures. | `#E6F2DB` | Meadow Clover · Field Daisy · Buttercup Lane · Barn Tulip · Sunfence · **Harvest Pumpkin** |
+| **Frost Orchard** | Crisp air, silver blossom. | `#D1E6FF` | Frost Snowdrop · Ice Crocus · Silver Aconite · Winter Camellia · Hoarfrost Rose · **Crystal Peony** |
+| **Lantern Meadow** | Dusk lights among tall grass. | `#EBD6FF` | Dusk Firefly Grass · Paper Lantern Bloom · Evening Primrose · Foxfire Lily · Glow Wisteria · **Midnight Lotus** |
+| **Amber Canopy** | Warm late-season light through high leaves. | `#FFEBC7` | Copper Leaf · Maple Aster · Russet Mallow · Cider Dahlia · Golden Oak Bloom · **Amber Magnolia** |
+| **Moonlit Warren** | Night blooms under a quiet moon. | `#B8BDFF` | Moon Moss · Nightshade Petal · Silver Harebell · Lunar Orchid · Star Jasmine · **Umbral Lily** |
+| **Coral Tide Garden** | Salt breeze and seashell petals. | `#FFE0D6` | Sea Thrift · Salt Daisy · Tide Anemone · Coral Hibiscus · Pearl Waterlily · **Reef Crown** |
+| **Starfall Glade** | Petals that catch the night sky. | `#DBCCFF` | Comet Sprig · Nebula Clover · Meteor Daisy · Aurora Tulip · Galaxy Sunburst · **Nova Bloom** |
+| **Ember Fen** | Low firelight over marsh blooms. | `#FFC79E` | Marsh Rush · Peat Violet · Cinder Buttercup · Flame Iris · Smoke Lotus · **Fenfire Crown** |
+
+**MORA**
+
+- **Osam polja, osam različitih mjesta.** Ne jedan crtež u osam paleta. Mijenjaj horizont, broj slojeva, elemente, gustoću, pravac. Coral Tide treba da bude plitka voda i pijesak, Ember Fen močvara s dimom, Frost Orchard smrznuti voćnjak — ne isti brežuljci u drugoj boji.
+- **Sjemenka mora ostati čitljiva na svih osam.** Sjemenka je krem rub + **tamni well** `#22342A`. Na tamnoj livadi to radi; na svijetloj (Country Bloom, Amber Canopy) krem rub se gubi. Reci kako to rješavaš — ili polje ostaje dovoljno tamno, ili sjemenka dobija nešto ispod sebe. **Kontrast sjemenke prema polju ≥ 3 : 1.**
+- **Muncher, vreća i Pip moraju se čitati na svih osam.**
+- **„Bujnost" ostaje.** Danas livada postaje bogatija sa svakim T3 u sesiji (nivo 0 → 4, crossfade 0,6 s). Svaka sezona mora imati svoj **prazan** i svoj **pun** izgled — reci šta konkretno raste u svakoj.
+- **Polje je pozadina, ne takmac.** Igrač gleda 30 sjemenki; livada ne smije da se bori za pažnju. Nikakav pokret koji vuče oko dok igrač spaja.
+- Bez blura, bez gradijenata, bez glowa (§6) — ravne boje, poligoni, lukovi, male teksture.
+
+**MORA (tehnički budžet — ovo je važno)**
+
+Cijeli sadržaj igre danas je **0,44 MB** od ~26 MB downloada. Osam pozadina od 1080 × 1589 kao pune PNG slike dodalo bi **višestruko više od cijele igre**.
+
+Zato: svaka livada mora biti **recept, ne slika** — spisak ravnih oblika s brojevima koje igra sama crta (kao što `arena_meadow_bg.gd` danas crta brda, busenje i cvjetiće). Za svaku sezonu daj:
+
+- boje traka / neba / tla (hex),
+- 2–4 sloja siluete: svaki kao poligon s tačkama u % širine i visine,
+- 3–6 vrsta „rasutih" elemenata (busen, kamen, školjka, pečurka, fenjer…): oblik, veličina, koliko ih je na nivou 0 i koliko na nivou 4, i gdje smiju biti,
+- šta se mijenja između praznog i punog polja.
+
+Ako neki motiv **mora** biti slika, neka bude jedan mali PNG po sezoni (≤ 256 × 256, koji se ponavlja ili rasipa), i reci zašto se ne da nacrtati.
+
+**SMIJEŠ**
+
+- Sve o izgledu svakog pojedinog polja — to je suština zadatka.
+- Predložiti da neke sezone dijele strukturu ako to zaista ima smisla (npr. dvije noćne), ali onda **objasni** i pokaži da se ne doimaju isto.
+- Predložiti da se polje mijenja i po dobu dana ili po napretku — ako ne košta ništa dodatno.
+
+### 11.6 R4 — Combo
+
+**Kako je danas.** Svaki merge unutar **1,4 s** od prethodnog diže combo. Od combo 2 Pip poskoči. Na combo 5 igrač dobije sitno zlato i „+N" iskoči na hub traci. Na samom polju **nema ničega** — combo pilula je obrisana 2026-09-24 kad je Arena ostala samo polje, i **ne vraća se**.
+
+**MORA**
+
+- **Combo se mora vidjeti na polju, bez povratka HUD-a.** Bez trake gore, bez pilule u uglu. Neka to bude nešto što živi u samom polju ili oko sjemenki.
+- **Polje reaguje dok combo traje** — to je izričito traženo. Reci tačno šta se mijenja na kojem broju, i kako se vraća kad combo istekne.
+- **Reakcija polja na combo ne smije se potući s „bujnošću" od T3.** To su dvije stvari na istoj površini: jedna je trajna (koliko si T3 napravio u sesiji), druga je trenutna (koliko brzo spajaš). Reci kako se slažu.
+- **Ne smije ometati igru.** Igrač u combou gleda sjemenke i vuče prstom; ako mu polje počne treperiti, combo je kazna a ne nagrada.
+- **Bez blura i glowa** i dalje vrijedi, i na vrhuncu combo-a.
+- Prozor je **1,4 s** — sve što predložiš mora raditi na toj brzini, uključujući povratak u normalu.
+
+**SMIJEŠ**
+
+- Kako combo izgleda i na kojem broju eskalira.
+- Predložiti drugi prozor (1,4 s) ili drugi prag za nagradu (danas 5), s obrazloženjem — **ali to je prijedlog, ne odluka**.
+- Šta radi Pip (danas poskoči od combo 2).
+
+**NE SMIJEŠ** — **iznos nagrade i dnevni limit su ekonomija, ne dizajn.** Danas: +2 coina na combo 5, najviše 10 coina dnevno. To čuva Pillar 2 (Fair F2P) i mijenja se samo dogovorom. Ne planiraj dizajn koji traži veću nagradu.
+
+### 11.7 Isporuka
+
+Novi paket: **`design_handoff_arena_v2/`**, ista struktura kao dosadašnji paketi.
+
+| Fajl | Sadržaj |
+|---|---|
+| `design/ArenaScreen.dc.html` | Arena, interaktivno. Prop `season` (8 ključeva), `lush` (0–4), `combo` (0–8), `state` (prazno polje · puno polje · muncher lovi · muncher jede · muncher zaleđen · vreća prazna) |
+| `design/Arena Specs.dc.html` | anatomija munchera (svih 6 stanja jedno pored drugog), anatomija korpe (3 stanja), **svih 8 livada jedna pored druge na nivou 0 i na nivou 4**, combo stepenice |
+| `godot/arena_v2_export.json` | tokeni: muncher, korpa, combo + **`fields`: po jedna stavka za svaku sezonu s bojama, slojevima i rasutim elementima** |
+| `godot/ui_arena_v2.gd` | iste vrijednosti kao JSON |
+| `godot/arena_tree.txt` | stablo čvorova i red prenosa |
+| `README.md` | § Odlučeno · § Šta se briše · § Runda 2 · § Samoprovjera · § Ideje van zadatka |
+
+**§ Samoprovjera** (popuni prije zipa, svaka stavka da/ne, mjereno u browseru):
+
+1. Svih šest stanja munchera razlučivo i u crno-bijelom.
+2. Muncher se ne može zamijeniti sa sjemenkom ni na jednoj od 8 livada.
+3. Korpa: količina sjemena se vidi bez brojača; tri stanja jasna; dodir ≥ 280 × 280.
+4. Osam livada — stavi ih jednu pored druge i pogledaj: da li bi neko rekao da su to različita mjesta, ili ista slika u osam boja?
+5. Sjemenka (krem rub + tamni well) ima kontrast ≥ 3 : 1 prema pozadini na **svakoj** od 8 livada, i na nivou 0 i na nivou 4.
+6. Nijedna livada nije puna PNG slika; svaka je opisana brojevima u `fields`.
+7. Combo se vidi na polju i **nigdje** nema trake ni pilule u uglu.
+8. Combo reakcija i „bujnost" od T3 rade istovremeno bez sudara.
+9. Nigdje blur, glow ni gradijent.
+
+### 11.8 Scope
+
+Osam zasebnih polja je **proširenje** obima. Trenutni milestone je M8 (launch IN lista), a sezone su na OUT listi *za launch*; per-sezonska tema je v1.1+ (`SEZ-01`, [[../../06-production/scope-i-granice|scope-i-granice]]).
+
+Zato paket mora biti **primjenjiv sezonu po sezonu**: prvo Country Bloom (početna sezona), pa ostale. Muncher, korpa i combo ne zavise od toga i mogu ući odmah.
+
+## 12. Prompt za Claude Design — redizajn 2
+
+> Kopiraj sve iz bloka ispod u CD. **Prije toga commitaj i pushaj na `master`.** Priloži i ovaj `.md` fajl.
+
+```
+Ovo je DRUGA RUNDA REDIZAJNA Merge Arene. Mehanika radi i ne mijenja se —
+mijenja se kako Arena izgleda.
+
+Pročitaj po ovim tačnim putanjama (repo, master):
+  docs/04-experience/design-drafts/merge-arena-cd-brief.md
+    -> §2 (pravila koja ostaju fiksna), §5 (paleta), §6 (tehnika),
+       §11 (OVAJ zadatak: mjere, MORA i SMIJEŠ, isporuka)
+  game/scripts/camp/arena_pest.gd          (muncher danas)
+  game/scripts/camp/arena_seed_bag.gd      (korpa danas)
+  game/scripts/camp/arena_meadow_bg.gd     (livada danas)
+  game/scripts/visual/ui_arena.gd          (tokeni u igri)
+  game/data/seasons/seasons.json           (8 sezona, taglineovi, cvijeće)
+
+Arena je cijela hub stranica: polje je 1080 x 1589 (stranica 1633 minus 44 px
+donjeg pojasa). Nema HUD-a, nema Done dugmeta — obrisani su 2026-09-24 i ne
+vraćaju se. Na polju je do 30 sjemenki (krug 134 px, krem rub + tamni well
+#22342A), muncher, korpa dolje na sredini i Pip dolje lijevo.
+
+ČETIRI STVARI:
+
+R1 — MUNCHER, PRAVI NEPRIJATELJ.
+Danas je ljubičasti krug r 52 s dvije uši, dva oka i ustima — izgleda kao
+smajli. Treba stvorenje koje GUTA CVIJEĆE: prijeteće, ali u cozy cartoon
+jeziku igre, bez horora. Šest stanja mora ostati razlučivo I BEZ BOJE: spava
+u gnijezdu, spava gdje je stao, budi se, lovi, jede, zaleđen je (T3 ga zaledi
+2 s — to je nagrada igraču i treba da izgleda tako). Ne smije se zamijeniti
+sa sjemenkom. Brojevi igre koji se NE mijenjaju: brzina 85 px/s, jede sve u
+36 px od svog centra, zalogaj traje 0,5 s, budi se 0,3 s poslije sipanja.
+Gnijezdo je na y 108, odmah ispod headera — ništa iznad njega ne smije biti
+odsječeno.
+
+R2 — KORPA SJEMENA.
+Danas je smeđa vreća 214 x 178 s vratom i brojačem, i izgleda smiješno. Drži
+do 40 sjemenki; tap sipa sjeme u polje. Redizajniraj je, i neka se KOLIČINA
+VIDI BEZ BROJAČA — sjeme mora viriti iz nje, više sjemena = više se vidi.
+Danas vire tri cvijeta iz vrata i to je premalo. Dodir ostaje >= 280 x 250,
+korpa ostaje centrirana 40 px iznad dna polja. Tri stanja: prazna, ima
+sjemena, sipa (nagib -12°). Cvijeće koje viri su pravi crteži iz igre.
+
+R3 — OSAM LIVADA, JEDNA PO SEZONI. (najveći dio)
+Danas je Arena jedna tamnozelena livada za sve. Treba da prati sezonu koju
+igrač igra. Osam sezona, njihovi taglineovi i mood boje su u §11.5 — Coral
+Tide je plitka voda i pijesak, Ember Fen močvara s dimom, Frost Orchard
+smrznuti voćnjak. NE isti brežuljci u osam paleta: mijenjaj horizont, slojeve,
+elemente, gustoću.
+Dva tvrda uslova:
+ (a) Sjemenka ima krem rub i TAMNI well. Na tamnoj livadi to radi, na svijetloj
+     (Country Bloom, Amber Canopy) se gubi. Riješi to i reci kako. Kontrast
+     sjemenke prema polju >= 3:1 na svih osam.
+ (b) BUDŽET: cijeli sadržaj igre je danas 0,44 MB od ~26 MB downloada. Osam
+     punih PNG pozadina 1080 x 1589 dodalo bi višestruko više od cijele igre.
+     Zato svaka livada mora biti RECEPT, NE SLIKA: boje, 2–4 sloja siluete kao
+     poligoni u % širine/visine, 3–6 vrsta rasutih elemenata s brojem na nivou
+     0 i na nivou 4, i gdje smiju stajati. Igra ih crta sama, kao danas.
+     Ako neki motiv mora biti slika — jedan mali PNG po sezoni, <= 256 x 256.
+Livada mora imati prazan i pun izgled: danas postaje bogatija sa svakim T3 u
+sesiji (nivo 0 -> 4, crossfade 0,6 s). Reci šta konkretno raste u svakoj sezoni.
+I: polje je pozadina, ne takmac. Igrač gleda 30 sjemenki.
+
+R4 — COMBO.
+Svaki merge unutar 1,4 s diže combo. Danas se to na polju NE VIDI — combo
+pilula je obrisana skupa s HUD-om i ne vraća se. Treba čitljiv prikaz koji
+živi u samom polju (ne traka, ne pilula u uglu) i POLJE MORA REAGOVATI dok
+combo traje. Reci tačno šta se mijenja na kojem broju i kako se vraća kad
+combo istekne. Pazi: reakcija na combo i „bujnost" od T3 su dvije stvari na
+istoj površini — reci kako se slažu. Ne smije ometati igru ni na vrhuncu.
+Iznos nagrade (+2 coina na combo 5) i dnevni limit (10) su ekonomija i NE
+mijenjaju se — ne planiraj dizajn koji traži veću nagradu.
+
+TEHNIČKI (Godot 4.7, OpenGL, slabiji Android): artboard 1080 x 1920, sve u px
+te baze. Ravne boje, poligoni, lukovi, tekst, male teksture. BEZ blura, glowa,
+bloom shadera i gradijenata. Animacije su tweenovi (skala, pozicija, rotacija,
+alpha, boja). Na polju je do 30 sjemenki + muncher + VFX odjednom — bez teških
+čestica. Cozy flat cartoon, pastel, meki outline (art-direction).
+
+ISPORUKA (§11.7): novi folder design_handoff_arena_v2/, cijeli u zipu:
+ArenaScreen.dc.html (prop season 8 ključeva, lush 0–4, combo 0–8, state),
+Arena Specs.dc.html (6 stanja munchera jedno pored drugog, 3 stanja korpe,
+SVIH 8 LIVADA jedna pored druge na nivou 0 i na nivou 4, combo stepenice),
+arena_v2_export.json (tokeni + „fields" po sezoni), ui_arena_v2.gd,
+arena_tree.txt, README.md sa § Odlučeno i § Samoprovjera (9 stavki iz §11.7,
+svaka da/ne, provjerene u browseru prije nego pošalješ zip).
+
+NE RADI: promjene mehanike, povratak HUD-a ili Done dugmeta, druge stranice
+huba, run, novi art cvijeća, više varijanti za biranje. Jedan dizajn, ti
+odlučuješ dileme i upisuješ ih u § Odlučeno.
+```
 
 ---
 
