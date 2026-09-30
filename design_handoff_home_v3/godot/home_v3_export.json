@@ -16,7 +16,7 @@
     "footer_h": 144,
     "units": "px 1:1",
     "renderer": "Godot 4 Compatibility (OpenGL)",
-    "round": 2
+    "round": 4
   },
   "tokens": {
     "warm_white": "#FFF8F0",
@@ -159,18 +159,20 @@
     },
     "SeasonRoster": {
       "top": 230,
-      "round": 3,
+      "round": 4,
       "count": 6,
       "eye": 220,
       "disc": 180,
-      "gap": 48,
+      "columns_x": [276, 516, 756],
+      "pitch": 240,
       "side_offset_y": 26,
-      "row2_top": 552,
-      "rects": [[178, 256, 180, 180], [406, 230, 220, 220], [674, 256, 180, 180], [198, 552, 180, 180], [426, 552, 180, 180], [654, 552, 180, 180]],
+      "row2_top": 560,
+      "rects": [[186, 256, 180, 180], [406, 230, 220, 220], [666, 256, 180, 180], [186, 560, 180, 180], [426, 560, 180, 180], [666, 560, 180, 180]],
       "order": "0..2 = round-2 trio (1 = signature flower, eye), 3..5 = the other three",
       "art_scale": 0.82,
-      "missing_name_gap": 18,
-      "clear_of": "arrows x <= 148 / >= 884 at y 680-800; lowest name end 826 < STATUS_TOP 830"
+      "missing_name_gap": 12,
+      "missing_name_max_w": 220,
+      "clear_of": "arrows x <= 148 / >= 884 at y 680-800 (discs x 186-846, widest name 234.4 -> >= 10.8 clear); lowest name end 820 < STATUS_TOP 830; row-1 names end <= 530 < row 2 top 560"
     },
     "LockVeil": {
       "color": "#E3D9CC",
@@ -380,8 +382,15 @@
         "disc": "rgba(255,248,240,.55), dashed 4",
         "art": "modulate black a .28",
         "label": {
-          "size": 38,
-          "weight": 900
+          "size": 34,
+          "weight": 900,
+          "color": "#1A1A14",
+          "line_h": 34,
+          "gap": 12,
+          "max_w": 220,
+          "wrap": "one line if <= 220 px, else the two-line split whose longer line is shortest = UiStage.balance_lines(text, font(900, 34), 34, 220); never three lines",
+          "shown": "only under a flower not found yet (playable && !_has_flower); all six on a new season",
+          "content_rule": "every flower name fits two lines of <= 234 px at 34/900 (widest today: Paper Lantern / Bloom 234.4)"
         }
       }
     },

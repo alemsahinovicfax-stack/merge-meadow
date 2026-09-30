@@ -12,11 +12,74 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>body{margin:0;background:#EFE8DE}a{color:#2D3436}a:hover{color:#9E6645}@keyframes fieldRipple{0%{transform:scale(1);opacity:.7}60%{transform:scale(1.16);opacity:0}100%{transform:scale(1.16);opacity:0}}</style>
 </helmet>
-<div style="padding:72px;display:flex;flex-direction:column;gap:72px;font-family:Nunito,system-ui,sans-serif;color:#2D3436;background:#EFE8DE;min-width:3400px">
+<div style="padding:72px;display:flex;flex-direction:column;gap:72px;font-family:Nunito,system-ui,sans-serif;color:#2D3436;background:#EFE8DE;min-width:3700px">
   <div style="display:flex;flex-direction:column;gap:12px">
-    <div style="font:900 64px/1.05 Nunito,sans-serif">Home v3 — Specs · round 3</div>
-    <div style="font:700 26px/1.4 Nunito,sans-serif;max-width:1600px;color:#555C5E">Artboard 1080 × 1920 · page 1080 × 1633 from y 143 · all px 1:1. State frames at 40 %, transition strips at 25 % (captured from HomeScreen with props openT / closeT / pipWalked — open HomeScreen and scrub those props to see any frame live).</div>
+    <div style="font:900 64px/1.05 Nunito,sans-serif">Home v3 — Specs · round 4</div>
+    <div style="font:700 26px/1.4 Nunito,sans-serif;max-width:1600px;color:#555C5E">Artboard 1080 × 1920 · page 1080 × 1633 from y 143 · all px 1:1. Round-4 name cards at 40 %, name anatomy at 60 %, state frames at 40 %, transition strips at 25 % (captured from HomeScreen with props openT / closeT / pipWalked — open HomeScreen and scrub those props to see any frame live).</div>
   </div>
+
+  <section data-screen-label="R4 flower names" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 40px/1 Nunito,sans-serif">Round 4 · flower names — all eight seasons, all six names (worst case: nothing found yet)</div>
+    <div style="font:700 24px/1.4 Nunito,sans-serif;color:#555C5E;max-width:2100px;text-wrap:pretty">Each card is HomeScreen with fresh = true: every season playable and no flower found, so all six names are drawn (Ember Fen is shown as if owned, only for this check). Name 34 / 900, 12 under its disc, one line up to 220 px, otherwise two balanced lines — never three. Discs on three columns x 276 / 516 / 756 in both rows, row 2 at 560. The line under each card is measured live from this page’s DOM, in card px.</div>
+    <div style="display:flex;gap:28px;align-items:flex-start">
+      <sc-for list="{{ worst }}" as="c" hint-placeholder-count="8">
+        <div data-r4-card="{{ c.key }}" style="display:flex;flex-direction:column;gap:10px;width:413px;flex:0 0 auto">
+          <div style="width:413px;height:464px;overflow:hidden;border-radius:18px;position:relative">
+            <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:scale(.4) translate(-24px,-315px);transform-origin:0 0">
+              <dc-import name="HomeScreen" season="{{ c.key }}" fresh="{{ true }}" warm="{{ false }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="font:900 26px/1.2 Nunito,sans-serif">{{ c.title }}</div>
+          <div style="font:700 22px/1.35 Nunito,sans-serif;color:#555C5E;font-variant-numeric:tabular-nums">{{ c.meas }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start">
+      <div data-r4-anat="1" style="position:relative;width:960px;height:700px;flex:0 0 auto">
+        <div style="position:absolute;left:0;top:0;width:620px;height:696px;overflow:hidden;border-radius:18px">
+          <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:scale(.6) translate(-24px,-315px);transform-origin:0 0">
+            <dc-import name="HomeScreen" season="lantern_meadow" fresh="{{ true }}" warm="{{ false }}" hint-size="1080px,1920px"></dc-import>
+          </div>
+        </div>
+        <div data-layer="AnatomyGuides" style="position:absolute;left:0;top:0;width:960px;height:700px;pointer-events:none">
+          <div style="position:absolute;left:0;top:408px;width:88.8px;height:72px;box-sizing:border-box;border:2px dashed #2D3436;background:rgba(255,184,140,.38)"></div>
+          <div style="position:absolute;left:530.4px;top:408px;width:88.8px;height:72px;box-sizing:border-box;border:2px dashed #2D3436;background:rgba(255,184,140,.38)"></div>
+          <div style="position:absolute;left:164.6px;top:138px;width:0;height:360px;border-left:2px dashed #9E6645"></div>
+          <div style="position:absolute;left:308.6px;top:138px;width:0;height:360px;border-left:2px dashed #9E6645"></div>
+          <div style="position:absolute;left:452.6px;top:138px;width:0;height:360px;border-left:2px dashed #9E6645"></div>
+          <div style="position:absolute;left:0;top:137px;width:640px;height:0;border-top:2px solid #9E6645"></div>
+          <div style="position:absolute;left:0;top:335px;width:640px;height:0;border-top:2px solid #9E6645"></div>
+          <div style="position:absolute;left:0;top:491px;width:640px;height:0;border-top:2px dashed #2D3436"></div>
+          <div style="position:absolute;left:0;top:497px;width:640px;height:0;border-top:2px solid #2D3436"></div>
+          <div style="position:absolute;left:135.6px;top:100px;width:60px;box-sizing:border-box;border-radius:12px;background:#FFF8F0;border:2px solid #9E6645;text-align:center;font:900 20px/28px Nunito,sans-serif">276</div>
+          <div style="position:absolute;left:279.6px;top:100px;width:60px;box-sizing:border-box;border-radius:12px;background:#FFF8F0;border:2px solid #9E6645;text-align:center;font:900 20px/28px Nunito,sans-serif">516</div>
+          <div style="position:absolute;left:423.6px;top:100px;width:60px;box-sizing:border-box;border-radius:12px;background:#FFF8F0;border:2px solid #9E6645;text-align:center;font:900 20px/28px Nunito,sans-serif">756</div>
+          <div style="position:absolute;left:652px;top:124px;font:800 22px/1.2 Nunito,sans-serif;white-space:nowrap">230 · ROSTER_TOP</div>
+          <div style="position:absolute;left:652px;top:322px;font:800 22px/1.2 Nunito,sans-serif;white-space:nowrap">560 · row 2 top (was 552)</div>
+          <div style="position:absolute;left:652px;top:404px;font:800 22px/1.2 Nunito,sans-serif;white-space:nowrap">680–800 · arrows, keep out</div>
+          <div style="position:absolute;left:652px;top:430px;font:700 20px/1.2 Nunito,sans-serif;color:#555C5E;white-space:nowrap">x ≤ 148 · x ≥ 884</div>
+          <div style="position:absolute;left:652px;top:462px;font:800 22px/1.2 Nunito,sans-serif;white-space:nowrap">820 · lowest name (2 lines)</div>
+          <div style="position:absolute;left:652px;top:504px;font:800 22px/1.2 Nunito,sans-serif;white-space:nowrap">830 · STATUS_TOP</div>
+          <div style="position:absolute;left:652px;top:560px;width:300px;font:700 20px/1.35 Nunito,sans-serif;color:#555C5E;text-wrap:pretty">Dashed boxes = the name boxes measured from this card’s DOM. Brown = disc columns.</div>
+          <sc-for list="{{ anatBoxes }}" as="b" hint-placeholder-count="6"><div style="{{ b.style }}"></div></sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:32px;flex:1 1 0;min-width:0;max-width:1500px">
+        <div style="display:flex;flex-direction:column;gap:12px;background:#FFF8F0;border:3px solid #2D3436;border-radius:28px;padding:36px">
+          <div style="font:900 30px/1.1 Nunito,sans-serif">Flower name anatomy (card px, card 1032 × 1160 at page 24, 172)</div>
+          <sc-for list="{{ anatomy4 }}" as="r" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:200px 1fr;gap:16px;font:700 22px/1.35 Nunito,sans-serif"><span style="font-weight:900">{{ r.a }}</span><span>{{ r.b }}</span></div>
+          </sc-for>
+        </div>
+        <div data-layer="SelfCheckR4" style="display:flex;flex-direction:column;gap:12px;background:#FFF8F0;border:3px solid #2D3436;border-radius:28px;padding:36px">
+          <div style="font:900 30px/1.1 Nunito,sans-serif">§ Samoprovjera runde 4 — measured live from this page’s DOM (every HomeScreen card on the page)</div>
+          <sc-for list="{{ checks }}" as="r" hint-placeholder-count="7">
+            <div style="display:grid;grid-template-columns:36px 64px 1fr;gap:12px;font:700 22px/1.4 Nunito,sans-serif;font-variant-numeric:tabular-nums"><span style="font-weight:900">{{ r.n }}</span><span style="font-weight:900">{{ r.ok }}</span><span>{{ r.b }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section data-screen-label="R3 card states" style="display:flex;flex-direction:column;gap:28px">
     <div style="font:900 40px/1 Nunito,sans-serif">Round 3 · the card shows all six flowers — six states side by side</div>
@@ -106,9 +169,117 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 const STEPS = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1];
+// Round 4: all eight seasons with all six names (HomeScreen fresh = true) + a live DOM check of every card on this page.
+const KEYS = ['country_bloom', 'frost_orchard', 'lantern_meadow', 'amber_canopy', 'moonlit_warren', 'coral_tide', 'starfall_glade', 'ember_fen'];
+const TITLE = { country_bloom: 'Country Bloom · free', frost_orchard: 'Frost Orchard · free', lantern_meadow: 'Lantern Meadow · free · playing', amber_canopy: 'Amber Canopy · free', moonlit_warren: 'Moonlit Warren · premium', coral_tide: 'Coral Tide · premium', starfall_glade: 'Starfall Glade · premium', ember_fen: 'Ember Fen · premium (as if owned)' };
+const PAIRS = [[0, 1], [1, 2], [3, 4], [4, 5]];
+const AX = [148, 884], AY = [680, 800], K_ANAT = 0.6;
+const STATUS = { OpenGate: 'open', UnlockNeeds: 'locked', UnlockButton: 'unlock', PriceButton: 'buy', OwnedChip: 'owned', SoonChip: 'soon' };
+const vis = el => { for (let e = el; e && e.nodeType === 1; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return false; } return true; };
+const f1 = v => (Math.round(v * 10) / 10).toFixed(1);
+const near = (a, b) => Math.abs(a - b) < 0.6;
+function geo(root) {
+  const card = root.querySelector('[data-layer="SeasonCard"]');
+  if (!card) return null;
+  const rb = root.getBoundingClientRect(), k = rb.width / 1080;
+  if (!k) return null;
+  const cb = card.getBoundingClientRect();
+  const C = r => ({ l: (r.left - cb.left) / k, t: (r.top - cb.top) / k, r: (r.right - cb.left) / k, b: (r.bottom - cb.top) / k });
+  const A = el => { if (!el) return null; const r = el.getBoundingClientRect(); return { x: (r.left - rb.left) / k, y: (r.top - rb.top) / k, w: r.width / k, h: r.height / k }; };
+  const fl = [...card.querySelectorAll('[data-layer="RosterFlower"]')];
+  const names = fl.map(f => {
+    const n = f.querySelector('[data-layer="FlowerName"]');
+    const ls = n && vis(n) ? [...n.querySelectorAll('[data-layer="FlowerNameLine"]')] : [];
+    if (!ls.length) return null;
+    const bs = ls.map(l => C(l.getBoundingClientRect()));
+    return { l: Math.min(...bs.map(x => x.l)), r: Math.max(...bs.map(x => x.r)), t: Math.min(...bs.map(x => x.t)), b: Math.max(...bs.map(x => x.b)), lines: ls.length, text: ls.map(l => l.textContent).join(' '), px: Math.min(...ls.map(l => parseFloat(getComputedStyle(l).fontSize))) };
+  });
+  const q = sel => A(root.querySelector(sel));
+  const nm = root.querySelector('[data-layer="SeasonName"]');
+  return { root, card, fl, names, season: nm ? nm.textContent : '', discs: fl.map(f => C(f.firstElementChild.getBoundingClientRect())), w: card.offsetWidth, h: card.offsetHeight, cardA: A(card), play: q('[data-layer="PlayButton"]'), tabs: q('[data-layer="SeasonTabs"]'), dots: q('[data-layer="SeasonDots"]'), status: q('[data-layer="CardStatus"]') };
+}
+function metrics(g) {
+  const N = g.names, D = g.discs;
+  const o = { count: 0, lines2: 0, px: Infinity, gap: Infinity, gapAt: '', arrow: Infinity, arrowAt: '', low: 0, lowAt: '', below: Infinity, belowAt: '', hits: 0 };
+  N.forEach((n, i) => {
+    if (!n) return;
+    o.count++; if (n.lines > 1) o.lines2++; o.px = Math.min(o.px, n.px);
+    if (n.b > o.low) { o.low = n.b; o.lowAt = n.text; }
+    if (n.b > AY[0] && n.t < AY[1]) { const a = Math.min(n.l - AX[0], AX[1] - n.r); if (a < o.arrow) { o.arrow = a; o.arrowAt = n.text; } }
+    D.forEach((d, j) => {
+      if (j === i) return;
+      if (n.l < d.r && d.l < n.r && n.t < d.b && d.t < n.b) o.hits++;
+      if (d.t > n.b - 0.5 && n.l < d.r && d.l < n.r && d.t - n.b < o.below) { o.below = d.t - n.b; o.belowAt = n.text; }
+    });
+  });
+  PAIRS.forEach(([a, b]) => { const P = N[a], Q = N[b]; if (P && Q && P.t < Q.b && Q.t < P.b && Q.l - P.r < o.gap) { o.gap = Q.l - P.r; o.gapAt = P.text + ' | ' + Q.text; } });
+  return o;
+}
 class Component extends DCLogic {
+  state = { m: null };
+  componentDidMount() {
+    this._alive = true;
+    const go = () => this._alive && this.measure();
+    this._ts = [1500, 3500, 7000].map(ms => setTimeout(go, ms));
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (this._ts) this._ts.push(setTimeout(go, 500)); });
+  }
+  componentWillUnmount() { this._alive = false; (this._ts || []).forEach(clearTimeout); }
+  measure() {
+    const all = [...document.querySelectorAll('[data-layer="HomeScreen"]')].map(root => {
+      const g = geo(root);
+      if (!g) return null;
+      const box = root.closest('[data-r4-card]');
+      const st = Object.keys(STATUS).find(l => { const e = root.querySelector('[data-layer="' + l + '"]'); return e && vis(e); });
+      let minPx = Infinity;
+      g.card.querySelectorAll('*').forEach(e => { if ([...e.childNodes].some(c => c.nodeType === 3 && c.textContent.trim()) && vis(e)) minPx = Math.min(minPx, parseFloat(getComputedStyle(e).fontSize)); });
+      return {
+        g, key: box ? box.getAttribute('data-r4-card') : '', anat: !!root.closest('[data-r4-anat]'), st: st ? STATUS[st] : 'active', m: metrics(g), minPx,
+        six: g.fl.filter(f => vis(f) && vis(f.firstElementChild)).length,
+        veils: [...g.card.querySelectorAll('[data-layer="LockVeil"]')].filter(v => vis(v) && +getComputedStyle(v).opacity >= 0.999).length,
+        locks: [...g.card.querySelectorAll('img')].filter(i => /icon_lock/.test(i.getAttribute('src') || '') && vis(i)).length
+      };
+    }).filter(Boolean);
+    if (!all.length) return;
+    const pick = (f, better) => all.reduce((w, x) => (better(f(x), f(w)) ? x : w), all[0]);
+    const gW = pick(x => x.m.gap, (a, b) => a < b), aW = pick(x => x.m.arrow, (a, b) => a < b), lW = pick(x => x.m.low, (a, b) => a > b), bW = pick(x => x.m.below, (a, b) => a < b);
+    const hits = all.reduce((s, x) => s + x.m.hits, 0), minPx = Math.min(...all.map(x => x.minPx));
+    const withNames = all.filter(x => x.m.count).length, r4 = all.filter(x => x.key), names = r4.reduce((s, x) => s + x.m.count, 0);
+    const states = [...new Set(all.filter(x => x.six === 6).map(x => x.st))];
+    const L = all.filter(x => x.st === 'locked'), U = all.filter(x => x.st === 'unlock'), O = all.filter(x => x.st !== 'locked' && x.st !== 'unlock');
+    const lockOk = L.every(x => x.veils === 6 && x.locks === 1) && U.every(x => x.veils === 6 && x.locks === 1) && O.every(x => x.veils === 0 && x.locks === 0);
+    const geoOk = all.every(({ g }) => g.w === 1032 && g.h === 1160 && g.cardA && near(g.cardA.x, 24) && near(g.cardA.y, 315) && g.play && near(g.play.x, 280) && near(g.play.y, 1556) && near(g.play.w, 520) && near(g.play.h, 180) && g.tabs && near(g.tabs.x, 24) && near(g.tabs.y, 167) && near(g.tabs.w, 1032) && near(g.tabs.h, 124) && g.dots && near(g.dots.y, 1495) && g.status && near(g.status.y, 1145) && near(g.status.h, 280));
+    const low = lW.m.low, per = {};
+    r4.forEach(x => { per[x.key] = 'min gap ' + f1(x.m.gap) + ' · arrows ' + (isFinite(x.m.arrow) ? f1(x.m.arrow) : '—') + ' · lowest ' + f1(x.m.low) + ' · two-line ' + x.m.lines2 + ' / ' + x.m.count; });
+    const an = all.find(x => x.anat);
+    const rows = [
+      { n: '1', ok: gW.m.gap > 0 ? 'da' : 'ne', b: 'No two names touch. Smallest gap between neighbouring names: ' + f1(gW.m.gap) + ' px (' + gW.g.season + ': ' + gW.m.gapAt + '). ' + names + ' names on the 8 worst-case cards; ' + withNames + ' cards with names checked.' },
+      { n: '2', ok: hits === 0 && aW.m.arrow > 0 && low < 830 && bW.m.below > 0 ? 'da' : 'ne', b: 'Arrows: closest name ' + f1(aW.m.arrow) + ' px from the keep-out x ≤ 148 / ≥ 884 at y 680–800 (' + aW.g.season + ': ' + aW.m.arrowAt + '). Status row: lowest name ' + f1(low) + ' < 830. Disc below: ≥ ' + f1(bW.m.below) + ' px (' + bW.g.season + ': ' + bW.m.belowAt + '). Name boxes crossing any disc: ' + hits + '.' },
+      { n: '3', ok: low < 830 ? 'da' : 'ne', b: 'Lowest point of any name: ' + f1(low) + ' card px (page ' + f1(low + 172) + ', ' + lW.m.lowAt + '); STATUS_TOP 830 → ' + f1(830 - low) + ' px clear.' },
+      { n: '4', ok: states.length === 7 && all.every(x => x.six === 6) ? 'da' : 'ne', b: 'Six discs visible on every one of the ' + all.length + ' cards; states covered: ' + states.join(', ') + ' (' + states.length + ' / 7).' },
+      { n: '5', ok: lockOk ? 'da' : 'ne', b: 'Locked (' + L.length + ' cards): veil at 100 % on all six + one lock on the block. Unlock (' + U.length + '): veil on all six, the only lock is on the Unlock button. Every other card: no veil, no lock.' },
+      { n: '6', ok: geoOk ? 'da' : 'ne', b: 'All ' + all.length + ' cards: SeasonCard 1032 × 1160 at page (24, 172); SeasonTabs (24, 24, 1032, 124), PlayButton (280, 1413, 520, 180), SeasonDots y 1352, CardStatus top 830 / h 280 — measured. Transition constants (T, NAME0/1, PIP0/1, PLAY0/1, CARD, BANDS) untouched.' },
+      { n: '7', ok: minPx >= 34 ? 'da' : 'ne', b: 'Smallest text on any card: ' + minPx + ' px (the flower names).' }
+    ];
+    rows.forEach(r => console.log('R4 ' + r.n + ' ' + r.ok + ' ' + r.b));
+    console.log('R4 per ' + JSON.stringify(per));
+    this.setState({ m: { per, rows, anat: an ? an.g.names.filter(Boolean) : [] } });
+  }
   renderVals() {
+    const m = this.state.m;
     return {
+      worst: KEYS.map(k => ({ key: k, title: TITLE[k], meas: (m && m.per[k]) || 'measuring…' })),
+      anatBoxes: (m ? m.anat : []).map(b => ({ style: 'position:absolute;left:' + f1(b.l * K_ANAT - 4) + 'px;top:' + f1(b.t * K_ANAT - 3) + 'px;width:' + f1((b.r - b.l) * K_ANAT + 8) + 'px;height:' + f1((b.b - b.t) * K_ANAT + 6) + 'px;box-sizing:border-box;border:2px dashed #2D3436;border-radius:8px' })),
+      checks: m ? m.rows : [{ n: '·', ok: '…', b: 'measuring the cards on this page…' }],
+      anatomy4: [
+        { a: 'name', b: '34 / 900 (was 38), ink #1A1A14 — ≥ 8 : 1 on every band of every season. Centred on its disc, 12 below it (was 18), line box 34. Drawn only under a flower not found yet' },
+        { a: 'wrap', b: 'one line if ≤ 220 px (was 300); otherwise the two-line split whose longer line is shortest = UiStage.balance_lines(text, font(900, 34), 34, 220). Never three: the widest two-line name is “Paper Lantern / Bloom”, 234.4 px' },
+        { a: 'columns', b: 'x 276 / 516 / 756 in both rows, pitch 240 (was 268 / 516 / 764 and 288 / 516 / 744). Eye 220 top 230, sides 180 top 256 (drop 26), row 2 180 top 560 (was 552)' },
+        { a: 'vertical', b: 'row-1 names end ≤ 516 (sides) / 530 (eye) → 30 clear of row 2 at 560, while each name sits 12 under its own disc. Row-2 names 752 – 820 → 10 clear of STATUS_TOP 830' },
+        { a: 'arrows', b: 'discs x 186 – 846. The widest possible name (234.4) in a corner column spans x 158.8 – 373.2 or 638.8 – 873.2 → ≥ 10.8 from the keep-out x ≤ 148 / ≥ 884 at y 680 – 800' },
+        { a: 'guarantee', b: 'any of the 48 names in any slot: neighbours ≥ 14.1 apart = 240 − (234.4 + 217.4) / 2 (widest two-line + widest one-line name). Two one-line names: ≥ 20' },
+        { a: 'new names', b: 'content rule: a flower name must fit two lines of ≤ 234 px at 34 / 900 (smoke test over missing_name_boxes())' },
+        { a: 'unchanged', b: 'disc sizes 220 / 180, side drop 26, veil, RosterLock (456, 436, 120), status row, arrows, tabs, Play, dots, transition' }
+      ],
       cardStates: [
         { scene: 'free_active', title: 'Active · the season you play', note: 'Six flowers, Pip. A flower not found yet = dashed disc, silhouette, name.' },
         { scene: 'free_open', title: 'Unlocked · not playing', note: 'Six flowers in full, gate, no Pip.' },
@@ -119,10 +290,10 @@ class Component extends DCLogic {
       ],
       anatomy: [
         { a: 'zone', b: 'y 230 (ROSTER_TOP) → 830 (STATUS_TOP) · two rows of three' },
-        { a: 'row 1 · 180 / 220 / 180', b: 'centres x 268 / 516 / 764 · eye top 230, sides top 256 (drop 26) · gap 48. Eye = the season’s signature flower (the same art as the Back disc on Play)' },
-        { a: 'row 2 · 180 × 3', b: 'top 552, centres x 288 / 516 / 744 → spans x 198–834, clear of the arrows (x ≤ 148 / ≥ 884 at y 680–800)' },
+        { a: 'row 1 · 180 / 220 / 180', b: 'centres x 276 / 516 / 756 (round 4; round 3 had 268 / 516 / 764) · eye top 230, sides top 256 (drop 26). Eye = the season’s signature flower (the same art as the Back disc on Play)' },
+        { a: 'row 2 · 180 × 3', b: 'top 560, centres x 276 / 516 / 756 (round 4; round 3: top 552, x 288 / 516 / 744) → spans x 186–846, clear of the arrows (x ≤ 148 / ≥ 884 at y 680–800)' },
         { a: 'art', b: 'img 82 % of the disc (ART_FILL .78 visible), border 4 ink' },
-        { a: 'missing name', b: '38 / 900, 18 below its disc; lowest possible end y 826 (two lines under row 2) < 830' },
+        { a: 'missing name', b: 'round 4: 34 / 900, 12 below its disc, one line ≤ 220 px else two balanced lines; lowest end 820 < 830 (round 3 had 38 / 900, gap 18 — names overlapped, see Round 4 above)' },
         { a: 'locked veil', b: 'flat #E3D9CC (locked-basket grey) over each disc, opacity 1, art not drawn. Missing marks are not drawn on a locked card' },
         { a: 'RosterLock', b: '120 disc at (456, 436), cream, border 4, shadow 0 6 0 α.24, icon 60 — one lock per card; the old LockBadge (96, top right) is gone' },
         { a: 'reveal', b: 'on Unlock: veil i opacity 1 → 0 in 300 ms, start i · 40 ms (all six in 500 ms)' }

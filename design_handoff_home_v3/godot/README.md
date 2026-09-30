@@ -14,4 +14,5 @@
    - **Unos:** `is_field_transitioning()` ili slide/drag → ignoriši tabove, strelice, karticu, Play, Seasons.
    - **OpenTransition ne prima dodir** (`OPEN_TRANSITION_MOUSE_FILTER` = `MOUSE_FILTER_IGNORE`) — pokriva cijelu stranicu, pa bi inače pojeo tap na tabove. Dodir primaju SeasonCard, PlayButton i FieldClip (samo na u = 1).
 8. FieldPage: postojeći čvorovi iz field v2; `tween_chrome_in` i `tween_flowers_settle` zamijeniti vrijednostima iz `_apply_u` (ANIM_CHANGES: chrome stagger 0, flower stagger 12 ms, start u .20).
-9. Provjeri: tekst ≥ 34, dodir ≥ 120, jedan loop (AttentionRing), bez blura i gradijenata.
+9. Runda 4 — imena cvijeća: diskovi iz `ROSTER6` (kolone 276 / 516 / 756, red 2 na 560). Ime koje fali: `font(900, MISSING_NAME_SIZE)`, linije = jedan red ako je `text_w ≤ MISSING_NAME_MAX_W`, inače `UiStage.balance_lines(text, font, 34, MISSING_NAME_MAX_W)` (najviše 2), centrirano na disk, `MISSING_NAME_GAP` ispod njega. Smoke test: za svih 8 sezona kutije imena se ne sijeku, dno ≤ 830, dvoredna širina ≤ `MISSING_NAME_CONTENT_MAX_W`.
+10. Provjeri: tekst ≥ 34, dodir ≥ 120, jedan loop (AttentionRing), bez blura i gradijenata.

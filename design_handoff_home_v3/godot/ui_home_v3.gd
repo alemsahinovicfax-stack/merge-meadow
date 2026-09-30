@@ -49,11 +49,17 @@ const ROSTER_TOP := 230
 # Order = roster order: 0..2 = round-2 trio (1 = signature flower, the eye), 3..5 = the other three.
 const ROSTER_EYE := 220
 const ROSTER_DISC := 180
-const ROSTER_GAP := 48
+# round 4: three columns x 276 / 516 / 756 in both rows (replaces ROSTER_GAP 48; round 3 had 268/516/764 and 288/516/744)
+const ROSTER_COLUMNS_X := [276, 516, 756]
+const ROSTER_PITCH := 240
 const ROSTER_SIDE_DROP := 26
-const ROSTER_ROW2_TOP := 552
-const ROSTER6 := [Rect2(178, 256, 180, 180), Rect2(406, 230, 220, 220), Rect2(674, 256, 180, 180), Rect2(198, 552, 180, 180), Rect2(426, 552, 180, 180), Rect2(654, 552, 180, 180)]
-const MISSING_NAME_GAP := 18
+const ROSTER_ROW2_TOP := 560
+const ROSTER6 := [Rect2(186, 256, 180, 180), Rect2(406, 230, 220, 220), Rect2(666, 256, 180, 180), Rect2(186, 560, 180, 180), Rect2(426, 560, 180, 180), Rect2(666, 560, 180, 180)]
+# round 4: missing name 34/900, 12 under its disc, one line <= 220 else UiStage.balance_lines(text, font(900, 34), 34, 220) -> max 2 lines
+const MISSING_NAME_GAP := 12
+const MISSING_NAME_MAX_W := 220
+const MISSING_NAME_MAX_LINES := 2
+const MISSING_NAME_CONTENT_MAX_W := 234   # content rule: every name fits 2 lines of <= 234 at 34/900
 # locked free season (status locked + unlock): flat veil on every disc, art not drawn, no missing marks
 const LOCK_VEIL := Color("#E3D9CC")   # = locked basket grey (field)
 const ROSTER_LOCK := Rect2(456, 436, 120, 120)   # status locked only; in unlock the Unlock button carries the lock
@@ -63,7 +69,7 @@ const REVEAL_MS := 300
 const REVEAL_STAGGER_MS := 40
 const ROSTER_ART_SCALE := 0.82
 const MISSING_ART_MODULATE := Color(0, 0, 0, 0.28)
-const MISSING_NAME_SIZE := 38
+const MISSING_NAME_SIZE := 34
 const PREMIUM_RIM_INSET := 14
 const PREMIUM_RIM_WIDTH := 8
 const STATUS_TOP := 830

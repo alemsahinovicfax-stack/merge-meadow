@@ -3,9 +3,9 @@
 Jedan dizajn Homea: biranje sezone (dva taba) i ulaz u polje te sezone. Hub header (143) i footer (144) su chrome v2, nedirnuti.
 
 ## Šta otvoriti
-- `design/HomeScreen.dc.html` — biranje, interaktivno. Prop `scene` (free_active · free_open · free_locked · free_unlock · premium_buy · premium_owned · premium_soon), `tab` (free|premium), `openT` / `closeT` (0–1, zamrznut kadar prelaza), `pipWalked` (zatvaranje kad je Pip odšetao). Klik: strelice, tabovi, Play, kartica, Unlock, cijena; na polju Seasons vraća nazad.
+- `design/HomeScreen.dc.html` — biranje, interaktivno. Prop `scene` (free_active · free_open · free_locked · free_unlock · premium_buy · premium_owned · premium_soon), `tab` (free|premium), `season` (8 ključeva, runda 4), `fresh` (runda 4: sve sezone igrive, nijedan cvijet nađen → svih šest imena), `openT` / `closeT` (0–1, zamrznut kadar prelaza), `pipWalked` (zatvaranje kad je Pip odšetao). Klik: strelice, tabovi, Play, kartica, Unlock, cijena; na polju Seasons vraća nazad.
 - `design/FieldScreen.dc.html` — polje. Prop `season` (8 ključeva), `scene` (gift · basket_empty · first), `u` (0–1, napredak prelaza); u Homeu se montira kao `embedded` (bez svojih traka, imena, Pipa i Playa — to nosi Home).
-- `design/Home Specs.dc.html` — runda 3: šest stanja kartice jedno pored drugog + anatomija zone cvijeća; zatim sva stanja §6.1, trake kadrova otvaranja / zatvaranja / zatvaranja s odšetanim Pipom (`design/frames/`, snimljeno iz HomeScreen), P9 predaja, tri koraka Playa, tajming.
+- `design/Home Specs.dc.html` — runda 4 na vrhu: svih 8 sezona sa svih šest imena (najgori slučaj), anatomija imena i živa samoprovjera iz DOM-a; zatim runda 3: šest stanja kartice + anatomija zone cvijeća; sva stanja §6.1, trake kadrova otvaranja / zatvaranja / zatvaranja s odšetanim Pipom (`design/frames/`, snimljeno iz HomeScreen), P9 predaja, tri koraka Playa, tajming.
 - `godot/` — export JSON, konstante, stablo čvorova, red prenosa.
 
 ## Stanja (§6.1)
@@ -116,6 +116,36 @@ Provjereno 2026-09-29 u `HomeScreen.dc.html` (Chromium), poslije dopune gore. Sv
 - **Zaključano potpuno zamjenjuje „missing":** na zaključanoj kartici nema isprekidanih diskova ni imena; „missing" se crta samo na sezoni koja se može igrati.
 - **Premium je drugačiji — bez vela i katanca:** premium se kupuje, pa kartica pokazuje šta se kupuje (šest cvjetova u boji); zlatni rub + cijena kažu „nije tvoje". Katanac znači „otključava se igrom", zlato „kupuje se". Ember (coming soon) ostaje na 50 %.
 - **Ime cvijeta koji fali ostaje** ispod njegovog diska (38, gap 18).
+
+## § Runda 4
+Problem: ime cvijeta (38/900, prelom 300) bilo je šire od razmaka centara diskova (248 / 228) → 10 preklapanja na 7 od 8 sezona, najgore Coral Tide „Tide Anemone | Pearl Waterlily" −46 px.
+
+| ID | Šta je promijenjeno |
+|---|---|
+| N1 | Ime 34/900 (bilo 38), boja `#1A1A14`, 12 ispod diska (bilo 18), centrirano na disk. |
+| N2 | Prelom: jedan red ako je ≤ 220 px, inače dva reda — podjela na razmaku kod koje je duži red najkraći (= `UiStage.balance_lines(text, font(900, 34), 34, 220)`). Nikad tri reda. Skraćivanja nema. |
+| N3 | Diskovi u tri kolone, x 276 / 516 / 756 u oba reda (korak 240). Red 1: oko 220 na vrhu 230, strane 180 na 256 (kao runda 3). Red 2: 180 na vrhu 560 (bilo 552). `ROSTER6` = (186,256) (406,230) (666,256) / (186,560) (426,560) (666,560). |
+| N4 | Mock koristi pravih 48 imena iz `game/data/seasons/seasons.json` redom `season_stage.gd _roster()`. Sezona otključana / kupljena tapom nema nađen cvijet → svih šest imena (kao u igri). |
+
+**Odlučeno (runda 4):**
+- **34, ne 38:** na 34 najšira dvoredna podjela je „Paper Lantern / Bloom" 234,4; na 38 bi bila 262 i ne bi stala u korak 240. 34 je donja granica iz §2, pa nema prostora ispod nje.
+- **Prelom 220 umjesto 300:** tako skoro svako dvorječno ime ide u dva kratka reda, a dva jednoredna imena (≤ 220) su uvijek ≥ 20 px razmaknuta. Širina 220 = disk 180 + 20 sa svake strane, pa ime ostaje „ispod svog diska".
+- **Jednak korak 240 u oba reda:** red 2 je imao samo 228. Širi korak od 240 bi gurnuo kolone preko strelica (disk + najšire ime moraju ostati iza x 148 / 884). 240 je najveći broj koji to drži: najšire ime u kraju je 10,8 px od strelica.
+- **Red 2 na 560:** ime ispod oka (dva reda) završava na 530 → 30 px do reda 2; ime ispod reda 2 u dva reda završava na 820 → 10 px do `STATUS_TOP` 830. Oba razmaka su veća nego u rundi 3 (8 i 4).
+- **Gap 12:** ime se i dalje čita kao dio svog diska (12 prema ≥ 30 do sljedećeg diska ispod i ≥ 36 do susjednog imena).
+- **Svaki cvijet koji fali zadržava ime:** nijedno ime se ne izbacuje, pa igrač i dalje vidi ime cvijeta koji mu fali.
+- **Pravilo za sadržaj:** svako novo ime cvijeta mora stati u dva reda od ≤ 234 px na 34/900. Test u igri: preko `missing_name_boxes()` na svih 8 sezona.
+- **Diskovi, veo, katanac, status red, strelice, tabovi, Play, tačke i prelaz:** nepromijenjeni.
+
+## § Samoprovjera runde 4
+Provjereno 2026-09-30 u `Home Specs.dc.html` (Chromium), mjereno iz DOM-a na svih 22 kartice na stranici (8 najgorih slučajeva sa svih šest imena = 48 imena, anatomija, 13 kartica runde 3). Isti ispis je u konzoli (`R4 …`) i na stranici (SelfCheckR4).
+1. **da** — nijedna dva imena se ne dodiruju. Najmanji razmak između susjednih imena je 36,4 px (Starfall Glade, Nova Bloom | Aurora Tulip); u rundi 3 je bilo −45,8. Garancija za bilo koje ime na bilo kojem mjestu: ≥ 14,1.
+2. **da** — nijedno ime ne siječe disk (0 presjeka). Strelice: najbliže ime je 10,8 px od x 148 / 884 na y 680–800 (Lantern Meadow, Paper Lantern Bloom). Do diska ispod ima ≥ 30 px (Country Bloom, Harvest Pumpkin).
+3. **da** — najniža tačka imena je 820 (stranica 992, Paper Lantern Bloom); `STATUS_TOP` 830 → 10 px slobodno.
+4. **da** — šest diskova je vidljivo na svih 22 kartice, u svih 7 stanja (open, active, owned, locked, unlock, buy, soon).
+5. **da** — locked (2 kartice): veo 100 % na svih šest diskova i jedan katanac na bloku. Unlock (2): veo na svih šest diskova, jedini katanac je na dugmetu Unlock. Na ostalim karticama nema ni vela ni katanca.
+6. **da** — sve kartice su 1032 × 1160 na (24, 172). SeasonTabs (24, 24, 1032, 124), PlayButton (280, 1413, 520, 180), tačke na y 1352, status red od 830 / visina 280 — izmjereno. Konstante prelaza nisu dirane.
+7. **da** — najmanji tekst na karticama je 34 px (imena). Boja `#1A1A14` na najsvjetlijoj i najtamnijoj traci (Moonlit `#B8BDFF`) daje ≥ 8:1.
 
 ## § Samoprovjera runde 3
 Provjereno 2026-09-29 na svim instancama kartice u `Home Specs.dc.html` (13 kartica, svih 7 stanja), mjereno iz DOM-a.
