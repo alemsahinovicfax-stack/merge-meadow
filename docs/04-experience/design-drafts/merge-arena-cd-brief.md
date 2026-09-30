@@ -678,6 +678,24 @@ Osam zasebnih polja je **proširenje** obima. Trenutni milestone je M8 (launch I
 
 Zato paket mora biti **primjenjiv sezonu po sezonu**: prvo Country Bloom (početna sezona), pa ostale. Muncher, korpa i combo ne zavise od toga i mogu ući odmah.
 
+### 11.9 Odluke CD-a tokom izrade (2026-09-30, paket još nije isporučen)
+
+CD je stao na pola paketa (istekao limit). Ove odluke postoje **samo u CD chatu**, pa su ovdje zapisane da se ne izgube ako ta sesija nestane. Nisu provjerene u igri — paket još nije stigao.
+
+**Gotovo u `design_handoff_arena_v2/design/`:** `Arena Today.dc.html` (današnja Arena rekonstruisana iz koda, kao „prije" referenca), `arena_v2_data.js` (jedan izvor za muncher, korpu, combo i svih 8 livada kao recepte — bez ijednog PNG-a), `ArenaField.dc.html` (crta bilo koju sezonu na bilo kojem nivou bujnosti).
+
+| Odluka | Sadržaj |
+|---|---|
+| **Čitljivost sjemenke** | Svaka sjemenka dobija **tamni prsten 4 px** ispod krem ruba. Na tamnoj livadi radi krem rub, na svijetloj tamni prsten — uvijek jedno od dvoje. Najniži izmjereni kontrast na 8 livada: **3,47 : 1** (traženo ≥ 3 : 1). |
+| **Muncher** | Ljubičasta **gusjenica** sa žutim upozoravajućim tačkama. Svako stanje ima svoj oblik: sklupčana sa „zzz" (u gnijezdu i van njega), rep uvis i „!" pri buđenju, ispružena s ljutim obrvama u lovu, širom otvorena usta dok jede, u ledenom bloku sa ledenicama kad je zaleđena. |
+| **Korpa** | Pletena **piknik korpa** s ručkom i peach krpom, dodir **300 × 280**. Do **12 cvjetova** se gomila u njoj (40 sjemenki = puna gomila), pa se količina vidi bez brojača. Brojač ostaje. |
+| **Combo** | Na svaki combo merge iskoči „×N" na mjestu spajanja. Prsten se širi ispod sjemenki, a livada se **posvjetljava stepenasto (2 → 5)**; 5 je maksimum. Na 5 broj postaje zlatan i coin odleti na coin chip. Poslije 1,4 s bez merga sve se vrati. |
+| **Combo vs bujnost** | Ne sudaraju se: **bujnost mijenja šta je na livadi** (više biljaka i detalja), **combo mijenja samo svjetlo**. |
+
+**Provjereno uz kod:** prsten od 4 px je tačan — najmanji razmak centara sjemenki je `CHIP_MIN_DIST` 142,8 px, a sjemenka je 134,4 px široka, pa između rubova ostaje 8,4 px; pola je 4,2. Prstenovi se ne mogu preklopiti. Dodir korpe 300 × 280 je iznad traženih 280 × 250. Puna korpa od 40 sjemenki odgovara `GameState` limitu vreće.
+
+**Ostalo CD-u:** popravka performansi (galerija od 16 livada se guši — spajanje oblika po boji), `SeedChip` / `Muncher` / `SeedBasket` komponente, `ArenaScreen.dc.html`, `Arena Specs.dc.html`, `godot/` (export JSON, `ui_arena_v2.gd`, `arena_tree.txt`), README sa § Odlučeno i § Samoprovjerom od 9 stavki, pa zip.
+
 ## 12. Prompt za Claude Design — redizajn 2
 
 > Kopiraj sve iz bloka ispod u CD. **Prije toga commitaj i pushaj na `master`.** Priloži i ovaj `.md` fajl.
