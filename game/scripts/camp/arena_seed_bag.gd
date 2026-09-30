@@ -5,6 +5,9 @@ extends Control
 ## dodir 300 x 280. Kolicina se vidi bez brojaca — do 12 cvjetova u gomili
 ## (UiArenaV2.basket_visible); brojac ostaje kao tacan broj. Prazna = tamni otvor i prazna
 ## rucka; ima sjemena (>= 2) = klacenje; sipa = nagib -12° oko dna i 2-3 cvijeta u letu.
+## Performanse: tijelo korpe je zaseban cvor (Body) koji se klati rotacijom — crtez se ne
+## obnavlja svaki frejm, samo kad se promijeni stanje. Sjena ide ispod, brojac i cvjetovi u
+## letu iznad (Front).
 
 signal bag_clicked
 
@@ -39,6 +42,9 @@ var _pour_fly: float = 0.0
 var _tilt_tween: Tween = null
 var _fly_tween: Tween = null
 var _colors: Dictionary = {}
+var _body: Control = null
+var _front: Control = null
+var _rim_box: StyleBoxFlat = null
 
 
 func _ready() -> void:
@@ -49,16 +55,34 @@ func _ready() -> void:
 	z_index = 50
 	for key in UiArenaV2.BASKET_COLORS:
 		_colors[key] = UiArenaV2.col(str(UiArenaV2.BASKET_COLORS[key]))
+	_body = _make_layer("Body", _draw_body)
+	_body.pivot_offset = UiArenaV2.BASKET_PIVOT
+	_front = _make_layer("Front", _draw_front)
 	gui_input.connect(_on_gui_input)
 
 
+func _make_layer(layer_name: String, painter: Callable) -> Control:
+	var layer := Control.new()
+	layer.name = layer_name
+	layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.size = UiArenaV2.BASKET_HIT
+	layer.draw.connect(painter)
+	add_child(layer)
+	return layer
+
+
 func _process(delta: float) -> void:
+	var angle := _pour_tilt
 	if _open:
 		_wiggle_t += delta * WIGGLE_SPEED
 		position = _base_position + Vector2(0.0, sin(_wiggle_t * 1.7) * 4.0)
+		angle += OPEN_TILT + sin(_wiggle_t) * WIGGLE_AMP
 	else:
 		position = _base_position
-	queue_redraw()
+	if _body != null:
+		_body.rotation = angle
+	if _pour_fly > 0.0 and _front != null:
+		_front.queue_redraw()
 
 
 func set_layout_position(base: Vector2) -> void:
@@ -83,7 +107,14 @@ func set_state(seed_count: int, can_pour: bool, preview_types: Array) -> void:
 		Control.MOUSE_FILTER_STOP if seed_count > 0
 		else Control.MOUSE_FILTER_IGNORE
 	)
+	_redraw_all()
+
+
+func _redraw_all() -> void:
 	queue_redraw()
+	if _body != null:
+		_body.queue_redraw()
+		_front.queue_redraw()
 
 
 func get_seed_count() -> int:
@@ -113,10 +144,12 @@ func play_pour() -> void:
 	if _fly_tween != null and _fly_tween.is_valid():
 		_fly_tween.kill()
 	_pour_fly = 1.0
+	_redraw_all()
 	_fly_tween = create_tween()
 	_fly_tween.tween_property(self, "_pour_fly", 0.0, POUR_FLY_SEC).set_trans(Tween.TRANS_CUBIC).set_ease(
 		Tween.EASE_IN
 	)
+	_fly_tween.tween_callback(_redraw_all)
 
 
 ## Usta korpe (centar otvora) u koordinatama roditelja.
@@ -143,29 +176,30 @@ func _on_gui_input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	draw_colored_polygon(_ellipse(SHADOW_RECT.get_center(), SHADOW_RECT.size * 0.5), _colors["shadow"])
-	var angle := _pour_tilt
-	if _open:
-		angle += OPEN_TILT + sin(_wiggle_t) * WIGGLE_AMP
-	var pivot := UiArenaV2.BASKET_PIVOT
-	var body := Transform2D(angle, pivot) * Transform2D(0.0, -pivot)
-	draw_set_transform_matrix(body)
-	_draw_handle()
+
+
+## Tijelo korpe (crta se u Body, koji se rotira oko dna): rucka, otvor, gomila, pleter, rub, krpa.
+func _draw_body() -> void:
+	var c := _body
+	_draw_handle(c)
 	var opening := _ellipse(OPENING_C, OPENING_R)
-	draw_colored_polygon(opening, _colors["opening"])
-	_draw_closed(opening, _colors["edge"], 4.0)
-	_draw_pile(body)
-	draw_set_transform_matrix(body)
-	_draw_wicker()
-	_draw_rim()
-	_draw_cloth()
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	c.draw_colored_polygon(opening, _colors["opening"])
+	_draw_closed(c, opening, _colors["edge"], 4.0)
+	_draw_pile(c)
+	_draw_wicker(c)
+	_draw_rim(c)
+	_draw_cloth(c)
+
+
+## Iznad tijela, bez rotacije: cvjetovi u letu pri sipanju i brojac.
+func _draw_front() -> void:
 	if _pour_fly > 0.0 and _seed_count > 0:
-		_draw_flyers()
+		_draw_flyers(_front)
 	if _seed_count > 0:
-		_draw_counter()
+		_draw_counter(_front)
 
 
-func _draw_handle() -> void:
+func _draw_handle(c: CanvasItem) -> void:
 	var pts := PackedVector2Array()
 	for i in 25:
 		var t := float(i) / 24.0
@@ -176,13 +210,13 @@ func _draw_handle() -> void:
 		)
 	for pass_i in 2:
 		var w := HANDLE_INK_W if pass_i == 0 else HANDLE_W
-		var c: Color = _colors["edge"] if pass_i == 0 else _colors["handle"]
-		draw_polyline(pts, c, w, true)
-		draw_circle(pts[0], w * 0.5, c)
-		draw_circle(pts[pts.size() - 1], w * 0.5, c)
+		var col: Color = _colors["edge"] if pass_i == 0 else _colors["handle"]
+		c.draw_polyline(pts, col, w, true)
+		c.draw_circle(pts[0], w * 0.5, col)
+		c.draw_circle(pts[pts.size() - 1], w * 0.5, col)
 
 
-func _draw_pile(body: Transform2D) -> void:
+func _draw_pile(c: CanvasItem) -> void:
 	var shown := get_visible_pile()
 	if shown <= 0 or _preview_types.is_empty():
 		return
@@ -191,40 +225,42 @@ func _draw_pile(body: Transform2D) -> void:
 			continue
 		var q: Array = UiArenaV2.BASKET_PILE[i]
 		var type_id := _preview_types[i % _preview_types.size()]
-		draw_set_transform_matrix(body * Transform2D(deg_to_rad(float(q[3])), Vector2(q[0], q[1])))
-		ArenaChipDraw.draw_flower(self, Vector2.ZERO, type_id, 1, float(q[2]))
+		c.draw_set_transform(Vector2(q[0], q[1]), deg_to_rad(float(q[3])), Vector2.ONE)
+		ArenaChipDraw.draw_flower(c, Vector2.ZERO, type_id, 1, float(q[2]))
+	c.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
-func _draw_wicker() -> void:
+func _draw_wicker(c: CanvasItem) -> void:
 	var pts := PackedVector2Array([Vector2(30, 166), Vector2(270, 166), Vector2(249, 256)])
 	_append_quad(pts, Vector2(249, 256), Vector2(246, 270), Vector2(232, 270))
 	pts.append(Vector2(68, 270))
 	_append_quad(pts, Vector2(68, 270), Vector2(54, 270), Vector2(51, 256))
-	draw_colored_polygon(pts, _colors["wicker"])
+	c.draw_colored_polygon(pts, _colors["wicker"])
 	var weave: Color = _colors["weave"]
-	draw_line(Vector2(40, 202), Vector2(260, 202), weave, 6.0, true)
-	draw_line(Vector2(47, 236), Vector2(253, 236), weave, 6.0, true)
+	c.draw_line(Vector2(40, 202), Vector2(260, 202), weave, 6.0, true)
+	c.draw_line(Vector2(47, 236), Vector2(253, 236), weave, 6.0, true)
 	for seg in [[84, 88], [117, 119], [150, 150], [183, 181], [216, 212]]:
-		draw_line(Vector2(seg[0], 172), Vector2(seg[1], 264), weave, 4.0, true)
-	_draw_closed(pts, _colors["edge"], 5.0)
+		c.draw_line(Vector2(seg[0], 172), Vector2(seg[1], 264), weave, 4.0, true)
+	_draw_closed(c, pts, _colors["edge"], 5.0)
 
 
-func _draw_rim() -> void:
-	var s := StyleBoxFlat.new()
-	s.bg_color = _colors["rim"]
-	s.border_color = _colors["edge"]
-	s.set_border_width_all(4)
-	s.set_corner_radius_all(17)
-	s.corner_detail = 12
-	s.anti_aliasing = true
-	draw_style_box(s, RIM_RECT.grow(2.0))
+func _draw_rim(c: CanvasItem) -> void:
+	if _rim_box == null:
+		_rim_box = StyleBoxFlat.new()
+		_rim_box.bg_color = _colors["rim"]
+		_rim_box.border_color = _colors["edge"]
+		_rim_box.set_border_width_all(4)
+		_rim_box.set_corner_radius_all(17)
+		_rim_box.corner_detail = 12
+		_rim_box.anti_aliasing = true
+	c.draw_style_box(_rim_box, RIM_RECT.grow(2.0))
 	var weave: Color = _colors["rim_weave"]
 	for x in [40, 62, 84, 206, 228]:
-		draw_line(Vector2(x, 152), Vector2(x + 10, 170), weave, 3.0, true)
-	draw_line(Vector2(250, 152), Vector2(258, 166), weave, 3.0, true)
+		c.draw_line(Vector2(x, 152), Vector2(x + 10, 170), weave, 3.0, true)
+	c.draw_line(Vector2(250, 152), Vector2(258, 166), weave, 3.0, true)
 
 
-func _draw_cloth() -> void:
+func _draw_cloth(c: CanvasItem) -> void:
 	var pts := PackedVector2Array([Vector2(98, 150), Vector2(202, 150), Vector2(202, 178)])
 	var scallops := [
 		[Vector2(196, 192), Vector2(186, 180)], [Vector2(177, 194), Vector2(168, 180)],
@@ -233,13 +269,13 @@ func _draw_cloth() -> void:
 	]
 	for sc in scallops:
 		_append_quad(pts, pts[pts.size() - 1], sc[0], sc[1])
-	draw_colored_polygon(pts, _colors["cloth"])
-	_draw_closed(pts, _colors["cloth_edge"], 3.0)
+	c.draw_colored_polygon(pts, _colors["cloth"])
+	_draw_closed(c, pts, _colors["cloth_edge"], 3.0)
 	for d in CLOTH_DOTS:
-		draw_circle(d, 4.0, _colors["cloth_dot"])
+		c.draw_circle(d, 4.0, _colors["cloth_dot"])
 
 
-func _draw_flyers() -> void:
+func _draw_flyers(c: CanvasItem) -> void:
 	var rise := (1.0 - _pour_fly) * POUR_FLY_RISE
 	for i in POUR_FLYERS.size():
 		var q: Array = POUR_FLYERS[i]
@@ -247,34 +283,34 @@ func _draw_flyers() -> void:
 		if type_id.is_empty():
 			continue
 		var tex := FlowerAssets.get_texture(type_id, 1)
-		draw_set_transform(Vector2(q[0], float(q[1]) - rise), deg_to_rad(float(q[3])), Vector2.ONE)
+		c.draw_set_transform(Vector2(q[0], float(q[1]) - rise), deg_to_rad(float(q[3])), Vector2.ONE)
 		if tex != null:
-			CampPlantDraw.draw_cropped_texture(self, Vector2.ZERO, tex, float(q[2]), Color(1, 1, 1, _pour_fly))
+			CampPlantDraw.draw_cropped_texture(c, Vector2.ZERO, tex, float(q[2]), Color(1, 1, 1, _pour_fly))
 		else:
-			ArenaChipDraw.draw_flower(self, Vector2.ZERO, type_id, 1, float(q[2]) * _pour_fly)
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+			ArenaChipDraw.draw_flower(c, Vector2.ZERO, type_id, 1, float(q[2]) * _pour_fly)
+	c.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
-func _draw_counter() -> void:
+func _draw_counter(c: CanvasItem) -> void:
 	var cfg := UiArenaV2.BASKET_COUNTER
-	var c := Vector2(cfg["c"][0], cfg["c"][1])
+	var center := Vector2(cfg["c"][0], cfg["c"][1])
 	var r := float(cfg["r"])
-	draw_circle(c, r + 3.0, _colors["edge"])
-	draw_circle(c, r, _colors["counter_edge"])
-	draw_circle(c, r - 4.0, _colors["counter"])
+	c.draw_circle(center, r + 3.0, _colors["edge"])
+	c.draw_circle(center, r, _colors["counter_edge"])
+	c.draw_circle(center, r - 4.0, _colors["counter"])
 	var size_px := int(cfg["font"])
 	var font := UiChrome.heavy_font(UiChrome.EMBOLDEN_800)
-	var baseline := c.y + (font.get_ascent(size_px) - font.get_descent(size_px)) * 0.5
-	draw_string(
-		font, Vector2(c.x - r, baseline), str(_seed_count), HORIZONTAL_ALIGNMENT_CENTER, r * 2.0,
+	var baseline := center.y + (font.get_ascent(size_px) - font.get_descent(size_px)) * 0.5
+	c.draw_string(
+		font, Vector2(center.x - r, baseline), str(_seed_count), HORIZONTAL_ALIGNMENT_CENTER, r * 2.0,
 		size_px, _colors["counter_ink"]
 	)
 
 
-func _draw_closed(pts: PackedVector2Array, c: Color, w: float) -> void:
+func _draw_closed(canvas: CanvasItem, pts: PackedVector2Array, col: Color, w: float) -> void:
 	var outline := pts.duplicate()
 	outline.append(pts[0])
-	draw_polyline(outline, c, w, true)
+	canvas.draw_polyline(outline, col, w, true)
 
 
 static func _append_quad(pts: PackedVector2Array, p0: Vector2, p1: Vector2, p2: Vector2, steps: int = 6) -> void:

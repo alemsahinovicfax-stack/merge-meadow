@@ -60,6 +60,10 @@ var _shell_tween: Tween = null
 var _segs: Array[Vector2] = [Vector2.ZERO, Vector2.ZERO, Vector2.ZERO]
 var _dir: Vector2 = Vector2(cos(deg_to_rad(200.0)), sin(deg_to_rad(200.0)))
 var _colors: Dictionary = {}
+var _drawn_pose: String = ""
+var _boxes: Dictionary = {}
+var _ice_box: StyleBoxFlat = null
+var _ice_rim: StyleBoxFlat = null
 
 var _get_edible_chips: Callable
 var _get_keepout_rect: Callable
@@ -158,8 +162,13 @@ func tick(delta: float) -> void:
 			_eat_timer -= delta
 			if _eat_timer <= 0.0:
 				_finish_eating()
-	_update_segments(delta)
-	queue_redraw()
+	var moved := _update_segments(delta)
+	# Crtez se obnavlja samo kad se nesto vidljivo mijenja: kretanje/jedenje, segmenti koji se
+	# jos namjestaju ili nova poza. Usnuli ili zaleđeni muncher ne trosi frejm.
+	var key := get_pose_key()
+	if moved or key != _drawn_pose or _state == State.HUNTING or _state == State.EATING:
+		_drawn_pose = key
+		queue_redraw()
 
 
 func _tick_hunting(delta: float) -> void:
@@ -298,16 +307,19 @@ func _snap_segments() -> void:
 
 ## Sleep/wake: fiksni pomaci poze. Hunt/eat: lanac — svaki segment na razmaku od prethodnog,
 ## pa tijelo prati put glave. Frozen: tijelo stoji.
-func _update_segments(delta: float) -> void:
+## Vraca true ako se neki segment pomjerio vise od 0,05 px (treba novi crtez).
+func _update_segments(delta: float) -> bool:
 	var key := get_pose_key()
 	if key == "frozen":
-		return
+		return false
+	var before := _segs.duplicate()
 	var pose: Dictionary = UiArenaV2.MUNCHER_POSES[key]
 	var follow := 1.0 - exp(-SEG_FOLLOW * delta)
 	if pose.has("segs"):
 		for k in 3:
-			_segs[k] = _segs[k].lerp(_pest_center + _v(pose["segs"][k]), follow)
-		return
+			var target := _pest_center + _v(pose["segs"][k])
+			_segs[k] = target if _segs[k].distance_squared_to(target) < 0.0025 else _segs[k].lerp(target, follow)
+		return _segs_moved(before)
 	var spacing: Array = pose["spacing"]
 	var prev := _pest_center
 	var prev_d := 0.0
@@ -320,6 +332,14 @@ func _update_segments(delta: float) -> void:
 		_segs[k] = _segs[k].lerp(target, follow) if key == "eat" else target
 		prev = _segs[k]
 		prev_d = float(spacing[k])
+	return _segs_moved(before)
+
+
+func _segs_moved(before: Array[Vector2]) -> bool:
+	for k in 3:
+		if _segs[k].distance_squared_to(before[k]) > 0.0025:
+			return true
+	return false
 
 
 func _draw() -> void:
@@ -503,19 +523,22 @@ func _draw_ice(center: Vector2) -> void:
 	var s := 0.8 + 0.2 * _shell
 	draw_set_transform(center, 0.0, Vector2(s, s))
 	var box := Rect2(-ICE_SIZE * 0.5, ICE_SIZE)
-	var sb := StyleBoxFlat.new()
+	if _ice_box == null:
+		_ice_box = StyleBoxFlat.new()
+		_ice_box.set_border_width_all(4)
+		_ice_box.set_corner_radius_all(28)
+		_ice_box.corner_detail = 10
+		_ice_box.anti_aliasing = true
+		_ice_rim = StyleBoxFlat.new()
+		_ice_rim.draw_center = false
+		_ice_rim.set_border_width_all(2)
+		_ice_rim.set_corner_radius_all(30)
+		_ice_rim.corner_detail = 10
+	var sb := _ice_box
 	sb.bg_color = Color(_colors["ice"], _colors["ice"].a * a)
 	sb.border_color = Color(_colors["ice_edge"], a)
-	sb.set_border_width_all(4)
-	sb.set_corner_radius_all(28)
-	sb.corner_detail = 10
-	sb.anti_aliasing = true
-	var rim := StyleBoxFlat.new()
-	rim.draw_center = false
+	var rim := _ice_rim
 	rim.border_color = Color(_colors["frozen_edge"], a)
-	rim.set_border_width_all(2)
-	rim.set_corner_radius_all(30)
-	rim.corner_detail = 10
 	draw_style_box(rim, box.grow(2.0))
 	draw_style_box(sb, box)
 	var tl := box.position
@@ -572,7 +595,12 @@ func _draw_alarm(center: Vector2) -> void:
 func _rounded(
 	rect: Rect2, fill: Color, top_r: int, bottom_r: int = -1, border: Color = Color.TRANSPARENT, border_w: int = 0
 ) -> void:
+	var cache_key := "%s|%s|%d|%d|%s|%d" % [rect.size, fill.to_html(), top_r, bottom_r, border.to_html(), border_w]
+	if _boxes.has(cache_key):
+		draw_style_box(_boxes[cache_key], rect)
+		return
 	var s := StyleBoxFlat.new()
+	_boxes[cache_key] = s
 	s.bg_color = fill
 	s.corner_radius_top_left = top_r
 	s.corner_radius_top_right = top_r
