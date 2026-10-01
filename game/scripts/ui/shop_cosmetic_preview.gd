@@ -112,7 +112,7 @@ func _draw() -> void:
 
 func _draw_half(rect: Rect2, slot: String, shown_id: String) -> void:
 	if slot == CosmeticCatalog.SLOT_JOURNAL_FRAME:
-		_draw_album(rect, shown_id == "journal_gold")
+		_draw_album(rect, shown_id)
 		return
 	var meadow_id := shown_id if slot == CosmeticCatalog.SLOT_MEADOW_BG \
 		else GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_MEADOW_BG)
@@ -153,32 +153,33 @@ func _draw_lane(rect: Rect2, meadow_id: String) -> void:
 	draw_circle(Vector2(left_x - 10.0, rect.position.y + 214.0), 5.0, c["petal"])
 
 
+## Ormar: skin je pravi pip_idle.svg s recolorom (PipAssets), ne PipDraw.
 func _draw_pip(rect: Rect2, pip_id: String) -> void:
-	var palette: Dictionary = UiShop.preview_pip_palette(pip_id)
 	var shadow_center := Vector2(
 		rect.position.x + rect.size.x * 0.5, rect.end.y - 24.0
 	)
 	draw_set_transform(shadow_center, 0.0, Vector2(1.0, 0.26))
 	draw_circle(Vector2.ZERO, 50.0, UiShop.PIP_SHADOW)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	if palette.is_empty():
-		var tex := PipAssets.get_texture()
-		if tex != null:
-			var side := float(UiShop.PIP_SPRITE)
-			var pos := Vector2(
-				rect.position.x + (rect.size.x - side) * 0.5,
-				rect.end.y - side - float(UiShop.PIP_SPRITE_BOTTOM)
-			)
-			draw_texture_rect(tex, Rect2(pos, Vector2(side, side)), false)
-			return
+	var tex := PipAssets.get_texture(pip_id)
+	if tex != null:
+		var side := float(UiShop.PIP_SPRITE)
+		var pos := Vector2(
+			rect.position.x + (rect.size.x - side) * 0.5,
+			rect.end.y - side - float(UiShop.PIP_SPRITE_BOTTOM)
+		)
+		draw_texture_rect(tex, Rect2(pos, Vector2(side, side)), false)
+		return
 	var center := Vector2(
 		rect.position.x + rect.size.x * 0.5,
 		rect.end.y - float(UiShop.PIP_DRAW_BOTTOM) - 66.0
 	)
-	PipDraw.draw_pip(self, center, UiShop.PIP_DRAW_SCALE, palette)
+	PipDraw.draw_pip(self, center, UiShop.PIP_DRAW_SCALE)
 
 
-func _draw_album(rect: Rect2, gold: bool) -> void:
+func _draw_album(rect: Rect2, frame_id: String) -> void:
+	var frame_look := CosmeticCatalog.get_album_frame(frame_id)
+	var gold := not frame_look.is_empty()
 	draw_rect(rect, UiShop.WELL)
 	var inset := float(UiShop.ALBUM_INSET)
 	var page := Rect2(rect.position + Vector2(inset, inset), rect.size - Vector2(inset, inset) * 2.0)
@@ -190,7 +191,7 @@ func _draw_album(rect: Rect2, gold: bool) -> void:
 	var title_w := minf(page.size.x - pad * 2.0, 520.0)
 	var title_pos := Vector2(page.position.x + (page.size.x - title_w) * 0.5, page.position.y + pad)
 	if _title_tex != null:
-		var modulate_col := Color(0.8, 0.8, 0.8, 1.0) if gold else Color.WHITE
+		var modulate_col := CosmeticCatalog.get_journal_title_color(frame_id)
 		draw_texture_rect(
 			_title_tex, Rect2(title_pos, Vector2(title_w, title_h)), false, modulate_col
 		)
@@ -212,15 +213,10 @@ func _draw_album(rect: Rect2, gold: bool) -> void:
 		draw_rect(row, color)
 		y += row_h + gap
 	if gold:
-		var w := float(UiShop.ALBUM_FRAME_W)
+		var w := float(frame_look.get("width", UiShop.ALBUM_FRAME_W))
+		var col := Color(str(frame_look.get("color", UiShop.ALBUM_FRAME.to_html(false))))
 		var frame := page
-		draw_rect(Rect2(frame.position, Vector2(frame.size.x, w)), UiShop.ALBUM_FRAME)
-		draw_rect(
-			Rect2(Vector2(frame.position.x, frame.end.y - w), Vector2(frame.size.x, w)),
-			UiShop.ALBUM_FRAME
-		)
-		draw_rect(Rect2(frame.position, Vector2(w, frame.size.y)), UiShop.ALBUM_FRAME)
-		draw_rect(
-			Rect2(Vector2(frame.end.x - w, frame.position.y), Vector2(w, frame.size.y)),
-			UiShop.ALBUM_FRAME
-		)
+		draw_rect(Rect2(frame.position, Vector2(frame.size.x, w)), col)
+		draw_rect(Rect2(Vector2(frame.position.x, frame.end.y - w), Vector2(frame.size.x, w)), col)
+		draw_rect(Rect2(frame.position, Vector2(w, frame.size.y)), col)
+		draw_rect(Rect2(Vector2(frame.end.x - w, frame.position.y), Vector2(w, frame.size.y)), col)

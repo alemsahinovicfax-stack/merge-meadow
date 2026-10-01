@@ -284,11 +284,6 @@ static func preview_lane_colors(meadow_id: String, season_id: String) -> Diction
 	}
 
 
-## Paleta za PipDraw; prazna = pip_idle.svg (klasicni Pip).
-static func preview_pip_palette(pip_skin_id: String) -> Dictionary:
-	return CosmeticCatalog.get_pip_palette(pip_skin_id)
-
-
 static func season_fill(season_id: String, soon: bool) -> Color:
 	var mood := SeasonCardContrast.mood_color(season_id)
 	return mood.lerp(PAGE_BG, 0.44) if soon else mood

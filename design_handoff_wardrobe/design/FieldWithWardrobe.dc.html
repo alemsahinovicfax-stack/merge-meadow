@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}a{color:#2D3436}a:hover{color:#9E6645}</style>
+</helmet>
+<div data-layer="FieldScreen" data-screen-label="{{ label }}" style="width:1080px;height:1920px;flex:0 0 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#2A2233;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+
+  <div data-layer="Header" style="flex:0 0 143px;position:relative;z-index:5;background:#2A2233;box-shadow:0 6px 14px rgba(20,14,26,.34)">
+    <div style="height:140px;display:flex;align-items:center;gap:16px;padding:0 0 0 20px;box-sizing:border-box">
+      <div data-layer="CoinChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="ref/icon_coin.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;white-space:nowrap">{{ coins }}</div></div>
+      <div data-layer="SeedChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="ref/icon_seed.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;white-space:nowrap">{{ seeds }}</div></div>
+      <div data-layer="FlowerChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="ref/icon_flower.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;white-space:nowrap">{{ flowers }}</div></div>
+      <div data-layer="SettingsSlot" style="width:124px;height:140px;flex:0 0 auto;display:flex;align-items:center;padding-left:4px;box-sizing:border-box"><div data-layer="SettingsButton" style="width:100px;height:100px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center"><img src="ref/icon_settings_light.svg" alt="" style="width:56px;height:56px"></div></div>
+    </div>
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+  </div>
+
+  <div data-layer="FieldPage" style="flex:0 0 1633px;height:1633px;position:relative;overflow:hidden">
+    <div data-layer="Meadow" style="position:absolute;left:0;top:0;width:1080px;height:1633px;overflow:hidden">
+      <div data-layer="MeadowSky" style="position:absolute;left:0;top:0;width:1080px;height:523px;background:{{ sky }}"></div>
+      <div data-layer="MeadowFar" style="position:absolute;left:0;top:523px;width:1080px;height:587px;background:{{ ground }}"></div>
+      <div data-layer="MeadowNear" style="position:absolute;left:0;top:1110px;width:1080px;height:523px;background:{{ near }}"></div>
+    </div>
+    <div data-layer="MeadowFlowers" style="position:absolute;left:0;top:0;width:1080px;height:1633px">
+      <sc-for list="{{ spots }}" as="sp" hint-placeholder-count="13">
+        <div data-layer="MeadowFlower" data-spot="{{ sp.i }}" style="{{ sp.wrap }}">
+          <div style="{{ sp.soil }}"></div>
+          <div style="{{ sp.shade }}"></div>
+          <img src="{{ sp.src }}" alt="" style="{{ sp.art }}">
+        </div>
+      </sc-for>
+      <div data-layer="ApplyRing" style="{{ ringStyle }}"></div>
+      <div data-layer="MeadowPip" style="{{ pipStyle }}">
+        <div style="position:absolute;left:35px;bottom:6px;width:120px;height:26px;border-radius:999px;background:rgba(26,26,20,.14)"></div>
+        <img data-layer="PipArt" src="{{ pipSrc }}" alt="" style="{{ pipArtStyle }}">
+      </div>
+    </div>
+
+    <div data-layer="SeasonLabel" style="position:absolute;left:0;top:36px;width:1080px;text-align:center;font:900 56px/1 Nunito,system-ui,sans-serif;letter-spacing:-.01em;color:#1A1A14;white-space:nowrap">{{ seasonName }}</div>
+
+    <div data-layer="TopChrome" style="position:absolute;left:0;top:0;width:1080px;height:420px">
+      <div style="position:absolute;left:228px;top:112px;width:624px;display:flex;justify-content:center">
+        <div data-layer="GrownChip" style="height:76px;box-sizing:border-box;border-radius:38px;background:#FFF8F0;border:3px solid #2D3436;display:flex;align-items:center;gap:12px;padding:0 26px 0 14px">
+          <img src="ref/icon_flower.svg" alt="" style="width:48px;height:48px;flex:0 0 auto">
+          <span style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums;white-space:nowrap">{{ grownText }}</span>
+          <span style="font:800 38px/1 Nunito,system-ui,sans-serif;color:#555C5E">grown</span>
+        </div>
+      </div>
+      <div data-layer="GiftChest" style="position:absolute;left:24px;top:24px;width:180px;height:180px;box-sizing:border-box;border-radius:32px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+        <div style="width:84px;height:84px;border-radius:18px;background:#D4A5FF;border:3px solid #2D3436;box-sizing:border-box;position:relative;overflow:hidden">
+          <div style="position:absolute;left:32px;top:0;bottom:0;width:14px;background:#FFF8F0"></div>
+          <div style="position:absolute;top:32px;left:0;right:0;height:14px;background:#FFF8F0"></div>
+        </div>
+        <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Gift</div>
+        <sc-if value="{{ giftWaiting }}" hint-placeholder-val="{{ true }}">
+          <div data-layer="GiftDot" style="position:absolute;top:-12px;right:-12px;width:48px;height:48px;border-radius:24px;background:#FFCCD5;border:4px solid #2D3436;box-sizing:border-box"></div>
+        </sc-if>
+      </div>
+      <div data-layer="BasketButton" style="position:absolute;left:24px;top:220px;width:180px;height:180px">
+        <sc-if value="{{ basketLocked }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:0;top:0;width:180px;height:180px;box-sizing:border-box;border-radius:32px;background:#EFE8DE;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+            <div style="width:84px;height:84px;border-radius:18px;background:#E3D9CC;border:3px solid rgba(45,52,54,.45);box-sizing:border-box;display:grid;place-items:center"><img src="ref/icon_lock.svg" alt="" style="width:44px;height:44px"></div>
+            <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#555C5E">Basket</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ basketChosen }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;left:0;top:0;width:180px;height:180px;box-sizing:border-box;border-radius:32px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+            <div style="width:84px;height:84px;border-radius:18px;background:#FFD56B;border:3px solid #2D3436;box-sizing:border-box;position:relative;display:grid;place-items:center"><div style="position:absolute;left:7px;top:7px;right:7px;bottom:7px;border-radius:11px;background:#22342A"></div><img src="{{ basketArt }}" alt="" style="position:relative;width:60px;height:60px"></div>
+            <div style="height:52px;box-sizing:border-box;padding:0 16px;border-radius:18px;background:#A8E6CF;border:2px solid #2D3436;display:flex;align-items:center;font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">+5 %</div>
+          </div>
+        </sc-if>
+      </div>
+      <div data-layer="UpgradesButton" style="position:absolute;left:876px;top:24px;width:180px;height:180px;box-sizing:border-box;border-radius:32px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+        <div style="width:84px;height:84px;border-radius:18px;background:#A8E6CF;border:3px solid #2D3436;box-sizing:border-box;position:relative">
+          <div style="position:absolute;left:22px;top:14px;width:20px;height:20px;border-top:8px solid #2D3436;border-left:8px solid #2D3436;transform:rotate(45deg)"></div>
+          <div style="position:absolute;left:22px;top:36px;width:20px;height:20px;border-top:8px solid #2D3436;border-left:8px solid #2D3436;transform:rotate(45deg)"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div data-layer="MagnetLevel" style="display:flex;gap:6px"><sc-for list="{{ magSegs }}" as="g" hint-placeholder-count="4"><div style="{{ g.style }}"></div></sc-for></div>
+          <div data-layer="LootLevel" style="display:flex;gap:6px"><sc-for list="{{ lootSegs }}" as="g" hint-placeholder-count="4"><div style="{{ g.style }}"></div></sc-for></div>
+        </div>
+        <sc-if value="{{ upReady }}" hint-placeholder-val="{{ true }}">
+          <div data-layer="UpgradeDot" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:24px;background:#FFD56B;border:4px solid #2D3436;box-sizing:border-box"></div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div data-layer="WardrobeButton" onClick="{{ openWardrobe }}" style="position:absolute;left:876px;top:1265px;width:180px;height:180px;box-sizing:border-box;border-radius:32px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;z-index:3;transition:transform .08s" style-active="transform:translateY(6px);box-shadow:0 2px 0 rgba(26,26,20,.28)">
+      <div data-layer="WardrobeGlyph" style="width:84px;height:84px;border-radius:18px;background:#FFCCD5;border:3px solid #2D3436;box-sizing:border-box;display:grid;place-items:center">
+        <img src="icons/icon_wardrobe.svg" alt="" style="width:66px;height:66px;display:block">
+      </div>
+      <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Looks</div>
+      <sc-if value="{{ newDot }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="WardrobeDot" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:24px;background:#A8E6CF;border:4px solid #2D3436;box-sizing:border-box"></div>
+      </sc-if>
+    </div>
+
+    <div data-layer="BottomRow" style="position:absolute;left:70px;top:1461px;width:940px;height:148px">
+      <div data-layer="SeasonsButton" style="position:absolute;left:0;top:16px;width:236px;height:124px;box-sizing:border-box;border-radius:28px;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;background:#FFF8F0;gap:14px">
+        <div style="width:18px;height:18px;border-left:7px solid #2D3436;border-bottom:7px solid #2D3436;transform:rotate(45deg);margin-left:8px"></div>
+        <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Seasons</div>
+      </div>
+      <sc-if value="{{ endless }}" hint-placeholder-val="{{ true }}">
+        <div data-layer="EndlessButton" style="position:absolute;left:704px;top:16px;width:236px;height:124px;box-sizing:border-box;border-radius:28px;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;background:#D4A5FF;gap:12px">
+          <div style="display:flex;flex:0 0 auto">
+            <div style="width:30px;height:30px;border-radius:15px;border:6px solid #2D3436;box-sizing:border-box"></div>
+            <div style="width:30px;height:30px;border-radius:15px;border:6px solid #2D3436;box-sizing:border-box;margin-left:-6px"></div>
+          </div>
+          <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Endless</div>
+        </div>
+      </sc-if>
+      <div data-layer="FieldPlayButton" style="position:absolute;left:254px;top:0;width:432px;height:140px;box-sizing:border-box;border-radius:70px;background:#FFB88C;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:22px;z-index:2">
+        <div style="width:0;height:0;border-top:26px solid transparent;border-bottom:26px solid transparent;border-left:42px solid #2D3436;margin-left:6px"></div>
+        <div style="font:900 64px/1 Nunito,system-ui,sans-serif;color:#2D3436">Play</div>
+      </div>
+    </div>
+
+    <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="ApplyToast" style="{{ toastStyle }}">{{ toastText }}</div>
+    </sc-if>
+
+    <sc-if value="{{ zones }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="ZonesOverlay" style="position:absolute;left:0;top:0;width:1080px;height:1633px;z-index:12;pointer-events:none">
+        <sc-for list="{{ zoneRects }}" as="z" hint-placeholder-count="0">
+          <div style="{{ z.style }}"><div style="{{ z.tag }}">{{ z.label }}</div></div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ sheetOn }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="WardrobeScrim" onClick="{{ scrimTap }}" style="position:absolute;left:0;top:0;width:1080px;height:1633px;z-index:8;background:rgba(26,22,30,{{ scrimA }})"></div>
+      <div data-layer="SheetLayer" style="position:absolute;left:0;top:307px;width:1080px;height:1326px;z-index:9;transform:translateY({{ sheetY }}px)">
+        <dc-import name="Wardrobe" slot="{{ slot }}" season="{{ season }}" owned="{{ owned }}" equipped="{{ saved }}" on-close="{{ onSheetClose }}" on-change="{{ onSheetChange }}" hint-size="1080px,1326px"></dc-import>
+      </div>
+    </sc-if>
+  </div>
+
+  <div data-layer="Footer" style="flex:0 0 144px;position:relative;z-index:5;background:#2A2233;box-shadow:0 -6px 14px rgba(20,14,26,.34)">
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+    <div style="position:relative;height:141px;display:flex">
+      <div data-layer="ActiveIndicator" style="position:absolute;top:6px;left:504px;width:72px;height:8px;border-radius:4px;z-index:1;background:#FFB88C"></div>
+      <div data-layer="Tab_Shop" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;border-radius:20px;display:grid;place-items:center"><img src="ref/tab_shop_light.svg" alt="Shop" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Journal" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;border-radius:20px;display:grid;place-items:center"><img src="ref/tab_journal_light.svg" alt="Journal" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Home" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;display:grid;place-items:center;background:#FFB88C;border:2px solid rgba(45,52,54,.14)"><img src="ref/tab_home.svg" alt="Home" style="width:72px;height:72px;display:block;transform:translateY(-2px)"></div></div>
+      <div data-layer="Tab_Camp" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;border-radius:20px;display:grid;place-items:center"><img src="ref/tab_camp_light.svg" alt="Camp" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Arena" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;border-radius:20px;display:grid;place-items:center"><img src="ref/tab_arena_light.svg" alt="Arena" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;moonlit_warren&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;endless&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;State&quot;},&quot;zones&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Provjera&quot;},&quot;newDot&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;State&quot;},&quot;slot&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;owned&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string[]&quot;},&quot;equipped&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string,string&gt;&quot;},&quot;openT&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;hopT&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;ringT&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;toastText&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;pipX&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;pipY&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;}}">
+const SPOTS = [
+  [10, 55, 88, 3, 5], [26, 54, 88, 0, 5], [42, 55, 88, 1, 5], [58, 54, 88, 4, 5], [74, 55, 88, 2, 5], [90, 54, 88, 5, 5],
+  [18, 40, 116, 0, 1], [50, 42, 116, 1, 1], [82, 40, 116, 2, 1],
+  [12, 29, 136, 3, 1], [66, 28, 136, 4, 1], [88, 30, 136, 5, 1],
+  [34, 26, 168, 5, 10]
+];
+const INK = '#2D3436';
+// Mjere — iste u ui_wardrobe.gd / wardrobe_export.json
+const T = { OPEN: 320, CLOSE: 280, HOP: 280, RING: 500, HOP_DELAY: 40, TOAST_IN: 180, TOAST_HOLD: 2600 };
+const PIP = 190, WARDROBE_BTN = [876, 1265, 180, 180];
+const easeOut = k => 1 - Math.pow(1 - k, 3), easeIn = k => k * k * k;
+class Component extends DCLogic {
+  state = { M: null, cat: null, phase: 'field', u: 0, hop: 0, ring: 0, saved: null, toast: '', toastA: 0 };
+  componentDidMount() { import('./wardrobe_data.js').then(M => M.loadCatalog().then(r => this.setState({ M, cat: r.cat }))); }
+  componentWillUnmount() { cancelAnimationFrame(this._raf); clearTimeout(this._tt); }
+  tween(ms, fn, done) {
+    // rAF + setTimeout rezerva: tween uvijek završi (rAF stoji u skrivenom tabu).
+    cancelAnimationFrame(this._raf); clearTimeout(this._fin); const t0 = performance.now(), id = (this._tid = (this._tid || 0) + 1);
+    let fired = false; const end = () => { if (fired || id !== this._tid) return; fired = true; fn(1); if (done) done(); };
+    const step = now => { if (id !== this._tid || fired) return; const k = Math.min(1, (now - t0) / ms); if (k >= 1) { end(); return; } fn(k); this._raf = requestAnimationFrame(step); };
+    this._raf = requestAnimationFrame(step); this._fin = setTimeout(end, ms + 80);
+  }
+  saved() { return this.state.saved || this.props.equipped || {}; }
+  open() {
+    if (this.state.phase !== 'field') return;
+    this._pending = null;
+    this.setState({ phase: 'opening', u: 0, toast: '' });
+    this.tween(T.OPEN, k => this.setState({ u: easeOut(k) }), () => this.setState({ phase: 'open', u: 1 }));
+  }
+  close(pending, changed) {
+    if (this.state.phase !== 'open' && this.state.phase !== 'opening') return;
+    const cat = this.state.cat, u0 = this.state.u;
+    this.setState({ phase: 'closing', saved: Object.assign({}, pending) });
+    this.tween(T.CLOSE * Math.max(0.3, u0), k => this.setState({ u: u0 * (1 - easeIn(k)) }), () => {
+      this.setState({ phase: 'field', u: 0 });
+      const slots = cat.slots;
+      const onField = changed.filter(s => { const sl = slots.find(x => x.id === s); return sl && sl.applies_to.indexOf('field') >= 0; });
+      const off = changed.filter(s => onField.indexOf(s) < 0);
+      if (onField.length) setTimeout(() => this.tween(T.RING, k => this.setState({ hop: Math.min(1, k * T.RING / T.HOP), ring: k }), () => this.setState({ hop: 0, ring: 0 })), T.HOP_DELAY);
+      if (off.length) {
+        let txt = 'New looks are on';
+        if (off.length === 1) { const sl = slots.find(x => x.id === off[0]); const id = pending[off[0]]; const it = id && cat.items.find(i => i.id === id); txt = sl.toast.replace('{title}', it ? it.title : sl.default_title); }
+        this.setState({ toast: txt, toastA: 1 }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: '' }), T.TOAST_HOLD);
+      }
+    });
+  }
+  segs(lvl) { return [0, 1, 2, 3].map(i => ({ style: 'width:28px;height:14px;border-radius:7px;box-sizing:border-box;flex:0 0 auto;' + (i < lvl ? 'background:#A8E6CF;border:2px solid ' + INK : 'background:rgba(45,52,54,.16)') })); }
+  renderVals() {
+    const p = this.props, { M, cat } = this.state;
+    const endless = p.endless ?? true;
+    const season = p.season || 'country_bloom';
+    const out = { label: '', coins: '1,250', seeds: '86', flowers: '27', sky: '#EEF6E8', ground: '#E6F2DB', near: '#D6E1CC', spots: [], seasonName: '', grownText: '', giftWaiting: endless, basketLocked: !endless, basketChosen: endless, basketArt: 'ref/flowers/ph_buttercup.svg', magSegs: this.segs(endless ? 1 : 0), lootSegs: this.segs(endless ? 2 : 0), upReady: endless, endless, newDot: !!p.newDot,
+      pipStyle: '', pipArtStyle: '', pipSrc: 'ref/pip_idle.svg', ringStyle: 'display:none', toast: false, toastStyle: '', toastText: '', zones: !!p.zones, zoneRects: [],
+      sheetOn: false, scrimA: 0, sheetY: 1326, slot: p.slot || 'pip_skin', season, owned: p.owned || ['pip_blossom', 'meadow_sunset', 'journal_gold'], saved: this.saved(),
+      openWardrobe: () => this.open(), scrimTap: () => { if (this.state.phase === 'open' || this.state.phase === 'opening') { if (!this._pending) this._pending = Object.assign({}, this.saved()); this.close(this._pending, this._changed()); } },
+      onSheetClose: (pend, ch) => this.close(pend, ch), onSheetChange: pend => { this._pending = pend; } };
+    if (!M) return out;
+    const s = M.SEASONS[season], b = M.bands(s.g);
+    const counts = endless ? [7, 5, 6, 3, 2, 1] : [2, 1, 1, 0, 0, 0];
+    let grown = 0;
+    out.spots = SPOTS.map((sp, i) => {
+      const up = (counts[sp[3]] || 0) >= sp[4]; if (up) grown++;
+      const size = sp[2], cx = Math.round(sp[0] * 10.8), by = Math.round(1633 - sp[1] * 16.33);
+      return { i: String(i), wrap: 'position:absolute;left:' + (cx - size / 2) + 'px;top:' + (by - size) + 'px;width:' + size + 'px;height:' + size + 'px',
+        soil: up ? 'display:none' : 'position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:' + Math.round(size * 0.68) + 'px;height:' + Math.round(size * 0.27) + 'px;box-sizing:border-box;border-radius:999px;background:rgba(26,26,20,.10);border:3px solid rgba(26,26,20,.19)',
+        shade: up ? 'position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:' + Math.round(size * 0.56) + 'px;height:' + Math.round(size * 0.17) + 'px;border-radius:999px;background:rgba(26,26,20,.13)' : 'display:none',
+        src: 'ref/flowers/ph_' + s.r[sp[3]] + '.svg', art: up ? 'position:relative;display:block;width:' + size + 'px;height:' + size + 'px' : 'display:none' };
+    });
+    Object.assign(out, { sky: b.sky, ground: b.far, near: b.near, seasonName: s.n, grownText: grown + ' / 13', basketArt: 'ref/flowers/ph_' + s.r[2] + '.svg',
+      label: 'Field · ' + s.n + (endless ? '' : ' · tutorial') });
+    // Pip — stopala u PIP_BASE_ZONE (151,1306,614,131); kuća (756,1404)
+    const fx = +(p.pipX ?? 756), fy = +(p.pipY ?? 1404);
+    const hopK = p.hopT != null ? +p.hopT : this.state.hop, arc = Math.sin(Math.PI * Math.min(1, hopK));
+    out.pipStyle = 'position:absolute;left:' + (fx - 95) + 'px;top:' + (fy - PIP) + 'px;width:190px;height:190px;transform-origin:50% 100%;' + (hopK > 0 ? 'transform:translateY(' + (-28 * arc).toFixed(1) + 'px) scale(' + (1 + 0.18 * arc).toFixed(3) + ')' : '');
+    out.pipArtStyle = 'position:relative;display:block;width:190px;height:190px';
+    const sv = this.saved(), pid = sv.pip_skin, pit = cat && pid && cat.items.find(i => i.id === pid);
+    out.pipSrc = M.creatureUrl('pip', pit ? pit.look.recolor : null);
+    const ringK = p.ringT != null ? +p.ringT : this.state.ring;
+    if (ringK > 0 && ringK < 1) { const r = 90 + 130 * easeOut(ringK); out.ringStyle = 'position:absolute;left:' + (fx - r) + 'px;top:' + (fy - 20 - r * 0.42) + 'px;width:' + (2 * r) + 'px;height:' + (r * 0.84) + 'px;box-sizing:border-box;border-radius:50%;border:10px solid #FFF8F0;opacity:' + (0.55 * (1 - ringK)).toFixed(3); }
+    const toastText = p.toastText || this.state.toast;
+    if (toastText) { out.toast = true; out.toastText = toastText; out.toastStyle = 'position:absolute;left:50%;top:1110px;transform:translateX(-50%);height:100px;box-sizing:border-box;padding:0 40px;border-radius:28px;background:#2D3436;display:flex;align-items:center;font:900 44px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap;z-index:6'; }
+    // Sheet
+    const frozen = p.openT != null, u = frozen ? +p.openT : this.state.u;
+    out.sheetOn = frozen ? u > 0 : this.state.phase !== 'field';
+    out.scrimA = (0.55 * u).toFixed(3); out.sheetY = Math.round((1 - u) * 1326);
+    // Zone (Specs / provjera)
+    if (p.zones) {
+      const zs = (x, y, w, h, fill, edge, dash) => 'position:absolute;left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px;box-sizing:border-box;background:' + fill + ';border:5px ' + (dash || 'dashed') + ' ' + edge + ';border-radius:12px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px';
+      const tag = c => 'padding:6px 12px;border-radius:10px;background:#2D3436;font:800 26px/1 ui-monospace,Menlo,monospace;white-space:nowrap;color:' + c;
+      out.zoneRects = [
+        { label: 'KEEPOUT donji red', style: zs(54, 1445, 972, 188, 'rgba(255,138,138,.22)', '#C0392B'), tag: tag('#FF8A8A') },
+        { label: 'NOVO keepout ormar', style: zs(860, 1249, 212, 212, 'rgba(255,204,213,.45)', '#C2185B'), tag: tag('#FFCCD5') },
+        { label: 'stara PIP zona do 929', style: zs(151, 1306, 778, 131, 'transparent', '#7A7A7A', 'dotted'), tag: tag('#E0E0E0') },
+        { label: 'PIP_BASE_ZONE (151,1306,614,131)', style: zs(151, 1306, 614, 131, 'rgba(168,230,207,.45)', '#2E8B67'), tag: tag('#A8E6CF') },
+        { label: 'Pip max desno 860', style: zs(670, 1247, 190, 190, 'transparent', '#2E8B67', 'dotted'), tag: tag('#A8E6CF') }
+      ].concat(SPOTS.map((sp, i) => { const size = sp[2], cx = Math.round(sp[0] * 10.8), by = Math.round(1633 - sp[1] * 16.33); return { label: '#' + i, style: zs(cx - size / 2, by - size, size, size, 'transparent', '#6A4FA0', 'dotted'), tag: tag('#D4A5FF') }; }));
+    }
+    return out;
+  }
+  _changed() { const sv = this.saved(), pd = this._pending || {}; return Object.keys(Object.assign({}, sv, pd)).filter(k => (sv[k] || '') !== (pd[k] || '')); }
+}
+</script>
+</body>
+</html>

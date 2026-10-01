@@ -147,6 +147,14 @@ func pip_feet() -> Vector2:
 	return meadow_pip.position + Vector2(meadow_pip.size.x * 0.5, meadow_pip.size.y)
 
 
+## Ormar · ApplyMoment: Pip skoči u novom skinu + prsten oko stopala.
+func play_apply_moment() -> bool:
+	if meadow_pip == null or not meadow_pip.visible or not meadow_pip.has_method("play_apply"):
+		return false
+	meadow_pip.call("play_apply")
+	return true
+
+
 func is_pip_wandering() -> bool:
 	return _wander_tween != null and _wander_tween.is_running()
 

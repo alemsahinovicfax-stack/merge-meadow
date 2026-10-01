@@ -13,6 +13,13 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ensure_size()
 	queue_redraw()
+	# Ormar: novi Pip skin se vidi bez restarta (Arena, Camp, run HUD).
+	if not GameState.cosmetics_changed.is_connected(_on_cosmetics_changed):
+		GameState.cosmetics_changed.connect(_on_cosmetics_changed)
+
+
+func _on_cosmetics_changed(_slots: Array) -> void:
+	queue_redraw()
 
 
 func _notification(what: int) -> void:

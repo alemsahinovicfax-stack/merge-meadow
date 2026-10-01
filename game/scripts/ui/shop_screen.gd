@@ -503,6 +503,28 @@ func _sync_spy() -> void:
 
 ## y sekcije unutar sadrzaja skrola. ShopPad se pomjera sa skrolom, pa se njegova
 ## pozicija ne smije sabirati (inace drugi skok gubi vec preskrolanu visinu).
+## Ormar · ShopLink: sekcija Looks, skrol do slota (UiShop jump "looks").
+func show_cosmetic_slot(slot: String) -> void:
+	_on_jump_pressed("looks")
+	var looks := _sections.get("looks") as Control
+	if looks == null:
+		return
+	var panel := looks.find_child("CosmeticSlot_%s" % slot, true, false) as Control
+	if panel == null:
+		return
+	await get_tree().process_frame
+	if not is_instance_valid(panel):
+		return
+	var y := panel.get_global_rect().position.y - shop_content.get_global_rect().position.y
+	var target := maxf(0.0, y - float(UiShop.CONTENT_TOP))
+	if _scroll_tween != null and _scroll_tween.is_valid():
+		_scroll_tween.kill()
+	_scroll_tween = create_tween()
+	_scroll_tween.set_trans(Tween.TRANS_CUBIC)
+	_scroll_tween.set_ease(Tween.EASE_OUT)
+	_scroll_tween.tween_property(shop_scroll, "scroll_vertical", int(target), UiShop.T_JUMP)
+
+
 func _content_top_of(box: Control) -> float:
 	return box.position.y + shop_content.position.y
 

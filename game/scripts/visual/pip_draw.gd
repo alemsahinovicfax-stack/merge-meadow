@@ -1,8 +1,8 @@
 class_name PipDraw
 extends RefCounted
 
-## Placeholder Pip (zeko) — proceduralni crtaj dok nema final spritea.
-## Isti izgled u runu, main menuu i HUD-u.
+## Placeholder Pip (zeko) — proceduralni crtaj, samo rezerva kad pip_idle.svg
+## nedostaje. Skinovi se više ne crtaju ovdje (Ormar: PipAssets recolor).
 
 const BODY := Color(0.95, 0.98, 0.92, 1.0)
 const EAR := Color(0.82, 0.94, 0.78, 1.0)
@@ -12,11 +12,9 @@ const EYE := Color(0.2, 0.25, 0.22, 1.0)
 const NOSE := Color(1.0, 0.55, 0.62, 1.0)
 
 
-## palette_override: Shop crta skin koji jos nije opremljen (design_handoff_shop).
 static func draw_pip(
-	canvas: CanvasItem, center: Vector2, scale: float = 1.0, palette_override: Dictionary = {}
+	canvas: CanvasItem, center: Vector2, scale: float = 1.0, palette: Dictionary = {}
 ) -> void:
-	var palette := palette_override if not palette_override.is_empty() else _resolve_palette()
 	var body: Color = palette.get("body", BODY)
 	var ear: Color = palette.get("ear", EAR)
 	var ear_inner: Color = palette.get("ear_inner", EAR_INNER)
@@ -37,9 +35,3 @@ static func draw_pip(
 	canvas.draw_circle(center + Vector2(8.0 * s, -2.0 * s), 3.0 * s, EYE)
 	canvas.draw_circle(center + Vector2(0.0, 6.0 * s), 3.5 * s, NOSE)
 
-
-static func _resolve_palette() -> Dictionary:
-	var skin_id := GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_PIP_SKIN)
-	if skin_id.is_empty():
-		return {}
-	return CosmeticCatalog.get_pip_palette(skin_id)

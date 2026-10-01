@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E2D6}a{color:#2D3436}a:hover{color:#9E6645}</style>
+</helmet>
+<div data-layer="WardrobeSpecs" style="width:2400px;box-sizing:border-box;padding:72px 80px 120px;background:#E9E2D6;font-family:Nunito,system-ui,sans-serif;color:#2D3436;display:flex;flex-direction:column;gap:88px;-webkit-font-smoothing:antialiased">
+
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:1500px">
+    <div style="font:900 72px/1 Nunito,system-ui,sans-serif">Wardrobe · Specs</div>
+    <div style="font:700 30px/1.35 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">Ormar je treći sheet polja sezone (1326, kao korpa). Sve ispod je ista komponenta <b>Wardrobe.dc.html</b> s drugim propovima; ItemCard i ItemPreview su jedna komponenta za sve slotove. Katalog: <b>godot/cosmetics.json</b>. Mjere u px baze 1080 × 1920, okviri na 50 %.</div>
+  </div>
+
+  <section data-screen-label="1 · Polje" style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:24px"><div style="font:900 48px/1 Nunito,system-ui,sans-serif">1 · Polje sezone s ikonom ormara</div><div style="font:700 28px/1 Nunito,system-ui,sans-serif;color:#555C5E">§8.1/1 · sa i bez Endlessa · Country Bloom i Moonlit Warren</div></div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px"><div data-frame="field" style="width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;flex:0 0 auto"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldWithWardrobe" season="country_bloom" endless="{{ true }}" hint-size="1080px,1920px"></dc-import></div></div><div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">Country Bloom · Endless</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px"><div data-frame="field" style="width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;flex:0 0 auto"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldWithWardrobe" season="country_bloom" endless="{{ false }}" hint-size="1080px,1920px"></dc-import></div></div><div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">Country Bloom · tutorial, bez Endlessa</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px"><div data-frame="field" style="width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;flex:0 0 auto"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldWithWardrobe" season="moonlit_warren" endless="{{ true }}" hint-size="1080px,1920px"></dc-import></div></div><div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">Moonlit Warren · Endless</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px"><div data-frame="field" style="width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;flex:0 0 auto"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldWithWardrobe" season="moonlit_warren" endless="{{ false }}" hint-size="1080px,1920px"></dc-import></div></div><div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">Moonlit Warren · tutorial</div></div>
+    </div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px"><div data-frame="zones" style="width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;flex:0 0 auto"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldWithWardrobe" season="country_bloom" endless="{{ true }}" zones="{{ true }}" pip-x="765" pip-y="1437" hint-size="1080px,1920px"></dc-import></div></div><div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">Zone · Pip na najdesnijem mjestu (765, 1437)</div></div>
+      <div style="display:flex;flex-direction:column;gap:18px;width:1100px">
+        <div style="font:900 34px/1 Nunito,system-ui,sans-serif">WardrobeButton = pločica polja</div>
+        <div style="font:700 28px/1.4 Nunito,system-ui,sans-serif;color:#2D3436;text-wrap:pretty">Rect (876, 1265, 180, 180) — ista pločica kao Gift / korpa / nadogradnje (TILE 180, glyph 84, rub 3, sjena 8). Desna kolona pločica (x 876 = Upgrades), 16 iznad donjeg reda (1461 − 16 = 1445), kao Gift → korpa. Glyph: roze (PINK #FFCCD5, slobodna boja na polju) + vješalica; natpis „Looks“ = isto ime kao sekcija u Shopu.</div>
+        <div style="font:900 30px/1 Nunito,system-ui,sans-serif;margin-top:8px">Sukob 1 · Pip</div>
+        <div style="font:700 28px/1.4 Nunito,system-ui,sans-serif;text-wrap:pretty">PIP_BASE_ZONE (151, 1306, 778, 131) → <b>(151, 1306, 614, 131)</b>. Stopala do x 765 → desni rub Pipa 765 + 95 = 860 = lijevi rub novog keepouta; do pločice 16. PIP_DEFAULT_BASE (756, 1404) ostaje — Pip stoji pored svog ormara. Lijevi rub zone se ne mijenja.</div>
+        <div style="font:900 30px/1 Nunito,system-ui,sans-serif;margin-top:8px">Sukob 2 · cvijeće</div>
+        <div style="font:700 28px/1.4 Nunito,system-ui,sans-serif;text-wrap:pretty">Najbliži cvijet #11 [88, 30, 136] = (882, 1007, 136, 136), dno 1143 → 122 do pločice. Novi keepout <b>Rect2i(860, 1249, 212, 212)</b> (pločica ± 16, isto pravilo kao Upgrades). Donji red, Endless i Play se ne pomjeraju.</div>
+        <div data-layer="FieldMeasure" style="margin-top:8px;box-sizing:border-box;padding:24px 28px;border-radius:20px;background:#FFF8F0;border:3px solid #2D3436;font:700 26px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap">{{ fieldMeasure }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="2 · Ormar" style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:24px"><div style="font:900 48px/1 Nunito,system-ui,sans-serif">2 · Ormar otvoren — tri slota</div><div style="font:700 28px/1 Nunito,system-ui,sans-serif;color:#555C5E">§8.1/2–4</div></div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="sheet" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="pip_skin" owned="{{ ownBlossom }}" equipped="{{ eqNone }}" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif;text-wrap:pretty">Pip · Default nošen, pip_blossom posjeduje, pip_sky nema → ne crta se; jedini put je „More in Shop“.</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="sheet" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="meadow_bg" owned="{{ ownAll }}" equipped="{{ eqSunset }}" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif;text-wrap:pretty">Meadow · Sunset nošen. Pozornica = prava staza runa × tint × sezona, s Pipom u izabranom skinu.</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="sheet" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="meadow_bg" owned="{{ ownAll }}" equipped="{{ eqLavender }}" season="moonlit_warren" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif;text-wrap:pretty">Meadow · Lavender na Moonlit Warren (tint × bg_modulate sezone, kao lane_background.gd).</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="sheet" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="journal_frame" owned="{{ ownAll }}" equipped="{{ eqGold }}" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif;text-wrap:pretty">Album · Golden Album nošen: zlatni ram 10 + naslov × 0,8 (= journal_title_color).</div></div>
+    </div>
+  </section>
+
+  <section data-screen-label="3 · Prazno" style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:24px"><div style="font:900 48px/1 Nunito,system-ui,sans-serif">3 · Prazno stanje</div><div style="font:700 28px/1 Nunito,system-ui,sans-serif;color:#555C5E">§8.1/5 · igrač nema nijednu stavku</div></div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="sheet" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="pip_skin" owned="{{ ownNone }}" equipped="{{ eqNone }}" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif">Pip · Classic nošen + EmptyState (3 kolone) s jedinim ShopLinkom.</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="sheet" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="journal_frame" owned="{{ ownNone }}" equipped="{{ eqNone }}" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif">Album · isto pravilo, tekst iz slota (empty_text).</div></div>
+      <div style="display:flex;flex-direction:column;gap:16px;width:900px">
+        <div style="font:900 34px/1 Nunito,system-ui,sans-serif">Pravilo</div>
+        <div style="font:700 28px/1.45 Nunito,system-ui,sans-serif;text-wrap:pretty">Slot u kojem nemaš ništa: Default (nošen) + EmptyState preko preostale 3 kolone — rečenica iz <b>slot.empty_text</b> i dugme „More in Shop“. Slot u kojem imaš bar jednu stavku: zadnja ćelija mreže je ShopLink kartica (isprekidan rub = „ima još, ali ne ovdje“). Uvijek tačno jedan put u Shop po ekranu; nikad cijena, nikad dugme za kupovinu.</div>
+        <div style="font:700 28px/1.45 Nunito,system-ui,sans-serif;text-wrap:pretty">Stavka iz Shopa koju nemaš se <b>ne crta</b> (ormar = ono što je tvoje). Stavka drugog izvora (<b>source</b> season / event, kasnije) crta se pod velom s katancem — „otključava se igrom“, kao na Home v3 — i nije dodirljiva.</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="4 · Anatomija" style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:24px"><div style="font:900 48px/1 Nunito,system-ui,sans-serif">4 · Anatomija — jedna ItemCard za sve slotove</div><div style="font:700 28px/1 Nunito,system-ui,sans-serif;color:#555C5E">1 : 1</div></div>
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:12px"><dc-import name="ItemCard" state="worn" kind="companion" title="Pip Blossom" look="{{ lookBlossom }}" hint-size="240px,272px"></dc-import><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">worn · rim #FFF6D6, rub 4 ink, ✓ 60</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><dc-import name="ItemCard" state="owned" kind="companion" title="Pip Sky" look="{{ lookSky }}" hint-size="240px,272px"></dc-import><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">owned · bijela, rub 3 @ .18</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><dc-import name="ItemCard" state="owned" is-default="{{ true }}" kind="companion" title="Classic Pip" hint-size="240px,272px"></dc-import><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">DefaultCard · look = null</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><dc-import name="ItemCard" state="owned" is-new="{{ true }}" kind="companion" title="Pip Honey" look="{{ lookHoney }}" hint-size="240px,272px"></dc-import><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">new · new_since &gt; viđeno</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><dc-import name="ItemCard" state="none" kind="companion" title="Pip Frost" look="{{ lookHoney }}" hint-size="240px,272px"></dc-import><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">none · samo source ≠ shop</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><dc-import name="ItemCard" state="owned" kind="meadow" title="Sunset Meadow" look="{{ lookSunset }}" hint-size="240px,272px"></dc-import><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">preview: meadow</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><dc-import name="ItemCard" state="owned" kind="album" title="Golden Album" look="{{ lookGold }}" hint-size="240px,272px"></dc-import><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">preview: album</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><dc-import name="ItemCard" state="owned" kind="swatch" title="Mint cloth" look="{{ lookCloth }}" hint-size="240px,272px"></dc-import><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">preview: swatch (rezerva)</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,640px));gap:40px">
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="font:900 30px/1 Nunito,system-ui,sans-serif">ItemCard 240 × 272</div><div style="font:700 26px/1.45 Nunito,system-ui,sans-serif;text-wrap:pretty">padding 12 · ItemPreview 210 × 150 (rub 3 #16211B, r 18) · gap 12 · ItemName 38/900, 2 reda × 40 (balance), nikad skraćeno · radius 28. Pritisak: scale .97 (80 ms). Dodir = cijela kartica 240 × 272.</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="font:900 30px/1 Nunito,system-ui,sans-serif">ItemGrid · 4 kolone</div><div style="font:700 26px/1.45 Nunito,system-ui,sans-serif;text-wrap:pretty">4 × 240 + 3 × 24 = 1032. Ćelije = Default + vidljive stavke (po order) + ShopLink | EmptyState. Redova = ⌈ćelija / 4⌉, mreža skrola okomito (vidljivo 477 = 1 red + 181 sljedećeg). Pozornica, tabovi i Close ne skrolaju.</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="font:900 30px/1 Nunito,system-ui,sans-serif">SlotTabs · 120</div><div style="font:700 26px/1.45 Nunito,system-ui,sans-serif;text-wrap:pretty">Tab = ikona 56 + naslov 40/900, padding 28, gap 12, r 24. Aktivan = peach #FFB88C + rub 3 ink. Ako Σ širina ≤ 1032 → tabovi se rastegnu (fill); inače prirodna širina + vodoravni skrol; aktivni tab se drži ≥ 24 od ruba, zadnji tab se uvijek vidi odsječen (bez fadea).</div></div>
+    </div>
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="width:1032px;height:300px;box-sizing:border-box;border-radius:28px;overflow:hidden;border:3px solid #2D3436"><dc-import name="ItemPreview" kind="companion" look="{{ lookSky }}" season="frost_orchard" w="1026" h="294" size="stage" hint-size="1026px,294px"></dc-import></div><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">PreviewStage · companion (subject pip) · livada aktivne sezone + 2 cvijeta iz roster-a</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="width:1032px;height:300px;box-sizing:border-box;border-radius:28px;overflow:hidden;border:3px solid #2D3436"><dc-import name="ItemPreview" kind="companion" subject="mochi" look="{{ lookMochi }}" w="1026" h="294" size="stage" hint-size="1026px,294px"></dc-import></div><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">companion · subject mochi (demo) — ista vrsta, drugi crtež (MochiDraw 1:1)</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="width:1032px;height:300px;box-sizing:border-box;border-radius:28px;overflow:hidden;border:3px solid #2D3436"><dc-import name="ItemPreview" kind="meadow" look="{{ lookLavender }}" pip="{{ recolorBlossom }}" w="1026" h="294" size="stage" hint-size="1026px,294px"></dc-import></div><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">meadow · tri staze runa (25 / 50 / 75 %), pruge 124 / 40, šavovi 405 / 675 — Lavender, Pip Blossom</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="width:1032px;height:300px;box-sizing:border-box;border-radius:28px;overflow:hidden;border:3px solid #2D3436"><dc-import name="ItemPreview" kind="album" look="{{ lookGold }}" w="1026" h="294" size="stage" hint-size="1026px,294px"></dc-import></div><div style="font:800 24px/1.2 Nunito,system-ui,sans-serif">album · stranica Albuma, frame / paper / title_modulate iz look</div></div>
+    </div>
+  </section>
+
+  <section data-screen-label="5 · Proširenje" style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:24px"><div style="font:900 48px/1 Nunito,system-ui,sans-serif">5 · Proširenje — samo izmjena podataka</div><div style="font:700 28px/1 Nunito,system-ui,sans-serif;color:#555C5E">§8.1/6 · prop extra = withPatch(CATALOG, DEMO) · demo ne ulazi u katalog</div></div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="extra" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="pip_skin" extra="{{ true }}" owned="{{ ownAll }}" equipped="{{ eqHoney }}" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif">8 slotova · Pip s 12 stavki (2 prave + 10 demo) · vrh mreže</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="extra" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="pip_skin" extra="{{ true }}" owned="{{ ownAll }}" equipped="{{ eqHoney }}" grid-scroll="600" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif">isto, mreža skrolana 600 — Frost (source season) pod velom, ShopLink na kraju</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="extra" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="mochi_skin" extra="{{ true }}" owned="{{ ownAll }}" equipped="{{ eqMochi }}" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif">novi slot Mochi bira postojeću vrstu companion</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="extra" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="combo_ring" extra="{{ true }}" owned="{{ ownAll }}" equipped="{{ eqNone }}" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif">zadnji slot — tabovi skrolani do kraja; vrsta swatch</div></div>
+    </div>
+    <div style="font:900 34px/1 Nunito,system-ui,sans-serif;margin-top:12px">Pravilo mreže · 1, 5 i 30 stavki (prop demoN, generisano iz podataka)</div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="demoN" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="pip_skin" demo-n="1" owned="{{ ownNone }}" equipped="{{ eqNone }}" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif">1 stavka → 3 ćelije, 1 red, bez skrola</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="demoN" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="pip_skin" demo-n="5" owned="{{ ownNone }}" equipped="{{ eqNone }}" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif">5 stavki → 7 ćelija, 2 reda</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px;width:540px"><div data-frame="demoN" style="width:540px;height:663px;overflow:hidden;border-radius:18px 18px 0 0;flex:0 0 auto"><div style="width:1080px;height:1326px;transform:scale(.5);transform-origin:0 0"><dc-import name="Wardrobe" slot="pip_skin" demo-n="30" owned="{{ ownNone }}" equipped="{{ eqNone }}" hint-size="1080px,1326px"></dc-import></div></div><div style="font:800 26px/1.3 Nunito,system-ui,sans-serif">30 stavki → 32 ćelije, 8 redova, skrol</div></div>
+      
+    </div>
+  </section>
+
+  <section data-screen-label="6 · Primjena" style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:24px"><div style="font:900 48px/1 Nunito,system-ui,sans-serif">6 · Izlazak i primjena</div><div style="font:700 28px/1 Nunito,system-ui,sans-serif;color:#555C5E">§8.1/7 · nema „Save“ — zatvaranje JE snimanje</div></div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px"><div style="width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;flex:0 0 auto"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldWithWardrobe" season="country_bloom" open-t="1" equipped="{{ eqBlossom }}" owned="{{ ownBlossom }}" hint-size="1080px,1920px"></dc-import></div></div><div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">a · izabran Pip Blossom (tap)</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px"><div style="width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;flex:0 0 auto"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldWithWardrobe" season="country_bloom" open-t="0.42" equipped="{{ eqBlossom }}" owned="{{ ownBlossom }}" hint-size="1080px,1920px"></dc-import></div></div><div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">b · Close / scrim / povlačenje: sheet dolje 280 ms</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px"><div style="width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;flex:0 0 auto"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldWithWardrobe" season="country_bloom" hop-t="0.5" ring-t="0.3" equipped="{{ eqBlossom }}" hint-size="1080px,1920px"></dc-import></div></div><div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">c · ApplyMoment: Pip skok u novom skinu + prsten</div></div>
+      <div style="display:flex;flex-direction:column;gap:14px"><div style="width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;flex:0 0 auto"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldWithWardrobe" season="country_bloom" equipped="{{ eqBlossomSunset }}" toast-text="Runs use Sunset Meadow" hint-size="1080px,1920px"></dc-import></div></div><div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">d · promjena koja se ne vidi na polju → toast</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1040px));gap:40px">
+      <div style="box-sizing:border-box;padding:28px 32px;border-radius:20px;background:#FFF8F0;border:3px solid #2D3436;font:700 26px/1.55 ui-monospace,Menlo,monospace;white-space:pre-wrap">open    tap WardrobeButton → press 80 ms → scrim 0 → .55, sheet y +1326 → 0 · 320 ms ease-out cubic
+pick    tap kartice → pending[slot] = id · stage Pip hop 1 → 1.12 → 1 (280 ms)
+close   Close · tap scrim · povlačenje &gt; 160 px · Android back → isto
+        sheet 0 → +1326 · 280 ms ease-in cubic · scrim → 0
+save    na početku close: Cosmetics.apply_wardrobe(pending) → 1 save
+        → GameState.cosmetics_changed(changed_slots)
+apply   slot s „field“ u applies_to → +40 ms Pip hop (1.18 / 280 ms)
+        + ApplyRing r 90 → 220, 10 px krem, α .55 → 0 (500 ms)
+        ostali → ApplyToast 100 px, 180 ms in, drži 2,6 s
+loop    nijedan (jedini loop na polju ostaje prsten korpe)</div>
+      <div style="display:flex;flex-direction:column;gap:14px;font:700 28px/1.45 Nunito,system-ui,sans-serif;text-wrap:pretty">
+        <div style="font:900 34px/1 Nunito,system-ui,sans-serif">Probaj uživo</div>
+        <div>Polje ispod je živo: Looks → izaberi → Close (ili tap na scrim, ili povuci sheet dolje). Pip reaguje u novom skinu; promjena tinta ili okvira daje toast. Samoprovjera (dolje) radi isti tok automatski.</div>
+        <div data-frame="live" data-test="live" style="width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;flex:0 0 auto"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldWithWardrobe" season="country_bloom" owned="{{ ownAll }}" equipped="{{ eqNone }}" hint-size="1080px,1920px"></dc-import></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="7 · Gdje se vidi" style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:24px"><div style="font:900 48px/1 Nunito,system-ui,sans-serif">7 · Gdje se vidi</div><div style="font:700 28px/1 Nunito,system-ui,sans-serif;color:#555C5E">§8.1/8 · Pip Blossom na pravom artu · tint na runu</div></div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px"><div style="width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;flex:0 0 auto"><div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0"><dc-import name="FieldWithWardrobe" season="moonlit_warren" equipped="{{ eqBlossom }}" hint-size="1080px,1920px"></dc-import></div></div><div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">Polje sezone · season_field_pip.gd</div></div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div data-layer="SeasonCardCrop" style="position:relative;width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;background:{{ cardPage }}">
+          <div style="position:absolute;left:12px;top:86px;width:516px;height:580px;box-sizing:border-box;border-radius:24px;border:2px solid #2D3436;overflow:hidden;background:{{ cardFar }}">
+            <div style="position:absolute;left:0;top:0;width:516px;height:186px;background:{{ cardSky }}"></div>
+            <div style="position:absolute;left:0;top:394px;width:516px;height:186px;background:{{ cardNear }}"></div>
+            <div style="position:absolute;left:0;top:36px;width:516px;text-align:center;font:900 40px/1 Nunito,system-ui,sans-serif;color:#1A1A14">Country Bloom</div>
+            <img data-layer="PipArt" src="{{ pipBlossomUrl }}" alt="" style="position:absolute;left:200px;top:428px;width:115px;height:115px">
+          </div>
+          <div style="position:absolute;left:140px;top:706px;width:260px;height:90px;box-sizing:border-box;border-radius:45px;background:#FFB88C;border:2px solid #2D3436;display:grid;place-items:center;font:900 38px/1 Nunito,system-ui,sans-serif">▶ Play</div>
+        </div>
+        <div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">Home · kartica sezone (UiHomeV3.draw_pip)</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div data-layer="ArenaCrop" style="position:relative;width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;background:#2A2233">
+          <div style="position:absolute;left:0;top:72px;width:540px;height:817px;overflow:hidden;background:{{ arenaBase }}">
+            <svg width="540" height="817" viewBox="0 0 1080 1633" preserveAspectRatio="none" style="position:absolute;left:0;top:0;display:block">
+              <sc-for list="{{ arenaLayers }}" as="L" hint-placeholder-count="0"><path d="{{ L.d }}" fill="{{ L.f }}" opacity="{{ L.o }}" stroke="{{ L.s }}" stroke-width="{{ L.sw }}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+              <sc-for list="{{ arenaItems }}" as="L" hint-placeholder-count="0"><path d="{{ L.d }}" fill="{{ L.f }}" opacity="{{ L.o }}" stroke="{{ L.s }}" stroke-width="{{ L.sw }}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+            </svg>
+            <div style="position:absolute;left:18px;top:768px;width:60px;height:13px;border-radius:50%;background:rgba(26,26,20,.16)"></div>
+            <img data-layer="PipArt" src="{{ pipBlossomUrl }}" alt="" style="position:absolute;left:3px;top:697px;width:95px;height:95px">
+          </div>
+        </div>
+        <div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">Arena · pip_placeholder_control.gd (livada bez tinta)</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div data-layer="RunCrop" style="position:relative;width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436">
+          <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0;background:#26382C">
+            <img data-layer="LaneBackground" src="{{ runA.bg }}" alt="" style="position:absolute;left:0;top:0;width:1080px;height:1920px;display:block">
+            <div data-layer="CompanionChip" style="position:absolute;left:40px;top:232px;width:268px;height:120px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,18,.42);display:flex;align-items:center;gap:12px;padding:0 20px 0 12px">
+              <img data-layer="PipArt" src="{{ runA.pip }}" alt="" style="width:96px;height:96px;display:block">
+              <div style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436">Pip</div>
+            </div>
+            <div style="position:absolute;left:504px;top:1600px;width:72px;height:24px;border-radius:50%;background:rgba(18,28,22,.28)"></div>
+            <img data-layer="PipArt" src="{{ runA.pip }}" alt="" style="position:absolute;left:465px;top:1474px;width:150px;height:150px">
+          </div>
+        </div>
+        <div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">Run · bez tinta · pip_visual.gd + HUD chip</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div data-layer="RunCrop" style="position:relative;width:540px;height:960px;overflow:hidden;border-radius:16px;border:3px solid #2D3436">
+          <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0;background:#26382C">
+            <img data-layer="LaneBackground" src="{{ runB.bg }}" alt="" style="position:absolute;left:0;top:0;width:1080px;height:1920px;display:block">
+            <div data-layer="CompanionChip" style="position:absolute;left:40px;top:232px;width:268px;height:120px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,18,.42);display:flex;align-items:center;gap:12px;padding:0 20px 0 12px">
+              <img data-layer="PipArt" src="{{ runB.pip }}" alt="" style="width:96px;height:96px;display:block">
+              <div style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436">Pip</div>
+            </div>
+            <div style="position:absolute;left:504px;top:1600px;width:72px;height:24px;border-radius:50%;background:rgba(18,28,22,.28)"></div>
+            <img data-layer="PipArt" src="{{ runB.pip }}" alt="" style="position:absolute;left:465px;top:1474px;width:150px;height:150px">
+          </div>
+        </div>
+        <div style="font:800 26px/1.2 Nunito,system-ui,sans-serif">Run · Sunset Meadow + Pip Blossom</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="8 · Pip skin" style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:24px"><div style="font:900 48px/1 Nunito,system-ui,sans-serif">8 · Pip skin na pravom artu</div><div style="font:700 28px/1 Nunito,system-ui,sans-serif;color:#555C5E">pip_idle.svg + zamjena boja po mapi · 0 KB po skinu</div></div>
+    <div style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start">
+      <sc-for list="{{ skins }}" as="k" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:14px;width:340px">
+          <div style="width:340px;height:340px;box-sizing:border-box;border-radius:28px;border:3px solid #2D3436;background:#E6F2DB;display:grid;place-items:center"><img data-layer="PipArt" src="{{ k.src }}" alt="" style="width:280px;height:280px;display:block"></div>
+          <div style="font:900 32px/1 Nunito,system-ui,sans-serif">{{ k.title }}</div>
+          <div style="font:700 24px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap">{{ k.map }}</div>
+        </div>
+      </sc-for>
+      <div style="display:flex;flex-direction:column;gap:14px;width:900px;font:700 28px/1.45 Nunito,system-ui,sans-serif;text-wrap:pretty">
+        <div style="font:900 34px/1 Nunito,system-ui,sans-serif">Kako</div>
+        <div>PipAssets.get_texture(skin_id): učita tekst <b>pip_idle.svg</b>, zamijeni hex po <b>look.recolor</b> (tijelo #A8E6CF, svijetlo #D4F5E4, obrazi #FFB88C), <b>Image.load_svg_from_string()</b> → ImageTexture, keš po (skin, veličina). Obrub, oči i crtež se ne diraju. Novi skin = 2–3 hexa u JSON-u.</div>
+        <div>Pravilo kontrasta (dvostruki rub iz Arene v2): tijelo skina mora imati L ≥ L(#A8E6CF), pa najgori slučaj ostaje ≥ 3,00 : 1 na svakoj livadi. Provjera u testu za svaki skin u katalogu.</div>
+        <div>Rezerva ako runtime SVG nije dostupan: isti map pečen u <b>icons/pip_blossom.svg</b>, <b>pip_sky.svg</b> (po 2,1 KB, generisano, ne crtano).</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="9 · Samoprovjera" style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:24px"><div style="font:900 48px/1 Nunito,system-ui,sans-serif">9 · Samoprovjera (§8.3) — mjereno iz DOM-a</div><div onClick="{{ rerun }}" style="height:64px;box-sizing:border-box;padding:0 24px;border-radius:18px;background:#FFF8F0;border:3px solid #2D3436;display:flex;align-items:center;font:900 28px/1 Nunito,system-ui,sans-serif;cursor:pointer">Ponovi</div></div>
+    <div data-layer="SelfCheck" style="display:flex;flex-direction:column;gap:14px;max-width:2200px">
+      <sc-for list="{{ checks }}" as="c" hint-placeholder-count="9">
+        <div style="display:flex;gap:20px;align-items:flex-start;box-sizing:border-box;padding:20px 24px;border-radius:18px;background:#FFF8F0;border:3px solid rgba(45,52,54,.18)">
+          <div style="{{ c.badge }}">{{ c.verdict }}</div>
+          <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+            <div style="font:900 30px/1.2 Nunito,system-ui,sans-serif">{{ c.title }}</div>
+            <div style="font:700 24px/1.45 ui-monospace,Menlo,monospace;color:#3F4648;white-space:pre-wrap">{{ c.detail }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ORIGINAL = { pip_blossom: ['pip_skin', 250], pip_sky: ['pip_skin', 200], meadow_sunset: ['meadow_bg', 150], meadow_lavender: ['meadow_bg', 180], journal_gold: ['journal_frame', 120] };
+const SPOTS = [[10, 55, 88], [26, 54, 88], [42, 55, 88], [58, 54, 88], [74, 55, 88], [90, 54, 88], [18, 40, 116], [50, 42, 116], [82, 40, 116], [12, 29, 136], [66, 28, 136], [88, 30, 136], [34, 26, 168]];
+const BTN = [876, 1265, 180, 180], ENDLESS = [774, 1477, 236, 124], ZONE = [151, 1306, 614, 131], KEEP = [860, 1249, 212, 212];
+const hit = (a, b) => a[0] < b[0] + b[2] && b[0] < a[0] + a[2] && a[1] < b[1] + b[3] && b[1] < a[1] + a[3];
+const gap = (a, b) => Math.max(b[0] - (a[0] + a[2]), a[0] - (b[0] + b[2]), b[1] - (a[1] + a[3]), a[1] - (b[1] + b[3]));
+class Component extends DCLogic {
+  state = { M: null, A: null, cat: null, src: '', same: true, checks: [] };
+  componentDidMount() {
+    Promise.all([import('./wardrobe_data.js'), import('./ref/arena_v2_data.js')]).then(([M, A]) => M.loadCatalog().then(r => this.setState({ M, A, cat: r.cat, src: r.source, same: r.same })));
+    this._t = setTimeout(() => this.runChecks(), 3500);
+  }
+  componentWillUnmount() { clearTimeout(this._t); }
+  item(id) { return this.state.cat ? this.state.cat.items.find(i => i.id === id) : null; }
+  runShapes(tint, pipId) {
+    const M = this.state.M, c = M.runColors(tint, 'country_bloom');
+    let g = '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920"><rect width="1080" height="1920" fill="' + c.ground + '"/>';
+    [[180, 90], [620, 240], [880, 120], [260, 480], [740, 560], [140, 640], [180, 810], [620, 960], [880, 840], [260, 1200], [740, 1280], [140, 1360], [620, 1680]].forEach(q => { g += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="96" fill="' + c.blob + '"/>'; });
+    [270, 540, 810].forEach(cx => { g += '<rect x="' + (cx - 100) + '" y="0" width="200" height="1920" fill="' + c.lane + '"/><rect x="' + (cx - 100) + '" width="4" height="1920" fill="' + c.edge + '"/><rect x="' + (cx + 96) + '" width="4" height="1920" fill="' + c.edge + '"/>'; for (let y = 30; y < 1920; y += 124) g += '<rect x="' + (cx - 96) + '" y="' + y + '" width="192" height="40" fill="' + c.mow + '"/>'; });
+    [405, 675].forEach(x => { g += '<line x1="' + x + '" y1="0" x2="' + x + '" y2="1920" stroke="' + c.seam + '" stroke-width="3" stroke-dasharray="18 14"/>'; });
+    [[48, 30, 1], [72, 360, 1], [1030, 240, 1], [940, 400, 1], [48, 510, 1], [72, 840, 1], [1030, 720, 1], [940, 880, 1], [48, 990, 1], [1030, 1200, 1], [72, 1320, 1], [940, 1360, 1], [130, 200, 0], [150, 80, 0], [980, 70, 0], [1000, 140, 0], [130, 680, 0], [980, 550, 0], [130, 1160, 0], [1000, 1100, 0], [150, 1520, 0], [980, 1510, 0]].forEach(q => {
+      g += q[2] ? '<g fill="' + c.tuft + '"><circle cx="' + (q[0] - 8) + '" cy="' + (q[1] + 4) + '" r="7"/><circle cx="' + (q[0] + 8) + '" cy="' + (q[1] + 4) + '" r="7"/><circle cx="' + q[0] + '" cy="' + (q[1] - 8) + '" r="8"/></g>'
+        : '<g fill="' + c.petal + '"><circle cx="' + q[0] + '" cy="' + q[1] + '" r="6"/><circle cx="' + q[0] + '" cy="' + (q[1] - 8) + '" r="4.5"/></g>';
+    });
+    g += '</svg>';
+    const it = this.item(pipId);
+    return { bg: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(g), pip: M.creatureUrl('pip', it ? it.look.recolor : null) };
+  }
+  renderVals() {
+    const { M, A, cat } = this.state;
+    const look = id => { const i = this.item(id); return i ? i.look : null; };
+    const base = {
+      ownBlossom: ['pip_blossom'], ownAll: ['pip_blossom', 'pip_sky', 'meadow_sunset', 'meadow_lavender', 'journal_gold'], ownNone: [],
+      eqNone: {}, eqSunset: { meadow_bg: 'meadow_sunset' }, eqLavender: { meadow_bg: 'meadow_lavender', pip_skin: 'pip_sky' }, eqGold: { journal_frame: 'journal_gold' },
+      eqBlossom: { pip_skin: 'pip_blossom' }, eqBlossomSunset: { pip_skin: 'pip_blossom', meadow_bg: 'meadow_sunset' }, eqHoney: { pip_skin: 'pip_blossom' }, eqMochi: { mochi_skin: 'demo_mochi_cocoa' },
+      lookBlossom: look('pip_blossom'), lookSky: look('pip_sky'), lookSunset: look('meadow_sunset'), lookLavender: look('meadow_lavender'), lookGold: look('journal_gold'),
+      lookHoney: { recolor: { '#A8E6CF': '#FFE3A8', '#D4F5E4': '#FFF4DC' } }, lookCloth: { colors: ['#A8E6CF', '#7FC9AC'] }, lookMochi: { recolor: { '#EBE6F0': '#F0DFCC', '#E0D6E6': '#E3CDB6' } },
+      recolorBlossom: look('pip_blossom') ? look('pip_blossom').recolor : null,
+      fieldMeasure: '…', checks: this.state.checks, rerun: () => this.runChecks(),
+      cardPage: '#F3F9EE', cardSky: '#EEF6E8', cardFar: '#E6F2DB', cardNear: '#D6E1CC', pipBlossomUrl: 'ref/pip_idle.svg',
+      arenaBase: '#EAF3DF', arenaLayers: [], arenaItems: [], runA: { bg: 'ref/pip_idle.svg', pip: 'ref/pip_idle.svg' }, runB: { bg: 'ref/pip_idle.svg', pip: 'ref/pip_idle.svg' }, skins: []
+    };
+    if (!M || !cat) return base;
+    const f = A.buildField('country_bloom', 2);
+    const zoneR = ZONE[0] + ZONE[2] + 95;
+    const near = SPOTS.map((s, i) => { const cx = s[0] * 10.8, by = 1633 - s[1] * 16.33; return { i, r: [cx - s[2] / 2, by - s[2], s[2], s[2]] }; }).map(o => ({ i: o.i, g: gap(BTN, o.r) })).sort((a, b) => a.g - b.g)[0];
+    Object.assign(base, {
+      pipBlossomUrl: M.creatureUrl('pip', look('pip_blossom').recolor),
+      arenaBase: f.base, arenaLayers: f.layers, arenaItems: f.items,
+      runA: this.runShapes(null, 'pip_blossom'), runB: this.runShapes(look('meadow_sunset').tint, 'pip_blossom'),
+      fieldMeasure: 'WardrobeButton  (876, 1265, 180, 180)\nEndless         (774, 1477, 236, 124)   razmak ' + gap(BTN, ENDLESS) + ' px\nPip max desno   ' + zoneR + '  → do pločice ' + (BTN[0] - zoneR) + ' px\nnajbliži cvijet #' + near.i + '  razmak ' + Math.round(near.g) + ' px\nkeepout         (860, 1249, 212, 212) ∩ donji red keepout: ' + (hit(KEEP, [54, 1445, 972, 188]) ? 'da' : 'ne'),
+      skins: [{ title: 'pip_idle (Default)', src: M.creatureUrl('pip', null), map: 'bez mape\nL tijela .694 · 3,00 : 1' }].concat(['pip_blossom', 'pip_sky'].map(id => {
+        const m = look(id).recolor; return { title: id, src: M.creatureUrl('pip', m), map: Object.keys(m).map(k => k + ' → ' + m[k]).join('\n') + '\nL tijela ' + M.lum(m['#A8E6CF']).toFixed(3) + ' · ' + M.dualEdge(m['#A8E6CF']).toFixed(2) + ' : 1' };
+      }))
+    });
+    return base;
+  }
+  async runChecks() {
+    const M = this.state.M, cat = this.state.cat; if (!M || !cat) { this._t = setTimeout(() => this.runChecks(), 1000); return; }
+    const root = document.querySelector('[data-layer="WardrobeSpecs"]');
+    const R = [], add = (title, ok, detail) => R.push({ title, ok, detail });
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    // 1 overlap — DOM, u px okvira (×2 = px stranice)
+    const lines1 = []; let ok1 = true;
+    root.querySelectorAll('[data-frame="field"]').forEach((fr, n) => {
+      const page = fr.querySelector('[data-layer="FieldPage"]'); if (!page) { ok1 = false; return; }
+      const P = page.getBoundingClientRect(), k = 1080 / P.width;
+      const rr = el => { const b = el.getBoundingClientRect(); return [(b.left - P.left) * k, (b.top - P.top) * k, b.width * k, b.height * k].map(v => Math.round(v)); };
+      const btn = rr(page.querySelector('[data-layer="WardrobeButton"]'));
+      const en = page.querySelector('[data-layer="EndlessButton"]');
+      const fl = [...page.querySelectorAll('[data-layer="MeadowFlower"]')].map(rr);
+      const pip = rr(page.querySelector('[data-layer="MeadowPip"]'));
+      const pipMax = [ZONE[0] + ZONE[2] - 95, ZONE[1] - 190 + ZONE[3], 190, 190];
+      const bad = (en && hit(btn, rr(en))) || fl.some(r => hit(btn, r)) || hit(btn, pip) || hit(btn, pipMax);
+      if (bad) ok1 = false;
+      lines1.push('okvir ' + (n + 1) + ': btn ' + btn.join(',') + ' · Endless ' + (en ? 'da, razmak ' + gap(btn, rr(en)) : 'nema') + ' · cvijeće min ' + Math.round(Math.min(...fl.map(r => gap(btn, r)))) + ' · Pip ' + gap(btn, pip) + ' · Pip max ' + gap(btn, pipMax));
+    });
+    add('1 · Ikona se ne preklapa s Endlessom, Pipom ni cvijećem (sa i bez Endlessa)', ok1 && lines1.length === 4, lines1.join('\n'));
+    // 2 touch + text + contrast
+    const b0 = root.querySelector('[data-frame="field"] [data-layer="WardrobeButton"]');
+    const bw = b0 ? b0.offsetWidth : 0, bh = b0 ? b0.offsetHeight : 0;
+    let minFont = 999, minEl = '';
+    root.querySelectorAll('[data-frame] *').forEach(el => {
+      if (el.closest('[data-layer="Header"],[data-layer="Footer"],[data-layer="ZonesOverlay"]')) return;
+      const own = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()); if (!own) return;
+      const fs = parseFloat(getComputedStyle(el).fontSize); if (fs < minFont) { minFont = fs; minEl = el.textContent.trim().slice(0, 24); }
+    });
+    const pairs = [['ink / krem', '#2D3436', '#FFF8F0'], ['INK_SOFT / krem', '#555C5E', '#FFF8F0'], ['ink / peach tab', '#2D3436', '#FFB88C'], ['ink / rim (worn)', '#2D3436', '#FFF6D6'], ['ink / bijela', '#2D3436', '#FFFFFF'], ['ink / PINK glyph', '#2D3436', '#FFCCD5'], ['ink / mint New', '#2D3436', '#A8E6CF'], ['INK_SOFT / DISABLED', '#555C5E', '#F1EAE0'],
+      ['krem / chip nad najsvjetlijim', '#FFF8F0', M.mix('#F5FAF1', '#1A241E', 0.84)], ['krem / chip nad Moonlit', '#FFF8F0', M.mix('#CDD1FF', '#1A241E', 0.84)], ['krem / toast', '#FFF8F0', '#2D3436']];
+    const cr = pairs.map(p => [p[0], M.contrast(p[1], p[2])]), minC = Math.min(...cr.map(c => c[1]));
+    add('2 · Dodir ≥ 120 × 120 · tekst ≥ 34 px · kontrast ≥ 4,5 : 1', bw >= 120 && bh >= 120 && minFont >= 34 && minC >= 4.5,
+      'WardrobeButton ' + bw + ' × ' + bh + ' · ShopLink 240 × 272 / 120 visine · tab 120 · kartica 240 × 272 · Close 132\nnajmanji tekst ' + minFont + ' px („' + minEl + '“)\n' + cr.map(c => c[0] + ' ' + c[1].toFixed(2)).join(' · '));
+    // 3 default + skidanje (živi tok)
+    const sheets = [...root.querySelectorAll('[data-layer="WardrobeSheet"]')];
+    const allDefault = sheets.every(s => s.querySelectorAll('[data-layer="DefaultCard"]').length === 1);
+    const live = root.querySelector('[data-test="live"]');
+    const pipSrc = () => live.querySelector('[data-layer="MeadowPip"] img').getAttribute('src');
+    const clickName = name => { const n = [...live.querySelectorAll('[data-layer="ItemName"]')].find(e => e.textContent.trim() === name); if (n) n.closest('[data-layer="ItemCard"],[data-layer="DefaultCard"]').click(); return !!n; };
+    let flow = [], ok3 = allDefault, ok8 = true;
+    const waitFor = async (fn, ms) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (fn()) return true; await wait(60); } return false; };
+    const isOpen = () => !!live.querySelector('[data-layer="WardrobeSheet"]') && !!live.querySelector('[data-layer="ItemName"]');
+    const isClosed = () => !live.querySelector('[data-layer="WardrobeSheet"]');
+    try {
+      live.querySelector('[data-layer="WardrobeButton"]').click(); await waitFor(isOpen, 5000); await wait(400);
+      flow.push('otvoren: ' + isOpen());
+      const before = pipSrc(); clickName('Pip Blossom'); await wait(150);
+      live.querySelector('[data-layer="CloseButton"]').click(); await waitFor(isClosed, 5000);
+      const after = pipSrc(); const worn = after.indexOf(encodeURIComponent('#FFD3DE')) >= 0;
+      flow.push('Blossom → Close → Pip na polju u Blossomu: ' + worn + ' (sheet zatvoren: ' + isClosed() + ')');
+      ok8 = worn && before !== after;
+      live.querySelector('[data-layer="WardrobeButton"]').click(); await waitFor(isOpen, 5000); await wait(400);
+      clickName('Classic Pip'); await wait(150);
+      live.querySelector('[data-layer="WardrobeScrim"]').click(); await waitFor(isClosed, 5000);
+      const back = pipSrc().indexOf(encodeURIComponent('#A8E6CF')) >= 0;
+      flow.push('Classic Pip → tap na scrim → Pip opet mint (skinuto): ' + back);
+      ok3 = ok3 && worn && back;
+    } catch (e) { flow.push('greška: ' + e); ok3 = false; ok8 = false; }
+    add('3 · Svaki slot ima Default i nošeno se može skinuti', ok3, sheets.length + ' WardrobeSheet okvira, svaki tačno 1 DefaultCard: ' + allDefault + '\n' + flow.join('\n'));
+    // 4 ne prodaje
+    let ok4 = true; const l4 = [];
+    sheets.forEach((s, i) => { const t = s.textContent; const links = s.querySelectorAll('[data-layer="ShopLink"]').length; const bad = /\b(buy|price|coins?|purchase)\b|[$€]|\b\d+\s?(◎|coin)/i.test(t); if (links > 1 || bad) { ok4 = false; l4.push('okvir ' + (i + 1) + ': ShopLink ' + links + (bad ? ' + riječ kupovine' : '')); } });
+    add('4 · Ormar ne prodaje — bez cijene i dugmeta za kupovinu, najviše 1 put u Shop', ok4, sheets.length + ' okvira: ShopLink ≤ 1 u svakom, 0 cijena, 0 „buy / coins / $“' + (l4.length ? '\n' + l4.join('\n') : ''));
+    // 5 extension
+    const ex = [...root.querySelectorAll('[data-frame="extra"] [data-layer="WardrobeSheet"]')][0];
+    const tabs = ex ? ex.querySelectorAll('[data-layer="SlotTab"]').length : 0, cards = ex ? ex.querySelectorAll('[data-layer="ItemCard"]').length : 0;
+    const dn = [...root.querySelectorAll('[data-frame="demoN"] [data-layer="WardrobeSheet"]')].map(s => s.querySelectorAll('[data-layer="ItemCard"]').length);
+    add('5 · 8 slotova i 12 stavki samo izmjenom podataka', tabs === 8 && cards === 12 && dn.join(',') === '1,5,30',
+      'extra okvir: ' + tabs + ' SlotTab · ' + cards + ' ItemCard u slotu Pip (+1 DefaultCard)\ndemoN okviri: ItemCard ' + dn.join(' / ') + '\nista Wardrobe.dc.html / ItemCard.dc.html / ItemPreview.dc.html — razlika je samo objekat kataloga (withPatch)');
+    // 6 catalog
+    const l6 = Object.keys(ORIGINAL).map(id => { const i = cat.items.find(x => x.id === id); return id + ' ' + (i ? i.slot + ' ' + i.coin_cost : 'NEMA') + (i && i.slot === ORIGINAL[id][0] && i.coin_cost === ORIGINAL[id][1] ? ' ✓' : ' ✗'); });
+    add('6 · Postojećih 5 stavki u šemi s istim id, slot i cijenom', l6.every(l => l.endsWith('✓')) && cat.items.length === 5 && this.state.same,
+      'izvor: ' + this.state.src + ' · isti kao ugrađena kopija: ' + this.state.same + '\n' + l6.join('\n'));
+    // 7 real art
+    const strip = s => s.replace(/#[0-9A-Fa-f]{6}/g, '#');
+    const ref = strip(M.PIP_SVG);
+    const imgs = [...root.querySelectorAll('img[data-layer="PipArt"]')];
+    const pipImgs = imgs.filter(i => (i.getAttribute('src') || '').indexOf('data:image/svg') === 0 && decodeURIComponent(i.getAttribute('src').split(',')[1]).indexOf('<ellipse') >= 0);
+    const allReal = pipImgs.length > 0 && pipImgs.every(i => strip(decodeURIComponent(i.getAttribute('src').split(',')[1])) === ref);
+    const where = ['FieldPage', 'SeasonCardCrop', 'ArenaCrop', 'RunCrop', 'PreviewStage'].map(l => l + ' ' + root.querySelectorAll('[data-layer="' + l + '"] img[data-layer="PipArt"]').length);
+    add('7 · Pip skin je na pravom SVG artu — polje, Arena, run', allReal && !root.querySelector('[data-layer="PipDraw"]'),
+      pipImgs.length + ' Pip slika: sve = pip_idle.svg s istom geometrijom, razlika samo u hex bojama · 0 PipDraw\n' + where.join(' · '));
+    // 8 apply
+    const hasSave = /\bsave\b/i.test(sheets.map(s => s.textContent).join(' '));
+    add('8 · Primjena se vidi odmah pri izlasku, bez „Save“', ok8 && !hasSave, 'živi tok (3): Pip na polju promijenio skin čim se sheet zatvorio · riječ „Save“ u ormaru: ' + hasSave);
+    // 9 blur / glow / gradient / loop
+    let grad = 0, blur = 0, softShadow = [], loops = 0;
+    root.querySelectorAll('*').forEach(el => {
+      if (el.closest('[data-layer="Header"],[data-layer="Footer"]')) return;
+      const cs = getComputedStyle(el);
+      if (/gradient/.test(cs.backgroundImage)) grad++;
+      if (/blur|drop-shadow/.test(cs.filter) || /blur/.test(cs.backdropFilter || '')) blur++;
+      if (cs.boxShadow && cs.boxShadow !== 'none') { const m = cs.boxShadow.match(/(-?\d+(\.\d+)?)px\s+(-?\d+(\.\d+)?)px\s+(\d+(\.\d+)?)px/); if (m && parseFloat(m[5]) > 0) softShadow.push(el.getAttribute('data-layer') || el.tagName); }
+      if (cs.animationIterationCount === 'infinite') loops++;
+    });
+    add('9 · Nigdje blur, glow ni gradijent; najviše jedan loop', grad === 0 && blur === 0 && softShadow.length === 0 && loops <= 1,
+      'gradijent ' + grad + ' · blur ' + blur + ' · meka sjena ' + softShadow.length + ' · beskonačnih animacija ' + loops + ' (header/footer = postojeći chrome v2, van ocjene)');
+    const checks = R.map(r => ({ title: r.title, detail: r.detail, verdict: r.ok ? 'da' : 'ne', badge: 'flex:0 0 auto;width:96px;height:64px;box-sizing:border-box;border-radius:18px;display:grid;place-items:center;font:900 32px/1 Nunito,system-ui,sans-serif;border:3px solid #2D3436;background:' + (r.ok ? '#A8E6CF' : '#FFCCD5') }));
+    R.forEach(r => console.log('SELFCHECK ' + (r.ok ? 'da ' : 'ne ') + r.title + ' :: ' + r.detail.replace(/\n/g, ' | ')));
+    window.__wardrobeSelfCheck = R;
+    this.setState({ checks });
+  }
+}
+</script>
+</body>
+</html>

@@ -9,6 +9,10 @@ const SCENE_MERGE_ARENA := "res://scenes/camp/merge_arena.tscn"
 const SCENE_SHOP := "res://scenes/ui/shop_screen.tscn"
 const SCENE_COLLECTION := "res://scenes/ui/collection_journal.tscn"
 
+## Ormar (design_handoff_wardrobe): slotovi čiji se izgled promijenio — svaka
+## površina iz slot.applies_to se osvježi bez restarta.
+signal cosmetics_changed(slots: Array)
+
 ## Tuned for ArenaSeedChip.DISPLAY_SCALE 1.4 (chip radius 67.2): snap/magnet
 ## scaled 1.4x from the original 100/130.
 const ARENA_MAX_CHIPS := 30
@@ -1873,6 +1877,15 @@ func equip_cosmetic(cosmetic_id: String) -> bool:
 
 func get_cosmetic_shop_entries() -> Array[Dictionary]:
 	return cosmetics.shop_entries()
+
+
+func unequip_cosmetic(slot: String) -> bool:
+	return cosmetics.unequip(slot)
+
+
+## Ormar: primijeni sve izbore odjednom (jedan save) — vraća promijenjene slotove.
+func apply_wardrobe(pending: Dictionary) -> Array:
+	return cosmetics.apply_wardrobe(pending)
 
 
 func get_booster_count(booster_id: String) -> int:

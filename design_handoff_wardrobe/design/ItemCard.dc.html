@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="{{ layer }}" data-state="{{ state }}" onClick="{{ tap }}" style="position:relative;width:240px;height:272px;box-sizing:border-box;border-radius:28px;padding:12px;display:flex;flex-direction:column;gap:12px;font-family:Nunito,system-ui,sans-serif;cursor:{{ cursor }};background:{{ fill }};border:{{ edge }};transition:transform .08s" style-active="transform:scale(.97)">
+  <div data-layer="ItemPreview" style="position:relative;flex:0 0 150px;width:210px;height:150px;box-sizing:border-box;border-radius:18px;overflow:hidden;border:3px solid #16211B;background:#16211B">
+    <dc-import name="ItemPreview" kind="{{ kind }}" subject="{{ subject }}" look="{{ look }}" pip="{{ pip }}" season="{{ season }}" w="204" h="144" size="thumb" veil="{{ veil }}" hint-size="204px,144px"></dc-import>
+  </div>
+  <div data-layer="ItemName" style="flex:0 0 80px;height:80px;overflow:hidden;font:900 38px/40px Nunito,system-ui,sans-serif;text-wrap:balance;color:{{ ink }}">{{ title }}</div>
+  <sc-if value="{{ worn }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="EquippedBadge" style="position:absolute;right:18px;top:18px;width:60px;height:60px;box-sizing:border-box;border-radius:30px;background:#2D3436;border:4px solid #FFF8F0;display:grid;place-items:center">
+      <svg width="32" height="32" viewBox="0 0 32 32" style="display:block"><path d="M7 16.5l6 6L25 10" fill="none" stroke="#FFF8F0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    </div>
+  </sc-if>
+  <sc-if value="{{ isNew }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="NewTag" style="position:absolute;left:18px;top:18px;height:52px;box-sizing:border-box;padding:0 14px;border-radius:16px;background:#A8E6CF;border:3px solid #2D3436;display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436">New</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:240,&quot;height&quot;:272},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;worn&quot;,&quot;owned&quot;,&quot;none&quot;],&quot;default&quot;:&quot;worn&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;kind&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;companion&quot;,&quot;meadow&quot;,&quot;album&quot;,&quot;swatch&quot;],&quot;default&quot;:&quot;companion&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;title&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Pip Blossom&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;isDefault&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;isNew&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;subject&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;look&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;pip&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;season&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;onTap&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props, st = p.state || 'owned';
+    const worn = st === 'worn', none = st === 'none';
+    return {
+      layer: p.isDefault ? 'DefaultCard' : 'ItemCard', state: st, worn, isNew: !!p.isNew && !none,
+      kind: p.kind || 'companion', subject: p.subject || 'pip', look: p.look || null, pip: p.pip || null, season: p.season || 'country_bloom',
+      veil: none, title: p.title || 'Pip Blossom',
+      fill: worn ? '#FFF6D6' : none ? '#F1EAE0' : '#FFFFFF',
+      edge: worn ? '4px solid #2D3436' : none ? '3px solid rgba(45,52,54,.10)' : '3px solid rgba(45,52,54,.18)',
+      ink: none ? '#555C5E' : '#2D3436',
+      cursor: none ? 'default' : 'pointer',
+      tap: () => { if (!none && p.onTap) p.onTap(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

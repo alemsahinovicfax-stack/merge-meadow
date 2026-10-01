@@ -1,6 +1,7 @@
 extends Sprite2D
 
 ## Run companion sprite — Pip SVG or procedural fallback (Mochi / missing art).
+## Ormar: Pip skin je ista SVG tekstura s recolorom (PipAssets), ne PipDraw.
 
 const COMPANION_CONFIG := preload("res://scripts/visual/companion_config.gd")
 const COMPANION_ASSETS := preload("res://scripts/visual/companion_assets.gd")
@@ -24,17 +25,12 @@ func refresh_companion_visual() -> void:
 
 func _apply_companion_visual() -> void:
 	var companion_id := GameState.get_active_companion_id()
-	var pip_skin := GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_PIP_SKIN)
-	if companion_id == CompanionConfig.ID_PIP and not pip_skin.is_empty():
-		_use_draw_fallback = true
-		texture = null
-		scale = Vector2.ONE
-		return
 	var tex := COMPANION_ASSETS.get_run_texture(companion_id)
 	if tex != null:
 		texture = tex
 		centered = true
-		scale = Vector2.ONE * CompanionConfig.run_scale()
+		# Skin se rasterizuje 2× (512 px) — visina u runu ostaje 112.
+		scale = Vector2.ONE * (CompanionConfig.RUN_DISPLAY_HEIGHT / maxf(1.0, float(tex.get_height())))
 		_use_draw_fallback = false
 	else:
 		_use_draw_fallback = true

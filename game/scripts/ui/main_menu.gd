@@ -59,10 +59,15 @@ var _loot_effect: Label
 var _loot_level: Label
 var _loot_cost: Label
 var _loot_have: Label
+## Ormar (design_handoff_wardrobe)
+var wardrobe_button: FieldWardrobeButton
+var wardrobe_sheet: WardrobeSheet
+var _apply_toast: ApplyToast
 
 
 func _ready() -> void:
 	_ensure_upgrade_extras()
+	_ensure_wardrobe()
 	_ensure_transition_blocker()
 	if season_stage:
 		season_stage.connect("play_run_requested", _start_run)
@@ -186,6 +191,7 @@ func _sync_field_hub_swipe_chrome() -> void:
 		endless_play_button,
 		basket_picker_overlay,
 		upgrades_overlay,
+		wardrobe_button,
 	]:
 		_set_block_hub_swipe(node as Control, open)
 	# Cip je info — swipe mora proci kroz njega.
@@ -263,12 +269,14 @@ func _apply_mode_layout(field_open: bool) -> void:
 		field_overlay.visible = field_open
 	if not field_open:
 		_close_upgrades_sheet()
+		_close_wardrobe(false)
 	_apply_field_overlay_styles()
 	if field_open:
 		_style_field_bottom_row()
 	_refresh_chest_card()
 	_refresh_tutorial_hint()
 	_refresh_upgrades_button()
+	_refresh_wardrobe_button()
 	_refresh_grown_chip()
 
 
@@ -684,6 +692,7 @@ func on_field_transition_started(_opening: bool) -> void:
 		field_basket.stop_attention()
 	_close_basket_picker()
 	_close_upgrades_sheet()
+	_close_wardrobe(false)
 
 
 func on_field_transition_finished(opened: bool) -> void:
@@ -953,3 +962,117 @@ func _on_basket_type_picked(type_id: String) -> void:
 	if GameState.set_loadout(type_id):
 		_refresh_basket_card()
 		_close_basket_picker()
+
+
+## ── Ormar (design_handoff_wardrobe) ──────────────────────────────────────────
+## Pločica „Looks" (876, 1265) u desnoj koloni, sheet 1326 iste porodice kao korpa,
+## ApplyMoment poslije zatvaranja: Pip skok + prsten (slot vidljiv na polju) ili
+## toast (slot koji se na polju ne vidi).
+
+func _ensure_wardrobe() -> void:
+	if wardrobe_button != null or field_overlay_inner == null:
+		return
+	wardrobe_button = FieldWardrobeButton.new()
+	field_overlay_inner.add_child(wardrobe_button)
+	wardrobe_button.position = Vector2(UiHomeField.WARDROBE_RECT.position)
+	wardrobe_button.size = Vector2(UiHomeField.WARDROBE_RECT.size)
+	wardrobe_button.clicked.connect(_open_wardrobe)
+	_apply_toast = ApplyToast.new()
+	_apply_toast.name = "ApplyToast"
+	field_overlay_inner.add_child(_apply_toast)
+	wardrobe_sheet = WardrobeSheet.new()
+	add_child(wardrobe_sheet)
+	wardrobe_sheet.close_finished.connect(_on_wardrobe_closed)
+	wardrobe_sheet.shop_requested.connect(_on_wardrobe_shop)
+
+
+func _refresh_wardrobe_button() -> void:
+	if wardrobe_button == null:
+		return
+	wardrobe_button.visible = GameState.home_season_field_open
+	wardrobe_button.set_dot(GameState.cosmetics.has_new())
+
+
+func _open_wardrobe() -> void:
+	if not GameState.home_season_field_open or wardrobe_sheet == null:
+		return
+	if _stage_transitioning():
+		return
+	_close_basket_picker()
+	_close_upgrades_sheet()
+	wardrobe_sheet.open(GameState.home_season_field_id)
+
+
+func _close_wardrobe(animated: bool = true) -> void:
+	if wardrobe_sheet != null and wardrobe_sheet.is_open():
+		wardrobe_sheet.close(animated)
+
+
+func is_wardrobe_open() -> bool:
+	return wardrobe_sheet != null and wardrobe_sheet.is_open()
+
+
+func _on_wardrobe_closed(changed: Array) -> void:
+	_refresh_wardrobe_button()
+	if changed.is_empty() or not GameState.home_season_field_open:
+		return
+	var slots := {}
+	for sd in CosmeticCatalog.slots():
+		slots[str(sd.get("id", ""))] = sd
+	if UiWardrobe.changed_on_field(changed, slots):
+		var meadow := season_stage.get_node_or_null("%SeasonField") if season_stage else null
+		if meadow != null and meadow.has_method("play_apply_moment"):
+			meadow.call("play_apply_moment")
+	var text := UiWardrobe.toast_text(changed, slots, wardrobe_sheet.pending)
+	if not text.is_empty() and _apply_toast != null:
+		_apply_toast.show_text(text)
+
+
+## ShopLink: zatvori (= snimi) i otvori Shop · Looks na istom slotu.
+func _on_wardrobe_shop(slot_id: String) -> void:
+	_close_wardrobe(false)
+	var hubs := get_tree().get_nodes_in_group("meta_hub")
+	if hubs.is_empty():
+		SceneRouter.change_to(GameState.SCENE_SHOP)
+		return
+	var hub := hubs[0]
+	hub.call("go_to_page", MetaHubPages.SHOP)
+	for _i in 30:
+		await get_tree().process_frame
+		var swipe := hub.get_node_or_null("RootVBox/SwipePager")
+		var host: Node = swipe.call("get_pages_host") if swipe and swipe.has_method("get_pages_host") else null
+		var shop := host.get_node_or_null("Page_%d" % MetaHubPages.SHOP) if host else null
+		if shop != null and shop.has_method("show_cosmetic_slot"):
+			shop.call("show_cosmetic_slot", slot_id)
+			return
+
+
+## ApplyToast: centar x 540, y 1110, h 100 · 44/900 krem na TOAST_BG · 2,6 s.
+class ApplyToast extends Control:
+	var text: String = ""
+	var _tween: Tween
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		visible = false
+
+	func show_text(t: String) -> void:
+		text = t
+		var w := UiHomeV3.text_w(900, 44, text) + 80.0
+		size = Vector2(ceilf(w), UiWardrobe.TOAST_H)
+		position = Vector2(540.0 - size.x * 0.5, float(UiWardrobe.TOAST_Y))
+		visible = true
+		modulate.a = 0.0
+		if _tween != null and _tween.is_valid():
+			_tween.kill()
+		_tween = create_tween()
+		_tween.tween_property(self, "modulate:a", 1.0, UiWardrobe.T_TOAST_IN)
+		_tween.tween_interval(UiWardrobe.T_TOAST_HOLD)
+		_tween.tween_property(self, "modulate:a", 0.0, UiWardrobe.T_TOAST_IN)
+		_tween.tween_callback(func() -> void: visible = false)
+		queue_redraw()
+
+	func _draw() -> void:
+		draw_style_box(UiWardrobe.toast(), Rect2(Vector2.ZERO, size))
+		var tw := UiHomeV3.text_w(900, 44, text)
+		UiHomeV3.draw_text(self, 900, 44, text, Vector2((size.x - tw) * 0.5, (size.y - 44.0) * 0.5), UiWardrobe.STICKER)

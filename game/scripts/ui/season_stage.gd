@@ -931,6 +931,9 @@ func _is_hub_on_home() -> bool:
 func _try_close_field_on_back() -> bool:
 	if not GameState.home_season_field_open or _moving:
 		return false
+	# Ormar je otvoren — back zatvara (i primjenjuje) njega, ne polje.
+	if is_inside_tree() and not get_tree().get_nodes_in_group(WardrobeSheet.OPEN_GROUP).is_empty():
+		return false
 	if not is_visible_in_tree() or not _is_hub_on_home():
 		return false
 	close_season_field()

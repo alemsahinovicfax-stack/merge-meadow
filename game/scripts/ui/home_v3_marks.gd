@@ -36,6 +36,16 @@ func _init(k: String = KIND_DOTS) -> void:
 	size = UiHomeV3.PAGE
 
 
+func _ready() -> void:
+	# Ormar: Pip na kartici sezone nosi isti skin kao na polju.
+	if kind == KIND_PIP and not GameState.cosmetics_changed.is_connected(_on_cosmetics_changed):
+		GameState.cosmetics_changed.connect(_on_cosmetics_changed)
+
+
+func _on_cosmetics_changed(_slots: Array) -> void:
+	queue_redraw()
+
+
 func _draw() -> void:
 	match kind:
 		KIND_DOTS:

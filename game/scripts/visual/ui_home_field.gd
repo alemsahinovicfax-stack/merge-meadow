@@ -63,6 +63,8 @@ const TILE_ICON       := 84
 const GIFT_RECT       := Rect2i(24, 24, 180, 180)
 const BASKET_RECT     := Rect2i(24, 220, 180, 180)
 const UPGRADES_RECT   := Rect2i(876, 24, 180, 180)
+## Ormar (design_handoff_wardrobe): desna kolona, 16 iznad donjeg reda.
+const WARDROBE_RECT   := Rect2i(876, 1265, 180, 180)
 const DOT             := 48
 const DOT_OFFSET      := Vector2i(-12, -12)
 const LEVEL_SEG       := Vector2i(28, 14)
@@ -93,6 +95,7 @@ const KEEPOUT := [
 	Rect2i(860, 8, 212, 212),     # Upgrades
 	Rect2i(212, 20, 656, 184),    # ime + cip (swipe prolazi)
 	Rect2i(54, 1445, 972, 188),   # donji red
+	Rect2i(860, 1249, 212, 212),  # Ormar (Looks)
 ]
 const KEEPOUT_HINT := Rect2i(220, 214, 632, 216)
 
@@ -106,7 +109,8 @@ const MEADOW_SPOTS := [
 	[34, 26, 168, 5, 10],
 ]
 const PIP_SIZE := 190
-const PIP_BASE_ZONE := Rect2i(151, 1306, 778, 131)
+## Ormar: zona sužena na x ≤ 765 (desni rub Pipa 860 = 16 do pločice Looks).
+const PIP_BASE_ZONE := Rect2i(151, 1306, 614, 131)
 const PIP_DEFAULT_BASE := Vector2i(756, 1404)
 
 ## Boja livade po sezoni — postojeće vrijednosti iz SeasonTheme.home_field_tint().

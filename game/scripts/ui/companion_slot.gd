@@ -16,6 +16,12 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	custom_minimum_size = Vector2(80, 80)
 	queue_redraw()
+	if not GameState.cosmetics_changed.is_connected(_on_cosmetics_changed):
+		GameState.cosmetics_changed.connect(_on_cosmetics_changed)
+
+
+func _on_cosmetics_changed(_slots: Array) -> void:
+	queue_redraw()
 
 
 func _gui_input(event: InputEvent) -> void:

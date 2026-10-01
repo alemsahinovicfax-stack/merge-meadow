@@ -1,0 +1,60 @@
+FieldPage (SeasonStage/SeasonField, 1080 x 1633 od y 143)
+├─ … Meadow, Spots, %MeadowPip                       postojeće; PIP_BASE_ZONE → (151,1306,614,131)
+├─ FieldOverlay (IGNORE)
+│  ├─ GiftChest · BasketButton · UpgradesButton · GrownChip · SeasonLabel   ne dira se
+│  ├─ WardrobeButton (Button)        876, 1265, 180 x 180   NOVO · UiHomeField.tile() · block_hub_swipe
+│  │  ├─ WardrobeGlyph (Panel 84)    UiWardrobe.wardrobe_glyph() (PINK, rub 3)
+│  │  │  └─ Icon (TextureRect 66)    res://assets/ui/wardrobe/icon_wardrobe.svg
+│  │  ├─ Label "Looks"               900 38 #2D3436
+│  │  └─ WardrobeDot (Panel 48)      (−12,−12), MINT — samo kad ima stavka s new_since > wardrobe_seen
+│  └─ BottomRow                       ne dira se (Seasons · Play · Endless)
+├─ ApplyRing (Control, IGNORE)        iza MeadowPip, crta elipsu; samo u ApplyMoment
+├─ ApplyToast (PanelContainer)        centar x 540, y 1110, h 100 · samo u ApplyMoment
+└─ SheetLayer (Control, full rect)    block_hub_swipe dok je bilo koji sheet otvoren
+   ├─ Scrim → WardrobeScrim           isti ColorRect; tap = zatvori i primijeni
+   ├─ BasketSheet · UpgradesSheet     postojeće
+   └─ WardrobeSheet (Panel)           0, 307, 1080 x 1326 · UiWardrobe.sheet() · NOVO
+      ├─ SheetHead (VBox, drag)       povlačenje > 160 px = zatvori
+      │  ├─ Grabber 120 x 10
+      │  ├─ SheetTitle "Wardrobe"     900 56
+      │  └─ SheetSub                  800 40 #555C5E
+      ├─ PreviewStage (Panel, clip)   1032 x 300, rub 3 ink, r 28
+      │  ├─ ItemPreview (Control)     kind = slot.preview — crta _draw() / TextureRect
+      │  ├─ StageName (chip)          lijevo dolje, 900 40 krem
+      │  └─ StageWhere (chip)         desno gore, 800 36 krem, where_text(applies_to)
+      ├─ SlotTabs (ScrollContainer H) 1032 x 120
+      │  └─ HBox gap 12 → N x SlotTab (Button)   ikona 56 + Label 40 · tab(active)
+      ├─ ItemGrid (ScrollContainer V) 1032 x 477
+      │  └─ GridContainer 4 kol, h/v sep 24
+      │     ├─ DefaultCard  = ItemCard.tscn (item = null)
+      │     ├─ ItemCard.tscn x N      240 x 272 · card(state)
+      │     │  ├─ ItemPreview         210 x 150, rub 3 #16211B (ista scena kao na pozornici)
+      │     │  ├─ ItemName            900 38, 2 reda, autowrap
+      │     │  ├─ EquippedBadge 60    samo worn
+      │     │  └─ NewTag 52           samo isNew
+      │     ├─ ShopLink (Button)      240 x 272 isprekidan · ili
+      │     └─ EmptyState             768 x 272 isprekidan (span 3) + ShopLink dugme 120
+      └─ CloseButton                  1032 x 132 · zatvori i primijeni
+
+Scripts
+  scripts/ui/wardrobe_sheet.gd        NOVO — gradi tabove/mrežu iz CosmeticCatalog, drži pending{}
+  scripts/ui/item_card.gd             NOVO — jedna kartica, set_item(slot, item|null, state)
+  scripts/ui/item_preview.gd          NOVO — kind: companion | meadow | album | swatch
+  scripts/visual/ui_wardrobe.gd       ovaj paket
+
+Red prenosa
+  1. game/data/cosmetics/cosmetics.json (ovaj paket). CosmeticCatalog čita JSON; zadržati static API
+     (all_ids, get_item, get_title, get_coin_cost, get_slot) + slots(), items_in_slot(), get_look().
+     get_pip_palette() → get_recolor(); get_meadow_modulate() / get_journal_title_color() čitaju look.
+     Test: 5 id / slot / coin_cost isti kao prije; svaki recolor ključ postoji u pip_idle.svg;
+     UiWardrobe.skin_body_ok() za svaki pip_skin.
+  2. Cosmetics: unequip(slot), apply_wardrobe(pending) (jedan save), signal GameState.cosmetics_changed(slots).
+     get_equipped() bez ključa = "" = Default (save format isti).
+  3. PipAssets.get_texture(skin_id = equipped): pip_idle.svg tekst → replace po recolor →
+     Image.load_svg_from_string(svg, scale) → ImageTexture; keš po (skin, scale). Rezerva: icons/pip_<id>.svg.
+  4. Svi Pipovi zovu PipAssets.get_texture(): season_field_pip (UiHomeV3.draw_pip), kartica sezone,
+     pip_placeholder_control (Arena, Camp, run HUD), pip_visual (run — briše se grana _use_draw_fallback za skin),
+     Shop CosmeticPreview (h.draw → sprite). Na cosmetics_changed: queue_redraw / refresh_*.
+  5. WardrobeButton + keepout + PIP_BASE_ZONE u ui_home_field.gd; SheetLayer dobija WardrobeSheet.
+  6. WardrobeSheet + ItemCard + ItemPreview; ApplyMoment (hop, ring, toast).
+  7. ShopLink → Shop tab, sekcija Looks, skrol do slota (UiShop jump "looks").

@@ -1,0 +1,500 @@
+{
+  "meta": {
+    "name": "Wardrobe",
+    "version": 1,
+    "date": "2026-10-01",
+    "base": [
+      1080,
+      1920
+    ],
+    "page": [
+      1080,
+      1633
+    ],
+    "page_y": 143,
+    "sources": [
+      "design/FieldWithWardrobe.dc.html",
+      "design/Wardrobe.dc.html",
+      "design/ItemCard.dc.html",
+      "design/ItemPreview.dc.html",
+      "design/Wardrobe Specs.dc.html",
+      "godot/cosmetics.json"
+    ],
+    "note": "Sve mjere u px baze. Iste vrijednosti u ui_wardrobe.gd i u HTML-u."
+  },
+  "tokens": {
+    "colors": {
+      "STICKER": "#FFF8F0",
+      "STICKER_EDGE": "#2D3436",
+      "INK": "#2D3436",
+      "INK_SOFT": "#555C5E",
+      "ACTIVE_RIM": "#FFF6D6",
+      "PEACH": "#FFB88C",
+      "PINK": "#FFCCD5",
+      "MINT": "#A8E6CF",
+      "ROW_FILL": "#FFFFFF",
+      "ROW_EDGE": "rgba(45,52,54,.18)",
+      "DISABLED": "#F1EAE0",
+      "DISABLED_EDGE": "rgba(45,52,54,.10)",
+      "LOCK_VEIL": "#E3D9CC",
+      "DASH_EDGE": "rgba(45,52,54,.40)",
+      "WELL_EDGE": "#16211B",
+      "ALBUM_BG": "#2E4733",
+      "LABEL_CHIP": "rgba(26,36,30,.84)",
+      "LABEL_CHIP_EDGE": "rgba(255,248,240,.40)",
+      "SCRIM": "rgba(26,22,30,.55)",
+      "TOAST_BG": "#2D3436",
+      "RING": "rgba(255,248,240,.55)"
+    },
+    "new_colors": {
+      "pip_blossom_body": {
+        "hex": "#FFD3DE",
+        "from": "svjetlija varijanta PINK #FFCCD5"
+      },
+      "pip_blossom_light": {
+        "hex": "#FFF0F3",
+        "from": "svjetlija varijanta PINK"
+      },
+      "pip_blossom_cheek": {
+        "hex": "#FF94AE",
+        "from": "tamnija varijanta PINK"
+      },
+      "pip_sky_body": {
+        "hex": "#C2E2FA",
+        "from": "svjetlija varijanta UiRun.DIAMOND_CHIP #B8E0F5"
+      },
+      "pip_sky_light": {
+        "hex": "#EAF5FE",
+        "from": "svjetlija varijanta DIAMOND_CHIP"
+      }
+    },
+    "type": {
+      "font": "Nunito (default font, embolden kao UiShop)",
+      "title": [
+        900,
+        56
+      ],
+      "sub": [
+        800,
+        40
+      ],
+      "tab": [
+        900,
+        40
+      ],
+      "card_name": [
+        900,
+        38,
+        40
+      ],
+      "stage_name": [
+        900,
+        40
+      ],
+      "stage_where": [
+        800,
+        36
+      ],
+      "button": [
+        900,
+        46
+      ],
+      "shop_link": [
+        900,
+        38
+      ],
+      "new_tag": [
+        900,
+        34
+      ],
+      "toast": [
+        900,
+        44
+      ],
+      "min": 34
+    },
+    "radius": {
+      "sheet": 36,
+      "stage": 28,
+      "tab": 24,
+      "card": 28,
+      "preview": 18,
+      "chip": 18,
+      "badge": 30,
+      "button": 28
+    },
+    "shadow": {
+      "sticker": "0 8 0 rgba(26,26,20,.28)",
+      "shop_button": "0 6 0 rgba(26,26,20,.28)",
+      "note": "jedna tvrda sjena, blur 0"
+    }
+  },
+  "layout": {
+    "WardrobeButton": {
+      "rect": [
+        876,
+        1265,
+        180,
+        180
+      ],
+      "glyph": 84,
+      "icon": 66,
+      "label": "Looks",
+      "dot_offset": [
+        -12,
+        -12
+      ]
+    },
+    "keepout_add": [
+      860,
+      1249,
+      212,
+      212
+    ],
+    "PIP_BASE_ZONE": {
+      "old": [
+        151,
+        1306,
+        778,
+        131
+      ],
+      "new": [
+        151,
+        1306,
+        614,
+        131
+      ],
+      "pip_right_max": 860,
+      "gap_to_button": 16
+    },
+    "PIP_DEFAULT_BASE": [
+      756,
+      1404
+    ],
+    "nearest_flower": {
+      "index": 11,
+      "spot": [
+        88,
+        30,
+        136
+      ],
+      "rect": [
+        882,
+        1007,
+        136,
+        136
+      ],
+      "gap": 122
+    },
+    "WardrobeSheet": {
+      "rect": [
+        0,
+        307,
+        1080,
+        1326
+      ],
+      "pad": [
+        24,
+        20,
+        24,
+        28
+      ],
+      "border_top": 3
+    },
+    "Grabber": [
+      120,
+      10
+    ],
+    "SheetTitle": {
+      "y": 54,
+      "px": 56
+    },
+    "SheetSub": {
+      "gap": 12,
+      "px": 40
+    },
+    "PreviewStage": {
+      "gap": 28,
+      "size": [
+        1032,
+        300
+      ],
+      "border": 3,
+      "inner": [
+        1026,
+        294
+      ],
+      "StageName": {
+        "inset": 16,
+        "h": 60
+      },
+      "StageWhere": {
+        "inset": 16,
+        "h": 56
+      }
+    },
+    "SlotTabs": {
+      "gap": 24,
+      "h": 120,
+      "tab": {
+        "pad_x": 28,
+        "icon": 56,
+        "inner_gap": 12,
+        "gap": 12
+      },
+      "rule": "fill ako Σ ≤ 1032, inače scroll; aktivni ≥ 24 od ruba"
+    },
+    "ItemGrid": {
+      "gap": 24,
+      "view_h": 477,
+      "cols": 4,
+      "cell": [
+        240,
+        272
+      ],
+      "gap_xy": 24,
+      "rows": "ceil(cells/4)",
+      "empty_span": 3
+    },
+    "ItemCard": {
+      "size": [
+        240,
+        272
+      ],
+      "pad": 12,
+      "preview": [
+        210,
+        150
+      ],
+      "preview_border": 3,
+      "name": {
+        "px": 38,
+        "line": 40,
+        "lines_max": 2
+      },
+      "badge": {
+        "size": 60,
+        "inset": 18
+      },
+      "new_tag": {
+        "h": 52,
+        "inset": 18
+      }
+    },
+    "ShopLink": {
+      "cell": [
+        240,
+        272
+      ],
+      "icon": 72,
+      "button_h": 120
+    },
+    "CloseButton": {
+      "gap": 28,
+      "h": 132
+    },
+    "ApplyToast": {
+      "center_x": 540,
+      "y": 1110,
+      "h": 100,
+      "pad_x": 40
+    }
+  },
+  "components": {
+    "ItemCard": {
+      "one_for_all_slots": true,
+      "props": [
+        "slot",
+        "item|null",
+        "state",
+        "is_new"
+      ],
+      "states": {
+        "worn": "ACTIVE_RIM + rub 4 ink + EquippedBadge",
+        "owned": "ROW_FILL + rub 3 ROW_EDGE",
+        "none": "DISABLED + LOCK_VEIL + katanac, nije dodirljivo (samo source ≠ shop)"
+      }
+    },
+    "ItemPreview": {
+      "kinds": {
+        "companion": {
+          "args": [
+            "subject: pip|mochi"
+          ],
+          "look": [
+            "recolor{hex:hex}"
+          ],
+          "draw": "trake livade aktivne sezone (32/68 %) + pravi SVG art s recolor; stage dodaje 2 cvijeta iz roster-a"
+        },
+        "meadow": {
+          "args": [
+            "scene: run"
+          ],
+          "look": [
+            "tint[r,g,b]"
+          ],
+          "draw": "UiRun boje × tint × SeasonTheme.bg_modulate; stage 3 staze, thumb 1 staza; Pip u izabranom skinu"
+        },
+        "album": {
+          "args": [],
+          "look": [
+            "frame{color,width,radius}",
+            "paper",
+            "title_modulate"
+          ],
+          "draw": "stranica Bloom Albuma kao u Shopu"
+        },
+        "swatch": {
+          "args": [],
+          "look": [
+            "colors[]"
+          ],
+          "draw": "rezerva za slot bez vlastite vrste: naljepnica s 1–2 boje"
+        }
+      }
+    },
+    "SlotTab": {
+      "active": "PEACH + rub 3 ink",
+      "idle": "ROW_FILL + rub 3 ROW_EDGE",
+      "new_dot": 36
+    },
+    "EmptyState": {
+      "when": "slot bez ijedne tvoje stavke",
+      "text": "slot.empty_text",
+      "contains": "ShopLink dugme"
+    }
+  },
+  "states": {
+    "1": "Polje: Country Bloom / Moonlit Warren, sa i bez Endlessa (FieldWithWardrobe season, endless)",
+    "2": "Ormar · pip_skin: Default worn, pip_blossom owned, pip_sky nema → ne crta se",
+    "3": "Ormar · meadow_bg: Sunset worn, živa pozornica runa",
+    "4": "Ormar · journal_frame: Golden Album worn",
+    "5": "Prazno: owned [] → Default + EmptyState",
+    "6": "Proširenje: extra = 8 slotova, Pip 12 stavki; demoN 1 / 5 / 30",
+    "7": "Izlazak: open-t 1 → 0.42 → hop/ring → toast",
+    "8": "Gdje se vidi: polje, kartica sezone, Arena, run (+HUD chip), tint na runu"
+  },
+  "animations": {
+    "press": {
+      "prop": "scale | shadow_offset",
+      "ms": 80
+    },
+    "open": {
+      "sheet_y": [
+        1326,
+        0
+      ],
+      "ms": 320,
+      "ease": "out cubic",
+      "scrim_alpha": [
+        0,
+        0.55
+      ],
+      "scrim_ms": 200
+    },
+    "pick": {
+      "stage_hop": {
+        "scale": [
+          1,
+          1.12,
+          1
+        ],
+        "y_pct": -0.11,
+        "ms": 280
+      }
+    },
+    "close": {
+      "triggers": [
+        "CloseButton",
+        "WardrobeScrim tap",
+        "drag > 160 px",
+        "Android back"
+      ],
+      "sheet_y": [
+        0,
+        1326
+      ],
+      "ms": 280,
+      "ease": "in cubic",
+      "interrupt_open": "iz trenutnog u, ms × u"
+    },
+    "apply": {
+      "save": "na početku close",
+      "field_hop": {
+        "delay_ms": 40,
+        "scale": 1.18,
+        "y": -28,
+        "ms": 280,
+        "pivot": "stopala"
+      },
+      "ring": {
+        "r": [
+          90,
+          220
+        ],
+        "w": 10,
+        "alpha": [
+          0.55,
+          0
+        ],
+        "ms": 500
+      },
+      "toast": {
+        "in_ms": 180,
+        "hold_s": 2.6,
+        "when": "promijenjen slot bez \"field\" u applies_to"
+      }
+    },
+    "loops": 0
+  },
+  "strings_en": {
+    "button": "Looks",
+    "title": "Wardrobe",
+    "sub": "Looks only. Tap one to wear it.",
+    "close": "Close",
+    "shop_link": "More in Shop",
+    "new": "New",
+    "toast_many": "New looks are on",
+    "per_slot": "cosmetics.json → slots[].default_title / toast / empty_text"
+  },
+  "godot_map": {
+    "ui_home_field.gd": [
+      "KEEPOUT += Rect2i(860, 1249, 212, 212)",
+      "PIP_BASE_ZONE = Rect2i(151, 1306, 614, 131)",
+      "WARDROBE_BTN = Rect2i(876, 1265, 180, 180)"
+    ],
+    "cosmetic_catalog.gd": "čita game/data/cosmetics/cosmetics.json; ITEMS dict i get_pip_palette() se brišu",
+    "cosmetics.gd": [
+      "unequip(slot)",
+      "apply_wardrobe(pending) → jedan save_player_save()",
+      "emit cosmetics_changed(slots)"
+    ],
+    "pip_assets.gd": "get_texture(skin_id := equipped) → recolor + Image.load_svg_from_string, keš",
+    "season_field_pip.gd / ui_home_v3.gd draw_pip": "tekstura po skinu; hop na apply",
+    "pip_placeholder_control.gd": "refresh_portrait() na cosmetics_changed (Arena, Camp, run HUD)",
+    "pip_visual.gd": "briše se grana: skin → PipDraw; uvijek tekstura",
+    "lane_background.gd": "bez izmjene logike (modulate = look.tint × bg_modulate)",
+    "ui_shop.gd preview": "h.draw (PipDraw) → sprite PipAssets.get_texture(skin)",
+    "surfaces": {
+      "field": "Home",
+      "season_card": "Home",
+      "arena": "Arena",
+      "run": "Runs",
+      "run_hud": "Runs",
+      "camp": "Camp",
+      "journal": "Journal",
+      "shop": "Shop"
+    }
+  },
+  "decisions": [
+    "WardrobeButton je pločica polja 180 (isti StyleBox kao Gift/korpa/nadogradnje) u desnoj koloni x 876, 16 iznad donjeg reda.",
+    "Sukob s Pipom: PIP_BASE_ZONE se sužava na x ≤ 765 (Pip ≤ 860); kuća (756,1404) ostaje — Pip stoji pored ormara.",
+    "Sukob s cvijećem: najbliži cvijet #11 je 122 px iznad; novi keepout (860,1249,212,212).",
+    "Sheet 1326 = BasketSheet; ista grabber/naslov/sub/Close anatomija.",
+    "Shop stavke koje nemaš se ne crtaju; jedan ShopLink po ekranu.",
+    "Zatvaranje (bilo kako) = snimanje; nema Save.",
+    "Pip skin = recolor pravog pip_idle.svg; PipDraw se ne koristi za skin.",
+    "meadow_bg samo u runu (+ Shop preview); polje sezone i Arena bez tinta.",
+    "4 vrste pregleda; swatch je rezerva za buduće slotove."
+  ]
+}

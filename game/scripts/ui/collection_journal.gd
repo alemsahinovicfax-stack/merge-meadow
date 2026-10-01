@@ -39,6 +39,8 @@ var _scroll_row: int = -1
 
 
 func _ready() -> void:
+	if not GameState.cosmetics_changed.is_connected(_on_cosmetics_changed):
+		GameState.cosmetics_changed.connect(_on_cosmetics_changed)
 	$Bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	$Bg.color = UiJournal.PAGE_BG
 	back_button.clicked.connect(_on_back_pressed)
@@ -294,8 +296,16 @@ func _clear_list() -> void:
 		child.queue_free()
 
 
+func _on_cosmetics_changed(slots: Array) -> void:
+	if slots.has(CosmeticCatalog.SLOT_JOURNAL_FRAME) and golden_edge != null:
+		_apply_frame()
+
+
 func _apply_frame() -> void:
-	var golden := GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_JOURNAL_FRAME) == "journal_gold"
+	# Ormar: okvir dolazi iz look.frame opremljene stavke (cosmetics.json).
+	var golden := not CosmeticCatalog.get_album_frame(
+		GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_JOURNAL_FRAME)
+	).is_empty()
 	golden_edge.visible = golden
 	golden_band.visible = golden
 	if golden:
