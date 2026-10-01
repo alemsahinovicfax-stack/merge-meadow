@@ -191,12 +191,12 @@ const SECTION_SUBS: Array[String] = [
 ]
 
 const SLOT_TITLES := {
-	CosmeticCatalog.SLOT_PIP_SKIN: ["Pip skin", "in runs · wear one"],
+	CosmeticCatalog.SLOT_PIP_SKIN: ["Pip skin", "everywhere · wear one"],
 	CosmeticCatalog.SLOT_MEADOW_BG: ["Meadow tint", "run background · wear one"],
 	CosmeticCatalog.SLOT_JOURNAL_FRAME: ["Album frame", "Journal page"],
 }
 const SLOT_EQUIPPED_NOTE := {
-	CosmeticCatalog.SLOT_PIP_SKIN: "Pip wears this in runs.",
+	CosmeticCatalog.SLOT_PIP_SKIN: "Pip wears this everywhere.",
 	CosmeticCatalog.SLOT_MEADOW_BG: "Your runs use this tint.",
 	CosmeticCatalog.SLOT_JOURNAL_FRAME: "Your Bloom Album wears this.",
 }
