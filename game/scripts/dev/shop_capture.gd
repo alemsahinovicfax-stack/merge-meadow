@@ -1,13 +1,13 @@
 extends SceneTree
 
-## Dev: renderuje hub u SubViewport 1080 x 1920 i snima Shop kroz cijeli scroll (svaka sekcija
-## od vrha, pa korak po korak do dna) — referenca za redizajn i poređenje poslije prenosa.
+## Dev: renderuje hub u SubViewport 1080 x 1920 i snima Shop v2 — svaki tab od vrha, pa
+## korak po korak (1200 px) do dna. Referenca za poređenje s design_handoff_shop_v2.
 ## Pokretanje BEZ --headless:
 ##   godot --path game --rendering-driver opengl3 -s scripts/dev/shop_capture.gd
 ## PNG ide u $MM_OUT (ili %TEMP%/mm_design/).
 
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
-const SECTIONS: Array[String] = ["looks", "seasons", "boosters", "support"]
+const TABS: Array[String] = ["seasons", "looks", "boosters", "support"]
 
 var _backup := ""
 var _svp: SubViewport
@@ -64,25 +64,20 @@ func _run() -> void:
 	var shop := host.get_node("Page_%d" % MetaHubPages.SHOP)
 	shop.call("refresh_shop")
 	await _frames(10)
-	var scroll := shop.get("shop_scroll") as ScrollContainer
-	for section in SECTIONS:
-		shop.call("_on_jump_pressed", section)
-		await create_timer(0.6).timeout
-		await _capture("%s_top" % section)
-	# Cijeli scroll u koracima od 1200 px (preklop ~180 px sa sjenom ekrana).
-	scroll.scroll_vertical = 0
-	await _frames(4)
-	var max_v := int(scroll.get_v_scroll_bar().max_value - scroll.size.y)
-	var y := 0
-	var step := 1200
-	var k := 0
-	while true:
-		scroll.scroll_vertical = y
-		await _frames(4)
-		await _capture("scroll_%02d" % k)
-		k += 1
-		if y >= max_v:
-			break
-		y = mini(y + step, max_v)
+	for tab in TABS:
+		shop.call("select_tab", tab, false)
+		var scroll := shop.call("page_node", tab) as ScrollContainer
+		scroll.scroll_vertical = 0
+		await _frames(6)
+		await _capture("%s_top" % tab)
+		var max_v := int(scroll.get_v_scroll_bar().max_value - scroll.size.y)
+		var y := 0
+		var k := 1
+		while y < max_v:
+			y = mini(y + 1200, max_v)
+			scroll.scroll_vertical = y
+			await _frames(4)
+			await _capture("%s_%02d" % [tab, k])
+			k += 1
 	CampSmokeUtil.restore_save(self, _backup)
 	quit(0)

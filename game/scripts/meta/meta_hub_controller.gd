@@ -415,6 +415,31 @@ func _refresh_tab_badges() -> void:
 
 
 ## Shop javlja potrosnju coina; pop krece ispod coin chipa (design_handoff_shop).
+## Shop v2 · coins.short: tap na dugme bez dovoljno coina — coin chip kratko pulsira
+## (scale 1,06, prsten 6 px #FFD56B, 0,3 s), bez rečenice.
+func pulse_coin_chip() -> void:
+	if coin_chip == null:
+		return
+	coin_chip.pivot_offset = coin_chip.size * 0.5
+	var tw := coin_chip.create_tween()
+	tw.tween_property(coin_chip, "scale", Vector2.ONE * 1.06, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(coin_chip, "scale", Vector2.ONE, 0.18)
+	var ring := Panel.new()
+	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := StyleBoxFlat.new()
+	sb.draw_center = false
+	sb.set_border_width_all(6)
+	sb.border_color = Color("#FFD56B")
+	sb.set_corner_radius_all(26)
+	ring.add_theme_stylebox_override("panel", sb)
+	ring.size = coin_chip.size + Vector2(12, 12)
+	ring.position = Vector2(-6, -6)
+	coin_chip.add_child(ring)
+	var rt := ring.create_tween()
+	rt.tween_property(ring, "modulate:a", 0.0, 0.3)
+	rt.tween_callback(ring.queue_free)
+
+
 func show_coin_spend_pop(amount: int) -> void:
 	if amount <= 0:
 		return

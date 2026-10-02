@@ -22,11 +22,16 @@ const SKU_SEASON_EMBER := "season_pack_ember_fen"
 const BOOSTER_MERGE_HINT := "merge_hint"
 const BOOSTER_LOOT_BURST := "loot_burst"
 
-const STARTER_PACK_COINS := 15
-const STARTER_PACK_SEEDS := 8
-const STARTER_PACK_BOOSTERS := 1
+## Starter Pack (Shop v2): 100 coina + Pip Blossom + po 10 sjemenki prvih 5 tipova
+## Country Bloom; nudi se 7 dana od prvog pokretanja. Merge Hint više nije u paketu.
+const STARTER_PACK_COINS := 100
+const STARTER_PACK_COSMETIC := "pip_blossom"
+const STARTER_PACK_SEED_TYPES: Array[String] = ["clover", "daisy", "buttercup", "tulip", "sunflower"]
+const STARTER_PACK_SEEDS_EACH := 10
+const STARTER_PACK_DAYS := 7
 
-const LOOT_BURST_SEEDS := 5
+## Loot Burst: +5 ★3 cvjetova sezone koja otključava sljedeću besplatnu.
+const LOOT_BURST_STAR3 := 5
 
 const IAP_PRODUCTS := {
 	SKU_REMOVE_ADS: {
@@ -38,22 +43,22 @@ const IAP_PRODUCTS := {
 	},
 	SKU_STARTER_PACK: {
 		"title": "Starter Pack",
-		"description": "One-time: +15 coins, +8 clover seeds, +1 Merge Hint booster.",
+		"description": "100 coins, Pip Blossom and 10 of each first five seeds. 7 days only.",
 		"price_label": "€1.99",
 		"play_product_id": "starter_pack",
 		"consumable": false,
 	},
 	SKU_BOOSTER_MERGE_HINT: {
 		"title": "Merge Hint",
-		"description": "Consumable — highlights your next merge pair in the arena.",
+		"description": "Marks the closest match while you hold a seed in the Arena. Yours for good.",
 		"price_label": "€0.99",
 		"play_product_id": "booster_merge_hint",
-		"consumable": true,
+		"consumable": false,
 		"booster_id": BOOSTER_MERGE_HINT,
 	},
 	SKU_BOOSTER_LOOT_BURST: {
 		"title": "Loot Burst",
-		"description": "Consumable — instantly adds 5 seeds to your camp bag.",
+		"description": "+5 ★3 flowers toward the next free season.",
 		"price_label": "€0.99",
 		"play_product_id": "booster_loot_burst",
 		"consumable": true,

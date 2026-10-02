@@ -93,6 +93,7 @@ var _combo_mark_tween: Tween = null
 var _combo_ripples: Array[Panel] = []
 var _combo_ripple_next: int = 0
 var _combo_ripple_tweens: Array[Tween] = []
+var _hint_mark: MergeHintMark = null
 
 
 func _ready() -> void:
@@ -125,16 +126,8 @@ func _deferred_boot() -> void:
 	_layout_playfield_chrome()
 	_apply_season_field()
 	_apply_meadow_tint()
-	_apply_merge_hint_if_ready()
 	_update_tutorial_cue()
 	_refresh_bag()
-
-
-func _apply_merge_hint_if_ready() -> void:
-	if not GameState.merge_hint_booster_active:
-		return
-	_cue.show_message(GameState.get_merge_hint_message(_chip_data))
-	GameState.consume_merge_hint_booster()
 
 
 func _setup_bag() -> void:
@@ -607,6 +600,27 @@ func _clear_combo() -> void:
 
 func _on_chip_drag_started(chip: ArenaSeedChip) -> void:
 	_set_pair_pulses(chip)
+	_update_merge_hint()
+
+
+## Merge Hint (kupljen jednom, Shop v2): dok igrač drži sjemenku, najbliža ista sjemenka
+## dobije MergeHintMark; histereza 24 px u UiShopV2.merge_hint_target.
+func _update_merge_hint() -> void:
+	var held := _get_dragging_chip()
+	if held == null or not GameState.merge_hint_owned:
+		if _hint_mark != null:
+			_hint_mark.set_target(null)
+		return
+	if _hint_mark == null:
+		_hint_mark = MergeHintMark.new()
+		_hint_mark.name = "MergeHintMark"
+		_hint_mark.z_index = 5
+		playfield.add_child(_hint_mark)
+	_hint_mark.set_target(UiShopV2.merge_hint_target(held, _chips, _hint_mark.get_target()))
+
+
+func get_merge_hint_target() -> Node:
+	return _hint_mark.get_target() if _hint_mark != null and _hint_mark.visible else null
 
 
 func _set_pair_pulses(held: ArenaSeedChip) -> void:
@@ -627,6 +641,8 @@ func _clear_pair_pulses() -> void:
 
 func _process(delta: float) -> void:
 	_apply_magnet_pull()
+	if _hint_mark != null or GameState.merge_hint_owned:
+		_update_merge_hint()
 	if _pest:
 		_pest.tick(delta)
 	if _combo_window_left > 0.0:

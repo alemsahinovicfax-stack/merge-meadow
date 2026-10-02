@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#1A1420}a{color:#2D3436}a:hover{color:#9E6645}</style>
+</helmet>
+<div data-layer="ShopScreen" data-screen-label="{{ screenLabel }}" data-catalog="{{ catSource }}" data-catalog-same="{{ catSame }}" data-active-tab="{{ activeTab }}" style="width:1080px;height:1920px;flex:0 0 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#2A2233;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+
+  <div data-layer="Header" style="flex:0 0 143px;position:relative;z-index:5;background:#2A2233;box-shadow:0 6px 14px rgba(20,14,26,.34)">
+    <div style="height:140px;display:flex;align-items:center;gap:16px;padding:0 0 0 20px;box-sizing:border-box">
+      <div data-layer="CoinChip" ref="{{ chipRef }}" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14);box-shadow:{{ chipShadow }};transform:{{ chipTf }}"><img src="icons/icon_coin.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;white-space:nowrap">{{ coinsText }}</div></div>
+      <div data-layer="SeedChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="icons/icon_seed.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;white-space:nowrap">{{ seedsText }}</div></div>
+      <div data-layer="FlowerChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="icons/icon_flower.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;white-space:nowrap">{{ flowersText }}</div></div>
+      <div data-layer="SettingsSlot" style="width:124px;height:140px;flex:0 0 auto;display:flex;align-items:center;padding-left:4px;box-sizing:border-box"><div data-layer="SettingsButton" style="width:100px;height:100px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center"><img src="icons/icon_settings_light.svg" alt="" style="width:56px;height:56px"></div></div>
+    </div>
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+  </div>
+
+  <div data-layer="ShopPage" style="flex:0 0 1633px;height:1633px;position:relative;overflow:hidden">
+    <div data-layer="ShopBg" style="position:absolute;left:0;top:0;width:1080px;height:1633px;background:#FBEDD7"></div>
+
+    <div data-layer="TabPage_Seasons" data-tab="seasons" ref="{{ pageSeasons }}" style="position:absolute;left:0;top:0;width:1080px;height:1633px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;{{ pageStyleSeasons }}">
+      <div style="position:relative;box-sizing:border-box;padding:196px 24px 64px;display:flex;flex-direction:column;gap:32px">
+        <sc-for list="{{ seasonCards }}" as="s" hint-placeholder-count="4">
+          <div data-layer="SeasonCard" data-card="{{ s.id }}" data-sells="{{ s.sells }}" style="position:relative;height:364px;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;box-shadow:0 10px 0 rgba(26,26,20,.22);overflow:hidden;background:{{ s.far }}">
+            <div style="position:absolute;left:0;top:0;right:0;height:115px;background:{{ s.sky }}"></div>
+            <div style="position:absolute;left:0;top:242px;right:0;bottom:0;background:{{ s.near }}"></div>
+            <div style="position:relative;box-sizing:border-box;padding:20px;display:flex;flex-direction:column;gap:20px">
+              <div data-layer="SeasonPortraits" style="height:176px;display:flex;align-items:center;justify-content:space-between">
+                <sc-for list="{{ s.portraits }}" as="f" hint-placeholder-count="6">
+                  <dc-import name="FlowerPortrait" p="{{ f }}" type="{{ f.type }}" dim="{{ s.soon }}" hint-size="148px,148px"></dc-import>
+                </sc-for>
+              </div>
+              <div style="height:120px;display:flex;align-items:center;gap:20px">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                  <div data-role="name" style="font:900 52px/1.2 Nunito,system-ui,sans-serif;color:#1A1A14;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.name }}</div>
+                  <sc-if value="{{ s.hasStatus }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex"><div data-layer="PurchaseStatus" style="height:56px;box-sizing:border-box;padding:0 22px;border-radius:28px;border:3px solid #2D3436;display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;background:{{ s.statusBg }}">{{ s.statusText }}</div></div>
+                  </sc-if>
+                </div>
+                <sc-if value="{{ s.soon }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="SoonTag" style="height:120px;box-sizing:border-box;padding:0 44px;border-radius:60px;background:#FFF8F0;border:4px dashed #2D3436;display:flex;align-items:center;font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Coming soon</div>
+                </sc-if>
+                <sc-if value="{{ s.sellsOn }}" hint-placeholder-val="{{ true }}">
+                  <dc-import name="BuyButton" kind="{{ s.kind }}" state="{{ s.state }}" price="{{ s.price }}" label="{{ s.label }}" frozen="{{ frozen }}" on-tap="{{ s.onTap }}" hint-size="280px,128px"></dc-import>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div data-layer="TabPage_Looks" data-tab="looks" ref="{{ pageLooks }}" style="position:absolute;left:0;top:0;width:1080px;height:1633px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;{{ pageStyleLooks }}">
+      <div style="position:relative;box-sizing:border-box;padding:196px 24px 64px;display:flex;flex-direction:column;gap:44px">
+        <sc-for list="{{ slots }}" as="g" hint-placeholder-count="0">
+          <div data-layer="LooksSlot" data-slot="{{ g.id }}" style="display:flex;flex-direction:column;gap:20px">
+            <div data-layer="SlotHeader" style="height:96px;box-sizing:border-box;border-radius:48px;padding:0 24px 0 16px;display:flex;align-items:center;gap:16px;background:{{ g.headBg }};border:4px solid {{ g.headEdge }}">
+              <img src="{{ g.icon }}" alt="" style="width:64px;height:64px;flex:0 0 auto;display:block">
+              <div style="font:900 48px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ g.title }}</div>
+            </div>
+            <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="2">
+              <div data-layer="CosmeticCard" data-card="{{ it.id }}" data-sells="{{ it.sells }}" style="position:relative;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;box-shadow:0 10px 0 rgba(26,26,20,.22);padding:20px;display:flex;flex-direction:column;gap:20px;background:{{ it.fill }}">
+                <div data-layer="CosmeticPreview" style="position:relative;width:984px;height:300px;box-sizing:border-box;border-radius:24px;border:4px solid #2D3436;overflow:hidden;background:#16211B">
+                  <dc-import name="ItemPreview" kind="{{ g.kind }}" subject="{{ g.subject }}" look="{{ it.look }}" pip="{{ pipLook }}" season="country_bloom" w="976" h="292" size="stage" paper-bg="#F2D39B" hop="{{ it.hop }}" hint-size="976px,292px"></dc-import>
+                  <sc-if value="{{ it.worn }}" hint-placeholder-val="{{ false }}">
+                    <div data-layer="EquippedBadge" style="position:absolute;right:16px;top:16px;width:64px;height:64px;box-sizing:border-box;border-radius:32px;background:#2D3436;border:4px solid #FFF8F0;display:grid;place-items:center"><svg width="34" height="34" viewBox="0 0 32 32" style="display:block"><path d="M7 16.5l6 6L25 10" fill="none" stroke="#FFF8F0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                  </sc-if>
+                </div>
+                <div style="height:120px;display:flex;align-items:center;gap:20px">
+                  <div data-role="name" style="flex:1;min-width:0;font:900 52px/1.2 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.title }}</div>
+                  <div style="display:flex;transform:{{ it.btnTf }}">
+                    <dc-import name="BuyButton" kind="{{ it.kind }}" state="{{ it.state }}" price="{{ it.price }}" label="{{ it.label }}" frozen="{{ frozen }}" shake-key="{{ it.shakeKey }}" on-tap="{{ it.onTap }}" on-short="{{ onShort }}" hint-size="280px,128px"></dc-import>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <sc-if value="{{ looksOn }}" hint-placeholder-val="{{ true }}">
+          <div data-layer="TabEnd" style="display:flex;justify-content:center;padding-top:4px">
+            <div data-layer="WardrobeLink" onClick="{{ onWardrobe }}" style="height:120px;box-sizing:border-box;padding:0 48px 0 36px;border-radius:60px;background:#FFFFFF;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.22);display:flex;align-items:center;gap:18px;cursor:pointer" style-active="transform:translateY(4px);box-shadow:0 4px 0 rgba(26,26,20,.22)">
+              <img src="icons/icon_wardrobe.svg" alt="" style="width:64px;height:64px;display:block">
+              <span style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Wardrobe</span>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div data-layer="TabPage_Boosters" data-tab="boosters" ref="{{ pageBoosters }}" style="position:absolute;left:0;top:0;width:1080px;height:1633px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;{{ pageStyleBoosters }}">
+      <div style="position:relative;box-sizing:border-box;padding:196px 24px 64px;display:flex;flex-direction:column;gap:32px">
+        <sc-if value="{{ mhOn }}" hint-placeholder-val="{{ true }}">
+          <div data-layer="BoosterCard" data-card="merge_hint" data-sells="{{ mh.sells }}" style="position:relative;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;box-shadow:0 10px 0 rgba(26,26,20,.22);padding:20px;display:flex;flex-direction:column;gap:20px;background:{{ mh.fill }}">
+            <div data-layer="MergeHintVignette" style="position:relative;width:984px;height:300px;box-sizing:border-box;border-radius:24px;border:4px solid #2D3436;overflow:hidden;background:#EAF3DF">
+              <div style="position:absolute;left:-52px;top:-640px;width:1080px;height:1633px">
+                <dc-import name="ArenaField" season="country_bloom" lush="{{ 1 }}" width="{{ 1080 }}" hint-size="1080px,1633px"></dc-import>
+              </div>
+              <sc-for list="{{ vignette }}" as="v" hint-placeholder-count="5">
+                <div style="position:absolute;left:{{ v.l }}px;top:{{ v.t }}px;width:134.4px;height:134.4px">
+                  <dc-import name="SeedChip" type="{{ v.type }}" tier="{{ 1 }}" state="{{ v.state }}" season="country_bloom" hint-size="134px,134px"></dc-import>
+                </div>
+              </sc-for>
+              <div style="position:absolute;left:429px;top:59px;width:174px;height:174px">
+                <dc-import name="MergeHintMark" hint-size="174px,174px"></dc-import>
+              </div>
+            </div>
+            <div style="height:120px;display:flex;align-items:center;gap:20px">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+                <div data-role="name" style="font:900 52px/1.05 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Merge Hint</div>
+                <sc-if value="{{ mh.hasStatus }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex"><div data-layer="PurchaseStatus" style="height:56px;box-sizing:border-box;padding:0 22px;border-radius:28px;border:3px solid #2D3436;display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;background:{{ mh.statusBg }}">{{ mh.statusText }}</div></div>
+                </sc-if>
+                <sc-if value="{{ mh.lineOn }}" hint-placeholder-val="{{ true }}">
+                  <div style="font:800 36px/1.1 Nunito,system-ui,sans-serif;color:#555C5E;white-space:nowrap">Marks the closest match</div>
+                </sc-if>
+              </div>
+              <dc-import name="BuyButton" kind="money" state="{{ mh.state }}" price="{{ mh.price }}" label="Yours" frozen="{{ frozen }}" on-tap="{{ mh.onTap }}" hint-size="280px,128px"></dc-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ lootOn }}" hint-placeholder-val="{{ true }}">
+          <div data-layer="BoosterCard" data-card="loot_burst" data-sells="yes" style="position:relative;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;box-shadow:0 10px 0 rgba(26,26,20,.22);padding:20px;display:flex;flex-direction:column;gap:20px;background:#FFFFFF">
+            <div data-layer="LootBurstVisual" style="position:relative;width:984px;height:260px;box-sizing:border-box;border-radius:24px;border:4px solid #2D3436;overflow:hidden;background:{{ loot.far }}">
+              <div style="position:absolute;left:0;top:0;right:0;height:82px;background:{{ loot.sky }}"></div>
+              <div style="position:absolute;left:0;top:174px;right:0;bottom:0;background:{{ loot.near }}"></div>
+              <div style="position:absolute;left:36px;top:24px">
+                <dc-import name="FlowerPortrait" p="{{ loot.portrait }}" type="{{ loot.flower }}" hint-size="204px,204px"></dc-import>
+              </div>
+              <div data-layer="PlusBadge" style="position:absolute;left:176px;top:156px;height:76px;box-sizing:border-box;padding:0 22px;border-radius:38px;background:#2D3436;border:4px solid #FFF8F0;display:flex;align-items:center;font:900 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">+5</div>
+              <div data-layer="NextSeason" style="position:absolute;left:316px;top:52px;width:624px;display:flex;flex-direction:column;gap:26px">
+                <div style="height:60px;display:flex;align-items:center;gap:14px">
+                  <img src="icons/icon_lock.svg" alt="" style="width:52px;height:52px;flex:0 0 auto;display:block">
+                  <div style="flex:1;min-width:0;font:900 44px/1 Nunito,system-ui,sans-serif;color:#1A1A14;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ loot.nextName }}</div>
+                  <div style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#1A1A14;font-variant-numeric:tabular-nums;white-space:nowrap">{{ loot.count }}</div>
+                </div>
+                <div data-layer="StarProgress" style="position:relative;width:624px;height:52px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:4px solid #2D3436;overflow:hidden">
+                  <div style="position:absolute;left:0;top:0;bottom:0;width:{{ loot.haveW }}px;background:#A8E6CF;border-right:4px solid #2D3436;box-sizing:border-box"></div>
+                  <div style="position:absolute;top:4px;bottom:4px;left:{{ loot.addX }}px;width:{{ loot.addW }}px;box-sizing:border-box;border-radius:18px;border:3px dashed #2D3436;background:#DCF5EC"></div>
+                </div>
+              </div>
+            </div>
+            <div style="height:120px;display:flex;align-items:center;gap:20px">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+                <div data-role="name" style="font:900 52px/1.05 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Loot Burst</div>
+                <sc-if value="{{ loot.hasStatus }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex"><div data-layer="PurchaseStatus" style="height:56px;box-sizing:border-box;padding:0 22px;border-radius:28px;border:3px solid #2D3436;display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;background:{{ loot.statusBg }}">{{ loot.statusText }}</div></div>
+                </sc-if>
+              </div>
+              <dc-import name="BuyButton" kind="money" state="{{ loot.state }}" price="{{ loot.price }}" frozen="{{ frozen }}" on-tap="{{ loot.onTap }}" hint-size="280px,128px"></dc-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ allSet }}" hint-placeholder-val="{{ false }}">
+          <div data-layer="TabEnd" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:24px">
+            <img src="ref/pip_idle.svg" alt="" style="width:180px;height:180px;display:block">
+            <div style="font:900 40px/1 Nunito,system-ui,sans-serif;color:#555C5E">All set here</div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div data-layer="TabPage_Support" data-tab="support" ref="{{ pageSupport }}" style="position:absolute;left:0;top:0;width:1080px;height:1633px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;{{ pageStyleSupport }}">
+      <div style="position:relative;box-sizing:border-box;padding:196px 24px 64px;display:flex;flex-direction:column;gap:32px">
+        <sc-if value="{{ supportOn }}" hint-placeholder-val="{{ true }}">
+          <div data-layer="SupportCard" data-card="remove_ads" data-sells="{{ ra.sells }}" style="position:relative;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;box-shadow:0 10px 0 rgba(26,26,20,.22);padding:20px 20px 20px 32px;display:flex;align-items:center;gap:20px;background:{{ ra.fill }}">
+            <div style="flex:1;min-width:0;height:120px;display:flex;flex-direction:column;justify-content:center;gap:10px">
+              <div data-role="name" style="font:900 52px/1.05 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Remove Ads</div>
+              <sc-if value="{{ ra.hasStatus }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex"><div data-layer="PurchaseStatus" style="height:56px;box-sizing:border-box;padding:0 22px;border-radius:28px;border:3px solid #2D3436;display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;background:{{ ra.statusBg }}">{{ ra.statusText }}</div></div>
+              </sc-if>
+              <sc-if value="{{ ra.lineOn }}" hint-placeholder-val="{{ true }}">
+                <div style="font:800 36px/1.1 Nunito,system-ui,sans-serif;color:#555C5E;white-space:nowrap">No ads between runs</div>
+              </sc-if>
+            </div>
+            <dc-import name="BuyButton" kind="money" state="{{ ra.state }}" price="{{ ra.price }}" label="Ads off" frozen="{{ frozen }}" on-tap="{{ ra.onTap }}" hint-size="280px,128px"></dc-import>
+          </div>
+
+          <div data-layer="StarterPackCard" data-card="starter_pack" data-sells="{{ st.sells }}" style="position:relative;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;box-shadow:0 10px 0 rgba(26,26,20,.22);padding:20px;display:flex;flex-direction:column;gap:20px;background:{{ st.fill }}">
+            <div data-layer="StarterContent" style="height:228px;display:flex;gap:16px">
+              <div data-layer="StarterCoins" style="flex:0 0 236px;box-sizing:border-box;border-radius:24px;border:4px solid #2D3436;background:#FFE8B8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
+                <img src="icons/icon_coin.svg" alt="" style="width:96px;height:96px;display:block">
+                <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">100</div>
+              </div>
+              <div data-layer="StarterSkin" style="position:relative;flex:0 0 296px;box-sizing:border-box;border-radius:24px;border:4px solid #2D3436;background:#FFF6D6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+                <img src="icons/pip_blossom.svg" alt="" style="width:152px;height:152px;display:block">
+                <div style="font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Pip Blossom</div>
+                <sc-if value="{{ st.skinOwned }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;right:12px;top:12px;width:60px;height:60px;box-sizing:border-box;border-radius:30px;background:#2D3436;border:4px solid #FFF8F0;display:grid;place-items:center"><svg width="32" height="32" viewBox="0 0 32 32" style="display:block"><path d="M7 16.5l6 6L25 10" fill="none" stroke="#FFF8F0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                </sc-if>
+              </div>
+              <div data-layer="StarterSeeds" style="flex:1;min-width:0;box-sizing:border-box;border-radius:24px;border:4px solid #2D3436;background:#DCF5EC;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+                <div style="display:flex;gap:8px">
+                  <sc-for list="{{ starterSeeds }}" as="sd" hint-placeholder-count="0">
+                    <div data-layer="StarterSeed" style="position:relative;width:68px;height:68px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:3px solid #2D3436">
+                      <div style="position:absolute;left:5px;top:5px;width:52px;height:52px;box-sizing:border-box;border-radius:50%;background:#22342A;border:2px solid #16211B;overflow:hidden">
+                        <img src="{{ sd.src }}" alt="" style="position:absolute;left:{{ sd.left }}px;top:{{ sd.top }}px;width:{{ sd.size }}px;height:{{ sd.size }}px;max-width:none;display:block">
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="font:900 48px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">×10</div>
+              </div>
+            </div>
+            <div style="height:120px;display:flex;align-items:center;gap:20px">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                <div data-role="name" style="font:900 52px/1.05 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Starter Pack</div>
+                <sc-if value="{{ st.hasStatus }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex"><div data-layer="PurchaseStatus" style="height:56px;box-sizing:border-box;padding:0 22px;border-radius:28px;border:3px solid #2D3436;display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;background:{{ st.statusBg }}">{{ st.statusText }}</div></div>
+                </sc-if>
+                <sc-if value="{{ st.timeOn }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex"><div data-layer="TimeLeft" style="height:56px;box-sizing:border-box;padding:0 22px 0 14px;border-radius:28px;border:3px solid #2D3436;background:#FFF8F0;display:flex;align-items:center;gap:10px;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">
+                    <div style="position:relative;width:30px;height:30px;box-sizing:border-box;border-radius:50%;border:4px solid #2D3436"><div style="position:absolute;left:9px;top:3px;width:4px;height:10px;border-radius:2px;background:#2D3436"></div><div style="position:absolute;left:9px;top:9px;width:9px;height:4px;border-radius:2px;background:#2D3436"></div></div>{{ st.timeText }}</div></div>
+                </sc-if>
+              </div>
+              <dc-import name="BuyButton" kind="money" state="{{ st.state }}" price="{{ st.price }}" label="Claimed" frozen="{{ frozen }}" on-tap="{{ st.onTap }}" hint-size="280px,128px"></dc-import>
+            </div>
+            <sc-if value="{{ st.expired }}" hint-placeholder-val="{{ false }}">
+              <div data-layer="ExpiredVeil" onClick="{{ swallow }}" style="position:absolute;left:-4px;top:-4px;right:-4px;bottom:-4px;border-radius:36px;background:rgba(227,217,204,.84);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;cursor:default">
+                <div style="width:128px;height:128px;box-sizing:border-box;border-radius:64px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center"><img src="icons/icon_lock.svg" alt="" style="width:64px;height:64px;display:block"></div>
+                <div style="height:72px;box-sizing:border-box;padding:0 30px;border-radius:36px;background:#FFF8F0;border:4px solid #2D3436;display:flex;align-items:center;font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436">Expired</div>
+              </div>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ restoreOn }}" hint-placeholder-val="{{ true }}">
+            <div data-layer="TabEnd" style="display:flex;justify-content:center">
+              <div data-layer="RestoreLink" onClick="{{ onRestore }}" style="height:120px;padding:0 32px;display:flex;align-items:center;cursor:pointer;font:800 38px/1 Nunito,system-ui,sans-serif;color:{{ restoreInk }};text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:8px;white-space:nowrap">{{ restoreText }}</div>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+
+    <div data-layer="ShopTabBar" style="position:absolute;left:0;top:0;width:1080px;height:172px;z-index:3;pointer-events:none">
+      <sc-for list="{{ awning }}" as="a" hint-placeholder-count="18">
+        <div style="position:absolute;left:{{ a.ix }}px;top:6px;width:68px;height:164px;border-radius:0 0 34px 34px;background:rgba(26,26,20,.16)"></div>
+      </sc-for>
+      <sc-for list="{{ awning }}" as="a" hint-placeholder-count="18">
+        <div style="position:absolute;left:{{ a.ix }}px;top:0;width:68px;height:164px;border-radius:0 0 34px 34px;background:#2D3436"></div>
+      </sc-for>
+      <sc-for list="{{ awning }}" as="a" hint-placeholder-count="18">
+        <div style="position:absolute;left:{{ a.x }}px;top:0;width:60px;height:160px;border-radius:0 0 30px 30px;background:{{ a.fill }}"></div>
+      </sc-for>
+      <div style="position:absolute;left:24px;top:10px;width:1032px;height:128px;pointer-events:auto">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <div style="position:absolute;left:{{ t.x }}px;top:0;width:249px;height:120px;box-sizing:border-box;border-radius:60px;background:#FFFFFF;border:3px solid #2D3436"></div>
+        </sc-for>
+        <div data-layer="ShopTabThumb" style="position:absolute;top:0;width:249px;height:120px;box-sizing:border-box;border-radius:60px;background:#FFB88C;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);left:{{ thumbX }}px;transition:{{ thumbTransition }}"></div>
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <div data-layer="ShopTab" data-tab="{{ t.id }}" data-active="{{ t.active }}" onClick="{{ t.onTap }}" style="position:absolute;left:{{ t.x }}px;top:0;width:249px;height:120px;display:grid;place-items:center;cursor:pointer;font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap" style-active="transform:scale(.97)">{{ t.label }}</div>
+        </sc-for>
+      </div>
+    </div>
+
+    <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="Toast" style="position:absolute;left:190px;top:1456px;width:700px;height:100px;box-sizing:border-box;border-radius:28px;background:#2D3436;display:grid;place-items:center;font:900 44px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;z-index:6;pointer-events:none;white-space:nowrap">{{ toast }}</div>
+    </sc-if>
+  </div>
+
+  <div data-layer="Footer" style="flex:0 0 144px;position:relative;z-index:5;background:#2A2233;box-shadow:0 -6px 14px rgba(20,14,26,.34)">
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+    <div style="position:relative;height:141px;display:flex">
+      <div data-layer="ActiveIndicator" style="position:absolute;top:6px;left:72px;width:72px;height:8px;border-radius:4px;z-index:1;background:#FFB88C"></div>
+      <div data-layer="Tab_Shop" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;display:grid;place-items:center;background:#FFB88C;border:2px solid rgba(45,52,54,.14)"><img src="icons/tab_shop.svg" alt="Shop" style="width:72px;height:72px;display:block;transform:translateY(-2px)"></div></div>
+      <div data-layer="Tab_Journal" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;border-radius:20px;display:grid;place-items:center"><img src="icons/tab_journal_light.svg" alt="Journal" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Home" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;border-radius:20px;display:grid;place-items:center"><img src="icons/tab_home_light.svg" alt="Home" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Camp" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;border-radius:20px;display:grid;place-items:center"><img src="icons/tab_camp_light.svg" alt="Camp" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Arena" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;border-radius:20px;display:grid;place-items:center"><img src="icons/tab_arena_light.svg" alt="Arena" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+    </div>
+  </div>
+
+  <sc-if value="{{ popOn }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="CoinPop" ref="{{ popRef }}" style="position:absolute;left:160px;top:150px;z-index:7;height:76px;box-sizing:border-box;padding:0 24px 0 12px;border-radius:38px;background:#FFD56B;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.28);display:flex;align-items:center;gap:8px;font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums;pointer-events:none">
+      <img src="icons/icon_coin.svg" alt="" style="width:52px;height:52px;display:block">{{ pop }}
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;tab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;seasons&quot;,&quot;looks&quot;,&quot;boosters&quot;,&quot;support&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;default&quot;,&quot;confirm&quot;,&quot;short_tap&quot;,&quot;bought&quot;,&quot;from_wardrobe&quot;,&quot;mh_owned&quot;,&quot;loot_lantern&quot;,&quot;loot_bought&quot;,&quot;boosters_done&quot;,&quot;support_owned&quot;,&quot;starter_busy&quot;,&quot;starter_expired&quot;,&quot;fail_cancel&quot;,&quot;fail_error&quot;,&quot;pending&quot;,&quot;restoring&quot;,&quot;restored&quot;,&quot;no_store&quot;,&quot;newbie&quot;,&quot;all_owned&quot;],&quot;default&quot;:&quot;default&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;price&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;eur&quot;,&quot;km&quot;,&quot;long&quot;],&quot;default&quot;:&quot;eur&quot;,&quot;tsType&quot;:&quot;'eur'|'km'|'long'&quot;,&quot;section&quot;:&quot;Store&quot;},&quot;coins&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:220,&quot;min&quot;:0,&quot;max&quot;:5000,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;State&quot;},&quot;starter&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;available&quot;,&quot;bought&quot;,&quot;expired&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;slot&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;pip_skin&quot;,&quot;meadow_bg&quot;,&quot;journal_frame&quot;],&quot;default&quot;:&quot;meadow_bg&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;storeResult&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;success&quot;,&quot;cancel&quot;,&quot;pending&quot;,&quot;error&quot;],&quot;default&quot;:&quot;success&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Store&quot;},&quot;frozen&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Check&quot;},&quot;transFrom&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;transT&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;}}">
+const TABS = [['seasons', 'Seasons'], ['looks', 'Looks'], ['boosters', 'Boosters'], ['support', 'Support']];
+const TI = { seasons: 0, looks: 1, boosters: 2, support: 3 };
+const TAB_W = 249, TAB_STEP = 261;
+const CONTENT_TOP = 196;
+const ALL_FREE = ['country_bloom', 'frost_orchard', 'lantern_meadow', 'amber_canopy'];
+const SEED_T1 = { clover: [80, 89, 96, 164], daisy: [90, 119, 76, 134], buttercup: [90, 125, 76, 128], tulip: [83, 117, 89, 136], sunflower: [88, 116, 80, 138] };
+const STATUS = { cancel: ['Cancelled', '#FFCCD5'], error: ['Didn’t go through', '#FFCCD5'], pending: ['Pending', '#FFE8B8'] };
+const VIGNETTE = [['daisy', 150, 'drag'], ['clover', 330, 'idle'], ['daisy', 516, 'pulse'], ['tulip', 704, 'idle'], ['daisy', 880, 'pulse']];
+
+function base(p) {
+  const coins = p.coins !== undefined && p.coins !== null && p.coins !== '' ? +p.coins : 220;
+  return {
+    coins, seeds: 100, flowers: 36,
+    owned: { meadow_sunset: 1, meadow_lavender: 1 }, equipped: { meadow_bg: 'meadow_sunset' },
+    seasons: { coral_tide: 1 }, busy: '', status: {}, confirm: '', mh: false,
+    unlocked: ['country_bloom'], star3: { pumpkin: 12, crystal_peony: 7, midnight_lotus: 4 },
+    ads: false, starter: 'available', days: 6, store: true, restoring: false,
+    toast: '', pop: '', flash: '', shakeId: '', chipRing: false, hop: {}, go: ''
+  };
+}
+// Stanja iz §9.1. `tab` = tab koji scena otvara kad prop tab = auto.
+const SCENES = {
+  default: { tab: 'seasons', label: 'Default (§9.1 / 1–4)', set: (s, tab, p) => { if (tab === 'seasons' && p.frozen) s.busy = 'season_pack_starfall_glade'; } },
+  confirm: { tab: 'looks', label: 'Looks · confirm (2nd tap buys)', set: s => { s.confirm = 'pip_sky'; s.go = 'slot:pip_skin'; } },
+  short_tap: { tab: 'looks', label: 'Looks · not enough coins, tapped', set: s => { s.shakeId = 'pip_blossom'; s.chipRing = true; s.go = 'slot:pip_skin'; } },
+  bought: { tab: 'looks', label: 'Looks · just bought', set: s => { s.coins = Math.max(0, s.coins - 200); s.owned.pip_sky = 1; s.equipped.pip_skin = 'pip_sky'; s.pop = '−200'; s.go = 'slot:pip_skin'; } },
+  from_wardrobe: { tab: 'looks', label: 'Entry · Wardrobe “More in Shop”', set: (s, tab, p) => { s.flash = p.slot || 'meadow_bg'; s.go = 'slot:' + s.flash; } },
+  mh_owned: { tab: 'boosters', label: 'Boosters · Merge Hint yours', set: s => { s.mh = true; } },
+  loot_lantern: { tab: 'boosters', label: 'Boosters · Loot Burst for Lantern Meadow', set: s => { s.unlocked = ['country_bloom', 'frost_orchard']; } },
+  loot_bought: { tab: 'boosters', label: 'Boosters · Loot Burst bought', set: s => { s.star3.pumpkin = 17; s.flowers = 41; s.toast = '+5 Harvest Pumpkin'; } },
+  boosters_done: { tab: 'boosters', label: 'Boosters · Loot Burst gone', set: s => { s.mh = true; s.unlocked = ALL_FREE.slice(); } },
+  support_owned: { tab: 'support', label: 'Support · all bought', set: s => { s.ads = true; s.starter = 'bought'; s.owned.pip_blossom = 1; } },
+  starter_busy: { tab: 'support', label: 'Support · waiting for store', set: s => { s.busy = 'starter_pack'; } },
+  starter_expired: { tab: 'support', label: 'Support · Starter Pack expired', set: s => { s.starter = 'expired'; } },
+  fail_cancel: { tab: 'seasons', label: 'Store · cancelled', set: s => { s.status.season_pack_moonlit_warren = 'cancel'; } },
+  fail_error: { tab: 'seasons', label: 'Store · failed', set: s => { s.status.season_pack_moonlit_warren = 'error'; } },
+  pending: { tab: 'seasons', label: 'Store · pending', set: s => { s.status.season_pack_moonlit_warren = 'pending'; } },
+  restoring: { tab: 'support', label: 'Support · restoring', set: s => { s.restoring = true; } },
+  restored: { tab: 'support', label: 'Support · restored', set: s => { s.ads = true; s.toast = 'Purchases restored'; } },
+  no_store: { tab: 'support', label: 'Support · no store (stub)', set: s => { s.store = false; } },
+  newbie: { tab: 'seasons', label: 'New player', set: s => { s.owned = {}; s.equipped = {}; s.seasons = {}; s.days = 7; } },
+  all_owned: { tab: 'seasons', label: 'Everything bought', set: s => { s.seasons = { moonlit_warren: 1, coral_tide: 1, starfall_glade: 1 }; s.owned = { pip_blossom: 1, pip_sky: 1, meadow_sunset: 1, meadow_lavender: 1, journal_gold: 1 }; s.equipped = { pip_skin: 'pip_blossom', meadow_bg: 'meadow_sunset', journal_frame: 'journal_gold' }; s.mh = true; s.unlocked = ALL_FREE.slice(); s.ads = true; s.starter = 'bought'; } }
+};
+
+class Component extends DCLogic {
+  chipRef = React.createRef(); popRef = React.createRef();
+  pageSeasons = React.createRef(); pageLooks = React.createRef(); pageBoosters = React.createRef(); pageSupport = React.createRef();
+  timers = [];
+  constructor(props) { super(props); this.state = Object.assign(this.fromProps(props), { M: null, cat: null }); }
+  fromProps(p) {
+    const sc = SCENES[p.scene] || SCENES.default;
+    const tab = p.tab && p.tab !== 'auto' && TI[p.tab] != null ? p.tab : sc.tab;
+    const s = base(p);
+    sc.set(s, tab, p);
+    if (p.starter && p.starter !== 'auto') s.starter = p.starter;
+    s.tab = tab; s.sceneKey = (p.scene || 'default') + '|' + tab + '|' + (p.coins ?? '') + '|' + (p.starter ?? '') + '|' + (p.slot ?? '');
+    return s;
+  }
+  componentDidMount() {
+    this._alive = true;
+    import('./shop_v2_data.js').then(M => M.loadCatalog().then(r => { if (this._alive) this.setState({ M, cat: r.cat, catSource: r.source, catSame: r.same }, () => this.goSoon()); }));
+    if (!this.props.frozen && this.state.flash) this.later(() => this.setState({ flash: '' }), 1200);
+  }
+  componentWillUnmount() { this._alive = false; this.timers.forEach(clearTimeout); }
+  componentDidUpdate(pp, ps) {
+    const p = this.props;
+    const key = (p.scene || 'default') + '|' + (p.tab && p.tab !== 'auto' ? p.tab : (SCENES[p.scene] || SCENES.default).tab) + '|' + (p.coins ?? '') + '|' + (p.starter ?? '') + '|' + (p.slot ?? '');
+    if (key !== this.state.sceneKey) { this.setState(this.fromProps(p), () => this.goSoon()); return; }
+    const prevTab = this._lastTab || this.state.tab, prevPop = this._lastPop;
+    this._lastTab = this.state.tab; this._lastPop = this.state.pop;
+    if (prevTab !== this.state.tab && !p.frozen) this.enterAnim(prevTab, this.state.tab);
+    if (!prevPop && this.state.pop && !p.frozen) this.popAnim();
+  }
+  later(fn, ms) { const t = setTimeout(() => { if (this._alive) fn(); }, ms); this.timers.push(t); }
+  pageEl(tab) { return { seasons: this.pageSeasons, looks: this.pageLooks, boosters: this.pageBoosters, support: this.pageSupport }[tab].current; }
+  goSoon() {
+    const go = this.state.go;
+    const run = () => {
+      const el = this.pageEl(this.state.tab);
+      if (!el) return;
+      if (!go) { el.scrollTop = 0; return; }
+      const [kind, id] = go.split(':');
+      const t = el.querySelector(kind === 'slot' ? '[data-slot="' + id + '"]' : '[data-card="' + id + '"]');
+      if (t) el.scrollTop = Math.max(0, t.offsetTop - CONTENT_TOP + 0);
+    };
+    requestAnimationFrame(run); this.later(run, 400); this.later(run, 1200);
+  }
+  enterAnim(from, to) {
+    const el = this.pageEl(to);
+    if (!el || !el.animate) return;
+    const dir = TI[to] > TI[from] ? 1 : -1;
+    el.animate([{ opacity: 0, transform: 'translateX(' + (48 * dir) + 'px)' }, { opacity: 1, transform: 'translateX(0)' }], { duration: 200, easing: 'cubic-bezier(.33,1,.68,1)' });
+  }
+  popAnim() {
+    const el = this.popRef.current;
+    if (el && el.animate) el.animate([{ transform: 'translateY(8px)', opacity: 0 }, { transform: 'translateY(0)', opacity: 1, offset: 0.2 }, { transform: 'translateY(-36px)', opacity: 0 }], { duration: 700, easing: 'cubic-bezier(.33,1,.68,1)', fill: 'forwards' });
+    this.later(() => this.setState({ pop: '' }), 720);
+  }
+  pulseChip() {
+    const el = this.chipRef.current;
+    if (el && el.animate) el.animate([{ transform: 'scale(1)', boxShadow: '0 0 0 0 #FFD56B' }, { transform: 'scale(1.06)', boxShadow: '0 0 0 6px #FFD56B' }, { transform: 'scale(1)', boxShadow: '0 0 0 0 #FFD56B' }], { duration: 300, easing: 'ease-out' });
+  }
+  toast(t) { this.setState({ toast: t }); if (!this.props.frozen) this.later(() => this.setState({ toast: '' }), 1600); }
+  moneyState(sku) { const s = this.state; if (s.busy === sku) return 'busy'; if (s.busy || s.restoring || s.status[sku] === 'pending') return 'dim'; return 'buy'; }
+  buyMoney(sku, grant) {
+    const s = this.state;
+    if (s.busy || s.restoring || this.props.frozen) return;
+    const st = Object.assign({}, s.status); delete st[sku];
+    this.setState({ busy: sku, status: st });
+    this.later(() => {
+      const r = this.props.storeResult || 'success';
+      if (r === 'success') { this.setState({ busy: '' }); grant(); }
+      else this.setState(x => ({ busy: '', status: Object.assign({}, x.status, { [sku]: r === 'pending' ? 'pending' : r === 'cancel' ? 'cancel' : 'error' }) }));
+    }, 1400);
+  }
+  statusOf(sku) { const k = this.state.status[sku]; const v = STATUS[k]; return v ? { hasStatus: true, statusText: v[0], statusBg: v[1] } : { hasStatus: false, statusText: '', statusBg: '#FFF8F0' }; }
+  setTab(t) { if (t !== this.state.tab) this.setState({ tab: t }); }
+
+  renderVals() {
+    const p = this.props, s = this.state, M = s.M, frozen = !!p.frozen;
+    const P = M ? (M.PRICES[p.price] || M.PRICES.eur) : {};
+    const tab = s.tab;
+    const tf = p.transFrom && TI[p.transFrom] != null && p.transFrom !== tab ? p.transFrom : null;
+    const tt = tf ? Math.max(0, Math.min(1, +(p.transT ?? 1))) : 1;
+    const e = 1 - Math.pow(1 - tt, 3);
+    const show = id => !frozen || id === tab || id === tf;
+    const pageStyle = id => {
+      if (id === tab) {
+        if (tf) { const dir = TI[tab] > TI[tf] ? 1 : -1; return 'visibility:visible;opacity:' + e.toFixed(3) + ';transform:translateX(' + (48 * dir * (1 - e)).toFixed(1) + 'px);z-index:2'; }
+        return 'visibility:visible;opacity:1;z-index:1';
+      }
+      if (id === tf) return 'visibility:visible;opacity:' + (1 - e).toFixed(3) + ';z-index:1;pointer-events:none';
+      return 'visibility:hidden;opacity:0;pointer-events:none';
+    };
+    const thumbX = tf ? TI[tf] * TAB_STEP + (TI[tab] - TI[tf]) * TAB_STEP * e : TI[tab] * TAB_STEP;
+
+    // Seasons
+    const seasonCards = M && show('seasons') ? M.PREMIUM.map(id => {
+      const d = M.SEASONS[id], b = M.bands(d.g), owned = !!s.seasons[id], soon = !!d.soon;
+      const st = this.statusOf(d.sku);
+      const state = owned ? 'buy' : this.moneyState(d.sku);
+      return Object.assign({
+        id, name: d.name, sky: b.sky, far: b.far, near: b.near, soon, sellsOn: !soon, sells: soon || owned ? 'no' : 'yes',
+        portraits: M.seasonPortraits(id),
+        kind: owned ? 'play' : 'money', state, price: P[d.sku] || '', label: 'Play',
+        onTap: () => owned ? this.toast('Opening ' + d.name + ' on Home') : this.buyMoney(d.sku, () => this.setState(x => ({ seasons: Object.assign({}, x.seasons, { [id]: 1 }) })))
+      }, owned ? { hasStatus: false } : st);
+    }) : [];
+
+    // Looks — iz cosmetics.json (isti katalog kao Ormar)
+    const cat = s.cat;
+    const eq = s.equipped;
+    const pipItem = cat && eq.pip_skin ? cat.items.find(i => i.id === eq.pip_skin) : null;
+    const slots = cat && show('looks') ? cat.slots.slice().sort((a, b) => a.order - b.order).map(sl => {
+      const items = cat.items.filter(i => i.slot === sl.id && i.source === 'shop').sort((a, b) => a.order - b.order).map(i => {
+        const owned = !!s.owned[i.id], worn = owned && eq[sl.id] === i.id;
+        let state = 'short';
+        if (owned) state = 'owned'; else if (s.confirm === i.id) state = 'confirm'; else if (s.coins >= i.coin_cost) state = 'buy';
+        const shaking = frozen && s.shakeId === i.id;
+        return {
+          id: i.id, title: i.title, look: i.look, worn, sells: owned ? 'no' : 'yes',
+          fill: worn ? '#FFF6D6' : '#FFFFFF', kind: 'coins', state, price: String(i.coin_cost), label: worn ? 'Wearing' : 'Owned',
+          hop: s.hop[i.id] || 0, shakeKey: s.shakeId === i.id && !frozen ? 1 : 0, btnTf: shaking ? 'translateX(-12px)' : 'none',
+          onTap: () => {
+            if (frozen) return;
+            if (state === 'buy') { this.setState({ confirm: i.id }); clearTimeout(this._ct); this._ct = setTimeout(() => this._alive && this.setState(x => x.confirm === i.id ? { confirm: '' } : null), 3000); }
+            else if (state === 'confirm') {
+              clearTimeout(this._ct);
+              this.setState(x => ({ coins: x.coins - i.coin_cost, confirm: '', pop: '−' + i.coin_cost, owned: Object.assign({}, x.owned, { [i.id]: 1 }), equipped: Object.assign({}, x.equipped, { [sl.id]: i.id }), hop: Object.assign({}, x.hop, { [i.id]: (x.hop[i.id] || 0) + 1 }) }));
+            }
+          }
+        };
+      });
+      const flash = s.flash === sl.id;
+      return { id: sl.id, title: sl.title, icon: M.iconUrl(sl.icon), kind: sl.preview, subject: (sl.preview_args && sl.preview_args.subject) || 'pip', items, headBg: flash ? '#FFF6D6' : 'transparent', headEdge: flash ? '#2D3436' : 'transparent' };
+    }) : [];
+
+    // Boosters
+    const lt = M ? M.lootTarget(s.unlocked) : null;
+    const mhOn = !!M && show('boosters');
+    const mhSt = this.statusOf('booster_merge_hint');
+    const mh = Object.assign({ state: s.mh ? 'owned' : this.moneyState('booster_merge_hint'), price: P.booster_merge_hint || '', sells: s.mh ? 'no' : 'yes', fill: s.mh ? '#FFF6D6' : '#FFFFFF',
+      onTap: () => this.buyMoney('booster_merge_hint', () => this.setState({ mh: true })) }, s.mh ? { hasStatus: false } : mhSt);
+    mh.lineOn = !mh.hasStatus;
+    let loot = { far: '#E6F2DB', sky: '#EEF6E6', near: '#D6E1CC', portrait: null, flower: '', nextName: '', count: '', haveW: 0, addX: 0, addW: 0, state: 'buy', price: '', hasStatus: false };
+    if (lt && M) {
+      const b = M.bands(M.SEASONS[lt.from].g), have = Math.min(20, s.star3[lt.flower] || 0), add = Math.min(5, 20 - have), W = 616;
+      loot = Object.assign({ far: b.far, sky: b.sky, near: b.near, portrait: M.portrait(lt.flower, lt.from, 3, 204), flower: lt.flower, nextName: lt.nextName, count: have + ' / 20',
+        haveW: Math.round(W * have / 20), addX: Math.round(W * have / 20) + 4, addW: Math.max(0, Math.round(W * add / 20) - 8), state: this.moneyState('booster_loot_burst'), price: P.booster_loot_burst || '',
+        onTap: () => this.buyMoney('booster_loot_burst', () => { this.setState(x => ({ star3: Object.assign({}, x.star3, { [lt.flower]: (x.star3[lt.flower] || 0) + 5 }), flowers: x.flowers + 5 })); this.toast('+5 ' + lt.flowerName); }) }, this.statusOf('booster_loot_burst'));
+    }
+    const vignette = VIGNETTE.map(v => ({ type: v[0], state: v[2], l: v[1] - 67.2 - 4, t: 150 - 67.2 - 4 }));
+
+    // Support
+    const raSt = this.statusOf('remove_ads');
+    const ra = Object.assign({ state: s.ads ? 'owned' : this.moneyState('remove_ads'), price: P.remove_ads || '', sells: s.ads ? 'no' : 'yes', fill: s.ads ? '#FFF6D6' : '#FFFFFF',
+      onTap: () => this.buyMoney('remove_ads', () => { this.setState({ ads: true }); this.toast('Ads are off'); }) }, s.ads ? { hasStatus: false } : raSt);
+    ra.lineOn = !ra.hasStatus;
+    const expired = s.starter === 'expired', bought = s.starter === 'bought';
+    const stS = this.statusOf('starter_pack');
+    const st = Object.assign({ state: bought ? 'owned' : expired ? 'dim' : this.moneyState('starter_pack'), price: P.starter_pack || '', sells: bought || expired ? 'no' : 'yes', fill: bought ? '#FFF6D6' : '#FFFFFF', expired,
+      skinOwned: !!s.owned.pip_blossom, timeText: s.days <= 1 ? '5h left' : s.days + 'd left',
+      onTap: () => this.buyMoney('starter_pack', () => { this.setState(x => ({ starter: 'bought', coins: x.coins + 100, seeds: x.seeds + 50, owned: Object.assign({}, x.owned, { pip_blossom: 1 }) })); this.toast('Pack added'); }) }, (bought || expired) ? { hasStatus: false } : stS);
+    st.timeOn = !bought && !expired && !st.hasStatus;
+    const starterSeeds = ['clover', 'daisy', 'buttercup', 'tulip', 'sunflower'].map(t => { const c = SEED_T1[t], box = 40, k = box / Math.max(c[2], c[3]); return { src: 'icons/flowers/' + t + '_t1.svg', size: +(256 * k).toFixed(2), left: +((48 - c[2] * k) / 2 - c[0] * k).toFixed(2), top: +((48 - c[3] * k) / 2 - c[1] * k).toFixed(2) }; });
+
+    const sc = SCENES[p.scene] || SCENES.default;
+    return {
+      screenLabel: 'Shop · ' + tab + ' · ' + sc.label,
+      catSource: s.catSource || '', catSame: s.catSame ? 'yes' : 'no', activeTab: tab,
+      frozen, chipRef: this.chipRef, popRef: this.popRef,
+      pageSeasons: this.pageSeasons, pageLooks: this.pageLooks, pageBoosters: this.pageBoosters, pageSupport: this.pageSupport,
+      coinsText: s.coins.toLocaleString('en-US'), seedsText: String(s.seeds), flowersText: String(s.flowers),
+      chipShadow: s.chipRing && frozen ? '0 0 0 6px #FFD56B' : 'none', chipTf: s.chipRing && frozen ? 'scale(1.06)' : 'none',
+      pageStyleSeasons: pageStyle('seasons'), pageStyleLooks: pageStyle('looks'), pageStyleBoosters: pageStyle('boosters'), pageStyleSupport: pageStyle('support'),
+      awning: Array.from({ length: 18 }, (_, i) => ({ x: i * 60, ix: i * 60 - 4, fill: i % 2 ? '#FFF8F0' : '#A8E6CF' })),
+      tabs: TABS.map(([id, label], i) => ({ id, label, x: i * TAB_STEP, active: id === tab ? 'yes' : 'no', onTap: () => this.setTab(id) })),
+      thumbX: thumbX.toFixed(1), thumbTransition: frozen ? 'none' : 'left .2s cubic-bezier(.33,1,.68,1)',
+      seasonCards,
+      slots, pipLook: pipItem && pipItem.look ? pipItem.look.recolor : null, looksOn: !!cat && show('looks'),
+      onShort: () => this.pulseChip(),
+      onWardrobe: () => this.toast('Opening Wardrobe'),
+      mhOn, mh, vignette, lootOn: !!lt && mhOn, loot, allSet: mhOn && s.mh && !lt,
+      supportOn: !!M && show('support'), ra, st, starterSeeds, swallow: ev => { if (ev && ev.stopPropagation) ev.stopPropagation(); },
+      restoreOn: s.store, restoreText: s.restoring ? 'Restoring…' : 'Restore purchases', restoreInk: s.busy ? '#555C5E' : '#2D3436',
+      onRestore: () => { if (s.restoring || s.busy || frozen) return; this.setState({ restoring: true }); this.later(() => { this.setState({ restoring: false }); this.toast('Nothing new to restore'); }, 1400); },
+      toastOn: !!s.toast, toast: s.toast,
+      popOn: !!s.pop, pop: s.pop
+    };
+  }
+}
+</script>
+</body>
+</html>

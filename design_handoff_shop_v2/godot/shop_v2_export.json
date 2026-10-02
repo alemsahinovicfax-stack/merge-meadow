@@ -1,0 +1,528 @@
+{
+  "$schema_version": "2.0",
+  "generated": "2026-10-02",
+  "source": "design_handoff_shop_v2/design/ShopScreen.dc.html · ArenaMergeHint.dc.html · Shop Specs.dc.html",
+  "brief": "docs/04-experience/design-drafts/shop-v2-cd-brief.md",
+  "direction": "jedan dizajn — tezga na livadi (tenda + pergament)",
+  "note": "Sve u px baze 1080 x 1920 (1:1). Boje sRGB hex. Bez blura, glowa, gradijenata; jedna tvrda sjena (blur 0).",
+  "meta": {
+    "base": {
+      "w": 1080,
+      "h": 1920
+    },
+    "header": {
+      "h": 143,
+      "given": "hub chrome v2 — ne dirati"
+    },
+    "page": {
+      "x": 0,
+      "y": 143,
+      "w": 1080,
+      "h": 1633
+    },
+    "footer": {
+      "h": 144,
+      "given": "hub chrome v2 — ne dirati",
+      "active": "shop"
+    },
+    "minimums": {
+      "text": 34,
+      "name_and_price": 44,
+      "touch": 120,
+      "contrast": 4.5
+    },
+    "gestures": "tab = tap; vodoravni swipe ostaje hub pageru",
+    "loops_max": 1
+  },
+  "tokens": {
+    "color": {
+      "page": "#FBEDD7",
+      "awning_a": "#A8E6CF",
+      "awning_b": "#FFF8F0",
+      "card": "#FFFFFF",
+      "card_yours": "#FFF6D6",
+      "ink": "#2D3436",
+      "ink_name_on_season": "#1A1A14",
+      "ink_sub": "#555C5E",
+      "tab_idle": "#FFFFFF",
+      "tab_active": "#FFB88C",
+      "coins": "#FFD56B",
+      "coins_confirm_bg": "#2D3436",
+      "coins_confirm_ink": "#FFD56B",
+      "coins_short": "#F1EAE0",
+      "money": "#D4A5FF",
+      "money_soft": "#EAD2FF",
+      "play": "#FFB88C",
+      "owned": "#A8E6CF",
+      "status_fail": "#FFCCD5",
+      "status_pending": "#FFE8B8",
+      "coin_tile": "#FFE8B8",
+      "seed_tile": "#DCF5EC",
+      "hint_band": "#DCF5EC",
+      "veil": "rgba(227,217,204,0.84)",
+      "portrait_disc": "#FFF8F0",
+      "toast": "#2D3436"
+    },
+    "shadow_hard": {
+      "card": "0 10 0 rgba(26,26,20,0.22)",
+      "button": "0 8 0 rgba(26,26,20,0.28)",
+      "tab_thumb": "0 6 0 rgba(26,26,20,0.24)",
+      "awning": "0 6 0 rgba(26,26,20,0.16)"
+    },
+    "radius": {
+      "card": 36,
+      "preview": 24,
+      "button": 60,
+      "tab": 60,
+      "status": 28,
+      "slot_header": 48
+    },
+    "border": {
+      "card": 4,
+      "button": 4,
+      "tab_idle": 3,
+      "tab_active": 4,
+      "preview": 4,
+      "portrait": 4,
+      "status": 3
+    },
+    "font": {
+      "family": "Nunito (900/800)",
+      "name": 52,
+      "price": 52,
+      "price_long": 44,
+      "price_long_chars": 7,
+      "tab": 44,
+      "slot_title": 48,
+      "sub": 36,
+      "status": 34,
+      "toast": 44,
+      "restore": 38
+    }
+  },
+  "layout": {
+    "ShopTabBar": {
+      "rect": [
+        0,
+        0,
+        1080,
+        172
+      ],
+      "z": 3,
+      "awning": {
+        "stripes": 18,
+        "stripe_w": 60,
+        "h": 160,
+        "scallop_r": 30,
+        "ink_edge": 4
+      },
+      "tabs": {
+        "x0": 24,
+        "y": 10,
+        "w": 249,
+        "h": 120,
+        "step": 261
+      },
+      "thumb": {
+        "fill": "tab_active",
+        "border": 4,
+        "slide_s": 0.2,
+        "ease": "cubic_out"
+      }
+    },
+    "TabPage": {
+      "count": 4,
+      "rect": [
+        0,
+        0,
+        1080,
+        1633
+      ],
+      "type": "ScrollContainer (vertikalno)",
+      "content_padding": [
+        196,
+        24,
+        64,
+        24
+      ],
+      "card_gap": 32,
+      "looks_slot_gap": 44,
+      "keeps_scroll": "dok je igrač u Shopu (visible=false, ne queue_free)"
+    },
+    "order": [
+      "seasons",
+      "looks",
+      "boosters",
+      "support"
+    ],
+    "entry": {
+      "footer": "seasons, scroll 0",
+      "wardrobe_more_in_shop": "looks, scroll na LooksSlot(slot), SlotHeader flash #FFF6D6 1.2 s"
+    },
+    "tab_change": {
+      "out": "alpha 1→0 0.2 s",
+      "in": "alpha 0→1 + x ±48→0 0.2 s cubic_out (smjer po indeksu)"
+    }
+  },
+  "components": {
+    "BuyButton": {
+      "h": 120,
+      "min_w": 280,
+      "radius": 60,
+      "border": 4,
+      "grows_with_text": true,
+      "states": {
+        "coins.buy": {
+          "fill": "coins",
+          "content": "icon_coin 60 + cijena 52",
+          "shadow": "button",
+          "tap": "→ coins.confirm (3 s timeout nazad)"
+        },
+        "coins.confirm": {
+          "fill": "coins_confirm_bg",
+          "content": "kvačica + icon_coin + cijena (#FFD56B)",
+          "tap": "kupi: buy_cosmetic_with_coins + equip"
+        },
+        "coins.short": {
+          "fill": "coins_short",
+          "border": "rgba(45,52,54,.35)",
+          "shadow": "nema",
+          "icon_alpha": 0.55,
+          "ink": "ink_sub",
+          "tap": "shake x −12/12/−8/8/0 0.32 s + puls CoinChip (scale 1.06, prsten 6 #FFD56B) 0.3 s"
+        },
+        "money.buy": {
+          "fill": "money",
+          "content": "store string 52 (44 ako > 7)",
+          "shadow": "button"
+        },
+        "money.busy": {
+          "fill": "money_soft",
+          "offset_y": 8,
+          "shadow": "nema",
+          "content": "3 tačke 20 px, alpha 0.3↔1, 0.9 s, delay 0/150/300 ms — JEDINI loop",
+          "input": false
+        },
+        "money.dim": {
+          "fill": "money_soft",
+          "border": "rgba(45,52,54,.30)",
+          "ink": "ink_sub",
+          "input": false,
+          "when": "IAPManager.is_busy() za drugi SKU, restore u toku, ili pending"
+        },
+        "play": {
+          "fill": "play",
+          "content": "▶ + Play 52",
+          "tap": "Home s fokusom na sezonu"
+        },
+        "owned": {
+          "fill": "owned",
+          "shadow": "nema",
+          "content": "kvačica + label 48",
+          "labels": [
+            "Yours",
+            "Wearing",
+            "Owned",
+            "Ads off",
+            "Claimed"
+          ]
+        }
+      },
+      "press": "y +4, sjena 8→4, 0.08 s",
+      "state_change_pop": "scale 1→1.06→1 0.22 s back_out"
+    },
+    "SeasonCard": {
+      "w": 1032,
+      "h": 364,
+      "bands": {
+        "sky": [
+          0,
+          115,
+          "g + 30 % bijele"
+        ],
+        "far": "g",
+        "near": [
+          242,
+          364,
+          "g × 0.93"
+        ]
+      },
+      "portraits": {
+        "row_h": 176,
+        "d": [
+          148,
+          148,
+          148,
+          148,
+          148,
+          172
+        ],
+        "justify": "space-between"
+      },
+      "row": {
+        "h": 120,
+        "name": 52,
+        "button": "BuyButton money | play | SoonTag"
+      },
+      "soon": {
+        "portrait_alpha": 0.5,
+        "tag": "Coming soon 44, krem, 4 px dashed ink, h 120",
+        "no_price": true
+      }
+    },
+    "FlowerPortrait": {
+      "disc": "portrait_disc, rub 4 ink",
+      "art": "CampPlantDraw.draw_cropped_plant(type, 3, d × 0.78) = UiHomeV3.draw_flower()",
+      "svg_when": "res://assets/sprites/flowers/<type>_t3.svg postoji (Country Bloom)",
+      "procedural": "★3 kristal: 4 kruga r10 + centar #FFF2BF + prsten r14 w3, stabljika #599E52 w5, ★3 tip +3 iskrice r3 bijele a .85; boja = SEASON_HUE + djb2 jitter"
+    },
+    "LooksSlot": {
+      "from": "game/data/cosmetics/cosmetics.json — slots[] po order, items[] gdje source == 'shop', po order",
+      "SlotHeader": {
+        "h": 96,
+        "icon": 64,
+        "title": 48
+      }
+    },
+    "CosmeticCard": {
+      "padding": 20,
+      "gap": 20,
+      "preview": {
+        "w": 984,
+        "h": 300,
+        "type": "ItemPreview (Ormar) kind = slot.preview, size = stage"
+      },
+      "row": {
+        "h": 120,
+        "name": 52,
+        "button": "BuyButton coins"
+      },
+      "worn": {
+        "card": "card_yours",
+        "badge": "EquippedBadge 64 gore desno (Ormar)"
+      },
+      "bought": {
+        "pip_hop": true,
+        "coin_pop": "−N, y −36 + fade 0.7 s"
+      }
+    },
+    "BoosterCard.merge_hint": {
+      "sku": "booster_merge_hint",
+      "type": "NON-CONSUMABLE (novo)",
+      "vignette": {
+        "w": 984,
+        "h": 300,
+        "content": "Country Bloom polje + 5 SeedChip + MergeHintMark"
+      },
+      "sub": "Marks the closest match",
+      "owned": "card_yours + Yours"
+    },
+    "BoosterCard.loot_burst": {
+      "sku": "booster_loot_burst",
+      "type": "consumable",
+      "visual": {
+        "w": 984,
+        "h": 260,
+        "portrait": 204,
+        "plus_badge": "+5",
+        "next": "katanac + ime sljedeće sezone + have / 20",
+        "bar": {
+          "w": 616,
+          "h": 52,
+          "have": "owned",
+          "add": "dashed seed_tile"
+        }
+      },
+      "grant": "+5 ★3 cvijeta sezone koja otključava Seasons.next_locked_free_id()",
+      "hidden_when": "next_locked_free_id() == ''"
+    },
+    "SupportCard.remove_ads": {
+      "sub": "No ads between runs",
+      "owned_label": "Ads off"
+    },
+    "StarterPackCard": {
+      "content": [
+        [
+          "coins",
+          100
+        ],
+        [
+          "cosmetic",
+          "pip_blossom"
+        ],
+        [
+          "seeds",
+          [
+            "clover",
+            "daisy",
+            "buttercup",
+            "tulip",
+            "sunflower"
+          ],
+          10
+        ]
+      ],
+      "no_merge_hint": true,
+      "tiles_h": 228,
+      "time_left_chip": "Nd left (zadnji dan: Nh left)",
+      "window_days": 7,
+      "states": [
+        "available",
+        "busy",
+        "bought",
+        "expired"
+      ],
+      "expired": {
+        "veil": "veil preko cijele kartice",
+        "lock": 128,
+        "label": "Expired 44",
+        "input": "veil guta tap"
+      },
+      "skin_already_owned": "✓ na Pip Blossom pločici"
+    },
+    "RestoreLink": {
+      "h": 120,
+      "font": 38,
+      "underline": 3,
+      "visible": "!IAPManager.is_stub_mode()",
+      "busy_text": "Restoring…"
+    },
+    "PurchaseStatus": {
+      "h": 56,
+      "font": 34,
+      "where": "ispod imena",
+      "cancel": [
+        "Cancelled",
+        "status_fail"
+      ],
+      "error": [
+        "Didn’t go through",
+        "status_fail"
+      ],
+      "pending": [
+        "Pending",
+        "status_pending"
+      ],
+      "clears": "sljedeći tap na kartici"
+    },
+    "Toast": {
+      "rect": [
+        190,
+        1456,
+        700,
+        100
+      ],
+      "radius": 28,
+      "font": 44,
+      "hold_s": 1.6
+    },
+    "MergeHintMark": {
+      "shape": "4 kutne zagrade (L)",
+      "frame": 156,
+      "arm": 40,
+      "ink_thickness": 18,
+      "band_thickness": 10,
+      "ink": "#2D3436",
+      "band": "#DCF5EC",
+      "no_glow": true
+    }
+  },
+  "arena_merge_hint": {
+    "when": "GameState.has_merge_hint() && igrač drži sjemenku",
+    "target": "najbliža sjemenka istog tipa i tiera (centar–centar)",
+    "hysteresis_px": 24,
+    "keeps": [
+      "zlatni puls na svim istim (#F2D940, 12 px)",
+      "magnet partner prsten (#FFD56B, 14 px)"
+    ],
+    "anim": {
+      "enter": "scale 1.35→1, alpha 0→1, 0.18 s back_out",
+      "move": "position 0.14 s cubic_out",
+      "exit": "alpha→0, scale→1.2, 0.12 s"
+    },
+    "contrast": {
+      "rule": "dvostruki rub Arene v2",
+      "proof_sqrt": 3.33,
+      "country_bloom_min": 3.77,
+      "moonlit_warren_min": 5.78,
+      "all_8_min": 3.36
+    },
+    "remove": "oblačić 'Hint: merge two … seeds.'"
+  },
+  "scenes": [
+    "default",
+    "confirm",
+    "short_tap",
+    "bought",
+    "from_wardrobe",
+    "mh_owned",
+    "loot_lantern",
+    "loot_bought",
+    "boosters_done",
+    "support_owned",
+    "starter_busy",
+    "starter_expired",
+    "fail_cancel",
+    "fail_error",
+    "pending",
+    "restoring",
+    "restored",
+    "no_store",
+    "newbie",
+    "all_owned"
+  ],
+  "strings_en": {
+    "tabs": [
+      "Seasons",
+      "Looks",
+      "Boosters",
+      "Support"
+    ],
+    "coming_soon": "Coming soon",
+    "play": "Play",
+    "yours": "Yours",
+    "wearing": "Wearing",
+    "owned": "Owned",
+    "ads_off": "Ads off",
+    "claimed": "Claimed",
+    "expired": "Expired",
+    "merge_hint": "Merge Hint",
+    "merge_hint_sub": "Marks the closest match",
+    "loot_burst": "Loot Burst",
+    "remove_ads": "Remove Ads",
+    "remove_ads_sub": "No ads between runs",
+    "starter_pack": "Starter Pack",
+    "days_left": "{n}d left",
+    "hours_left": "{n}h left",
+    "restore": "Restore purchases",
+    "restoring": "Restoring…",
+    "cancelled": "Cancelled",
+    "failed": "Didn’t go through",
+    "pending": "Pending",
+    "wardrobe": "Wardrobe",
+    "all_set": "All set here",
+    "toast_restored": "Purchases restored",
+    "toast_nothing": "Nothing new to restore",
+    "toast_ads": "Ads are off",
+    "toast_pack": "Pack added",
+    "toast_loot": "+5 {flower}"
+  },
+  "assets": {
+    "existing": [
+      "res://assets/ui/chrome/icon_coin.svg",
+      "icon_seed.svg",
+      "icon_flower.svg",
+      "icon_lock.svg",
+      "icon_wardrobe.svg",
+      "pip_blossom.svg",
+      "slot_*.svg (Ormar)",
+      "sprites/flowers/*_t1.svg, *_t3.svg"
+    ],
+    "new": []
+  },
+  "economy_changes_needed": [
+    "booster_merge_hint: consumable → non-consumable (IAPManager + MonetizationConfig + GameState.merge_hint_owned)",
+    "booster_loot_burst: grant = 5 × ★3 sezone koja gate-a next_locked_free_id() (umjesto +5 sjemenki)",
+    "starter_pack: 100 coina + pip_blossom + 10 × clover/daisy/buttercup/tulip/sunflower, bez Merge Hinta; prozor 7 dana od first_launch_unix"
+  ]
+}

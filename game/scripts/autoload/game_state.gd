@@ -156,13 +156,10 @@ var seasons_domain: SeasonsDomain
 var save_migrations: SaveMigrations
 var debug: GameStateDebug
 
-## Kept as a var (not moved into Boosters) because merge_arena_controller.gd
-## reads it directly as GameState.merge_hint_booster_active in two places;
-## this getter/setter keeps that working while boosters.merge_hint_active
-## stays the single source of truth.
-var merge_hint_booster_active: bool:
-	get: return boosters.merge_hint_active
-	set(value): boosters.merge_hint_active = value
+## Shop v2: Merge Hint je jednokratna kupovina — boosters.merge_hint_owned je izvor.
+var merge_hint_owned: bool:
+	get: return boosters.merge_hint_owned
+	set(value): boosters.merge_hint_owned = value
 
 var magnet_level: int = 0
 var multiplier_level: int = 0
@@ -182,6 +179,10 @@ var tutorial_step: int:
 
 var ads_removed: bool = false
 var starter_pack_owned: bool = false
+## Unix vrijeme prvog pokretanja — Starter Pack se nudi 7 dana od njega
+## (MonetizationConfig.STARTER_PACK_DAYS). Stari saveovi: počinje pri prvom
+## pokretanju verzije koja ga zna.
+var first_launch_unix: int = 0
 var run_level: int = 1
 var endless_runs_completed: int = 0
 var endless_difficulty: int = EndlessDifficulty.NORMAL
@@ -285,6 +286,7 @@ func _ready() -> void:
 		tutorial.migrate_legacy_flags()
 		debug.apply_resources_if_new_game()
 		_normalize_season_progress()
+		_ensure_first_launch()
 	else:
 		apply_debug_leftover_test_bag()
 
@@ -314,6 +316,7 @@ func save_player_save() -> void:
 		"greenhouse_beds": _serialize_beds(greenhouse_beds),
 		"ads_removed": ads_removed,
 		"starter_pack_owned": starter_pack_owned,
+		"first_launch_unix": first_launch_unix,
 		"run_level": run_level,
 		"endless_runs_completed": endless_runs_completed,
 		"endless_difficulty": endless_difficulty,
@@ -540,6 +543,7 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	boosters.apply_from_save(data)
 	ads_removed = bool(data.get("ads_removed", false))
 	starter_pack_owned = bool(data.get("starter_pack_owned", false))
+	first_launch_unix = maxi(0, int(data.get("first_launch_unix", 0)))
 	run_level = clampi(int(data.get("run_level", 1)), 1, RunLevelLibrary.MAX_RUN_LEVEL)
 	endless_runs_completed = maxi(0, int(data.get("endless_runs_completed", 0)))
 	endless_difficulty = clampi(
@@ -564,7 +568,26 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	_refresh_seed_unlock_from_lifetime()
 	if not is_seed_type_unlocked(loadout_type_id):
 		loadout_type_id = ""
+	_ensure_first_launch()
+	if boosters.migrate_legacy_inventory():
+		save_player_save()
 	return true
+
+
+func _ensure_first_launch() -> void:
+	if first_launch_unix <= 0:
+		first_launch_unix = int(Time.get_unix_time_from_system())
+
+
+## Starter Pack: preostale sekunde ponude (0 = istekla). Kupljen pack se ne gleda ovdje.
+func starter_pack_seconds_left() -> int:
+	_ensure_first_launch()
+	var end := first_launch_unix + MonetizationConfig.STARTER_PACK_DAYS * 86400
+	return maxi(0, end - int(Time.get_unix_time_from_system()))
+
+
+func is_starter_pack_expired() -> bool:
+	return not starter_pack_owned and starter_pack_seconds_left() <= 0
 
 
 func _serialize_beds(beds: Array) -> Array:
@@ -1892,17 +1915,26 @@ func get_booster_count(booster_id: String) -> int:
 	return boosters.count(booster_id)
 
 
-func add_booster(booster_id: String, count: int = 1) -> void:
-	boosters.add(booster_id, count)
+## Loot Burst cilj za Shop: {next, from, flower, have, need, add} ili {}.
+func get_loot_burst_target() -> Dictionary:
+	return boosters.loot_target()
 
 
-func use_booster(booster_id: String) -> String:
-	return boosters.use(booster_id)
+func can_buy_loot_burst() -> bool:
+	return boosters.can_buy_loot_burst()
 
 
-func consume_merge_hint_booster() -> bool:
-	return boosters.consume_merge_hint()
-
-
-func get_merge_hint_message(chip_data: Dictionary) -> String:
-	return boosters.get_merge_hint_message(chip_data)
+## Starter Pack sadržaj (MonetizationConfig): coini, Pip Blossom (ako nije tvoj, odmah se
+## nosi kad je slot prazan) i po 10 sjemenki prvih 5 tipova — bez limita vreće (plaćeno).
+func grant_starter_pack() -> void:
+	starter_pack_owned = true
+	wallet_coins += MonetizationConfig.STARTER_PACK_COINS
+	var skin := MonetizationConfig.STARTER_PACK_COSMETIC
+	if not cosmetics.owns(skin):
+		cosmetics.owned[skin] = true
+		if cosmetics.get_equipped(CosmeticCatalog.get_slot(skin)).is_empty():
+			cosmetics.equipped[CosmeticCatalog.get_slot(skin)] = skin
+			cosmetics_changed.emit([CosmeticCatalog.get_slot(skin)])
+	for type_id in MonetizationConfig.STARTER_PACK_SEED_TYPES:
+		add_seeds_to_bag_unbounded(type_id, MonetizationConfig.STARTER_PACK_SEEDS_EACH)
+	save_player_save()

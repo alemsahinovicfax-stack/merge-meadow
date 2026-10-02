@@ -144,25 +144,45 @@ func _run() -> void:
 	arena.call("_clear_field_chips")
 	await _frames(2)
 
-	# Merge Hint booster (IAP) nema traku — poruka mora stici u oblacic iznad vrece.
-	gs.set("merge_hint_booster_active", true)
-	arena.call("_apply_merge_hint_if_ready")
-	await _frames(4)
-	var cue: Object = arena.get("_cue")
-	if cue == null:
-		_fail("ArenaCue missing")
+	# Merge Hint (Shop v2, jednokratna kupovina): dok igrač drži sjemenku, najbliža ista
+	# sjemenka dobije MergeHintMark; bez kupovine nema oznake; pustanjem oznaka nestaje.
+	gs.set("seed_bag", {"clover": 4})
+	arena.call("_on_bag_clicked")
+	await _frames(8)
+	var chips: Array = arena.get("_chips")
+	if chips.size() < 3:
+		_fail("need at least 3 clover chips for the hint check, got %d" % chips.size())
 		_finish(backup, gs)
 		return
-	if not bool(cue.call("is_cue_visible")):
-		_fail("merge hint should show the cue bubble")
+	var held: Control = chips[0]
+	gs.set("merge_hint_owned", false)
+	held.set("_dragging", true)
+	await _frames(3)
+	if arena.call("get_merge_hint_target") != null:
+		_fail("no Merge Hint mark without the purchase")
 		_finish(backup, gs)
 		return
-	if not str(cue.call("get_text")).begins_with("Hint:"):
-		_fail("cue should carry the merge hint, got %s" % str(cue.call("get_text")))
+	gs.set("merge_hint_owned", true)
+	await _frames(3)
+	var target: Node = arena.call("get_merge_hint_target")
+	var nearest: Node = null
+	var best := INF
+	for c in chips:
+		if c == held:
+			continue
+		var d: float = (held.call("get_center") as Vector2).distance_to(c.call("get_center"))
+		if d < best:
+			best = d
+			nearest = c
+	if target == null or target != nearest:
+		_fail("Merge Hint should mark the nearest matching seed")
 		_finish(backup, gs)
 		return
-	if bool(gs.get("merge_hint_booster_active")):
-		_fail("merge hint booster should be consumed")
+	held.set("_dragging", false)
+	await _frames(12)
+	if arena.call("get_merge_hint_target") != null:
+		_fail("Merge Hint mark should go away on release")
 		_finish(backup, gs)
 		return
+	gs.set("merge_hint_owned", false)
 	_finish(backup, gs)

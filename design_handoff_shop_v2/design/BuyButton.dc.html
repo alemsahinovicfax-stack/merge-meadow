@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="BuyButton" data-kind="{{ kind }}" data-state="{{ state }}" data-tappable="{{ tappable }}" ref="{{ rootRef }}" onClick="{{ tap }}" style="display:flex;flex:0 0 auto;font-family:Nunito,system-ui,sans-serif;user-select:none">
+  <sc-if value="{{ coinBuy }}" hint-placeholder-val="{{ false }}">
+    <div style="height:120px;min-width:280px;box-sizing:border-box;padding:0 40px 0 30px;border-radius:60px;background:#FFD56B;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:14px;cursor:pointer" style-active="transform:translateY(4px);box-shadow:0 4px 0 rgba(26,26,20,.28)">
+      <img src="icons/icon_coin.svg" alt="" style="width:60px;height:60px;flex:0 0 auto;display:block">
+      <span data-role="price" style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums;white-space:nowrap">{{ price }}</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{ coinConfirm }}" hint-placeholder-val="{{ false }}">
+    <div style="height:120px;min-width:280px;box-sizing:border-box;padding:0 40px 0 34px;border-radius:60px;background:#2D3436;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:14px;cursor:pointer" style-active="transform:translateY(4px);box-shadow:0 4px 0 rgba(26,26,20,.28)">
+      <div style="width:16px;height:30px;flex:0 0 auto;box-sizing:border-box;border-right:8px solid #FFD56B;border-bottom:8px solid #FFD56B;transform:rotate(45deg) translate(-3px,-5px);margin:0 6px 0 2px"></div>
+      <img src="icons/icon_coin.svg" alt="" style="width:60px;height:60px;flex:0 0 auto;display:block">
+      <span data-role="price" style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#FFD56B;font-variant-numeric:tabular-nums;white-space:nowrap">{{ price }}</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{ coinShort }}" hint-placeholder-val="{{ false }}">
+    <div style="height:120px;min-width:280px;box-sizing:border-box;padding:0 40px 0 30px;border-radius:60px;background:#F1EAE0;border:4px solid rgba(45,52,54,.35);display:flex;align-items:center;justify-content:center;gap:14px;cursor:default">
+      <img src="icons/icon_coin.svg" alt="" style="width:60px;height:60px;flex:0 0 auto;display:block;opacity:.55">
+      <span data-role="price" style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#555C5E;font-variant-numeric:tabular-nums;white-space:nowrap">{{ price }}</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{ moneyBuy }}" hint-placeholder-val="{{ false }}">
+    <div style="height:120px;min-width:280px;box-sizing:border-box;padding:0 44px;border-radius:60px;background:#D4A5FF;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;cursor:pointer" style-active="transform:translateY(4px);box-shadow:0 4px 0 rgba(26,26,20,.28)">
+      <span data-role="price" style="font:900 {{ fs }}px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums;white-space:nowrap">{{ price }}</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{ moneyBusy }}" hint-placeholder-val="{{ false }}">
+    <div style="height:120px;min-width:280px;box-sizing:border-box;padding:0 44px;border-radius:60px;background:#EAD2FF;border:4px solid #2D3436;transform:translateY(8px);display:flex;align-items:center;justify-content:center;gap:14px;cursor:default">
+      <div ref="{{ dot0 }}" style="width:20px;height:20px;border-radius:50%;background:#2D3436;opacity:.35"></div>
+      <div ref="{{ dot1 }}" style="width:20px;height:20px;border-radius:50%;background:#2D3436;opacity:.7"></div>
+      <div ref="{{ dot2 }}" style="width:20px;height:20px;border-radius:50%;background:#2D3436"></div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ moneyDim }}" hint-placeholder-val="{{ false }}">
+    <div style="height:120px;min-width:280px;box-sizing:border-box;padding:0 44px;border-radius:60px;background:#EAD2FF;border:4px solid rgba(45,52,54,.30);display:flex;align-items:center;justify-content:center;cursor:default">
+      <span data-role="price" style="font:900 {{ fs }}px/1 Nunito,system-ui,sans-serif;color:#555C5E;font-variant-numeric:tabular-nums;white-space:nowrap">{{ price }}</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{ play }}" hint-placeholder-val="{{ false }}">
+    <div style="height:120px;min-width:280px;box-sizing:border-box;padding:0 48px 0 42px;border-radius:60px;background:#FFB88C;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:20px;cursor:pointer" style-active="transform:translateY(4px);box-shadow:0 4px 0 rgba(26,26,20,.28)">
+      <div style="width:0;height:0;flex:0 0 auto;border-top:24px solid transparent;border-bottom:24px solid transparent;border-left:38px solid #2D3436;margin-left:6px"></div>
+      <span style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Play</span>
+    </div>
+  </sc-if>
+  <sc-if value="{{ owned }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="OwnedTag" style="height:120px;min-width:280px;box-sizing:border-box;padding:0 44px 0 40px;border-radius:60px;background:#A8E6CF;border:4px solid #2D3436;display:flex;align-items:center;justify-content:center;gap:18px;cursor:default">
+      <div style="width:18px;height:34px;flex:0 0 auto;box-sizing:border-box;border-right:8px solid #2D3436;border-bottom:8px solid #2D3436;transform:rotate(45deg) translate(-3px,-5px);margin-right:4px"></div>
+      <span style="font:900 48px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ label }}</span>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:420,&quot;height&quot;:160},&quot;kind&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;coins&quot;,&quot;money&quot;,&quot;play&quot;],&quot;default&quot;:&quot;money&quot;,&quot;tsType&quot;:&quot;'coins'|'money'|'play'&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;buy&quot;,&quot;confirm&quot;,&quot;short&quot;,&quot;busy&quot;,&quot;dim&quot;,&quot;owned&quot;],&quot;default&quot;:&quot;buy&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;price&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;€2.99&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;label&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Yours&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;frozen&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;shakeKey&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;onTap&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onShort&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  dot0 = React.createRef(); dot1 = React.createRef(); dot2 = React.createRef();
+  componentDidMount() { this.sync(null); }
+  componentDidUpdate(pp) { this.sync(pp); }
+  componentWillUnmount() { this.stopDots(); }
+  key() { const p = this.props; return (p.kind || 'money') + ':' + (p.state || 'buy'); }
+  sync(pp) {
+    const st = this.props.state || 'buy', busy = st === 'busy' && (this.props.kind || 'money') !== 'coins';
+    if (busy && !this.props.frozen) this.startDots(); else this.stopDots();
+    if (pp && (pp.state !== this.props.state || pp.kind !== this.props.kind) && !this.props.frozen) {
+      if (['owned', 'confirm'].includes(st) || this.props.kind === 'play') this.pop();
+    }
+    if (pp && this.props.shakeKey && pp.shakeKey !== this.props.shakeKey) this.shake();
+  }
+  startDots() {
+    if (this._anims) return;
+    const ds = [this.dot0.current, this.dot1.current, this.dot2.current];
+    if (!ds[0] || !ds[0].animate) return;
+    // jedini loop na ekranu: najvise jedno dugme ceka store u isto vrijeme
+    this._anims = ds.map((d, i) => d.animate([{ opacity: 0.3 }, { opacity: 1 }, { opacity: 0.3 }], { duration: 900, delay: i * 150, iterations: Infinity, easing: 'ease-in-out' }));
+  }
+  stopDots() { if (this._anims) { this._anims.forEach(a => a.cancel()); this._anims = null; } }
+  pop() { const el = this.rootRef.current; if (el && el.animate) el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }, { transform: 'scale(1)' }], { duration: 220, easing: 'cubic-bezier(.34,1.56,.64,1)' }); }
+  shake() { const el = this.rootRef.current; if (el && el.animate) el.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-12px)' }, { transform: 'translateX(12px)' }, { transform: 'translateX(-8px)' }, { transform: 'translateX(8px)' }, { transform: 'translateX(0)' }], { duration: 320, easing: 'ease-out' }); }
+  renderVals() {
+    const p = this.props, kind = p.kind || 'money', st = p.state || 'buy';
+    const coins = kind === 'coins';
+    const price = String(p.price ?? '');
+    const tappable = (kind === 'play') || (st === 'buy') || (coins && st === 'confirm') || (coins && st === 'short');
+    return {
+      rootRef: this.rootRef, dot0: this.dot0, dot1: this.dot1, dot2: this.dot2,
+      kind, state: st, tappable: tappable ? 'yes' : 'no', price, label: p.label || 'Yours',
+      fs: price.length > 7 ? 44 : 52,
+      coinBuy: coins && st === 'buy', coinConfirm: coins && st === 'confirm', coinShort: coins && st === 'short',
+      moneyBuy: kind === 'money' && st === 'buy', moneyBusy: kind === 'money' && st === 'busy', moneyDim: kind === 'money' && st === 'dim',
+      play: kind === 'play', owned: kind !== 'play' && st === 'owned',
+      tap: ev => {
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        if (coins && st === 'short') { this.shake(); if (p.onShort) p.onShort(); return; }
+        if (tappable && p.onTap) p.onTap();
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

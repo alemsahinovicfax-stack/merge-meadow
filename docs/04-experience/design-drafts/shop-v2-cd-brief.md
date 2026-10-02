@@ -15,7 +15,7 @@ ai_sažetak: "Brief za Claude Design: Shop redizajn 2 — četiri taba kao četi
 
 # Shop — redizajn 2 — Claude Design brief
 
-> **Status 2026-10-01: brief spreman, čeka CD.** Prompt je u §12. Paket se vraća kao `design_handoff_shop_v2/` (zip).
+> **Status 2026-10-02: prenesen u igru.** Paket `design_handoff_shop_v2/` je u repou; mehanike (Merge Hint, Loot Burst, Starter Pack) urađene. Čeka playtest. Prompt je u §12.
 
 > Prvi redizajn Shopa je u igri od 2026-09-24 ([[shop-cd-brief|brief]], paket `design_handoff_shop/`). Ovo je **runda 2**: isti sadržaj, ali Shop postaje četiri taba umjesto jedne duge stranice, s manje teksta i novim izgledom. Uz to se mijenjaju tri ponude (Merge Hint, Loot Burst, Starter Pack) — mehaniku radi agent, CD crta stanja.
 

@@ -29,7 +29,7 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - Splash → tutorial run (prvi launch) → main menu
 - Loot ekran: ×2 rewarded, revive rewarded (max 1/run), retry, u kamp
 - Kamp: merge, upgrade, daily chest
-- Shop: remove ads, starter pack, booster consumables
+- Shop: remove ads, starter pack (7 dana od prvog pokretanja), boosteri (Merge Hint jednokratan, Loot Burst consumable) — Shop v2, 2026-10-02
 
 ### Monetizacija
 - AdMob rewarded video (×2 loot, revive)

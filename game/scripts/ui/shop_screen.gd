@@ -1,73 +1,53 @@
 extends Control
 
-## Shop — design_handoff_shop (jedan dizajn, 2026-09-23).
-## Cetiri sekcije u jednom skrolu (Looks · Seasons · Boosters · Support) sa
-## sticky redom chipova. Kozmetika se kupuje u dva tapa i odmah se nosi; sve
-## poruke stoje na samoj kartici, a ne u jednoj liniji na dnu. Ekonomija,
-## katalog, SKU-ovi i cijene su nepromijenjeni.
+## Shop v2 — design_handoff_shop_v2 (jedan dizajn, 2026-10-02): tezga na livadi. Tenda s
+## četiri taba (Seasons · Looks · Boosters · Support) iznad toplog pergamenta `#FBEDD7`;
+## svaki tab je svoj ScrollContainer (neaktivni su skriveni, ne brišu se → pamte skrol dok
+## si u Shopu). Ulaz iz footera uvijek otvara Seasons od vrha; „More in Shop" iz Ormara
+## otvara Looks na slotu (zaglavlje bljesne). Na svakoj kartici koja prodaje je jedno dugme
+## koje nosi cijenu i kupuje. SKU-ovi i cijene su nepromijenjeni.
 
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
-const CATALOG := preload("res://scripts/monetization/cosmetic_catalog.gd")
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
-
-const SLOT_ORDER: Array[String] = [
-	CosmeticCatalog.SLOT_PIP_SKIN,
-	CosmeticCatalog.SLOT_MEADOW_BG,
-	CosmeticCatalog.SLOT_JOURNAL_FRAME,
-]
+const TOAST_RECT := Rect2(190, 1456, 700, 100)
+const SLOT_FLASH_SEC := 1.2
+const ENTRY_OVERRIDE_MSEC := 2000
 
 @onready var bg: ColorRect = $Bg
-@onready var shop_scroll: ScrollContainer = %ShopScroll
-@onready var shop_pad: MarginContainer = %ShopPad
-@onready var shop_content: VBoxContainer = %ShopContent
-@onready var header_row: PanelContainer = %ShopHeaderRow
-@onready var jump_row: HBoxContainer = %JumpRow
-@onready var reset_dev_button: UiClickButton = %ResetDevButton
 
 var _hub_embedded: bool = false
 var _built: bool = false
+var _tab: String = "seasons"
+var _tab_bar: ShopTabBar
+var _pages: Dictionary = {}
+var _contents: Dictionary = {}
+var _page_tween: Tween
 var _confirm_id: String = ""
+var _confirm_timer: SceneTreeTimer
 var _busy_sku: String = ""
-var _chips: Array[ShopJumpChip] = []
-var _sections: Dictionary = {}
-var _cosmetic_cards: Dictionary = {}
-var _booster_cards: Dictionary = {}
 var _season_cards: Dictionary = {}
-var _iap_cards: Dictionary = {}
-var _restore_button: CampButton
-var _fair_note: Label
-var _toast: PanelContainer
-var _toast_title: Label
-var _toast_sub: Label
-var _toast_tween: Tween
-var _scroll_tween: Tween
-var _active_section: String = "looks"
+var _cosmetic_cards: Dictionary = {}
+var _slot_headers: Dictionary = {}
+var _booster_cards: Dictionary = {}
+var _support_cards: Dictionary = {}
+var _boosters_end: Control
+var _restore: _RestoreLink
+var _toast: _Toast
+var _entry_override: String = ""
+var _entry_override_slot: String = ""
+var _entry_override_at: int = 0
 
 
 func _ready() -> void:
 	_hub_embedded = bool(get_meta("meta_hub_embedded", false))
-	bg.color = UiShop.PAGE_BG
+	bg.color = UiShopV2.PAGE
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	header_row.add_theme_stylebox_override("panel", UiShop.header_row_style())
-	_style_header_row()
-	if reset_dev_button:
-		reset_dev_button.clicked.connect(_on_reset_dev_pressed)
-	shop_scroll.get_v_scroll_bar().value_changed.connect(_on_scrolled)
-	if not _hub_embedded:
-		SAFE_AREA.apply_top_margin(header_row, 8.0)
-	_build_page()
+	_build()
 	_connect_iap_signals()
+	if not _hub_embedded:
+		SAFE_AREA.apply_top_margin(_tab_bar, 8.0)
+	GameState.cosmetics_changed.connect(func(_slots: Array) -> void: refresh_shop())
 	call_deferred("refresh_shop")
-
-
-func _style_header_row() -> void:
-	var pad := header_row.get_theme_stylebox("panel") as StyleBoxFlat
-	if pad:
-		pad.content_margin_left = UiShop.PAGE_PAD_X
-		pad.content_margin_right = UiShop.PAGE_PAD_X
-		pad.content_margin_top = UiShop.HEADER_ROW_PAD_TOP
-		pad.content_margin_bottom = UiShop.HEADER_ROW_PAD_TOP
-	header_row.custom_minimum_size.y = UiShop.HEADER_ROW_H
 
 
 func _connect_iap_signals() -> void:
@@ -82,457 +62,267 @@ func _connect_iap_signals() -> void:
 # --- gradnja ---
 
 
-func _build_page() -> void:
+func _build() -> void:
 	if _built:
 		return
 	_built = true
-	for i in UiShop.SECTIONS.size():
-		var chip := ShopJumpChip.new()
-		jump_row.add_child(chip)
-		chip.setup(UiShop.SECTIONS[i], UiShop.SECTION_LABELS[i])
-		chip.clicked.connect(_on_jump_pressed.bind(UiShop.SECTIONS[i]))
-		_chips.append(chip)
-	_build_looks()
+	for tab_id in UiShopV2.TABS:
+		_make_page(tab_id)
 	_build_seasons()
+	_build_looks()
 	_build_boosters()
 	_build_support()
-	_build_toast()
-	_set_active_section("looks")
+	_tab_bar = ShopTabBar.new()
+	_tab_bar.name = "ShopTabBar"
+	_tab_bar.z_index = 3
+	add_child(_tab_bar)
+	_tab_bar.tab_selected.connect(select_tab)
+	_toast = _Toast.new()
+	_toast.name = "Toast"
+	_toast.z_index = 6
+	_toast.position = TOAST_RECT.position
+	_toast.size = TOAST_RECT.size
+	add_child(_toast)
+	_show_page(_tab, false)
 
 
-func _section(id: String, index: int) -> VBoxContainer:
+func _make_page(tab_id: String) -> void:
+	var scroll := ScrollContainer.new()
+	scroll.name = "TabPage_%s" % tab_id.capitalize()
+	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	scroll.visible = false
+	add_child(scroll)
+	var pad := MarginContainer.new()
+	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pad.add_theme_constant_override("margin_left", UiShopV2.PAGE_PAD_X)
+	pad.add_theme_constant_override("margin_right", UiShopV2.PAGE_PAD_X)
+	pad.add_theme_constant_override("margin_top", UiShopV2.CONTENT_TOP)
+	pad.add_theme_constant_override("margin_bottom", UiShopV2.CONTENT_BOTTOM)
+	scroll.add_child(pad)
 	var box := VBoxContainer.new()
-	box.name = "%sSection" % id.capitalize()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_theme_constant_override("separation", UiShop.BLOCK_GAP)
-	shop_content.add_child(box)
-	box.add_child(_section_title(index))
-	_sections[id] = box
-	return box
-
-
-func _section_title(index: int) -> HBoxContainer:
-	var row := HBoxContainer.new()
-	row.name = "SectionTitle"
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.custom_minimum_size.y = UiShop.SECTION_TITLE_H
-	row.add_theme_constant_override("separation", 16)
-	var accent := Panel.new()
-	accent.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	accent.custom_minimum_size = UiShop.ACCENT_SIZE
-	accent.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	accent.add_theme_stylebox_override("panel", UiShop.accent_style(index == 0))
-	row.add_child(accent)
-	var title := Label.new()
-	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	title.text = UiShop.SECTION_LABELS[index]
-	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	UiShop.style(title, UiShop.FONT_SECTION_TITLE, UiShop.CREAM, UiShop.HEAVY)
-	row.add_child(title)
-	var sub := Label.new()
-	sub.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	sub.text = UiShop.SECTION_SUBS[index]
-	sub.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	sub.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	UiShop.style(sub, UiShop.FONT_SECTION_SUB, UiShop.alpha(UiShop.CREAM, 0.78), UiShop.BOLD)
-	row.add_child(sub)
-	return row
-
-
-func _build_looks() -> void:
-	var section := _section("looks", 0)
-	var by_slot: Dictionary = {}
-	for entry in GameState.get_cosmetic_shop_entries():
-		var item_id := str(entry.get("id", ""))
-		if item_id.is_empty():
-			continue
-		var slot := CATALOG.get_slot(item_id)
-		if not by_slot.has(slot):
-			by_slot[slot] = []
-		(by_slot[slot] as Array).append(item_id)
-	for slot in SLOT_ORDER:
-		if not by_slot.has(slot):
-			continue
-		section.add_child(_cosmetic_slot(slot, by_slot[slot]))
-	for slot in by_slot:
-		if SLOT_ORDER.has(slot):
-			continue
-		section.add_child(_cosmetic_slot(str(slot), by_slot[slot]))
-
-
-func _cosmetic_slot(slot: String, ids: Array) -> PanelContainer:
-	var panel := PanelContainer.new()
-	panel.name = "CosmeticSlot_%s" % slot
-	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_theme_stylebox_override("panel", UiShop.card_style(UiShop.SLOT_PAD))
-	var col := VBoxContainer.new()
-	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_theme_constant_override("separation", UiShop.BLOCK_GAP)
-	panel.add_child(col)
-	var head := HBoxContainer.new()
-	head.name = "SlotHead"
-	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	head.custom_minimum_size.y = UiShop.SLOT_HEAD_H
-	head.add_theme_constant_override("separation", 16)
-	col.add_child(head)
-	var titles: Array = UiShop.SLOT_TITLES.get(slot, [slot, ""])
-	var title := Label.new()
-	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	title.text = str(titles[0])
-	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	UiShop.style(title, UiShop.FONT_SLOT_TITLE, UiShop.INK, UiShop.HEAVY)
-	head.add_child(title)
-	var where := Label.new()
-	where.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	where.text = str(titles[1]) if titles.size() > 1 else ""
-	where.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	where.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	UiShop.style(where, UiShop.FONT_BODY, UiShop.SUB_INK, UiShop.BOLD)
-	head.add_child(where)
-	var first := true
-	for item_id in ids:
-		if not first:
-			var line := Panel.new()
-			line.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			line.custom_minimum_size.y = 2
-			line.add_theme_stylebox_override("panel", UiShop.hairline_style())
-			col.add_child(line)
-		first = false
-		var card := ShopCosmeticCard.new()
-		card.name = "Cosmetic_%s" % item_id
-		col.add_child(card)
-		card.configure(str(item_id))
-		card.buy_requested.connect(_on_cosmetic_buy_requested)
-		card.buy_confirmed.connect(_on_cosmetic_buy_confirmed)
-		card.cancel_requested.connect(_on_cosmetic_cancel)
-		card.equip_pressed.connect(_on_cosmetic_equip)
-		_cosmetic_cards[str(item_id)] = card
-	return panel
+	box.add_theme_constant_override(
+		"separation", UiShopV2.LOOKS_SLOT_GAP if tab_id == "looks" else UiShopV2.CARD_GAP
+	)
+	pad.add_child(box)
+	_pages[tab_id] = scroll
+	_contents[tab_id] = box
 
 
 func _build_seasons() -> void:
-	var section := _section("seasons", 1)
+	var box: VBoxContainer = _contents["seasons"]
 	for def in SeasonCatalog.paid_defs():
 		var sku := def.iap_product_id
 		if sku.is_empty():
 			continue
 		var card := SeasonPackCard.new()
-		card.name = "SeasonPack_%s" % def.id
-		section.add_child(card)
+		card.name = "SeasonCard_%s" % def.id
+		box.add_child(card)
 		card.apply(sku)
 		card.buy_pressed.connect(_on_money_buy)
 		card.open_home_pressed.connect(_on_open_on_home)
 		_season_cards[sku] = card
 
 
+func _build_looks() -> void:
+	var box: VBoxContainer = _contents["looks"]
+	for slot in CosmeticCatalog.slots():
+		var slot_id := str(slot.get("id", ""))
+		var items: Array[String] = []
+		for it in CosmeticCatalog.items_in_slot(slot_id):
+			var iid := str(it.get("id", ""))
+			if CosmeticCatalog.is_shop_item(iid):
+				items.append(iid)
+		if items.is_empty():
+			continue
+		var group := VBoxContainer.new()
+		group.name = "LooksSlot_%s" % slot_id
+		group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		group.add_theme_constant_override("separation", 20)
+		box.add_child(group)
+		var head := _SlotHeader.new()
+		head.name = "SlotHeader"
+		head.title = str(slot.get("title", slot_id))
+		head.icon = UiWardrobe.icon(str(slot.get("icon", "")))
+		group.add_child(head)
+		_slot_headers[slot_id] = head
+		for iid in items:
+			var card := ShopCosmeticCard.new()
+			card.name = "CosmeticCard_%s" % iid
+			group.add_child(card)
+			card.configure(iid)
+			card.buy_requested.connect(_on_cosmetic_buy_requested)
+			card.buy_confirmed.connect(_on_cosmetic_buy_confirmed)
+			card.short_tapped.connect(_on_cosmetic_short)
+			_cosmetic_cards[iid] = card
+	var end := CenterContainer.new()
+	end.name = "TabEnd"
+	end.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(end)
+	var link := _PillLink.new()
+	link.name = "WardrobeLink"
+	link.text = UiShopV2.S_WARDROBE
+	link.icon = UiAssets.get_chrome_icon("icon_wardrobe")
+	if link.icon == null:
+		link.icon = UiWardrobe.icon("res://assets/ui/wardrobe/icon_wardrobe.svg")
+	end.add_child(link)
+	link.clicked.connect(_on_wardrobe_link)
+
+
 func _build_boosters() -> void:
-	var section := _section("boosters", 2)
+	var box: VBoxContainer = _contents["boosters"]
 	for booster_id in CONFIG.all_booster_ids():
-		var card := ShopBoosterRow.new()
-		card.name = "Booster_%s" % booster_id
-		section.add_child(card)
-		card.apply(booster_id)
-		card.buy_pressed.connect(_on_booster_buy)
-		card.use_pressed.connect(_on_booster_use)
-		card.arena_pressed.connect(_on_booster_arena)
+		var card := ShopBoosterCard.new()
+		card.name = "BoosterCard_%s" % booster_id
+		box.add_child(card)
+		card.setup(booster_id)
+		card.buy_pressed.connect(_on_money_buy)
 		_booster_cards[booster_id] = card
+	_boosters_end = _AllSet.new()
+	_boosters_end.name = "TabEnd"
+	box.add_child(_boosters_end)
 
 
 func _build_support() -> void:
-	var section := _section("support", 3)
-	section.add_child(_iap_card(CONFIG.SKU_REMOVE_ADS))
-	section.add_child(_iap_card(CONFIG.SKU_STARTER_PACK))
-	_restore_button = CampButton.new()
-	_restore_button.name = "RestoreButton"
-	_restore_button.label_text = ""
-	_restore_button.custom_minimum_size.y = UiShop.MONEY_ROW_H
-	section.add_child(_restore_button)
-	_restore_button.set_fonts(UiShop.FONT_BUTTON, UiShop.FONT_BUTTON_SUB)
-	_restore_button.set_press_scale(0.97)
-	_restore_button.clicked.connect(_on_restore_pressed)
-	_fair_note = Label.new()
-	_fair_note.name = "FairNote"
-	_fair_note.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_fair_note.text = (
-		"Everything here is optional. Looks and seasons change how the meadow looks"
-		+ " — never how runs, merges or rewards work."
+	var box: VBoxContainer = _contents["support"]
+	for sku in [CONFIG.SKU_REMOVE_ADS, CONFIG.SKU_STARTER_PACK]:
+		var card := ShopSupportCard.new()
+		card.name = "SupportCard_%s" % sku
+		box.add_child(card)
+		card.setup(sku)
+		card.buy_pressed.connect(_on_money_buy)
+		_support_cards[sku] = card
+	var end := CenterContainer.new()
+	end.name = "TabEnd"
+	end.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(end)
+	_restore = _RestoreLink.new()
+	_restore.name = "RestoreLink"
+	end.add_child(_restore)
+	_restore.clicked.connect(_on_restore_pressed)
+
+
+# --- tabovi i ulaz ---
+
+
+func select_tab(tab_id: String, animated: bool = true) -> void:
+	if not _pages.has(tab_id):
+		return
+	if tab_id == _tab and (_pages[tab_id] as Control).visible:
+		return
+	_show_page(tab_id, animated)
+
+
+func _show_page(tab_id: String, animated: bool) -> void:
+	var old := _tab
+	_tab = tab_id
+	if _tab_bar != null:
+		_tab_bar.set_active(tab_id, animated)
+	_cancel_confirm()
+	if _page_tween != null and _page_tween.is_valid():
+		_page_tween.kill()
+	var incoming := _pages[tab_id] as Control
+	for id in _pages:
+		var p := _pages[id] as Control
+		if id != tab_id and id != old:
+			p.visible = false
+	incoming.visible = true
+	incoming.position.x = 0.0
+	incoming.modulate.a = 1.0
+	if not animated or old == tab_id or not is_inside_tree():
+		(_pages[old] as Control).visible = old == tab_id
+		return
+	var outgoing := _pages[old] as Control
+	var dir := 1.0 if UiShopV2.TABS.find(tab_id) > UiShopV2.TABS.find(old) else -1.0
+	incoming.modulate.a = 0.0
+	incoming.position.x = dir * UiShopV2.TAB_SLIDE_PX
+	_page_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_page_tween.tween_property(outgoing, "modulate:a", 0.0, UiShopV2.T_TAB)
+	_page_tween.tween_property(incoming, "modulate:a", 1.0, UiShopV2.T_TAB)
+	_page_tween.tween_property(incoming, "position:x", 0.0, UiShopV2.T_TAB)
+	_page_tween.chain().tween_callback(func() -> void:
+		outgoing.visible = false
+		outgoing.modulate.a = 1.0
 	)
-	_fair_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_fair_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	UiShop.style(_fair_note, UiShop.FONT_BODY, UiShop.alpha(UiShop.CREAM, 0.78), UiShop.REGULAR, 1.2)
-	section.add_child(_fair_note)
 
 
-func _iap_card(sku: String) -> PanelContainer:
-	var panel := PanelContainer.new()
-	panel.name = "IapCard_%s" % sku
-	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_theme_stylebox_override("panel", UiShop.card_style(UiShop.IAP_PAD))
-	var col := VBoxContainer.new()
-	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_theme_constant_override("separation", 18)
-	panel.add_child(col)
-	var title := Label.new()
-	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	title.text = CONFIG.get_product_title(sku)
-	UiShop.style(title, UiShop.FONT_NAME, UiShop.INK, UiShop.HEAVY)
-	col.add_child(title)
-	var desc := Label.new()
-	desc.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc.text = _iap_desc(sku)
-	UiShop.style(desc, UiShop.FONT_BODY, UiShop.SUB_INK, UiShop.REGULAR, 1.2)
-	col.add_child(desc)
-	var contents: HBoxContainer = null
-	if sku == CONFIG.SKU_STARTER_PACK:
-		contents = HBoxContainer.new()
-		contents.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		contents.add_theme_constant_override("separation", 14)
-		col.add_child(contents)
-		contents.add_child(_content_chip("coin", "icon_coin", "+%d coins" % CONFIG.STARTER_PACK_COINS))
-		contents.add_child(_content_chip("seed", "icon_seed", "+%d seeds" % CONFIG.STARTER_PACK_SEEDS))
-		contents.add_child(_content_chip("hint", "icon_target", "+1 Merge Hint"))
-	var status := ShopPurchaseStatus.new()
-	status.name = "PurchaseStatus"
-	col.add_child(status)
-	var action := HBoxContainer.new()
-	action.name = "ActionRow"
-	action.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	action.custom_minimum_size.y = UiShop.MONEY_ROW_H
-	action.add_theme_constant_override("separation", 16)
-	col.add_child(action)
-	var price := ShopPriceTag.new()
-	action.add_child(price)
-	var buy := CampButton.new()
-	buy.label_text = ""
-	buy.custom_minimum_size.y = UiShop.MONEY_ROW_H
-	buy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	action.add_child(buy)
-	buy.set_fonts(UiShop.FONT_BUTTON, UiShop.FONT_BUTTON_SUB)
-	buy.set_press_scale(0.97)
-	buy.clicked.connect(_on_money_buy.bind(sku))
-	var badge := PanelContainer.new()
-	badge.name = "OwnedBadge"
-	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	badge.custom_minimum_size.y = UiShop.TAG_H
-	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	badge.add_theme_stylebox_override("panel", UiShop.tag_style("iap"))
-	action.add_child(badge)
-	var badge_label := Label.new()
-	badge_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	badge_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	badge.add_child(badge_label)
-	var owned_note := Label.new()
-	owned_note.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	owned_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	owned_note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	owned_note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	action.add_child(owned_note)
-	_iap_cards[sku] = {
-		"panel": panel,
-		"price": price,
-		"buy": buy,
-		"badge": badge,
-		"badge_label": badge_label,
-		"note": owned_note,
-		"status": status,
-		"contents": contents,
-	}
-	status.cleared.connect(_refresh_iap_cards)
-	return panel
+## Ulaz u Shop (hub ga zove kad Shop postane aktivna stranica): Seasons od vrha, osim
+## kad je upravo stigao link iz Ormara.
+func _enter_shop() -> void:
+	for id in _pages:
+		(_pages[id] as ScrollContainer).scroll_vertical = 0
+	if not _entry_override.is_empty() and Time.get_ticks_msec() - _entry_override_at < ENTRY_OVERRIDE_MSEC:
+		var slot := _entry_override_slot
+		_entry_override = ""
+		_show_page("looks", false)
+		_scroll_to_slot(slot)
+		return
+	_entry_override = ""
+	_show_page("seasons", false)
 
 
-func _content_chip(kind: String, icon_name: String, text: String) -> PanelContainer:
-	var chip := PanelContainer.new()
-	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.custom_minimum_size.y = UiShop.CONTENT_CHIP_H
-	chip.add_theme_stylebox_override("panel", UiShop.content_chip_style(kind))
-	var row := HBoxContainer.new()
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_theme_constant_override("separation", 14)
-	chip.add_child(row)
-	var icon := TextureRect.new()
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	icon.custom_minimum_size = Vector2(48, 48)
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	icon.texture = UiAssets.get_chrome_icon(icon_name)
-	if icon.texture == null:
-		icon.texture = UiAssets.get_arena_icon(icon_name)
-	row.add_child(icon)
-	var label := Label.new()
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.text = text
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	UiShop.style(label, UiShop.FONT_TAG, UiShop.INK, UiShop.HEAVY)
-	row.add_child(label)
-	return chip
+## Ormar · „More in Shop": Looks, skrol na zaglavlje slota, zaglavlje bljesne 1,2 s.
+func show_cosmetic_slot(slot: String) -> void:
+	_entry_override = "looks"
+	_entry_override_slot = slot
+	_entry_override_at = Time.get_ticks_msec()
+	_show_page("looks", false)
+	_scroll_to_slot(slot)
 
 
-func _iap_desc(sku: String) -> String:
-	if sku == CONFIG.SKU_REMOVE_ADS:
-		return (
-			"Turns off the ad between runs. Rewarded videos stay optional"
-			+ " — they only play when you tap them."
-		)
-	return "A one-time bundle to get going."
+func _scroll_to_slot(slot: String) -> void:
+	var head := _slot_headers.get(slot) as _SlotHeader
+	if head == null:
+		return
+	await get_tree().process_frame
+	if not is_instance_valid(head):
+		return
+	var scroll := _pages["looks"] as ScrollContainer
+	var box := _contents["looks"] as Control
+	var y := head.get_global_rect().position.y - box.get_global_rect().position.y
+	scroll.scroll_vertical = int(maxf(0.0, y))
+	head.flash(SLOT_FLASH_SEC)
 
 
-func _build_toast() -> void:
-	_toast = PanelContainer.new()
-	_toast.name = "PurchaseToast"
-	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_toast.visible = false
-	_toast.z_index = 4
-	_toast.add_theme_stylebox_override("panel", UiShop.toast_style())
-	add_child(_toast)
-	var col := VBoxContainer.new()
-	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_theme_constant_override("separation", 4)
-	_toast.add_child(col)
-	_toast_title = Label.new()
-	_toast_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_toast_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	col.add_child(_toast_title)
-	_toast_sub = Label.new()
-	_toast_sub.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_toast_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	col.add_child(_toast_sub)
+func active_tab() -> String:
+	return _tab
 
 
-# --- osvjezavanje ---
+# --- osvježavanje ---
 
 
 func refresh_shop() -> void:
 	if not _built or not is_inside_tree():
 		return
-	for item_id in _cosmetic_cards:
-		(_cosmetic_cards[item_id] as ShopCosmeticCard).configure(str(item_id), _confirm_id)
-	for booster_id in _booster_cards:
-		(_booster_cards[booster_id] as ShopBoosterRow).apply(str(booster_id), _busy_sku)
+	var restoring := _busy_sku == "restore"
+	for iid in _cosmetic_cards:
+		(_cosmetic_cards[iid] as ShopCosmeticCard).configure(str(iid), _confirm_id)
 	for sku in _season_cards:
-		(_season_cards[sku] as SeasonPackCard).apply(str(sku), _busy_sku)
-	_refresh_iap_cards()
-	if reset_dev_button:
-		reset_dev_button.visible = Engine.is_editor_hint() and IAPManager.is_stub_mode()
+		(_season_cards[sku] as SeasonPackCard).apply(str(sku), _iap_busy_sku(), false, restoring)
+	var loot_on := GameState.can_buy_loot_burst()
+	for booster_id in _booster_cards:
+		var card := _booster_cards[booster_id] as ShopBoosterCard
+		card.apply(_iap_busy_sku(), false, restoring)
+		if booster_id == CONFIG.BOOSTER_LOOT_BURST:
+			card.visible = loot_on
+	_boosters_end.visible = GameState.merge_hint_owned and not loot_on
+	for sku in _support_cards:
+		(_support_cards[sku] as ShopSupportCard).apply(_iap_busy_sku(), false, restoring)
+	_restore.visible = not IAPManager.is_stub_mode()
+	_restore.set_busy(restoring)
 	_notify_hub_chrome()
 
 
-func _refresh_iap_cards() -> void:
-	for sku in _iap_cards:
-		var parts: Dictionary = _iap_cards[sku]
-		var owned := IAPManager.owns_product(str(sku))
-		var price: ShopPriceTag = parts["price"]
-		var buy: CampButton = parts["buy"]
-		var badge: PanelContainer = parts["badge"]
-		var badge_label: Label = parts["badge_label"]
-		var note: Label = parts["note"]
-		price.visible = not owned
-		buy.visible = not owned
-		badge.visible = owned
-		note.visible = owned
-		if not owned:
-			price.configure(IAPManager.get_price_label(str(sku)), "one-time")
-			var label := "Remove ads"
-			var sub := "for good, on this account"
-			if str(sku) == CONFIG.SKU_STARTER_PACK:
-				label = "Get the pack"
-				sub = "once per account"
-			UiShopButtons.apply_money(buy, UiShop.buy_mode(str(sku), _busy_sku), label, sub)
-		else:
-			badge_label.text = (
-				"Ads are off" if str(sku) == CONFIG.SKU_REMOVE_ADS else "Claimed"
-			)
-			UiShop.style(badge_label, UiShop.FONT_TAG, UiShop.INK, UiShop.HEAVY)
-			note.text = (
-				"Thanks for supporting Merge Meadow."
-				if str(sku) == CONFIG.SKU_REMOVE_ADS
-				else "+15 coins, +8 seeds and 1 Merge Hint were added."
-			)
-			UiShop.style(note, UiShop.FONT_BODY, UiShop.SUB_INK, UiShop.REGULAR, 1.2)
-	if _restore_button:
-		var stub := IAPManager.is_stub_mode()
-		_restore_button.visible = not stub
-		var busy := IAPManager.is_busy() and _busy_sku == "restore"
-		_restore_button.set_text(
-			"Restoring…" if busy else "Restore purchases",
-			"asking the store" if busy else "bought before on this store account?"
-		)
-		_restore_button.set_styles(UiShop.restore_style(busy))
-		_restore_button.set_ink(UiShop.CREAM)
-		_restore_button.disabled = IAPManager.is_busy()
+## Restore nije SKU: dok traje, sva IAP dugmad su prigušena (money.dim).
+func _iap_busy_sku() -> String:
+	return "restore" if _busy_sku == "restore" else _busy_sku
 
 
-# --- chipovi i skrol ---
-
-
-func _on_jump_pressed(section_id: String) -> void:
-	var box := _sections.get(section_id) as Control
-	if box == null:
-		return
-	var target := maxf(0.0, _content_top_of(box) - float(UiShop.CONTENT_TOP))
-	if _scroll_tween != null and _scroll_tween.is_valid():
-		_scroll_tween.kill()
-	_scroll_tween = create_tween()
-	_scroll_tween.set_trans(Tween.TRANS_CUBIC)
-	_scroll_tween.set_ease(Tween.EASE_OUT)
-	_scroll_tween.tween_property(shop_scroll, "scroll_vertical", int(target), UiShop.T_JUMP)
-	_set_active_section(section_id)
-
-
-func _on_scrolled(_value: float) -> void:
-	_sync_spy()
-
-
-func _sync_spy() -> void:
-	var scroll := float(shop_scroll.scroll_vertical)
-	var bar := shop_scroll.get_v_scroll_bar()
-	if bar != null and scroll >= bar.max_value - bar.page - 2.0:
-		_set_active_section(UiShop.SECTIONS[UiShop.SECTIONS.size() - 1])
-		return
-	var current: String = UiShop.SECTIONS[0]
-	for section_id in UiShop.SECTIONS:
-		var box := _sections.get(section_id) as Control
-		if box == null:
-			continue
-		if _content_top_of(box) <= scroll + float(UiShop.SPY_OFFSET):
-			current = section_id
-	_set_active_section(current)
-
-
-## y sekcije unutar sadrzaja skrola. ShopPad se pomjera sa skrolom, pa se njegova
-## pozicija ne smije sabirati (inace drugi skok gubi vec preskrolanu visinu).
-## Ormar · ShopLink: sekcija Looks, skrol do slota (UiShop jump "looks").
-func show_cosmetic_slot(slot: String) -> void:
-	_on_jump_pressed("looks")
-	var looks := _sections.get("looks") as Control
-	if looks == null:
-		return
-	var panel := looks.find_child("CosmeticSlot_%s" % slot, true, false) as Control
-	if panel == null:
-		return
-	await get_tree().process_frame
-	if not is_instance_valid(panel):
-		return
-	var y := panel.get_global_rect().position.y - shop_content.get_global_rect().position.y
-	var target := maxf(0.0, y - float(UiShop.CONTENT_TOP))
-	if _scroll_tween != null and _scroll_tween.is_valid():
-		_scroll_tween.kill()
-	_scroll_tween = create_tween()
-	_scroll_tween.set_trans(Tween.TRANS_CUBIC)
-	_scroll_tween.set_ease(Tween.EASE_OUT)
-	_scroll_tween.tween_property(shop_scroll, "scroll_vertical", int(target), UiShop.T_JUMP)
-
-
-func _content_top_of(box: Control) -> float:
-	return box.position.y + shop_content.position.y
-
-
-func _set_active_section(section_id: String) -> void:
-	_active_section = section_id
-	for chip in _chips:
-		chip.set_active(chip.section == section_id)
+func _on_catalog_updated() -> void:
+	refresh_shop()
 
 
 # --- kozmetika ---
@@ -541,35 +331,45 @@ func _set_active_section(section_id: String) -> void:
 func _on_cosmetic_buy_requested(item_id: String) -> void:
 	_confirm_id = item_id
 	refresh_shop()
+	_confirm_timer = get_tree().create_timer(UiShopV2.T_CONFIRM_TIMEOUT)
+	_confirm_timer.timeout.connect(_on_confirm_timeout.bind(item_id, _confirm_timer))
 
 
-func _on_cosmetic_cancel(_item_id: String) -> void:
+func _on_confirm_timeout(item_id: String, timer: SceneTreeTimer) -> void:
+	if timer != _confirm_timer or _confirm_id != item_id:
+		return
+	_cancel_confirm()
+
+
+func _cancel_confirm() -> void:
+	if _confirm_id.is_empty():
+		return
 	_confirm_id = ""
+	_confirm_timer = null
 	refresh_shop()
 
 
 func _on_cosmetic_buy_confirmed(item_id: String) -> void:
-	var cost := CATALOG.get_coin_cost(item_id)
+	var cost := CosmeticCatalog.get_coin_cost(item_id)
 	var result := GameState.buy_cosmetic_with_coins(item_id)
 	_confirm_id = ""
-	var card := _cosmetic_cards.get(item_id) as ShopCosmeticCard
+	_confirm_timer = null
 	refresh_shop()
+	var card := _cosmetic_cards.get(item_id) as ShopCosmeticCard
 	if card == null:
 		return
 	if result.begins_with("Purchased"):
 		card.show_bought()
 		_spend_pop(cost)
+		GameState.cosmetics_changed.emit([CosmeticCatalog.get_slot(item_id)])
 	else:
-		card.get_status().show_status(UiShop.STATUS_FAIL, result)
+		card.show_status(UiShopV2.S_FAILED, UiShopV2.STATUS_FAIL_BG)
 
 
-func _on_cosmetic_equip(item_id: String) -> void:
-	if not GameState.equip_cosmetic(item_id):
-		return
-	refresh_shop()
-	var card := _cosmetic_cards.get(item_id) as ShopCosmeticCard
-	if card:
-		card.get_status().show_status(UiShop.STATUS_OK, "Wearing it now")
+func _on_cosmetic_short(_item_id: String) -> void:
+	_cancel_confirm()
+	if is_inside_tree():
+		get_tree().call_group("meta_hub", "pulse_coin_chip")
 
 
 func _spend_pop(amount: int) -> void:
@@ -578,29 +378,22 @@ func _spend_pop(amount: int) -> void:
 	get_tree().call_group("meta_hub", "show_coin_spend_pop", amount)
 
 
-# --- boosteri ---
-
-
-func _on_booster_use(booster_id: String) -> void:
-	var message := GameState.use_booster(booster_id)
-	refresh_shop()
-	var card := _booster_cards.get(booster_id) as ShopBoosterRow
-	if card:
-		card.get_status().show_status(UiShop.STATUS_OK, message)
-
-
-func _on_booster_arena(_booster_id: String) -> void:
-	if GameState.meta_hub_active:
-		GameState.go_to_meta_page(MetaHubPages.ARENA)
-	else:
-		SceneRouter.change_to(GameState.SCENE_MERGE_ARENA)
-
-
-func _on_booster_buy(booster_id: String) -> void:
-	var sku := CONFIG.booster_sku(booster_id)
-	if sku.is_empty():
+func _on_wardrobe_link() -> void:
+	if not GameState.meta_hub_active:
+		SceneRouter.change_to(GameState.SCENE_MAIN)
 		return
-	_on_money_buy(sku)
+	GameState.go_to_meta_page(MetaHubPages.MAIN)
+	for menu in get_tree().get_nodes_in_group("main_menu"):
+		if menu.has_method("open_wardrobe_from_shop"):
+			menu.call("open_wardrobe_from_shop")
+			return
+	var hubs := get_tree().get_nodes_in_group("meta_hub")
+	if hubs.is_empty():
+		return
+	var host: Node = hubs[0].get_node("RootVBox/SwipePager").call("get_pages_host")
+	var home := host.get_node_or_null("Page_%d" % MetaHubPages.MAIN)
+	if home != null and home.has_method("open_wardrobe_from_shop"):
+		home.call("open_wardrobe_from_shop")
 
 
 # --- pravi novac ---
@@ -612,6 +405,7 @@ func _on_money_buy(sku: String) -> void:
 	var season_id := CONFIG.season_id_for_sku(sku)
 	if not season_id.is_empty() and GameState.is_test_locked_season(season_id):
 		return
+	_cancel_confirm()
 	_busy_sku = sku
 	_clear_status_for(sku)
 	IAPManager.purchase(sku)
@@ -637,99 +431,53 @@ func _on_restore_pressed() -> void:
 	refresh_shop()
 
 
-func _on_reset_dev_pressed() -> void:
-	IAPManager.reset_purchases_for_dev()
-	refresh_shop()
-
-
-func _on_catalog_updated() -> void:
-	refresh_shop()
-
-
 func _on_purchase_completed(sku: String) -> void:
 	_busy_sku = ""
 	refresh_shop()
-	var status := _status_for(sku)
 	match sku:
 		CONFIG.SKU_REMOVE_ADS:
-			_show_toast("Ads are off", "Thanks for supporting Merge Meadow.")
+			_toast.show_text(UiShopV2.S_TOAST_ADS)
 		CONFIG.SKU_STARTER_PACK:
-			_show_toast("+15 coins · +8 seeds · +1 Merge Hint", "Starter Pack added")
-		_:
-			if CONFIG.is_season_sku(sku):
-				var def: SeasonDef = SeasonCatalog.get_def(CONFIG.season_id_for_sku(sku))
-				var name := def.display_name if def else CONFIG.get_product_title(sku)
-				if status:
-					status.show_status(UiShop.STATUS_OK, "%s is yours." % name, "Pick it on Home.")
-			else:
-				var booster_id := CONFIG.sku_booster_id(sku)
-				if not booster_id.is_empty() and status:
-					status.show_status(
-						UiShop.STATUS_OK,
-						"+1 %s · you have %d"
-						% [
-							CONFIG.get_product_title(sku),
-							GameState.get_booster_count(booster_id),
-						]
-					)
+			_toast.show_text(UiShopV2.S_TOAST_PACK)
+		CONFIG.SKU_BOOSTER_LOOT_BURST:
+			var flower := str(IAPManager.last_loot_burst.get("flower", ""))
+			if not flower.is_empty():
+				_toast.show_text(UiShopV2.S_TOAST_LOOT % GameState.get_seed_display_name(flower))
 
 
 func _on_purchase_failed(sku: String, reason: String) -> void:
 	if _busy_sku == sku:
 		_busy_sku = ""
 	refresh_shop()
-	var parts := UiShop.fail_text(reason)
-	if parts[0].is_empty():
+	var parts := UiShopV2.status_for(reason)
+	if parts.is_empty():
 		return
-	var status := _status_for(sku)
-	if status:
-		status.show_status(parts[0], parts[1], parts[2])
+	var card := _card_for(sku)
+	if card != null:
+		card.show_status(str(parts[0]), parts[1])
 
 
 func _on_restore_completed() -> void:
 	_busy_sku = ""
 	refresh_shop()
-	_show_toast("Purchases restored", "")
+	_toast.show_text(UiShopV2.S_TOAST_RESTORED)
 
 
-func _status_for(sku: String) -> ShopPurchaseStatus:
-	if _iap_cards.has(sku):
-		return (_iap_cards[sku] as Dictionary)["status"] as ShopPurchaseStatus
+func _card_for(sku: String) -> ShopCard:
 	if _season_cards.has(sku):
-		return (_season_cards[sku] as SeasonPackCard).get_status()
+		return _season_cards[sku]
+	if _support_cards.has(sku):
+		return _support_cards[sku]
 	var booster_id := CONFIG.sku_booster_id(sku)
 	if _booster_cards.has(booster_id):
-		return (_booster_cards[booster_id] as ShopBoosterRow).get_status()
+		return _booster_cards[booster_id]
 	return null
 
 
 func _clear_status_for(sku: String) -> void:
-	var status := _status_for(sku)
-	if status:
-		status.clear()
-
-
-func _show_toast(title: String, sub: String) -> void:
-	if _toast == null:
-		return
-	_toast_title.text = title
-	UiShop.style(_toast_title, UiShop.FONT_TOAST, UiShop.INK, UiShop.HEAVY)
-	_toast_sub.text = sub
-	_toast_sub.visible = not sub.is_empty()
-	UiShop.style(_toast_sub, UiShop.FONT_BODY, UiShop.SUB_INK, UiShop.REGULAR)
-	_toast.reset_size()
-	var toast_size := _toast.get_combined_minimum_size()
-	_toast.size = Vector2(minf(960.0, maxf(toast_size.x, 520.0)), toast_size.y)
-	_toast.position = Vector2((size.x - _toast.size.x) * 0.5, float(UiShop.CONTENT_TOP))
-	_toast.visible = true
-	_toast.modulate.a = 0.0
-	if _toast_tween != null and _toast_tween.is_valid():
-		_toast_tween.kill()
-	_toast_tween = create_tween()
-	_toast_tween.tween_property(_toast, "modulate:a", 1.0, 0.2)
-	_toast_tween.tween_interval(UiShop.T_TOAST_HOLD)
-	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.25)
-	_toast_tween.tween_callback(_toast.hide)
+	var card := _card_for(sku)
+	if card != null:
+		card.clear_status()
 
 
 # --- hub ---
@@ -740,6 +488,7 @@ func set_meta_hub_mode(enabled: bool) -> void:
 
 
 func refresh_for_meta_hub() -> void:
+	_enter_shop()
 	refresh_shop()
 
 
@@ -756,37 +505,169 @@ func get_cosmetic_card(item_id: String) -> ShopCosmeticCard:
 	return _cosmetic_cards.get(item_id) as ShopCosmeticCard
 
 
-func get_booster_card(booster_id: String) -> ShopBoosterRow:
-	return _booster_cards.get(booster_id) as ShopBoosterRow
+func get_booster_card(booster_id: String) -> ShopBoosterCard:
+	return _booster_cards.get(booster_id) as ShopBoosterCard
 
 
 func get_season_card(sku: String) -> SeasonPackCard:
 	return _season_cards.get(sku) as SeasonPackCard
 
 
-func get_jump_chips() -> Array[ShopJumpChip]:
-	return _chips
+func get_support_card(sku: String) -> ShopSupportCard:
+	return _support_cards.get(sku) as ShopSupportCard
 
 
-func active_section() -> String:
-	return _active_section
+func get_tab_bar() -> ShopTabBar:
+	return _tab_bar
 
 
-func section_node(section_id: String) -> Control:
-	return _sections.get(section_id) as Control
+func page_node(tab_id: String) -> ScrollContainer:
+	return _pages.get(tab_id) as ScrollContainer
 
 
 func is_restore_visible() -> bool:
-	return _restore_button != null and _restore_button.visible
+	return _restore != null and _restore.visible
 
 
-func get_fair_note_text() -> String:
-	return _fair_note.text if _fair_note else ""
-
-
-func get_iap_status(sku: String) -> ShopPurchaseStatus:
-	return _status_for(sku)
+func is_all_set_visible() -> bool:
+	return _boosters_end != null and _boosters_end.visible
 
 
 func get_confirm_id() -> String:
 	return _confirm_id
+
+
+func get_toast_text() -> String:
+	return _toast.text if _toast != null and _toast.visible else ""
+
+
+# --- male komponente ---
+
+
+## Zaglavlje slota: ikona 64 + naslov 48; iz Ormara bljesne `#FFF6D6` s ink rubom.
+class _SlotHeader:
+	extends Control
+
+	var title: String = ""
+	var icon: Texture2D
+	var _flash: float = 0.0
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		custom_minimum_size = Vector2(UiShopV2.CARD_W, 96)
+
+	func flash(sec: float) -> void:
+		_flash = 1.0
+		queue_redraw()
+		var tw := create_tween()
+		tw.tween_interval(sec)
+		tw.tween_callback(func() -> void:
+			_flash = 0.0
+			queue_redraw()
+		)
+
+	func is_flashing() -> bool:
+		return _flash > 0.0
+
+	func _draw() -> void:
+		if _flash > 0.0:
+			draw_style_box(UiShopV2.box(UiShopV2.CARD_YOURS, 48, 4), Rect2(Vector2.ZERO, size))
+		if icon != null:
+			draw_texture_rect(icon, Rect2(20, 16, 64, 64), false)
+		UiHomeV3.draw_text(self, 900, 48, title, Vector2(20.0 + 64.0 + 16.0, 24.0), UiShopV2.INK)
+
+
+## Pilula s ikonom i tekstom (Looks → Wardrobe): bijela, rub 4, tvrda sjena 8.
+class _PillLink:
+	extends HubPressable
+
+	var text: String = ""
+	var icon: Texture2D
+
+	func _ready() -> void:
+		super()
+		custom_minimum_size = Vector2(36.0 + 64.0 + 18.0 + UiHomeV3.text_w(900, 44, text) + 48.0, 120.0 + 8.0)
+
+	func _apply_state() -> void:
+		queue_redraw()
+
+	func _draw() -> void:
+		var down := 4.0 if is_pressing() else 0.0
+		var r := Rect2(Vector2(0, down), Vector2(size.x, 120))
+		draw_style_box(UiShopV2.box(UiShopV2.SHADOW_CARD, 60), Rect2(Vector2(0, 8), r.size))
+		draw_style_box(UiShopV2.box(UiShopV2.CARD, 60, 4), r)
+		if icon != null:
+			draw_texture_rect(icon, Rect2(36, down + 28.0, 64, 64), false)
+		UiHomeV3.draw_text(self, 900, 44, text, Vector2(36.0 + 64.0 + 18.0, down + 38.0), UiShopV2.INK)
+
+
+## Restore purchases: podvučen link 38/800, h 120.
+class _RestoreLink:
+	extends HubPressable
+
+	var _busy: bool = false
+
+	func _ready() -> void:
+		super()
+		custom_minimum_size = Vector2(32.0 * 2.0 + UiHomeV3.text_w(800, 38, UiShopV2.S_RESTORE), 120)
+
+	func set_busy(on: bool) -> void:
+		_busy = on
+		disabled = on or IAPManager.is_busy()
+		queue_redraw()
+
+	func _draw() -> void:
+		var t := UiShopV2.S_RESTORING if _busy else UiShopV2.S_RESTORE
+		var ink := UiShopV2.INK_SUB if _busy else UiShopV2.INK
+		var w := UiHomeV3.text_w(800, 38, t)
+		var x := (size.x - w) * 0.5
+		UiHomeV3.draw_text(self, 800, 38, t, Vector2(x, 41.0), ink)
+		draw_line(Vector2(x, 41.0 + 38.0 + 8.0), Vector2(x + w, 41.0 + 38.0 + 8.0), ink, 3.0)
+
+
+## Boosters bez ponude: Pip + „All set here".
+class _AllSet:
+	extends Control
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		custom_minimum_size = Vector2(UiShopV2.CARD_W, 24.0 + 180.0 + 8.0 + 40.0)
+
+	func _draw() -> void:
+		var pip := PipAssets.get_texture()
+		if pip != null:
+			var ps := pip.get_size()
+			var k := 180.0 / maxf(ps.x, ps.y)
+			draw_texture_rect(pip, Rect2(Vector2(size.x * 0.5 - ps.x * k * 0.5, 24.0), ps * k), false)
+		var w := UiHomeV3.text_w(900, 40, UiShopV2.S_ALL_SET)
+		UiHomeV3.draw_text(self, 900, 40, UiShopV2.S_ALL_SET, Vector2(size.x * 0.5 - w * 0.5, 24.0 + 180.0 + 8.0), UiShopV2.INK_SUB)
+
+
+## Toast: ink pilula 700 x 100 na y 1456, 44/900 krem, drži 1,6 s.
+class _Toast:
+	extends Control
+
+	var text: String = ""
+	var _tw: Tween
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		visible = false
+
+	func show_text(t: String) -> void:
+		text = t
+		visible = true
+		modulate.a = 0.0
+		queue_redraw()
+		if _tw != null and _tw.is_valid():
+			_tw.kill()
+		_tw = create_tween()
+		_tw.tween_property(self, "modulate:a", 1.0, 0.2)
+		_tw.tween_interval(UiShopV2.T_TOAST)
+		_tw.tween_property(self, "modulate:a", 0.0, 0.25)
+		_tw.tween_callback(hide)
+
+	func _draw() -> void:
+		draw_style_box(UiShopV2.box(UiShopV2.INK, 28), Rect2(Vector2.ZERO, size))
+		var w := UiHomeV3.text_w(900, 44, text)
+		UiHomeV3.draw_text(self, 900, 44, text, Vector2((size.x - w) * 0.5, (size.y - 44.0) * 0.5), UiShopV2.DISC)

@@ -21,6 +21,8 @@ var _billing_ready: bool = false
 var _store_prices: Dictionary = {}
 var _pending_purchase_sku: String = ""
 var _pending_ack_tokens: Dictionary = {}
+## Zadnji Loot Burst {flower, added} — Shop iz njega pravi toast „+5 <cvijet>".
+var last_loot_burst: Dictionary = {}
 
 
 func _ready() -> void:
@@ -46,6 +48,8 @@ func owns_product(sku: String) -> bool:
 			return GameState.ads_removed
 		CONFIG.SKU_STARTER_PACK:
 			return GameState.starter_pack_owned
+		CONFIG.SKU_BOOSTER_MERGE_HINT:
+			return GameState.merge_hint_owned
 	var season_id := CONFIG.season_id_for_sku(sku)
 	if not season_id.is_empty():
 		return GameState.owned_paid_seasons.has(season_id)
@@ -74,6 +78,12 @@ func purchase(sku: String) -> void:
 	if owns_product(sku):
 		purchase_failed.emit(sku, "already_owned")
 		return
+	if sku == CONFIG.SKU_STARTER_PACK and GameState.is_starter_pack_expired():
+		purchase_failed.emit(sku, "expired")
+		return
+	if sku == CONFIG.SKU_BOOSTER_LOOT_BURST and not GameState.can_buy_loot_burst():
+		purchase_failed.emit(sku, "unavailable")
+		return
 	_busy = true
 	_pending_purchase_sku = sku
 	if OS.get_name() == "Android" and _billing_ready:
@@ -98,6 +108,7 @@ func reset_purchases_for_dev() -> void:
 		return
 	GameState.ads_removed = false
 	GameState.starter_pack_owned = false
+	GameState.merge_hint_owned = false
 	GameState.clear_owned_paid_seasons()
 	GameState.save_player_save()
 	catalog_updated.emit()
@@ -261,18 +272,15 @@ func _grant_product(sku: String) -> void:
 		CONFIG.SKU_STARTER_PACK:
 			if GameState.starter_pack_owned:
 				return
-			GameState.starter_pack_owned = true
-			GameState.wallet_coins += CONFIG.STARTER_PACK_COINS
-			GameState.add_seeds_to_bag(GameState.SEED_TYPE_CLOVER, CONFIG.STARTER_PACK_SEEDS)
-			GameState.add_booster(CONFIG.BOOSTER_MERGE_HINT, CONFIG.STARTER_PACK_BOOSTERS)
+			GameState.grant_starter_pack()
+		CONFIG.SKU_BOOSTER_MERGE_HINT:
+			GameState.merge_hint_owned = true
+		CONFIG.SKU_BOOSTER_LOOT_BURST:
+			last_loot_burst = GameState.boosters.grant_loot_burst()
 		_:
 			var season_id := CONFIG.season_id_for_sku(sku)
 			if not season_id.is_empty():
 				GameState.grant_paid_season(season_id)
-			else:
-				var booster_id := CONFIG.sku_booster_id(sku)
-				if not booster_id.is_empty():
-					GameState.add_booster(booster_id, 1)
 	GameState.save_player_save()
 
 

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#1A1420}a{color:#2D3436}a:hover{color:#9E6645}</style>
+</helmet>
+<div data-layer="ArenaMergeHint" data-season="{{ season }}" style="width:1080px;height:1633px;flex:0 0 auto;position:relative;overflow:hidden;font-family:Nunito,system-ui,sans-serif;user-select:none;touch-action:none" onPointerDown="{{ onDown }}" onPointerMove="{{ onMove }}" onPointerUp="{{ onUp }}" onPointerLeave="{{ onUp }}" ref="{{ rootRef }}">
+  <div data-layer="Bg" style="position:absolute;left:0;top:0">
+    <dc-import name="ArenaField" season="{{ season }}" lush="{{ 1 }}" width="{{ 1080 }}" hint-size="1080px,1633px"></dc-import>
+  </div>
+  <div data-layer="Playfield" style="position:absolute;left:0;top:0;width:1080px;height:1589px">
+    <sc-for list="{{ seeds }}" as="s" hint-placeholder-count="22">
+      <div data-layer="SeedSlot" data-match="{{ s.match }}" style="position:absolute;left:{{ s.l }}px;top:{{ s.t }}px;width:134.4px;height:134.4px">
+        <dc-import name="SeedChip" type="{{ s.type }}" tier="{{ s.tier }}" state="{{ s.state }}" season="{{ season }}" hint-size="134px,134px"></dc-import>
+      </div>
+    </sc-for>
+    <sc-if value="{{ markOn }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="MergeHintMark" ref="{{ markRef }}" style="position:absolute;width:174px;height:174px;left:{{ markL }}px;top:{{ markT }}px;transition:{{ markTransition }};z-index:3">
+        <dc-import name="MergeHintMark" k="{{ markK }}" alpha="{{ markA }}" hint-size="174px,174px"></dc-import>
+      </div>
+    </sc-if>
+    <div data-layer="HeldSeed" style="position:absolute;width:134.4px;height:134.4px;left:{{ heldL }}px;top:{{ heldT }}px;z-index:4">
+      <dc-import name="SeedChip" type="daisy" tier="{{ 1 }}" state="drag" season="{{ season }}" hint-size="134px,134px"></dc-import>
+    </div>
+    <div data-layer="Finger" style="position:absolute;width:96px;height:96px;left:{{ fingerL }}px;top:{{ fingerT }}px;z-index:5;box-sizing:border-box;border-radius:48px;border:4px solid rgba(45,52,54,.55);background:rgba(255,248,240,.28);pointer-events:none"></div>
+    <div data-layer="ArenaPip" style="position:absolute;left:30px;top:1413px;width:150px;height:150px">
+      <img src="ref/pip_idle.svg" alt="Pip" style="width:150px;height:150px;display:block">
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1633},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;frame&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;a&quot;,&quot;b&quot;,&quot;close&quot;],&quot;default&quot;:&quot;a&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;frozen&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;markK&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;markAlpha&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;}}">
+// Merge Hint u Areni: dok igrac drzi sjemenku, NAJBLIZA ista (tip + tier) dobije MergeHintMark.
+// Ostale iste zadrzavaju danasnji zlatni puls; magnet partner zadrzava svoj prsten. Histereza 24 px.
+const SEEDS = [
+  [130, 84.4, 'clover', 1], [294, 84.4, 'daisy', 1], [786, 84.4, 'tulip', 1], [950, 84.4, 'buttercup', 1],
+  [212, 226.4, 'sunflower', 1], [540, 226.4, 'clover', 1], [868, 226.4, 'daisy', 2],
+  [130, 368.5, 'buttercup', 1], [458, 368.5, 'tulip', 1], [786, 368.5, 'daisy', 1],
+  [212, 510.5, 'clover', 1], [540, 510.5, 'sunflower', 1], [868, 510.5, 'buttercup', 1],
+  [130, 652.5, 'daisy', 1], [458, 652.5, 'clover', 1], [950, 652.5, 'tulip', 1],
+  [376, 794.5, 'buttercup', 1], [704, 794.5, 'daisy', 1],
+  [130, 936.5, 'tulip', 1], [540, 936.5, 'clover', 1], [950, 936.5, 'daisy', 1],
+  [212, 1078.6, 'sunflower', 1], [868, 1078.6, 'clover', 1]
+];
+const FRAMES = { a: [420, 1180], b: [330, 470], close: [258, 700] };
+const HELD = { type: 'daisy', tier: 1 };
+const HYST = 24, MAGNET = 190;
+class Component extends DCLogic {
+  rootRef = React.createRef(); markRef = React.createRef();
+  state = { pos: null, target: -1, drag: false };
+  componentDidUpdate() {
+    const prev = this._lastTarget ?? -1; this._lastTarget = this.state.target;
+    if (!this.props.frozen && prev === -1 && this.state.target >= 0) this.enter();
+  }
+  enter() { const el = this.markRef.current; if (el && el.animate) el.animate([{ transform: 'scale(1.35)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 180, easing: 'cubic-bezier(.34,1.56,.64,1)' }); }
+  posFrom(ev) { const el = this.rootRef.current; if (!el) return null; const r = el.getBoundingClientRect(), k = r.width / 1080; return [(ev.clientX - r.left) / k, (ev.clientY - r.top) / k]; }
+  nearest(pos, cur) {
+    let best = -1, bd = 1e9;
+    SEEDS.forEach((s, i) => { if (s[2] !== HELD.type || s[3] !== HELD.tier) return; const d = Math.hypot(s[0] - pos[0], s[1] - pos[1]); if (d < bd) { bd = d; best = i; } });
+    if (cur >= 0 && best !== cur) { const c = SEEDS[cur], dc = Math.hypot(c[0] - pos[0], c[1] - pos[1]); if (dc - bd < HYST) return cur; }
+    return best;
+  }
+  renderVals() {
+    const p = this.props, live = !p.frozen;
+    const season = p.season || 'country_bloom';
+    const frame = FRAMES[p.frame] || FRAMES.a;
+    const pos = (live && this.state.pos) || frame;
+    const target = live && this.state.pos ? this.state.target : this.nearest(pos, -1);
+    const T = SEEDS[target];
+    const dT = T ? Math.hypot(T[0] - pos[0], T[1] - pos[1]) : 1e9;
+    const seeds = SEEDS.map((s, i) => {
+      const match = s[2] === HELD.type && s[3] === HELD.tier;
+      let state = match ? 'pulse' : 'idle';
+      if (i === target && dT < MAGNET) state = 'partner';
+      return { l: s[0] - 67.2, t: s[1] - 67.2, type: s[2], tier: s[3], state, match: i === target ? 'nearest' : match ? 'same' : 'no' };
+    });
+    const k = p.markK != null ? +p.markK : 1, a = p.markAlpha != null ? +p.markAlpha : 1;
+    return {
+      season, rootRef: this.rootRef, markRef: this.markRef, seeds,
+      markOn: !!T, markL: T ? T[0] - 87 : 0, markT: T ? T[1] - 87 : 0, markK: k, markA: a,
+      markTransition: live ? 'left .14s cubic-bezier(.33,1,.68,1), top .14s cubic-bezier(.33,1,.68,1)' : 'none',
+      heldL: pos[0] - 67.2, heldT: pos[1] - 67.2 - 18, fingerL: pos[0] - 48, fingerT: pos[1] - 48 + 30,
+      onDown: ev => { if (!live) return; const q = this.posFrom(ev); if (q) this.setState({ drag: true, pos: q, target: this.nearest(q, this.state.target) }); },
+      onMove: ev => { if (!live || !this.state.drag) return; const q = this.posFrom(ev); if (q) this.setState(s => ({ pos: q, target: this.nearest(q, s.target) })); },
+      onUp: () => { if (this.state.drag) this.setState({ drag: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

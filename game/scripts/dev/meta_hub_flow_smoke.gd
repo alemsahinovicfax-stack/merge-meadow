@@ -103,14 +103,14 @@ func _step() -> void:
 		push_error("meta_hub_flow_smoke: AlmanacList should be removed from Shop")
 		quit(1)
 		return
-	# Shop redizajn (design_handoff_shop): kozmetika je u karticama po slotu.
-	var cosmetic_cards := shop.find_children("Cosmetic_*", "", true, false).size()
+	# Shop v2 (design_handoff_shop_v2): kozmetika je u Looks tabu, kartica po stavci iz kataloga.
+	var cosmetic_cards := shop.find_children("CosmeticCard_*", "", true, false).size()
 	if cosmetic_cards != 5:
 		push_error("meta_hub_flow_smoke: expected 5 cosmetic cards got %d" % cosmetic_cards)
 		quit(1)
 		return
-	if not bool(shop.call("get_fair_note_text").begins_with("Everything here is optional")):
-		push_error("meta_hub_flow_smoke: Shop fair note missing")
+	if str(shop.call("active_tab")) != "seasons":
+		push_error("meta_hub_flow_smoke: Shop should open on Seasons")
 		quit(1)
 		return
 	var coin_icon := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/CoinChip/HBox/CoinIcon") as TextureRect

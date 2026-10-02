@@ -1,7 +1,8 @@
 extends SceneTree
 
-## Bug-017 + design_handoff_shop: kupovina kozmetike za coine ide u dva tapa
-## ("Buy & wear" -> potvrda), skida coine, oprema predmet i javlja na kartici.
+## Shop v2 · Looks: coin kupovina u dva tapa na ISTOM dugmetu (coins.buy → coins.confirm →
+## kupljeno i nošeno), 3 s bez tapa vraća nazad, nema dovoljno coina → coins.short (tap ne
+## troši ništa), kupljeno = „Wearing" i kartica `#FFF6D6`; stanje isto kao u Ormaru.
 
 var _backup := ""
 
@@ -48,68 +49,66 @@ func _run() -> void:
 	if card == null:
 		_fail("meadow_sunset card missing")
 		return
-	if str(card.call("get_mode")) != "buy":
-		_fail("expected buy mode, got %s" % str(card.call("get_mode")))
-		return
-	if str(card.call("get_action_text")) != "Buy & wear":
-		_fail("buy label %s" % str(card.call("get_action_text")))
-		return
-	if str(card.call("get_price_text")) != "150":
-		_fail("price tag %s" % str(card.call("get_price_text")))
+	var btn: Node = card.call("get_buy_button")
+	if str(card.call("get_state")) != "coins.buy" or str(btn.get("price")) != "150":
+		_fail("expected coins.buy 150, got %s %s" % [card.call("get_state"), btn.get("price")])
 		return
 
-	card.emit_signal("buy_requested", "meadow_sunset")
+	# Prvi tap: potvrda na istom dugmetu, coini netaknuti.
+	btn.emit_signal("clicked")
 	await _frames(3)
-	if str(shop.call("get_confirm_id")) != "meadow_sunset":
-		_fail("first tap should open the confirm row")
-		return
-	if str(card.call("get_mode")) != "confirm":
-		_fail("card should be in confirm mode")
+	if str(shop.call("get_confirm_id")) != "meadow_sunset" or str(card.call("get_state")) != "coins.confirm":
+		_fail("first tap should arm the confirm state")
 		return
 	if int(gs.get("wallet_coins")) != 300:
 		_fail("first tap must not spend coins")
 		return
+	# 3 s bez tapa → nazad na coins.buy.
+	await create_timer(3.3).timeout
+	if str(card.call("get_state")) != "coins.buy":
+		_fail("confirm should time out back to coins.buy")
+		return
 
-	card.emit_signal("buy_confirmed", "meadow_sunset")
+	# Dva tapa: kupi i obuci.
+	btn.emit_signal("clicked")
+	await _frames(2)
+	btn.emit_signal("clicked")
 	await _frames(4)
 	if int(gs.get("wallet_coins")) != 150:
 		_fail("wallet expected 150 got %s" % str(gs.get("wallet_coins")))
 		return
-	var owned: Dictionary = cosmetics.get("owned")
-	if not bool(owned.get("meadow_sunset", false)):
+	if not bool(gs.call("owns_cosmetic", "meadow_sunset")):
 		_fail("meadow_sunset should be owned")
 		return
-	if not bool(gs.call("is_cosmetic_equipped", "meadow_sunset")):
-		_fail("meadow_sunset should be equipped")
+	if str(gs.call("get_equipped_cosmetic", "meadow_bg")) != "meadow_sunset":
+		_fail("bought item should be worn")
 		return
-	if str(card.call("get_mode")) != "equipped":
-		_fail("card should be equipped, got %s" % str(card.call("get_mode")))
+	if str(card.call("get_state")) != "owned" or not bool(card.call("is_worn")) or str(btn.get("owned_label")) != "Wearing":
+		_fail("card should show Wearing")
 		return
-	if str(card.call("get_badge_text")) != "Wearing":
-		_fail("badge %s" % str(card.call("get_badge_text")))
-		return
-	var status: Node = card.call("get_status")
-	if status == null or not status.visible or str(status.call("get_kind")) != "ok":
-		_fail("bought status missing on the card")
-		return
-	if not str(status.call("get_title_text")).begins_with("Bought"):
-		_fail("bought text %s" % str(status.call("get_title_text")))
+	if not bool(card.get("yours")):
+		_fail("bought card should use the yours fill")
 		return
 
-	gs.set("wallet_coins", 10)
+	# Nema dovoljno coina: coins.short, tap ne troši i ne potvrđuje.
+	var sky: Node = shop.call("get_cosmetic_card", "pip_blossom")
+	if str(sky.call("get_state")) != "coins.short":
+		_fail("pip_blossom (250) with 150 coins should be coins.short, got %s" % str(sky.call("get_state")))
+		return
+	var short_btn: Node = sky.call("get_buy_button")
+	short_btn.emit_signal("short_tapped")
+	await _frames(3)
+	if int(gs.get("wallet_coins")) != 150 or str(shop.call("get_confirm_id")) != "":
+		_fail("short tap must not spend or arm confirm")
+		return
+
+	# Ormar skine (Default) → Shop kaže Owned, ne Wearing.
+	gs.call("apply_wardrobe", {"meadow_bg": ""})
 	shop.call("refresh_shop")
 	await _frames(3)
-	var pricey: Node = shop.call("get_cosmetic_card", "pip_blossom")
-	if str(pricey.call("get_mode")) != "short":
-		_fail("pip_blossom should be short on coins")
+	if bool(card.call("is_worn")) or str(btn.get("owned_label")) != "Owned":
+		_fail("after Default in the Wardrobe the Shop should show Owned")
 		return
-	if bool(pricey.call("is_action_enabled")):
-		_fail("short card must not be buyable")
-		return
-	if str(pricey.call("get_action_text")) != "Need 240 more":
-		_fail("short label %s" % str(pricey.call("get_action_text")))
-		return
-
 	CampSmokeUtil.restore_save(self, _backup)
 	print("shop_cosmetic_buy_smoke OK")
 	quit(0)

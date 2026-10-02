@@ -1003,6 +1003,15 @@ func _open_wardrobe() -> void:
 	wardrobe_sheet.open(GameState.home_season_field_id)
 
 
+## Shop v2 · Looks → „Wardrobe": otvori polje aktivne sezone (bez prelaza) i Ormar.
+func open_wardrobe_from_shop() -> void:
+	if not GameState.home_season_field_open and season_stage != null:
+		season_stage.call("open_season_field", GameState.active_season_id, false)
+	for _i in 4:
+		await get_tree().process_frame
+	_open_wardrobe()
+
+
 func _close_wardrobe(animated: bool = true) -> void:
 	if wardrobe_sheet != null and wardrobe_sheet.is_open():
 		wardrobe_sheet.close(animated)

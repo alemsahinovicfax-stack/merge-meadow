@@ -112,7 +112,7 @@ Legenda: ✅ gotovo · 🟡 djelomično · ❌ nedostaje · ⏸ odgođeno (plan)
 | U3 | Kamp: merge, upgrade, Keep, auto-plant | ✅ | Keep oslobađa gredicu; torba soft cap 40 |
 | U4 | **Daily chest** | ✅ | `claim_daily_chest()`, save v4, kamp gumb |
 | U5 | Shop: remove ads + starter pack | ✅ | `shop_screen.gd`, `IAPManager` |
-| U6 | Shop: **booster consumables** | ✅ | Merge Hint + Loot Burst IAP; inventory + Use u shopu |
+| U6 | Shop: **boosteri** | ✅ | Shop v2 (2026-10-02): Merge Hint jednokratan (oznaka u Areni), Loot Burst consumable (+5 ★3 za sljedeću besplatnu sezonu) |
 | U7 | Shop / kamp kozmetika (3–5 itema) | ✅ | 5 coin itema u shopu (`cosmetic_catalog.gd`) |
 | U8 | **Dnevnik kolekcije** (lista otkrića) | ✅ | `collection_journal.tscn`, 📖 u kamp top baru, NEW badge |
 | U9 | Settings ekran | 🟡 | Placeholder handleri (hub/camp/menu); puni ekran **D0-P** |

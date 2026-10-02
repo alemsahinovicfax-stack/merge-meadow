@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div data-layer="ItemPreview" style="position:relative;overflow:hidden;width:{{ w }}px;height:{{ h }}px;background:{{ bg }}">
+  <sc-for list="{{ shapes }}" as="s" hint-placeholder-count="0">
+    <div style="{{ s.style }}"></div>
+  </sc-for>
+  <sc-for list="{{ imgs }}" as="m" hint-placeholder-count="0">
+    <img src="{{ m.src }}" alt="" style="{{ m.style }}">
+  </sc-for>
+  <sc-if value="{{ hasCreature }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="CreatureShadow" style="{{ shadowStyle }}"></div>
+    <img data-layer="{{ creatureLayer }}" src="{{ creatureSrc }}" alt="" style="{{ creatureStyle }}">
+  </sc-if>
+  <sc-if value="{{ veil }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="NotOwnedVeil" style="position:absolute;left:0;top:0;right:0;bottom:0;background:#E3D9CC;display:grid;place-items:center">
+      <div style="width:72px;height:72px;box-sizing:border-box;border-radius:20px;background:#EFE8DE;border:3px solid rgba(45,52,54,.45);display:grid;place-items:center">
+        <img src="ref/icon_lock.svg" alt="" style="width:40px;height:40px">
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1026,&quot;height&quot;:294},&quot;kind&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;companion&quot;,&quot;meadow&quot;,&quot;album&quot;,&quot;swatch&quot;],&quot;default&quot;:&quot;companion&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;subject&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;pip&quot;,&quot;mochi&quot;],&quot;default&quot;:&quot;pip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;size&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;thumb&quot;,&quot;stage&quot;],&quot;default&quot;:&quot;stage&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;w&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1026,&quot;tsType&quot;:&quot;number&quot;},&quot;h&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:294,&quot;tsType&quot;:&quot;number&quot;},&quot;veil&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;look&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;pip&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;},&quot;hop&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;}}">
+const ROWS = ['#B8D4F0', '#E0C4FF', '#FFE8B8', '#E4E4E0'];
+class Component extends DCLogic {
+  state = { M: null, k: 0 };
+  componentDidMount() { import('./wardrobe_data.js').then(M => this.setState({ M })); }
+  componentDidUpdate(pp) { if (pp.hop !== this.props.hop && this.props.hop) this.hopNow(); }
+  componentWillUnmount() { cancelAnimationFrame(this._raf); }
+  hopNow() {
+    cancelAnimationFrame(this._raf); const t0 = performance.now(), D = 280;
+    const step = now => { const k = Math.min(1, (now - t0) / D); this.setState({ k }); if (k < 1) this._raf = requestAnimationFrame(step); else this.setState({ k: 0 }); };
+    this._raf = requestAnimationFrame(step);
+  }
+  abs(x, y, w, h, extra) { return 'position:absolute;left:' + Math.round(x) + 'px;top:' + Math.round(y) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px;' + (extra || ''); }
+  renderVals() {
+    const p = this.props, M = this.state.M;
+    const w = +(p.w ?? 204), h = +(p.h ?? 144), stage = p.size === 'stage';
+    const kind = p.kind || 'companion', look = p.look || null;
+    const out = { w, h, bg: '#16211B', shapes: [], imgs: [], hasCreature: false, veil: !!p.veil, shadowStyle: '', creatureStyle: '', creatureSrc: '', creatureLayer: 'Creature' };
+    if (!M) return out;
+    const S = out.shapes, I = out.imgs, A = this.abs.bind(this);
+    const season = M.SEASONS[p.season] ? p.season : 'country_bloom';
+    const creature = (subject, map, size, cx, feet) => {
+      const r = subject === 'mochi' ? 0.95 : 0.926;
+      const top = feet - size * r, k = this.state.k, arc = Math.sin(Math.PI * k);
+      out.hasCreature = true;
+      out.creatureLayer = subject === 'mochi' ? 'MochiArt' : 'PipArt';
+      out.creatureSrc = M.creatureUrl(subject, map);
+      out.creatureStyle = A(cx - size / 2, top, size, size, 'display:block;transform-origin:50% ' + Math.round(r * 100) + '%;' + (k > 0 ? 'transform:translateY(' + (-arc * size * 0.11).toFixed(1) + 'px) scale(' + (1 + 0.12 * arc).toFixed(3) + ')' : ''));
+      out.shadowStyle = A(cx - size * 0.315, feet - size * 0.075, size * 0.63, size * 0.137, 'border-radius:50%;background:rgba(26,26,20,.16)');
+    };
+    if (kind === 'companion') {
+      const b = M.bands(M.SEASONS[season].g);
+      out.bg = b.far;
+      S.push({ style: A(0, 0, w, Math.round(h * 0.32), 'background:' + b.sky) });
+      S.push({ style: A(0, Math.round(h * 0.68), w, h - Math.round(h * 0.68), 'background:' + b.near) });
+      if (stage) {
+        const r = M.SEASONS[season].r, fs = Math.round(h * 0.42);
+        I.push({ src: 'ref/flowers/ph_' + r[0] + '.svg', style: A(w * 0.13 - fs / 2, h * 0.74 - fs, fs, fs, 'display:block') });
+        I.push({ src: 'ref/flowers/ph_' + r[4] + '.svg', style: A(w * 0.87 - fs * 0.45, h * 0.70 - fs * 0.9, fs * 0.9, fs * 0.9, 'display:block') });
+      }
+      const size = Math.round(h * (stage ? 0.80 : 0.84));
+      creature(p.subject || 'pip', look && look.recolor, size, w / 2, h - Math.round(h * 0.05));
+    } else if (kind === 'meadow') {
+      const c = M.runColors(look && look.tint, season);
+      out.bg = c.ground;
+      S.push({ style: A(w * 0.10, h * 0.05, h * 0.62, h * 0.62, 'border-radius:50%;background:' + c.blob) });
+      S.push({ style: A(w * 0.78, h * 0.42, h * 0.7, h * 0.7, 'border-radius:50%;background:' + c.blob) });
+      const lanes = stage ? [0.25, 0.5, 0.75] : [0.5], lw = Math.round(stage ? w * 200 / 1080 : w * 0.46), ew = stage ? 4 : 3;
+      const per = Math.round(h * 0.31), sh = Math.round(h * 0.105);
+      lanes.forEach(f => {
+        const x = Math.round(w * f - lw / 2);
+        S.push({ style: A(x, 0, lw, h, 'box-sizing:border-box;background:' + c.lane + ';border-left:' + ew + 'px solid ' + c.edge + ';border-right:' + ew + 'px solid ' + c.edge) });
+        for (let y = Math.round(h * 0.05); y < h; y += per) S.push({ style: A(x + ew, y, lw - ew * 2, sh, 'background:' + c.mow) });
+      });
+      if (stage) [405, 675].forEach(sx => S.push({ style: A(w * sx / 1080 - 1, 0, 3, h, 'border-left:3px dashed ' + c.seam + ';box-sizing:border-box') }));
+      const tuft = (x, y, z) => { S.push({ style: A(x - 8 * z, y + 4 * z - 7 * z, 14 * z, 14 * z, 'border-radius:50%;background:' + c.tuft) }); S.push({ style: A(x + 8 * z - 7 * z, y + 4 * z - 7 * z, 14 * z, 14 * z, 'border-radius:50%;background:' + c.tuft) }); S.push({ style: A(x - 8 * z, y - 16 * z, 16 * z, 16 * z, 'border-radius:50%;background:' + c.tuft) }); };
+      const petal = (x, y, z) => { S.push({ style: A(x - 6 * z, y - 6 * z, 12 * z, 12 * z, 'border-radius:50%;background:' + c.petal) }); S.push({ style: A(x - 4.5 * z, y - 12.5 * z, 9 * z, 9 * z, 'border-radius:50%;background:' + c.petal) }); };
+      const z = stage ? 1.2 : 0.8;
+      if (stage) { tuft(w * 0.045, h * 0.22, z); petal(w * 0.08, h * 0.78, z); tuft(w * 0.955, h * 0.66, z); petal(w * 0.93, h * 0.3, z); tuft(w * 0.62, h * 0.86, z); }
+      else { tuft(w * 0.1, h * 0.3, z); petal(w * 0.12, h * 0.8, z); tuft(w * 0.9, h * 0.72, z); petal(w * 0.88, h * 0.22, z); }
+      const size = Math.round(h * (stage ? 0.56 : 0.62));
+      creature('pip', p.pip || null, size, w / 2, h - Math.round(h * 0.06));
+      out.shadowStyle = out.shadowStyle.replace('rgba(26,26,20,.16)', 'rgba(18,28,22,.28)');
+    } else if (kind === 'album') {
+      out.bg = p.paperBg || '#2E4733';
+      const pw = stage ? 560 : w - 24, ph = h - (stage ? 40 : 24), px = (w - pw) / 2, py = (h - ph) / 2;
+      const s = stage ? 1.2 : 0.62, fr = look && look.frame, bw = fr ? Math.max(4, Math.round(fr.width * s)) : 0;
+      const paper = (look && look.paper) || '#FFF8F0';
+      S.push({ style: A(px, py, pw, ph, 'box-sizing:border-box;border-radius:' + Math.round(14 * s) + 'px;background:' + paper + (fr ? ';border:' + bw + 'px solid ' + fr.color : '')) });
+      const pad = Math.round(14 * s) + bw, th = Math.round(34 * s), tw = th * 13;
+      const tm = look && look.title_modulate ? look.title_modulate[0] : 1;
+      const cw = pw - pad * 2;
+      I.push({ src: 'ref/title_bloom_album.png', style: A(px + pad + (cw - Math.min(tw, cw)) / 2, py + pad, Math.min(tw, cw), Math.min(th, cw / 13), 'display:block;' + (tm !== 1 ? 'filter:brightness(' + tm + ')' : '')) });
+      const rh = Math.round((ph - pad * 2 - th - 4 * 10 * s) / 4), gap = Math.round(10 * s);
+      ROWS.forEach((col, i) => S.push({ style: A(px + pad, py + pad + th + gap + i * (rh + gap), cw, rh, 'border-radius:' + Math.round(10 * s) + 'px;background:' + col) }));
+    } else {
+      out.bg = p.paperBg || '#2E4733';
+      const cols = (look && look.colors) || ['#FFF8F0'];
+      const sw = stage ? 420 : w - 48, shh = stage ? h - 90 : h - 44, sx = (w - sw) / 2, sy = (h - shh) / 2;
+      S.push({ style: A(sx, sy, sw, shh, 'box-sizing:border-box;border-radius:' + (stage ? 28 : 16) + 'px;border:3px solid #2D3436;background:' + cols[0]) });
+      if (cols[1]) S.push({ style: A(sx + 3, sy + shh * 0.62, sw - 6, shh * 0.38 - 3, 'border-radius:0 0 ' + (stage ? 25 : 13) + 'px ' + (stage ? 25 : 13) + 'px;background:' + cols[1]) });
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>

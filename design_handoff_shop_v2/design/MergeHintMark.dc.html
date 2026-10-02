@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div data-layer="MergeHintMark" style="position:relative;width:{{ box }}px;height:{{ box }}px;pointer-events:none;transform:scale({{ k }});opacity:{{ a }}">
+  <sc-for list="{{ ink }}" as="b" hint-placeholder-count="8">
+    <div style="position:absolute;left:{{ b.x }}px;top:{{ b.y }}px;width:{{ b.w }}px;height:{{ b.h }}px;border-radius:9px;background:#2D3436"></div>
+  </sc-for>
+  <sc-for list="{{ band }}" as="b" hint-placeholder-count="8">
+    <div style="position:absolute;left:{{ b.x }}px;top:{{ b.y }}px;width:{{ b.w }}px;height:{{ b.h }}px;border-radius:5px;background:#DCF5EC"></div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:200,&quot;height&quot;:200},&quot;frame&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:156,&quot;min&quot;:120,&quot;max&quot;:220,&quot;tsType&quot;:&quot;number&quot;},&quot;arm&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:40,&quot;min&quot;:20,&quot;max&quot;:70,&quot;tsType&quot;:&quot;number&quot;},&quot;k&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.8,&quot;max&quot;:1.4,&quot;step&quot;:0.01,&quot;tsType&quot;:&quot;number&quot;},&quot;alpha&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;}}">
+// 4 kutne zagrade (L): taman vanjski rub 4 px #2D3436 + svijetla traka 10 px #DCF5EC (svjetlija mint).
+// Nije prsten (puls i magnet su prstenovi) — razlika je u obliku.
+class Component extends DCLogic {
+  renderVals() {
+    const F = +(this.props.frame ?? 156), A = +(this.props.arm ?? 40), T = 18, t = 10;
+    const box = F + T, c = box / 2;
+    const ink = [], band = [];
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sy]) => {
+      const cx = c + sx * F / 2, cy = c + sy * F / 2;
+      const bar = (th, list) => {
+        const x1 = Math.min(cx, cx - sx * A), y1 = Math.min(cy, cy - sy * A);
+        list.push({ x: x1 - th / 2, y: cy - th / 2, w: A + th, h: th });
+        list.push({ x: cx - th / 2, y: y1 - th / 2, w: th, h: A + th });
+      };
+      bar(T, ink); bar(t, band);
+    });
+    const k = +(this.props.k ?? 1), a = +(this.props.alpha ?? 1);
+    return { box, ink, band, k, a };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#EFE4D2}a{color:#9E6645}a:hover{color:#2D3436}</style>
+</helmet>
+<div data-layer="ShopSpecs" style="width:2160px;box-sizing:border-box;padding:80px;background:#EFE4D2;font-family:Nunito,system-ui,sans-serif;color:#2D3436;display:flex;flex-direction:column;gap:96px">
+
+  <div style="display:flex;flex-direction:column;gap:18px;max-width:1600px">
+    <div style="font:900 30px/1 Nunito,system-ui,sans-serif;letter-spacing:.12em;color:#7A6A4E">MERGE MEADOW · SHOP · RUNDA 2</div>
+    <div style="font:900 92px/1 Nunito,system-ui,sans-serif;letter-spacing:-.02em">Shop v2 — specs &amp; stanja</div>
+    <div style="font:700 34px/1.4 Nunito,system-ui,sans-serif;color:#4A5153;text-wrap:pretty">Shop je tezga na livadi: tenda s prugama (mint / krem, kao ikona Shop taba) drži četiri taba, ispod je pergament i roba. Svaki tab je svoj ekran sa svojim skrolom. Na svakoj kartici koja prodaje je jedno dugme — ono je i cijena i kupovina. Sve slike ispod su živi <span style="font-family:ui-monospace,Menlo,monospace">ShopScreen.dc.html</span> s fiksnom scenom; stranica 1080 × 1633 između hub headera i footera (chrome v2, nepromijenjen).</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font:800 30px/1 Nunito,system-ui,sans-serif">
+      <a href="#s1">1 Prije → poslije</a><a href="#s2">2 Stanja §9.1</a><a href="#s3">3 Tabovi i ulaz</a><a href="#s4">4 Dugme</a><a href="#s5">5 Kartice</a><a href="#s6">6 Merge Hint u Areni</a><a href="#s7">7 Boje</a><a href="#s8">8 Samoprovjera</a>
+    </div>
+  </div>
+
+  <sc-if value="{{ on.s1 }}" hint-placeholder-val="{{ true }}">
+  <div id="s1" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 56px/1 Nunito,system-ui,sans-serif">1 · Prije → poslije</div>
+    <div style="display:grid;grid-template-columns:repeat(4,389px);gap:40px 52px">
+      <sc-for list="{{ before }}" as="b" hint-placeholder-count="0">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font:800 28px/1 Nunito,system-ui,sans-serif;color:#7A6A4E">Danas · {{ b.label }}</div>
+          <img src="{{ b.src }}" alt="" style="width:389px;height:692px;display:block;border-radius:20px;box-shadow:0 8px 0 rgba(26,26,20,.18)">
+          <div onClick="{{ b.pick }}" style="height:96px;box-sizing:border-box;border-radius:48px;border:4px solid #2D3436;background:#FFB88C;box-shadow:0 6px 0 rgba(26,26,20,.22);display:grid;place-items:center;font:900 32px/1 Nunito,system-ui,sans-serif;cursor:pointer">Novo · {{ b.label }} → u pregledniku §2</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ on.s2 }}" hint-placeholder-val="{{ true }}">
+  <div id="s2" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 56px/1 Nunito,system-ui,sans-serif">2 · Stanja §9.1</div>
+    <div style="font:700 30px/1.35 Nunito,system-ui,sans-serif;color:#4A5153;max-width:1700px">Id = <span style="font-family:ui-monospace,Menlo,monospace">scene</span> (+ tab / price / starter) u ShopScreen. Tap na stanje ga učita lijevo. Otvori ShopScreen samostalno za žive tokove: tap na tab, kupovina za coine (2 tapa), store sa <span style="font-family:ui-monospace,Menlo,monospace">storeResult</span> success / cancel / pending / error.</div>
+    <div style="display:flex;gap:48px;align-items:flex-start">
+      <div data-layer="StateViewer" style="flex:0 0 auto;width:756px;height:1344px;overflow:hidden;border-radius:26px;box-shadow:0 10px 0 rgba(26,26,20,.2)">
+        <div style="width:1080px;height:1920px;transform:scale(.7);transform-origin:0 0" data-viewer="1">
+          <dc-import name="ShopScreen" tab="{{ cur.tab }}" scene="{{ cur.scene }}" price="{{ cur.price }}" starter="auto" slot="meadow_bg" frozen="{{ true }}" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+      <div style="flex:1;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+        <sc-for list="{{ states }}" as="s" hint-placeholder-count="12">
+          <div data-state-id="{{ s.id }}" onClick="{{ s.pick }}" style="box-sizing:border-box;padding:20px 24px;border-radius:22px;cursor:pointer;display:flex;flex-direction:column;gap:8px;background:{{ s.bg }};border:3px solid {{ s.edge }}">
+            <div style="font:900 22px/1 ui-monospace,Menlo,monospace;color:#7A6A4E">{{ s.no }} · {{ s.code }}</div>
+            <div style="font:900 28px/1.1 Nunito,system-ui,sans-serif">{{ s.title }}</div>
+            <div style="font:700 23px/1.35 Nunito,system-ui,sans-serif;color:#4A5153;text-wrap:pretty">{{ s.note }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ on.s3 }}" hint-placeholder-val="{{ true }}">
+  <div id="s3" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 56px/1 Nunito,system-ui,sans-serif">3 · Tabovi, prelaz i ulaz</div>
+    <div style="display:flex;gap:48px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="width:389px;height:692px;overflow:hidden;border-radius:20px;box-shadow:0 8px 0 rgba(26,26,20,.18)">
+          <div style="width:1080px;height:1920px;transform:scale(.36);transform-origin:0 0">
+            <dc-import name="ShopScreen" tab="looks" scene="default" trans-from="seasons" trans-t="{{ 0 }}" frozen="{{ true }}" hint-size="1080px,1920px"></dc-import>
+          </div>
+        </div>
+        <div style="font:900 30px/1.1 Nunito,system-ui,sans-serif;max-width:389px">Prelaz 0 ms — tap na Looks</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="width:389px;height:692px;overflow:hidden;border-radius:20px;box-shadow:0 8px 0 rgba(26,26,20,.18)">
+          <div style="width:1080px;height:1920px;transform:scale(.36);transform-origin:0 0">
+            <dc-import name="ShopScreen" tab="looks" scene="default" trans-from="seasons" trans-t="{{ 1 }}" frozen="{{ true }}" hint-size="1080px,1920px"></dc-import>
+          </div>
+        </div>
+        <div style="font:900 30px/1.1 Nunito,system-ui,sans-serif;max-width:389px">200 ms — gotovo (između: Seasons blijedi 1 → 0, Looks 0 → 1 i klizi 48 → 0 px, cubic-out; peach klizač prelazi na Looks). Seasons pamti svoj skrol.</div>
+      </div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:22px;padding-top:8px">
+        <sc-for list="{{ tabRules }}" as="r" hint-placeholder-count="6">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font:900 32px/1.15 Nunito,system-ui,sans-serif">{{ r.t }}</div>
+            <div style="font:700 28px/1.4 Nunito,system-ui,sans-serif;color:#4A5153;text-wrap:pretty">{{ r.d }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ on.s4 }}" hint-placeholder-val="{{ true }}">
+  <div id="s4" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 56px/1 Nunito,system-ui,sans-serif">4 · BuyButton — jedno dugme, stanja oblikom i bojom</div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:36px">
+      <sc-for list="{{ buttons }}" as="b" hint-placeholder-count="10">
+        <div style="background:#FFFFFF;border:4px solid #2D3436;border-radius:32px;padding:28px;display:flex;flex-direction:column;gap:18px;min-height:300px;box-sizing:border-box">
+          <div style="height:136px;display:flex;align-items:center">
+            <dc-import name="BuyButton" kind="{{ b.kind }}" state="{{ b.state }}" price="{{ b.price }}" label="{{ b.label }}" frozen="{{ true }}" hint-size="300px,128px"></dc-import>
+          </div>
+          <div style="font:900 30px/1.1 Nunito,system-ui,sans-serif">{{ b.t }}</div>
+          <div style="font:700 25px/1.35 Nunito,system-ui,sans-serif;color:#4A5153;text-wrap:pretty">{{ b.d }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ on.s5 }}" hint-placeholder-val="{{ true }}">
+  <div id="s5" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 56px/1 Nunito,system-ui,sans-serif">5 · Kartice — anatomija</div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px">
+      <sc-for list="{{ parts }}" as="p" hint-placeholder-count="9">
+        <div style="background:#FFF8F0;border:3px solid rgba(45,52,54,.2);border-radius:28px;padding:30px 34px;display:flex;flex-direction:column;gap:12px">
+          <div style="font:900 26px/1 ui-monospace,Menlo,monospace;color:#7A6A4E">{{ p.layer }}</div>
+          <sc-for list="{{ p.lines }}" as="l" hint-placeholder-count="4">
+            <div style="font:700 26px/1.4 Nunito,system-ui,sans-serif;text-wrap:pretty">{{ l }}</div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:40px;align-items:flex-end;flex-wrap:wrap">
+      <sc-for list="{{ portraitDemo }}" as="f" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+          <dc-import name="FlowerPortrait" p="{{ f.p }}" type="{{ f.type }}" hint-size="172px,172px"></dc-import>
+          <div style="font:800 24px/1.2 Nunito,system-ui,sans-serif;color:#4A5153;text-align:center;max-width:200px">{{ f.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ on.s6 }}" hint-placeholder-val="{{ true }}">
+  <div id="s6" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 56px/1 Nunito,system-ui,sans-serif">6 · Merge Hint u Areni</div>
+    <div style="font:700 30px/1.4 Nunito,system-ui,sans-serif;color:#4A5153;max-width:1700px;text-wrap:pretty">Dok igrač drži sjemenku, najbliža ista (tip + tier) dobije MergeHintMark: četiri kutne zagrade — taman rub 4 px #2D3436 + svijetla traka 10 px #DCF5EC. Ostale iste i dalje pulsiraju zlatnim prstenom; magnet partner zadržava svoj prsten. Zagrade nisu prsten → razlika je u obliku, ne samo u boji. Daisy T2 (gore desno) nije ista sjemenka — nema ni puls ni oznaku.</div>
+    <div style="display:flex;gap:36px;align-items:flex-start">
+      <sc-for list="{{ arena }}" as="a" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="width:432px;height:653px;overflow:hidden;border-radius:20px;border:4px solid #2D3436;box-sizing:content-box">
+            <div style="width:1080px;height:1633px;transform:scale(.4);transform-origin:0 0">
+              <dc-import name="ArenaMergeHint" season="{{ a.season }}" frame="{{ a.frame }}" frozen="{{ true }}" hint-size="1080px,1633px"></dc-import>
+            </div>
+          </div>
+          <div style="font:900 28px/1.15 Nunito,system-ui,sans-serif">{{ a.title }}</div>
+          <div style="font:700 24px/1.35 Nunito,system-ui,sans-serif;color:#4A5153;max-width:432px;text-wrap:pretty">{{ a.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:56px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:16px;align-items:center">
+        <div style="position:relative;width:420px;height:420px;border-radius:28px;background:#7DAA67;border:4px solid #2D3436;display:grid;place-items:center">
+          <div style="position:absolute;left:127px;top:127px;width:166px;height:166px;transform:scale(1.4)">
+            <dc-import name="SeedChip" type="daisy" tier="{{ 1 }}" state="pulse" season="country_bloom" hint-size="134px,134px"></dc-import>
+          </div>
+          <div style="position:absolute;left:88px;top:88px;width:244px;height:244px;transform:scale(1.4);transform-origin:50% 50%">
+            <div style="position:absolute;left:35px;top:35px"><dc-import name="MergeHintMark" hint-size="174px,174px"></dc-import></div>
+          </div>
+        </div>
+        <div style="font:800 26px/1.3 Nunito,system-ui,sans-serif;color:#4A5153">× 1,4 · okvir 156 · krak 40 · debljina 18</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;flex:1;min-width:0">
+        <div style="font:900 34px/1 Nunito,system-ui,sans-serif">Kontrast oznake na svih 8 livada (računa se ovdje, iz arena_v2_data.fieldColors)</div>
+        <div style="display:grid;grid-template-columns:320px 220px 220px 220px;gap:10px 24px;font:800 26px/1.2 Nunito,system-ui,sans-serif">
+          <div style="color:#7A6A4E">Livada</div><div style="color:#7A6A4E">min · nivo 0</div><div style="color:#7A6A4E">min · nivo 4</div><div style="color:#7A6A4E">najgora boja</div>
+          <sc-for list="{{ contrastRows }}" as="c" hint-placeholder-count="8">
+            <div>{{ c.name }}</div><div style="color:{{ c.c0 }}">{{ c.v0 }}</div><div style="color:{{ c.c4 }}">{{ c.v4 }}</div><div style="font-family:ui-monospace,Menlo,monospace">{{ c.at }}</div>
+          </sc-for>
+        </div>
+        <div style="font:700 26px/1.4 Nunito,system-ui,sans-serif;color:#4A5153">Dokaz za bilo koju boju polja: √((L traka + 0,05) / (L ink + 0,05)) = {{ proof }} ≥ 3 — jedna od dvije ivice uvijek ima ≥ 3 : 1 (isto pravilo kao sjemenka 3,47 i Pip 3,00).</div>
+        <sc-for list="{{ anim }}" as="m" hint-placeholder-count="4">
+          <div style="font:700 26px/1.4 Nunito,system-ui,sans-serif"><b>{{ m.t }}</b> — {{ m.d }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ on.s7 }}" hint-placeholder-val="{{ true }}">
+  <div id="s7" style="display:flex;flex-direction:column;gap:28px">
+    <div style="font:900 56px/1 Nunito,system-ui,sans-serif">7 · Boje (sve iz postojeće palete; nove su samo svjetlije varijante)</div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px">
+      <sc-for list="{{ swatches }}" as="w" hint-placeholder-count="14">
+        <div style="width:300px;display:flex;flex-direction:column;gap:10px">
+          <div style="height:110px;border-radius:24px;border:4px solid #2D3436;background:{{ w.c }}"></div>
+          <div style="font:900 26px/1 ui-monospace,Menlo,monospace">{{ w.c }}</div>
+          <div style="font:700 25px/1.3 Nunito,system-ui,sans-serif;color:#4A5153">{{ w.r }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ on.s8 }}" hint-placeholder-val="{{ true }}">
+  <div id="s8" style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 56px/1 Nunito,system-ui,sans-serif">8 · Samoprovjera §9.3 (mjeri se u browseru, iz DOM-a ove stranice)</div>
+    <div style="font:700 28px/1.35 Nunito,system-ui,sans-serif;color:#4A5153">{{ checkStatus }}</div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <sc-for list="{{ checks }}" as="c" hint-placeholder-count="9">
+        <div data-check="{{ c.n }}" data-ok="{{ c.ok }}" style="display:flex;gap:24px;align-items:flex-start;background:#FFFFFF;border:3px solid rgba(45,52,54,.2);border-radius:24px;padding:22px 28px">
+          <div style="flex:0 0 96px;height:56px;border-radius:28px;border:3px solid #2D3436;display:grid;place-items:center;font:900 30px/1 Nunito,system-ui,sans-serif;background:{{ c.bg }}">{{ c.verdict }}</div>
+          <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+            <div style="font:900 30px/1.2 Nunito,system-ui,sans-serif">{{ c.n }}. {{ c.t }}</div>
+            <div style="font:700 25px/1.4 Nunito,system-ui,sans-serif;color:#4A5153;text-wrap:pretty">{{ c.d }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div data-layer="LiveCheck" style="display:flex;gap:40px;align-items:flex-start">
+      <div style="width:540px;height:960px;overflow:hidden;border-radius:20px;box-shadow:0 8px 0 rgba(26,26,20,.18)">
+        <div style="width:1080px;height:1920px;transform:scale(.5);transform-origin:0 0" data-live-shop="1">
+          <dc-import name="ShopScreen" scene="default" hint-size="1080px,1920px"></dc-import>
+        </div>
+      </div>
+      <div style="font:700 28px/1.4 Nunito,system-ui,sans-serif;color:#4A5153;max-width:900px">Živi ShopScreen (nije frozen) za provjere 1 i 9: četiri TabPage s vlastitim skrolom, ulaz = Seasons, broj beskonačnih animacija dok Starfall čeka store.</div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;only&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;}}">
+const BANNED = [/6 flowers for your Album/i, /same runs, same rewards/i, /yours to keep/i, /\bGet (Moonlit|Coral|Starfall|Ember)/i, /one-time/i, /everywhere · wear one/i, /run background · wear one/i, /Journal page/i, /for coins · looks only/i, /Need \d+ more/i, /earn in runs/i, /Buy & wear/i, /You have/i, /\+1 to your stock/i, /\beach\b/i, /Use one/i, /Bag is full/i, /trade seeds in Camp first/i, /optional helpers/i, /for good, on this account/i, /once per account/i, /one-time bundle/i, /Rewarded videos stay optional/i, /Buy 1\b/i];
+const STATES = [
+  ['1', 'seasons · default', 'seasons', 'default', 'Seasons — podrazumijevani', 'Moonlit za kupiti (prigušen jer Starfall čeka store — jedna IAP u isto vrijeme), Coral kupljena → Play, Starfall čeka, Ember uskoro.'],
+  ['2a', 'looks · default', 'looks', 'default', 'Looks', 'Pip Blossom: nema coina (220 < 250). Pip Sky: kupi. Slotovi, ikone i nazivi iz cosmetics.json.'],
+  ['2b', 'confirm', 'looks', 'confirm', 'Looks — potvrda', 'Prvi tap obrne isto dugme (ink + ✓). Drugi tap kupuje; 3 s bez tapa → nazad.'],
+  ['2c', 'short_tap', 'looks', 'short_tap', 'Looks — tap bez coina', 'Dugme drhti (−12 px), coin chip u headeru pulsira zlatnim prstenom. Bez rečenice.'],
+  ['2d', 'bought', 'looks', 'bought', 'Looks — kupljeno', 'Kartica = Ormar „nosiš“: krem-žuta + ✓; Pip skoči u pregledu; −200 leti u coin chip.'],
+  ['2e', 'looks · owned / wearing', 'looks', 'all_owned', 'Looks — sve tvoje', 'Wearing (✓ na pregledu) i Owned. Mijenja se u Ormaru (dugme Wardrobe na dnu taba).'],
+  ['3a', 'boosters · default', 'boosters', 'default', 'Boosters', 'Merge Hint (jednom, zauvijek) i Loot Burst: +5 Harvest Pumpkin za Frost Orchard, 12 / 20.'],
+  ['3b', 'mh_owned', 'boosters', 'mh_owned', 'Merge Hint — tvoj', 'Kartica ostaje kao „imaš“: pregled oznake + Yours.'],
+  ['3c', 'loot_lantern', 'boosters', 'loot_lantern', 'Loot Burst — sljedeća sezona', 'Frost Orchard otključan → Crystal Peony za Lantern Meadow (proceduralni ★3, kao Home).'],
+  ['3d', 'boosters_done', 'boosters', 'boosters_done', 'Loot Burst nestao', 'Sve besplatne sezone otključane: samo tvoj Merge Hint + Pip „All set here“.'],
+  ['4a', 'support · default', 'support', 'default', 'Support', 'Remove Ads, Starter Pack (6d left), Restore kao diskretan link.'],
+  ['4b', 'support_owned', 'support', 'support_owned', 'Support — kupljeno', 'Ads off · Claimed. Rok se više ne prikazuje.'],
+  ['4c', 'starter_expired', 'support', 'starter_expired', 'Starter Pack — istekao', 'Siv veo 84 % + katanac + Expired. Veo guta tap.'],
+  ['4d', 'starter_busy', 'support', 'starter_busy', 'Starter — čeka store', 'Dugme pritisnuto (−8 px, bez sjene) + tri tačke = jedini loop. Ostala IAP dugmad prigušena.'],
+  ['5', 'from_wardrobe', 'looks', 'from_wardrobe', 'Ulaz iz Ormara', '„More in Shop“ iz slota Meadow → tab Looks, skrol na Meadow, zaglavlje slota bljesne 1,2 s.'],
+  ['6a', 'fail_cancel', 'seasons', 'fail_cancel', 'Otkazano', 'Roze status ispod imena, dugme opet kupuje. Nestaje na sljedeći tap.'],
+  ['6b', 'fail_error', 'seasons', 'fail_error', 'Neuspjelo', 'Isto mjesto, drugi tekst.'],
+  ['6c', 'pending', 'seasons', 'pending', 'Pending', 'Žuti status; dugme prigušeno dok store ne potvrdi.'],
+  ['7a', 'newbie · long', 'seasons', 'newbie', 'Dug store string — sezone', '„Rp 57.900“ > 7 znakova → 44 px; dugme raste.', 'long'],
+  ['7b', 'boosters · long', 'boosters', 'default', 'Dug store string — boosteri', '„Rp 16.500“ na oba boostera.', 'long'],
+  ['—', 'restored', 'support', 'restored', 'Restore gotov', 'Toast; Remove Ads vraćen → Ads off.'],
+  ['—', 'no_store', 'support', 'no_store', 'Bez storea (stub)', 'Restore se ne crta.'],
+  ['—', 'newbie', 'support', 'newbie', 'Novi igrač — Support', 'Starter Pack 7d left, Pip Blossom još nije tvoj.'],
+  ['—', 'all_owned', 'seasons', 'all_owned', 'Sve kupljeno — Seasons', 'Tri × Play, Ember uskoro.']
+];
+const BUTTONS = [
+  ['coins', 'buy', '200', '', 'Coini · kupi', 'Zlatno #FFD56B, coin ikona + cijena, tvrda sjena 8. Prvi tap ne kupuje.'],
+  ['coins', 'confirm', '200', '', 'Coini · potvrdi', 'Isto dugme obrnuto: ink #2D3436, zlatna ✓ i cijena (9 : 1). Drugi tap kupuje; 3 s → nazad.'],
+  ['coins', 'short', '250', '', 'Coini · nema dovoljno', 'Ravno (bez sjene), #F1EAE0, coin 55 %. Tap = drhtaj + puls coin chipa.'],
+  ['money', 'buy', '€2.99', '', 'Pravi novac · kupi', 'Lavanda #D4A5FF, samo store string — bez coina. Boja + ikona razlikuju valutu.'],
+  ['money', 'busy', '€2.99', '', 'Čeka store', 'Dugme ostaje pritisnuto (+8 px, bez sjene), tri tačke pulsiraju — jedini loop.'],
+  ['money', 'dim', '€3.49', '', 'Nedostupno', 'Druga kupovina traje ili pending: ravno, svijetla lavanda, cijena #555C5E (4,9 : 1).'],
+  ['money', 'buy', 'Rp 57.900', '', 'Dug string', '> 7 znakova → 44 px; dugme raste od min 280.'],
+  ['play', 'buy', '', '', 'Kupljena sezona', 'Peach ▶ Play (kao Home Play) → Home s fokusom na sezonu.'],
+  ['money', 'owned', '', 'Yours', 'Kupljeno', 'Mint + ✓, bez sjene (= Home „Yours“). Label: Yours / Ads off / Claimed / Owned / Wearing.'],
+  ['coins', 'owned', '', 'Wearing', 'Looks · nosiš', 'Isti tag; kartica dobije krem-žutu podlogu i ✓ na pregledu (jezik Ormara).']
+];
+const SWATCHES = [
+  ['#FBEDD7', 'ShopBg — pergament (svjetlija tezga #F2D39B, 70 % ka krem)'], ['#A8E6CF', 'Tenda · mint (ikona Shop)'], ['#FFF8F0', 'Tenda · krem, diskovi portreta'],
+  ['#FFFFFF', 'Kartica'], ['#FFF6D6', 'Kartica „tvoje / nosiš“ (Ormar chosen)'], ['#FFB88C', 'Aktivan tab · Play'],
+  ['#FFD56B', 'Kupovina za coine'], ['#D4A5FF', 'Kupovina pravim novcem'], ['#EAD2FF', 'Čeka / nedostupno (svjetlija lavanda)'],
+  ['#F1EAE0', 'Nema coina (= Ormar none)'], ['#DCF5EC', 'Merge Hint traka, sjemenke (svjetlija mint)'], ['#FFCCD5', 'Otkazano / neuspjelo'],
+  ['#FFE8B8', 'Pending · coin pločica'], ['#2D3436', 'Ink — rubovi, tekst, potvrda']
+];
+const PAIRS = [
+  ['#2D3436', '#FFFFFF'], ['#2D3436', '#FBEDD7'], ['#555C5E', '#FFFFFF'], ['#555C5E', '#FBEDD7'], ['#2D3436', '#FFF6D6'], ['#2D3436', '#FFD56B'], ['#FFD56B', '#2D3436'],
+  ['#555C5E', '#F1EAE0'], ['#2D3436', '#D4A5FF'], ['#555C5E', '#EAD2FF'], ['#2D3436', '#FFB88C'], ['#2D3436', '#A8E6CF'], ['#2D3436', '#FFCCD5'], ['#2D3436', '#FFE8B8'],
+  ['#FFF8F0', '#2D3436'], ['#2D3436', '#FFF8F0'], ['#555C5E', '#DCF5EC'], ['#2D3436', '#DCF5EC'], ['#555C5E', '#FFF6D6']
+];
+class Component extends DCLogic {
+  state = { A: null, S: null, checks: null, pick: 0, status: 'Provjera prolazi kroz sva stanja u pregledniku (~30 s)…' };
+  componentDidMount() {
+    this._alive = true;
+    Promise.all([import('./arena_v2_data.js'), import('./shop_v2_data.js')]).then(([A, S]) => { if (this._alive) this.setState({ A, S }); });
+    this._t = setTimeout(() => this.runChecks(), 5000);
+  }
+  componentWillUnmount() { this._alive = false; clearTimeout(this._t); }
+  async runChecks() {
+    if (!this._alive) return;
+    const A = this.state.A, S = this.state.S;
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    const root = document.querySelector('[data-layer="ShopSpecs"]');
+    const viewerSh = () => root.querySelector('[data-viewer] [data-layer="ShopScreen"]');
+    const agg = { sell: 0, bad: [], hits: new Set(), small: new Set(), clip: 0, longOk: 0, minBtn: 999, minTab: 999, minName: 999, grad: 0, blur: 0, soft: 0, green: 0, seasonCards: 0, p6: true, minD: 999, cat: '', same: true, slots: new Set(), exp: null, visited: 0 };
+    for (let i = 0; i < STATES.length; i++) {
+      if (!this._alive) return;
+      this.setState({ pick: i, status: 'Provjera: stanje ' + (i + 1) + ' / ' + STATES.length + ' …' });
+      await wait(1100);
+      const sh = viewerSh(); if (!sh) continue;
+      const page = sh.querySelector('[data-layer="ShopPage"]'); if (!page) continue;
+      agg.visited++;
+      const tab = sh.getAttribute('data-active-tab');
+      const pg = page.querySelector('[data-tab="' + tab + '"][data-layer^="TabPage_"]');
+      pg.querySelectorAll('[data-sells="yes"]').forEach(card => {
+        agg.sell++;
+        const btns = card.querySelectorAll('[data-layer="BuyButton"]');
+        const ok = btns.length === 1 && (btns[0].querySelector('[data-role="price"]') || btns[0].getAttribute('data-state') === 'busy');
+        if (!ok) agg.bad.push(STATES[i][0] + ':' + card.getAttribute('data-card') + ':' + btns.length);
+      });
+      const txt = pg.innerText + '\n' + page.querySelector('[data-layer="ShopTabBar"]').innerText;
+      BANNED.forEach(r => { if (r.test(txt)) agg.hits.add(r.source + ' @' + STATES[i][0]); });
+      const walker = document.createTreeWalker(pg, NodeFilter.SHOW_TEXT); let n;
+      while ((n = walker.nextNode())) { if (!n.textContent.trim()) continue; const fs = parseFloat(getComputedStyle(n.parentElement).fontSize); if (fs < 34) agg.small.add(n.textContent.trim().slice(0, 18) + ' ' + fs + 'px'); }
+      pg.querySelectorAll('[data-role="price"]').forEach(el => { const box = el.parentElement; if (el.scrollWidth > el.clientWidth + 1 || box.scrollWidth > box.clientWidth + 1) agg.clip++; if (el.textContent.length > 7) { if (parseFloat(getComputedStyle(el).fontSize) >= 44) agg.longOk++; else agg.clip++; } });
+      pg.querySelectorAll('[data-layer="BuyButton"] > div, [data-layer="SoonTag"]').forEach(x => { if (x.offsetHeight) agg.minBtn = Math.min(agg.minBtn, x.offsetHeight); });
+      page.querySelectorAll('[data-layer="ShopTab"], [data-layer="WardrobeLink"], [data-layer="RestoreLink"]').forEach(x => { if (x.offsetHeight) agg.minTab = Math.min(agg.minTab, x.offsetHeight); });
+      pg.querySelectorAll('[data-role="name"]').forEach(x => agg.minName = Math.min(agg.minName, parseFloat(getComputedStyle(x).fontSize)));
+      page.querySelectorAll('*').forEach(el => { const c = getComputedStyle(el); if (/gradient/.test(c.backgroundImage)) agg.grad++; if (/blur|drop-shadow/.test(c.filter)) agg.blur++; if (c.boxShadow && c.boxShadow !== 'none' && c.boxShadow.split(/,(?![^(]*\))/).some(s => { const v = s.replace(/rgba?\([^)]*\)/, '').trim().split(/\s+/).map(parseFloat); return v.length >= 3 && v[2] > 0; })) agg.soft++; if (c.backgroundColor === 'rgb(46, 71, 51)' || c.color === 'rgb(46, 71, 51)') agg.green++; });
+      if (tab === 'seasons') pg.querySelectorAll('[data-layer="SeasonCard"]').forEach(c => { agg.seasonCards++; const ps = c.querySelectorAll('[data-layer="FlowerPortrait"]'); if (ps.length !== 6) agg.p6 = false; ps.forEach(pp => { agg.minD = Math.min(agg.minD, pp.offsetWidth); if (!pp.querySelector('[data-layer="FlowerArt"]')) agg.p6 = false; }); });
+      if (tab === 'looks') { agg.cat = sh.getAttribute('data-catalog'); if (sh.getAttribute('data-catalog-same') === 'no') agg.same = false; pg.querySelectorAll('[data-layer="LooksSlot"]').forEach(e => agg.slots.add(e.getAttribute('data-slot'))); }
+      if (STATES[i][3] === 'starter_expired') {
+        const card = pg.querySelector('[data-layer="StarterPackCard"]');
+        const veil = card && card.querySelector('[data-layer="ExpiredVeil"]');
+        const btn = card && card.querySelector('[data-layer="BuyButton"]');
+        let blocked = false;
+        if (veil && btn) { const r = btn.getBoundingClientRect(), v = veil.getBoundingClientRect(); const covers = v.left <= r.left && v.top <= r.top && v.right >= r.right && v.bottom >= r.bottom; const z = getComputedStyle(veil); blocked = covers && z.pointerEvents !== 'none' && z.position === 'absolute' && btn.getAttribute('data-tappable') === 'no'; }
+        const t = card ? card.innerText : '';
+        agg.exp = { veil: !!veil, lock: !!(veil && veil.querySelector('img[src*="icon_lock"]')), blocked, content: /100/.test(t) && /Pip Blossom/.test(t) && card.querySelectorAll('[data-layer="StarterSeed"]').length === 5 && /×10/.test(t) && !/Merge Hint/i.test(t), sells: card ? card.getAttribute('data-sells') : '' };
+      }
+    }
+    const out = [];
+    const live = root.querySelector('[data-live-shop] [data-layer="ShopScreen"]');
+    const pages = live ? [...live.querySelectorAll('[data-layer^="TabPage_"]')] : [];
+    const ownScroll = pages.length === 4 && pages.every(pg => getComputedStyle(pg).overflowY === 'auto');
+    const tabs = live ? live.querySelectorAll('[data-layer="ShopTab"]').length : 0;
+    const entry = live && live.getAttribute('data-active-tab');
+    out.push([ownScroll && entry === 'seasons' && tabs === 4, 'Četiri taba, svaki svoj ekran sa svojim skrolom; ulaz iz footera otvara Seasons', tabs + ' ShopTab · ' + pages.length + ' TabPage, svaki overflow-y auto: ' + (ownScroll ? 'da' : 'ne') + ' · aktivan pri ulazu (scene default, tab auto): ' + entry + '.']);
+    out.push([agg.sell > 0 && agg.bad.length === 0, 'Na svakoj kartici koja prodaje je tačno jedno dugme, i ono nosi cijenu', agg.sell + ' prodajnih kartica kroz ' + agg.visited + ' stanja; odstupanja: ' + (agg.bad.length ? agg.bad.slice(0, 6).join(', ') : 'nema') + ' (dok čeka store isto dugme nosi tačke).']);
+    out.push([agg.hits.size === 0, 'Nijedan tekst iz §4 označen „izbaciti“ se ne pojavljuje', BANNED.length + ' obrazaca × ' + agg.visited + ' stanja (tekst stranice + tab bar); pogodaka: ' + (agg.hits.size ? [...agg.hits].join(', ') : '0') + '.']);
+    out.push([agg.seasonCards > 0 && agg.p6 && agg.minD > 96, 'Portreti sezona su pravi crteži cvijeća, svih 6, veći od 96 px', agg.seasonCards + ' SeasonCard (kroz Seasons stanja); svaka 6 FlowerPortrait s crtežom (draw_cropped_plant ★3 — proceduralni kristal u boji sezone, SVG za Country Bloom); najmanji disk ' + agg.minD + ' px.']);
+    out.push([!!agg.cat && agg.same && agg.slots.size === 3, 'Looks tab je napravljen iz cosmetics.json (isti katalog kao Ormar)', 'izvor: ' + (agg.cat || '—') + ' · identičan game/data/cosmetics/cosmetics.json: ' + (agg.same ? 'da' : 'ne') + ' · slotovi: ' + [...agg.slots].join(', ') + ' (po order, ikone i naslovi iz JSON-a).']);
+    const e = agg.exp || {};
+    out.push([!!(e.veil && e.lock && e.blocked && e.content && e.sells === 'no'), 'Starter Pack ima stanje „istekao“ (siv veo + katanac) i nije dodirljiv; sadržaj je 100 coina + Pip Blossom + 5 × 10 sjemenki, bez Merge Hinta', 'veo: ' + (e.veil ? 'da' : 'ne') + ' · katanac: ' + (e.lock ? 'da' : 'ne') + ' · veo prekriva dugme, prima tap, dugme data-tappable=no: ' + (e.blocked ? 'da' : 'ne') + ' · sadržaj tačan, bez Merge Hinta: ' + (e.content ? 'da' : 'ne') + '.']);
+    let r7 = false, d7 = 'nema arena_v2_data';
+    if (A) {
+      const proof = A.worstCase('#2D3436', '#DCF5EC');
+      const mark = root.querySelector('[data-layer="ArenaMergeHint"] [data-layer="MergeHintMark"] [data-layer="MergeHintMark"]') || root.querySelector('[data-layer="ArenaMergeHint"] [data-layer="MergeHintMark"]');
+      const bars = mark ? [...mark.querySelectorAll('div')].filter(d => getComputedStyle(d).borderRadius !== '50%' && d.offsetWidth !== d.offsetHeight).length : 0;
+      const m = (id, l) => Math.min(...A.fieldColors(id, l).map(c => Math.max(A.contrast('#2D3436', c.hex), A.contrast('#DCF5EC', c.hex))));
+      const cb = [m('country_bloom', 0), m('country_bloom', 4)], mw = [m('moonlit_warren', 0), m('moonlit_warren', 4)];
+      const all8 = Math.min(...A.SEASON_KEYS.flatMap(id => [m(id, 0), m(id, 4)]));
+      r7 = bars >= 16 && proof >= 3 && Math.min(...cb, ...mw) >= 3;
+      d7 = 'oblik: ' + bars + ' šipki = 4 kutne zagrade (puls i magnet su krugovi) · rub #2D3436 4 px + traka #DCF5EC · Country Bloom ' + cb.map(v => v.toFixed(2)).join(' / ') + ' · Moonlit Warren ' + mw.map(v => v.toFixed(2)).join(' / ') + ' (nivo 0 / 4) · svih 8 livada min ' + all8.toFixed(2) + ' · dokaz √ ' + proof.toFixed(2) + '.';
+    }
+    out.push([r7, 'Merge Hint oznaka se razlikuje od pulsa i od magnet prstena oblikom, ima taman rub i ≥ 3 : 1 na obje livade', d7]);
+    const cons = S ? PAIRS.map(([fg, bg]) => S.contrast(fg, bg)) : [0];
+    const band = S ? Math.min(...S.PREMIUM.concat(S.FREE).flatMap(id => { const b = S.bands(S.SEASONS[id].g); return [b.sky, b.far, b.near].map(c => S.contrast('#1A1A14', c)); })) : 0;
+    const minC = Math.min(...cons, band);
+    out.push([agg.clip === 0 && agg.small.size === 0 && agg.minName >= 44 && agg.minBtn >= 120 && agg.minTab >= 120 && minC >= 4.5, 'Dugačka cijena stane bez rezanja; tekst ≥ 34 (ime i cijena ≥ 44), dodir ≥ 120, kontrast ≥ 4,5 : 1', 'rezanih cijena ' + agg.clip + ' · dugih (> 7 znakova) na 44 px: ' + agg.longOk + ' · tekst < 34: ' + (agg.small.size ? [...agg.small].slice(0, 4).join(' | ') : '0') + ' · najmanje ime ' + agg.minName + ' px · dugme/tag min ' + agg.minBtn + ' · tab/link min ' + agg.minTab + ' · najmanji kontrast ' + minC.toFixed(2) + ' : 1 (' + PAIRS.length + ' parova tokena + ime #1A1A14 na trakama 8 sezona).']);
+    const loops = live ? document.getAnimations().filter(an => { const t = an.effect && an.effect.target; return t && live.contains(t) && an.effect.getTiming().iterations === Infinity; }) : [];
+    const lt = new Set(loops.map(an => an.effect.target.closest('[data-layer="BuyButton"]')));
+    out.push([agg.grad === 0 && agg.blur === 0 && agg.soft === 0 && agg.green === 0 && lt.size <= 1, 'Nigdje blur, glow ni gradijent; najviše jedan loop; nema zelene #2E4733', 'kroz ' + agg.visited + ' stanja: gradijenata ' + agg.grad + ' · blur/drop-shadow ' + agg.blur + ' · mekih sjena (blur > 0) ' + agg.soft + ' · #2E4733 ' + agg.green + ' · beskonačnih animacija u živom ekranu: ' + loops.length + ' na ' + lt.size + ' elementu (tri tačke dugmeta koje čeka store). Header/footer = chrome v2, nije ocjenjivan.']);
+    const checks = out.map((c, i) => ({ n: i + 1, ok: c[0] ? 'yes' : 'no', verdict: c[0] ? 'da' : 'ne', bg: c[0] ? '#A8E6CF' : '#FFCCD5', t: c[1], d: c[2] }));
+    checks.forEach(c => console.log('SELFCHECK ' + c.n + ' ' + c.verdict + ' — ' + c.d));
+    this.setState({ checks, pick: 0, status: 'Provjereno ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC · ' + checks.filter(c => c.ok === 'yes').length + ' / 9 da' });
+  }
+  renderVals() {
+    const A = this.state.A, S = this.state.S;
+    const contrastRows = A ? A.SEASON_KEYS.map(id => {
+      const m = l => { let min = 99, at = ''; A.fieldColors(id, l).forEach(c => { const v = Math.max(A.contrast('#2D3436', c.hex), A.contrast('#DCF5EC', c.hex)); if (v < min) { min = v; at = c.hex; } }); return [min, at]; };
+      const a = m(0), b = m(4);
+      return { name: A.FIELDS[id].name, v0: a[0].toFixed(2), v4: b[0].toFixed(2), c0: a[0] >= 3 ? '#2D3436' : '#C0392B', c4: b[0] >= 3 ? '#2D3436' : '#C0392B', at: a[0] <= b[0] ? a[1] : b[1] };
+    }) : [];
+    const portraitDemo = S ? [['umbral_lily', 'moonlit_warren', 3, 'Umbral Lily ★3 · Moonlit (iskrice)'], ['moon_moss', 'moonlit_warren', 1, 'Moon Moss ★1'], ['reef_crown', 'coral_tide', 3, 'Reef Crown ★3 · Coral'], ['nova_bloom', 'starfall_glade', 3, 'Nova Bloom ★3 · Starfall'], ['fenfire_crown', 'ember_fen', 3, 'Fenfire Crown ★3 · Ember'], ['pumpkin', 'country_bloom', 3, 'Harvest Pumpkin · pumpkin_t3.svg'], ['crystal_peony', 'frost_orchard', 3, 'Crystal Peony ★3 · Frost']].map(([t, s, r, label]) => ({ type: t, label, p: S.portrait(t, s, r, 172) })) : [];
+    const only = (this.props.only || '').split(',').filter(Boolean);
+    const on = {}; for (let n = 1; n <= 8; n++) on['s' + n] = !only.length || only.includes('s' + n);
+    return {
+      on,
+      before: [['Seasons', 'ref/before/02_shop_seasons.jpg', 'seasons'], ['Looks', 'ref/before/01_shop_looks.jpg', 'looks'], ['Boosters', 'ref/before/03_shop_boosters.jpg', 'boosters'], ['Support', 'ref/before/04_shop_support.jpg', 'support']].map((b, i) => ({ label: b[0], src: b[1], tab: b[2], pick: () => this.setState({ pick: [0, 1, 6, 10][i] }) })),
+      states: STATES.map((s, i) => ({ no: s[0], code: s[1], title: s[4], note: s[5], id: s[0] + '|' + s[3] + '|' + s[2], bg: i === this.state.pick ? '#FFB88C' : '#FFFFFF', edge: i === this.state.pick ? '#2D3436' : 'rgba(45,52,54,.18)', pick: () => this.setState({ pick: i }) })),
+      cur: (() => { const s = STATES[this.state.pick] || STATES[0]; return { tab: s[2], scene: s[3], price: s[6] || 'eur' }; })(),
+      trans: [[0, 'Prelaz 0 ms — tap na Looks'], [0.45, '90 ms — Seasons blijedi, Looks ulazi s desna (48 px)'], [1, '200 ms — gotovo; Seasons pamti svoj skrol']].map(t => ({ t: t[0], title: t[1] })),
+      tabRules: [
+        { t: 'Redoslijed: Seasons · Looks · Boosters · Support', d: 'Seasons je fiksno prvi. Looks drugi: najčešća kupovina za igrače koji ne plaćaju i cilj „More in Shop“ iz Ormara; Seasons + Looks su oba „kako livada izgleda“. Boosters treći (male pomoći). Support zadnji: račun i Restore, ono što se rijetko traži — tu ga store pregled i očekuje.' },
+        { t: 'Ulaz', d: 'Footer → uvijek Seasons, skrol 0. Ormar „More in Shop“ (slot X) → Looks, skrol na zaglavlje slota X, zaglavlje bljesne krem-žutom 1,2 s. Tabovi se mijenjaju samo tapom; vodoravni swipe i dalje lista hub.' },
+        { t: 'Tab bar = tenda', d: 'Pruge 18 × 60 px (mint / krem), donji rub 18 polukrugova r 30 s ink rubom 4 i tvrdom sjenom 6. Tabovi 4 × 249 × 120, razmak 12; neaktivan bijeli s rubom 3, aktivan = peach klizač (rub 4, sjena 6) koji klizne 0,2 s. Sadržaj skrola ispod tende (od y 196).' },
+        { t: 'Kraj taba', d: 'Looks: dugme Wardrobe (vodi u Ormar na isti slot — Shop prodaje, Ormar oblači). Support: Restore purchases kao podvučen link. Boosters bez ponude: Pip + „All set here“. Seasons: zadnja kartica + 64 px.' },
+        { t: 'Pamćenje skrola', d: 'Svaki TabPage je svoj ScrollContainer; neaktivni su sakriveni (visible = false), ne uništeni, pa scroll_vertical ostaje dok je igrač u Shopu. Izlazak iz Shopa resetuje sve na 0.' }
+      ],
+      buttons: BUTTONS.map(b => ({ kind: b[0], state: b[1], price: b[2], label: b[3] || 'Yours', t: b[4], d: b[5] })),
+      parts: [
+        { layer: 'ShopPage · ShopBg', lines: ['1080 × 1633, pozadina #FBEDD7. Sadržaj: padding 196 / 24 / 64, razmak kartica 32.', 'Kartica: 1032 široka, bijela, rub 4 #2D3436, radius 36, tvrda sjena 0 10 0 rgba(26,26,20,.22), padding 20.'] },
+        { layer: 'SeasonCard', lines: ['1032 × 364. Pozadina = Home trake sezone: nebo 0–115, daljina, blizina od 242.', 'SeasonPortraits h 176: 5 × 148 + ★3 172, space-between (≈ 14).', 'Donji red h 120: ime 52/900 #1A1A14 · BuyButton desno (ili SoonTag).'] },
+        { layer: 'FlowerPortrait', lines: ['Disk krem #FFF8F0, rub 4 ink (kao Home). Crtež = draw_cropped_plant(type, 3, d × 0,78).', 'Country Bloom: <type>_t3.svg odrezan na vidljive piksele. Ostali: proceduralni ★3 kristal u boji sezone (djb2 jitter); ★3 tip dobije 3 bijele iskrice.', 'Ember (uskoro): crtež na alpha 0,5.'] },
+        { layer: 'CosmeticCard · CosmeticPreview', lines: ['Pregled 984 × 300, radius 24, rub 4 = ItemPreview iz Ormara (size stage), ista vrsta po slotu iz JSON-a.', 'Nosiš: kartica #FFF6D6 + EquippedBadge 64 gore desno. Opis stavke izbačen.', 'Zaglavlje slota h 96: ikona 64 iz JSON-a + naslov 48/900.'] },
+        { layer: 'BoosterCard · Merge Hint', lines: ['Vinjeta 984 × 300: Country Bloom polje, 5 sjemenki (prava SeedChip), držana daisy, puls na istima, MergeHintMark na najbližoj.', 'Ime 52 + jedna linija 36/800 #555C5E „Marks the closest match“.'] },
+        { layer: 'BoosterCard · Loot Burst', lines: ['984 × 260 na trakama sezone iz koje je cvijet. Portret ★3 204 + PlusBadge „+5“ (ink, krem 48).', 'NextSeason: katanac 52 + ime 44 + „12 / 20“ 44; traka 616 × 52: mint = imaš, isprekidano = +5 ovom kupovinom.', 'Kad nema sljedeće zaključane besplatne sezone — kartica se ne crta.'] },
+        { layer: 'SupportCard · Remove Ads', lines: ['Ime 52 + „No ads between runs“ 36/800 · BuyButton. Kupljeno: krem-žuta + Ads off.'] },
+        { layer: 'StarterPackCard · StarterContent', lines: ['3 pločice h 228: 100 coina (#FFE8B8), Pip Blossom (#FFF6D6, ✓ ako je već tvoj), 5 sjemenki 68 (SeedChip jezik) + ×10 (#DCF5EC).', 'TimeLeft chip ispod imena: „6d left“ (dani; zadnji dan sati).', 'ExpiredVeil: rgba(227,217,204,.84) preko cijele kartice, katanac 128 + Expired 44; guta tap.'] },
+        { layer: 'PurchaseStatus · Toast · CoinPop', lines: ['Status ispod imena h 56, 34/900: Cancelled / Didn’t go through (#FFCCD5), Pending (#FFE8B8). Nestaje na sljedeći tap.', 'Toast = Home toast (ink 700 × 100, krem 44), 1,6 s — samo za ono što se mijenja van kartice.', 'CoinPop „−200“ kod coin chipa, gore 36 px + fade, 0,7 s.'] }
+      ],
+      portraitDemo,
+      arena: [['country_bloom', 'a', 'Country Bloom · drži se daisy', 'Najbliža ista (desno gore od prsta) ima zagrade; ostale 4 iste pulsiraju.'], ['moonlit_warren', 'close', 'Moonlit Warren · u magnet dometu', 'Partner prsten + zagrade zajedno: prsten unutra, zagrade izvan njega.']].map(a => ({ season: a[0], frame: a[1], title: a[2], note: a[3] })),
+      contrastRows, proof: A ? A.worstCase('#2D3436', '#DCF5EC').toFixed(2) : '…',
+      anim: [
+        { t: 'Ulaz', d: 'prvi put kad postoji ista sjemenka: zagrade od × 1,35 i alpha 0 do × 1, 0,18 s back-out.' },
+        { t: 'Prelaz', d: 'nova najbliža bliža za ≥ 24 px od trenutne → okvir klizne na nju 0,14 s cubic-out. Bez treperenja.' },
+        { t: 'Izlaz', d: 'pušten prst ili nema iste: alpha → 0 i × 1,2, 0,12 s.' },
+        { t: 'Loop', d: 'nema — jedini loop u Areni ostaje današnji zlatni puls. Oblačić „Hint: merge two … seeds.“ se briše.' }
+      ],
+      swatches: SWATCHES.map(w => ({ c: w[0], r: w[1] })),
+      checks: this.state.checks || Array.from({ length: 9 }, (_, i) => ({ n: i + 1, ok: 'wait', verdict: '…', bg: '#FFF8F0', t: '…', d: '' })),
+      checkStatus: this.state.status
+    };
+  }
+}
+</script>
+</body>
+</html>

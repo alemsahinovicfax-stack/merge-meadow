@@ -1,0 +1,51 @@
+ShopScreen (Control, 1080 x 1633, y 143)                      shop_screen.gd
+├─ ShopBg (ColorRect #FBEDD7)
+├─ TabPage_Seasons (ScrollContainer, vertikalno)                visible = tab == seasons
+│  └─ VBox (sep 32, margin 196/24/64/24)
+│     └─ SeasonCard × 4 (PanelContainer 1032 x 364)              season_pack_card.gd
+│        ├─ Bands (_draw: sky 0-115, far, near 242-364)
+│        ├─ SeasonPortraits (HBox space-between, h 176)
+│        │  └─ FlowerPortrait × 6 (Control 148|172, _draw)        flower_portrait.gd → UiHomeV3.draw_flower()
+│        └─ Row (HBox h 120)
+│           ├─ Name (Label 52)  + PurchaseStatus (opc.)
+│           └─ BuyButton (money | play) | SoonTag
+├─ TabPage_Looks (ScrollContainer)
+│  └─ VBox (sep 44)
+│     ├─ LooksSlot × N  (iz cosmetics.json, po order)            shop_looks_slot.gd
+│     │  ├─ SlotHeader (HBox h 96: ikona 64 + naslov 48)
+│     │  └─ CosmeticCard × M (source == "shop")                  shop_cosmetic_card.gd
+│     │     ├─ CosmeticPreview (984 x 300) → ItemPreview iz Ormara
+│     │     │  └─ EquippedBadge (64, opc.)
+│     │     └─ Row: Name 52 · BuyButton (coins)
+│     └─ TabEnd: WardrobeLink (h 120)
+├─ TabPage_Boosters (ScrollContainer)
+│  └─ VBox (sep 32)
+│     ├─ BoosterCard merge_hint                                  shop_booster_card.gd
+│     │  ├─ MergeHintVignette (984 x 300: ArenaField crop + SeedChip × 5 + MergeHintMark)
+│     │  └─ Row: Name + sub · BuyButton (money / owned)
+│     ├─ BoosterCard loot_burst  (samo ako next_locked_free_id() != "")
+│     │  ├─ LootBurstVisual (984 x 260: FlowerPortrait 204 + PlusBadge + NextSeason + StarProgress)
+│     │  └─ Row: Name · BuyButton (money)
+│     └─ TabEnd: Pip + "All set here" (kad nema Loot Bursta i Merge Hint je tvoj)
+├─ TabPage_Support (ScrollContainer)
+│  └─ VBox (sep 32)
+│     ├─ SupportCard remove_ads (Row: Name + sub · BuyButton)
+│     ├─ StarterPackCard                                         shop_starter_card.gd
+│     │  ├─ StarterContent (HBox h 228: Coins 236 · Skin 296 · Seeds flex)
+│     │  ├─ Row: Name + TimeLeft/PurchaseStatus · BuyButton
+│     │  └─ ExpiredVeil (ColorRect + lock 128 + "Expired", mouse_filter STOP)
+│     └─ TabEnd: RestoreLink (h 120; skriven u stub modu)
+├─ ShopTabBar (Control 1080 x 172, z 3)                          shop_tab_bar.gd
+│  ├─ Awning (_draw: 18 pruga 60, scallop r30, ink 4, tvrda sjena 6)
+│  ├─ TabBg × 4 (StyleBox bijeli, rub 3)
+│  ├─ ShopTabThumb (peach, rub 4, sjena 6; tween x 0.2 s)
+│  └─ ShopTab × 4 (HubPressable, 249 x 120, Label 44)
+├─ Toast (PanelContainer 700 x 100, y 1456)
+└─ CoinPop (iznad headera, x 160 y 7 globalno)
+
+BuyButton (HubPressable, h 120, min 280)                         shop_buy_button.gd
+  state: coins.buy | coins.confirm | coins.short | money.buy | money.busy | money.dim | play | owned
+
+Arena (postojeća scena) — novo:
+  MergeHintMark (Control 174 x 174, _draw 4 L-zagrade)           merge_hint_mark.gd
+  └─ roditelj: ArenaBoard overlay, z iznad SeedChip, ispod držane sjemenke
