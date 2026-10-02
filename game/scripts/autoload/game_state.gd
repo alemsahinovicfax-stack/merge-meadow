@@ -106,6 +106,8 @@ var last_failed: bool = false
 var last_raw_seed_total: int = 0
 var loot_doubled: bool = false
 var revive_used_this_run: bool = false
+## Zadnji kadar runa (R5 · kraj runa se crta preko njega). Samo u memoriji, ne u saveu.
+var last_run_snapshot: Texture2D = null
 
 ## Property (not a plain var) — see seed_bag_domain.gd's header for why:
 ## ~50 sites in this file plus several external scripts read/write

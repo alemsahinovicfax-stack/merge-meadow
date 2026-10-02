@@ -1,0 +1,909 @@
+{
+  "meta": {
+    "name": "design_handoff_popups",
+    "brief": "docs/04-experience/design-drafts/popups-cd-brief.md",
+    "date": "2026-10-02",
+    "artboard": [
+      1080,
+      1920
+    ],
+    "units": "px",
+    "engine": "Godot 4.7 GL Compatibility"
+  },
+  "tokens": {
+    "color": {
+      "CREAM": "#FFF8F0",
+      "INK": "#2D3436",
+      "INK_SOFT": "#555C5E",
+      "RIM": "#FFF6D6",
+      "WHITE": "#FFFFFF",
+      "PEACH": "#FFB88C",
+      "LAVENDER": "#D4A5FF",
+      "LAVENDER_LIGHT": "#EAD2FF",
+      "GOLD": "#FFD56B",
+      "MINT": "#A8E6CF",
+      "PINK": "#FFCCD5",
+      "DISABLED": "#F1EAE0",
+      "DISABLED_EDGE": "rgba(45,52,54,0.30)",
+      "TRAY_EDGE": "rgba(45,52,54,0.18)",
+      "SEGMENT_EMPTY": "rgba(45,52,54,0.16)",
+      "LOCKED_FRAME": "#E3D9CC",
+      "WELL": "#22342A",
+      "STAR": "#7A4A28",
+      "SCRIM": "rgba(26,22,30,0.55)",
+      "DROP": "rgba(26,26,20,0.28)",
+      "PANEL_DROP": "rgba(20,14,26,0.45)",
+      "RUN_DROP": "rgba(10,14,12,0.55)",
+      "TOAST_RIM": "rgba(255,248,240,0.90)"
+    },
+    "font": {
+      "family": "Nunito",
+      "title": [
+        900,
+        56
+      ],
+      "banner": [
+        900,
+        104
+      ],
+      "button": [
+        900,
+        48
+      ],
+      "ad_button": [
+        900,
+        44
+      ],
+      "body": [
+        800,
+        44
+      ],
+      "body_lead": [
+        900,
+        48
+      ],
+      "line": [
+        900,
+        44
+      ],
+      "chip_number": [
+        900,
+        56
+      ],
+      "chip_was": [
+        800,
+        40
+      ],
+      "toast": [
+        900,
+        44
+      ],
+      "pop": [
+        900,
+        64
+      ],
+      "pop_seed": [
+        900,
+        56
+      ],
+      "pop_name": [
+        900,
+        44
+      ],
+      "tile_name": [
+        900,
+        40
+      ],
+      "stars": [
+        900,
+        38
+      ],
+      "card_name": [
+        900,
+        52
+      ],
+      "effect": [
+        800,
+        40
+      ],
+      "stamp": [
+        900,
+        38
+      ],
+      "min_text": 34
+    },
+    "size": {
+      "artboard": [
+        1080,
+        1920
+      ],
+      "header": 143,
+      "footer": 144,
+      "page": [
+        1080,
+        1633
+      ],
+      "touch_min": 120
+    }
+  },
+  "components": {
+    "PopupScrim": {
+      "color": "SCRIM",
+      "hub_rect": [
+        0,
+        143,
+        1080,
+        1633
+      ],
+      "run_rect": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "fade_ms": 220
+    },
+    "PopupModal": {
+      "width": 984,
+      "x": 48,
+      "radius": 48,
+      "border": 4,
+      "shadow": [
+        0,
+        14,
+        "PANEL_DROP"
+      ],
+      "padding": [
+        92,
+        48,
+        48,
+        48
+      ],
+      "gap": 36,
+      "centred_in": "page (hub) / screen (run)",
+      "plate": {
+        "h": 112,
+        "radius": 56,
+        "border": 4,
+        "pad_x": 52,
+        "overlap": 56,
+        "tones": {
+          "reward_gift": "GOLD",
+          "success": "MINT",
+          "fail": "PINK",
+          "decision": "RIM"
+        }
+      }
+    },
+    "RewardTray": {
+      "fill": "RIM",
+      "edge": [
+        3,
+        "TRAY_EDGE"
+      ],
+      "radius": 36,
+      "padding": [
+        36,
+        20,
+        36,
+        20
+      ],
+      "padding_with_stamp_top": 56,
+      "gap": [
+        20,
+        16
+      ],
+      "wrap": true,
+      "stamp": {
+        "h": 64,
+        "radius": 32,
+        "fill": "PINK",
+        "border": 3,
+        "icon": "icon_half.svg 44",
+        "offset": [
+          28,
+          -32
+        ]
+      }
+    },
+    "RewardChip": {
+      "h": 132,
+      "radius": 66,
+      "fill": "WHITE",
+      "border": [
+        3,
+        "INK"
+      ],
+      "padding": [
+        0,
+        28,
+        0,
+        14
+      ],
+      "gap": 12,
+      "art_box": 92,
+      "art_disc": {
+        "fill": "RIM",
+        "edge": [
+          3,
+          "TRAY_EDGE"
+        ]
+      },
+      "coin_art": 84,
+      "variants": {
+        "half": "was number 40/800 INK_SOFT strike 4px, then new number",
+        "x2": "GOLD tag h 54 radius 27 border 3 at (right -16, top -24)"
+      },
+      "art": {
+        "seed": "ArenaChipDraw T1 (icons/flowers/<type>_t1.svg crop)",
+        "flower": "T3 (clover_t3 / pumpkin_t3) or HomeBasketPickerIcon",
+        "coin": "icon_coin.svg"
+      }
+    },
+    "PopupSheet": {
+      "heights": [
+        922,
+        1326
+      ],
+      "top_edge": 4,
+      "radius_top": 36,
+      "padding": [
+        20,
+        24,
+        20,
+        24
+      ],
+      "handle": [
+        120,
+        12,
+        6,
+        "rgba(45,52,54,0.28)"
+      ],
+      "handle_gap": 24,
+      "title": [
+        900,
+        56
+      ],
+      "close": "PopupButton secondary 132, full width",
+      "drag_close_px": 160
+    },
+    "CoachBubble": {
+      "fill": "CREAM",
+      "border": [
+        4,
+        "INK"
+      ],
+      "radius": 32,
+      "padding": [
+        26,
+        34
+      ],
+      "gap": 16,
+      "max_w": 760,
+      "shadow_hub": [
+        0,
+        8,
+        "DROP"
+      ],
+      "shadow_run": [
+        0,
+        8,
+        "RUN_DROP"
+      ],
+      "icon_disc": 72,
+      "tail": {
+        "w": 52,
+        "h": 32,
+        "inner_w": 36,
+        "inner_h": 24,
+        "inner_inset": 5,
+        "dirs": [
+          "down",
+          "up",
+          "left",
+          "right",
+          "none"
+        ]
+      }
+    },
+    "Toast": {
+      "h": 100,
+      "radius": 50,
+      "fill": "INK",
+      "rim": [
+        3,
+        "TOAST_RIM"
+      ],
+      "pad": [
+        0,
+        40
+      ],
+      "pad_icon_left": 20,
+      "gap": 16,
+      "disc": 60,
+      "text": [
+        900,
+        44,
+        "CREAM"
+      ],
+      "shadow": "none",
+      "lanes": {
+        "home_wardrobe_y": 1253,
+        "home_season_y": 1393,
+        "under_header_y": 167,
+        "shop_y": 1600
+      },
+      "queue": {
+        "max": 2,
+        "step": 116
+      },
+      "mouse_filter": "IGNORE"
+    },
+    "FloatPop": {
+      "size": 64,
+      "stroke": 10,
+      "earn": "GOLD",
+      "spend": "PINK",
+      "coin": 58,
+      "seed": {
+        "size": 56,
+        "disc": true,
+        "name": [
+          900,
+          44,
+          "CREAM",
+          8
+        ]
+      },
+      "mouse_filter": "IGNORE"
+    },
+    "PopupButton": {
+      "h": 132,
+      "radius": 36,
+      "border": 4,
+      "shadow": [
+        0,
+        8,
+        "DROP"
+      ],
+      "pressed": {
+        "y": 6,
+        "shadow_y": 2
+      },
+      "gap": 16,
+      "pad_x": 24,
+      "states": {
+        "primary": "PEACH",
+        "secondary": "WHITE",
+        "disabled": "DISABLED, edge DISABLED_EDGE, no shadow, text INK_SOFT, icon 45%",
+        "loading": "LAVENDER_LIGHT, y+8, no shadow, 3 dots (only loop)",
+        "done": "MINT, no shadow, check"
+      }
+    },
+    "AdButton": {
+      "h": 120,
+      "rule": "always < PopupButton (132); own row above Retry/To Camp",
+      "fill": "LAVENDER",
+      "badge": "icon_video.svg 64x48",
+      "states": [
+        "ready",
+        "loading",
+        "done",
+        "unavailable"
+      ]
+    },
+    "NavLockPill": {
+      "rect": "unchanged (h 64, top -36 over footer, centred)",
+      "fill": "INK",
+      "rim": [
+        3,
+        "CREAM"
+      ],
+      "radius": 32,
+      "disc": 44,
+      "text": [
+        900,
+        38,
+        "CREAM"
+      ],
+      "copy": "Round in progress"
+    }
+  },
+  "popups": {
+    "H1": {
+      "kind": "coach",
+      "node": "home_stage_hint.gd",
+      "anchor": "Play (324,1461,432,140 page)",
+      "bubble": {
+        "x": 150,
+        "bottom_y": 1556,
+        "dir": "down",
+        "tail_x": 390
+      },
+      "ring": "PlayRing 432x140 radius 70, border 6, loop 1.2 s",
+      "states": [
+        "default"
+      ]
+    },
+    "H2": {
+      "kind": "coach",
+      "node": "main_menu.gd TutorialHintPanel",
+      "rect": "inside HINT_RECT (236,230,600,184 page)",
+      "bubble": {
+        "x": 244,
+        "y": 383,
+        "dir": "left",
+        "tail_y": 70,
+        "max_w": 600
+      },
+      "states": [
+        "default",
+        "tap (basket shake + bubble)"
+      ]
+    },
+    "H3": {
+      "kind": "modal",
+      "variant": "reward",
+      "node": "main_menu.gd RewardOverlay",
+      "plate": "GOLD | RIM (tomorrow)",
+      "states": {
+        "claimed": "coin +8, seed +3, Collect",
+        "near_full": "coin +8, seed +N (<3), note \"Bag almost full\"",
+        "tomorrow": "closed gift glyph 176 + \"Back in Nh\", OK secondary"
+      },
+      "close": "button or tap outside"
+    },
+    "H4": {
+      "kind": "sheet",
+      "h": 1326,
+      "node": "main_menu.gd BasketPickerOverlay",
+      "tile": {
+        "w": 328,
+        "h": 410,
+        "cols": 3,
+        "gap": 24,
+        "frame": 194,
+        "well_inset": 10,
+        "art": 134,
+        "name": 40,
+        "stars": 38
+      },
+      "states": [
+        "none",
+        "one",
+        "locked"
+      ],
+      "footer": [
+        "Clear (secondary, w 380, basket icon; disabled when empty)",
+        "Close"
+      ]
+    },
+    "H5": {
+      "kind": "sheet",
+      "h": 922,
+      "node": "main_menu.gd UpgradesOverlay",
+      "card": {
+        "w": 1032,
+        "h": 264,
+        "name": 52,
+        "seg": [
+          96,
+          22,
+          10
+        ],
+        "effect": 40,
+        "button": [
+          300,
+          132
+        ]
+      },
+      "states": [
+        "both",
+        "short",
+        "max",
+        "buy (0.4 s flash)"
+      ]
+    },
+    "H6": {
+      "kind": "sheet",
+      "h": 1326,
+      "node": "wardrobe_sheet.gd",
+      "change": "top edge 3->4, SheetHandle 120x12, Close -> PopupButton secondary; layout unchanged",
+      "states": [
+        "default"
+      ]
+    },
+    "H7": {
+      "kind": "toast",
+      "node": "UiWardrobe.TOAST_*",
+      "y": 1253,
+      "states": [
+        "default",
+        "queue"
+      ]
+    },
+    "H8": {
+      "kind": "toast",
+      "node": "season_stage.gd StageToast",
+      "y": 1393,
+      "states": [
+        "unlocked",
+        "yours"
+      ]
+    },
+    "X1": {
+      "kind": "toast",
+      "node": "meta_hub_controller.gd SettingsToast",
+      "y": 167,
+      "hold_s": 1.6,
+      "states": [
+        "default"
+      ]
+    },
+    "X2": {
+      "kind": "pop",
+      "node": "CoinSpendPop",
+      "at": [
+        168,
+        150
+      ],
+      "states": [
+        "spend",
+        "earn"
+      ]
+    },
+    "X3": {
+      "kind": "status_pill",
+      "node": "NavLockPill",
+      "states": [
+        "default"
+      ]
+    },
+    "S1": {
+      "kind": "toast",
+      "node": "shop_screen.gd _Toast",
+      "y": 1600,
+      "states": [
+        "default"
+      ]
+    },
+    "C1": {
+      "kind": "pop",
+      "node": "camp_trade_bar.gd + TradeFeedbackFly",
+      "at": [
+        871,
+        1520
+      ],
+      "states": [
+        "hold",
+        "fly"
+      ]
+    },
+    "A1": {
+      "kind": "coach",
+      "node": "arena_cue.gd",
+      "bubble": {
+        "x": 200,
+        "bottom_y": 1398,
+        "dir": "down",
+        "tail_x": 340
+      },
+      "states": [
+        "default"
+      ]
+    },
+    "A2": {
+      "kind": "coach",
+      "node": "arena_cue.gd",
+      "bubble": {
+        "x": 230,
+        "y": 593,
+        "dir": "up",
+        "tail_x": 310,
+        "target": "muncher"
+      },
+      "hold_s": 3.5,
+      "states": [
+        "default"
+      ]
+    },
+    "A3": {
+      "kind": "modal",
+      "variant": "decision",
+      "node": "merge_arena_controller.gd NeedMoreSeedsOverlay",
+      "tile": {
+        "w": 264,
+        "h": 244,
+        "art": 136,
+        "dots": [
+          44,
+          22,
+          10
+        ]
+      },
+      "layout": "HFlowContainer centred, wraps (fixes one-row bug)",
+      "states": [
+        "five",
+        "one"
+      ],
+      "close": "button only"
+    },
+    "A4": {
+      "kind": "pop",
+      "note": "= X2 earn; Arena v2 flight untouched",
+      "states": [
+        "default"
+      ]
+    },
+    "R1": {
+      "kind": "coach",
+      "node": "run_controller.gd TutorialCue",
+      "bubble": {
+        "x": 120,
+        "y": 384,
+        "dir": "up",
+        "tail_x": 618,
+        "target": "CoinChip HUD (645,232,188,120)"
+      },
+      "states": [
+        "default"
+      ]
+    },
+    "R2": {
+      "kind": "pop",
+      "node": "run_pickup_feed.gd",
+      "at": [
+        944,
+        400
+      ],
+      "step": 80,
+      "max": 2,
+      "hold_s": 1.4,
+      "states": [
+        "default",
+        "two"
+      ]
+    },
+    "R3": {
+      "kind": "modal",
+      "variant": "decision",
+      "node": "run_scene.tscn PauseOverlay",
+      "states": [
+        "default"
+      ],
+      "close": "button only; back = Keep running"
+    },
+    "R4": {
+      "kind": "modal",
+      "variant": "banner",
+      "node": "FinishBanner",
+      "plate": {
+        "h": 180,
+        "radius": 90,
+        "border": 5,
+        "text": 104,
+        "y": 640
+      },
+      "states": [
+        "time",
+        "ouch (optional, fall)"
+      ],
+      "hold_s": 1
+    },
+    "R5": {
+      "kind": "modal",
+      "variant": "reward",
+      "node": "loot_screen.tscn",
+      "states": [
+        "fail",
+        "fail_noads",
+        "fail_tutorial",
+        "complete",
+        "loading",
+        "doubled",
+        "many",
+        "retry_loading"
+      ],
+      "close": "button only"
+    }
+  },
+  "animations": {
+    "modal_in": {
+      "props": [
+        "scale 0.90->1",
+        "alpha 0->1"
+      ],
+      "ms": 220,
+      "ease": "back-out"
+    },
+    "modal_out": {
+      "props": [
+        "scale 1->0.96",
+        "alpha 1->0"
+      ],
+      "ms": 160,
+      "ease": "cubic-in"
+    },
+    "sheet_in": {
+      "props": [
+        "y +h->0"
+      ],
+      "ms": 320,
+      "ease": "cubic-out"
+    },
+    "sheet_out": {
+      "props": [
+        "y ->+h"
+      ],
+      "ms": 280,
+      "ease": "cubic-in",
+      "from_current": true
+    },
+    "scrim": {
+      "props": [
+        "alpha 0->0.55"
+      ],
+      "ms": 220
+    },
+    "coach_in": {
+      "props": [
+        "scale 0.85->1 (pivot = tail tip)",
+        "alpha"
+      ],
+      "ms": 180,
+      "ease": "back-out"
+    },
+    "coach_out": {
+      "props": [
+        "alpha"
+      ],
+      "ms": 140
+    },
+    "toast_in": {
+      "props": [
+        "y +24->0",
+        "alpha"
+      ],
+      "ms": 180,
+      "ease": "cubic-out"
+    },
+    "toast_out": {
+      "props": [
+        "alpha"
+      ],
+      "ms": 160
+    },
+    "pop_earn": {
+      "props": [
+        "scale 0.6->1 (120 ms)",
+        "path to counter 420 ms",
+        "counter bump 1.08"
+      ]
+    },
+    "pop_spend": {
+      "props": [
+        "y +60",
+        "alpha ->0"
+      ],
+      "ms": 600
+    },
+    "reward_reveal": {
+      "props": [
+        "scale 0.6->1",
+        "alpha"
+      ],
+      "ms": 240,
+      "stagger_ms": 90,
+      "ease": "back-out"
+    },
+    "doubled": {
+      "props": [
+        "number 1->1.12->1",
+        "x2 tag drop"
+      ],
+      "ms": 220
+    },
+    "upgrade_flash": {
+      "ms": 400,
+      "props": [
+        "card RIM + ink 4",
+        "new segment GOLD->MINT",
+        "button Done"
+      ]
+    },
+    "loops": {
+      "H1_play_ring": {
+        "s": 1.2,
+        "scale": 1.16
+      },
+      "loading_dots": {
+        "s": 0.9,
+        "stagger": 0.15
+      },
+      "rule": "max one loop on screen"
+    }
+  },
+  "strings_en": {
+    "gift_title": "Daily gift",
+    "gift_collect": "Collect",
+    "gift_bag_full": "Bag almost full",
+    "gift_back_in": "Back in %s",
+    "ok": "OK",
+    "close": "Close",
+    "basket_title": "Basket seed",
+    "basket_clear": "Clear",
+    "upgrades_title": "Upgrades",
+    "upgrade_need": "Need %d",
+    "upgrade_max": "Max",
+    "upgrade_done": "Done",
+    "magnet": "Magnet",
+    "loot_boost": "Loot Boost",
+    "magnet_effect": "Pull %d → %d px",
+    "magnet_effect_max": "Pull %d px",
+    "loot_effect": "Loot ×%s → ×%s",
+    "loot_effect_max": "Loot ×2.0",
+    "hint_play": "Tap Play to start",
+    "hint_basket": "Your first Arena merge unlocks it",
+    "arena_tap": "Tap the bag to pour",
+    "arena_join": "Join matching seeds",
+    "muncher_awake": "Muncher’s awake!",
+    "muncher_freeze": "A T3 freezes it 2s",
+    "need_title": "You need more seeds!",
+    "need_line": "Every type needs 4",
+    "back_to_camp": "Back to Camp",
+    "run_tut_coins": "Coins for the shop!",
+    "paused": "Paused",
+    "if_you_quit": "If you quit",
+    "keep_running": "Keep running",
+    "quit_to_camp": "Quit to Camp",
+    "time": "Time!",
+    "ouch": "Ouch!",
+    "nothing_lost": "Nothing lost",
+    "run_failed": "Run Failed",
+    "run_complete": "Run Complete!",
+    "kept_half": "Kept half",
+    "ad_double": "Double",
+    "ad_revive": "Revive",
+    "ad_doubled": "Doubled",
+    "ad_none": "No ad now",
+    "retry": "Retry",
+    "to_camp": "To Camp",
+    "round_in_progress": "Round in progress",
+    "settings_soon": "Settings coming soon",
+    "unlocked": "Unlocked",
+    "yours": "Yours"
+  },
+  "godot_map": {
+    "scripts": {
+      "game/scripts/visual/ui_popups.gd": "NEW — tokens + StyleBox factories (this folder)",
+      "game/scripts/ui/popup_host.gd": "NEW autoload — one modal/sheet at a time, toast queue (2), back-button routing",
+      "game/scripts/ui/main_menu.gd": "H2, H3, H4, H5 build from UiPopups",
+      "game/scripts/ui/home_stage_hint.gd": "H1",
+      "game/scripts/ui/wardrobe_sheet.gd": "H6 (UiPopups.sheet_panel / handle / button)",
+      "game/scripts/ui/season_stage.gd": "H8",
+      "game/scripts/camp/arena_cue.gd": "A1, A2",
+      "game/scripts/camp/merge_arena_controller.gd": "A3 (HFlowContainer of NeedSeedTile)",
+      "game/scripts/camp/arena_need_row.gd": "→ need_seed_tile.gd",
+      "game/scripts/run/run_controller.gd": "R1, R3, R4",
+      "game/scripts/ui/run_pickup_feed.gd": "R2",
+      "game/scripts/ui/loot_screen.gd": "R5"
+    },
+    "reuse": {
+      "UiHomeField.SCRIM": "= UiPopups.SCRIM",
+      "UiHomeField.STICKER": "= CREAM",
+      "UiHomeField.STICKER_EDGE": "= INK",
+      "UiHomeField.SHEET_*": "unchanged heights"
+    }
+  },
+  "decisions": [
+    "Five kinds differ by shape: plate (modal), handle (sheet), tail (coach), dark pill (toast), outlined number (pop).",
+    "One palette for hub and run; scrim + cream panel carry contrast.",
+    "Ads are 120 high in their own row; main buttons are 132.",
+    "Run end is shown over the frozen run, not a black scene.",
+    "R1 points at the coin counter instead of covering the lanes.",
+    "A3 is a wrapping grid of tiles with 4 dots each.",
+    "Upgrade button is the price (flower drawing ×2).",
+    "Optional fall banner \"Ouch!\" (≤1 s, no button).",
+    "Gift \"Back in Nh\" is a display of existing reset time."
+  ]
+}

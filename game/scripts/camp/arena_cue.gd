@@ -1,56 +1,57 @@
 class_name ArenaCue
 extends RefCounted
 
-## Bijeli oblacic iznad vrece — jedini tekst koji je ostao u areni. Nosi tutorial
-## poruku prvog pokretanja i prolaznu poruku Merge Hint boostera. HUD red, traka s
-## porukama i combo pilula uklonjeni su 2026-09-24 (merge-arena-cd-brief § Izmjena).
+## A1 / A2 · oblačići Arene (design_handoff_popups): CoachBubble sistema iznad polja. Tutorial prvog
+## pokretanja (dva reda sa slikama, rep dolje na korpu) stoji dok se ne prospe sjeme; „Muncher's
+## awake!" (vodeći red + crtež T3, rep gore na munchera) je prolazan (3,5 s) i privremeno ga preuzme.
 
-const CUE_FONT_SIZE := 40
-const CUE_MAX_W := 760.0
-const CUE_BOTTOM := 330.0
 const MESSAGE_SEC := 3.5
 const FADE_SEC := 0.25
+const BAG_TIP_GAP := 6.0
+const PEST_TIP_GAP := 46.0
 
-var cue: VBoxContainer
-var cue_label: Label
-var cue_arrow: Control
+var cue: CoachBubble
 
 var _owner: Control
 var _tutorial_on: bool = false
+var _message_on: bool = false
 var _message_tween: Tween = null
 
 
 func _init(owner: Control) -> void:
 	_owner = owner
-	var field := "RootVBox/Playfield/"
-	cue = owner.get_node(field + "TutorialCue")
-	cue_label = owner.get_node(field + "TutorialCue/CuePanel/CueLabel")
-	cue_arrow = owner.get_node(field + "TutorialCue/CueArrow")
-	_style()
+	cue = CoachBubble.new()
+	cue.name = "TutorialCue"
+	cue.z_index = 56
+	cue.visible = false
+	owner.get_node("RootVBox/Playfield").add_child(cue)
 
 
-## Tutorial oblacic stoji dok se ne prospe sjeme; poruka boostera ga privremeno preuzme.
+## Tutorial oblačić stoji dok se ne prospe sjeme; poruka munchera ga privremeno preuzme.
 func set_tutorial_visible(on: bool) -> void:
+	var was := _tutorial_on and cue.visible and not _message_on
 	_tutorial_on = on
-	if _message_tween != null and _message_tween.is_valid():
+	if _message_on:
 		return
-	cue_label.text = tutorial_text()
-	cue.modulate.a = 1.0
-	cue.visible = on
-	if on:
-		layout(_field_size())
+	if not on:
+		cue.visible = false
+		return
+	cue.setup(tutorial_rows(), "down")
+	layout(_field_size())
+	if not was:
+		cue.pop_in()
 
 
-## Prolazna poruka (Merge Hint booster) — isti oblacic, sam se gasi.
+## Prolazna poruka — isti oblačić, sam se gasi. Tekst „Muncher's awake — …" daje dva reda sistema.
 func show_message(text: String, sec: float = MESSAGE_SEC) -> void:
 	if text.is_empty():
 		return
 	_kill_message_tween()
-	cue_label.text = text
-	cue.modulate.a = 1.0
-	cue.visible = true
-	cue_arrow.visible = false
+	_message_on = true
+	cue.setup(message_rows(text), "up")
 	layout(_field_size())
+	cue.modulate.a = 1.0
+	cue.pop_in()
 	_message_tween = _owner.create_tween()
 	_message_tween.tween_interval(sec)
 	_message_tween.tween_property(cue, "modulate:a", 0.0, FADE_SEC)
@@ -58,7 +59,7 @@ func show_message(text: String, sec: float = MESSAGE_SEC) -> void:
 
 
 func get_text() -> String:
-	return cue_label.text
+	return cue.text()
 
 
 func is_cue_visible() -> bool:
@@ -66,27 +67,49 @@ func is_cue_visible() -> bool:
 
 
 static func tutorial_text() -> String:
-	return "Tap the bag to pour seeds. Drag matching seeds together."
+	return "%s / %s" % [UiPopups.S_ARENA_TAP, UiPopups.S_ARENA_JOIN]
 
 
-## Autowrap labela javlja visinu po svojoj trenutnoj sirini, a container je dobije tek
-## u sljedecem sort prolazu — zato se oblacic mjeri dva puta (odmah i frejm kasnije).
+static func tutorial_rows() -> Array:
+	return [
+		{"text": UiPopups.S_ARENA_TAP, "icon": UiPopups.icon("icon_basket"), "disc": UiPopups.COIN_GOLD},
+		{"text": UiPopups.S_ARENA_JOIN, "art": "clover", "tier": 1, "disc": UiPopups.ACTIVE_RIM},
+	]
+
+
+static func message_rows(text: String) -> Array:
+	if text.begins_with("Muncher"):
+		return [
+			{"text": UiPopups.S_MUNCHER_AWAKE, "lead": true},
+			{"text": UiPopups.S_MUNCHER_FREEZE, "art": "clover", "tier": 3, "disc": UiPopups.ACTIVE_RIM},
+		]
+	return [{"text": text, "lead": true}]
+
+
 func layout(field_size: Vector2) -> void:
 	if field_size.x < 10.0 or not cue.is_inside_tree():
 		return
-	cue_label.custom_minimum_size.x = minf(CUE_MAX_W - 64.0, field_size.x - 160.0)
-	_place(field_size)
-	await cue.get_tree().process_frame
-	if cue.is_inside_tree():
-		_place(field_size)
+	var bounds := Rect2(24.0, 24.0, field_size.x - 48.0, field_size.y - 48.0)
+	if cue.dir == "up":
+		cue.point_at(_pest_tip(field_size), 0.5, bounds)
+	else:
+		cue.point_at(_bag_tip(field_size), 0.5, bounds)
 
 
-func _place(field_size: Vector2) -> void:
-	var cue_size := cue.get_combined_minimum_size()
-	cue_size.x = maxf(cue_size.x, cue_label.custom_minimum_size.x)
-	cue_size.y = minf(cue_size.y, field_size.y * 0.5)
-	cue.size = cue_size
-	cue.position = Vector2((field_size.x - cue_size.x) * 0.5, field_size.y - CUE_BOTTOM - cue_size.y)
+func _bag_tip(field_size: Vector2) -> Vector2:
+	var bag: Control = _owner.get("_seed_bag")
+	if bag != null:
+		var r := bag.get_rect()
+		return Vector2(r.get_center().x, r.position.y + BAG_TIP_GAP)
+	return Vector2(field_size.x * 0.5, field_size.y - 330.0)
+
+
+func _pest_tip(field_size: Vector2) -> Vector2:
+	var pest: Control = _owner.get("_pest")
+	if pest != null:
+		var c: Vector2 = pest.get("_pest_center")
+		return pest.position + c + Vector2(0.0, PEST_TIP_GAP)
+	return Vector2(field_size.x * 0.5, UiArena.NEST_Y + 60.0)
 
 
 func _field_size() -> Vector2:
@@ -96,7 +119,9 @@ func _field_size() -> Vector2:
 
 func _restore_tutorial() -> void:
 	_message_tween = null
-	cue_arrow.visible = true
+	_message_on = false
+	cue.modulate.a = 1.0
+	cue.visible = false
 	set_tutorial_visible(_tutorial_on)
 
 
@@ -104,19 +129,3 @@ func _kill_message_tween() -> void:
 	if _message_tween != null and _message_tween.is_valid():
 		_message_tween.kill()
 	_message_tween = null
-
-
-func _style() -> void:
-	cue_label.add_theme_font_size_override("font_size", CUE_FONT_SIZE)
-	cue_label.add_theme_font_override("font", UiChrome.heavy_font(UiChrome.EMBOLDEN_800))
-	cue_label.add_theme_color_override("font_color", UiPalette.OUTLINE)
-	(cue_label.get_parent() as PanelContainer).add_theme_stylebox_override("panel", UiArena.cue_style())
-	cue_arrow.draw.connect(_draw_cue_arrow)
-
-
-func _draw_cue_arrow() -> void:
-	var w := cue_arrow.size.x
-	var h := cue_arrow.size.y
-	cue_arrow.draw_colored_polygon(
-		PackedVector2Array([Vector2(0.0, 0.0), Vector2(w, 0.0), Vector2(w * 0.5, h)]), UiPalette.WARM_WHITE
-	)

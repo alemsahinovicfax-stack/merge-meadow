@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}a{color:#2D3436}a:hover{color:#9E6645}</style>
+</helmet>
+<div data-layer="WardrobeSheet" data-screen-label="Wardrobe" style="position:relative;width:1080px;height:1326px;box-sizing:border-box;background:#FFF8F0;border-top:4px solid #2D3436;border-radius:36px 36px 0 0;padding:20px 24px 20px;display:flex;flex-direction:column;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;transform:translateY({{ dragY }}px)">
+  <div data-layer="SheetHead" onPointerDown="{{ dragStart }}" onPointerMove="{{ dragMove }}" onPointerUp="{{ dragEnd }}" onPointerCancel="{{ dragEnd }}" style="flex:0 0 auto;touch-action:none;cursor:grab">
+    <div data-layer="SheetHandle" style="width:120px;height:12px;border-radius:6px;background:rgba(45,52,54,.28);margin:0 auto 24px"></div>
+    <div data-layer="SheetTitle" style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#2D3436">Wardrobe</div>
+    <div data-layer="SheetSub" style="margin-top:12px;font:800 40px/1 Nunito,system-ui,sans-serif;color:#555C5E">Looks only. Tap one to wear it.</div>
+  </div>
+
+  <div data-layer="PreviewStage" style="position:relative;margin-top:28px;flex:0 0 300px;width:1032px;height:300px;box-sizing:border-box;border-radius:28px;overflow:hidden;border:3px solid #2D3436;background:#16211B">
+    <dc-import name="ItemPreview" kind="{{ stageKind }}" subject="{{ stageSubject }}" look="{{ stageLook }}" pip="{{ stagePip }}" season="{{ season }}" w="1026" h="294" size="stage" hop="{{ hop }}" hint-size="1026px,294px"></dc-import>
+    <div data-layer="StageName" style="position:absolute;left:16px;bottom:16px;height:60px;box-sizing:border-box;padding:0 20px;border-radius:18px;background:rgba(26,36,30,.84);border:2px solid rgba(255,248,240,.40);display:flex;align-items:center;font:900 40px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">{{ stageName }}</div>
+    <div data-layer="StageWhere" style="position:absolute;right:16px;top:16px;height:56px;box-sizing:border-box;padding:0 18px;border-radius:16px;background:rgba(26,36,30,.84);border:2px solid rgba(255,248,240,.40);display:flex;align-items:center;gap:10px;font:800 36px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">{{ stageWhere }}</div>
+  </div>
+
+  <div data-layer="SlotTabs" ref="{{ tabsRef }}" style="margin-top:24px;flex:0 0 120px;height:120px;width:1032px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;scroll-behavior:smooth">
+    <div style="display:flex;gap:12px;height:120px;min-width:100%;width:max-content">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+        <div data-layer="SlotTab" data-slot="{{ t.id }}" data-active="{{ t.active }}" onClick="{{ t.pick }}" style="{{ t.style }}">
+          <img src="{{ t.icon }}" alt="" style="width:56px;height:56px;flex:0 0 auto;display:block">
+          <span style="font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ t.title }}</span>
+          <sc-if value="{{ t.dot }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="TabNewDot" style="position:absolute;top:-8px;right:-8px;width:36px;height:36px;box-sizing:border-box;border-radius:18px;background:#A8E6CF;border:4px solid #2D3436"></div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="ItemGrid" ref="{{ gridRef }}" style="margin-top:24px;flex:1 1 auto;min-height:0;width:1032px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-top:6px;margin-bottom:-6px;box-sizing:border-box">
+    <div style="display:grid;grid-template-columns:repeat(4,240px);column-gap:24px;row-gap:24px;align-content:start;padding-bottom:24px">
+      <sc-for list="{{ cells }}" as="c" hint-placeholder-count="4">
+        <sc-if value="{{ c.isCard }}" hint-placeholder-val="{{ true }}">
+          <dc-import name="ItemCard" data-item="{{ c.id }}" kind="{{ c.kind }}" subject="{{ c.subject }}" look="{{ c.look }}" pip="{{ c.pip }}" season="{{ season }}" title="{{ c.title }}" state="{{ c.state }}" is-default="{{ c.isDefault }}" is-new="{{ c.isNew }}" on-tap="{{ c.tap }}" hint-size="240px,272px"></dc-import>
+        </sc-if>
+        <sc-if value="{{ c.isLink }}" hint-placeholder-val="{{ false }}">
+          <div data-layer="ShopLink" onClick="{{ toShop }}" style="width:240px;height:272px;box-sizing:border-box;border-radius:28px;border:3px dashed rgba(45,52,54,.40);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;cursor:pointer;text-align:center" style-active="background:rgba(45,52,54,.06)">
+            <img src="icons/icon_shop_ink.svg" alt="" style="width:72px;height:72px;display:block">
+            <div style="font:900 38px/40px Nunito,system-ui,sans-serif;color:#2D3436;text-wrap:balance">More in Shop</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ c.isEmpty }}" hint-placeholder-val="{{ false }}">
+          <div data-layer="EmptyState" style="grid-column:span 3;height:272px;box-sizing:border-box;border-radius:28px;border:3px dashed rgba(45,52,54,.40);padding:28px 32px;display:flex;flex-direction:column;justify-content:space-between">
+            <div style="font:800 40px/1.15 Nunito,system-ui,sans-serif;color:#2D3436;text-wrap:pretty">{{ c.text }}</div>
+            <div data-layer="ShopLink" onClick="{{ toShop }}" style="align-self:flex-start;height:120px;box-sizing:border-box;padding:0 32px 0 22px;border-radius:28px;background:#FFFFFF;border:3px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.28);display:flex;align-items:center;gap:16px;cursor:pointer" style-active="box-shadow:0 2px 0 rgba(26,26,20,.28);transform:translateY(4px)">
+              <img src="icons/icon_shop_ink.svg" alt="" style="width:64px;height:64px;display:block">
+              <span style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">More in Shop</span>
+            </div>
+          </div>
+        </sc-if>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="PopupButton" data-kind="secondary" onClick="{{ close }}" style="margin-top:28px;margin-bottom:8px;flex:0 0 132px;height:132px;box-sizing:border-box;border-radius:36px;background:#FFFFFF;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;font:900 48px/1 Nunito,system-ui,sans-serif;color:#2D3436;cursor:pointer" style-active="transform:translateY(6px);box-shadow:0 2px 0 rgba(26,26,20,.28)">Close</div>
+
+  <sc-if value="{{ toastShop }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="ShopToast" style="position:absolute;left:190px;top:560px;width:700px;height:100px;box-sizing:border-box;border-radius:28px;background:#2D3436;display:grid;place-items:center;font:900 44px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">Opens Shop · Looks</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1326},&quot;slot&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;pip_skin&quot;,&quot;meadow_bg&quot;,&quot;journal_frame&quot;,&quot;mochi_skin&quot;,&quot;album_paper&quot;,&quot;basket_cloth&quot;,&quot;gift_ribbon&quot;,&quot;combo_ring&quot;],&quot;default&quot;:&quot;pip_skin&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;extra&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Proširivost&quot;},&quot;demoN&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:null,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Proširivost&quot;},&quot;owned&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string[]&quot;},&quot;equipped&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Record&lt;string,string&gt;&quot;},&quot;gridScroll&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;tabScroll&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;onClose&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(pending, changed) =&gt; void&quot;},&quot;onChange&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(pending) =&gt; void&quot;},&quot;onShop&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(slot) =&gt; void&quot;}}">
+const W_CHAR = 22, TAB_PAD = 56, TAB_ICON = 56, TAB_GAP = 12, ROW_W = 1032;
+class Component extends DCLogic {
+  state = { M: null, cat: null, slot: null, pending: null, hop: 0, dragY: 0, toastShop: false };
+  tabsRef = React.createRef();
+  gridRef = React.createRef();
+  componentDidMount() {
+    import('./wardrobe_data.js').then(M => M.loadCatalog().then(r => this.setState({ M, cat: r.cat })));
+  }
+  componentDidUpdate() {
+    if (this.state.cat && !this._st) { this._st = 1; [300, 900, 1800].forEach(ms => setTimeout(() => { this._gs = null; this._ts = null; this.applyScroll(); }, ms)); }
+    this.applyScroll();
+  }
+  applyScroll() {
+    const g = this.gridRef.current, t = this.tabsRef.current;
+    if (g && this.props.gridScroll != null && this._gs !== this.props.gridScroll) { this._gs = this.props.gridScroll; g.style.scrollBehavior = 'auto'; g.scrollTop = +this.props.gridScroll; }
+    if (t) {
+      t.style.scrollBehavior = 'auto';
+      const a = t.querySelector('[data-active="1"]');
+      const key = this.curSlot() + '|' + (this.props.tabScroll ?? '');
+      if (a && this._ts !== key) {
+        this._ts = key;
+        if (this.props.tabScroll != null) t.scrollLeft = +this.props.tabScroll;
+        else if (a.offsetLeft + a.offsetWidth > t.scrollLeft + t.clientWidth - 24 || a.offsetLeft < t.scrollLeft) t.scrollLeft = Math.max(0, a.offsetLeft - 24);
+      }
+    }
+  }
+  componentWillUnmount() { clearTimeout(this._tt); }
+  model() {
+    const { M, cat } = this.state, p = this.props;
+    let c = cat, owned = (p.owned || ['pip_blossom', 'meadow_sunset', 'meadow_lavender', 'journal_gold']).slice(), seen = 1;
+    if (p.extra) { c = M.withPatch(c, M.DEMO); owned = owned.concat(M.DEMO.owned); seen = M.DEMO.seen_version; }
+    if (p.demoN != null) { const d = M.demoN(+p.demoN); c = M.withPatch(c, d); owned = owned.concat(d.owned); }
+    return { c, owned, seen };
+  }
+  curSlot() { return this.state.slot || this.props.slot || 'pip_skin'; }
+  renderVals() {
+    const { M, cat } = this.state, p = this.props;
+    const season = p.season || 'country_bloom';
+    const base = { season, dragY: this.state.dragY, hop: this.state.hop, tabs: [], cells: [], stageKind: 'companion', stageSubject: 'pip', stageLook: null, stagePip: null, stageName: '', stageWhere: '',
+      tabsRef: this.tabsRef, gridRef: this.gridRef, toastShop: this.state.toastShop,
+      dragStart: e => this.dragStart(e), dragMove: e => this.dragMove(e), dragEnd: e => this.dragEnd(e),
+      close: () => this.finish(), toShop: () => this.toShop() };
+    if (!M || !cat) return base;
+    const { c, owned, seen } = this.model();
+    const ownSet = new Set(owned);
+    const eq = Object.assign({}, p.equipped || {});
+    const pending = this.state.pending || Object.keys(eq).reduce((o, k) => { if (ownSet.has(eq[k])) o[k] = eq[k]; return o; }, {});
+    this._pending = pending; this._saved = eq;
+    const v = M.view(c, owned, pending, seen);
+    const sid = v.some(x => x.slot.id === this.curSlot()) ? this.curSlot() : v[0].slot.id;
+    const est = s => TAB_PAD + TAB_ICON + TAB_GAP + Math.round(s.title.length * W_CHAR);
+    const total = v.reduce((a, x) => a + est(x.slot), 0) + TAB_GAP * (v.length - 1);
+    const fill = total <= ROW_W;
+    const tabs = v.map(x => {
+      const act = x.slot.id === sid;
+      return {
+        id: x.slot.id, title: x.slot.title, icon: M.iconUrl(x.slot.icon), dot: x.items.some(i => i.isNew),
+        style: 'position:relative;height:120px;box-sizing:border-box;border-radius:24px;padding:0 28px;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;' +
+          (fill ? 'flex:1 1 0;min-width:0;' : 'flex:0 0 auto;') +
+          (act ? 'background:#FFB88C;border:3px solid #2D3436' : 'background:#FFFFFF;border:3px solid rgba(45,52,54,.18)'),
+        pick: () => this.setState({ slot: x.slot.id, toastShop: false })
+      };
+    });
+    // data-active marker: injected via style hack-free attribute on the element list
+    this._activeSlot = sid;
+    const cur = v.find(x => x.slot.id === sid), sl = cur.slot;
+    const subj = (sl.preview_args && sl.preview_args.subject) || 'pip';
+    const wornId = pending[sl.id] || '';
+    const pipLook = (() => { const id = pending.pip_skin; const it = id && c.items.find(i => i.id === id); return it ? it.look.recolor : null; })();
+    const cells = [];
+    const mk = (it, isDefault) => {
+      const id = isDefault ? '' : it.item.id, worn = wornId === id;
+      return {
+        isCard: true, isLink: false, isEmpty: false, id: isDefault ? 'default:' + sl.id : id,
+        kind: sl.preview, subject: subj, look: isDefault ? null : it.item.look, pip: pipLook,
+        title: isDefault ? sl.default_title : it.item.title,
+        state: isDefault ? (worn ? 'worn' : 'owned') : (!it.owned ? 'none' : worn ? 'worn' : 'owned'),
+        isDefault, isNew: !isDefault && it.isNew,
+        tap: () => this.pick(sl.id, id)
+      };
+    };
+    if (sl.allow_default) cells.push(mk(null, true));
+    const vis = cur.items.filter(i => i.visible);
+    vis.forEach(i => cells.push(mk(i, false)));
+    if (!cur.items.some(i => i.owned)) cells.push({ isCard: false, isLink: false, isEmpty: true, id: 'empty', text: sl.empty_text });
+    else cells.push({ isCard: false, isLink: true, isEmpty: false, id: 'shop' });
+    const wornItem = wornId ? c.items.find(i => i.id === wornId) : null;
+    const labels = []; (sl.applies_to || []).forEach(s => { if (s === 'shop') return; const l = (c.surfaces || {})[s] || s; if (labels.indexOf(l) < 0) labels.push(l); });
+    tabs.forEach(t => { t.style += t.id === sid ? '' : ''; });
+    return Object.assign(base, {
+      tabs: tabs.map(t => Object.assign(t, { active: t.id === sid ? '1' : '0' })), cells,
+      stageKind: sl.preview, stageSubject: subj, stageLook: wornItem ? wornItem.look : null, stagePip: pipLook,
+      stageName: wornItem ? wornItem.title : sl.default_title,
+      stageWhere: labels.join(' · ')
+    });
+  }
+  pick(slot, id) {
+    const pending = Object.assign({}, this._pending);
+    if ((pending[slot] || '') === id) { this.setState({ hop: this.state.hop + 1 }); return; }
+    if (id) pending[slot] = id; else delete pending[slot];
+    this.setState({ pending, hop: this.state.hop + 1, toastShop: false });
+    if (this.props.onChange) this.props.onChange(pending);
+  }
+  finish() {
+    const saved = this._saved || {}, pending = this._pending || {};
+    const changed = Object.keys(Object.assign({}, saved, pending)).filter(k => (saved[k] || '') !== (pending[k] || ''));
+    if (this.props.onClose) this.props.onClose(pending, changed);
+  }
+  toShop() {
+    if (this.props.onShop) { this.props.onShop(this.curSlot()); return; }
+    this.setState({ toastShop: true }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toastShop: false }), 1600);
+  }
+  dragStart(e) { this._d = { y: e.clientY, id: e.pointerId }; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} }
+  dragMove(e) { if (!this._d) return; const k = this.dragScale(e); this.setState({ dragY: Math.max(0, (e.clientY - this._d.y) / k) }); }
+  dragEnd() { if (!this._d) return; this._d = null; if (this.state.dragY > 160) { this.setState({ dragY: 0 }); this.finish(); } else this.setState({ dragY: 0 }); }
+  dragScale(e) { const el = e.currentTarget; const r = el.getBoundingClientRect(); return r.width / el.offsetWidth || 1; }
+}
+</script>
+</body>
+</html>

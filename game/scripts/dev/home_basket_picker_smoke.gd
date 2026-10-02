@@ -63,14 +63,14 @@ func _assert_picker_rows(home: Node) -> String:
 			return "flower row missing label_text"
 		if label_text.findn("Clear") >= 0:
 			return "Clear must not be a PickerList child"
+		# Popups v2: SeedTile — zaključana pločica nosi katanac umjesto crteža.
+		if bool(child.call("is_locked")):
+			continue
 		var icon := _find_picker_icon(child)
 		if icon == null:
-			return "flower row missing T3 PlantIcon"
-		var label := _find_named(child, "Label") as Control
-		if label == null:
-			return "flower row missing Label"
-		if icon.global_position.y >= label.global_position.y:
-			return "T3 icon must sit above the name label"
+			return "flower tile missing T3 PlantIcon"
+		if icon.size.x < 120.0:
+			return "T3 art should be the 134 px frame drawing"
 	return ""
 
 
@@ -91,8 +91,8 @@ func _assert_picker_footer(home: Node) -> String:
 				return "Clear must not be a PickerList child"
 			if str(child.get("label_text")).findn("Clear") >= 0:
 				return "Clear must not be a PickerList child"
-	if close_btn.global_position.y <= clear_btn.global_position.y:
-		return "Close must sit below Clear in footer"
+	if close_btn.global_position.x <= clear_btn.global_position.x:
+		return "Close must sit right of Clear in footer"
 	return ""
 
 
@@ -303,8 +303,8 @@ func _run() -> void:
 	if pumpkin_row == null:
 		_fail("Bloom picker must include locked pumpkin row")
 		return
-	if pumpkin_row.modulate.r > 0.6:
-		_fail("locked pumpkin row should be gray")
+	if not bool(pumpkin_row.call("is_locked")):
+		_fail("locked pumpkin tile should show the lock state")
 		return
 	var row_err := _assert_picker_rows(home)
 	if not row_err.is_empty():
@@ -389,7 +389,7 @@ func _run() -> void:
 		close_btn.emit_signal("clicked")
 	elif home.has_method("_close_basket_picker"):
 		home.call("_close_basket_picker")
-	await process_frame
+	await create_timer(0.45).timeout
 	if overlay.visible:
 		_fail("Close should hide BasketPickerOverlay")
 		return

@@ -17,7 +17,7 @@ ai_sažetak: "Brief za Claude Design: redizajn SVIH pop-upova u igri kao jednog 
 
 # Pop-upovi — cijela igra — Claude Design brief
 
-> **Status 2026-10-02: brief spreman, čeka CD.** Prompt je u §12. Paket se vraća kao `design_handoff_popups/` (zip).
+> **Status 2026-10-02: prenesen u igru.** Paket `design_handoff_popups/` je u repou (22 ID-a — H1–H8, X1–X3, S1, C1, A1–A4, R1–R5; brief je brojao 21). Čeka playtest. Prompt je u §12.
 
 > Pop-upovi su nastajali jedan po jedan, uz svaki ekran posebno, pa danas igra ima **pet različitih izgleda** za istu stvar: tamni stari loot ekran sa zelenim/crvenim tekstom, bijeli panel pauze, sitni poklon od 400 × 320, sheet korpe s tekstom od 22 px, tri vrste toasta. Ovo je **jedan dizajn za sve**: sistem od pet vrsta pop-upa, pa svaki pop-up iz §4 nacrtan u tom sistemu. **Nijedan ne smije ostati u starom izgledu.**
 

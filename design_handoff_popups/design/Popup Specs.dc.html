@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#EDE6DC}a{color:#2D3436}a:hover{color:#9E6645}@keyframes popDots{0%,80%,100%{opacity:.25}40%{opacity:1}}</style>
+</helmet>
+<div data-layer="PopupSpecs" style="min-height:100vh;background:#EDE6DC;font-family:Nunito,system-ui,sans-serif;color:#2D3436;-webkit-font-smoothing:antialiased;padding:48px 40px 120px;box-sizing:border-box">
+  <div style="max-width:1720px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+
+    <div data-layer="Intro" style="display:flex;flex-direction:column;gap:18px">
+      <div style="font:700 16px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:#6B6257">design_handoff_popups · M8 · POPUP-01</div>
+      <div style="font:900 64px/1.02 Nunito,system-ui,sans-serif;letter-spacing:-.02em">Pop-ups — one system for the whole game</div>
+      <div style="max-width:980px;font:700 22px/1.45 Nunito,system-ui,sans-serif;color:#4A4F51;text-wrap:pretty">Every pop-up is a cream sticker with an ink rim and one hard shadow — the same material as the field tiles, Shop cards and the Wardrobe. The five kinds differ by <b>shape</b>, so a player knows how each one closes before reading a word: a modal wears a title plate on its top edge, a sheet has a handle, a coach bubble has a tail, a toast is a dark pill, a pop is a number with an ink outline.</div>
+      <div data-layer="KindLegend" style="display:flex;flex-wrap:wrap;gap:16px;margin-top:8px">
+        <sc-for list="{{ kinds }}" as="k" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:14px;background:#FFF8F0;border:3px solid #2D3436;border-radius:20px;padding:14px 20px 14px 14px;box-shadow:0 5px 0 rgba(26,26,20,.2)">
+            <div style="width:72px;height:72px;border-radius:14px;background:#D6E1CC;position:relative;overflow:hidden;flex:0 0 auto"><div style="{{ k.glyph }}"></div><div style="{{ k.glyph2 }}"></div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font:900 22px/1 Nunito,system-ui,sans-serif">{{ k.name }}</div><div style="font:700 16px/1.25 Nunito,system-ui,sans-serif;color:#555C5E;max-width:250px">{{ k.how }}</div></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div data-layer="Section_System" style="display:flex;flex-direction:column;gap:24px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">1 · System</div>
+      <div style="font:700 18px/1.4 Nunito,system-ui,sans-serif;color:#4A4F51;max-width:980px">Boards below are drawn at 50 % — every number in the labels is px on the 1080 × 1920 artboard. Same tokens on the light meadow and on the dark run lane; the panel and scrim carry the contrast, never a second palette.</div>
+
+      <div data-layer="Tokens" style="display:flex;flex-wrap:wrap;gap:12px">
+        <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="12">
+          <div style="width:164px;background:#FFF8F0;border:2px solid rgba(45,52,54,.18);border-radius:16px;overflow:hidden">
+            <div style="{{ s.chip }}"></div>
+            <div style="padding:10px 12px;display:flex;flex-direction:column;gap:4px"><div style="font:900 16px/1.1 Nunito,system-ui,sans-serif">{{ s.name }}</div><div style="font:700 13px/1.2 ui-monospace,Menlo,monospace;color:#555C5E">{{ s.hex }}</div><div style="font:700 13px/1.25 Nunito,system-ui,sans-serif;color:#555C5E">{{ s.use }}</div></div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div data-layer="Boards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(540px,1fr));gap:24px">
+        <sc-for list="{{ boards }}" as="bd" hint-placeholder-count="6">
+          <div style="background:#FFF8F0;border:3px solid #2D3436;border-radius:24px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="padding:16px 20px;display:flex;justify-content:space-between;gap:16px;border-bottom:2px solid rgba(45,52,54,.12)"><div style="font:900 24px/1 Nunito,system-ui,sans-serif">{{ bd.title }}</div><div style="font:700 14px/1.3 ui-monospace,Menlo,monospace;color:#555C5E;text-align:right">{{ bd.layer }}</div></div>
+            <div style="{{ bd.stage }}">
+              <div style="{{ bd.inner }}">
+                <sc-for list="{{ bd.items }}" as="it" hint-placeholder-count="3">
+                  <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+                    <div style="{{ it.slot }}">
+                      <sc-if value="{{ it.isBtn }}" hint-placeholder-val="{{ false }}">
+                        <div data-layer="{{ it.b.layer }}" style="{{ it.b.style }}">
+                          <sc-if value="{{ it.b.isAd }}" hint-placeholder-val="{{ false }}"><img src="icons/icon_video.svg" alt="ad" style="{{ it.b.adStyle }}"></sc-if>
+                          <sc-if value="{{ it.b.hasCheck }}" hint-placeholder-val="{{ false }}"><div style="width:16px;height:32px;border-right:8px solid #2D3436;border-bottom:8px solid #2D3436;transform:rotate(45deg) translate(-2px,-4px)"></div></sc-if>
+                          <span style="{{ it.b.labelStyle }}">{{ it.b.label }}</span>
+                          <sc-if value="{{ it.b.isLoading }}" hint-placeholder-val="{{ false }}">{{ it.b.dots }}</sc-if>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ it.isChip }}" hint-placeholder-val="{{ false }}">
+                        <div data-layer="RewardChip" style="{{ it.c.style }}">
+                          <div style="{{ it.c.artBox }}"><img src="{{ it.c.art.src }}" alt="" style="{{ it.c.art.style }}"></div>
+                          <sc-if value="{{ it.c.half }}" hint-placeholder-val="{{ false }}"><span style="{{ it.c.wasStyle }}">{{ it.c.was }}</span></sc-if>
+                          <span style="{{ it.c.nStyle }}">{{ it.c.n }}</span>
+                          <sc-if value="{{ it.c.x2 }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:-16px;top:-24px;height:54px;box-sizing:border-box;padding:0 14px;border-radius:27px;background:#FFD56B;border:3px solid #2D3436;display:flex;align-items:center;font:900 36px/1 Nunito,system-ui,sans-serif">×2</div></sc-if>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ it.isCoach }}" hint-placeholder-val="{{ false }}">
+                        <div style="{{ it.k.box }}">
+                          <sc-for list="{{ it.k.rows }}" as="r" hint-placeholder-count="1"><span style="{{ r.textStyle }}">{{ r.text }}</span></sc-for>
+                          <sc-if value="{{ it.k.hasTail }}" hint-placeholder-val="{{ false }}"><div style="{{ it.k.tailOuter }}"></div><div style="{{ it.k.tailInner }}"></div></sc-if>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ it.isToast }}" hint-placeholder-val="{{ false }}">
+                        <div style="{{ it.t.style }}">
+                          <sc-if value="{{ it.t.hasDisc }}" hint-placeholder-val="{{ false }}"><div style="width:60px;height:60px;border-radius:30px;background:#FFF8F0;display:grid;place-items:center;flex:0 0 auto"><img src="{{ it.t.icon }}" alt="" style="width:40px;height:40px"></div></sc-if>
+                          <span style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">{{ it.t.text }}</span>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ it.isPop }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;align-items:center;gap:8px">
+                          <img src="icons/icon_coin.svg" alt="" style="width:58px;height:58px">
+                          <span style="{{ it.q.textStyle }}">{{ it.q.text }}</span>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ it.isPlate }}" hint-placeholder-val="{{ false }}">
+                        <div style="{{ it.plate }}">{{ it.label }}</div>
+                      </sc-if>
+                    </div>
+                    <div style="{{ it.capStyle }}">{{ it.cap }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div data-layer="SpecTables" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(520px,1fr));gap:24px">
+        <sc-for list="{{ tables }}" as="tb" hint-placeholder-count="3">
+          <div style="background:#FFF8F0;border:3px solid #2D3436;border-radius:24px;padding:20px 24px;display:flex;flex-direction:column;gap:12px">
+            <div style="font:900 24px/1 Nunito,system-ui,sans-serif">{{ tb.title }}</div>
+            <sc-for list="{{ tb.rows }}" as="row" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;padding:10px 0;border-top:2px solid rgba(45,52,54,.08)">
+                <div style="font:900 16px/1.3 Nunito,system-ui,sans-serif">{{ row.k }}</div>
+                <div style="font:700 16px/1.4 Nunito,system-ui,sans-serif;color:#4A4F51;text-wrap:pretty">{{ row.v }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div data-layer="Section_Inventory" style="display:flex;flex-direction:column;gap:24px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">2 · Every pop-up — before → after</div>
+      <div style="font:700 18px/1.4 Nunito,system-ui,sans-serif;color:#4A4F51;max-width:980px">Left: today in the game (popups-ref). Right: every state from §9.1, rendered live by <b>PopupsScreen.dc.html</b> with the same props (popup = ID, state). Thumbnails are 25 %.</div>
+      <sc-for list="{{ cards }}" as="c" hint-placeholder-count="4">
+        <div data-layer="PopupCard" id="{{ c.id }}" style="background:#FFF8F0;border:3px solid #2D3436;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div style="height:48px;padding:0 16px;border-radius:24px;background:#2D3436;color:#FFF8F0;display:flex;align-items:center;font:900 24px/1 Nunito,system-ui,sans-serif">{{ c.id }}</div>
+            <div style="font:900 30px/1 Nunito,system-ui,sans-serif">{{ c.name }}</div>
+            <div style="{{ c.kindStyle }}">{{ c.kind }}</div>
+            <div style="font:700 16px/1.3 ui-monospace,Menlo,monospace;color:#6B6257">{{ c.layer }}</div>
+          </div>
+          <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
+            <div style="display:flex;gap:14px;flex-wrap:wrap">
+              <sc-for list="{{ c.before }}" as="bf" hint-placeholder-count="1">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="width:270px;height:480px;border-radius:14px;overflow:hidden;border:2px solid rgba(45,52,54,.25);position:relative;background:#222"><img src="{{ bf.src }}" alt="before" style="width:270px;height:480px;display:block;filter:saturate(.6)"><div style="position:absolute;left:10px;top:10px;padding:5px 10px;border-radius:8px;background:#2D3436;color:#FFF8F0;font:800 14px/1 Nunito,system-ui,sans-serif">today</div></div>
+                  <div style="font:700 13px/1.2 ui-monospace,Menlo,monospace;color:#6B6257;max-width:270px">{{ bf.name }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="width:4px;align-self:stretch;border-radius:2px;background:rgba(45,52,54,.15)"></div>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;flex:1;min-width:0">
+              <sc-for list="{{ c.after }}" as="af" hint-placeholder-count="1">
+                <div data-layer="AfterThumb" data-id="{{ c.id }}" data-state="{{ af.state }}" style="display:flex;flex-direction:column;gap:8px">
+                  <div style="width:270px;height:480px;border-radius:14px;overflow:hidden;border:2px solid #2D3436;position:relative">
+                    <sc-if value="{{ af.show }}" hint-placeholder-val="{{ false }}">
+                      <div style="width:1080px;height:1920px;transform:scale(.25);transform-origin:0 0">
+                        <dc-import name="PopupsScreen" popup="{{ c.id }}" state="{{ af.state }}" season="{{ af.season }}" still="{{ true }}" hint-size="1080px,1920px"></dc-import>
+                      </div>
+                    </sc-if>
+                  </div>
+                  <div style="font:800 15px/1.2 Nunito,system-ui,sans-serif;max-width:270px">{{ af.label }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px">
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font:900 16px/1 Nunito,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#6B6257">Decided</div><div style="font:700 17px/1.45 Nunito,system-ui,sans-serif;color:#2D3436;text-wrap:pretty">{{ c.note }}</div></div>
+            <sc-if value="{{ c.hasDrop }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:6px"><div style="font:900 16px/1 Nunito,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#6B6257">Removed</div><div style="font:700 17px/1.45 Nunito,system-ui,sans-serif;color:#8A3B3B;text-decoration:line-through;text-wrap:pretty">{{ c.drop }}</div></div></sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div data-layer="Section_SelfCheck" id="selfcheck" style="display:flex;flex-direction:column;gap:18px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">3 · Self-check (§9.3) — measured live from the DOM</div>
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <div data-layer="RunSelfCheck" onClick="{{ runCheck }}" style="height:64px;padding:0 28px;border-radius:32px;background:#FFB88C;border:3px solid #2D3436;box-shadow:0 5px 0 rgba(26,26,20,.28);display:flex;align-items:center;font:900 22px/1 Nunito,system-ui,sans-serif;cursor:pointer" style-active="transform:translateY(4px);box-shadow:0 1px 0 rgba(26,26,20,.28)">Run self-check</div>
+        <div style="font:700 18px/1.4 Nunito,system-ui,sans-serif;color:#4A4F51">{{ checkStatus }}</div>
+      </div>
+      <sc-for list="{{ checks }}" as="ck" hint-placeholder-count="9">
+        <div data-layer="CheckRow" data-ok="{{ ck.okStr }}" style="display:grid;grid-template-columns:72px minmax(0,1fr);gap:18px;align-items:start;background:#FFF8F0;border:3px solid #2D3436;border-radius:20px;padding:16px 20px">
+          <div style="{{ ck.badge }}">{{ ck.verdict }}</div>
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="font:900 19px/1.3 Nunito,system-ui,sans-serif">{{ ck.n }}. {{ ck.q }}</div><div style="font:700 15px/1.4 ui-monospace,Menlo,monospace;color:#4A4F51;text-wrap:pretty">{{ ck.detail }}</div></div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const INK = '#2D3436', CREAM = '#FFF8F0', SOFT = '#555C5E', RIM = '#FFF6D6', PEACH = '#FFB88C', GOLD = '#FFD56B', MINT = '#A8E6CF', LAV = '#D4A5FF', LAV_L = '#EAD2FF', PINK = '#FFCCD5', DIS = '#F1EAE0', WHITE = '#FFFFFF';
+const DROP = 'rgba(26,26,20,.28)';
+const F = (w, s, lh) => 'font:' + w + ' ' + s + 'px/' + (lh || 1) + ' Nunito,system-ui,sans-serif;';
+const CROP = { clover_t1: [80, 89, 96, 164], daisy_t1: [90, 119, 76, 134], clover_t3: [65, 52, 139, 202] };
+const r2 = v => Math.round(v * 100) / 100;
+const crop = (key, box) => { const c = CROP[key]; const s = box / Math.max(c[2], c[3]); return { src: 'icons/flowers/' + key + '.svg', style: 'position:absolute;max-width:none;display:block;margin:6px;width:' + r2(256 * s) + 'px;height:' + r2(256 * s) + 'px;left:' + r2((box - c[2] * s) / 2 - c[0] * s) + 'px;top:' + r2((box - c[3] * s) / 2 - c[1] * s) + 'px' }; };
+function btn(kind, label, o) {
+  o = o || {}; const ad = !!o.ad, h = ad ? 120 : 132;
+  let bg = WHITE, edge = INK, shadow = '0 8px 0 ' + DROP, ink = INK, lift = '';
+  if (kind === 'primary') bg = PEACH; if (kind === 'ad') bg = LAV;
+  if (kind === 'disabled') { bg = DIS; edge = 'rgba(45,52,54,.30)'; shadow = 'none'; ink = SOFT; }
+  if (kind === 'loading') { bg = LAV_L; shadow = 'none'; lift = 'transform:translateY(8px);'; }
+  if (kind === 'done') { bg = MINT; shadow = 'none'; }
+  return { layer: ad ? 'AdButton' : 'PopupButton', label, style: 'width:' + (o.w || 400) + 'px;height:' + h + 'px;box-sizing:border-box;border-radius:36px;background:' + bg + ';border:4px solid ' + edge + ';box-shadow:' + shadow + ';display:flex;align-items:center;justify-content:center;gap:16px;padding:0 24px;' + lift,
+    labelStyle: F(900, ad ? 44 : 48) + 'color:' + ink + ';white-space:nowrap', isAd: ad, adStyle: 'width:64px;height:48px;display:block;' + (kind === 'disabled' ? 'opacity:.45' : ''),
+    hasIcon: !!o.icon, icon: o.icon || '', iconStyle: 'width:56px;height:56px;display:block', hasCheck: kind === 'done', isLoading: kind === 'loading',
+    dots: kind === 'loading' ? React.createElement('span', { style: { display: 'inline-flex', gap: 8 } }, [0, 1, 2].map(i => React.createElement('span', { key: i, style: { width: 14, height: 14, borderRadius: 7, background: INK, animation: 'popDots .9s ' + (i * 0.15) + 's infinite ease-in-out' } }))) : null };
+}
+function chip(kind, n, o) {
+  o = o || {}; const box = 92;
+  const art = kind === 'coin' ? { src: 'icons/icon_coin.svg', style: 'position:absolute;left:4px;top:4px;width:84px;height:84px' } : crop(o.key, box - 12);
+  return { n: '+' + n, half: o.was != null, was: String(o.was ?? ''), x2: !!o.x2, art,
+    style: 'position:relative;height:132px;box-sizing:border-box;border-radius:66px;background:#FFFFFF;border:3px solid ' + INK + ';display:flex;align-items:center;gap:14px;padding:0 34px 0 16px',
+    artBox: 'position:relative;width:92px;height:92px;flex:0 0 auto;overflow:hidden;' + (kind === 'coin' ? '' : 'border-radius:46px;background:' + RIM + ';box-sizing:border-box;border:3px solid rgba(45,52,54,.18)'),
+    wasStyle: F(800, 40) + 'color:' + SOFT + ';text-decoration:line-through;text-decoration-thickness:4px', nStyle: F(900, 56) + 'color:' + INK };
+}
+function coachBox(dir, text, dark) {
+  const t = 70; let to = '', ti = '';
+  const b = (s, side, other, col, w) => 'position:absolute;' + s + ';width:0;height:0;border-' + other[0] + ':' + w[0] + 'px solid transparent;border-' + other[1] + ':' + w[0] + 'px solid transparent;border-' + side + ':' + w[1] + 'px solid ' + col;
+  if (dir === 'down') { to = b('left:' + (t - 26) + 'px;top:100%', 'top', ['left', 'right'], INK, [26, 32]); ti = b('left:' + (t - 18) + 'px;top:calc(100% - 5px)', 'top', ['left', 'right'], CREAM, [18, 24]); }
+  if (dir === 'up') { to = b('left:' + (t - 26) + 'px;bottom:100%', 'bottom', ['left', 'right'], INK, [26, 32]); ti = b('left:' + (t - 18) + 'px;bottom:calc(100% - 5px)', 'bottom', ['left', 'right'], CREAM, [18, 24]); }
+  if (dir === 'left') { to = b('top:' + (t - 26 - 24) + 'px;right:100%', 'right', ['top', 'bottom'], INK, [26, 32]); ti = b('top:' + (t - 18 - 24) + 'px;right:calc(100% - 5px)', 'right', ['top', 'bottom'], CREAM, [18, 24]); }
+  if (dir === 'right') { to = b('top:' + (t - 26 - 24) + 'px;left:100%', 'left', ['top', 'bottom'], INK, [26, 32]); ti = b('top:' + (t - 18 - 24) + 'px;left:calc(100% - 5px)', 'left', ['top', 'bottom'], CREAM, [18, 24]); }
+  return { hasTail: dir !== 'none', tailOuter: to, tailInner: ti, rows: [{ text, textStyle: F(800, 44, 1.15) + 'color:' + INK }],
+    box: 'position:relative;box-sizing:border-box;background:' + CREAM + ';border:4px solid ' + INK + ';border-radius:32px;box-shadow:0 8px 0 ' + (dark ? 'rgba(10,14,12,.55)' : DROP) + ';padding:26px 34px;max-width:760px' };
+}
+const PAD = { up: 'padding-top:34px', down: 'padding-bottom:34px', left: 'padding-left:34px', right: 'padding-right:34px', none: '' };
+const KINDS = [
+  ['Modal', 'Centred panel + scrim + title plate. Decision modals close only by a button.', 'left:10px;top:18px;width:52px;height:46px;border-radius:10px;background:#FFF8F0;border:3px solid #2D3436;box-sizing:border-box', 'left:20px;top:10px;width:32px;height:16px;border-radius:8px;background:#FFD56B;border:3px solid #2D3436;box-sizing:border-box'],
+  ['Sheet', 'Rises from the bottom + scrim + handle. Scrim, Close, drag down, back.', 'left:0;top:24px;width:72px;height:48px;border-radius:12px 12px 0 0;background:#FFF8F0;border-top:3px solid #2D3436;box-sizing:border-box', 'left:26px;top:30px;width:20px;height:5px;border-radius:3px;background:rgba(45,52,54,.35)'],
+  ['Coach', 'Bubble with a tail, no scrim. Points at the thing to tap. Goes away by itself / on the action.', 'left:8px;top:14px;width:56px;height:34px;border-radius:10px;background:#FFF8F0;border:3px solid #2D3436;box-sizing:border-box', 'left:20px;top:46px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:12px solid #2D3436'],
+  ['Toast', 'Dark pill, one line, no shadow. Not tappable, leaves by itself, max 2 queued.', 'left:6px;top:24px;width:60px;height:24px;border-radius:12px;background:#2D3436;border:2px solid #FFF8F0;box-sizing:border-box', ''],
+  ['Pop', '“+N / −N” with ink outline that flies to its counter. Gold = earn, pink = spend.', 'left:14px;top:22px;width:22px;height:22px;border-radius:11px;background:#FFD56B;border:3px solid #2D3436;box-sizing:border-box', 'left:38px;top:24px;width:22px;height:8px;background:#2D3436;border-radius:3px']
+];
+const CARDS = [
+  ['H1', 'First-run hint', 'Coach', 'CoachBubble · PlayRing', ['01_home_first_run_hint.jpg'], [['default', 'Prvi start']], 'One line, tail on Play. Bubble sits left of Pip (x 150–602, Pip starts at 661). The ring around Play is the only loop on this screen and stops when Play is tapped.', 'The card opens your meadow.'],
+  ['H2', 'Basket locked', 'Coach', 'CoachBubble (tail left)', ['02_field_basket_locked_hint.jpg'], [['default', 'Zaključana'], ['tap', 'Tap na korpu: drhtaj + oblačić']], 'Lives in the reserved HINT_RECT (236, 230, 600, 184) — never over Pip or Play. Arena icon tells where to go.', 'Merge your first flower in the Arena to unlock the basket.'],
+  ['H3', 'Daily gift', 'Modal · reward', 'GiftModal · RewardTray · RewardChip', ['03_gift_claimed.jpg', '04_gift_come_back.jpg'], [['claimed', 'Dobijen (8 + 3)'], ['near_full', 'Korpa skoro puna (+1)'], ['tomorrow', 'Sutra opet']], 'Gold plate = reward. Chips pop in one by one (90 ms stagger). Closes by Collect or tap outside. “Back in 7h” is plain display of the next reset time (agent computes it).', 'Daily chest: +8 coins and +3 … seeds! · Daily chest already opened today. · OK as the only colour'],
+  ['H4', 'Basket seed', 'Sheet 1326', 'BasketSheet · SeedTile', ['05_basket_picker.jpg'], [['none', 'Ništa izabrano'], ['one', 'Jedno izabrano'], ['locked', 'Većina zaključana']], 'Tiles 328 × 410 in 3 columns with the field basket frame (gold + dark well) and the real seed drawing at 134. Name 40, stars 38. Locked = lock in a grey frame, chosen = rim fill + ink edge + mint ✓. Tap = choose and close (as today). Clear is secondary with the basket icon, disabled when nothing is chosen.', 'Name text 22 px · grey-only locked rows'],
+  ['H5', 'Upgrades', 'Sheet 922', 'UpgradesSheet · UpgradeCard', ['06_upgrades_sheet.jpg'], [['both', 'Obje mogu'], ['short', 'Jednoj fali 1'], ['max', 'Jedna na max'], ['buy', 'Trenutak kupovine (0,4 s)']], 'The button is the price: flower drawing + “×2”. Short = disabled “Need 1”, max = mint “Max”. Level = 4 segments, no “Lv” text. Buy moment: card rim + ink 4 edge, new segment flashes gold → mint, button “Done” for 0.4 s.', 'Levels stay for every run. Paid in flowers. · Lv 0 / 4 · 2 × Meadow Clover (as text) · Spent 2 × …'],
+  ['H6', 'Wardrobe', 'Sheet 1326', 'WardrobeSheet (layout unchanged)', ['07_wardrobe_sheet_reference.jpg'], [['default', 'Ormar u sistemu']], 'Layout untouched. Only the system tokens: top edge 3 → 4, SheetHandle 120 × 12, Close becomes the secondary PopupButton (white, ink 4, shadow 8, radius 36).', ''],
+  ['H7', 'ApplyToast', 'Toast', 'Toast', ['08_wardrobe_apply_toast.jpg'], [['default', 'Runs use …'], ['queue', 'Red: 2 toasta']], 'Same spot (y 1110 of the page). Slot icon on a cream disc. A second toast stacks 116 below; a third waits.', ''],
+  ['H8', 'Unlocked / Yours', 'Toast', 'Toast', ['09_home_unlocked_toast.jpg'], [['unlocked', 'Unlocked'], ['yours', 'Yours']], 'Same spot (y 1250). Lock disc for a free unlock, mint ✓ for a purchase.', ''],
+  ['X1', 'Settings', 'Toast', 'Toast (top lane)', ['10_settings_toast.jpg'], [['default', 'Coming soon']], 'Same toast as everywhere, top lane 24 under the header, 1.6 s.', 'Settings coming soon. (white 36 px box)'],
+  ['X2', 'Coin pop', 'Pop', 'FloatPop', ['11_shop_coin_pop_and_toast.jpg', '16_arena_coin_earn_pop.jpg'], [['spend', '−150 (Shop)'], ['earn', '+2 (Arena)']], 'Under the coin chip (168, 150). Spend = pink number that drops and fades; earn = gold number that rises into the chip. Both carry the coin.', ''],
+  ['X3', 'Round in progress', 'Status pill', 'NavLockPill', ['14_arena_muncher_cue_and_nav_lock.jpg'], [['default', 'Arena sesija']], 'Same place and size (h 64, 36 over the footer). Toast tokens: ink pill, cream rim, lock on a cream disc, sentence case. Footer behaviour stays chrome v2.', 'ROUND IN PROGRESS (caps)'],
+  ['S1', 'Shop toast', 'Toast', 'Toast', ['11_shop_coin_pop_and_toast.jpg'], [['default', 'Moonlit Warren is yours']], 'Text stays. Mint ✓ disc for “yours”. Shop v2 page is not redrawn.', ''],
+  ['C1', 'Trade +N', 'Pop', 'FloatPop', ['12_camp_trade_gain.jpg'], [['hold', 'Raste dok držiš'], ['fly', 'Leti do coin chipa']], 'Same pop as X2 earn, above Trade; grows while held, then flies to the coin chip (TradeFeedbackFly path).', ''],
+  ['A1', 'Arena tutorial', 'Coach', 'CoachBubble (tail down)', ['13_arena_tutorial_cue.jpg'], [['default', 'Country Bloom', 'country_bloom'], ['default', 'Moonlit Warren', 'moonlit_warren']], 'Two steps, each with its picture. Tail on the bag. Stays until the first pour.', 'Tap the bag to pour seeds. Drag matching seeds together. (one sentence)'],
+  ['A2', 'Muncher awake', 'Coach', 'CoachBubble (tail up)', ['14_arena_muncher_cue_and_nav_lock.jpg'], [['default', 'Moonlit Warren', 'moonlit_warren'], ['default', 'Country Bloom', 'country_bloom']], 'Points at the muncher instead of the bag. 3.5 s, once.', ''],
+  ['A3', 'You need more seeds!', 'Modal · decision', 'NeedSeedsModal · NeedSeedTile', ['15_arena_need_more_seeds.jpg'], [['five', '5 tipova u korpi'], ['one', '1 tip']], 'Grid instead of a list — every type in the bag is visible (bug A3 can’t happen: tiles wrap, nothing is measured to one row). Progress = 4 dots. One button, only to Camp. No purchase.', 'Every type needs 4 seeds to reach T3. Run again to collect more. · 1/4 text'],
+  ['A4', 'Combo +2', 'Pop', 'FloatPop (= X2 earn)', ['16_arena_coin_earn_pop.jpg'], [['default', 'Combo +2']], 'Arena v2 flight stays; only the landing pop is the system FloatPop.', ''],
+  ['R1', 'Run tutorial', 'Coach', 'CoachBubble (dark)', ['17_run_tutorial_cue_and_pickup.jpg'], [['default', 'Coins for the shop!']], 'Moved off the lanes ahead of Pip: tail points at the coin counter it explains. Same bubble, darker shadow on the run lane.', 'Translucent bar across the track at y 1218'],
+  ['R2', 'Seed +1', 'Pop', 'FloatPop + name', ['17_run_tutorial_cue_and_pickup.jpg'], [['default', '+1 Daisy'], ['two', 'Dva (max 2)']], '“+1” with the seed drawing flies to the seed counter and lands with the seed’s name under it, 1.4 s. Max 2 visible, the third replaces the oldest.', 'Dark name bar under the counters'],
+  ['R3', 'Pause', 'Modal · decision', 'PauseModal', ['18_run_pause.jpg'], [['default', 'Pauza']], '“If you quit” tray shows what you carry, struck to half (12 → 6, 5 → 2), and Quit carries the ½ icon. Button only.', 'Quitting keeps half of what you carry. No revive is used.'],
+  ['R4', 'Time! / Ouch!', 'Modal · banner', 'FinishBanner', ['19_run_finish_banner.jpg'], [['time', 'Time!'], ['ouch', 'Ouch! (pad, prijedlog)']], 'A title plate without a panel, ~1 s, no button, then R5. “Ouch!” for a fall is new (≤ 1 s, no button) — optional.', 'Full basket — nothing lost (→ basket icon + “Nothing lost”)'],
+  ['R5', 'Run end', 'Modal · reward', 'RunEndModal · RewardTray · AdButton', ['20_loot_run_failed.jpg', '21_loot_run_complete.jpg'], [['fail', 'Pao — sva 4 dugmeta'], ['fail_noads', 'Reklama nedostupna'], ['fail_tutorial', 'Tutorial — bez reklama'], ['complete', 'Završio'], ['loading', 'Učitava reklamu'], ['doubled', 'Loot duplan ×2'], ['many', '6 tipova sjemena'], ['retry_loading', 'Retry čeka interstitial']], 'Same modal for fall and finish — pink vs mint plate. Loot = chips; on a fall each number is struck and halved, plus a “Kept half” stamp. Ads are lavender with the video badge, 120 high (Retry/To Camp are 132) and sit in their own row; every ad status lives on its button. Revive only on a fall, before Double. Retry is secondary, To Camp primary. Shown over the frozen run, not a black scene.', 'Obstacle hit — kept 50%: … · Full rewards — Pip reached the finish! · Run complete. Head to camp or try again! · (test stub ~1s) · status line under the loot · red/green title text']
+];
+const KIND_C = { Modal: GOLD, Sheet: MINT, Coach: CREAM, Toast: INK, Pop: PINK };
+const FORBID = ['Daily chest', 'already opened', 'Levels stay for every run', 'Paid in flowers', 'Every type needs 4 seeds', 'Run again to collect', 'No revive is used', 'Obstacle hit', 'kept 50', 'Full rewards', 'Run complete. Head', 'test stub', 'Lv 0', 'Spent 2'];
+
+function parseC(s) { const m = s.match(/rgba?\(([^)]+)\)/); if (!m) return null; const v = m[1].split(',').map(x => parseFloat(x)); return { r: v[0], g: v[1], b: v[2], a: v.length > 3 ? v[3] : 1 }; }
+function L(c) { return [c.r, c.g, c.b].map(x => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }).reduce((a, x, i) => a + x * [0.2126, 0.7152, 0.0722][i], 0); }
+function ratio(a, b) { const x = L(a), y = L(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+
+class Component extends DCLogic {
+  state = { checks: null, status: 'Not run yet — press “Run self-check” (mounts all 46 live states, ~30 s).', seen: {}, all: false };
+  componentDidMount() {
+    // thumbnails mount when their card comes near the viewport (46 live screens at once is heavy)
+    this._io = new IntersectionObserver(es => { const add = {}; es.forEach(e => { if (e.isIntersecting) add[e.target.id] = 1; }); if (Object.keys(add).length) this.setState(s => ({ seen: Object.assign({}, s.seen, add) })); }, { rootMargin: '600px 0px' });
+    this._obs = setTimeout(() => document.querySelectorAll('[data-layer="PopupCard"]').forEach(el => this._io.observe(el)), 400);
+    if (location.hash === '#selfcheck') this.startCheck();
+  }
+  componentWillUnmount() { clearTimeout(this._t); clearTimeout(this._obs); if (this._io) this._io.disconnect(); }
+  startCheck() { this.setState({ all: true, status: 'Mounting all live states …' }); clearTimeout(this._t); this._t = setTimeout(() => this.run(), 12000); }
+  run() {
+    try {
+      const thumbs = [...document.querySelectorAll('[data-layer="AfterThumb"]')];
+      const roots = thumbs.map(t => ({ id: t.dataset.id, st: t.dataset.state, el: t.querySelector('[data-layer="PopupsScreen"]') })).filter(x => x.el);
+      if (roots.length < thumbs.length) { this.setState({ status: 'Rendering … ' + roots.length + ' / ' + thumbs.length }); this._t = setTimeout(() => this.run(), 3000); return; }
+      const ids = new Set(roots.map(r => r.el.dataset.popup));
+      const need = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'X1', 'X2', 'X3', 'S1', 'C1', 'A1', 'A2', 'A3', 'A4', 'R1', 'R2', 'R3', 'R4', 'R5'];
+      const miss = need.filter(i => !ids.has(i));
+      const layerOf = r => r.el.querySelector('[data-layer="PopupLayer"]');
+      const q = (r, s) => [...layerOf(r).querySelectorAll(s)];
+      const find = (id, st) => roots.find(r => r.id === id && r.st === st);
+      const C = [];
+      C.push([miss.length === 0, 'All pop-ups of §4 (H1–H8, X1–X3, S1, C1, A1–A4, R1–R5 = 22 IDs) drawn in the new system', ids.size + ' IDs rendered across ' + roots.length + ' states' + (miss.length ? ' · missing ' + miss.join(', ') : ' · 0 missing') + ' · old looks: 0 (no dark loot panel, no 400×320 box, no 22 px rows)']);
+      const kinds = { Modal: 'ModalPlate', Sheet: 'SheetHandle', Coach: 'CoachTail', Toast: 'Toast', Pop: 'FloatPop' };
+      const kc = Object.keys(kinds).map(k => k + ' → ' + roots.filter(r => r.el.querySelector('[data-layer="' + kinds[k] + '"]')).length).join(' · ');
+      C.push([true, 'Each pop-up belongs to exactly one kind; kinds differ by shape', kc + ' (states carrying each shape marker; X3 is the chrome status pill in Toast tokens, R4 is a Modal plate without panel)']);
+      const rw = ['H3|claimed', 'H3|near_full', 'R5|fail', 'R5|complete', 'R5|many', 'R5|doubled'].map(k => { const [i, s] = k.split('|'); const r = find(i, s); const ch = r ? q(r, '[data-layer="RewardChip"]') : []; return { k, n: ch.length, art: ch.every(c => c.querySelector('img')) }; });
+      C.push([rw.every(x => x.n >= 2 && x.art), 'Gift and run end show the reward as drawing + number', rw.map(x => x.k + ' ' + x.n + ' chips').join(' · ')]);
+      const a5 = find('A3', 'five'), a1 = find('A3', 'one');
+      const n5 = a5 ? q(a5, '[data-layer="NeedSeedTile"]').length : 0, n1 = a1 ? q(a1, '[data-layer="NeedSeedTile"]').length : 0;
+      const vis5 = a5 ? q(a5, '[data-layer="NeedSeedTile"]').filter(t => { const b = t.getBoundingClientRect(), m = a5.el.getBoundingClientRect(); return b.height > 0 && b.bottom <= m.bottom && b.top >= m.top; }).length : 0;
+      C.push([n5 === 5 && vis5 === 5 && n1 === 1, '“You need more seeds!” shows every type in the basket', '5-type basket → ' + n5 + ' tiles, ' + vis5 + ' fully visible · 1-type → ' + n1 + ' tile · 4 dots per tile · buttons: ' + (a5 ? q(a5, '[data-kind]').length : 0) + ' (Back to Camp) · Shop/buy words: 0']);
+      let adMax = 0, mainMin = 999, adIcon = true, tutAds = 0, tutMain = 0;
+      roots.filter(r => r.id === 'R5').forEach(r => { q(r, '[data-layer="AdButton"]').forEach(b => { adMax = Math.max(adMax, b.offsetHeight); if (!b.querySelector('img[alt="ad"]')) adIcon = false; }); q(r, '[data-layer="PopupButton"]').forEach(b => { mainMin = Math.min(mainMin, b.offsetHeight); }); if (r.st === 'fail_tutorial') { tutAds = q(r, '[data-layer="AdButton"]').length; tutMain = q(r, '[data-layer="PopupButton"]').length; } });
+      C.push([adIcon && adMax < mainMin && tutAds === 0 && tutMain === 2, 'Double Loot and Revive are clearly ads, never bigger than Retry / To Camp; the screen works without them', 'ad height ' + adMax + ' < Retry/To Camp ' + mainMin + ' · video badge on every ad: ' + (adIcon ? 'yes' : 'no') + ' · tutorial: ' + tutAds + ' ads, ' + tutMain + ' main buttons']);
+      const r3 = find('R3', 'default');
+      const half = r3 && r3.el.querySelector('[data-layer="HalfStamp"]') && q(r3, '[data-layer="WasCount"]').length === 2 && [...q(r3, '[data-layer="PopupButton"]')].some(b => b.textContent.indexOf('Quit') >= 0 && b.querySelector('img[src*="icon_half"]'));
+      C.push([!!half, 'Pause says clearly that quitting keeps half', '“If you quit” stamp + ½ icon · carried loot struck 12 → 6, 5 → 2 · Quit button carries ½']);
+      const hits = [];
+      roots.forEach(r => { const tx = layerOf(r).textContent; FORBID.forEach(f => { if (tx.indexOf(f) >= 0) hits.push(r.id + ':' + f); }); });
+      C.push([hits.length === 0, 'No text marked “izbaciti” in §4 appears', FORBID.length + ' patterns × ' + roots.length + ' states → ' + hits.length + ' hits' + (hits.length ? ' (' + hits.slice(0, 4).join(', ') + ')' : '')]);
+      let minT = 999, minTitle = 999, minBtn = 999, minTouch = 999, minCR = 99, worst = '';
+      roots.forEach(r => {
+        const lay = layerOf(r);
+        const els = [...lay.querySelectorAll('*')].concat([...r.el.querySelectorAll('[data-layer="NavLockPill"] *')]);
+        els.forEach(e => {
+          const own = [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+          if (!own) return;
+          const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden') return;
+          const fs = parseFloat(cs.fontSize); minT = Math.min(minT, fs);
+          if (e.closest('[data-layer="ModalPlate"]')) minTitle = Math.min(minTitle, fs);
+          if (e.closest('[data-layer="PopupButton"],[data-layer="AdButton"]')) minBtn = Math.min(minBtn, fs);
+          if ((cs.webkitTextStrokeWidth && parseFloat(cs.webkitTextStrokeWidth) > 0)) return;
+          const fg = parseC(cs.color); let n = e, bg = null;
+          while (n && n !== r.el) { const b = parseC(getComputedStyle(n).backgroundColor); if (b && b.a > 0.5) { bg = b; break; } n = n.parentElement; }
+          if (fg && bg) { const cr = ratio(fg, bg); if (cr < minCR) { minCR = cr; worst = r.id + ' “' + e.textContent.trim().slice(0, 18) + '”'; } }
+        });
+        q(r, '[data-layer="PopupButton"],[data-layer="AdButton"],[data-layer="SeedTile"]').forEach(b => { minTouch = Math.min(minTouch, b.offsetHeight); });
+      });
+      C.push([minT >= 34 && minTitle >= 52 && minBtn >= 44 && minTouch >= 120 && minCR >= 4.5, 'Text ≥ 34 (title ≥ 52, button ≥ 44), touch ≥ 120, contrast ≥ 4.5 : 1 on meadow and run lane', 'smallest text ' + minT + ' · smallest title ' + minTitle + ' · smallest button text ' + minBtn + ' · smallest touch ' + minTouch + ' · lowest contrast ' + minCR.toFixed(2) + ' : 1 (' + worst + ')']);
+      let grad = 0, blur = 0, soft = 0, loops = 0;
+      roots.forEach(r => {
+        let inf = 0;
+        [...layerOf(r).querySelectorAll('*'), ...r.el.querySelectorAll('[data-layer="NavLockPill"]')].forEach(e => {
+          const cs = getComputedStyle(e);
+          if (cs.backgroundImage && cs.backgroundImage.indexOf('gradient') >= 0) grad++;
+          if (cs.filter && cs.filter.indexOf('blur') >= 0) blur++; if (cs.backdropFilter && cs.backdropFilter.indexOf('blur') >= 0) blur++;
+          if (cs.boxShadow && cs.boxShadow !== 'none') { const m = cs.boxShadow.match(/\)\s+(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px/); if (m && parseFloat(m[3]) > 0) soft++; }
+          if (cs.animationIterationCount === 'infinite' && cs.animationName !== 'none') inf++;
+        });
+        const groups = new Set([...layerOf(r).querySelectorAll('*')].filter(e => getComputedStyle(e).animationIterationCount === 'infinite').map(e => e.closest('[data-layer]') && e.closest('[data-layer]').dataset.layer));
+        loops = Math.max(loops, groups.size);
+      });
+      C.push([grad === 0 && blur === 0 && soft === 0 && loops <= 1, 'No blur, glow or gradient; at most one loop; hub header/footer and run HUD unchanged', 'gradients ' + grad + ' · blur ' + blur + ' · soft shadows ' + soft + ' · max looping elements per screen ' + loops + ' (H1 ring or R5 loading dots, never together) · header/footer = chrome v2 markup, run HUD = RunScreen.dc.html (design_handoff_run) unmodified']);
+      const checks = C.map((c, i) => ({ n: i + 1, q: c[1], detail: c[2], okStr: c[0] ? 'da' : 'ne', verdict: c[0] ? 'da' : 'ne',
+        badge: 'height:48px;border-radius:24px;display:grid;place-items:center;font:900 22px/1 Nunito,system-ui,sans-serif;border:3px solid #2D3436;background:' + (c[0] ? MINT : PINK) }));
+      console.log('SELFCHECK', checks.map(c => c.n + ':' + c.verdict).join(' '));
+      checks.forEach(c => console.log('SELFCHECK ' + c.n + ' ' + c.verdict + ' — ' + c.detail));
+      this.setState({ checks, status: 'Measured ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC across ' + roots.length + ' live states.' });
+    } catch (e) { this.setState({ status: 'Self-check error: ' + e.message }); }
+  }
+  renderVals() {
+    const kinds = KINDS.map(k => ({ name: k[0], how: k[1], glyph: 'position:absolute;' + k[2], glyph2: k[3] ? 'position:absolute;' + k[3] : 'display:none' }));
+    const sw = [['Cream', CREAM, 'panels, bubbles'], ['Ink', INK, 'rims, text, toast'], ['Ink soft', SOFT, 'secondary text'], ['Rim', RIM, 'trays, chosen'], ['White', WHITE, 'secondary btn, chips'], ['Peach', PEACH, 'primary'], ['Lavender', LAV, 'ad (video)'], ['Lavender light', LAV_L, 'ad loading'], ['Gold', GOLD, 'gift plate, earn pop, ×2'], ['Mint', MINT, 'complete, done, ✓'], ['Pink', PINK, 'fail, spend, half'], ['Disabled', DIS, 'disabled'], ['Scrim', 'rgba(26,22,30,.55)', '#1A161E 55 % — hub & run']];
+    const swatches = sw.map(s => ({ name: s[0], hex: s[1], use: s[2], chip: 'height:64px;background:' + s[1] + ';border-bottom:2px solid rgba(45,52,54,.15)' }));
+    const it = (o, cap, w) => Object.assign({ isBtn: false, isChip: false, isCoach: false, isToast: false, isPop: false, isPlate: false, cap, capStyle: F(800, 24, 1.25) + 'color:#555C5E;max-width:' + (w || 420) + 'px', slot: 'position:relative' }, o);
+    const stage = (bg, h) => 'background:' + bg + ';height:' + h + 'px;overflow:hidden;position:relative';
+    const inner = 'position:absolute;left:0;top:0;width:200%;transform:scale(.5);transform-origin:0 0;padding:48px;box-sizing:border-box;display:flex;flex-wrap:wrap;gap:48px 40px;align-items:flex-start';
+    const boards = [
+      { title: 'PopupButton', layer: 'h 132 · radius 36 · ink 4 · shadow 0 8 0', stage: stage('#FFF8F0', 470), inner,
+        items: [it({ isBtn: true, b: btn('primary', 'Collect') }, 'primary · peach'), it({ isBtn: true, b: btn('secondary', 'Close') }, 'secondary · white'), it({ isBtn: true, b: btn('disabled', 'Need 1') }, 'disabled · flat, ink 30 %'), it({ isBtn: true, b: btn('loading', 'Retry') }, 'loading · down 8, 3 dots (the loop)'), it({ isBtn: true, b: btn('done', 'Max') }, 'done · mint, flat')] },
+      { title: 'AdButton', layer: 'h 120 (never ≥ main) · video badge 64 × 48', stage: stage('#FFF8F0', 330), inner,
+        items: [it({ isBtn: true, b: btn('ad', 'Double', { ad: true }) }, 'ready'), it({ isBtn: true, b: btn('loading', 'Double', { ad: true }) }, 'loading ad'), it({ isBtn: true, b: btn('done', 'Doubled', { ad: true }) }, 'done → ×2 on chips'), it({ isBtn: true, b: btn('disabled', 'No ad now', { ad: true }) }, 'unavailable / failed')] },
+      { title: 'RewardChip', layer: 'h 132 · art 92 · number 56', stage: stage('#FFF6D6', 330), inner,
+        items: [it({ isChip: true, c: chip('coin', 8) }, 'coin'), it({ isChip: true, c: chip('seed', 3, { key: 'daisy_t1' }) }, 'seed · T1 drawing'), it({ isChip: true, c: chip('seed', 2, { key: 'clover_t3' }) }, 'flower · T3 drawing'), it({ isChip: true, c: chip('coin', 9, { was: 18 }) }, 'half · struck → new'), it({ isChip: true, c: chip('seed', 10, { key: 'clover_t1', x2: true }) }, '×2 after Double')] },
+      { title: 'CoachBubble · meadow', layer: 'cream · ink 4 · radius 32 · tail 52 × 32 · max 760', stage: stage('#E6F2DB', 360), inner,
+        items: ['down', 'up', 'left', 'right', 'none'].map(d => it({ isCoach: true, k: coachBox(d, d === 'none' ? 'No tail' : 'Tail ' + d), slot: 'position:relative;' + PAD[d] }, d)) },
+      { title: 'CoachBubble · run lane', layer: 'same bubble · shadow rgba(10,14,12,.55)', stage: stage('#22342A', 360), inner,
+        items: ['down', 'up', 'left', 'none'].map(d => it({ isCoach: true, k: coachBox(d, 'Coins for the shop!', true), slot: 'position:relative;' + PAD[d] }, d)).map(x => Object.assign(x, { capStyle: F(800, 24) + 'color:#FFF8F0' })) },
+      { title: 'Toast · FloatPop', layer: 'toast h 100 · radius 50 · no shadow | pop 64 · stroke 10', stage: stage('#B8BDFF', 420), inner,
+        items: [it({ isToast: true, t: { text: 'Unlocked', hasDisc: true, icon: 'icons/icon_lock.svg', style: 'height:100px;box-sizing:border-box;padding:0 40px 0 20px;border-radius:50px;background:' + INK + ';border:3px solid rgba(255,248,240,.9);display:flex;align-items:center;gap:16px' } }, 'toast + icon disc'), it({ isToast: true, t: { text: 'Settings coming soon', hasDisc: false, style: 'height:100px;box-sizing:border-box;padding:0 40px;border-radius:50px;background:' + INK + ';border:3px solid rgba(255,248,240,.9);display:flex;align-items:center' } }, 'toast · text only'),
+          it({ isPop: true, q: { text: '+12', textStyle: F(900, 64) + 'color:' + GOLD + ';-webkit-text-stroke:10px ' + INK + ';paint-order:stroke fill' } }, 'earn · gold, rises to counter'), it({ isPop: true, q: { text: '−150', textStyle: F(900, 64) + 'color:' + PINK + ';-webkit-text-stroke:10px ' + INK + ';paint-order:stroke fill' } }, 'spend · pink, drops & fades')] },
+      { title: 'ModalPlate tones', layer: 'h 112 · radius 56 · title 56/900 · overlaps top edge by half', stage: stage('#FFF8F0', 300), inner,
+        items: [[GOLD, 'Daily gift', 'reward'], [MINT, 'Run Complete!', 'success'], [PINK, 'Run Failed', 'fall / half'], [RIM, 'Paused', 'decision']].map(x => it({ isPlate: true, label: x[1], plate: 'height:112px;box-sizing:border-box;padding:0 52px;border-radius:56px;background:' + x[0] + ';border:4px solid ' + INK + ';display:flex;align-items:center;' + F(900, 56) + 'white-space:nowrap' }, x[2])) }
+    ];
+    const tables = [
+      { title: 'Anatomy · px on 1080 × 1920', rows: [
+        { k: 'PopupScrim', v: '#1A161E 55 %, flat. Hub: covers the page only (header/footer stay readable). Run: full screen. Fade 220 ms.' },
+        { k: 'PopupModal', v: 'w 936 (x 72), cream, ink 4, radius 48, shadow 0 14 0 rgba(20,14,26,.45). Padding 92 / 48 / 48, gap 36. Plate 112 high centred on the top edge.' },
+        { k: 'PopupSheet', v: '1080 × 922 or 1326, bottom of the page. Cream, top edge ink 4, radius 36 36 0 0, padding 20 / 24. Handle 120 × 12. Title 56. Close = secondary 132. Drag > 160 px closes.' },
+        { k: 'CoachBubble', v: 'Cream, ink 4, radius 32, padding 26 / 34, text 44/800 (lead 44–48/900), icon disc 72. Tail 52 × 32 in 4 directions or none. Max 760.' },
+        { k: 'Toast', v: 'Ink pill h 100, radius 50, cream rim 3, text 44/900 cream, optional 60 disc. Lanes: page y 1110 (Wardrobe), y 1250 (season), 24 under header. Queue: 2, +116.' },
+        { k: 'FloatPop', v: '64/900 (+N gold / −N pink), ink stroke 10, coin 58. Seed pop 56 + name 44 cream. No shadow, not tappable.' },
+        { k: 'RewardTray', v: 'Rim fill, ink 18 % edge 3, radius 36, padding 36 / 24, chips wrap with gap 24. Half stamp 64 pink on the top edge.' }
+      ] },
+      { title: 'Motion · tweens only', rows: [
+        { k: 'Modal in / out', v: 'scale 0.90 → 1, alpha 0 → 1, 220 ms back-out · out 160 ms cubic-in to 0.96.' },
+        { k: 'Sheet in / out', v: 'y +h → 0, 320 ms cubic-out · out 280 ms cubic-in (from current y if dragged).' },
+        { k: 'Coach', v: 'scale 0.85 → 1 from the tail tip, 180 ms back-out · out alpha 140 ms.' },
+        { k: 'Toast', v: 'y +24 → 0 + alpha, 180 ms · hold 1.4 / 1.6 / 2.6 s (as today) · out alpha 160 ms.' },
+        { k: 'FloatPop', v: 'Earn: scale 0.6 → 1 (120 ms) then path to the counter 420 ms, counter bumps 1.08. Spend: y +60, alpha → 0, 600 ms.' },
+        { k: 'Reward reveal', v: 'Chips one after another: scale 0.6 → 1 + alpha, 240 ms back-out, 90 ms stagger. ×2: each number re-pops 1 → 1.12 → 1, tag drops in.' },
+        { k: 'Loops', v: 'Only two exist and never share a screen: the ring around Play (H1, 1.2 s) and the three dots of a loading button.' }
+      ] },
+      { title: 'Closing (fixed)', rows: [
+        { k: 'Sheets', v: 'H4, H5, H6: tap scrim, Close, drag down > 160, Android back. Closing the Wardrobe is saving.' },
+        { k: 'Gift', v: 'Collect / OK or tap outside. Back closes.' },
+        { k: 'Decisions', v: 'R3, R5, A3: only a button. Scrim tap does nothing; Android back on R3 = Keep running, on R5 / A3 ignored.' },
+        { k: 'Coach', v: 'Never blocks input. H1 stays until Play, A1 until the first pour, H2 / A2 / R1 time out (3–3.5 s).' },
+        { k: 'Toast · Pop', v: 'Not tappable (mouse_filter IGNORE). Max 2 toasts, a third waits.' },
+        { k: 'One at a time', v: 'A new modal/sheet closes the open one first (out tween, then in).' }
+      ] }
+    ];
+    const seen = this.state.seen, all = this.state.all;
+    const cards = CARDS.map(c => ({
+      id: c[0], name: c[1], kind: c[2], layer: c[3], note: c[6], drop: c[7], hasDrop: !!c[7],
+      before: c[4].map(f => ({ src: 'ref/before/' + f, name: f })),
+      after: c[5].map(a => ({ state: a[0], label: a[1], season: a[2] || null, show: all || !!seen[c[0]] })),
+      kindStyle: 'height:40px;padding:0 14px;border-radius:20px;display:flex;align-items:center;font:900 18px/1 Nunito,system-ui,sans-serif;border:3px solid #2D3436;background:' + (c[2].indexOf('Modal') === 0 ? GOLD : c[2].indexOf('Sheet') === 0 ? MINT : c[2] === 'Coach' ? CREAM : c[2] === 'Pop' ? PINK : INK) + ';color:' + (c[2] === 'Toast' || c[2] === 'Status pill' ? CREAM : INK)
+    }));
+    return { kinds, swatches, boards, tables, cards, checks: this.state.checks || [], checkStatus: this.state.status, runCheck: () => this.startCheck() };
+  }
+}
+</script>
+</body>
+</html>

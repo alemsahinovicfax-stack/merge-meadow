@@ -7,6 +7,9 @@ extends Control
 ## Drzanje se vidi: fill je prodani dio gomile, a svaki tik posalje novcic prema
 ## coin chipu u headeru. Stanje racuna kontroler.
 
+const FEEDBACK_PX := 72
+const FEEDBACK_COIN_PX := 65.0
+
 @onready var panel: PanelContainer = $TradePanel
 @onready var warning: PanelContainer = %ReservedWarning
 @onready var warn_icon: TextureRect = %WarnIcon
@@ -44,11 +47,18 @@ func _ready() -> void:
 	UiCamp.style_label(warn_label, UiCamp.FONT_WARN, UiCamp.INK)
 	feedback.visible = false
 	feedback.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	feedback.add_theme_stylebox_override("panel", UiCamp.feedback_style())
+	# C1 · leteća poruka sistema (design_handoff_popups): coin 65 + „+N" 72/900 zlatno s ink obrubom,
+	# bez pilule; na otpuštanje odleti do coin chipa.
+	feedback.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	feedback.custom_minimum_size.y = UiCamp.FEEDBACK_H
-	UiCamp.style_label(feedback_label, UiCamp.FONT_FEEDBACK, UiCamp.INK)
+	feedback_label.add_theme_font_override("font", UiPopups.font(900, FEEDBACK_PX))
+	feedback_label.add_theme_font_size_override("font_size", FEEDBACK_PX)
+	feedback_label.add_theme_color_override("font_color", UiPopups.COIN_GOLD)
+	feedback_label.add_theme_color_override("font_outline_color", UiPopups.OUTLINE)
+	feedback_label.add_theme_constant_override("outline_size", UiPopups.POP_STROKE)
 	feedback_coin.texture = UiAssets.get_chrome_icon("icon_coin")
-	feedback_coin.custom_minimum_size = Vector2(UiCamp.FEEDBACK_COIN, UiCamp.FEEDBACK_COIN)
+	feedback_coin.custom_minimum_size = Vector2(FEEDBACK_COIN_PX, FEEDBACK_COIN_PX)
+	feedback_coin.get_parent().move_child(feedback_coin, 0)
 	button.custom_minimum_size = UiCamp.TRADE_BTN
 	button.set_fonts(UiCamp.FONT_BTN)
 	button.set_press_scale(0.97)
@@ -282,42 +292,12 @@ func release_gain() -> void:
 		target = hub.get("coin_chip") as Control
 	if hub == null or target == null or not is_instance_valid(target):
 		return
-	var fly := PanelContainer.new()
+	var origin := (hub as Control).get_global_rect().position
+	var from_c := from + feedback.size * 0.5 - origin
+	var to_c := target.get_global_rect().get_center() - origin
+	var fly := FloatPop.earn(hub, from_c, text, feedback_coin.texture, to_c, target)
 	fly.name = "TradeFeedbackFly"
-	fly.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	fly.add_theme_stylebox_override("panel", UiCamp.feedback_style())
-	fly.custom_minimum_size.y = UiCamp.FEEDBACK_H
-	var row := HBoxContainer.new()
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_theme_constant_override("separation", 8)
-	fly.add_child(row)
-	var label := Label.new()
-	label.text = text
-	UiCamp.style_label(label, UiCamp.FONT_FEEDBACK, UiCamp.INK)
-	label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(label)
-	var coin := TextureRect.new()
-	coin.texture = feedback_coin.texture
-	coin.custom_minimum_size = feedback_coin.custom_minimum_size
-	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(coin)
-	fly.top_level = true
 	fly.z_index = 100
-	hub.add_child(fly)
-	fly.reset_size()
-	fly.global_position = from
-	fly.pivot_offset = fly.size * 0.5
-	var to := target.global_position + target.size * 0.5 - fly.size * 0.5
-	var tw := fly.create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(fly, "global_position", to, UiCamp.T_TAP_FLY) \
-		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tw.tween_property(fly, "scale", Vector2.ONE * 0.6, UiCamp.T_TAP_FLY)
-	tw.tween_property(fly, "modulate:a", 0.0, UiCamp.T_TAP_FADE).set_delay(UiCamp.T_TAP_FLY - UiCamp.T_TAP_FADE)
-	tw.chain().tween_callback(fly.queue_free)
 
 
 func _find_hub() -> Node:

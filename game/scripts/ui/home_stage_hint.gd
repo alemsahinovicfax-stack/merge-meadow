@@ -1,18 +1,14 @@
 class_name HomeStageHint
 extends Control
 
-## TutorialHint prve sesije: cream prsten oko Play dugmeta (scale 1.06, pilula)
-## koji pulsira i oblacic centriran na y 836 — izmedju cvijeca i Pipa na kartici
-## Home v3, pa ne pokriva nista od kartice. Koordinate su koordinate stranice.
+## H1 · TutorialHint prve sesije (design_handoff_popups): oblačić „Tap Play to start" pokazuje na
+## Play, a prsten oko Play je jedini loop na Homeu. Koordinate su koordinate stranice.
 
-const TITLE := "Tap Play to start your first run"
-const SUB := "The card opens your meadow."
-const BUBBLE_TOP := 836.0
-const BUBBLE_MAX_W := 960.0
-const PULSE_SEC := 1.4
+const TITLE := "Tap Play to start"
 
 var target: Rect2 = UiHomeV3.PLAY_CARD.rect
 var _t: float = 0.0
+var _bubble: CoachBubble
 
 
 func _init() -> void:
@@ -35,51 +31,32 @@ func get_title() -> String:
 	return TITLE
 
 
+## H1 · (design_handoff_popups) oblačić sistema s repom dolje na Play (lijevo od Pipa) i ink prsten
+## 6 px oko Play koji se širi 1 → 1,16 i gasi (1,2 s) — jedini loop na Homeu, staje na Play.
+func _ensure_bubble() -> void:
+	if _bubble != null:
+		return
+	_bubble = CoachBubble.new()
+	_bubble.name = "CoachBubble"
+	add_child(_bubble)
+	_bubble.setup([{"text": TITLE, "lead": true, "px": 44}], "down")
+	_place_bubble()
+
+
+func _place_bubble() -> void:
+	if _bubble == null:
+		return
+	var tip := Vector2(target.position.x + target.size.x * 0.48, target.position.y - 4.0)
+	_bubble.point_at(tip, 0.85, Rect2(24, 0, 1032, 1633))
+
+
 func _draw() -> void:
-	var s := 1.06
-	var ring_rect := Rect2(target.get_center() - target.size * s * 0.5, target.size * s)
-	var wave := 0.5 + 0.5 * cos(_t * TAU / PULSE_SEC)
-	var ring := UiStage.box(Color.TRANSPARENT, roundi(ring_rect.size.y * 0.5), roundi(10.0 * s), Color(UiStage.HINT_RING, UiStage.HINT_RING.a * lerpf(0.45, 1.0, wave)))
+	_ensure_bubble()
+	var k := fmod(_t, UiPopups.ANIM.ring) / UiPopups.ANIM.ring
+	var grow := clampf(k / 0.6, 0.0, 1.0)
+	var sc := lerpf(1.0, 1.16, grow)
+	var alpha := lerpf(0.7, 0.0, grow)
+	var r := Rect2(target.get_center() - target.size * sc * 0.5, target.size * sc)
+	var ring := UiStage.box(Color.TRANSPARENT, roundi(70.0 * sc), roundi(6.0 * sc), Color(UiPopups.OUTLINE, alpha))
 	ring.draw_center = false
-	draw_style_box(ring, ring_rect)
-
-	var f_title := UiStage.font(900, 44, 1.05)
-	var f_sub := UiStage.font(800, 38, 1.1)
-	var max_text := BUBBLE_MAX_W - 68.0 - 8.0
-	var title_lines := _wrap(TITLE, f_title, 44, max_text)
-	var inner_w := UiStage.text_w(f_sub, 38, SUB)
-	for line in title_lines:
-		inner_w = maxf(inner_w, UiStage.text_w(f_title, 44, line))
-	inner_w = minf(inner_w, max_text)
-	var title_h := f_title.get_height(44) * float(title_lines.size())
-	var sub_h := f_sub.get_height(38)
-	var bubble_w := inner_w + 68.0 + 8.0
-	var bubble := Rect2(Vector2((size.x - bubble_w) * 0.5, BUBBLE_TOP), Vector2(bubble_w, 8.0 + 52.0 + title_h + 10.0 + sub_h))
-	draw_style_box(UiStage.box(UiStage.CREAM, 28, 4, UiStage.INK), bubble)
-	var x := bubble.position.x + 4.0 + 34.0
-	var top := bubble.position.y + 4.0 + 26.0
-	for line in title_lines:
-		draw_string(f_title, Vector2(x, UiStage.baseline(f_title, 44, top)), line, HORIZONTAL_ALIGNMENT_LEFT, -1, 44, UiStage.INK)
-		top += f_title.get_height(44)
-	top += 10.0
-	draw_string(f_sub, Vector2(x, UiStage.baseline(f_sub, 38, top)), SUB, HORIZONTAL_ALIGNMENT_LEFT, -1, 38, UiStage.INK_SOFT)
-	var ax := bubble.get_center().x - 26.0
-	var ay := bubble.end.y
-	draw_colored_polygon(PackedVector2Array([
-		Vector2(ax, ay), Vector2(ax + 52.0, ay), Vector2(ax + 26.0, ay + 30.0)
-	]), UiStage.INK)
-
-
-func _wrap(text: String, f: Font, px: int, max_w: float) -> PackedStringArray:
-	var out := PackedStringArray()
-	var line := ""
-	for word in text.split(" "):
-		var candidate := word if line.is_empty() else line + " " + word
-		if not line.is_empty() and UiStage.text_w(f, px, candidate) > max_w:
-			out.append(line)
-			line = word
-		else:
-			line = candidate
-	if not line.is_empty():
-		out.append(line)
-	return out
+	draw_style_box(ring, r)

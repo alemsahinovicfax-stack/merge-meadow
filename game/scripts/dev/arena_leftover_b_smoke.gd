@@ -171,46 +171,51 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("stuck bag should show overlay")
 		return
-	var title: Label = arena.get_node_or_null("NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsTitle")
-	if title == null or not title.text.contains("You need more seeds"):
+	var title := str(arena.call("get_need_title"))
+	if not title.contains("You need more seeds"):
 		_restore_save(backup)
-		_fail("title should contain You need more seeds, got %s" % (title.text if title else "null"))
+		_fail("title should contain You need more seeds, got %s" % title)
 		return
-	var list: VBoxContainer = arena.get_node_or_null(
-		"NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsScroll/NeedMoreSeedsList"
-	)
-	if list == null or list.get_child_count() != 3:
+	# Popups v2: mreža pločica — svi tipovi iz korpe vidljivi (bug jednog reda).
+	var tiles: Array = arena.call("get_need_tiles")
+	if tiles.size() != 3:
 		_restore_save(backup)
-		_fail("list should have 3 rows, got %s" % (str(list.get_child_count()) if list else "null"))
+		_fail("need-more grid should have 3 tiles, got %d" % tiles.size())
 		return
 	var clover_chip: Node = null
-	for i in list.get_child_count():
-		var row := list.get_child(i)
-		if row.has_method("get_type_id") and str(row.call("get_type_id")) == "clover":
-			clover_chip = row
+	for tile in tiles:
+		if tile.has_method("get_type_id") and str(tile.call("get_type_id")) == "clover":
+			clover_chip = tile
 			break
 	if clover_chip == null:
 		_restore_save(backup)
-		_fail("clover row missing from need-more list")
+		_fail("clover tile missing from need-more grid")
 		return
-	var count_text := ""
-	if clover_chip.has_method("get_count_label_text"):
-		count_text = str(clover_chip.call("get_count_label_text"))
+	var count_text := str(clover_chip.call("get_count_label_text"))
 	if not count_text.contains("3/4"):
 		_restore_save(backup)
 		_fail("clover quota should be 3/4, got %s" % count_text)
 		return
+	for _k in 8:
+		await process_frame
+	var panel_rect: Rect2 = overlay.call("panel_rect")
+	for tile in tiles:
+		var tr := (tile as Control).get_global_rect()
+		if tr.size.y < 200.0 or not overlay.get_global_rect().encloses(tr) or tr.position.y < panel_rect.position.y:
+			_restore_save(backup)
+			_fail("every need-more tile must be fully visible")
+			return
 	if int(gs.get("wallet_coins")) != 17:
 		_restore_save(backup)
 		_fail("wallet must not change on overlay, got %d" % int(gs.get("wallet_coins")))
 		return
-	# Redizajn (design_handoff_merge_arena): overlay se zatvara samo preko "Back to Camp".
-	var back_btn := arena.get_node_or_null("NeedMoreSeedsOverlay/Panel/VBox/BackToCampButton") as Control
+	# Zatvara se samo preko "Back to Camp".
+	var back_btn := arena.get("back_to_camp_button") as Control
 	if back_btn == null or not back_btn.is_visible_in_tree():
 		_restore_save(backup)
 		_fail("overlay should offer a Back to Camp CTA")
 		return
-	if not overlay.get_signal_connection_list("gui_input").is_empty():
+	if bool(overlay.get("dismiss_on_scrim")):
 		_restore_save(backup)
 		_fail("overlay must not close on any tap — only Back to Camp")
 		return

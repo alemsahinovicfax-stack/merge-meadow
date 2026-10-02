@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}@keyframes popRing{0%{transform:scale(1);opacity:.7}60%{transform:scale(1.16);opacity:0}100%{transform:scale(1.16);opacity:0}}@keyframes popDots{0%,80%,100%{opacity:.25}40%{opacity:1}}</style>
+</helmet>
+<div data-layer="PopupsScreen" data-screen-label="{{ label }}" data-popup="{{ popupId }}" style="width:1080px;height:1920px;flex:0 0 auto;position:relative;overflow:hidden;background:#2A2233;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+
+  <sc-if value="{{ isRun }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="RunBackdrop" style="position:absolute;left:0;top:0;width:1080px;height:1920px">
+      <dc-import name="RunScreen" scene="start" coins="{{ runCoins }}" seed-count="{{ runSeeds }}" hint-size="1080px,1920px"></dc-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isHub }}" hint-placeholder-val="{{ true }}">
+    <div data-layer="Header" style="position:absolute;left:0;top:0;width:1080px;height:143px;z-index:2;background:#2A2233;box-shadow:0 6px 14px rgba(20,14,26,.34)">
+      <div style="height:140px;display:flex;align-items:center;gap:16px;padding:0 0 0 20px;box-sizing:border-box">
+        <div data-layer="CoinChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="icons/icon_coin.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">{{ hdrCoins }}</div></div>
+        <div data-layer="SeedChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="icons/icon_seed.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">{{ hdrSeeds }}</div></div>
+        <div data-layer="FlowerChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="icons/icon_flower.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">{{ hdrFlowers }}</div></div>
+        <div data-layer="SettingsSlot" style="width:124px;height:140px;flex:0 0 auto;display:flex;align-items:center;padding-left:4px;box-sizing:border-box"><div data-layer="SettingsButton" style="width:100px;height:100px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center"><img src="icons/icon_settings_light.svg" alt="" style="width:56px;height:56px"></div></div>
+      </div>
+      <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+    </div>
+
+    <div data-layer="PageArea" style="position:absolute;left:0;top:143px;width:1080px;height:1633px;overflow:hidden">
+
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+        <div data-layer="FieldPage" style="position:absolute;left:0;top:0;width:1080px;height:1633px">
+          <div data-layer="MeadowSky" style="position:absolute;left:0;top:0;width:1080px;height:523px;background:{{ sky }}"></div>
+          <div data-layer="MeadowFar" style="position:absolute;left:0;top:523px;width:1080px;height:587px;background:{{ ground }}"></div>
+          <div data-layer="MeadowNear" style="position:absolute;left:0;top:1110px;width:1080px;height:523px;background:{{ near }}"></div>
+          <sc-for list="{{ spots }}" as="sp" hint-placeholder-count="0">
+            <div data-layer="MeadowFlower" style="{{ sp.wrap }}">
+              <div style="{{ sp.soil }}"></div>
+              <div style="{{ sp.shade }}"></div>
+              <img src="{{ sp.src }}" alt="" style="{{ sp.art }}">
+            </div>
+          </sc-for>
+          <div data-layer="MeadowPip" style="position:absolute;left:661px;top:1214px;width:190px;height:190px">
+            <div style="position:absolute;left:35px;bottom:6px;width:120px;height:26px;border-radius:999px;background:rgba(26,26,20,.14)"></div>
+            <img src="icons/pip_idle.svg" alt="" style="position:relative;display:block;width:190px;height:190px">
+          </div>
+          <div data-layer="SeasonLabel" style="position:absolute;left:0;top:36px;width:1080px;text-align:center;font:900 56px/1 Nunito,system-ui,sans-serif;letter-spacing:-.01em;color:#1A1A14;white-space:nowrap">{{ seasonName }}</div>
+          <div style="position:absolute;left:228px;top:112px;width:624px;display:flex;justify-content:center">
+            <div data-layer="GrownChip" style="height:76px;box-sizing:border-box;border-radius:38px;background:#FFF8F0;border:3px solid #2D3436;display:flex;align-items:center;gap:12px;padding:0 26px 0 14px">
+              <img src="icons/icon_flower.svg" alt="" style="width:48px;height:48px;flex:0 0 auto">
+              <span style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums;white-space:nowrap">{{ grownText }}</span>
+              <span style="font:800 38px/1 Nunito,system-ui,sans-serif;color:#555C5E">grown</span>
+            </div>
+          </div>
+          <div data-layer="GiftChest" style="position:absolute;left:24px;top:24px;width:180px;height:180px;box-sizing:border-box;border-radius:32px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+            <div style="width:84px;height:84px;border-radius:18px;background:#D4A5FF;border:3px solid #2D3436;box-sizing:border-box;position:relative;overflow:hidden">
+              <div style="position:absolute;left:32px;top:0;bottom:0;width:14px;background:#FFF8F0"></div>
+              <div style="position:absolute;top:32px;left:0;right:0;height:14px;background:#FFF8F0"></div>
+            </div>
+            <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Gift</div>
+            <sc-if value="{{ giftDot }}" hint-placeholder-val="{{ false }}">
+              <div data-layer="GiftDot" style="position:absolute;top:-12px;right:-12px;width:48px;height:48px;border-radius:24px;background:#FFCCD5;border:4px solid #2D3436;box-sizing:border-box"></div>
+            </sc-if>
+          </div>
+          <div data-layer="BasketButton" style="{{ basketBtnStyle }}">
+            <sc-if value="{{ basketLocked }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;left:0;top:0;width:180px;height:180px;box-sizing:border-box;border-radius:32px;background:#EFE8DE;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+                <div style="width:84px;height:84px;border-radius:18px;background:#E3D9CC;border:3px solid rgba(45,52,54,.45);box-sizing:border-box;display:grid;place-items:center"><img src="icons/icon_lock.svg" alt="" style="width:44px;height:44px"></div>
+                <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#555C5E">Basket</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ basketChosen }}" hint-placeholder-val="{{ true }}">
+              <div style="position:absolute;left:0;top:0;width:180px;height:180px;box-sizing:border-box;border-radius:32px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+                <div style="width:84px;height:84px;border-radius:18px;background:#FFD56B;border:3px solid #2D3436;box-sizing:border-box;position:relative;display:grid;place-items:center"><div style="position:absolute;left:7px;top:7px;right:7px;bottom:7px;border-radius:11px;background:#22342A"></div><img src="{{ basketArt }}" alt="" style="position:relative;width:60px;height:60px"></div>
+                <div style="height:52px;box-sizing:border-box;padding:0 16px;border-radius:18px;background:#A8E6CF;border:2px solid #2D3436;display:flex;align-items:center;font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">+5 %</div>
+              </div>
+            </sc-if>
+          </div>
+          <div data-layer="UpgradesButton" style="position:absolute;left:876px;top:24px;width:180px;height:180px;box-sizing:border-box;border-radius:32px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+            <div style="width:84px;height:84px;border-radius:18px;background:#A8E6CF;border:3px solid #2D3436;box-sizing:border-box;position:relative">
+              <div style="position:absolute;left:22px;top:14px;width:20px;height:20px;border-top:8px solid #2D3436;border-left:8px solid #2D3436;transform:rotate(45deg)"></div>
+              <div style="position:absolute;left:22px;top:36px;width:20px;height:20px;border-top:8px solid #2D3436;border-left:8px solid #2D3436;transform:rotate(45deg)"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;gap:6px"><sc-for list="{{ magSegs }}" as="g" hint-placeholder-count="4"><div style="{{ g.style }}"></div></sc-for></div>
+              <div style="display:flex;gap:6px"><sc-for list="{{ lootSegs }}" as="g" hint-placeholder-count="4"><div style="{{ g.style }}"></div></sc-for></div>
+            </div>
+          </div>
+          <sc-if value="{{ showWardrobeBtn }}" hint-placeholder-val="{{ true }}">
+            <div data-layer="WardrobeButton" style="position:absolute;left:876px;top:1265px;width:180px;height:180px;box-sizing:border-box;border-radius:32px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+              <div style="width:84px;height:84px;border-radius:18px;background:#FFCCD5;border:3px solid #2D3436;box-sizing:border-box;display:grid;place-items:center"><img src="icons/icon_wardrobe.svg" alt="" style="width:66px;height:66px;display:block"></div>
+              <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Looks</div>
+            </div>
+          </sc-if>
+          <div data-layer="BottomRow" style="position:absolute;left:70px;top:1461px;width:940px;height:148px">
+            <div data-layer="SeasonsButton" style="position:absolute;left:0;top:16px;width:236px;height:124px;box-sizing:border-box;border-radius:28px;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;background:#FFF8F0;gap:14px">
+              <div style="width:18px;height:18px;border-left:7px solid #2D3436;border-bottom:7px solid #2D3436;transform:rotate(45deg);margin-left:8px"></div>
+              <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Seasons</div>
+            </div>
+            <sc-if value="{{ endless }}" hint-placeholder-val="{{ true }}">
+              <div data-layer="EndlessButton" style="position:absolute;left:704px;top:16px;width:236px;height:124px;box-sizing:border-box;border-radius:28px;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;background:#D4A5FF;gap:12px">
+                <div style="display:flex;flex:0 0 auto"><div style="width:30px;height:30px;border-radius:15px;border:6px solid #2D3436;box-sizing:border-box"></div><div style="width:30px;height:30px;border-radius:15px;border:6px solid #2D3436;box-sizing:border-box;margin-left:-6px"></div></div>
+                <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Endless</div>
+              </div>
+            </sc-if>
+            <div data-layer="FieldPlayButton" style="position:absolute;left:254px;top:0;width:432px;height:140px;box-sizing:border-box;border-radius:70px;background:#FFB88C;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:22px;z-index:2">
+              <div style="width:0;height:0;border-top:26px solid transparent;border-bottom:26px solid transparent;border-left:42px solid #2D3436;margin-left:6px"></div>
+              <div style="font:900 64px/1 Nunito,system-ui,sans-serif;color:#2D3436">Play</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isArena }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="MergeArena" style="position:absolute;left:0;top:0;width:1080px;height:1633px;overflow:hidden">
+          <div style="position:absolute;left:0;top:0"><dc-import name="ArenaField" season="{{ season }}" lush="{{ 1 }}" width="{{ 1080 }}" hint-size="1080px,1633px"></dc-import></div>
+          <div data-layer="ArenaPip" style="position:absolute;left:30px;top:1413px;width:150px;height:150px"><img src="icons/pip_idle.svg" alt="Pip" style="width:150px;height:150px;display:block"></div>
+          <div data-layer="SeedBag" style="position:absolute;left:390px;top:1269px;width:300px;height:280px">
+            <dc-import name="SeedBasket" count="{{ bagCount }}" state="idle" types="{{ bagTypes }}" hint-size="300px,280px"></dc-import>
+          </div>
+          <div data-layer="MuncherSlot" style="position:absolute;left:300px;top:120px;width:480px;height:360px;pointer-events:none">
+            <dc-import name="Muncher" state="{{ muncherState }}" dir="{{ 200 }}" chomp="{{ 0.85 }}" hint-size="480px,360px"></dc-import>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPlaceholderPage }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="UnchangedPage" style="{{ phPageStyle }}">
+          <div style="height:210px;border-radius:26px;background:{{ phBlock }}"></div>
+          <div style="display:flex;gap:40px;flex:1;min-height:0"><div style="flex:1;border-radius:26px;background:{{ phBlock }}"></div><div style="flex:1;border-radius:26px;background:{{ phBlock }}"></div></div>
+          <div style="height:180px;border-radius:26px;background:{{ phBlock }}"></div>
+          <div style="position:absolute;left:0;right:0;top:46%;display:flex;flex-direction:column;align-items:center;gap:14px;font:700 26px/1 ui-monospace,Menlo,monospace;letter-spacing:.12em;color:{{ phInk }};text-transform:uppercase">
+            <div>{{ phName }} · unchanged</div><div>page 1080 × 1633</div>
+          </div>
+          <sc-if value="{{ showTrade }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="TradeButton_ref" style="position:absolute;left:722px;top:1452px;width:298px;height:117px;box-sizing:border-box;border-radius:20px;border:4px dashed rgba(255,248,240,.6);display:grid;place-items:center;font:900 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">Trade</div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+
+    <div data-layer="Footer" style="position:absolute;left:0;top:1776px;width:1080px;height:144px;z-index:2;background:#2A2233;box-shadow:0 -6px 14px rgba(20,14,26,.34)">
+      <sc-if value="{{ navLocked }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:0;right:0;top:-36px;display:flex;justify-content:center;z-index:3">
+          <div data-layer="NavLockPill" style="display:flex;align-items:center;gap:14px;height:64px;padding:0 28px 0 12px;border-radius:32px;background:#2D3436;border:3px solid #FFF8F0;box-sizing:border-box">
+            <div style="width:44px;height:44px;border-radius:22px;background:#FFF8F0;display:grid;place-items:center;flex:0 0 auto"><img src="icons/icon_lock.svg" alt="" style="width:30px;height:30px;display:block"></div>
+            <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">Round in progress</div>
+          </div>
+        </div>
+      </sc-if>
+      <div style="height:3px;background:{{ footEdge }}"></div>
+      <div style="position:relative;height:141px;display:flex">
+        <div data-layer="ActiveIndicator" style="{{ indicatorStyle }}"></div>
+        <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="5">
+          <div data-layer="{{ tab.layer }}" style="{{ tab.slotStyle }}"><div style="{{ tab.tileStyle }}"><img src="{{ tab.icon }}" alt="{{ tab.label }}" style="{{ tab.iconStyle }}"></div></div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <div data-layer="PopupLayer" style="position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:10;pointer-events:none">
+
+    <sc-if value="{{ ringOn }}" hint-placeholder-val="{{ false }}">{{ ring }}</sc-if>
+
+    <sc-if value="{{ scrimOn }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="PopupScrim" style="{{ scrimStyle }}"></div>
+    </sc-if>
+
+    <sc-for list="{{ coaches }}" as="k" hint-placeholder-count="0">
+      <div data-layer="CoachBubble" style="{{ k.wrap }}">
+        <div style="{{ k.box }}">
+          <sc-for list="{{ k.rows }}" as="r" hint-placeholder-count="1">
+            <div style="display:flex;align-items:center;gap:18px">
+              <sc-if value="{{ r.hasIcon }}" hint-placeholder-val="{{ false }}"><div style="{{ r.iconBox }}"><img src="{{ r.icon }}" alt="" style="{{ r.iconStyle }}"></div></sc-if>
+              <span style="{{ r.textStyle }}">{{ r.text }}</span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ k.hasTail }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="CoachTail" style="{{ k.tailOuter }}"></div>
+            <div style="{{ k.tailInner }}"></div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-for>
+
+    <sc-if value="{{ basketOn }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="BasketSheet" style="{{ sheet1326 }}">
+        <div data-layer="SheetHandle" style="width:120px;height:12px;border-radius:6px;background:rgba(45,52,54,.28);margin:0 auto 24px;flex:0 0 auto"></div>
+        <div data-layer="SheetTitle" style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#2D3436;flex:0 0 auto">Basket seed</div>
+        <div data-layer="SeedGrid" style="margin-top:36px;display:grid;grid-template-columns:repeat(3,328px);gap:24px;flex:0 0 auto">
+          <sc-for list="{{ seedTiles }}" as="s" hint-placeholder-count="6">
+            <div data-layer="SeedTile" data-state="{{ s.state }}" onClick="{{ s.tap }}" style="{{ s.style }}">
+              <div style="{{ s.frame }}">
+                <sc-if value="{{ s.open }}" hint-placeholder-val="{{ true }}">
+                  <div style="position:absolute;left:10px;top:10px;right:10px;bottom:10px;border-radius:24px;background:#22342A"></div>
+                  <div style="position:absolute;left:30px;top:30px;width:134px;height:134px;overflow:hidden"><img src="{{ s.art.src }}" alt="" style="{{ s.art.style }}"></div>
+                </sc-if>
+                <sc-if value="{{ s.locked }}" hint-placeholder-val="{{ false }}"><img src="icons/icon_lock.svg" alt="" style="width:80px;height:80px;display:block"></sc-if>
+              </div>
+              <div style="{{ s.nameStyle }}">{{ s.name }}</div>
+              <div style="{{ s.starStyle }}">{{ s.stars }}</div>
+              <sc-if value="{{ s.chosen }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="ChosenMark" style="position:absolute;right:-14px;top:-14px;width:72px;height:72px;box-sizing:border-box;border-radius:36px;background:#A8E6CF;border:4px solid #2D3436;display:grid;place-items:center"><div style="width:16px;height:30px;border-right:8px solid #2D3436;border-bottom:8px solid #2D3436;transform:rotate(45deg) translate(-2px,-4px)"></div></div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex:1 1 auto"></div>
+        <div data-layer="SheetFooter" style="display:flex;gap:24px;flex:0 0 auto;margin-bottom:8px">
+          <sc-for list="{{ basketBtns }}" as="b" hint-placeholder-count="2">
+            <div data-layer="PopupButton" data-kind="{{ b.kind }}" style="{{ b.style }}">
+              <sc-if value="{{ b.hasIcon }}" hint-placeholder-val="{{ false }}"><img src="{{ b.icon }}" alt="" style="{{ b.iconStyle }}"></sc-if>
+              <span style="{{ b.labelStyle }}">{{ b.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ upgradesOn }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="UpgradesSheet" style="{{ sheet922 }}">
+        <div data-layer="SheetHandle" style="width:120px;height:12px;border-radius:6px;background:rgba(45,52,54,.28);margin:0 auto 24px;flex:0 0 auto"></div>
+        <div data-layer="SheetTitle" style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#2D3436;flex:0 0 auto">Upgrades</div>
+        <div style="margin-top:36px;display:flex;flex-direction:column;gap:24px;flex:0 0 auto">
+          <sc-for list="{{ upCards }}" as="u" hint-placeholder-count="2">
+            <div data-layer="UpgradeCard" data-state="{{ u.state }}" style="{{ u.style }}">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:22px">
+                <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#2D3436">{{ u.name }}</div>
+                <div data-layer="UpgradeLevel" style="display:flex;gap:10px"><sc-for list="{{ u.segs }}" as="g" hint-placeholder-count="4"><div style="{{ g.style }}"></div></sc-for></div>
+                <div style="font:800 40px/1 Nunito,system-ui,sans-serif;color:#555C5E;white-space:nowrap">{{ u.effect }}</div>
+              </div>
+              <div data-layer="PopupButton" data-kind="{{ u.btn.kind }}" style="{{ u.btn.style }}">
+                <sc-if value="{{ u.btn.hasArt }}" hint-placeholder-val="{{ true }}"><div style="{{ u.btn.artBox }}"><img src="{{ u.btn.art.src }}" alt="" style="{{ u.btn.art.style }}"></div></sc-if>
+                <sc-if value="{{ u.btn.hasCheck }}" hint-placeholder-val="{{ false }}"><div style="width:16px;height:32px;border-right:8px solid #2D3436;border-bottom:8px solid #2D3436;transform:rotate(45deg) translate(-2px,-4px)"></div></sc-if>
+                <span style="{{ u.btn.labelStyle }}">{{ u.btn.label }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex:1 1 auto"></div>
+        <div data-layer="PopupButton" data-kind="secondary" style="flex:0 0 132px;height:132px;margin-bottom:8px;box-sizing:border-box;border-radius:36px;background:#FFFFFF;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;font:900 48px/1 Nunito,system-ui,sans-serif;color:#2D3436">Close</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ wardrobeOn }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="WardrobeSheetLayer" style="{{ wardrobeLayer }}">
+        <dc-import name="Wardrobe" slot="meadow_bg" season="{{ season }}" hint-size="1080px,1326px"></dc-import>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ modalOn }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="ModalArea" style="{{ modalArea }}">
+        <div data-layer="{{ modalLayer }}" style="{{ modalStyle }}">
+          <div data-layer="ModalPlate" style="{{ plateStyle }}">{{ modalTitle }}</div>
+
+          <sc-if value="{{ hasLine }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="ModalLine" style="display:flex;align-items:center;justify-content:center;gap:16px;text-align:center">
+              <sc-if value="{{ lineHasIcon }}" hint-placeholder-val="{{ false }}"><img src="{{ lineIcon }}" alt="" style="width:56px;height:56px;flex:0 0 auto"></sc-if>
+              <span style="font:900 44px/1.15 Nunito,system-ui,sans-serif;color:#2D3436">{{ modalLine }}</span>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasTray }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="RewardTray" style="{{ trayStyle }}">
+              <sc-if value="{{ trayStamp }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="HalfStamp" style="position:absolute;left:28px;top:-32px;height:64px;box-sizing:border-box;padding:0 22px 0 10px;border-radius:32px;background:#FFCCD5;border:3px solid #2D3436;display:flex;align-items:center;gap:10px;font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap"><img src="icons/icon_half.svg" alt="" style="width:44px;height:44px;display:block">{{ stampText }}</div>
+              </sc-if>
+              <sc-for list="{{ chips }}" as="c" hint-placeholder-count="2">
+                <div data-layer="RewardChip" data-kind="{{ c.kind }}" style="{{ c.style }}">
+                  <div style="{{ c.artBox }}"><img src="{{ c.art.src }}" alt="" style="{{ c.art.style }}"></div>
+                  <sc-if value="{{ c.half }}" hint-placeholder-val="{{ false }}"><span data-layer="WasCount" style="{{ c.wasStyle }}">{{ c.was }}</span></sc-if>
+                  <span style="{{ c.nStyle }}">{{ c.n }}</span>
+                  <sc-if value="{{ c.x2 }}" hint-placeholder-val="{{ false }}"><div data-layer="DoubleTag" style="position:absolute;right:-16px;top:-24px;height:54px;box-sizing:border-box;padding:0 14px;border-radius:27px;background:#FFD56B;border:3px solid #2D3436;display:flex;align-items:center;font:900 36px/1 Nunito,system-ui,sans-serif;color:#2D3436">×2</div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasNote }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="ModalNote" style="display:flex;align-items:center;justify-content:center;gap:14px">
+              <div style="width:64px;height:64px;box-sizing:border-box;border-radius:32px;background:#FFCCD5;border:3px solid #2D3436;display:grid;place-items:center;flex:0 0 auto"><img src="icons/icon_basket.svg" alt="" style="width:40px;height:40px"></div>
+              <span style="font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436">{{ noteText }}</span>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasClosedGift }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="GiftClosed" style="display:flex;flex-direction:column;align-items:center;gap:28px;padding:12px 0 4px">
+              <div style="width:176px;height:176px;border-radius:40px;background:#D4A5FF;border:4px solid #2D3436;box-sizing:border-box;position:relative;overflow:hidden;opacity:.9">
+                <div style="position:absolute;left:68px;top:0;bottom:0;width:32px;background:#FFF8F0"></div>
+                <div style="position:absolute;top:68px;left:0;right:0;height:32px;background:#FFF8F0"></div>
+              </div>
+              <div style="height:84px;box-sizing:border-box;padding:0 32px;border-radius:42px;background:#FFF6D6;border:3px solid rgba(45,52,54,.18);display:flex;align-items:center;font:900 52px/1 Nunito,system-ui,sans-serif;color:#2D3436">{{ backIn }}</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasTiles }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="NeedSeedTiles" style="display:flex;flex-wrap:wrap;justify-content:center;gap:24px">
+              <sc-for list="{{ needTiles }}" as="t" hint-placeholder-count="3">
+                <div data-layer="NeedSeedTile" style="width:264px;height:244px;box-sizing:border-box;border-radius:32px;background:#FFFFFF;border:3px solid rgba(45,52,54,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px">
+                  <div style="position:relative;width:136px;height:136px;overflow:hidden"><img src="{{ t.art.src }}" alt="" style="{{ t.art.style }}"></div>
+                  <div data-layer="NeedDots" style="display:flex;gap:10px"><sc-for list="{{ t.dots }}" as="d" hint-placeholder-count="4"><div style="{{ d.style }}"></div></sc-for></div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasBtns }}" hint-placeholder-val="{{ true }}">
+            <div data-layer="ModalButtons" style="display:flex;flex-wrap:wrap;gap:24px">
+              <sc-for list="{{ btns }}" as="b" hint-placeholder-count="1">
+                <div data-layer="{{ b.layer }}" data-kind="{{ b.kind }}" onClick="{{ b.tap }}" style="{{ b.style }}">
+                  <sc-if value="{{ b.isAd }}" hint-placeholder-val="{{ false }}"><img src="icons/icon_video.svg" alt="ad" style="{{ b.adStyle }}"></sc-if>
+                  <sc-if value="{{ b.hasIcon }}" hint-placeholder-val="{{ false }}"><img src="{{ b.icon }}" alt="" style="{{ b.iconStyle }}"></sc-if>
+                  <sc-if value="{{ b.hasTri }}" hint-placeholder-val="{{ false }}"><div style="width:0;height:0;border-top:20px solid transparent;border-bottom:20px solid transparent;border-left:32px solid #2D3436;margin-left:4px"></div></sc-if>
+                  <sc-if value="{{ b.hasCheck }}" hint-placeholder-val="{{ false }}"><div style="width:16px;height:32px;border-right:8px solid #2D3436;border-bottom:8px solid #2D3436;transform:rotate(45deg) translate(-2px,-4px)"></div></sc-if>
+                  <span style="{{ b.labelStyle }}">{{ b.label }}</span>
+                  <sc-if value="{{ b.isLoading }}" hint-placeholder-val="{{ false }}">{{ b.dots }}</sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ bannerOn }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="FinishBanner" style="{{ bannerWrap }}">
+        <div data-layer="ModalPlate" style="{{ bannerPlate }}">{{ bannerTitle }}</div>
+        <sc-if value="{{ bannerHasSub }}" hint-placeholder-val="{{ false }}">
+          <div style="height:88px;box-sizing:border-box;padding:0 30px 0 14px;border-radius:44px;background:#FFF8F0;border:4px solid #2D3436;display:flex;align-items:center;gap:14px">
+            <div style="width:60px;height:60px;border-radius:30px;background:#A8E6CF;border:3px solid #2D3436;box-sizing:border-box;display:grid;place-items:center"><img src="icons/icon_basket.svg" alt="" style="width:38px;height:38px"></div>
+            <span style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ bannerSub }}</span>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0">
+      <div data-layer="Toast" style="{{ t.style }}">
+        <sc-if value="{{ t.hasDisc }}" hint-placeholder-val="{{ false }}"><div style="{{ t.discStyle }}"><img src="{{ t.icon }}" alt="" style="width:40px;height:40px;display:block"></div></sc-if>
+        <sc-if value="{{ t.hasCheck }}" hint-placeholder-val="{{ false }}"><div style="width:60px;height:60px;border-radius:30px;background:#A8E6CF;display:grid;place-items:center;flex:0 0 auto"><div style="width:12px;height:24px;border-right:7px solid #2D3436;border-bottom:7px solid #2D3436;transform:rotate(45deg) translate(-2px,-3px)"></div></div></sc-if>
+        <sc-if value="{{ t.hasBare }}" hint-placeholder-val="{{ false }}"><img src="{{ t.icon }}" alt="" style="width:52px;height:52px;display:block;flex:0 0 auto"></sc-if>
+        <span style="font:900 44px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">{{ t.text }}</span>
+      </div>
+    </sc-for>
+
+    <sc-for list="{{ pops }}" as="q" hint-placeholder-count="0">
+      <div data-layer="FloatPop" style="{{ q.style }}">
+        <sc-if value="{{ q.hasIcon }}" hint-placeholder-val="{{ false }}"><div style="{{ q.iconBox }}"><img src="{{ q.art.src }}" alt="" style="{{ q.art.style }}"></div></sc-if>
+        <span style="{{ q.textStyle }}">{{ q.text }}</span>
+        <sc-if value="{{ q.hasName }}" hint-placeholder-val="{{ false }}"><span style="{{ q.nameStyle }}">{{ q.name }}</span></sc-if>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;popup&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;H1&quot;,&quot;H2&quot;,&quot;H3&quot;,&quot;H4&quot;,&quot;H5&quot;,&quot;H6&quot;,&quot;H7&quot;,&quot;H8&quot;,&quot;X1&quot;,&quot;X2&quot;,&quot;X3&quot;,&quot;S1&quot;,&quot;C1&quot;,&quot;A1&quot;,&quot;A2&quot;,&quot;A3&quot;,&quot;A4&quot;,&quot;R1&quot;,&quot;R2&quot;,&quot;R3&quot;,&quot;R4&quot;,&quot;R5&quot;],&quot;default&quot;:&quot;R5&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Pop-up&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;default&quot;,&quot;tap&quot;,&quot;claimed&quot;,&quot;near_full&quot;,&quot;tomorrow&quot;,&quot;none&quot;,&quot;one&quot;,&quot;locked&quot;,&quot;both&quot;,&quot;short&quot;,&quot;max&quot;,&quot;buy&quot;,&quot;queue&quot;,&quot;unlocked&quot;,&quot;yours&quot;,&quot;spend&quot;,&quot;earn&quot;,&quot;hold&quot;,&quot;fly&quot;,&quot;five&quot;,&quot;two&quot;,&quot;time&quot;,&quot;ouch&quot;,&quot;fail&quot;,&quot;fail_noads&quot;,&quot;fail_tutorial&quot;,&quot;complete&quot;,&quot;loading&quot;,&quot;doubled&quot;,&quot;many&quot;,&quot;retry_loading&quot;],&quot;default&quot;:&quot;fail&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Pop-up&quot;},&quot;zone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;home&quot;,&quot;hub&quot;,&quot;shop&quot;,&quot;camp&quot;,&quot;arena&quot;,&quot;run&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Pop-up&quot;},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;moonlit_warren&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Pop-up&quot;},&quot;still&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Provjera&quot;}}">
+const INK = '#2D3436', CREAM = '#FFF8F0', SOFT = '#555C5E', RIM = '#FFF6D6', PEACH = '#FFB88C', GOLD = '#FFD56B', MINT = '#A8E6CF', LAV = '#D4A5FF', LAV_L = '#EAD2FF', PINK = '#FFCCD5', DIS = '#F1EAE0', WHITE = '#FFFFFF';
+const DROP = 'rgba(26,26,20,.28)', PANEL_DROP = 'rgba(20,14,26,.45)', SCRIM = 'rgba(26,22,30,.55)';
+const F = (w, s, lh) => 'font:' + w + ' ' + s + 'px/' + (lh || 1) + ' Nunito,system-ui,sans-serif;';
+// Popis §4 — ID → zona, vrsta, stanja (prvo = default)
+const POPUPS = {
+  H1: ['home', 'coach', ['default']], H2: ['home', 'coach', ['default', 'tap']],
+  H3: ['home', 'modal', ['claimed', 'near_full', 'tomorrow']], H4: ['home', 'sheet', ['none', 'one', 'locked']],
+  H5: ['home', 'sheet', ['both', 'short', 'max', 'buy']], H6: ['home', 'sheet', ['default']],
+  H7: ['home', 'toast', ['default', 'queue']], H8: ['home', 'toast', ['unlocked', 'yours']],
+  X1: ['home', 'toast', ['default']], X2: ['shop', 'pop', ['spend', 'earn']], X3: ['arena', 'pill', ['default']],
+  S1: ['shop', 'toast', ['default']], C1: ['camp', 'pop', ['hold', 'fly']],
+  A1: ['arena', 'coach', ['default']], A2: ['arena', 'coach', ['default']], A3: ['arena', 'modal', ['five', 'one']], A4: ['arena', 'pop', ['default']],
+  R1: ['run', 'coach', ['default']], R2: ['run', 'pop', ['default', 'two']], R3: ['run', 'modal', ['default']],
+  R4: ['run', 'modal', ['time', 'ouch']],
+  R5: ['run', 'modal', ['fail', 'fail_noads', 'fail_tutorial', 'complete', 'loading', 'doubled', 'many', 'retry_loading']]
+};
+const NAMES = { country_bloom: 'Country Bloom', frost_orchard: 'Frost Orchard', lantern_meadow: 'Lantern Meadow', amber_canopy: 'Amber Canopy', moonlit_warren: 'Moonlit Warren', coral_tide: 'Coral Tide', starfall_glade: 'Starfall Glade', ember_fen: 'Ember Fen' };
+const GROUND = { country_bloom: '#E6F2DB', frost_orchard: '#D1E6FF', lantern_meadow: '#EBD6FF', amber_canopy: '#FFEBC7', moonlit_warren: '#B8BDFF', coral_tide: '#FFE0D6', starfall_glade: '#DBCCFF', ember_fen: '#FFC79E' };
+const ART = { country_bloom: ['clover', 'pumpkin', 'tulip', 'daisy', 'buttercup', 'sunflower'], frost_orchard: ['frost_snowdrop', 'silver_aconite', 'clover', 'daisy', 'tulip', 'sunflower'], moonlit_warren: ['silver_aconite', 'frost_snowdrop', 'tulip', 'clover', 'daisy', 'sunflower'] };
+const SPOTS = [[10, 55, 88, 3, 5], [26, 54, 88, 0, 5], [42, 55, 88, 1, 5], [58, 54, 88, 4, 5], [74, 55, 88, 2, 5], [90, 54, 88, 5, 5], [18, 40, 116, 0, 1], [50, 42, 116, 1, 1], [82, 40, 116, 2, 1], [12, 29, 136, 3, 1], [66, 28, 136, 4, 1], [88, 30, 136, 5, 1], [34, 26, 168, 5, 10]];
+// Country Bloom roster (seasons.json) — crteži iz igre: T1 = sjeme (ArenaChipDraw), T3 = cvijet
+const SEED = { clover: ['Meadow Clover', 1], pumpkin: ['Harvest Pumpkin', 3], tulip: ['Barn Tulip', 2], daisy: ['Field Daisy', 1], buttercup: ['Buttercup Lane', 1], sunflower: ['Sunfence', 2] };
+const CROP = { clover_t1: [80, 89, 96, 164], daisy_t1: [90, 119, 76, 134], buttercup_t1: [90, 125, 76, 128], tulip_t1: [83, 117, 89, 136], sunflower_t1: [88, 116, 80, 138], pumpkin_t1: [85, 99, 86, 154], pumpkin_t3: [30, 47, 197, 181], clover_t3: [65, 52, 139, 202] };
+const r2 = v => Math.round(v * 100) / 100;
+const crop = (key, box) => { const c = CROP[key]; const s = box / Math.max(c[2], c[3]); return { src: 'icons/flowers/' + key + '.svg', style: 'position:absolute;max-width:none;display:block;width:' + r2(256 * s) + 'px;height:' + r2(256 * s) + 'px;left:' + r2((box - c[2] * s) / 2 - c[0] * s) + 'px;top:' + r2((box - c[3] * s) / 2 - c[1] * s) + 'px' }; };
+const TABS = [['Tab_Shop', 'Shop', 'shop'], ['Tab_Journal', 'Journal', 'journal'], ['Tab_Home', 'Home', 'home'], ['Tab_Camp', 'Camp', 'camp'], ['Tab_Arena', 'Arena', 'arena']];
+const ACTIVE = { shop: 0, home: 2, camp: 3, arena: 4 };
+const T = { MODAL_IN: 220, SHEET_IN: 320, COACH_IN: 180, TOAST_IN: 180, CHIP_STAGGER: 90, CHIP_IN: 240 };
+
+// ── PopupButton ──
+function btn(kind, label, o) {
+  o = o || {};
+  const ad = !!o.ad, h = ad ? 120 : 132;
+  let bg = WHITE, edge = INK, shadow = '0 8px 0 ' + DROP, ink = INK, lift = '';
+  if (kind === 'primary') bg = PEACH;
+  if (kind === 'ad') bg = LAV;
+  if (kind === 'disabled') { bg = DIS; edge = 'rgba(45,52,54,.30)'; shadow = 'none'; ink = SOFT; }
+  if (kind === 'loading') { bg = LAV_L; shadow = 'none'; lift = 'transform:translateY(8px);'; }
+  if (kind === 'done') { bg = MINT; shadow = 'none'; }
+  const flex = o.w === 'half' ? 'flex:1 1 360px;' : o.w ? 'flex:0 0 ' + o.w + 'px;' : 'flex:1 1 100%;';
+  return {
+    kind: ad ? 'ad-' + kind : kind, label, layer: o.layer || (ad ? 'AdButton' : 'PopupButton'), tap: o.tap || null,
+    style: flex + 'min-width:0;height:' + h + 'px;box-sizing:border-box;border-radius:36px;background:' + bg + ';border:4px solid ' + edge + ';box-shadow:' + shadow + ';display:flex;align-items:center;justify-content:center;gap:16px;padding:0 24px;cursor:' + (o.tap ? 'pointer' : 'default') + ';pointer-events:auto;' + lift,
+    labelStyle: F(900, ad ? 44 : 48) + 'color:' + ink + ';white-space:nowrap',
+    isAd: ad, adStyle: 'width:64px;height:48px;display:block;flex:0 0 auto;' + (kind === 'disabled' ? 'opacity:.45' : ''),
+    hasIcon: !!o.icon, icon: o.icon || '', iconStyle: 'width:56px;height:56px;display:block;flex:0 0 auto;' + (kind === 'disabled' ? 'opacity:.45' : ''),
+    hasTri: !!o.tri, hasCheck: kind === 'done', isLoading: kind === 'loading',
+    dots: kind === 'loading' ? React.createElement('span', { style: { display: 'inline-flex', gap: 8 } }, [0, 1, 2].map(i => React.createElement('span', { key: i, style: { width: 14, height: 14, borderRadius: 7, background: INK, animation: 'popDots .9s ' + (i * 0.15) + 's infinite ease-in-out' } }))) : null
+  };
+}
+// ── RewardChip ──
+function chip(kind, n, o, i, rev) {
+  o = o || {};
+  const box = 92;
+  const art = kind === 'coin' ? { src: 'icons/icon_coin.svg', style: 'position:absolute;left:4px;top:4px;width:84px;height:84px;display:block' } : crop(o.key, box - 12);
+  if (kind !== 'coin') art.style = art.style.replace('position:absolute;', 'position:absolute;margin:6px;');
+  const d = (i || 0) * T.CHIP_STAGGER;
+  return {
+    kind, n: (o.plus === false ? '' : '+') + n, half: o.was != null, was: o.was != null ? String(o.was) : '', x2: !!o.x2, art,
+    style: 'position:relative;height:132px;box-sizing:border-box;border-radius:66px;background:' + WHITE + ';border:3px solid ' + INK + ';display:flex;align-items:center;gap:12px;padding:0 28px 0 14px;' +
+      'transition:transform ' + T.CHIP_IN + 'ms cubic-bezier(.34,1.56,.64,1) ' + d + 'ms,opacity ' + T.CHIP_IN + 'ms ease ' + d + 'ms;transform:scale(' + (rev ? 1 : 0.6) + ');opacity:' + (rev ? 1 : 0),
+    artBox: 'position:relative;width:' + box + 'px;height:' + box + 'px;flex:0 0 auto;overflow:hidden;' + (kind === 'coin' ? '' : 'border-radius:46px;background:' + RIM + ';box-sizing:border-box;border:3px solid rgba(45,52,54,.18)'),
+    wasStyle: F(800, 40) + 'color:' + SOFT + ';text-decoration:line-through;text-decoration-thickness:4px;font-variant-numeric:tabular-nums',
+    nStyle: F(900, 56) + 'color:' + INK + ';font-variant-numeric:tabular-nums;white-space:nowrap'
+  };
+}
+// ── CoachBubble ── anchor: dir down → (x, bottom y of box), up → (x, top y), left → (x, top y)
+function coach(o, dark) {
+  const tail = o.dir !== 'none';
+  let wrap = 'position:absolute;left:' + o.x + 'px;' + (o.dir === 'down' ? 'bottom:' + (1920 - o.y) + 'px;' : 'top:' + o.y + 'px;') + 'max-width:' + (o.max || 760) + 'px;transition:transform ' + T.COACH_IN + 'ms cubic-bezier(.34,1.56,.64,1),opacity ' + T.COACH_IN + 'ms;transform-origin:' + (o.dir === 'down' ? o.t + 'px 100%' : o.dir === 'up' ? o.t + 'px 0' : '0 ' + o.t + 'px') + ';';
+  wrap += 'transform:scale(' + (o.rev ? 1 : 0.85) + ');opacity:' + (o.rev ? 1 : 0);
+  const box = 'position:relative;box-sizing:border-box;background:' + CREAM + ';border:4px solid ' + INK + ';border-radius:32px;box-shadow:0 8px 0 ' + (dark ? 'rgba(10,14,12,.55)' : DROP) + ';padding:26px 34px;display:flex;flex-direction:column;gap:16px';
+  let to = '', ti = '';
+  const t = o.t;
+  if (o.dir === 'down') { to = 'position:absolute;left:' + (t - 26) + 'px;top:100%;width:0;height:0;border-left:26px solid transparent;border-right:26px solid transparent;border-top:32px solid ' + INK; ti = 'position:absolute;left:' + (t - 18) + 'px;top:calc(100% - 5px);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:24px solid ' + CREAM; }
+  if (o.dir === 'up') { to = 'position:absolute;left:' + (t - 26) + 'px;bottom:100%;width:0;height:0;border-left:26px solid transparent;border-right:26px solid transparent;border-bottom:32px solid ' + INK; ti = 'position:absolute;left:' + (t - 18) + 'px;bottom:calc(100% - 5px);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-bottom:24px solid ' + CREAM; }
+  if (o.dir === 'left') { to = 'position:absolute;top:' + (t - 26) + 'px;right:100%;width:0;height:0;border-top:26px solid transparent;border-bottom:26px solid transparent;border-right:32px solid ' + INK; ti = 'position:absolute;top:' + (t - 18) + 'px;right:calc(100% - 5px);width:0;height:0;border-top:18px solid transparent;border-bottom:18px solid transparent;border-right:24px solid ' + CREAM; }
+  if (o.dir === 'right') { to = 'position:absolute;top:' + (t - 26) + 'px;left:100%;width:0;height:0;border-top:26px solid transparent;border-bottom:26px solid transparent;border-left:32px solid ' + INK; ti = 'position:absolute;top:' + (t - 18) + 'px;left:calc(100% - 5px);width:0;height:0;border-top:18px solid transparent;border-bottom:18px solid transparent;border-left:24px solid ' + CREAM; }
+  const rows = o.rows.map(r => {
+    const isArt = r.art != null;
+    return {
+      text: r.text, hasIcon: !!(r.icon || isArt), icon: isArt ? r.art.src : r.icon,
+      iconBox: 'position:relative;width:72px;height:72px;flex:0 0 auto;box-sizing:border-box;border-radius:36px;background:' + (r.disc || MINT) + ';border:3px solid ' + INK + ';overflow:hidden;display:grid;place-items:center',
+      iconStyle: isArt ? r.art.style : 'width:46px;height:46px;display:block',
+      textStyle: F(r.big ? 900 : 800, r.size || 44, 1.15) + 'color:' + INK + ';text-wrap:balance'
+    };
+  });
+  return { wrap, box, rows, hasTail: tail, tailOuter: to, tailInner: ti };
+}
+// ── Toast ──
+function toast(text, y, o, rev) {
+  o = o || {};
+  return {
+    text, hasDisc: !!o.disc, icon: o.disc || o.bare || '', hasBare: !!o.bare, hasCheck: !!o.check,
+    discStyle: 'width:60px;height:60px;border-radius:30px;background:' + CREAM + ';display:grid;place-items:center;flex:0 0 auto',
+    style: 'position:absolute;left:50%;top:' + y + 'px;height:100px;box-sizing:border-box;padding:0 40px 0 ' + (o.disc || o.check || o.bare ? 20 : 40) + 'px;border-radius:50px;background:' + INK + ';border:3px solid rgba(255,248,240,.9);display:flex;align-items:center;gap:16px;white-space:nowrap;' +
+      'transition:transform ' + T.TOAST_IN + 'ms cubic-bezier(.33,1,.68,1),opacity ' + T.TOAST_IN + 'ms;transform:translate(-50%,' + (rev ? 0 : 24) + 'px);opacity:' + (rev ? (o.a ?? 1) : 0)
+  };
+}
+// ── FloatPop ──
+function pop(text, x, y, o) {
+  o = o || {};
+  const fill = o.spend ? PINK : o.fill || GOLD, sz = o.size || 64;
+  const art = o.art || (o.coin ? { src: 'icons/icon_coin.svg', style: 'position:absolute;left:0;top:0;width:100%;height:100%;display:block' } : null);
+  return {
+    text, hasName: !!o.name, name: o.name || '', hasIcon: !!art, art: art || { src: '', style: '' },
+    iconBox: 'position:relative;width:' + Math.round(sz * 0.9) + 'px;height:' + Math.round(sz * 0.9) + 'px;flex:0 0 auto;overflow:hidden;' + (o.art ? 'border-radius:50%;background:' + RIM + ';border:4px solid ' + INK + ';box-sizing:border-box' : ''),
+    style: 'position:absolute;left:' + x + 'px;top:' + y + 'px;transform:translateX(-50%) scale(' + (o.s || 1) + ');transform-origin:50% 50%;display:flex;align-items:center;gap:8px;white-space:nowrap;opacity:' + (o.a ?? 1),
+    textStyle: F(900, sz) + 'color:' + fill + ';-webkit-text-stroke:' + Math.round(sz / 6.4) + 'px ' + INK + ';paint-order:stroke fill;font-variant-numeric:tabular-nums',
+    nameStyle: F(900, 44) + 'color:' + CREAM + ';-webkit-text-stroke:8px ' + INK + ';paint-order:stroke fill;margin-left:6px'
+  };
+}
+function segs(lvl, w, h, gap, flash) {
+  return [0, 1, 2, 3].map(i => ({ style: 'width:' + w + 'px;height:' + h + 'px;border-radius:' + (h / 2) + 'px;box-sizing:border-box;flex:0 0 auto;' + (i < lvl ? 'background:' + (flash && i === lvl - 1 ? GOLD : MINT) + ';border:' + (h > 16 ? 3 : 2) + 'px solid ' + INK : 'background:rgba(45,52,54,.16)') }));
+}
+const hx = a => '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
+const rgb = h => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16));
+
+class Component extends DCLogic {
+  state = { rev: false, r5: null };
+  componentDidMount() { this.kick(); }
+  componentDidUpdate(pp) { if (pp.popup !== this.props.popup || pp.state !== this.props.state) { this.setState({ rev: false, r5: null }); this.kick(); } }
+  componentWillUnmount() { clearTimeout(this._t); clearTimeout(this._l); }
+  kick() { clearTimeout(this._t); if (this.props.still) return; this._t = setTimeout(() => this.setState({ rev: true }), 60); }
+  renderVals() {
+    const p = this.props;
+    const id = POPUPS[p.popup] ? p.popup : 'R5';
+    const [defZone, kind, states] = POPUPS[id];
+    const zone = p.zone && p.zone !== 'auto' ? p.zone : defZone;
+    let st = states.indexOf(p.state) >= 0 ? p.state : states[0];
+    if (id === 'R5' && this.state.r5) st = this.state.r5;
+    const rev = !!p.still || this.state.rev;
+    const season = p.season || ((id === 'A2' || id === 'X3') ? 'moonlit_warren' : 'country_bloom');
+    const isRun = zone === 'run', isHub = !isRun;
+    const out = {
+      label: id + ' · ' + st, popupId: id, isRun, isHub, isHome: zone === 'home' || zone === 'hub', isArena: zone === 'arena', isPlaceholderPage: zone === 'shop' || zone === 'camp',
+      season, runCoins: 12, runSeeds: 5, hdrCoins: '1,250', hdrSeeds: '86', hdrFlowers: '27',
+      coaches: [], toasts: [], pops: [], chips: [], btns: [], needTiles: [], seedTiles: [], upCards: [], basketBtns: [],
+      scrimOn: false, modalOn: false, basketOn: false, upgradesOn: false, wardrobeOn: false, bannerOn: false, ringOn: false, ring: null,
+      hasLine: false, hasTray: false, trayStamp: false, hasNote: false, hasClosedGift: false, hasTiles: false, hasBtns: true, lineHasIcon: false
+    };
+    // ── hub chrome (chrome v2, nepromijenjeno; samo NavLockPill u stilu sistema) ──
+    const active = ACTIVE[zone === 'hub' ? 'home' : zone] ?? 2;
+    const locked = zone === 'arena';
+    out.navLocked = locked;
+    out.footEdge = locked ? 'rgba(232,196,74,.85)' : 'rgba(255,248,240,.55)';
+    out.tabs = TABS.map((t, i) => {
+      const on = i === active;
+      return { layer: t[0], label: t[1], icon: 'icons/tab_' + t[2] + (on ? '' : '_light') + '.svg',
+        slotStyle: 'width:216px;height:141px;flex:0 0 auto;position:relative;opacity:' + (locked && !on ? 0.6 : 1),
+        tileStyle: 'position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;display:grid;place-items:center;' + (on ? 'background:#FFB88C;border:2px solid rgba(45,52,54,.14)' : 'background:transparent;border:2px solid transparent'),
+        iconStyle: on ? 'width:72px;height:72px;display:block;transform:translateY(-2px)' : 'width:64px;height:64px;display:block;opacity:.82' };
+    });
+    out.indicatorStyle = 'position:absolute;top:6px;left:' + (active * 216 + 72) + 'px;width:72px;height:8px;border-radius:4px;z-index:1;background:' + (locked ? 'rgba(255,184,140,.4)' : '#FFB88C');
+    // ── home field (FieldWithWardrobe, statično) ──
+    const tut = id === 'H1' || id === 'H2';
+    const g = GROUND[season] || GROUND.country_bloom, gr = rgb(g);
+    out.ground = g; out.sky = hx(gr.map(v => v + (255 - v) * 0.30)); out.near = hx(gr.map(v => v * 0.93));
+    out.seasonName = NAMES[season] || NAMES.country_bloom;
+    const art = ART[season] || ART.country_bloom;
+    const counts = id === 'H1' ? [0, 0, 0, 0, 0, 0] : tut ? [2, 1, 1, 0, 0, 0] : [7, 5, 6, 3, 2, 1];
+    let grown = 0;
+    out.spots = SPOTS.map(sp => {
+      const up = counts[sp[3]] >= sp[4]; if (up) grown++;
+      const size = sp[2], cx = Math.round(sp[0] * 10.8), by = Math.round(1633 - sp[1] * 16.33);
+      return { wrap: 'position:absolute;left:' + (cx - size / 2) + 'px;top:' + (by - size) + 'px;width:' + size + 'px;height:' + size + 'px',
+        soil: up ? 'display:none' : 'position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:' + Math.round(size * 0.68) + 'px;height:' + Math.round(size * 0.27) + 'px;box-sizing:border-box;border-radius:999px;background:rgba(26,26,20,.10);border:3px solid rgba(26,26,20,.19)',
+        shade: up ? 'position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:' + Math.round(size * 0.56) + 'px;height:' + Math.round(size * 0.17) + 'px;border-radius:999px;background:rgba(26,26,20,.13)' : 'display:none',
+        src: 'flowers/ph_' + art[sp[3]] + '.svg', art: up ? 'position:relative;display:block;width:' + size + 'px;height:' + size + 'px' : 'display:none' };
+    });
+    out.grownText = grown + ' / 13';
+    out.giftDot = !tut && id !== 'H3';
+    out.basketLocked = tut; out.basketChosen = !tut;
+    out.basketArt = 'flowers/ph_' + art[2] + '.svg';
+    out.basketBtnStyle = 'position:absolute;left:24px;top:220px;width:180px;height:180px;' + (id === 'H2' && st === 'tap' ? 'transform:rotate(-4deg) translateX(-6px)' : '');
+    out.magSegs = segs(tut ? 0 : 1, 28, 14); out.lootSegs = segs(tut ? 0 : 2, 28, 14);
+    out.endless = !tut; out.showWardrobeBtn = id !== 'H1';
+    // ── arena ──
+    const five = !(id === 'A3' && st === 'one');
+    out.bagCount = five ? 10 : 3; out.bagTypes = five ? ['clover', 'daisy', 'buttercup', 'tulip', 'sunflower'] : ['buttercup'];
+    out.muncherState = id === 'A2' ? 'waking' : 'sleep_nest';
+    // ── placeholder pages (Shop v2 / Camp — ne diraju se) ──
+    const shop = zone === 'shop';
+    out.phPageStyle = 'position:absolute;left:0;top:0;width:1080px;height:1633px;padding:56px 48px;box-sizing:border-box;display:flex;flex-direction:column;gap:40px;background:' + (shop ? '#FBEDD7' : '#2E4733');
+    out.phBlock = shop ? 'rgba(45,52,54,.10)' : 'rgba(255,248,240,.10)'; out.phInk = shop ? 'rgba(45,52,54,.5)' : 'rgba(255,248,240,.5)';
+    out.phName = shop ? 'Shop v2' : 'Camp'; out.showTrade = zone === 'camp';
+
+    // ── shared overlay geometry ──
+    const PAGE = { top: 143, h: 1633 };
+    const scrim = full => { out.scrimOn = true; out.scrimStyle = 'position:absolute;left:0;top:' + (full ? 0 : PAGE.top) + 'px;width:1080px;height:' + (full ? 1920 : PAGE.h) + 'px;background:' + SCRIM + ';transition:opacity ' + T.MODAL_IN + 'ms;opacity:' + (rev ? 1 : 0) + ';pointer-events:auto'; };
+    const modal = (layer, title, plate, full) => {
+      out.modalOn = true; out.modalLayer = layer; out.modalTitle = title;
+      out.modalArea = 'position:absolute;left:0;top:' + (full ? 0 : PAGE.top) + 'px;width:1080px;height:' + (full ? 1920 : PAGE.h) + 'px;display:flex;align-items:center;justify-content:center;padding-top:52px;box-sizing:border-box';
+      out.modalStyle = 'position:relative;width:984px;box-sizing:border-box;background:' + CREAM + ';border:4px solid ' + INK + ';border-radius:48px;box-shadow:0 14px 0 ' + PANEL_DROP + ';padding:92px 48px 48px;display:flex;flex-direction:column;gap:36px;pointer-events:auto;transition:transform ' + T.MODAL_IN + 'ms cubic-bezier(.34,1.56,.64,1),opacity ' + T.MODAL_IN + 'ms;transform:scale(' + (rev ? 1 : 0.9) + ');opacity:' + (rev ? 1 : 0);
+      out.plateStyle = 'position:absolute;left:50%;top:-56px;transform:translateX(-50%);height:112px;box-sizing:border-box;padding:0 52px;border-radius:56px;background:' + plate + ';border:4px solid ' + INK + ';display:flex;align-items:center;' + F(900, 56) + 'color:' + INK + ';white-space:nowrap';
+    };
+    const tray = (stamp) => { out.hasTray = true; out.trayStamp = !!stamp; out.stampText = stamp || ''; out.trayStyle = 'position:relative;background:' + RIM + ';border:3px solid rgba(45,52,54,.18);border-radius:36px;padding:' + (stamp ? 56 : 36) + 'px 20px 36px;display:flex;flex-wrap:wrap;justify-content:center;gap:20px 16px'; };
+    const sheet = h => 'position:absolute;left:0;top:' + (PAGE.top + PAGE.h - h) + 'px;width:1080px;height:' + h + 'px;box-sizing:border-box;background:' + CREAM + ';border-top:4px solid ' + INK + ';border-radius:36px 36px 0 0;padding:20px 24px 20px;display:flex;flex-direction:column;pointer-events:auto;transition:transform ' + T.SHEET_IN + 'ms cubic-bezier(.33,1,.68,1);transform:translateY(' + (rev ? 0 : h) + 'px)';
+    const C = (o, dark) => out.coaches.push(coach(Object.assign({ rev }, o), dark));
+
+    // ── per ID ──
+    if (id === 'H1') {
+      C({ x: 150, y: 1556, dir: 'down', t: 390, rows: [{ text: 'Tap Play to start', big: true }] });
+      out.ringOn = true;
+      out.ring = React.createElement('div', { 'data-layer': 'PlayRing', style: { position: 'absolute', left: 324, top: 1604, width: 432, height: 140, boxSizing: 'border-box', borderRadius: 70, border: '6px solid ' + INK, animation: 'popRing 1.2s ease-out infinite' } });
+    }
+    if (id === 'H2') C({ x: 244, y: 383, dir: 'left', t: 70, max: 600, rows: [{ icon: 'icons/tab_arena.svg', text: 'Your first Arena merge unlocks it' }] });
+    if (id === 'H3') {
+      scrim(false);
+      if (st === 'tomorrow') {
+        modal('GiftModal', 'Daily gift', RIM);
+        out.hasClosedGift = true; out.backIn = 'Back in 7h';
+        out.btns = [btn('secondary', 'OK')];
+      } else {
+        modal('GiftModal', 'Daily gift', GOLD);
+        tray();
+        const near = st === 'near_full';
+        out.chips = [chip('coin', 8, {}, 0, rev), chip('seed', near ? 1 : 3, { key: 'daisy_t1' }, 1, rev)];
+        out.hasNote = near; out.noteText = 'Bag almost full';
+        out.btns = [btn('primary', 'Collect')];
+      }
+    }
+    if (id === 'H4') {
+      scrim(false); out.basketOn = true; out.sheet1326 = sheet(1326);
+      const order = ['clover', 'daisy', 'buttercup', 'tulip', 'sunflower', 'pumpkin'];
+      const lockedN = st === 'locked' ? 4 : 2;
+      const chosenKey = this.state.pick || (st === 'none' ? '' : 'daisy');
+      out.seedTiles = order.map((k, i) => {
+        const lockd = i >= order.length - lockedN, chosen = !lockd && k === chosenKey;
+        return {
+          state: lockd ? 'locked' : chosen ? 'chosen' : 'open', open: !lockd, locked: lockd, chosen, name: SEED[k][0],
+          stars: '★'.repeat(SEED[k][1]) + '☆'.repeat(3 - SEED[k][1]), art: crop(k + '_t1', 134),
+          tap: lockd ? null : () => this.setState({ pick: k }),
+          style: 'position:relative;width:328px;height:410px;box-sizing:border-box;border-radius:32px;padding:24px 16px 20px;display:flex;flex-direction:column;align-items:center;gap:16px;cursor:' + (lockd ? 'default' : 'pointer') + ';pointer-events:auto;' +
+            (chosen ? 'background:' + RIM + ';border:4px solid ' + INK : lockd ? 'background:' + DIS + ';border:3px solid rgba(45,52,54,.10)' : 'background:' + WHITE + ';border:3px solid rgba(45,52,54,.18)'),
+          frame: 'position:relative;width:194px;height:194px;flex:0 0 auto;box-sizing:border-box;border-radius:34px;display:grid;place-items:center;' + (lockd ? 'background:#E3D9CC;border:3px solid rgba(45,52,54,.30)' : 'background:' + GOLD + ';border:3px solid ' + INK),
+          nameStyle: F(900, 40, 1.05) + 'color:' + (lockd ? SOFT : INK) + ';text-align:center;text-wrap:balance;flex:1 1 auto;display:flex;align-items:center',
+          starStyle: F(900, 38) + 'color:' + (lockd ? SOFT : '#7A4A28') + ';letter-spacing:.06em'
+        };
+      });
+      const none = !chosenKey;
+      out.basketBtns = [btn(none ? 'disabled' : 'secondary', 'Clear', { w: 380, icon: 'icons/icon_basket.svg' }), btn('secondary', 'Close', { w: 'half' })];
+    }
+    if (id === 'H5') {
+      scrim(false); out.upgradesOn = true; out.sheet922 = sheet(922);
+      const cfg = { both: [1, 2, 4, 4, ''], short: [1, 2, 4, 1, ''], max: [4, 2, 4, 4, ''], buy: [2, 2, 2, 4, 'Magnet'] }[st];
+      // [magnet lvl, loot lvl, flowers for magnet, flowers for loot, flashing]
+      const mk = (name, lvl, have, eff) => {
+        const flash = cfg[4] === name, max = lvl >= 4, ok = have >= 2;
+        const k = flash ? 'done' : max ? 'done' : ok ? 'primary' : 'disabled';
+        const b = btn(k, flash ? 'Done' : max ? 'Max' : ok ? '×2' : 'Need ' + (2 - have), { w: 300 });
+        b.hasArt = !max && !flash; b.hasCheck = flash || max;
+        b.art = crop('clover_t3', 64); b.artBox = 'position:relative;width:64px;height:64px;flex:0 0 auto;overflow:hidden;' + (k === 'disabled' ? 'opacity:.5' : '');
+        return { name, state: flash ? 'buy' : max ? 'max' : ok ? 'ready' : 'short', segs: segs(lvl, 96, 22, 10, flash), effect: eff(lvl), btn: b,
+          style: 'height:264px;box-sizing:border-box;border-radius:32px;padding:0 32px;display:flex;align-items:center;gap:24px;' + (flash ? 'background:' + RIM + ';border:4px solid ' + INK : 'background:' + WHITE + ';border:3px solid rgba(45,52,54,.18)') };
+      };
+      out.upCards = [
+        mk('Magnet', cfg[0], cfg[2], l => l >= 4 ? 'Pull 232 px' : 'Pull ' + (40 + 48 * l) + ' → ' + (40 + 48 * (l + 1)) + ' px'),
+        mk('Loot Boost', cfg[1], cfg[3], l => { const m = [1.0, 1.25, 1.5, 1.75, 2.0]; return l >= 4 ? 'Loot ×2.0' : 'Loot ×' + m[l].toFixed(m[l] % 1 ? 2 : 1).replace(/0$/, '') + ' → ×' + m[l + 1].toFixed(2).replace(/0$/, '').replace(/\.0$/, '.0'); })
+      ];
+    }
+    if (id === 'H6') { scrim(false); out.wardrobeOn = true; out.wardrobeLayer = 'position:absolute;left:0;top:' + (PAGE.top + 307) + 'px;width:1080px;height:1326px;pointer-events:auto;transition:transform ' + T.SHEET_IN + 'ms cubic-bezier(.33,1,.68,1);transform:translateY(' + (rev ? 0 : 1326) + 'px)'; }
+    if (id === 'H7') {
+      out.toasts.push(toast('Runs use Sunset Meadow', PAGE.top + 1110, { disc: 'icons/slot_meadow.svg' }, rev));
+      if (st === 'queue') out.toasts.push(toast('New looks are on', PAGE.top + 1110 + 116, { disc: 'icons/slot_pip.svg' }, rev));
+    }
+    if (id === 'H8') out.toasts.push(st === 'yours' ? toast('Yours', PAGE.top + 1250, { check: true }, rev) : toast('Unlocked', PAGE.top + 1250, { disc: 'icons/icon_lock.svg' }, rev));
+    if (id === 'X1') out.toasts.push(toast('Settings coming soon', PAGE.top + 24, { bare: 'icons/icon_settings_light.svg' }, rev));
+    if (id === 'S1') { out.toasts.push(toast('Moonlit Warren is yours', 1600, { check: true }, rev)); out.pops.push(pop('−150', 168, 150, { spend: true, coin: true, size: 56 })); }
+    if (id === 'X2') {
+      if (st === 'spend') { out.pops.push(pop('−150', 168, 150, { spend: true, coin: true })); out.pops.push(pop('−150', 168, 210, { spend: true, coin: true, a: 0.3, s: 0.9 })); }
+      else { out.pops.push(pop('+2', 168, 150, { coin: true })); out.pops.push(pop('+2', 168, 230, { coin: true, a: 0.3, s: 0.9 })); }
+    }
+    if (id === 'A4') { out.pops.push(pop('+2', 168, 150, { coin: true })); out.pops.push(pop('+2', 300, 560, { coin: true, a: 0.25, s: 0.8 })); out.pops.push(pop('+2', 230, 330, { coin: true, a: 0.5, s: 0.9 })); }
+    if (id === 'C1') {
+      if (st === 'hold') out.pops.push(pop('+12', 871, 1520, { coin: true, size: 72 }));
+      else { out.pops.push(pop('+12', 871, 1520, { coin: true, a: 0.2, s: 0.9 })); out.pops.push(pop('+12', 560, 860, { coin: true, a: 0.5, s: 0.85 })); out.pops.push(pop('+12', 168, 150, { coin: true, s: 0.85 })); }
+    }
+    if (id === 'X3') { /* NavLockPill u footeru */ }
+    if (id === 'A1') C({ x: 200, y: PAGE.top + 1269 - 14, dir: 'down', t: 340, rows: [{ icon: 'icons/icon_basket.svg', disc: GOLD, text: 'Tap the bag to pour' }, { art: crop('clover_t1', 60), disc: RIM, text: 'Join matching seeds' }] });
+    if (id === 'A2') C({ x: 230, y: PAGE.top + 120 + 330, dir: 'up', t: 310, rows: [{ text: 'Muncher’s awake!', big: true, size: 48 }, { art: crop('clover_t3', 60), disc: RIM, text: 'A T3 freezes it 2s' }] }, season === 'moonlit_warren');
+    if (id === 'A3') {
+      scrim(false); modal('NeedSeedsModal', 'You need more seeds!', RIM);
+      out.hasLine = true; out.modalLine = 'Every type needs 4';
+      const have = five ? [['clover', 3], ['daisy', 2], ['buttercup', 1], ['tulip', 2], ['sunflower', 2]] : [['buttercup', 1]];
+      out.hasTiles = true;
+      out.needTiles = have.map(([k, n]) => ({ art: crop(k + '_t1', 136), dots: [0, 1, 2, 3].map(i => ({ style: 'width:44px;height:22px;border-radius:11px;box-sizing:border-box;' + (i < n ? 'background:' + MINT + ';border:3px solid ' + INK : 'background:rgba(45,52,54,.16)') })) }));
+      out.btns = [btn('primary', 'Back to Camp', { icon: 'icons/tab_camp.svg' })];
+    }
+    if (id === 'R1') C({ x: 120, y: 384, dir: 'up', t: 618, rows: [{ icon: 'icons/icon_coin.svg', disc: RIM, text: 'Coins for the shop!' }] }, true);
+    if (id === 'R2') {
+      out.pops.push(pop('+1', 944, 400, { art: crop('daisy_t1', 48), name: 'Daisy', size: 56 }));
+      out.pops.push(pop('+1', 690, 1000, { art: crop('daisy_t1', 40), size: 48, a: 0.35, s: 0.9 }));
+      if (st === 'two') out.pops.push(pop('+1', 944, 480, { art: crop('clover_t1', 48), name: 'Clover', size: 56 }));
+    }
+    if (id === 'R3') {
+      scrim(true); modal('PauseModal', 'Paused', RIM, true);
+      tray('If you quit');
+      out.chips = [chip('coin', 6, { was: 12, plus: false }, 0, true), chip('seed', 2, { key: 'clover_t1', was: 5, plus: false }, 1, true)];
+      out.btns = [btn('primary', 'Keep running', { tri: true }), btn('secondary', 'Quit to Camp', { icon: 'icons/icon_half.svg' })];
+    }
+    if (id === 'R4') {
+      out.bannerOn = true;
+      const ouch = st === 'ouch';
+      out.bannerTitle = ouch ? 'Ouch!' : 'Time!'; out.bannerHasSub = !ouch; out.bannerSub = 'Nothing lost';
+      out.bannerWrap = 'position:absolute;left:0;top:640px;width:1080px;display:flex;flex-direction:column;align-items:center;gap:24px;transition:transform ' + T.MODAL_IN + 'ms cubic-bezier(.34,1.56,.64,1),opacity ' + T.MODAL_IN + 'ms;transform:scale(' + (rev ? 1 : 0.7) + ');opacity:' + (rev ? 1 : 0);
+      out.bannerPlate = 'height:180px;box-sizing:border-box;padding:0 80px;border-radius:90px;background:' + (ouch ? PINK : MINT) + ';border:5px solid ' + INK + ';box-shadow:0 12px 0 rgba(10,14,12,.55);display:flex;align-items:center;' + F(900, 104) + 'color:' + INK + ';white-space:nowrap';
+    }
+    if (id === 'R5') {
+      scrim(true);
+      const fail = st !== 'complete' && st !== 'doubled' && st !== 'many';
+      modal('RunEndModal', fail ? 'Run Failed' : 'Run Complete!', fail ? PINK : MINT, true);
+      const dbl = st === 'doubled', many = st === 'many';
+      tray(fail ? 'Kept half' : '');
+      const loot = fail ? [['coin', 9, 18], ['clover_t1', 3, 6], ['daisy_t1', 2, 4]]
+        : many ? [['coin', 31], ['clover_t1', 5], ['daisy_t1', 3], ['tulip_t1', 2], ['buttercup_t1', 2], ['sunflower_t1', 1], ['pumpkin_t1', 1]]
+        : [['coin', 24], ['clover_t1', 5], ['daisy_t1', 3], ['tulip_t1', 2]];
+      out.chips = loot.map((l, i) => l[0] === 'coin' ? chip('coin', dbl ? l[1] * 2 : l[1], { was: l[2], x2: dbl }, i, rev) : chip('seed', dbl ? l[1] * 2 : l[1], { key: l[0], was: l[2], x2: dbl }, i, rev));
+      const goDouble = () => { if (this.state.r5) return; this.setState({ r5: 'loading' }); clearTimeout(this._l); this._l = setTimeout(() => this.setState({ r5: 'doubled' }), 1400); };
+      const ads = [];
+      if (st === 'fail' || st === 'complete' || st === 'many') ads.push(btn('ad', 'Double', { ad: true, w: 'half', tap: goDouble }));
+      if (st === 'fail') ads.push(btn('ad', 'Revive', { ad: true, w: 'half' }));
+      if (st === 'fail_noads') { ads.push(btn('disabled', 'No ad now', { ad: true, w: 'half' })); ads.push(btn('disabled', 'No ad now', { ad: true, w: 'half' })); }
+      if (st === 'loading') { ads.push(btn('loading', 'Double', { ad: true, w: 'half' })); ads.push(btn('disabled', 'Revive', { ad: true, w: 'half' })); }
+      if (st === 'doubled') ads.push(btn('done', 'Doubled', { ad: true }));
+      if (ads.length === 1) ads[0] = Object.assign(ads[0], { style: ads[0].style.replace('flex:1 1 360px;', 'flex:1 1 100%;') });
+      out.btns = ads.concat([
+        st === 'retry_loading' ? btn('loading', 'Retry', { w: 'half' }) : btn('secondary', 'Retry', { w: 'half', icon: null }),
+        btn('primary', 'To Camp', { w: 'half', icon: 'icons/tab_camp.svg' })
+      ]);
+      if (st === 'retry_loading') out.btns[out.btns.length - 1] = btn('disabled', 'To Camp', { w: 'half', icon: 'icons/tab_camp.svg' });
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>

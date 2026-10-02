@@ -42,10 +42,6 @@ const T3_RING_END := 1.9
 const T3_RING_SEC := 0.22
 const T3_FLY_SEC := 0.52
 const T3_FLY_END_SCALE := 0.45
-const OVERLAY_MARGIN_Y := 60.0
-const NEED_ROW_GAP := 16.0
-const NEED_TITLE_FONT_SIZE := 58
-const NEED_BODY_FONT_SIZE := 38
 
 ## Jedini tekst koji je ostao u areni — prolazna poruka u oblacicu iznad vrece.
 const CUE_PEST_AWAKE := "Muncher's awake — a T3 freezes it 2s."
@@ -53,13 +49,11 @@ const CUE_PEST_AWAKE := "Muncher's awake — a T3 freezes it 2s."
 @onready var meadow_bg: ArenaMeadowBg = $Bg
 @onready var playfield: Control = $RootVBox/Playfield
 @onready var arena_pip: Control = $RootVBox/Playfield/ArenaPip
-@onready var need_more_overlay: Control = $NeedMoreSeedsOverlay
-@onready var need_more_panel: PanelContainer = $NeedMoreSeedsOverlay/Panel
-@onready var need_more_title: Label = $NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsTitle
-@onready var need_more_subtitle: Label = $NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsSubtitle
-@onready var need_more_scroll: ScrollContainer = $NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsScroll
-@onready var need_more_list: VBoxContainer = $NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsScroll/NeedMoreSeedsList
-@onready var back_to_camp_button: UiClickButton = $NeedMoreSeedsOverlay/Panel/VBox/BackToCampButton
+## A3 · „You need more seeds!" (design_handoff_popups): modal s mrežom pločica (HFlowContainer —
+## svi tipovi iz korpe vidljivi), linija „Every type needs 4" i jedno dugme Back to Camp.
+var need_more_overlay: PopupModal
+var need_more_tiles: HFlowContainer
+var back_to_camp_button: PopupButton
 
 var _chips: Array[ArenaSeedChip] = []
 var _chip_data: Dictionary = {}
@@ -100,8 +94,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_rng.randomize()
 	_cue = ArenaCue.new(self)
-	back_to_camp_button.clicked.connect(_on_back_to_camp_pressed)
-	_style_need_more_overlay()
+	_build_need_more_overlay()
 	playfield.resized.connect(_layout_playfield_chrome)
 	call_deferred("_deferred_boot")
 
@@ -122,7 +115,7 @@ func _deferred_boot() -> void:
 	_setup_bag()
 	_setup_pest()
 	_setup_combo_fx()
-	need_more_overlay.visible = false
+	need_more_overlay.close(false)
 	_layout_playfield_chrome()
 	_apply_season_field()
 	_apply_meadow_tint()
@@ -798,53 +791,63 @@ func _bag_has_pourable_set() -> bool:
 
 func _show_need_more_seeds_overlay() -> void:
 	_rebuild_need_more_list()
-	need_more_overlay.visible = true
-	_fit_need_more_scroll()
+	need_more_overlay.open(true)
 
 
 func _hide_need_more_overlay() -> void:
 	if need_more_overlay:
-		need_more_overlay.visible = false
-	if need_more_list == null:
+		need_more_overlay.close(false)
+	if need_more_tiles == null:
 		return
-	for child in need_more_list.get_children():
-		need_more_list.remove_child(child)
+	for child in need_more_tiles.get_children():
+		need_more_tiles.remove_child(child)
 		child.queue_free()
 
 
-func _style_need_more_overlay() -> void:
-	need_more_panel.add_theme_stylebox_override("panel", UiArena.overlay_panel_style())
-	need_more_title.add_theme_font_size_override("font_size", NEED_TITLE_FONT_SIZE)
-	need_more_title.add_theme_font_override("font", UiChrome.heavy_font(UiChrome.EMBOLDEN_800))
-	need_more_title.add_theme_color_override("font_color", UI_PALETTE.OUTLINE)
-	need_more_subtitle.add_theme_font_size_override("font_size", NEED_BODY_FONT_SIZE)
-	need_more_subtitle.add_theme_font_override("font", UiChrome.heavy_font(UiChrome.EMBOLDEN_700))
-	need_more_subtitle.add_theme_color_override("font_color", UI_PALETTE.UI_TEXT)
+func _build_need_more_overlay() -> void:
+	need_more_overlay = PopupModal.new()
+	need_more_overlay.name = "NeedMoreSeedsOverlay"
+	need_more_overlay.z_index = 30
+	need_more_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(need_more_overlay)
+	need_more_overlay.setup(UiPopups.S_NEED_TITLE, "decision")
+	var line := Label.new()
+	line.name = "ModalLine"
+	line.text = UiPopups.S_NEED_LINE
+	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	line.add_theme_font_override("font", UiPopups.font(900, 44))
+	line.add_theme_font_size_override("font_size", 44)
+	line.add_theme_color_override("font_color", UiPopups.OUTLINE)
+	need_more_overlay.content.add_child(line)
+	need_more_tiles = HFlowContainer.new()
+	need_more_tiles.name = "NeedSeedTiles"
+	need_more_tiles.alignment = FlowContainer.ALIGNMENT_CENTER
+	need_more_tiles.add_theme_constant_override("h_separation", 24)
+	need_more_tiles.add_theme_constant_override("v_separation", 24)
+	need_more_tiles.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	need_more_overlay.content.add_child(need_more_tiles)
+	back_to_camp_button = PopupButton.new()
+	back_to_camp_button.name = "BackToCampButton"
+	back_to_camp_button.configure("primary", UiPopups.S_BACK_TO_CAMP, false, UiAssets.get_chrome_icon("tab_camp"))
+	back_to_camp_button.clicked.connect(_on_back_to_camp_pressed)
+	need_more_overlay.content.add_child(back_to_camp_button)
 
 
 func _rebuild_need_more_list() -> void:
-	for child in need_more_list.get_children():
-		need_more_list.remove_child(child)
+	for child in need_more_tiles.get_children():
+		need_more_tiles.remove_child(child)
 		child.queue_free()
 	for entry in GameState.get_seed_bag_entries():
-		var row := ArenaNeedRow.new()
-		row.setup(
-			str(entry.get("type_id", "")),
-			int(entry.get("count", 0)),
-			str(entry.get("display_name", "")),
-			int(entry.get("rarity", 1))
-		)
-		need_more_list.add_child(row)
+		var tile := NeedSeedTile.new().setup(str(entry.get("type_id", "")), int(entry.get("count", 0)))
+		need_more_tiles.add_child(tile)
 
 
-## Lista scrolla kad tipova ima vise nego sto stane izmedju naslova i CTA.
-func _fit_need_more_scroll() -> void:
-	var rows := need_more_list.get_child_count()
-	var rows_h := rows * ArenaNeedRow.ROW_H + maxi(rows - 1, 0) * NEED_ROW_GAP
-	need_more_scroll.custom_minimum_size.y = 0.0
-	var chrome_h := need_more_panel.get_combined_minimum_size().y
-	var max_h := need_more_overlay.size.y - OVERLAY_MARGIN_Y * 2.0 - chrome_h
-	need_more_scroll.custom_minimum_size.y = clampf(rows_h, 0.0, maxf(max_h, ArenaNeedRow.ROW_H))
+func get_need_title() -> String:
+	return need_more_overlay.title if need_more_overlay else ""
+
+
+func get_need_tiles() -> Array:
+	return need_more_tiles.get_children() if need_more_tiles else []
 
 
 ## Overlay se zatvara samo preko "Back to Camp" (ne tap bilo gdje).

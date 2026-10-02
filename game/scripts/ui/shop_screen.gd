@@ -643,7 +643,7 @@ class _AllSet:
 		UiHomeV3.draw_text(self, 900, 40, UiShopV2.S_ALL_SET, Vector2(size.x * 0.5 - w * 0.5, 24.0 + 180.0 + 8.0), UiShopV2.INK_SUB)
 
 
-## Toast: ink pilula 700 x 100 na y 1456, 44/900 krem, drži 1,6 s.
+## Toast: pilula sistema (popups) na y 1456 stranice, drži 1,6 s.
 class _Toast:
 	extends Control
 
@@ -667,7 +667,7 @@ class _Toast:
 		_tw.tween_property(self, "modulate:a", 0.0, 0.25)
 		_tw.tween_callback(hide)
 
+	## S1 · toast sistema (design_handoff_popups): pilula s mint ✓, centrirana u svom okviru.
 	func _draw() -> void:
-		draw_style_box(UiShopV2.box(UiShopV2.INK, 28), Rect2(Vector2.ZERO, size))
-		var w := UiHomeV3.text_w(900, 44, text)
-		UiHomeV3.draw_text(self, 900, 44, text, Vector2((size.x - w) * 0.5, (size.y - 44.0) * 0.5), UiShopV2.DISC)
+		var w := PopupToast.pill_width(text, true)
+		PopupToast.draw_pill(self, Rect2((size.x - w) * 0.5, (size.y - UiPopups.TOAST_H) * 0.5, w, UiPopups.TOAST_H), text, null, "check")

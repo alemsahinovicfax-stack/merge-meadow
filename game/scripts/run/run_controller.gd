@@ -44,14 +44,7 @@ const RING_SCRIPT := preload("res://scripts/run/run_ring_fx.gd")
 @onready var basket_icon: TextureRect = $HUD/TopHud/BasketBadge/Row/BasketIcon
 @onready var loadout_label: Label = $HUD/TopHud/BasketBadge/Row/LoadoutLabel
 @onready var pickup_feed: Control = $HUD/TopHud/PickupFeed
-@onready var tutorial_cue: Panel = $HUD/TopHud/TutorialCue
-@onready var tutorial_banner: Label = $HUD/TopHud/TutorialCue/TutorialBanner
-@onready var pause_overlay: Control = $HUD/PauseOverlay
-@onready var pause_panel: Panel = $HUD/PauseOverlay/Panel
-@onready var keep_button: Control = $HUD/PauseOverlay/Panel/VBox/KeepButton
-@onready var quit_button: Control = $HUD/PauseOverlay/Panel/VBox/QuitButton
 @onready var fail_flash: ColorRect = $HUD/FailFlash
-@onready var finish_banner: Panel = $HUD/FinishBanner
 @onready var fly_layer: Node2D = $HUD/FlyLayer
 @onready var world: Node2D = $World
 @onready var player: Area2D = $Player
@@ -80,10 +73,21 @@ var _coins_callout_hide_at: float = -1.0
 var _tutorial_obstacle_done: bool = false
 var _next_obstacle_stump: bool = false
 
+## Pop-upovi runa (design_handoff_popups): R1 oblačić, R3 pauza, R4 banner. Svi žive u
+## `_popup_root` (px baze 1080, skaliran na ekran) iznad HUD-a.
+var _popup_root: Control
+var tutorial_cue: CoachBubble
+var pause_overlay: PopupModal
+var keep_button: PopupButton
+var quit_button: PopupButton
+var finish_banner: RunBanner
+var _banner_shown_at: float = -1.0
+
 
 func _ready() -> void:
 	player.hit_obstacle.connect(_on_player_hit_obstacle)
 	pause_button.clicked.connect(_on_pause_pressed)
+	_build_popups()
 	keep_button.clicked.connect(_on_keep_running)
 	quit_button.clicked.connect(_on_quit_to_camp)
 	_apply_hud_styles()
@@ -91,7 +95,7 @@ func _ready() -> void:
 	if pickup_feed and pickup_feed.has_method("bind_targets"):
 		pickup_feed.bind_targets(coin_chip, seed_chip, diamond_chip, fly_layer)
 	_hide_tutorial()
-	pause_overlay.visible = false
+	pause_overlay.close(false)
 	fail_flash.visible = false
 	finish_banner.visible = false
 	await _wait_for_viewport()
@@ -224,15 +228,27 @@ func _update_tutorial_run_events() -> void:
 			_tutorial_obstacle_done = true
 
 
+## R1 · oblačić s repom gore prema brojaču coina (ne pokriva staze ispred Pipa).
 func _show_tutorial(text: String) -> void:
-	tutorial_banner.text = text
-	tutorial_banner.visible = true
-	tutorial_cue.visible = true
+	tutorial_cue.setup([{"text": text, "icon": UiAssets.get_chrome_icon("icon_coin"), "disc": UiPopups.ACTIVE_RIM}], "up", true)
+	var s := _ui_scale()
+	var chip := Rect2(coin_chip.get_global_rect().position / s, coin_chip.get_global_rect().size / s)
+	var tip := Vector2(chip.get_center().x, chip.end.y + 8.0)
+	tutorial_cue.point_at(tip, 0.8, Rect2(24, 0, 1032, 1920))
+	tutorial_cue.pop_in()
 
 
 func _hide_tutorial() -> void:
-	tutorial_banner.visible = false
-	tutorial_cue.visible = false
+	if tutorial_cue:
+		tutorial_cue.visible = false
+
+
+func get_tutorial_text() -> String:
+	return tutorial_cue.text() if tutorial_cue and tutorial_cue.visible else ""
+
+
+func is_paused() -> bool:
+	return _state == _STATE_PAUSED
 
 
 func _end_run(failed: bool) -> void:
@@ -240,7 +256,7 @@ func _end_run(failed: bool) -> void:
 		return
 	_state = _STATE_ENDED
 	player.set_input_enabled(false)
-	pause_overlay.visible = false
+	pause_overlay.close(false)
 	_hide_tutorial()
 	GameState.finish_run(seeds_by_type.duplicate(), coin_count, failed, elapsed)
 	_play_end_and_leave(failed)
@@ -251,8 +267,35 @@ func _play_end_and_leave(failed: bool) -> void:
 		await _play_fail_beat()
 	else:
 		await _play_finish_beat()
+	if not is_instance_valid(self):
+		return
+	# R4: banner drži ~1 s, pa se snimi zadnji kadar (R5 se crta preko njega).
+	var left := finish_banner.hold_sec() - (_now() - _banner_shown_at)
+	if _banner_shown_at >= 0.0 and left > 0.0:
+		await get_tree().create_timer(left).timeout
+	if not is_instance_valid(self):
+		return
+	finish_banner.visible = false
+	fail_flash.visible = false
+	await _capture_snapshot()
 	if is_instance_valid(self):
 		GameState.go_to_scene(GameState.SCENE_LOOT)
+
+
+func _now() -> float:
+	return Time.get_ticks_msec() / 1000.0
+
+
+func _capture_snapshot() -> void:
+	GameState.set("last_run_snapshot", null)
+	if DisplayServer.get_name() == "headless":
+		return
+	await RenderingServer.frame_post_draw
+	if not is_instance_valid(self):
+		return
+	var img := get_viewport().get_texture().get_image()
+	if img != null and not img.is_empty():
+		GameState.set("last_run_snapshot", ImageTexture.create_from_image(img))
 
 
 func _play_fail_beat() -> void:
@@ -264,6 +307,7 @@ func _play_fail_beat() -> void:
 			pip.rotation_degrees = -13.0
 		_spill_tokens()
 		_shake()
+		_show_banner(false)
 	)
 	tw.tween_interval(UiRun.FAIL_SHAKE - UiRun.FAIL_FLASH)
 	tw.tween_callback(func() -> void:
@@ -277,7 +321,7 @@ func _play_fail_beat() -> void:
 func _play_finish_beat() -> void:
 	if timer_ring and timer_ring.has_method("set_progress"):
 		timer_ring.set_progress(0.0, UiRun.RING_OK)
-	finish_banner.visible = true
+	_show_banner(true)
 	_spawn_finish_burst()
 	var start_speed := scroll_speed
 	var t := 0.0
@@ -338,13 +382,14 @@ func _on_pause_pressed() -> void:
 		return
 	_state = _STATE_PAUSED
 	player.set_input_enabled(false)
-	pause_overlay.visible = true
+	_fill_pause()
+	pause_overlay.open(true)
 
 
 func _on_keep_running() -> void:
 	if _state != _STATE_PAUSED:
 		return
-	pause_overlay.visible = false
+	pause_overlay.close(true)
 	_state = _STATE_RUNNING
 	player.set_input_enabled(true)
 
@@ -352,8 +397,90 @@ func _on_keep_running() -> void:
 func _on_quit_to_camp() -> void:
 	if _state == _STATE_ENDED:
 		return
-	pause_overlay.visible = false
+	pause_overlay.close(false)
 	_end_run(true)
+
+
+## Android back na pauzi = Keep running (README § Sistem · Zatvaranje).
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST and _state == _STATE_PAUSED:
+		_on_keep_running()
+
+
+# --- pop-upovi ---
+
+func _build_popups() -> void:
+	_popup_root = Control.new()
+	_popup_root.name = "PopupRoot"
+	_popup_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$HUD.add_child(_popup_root)
+	$HUD.move_child(_popup_root, fail_flash.get_index() + 1)
+	tutorial_cue = CoachBubble.new()
+	tutorial_cue.name = "TutorialCue"
+	tutorial_cue.visible = false
+	_popup_root.add_child(tutorial_cue)
+	finish_banner = RunBanner.new()
+	finish_banner.name = "FinishBanner"
+	finish_banner.visible = false
+	_popup_root.add_child(finish_banner)
+	pause_overlay = PopupModal.new()
+	pause_overlay.name = "PauseOverlay"
+	pause_overlay.setup(UiPopups.S_PAUSED, "decision", true)
+	_popup_root.add_child(pause_overlay)
+	keep_button = PopupButton.new()
+	keep_button.name = "KeepButton"
+	keep_button.configure("primary", UiPopups.S_KEEP_RUNNING)
+	keep_button.glyph = "play"
+	quit_button = PopupButton.new()
+	quit_button.name = "QuitButton"
+	quit_button.configure("secondary", UiPopups.S_QUIT_TO_CAMP, false, UiPopups.icon("icon_half"))
+	_layout_popup_root()
+
+
+func _layout_popup_root() -> void:
+	if _popup_root == null:
+		return
+	var s := _ui_scale()
+	var base := _viewport_size() / s
+	_popup_root.position = Vector2.ZERO
+	_popup_root.scale = Vector2(s, s)
+	_popup_root.size = base
+	pause_overlay.position = Vector2.ZERO
+	pause_overlay.size = base
+	pause_overlay.area = Rect2(Vector2.ZERO, base)
+	finish_banner.position = Vector2(0.0, UiPopups.BANNER_Y * base.y / 1920.0)
+	finish_banner.size = Vector2(base.x, 300.0)
+
+
+## R3 · „If you quit": šta nosiš, precrtano na pola (isto pravilo kao pad: ceil pola).
+func _fill_pause() -> void:
+	for b in [keep_button, quit_button]:
+		if b.get_parent() != null:
+			b.get_parent().remove_child(b)
+	pause_overlay.clear_content()
+	var chips: Array = []
+	if coin_count > 0:
+		chips.append(RewardChip.new().setup("coin", "", int(ceil(coin_count * 0.5)), coin_count, false, false))
+	for type_id in seeds_by_type:
+		var n := int(seeds_by_type[type_id])
+		if n > 0:
+			chips.append(RewardChip.new().setup("seed", str(type_id), int(ceil(n * 0.5)), n, false, false))
+	var tray := RewardTray.new().setup(880.0, chips, UiPopups.S_IF_YOU_QUIT)
+	tray.name = "RewardTray"
+	pause_overlay.content.add_child(PopupModal.centered(tray))
+	var col := VBoxContainer.new()
+	col.name = "ModalButtons"
+	col.add_theme_constant_override("separation", 24)
+	col.add_child(keep_button)
+	col.add_child(quit_button)
+	pause_overlay.content.add_child(col)
+
+
+func _show_banner(time_up: bool) -> void:
+	finish_banner.setup(time_up)
+	finish_banner.visible = true
+	finish_banner.pop_in()
+	_banner_shown_at = _now()
 
 
 func _viewport_size() -> Vector2:
@@ -559,10 +686,7 @@ func _layout_hud() -> void:
 	_place_rect(basket_badge, UiRun.BASKET_RECT, s)
 	var toast := Rect2(600, UiRun.TOAST_TOP, 440, 150)
 	_place_rect(pickup_feed, toast, s)
-	var cue := Rect2(160, UiRun.CUE_TOP, 760, 110)
-	_place_rect(tutorial_cue, cue, s)
-	_layout_pause_panel(s)
-	_layout_finish_banner(s)
+	_layout_popup_root()
 	_layout_counters()
 
 
@@ -585,28 +709,6 @@ func _layout_counters() -> void:
 	_place_xy(coin_chip, x, top, coin_size)
 
 
-func _layout_pause_panel(s: float) -> void:
-	var vp := _viewport_size()
-	var panel_w := 900.0 * s
-	var panel_h := 680.0 * s
-	pause_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	pause_panel.offset_left = (vp.x - panel_w) * 0.5
-	pause_panel.offset_top = vp.y * 0.18
-	pause_panel.offset_right = pause_panel.offset_left + panel_w
-	pause_panel.offset_bottom = pause_panel.offset_top + panel_h
-	keep_button.custom_minimum_size = Vector2(0, 140.0 * s)
-	quit_button.custom_minimum_size = Vector2(0, 140.0 * s)
-
-
-func _layout_finish_banner(s: float) -> void:
-	var vp := _viewport_size()
-	var w := 760.0 * s
-	var h := 220.0 * s
-	finish_banner.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	finish_banner.offset_left = (vp.x - w) * 0.5
-	finish_banner.offset_top = vp.y * 0.36
-	finish_banner.offset_right = finish_banner.offset_left + w
-	finish_banner.offset_bottom = finish_banner.offset_top + h
 
 
 func _place_rect(node: Control, rect: Rect2, s: float) -> void:
@@ -631,9 +733,6 @@ func _apply_hud_styles() -> void:
 	seed_chip.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(26), 14, 8))
 	diamond_chip.add_theme_stylebox_override("panel", _padded(UiRun.diamond_chip_style(), 12, 8))
 	basket_badge.add_theme_stylebox_override("panel", _padded(UiRun.basket_style(), 14, 8))
-	tutorial_cue.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(22), 18, 12))
-	pause_panel.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(28), 36, 28))
-	finish_banner.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(28), 28, 20))
 	fail_flash.color = Color(UiRun.FAIL.r, UiRun.FAIL.g, UiRun.FAIL.b, 0.26)
 	_style_label(mode_label, UiRun.FONT_MODE, ink, HORIZONTAL_ALIGNMENT_LEFT)
 	_style_label(seconds_label, UiRun.FONT_SECONDS, ink, HORIZONTAL_ALIGNMENT_LEFT)
@@ -642,17 +741,6 @@ func _apply_hud_styles() -> void:
 	_style_label(seed_counter_label, UiRun.FONT_COUNTER, ink, HORIZONTAL_ALIGNMENT_LEFT)
 	_style_label(diamond_counter_label, UiRun.FONT_COUNTER, ink, HORIZONTAL_ALIGNMENT_LEFT)
 	_style_label(loadout_label, UiRun.FONT_BASKET, ink, HORIZONTAL_ALIGNMENT_LEFT)
-	_style_label(tutorial_banner, UiRun.FONT_TOAST, ink, HORIZONTAL_ALIGNMENT_CENTER)
-	var title := pause_panel.get_node_or_null("VBox/Title") as Label
-	var body := pause_panel.get_node_or_null("VBox/Body") as Label
-	_style_label(title, UiRun.FONT_NAME, ink, HORIZONTAL_ALIGNMENT_CENTER)
-	_style_label(body, UiRun.FONT_TOAST, ink, HORIZONTAL_ALIGNMENT_CENTER)
-	if body:
-		body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	var finish_title := finish_banner.get_node_or_null("VBox/Title") as Label
-	var finish_sub := finish_banner.get_node_or_null("VBox/Subtitle") as Label
-	_style_label(finish_title, UiRun.FONT_SECONDS, ink, HORIZONTAL_ALIGNMENT_CENTER)
-	_style_label(finish_sub, UiRun.FONT_TOAST, ink, HORIZONTAL_ALIGNMENT_CENTER)
 	mode_label.clip_text = true
 	seconds_label.clip_text = true
 

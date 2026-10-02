@@ -3,15 +3,12 @@ extends Control
 const TEXT_LAYOUT := preload("res://scripts/ui/ui_text_layout.gd")
 const HomeBasketPickerIcon := preload("res://scripts/ui/home_basket_picker_icon.gd")
 
-const PICKER_ROW_MIN_HEIGHT := 148.0
 const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
-const LOCKED_SEED_MODULATE := Color(0.45, 0.45, 0.45, 1)
-const HINT_PAD := Vector2(27, 23)
+const SHEET_PAD := Vector4(24, 24, 24, 28)   # lijevo, gore, desno, dolje (design_handoff_popups)
 
 enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 
-@onready var tutorial_hint: Label = %TutorialHint
-@onready var tutorial_hint_panel: PanelContainer = %TutorialHintPanel
+@onready var tutorial_hint_panel: Control = %TutorialHintPanel
 @onready var field_overlay: Control = %FieldOverlay
 @onready var field_overlay_inner: Control = %FieldOverlayInner
 @onready var top_chrome: Control = %TopChrome
@@ -25,26 +22,21 @@ enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 @onready var upgrades_panel: PanelContainer = %UpgradesPanel
 @onready var upgrades_vbox: VBoxContainer = %UpgradesVBox
 @onready var upgrades_title: Label = %UpgradesTitle
-@onready var upgrades_sub: Label = %UpgradesSub
-@onready var upgrades_close_button: UiClickButton = %UpgradesCloseButton
+@onready var upgrades_close_button: PopupButton = %UpgradesCloseButton
 @onready var magnet_title: Label = %MagnetTitle
-@onready var magnet_button: UiClickButton = %MagnetButton
+@onready var magnet_button: PopupButton = %MagnetButton
 @onready var loot_boost_title: Label = %LootBoostTitle
-@onready var loot_boost_button: UiClickButton = %LootBoostButton
+@onready var loot_boost_button: PopupButton = %LootBoostButton
 @onready var seasons_row_button: UiClickButton = %SeasonsRowButton
 @onready var endless_play_button: UiClickButton = %EndlessPlayButton
 @onready var stage_hint: HomeStageHint = %StageHint
 @onready var background: ColorRect = $Background
-@onready var reward_overlay: Control = %RewardOverlay
-@onready var reward_title: Label = %RewardTitle
-@onready var reward_body: Label = %RewardBody
-@onready var reward_ok_button: UiClickButton = %RewardOkButton
 @onready var basket_picker_overlay: Control = %BasketPickerOverlay
 @onready var picker_panel: PanelContainer = %PickerPanel
-@onready var picker_list: VBoxContainer = %PickerList
-@onready var picker_footer: VBoxContainer = %PickerFooter
-@onready var picker_clear_button: UiClickButton = %PickerClearButton
-@onready var picker_close_button: UiClickButton = %PickerCloseButton
+@onready var picker_list: GridContainer = %PickerList
+@onready var picker_footer: HBoxContainer = %PickerFooter
+@onready var picker_clear_button: PopupButton = %PickerClearButton
+@onready var picker_close_button: PopupButton = %PickerCloseButton
 @onready var season_stage: Control = %SeasonStage
 
 var _chest_ui_state: ChestUiState = ChestUiState.LOCKED
@@ -52,13 +44,12 @@ var _transition_blocker: Control
 var _basket_locked: bool = false
 var _upgrade_flash_kind: String = ""
 var _magnet_effect: Label
-var _magnet_level: Label
-var _magnet_cost: Label
-var _magnet_have: Label
 var _loot_effect: Label
-var _loot_level: Label
-var _loot_cost: Label
-var _loot_have: Label
+## H3 · poklon (PopupModal „RewardOverlay"), H2 · oblačić na korpi.
+var reward_overlay: PopupModal
+var _gift_button: PopupButton
+var _basket_hint: CoachBubble
+var _sheet_drag: Dictionary = {}
 ## Ormar (design_handoff_wardrobe)
 var wardrobe_button: FieldWardrobeButton
 var wardrobe_sheet: WardrobeSheet
@@ -85,28 +76,28 @@ func _ready() -> void:
 	if upgrades_button:
 		upgrades_button.clicked.connect(_open_upgrades_sheet)
 	if upgrades_close_button:
-		upgrades_close_button.clicked.connect(_close_upgrades_sheet)
+		upgrades_close_button.clicked.connect(_dismiss_sheet.bind(upgrades_panel, _close_upgrades_sheet))
 	if upgrades_overlay:
 		var up_dim := upgrades_overlay.get_node_or_null("Dim") as Control
 		if up_dim:
 			up_dim.gui_input.connect(_on_upgrades_dim_gui_input)
+		upgrades_panel.gui_input.connect(_on_sheet_drag.bind(upgrades_panel, _close_upgrades_sheet))
 	if gift_chest:
 		gift_chest.gui_input.connect(_on_daily_chest_gui_input)
 		gift_chest.drop = true
 	if picker_clear_button:
 		picker_clear_button.clicked.connect(_on_basket_clear_picked)
 	if picker_close_button:
-		picker_close_button.clicked.connect(_close_basket_picker)
+		picker_close_button.clicked.connect(_dismiss_sheet.bind(picker_panel, _close_basket_picker))
 	if basket_picker_overlay:
 		var dim := basket_picker_overlay.get_node_or_null("Dim") as Control
 		if dim:
 			dim.gui_input.connect(_on_picker_dim_gui_input)
+		picker_panel.gui_input.connect(_on_sheet_drag.bind(picker_panel, _close_basket_picker))
 	if magnet_button:
 		magnet_button.clicked.connect(_on_field_magnet_pressed)
 	if loot_boost_button:
 		loot_boost_button.clicked.connect(_on_field_loot_boost_pressed)
-	if reward_ok_button:
-		reward_ok_button.clicked.connect(_on_reward_ok_pressed)
 	if field_basket:
 		field_basket.clicked.connect(_on_basket_pressed)
 	_bind_meadow_signal()
@@ -120,18 +111,45 @@ func _ready() -> void:
 
 
 func _setup_typography() -> void:
-	UiCamp.style_label(tutorial_hint, 40, UiHomeField.OUTLINE, 0.38)
-	tutorial_hint_panel.add_theme_stylebox_override(
-		"panel", UiStage.pad(UiHomeField.tutorial_hint(), HINT_PAD.x, HINT_PAD.y, HINT_PAD.x, HINT_PAD.y)
-	)
-	if magnet_title:
-		TEXT_LAYOUT.caption_label_scroll(magnet_title)
-	if loot_boost_title:
-		TEXT_LAYOUT.caption_label_scroll(loot_boost_title)
-	if reward_title:
-		TEXT_LAYOUT.card_title_scroll(reward_title)
-	if reward_body:
-		TEXT_LAYOUT.body_label_scroll(reward_body)
+	_basket_hint = CoachBubble.new()
+	_basket_hint.name = "BasketHint"
+	tutorial_hint_panel.add_child(_basket_hint)
+	_style_sheet(picker_panel, basket_picker_overlay, UiHomeField.SHEET_BASKET_H)
+	_style_sheet(upgrades_panel, upgrades_overlay, UiHomeField.SHEET_UPGRADES_H)
+	_style_sheet_label(picker_panel.get_node("PickerVBox/PickerTitle") as Label, 900, UiPopups.PLATE_TITLE, UiPopups.OUTLINE)
+	_style_sheet_label(upgrades_title, 900, UiPopups.PLATE_TITLE, UiPopups.OUTLINE)
+	_style_sheet_label(magnet_title, 900, 52, UiPopups.OUTLINE)
+	_style_sheet_label(loot_boost_title, 900, 52, UiPopups.OUTLINE)
+	picker_clear_button.configure("secondary", UiPopups.S_BASKET_CLEAR, false, UiPopups.icon("icon_basket"))
+	picker_close_button.configure("secondary", UiPopups.S_CLOSE)
+	upgrades_close_button.configure("secondary", UiPopups.S_CLOSE)
+
+
+## Sheet sistema: krem, rub 4 gore, radius 36, ručka 120 × 12, padding 24 / 24 / 24 / 28.
+func _style_sheet(panel: PanelContainer, overlay: Control, h: int) -> void:
+	var sb := UiPopups.sheet_panel()
+	sb.content_margin_left = SHEET_PAD.x
+	sb.content_margin_top = SHEET_PAD.y
+	sb.content_margin_right = SHEET_PAD.z
+	sb.content_margin_bottom = SHEET_PAD.w
+	panel.add_theme_stylebox_override("panel", sb)
+	panel.offset_top = -float(h)
+	panel.offset_bottom = 0.0
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	var handle := panel.find_child("SheetHandle", true, false) as Panel
+	if handle:
+		handle.add_theme_stylebox_override("panel", UiPopups.sheet_handle())
+	var dim := overlay.get_node_or_null("Dim") as ColorRect
+	if dim:
+		dim.color = UiPopups.SCRIM
+
+
+func _style_sheet_label(label: Label, weight: int, px: int, color: Color) -> void:
+	if label == null:
+		return
+	label.add_theme_font_override("font", UiPopups.font(weight, px))
+	label.add_theme_font_size_override("font_size", px)
+	label.add_theme_color_override("font_color", color)
 
 
 func _setup_safe_area() -> void:
@@ -162,9 +180,28 @@ func _refresh_tutorial_hint() -> void:
 	var open := GameState.home_season_field_open
 	if stage_hint:
 		stage_hint.visible = first and not open
-	if tutorial_hint and tutorial_hint_panel:
-		tutorial_hint.text = "Merge your first flower in the Arena to unlock the basket."
-		tutorial_hint_panel.visible = first and open
+	if tutorial_hint_panel:
+		var show := first and open
+		if show and not tutorial_hint_panel.visible:
+			_show_basket_hint(false)
+		tutorial_hint_panel.visible = show
+
+
+## H2 · oblačić s repom lijevo prema korpi (u HINT_RECT), ikona Arene na mint disku.
+func _show_basket_hint(pop: bool) -> void:
+	if _basket_hint == null:
+		return
+	_basket_hint.setup([{
+		"text": UiPopups.S_HINT_BASKET, "icon": UiAssets.get_chrome_icon("tab_arena"), "disc": UiPopups.MINT
+	}], "left")
+	_basket_hint.max_w = 600.0
+	_basket_hint.setup(_basket_hint.rows, "left")
+	var basket_c := Vector2(UiHomeField.BASKET_RECT.get_center())
+	var tip := Vector2(UiHomeField.BASKET_RECT.end.x + 12.0, basket_c.y) - Vector2(UiHomeField.HINT_RECT.position)
+	_basket_hint.point_at(tip, 0.5)
+	_basket_hint.visible = true
+	if pop:
+		_basket_hint.pop_in()
 
 
 ## Home v3: livada (SeasonStage) pokriva stranicu, pa nema tamne pozadine polja;
@@ -296,10 +333,6 @@ func _apply_field_overlay_styles() -> void:
 		var word := grown_chip.get_node_or_null("Row/Word") as Label
 		if word:
 			word.add_theme_font_override("font", UiStage.font(800, 38))
-	if tutorial_hint_panel:
-		tutorial_hint_panel.add_theme_stylebox_override(
-			"panel", UiStage.pad(UiHomeField.tutorial_hint(), HINT_PAD.x, HINT_PAD.y, HINT_PAD.x, HINT_PAD.y)
-		)
 
 
 ## Donji red: Seasons 236 x 124 · Play 432 x 140 (centar x 540, JE PlayButton
@@ -349,54 +382,46 @@ func _refresh_field_upgrades() -> void:
 		return
 	_ensure_upgrade_extras()
 	var flower_id := GameState.pick_upgrade_flower_type("")
-	var flower_name := GameState.get_seed_display_name(flower_id) if not flower_id.is_empty() else ""
 	var have := int(GameState.garden_crystal_stash.get(flower_id, 0)) if not flower_id.is_empty() else 0
 	_apply_upgrade_card(
 		"magnet",
 		magnet_button,
 		magnet_title,
-		_magnet_level,
+		null,
 		_magnet_effect,
-		_magnet_cost,
-		_magnet_have,
+		null,
+		null,
 		GameState.magnet_level,
 		GameState.MAGNET_MAX_LEVEL,
 		UiHomeField.magnet_effect(GameState.magnet_level),
-		flower_name,
+		flower_id,
 		have
 	)
 	_apply_upgrade_card(
 		"loot",
 		loot_boost_button,
 		loot_boost_title,
-		_loot_level,
+		null,
 		_loot_effect,
-		_loot_cost,
-		_loot_have,
+		null,
+		null,
 		GameState.multiplier_level,
 		GameState.MULTIPLIER_MAX_LEVEL,
 		UiHomeField.loot_effect(GameState.multiplier_level),
-		flower_name,
+		flower_id,
 		have
 	)
 
 
-## Svaki novi red ide ODMAH iza naslova, pa je redoslijed poziva obrnut od
-## redoslijeda na ekranu: naslov · Lv N / 4 · 4 segmenta · efekat · cijena.
+## H5 · kartica nadogradnje (design_handoff_popups): ime 52 · 4 segmenta 96 × 22 · efekat 40/800;
+## desno dugme koje JE cijena (crtež cvijeta T3 + „×2", „Need N", „✓ Max", „✓ Done").
 func _ensure_upgrade_extras() -> void:
-	_magnet_have = _ensure_extra_label(magnet_title, "MagnetHave", _magnet_have)
-	_magnet_cost = _ensure_extra_label(magnet_title, "MagnetCost", _magnet_cost)
 	_magnet_effect = _ensure_extra_label(magnet_title, "MagnetEffect", _magnet_effect)
 	_ensure_segment_row(magnet_title, "MagnetSegments")
-	_magnet_level = _ensure_extra_label(magnet_title, "MagnetLevel", _magnet_level)
-	_loot_have = _ensure_extra_label(loot_boost_title, "LootHave", _loot_have)
-	_loot_cost = _ensure_extra_label(loot_boost_title, "LootCost", _loot_cost)
 	_loot_effect = _ensure_extra_label(loot_boost_title, "LootEffect", _loot_effect)
 	_ensure_segment_row(loot_boost_title, "LootSegments")
-	_loot_level = _ensure_extra_label(loot_boost_title, "LootLevel", _loot_level)
 
 
-## Cetiri segmenta 64 x 18 ispod naslova — nivo se vidi i bez citanja.
 func _ensure_segment_row(after: Label, row_name: String) -> HBoxContainer:
 	if after == null or after.get_parent() == null:
 		return null
@@ -411,14 +436,14 @@ func _ensure_segment_row(after: Label, row_name: String) -> HBoxContainer:
 		var seg := Panel.new()
 		seg.name = "Seg_%d" % i
 		seg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		seg.custom_minimum_size = Vector2(UiHomeField.UPGRADE_SEG)
+		seg.custom_minimum_size = Vector2(UiPopups.UPGRADE_SEG)
 		row.add_child(seg)
 	after.get_parent().add_child(row)
 	after.get_parent().move_child(row, after.get_index() + 1)
 	return row
 
 
-func _paint_segments(title: Label, row_name: String, level: int) -> void:
+func _paint_segments(title: Label, row_name: String, level: int, flash: bool) -> void:
 	if title == null or title.get_parent() == null:
 		return
 	var row := title.get_parent().get_node_or_null(row_name) as HBoxContainer
@@ -427,7 +452,7 @@ func _paint_segments(title: Label, row_name: String, level: int) -> void:
 	for i in row.get_child_count():
 		var seg := row.get_child(i) as Panel
 		if seg:
-			seg.add_theme_stylebox_override("panel", UiHomeField.upgrade_segment(i < level))
+			seg.add_theme_stylebox_override("panel", UiPopups.level_segment(i < level, flash and i == level - 1))
 
 
 func _ensure_extra_label(after: Label, extra_name: String, existing: Label) -> Label:
@@ -440,79 +465,69 @@ func _ensure_extra_label(after: Label, extra_name: String, existing: Label) -> L
 		return found
 	var lab := Label.new()
 	lab.name = extra_name
-	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	after.get_parent().add_child(lab)
 	after.get_parent().move_child(lab, after.get_index() + 1)
 	return lab
 
 
+func _effect_text(kind: String, level: int, max_level: int) -> String:
+	if kind == "magnet":
+		if level >= max_level:
+			return "Pull %d px" % UiHomeField.magnet_radius(max_level)
+		return "Pull %d → %d px" % [UiHomeField.magnet_radius(level), UiHomeField.magnet_radius(level + 1)]
+	if level >= max_level:
+		return "Loot ×%s" % str(UiHomeField.loot_multiplier(max_level))
+	return "Loot ×%s → ×%s" % [str(UiHomeField.loot_multiplier(level)), str(UiHomeField.loot_multiplier(level + 1))]
+
+
 func _apply_upgrade_card(
 	kind: String,
-	btn: UiClickButton,
+	btn: PopupButton,
 	title: Label,
-	level_lab: Label,
+	_level_lab: Label,
 	effect_lab: Label,
-	cost_lab: Label,
-	have_lab: Label,
+	_cost_lab: Label,
+	_have_lab: Label,
 	level: int,
 	max_level: int,
-	effect: String,
-	flower_name: String,
+	_effect: String,
+	flower_id: String,
 	have: int
 ) -> void:
 	var maxed := level >= max_level
 	var ready := not maxed and have >= GameState.UPGRADE_FLOWER_COST
-	var state := "maxed" if maxed else ("ready" if ready else "blocked")
 	var flash := _upgrade_flash_kind == kind
-	if upgrades_vbox:
-		var row_btn: Control = magnet_button if kind == "magnet" else loot_boost_button
-		var row: Control = (
-			row_btn.get_parent().get_parent() as Control
-			if row_btn and row_btn.get_parent()
-			else null
-		)
-		if row:
-			row.custom_minimum_size = Vector2(UiHomeField.UPGRADE_CARD)
-			if row is PanelContainer:
-				(row as PanelContainer).add_theme_stylebox_override("panel", UiHomeField.upgrade_card(flash))
+	var row: PanelContainer = null
+	if btn and btn.get_parent():
+		row = btn.get_parent().get_parent() as PanelContainer
+	if row:
+		row.custom_minimum_size = Vector2(UiPopups.UPGRADE_CARD)
+		var sb := UiPopups.upgrade_card(flash)
+		sb.content_margin_left = 36.0
+		sb.content_margin_right = 36.0
+		sb.content_margin_top = 24.0
+		sb.content_margin_bottom = 24.0
+		row.add_theme_stylebox_override("panel", sb)
 	if title:
 		title.text = "Magnet" if kind == "magnet" else "Loot Boost"
-		title.add_theme_font_override("font", UiStage.font(900, 52))
-		title.add_theme_font_size_override("font_size", 52)
-		title.add_theme_color_override("font_color", UiHomeField.INK)
-	_paint_segments(title, "MagnetSegments" if kind == "magnet" else "LootSegments", level)
-	if level_lab:
-		level_lab.text = UiHomeField.level_text(level)
-		level_lab.add_theme_font_override("font", UiStage.font(900, 44))
-		level_lab.add_theme_font_size_override("font_size", 44)
-		level_lab.add_theme_color_override("font_color", UiHomeField.INK)
-		level_lab.add_theme_stylebox_override("normal", UiHomeField.upgrade_level(flash))
+	_paint_segments(title, "MagnetSegments" if kind == "magnet" else "LootSegments", level, flash)
 	if effect_lab:
-		effect_lab.text = effect
-		effect_lab.add_theme_font_override("font", UiStage.font(800, 44))
-		effect_lab.add_theme_font_size_override("font_size", 44)
-		effect_lab.add_theme_color_override("font_color", UiHomeField.INK_SOFT)
-	if cost_lab:
-		if maxed:
-			cost_lab.text = "Nothing left to buy"
-		elif flash:
-			cost_lab.text = "Spent 2 × %s" % flower_name
-		else:
-			cost_lab.text = UiHomeField.cost_text(flower_name)
-		cost_lab.add_theme_font_override("font", UiStage.font(800, 44))
-		cost_lab.add_theme_font_size_override("font_size", 44)
-		cost_lab.add_theme_color_override("font_color", UiHomeField.INK)
-	# v2: cip "you have N" otpada — razlog vec pise na dugmetu ("Need N").
-	if have_lab:
-		have_lab.visible = false
-	if btn:
-		btn.label_text = UiHomeField.upgrade_button_label(state, have)
-		btn.font_size = 44
-		btn.custom_minimum_size = Vector2(UiHomeField.UPGRADE_BTN)
-		btn.disabled = not ready
-		btn.add_theme_stylebox_override("panel", UiHomeField.upgrade_button(state))
-		if btn.has_method("set_ink"):
-			btn.call("set_ink", UiHomeField.upgrade_button_ink(state))
+		effect_lab.text = _effect_text(kind, level, max_level)
+		_style_sheet_label(effect_lab, 800, 40, UiPopups.INK_SOFT)
+	if btn == null:
+		return
+	btn.custom_minimum_size = Vector2(UiPopups.UPGRADE_BTN)
+	btn.art_type = ""
+	if flash:
+		btn.configure("done", UiPopups.S_UPGRADE_DONE)
+	elif maxed:
+		btn.configure("done", UiPopups.S_UPGRADE_MAX)
+	elif ready:
+		btn.configure("primary", "×%d" % GameState.UPGRADE_FLOWER_COST)
+		btn.set_art(flower_id, 3, 81.0)
+	else:
+		btn.configure("disabled", UiPopups.S_UPGRADE_NEED % maxi(1, GameState.UPGRADE_FLOWER_COST - have))
+		btn.set_art(flower_id, 3, 81.0)
 
 
 func _on_field_magnet_pressed() -> void:
@@ -589,10 +604,7 @@ func _on_daily_chest_pressed() -> void:
 	if _chest_ui_state == ChestUiState.LOCKED:
 		return
 	if _chest_ui_state == ChestUiState.CLAIMED:
-		_show_reward_overlay(
-			"Come back tomorrow",
-			"Daily chest already opened today."
-		)
+		show_gift_tomorrow()
 		return
 	_chest_ui_state = ChestUiState.OPENING
 	var card: HomeGiftCard = gift_chest
@@ -605,11 +617,20 @@ func _on_daily_chest_pressed() -> void:
 
 
 func _finish_chest_claim() -> void:
-	var msg := GameState.claim_daily_chest()
+	var bag_before: Dictionary = GameState.seed_bag.duplicate()
+	var coins_before := int(GameState.wallet_coins)
+	GameState.claim_daily_chest()
 	_chest_ui_state = ChestUiState.CLAIMED
 	_refresh_chest_card()
 	_notify_hub_chrome()
-	_show_reward_overlay("Daily gift!", msg)
+	var seed_type := ""
+	var added := 0
+	for type_id in GameState.seed_bag:
+		var diff := int(GameState.seed_bag[type_id]) - int(bag_before.get(type_id, 0))
+		if diff > 0:
+			seed_type = str(type_id)
+			added = diff
+	show_gift_claimed(int(GameState.wallet_coins) - coins_before, seed_type, added)
 
 
 func _notify_hub_chrome() -> void:
@@ -618,23 +639,136 @@ func _notify_hub_chrome() -> void:
 	get_tree().call_group("meta_hub", "refresh_top_bar")
 
 
-func _show_reward_overlay(title: String, body: String) -> void:
+## H3 · poklon (design_handoff_popups): modal sa zlatnom pločicom „Daily gift" i nagradom kao
+## chipovima (coin + crtež sjemena). Dobio manje sjemenki → napomena „Bag almost full". Već otvoren
+## danas → poklon glif 176 + „Back in Nh" i OK. Zatvara se dugmetom ili tapom van.
+func show_gift_claimed(coins: int, seed_type: String, added: int) -> void:
+	var modal := _ensure_gift_modal()
+	modal.set_title(UiPopups.S_GIFT_TITLE, "reward")
+	_clear_gift_content()
+	var chips: Array = [RewardChip.new().setup("coin", "", coins)]
+	if not seed_type.is_empty() and added > 0:
+		chips.append(RewardChip.new().setup("seed", seed_type, added))
+	var tray := RewardTray.new().setup(880.0, chips)
+	tray.name = "RewardTray"
+	modal.content.add_child(PopupModal.centered(tray))
+	if added < GameState.DAILY_CHEST_SEEDS:
+		modal.content.add_child(_gift_note())
+	_attach_gift_button("primary", UiPopups.S_GIFT_COLLECT)
+	modal.open(true)
+	tray.reveal()
+
+
+func show_gift_tomorrow() -> void:
+	var modal := _ensure_gift_modal()
+	modal.set_title(UiPopups.S_GIFT_TITLE, "decision")
+	_clear_gift_content()
+	var closed := _GiftClosed.new()
+	closed.name = "GiftClosed"
+	closed.text = UiPopups.back_in_text()
+	modal.content.add_child(closed)
+	_attach_gift_button("secondary", UiPopups.S_OK)
+	modal.open(true)
+
+
+func is_gift_open() -> bool:
+	return reward_overlay != null and reward_overlay.visible
+
+
+func get_gift_text() -> String:
 	if reward_overlay == null:
-		return
-	if reward_title:
-		reward_title.text = title
-	if reward_body:
-		reward_body.text = body
-	reward_overlay.visible = true
+		return ""
+	var parts: PackedStringArray = [reward_overlay.title]
+	var closed := reward_overlay.content.get_node_or_null("GiftClosed")
+	if closed:
+		parts.append(str(closed.get("text")))
+	if reward_overlay.content.get_node_or_null("ModalNote"):
+		parts.append(UiPopups.S_GIFT_BAG_FULL)
+	if _gift_button:
+		parts.append(_gift_button.label)
+	return " | ".join(parts)
+
+
+func _ensure_gift_modal() -> PopupModal:
+	if reward_overlay != null:
+		return reward_overlay
+	reward_overlay = PopupModal.new()
+	reward_overlay.name = "RewardOverlay"
+	reward_overlay.z_index = 40
+	reward_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	reward_overlay.dismiss_on_scrim = true
+	add_child(reward_overlay)
+	reward_overlay.setup(UiPopups.S_GIFT_TITLE, "reward")
+	_gift_button = PopupButton.new()
+	_gift_button.name = "RewardOkButton"
+	_gift_button.clicked.connect(_on_reward_ok_pressed)
+	return reward_overlay
+
+
+## Dugme poklona se čuva između otvaranja — skine se prije nego se sadržaj obriše.
+func _clear_gift_content() -> void:
+	if _gift_button.get_parent() != null:
+		_gift_button.get_parent().remove_child(_gift_button)
+	reward_overlay.clear_content()
+
+
+func _attach_gift_button(kind: String, label: String) -> void:
+	if _gift_button.get_parent() != null:
+		_gift_button.get_parent().remove_child(_gift_button)
+	_gift_button.configure(kind, label)
+	reward_overlay.content.add_child(_gift_button)
+
+
+func _gift_note() -> Control:
+	var row := HBoxContainer.new()
+	row.name = "ModalNote"
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 14)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var disc := PanelContainer.new()
+	disc.custom_minimum_size = Vector2(64, 64)
+	disc.add_theme_stylebox_override("panel", UiPopups._box(UiPopups.PINK, 32, 3))
+	var icon := TextureRect.new()
+	icon.texture = UiPopups.icon("icon_basket")
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.custom_minimum_size = Vector2(40, 40)
+	disc.add_child(icon)
+	row.add_child(disc)
+	var lab := Label.new()
+	lab.text = UiPopups.S_GIFT_BAG_FULL
+	_style_sheet_label(lab, 900, 40, UiPopups.OUTLINE)
+	row.add_child(lab)
+	return row
 
 
 func _hide_reward_overlay() -> void:
 	if reward_overlay:
-		reward_overlay.visible = false
+		reward_overlay.close(false)
 
 
 func _on_reward_ok_pressed() -> void:
-	_hide_reward_overlay()
+	if reward_overlay:
+		reward_overlay.close(true)
+
+
+## „Sutra opet": lavanda poklon 176 (krem traka u krst) + RIM pilula „Back in Nh".
+class _GiftClosed extends Control:
+	var text: String = ""
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		custom_minimum_size = Vector2(880, 304)
+
+	func _draw() -> void:
+		var g := Rect2((size.x - 176.0) * 0.5, 12.0, 176.0, 176.0)
+		draw_style_box(UiPopups._box(UiPopups.LAVENDER, 40, 4), g)
+		draw_rect(Rect2(g.get_center().x - 16.0, g.position.y + 4.0, 32.0, 168.0), UiPopups.WARM_WHITE)
+		draw_rect(Rect2(g.position.x + 4.0, g.get_center().y - 16.0, 168.0, 32.0), UiPopups.WARM_WHITE)
+		var tw := UiPopups.text_w(900, 52, text)
+		var chip := Rect2((size.x - tw - 70.0) * 0.5, 216.0, tw + 70.0, 84.0)
+		draw_style_box(UiPopups._box(UiPopups.ACTIVE_RIM, 42, 3, UiPopups.TRAY_EDGE), chip)
+		UiPopups.draw_text_centered(self, 900, 52, text, chip, UiPopups.OUTLINE)
 
 
 func refresh_for_meta_hub() -> void:
@@ -713,9 +847,9 @@ func _on_basket_pressed() -> void:
 	if _basket_locked or not GameState.loadout_enabled():
 		if field_basket:
 			field_basket.shake()
-		if tutorial_hint and tutorial_hint_panel:
-			tutorial_hint.text = "Merge your first flower in the Arena to unlock the basket."
+		if tutorial_hint_panel:
 			tutorial_hint_panel.visible = true
+			_show_basket_hint(true)
 		return
 	_open_basket_picker()
 
@@ -728,7 +862,7 @@ func _on_picker_dim_gui_input(event: InputEvent) -> void:
 	elif event is InputEventScreenTouch:
 		tapped = (event as InputEventScreenTouch).pressed
 	if tapped:
-		_close_basket_picker()
+		_dismiss_sheet(picker_panel, _close_basket_picker)
 
 
 func _open_basket_picker() -> void:
@@ -737,8 +871,8 @@ func _open_basket_picker() -> void:
 	if basket_picker_overlay == null or picker_list == null:
 		return
 	_rebuild_picker_list()
-	basket_picker_overlay.visible = true
 	_fit_picker_panel()
+	_open_sheet(basket_picker_overlay, picker_panel, UiHomeField.SHEET_BASKET_H)
 
 
 func _close_basket_picker() -> void:
@@ -754,85 +888,23 @@ func _rebuild_picker_list() -> void:
 		child.queue_free()
 	var current := GameState.get_loadout_type()
 	if picker_clear_button:
-		picker_clear_button.disabled = current.is_empty()
+		picker_clear_button.configure("disabled" if current.is_empty() else "secondary", UiPopups.S_BASKET_CLEAR, false, UiPopups.icon("icon_basket"))
 	for type_id in SeedCatalog.types_for_season(GameState.home_season_field_id):
 		var unlocked := GameState.is_seed_type_unlocked(type_id)
-		var display_name: String = GameState.get_seed_display_name(type_id)
-		var stars := "★".repeat(GameState.get_seed_rarity(type_id))
-		var row := UiClickButton.new()
-		row.custom_minimum_size = Vector2(0, PICKER_ROW_MIN_HEIGHT)
-		row.font_size = 22
-		row.label_text = "%s %s" % [display_name, stars]
-		row.set_meta("seed_type_id", type_id)
-		row.button_variant = "primary" if unlocked and type_id == current else "subtle"
+		var tile := SeedTile.new().setup(
+			type_id, GameState.get_seed_display_name(type_id), GameState.get_seed_rarity(type_id),
+			not unlocked, unlocked and type_id == current
+		)
 		if unlocked:
-			row.clicked.connect(func() -> void: _on_basket_type_picked(type_id))
-		else:
-			row.disabled = true
-			row.modulate = LOCKED_SEED_MODULATE
-			row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		picker_list.add_child(row)
-		_layout_picker_flower_row(row, type_id)
-	_fit_picker_panel()
+			tile.clicked.connect(func() -> void: _on_basket_type_picked(type_id))
+		picker_list.add_child(tile)
 
 
 func _fit_picker_panel() -> void:
 	if picker_panel == null:
 		return
-	picker_panel.add_theme_stylebox_override("panel", UiHomeField.picker_sheet())
-	picker_panel.anchor_left = 0.0
-	picker_panel.anchor_right = 1.0
-	picker_panel.anchor_top = 1.0
-	picker_panel.anchor_bottom = 1.0
-	picker_panel.offset_left = 0.0
-	picker_panel.offset_right = 0.0
 	picker_panel.offset_top = -float(UiHomeField.SHEET_BASKET_H)
 	picker_panel.offset_bottom = 0.0
-	if picker_clear_button:
-		picker_clear_button.custom_minimum_size.y = 132.0
-		picker_clear_button.font_size = 46
-	if picker_close_button:
-		picker_close_button.custom_minimum_size.y = 132.0
-		picker_close_button.font_size = 46
-	var title := picker_panel.get_node_or_null("PickerVBox/PickerTitle") as Label
-	if title:
-		title.text = "Basket seed"
-		title.add_theme_font_override("font", UiStage.font(900, 56))
-		title.add_theme_font_size_override("font_size", 56)
-		title.add_theme_color_override("font_color", UiHomeField.INK)
-	var dim := basket_picker_overlay.get_node_or_null("Dim") as ColorRect if basket_picker_overlay else null
-	if dim:
-		dim.color = UiHomeField.SCRIM
-
-
-func _layout_picker_flower_row(row: UiClickButton, type_id: String) -> void:
-	var hbox := row.get_node_or_null("ContentRow") as Container
-	if hbox == null:
-		return
-	var label := hbox.get_node_or_null("Label") as Label
-	var legacy_icon := hbox.get_node_or_null("Icon") as Control
-	var vbox := VBoxContainer.new()
-	vbox.name = "ContentRow"
-	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vbox.add_theme_constant_override("separation", 6)
-	var plant: Control = HomeBasketPickerIcon.new()
-	plant.name = "PlantIcon"
-	plant.set("type_id", type_id)
-	row.remove_child(hbox)
-	if label:
-		hbox.remove_child(label)
-	if legacy_icon:
-		hbox.remove_child(legacy_icon)
-	vbox.add_child(plant)
-	if label:
-		vbox.add_child(label)
-	if legacy_icon:
-		vbox.add_child(legacy_icon)
-	row.add_child(vbox)
-	hbox.queue_free()
 
 
 func _on_basket_clear_picked() -> void:
@@ -917,7 +989,7 @@ func _open_upgrades_sheet() -> void:
 		return
 	_fit_upgrades_panel()
 	_refresh_field_upgrades()
-	upgrades_overlay.visible = true
+	_open_sheet(upgrades_overlay, upgrades_panel, UiHomeField.SHEET_UPGRADES_H)
 
 
 func _close_upgrades_sheet() -> void:
@@ -933,29 +1005,70 @@ func _on_upgrades_dim_gui_input(event: InputEvent) -> void:
 	elif event is InputEventScreenTouch:
 		tapped = (event as InputEventScreenTouch).pressed
 	if tapped:
-		_close_upgrades_sheet()
+		_dismiss_sheet(upgrades_panel, _close_upgrades_sheet)
 
 
 func _fit_upgrades_panel() -> void:
 	if upgrades_panel == null:
 		return
-	upgrades_panel.add_theme_stylebox_override(
-		"panel", UiStage.pad(UiHomeField.picker_sheet(), 24, 20, 24, 28)
-	)
 	upgrades_panel.offset_top = -float(UiHomeField.SHEET_UPGRADES_H)
-	if upgrades_title:
-		upgrades_title.add_theme_font_override("font", UiStage.font(900, 56))
-		upgrades_title.add_theme_color_override("font_color", UiHomeField.INK)
-	if upgrades_sub:
-		upgrades_sub.add_theme_font_override("font", UiStage.font(800, 40))
-		upgrades_sub.add_theme_color_override("font_color", UiHomeField.INK_SOFT)
-	if upgrades_close_button:
-		upgrades_close_button.custom_minimum_size.y = 132.0
-		upgrades_close_button.font_size = 44
-		upgrades_close_button.add_theme_stylebox_override("panel", UiHomeField.seasons_button())
-	var dim := upgrades_overlay.get_node_or_null("Dim") as ColorRect if upgrades_overlay else null
+	upgrades_panel.offset_bottom = 0.0
+
+
+## Sheet sistema: ulaz y +h → 0 (320 ms cubic-out) + scrim fade; izlaz od trenutne pozicije
+## nadolje (280 ms cubic-in). `_close_*` zatvara odmah (prelazi, kod); dodir ide kroz `_dismiss_sheet`.
+func _open_sheet(overlay: Control, panel: Control, h: int) -> void:
+	overlay.visible = true
+	var dim := overlay.get_node_or_null("Dim") as CanvasItem
+	if not is_inside_tree():
+		return
+	panel.position.y = overlay.size.y - float(h)
+	UiPopups.tween_sheet_in(panel, h)
 	if dim:
-		dim.color = UiHomeField.SCRIM
+		dim.modulate.a = 0.0
+		create_tween().tween_property(dim, "modulate:a", 1.0, UiPopups.ANIM.modal_in)
+
+
+func _dismiss_sheet(panel: Control, close_fn: Callable) -> void:
+	var overlay := panel.get_parent() as Control
+	if overlay == null or not overlay.visible or not is_inside_tree():
+		close_fn.call()
+		return
+	var dim := overlay.get_node_or_null("Dim") as CanvasItem
+	var t := create_tween().set_parallel()
+	t.tween_property(panel, "position:y", overlay.size.y, UiPopups.ANIM.sheet_out).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	if dim:
+		t.tween_property(dim, "modulate:a", 0.0, UiPopups.ANIM.sheet_out)
+	t.chain().tween_callback(func() -> void:
+		close_fn.call()
+		panel.position.y = overlay.size.y - panel.size.y
+		if dim:
+			dim.modulate.a = 1.0
+	)
+
+
+## Povlačenje sheeta nadolje > 160 px zatvara; manje vraća na mjesto.
+func _on_sheet_drag(event: InputEvent, panel: Control, close_fn: Callable) -> void:
+	var overlay := panel.get_parent() as Control
+	if overlay == null:
+		return
+	var rest := overlay.size.y - panel.size.y
+	if event is InputEventMouseButton or event is InputEventScreenTouch:
+		var pressed: bool = event.pressed
+		if (event is InputEventMouseButton) and (event as InputEventMouseButton).button_index != MOUSE_BUTTON_LEFT:
+			return
+		if pressed:
+			_sheet_drag = {"panel": panel, "y0": event.position.y + panel.position.y, "start": panel.position.y}
+		elif _sheet_drag.get("panel") == panel:
+			var moved := panel.position.y - rest
+			_sheet_drag = {}
+			if moved > UiPopups.DRAG_CLOSE_PX:
+				_dismiss_sheet(panel, close_fn)
+			elif moved > 0.5:
+				create_tween().tween_property(panel, "position:y", rest, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	elif (event is InputEventMouseMotion or event is InputEventScreenDrag) and _sheet_drag.get("panel") == panel:
+		var y_abs: float = event.position.y + panel.position.y
+		panel.position.y = maxf(rest, float(_sheet_drag.start) + y_abs - float(_sheet_drag.y0))
 
 
 func _on_basket_type_picked(type_id: String) -> void:
@@ -1034,7 +1147,9 @@ func _on_wardrobe_closed(changed: Array) -> void:
 			meadow.call("play_apply_moment")
 	var text := UiWardrobe.toast_text(changed, slots, wardrobe_sheet.pending)
 	if not text.is_empty() and _apply_toast != null:
-		_apply_toast.show_text(text)
+		var slot_id := str(changed[0]) if changed.size() == 1 else "pip_skin"
+		var icon_path := str((slots.get(slot_id, {}) as Dictionary).get("icon", ""))
+		_apply_toast.show_text(text, UiWardrobe.icon(icon_path) if not icon_path.is_empty() else null)
 
 
 ## ShopLink: zatvori (= snimi) i otvori Shop · Looks na istom slotu.
@@ -1059,29 +1174,29 @@ func _on_wardrobe_shop(slot_id: String) -> void:
 ## ApplyToast: centar x 540, y 1110, h 100 · 44/900 krem na TOAST_BG · 2,6 s.
 class ApplyToast extends Control:
 	var text: String = ""
+	var icon: Texture2D = null
 	var _tween: Tween
 
 	func _init() -> void:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		visible = false
 
-	func show_text(t: String) -> void:
+	## H7 · toast sistema (design_handoff_popups): pilula s ikonom slota na kremastom disku.
+	func show_text(t: String, p_icon: Texture2D = null) -> void:
 		text = t
-		var w := UiHomeV3.text_w(900, 44, text) + 80.0
-		size = Vector2(ceilf(w), UiWardrobe.TOAST_H)
+		icon = p_icon
+		size = Vector2(PopupToast.pill_width(text, icon != null), UiPopups.TOAST_H)
 		position = Vector2(540.0 - size.x * 0.5, float(UiWardrobe.TOAST_Y))
 		visible = true
 		modulate.a = 0.0
 		if _tween != null and _tween.is_valid():
 			_tween.kill()
+		UiPopups.tween_toast_in(self)
 		_tween = create_tween()
-		_tween.tween_property(self, "modulate:a", 1.0, UiWardrobe.T_TOAST_IN)
-		_tween.tween_interval(UiWardrobe.T_TOAST_HOLD)
-		_tween.tween_property(self, "modulate:a", 0.0, UiWardrobe.T_TOAST_IN)
+		_tween.tween_interval(UiPopups.ANIM.toast_in + UiWardrobe.T_TOAST_HOLD)
+		_tween.tween_property(self, "modulate:a", 0.0, UiPopups.ANIM.toast_out)
 		_tween.tween_callback(func() -> void: visible = false)
 		queue_redraw()
 
 	func _draw() -> void:
-		draw_style_box(UiWardrobe.toast(), Rect2(Vector2.ZERO, size))
-		var tw := UiHomeV3.text_w(900, 44, text)
-		UiHomeV3.draw_text(self, 900, 44, text, Vector2((size.x - tw) * 0.5, (size.y - 44.0) * 0.5), UiWardrobe.STICKER)
+		PopupToast.draw_pill(self, Rect2(Vector2.ZERO, size), text, icon)

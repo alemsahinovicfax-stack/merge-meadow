@@ -1,0 +1,42 @@
+PopupHost (CanvasLayer 10, autoload popup_host.gd)
+├─ PopupScrim (ColorRect, SCRIM; hub: PAGE_RECT, run: full) mouse_filter STOP (sheets/gift: tap = close; R3/R5/A3: tap ignored)
+├─ ModalSlot (Control)                       ← samo jedan modal/sheet; novi zatvara stari (out → in)
+│  └─ PopupModal (PanelContainer, modal_panel) w 984 centriran
+│     ├─ ModalPlate (PanelContainer, modal_plate(tone)) + Label 56/900 — pola iznad gornjeg ruba
+│     └─ VBox (gap 36)
+│        ├─ ModalLine (HBox: TextureRect 56 + Label 44/900)            [A3]
+│        ├─ RewardTray (PanelContainer, reward_tray) → HFlowContainer centar, gap 20/16
+│        │  ├─ HalfStamp (PanelContainer, half_stamp: icon_half 44 + Label 38)   [R3, R5 pao]
+│        │  └─ RewardChip × N (PanelContainer h 132: ArtDisc 92 · WasLabel 40 · CountLabel 56 · DoubleTag)
+│        ├─ ModalNote (HBox: disc 64 + Label 40)                       [H3 near_full]
+│        ├─ GiftClosed (glyph 176 + chip "Back in Nh")                 [H3 tomorrow]
+│        ├─ NeedSeedTiles (HFlowContainer centar, gap 24) → NeedSeedTile 264×244 (Art 136 + 4 × NeedDot)   [A3]
+│        └─ ModalButtons (HFlowContainer gap 24) → AdButton 120 (red 1) · PopupButton 132 (red 2)
+├─ FinishBanner (VBox centar, y 640): ModalPlate 180 + chip "Nothing lost"   [R4]
+├─ SheetSlot
+│  └─ PopupSheet (PanelContainer, sheet_panel) h 922 | 1326, dno stranice
+│     ├─ SheetHandle (Panel 120×12) — drag > 160 = close
+│     ├─ SheetTitle (Label 56/900)
+│     ├─ Content (BasketSheet: GridContainer 3 × SeedTile 328×410 | UpgradesSheet: VBox 2 × UpgradeCard | WardrobeSheet: postojeći)
+│     └─ SheetFooter (HBox: PopupButton secondary Clear 380 + Close | Close)
+├─ CoachLayer (Control, mouse_filter IGNORE)
+│  └─ CoachBubble (PanelContainer, coach_bubble) + CoachTail (2 × Polygon2D) + VBox redova (disc 72 + Label 44)
+├─ ToastQueue (VBox, mouse_filter IGNORE) — max 2, korak 116; lane y 1253 | 1393 | 167 | 1600
+│  └─ Toast (PanelContainer, toast) h 100: disc 60 + Label 44/900 krem
+└─ PopLayer (Control, mouse_filter IGNORE)
+   └─ FloatPop (HBox: coin/sjeme + Label 64 outline 10) → tween do brojača
+
+Stablo dugmeta
+PopupButton (Button, flat; StyleBox iz UiPopups.button(kind)) h 132 | AdButton h 120
+└─ HBox centar gap 16: [AdBadge icon_video 64×48] [Icon 56] [Check] Label 48 (44 ad) [Dots 3 × 14 — jedini loop]
+
+RED PRENOSA
+1. ui_popups.gd + popup_host.gd (scrim, slotovi, red toastova, Android back). Ikone icon_video.svg, icon_half.svg → game/assets/ui/chrome/.
+2. PopupButton / AdButton / RewardChip kao scene (res://scenes/ui/popup/*.tscn).
+3. R5 loot_screen (najveća razlika; dugmad 72 → 132/120) + R3 pauza + R4 banner.
+4. A3 NeedSeedsModal (HFlowContainer — ujedno popravka buga jednog reda) + A1/A2 oblačići.
+5. H3 poklon, H4 korpa, H5 nadogradnje; H6 samo tokeni (rub 4, handle 12, Close secondary).
+6. Toastovi H7, H8, X1, S1 → ToastQueue; X3 NavLockPill stil.
+7. Leteće poruke X2, A4, C1, R2 → FloatPop.
+8. H1, H2, R1 oblačići; H1 prsten (jedini loop na Homeu).
+9. popups_capture.gd ponovo snimi 21 sliku → poređenje s design/ref/before/.

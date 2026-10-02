@@ -705,12 +705,17 @@ class EmptyState extends Control:
 		UiHomeV3.draw_dashed_round_rect(self, Rect2(Vector2.ZERO, size), float(UiWardrobe.CARD_RADIUS), 3.0, UiWardrobe.DASH_EDGE)
 
 
-## Close 1032 x 132 — zatvori i primijeni (nema Save).
+## Close 1032 x 132 — zatvori i primijeni (nema Save). Popups v2: PopupButton secondary (bijelo,
+## rub 4, radius 36, sjena 8; pritisak y +6).
 class CloseButton extends WardrobePressable:
 	func _ready() -> void:
 		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
 	func _draw() -> void:
-		draw_style_box(UiWardrobe.close_button(is_pressed()), Rect2(Vector2.ZERO, size))
-		var w := UiHomeV3.text_w(900, 46, UiWardrobe.CLOSE_TEXT)
-		UiHomeV3.draw_text(self, 900, 46, UiWardrobe.CLOSE_TEXT, Vector2((size.x - w) * 0.5, (size.y - 46.0) * 0.5), UiWardrobe.INK)
+		var press := is_pressed()
+		var sb := UiPopups.button("secondary")
+		if press:
+			sb = UiPopups.button_pressed(sb)
+		var r := Rect2(0.0, 6.0 if press else 0.0, size.x, size.y)
+		draw_style_box(sb, r)
+		UiPopups.draw_text_centered(self, 900, UiPopups.BUTTON_TEXT, UiWardrobe.CLOSE_TEXT, r, UiPopups.OUTLINE)

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="RunScreen" data-screen-label="{{ label }}" style="{{ rootStyle }}">
+
+  <div data-layer="LaneField" style="{{ fieldStyle }}">
+    <sc-for list="{{ blobs }}" as="b" hint-placeholder-count="5">
+      <div style="{{ b.style }}"></div>
+    </sc-for>
+    <div style="{{ laneA }}"></div>
+    <div style="{{ laneB }}"></div>
+    <div style="{{ laneC }}"></div>
+    <div style="{{ mowStyle }}"></div>
+    <div style="{{ seam1 }}"></div>
+    <div style="{{ seam2 }}"></div>
+    <sc-for list="{{ tufts }}" as="t" hint-placeholder-count="10">
+      <div style="{{ t.style }}"></div>
+    </sc-for>
+    <sc-for list="{{ petals }}" as="p" hint-placeholder-count="6">
+      <div style="{{ p.style }}"></div>
+    </sc-for>
+  </div>
+
+  <sc-for list="{{ coinEnts }}" as="c" hint-placeholder-count="4">
+    <div data-layer="CoinPickup" style="{{ c.pos }}">
+      <div style="position:absolute;left:16px;top:88px;width:64px;height:18px;border-radius:50%;background:rgba(18,28,22,.3)"></div>
+      <div style="position:absolute;left:0;top:0;width:96px;height:96px;border-radius:50%;background:#FFD56B;border:5px solid #D6A82F;box-sizing:border-box"></div>
+      <div style="position:absolute;left:15px;top:15px;width:66px;height:66px;border-radius:50%;border:6px solid #FFE8B8;box-sizing:border-box"></div>
+      <div style="position:absolute;left:24px;top:20px;width:34px;height:16px;border-radius:50%;background:#FFF3D0;transform:rotate(-24deg)"></div>
+    </div>
+  </sc-for>
+
+  <sc-for list="{{ seedEnts }}" as="s" hint-placeholder-count="2">
+    <div data-layer="SeedPickup" style="{{ s.pos }}">
+      <div style="position:absolute;left:28px;top:112px;width:64px;height:18px;border-radius:50%;background:rgba(18,28,22,.3)"></div>
+      <div style="position:absolute;left:0;top:0;width:120px;height:120px;border-radius:50%;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box"></div>
+      <sc-if value="{{ s.star2 }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:60px;top:60px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#D4A5FF;transform:rotate(-104deg) translateX(51px)"></div>
+        <div style="position:absolute;left:60px;top:60px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#D4A5FF;transform:rotate(-76deg) translateX(51px)"></div>
+      </sc-if>
+      <sc-if value="{{ s.star3 }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:60px;top:60px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#D6A82F;transform:rotate(-118deg) translateX(51px)"></div>
+        <div style="position:absolute;left:60px;top:60px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#D6A82F;transform:rotate(-90deg) translateX(51px)"></div>
+        <div style="position:absolute;left:60px;top:60px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#D6A82F;transform:rotate(-62deg) translateX(51px)"></div>
+      </sc-if>
+      <div style="position:absolute;left:18px;top:18px;width:84px;height:84px;border-radius:50%;background:#22342A;border:2px solid #16211B;box-sizing:border-box"></div>
+      <img src="{{ s.flower }}" alt="" style="position:absolute;left:22px;top:22px;width:76px;height:76px" />
+    </div>
+  </sc-for>
+
+  <sc-for list="{{ diamondEnts }}" as="d" hint-placeholder-count="0">
+    <div data-layer="DiamondPickup" style="{{ d.pos }}">
+      <div style="position:absolute;left:14px;top:84px;width:60px;height:16px;border-radius:50%;background:rgba(18,28,22,.3)"></div>
+      <div style="position:absolute;left:-6px;top:-6px;width:100px;height:100px;border-radius:50%;background:rgba(255,248,240,.2)"></div>
+      <div style="position:absolute;left:0;top:0;width:88px;height:88px;background:#2E7F8C;clip-path:polygon(50% 0%,100% 38%,50% 100%,0% 38%)"></div>
+      <div style="position:absolute;left:7px;top:8px;width:74px;height:72px;background:#7FDCE8;clip-path:polygon(50% 0%,100% 38%,50% 100%,0% 38%)"></div>
+      <div style="position:absolute;left:19px;top:16px;width:50px;height:18px;background:#C8F3F8;clip-path:polygon(50% 0%,100% 100%,0% 100%)"></div>
+    </div>
+  </sc-for>
+
+  <sc-for list="{{ obstacleEnts }}" as="o" hint-placeholder-count="1">
+    <div data-layer="Obstacle" style="{{ o.pos }}">
+      <div style="position:absolute;left:10px;top:158px;width:240px;height:52px;border-radius:50%;background:#C7BE9A;border:3px solid #A79C78;box-sizing:border-box"></div>
+      <div style="position:absolute;left:46px;top:150px;width:168px;height:40px;border-radius:50%;background:rgba(18,28,22,.26)"></div>
+      <sc-if value="{{ o.isStone }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;left:42px;top:34px;width:176px;height:150px;background:#A9AFA6;border:5px solid #878C85;box-sizing:border-box;border-radius:50% 50% 44% 44% / 58% 58% 42% 42%"></div>
+        <div style="position:absolute;left:74px;top:58px;width:64px;height:28px;border-radius:50%;background:#C4C9C0"></div>
+        <div style="position:absolute;left:150px;top:104px;width:34px;height:20px;border-radius:50%;background:#8E948B"></div>
+      </sc-if>
+      <sc-if value="{{ o.isStump }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:55px;top:66px;width:150px;height:118px;background:#9E7A52;border:5px solid #735738;box-sizing:border-box;border-radius:16px 16px 24px 24px"></div>
+        <div style="position:absolute;left:55px;top:34px;width:150px;height:60px;border-radius:50%;background:#B89466;border:5px solid #735738;box-sizing:border-box"></div>
+        <div style="position:absolute;left:92px;top:50px;width:76px;height:28px;border-radius:50%;border:4px solid #8A6A46;box-sizing:border-box"></div>
+        <div style="position:absolute;left:118px;top:60px;width:24px;height:10px;border-radius:50%;background:#8A6A46"></div>
+      </sc-if>
+      <sc-if value="{{ o.isHay }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:42px;top:50px;width:176px;height:134px;background:#D9C98A;border:5px solid #AEA06A;box-sizing:border-box;border-radius:34px"></div>
+        <div style="position:absolute;left:58px;top:88px;width:144px;height:5px;background:#AEA06A"></div>
+        <div style="position:absolute;left:58px;top:120px;width:144px;height:5px;background:#AEA06A"></div>
+        <div style="position:absolute;left:58px;top:152px;width:144px;height:5px;background:#AEA06A"></div>
+        <div style="position:absolute;left:96px;top:66px;width:68px;height:24px;border-radius:50%;background:#EBDCA6"></div>
+      </sc-if>
+    </div>
+  </sc-for>
+
+  <div data-layer="PlayerRunner" style="{{ playerWrap }}">
+    <div data-layer="MagnetRing" style="{{ magnetStyle }}"></div>
+    <div style="{{ playerShadow }}"></div>
+    <div style="{{ dustL }}"></div>
+    <div style="{{ dustR }}"></div>
+    <div data-layer="PipVisual" style="{{ pipStyle }}">
+      <div style="font:900 42px/1 Nunito,sans-serif;color:inherit">PIP</div>
+      <div style="font:700 24px/1.2 Nunito,sans-serif;color:inherit;opacity:.78;text-align:center">art<br>postoji</div>
+    </div>
+  </div>
+
+  <sc-for list="{{ spills }}" as="s" hint-placeholder-count="0">
+    <div style="{{ s.style }}"></div>
+  </sc-for>
+
+  <div data-layer="RunHud" style="{{ hudWrap }}">
+    <div style="{{ bandStyle }}"></div>
+
+    <div data-layer="TimerChip" style="{{ timerWrap }}">
+      <div style="{{ ringOuter }}">
+        <div style="{{ ringInner }}"></div>
+      </div>
+      <div style="{{ timerTextWrap }}">
+        <sc-if value="{{ hasMode }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ modeStyle }}">{{ modeText }}</div>
+        </sc-if>
+        <div style="{{ secondsStyle }}">{{ secondsText }}</div>
+      </div>
+    </div>
+
+    <div data-layer="PauseButton" style="{{ pauseStyle }}">
+      <img src="icons/icon_pause.svg" alt="Pause" style="{{ pauseIcon }}" />
+    </div>
+
+    <div data-layer="CompanionChip" style="{{ companionStyle }}">
+      <div style="{{ portraitStyle }}">PIP</div>
+      <div style="{{ companionName }}">{{ companion }}</div>
+    </div>
+
+    <sc-if value="{{ showBasket }}" hint-placeholder-val="{{ true }}">
+      <div data-layer="BasketBadge" style="{{ basketStyle }}">
+        <img src="icons/icon_basket.svg" alt="" style="width:48px;height:48px;flex:0 0 auto" />
+        <div style="font:800 40px/1 Nunito,sans-serif;color:#2D3436">{{ basketType }}</div>
+      </div>
+    </sc-if>
+
+    <div data-layer="PickupBar" style="{{ barStyle }}">
+      <div style="{{ coinChip }}">
+        <img src="icons/icon_coin.svg" alt="" style="{{ coinIcon }}" />
+        <div style="{{ numStyle }}">{{ coinText }}</div>
+      </div>
+      <div style="{{ seedChip }}">
+        <img src="icons/icon_seed.svg" alt="" style="{{ seedIcon }}" />
+        <div style="{{ numStyle }}">{{ seedText }}</div>
+      </div>
+      <sc-if value="{{ showDiamond }}" hint-placeholder-val="{{ false }}">
+        <div style="{{ diamondChip }}">
+          <img src="icons/icon_diamond.svg" alt="" style="width:48px;height:48px;flex:0 0 auto" />
+          <div style="font:900 56px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">{{ diamondText }}</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div data-layer="PickupFeed" style="{{ feedWrap }}">
+      <div style="{{ feedPath }}"></div>
+      <sc-for list="{{ feedChips }}" as="f" hint-placeholder-count="0">
+        <div style="{{ f.style }}">
+          <img src="{{ f.icon }}" alt="" style="{{ f.iconStyle }}" />
+          <div style="{{ f.textStyle }}">+1</div>
+        </div>
+      </sc-for>
+      <sc-if value="{{ showToast }}" hint-placeholder-val="{{ false }}">
+        <div style="{{ toastStyle }}">{{ toastText }}</div>
+      </sc-if>
+    </div>
+  </div>
+
+  <sc-if value="{{ showCue }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="TutorialBanner" style="{{ cueWrap }}">
+      <div style="{{ cueBubble }}">{{ cueText }}</div>
+      <div style="{{ cueTail }}"></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isFail }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="FailFlash" style="position:absolute;inset:0;z-index:8;pointer-events:none">
+      <div style="position:absolute;inset:0;background:rgba(232,139,139,.26)"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 78%,rgba(30,22,22,0) 42%,rgba(30,22,22,.5) 100%)"></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isFinish }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="FinishFlash" style="position:absolute;inset:0;z-index:8;pointer-events:none">
+      <div style="position:absolute;left:540px;top:138px;width:560px;height:560px;margin:-280px 0 0 -280px;border-radius:50%;border:14px solid rgba(168,230,207,.45);box-sizing:border-box"></div>
+      <div style="position:absolute;left:150px;top:760px;width:780px;height:180px;border-radius:26px;background:rgba(22,33,27,.78);display:grid;place-items:center">
+        <div style="font:900 96px/1 Nunito,sans-serif;color:#FFF8F0">Time!</div>
+      </div>
+      <div style="position:absolute;left:150px;top:960px;width:780px;height:70px;display:grid;place-items:center;font:700 40px/1 Nunito,sans-serif;color:#FFF8F0">Full basket — nothing lost</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isPause }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="PauseOverlay" style="position:absolute;inset:0;z-index:9;background:rgba(22,33,27,.82);display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <div style="width:900px;padding:52px 48px 44px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:3px solid rgba(45,52,54,.14);box-shadow:0 14px 0 rgba(15,20,18,.45);display:flex;flex-direction:column;gap:28px">
+        <div style="font:900 72px/1 Nunito,sans-serif;color:#2D3436;text-align:center">Paused</div>
+        <div style="font:700 40px/1.3 Nunito,sans-serif;color:#4A4A4A;text-align:center">42s left · 12 coins · 5 seeds</div>
+        <div style="height:140px;border-radius:26px;background:#FFB88C;border:3px solid #E8A374;box-sizing:border-box;display:grid;place-items:center;font:900 52px/1 Nunito,sans-serif;color:#2D3436">Keep running</div>
+        <div style="height:140px;border-radius:26px;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box;display:grid;place-items:center;font:900 48px/1 Nunito,sans-serif;color:#4A4A4A">Quit to Camp</div>
+        <div style="font:700 34px/1.3 Nunito,sans-serif;color:#4A4A4A;text-align:center;text-wrap:pretty">Quitting keeps half of what you carry. No revive is used.</div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;dir&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;A&quot;,&quot;B&quot;],&quot;default&quot;:&quot;A&quot;,&quot;tsType&quot;:&quot;'A'|'B'&quot;,&quot;section&quot;:&quot;Smjer&quot;},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;mid&quot;,&quot;start&quot;,&quot;tutorial&quot;,&quot;fail&quot;,&quot;finish&quot;,&quot;pause&quot;],&quot;default&quot;:&quot;mid&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Scena&quot;},&quot;magnet&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:null,&quot;min&quot;:0,&quot;max&quot;:4,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;timer&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;normal&quot;,&quot;level&quot;,&quot;endless&quot;],&quot;default&quot;:&quot;normal&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;seconds&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:null,&quot;min&quot;:0,&quot;max&quot;:60,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;coins&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:0,&quot;max&quot;:999,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;seedCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:5,&quot;min&quot;:0,&quot;max&quot;:99,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;diamonds&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:99,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;basket&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Stanje&quot;},&quot;companion&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Pip&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Tekst&quot;},&quot;basketType&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Clover&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Tekst&quot;},&quot;cue&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:null,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Tekst&quot;}}">
+const LANE = [270, 540, 810];
+const LANE_W = 200;
+const PLAYER_Y = 1574;
+
+const PAL = {
+  A: { ground: '#26382C', lane: '#3A5C41', laneEdge: 'rgba(255,248,240,.20)', seam: 'rgba(255,248,240,.16)',
+       mow: 'rgba(255,248,240,.055)', blob: 'rgba(255,248,240,.05)', tuft: '#436B4A', petal: '#7FB98B',
+       chipBg: '#FFF8F0', chipBd: '3px solid #CBC2B6', ink: '#2D3436', sub: '#4A4A4A',
+       chipSh: '0 6px 0 rgba(18,28,22,.42)', track: 'rgba(45,52,54,.16)',
+       pipBg: 'rgba(255,248,240,.14)', pipBd: 'rgba(255,248,240,.6)', pipInk: '#FFF8F0',
+       dust: 'rgba(255,248,240,.24)', band: false, basketTop: 364 },
+  B: { ground: '#A9D4E8', lane: '#BFE3BC', laneEdge: 'rgba(255,255,255,.75)', seam: 'rgba(255,255,255,.6)',
+       mow: 'rgba(45,52,54,.045)', blob: 'rgba(255,255,255,.3)', tuft: '#8FC79A', petal: '#FFB88C',
+       chipBg: 'rgba(255,248,240,.12)', chipBd: '3px solid rgba(255,248,240,.45)', ink: '#FFF8F0', sub: 'rgba(255,248,240,.82)',
+       chipSh: 'none', track: 'rgba(255,248,240,.24)',
+       pipBg: 'rgba(45,52,54,.12)', pipBd: 'rgba(45,52,54,.5)', pipInk: '#2D3436',
+       dust: 'rgba(45,52,54,.14)', band: true, basketTop: 400 }
+};
+
+const SCENES = {
+  mid:      { seconds: 42, magnet: 2, basket: true,  feed: true,  ents: 'mid',   cue: '' },
+  start:    { seconds: 60, magnet: 0, basket: false, feed: false, ents: 'start', cue: '' },
+  tutorial: { seconds: 45, magnet: 0, basket: false, feed: false, ents: 'tut',   cue: 'Swipe to change lanes' },
+  fail:     { seconds: 31, magnet: 2, basket: true,  feed: false, ents: 'fail',  cue: '' },
+  finish:   { seconds: 0,  magnet: 2, basket: true,  feed: false, ents: 'mid',   cue: '' },
+  pause:    { seconds: 42, magnet: 2, basket: true,  feed: false, ents: 'mid',   cue: '' }
+};
+
+const ENTS = {
+  mid:   { coins: [[0, 540], [0, 700], [2, 620], [2, 980]],
+           seeds: [[1, 560, 'clover', 1], [0, 1210, 'sunflower', 3]],
+           obst:  [[1, 1010, 'stump']], diam: [] },
+  start: { coins: [[1, 286], [0, 140]], seeds: [], obst: [], diam: [] },
+  tut:   { coins: [[2, 330]], seeds: [[1, 700, 'clover', 1]], obst: [], diam: [] },
+  fail:  { coins: [[0, 520], [2, 640]], seeds: [[0, 1150, 'sunflower', 3]],
+           obst:  [[1, 1516, 'stump']], diam: [] }
+};
+
+class Component extends DCLogic {
+  rng(seed) {
+    let a = seed | 0;
+    return () => {
+      a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  renderVals() {
+    const p = this.props;
+    const sceneId = p.scene ?? 'mid';
+    const sc = SCENES[sceneId] ?? SCENES.mid;
+    const dir = (p.dir ?? 'A').toUpperCase() === 'B' ? 'B' : 'A';
+    const C = PAL[dir];
+    const pick = (k) => p[k] ?? sc[k];
+
+    const seconds = pick('seconds');
+    const magnet = pick('magnet');
+    const timerMode = p.timer ?? 'normal';
+    const set = ENTS[sc.ents] ?? ENTS.mid;
+    const shake = sceneId === 'fail' ? 14 : 0;
+
+    // --- ground -------------------------------------------------------
+    const rootStyle = 'width:1080px;height:1920px;flex:0 0 auto;position:relative;overflow:hidden;' +
+      'font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:' + C.ground;
+    const fieldStyle = 'position:absolute;inset:0;overflow:hidden;transform:translate(' +
+      shake + 'px,' + (shake ? -6 : 0) + 'px)';
+
+    const laneStyle = (cx) => 'position:absolute;left:' + (cx - LANE_W / 2) + 'px;top:-40px;width:' +
+      LANE_W + 'px;height:2000px;box-sizing:border-box;background:' + C.lane +
+      ';border-left:4px solid ' + C.laneEdge + ';border-right:4px solid ' + C.laneEdge +
+      ';background-image:repeating-linear-gradient(180deg,' + C.mow + ' 0 58px,rgba(0,0,0,0) 58px 124px)';
+    const laneA = laneStyle(LANE[0]);
+    const laneB = laneStyle(LANE[1]);
+    const laneC = laneStyle(LANE[2]);
+    const mowStyle = 'display:none';
+    const seamStyle = (cx) => 'position:absolute;left:' + (cx - 3) + 'px;top:0;width:6px;height:1920px;' +
+      'background:repeating-linear-gradient(180deg,' + C.seam + ' 0 46px,rgba(0,0,0,0) 46px 108px)';
+    const seam1 = seamStyle((LANE[0] + LANE[1]) / 2);
+    const seam2 = seamStyle((LANE[1] + LANE[2]) / 2);
+
+    const rb = this.rng(4471);
+    const blobs = [];
+    for (let i = 0; i < 6; i++) {
+      const w = 260 + rb() * 300, x = -60 + rb() * 1000, y = rb() * 1800;
+      blobs.push({ style: 'position:absolute;left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) +
+        'px;width:' + w.toFixed(0) + 'px;height:' + (w * 0.42).toFixed(0) + 'px;border-radius:50%;background:' + C.blob });
+    }
+    const tufts = [];
+    for (let i = 0; i < 16; i++) {
+      const side = i % 2 === 0;
+      const x = side ? 10 + rb() * 116 : 946 + rb() * 116;
+      const y = rb() * 1860, h = 34 + rb() * 34;
+      tufts.push({ style: 'position:absolute;left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) +
+        'px;width:' + (h * 0.55).toFixed(0) + 'px;height:' + h.toFixed(0) + 'px;background:' + C.tuft +
+        ';clip-path:polygon(50% 0%,100% 100%,0% 100%)' });
+    }
+    const petals = [];
+    for (let i = 0; i < 9; i++) {
+      const x = 16 + rb() * 1040, y = rb() * 1880, d = 18 + rb() * 12;
+      const inTrack = x > 130 && x < 950;
+      petals.push({ style: 'position:absolute;left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) +
+        'px;width:' + d.toFixed(0) + 'px;height:' + d.toFixed(0) + 'px;border-radius:50%;background:' +
+        C.petal + ';opacity:' + (inTrack ? '.38' : '.8') });
+    }
+
+    // --- entities -----------------------------------------------------
+    const box = (cx, cy, w, h) => 'position:absolute;left:' + (cx - w / 2) + 'px;top:' + (cy - h / 2) +
+      'px;width:' + w + 'px;height:' + h + 'px;z-index:2;transform:translate(' + shake + 'px,' + (shake ? -6 : 0) + 'px)';
+
+    const coinEnts = set.coins.map(([l, y]) => ({ pos: box(LANE[l], y, 96, 96) }));
+    const seedEnts = set.seeds.map(([l, y, flower, star]) => ({
+      pos: box(LANE[l], y, 120, 120),
+      flower: 'flowers/ph_' + flower + '.svg',
+      star2: star === 2, star3: star === 3
+    }));
+    const diamondEnts = set.diam.map(([l, y]) => ({ pos: box(LANE[l], y, 88, 88) }));
+    const obstacleEnts = set.obst.map(([l, y, kind]) => ({
+      pos: box(LANE[l], y, 260, 230),
+      isStone: kind === 'stone', isStump: kind === 'stump', isHay: kind === 'hay'
+    }));
+
+    // --- player -------------------------------------------------------
+    const playerWrap = 'position:absolute;left:' + LANE[1] + 'px;top:' + PLAYER_Y +
+      'px;width:0;height:0;z-index:3;transform:translate(' + shake + 'px,' + (shake ? -6 : 0) + 'px)';
+    const mr = 40 + magnet * 48;
+    const magnetStyle = magnet > 0
+      ? 'position:absolute;left:0;top:0;width:' + (mr * 2) + 'px;height:' + (mr * 2) +
+        'px;transform:translate(-50%,-50%);border-radius:50%;box-sizing:border-box;border:7px dashed rgba(255,248,240,.42);background:rgba(255,248,240,.07)'
+      : 'position:absolute;left:0;top:0;width:80px;height:80px;transform:translate(-50%,-50%);border-radius:50%;box-sizing:border-box;border:4px solid rgba(255,248,240,.2)';
+    const playerShadow = 'position:absolute;left:0;top:78px;width:140px;height:34px;transform:translate(-50%,-50%);border-radius:50%;background:rgba(18,28,22,.34)';
+    const pipRot = sceneId === 'fail' ? -13 : 0;
+    const pipStyle = 'position:absolute;left:0;top:0;width:150px;height:150px;transform:translate(-50%,-50%) rotate(' +
+      pipRot + 'deg);border-radius:34px;background:' + C.pipBg + ';border:4px dashed ' + C.pipBd +
+      ';box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:' + C.pipInk;
+    const dust = (dx) => 'position:absolute;left:' + dx + 'px;top:52px;width:' + (dx < 0 ? 54 : 44) +
+      'px;height:' + (dx < 0 ? 30 : 24) + 'px;transform:translate(-50%,-50%);border-radius:50%;background:' + C.dust;
+    const dustL = dust(-112);
+    const dustR = dust(104);
+
+    const spills = [];
+    if (sceneId === 'fail') {
+      const rs = this.rng(77);
+      for (let i = 0; i < 5; i++) {
+        const d = i % 2 ? 56 : 64;
+        const x = 540 + (rs() - 0.5) * 520, y = 1330 + rs() * 200;
+        spills.push({ style: 'position:absolute;left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) +
+          'px;width:' + d + 'px;height:' + d + 'px;border-radius:50%;z-index:4;background:' +
+          (i % 2 ? '#FFF8F0' : '#FFD56B') + ';border:4px solid ' + (i % 2 ? '#CBC2B6' : '#D6A82F') +
+          ';box-sizing:border-box;opacity:.9' });
+      }
+    }
+
+    // --- HUD ----------------------------------------------------------
+    const hudWrap = 'position:absolute;inset:0;z-index:6;pointer-events:none';
+    const bandStyle = C.band
+      ? 'position:absolute;left:0;top:0;width:1080px;height:372px;background:#1A241E;border-bottom:3px solid rgba(255,248,240,.55);box-sizing:border-box'
+      : 'display:none';
+
+    const chip = (l, t, w, h, r) => 'position:absolute;left:' + l + 'px;top:' + t + 'px;width:' + w +
+      'px;height:' + h + 'px;box-sizing:border-box;border-radius:' + r + 'px;background:' + C.chipBg +
+      ';border:' + C.chipBd + ';box-shadow:' + C.chipSh;
+
+    const duration = timerMode === 'normal' && sceneId === 'tutorial' ? 45 : 60;
+    const pct = Math.max(0, Math.min(1, seconds / duration));
+    const ringColor = pct > 0.17 ? '#A8E6CF' : '#FFB88C';
+    const timerWrap = chip(310, 60, 460, 156, 26) + ';display:flex;align-items:center;gap:22px;padding:0 28px 0 26px';
+    const ringOuter = 'position:relative;flex:0 0 auto;width:104px;height:104px;border-radius:50%;background:conic-gradient(from -90deg,' +
+      ringColor + ' 0 ' + (pct * 100).toFixed(1) + '%,' + C.track + ' ' + (pct * 100).toFixed(1) + '% 100%)';
+    const ringInner = 'position:absolute;left:14px;top:14px;width:76px;height:76px;border-radius:50%;background:' +
+      (C.band ? '#1A241E' : '#FFF8F0');
+    const hasMode = timerMode !== 'normal';
+    const timerTextWrap = 'flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px';
+    const modeStyle = 'font:800 38px/1.1 Nunito,sans-serif;color:' + C.sub + ';white-space:nowrap';
+    const secondsStyle = 'font:900 72px/1 Nunito,sans-serif;color:' + C.ink + ';font-variant-numeric:tabular-nums';
+    const modeText = timerMode === 'endless' ? 'Endless · Hard' : 'Level 3';
+    const secondsText = seconds + 's';
+
+    const pauseStyle = chip(912, 74, 128, 128, 26) + ';display:grid;place-items:center';
+    const pauseIcon = 'width:56px;height:56px;' + (C.band ? 'filter:invert(1) brightness(1.7)' : '');
+
+    const companionStyle = chip(40, 232, 268, 120, 26) + ';display:flex;align-items:center;gap:18px;padding:0 26px 0 16px';
+    const portraitStyle = 'flex:0 0 auto;width:88px;height:88px;border-radius:22px;background:#22342A;' +
+      'border:3px dashed rgba(255,248,240,.55);box-sizing:border-box;display:grid;place-items:center;font:900 26px/1 Nunito,sans-serif;color:#FFF8F0';
+    const companionName = 'font:800 44px/1 Nunito,sans-serif;color:' + C.ink;
+
+    const showDiamond = (p.diamonds ?? 0) > 0;
+    const barStyle = 'position:absolute;right:40px;top:232px;height:120px;display:flex;align-items:center;gap:16px';
+    const counterChip = (w) => 'width:' + w + 'px;height:120px;box-sizing:border-box;border-radius:26px;background:' +
+      C.chipBg + ';border:' + C.chipBd + ';box-shadow:' + C.chipSh +
+      ';display:flex;align-items:center;justify-content:center;gap:14px';
+    const coinChip = counterChip(190);
+    const seedChip = counterChip(190);
+    const diamondChip = 'width:168px;height:120px;box-sizing:border-box;border-radius:26px;background:#B8E0F5;border:3px solid #8FC4DE;box-shadow:' +
+      C.chipSh + ';display:flex;align-items:center;justify-content:center;gap:14px';
+    const iconInk = C.band ? 'filter:invert(1) brightness(1.7)' : '';
+    const coinIcon = 'width:56px;height:56px;flex:0 0 auto;' + iconInk;
+    const seedIcon = 'width:56px;height:56px;flex:0 0 auto;' + iconInk;
+    const numStyle = 'font:900 56px/1 Nunito,sans-serif;color:' + C.ink + ';font-variant-numeric:tabular-nums';
+
+    const showFeed = pick('feed');
+    const feedWrap = 'position:absolute;inset:0';
+    // fly-to-counter: od coina koji je magnet upravo pokupio do CoinChip centra
+    const src = [648, 1452];
+    const dst = [1040 - (showDiamond ? 580 : 396) + 95, 292];
+    const dx = dst[0] - src[0], dy = dst[1] - src[1];
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+    const feedPath = 'display:none';
+    const feedChips = [];
+    if (showFeed) {
+      [[0.68, 0.9, 0.18], [0.74, 0.78, 0.42], [0.8, 0.66, 1]].forEach(([t, s, op]) => {
+        const cx = src[0] + dx * t, cy = src[1] + dy * t;
+        feedChips.push({
+          icon: 'icons/icon_coin.svg',
+          style: 'position:absolute;left:' + cx.toFixed(0) + 'px;top:' + cy.toFixed(0) +
+            'px;transform:translate(-50%,-50%);display:flex;align-items:center;gap:' + Math.round(12 * s) +
+            'px;height:' + Math.round(76 * s) + 'px;padding:0 ' + Math.round(22 * s) +
+            'px;border-radius:22px;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box;opacity:' + op,
+          iconStyle: 'width:' + Math.round(42 * s) + 'px;height:' + Math.round(42 * s) + 'px;flex:0 0 auto',
+          textStyle: 'font:900 ' + Math.round(40 * s) + 'px/1 Nunito,sans-serif;color:#2D3436'
+        });
+      });
+    }
+    const showToast = showFeed;
+    const toastStyle = 'position:absolute;right:40px;top:' + (C.band ? 400 : 386) +
+      'px;padding:12px 26px;border-radius:22px;background:rgba(22,33,27,.78);font:700 38px/1.1 Nunito,sans-serif;color:#FFF8F0;white-space:nowrap';
+    const toastText = 'Meadow Clover';
+
+    const cueText = p.cue ?? sc.cue;
+    const showCue = !!cueText;
+    const cueWrap = 'position:absolute;left:150px;top:1218px;width:780px;z-index:5;display:flex;flex-direction:column;align-items:center';
+    const cueBubble = 'max-width:780px;padding:26px 36px;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:4px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);font:800 44px/1.2 Nunito,sans-serif;color:#2D3436;text-align:center;text-wrap:pretty';
+    const cueTail = 'width:0;height:0;border-left:26px solid transparent;border-right:26px solid transparent;border-top:32px solid #FFF8F0';
+
+    return {
+      label: 'Run ' + sceneId + ' ' + dir,
+      rootStyle, fieldStyle, laneA, laneB, laneC, mowStyle, seam1, seam2, blobs, tufts, petals,
+      coinEnts, seedEnts, diamondEnts, obstacleEnts,
+      playerWrap, magnetStyle, playerShadow, pipStyle, dustL, dustR, spills,
+      hudWrap, bandStyle, timerWrap, ringOuter, ringInner, hasMode, timerTextWrap, modeStyle,
+      modeText, secondsStyle, secondsText, pauseStyle, pauseIcon,
+      companionStyle, portraitStyle, companionName, companion: p.companion ?? 'Pip',
+      showBasket: pick('basket'), basketStyle: chip(40, C.basketTop, 268, 76, 20) + ';display:flex;align-items:center;justify-content:center;gap:14px;background:#A8E6CF;border:3px solid #7FBFA3',
+      basketType: p.basketType ?? 'Clover',
+      barStyle, coinChip, seedChip, diamondChip, coinIcon, seedIcon, numStyle,
+      coinText: String(p.coins ?? 12), seedText: String(p.seedCount ?? 5),
+      showDiamond, diamondText: String(p.diamonds ?? 0),
+      feedWrap, feedPath, feedChips, showToast, toastStyle, toastText,
+      showCue, cueWrap, cueBubble, cueTail, cueText,
+      isFail: sceneId === 'fail', isFinish: sceneId === 'finish', isPause: sceneId === 'pause'
+    };
+  }
+}
+</script>
+</body>
+</html>

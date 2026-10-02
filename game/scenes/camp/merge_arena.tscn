@@ -1,7 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://mergearena01"]
+[gd_scene load_steps=4 format=3 uid="uid://mergearena01"]
 
 [ext_resource type="Script" path="res://scripts/camp/merge_arena_controller.gd" id="1_arena"]
-[ext_resource type="Script" path="res://scripts/ui/ui_click_button.gd" id="2_uibtn"]
 [ext_resource type="Script" path="res://scripts/visual/pip_placeholder_control.gd" id="3_pip"]
 [ext_resource type="Script" path="res://scripts/camp/arena_meadow_bg.gd" id="4_meadow"]
 
@@ -52,98 +51,8 @@ script = ExtResource("3_pip")
 companion_id = "pip"
 follow_active_companion = false
 
-[node name="TutorialCue" type="VBoxContainer" parent="RootVBox/Playfield"]
-visible = false
-z_index = 56
-layout_mode = 0
-mouse_filter = 2
-theme_override_constants/separation = 0
-alignment = 1
-
-[node name="CuePanel" type="PanelContainer" parent="RootVBox/Playfield/TutorialCue"]
-layout_mode = 2
-mouse_filter = 2
-
-[node name="CueLabel" type="Label" parent="RootVBox/Playfield/TutorialCue/CuePanel"]
-layout_mode = 2
-text = "Tap the bag to pour seeds. Drag matching seeds together."
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="CueArrow" type="Control" parent="RootVBox/Playfield/TutorialCue"]
-custom_minimum_size = Vector2(52, 30)
-layout_mode = 2
-size_flags_horizontal = 4
-mouse_filter = 2
-
 [node name="BottomGap" type="Control" parent="RootVBox"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="NeedMoreSeedsOverlay" type="Control" parent="."]
-unique_name_in_owner = true
-visible = false
-z_index = 30
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Dim" type="ColorRect" parent="NeedMoreSeedsOverlay"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0.059, 0.078, 0.071, 0.82)
-
-[node name="Panel" type="PanelContainer" parent="NeedMoreSeedsOverlay"]
-custom_minimum_size = Vector2(940, 0)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBox" type="VBoxContainer" parent="NeedMoreSeedsOverlay/Panel"]
-layout_mode = 2
-theme_override_constants/separation = 30
-
-[node name="NeedMoreSeedsTitle" type="Label" parent="NeedMoreSeedsOverlay/Panel/VBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "You need more seeds!"
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="NeedMoreSeedsSubtitle" type="Label" parent="NeedMoreSeedsOverlay/Panel/VBox"]
-layout_mode = 2
-text = "Every type needs 4 seeds to reach T3. Run again to collect more."
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="NeedMoreSeedsScroll" type="ScrollContainer" parent="NeedMoreSeedsOverlay/Panel/VBox"]
-layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="NeedMoreSeedsList" type="VBoxContainer" parent="NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 16
-
-[node name="BackToCampButton" type="PanelContainer" parent="NeedMoreSeedsOverlay/Panel/VBox"]
-custom_minimum_size = Vector2(0, 140)
-layout_mode = 2
-script = ExtResource("2_uibtn")
-label_text = "Back to Camp"
-font_size = 50
-button_variant = "cta"

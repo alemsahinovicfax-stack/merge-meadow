@@ -43,7 +43,7 @@ const WARDROBE_DOT_OFFSET := Vector2i(-12, -12)           # gore lijevo, kao Upg
 const SHEET_H        := 1326          # = UiHomeField.SHEET_BASKET_H → top y 307 na stranici
 const SHEET_RADIUS   := 36
 const SHEET_PAD      := Vector4i(24, 20, 24, 28)   # l, t, r, b
-const GRABBER        := Vector2i(120, 10)
+const GRABBER        := Vector2i(120, 12)   # = UiPopups.HANDLE (popups: 10 → 12)
 const GRABBER_GAP    := 24
 const TITLE_PX       := 56
 const SUB_PX         := 40
@@ -263,8 +263,9 @@ static func wardrobe_glyph() -> StyleBoxFlat:
 	return _box(PINK, 18, 3, STICKER_EDGE)
 
 
+## Popups v2: sheet sistema (rub 4 gore umjesto 3).
 static func sheet() -> StyleBoxFlat:
-	return UiHomeField.picker_sheet()
+	return UiPopups.sheet_panel()
 
 
 static func stage() -> StyleBoxFlat:

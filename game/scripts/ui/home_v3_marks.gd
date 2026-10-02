@@ -7,7 +7,7 @@ extends Control
 ## KIND_EDGE  — CardEdge, rub kartice iznad polja (4 → 0, radius 48 → 0);
 ## KIND_NAME  — SeasonName, JEDAN objekat: 80 px na kartici → 56 px SeasonLabel;
 ## KIND_PIP   — MeadowPip, JEDAN objekat: 230 na kartici → 190 na livadi;
-## KIND_TOAST — tamni toast 600 x 100 na y 1250.
+## KIND_TOAST — toast sistema (pilula h 100 s diskom) na y 1250.
 
 const KIND_DOTS := "dots"
 const KIND_EDGE := "edge"
@@ -65,12 +65,12 @@ func _draw() -> void:
 			if rect.size.x > 1.0:
 				UiHomeV3.draw_pip(self, rect, shadow)
 		KIND_TOAST:
+			# H8 · toast sistema (design_handoff_popups): „Unlocked" zlatni disk s katancem, „Yours" mint ✓.
 			if not text.is_empty():
-				var w := maxf(UiHomeV3.TOAST_RECT.size.x, UiHomeV3.text_w(900, UiHomeV3.TOAST_LABEL, text) + 80.0)
-				var r := Rect2(UiHomeV3.PAGE.x * 0.5 - w * 0.5, UiHomeV3.TOAST_RECT.position.y, w, UiHomeV3.TOAST_RECT.size.y)
-				draw_style_box(UiStage.box(UiHomeV3.TOAST_BG, 28), r)
-				var tw := UiHomeV3.text_w(900, UiHomeV3.TOAST_LABEL, text)
-				UiHomeV3.draw_text(self, 900, UiHomeV3.TOAST_LABEL, text, Vector2(r.get_center().x - tw * 0.5, r.get_center().y - UiHomeV3.TOAST_LABEL * 0.5), UiHomeV3.CREAM)
+				var glyph := "check" if text == UiPopups.S_YOURS else "lock"
+				var w := PopupToast.pill_width(text, true)
+				var r := Rect2(UiHomeV3.PAGE.x * 0.5 - w * 0.5, UiHomeV3.TOAST_RECT.position.y, w, UiPopups.TOAST_H)
+				PopupToast.draw_pill(self, r, text, null, glyph)
 
 
 func _draw_dots() -> void:

@@ -7,11 +7,10 @@ const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
 const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
 
 ## Settings ekran je D0-P — do tada kratka poruka ispod headera (kao ranije na Home).
-const SETTINGS_TOAST_TEXT := "Settings coming soon."
+const SETTINGS_TOAST_TEXT := UiPopups.S_SETTINGS_SOON
 const SETTINGS_TOAST_HOLD := 1.6  # s
 const SETTINGS_TOAST_GAP := 24.0  # px ispod headera
 const COIN_POP_POS := Vector2(150, 132)  # design_handoff_shop · CoinSpendPop
-const COIN_POP_TIME := 0.6  # s
 
 @onready var swipe_pager: SwipePager = $RootVBox/SwipePager
 @onready var top_bar: MarginContainer = $RootVBox/TopBar
@@ -40,10 +39,7 @@ var _tabs_enabled: bool = true
 var _nav_locked: bool = false
 var _current_page: int = MetaHubPagesScript.MAIN
 var _safe_insets: Vector4 = Vector4.ZERO
-var _settings_toast: PanelContainer = null
-var _coin_pop: PanelContainer = null
-var _coin_pop_tween: Tween = null
-var _settings_toast_tween: Tween = null
+var _settings_toast: PopupToast = null
 
 
 func _ready() -> void:
@@ -106,15 +102,19 @@ func _chrome_icon_or(icon_name: String, fallback: Texture2D) -> Texture2D:
 	return tex if tex != null else fallback
 
 
+## X3 · „Round in progress" (design_handoff_popups): ink pilula s kremastim rubom (tokeni toasta),
+## isto mjesto i mjere kao chrome v2; tekst više nije velikim slovima.
 func _setup_nav_lock_pill() -> void:
-	nav_lock_pill.add_theme_stylebox_override("panel", UiChrome.lock_pill_style())
+	var sb := UiPopups.nav_lock_pill()
+	sb.content_margin_left = 22.0
+	sb.content_margin_right = 26.0
+	nav_lock_pill.add_theme_stylebox_override("panel", sb)
 	nav_lock_icon.custom_minimum_size = Vector2(UiChrome.LOCK_ICON_SIZE, UiChrome.LOCK_ICON_SIZE)
 	nav_lock_icon.texture = UI_ASSETS.get_chrome_icon("icon_lock")
+	nav_lock_label.text = UiPopups.S_ROUND_IN_PROGRESS
 	nav_lock_label.add_theme_font_size_override("font_size", UiChrome.LOCK_FONT_SIZE)
-	nav_lock_label.add_theme_font_override(
-		"font", UiChrome.heavy_font(UiChrome.EMBOLDEN_800, UiChrome.LOCK_GLYPH_SPACING)
-	)
-	nav_lock_label.add_theme_color_override("font_color", UiPalette.GOLD)
+	nav_lock_label.add_theme_font_override("font", UiPopups.font(900, UiChrome.LOCK_FONT_SIZE))
+	nav_lock_label.add_theme_color_override("font_color", UiPopups.WARM_WHITE)
 
 
 ## Traka se produžava u safe area (notch gore, gesture bar dolje) — bez tamne "rupe".
@@ -440,91 +440,39 @@ func pulse_coin_chip() -> void:
 	rt.tween_callback(ring.queue_free)
 
 
+## X2 · leteća poruka (design_handoff_popups): potrošnja roze „−N" pada ispod coin chipa.
 func show_coin_spend_pop(amount: int) -> void:
 	if amount <= 0:
 		return
-	_show_coin_pop("-%d" % amount)
+	FloatPop.spend_at(self, _coin_pop_origin(), "−%d" % amount, UI_ASSETS.get_chrome_icon("icon_coin"))
 
 
-## Arena javlja combo nagradu (+2 na combo 5) — isti pop, samo u plusu.
+## Arena javlja combo nagradu (+2 na combo 5): zlatna „+N" iskoči ispod chipa i uleti u njega.
 func show_coin_earn_pop(amount: int) -> void:
 	if amount <= 0:
 		return
-	_show_coin_pop("+%d" % amount)
+	var target := coin_chip.get_global_rect().get_center() - get_global_rect().position if coin_chip else Vector2(COIN_POP_POS)
+	FloatPop.earn(self, _coin_pop_origin() + Vector2(0, 24), "+%d" % amount, UI_ASSETS.get_chrome_icon("icon_coin"), target, coin_chip)
 
 
-func _show_coin_pop(text: String) -> void:
-	if _coin_pop == null:
-		_coin_pop = _build_coin_pop()
-	var label := _coin_pop.get_child(0) as Label
-	if label:
-		label.text = text
-	if _coin_pop_tween != null and _coin_pop_tween.is_valid():
-		_coin_pop_tween.kill()
-	_coin_pop.reset_size()
-	var start := Vector2(COIN_POP_POS)
-	if coin_chip != null:
-		start = Vector2(coin_chip.position.x + 26.0, coin_chip.position.y + coin_chip.size.y - 12.0)
-	_coin_pop.position = start
-	_coin_pop.modulate.a = 1.0
-	_coin_pop.visible = true
-	var tween := create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(_coin_pop, "position:y", start.y - 40.0, COIN_POP_TIME).set_delay(0.1)
-	tween.tween_property(_coin_pop, "modulate:a", 0.0, COIN_POP_TIME).set_delay(0.1)
-	tween.chain().tween_callback(_coin_pop.hide)
-	_coin_pop_tween = tween
+func _coin_pop_origin() -> Vector2:
+	if coin_chip == null:
+		return Vector2(COIN_POP_POS)
+	var r := coin_chip.get_global_rect()
+	r.position -= get_global_rect().position
+	return Vector2(r.position.x + 100.0, r.end.y + 36.0)
 
 
-func _build_coin_pop() -> PanelContainer:
-	var pop := PanelContainer.new()
-	pop.name = "CoinSpendPop"
-	pop.visible = false
-	pop.z_index = 6
-	pop.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pop.add_theme_stylebox_override("panel", UiShop.coin_pop_style())
-	var label := Label.new()
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	UiCamp.style_label(label, UiShop.FONT_PRICE_LONG, UiShop.PRICE_INK)
-	pop.add_child(label)
-	add_child(pop)
-	return pop
-
-
+## X1 · toast sistema 24 px ispod headera (traka čvora „SettingsToast").
 func _show_settings_toast() -> void:
 	if _settings_toast == null:
-		_settings_toast = _build_settings_toast()
-	if _settings_toast_tween != null and _settings_toast_tween.is_valid():
-		_settings_toast_tween.kill()
-	var toast_size := _settings_toast.get_combined_minimum_size()
-	_settings_toast.size = toast_size
-	_settings_toast.position = Vector2(
-		floorf((size.x - toast_size.x) * 0.5),
-		top_bar.position.y + top_bar.size.y + SETTINGS_TOAST_GAP
-	)
-	_settings_toast.modulate.a = 0.0
-	_settings_toast.visible = true
-	var tween := create_tween()
-	tween.tween_property(_settings_toast, "modulate:a", 1.0, 0.15)
-	tween.tween_interval(SETTINGS_TOAST_HOLD)
-	tween.tween_property(_settings_toast, "modulate:a", 0.0, 0.25)
-	tween.tween_callback(_settings_toast.hide)
-	_settings_toast_tween = tween
-
-
-func _build_settings_toast() -> PanelContainer:
-	var toast := PanelContainer.new()
-	toast.name = "SettingsToast"
-	toast.visible = false
-	toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	toast.add_theme_stylebox_override("panel", UiChrome.toast_style())
-	var label := Label.new()
-	label.text = SETTINGS_TOAST_TEXT
-	label.add_theme_font_size_override("font_size", UiChrome.TOAST_FONT_SIZE)
-	label.add_theme_color_override("font_color", UiPalette.UI_TEXT)
-	toast.add_child(label)
-	add_child(toast)
-	return toast
+		_settings_toast = PopupToast.new()
+		_settings_toast.name = "SettingsToast"
+		_settings_toast.z_index = 60
+		add_child(_settings_toast)
+	_settings_toast.position = Vector2(0.0, top_bar.position.y + top_bar.size.y + SETTINGS_TOAST_GAP)
+	_settings_toast.setup(0.0, SETTINGS_TOAST_HOLD, size.x * 0.5)
+	_settings_toast.show_text(SETTINGS_TOAST_TEXT, UI_ASSETS.get_chrome_icon("icon_settings"))
 
 
 func _show_swipe_hint_if_needed() -> void:

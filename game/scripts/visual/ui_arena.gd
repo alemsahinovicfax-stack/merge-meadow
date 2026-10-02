@@ -199,39 +199,6 @@ static func chip_corner_radius(tier: int) -> float:
 	return float(_chip_radius(tier))
 
 
-static func cue_style() -> StyleBoxFlat:
-	var s := _round(24)
-	s.bg_color = UiPalette.WARM_WHITE
-	s.border_color = RIM_EDGE
-	s.set_border_width_all(4)
-	_pad(s, 32, 20)
-	return s
-
-
-static func overlay_panel_style() -> StyleBoxFlat:
-	var s := _round(26)
-	s.bg_color = UiPalette.WARM_WHITE
-	s.border_color = Color(UiPalette.OUTLINE, 0.14)
-	s.set_border_width_all(3)
-	s.content_margin_left = 48.0
-	s.content_margin_right = 48.0
-	s.content_margin_top = 48.0
-	s.content_margin_bottom = 44.0
-	s.shadow_color = Color(0.059, 0.078, 0.071, 0.45)
-	s.shadow_size = 1
-	s.shadow_offset = Vector2(0, 14)
-	return s
-
-
-static func need_row_style(rarity: int) -> StyleBoxFlat:
-	var s := _round(20)
-	s.bg_color = UiPalette.rarity_bg_color(rarity)
-	s.border_color = Color(UiPalette.OUTLINE, 0.14)
-	s.set_border_width_all(2)
-	_pad(s, 26, 0)
-	return s
-
-
 static func _chip_radius(tier: int) -> int:
 	return CHIP_T2_RADIUS if tier == 2 else 999
 

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div data-layer="Muncher" style="position:relative;width:480px;height:360px;pointer-events:none;--body:{{ c.body }};--deep:{{ c.deep }};--edge:{{ c.edge }};--spot:{{ c.spot }}">
+  <sc-if value="{{ nest }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="MuncherNest" style="position:absolute;left:115px;top:124px;width:250px;height:112px;box-sizing:border-box;border-radius:50%;background:#9E7A52;border:5px solid #735738">
+      <div data-layer="NestBed" style="position:absolute;left:17px;top:15px;width:206px;height:78px;box-sizing:border-box;border-radius:50%;background:#6E5238;border:4px solid #543E2A"></div>
+      <div style="position:absolute;left:48px;top:48px;width:22px;height:13px;border-radius:50%;background:#FFCCD5;transform:rotate(-20deg)"></div>
+      <div style="position:absolute;left:84px;top:62px;width:22px;height:13px;border-radius:50%;background:#FFEAA7;transform:rotate(15deg)"></div>
+      <div style="position:absolute;left:150px;top:60px;width:22px;height:13px;border-radius:50%;background:#D4A5FF;transform:rotate(-10deg)"></div>
+      <div style="position:absolute;left:180px;top:44px;width:20px;height:12px;border-radius:50%;background:#B8E0F5;transform:rotate(25deg)"></div>
+    </div>
+  </sc-if>
+
+  <sc-for list="{{ segs }}" as="s" hint-placeholder-count="3">
+    <div data-layer="SegShadow" style="position:absolute;left:{{ s.l }}px;top:{{ s.ts }}px;width:{{ s.d }}px;height:{{ s.d }}px;border-radius:50%;background:rgba(20,26,22,.30)"></div>
+  </sc-for>
+  <div data-layer="HeadShadow" style="position:absolute;left:{{ hx0 }}px;top:{{ hys }}px;width:{{ hd }}px;height:{{ hd }}px;border-radius:50%;background:rgba(20,26,22,.30)"></div>
+  <sc-for list="{{ segs }}" as="s" hint-placeholder-count="3">
+    <div data-layer="Segment" style="position:absolute;left:{{ s.l }}px;top:{{ s.t }}px;width:{{ s.d }}px;height:{{ s.d }}px;box-sizing:border-box;border-radius:50%;background:{{ s.fill }};border:4px solid var(--edge)">
+      <div style="position:absolute;left:{{ s.sx }}px;top:{{ s.sy }}px;width:{{ s.sd }}px;height:{{ s.sd }}px;border-radius:50%;background:var(--spot)"></div>
+    </div>
+  </sc-for>
+
+  <div data-layer="Head" style="position:absolute;left:{{ hx }}px;top:{{ hy }}px;width:0;height:0;transform:rotate({{ hrot }}deg) scale({{ hsc }})">
+    <sc-for list="{{ ant }}" as="a" hint-placeholder-count="2">
+      <div data-layer="Antenna" style="position:absolute;left:{{ a.bx }}px;top:{{ a.by }}px;width:{{ a.len }}px;height:7px;margin-top:-3.5px;border-radius:4px;background:var(--edge);transform-origin:0 50%;transform:rotate({{ a.ang }}deg)"></div>
+      <div data-layer="AntennaBulb" style="position:absolute;left:{{ a.tx }}px;top:{{ a.ty }}px;width:18px;height:18px;box-sizing:border-box;border-radius:50%;background:var(--spot);border:4px solid var(--edge)"></div>
+    </sc-for>
+    <div data-layer="HeadBody" style="position:absolute;left:-50px;top:-50px;width:100px;height:100px;box-sizing:border-box;border-radius:50%;background:var(--body);border:4px solid var(--edge)">
+      <div style="position:absolute;left:12px;top:22px;width:11px;height:11px;border-radius:50%;background:var(--spot)"></div>
+      <div style="position:absolute;left:78px;top:26px;width:8px;height:8px;border-radius:50%;background:var(--spot)"></div>
+    </div>
+
+    <sc-if value="{{ eyesOpen }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="EyeL" style="position:absolute;left:{{ eL }}px;top:{{ eT }}px;width:{{ eW }}px;height:{{ eH }}px;box-sizing:border-box;border-radius:50%;background:#FFFFFF;border:3px solid #2D3436">
+        <div style="position:absolute;left:{{ pL }}px;top:{{ pT }}px;width:{{ pD }}px;height:{{ pD }}px;border-radius:50%;background:#2D3436"></div>
+      </div>
+      <div data-layer="EyeR" style="position:absolute;left:{{ eR }}px;top:{{ eT }}px;width:{{ eW }}px;height:{{ eH }}px;box-sizing:border-box;border-radius:50%;background:#FFFFFF;border:3px solid #2D3436">
+        <div style="position:absolute;left:{{ pL }}px;top:{{ pT }}px;width:{{ pD }}px;height:{{ pD }}px;border-radius:50%;background:#2D3436"></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ eyesClosed }}" hint-placeholder-val="{{ true }}">
+      <div data-layer="EyeClosedL" style="position:absolute;left:-31px;top:-20px;width:24px;height:12px;box-sizing:border-box;border-bottom:5px solid #2D3436;border-radius:0 0 12px 12px"></div>
+      <div data-layer="EyeClosedR" style="position:absolute;left:7px;top:-20px;width:24px;height:12px;box-sizing:border-box;border-bottom:5px solid #2D3436;border-radius:0 0 12px 12px"></div>
+    </sc-if>
+    <sc-if value="{{ eyesSquint }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="EyeSquintL" style="position:absolute;left:-31px;top:-20px;width:24px;height:12px;box-sizing:border-box;border-top:5px solid #2D3436;border-radius:12px 12px 0 0"></div>
+      <div data-layer="EyeSquintR" style="position:absolute;left:7px;top:-20px;width:24px;height:12px;box-sizing:border-box;border-top:5px solid #2D3436;border-radius:12px 12px 0 0"></div>
+    </sc-if>
+    <sc-if value="{{ brows }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="BrowL" style="position:absolute;left:-33px;top:{{ browT }}px;width:28px;height:8px;border-radius:4px;background:#2D3436;transform:rotate({{ browL }}deg)"></div>
+      <div data-layer="BrowR" style="position:absolute;left:5px;top:{{ browT }}px;width:28px;height:8px;border-radius:4px;background:#2D3436;transform:rotate({{ browR }}deg)"></div>
+    </sc-if>
+
+    <sc-if value="{{ mSleep }}" hint-placeholder-val="{{ true }}">
+      <div data-layer="MouthShut" style="position:absolute;left:-12px;top:14px;width:24px;height:6px;border-radius:3px;background:#3B2350"></div>
+      <div data-layer="Tooth" style="position:absolute;left:3px;top:18px;width:8px;height:8px;border-radius:0 0 3px 3px;background:#FFF8F0;border:2px solid #3B2350;box-sizing:border-box"></div>
+    </sc-if>
+    <sc-if value="{{ mHunt }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="MouthGrin" style="position:absolute;left:-26px;top:4px;width:52px;height:24px;overflow:hidden;border-radius:6px 6px 26px 26px;background:#3B2350">
+        <div style="position:absolute;left:15px;top:14px;width:22px;height:12px;border-radius:50%;background:#FF9FB4"></div>
+        <div style="position:absolute;left:10px;top:0;width:10px;height:9px;border-radius:0 0 3px 3px;background:#FFF8F0"></div>
+        <div style="position:absolute;left:32px;top:0;width:10px;height:9px;border-radius:0 0 3px 3px;background:#FFF8F0"></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ mEat }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="MouthOpen" style="position:absolute;left:-32px;top:{{ mouthT }}px;width:64px;height:{{ mouthH }}px;overflow:hidden;box-sizing:border-box;border-radius:50%;background:#3B2350;border:3px solid var(--edge)">
+        <div style="position:absolute;left:12px;bottom:-4px;width:34px;height:16px;border-radius:50%;background:#FF9FB4"></div>
+        <div style="position:absolute;left:12px;top:-1px;width:11px;height:10px;border-radius:0 0 3px 3px;background:#FFF8F0"></div>
+        <div style="position:absolute;left:35px;top:-1px;width:11px;height:10px;border-radius:0 0 3px 3px;background:#FFF8F0"></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ mWake }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="MouthO" style="position:absolute;left:-9px;top:10px;width:18px;height:20px;border-radius:50%;background:#3B2350"></div>
+    </sc-if>
+    <sc-if value="{{ mFrozen }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="MouthStuck" style="position:absolute;left:-13px;top:14px;width:26px;height:8px;border-radius:4px;background:#3B2350"></div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ nest }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="NestFront" style="position:absolute;left:115px;top:184px;width:250px;height:60px;overflow:hidden">
+      <div style="position:absolute;left:0;top:-60px;width:250px;height:112px;box-sizing:border-box;border-radius:50%;border-style:solid;border-color:#9E7A52;border-width:17px 22px;box-shadow:0 0 0 5px #735738, inset 0 0 0 4px #543E2A"></div>
+      <div style="position:absolute;left:40px;top:34px;width:34px;height:5px;border-radius:3px;background:#735738;transform:rotate(12deg)"></div>
+      <div style="position:absolute;left:160px;top:36px;width:30px;height:5px;border-radius:3px;background:#735738;transform:rotate(-10deg)"></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ frozen }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="IceBlock" style="position:absolute;left:{{ iceL }}px;top:{{ iceT }}px;width:200px;height:170px">
+      <div style="position:absolute;inset:0;box-sizing:border-box;border-radius:28px;background:rgba(232,246,255,.58);border:4px solid #DCF0FF;box-shadow:0 0 0 2px #4F7FAE"></div>
+      <div style="position:absolute;left:22px;top:30px;width:70px;height:9px;border-radius:5px;background:#FFFFFF;transform:rotate(-35deg)"></div>
+      <div style="position:absolute;left:40px;top:54px;width:34px;height:9px;border-radius:5px;background:#FFFFFF;transform:rotate(-35deg)"></div>
+      <div style="position:absolute;left:34px;top:168px;width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:24px solid #DCF0FF"></div>
+      <div style="position:absolute;left:86px;top:168px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:18px solid #DCF0FF"></div>
+      <div style="position:absolute;left:134px;top:168px;width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:28px solid #DCF0FF"></div>
+      <div style="position:absolute;left:20px;top:-14px;width:32px;height:32px;border-radius:50%;background:#FFFFFF"></div>
+      <div style="position:absolute;left:44px;top:-20px;width:40px;height:40px;border-radius:50%;background:#FFFFFF"></div>
+      <div style="position:absolute;left:78px;top:-10px;width:26px;height:26px;border-radius:50%;background:#FFFFFF"></div>
+      <div style="position:absolute;left:206px;top:16px;width:14px;height:14px;background:#FFFFFF;transform:rotate(45deg)"></div>
+      <div style="position:absolute;left:-22px;top:104px;width:11px;height:11px;background:#FFFFFF;transform:rotate(45deg)"></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ asleep }}" hint-placeholder-val="{{ true }}">
+    <sc-for list="{{ zzz }}" as="z" hint-placeholder-count="3">
+      <div data-layer="Zzz" style="position:absolute;left:{{ z.x }}px;top:{{ z.y }}px;font:900 {{ z.s }}px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;-webkit-text-stroke:6px #2D3436;paint-order:stroke fill">z</div>
+    </sc-for>
+  </sc-if>
+  <sc-if value="{{ waking }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="Alarm" style="position:absolute;left:{{ alX }}px;top:{{ alY }}px;width:64px;height:64px">
+      <div style="position:absolute;inset:0;background:#2D3436;clip-path:polygon(50% 0,62% 30%,96% 22%,72% 50%,96% 78%,62% 70%,50% 100%,38% 70%,4% 78%,28% 50%,4% 22%,38% 30%)"></div>
+      <div style="position:absolute;inset:5px;background:#FFEAA7;clip-path:polygon(50% 0,62% 30%,96% 22%,72% 50%,96% 78%,62% 70%,50% 100%,38% 70%,4% 78%,28% 50%,4% 22%,38% 30%)"></div>
+      <div style="position:absolute;inset:0;display:grid;place-items:center;font:900 36px/1 Nunito,system-ui,sans-serif;color:#2D3436">!</div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ eating }}" hint-placeholder-val="{{ false }}">
+    <sc-for list="{{ crumbs }}" as="k" hint-placeholder-count="3">
+      <div data-layer="Crumb" style="position:absolute;left:{{ k.x }}px;top:{{ k.y }}px;width:15px;height:10px;border-radius:50%;background:{{ k.c }};transform:rotate({{ k.r }}deg)"></div>
+    </sc-for>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:480,&quot;height&quot;:360},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;sleep_nest&quot;,&quot;sleep_spot&quot;,&quot;waking&quot;,&quot;hunting&quot;,&quot;eating&quot;,&quot;frozen&quot;],&quot;default&quot;:&quot;hunting&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;dir&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:0,&quot;max&quot;:359,&quot;default&quot;:200,&quot;tsType&quot;:&quot;number&quot;},&quot;chomp&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;},&quot;atNest&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+// Muncher v2 — gusjenica koja guta cvijece. Sidro (centar glave = centar za jedenje) je na (240, 180).
+const AX = 240, AY = 180;
+const COL = {
+  awake: { body: '#A275CD', deep: '#946AC0', edge: '#3E2856', spot: '#FFEAA7' },
+  asleep: { body: '#8C61B8', deep: '#7F58A8', edge: '#3E2856', spot: '#EADB9E' },
+  frozen: { body: '#A6D1FA', deep: '#95C3EE', edge: '#4F7FAE', spot: '#E8F6FF' }
+};
+const POSE = {
+  sleep: { segs: [[-60, 18], [-40, 56], [4, 64]], rot: 8, ant: [[-34, -58], [30, -60]] },
+  wake: { segs: [[56, 10], [98, -2], [134, -22]], rot: 0, ant: [[-22, -80], [22, -80]] },
+  hunt: { sp: [56, 102, 144], wave: 8, rot: -6, ant: [[-30, -74], [26, -76]] },
+  eat: { sp: [44, 80, 110], wave: 4, rot: 0, sc: 1.08, ant: [[-38, -62], [38, -62]] },
+  frozen: { sp: [56, 102, 144], wave: 0, rot: 0, ant: [[-24, -76], [24, -76]] }
+};
+const R = [38, 32, 26];
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const st = p.state ?? 'hunting';
+    const key = { sleep_nest: 'sleep', sleep_spot: 'sleep', waking: 'wake', hunting: 'hunt', eating: 'eat', frozen: 'frozen' }[st] || 'hunt';
+    const P = POSE[key];
+    const dir = +(p.dir ?? 200) * Math.PI / 180;
+    const c = key === 'frozen' ? COL.frozen : key === 'sleep' ? COL.asleep : COL.awake;
+    let offs;
+    if (P.segs) offs = P.segs;
+    else { const t = dir + Math.PI, W = [0.5, -0.8, 1]; offs = P.sp.map((d, k) => [Math.cos(t) * d - Math.sin(t) * P.wave * W[k], Math.sin(t) * d + Math.cos(t) * P.wave * W[k]]); }
+    const segs = offs.map((o, k) => ({ k, x: AX + o[0], y: AY + o[1], r: R[k] })).reverse().map(s => ({
+      l: s.x - s.r, t: s.y - s.r, ts: s.y - s.r + 6, d: 2 * s.r, fill: s.k === 0 ? c.body : c.deep,
+      sx: s.r * 0.36, sy: s.r * 0.28, sd: s.r * 0.56
+    }));
+    const ant = P.ant.map((tip, i) => { const bx = i ? 16 : -16, by = -40; const dx = tip[0] - bx, dy = tip[1] - by; return { bx, by, len: Math.hypot(dx, dy), ang: Math.atan2(dy, dx) * 180 / Math.PI, tx: tip[0] - 9, ty: tip[1] - 9 }; });
+    const look = key === 'hunt' || key === 'eat' ? [Math.cos(dir) * 4, Math.sin(dir) * 4] : [0, 0];
+    const eye = key === 'wake' ? [32, 34, 10] : key === 'frozen' ? [28, 30, 8] : [26, 30, 14];
+    const chomp = Math.max(0, Math.min(1, +(p.chomp ?? 1)));
+    const mouthH = 12 + 36 * chomp;
+    const sc = P.sc || 1;
+    const seg0 = offs[0];
+    return {
+      c, segs, ant, nest: st === 'sleep_nest' || (st === 'waking' && p.atNest !== false),
+      hx: AX, hy: AY, hrot: P.rot, hsc: sc, hx0: AX - 50 * sc, hys: AY - 50 * sc + 6, hd: 100 * sc,
+      eyesOpen: key === 'hunt' || key === 'wake' || key === 'frozen', eyesClosed: key === 'sleep', eyesSquint: key === 'eat',
+      eL: -19 - eye[0] / 2, eR: 19 - eye[0] / 2, eT: -13 - eye[1] / 2, eW: eye[0], eH: eye[1],
+      pD: eye[2], pL: (eye[0] - 6 - eye[2]) / 2 + look[0], pT: (eye[1] - 6 - eye[2]) / 2 + look[1],
+      brows: key === 'hunt' || key === 'eat' || key === 'frozen', browT: key === 'frozen' ? -40 : -36,
+      browL: key === 'frozen' ? -14 : 20, browR: key === 'frozen' ? 14 : -20,
+      mSleep: key === 'sleep', mHunt: key === 'hunt', mEat: key === 'eat', mWake: key === 'wake', mFrozen: key === 'frozen',
+      mouthT: 20 - mouthH / 2, mouthH,
+      frozen: key === 'frozen', iceL: AX + seg0[0] * 0.35 - 100, iceT: AY + seg0[1] * 0.35 - 85,
+      asleep: key === 'sleep', zzz: [[58, -30, 26], [82, -46, 32], [108, -58, 38]].map(z => ({ x: AX + z[0], y: AY + z[1] - z[2] * 0.8, s: z[2] })),
+      waking: key === 'wake', alX: AX - 70 - 32, alY: AY - 46 - 32,
+      eating: key === 'eat', crumbs: [[-56, 40, '#FFCCD5', 30], [46, 48, '#FFEAA7', -20], [-8, 70, '#B8E0F5', 60]].map(k => ({ x: AX + k[0], y: AY + k[1], c: k[2], r: k[3] }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -241,13 +241,14 @@ func _assert_field_upgrades_open(home: Node, label: String) -> String:
 	var blob := "%s %s %s %s" % [
 		mag_t,
 		loot_t,
-		str(magnet.get("label_text")),
-		str(loot.get("label_text")),
+		str(magnet.get("label")),
+		str(loot.get("label")),
 	]
 	if blob.find("Sprinkler") >= 0:
 		return "%s upgrade chrome must not say Sprinkler" % label
-	if blob.find("Need") < 0 and blob.find("Upgrade") < 0 and blob.find("Maxed") < 0:
-		return "%s upgrade button should show Upgrade/Need/Maxed" % label
+	# Popups v2: dugme JE cijena — „×2" (crtež cvijeta), „Need N", „Max", „Done".
+	if blob.find("×") < 0 and blob.find("Need") < 0 and blob.find("Max") < 0 and blob.find("Done") < 0:
+		return "%s upgrade button should show ×2/Need/Max/Done" % label
 	return ""
 
 

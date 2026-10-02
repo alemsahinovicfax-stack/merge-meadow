@@ -4,7 +4,6 @@ extends SceneTree
 
 
 const SAVE_PATH := "user://player_save.json"
-const UI_TEXT_INK := Color("#4A4A4A")
 
 
 func _initialize() -> void:
@@ -55,14 +54,9 @@ func _overlay_of(arena: Node) -> Control:
 	return arena.get_node_or_null("NeedMoreSeedsOverlay") as Control
 
 
-func _list_of(arena: Node) -> VBoxContainer:
-	return arena.get_node_or_null(
-		"NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsScroll/NeedMoreSeedsList"
-	) as VBoxContainer
-
-
-func _title_of(arena: Node) -> Label:
-	return arena.get_node_or_null("NeedMoreSeedsOverlay/Panel/VBox/NeedMoreSeedsTitle") as Label
+## Popups v2: pločice u HFlowContaineru (NeedSeedTiles), naslov na ModalPlate.
+func _list_of(arena: Node) -> Container:
+	return arena.get("need_more_tiles") as Container
 
 
 func _boot_arena(backup: String) -> Node:
@@ -113,19 +107,10 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("stuck bag should show overlay")
 		return
-	var title := _title_of(arena)
-	if title == null or not title.text.contains("You need more seeds"):
+	var title := str(arena.call("get_need_title"))
+	if not title.contains("You need more seeds"):
 		_restore_save(backup)
 		_fail("title should contain You need more seeds")
-		return
-	if title.modulate.a < 0.9:
-		_restore_save(backup)
-		_fail("title modulate too faint %s" % str(title.modulate.a))
-		return
-	var font_color: Color = title.get_theme_color("font_color")
-	if font_color.is_equal_approx(UI_TEXT_INK):
-		_restore_save(backup)
-		_fail("title font_color must not be UI_TEXT ink, got %s" % str(font_color))
 		return
 
 	arena.call("set_arena_page_active", false)
