@@ -1410,7 +1410,10 @@ func begin_endless_run(difficulty: int) -> void:
 	save_player_save()
 
 
+## Svjež run (Retry, Play) prvo spusti neuzeti plijen prošlog runa u vreću — inače bi ga
+## finish_run sljedećeg runa pregazio (Retry → Retry gubio je sjemenke bez traga).
 func begin_fresh_run() -> void:
+	ensure_loot_in_camp_bag()
 	revive_used_this_run = false
 	resume_pending = false
 	carry_seed_bag = {}
@@ -1465,6 +1468,12 @@ func take_seeds_from_bag(type_id: String, count: int) -> bool:
 
 func take_seed_from_bag(type_id: String) -> bool:
 	return seed_bag_domain.take_one(type_id)
+
+
+## Koliko sjemenki plijena stane u vreću (soft cap) — R5 javlja kad nije sve.
+func pending_loot_fit() -> Vector2i:
+	var total := sum_seed_bag(last_seed_bag)
+	return Vector2i(mini(total, seed_bag_remaining_capacity()), total)
 
 
 func deposit_loot_to_camp() -> int:

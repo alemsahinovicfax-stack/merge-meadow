@@ -11,6 +11,9 @@ const SIDE := UiShopV2.HINT_FRAME + UiShopV2.HINT_INK_W
 var _target: Node = null
 var _tween: Tween = null
 var _moving: bool = false
+## Zagrade su na ekranu ili ulaze (false čim krene izlaz) — ne čita se iz `visible`,
+## jer izlaz traje 0,12 s i `hide` dolazi tek na kraju.
+var _shown: bool = false
 
 
 func _init() -> void:
@@ -29,24 +32,34 @@ func get_target() -> Node:
 	return _target if is_instance_valid(_target) else null
 
 
+func is_shown() -> bool:
+	return _shown
+
+
 ## Nova meta (ili null = sakrij). Isti cilj → samo prati poziciju.
+## Poređenje ide preko get_target(): oslobođena meta (spojena sjemenka) je u Godotu 4.7
+## `== null`, pa bi `null == _target` bilo true i zagrade bi ostale visjeti.
 func set_target(target: Node) -> void:
 	if target != null and not is_instance_valid(target):
 		target = null
-	if target == _target:
+	var current := get_target()
+	if target != null and target == current:
 		follow()
 		return
-	var had := _target != null and is_instance_valid(_target) and visible
+	if target == null and not _shown:
+		_target = null
+		return
+	var had := current != null and _shown
 	_target = target
 	_kill_tween()
 	if target == null:
-		if not visible:
-			return
+		_shown = false
 		_tween = create_tween().set_parallel(true)
 		_tween.tween_property(self, "modulate:a", 0.0, UiShopV2.T_HINT_OUT)
 		_tween.tween_property(self, "scale", Vector2.ONE * 1.2, UiShopV2.T_HINT_OUT)
 		_tween.chain().tween_callback(hide)
 		return
+	_shown = true
 	var goal := _goal()
 	if had:
 		_moving = true
@@ -67,9 +80,18 @@ func set_target(target: Node) -> void:
 	_tween.tween_property(self, "modulate:a", 1.0, UiShopV2.T_HINT_IN)
 
 
+## Odmah, bez izlaza (kraj sesije, stranica se gasi).
+func clear_now() -> void:
+	_kill_tween()
+	_target = null
+	_shown = false
+	modulate.a = 0.0
+	hide()
+
+
 ## Prati metu kad se ona pomjeri (magnet, razmicanje), osim dok traje prelaz.
 func follow() -> void:
-	if _target == null or not is_instance_valid(_target) or _moving:
+	if not is_instance_valid(_target) or _moving:
 		return
 	position = _goal()
 

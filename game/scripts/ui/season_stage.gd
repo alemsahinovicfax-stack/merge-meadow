@@ -101,6 +101,10 @@ func refresh() -> void:
 		_sync_field_content()
 		_set_u(1.0)
 		_release_pip()
+	elif GameState.home_season_field_open and not _moving:
+		# Polje ostalo otvoreno dok je igrač spajao u Areni: novi ★3 izrastaju odmah.
+		if season_field.has_method("refresh_growth"):
+			season_field.call("refresh_growth")
 	elif not GameState.home_season_field_open and not _moving and _u > 0.0:
 		# Polje zatvoreno izvana (Camp, Shop): bez prelaza, odmah kartica.
 		_snap_closed()
@@ -357,6 +361,8 @@ func _card_data(season_id: String) -> Dictionary:
 		"prev_type": GameState.star3_type_id_for_season(prev) if not prev.is_empty() else "",
 		"price": IAPManager.get_price_label(def.iap_product_id) if not def.iap_product_id.is_empty() else "",
 		"buying": season_id == _buying_id,
+		# Season Kit: tekst direktno na livadi kartice (imena cvijeća) je boja kita.
+		"ink_field": UiSeasons.ink_field(season_id),
 	}
 
 
@@ -406,6 +412,7 @@ func _refresh_view() -> void:
 	var data := _card_data(id)
 	season_card.content.configure(data)
 	season_card.set_ground(UiHomeV3.ground(id))
+	season_card.set_season(id, UiSeasons.page_color(id, UiHomeV3.page_bg(UiHomeV3.ground(id))))
 	season_tabs.premium = _tab == TAB_PREMIUM
 	var active := GameState.active_season_id
 	var active_tab := TAB_PREMIUM if _is_paid(active) else TAB_FREE
@@ -446,7 +453,7 @@ func _apply() -> void:
 	var ground := UiHomeV3.ground(id)
 
 	if page_bg:
-		page_bg.color = UiHomeV3.page_bg(ground)
+		page_bg.color = UiSeasons.page_color(id, UiHomeV3.page_bg(ground))
 
 	# Kartica = livada dok traje prelaz.
 	season_card.visible = not in_field
@@ -480,6 +487,7 @@ func _apply() -> void:
 	# Ime: JEDAN objekat, 80 px na kartici → 56 px SeasonLabel.
 	var active_name := _season_name(GameState.active_season_id)
 	season_name.text = _season_name(id) if idle else active_name
+	season_name.ink = UiSeasons.ink_field(id if idle else GameState.active_season_id)
 	season_name.top = lerpf(UiHomeV3.NAME_CARD_TOP, UiHomeV3.NAME_FIELD_TOP, e)
 	season_name.px = lerpf(UiHomeV3.NAME_CARD_SIZE, UiHomeV3.NAME_FIELD_SIZE, e)
 	season_name.tracking = lerpf(UiHomeV3.NAME_CARD_LS, UiHomeV3.NAME_FIELD_LS, e)
@@ -517,7 +525,7 @@ func _apply() -> void:
 	season_field.position = -rect.position
 	season_field.size = page
 	if season_field.has_method("apply_reveal"):
-		season_field.call("apply_reveal", u)
+		season_field.call("apply_reveal", u, rect)
 	_apply_chrome(u, rect, page)
 
 

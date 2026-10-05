@@ -1,0 +1,506 @@
+{
+ "clover_t1": {
+  "season": "country_bloom",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 3193,
+  "parts": 5,
+  "crop": [
+   89,
+   132,
+   78,
+   121
+  ],
+  "out": "#3D2B3D"
+ },
+ "clover_t2": {
+  "season": "country_bloom",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 3169,
+  "parts": 5,
+  "crop": [
+   66,
+   52,
+   122,
+   201
+  ],
+  "out": "#3D2B3D"
+ },
+ "clover_t3": {
+  "season": "country_bloom",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 4075,
+  "parts": 6,
+  "crop": [
+   66,
+   52,
+   122,
+   201
+  ],
+  "out": "#3D2B3D"
+ },
+ "daisy_t1": {
+  "season": "country_bloom",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 2499,
+  "parts": 5,
+  "crop": [
+   92,
+   129,
+   72,
+   124
+  ],
+  "out": "#3D2B3D"
+ },
+ "daisy_t2": {
+  "season": "country_bloom",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 8191,
+  "parts": 16,
+  "crop": [
+   75,
+   47,
+   106,
+   206
+  ],
+  "out": "#3D2B3D"
+ },
+ "daisy_t3": {
+  "season": "country_bloom",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 10517,
+  "parts": 16,
+  "crop": [
+   75,
+   47,
+   106,
+   206
+  ],
+  "out": "#3D2B3D"
+ },
+ "buttercup_t1": {
+  "season": "country_bloom",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 2327,
+  "parts": 5,
+  "crop": [
+   94,
+   141,
+   68,
+   112
+  ],
+  "out": "#3D2B3D"
+ },
+ "buttercup_t2": {
+  "season": "country_bloom",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 5802,
+  "parts": 9,
+  "crop": [
+   83,
+   59,
+   90,
+   194
+  ],
+  "out": "#3D2B3D"
+ },
+ "buttercup_t3": {
+  "season": "country_bloom",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 5878,
+  "parts": 9,
+  "crop": [
+   81,
+   57,
+   94,
+   196
+  ],
+  "out": "#3D2B3D"
+ },
+ "tulip_t1": {
+  "season": "country_bloom",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 2896,
+  "parts": 6,
+  "crop": [
+   86,
+   113,
+   85,
+   140
+  ],
+  "out": "#3D2B3D"
+ },
+ "tulip_t2": {
+  "season": "country_bloom",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 4185,
+  "parts": 10,
+  "crop": [
+   69,
+   59,
+   124,
+   194
+  ],
+  "out": "#3D2B3D"
+ },
+ "tulip_t3": {
+  "season": "country_bloom",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 4997,
+  "parts": 10,
+  "crop": [
+   69,
+   59,
+   124,
+   194
+  ],
+  "out": "#3D2B3D"
+ },
+ "sunflower_t1": {
+  "season": "country_bloom",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 2897,
+  "parts": 6,
+  "crop": [
+   88,
+   123,
+   80,
+   130
+  ],
+  "out": "#3D2B3D"
+ },
+ "sunflower_t2": {
+  "season": "country_bloom",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 11314,
+  "parts": 25,
+  "crop": [
+   67,
+   38,
+   122,
+   216
+  ],
+  "out": "#3D2B3D"
+ },
+ "sunflower_t3": {
+  "season": "country_bloom",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 10443,
+  "parts": 25,
+  "crop": [
+   67,
+   37,
+   122,
+   217
+  ],
+  "out": "#3D2B3D"
+ },
+ "pumpkin_t1": {
+  "season": "country_bloom",
+  "rarity": 3,
+  "tier": 1,
+  "bytes": 7515,
+  "parts": 13,
+  "crop": [
+   60,
+   145,
+   123,
+   104
+  ],
+  "out": "#3D2B3D"
+ },
+ "pumpkin_t2": {
+  "season": "country_bloom",
+  "rarity": 3,
+  "tier": 2,
+  "bytes": 9439,
+  "parts": 16,
+  "crop": [
+   29,
+   103,
+   179,
+   146
+  ],
+  "out": "#3D2B3D"
+ },
+ "pumpkin_t3": {
+  "season": "country_bloom",
+  "rarity": 3,
+  "tier": 3,
+  "bytes": 10801,
+  "parts": 16,
+  "crop": [
+   29,
+   103,
+   179,
+   146
+  ],
+  "out": "#3D2B3D"
+ },
+ "moon_moss_t1": {
+  "season": "moonlit_warren",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 2200,
+  "parts": 3,
+  "crop": [
+   77,
+   136,
+   102,
+   113
+  ],
+  "out": "#221B3A"
+ },
+ "moon_moss_t2": {
+  "season": "moonlit_warren",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 4485,
+  "parts": 7,
+  "crop": [
+   48,
+   81,
+   160,
+   168
+  ],
+  "out": "#221B3A"
+ },
+ "moon_moss_t3": {
+  "season": "moonlit_warren",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 5639,
+  "parts": 7,
+  "crop": [
+   48,
+   81,
+   160,
+   168
+  ],
+  "out": "#221B3A"
+ },
+ "nightshade_petal_t1": {
+  "season": "moonlit_warren",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 2466,
+  "parts": 5,
+  "crop": [
+   94,
+   127,
+   68,
+   126
+  ],
+  "out": "#221B3A"
+ },
+ "nightshade_petal_t2": {
+  "season": "moonlit_warren",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 4556,
+  "parts": 9,
+  "crop": [
+   79,
+   53,
+   98,
+   200
+  ],
+  "out": "#221B3A"
+ },
+ "nightshade_petal_t3": {
+  "season": "moonlit_warren",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 5787,
+  "parts": 9,
+  "crop": [
+   77,
+   51,
+   102,
+   202
+  ],
+  "out": "#221B3A"
+ },
+ "silver_harebell_t1": {
+  "season": "moonlit_warren",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 1598,
+  "parts": 4,
+  "crop": [
+   93,
+   162,
+   90,
+   90
+  ],
+  "out": "#221B3A"
+ },
+ "silver_harebell_t2": {
+  "season": "moonlit_warren",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 2842,
+  "parts": 5,
+  "crop": [
+   93,
+   105,
+   124,
+   147
+  ],
+  "out": "#221B3A"
+ },
+ "silver_harebell_t3": {
+  "season": "moonlit_warren",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 2384,
+  "parts": 5,
+  "crop": [
+   93,
+   105,
+   124,
+   147
+  ],
+  "out": "#221B3A"
+ },
+ "lunar_orchid_t1": {
+  "season": "moonlit_warren",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 3454,
+  "parts": 7,
+  "crop": [
+   60,
+   131,
+   136,
+   120
+  ],
+  "out": "#221B3A"
+ },
+ "lunar_orchid_t2": {
+  "season": "moonlit_warren",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 5570,
+  "parts": 13,
+  "crop": [
+   60,
+   59,
+   136,
+   192
+  ],
+  "out": "#221B3A"
+ },
+ "lunar_orchid_t3": {
+  "season": "moonlit_warren",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 8239,
+  "parts": 13,
+  "crop": [
+   60,
+   59,
+   136,
+   192
+  ],
+  "out": "#221B3A"
+ },
+ "star_jasmine_t1": {
+  "season": "moonlit_warren",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 3188,
+  "parts": 7,
+  "crop": [
+   91,
+   113,
+   74,
+   139
+  ],
+  "out": "#221B3A"
+ },
+ "star_jasmine_t2": {
+  "season": "moonlit_warren",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 11177,
+  "parts": 26,
+  "crop": [
+   74,
+   63,
+   127,
+   189
+  ],
+  "out": "#221B3A"
+ },
+ "star_jasmine_t3": {
+  "season": "moonlit_warren",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 11424,
+  "parts": 26,
+  "crop": [
+   74,
+   63,
+   127,
+   189
+  ],
+  "out": "#221B3A"
+ },
+ "umbral_lily_t1": {
+  "season": "moonlit_warren",
+  "rarity": 3,
+  "tier": 1,
+  "bytes": 3522,
+  "parts": 7,
+  "crop": [
+   81,
+   73,
+   92,
+   180
+  ],
+  "out": "#221B3A"
+ },
+ "umbral_lily_t2": {
+  "season": "moonlit_warren",
+  "rarity": 3,
+  "tier": 2,
+  "bytes": 11329,
+  "parts": 17,
+  "crop": [
+   72,
+   52,
+   126,
+   201
+  ],
+  "out": "#221B3A"
+ },
+ "umbral_lily_t3": {
+  "season": "moonlit_warren",
+  "rarity": 3,
+  "tier": 3,
+  "bytes": 9434,
+  "parts": 17,
+  "crop": [
+   72,
+   52,
+   126,
+   201
+  ],
+  "out": "#221B3A"
+ }
+}

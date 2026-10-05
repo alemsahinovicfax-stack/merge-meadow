@@ -13,6 +13,8 @@ ai_sažetak: "Art brief za SVIH 48 vrsta cvijeća (8 sezona × 6 tipova, 3 tier-
 
 # Sjeme i cvijeće — Claude Design brief
 
+> **2026-10-03: zamijenjeno sa [[seasons-cd-brief|seasons-cd-brief]]** (cvijeće + izgled svih 8 sezona na svim površinama). Pravila tiera i rijetkosti odavde su prenesena u njegov §6; za CD koristi novi brief.
+
 > **Status: priprema materijala.** Ne mijenja kod. Cilj je dokument iz kojeg CD generiše ilustracije koje ćeš mi proslijediti, pa ih ja uvezem na mjesta u igri gdje se sjeme/cvijeće prikazuje.
 
 ## 1. Zašto ovo postoji

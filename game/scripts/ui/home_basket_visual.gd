@@ -1,6 +1,7 @@
 extends Control
 
-## Home basket card icon — empty outline or T3 plant for the selected seed.
+## Home basket card icon — empty outline or T3 plant for the selected seed (odrezan crtež,
+## isti kadar kao ostatak igre).
 
 const CampPlantDraw := preload("res://scripts/visual/camp_plant_draw.gd")
 
@@ -32,7 +33,7 @@ func _draw() -> void:
 		else:
 			_draw_empty_basket(center, side)
 		return
-	CampPlantDraw.draw_fitted_plant(self, center, _type_id, 3, side * _plant_ratio)
+	CampPlantDraw.draw_cropped_plant(self, center, _type_id, 3, side * _plant_ratio)
 
 
 func _draw_empty_basket(center: Vector2, side: float) -> void:

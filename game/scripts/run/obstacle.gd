@@ -21,4 +21,8 @@ func apply_season_tint() -> void:
 	var visual := get_node_or_null("Visual") as CanvasItem
 	if visual == null:
 		return
+	# Season Kit: prepreke kita imaju svoje boje — bez tinta sezone.
+	if UiSeasons.has_kit(GameState.active_season_id):
+		visual.modulate = Color.WHITE
+		return
 	visual.modulate = SeasonThemeScript.obstacle_modulate(GameState.active_season_id)

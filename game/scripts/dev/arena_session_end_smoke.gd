@@ -184,5 +184,47 @@ func _run() -> void:
 		_fail("Merge Hint mark should go away on release")
 		_finish(backup, gs)
 		return
+	await create_timer(0.3).timeout
+	if bool(arena.call("is_merge_hint_visible")):
+		_fail("Merge Hint brackets should be hidden after release")
+		_finish(backup, gs)
+		return
+
+	# Spoj: držana i označena sjemenka nestanu (oslobođena meta je `== null` u 4.7) —
+	# zagrade ne smiju ostati visjeti na mjestu spojenog para.
+	held.set("_dragging", true)
+	await _frames(3)
+	target = arena.call("get_merge_hint_target")
+	if target == null:
+		_fail("Merge Hint should mark a seed again")
+		_finish(backup, gs)
+		return
+	chips.erase(target)
+	chips.erase(held)
+	target.free()
+	held.free()
+	await _frames(12)
+	await create_timer(0.3).timeout
+	if bool(arena.call("is_merge_hint_visible")):
+		_fail("Merge Hint brackets stayed on screen after the marked pair merged")
+		_finish(backup, gs)
+		return
+
+	# Kraj sesije sa zagradama na ekranu: polje se isprazni → oznaka mora otići.
+	held = chips[0]
+	held.set("_dragging", true)
+	await _frames(3)
+	if not bool(arena.call("is_merge_hint_visible")):
+		_fail("Merge Hint should show for the remaining pair")
+		_finish(backup, gs)
+		return
+	arena.call("_clear_field_chips")
+	await _frames(1)
+	arena.call("_end_session_if_settled")
+	await _frames(2)
+	if bool(arena.call("is_merge_hint_visible")) or bool(arena.call("is_session_open")):
+		_fail("Merge Hint brackets should be gone when the session ends")
+		_finish(backup, gs)
+		return
 	gs.set("merge_hint_owned", false)
 	_finish(backup, gs)

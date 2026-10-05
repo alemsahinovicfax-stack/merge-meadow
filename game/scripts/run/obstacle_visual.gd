@@ -2,6 +2,21 @@ extends Node2D
 
 ## Prepreka — tijelo 176×150 + ovratnik. Kolizija ostaje 64×64 na roditelju.
 ## v1 motivi: stone i stump. Hay je u UiRun.obstacle_colors, ali se ne spawna.
+## Season Kit (design_handoff_seasons § Odlučeno 9): sezona s kitom crta svoje dvije
+## prepreke (SVG 176 x 150; "stone" → prva, "stump" → druga) s ovratnikom u boji kita
+## i sjenom ispod; kolizija 64 x 64 ostaje na roditelju.
+
+## Iz RunScreen.dc.html (kutija 260 x 230 oko centra): sjena 168 x 40 na y +55,
+## ovratnik na y +69, tijelo centrirano na y −6.
+const KIT_SHADOW := Color(0.039, 0.055, 0.078, 0.30)
+const KIT_SHADOW_SIZE := Vector2(168, 40)
+const KIT_SHADOW_Y := 55.0
+const KIT_COLLAR_Y := 69.0
+const KIT_BODY_Y := -6.0
+const KIT_COLLAR_EDGE_W := 3.0
+
+
+static var _tex_cache: Dictionary = {}
 
 
 func _ready() -> void:
@@ -15,7 +30,21 @@ func _kind() -> String:
 	return "stone"
 
 
+## Tekstura prepreke kita za aktivnu sezonu (null = današnji kamen/panj).
+func kit_texture() -> Texture2D:
+	var path := UiSeasons.obstacle_texture(GameState.active_season_id, 1 if _kind() == "stump" else 0)
+	if path.is_empty():
+		return null
+	if not _tex_cache.has(path):
+		_tex_cache[path] = load(path) as Texture2D if ResourceLoader.exists(path) else null
+	return _tex_cache[path]
+
+
 func _draw() -> void:
+	var tex := kit_texture()
+	if tex != null:
+		_draw_kit(tex)
+		return
 	var body := UiRun.OBSTACLE_BODY
 	var body_rect := Rect2(-body * 0.5, body)
 	var collar := UiRun.OBSTACLE_COLLAR
@@ -32,6 +61,19 @@ func _draw() -> void:
 		_draw_stump(body_rect, colors)
 	else:
 		_draw_stone(body_rect, colors)
+
+
+func _draw_kit(tex: Texture2D) -> void:
+	var collar_cols: Array = UiSeasons.run_def(GameState.active_season_id).get("collar", [])
+	var collar := UiRun.OBSTACLE_COLLAR
+	var fill := UiSeasons.col(str(collar_cols[0])) if collar_cols.size() > 0 else UiRun.COLLAR
+	var edge := UiSeasons.col(str(collar_cols[1])) if collar_cols.size() > 1 else UiRun.COLLAR_EDGE
+	var cc := Vector2(0.0, KIT_COLLAR_Y)
+	_draw_ellipse(cc, collar, fill)
+	_draw_ellipse_outline(cc, collar * 0.5 - Vector2.ONE * KIT_COLLAR_EDGE_W * 0.5, edge, KIT_COLLAR_EDGE_W)
+	_draw_ellipse(Vector2(0.0, KIT_SHADOW_Y), KIT_SHADOW_SIZE, KIT_SHADOW)
+	var body := UiRun.OBSTACLE_BODY
+	draw_texture_rect(tex, Rect2(Vector2(-body.x * 0.5, KIT_BODY_Y - body.y * 0.5), body), false)
 
 
 func _draw_stone(body: Rect2, colors: Array) -> void:

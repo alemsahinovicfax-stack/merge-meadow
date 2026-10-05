@@ -379,6 +379,7 @@ func set_arena_page_active(active: bool) -> void:
 		_sync_hub_nav_lock()
 	else:
 		_hide_need_more_overlay()
+		_clear_merge_hint()
 		if _pest and not _session_open:
 			_pest.reset_to_nest()
 		# Stay locked only while session lives; tabs should already block leave.
@@ -613,7 +614,17 @@ func _update_merge_hint() -> void:
 
 
 func get_merge_hint_target() -> Node:
-	return _hint_mark.get_target() if _hint_mark != null and _hint_mark.visible else null
+	return _hint_mark.get_target() if _hint_mark != null and _hint_mark.is_shown() else null
+
+
+func is_merge_hint_visible() -> bool:
+	return _hint_mark != null and _hint_mark.visible
+
+
+## Kraj sesije / stranica se gasi (_process staje): zagrade ne smiju ostati na polju.
+func _clear_merge_hint() -> void:
+	if _hint_mark != null:
+		_hint_mark.clear_now()
 
 
 func _set_pair_pulses(held: ArenaSeedChip) -> void:
@@ -776,6 +787,7 @@ func _end_session_if_settled() -> void:
 	GameState.commit_arena_chips_to_bag(_chip_data)
 	_clear_combo()
 	_clear_pair_pulses()
+	_clear_merge_hint()
 	_update_tutorial_cue()
 	_refresh_bag()
 	_sync_hub_nav_lock()
@@ -1481,6 +1493,7 @@ func _end_session_to_camp() -> void:
 	_reset_session_feel()
 	_clear_combo()
 	_clear_pair_pulses()
+	_clear_merge_hint()
 	GameState.commit_arena_chips_to_bag(_chip_data)
 	_clear_field_chips()
 	GameState.clear_arena_pour_locks()

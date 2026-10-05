@@ -325,6 +325,8 @@ const S_NOTHING_LOST := "Nothing lost"
 const S_RUN_FAILED := "Run Failed"
 const S_RUN_COMPLETE := "Run Complete!"
 const S_KEPT_HALF := "Kept half"
+## R5: vreća (soft cap 40) ne prima sav plijen — višak se ne prima, ali igrač to vidi.
+const S_LOOT_BAG_FULL := "Bag full · %d of %d seeds fit"
 const S_AD_DOUBLE := "Double"
 const S_AD_REVIVE := "Revive"
 const S_AD_DOUBLED := "Doubled"
@@ -354,6 +356,33 @@ static func icon(icon_name: String) -> Texture2D:
 
 static func font(weight: int, px: int) -> Font:
 	return UiStage.font(weight, px)
+
+
+## ModalNote: roza disk 64 s ikonom korpe + tekst 900/40 (Daily gift „Bag almost full", R5 puna vreća).
+static func modal_note(text: String) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.name = "ModalNote"
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 14)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var disc := PanelContainer.new()
+	disc.custom_minimum_size = Vector2(64, 64)
+	disc.add_theme_stylebox_override("panel", _box(PINK, 32, 3))
+	var ico := TextureRect.new()
+	ico.texture = icon("icon_basket")
+	ico.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ico.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	ico.custom_minimum_size = Vector2(40, 40)
+	disc.add_child(ico)
+	row.add_child(disc)
+	var lab := Label.new()
+	lab.name = "NoteText"
+	lab.text = text
+	lab.add_theme_font_override("font", font(900, 40))
+	lab.add_theme_font_size_override("font_size", 40)
+	lab.add_theme_color_override("font_color", OUTLINE)
+	row.add_child(lab)
+	return row
 
 
 static func text_w(weight: int, px: float, text: String) -> float:

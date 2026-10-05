@@ -720,26 +720,7 @@ func _attach_gift_button(kind: String, label: String) -> void:
 
 
 func _gift_note() -> Control:
-	var row := HBoxContainer.new()
-	row.name = "ModalNote"
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 14)
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var disc := PanelContainer.new()
-	disc.custom_minimum_size = Vector2(64, 64)
-	disc.add_theme_stylebox_override("panel", UiPopups._box(UiPopups.PINK, 32, 3))
-	var icon := TextureRect.new()
-	icon.texture = UiPopups.icon("icon_basket")
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.custom_minimum_size = Vector2(40, 40)
-	disc.add_child(icon)
-	row.add_child(disc)
-	var lab := Label.new()
-	lab.text = UiPopups.S_GIFT_BAG_FULL
-	_style_sheet_label(lab, 900, 40, UiPopups.OUTLINE)
-	row.add_child(lab)
-	return row
+	return UiPopups.modal_note(UiPopups.S_GIFT_BAG_FULL)
 
 
 func _hide_reward_overlay() -> void:

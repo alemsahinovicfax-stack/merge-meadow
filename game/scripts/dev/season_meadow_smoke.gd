@@ -471,10 +471,17 @@ func _run() -> void:
 	if not swipe_err.is_empty():
 		_fail("Bloom open: %s" % swipe_err)
 		return
+	var grown_before := int(field.call("get_meadow_grown_count"))
 	if hub.has_method("go_to_page"):
 		hub.call("go_to_page", MetaHubPages.CAMP, false)
 	for _camp_i in 12:
 		await process_frame
+	# Dok je polje otvoreno igrač spoji ★3 drugdje (Arena): povratak na Home mora ih pokazati.
+	var grown_stash: Dictionary = (gs.get("garden_crystal_stash") as Dictionary).duplicate()
+	var cb_def: SeasonDef = gs.call("get_season_def", "country_bloom")
+	for type_id in cb_def.seed_type_ids:
+		grown_stash[str(type_id)] = 10
+	gs.set("garden_crystal_stash", grown_stash)
 	if not bool(gs.get("home_season_field_open")):
 		_fail("CAMP hop should keep home_season_field_open")
 		return
@@ -492,6 +499,10 @@ func _run() -> void:
 		return
 	if field == null or not field.visible:
 		_fail("return MAIN should still show SeasonField")
+		return
+	var grown_after := int(field.call("get_meadow_grown_count"))
+	if grown_after <= grown_before or grown_after != int(field.call("get_meadow_spot_count")):
+		_fail("open field should grow new ★3 on return (before %d, after %d)" % [grown_before, grown_after])
 		return
 	var bloom_def: SeasonDef = gs.call("get_season_def", "country_bloom")
 	var bloom_pool: Array = bloom_def.seed_type_ids if bloom_def else []

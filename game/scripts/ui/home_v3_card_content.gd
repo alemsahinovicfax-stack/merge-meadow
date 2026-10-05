@@ -338,7 +338,7 @@ func _draw_name(text: String, disc: Rect2) -> void:
 	var lines := _name_lines(text)
 	var boxes := _name_boxes(text, disc)
 	for i in mini(lines.size(), boxes.size()):
-		UiHomeV3.draw_text(self, 900, UiHomeV3.MISSING_NAME, lines[i], boxes[i].position, UiHomeV3.INK_DEEP)
+		UiHomeV3.draw_text(self, 900, UiHomeV3.MISSING_NAME, lines[i], boxes[i].position, data.get("ink_field", UiHomeV3.INK_DEEP))
 
 
 func _name_lines(text: String) -> PackedStringArray:

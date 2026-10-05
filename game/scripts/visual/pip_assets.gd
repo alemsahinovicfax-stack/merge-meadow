@@ -34,6 +34,48 @@ static func get_texture(skin_id: String = EQUIPPED) -> Texture2D:
 	return _base_texture()
 
 
+## Season Kit · Pip poze na polju (pip_sniff.svg, pip_sleep.svg): iste boje kao
+## pip_idle.svg, pa isti recolor skina radi i na njima. "walk" = get_texture().
+const POSE_PATHS := {
+	"sniff": "res://assets/sprites/pip_sniff.svg",
+	"sleep": "res://assets/sprites/pip_sleep.svg",
+}
+static var _pose_sources: Dictionary = {}
+
+
+static func get_pose_texture(pose: String, skin_id: String = EQUIPPED) -> Texture2D:
+	if not POSE_PATHS.has(pose):
+		return get_texture(skin_id)
+	var path: String = POSE_PATHS[pose]
+	var skin := equipped_skin() if skin_id == EQUIPPED else skin_id
+	if not skin.is_empty():
+		var recolor := CosmeticCatalog.get_recolor(skin)
+		if not recolor.is_empty():
+			var key := "pose:%s:%s@%s" % [pose, skin, str(SKIN_RASTER_SCALE)]
+			if _skin_cache.has(key):
+				return _skin_cache[key] as Texture2D
+			var src := _pose_source(path)
+			if not src.is_empty():
+				var tex := texture_from_svg(recolor_svg(src, recolor), SKIN_RASTER_SCALE)
+				if tex != null:
+					_skin_cache[key] = tex
+					return tex
+	var base_key := "pose:" + pose
+	if _skin_cache.has(base_key):
+		return _skin_cache[base_key] as Texture2D
+	var base: Texture2D = load(path) as Texture2D if ResourceLoader.exists(path) else null
+	if base == null:
+		return get_texture(skin_id)
+	_skin_cache[base_key] = base
+	return base
+
+
+static func _pose_source(path: String) -> String:
+	if not _pose_sources.has(path):
+		_pose_sources[path] = FileAccess.get_file_as_string(path) if FileAccess.file_exists(path) else ""
+	return _pose_sources[path]
+
+
 static func equipped_skin() -> String:
 	var gs := _game_state()
 	if gs == null:

@@ -51,7 +51,7 @@ static func draw_plant(canvas: CanvasItem, center: Vector2, type_id: String, tie
 
 
 ## Odrezan crtež: vidljivi piksel (alpha > 0) puni `box` po dužoj strani, centrirano.
-## Home polje, korpa i biranje sezone i dalje zovu draw_fitted_plant (FIT_FRAC).
+## draw_fitted_plant (FIT_FRAC) ostaje samo za polje sezone bez kita.
 static func draw_cropped_plant(
 	canvas: CanvasItem, center: Vector2, type_id: String, tier: int, box: float
 ) -> void:

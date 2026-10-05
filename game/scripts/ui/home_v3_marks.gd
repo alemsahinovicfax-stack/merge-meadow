@@ -27,6 +27,8 @@ var top: float = 0.0
 var px: float = 80.0
 var tracking: float = 0.0
 var offset_x: float = 0.0
+## KIND_NAME: boja imena — ink kita sezone (svijetao na tamnoj livadi).
+var ink: Color = UiHomeV3.INK_DEEP
 var shadow: Array = UiHomeV3.PIP_SHADOW_CARD
 
 
@@ -60,7 +62,7 @@ func _draw() -> void:
 		KIND_NAME:
 			if not text.is_empty():
 				var w := UiHomeV3.text_w(900, px, text, tracking)
-				UiHomeV3.draw_text(self, 900, px, text, Vector2(UiHomeV3.PAGE.x * 0.5 - w * 0.5 + offset_x, top), UiHomeV3.INK_DEEP, tracking)
+				UiHomeV3.draw_text(self, 900, px, text, Vector2(UiHomeV3.PAGE.x * 0.5 - w * 0.5 + offset_x, top), ink, tracking)
 		KIND_PIP:
 			if rect.size.x > 1.0:
 				UiHomeV3.draw_pip(self, rect, shadow)

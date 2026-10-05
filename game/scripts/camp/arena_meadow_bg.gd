@@ -302,7 +302,8 @@ static func _shape_mesh(shape_id: String) -> Array:
 	if _shape_cache.has(shape_id):
 		return _shape_cache[shape_id]
 	var out: Array = []
-	for p in UiArenaV2.SHAPES.get(shape_id, []):
+	# Season Kit: oblici kojih nema u Areni v2 (bala sijena) dolaze iz kita.
+	for p in UiArenaV2.SHAPES.get(shape_id, UiSeasons.shapes().get(shape_id, [])):
 		var ci := int(p[p.size() - 1])
 		var pts := PackedVector2Array()
 		var idx := PackedInt32Array()

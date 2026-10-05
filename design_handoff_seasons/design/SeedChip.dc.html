@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div data-layer="{{ layer }}" style="position:relative;width:134.4px;height:134.4px;transform:{{ tf }};opacity:{{ op }};--r:{{ r }};--rb:{{ rb }};--rim:{{ rim }};--edge:{{ edge }};--wi:{{ wi }}px;--wr:{{ wr }}">
+  <div data-layer="Shadow" style="position:absolute;left:-4px;top:{{ shY }}px;width:142.4px;height:142.4px;border-radius:var(--rb);background:{{ shC }}"></div>
+  <sc-if value="{{ base }}" hint-placeholder-val="{{ true }}">
+    <div data-layer="SeedBase" style="position:absolute;inset:-4px;border-radius:var(--rb);background:#2D3436"></div>
+  </sc-if>
+  <div data-layer="Rim" style="position:absolute;inset:0;box-sizing:border-box;border-radius:var(--r);background:var(--rim);border:3px solid var(--edge)"></div>
+  <div data-layer="Well" style="position:absolute;inset:var(--wi);box-sizing:border-box;border-radius:var(--wr);background:#22342A;border:2px solid #16211B"></div>
+  <sc-if value="{{ t2 }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="Hairline" style="position:absolute;inset:5px;box-sizing:border-box;border-radius:33px;border:2px solid var(--edge)"></div>
+  </sc-if>
+  <sc-if value="{{ hasImg }}" hint-placeholder-val="{{ true }}">
+    <div data-layer="Flower" style="position:absolute;left:{{ bx }}px;top:{{ bx }}px;width:{{ box }}px;height:{{ box }}px;overflow:hidden">
+      <img src="{{ img.src }}" alt="" style="position:absolute;left:{{ img.left }}px;top:{{ img.top }}px;width:{{ img.size }}px;height:{{ img.size }}px;max-width:none;display:block">
+    </div>
+  </sc-if>
+  <sc-for list="{{ proc }}" as="q" hint-placeholder-count="0">
+    <div style="position:absolute;left:{{ q.x }}px;top:{{ q.y }}px;width:{{ q.w }}px;height:{{ q.h }}px;border-radius:{{ q.br }};background:{{ q.c }}"></div>
+  </sc-for>
+  <sc-if value="{{ mythic }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="MythicRing" style="position:absolute;inset:-11px;box-sizing:border-box;border-radius:var(--rb);border:4px dashed rgba(214,168,47,.9)"></div>
+  </sc-if>
+  <sc-if value="{{ eaten }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="Chomp" style="position:absolute;left:84.4px;top:30px;width:54px;height:54px;box-sizing:border-box;border-radius:27px 0 27px 27px;background:#FFCCD5;border:3px solid #E89AAA"></div>
+  </sc-if>
+  <sc-if value="{{ hasRing }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="Ring" style="position:absolute;inset:{{ ringIn }}px;box-sizing:border-box;border-radius:{{ ringR }};border:{{ ringW }}px solid {{ ringC }}"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:200,&quot;height&quot;:200},&quot;type&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;clover&quot;,&quot;daisy&quot;,&quot;buttercup&quot;,&quot;tulip&quot;,&quot;sunflower&quot;,&quot;pumpkin&quot;,&quot;generic&quot;],&quot;default&quot;:&quot;clover&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;tier&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:1,&quot;max&quot;:2,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;idle&quot;,&quot;drag&quot;,&quot;pulse&quot;,&quot;partner&quot;,&quot;merge&quot;,&quot;eaten&quot;],&quot;default&quot;:&quot;idle&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;base&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;mythic&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;season&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;frost_orchard&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;rarity&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:1,&quot;max&quot;:3,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;},&quot;jitter&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:0.5,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  state = { M: null };
+  componentDidMount() { import('./arena_v2_data.js').then(M => this.setState({ M })); }
+  renderVals() {
+    const p = this.props, M = this.state.M;
+    const tier = +(p.tier ?? 1) === 2 ? 2 : 1, t2 = tier === 2;
+    const type = p.type ?? 'clover', st = p.state ?? 'idle';
+    const mythic = !!p.mythic || type === 'pumpkin';
+    const base = p.base !== false && p.base !== 'false';
+    const box = t2 ? 88 : 80;
+    let img = null, proc = [];
+    if (M) {
+      img = M.cropImg(type + '_t' + tier, box);
+      if (!img) {
+        const pal = M.procPalette(p.season ?? 'frost_orchard', ((+(p.jitter ?? 0)) - 0.5) * 0.08);
+        const rar = +(p.rarity ?? 1), c = 67.2;
+        const dot = (x, y, r, col) => proc.push({ x: c + x - r, y: c + y - r, w: 2 * r, h: 2 * r, br: '50%', c: col });
+        if (!t2) {
+          const s = box / 45, oy = 6 * s;
+          proc.push({ x: c - 2 * s, y: c + oy + 8 * s, w: 4 * s, h: 14 * s, br: '2px', c: '#599E52' });
+          dot(0, oy - 6 * s, 6 * s, pal.seed);
+          if (rar >= 2) { dot(-6 * s, oy + s, 4 * s, pal.petal); dot(6 * s, oy + s, 4 * s, pal.petal); }
+          if (rar >= 3) dot(0, oy - 14 * s, 3.5 * s, pal.center);
+        } else {
+          const s = box / 68, oy = 6 * s, n = rar >= 3 ? 10 : rar >= 2 ? 7 : 5, rad = rar >= 3 ? 15 : 13;
+          proc.push({ x: c - 2.5 * s, y: c + oy + 10 * s, w: 5 * s, h: 16 * s, br: '3px', c: '#599E52' });
+          for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; dot(Math.cos(a) * rad * s, oy + (Math.sin(a) * rad - 6) * s, 7 * s, i % 2 && rar >= 2 ? pal.center : pal.petal); }
+          dot(0, oy - 6 * s, 8 * s, pal.center);
+        }
+      }
+    }
+    const drag = st === 'drag', eaten = st === 'eaten';
+    let tf = 'none', op = 1, ring = null;
+    if (drag) tf = 'scale(1.12) rotate(-3deg)';
+    if (st === 'partner') { tf = 'scale(1.04)'; ring = [-12, 14, '#FFD56B']; }
+    if (st === 'pulse') ring = [-10, 12, 'rgba(242,217,64,.85)'];
+    if (st === 'merge') { tf = 'scale(1.15)'; ring = [-26, 10, 'rgba(255,245,209,.55)']; }
+    if (eaten) { tf = 'scale(.62)'; op = 0.4; }
+    return {
+      layer: 'SeedChip_T' + tier, tf, op,
+      r: t2 ? '38px' : '50%', rb: t2 ? '42px' : '50%',
+      rim: mythic ? '#FFD56B' : '#FFF8F0', edge: mythic ? '#D6A82F' : '#CBC2B6',
+      wi: t2 ? 11 : 8, wr: t2 ? '27px' : '50%', t2, mythic, base,
+      shY: drag ? 14 : 2, shC: drag ? 'rgba(20,32,26,.34)' : 'rgba(20,32,26,.42)',
+      hasImg: !!img, img: img || { src: '', left: 0, top: 0, size: 0 }, box, bx: (134.4 - box) / 2, proc, eaten,
+      hasRing: !!ring, ringIn: ring ? ring[0] : 0, ringW: ring ? ring[1] : 0, ringC: ring ? ring[2] : 'transparent',
+      ringR: st === 'merge' ? '50%' : (t2 ? (38 - (ring ? ring[0] : 0)) + 'px' : '50%')
+    };
+  }
+}
+</script>
+</body>
+</html>

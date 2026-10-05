@@ -1,0 +1,41 @@
+Season Kit — stablo čvorova (faza 1). Novo = [+], mijenja se = [~], briše se = [-]. Raspored svih paketa ostaje.
+
+res://data/seasons/seasons_kit.json            [+] = godot/seasons_export.json
+res://scripts/visual/ui_seasons.gd             [+] UiSeasons (konstante + recept helperi)
+res://scripts/visual/season_backdrop.gd        [+] SeasonBackdrop (Control) — generalizovani ArenaMeadowBg:
+                                                   slojevi band / ridge (+rim) / mow / fence / shape / scatter,
+                                                   keš geometrije u lokalnom prostoru JEDNOM po sezoni,
+                                                   po frejmu samo transform (rect kartice u prelazu) i alpha
+res://assets/sprites/flowers/*_t{1,2,3}.svg    [~] 18 Country Bloom zamijenjeno + [+] 18 Moonlit Warren (+ .import)
+res://assets/sprites/pip_sniff.svg, pip_sleep.svg   [+]
+res://assets/sprites/seasons/<id>/obstacle_*.svg    [+] 4 (176 × 150)
+
+SeasonSelect (Home v3)
+├─ PageBg (ColorRect)                          [~] boja = UiSeasons.page_color(id)
+├─ SeasonTabs                                  (isto)
+├─ OpenTransition
+│  ├─ SeasonCard (HomeV3Card)                  [~] _draw trake → dijete SeasonBackdrop(recipe "field")
+│  │  ├─ SeasonBackdrop                        [+] size = rect kartice; MOUSE_FILTER_IGNORE
+│  │  ├─ MeadowSpots (Control)                 [+] 13 mjesta u prostoru recta (UiSeasons.spot_rects) — prelaz bez šava
+│  │  └─ HomeV3CardContent                     (isto; tekst imena = UiSeasons.ink_field)
+│  ├─ FieldClip / SeasonField                  [~] SeasonField crta SeasonBackdrop umjesto MeadowSky/Far/Near
+│  │  ├─ MeadowGround → SeasonBackdrop         [~]
+│  │  ├─ MeadowFlower × 13                     [~] pozicije iz kit.spots (dubine/pragovi isti); grow tween
+│  │  ├─ Ambient (Node2D)                      [+] ≤ 24 čestice, 1 petlja, samo u = 1
+│  │  ├─ MeadowPip (season_field_pip.gd)       [~] tekstura po FSM stanju (walk/sniff/sleep), bob, Zzz, SniffPuff
+│  │  └─ MeadowNote                            [~] boja = ink_field
+│  ├─ CardEdge, SeasonName, MeadowPip, PlayButton   (isto; SeasonName boja = ink_field)
+└─ CardNav                                     (isto)
+
+ShopScreen › TabPage_Seasons › SeasonPackCard  [~] _draw: ako recipe(id,"shop") postoji → SeasonBackdrop 1024 × 356 u kartici,
+                                                   ime = ink_field; inače današnje trake. Dugme/stanja isti (BuyButton).
+
+MergeArena › ArenaMeadowBg                     [~] UiArenaV2.FIELDS[id] + kits[id].arena (merge pri učitavanju)
+
+run_scene › LaneBackground (lane_background.gd) [~] boje/uzorci iz run_def(id): ground, lane, material (mown | moon_path),
+                                                   far (0,35×), near (1,0×), ambient; modulate = samo kozmetika (bez SeasonTheme)
+run_scene › Obstacle › ObstacleVisual          [~] Sprite2D tekstura iz obstacle_texture(id, kind) + collar boje kita;
+                                                   kolizija 64 × 64 ostaje
+
+Briše se: SeasonTheme.bg_modulate / obstacle_modulate / home_field_tint za sezone s kitom; HomeV3Card._band() trake;
+SeasonField._band_sky/_far/_near; procedural CampPlantDraw fallback za 12 tipova s crtežom.

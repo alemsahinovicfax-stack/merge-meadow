@@ -62,8 +62,54 @@ static func combo_step(n: int) -> Dictionary:
 	return COMBO_STEPS[mini(n, 6) - 2]
 
 
+static var _fields_kit: Dictionary = {}
+
+
+## Recept livade. Season Kit (design_handoff_seasons): sezona s kitom dobija kits[id].arena
+## spojen preko Arena v2 recepta (base, boje slojeva, nove pruge, palete rasutih, nove bale,
+## combo) — isto mjesto kao Home polje. Spaja se jednom po sezoni.
 static func field(season_id: String) -> Dictionary:
-	return FIELDS.get(season_id, FIELDS["country_bloom"])
+	var id := season_id if FIELDS.has(season_id) else "country_bloom"
+	if _fields_kit.has(id):
+		return _fields_kit[id]
+	var f: Dictionary = FIELDS[id]
+	var a := UiSeasons.arena_def(id)
+	if not a.is_empty():
+		f = _merge_kit(f, a)
+	_fields_kit[id] = f
+	return f
+
+
+static func _merge_kit(src: Dictionary, a: Dictionary) -> Dictionary:
+	var f := src.duplicate(true)
+	if a.has("base"):
+		f["base"] = (a["base"] as Array).duplicate()
+	var over: Dictionary = a.get("layers", {})
+	var layers: Array = f["layers"]
+	for L in layers:
+		if over.has(str(L.get("id", ""))):
+			L["fill"] = (over[str(L["id"])] as Array).duplicate()
+	for n in a.get("addLayers", []):
+		var at := layers.size() - 1
+		for i in layers.size():
+			if str(layers[i].get("id", "")) == str(n["after"]):
+				at = i
+		var polys: Array = []
+		for st in n["stripes"]:
+			polys.append([[-2, st[0]], [102, st[0]], [102, st[1]], [-2, st[1]]])
+		layers.insert(at + 1, {"id": n["id"], "kind": "poly", "fill": n["fill"], "polys": polys})
+	var pal: Dictionary = a.get("scatter", {})
+	for sc in f["scatter"]:
+		if pal.has(str(sc.get("id", ""))):
+			sc["palette"] = (pal[str(sc["id"])] as Array).duplicate()
+	for sc in a.get("addScatter", []):
+		var add: Dictionary = {"grow": [1, 1], "rot": [0, 0]}
+		add.merge(sc, true)
+		(f["scatter"] as Array).append(add)
+	if a.has("combo"):
+		f["combo"] = a["combo"]
+	f["kit"] = true
+	return f
 
 
 ## Instanca rasutog elementa: {pos (% ), size, rot (deg), palette, avoided}. Isto kao scatterInstance u JS.

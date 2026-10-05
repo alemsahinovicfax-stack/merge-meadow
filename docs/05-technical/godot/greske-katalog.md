@@ -393,6 +393,42 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** u izlazu testa uvijek traži i `SCRIPT ERROR`, ne samo „OK" (`grep -c "SCRIPT ERROR"` mora biti 0).
 
+## #22 — tekstura iz `load()` u `_draw()` se crta kao bijeli pravougaonik
+
+**Datum:** 2026-10-05 (Sezone faza 1, prepreke u runu)
+
+**Simptom:** nova SVG prepreka u runu je bijeli pravougaonik tačno svoje veličine (176 × 150). Headless provjera piksela teksture je ispravna, a ista tekstura na `Sprite2D` se vidi normalno.
+
+**Uzrok:** `draw_texture_rect(load(path), …)` u `_draw()` upisuje u canvas samo RID teksture, ne i referencu na `Texture2D`. Kad `_draw()` završi, niko ne drži resurs, pa se oslobodi i renderer crta nevažeći RID (bijelo). Ako isti resurs drži neko drugi (npr. `Sprite2D`), greška se ne vidi.
+
+**Rješenje:** teksturu koju crtaš drži u varijabli ili statičkom kešu (`static var _tex_cache` u `obstacle_visual.gd`, `FlowerAssets._cache`, `PipAssets._skin_cache`).
+
+**Prevencija:** nikad `load()` direktno u argumentu `draw_*` poziva; tekstura mora imati vlasnika koji živi dok se crtež vidi.
+
+## #23 — oslobođen objekat je `== null`: „isti cilj" grana proguta sakrivanje
+
+**Datum:** 2026-10-05 (Merge Hint u Areni)
+
+**Simptom:** zagrade Merge Hinta ostanu na polju poslije spajanja para i kad sesija Arene završi.
+
+**Uzrok:** `set_target(null)` je prvo provjeravao `if target == _target: follow(); return`. Kad se označena sjemenka spoji, `_target` je oslobođen objekat, a u Godotu 4.7 je `oslobođen == null` **true** (headless provjera: `freed == null` true, `freed != null` false, `is_instance_valid(freed)` false). Zato je `null == _target` prošlo kao „isti cilj" i oznaka se nikad nije sakrila. Uz to `set_arena_page_active(false)` gasi `_process`, pa se oznaka ne bi ni osvježila.
+
+**Rješenje:** poredi s `get_target()` (vraća `null` za nevažeći), stanje „prikazano" drži u svom flagu (`_shown`), ne u `visible` dok traje izlaz, a na kraju sesije i pri gašenju stranice zovi `clear_now()`.
+
+**Prevencija:** za čuvanu referencu na čvor koji može nestati nikad ne poredi `== null` / `==` direktno; prvo `is_instance_valid()`.
+
+## #24 — GL Compatibility na laptopu ne reže crtanje (ni `clip_contents`)
+
+**Datum:** 2026-10-05 (kartica izbora sezone i Shop kartica)
+
+**Simptom:** recept Season Kita ide do −2 / 102 / 101 % recta, pa pozadina kartice izbora i Shop kartice viri izvan okvira kartice (najviše u swipeu između kartica).
+
+**Uzrok:** proba sa `--rendering-driver opengl3` na AMD iGPU (i u SubViewportu i u glavnom prozoru): crvena površina veća od svog Controla ostala je neodrezana i sa `clip_contents = true` na roditelju, i sa `RenderingServer.canvas_item_set_clip` + `canvas_item_set_custom_rect` na zasebnom canvas itemu. Scissor se ovdje ne primjenjuje, pa se rezanje ne može prepustiti rendereru.
+
+**Rješenje:** rezati geometriju. `SeasonBackdrop` reže slojeve u % na [0, 100] jednom pri gradnji (`Geometry2D.intersect_polygons` / `intersect_polyline_with_polygon`), a oblik koji viri preko recta pri crtanju trokut po trokut. Uglovi kartice i dalje idu maskom u boji stranice.
+
+**Prevencija:** crtež koji mora ostati u okviru na ovom rendereru ne smije izaći iz svog recta; ne oslanjaj se na `clip_contents` / `clip_children` za ukrasne mreže.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-layer="HubScreen" style="width:1080px;height:1920px;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#2A2233;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;filter:{{ filter }}">
+
+  <div data-layer="Header" style="flex:0 0 auto;position:relative;z-index:3;height:143px;background:#2A2233;box-shadow:0 6px 14px rgba(20,14,26,.34)">
+    <div style="height:140px;display:flex;align-items:center;gap:16px;padding-left:20px;box-sizing:border-box">
+      <div data-layer="CoinChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14);box-shadow:{{ coinRing }}">
+        <img src="icons/icon_coin.svg" alt="" style="width:64px;height:64px;flex:0 0 auto;display:block">
+        <div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">12,450</div>
+      </div>
+      <div data-layer="SeedChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)">
+        <img src="icons/icon_seed.svg" alt="" style="width:64px;height:64px;flex:0 0 auto;display:block">
+        <div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">340</div>
+      </div>
+      <div data-layer="FlowerChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)">
+        <img src="icons/icon_flower.svg" alt="" style="width:64px;height:64px;flex:0 0 auto;display:block">
+        <div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">27</div>
+      </div>
+      <div data-layer="SettingsSlot" style="width:124px;height:140px;flex:0 0 auto;display:flex;align-items:center;padding-left:4px;box-sizing:border-box">
+        <div data-layer="SettingsButton" style="width:100px;height:100px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center">
+          <img src="icons/icon_settings_light.svg" alt="" style="width:56px;height:56px;display:block">
+        </div>
+      </div>
+    </div>
+    <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+  </div>
+
+  <div data-layer="MergeArena" style="flex:0 0 auto;position:relative;width:1080px;height:1633px;overflow:hidden">
+    <div data-layer="Bg" style="position:absolute;left:0;top:0">
+      <dc-import name="ArenaField" season="{{ season }}" lush="{{ lush }}" width="{{ 1080 }}" combo-light="{{ lightA }}" light-out="{{ lightOut }}" hint-size="1080px,1633px"></dc-import>
+    </div>
+
+    <div data-layer="Playfield" style="position:absolute;left:0;top:0;width:1080px;height:1589px">
+      <sc-if value="{{ showRipple }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="ComboRipple" ref="{{ rippleRef }}" style="position:absolute;left:{{ rpL }}px;top:{{ rpT }}px;width:{{ rpD }}px;height:{{ rpD }}px;box-sizing:border-box;border-radius:50%;border:10px solid {{ rpC }};opacity:{{ rpA }};transform:scale({{ rpS }});pointer-events:none"></div>
+      </sc-if>
+      <sc-if value="{{ showBurst }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="T3Burst" style="position:absolute;left:630px;top:910px;width:260px;height:260px;box-sizing:border-box;border-radius:50%;border:12px solid #FFF5D1;opacity:.45;transform:scale(1.3)"></div>
+      </sc-if>
+
+      <sc-for list="{{ seeds }}" as="s" hint-placeholder-count="0">
+        <div data-layer="SeedSlot" onClick="{{ s.onClick }}" style="position:absolute;left:{{ s.l }}px;top:{{ s.t }}px;width:134.4px;height:134.4px;cursor:pointer">
+          <dc-import name="SeedChip" type="{{ s.type }}" tier="{{ s.tier }}" state="{{ s.state }}" season="{{ s.season }}" rarity="{{ s.rarity }}" jitter="{{ s.jitter }}" hint-size="134px,134px"></dc-import>
+        </div>
+      </sc-for>
+
+      <div data-layer="ArenaPip" style="position:absolute;left:30px;top:1413px;width:150px;height:150px;transform-origin:50% 50%;transform:scale({{ pipScale }})">
+        <img src="icons/pip_idle.svg" alt="Pip" style="width:150px;height:150px;display:block">
+      </div>
+
+      <div data-layer="SeedBag" onClick="{{ onBasket }}" style="position:absolute;left:390px;top:1269px;width:300px;height:280px;cursor:pointer">
+        <dc-import name="SeedBasket" count="{{ bagCount }}" state="{{ bagState }}" types="{{ bagTypes }}" hint-size="300px,280px"></dc-import>
+      </div>
+
+      <div data-layer="MuncherSlot" style="position:absolute;left:{{ mL }}px;top:{{ mT }}px;width:480px;height:360px;pointer-events:none">
+        <dc-import name="Muncher" state="{{ mState }}" dir="{{ mDir }}" chomp="{{ 0.85 }}" hint-size="480px,360px"></dc-import>
+      </div>
+
+      <sc-if value="{{ showCrystal }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="T3Crystal" style="position:absolute;left:846px;top:236px;width:98px;height:98px;overflow:hidden;opacity:.8">
+          <img src="{{ crystalArt }}" alt="" style="position:absolute;left:-15px;top:-23px;width:127px;height:127px;max-width:none;display:block">
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showMark }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="ComboMark" ref="{{ markRef }}" style="position:absolute;left:{{ mkX }}px;top:{{ mkY }}px;transform:translate(-50%,0);font:900 {{ mkSize }}px/1 Nunito,system-ui,sans-serif;color:{{ mkFill }};-webkit-text-stroke:8px #2D3436;paint-order:stroke fill;white-space:nowrap;pointer-events:none">{{ mkText }}</div>
+      </sc-if>
+    </div>
+  </div>
+
+  <sc-if value="{{ showCoin }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="ComboCoin" style="position:absolute;left:{{ cnX }}px;top:{{ cnY }}px;width:56px;height:56px;z-index:5;pointer-events:none">
+      <img src="icons/icon_coin.svg" alt="" style="width:56px;height:56px;display:block">
+    </div>
+  </sc-if>
+
+  <div data-layer="Footer" style="flex:0 0 auto;position:relative;z-index:2;height:144px;background:#2A2233;box-shadow:0 -6px 14px rgba(20,14,26,.34)">
+    <sc-if value="{{ locked }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:0;right:0;top:-36px;display:flex;justify-content:center;z-index:3">
+        <div data-layer="NavLockPill" style="display:flex;align-items:center;gap:14px;height:64px;padding:0 28px;border-radius:20px;background:#2A2233;border:2px solid rgba(232,196,74,.85);box-sizing:border-box">
+          <img src="icons/icon_lock.svg" alt="" style="width:34px;height:34px;flex:0 0 auto;display:block">
+          <div style="font:800 38px/1 Nunito,system-ui,sans-serif;letter-spacing:.04em;color:#E8C44A;white-space:nowrap">ROUND IN PROGRESS</div>
+        </div>
+      </div>
+    </sc-if>
+    <div style="height:3px;background:{{ footEdge }}"></div>
+    <div style="position:relative;height:141px;display:flex">
+      <div data-layer="ActiveIndicator" style="position:absolute;top:6px;left:936px;width:72px;height:8px;border-radius:4px;z-index:1;background:{{ indC }}"></div>
+      <div data-layer="Tab_Shop" style="width:216px;height:141px;flex:0 0 auto;position:relative;opacity:{{ tabA }}"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_shop_light.svg" alt="Shop" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Journal" style="width:216px;height:141px;flex:0 0 auto;position:relative;opacity:{{ tabA }}"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_journal_light.svg" alt="Journal" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Home" style="width:216px;height:141px;flex:0 0 auto;position:relative;opacity:{{ tabA }}"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_home_light.svg" alt="Home" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Camp" style="width:216px;height:141px;flex:0 0 auto;position:relative;opacity:{{ tabA }}"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;display:grid;place-items:center"><img src="icons/tab_camp_light.svg" alt="Camp" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+      <div data-layer="Tab_Arena" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;background:#FFB88C;border:2px solid rgba(45,52,54,.14);display:grid;place-items:center"><img src="icons/tab_arena.svg" alt="Arena" style="width:72px;height:72px;display:block;transform:translateY(-2px)"></div></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Scene&quot;},&quot;lush&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:0,&quot;max&quot;:4,&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scene&quot;},&quot;combo&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:0,&quot;max&quot;:8,&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scene&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;empty&quot;,&quot;full&quot;,&quot;hunting&quot;,&quot;eating&quot;,&quot;frozen&quot;,&quot;bag_empty&quot;],&quot;default&quot;:&quot;hunting&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Scene&quot;},&quot;grayscale&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Check&quot;}}">
+const SLOTS = [[130,84.4],[294,84.4],[786,84.4],[950,84.4],[212,226.4],[376,226.4],[540,226.4],[704,226.4],[868,226.4],[130,368.5],[294,368.5],[458,368.5],[622,368.5],[786,368.5],[950,368.5],[212,510.5],[376,510.5],[540,510.5],[704,510.5],[868,510.5],[130,652.5],[294,652.5],[458,652.5],[622,652.5],[786,652.5],[950,652.5],[212,794.5],[376,794.5],[540,794.5],[704,794.5],[868,794.5],[130,936.5],[294,936.5],[458,936.5],[622,936.5],[786,936.5],[950,936.5],[212,1078.6],[376,1078.6],[540,1078.6],[704,1078.6],[868,1078.6],[130,1220.6],[294,1220.6],[786,1220.6],[950,1220.6]];
+const TYPES = [['clover',1],['daisy',1],['gen',1,1],['buttercup',1],['tulip',2],['gen',2,2],['sunflower',1],['daisy',2],['clover',2],['pumpkin',1],['gen',1,2],['buttercup',2],['tulip',1],['gen',2,1],['sunflower',2],['clover',1]];
+const KIT_TYPES = { country_bloom: ['clover', 'daisy', 'buttercup', 'tulip', 'sunflower', 'pumpkin'], moonlit_warren: ['moon_moss', 'nightshade_petal', 'silver_harebell', 'lunar_orchid', 'star_jasmine', 'umbral_lily'] };
+const CB_IDX = { clover: 0, daisy: 1, buttercup: 2, tulip: 3, sunflower: 4, pumpkin: 5 };
+const STATES = {
+  empty: { n: 0, m: ['sleep_nest', 540, 108, 0], bag: 38 },
+  full: { n: 30, m: ['waking', 540, 108, 0], bag: 8 },
+  hunting: { n: 20, m: ['hunting', 700, 720, 200], bag: 14 },
+  eating: { n: 19, m: ['eating', 0, 0, 225], bag: 14, eatSlot: 23 },
+  frozen: { n: 18, m: ['frozen', 330, 640, 20], bag: 10 },
+  bag_empty: { n: 12, m: ['hunting', 420, 980, 330], bag: 0 }
+};
+const STEP = { 2: [52, 260, 0.04], 3: [58, 320, 0.07], 4: [64, 380, 0.10], 5: [70, 380, 0.13] };
+const RING = { country_bloom: '#FFF8F0', frost_orchard: '#FFFFFF', lantern_meadow: '#FFE3B8', amber_canopy: '#FFEBC7', moonlit_warren: '#E6E4FF', coral_tide: '#FFFFFF', starfall_glade: '#FFF2BF', ember_fen: '#FFC79E' };
+const ORDER = Array.from({ length: 46 }, (_, i) => (i * 17 + 5) % 46);
+class Component extends DCLogic {
+  state = { live: null, liveOut: false, pour: false };
+  markRef = React.createRef();
+  rippleRef = React.createRef();
+  componentDidUpdate(pp, ps) {
+    const L = this.state.live;
+    if (L && (!ps.live || ps.live.at !== L.at) && L.n >= 2) {
+      const m = this.markRef.current, r = this.rippleRef.current;
+      if (m) m.animate([{ transform: 'translate(-50%,22px) scale(.6)', opacity: 0 }, { transform: 'translate(-50%,0) scale(1.15)', opacity: 1, offset: 0.25 }, { transform: 'translate(-50%,-50px) scale(1)', opacity: 1, offset: 0.66 }, { transform: 'translate(-50%,-50px) scale(1)', opacity: 0 }], { duration: 730, fill: 'forwards' });
+      if (r) r.animate([{ transform: 'scale(' + (90 / (L.R || 260)) + ')', opacity: 0.55 }, { transform: 'scale(1)', opacity: 0 }], { duration: 500, easing: 'cubic-bezier(.33,1,.68,1)', fill: 'forwards' });
+    }
+  }
+  componentWillUnmount() { clearTimeout(this._t); clearTimeout(this._p); }
+  merge(x, y) {
+    const now = Date.now(), prev = this.state.live;
+    const n = prev && now - prev.at <= 1400 ? prev.n + 1 : 1;
+    const st = STEP[Math.min(n, 5)];
+    this.setState({ live: { n, x, y, at: now, R: st ? st[1] : 260 }, liveOut: false });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ live: null, liveOut: true }), 1400);
+  }
+  renderVals() {
+    const p = this.props;
+    const season = p.season ?? 'country_bloom';
+    const lush = Math.max(0, Math.min(4, +(p.lush ?? 0)));
+    const S = STATES[p.state] || STATES.hunting;
+    const live = this.state.live;
+    const [mSt, mx0, my0, mDir] = S.m;
+    let mx = mx0, my = my0;
+    const seeds = [];
+    let eatSeed = null;
+    if (S.eatSlot != null) { const q = SLOTS[S.eatSlot]; eatSeed = q; mx = q[0] + 30; my = q[1] - 20; }
+    for (let k = 0, i = 0; seeds.length < S.n && k < ORDER.length; k++) {
+      const slot = ORDER[k], q = SLOTS[slot];
+      const isEat = slot === S.eatSlot;
+      if (!isEat && Math.hypot(q[0] - mx, q[1] - my) < (mSt === 'frozen' ? 175 : 150)) continue;
+      const T = TYPES[i++ % TYPES.length];
+      const gen = T[0] === 'gen';
+      const KT = KIT_TYPES[season];
+      const kType = KT ? KT[gen ? (T[2] === 2 ? 3 : 1 + (i % 2)) : CB_IDX[T[0]]] : null;
+      seeds.push({ slot, x: q[0], y: q[1], type: KT ? kType : (gen ? 'generic' : T[0]), tier: T[1], rarity: T[2] || 1, season: KT ? season : (gen ? (i % 3 ? season : 'coral_tide') : season), jitter: (i * 0.37) % 1, state: isEat ? 'eaten' : 'idle' });
+    }
+    const propCombo = Math.max(0, Math.min(8, +(p.combo ?? 0)));
+    const n = live ? live.n : propCombo;
+    const step = n >= 2 ? STEP[Math.min(n, 5)] : null;
+    let cx = 622, cy = 794.5;
+    if (!live && step && seeds.length) { let best = null, bd = 1e9; seeds.forEach(s => { if (s.state === 'eaten') return; const d = Math.hypot(s.x - 620, s.y - 800); if (d < bd) { bd = d; best = s; } }); if (best) { best.tier = 2; best.state = 'merge'; best.type = best.type === 'generic' ? 'daisy' : best.type; cx = best.x; cy = best.y; } }
+    if (live) { cx = live.x; cy = live.y; }
+    const out = seeds.map(s => ({ ...s, l: s.x - 67.2, t: s.y - 67.2, onClick: () => this.merge(s.x, s.y) }));
+    const R = step ? step[1] : 260;
+    const staticRip = !live && step;
+    const gold = n >= 5;
+    const coinT = 0.45, chip = [66, 70], from = [cx, cy + 143];
+    return {
+      filter: p.grayscale ? 'grayscale(1)' : 'none',
+      season, lush,
+      lightA: step ? step[2] : 0, lightOut: !!this.state.liveOut && !live,
+      seeds: out,
+      showRipple: !!step, rippleRef: this.rippleRef, rpL: cx - R, rpT: cy - R, rpD: 2 * R, rpC: RING[season] || '#FFF8F0',
+      rpA: staticRip ? 0.33 : 0, rpS: staticRip ? (90 + (R - 90) * 0.784) / R : 1,
+      showBurst: p.state === 'frozen', showCrystal: p.state === 'frozen',
+      showMark: !!step, markRef: this.markRef, mkX: cx, mkY: cy - (live ? 128 : 118) - (step ? step[0] : 52) * 0.5, mkSize: step ? step[0] : 52,
+      mkFill: gold ? '#FFD56B' : '#FFF8F0', mkText: '×' + n,
+      showCoin: gold && !live, cnX: from[0] + (chip[0] - from[0]) * coinT - 28, cnY: from[1] + (chip[1] - from[1]) * coinT - 28,
+      coinRing: gold ? '0 0 0 6px #FFD56B' : 'none',
+      pipScale: n >= 5 ? 1.2 : n >= 2 ? 1.12 : 1,
+      crystalArt: '../assets/flowers/' + (season === 'moonlit_warren' ? 'umbral_lily' : 'pumpkin') + '_t3.svg',
+      bagCount: S.bag, bagState: this.state.pour ? 'pour' : 'idle', bagTypes: (KIT_TYPES[season] || KIT_TYPES.country_bloom).slice(0, 5),
+      onBasket: () => { if (S.bag <= 0) return; this.setState({ pour: true }); clearTimeout(this._p); this._p = setTimeout(() => this.setState({ pour: false }), 350); },
+      mState: mSt, mDir, mL: mx - 240, mT: my - 180,
+      locked: S.n > 0, footEdge: S.n > 0 ? 'rgba(232,196,74,.85)' : 'rgba(255,248,240,.55)', indC: S.n > 0 ? 'rgba(255,184,140,.4)' : '#FFB88C', tabA: S.n > 0 ? 0.6 : 1
+    };
+  }
+}
+</script>
+</body>
+</html>

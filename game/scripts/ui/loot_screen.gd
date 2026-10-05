@@ -99,8 +99,13 @@ func get_chips() -> Array[RewardChip]:
 	return tray.chips if tray else ([] as Array[RewardChip])
 
 
+func get_bag_note() -> String:
+	var fit := GameState.pending_loot_fit()
+	return UiPopups.S_LOOT_BAG_FULL % [fit.x, fit.y] if fit.x < fit.y else ""
+
+
 func get_all_text() -> String:
-	var parts: PackedStringArray = [get_title(), tray.stamp_text if tray else ""]
+	var parts: PackedStringArray = [get_title(), tray.stamp_text if tray else "", get_bag_note()]
 	for b in [double_button, revive_button, retry_button, camp_button]:
 		if b.is_inside_tree() and b.visible:
 			parts.append(b.label)
@@ -116,6 +121,9 @@ func _build() -> void:
 	tray = RewardTray.new().setup(880.0, _make_chips(), UiPopups.S_KEPT_HALF if is_failed() else "")
 	tray.name = "RewardTray"
 	modal.content.add_child(PopupModal.centered(tray))
+	var fit := GameState.pending_loot_fit()
+	if fit.x < fit.y:
+		modal.content.add_child(UiPopups.modal_note(get_bag_note()))
 	var buttons := VBoxContainer.new()
 	buttons.name = "ModalButtons"
 	buttons.add_theme_constant_override("separation", 24)

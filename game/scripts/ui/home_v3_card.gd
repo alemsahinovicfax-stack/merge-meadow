@@ -5,9 +5,15 @@ extends Control
 ## kao polje, radius 48 i sjenka 0 12 0. Rub (CardEdge) je poseban cvor iznad
 ## polja. Sadrzaj (ime cvijeca, status) je dijete `content`, jer blijedi odvojeno
 ## (CONTENT_OUT), a trake ostaju — kartica se u prelazu raširi u livadu.
+## Season Kit (design_handoff_seasons): sezona s kitom crta ISTI recept kao polje
+## (SeasonBackdrop) u rectu kartice — na u = 1 isti pikseli kao livada, bez šava.
+## SeasonBackdrop ne crta ništa izvan recta (rez geometrije); uglovi = maska u boji
+## stranice (bez clip_children), sjena = sjena minus tijelo.
 
 var content: HomeV3CardContent
 var _ground := Color.WHITE
+var _scene: Dictionary = {}
+var _page := Color.WHITE
 var _radius: float = UiHomeV3.CARD_RADIUS
 var _shadow_y: float = UiHomeV3.CARD_SHADOW_Y
 
@@ -25,6 +31,20 @@ func set_ground(ground: Color) -> void:
 		return
 	_ground = ground
 	queue_redraw()
+
+
+## Kit sezone (prazno = trake iz `set_ground`). `page` = boja stranice iza uglova.
+func set_season(season_id: String, page: Color) -> void:
+	var sc := SeasonBackdrop.field_scene(season_id)
+	if is_same(sc, _scene) and page == _page:
+		return
+	_scene = sc
+	_page = page
+	queue_redraw()
+
+
+func has_kit() -> bool:
+	return not _scene.is_empty()
 
 
 func set_shape(radius: float, shadow_y: float) -> void:
@@ -48,6 +68,9 @@ func band_edges() -> Vector2:
 
 
 func _draw() -> void:
+	if not _scene.is_empty():
+		_draw_kit()
+		return
 	var r := roundi(_radius)
 	var body := Rect2(Vector2.ZERO, size)
 	if _shadow_y > 0.01:
@@ -60,6 +83,18 @@ func _draw() -> void:
 	draw_style_box(sky, Rect2(0.0, 0.0, size.x, edges.x))
 	var near := _band(UiHomeV3.near(_ground), 0, r)
 	draw_style_box(near, Rect2(0.0, edges.y, size.x, size.y - edges.y))
+
+
+func _draw_kit() -> void:
+	var body := Rect2(Vector2.ZERO, size)
+	SeasonBackdrop.draw(self, _scene, body)
+	SeasonBackdrop.draw_corner_masks(self, body, _radius, _page)
+	if _shadow_y > 0.01:
+		var shadow := SeasonBackdrop.round_rect_points(Rect2(Vector2(0.0, _shadow_y), size), _radius)
+		var card := SeasonBackdrop.round_rect_points(body, _radius)
+		for poly in Geometry2D.clip_polygons(shadow, card):
+			if poly.size() >= 3:
+				draw_colored_polygon(poly, UiHomeV3.CARD_SHADOW)
 
 
 func _band(fill: Color, top_r: int, bottom_r: int) -> StyleBoxFlat:
