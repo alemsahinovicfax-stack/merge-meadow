@@ -29,6 +29,7 @@ var _w: Node
 
 
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
 
 
@@ -43,23 +44,26 @@ func _settle(frames: int = 6) -> void:
 
 
 func _run() -> void:
-	_backup = CampSmokeUtil.backup_save()
 	_check_catalog()
 	_check_recolor()
+	_gs = get_root().get_node_or_null("GameState")
+	# Stanje ne smije zavisiti od developerovog save-a: fokus na nekupljenoj
+	# premium sezoni (home_band "paid") ne otvara polje.
+	_gs.set("skip_debug_season_unlock", true)
+	_gs.call("reset_seasons_to_s1")
+	_gs.set("tutorial_complete", true)
 	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
 	if err != OK:
 		_fail("hub load failed")
 		_finish()
 		return
 	await _settle(14)
-	_gs = get_root().get_node_or_null("GameState")
 	var hub := get_nodes_in_group("meta_hub")[0] as Control
 	hub.call("go_to_page", 2, false)
 	await _settle(10)
 	var host: Node = hub.get_node("RootVBox/SwipePager").call("get_pages_host")
 	_home = host.get_node("Page_2") as Control
 	_stage = _home.get_node("%SeasonStage") as Control
-	_gs.set("tutorial_complete", true)
 	var cos: Object = _gs.get("cosmetics")
 	cos.set("owned", {"pip_blossom": true, "meadow_sunset": true, "meadow_lavender": true, "journal_gold": true})
 	cos.set("equipped", {"meadow_bg": "meadow_sunset"})

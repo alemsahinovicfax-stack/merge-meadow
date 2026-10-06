@@ -11,15 +11,17 @@ const PAGE := Vector2(1080.0, 1633.0)
 const TOL := 1.5
 
 var _failed: bool = false
+var _backup := ""
 
 
 func _initialize() -> void:
-	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
-	if err != OK:
-		push_error("home_field_overlay_smoke: hub load failed %d" % err)
-		quit(1)
-		return
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _fail(msg: String) -> void:
@@ -33,13 +35,27 @@ func _settle(frames: int = 6) -> void:
 
 
 func _run() -> void:
+	var gs := get_root().get_node_or_null("GameState")
+	if gs == null:
+		_fail("GameState missing")
+		_quit(1)
+		return
+	# Stanje ne smije zavisiti od developerovog save-a: fokus na nekupljenoj
+	# premium sezoni (home_band "paid") ne otvara polje.
+	gs.set("skip_debug_season_unlock", true)
+	gs.call("reset_seasons_to_s1")
+	gs.set("tutorial_complete", true)
+	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
+	if err != OK:
+		_fail("hub load failed %d" % err)
+		_quit(1)
+		return
 	for _i in 14:
 		await process_frame
-	var gs := get_root().get_node_or_null("GameState")
 	var hubs := get_nodes_in_group("meta_hub")
-	if gs == null or hubs.is_empty():
-		_fail("GameState / meta_hub missing")
-		quit(1)
+	if hubs.is_empty():
+		_fail("meta_hub missing")
+		_quit(1)
 		return
 	var hub := hubs[0] as Control
 	hub.call("go_to_page", 2, false)
@@ -49,12 +65,12 @@ func _run() -> void:
 	var home := (host.get_node_or_null("Page_2") if host else null) as Control
 	if home == null:
 		_fail("MainMenu page missing")
-		quit(1)
+		_quit(1)
 		return
 	var stage := home.get_node_or_null("%SeasonStage") as Control
 	if stage == null or not bool(stage.call("open_season_field")):
 		_fail("could not open the season field")
-		quit(1)
+		_quit(1)
 		return
 	# Home v3: prelaz traje 0,56 s — provjera mora sacekati kraj tweena.
 	await create_timer(1.2).timeout
@@ -70,10 +86,10 @@ func _run() -> void:
 		stage.call("close_season_field", false)
 	await _settle(4)
 	if _failed:
-		quit(1)
+		_quit(1)
 		return
 	print("home_field_overlay_smoke OK")
-	quit(0)
+	_quit(0)
 
 
 ## Livada uzima cijelu stranicu, bez okvira.
