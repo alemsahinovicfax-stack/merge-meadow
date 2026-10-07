@@ -9,6 +9,17 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-07
+
+- **Brief za Claude Design: redizajn Pipa** (`docs/04-experience/design-drafts/pip-cd-brief.md`, traka PIP-01). Traži se novi lik od nule (turnaround s pogledom odozgo, ≥ 12 izraza, biblija lika) i tri skina: Classic, Blossom 250 i Sky 200, gdje plaćeni skin ima prepoznatljiv detalj pored boje. Traže se i sve Pipove animacije:
+  - Shop i Ormar kao izlog (potpisni pokret skina);
+  - Home kartica i polje: hop ciklus, idle varijante, cvijeće, spavanje, tap, ≥ 2 interakcije s prirodom po svakoj od 8 sezona;
+  - Arena: look-at za sjemenku koja se vuče, merge, combo, Muncher;
+  - run iz ptičije perspektive: galop vezan za brzinu svijeta, prelaz trake u 0,12 s, pad i cilj u postojećim trakama jer zadnji kadar ide na Loot, ustajanje poslije Revive;
+  - HUD portret.
+
+  Isporuka je cutout rig sa SVG dijelovima i podacima za Godot (`rig.json`, `animations.json`, `behaviors.json`, `skins.json`). Brief ima i obavezan budžet performansi: samo transformacije, jedan atlas ≤ 1024² po skinu, ≤ 30 dijelova po pogledu, jedan loop po Pipu, ≤ 0,3 ms po Pipu. Nove su i slike današnjeg stanja `pip-ref/` (19), snimljene novim `game/scripts/dev/pip_capture.gd` (krupni plan skinova i poza, veličine i silueta) i postojećim capture skriptama.
+
 ## 2026-10-06
 
 - **Arena: muncher ne viri iz gnijezda dok spava** — poza „sleep" iz paketa Arena v2 stavlja rep na y +56 / +64, a gnijezdo je visoko 112, pa je donji dio tijela (i sjena) virio ispod prednjeg ruba (i u CD-ovoj maketi). Spavanje U gnijezdu ima svoju sklupčanu pozu unutar vanjskog ruba (`NEST_SLEEP_SEGS`) i bez sjene na tlu; spavanje van gnijezda i buđenje ostaju po paketu.
