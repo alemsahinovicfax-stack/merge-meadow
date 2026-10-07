@@ -3,12 +3,14 @@ extends Sprite2D
 ## Smjer A — košene staze na tamnoj livadi. PNG cover je zamijenjen crtanjem.
 ## `apply_theme()` i dalje postavlja `modulate` (cosmetic × season) — season_run_smoke.
 ## Season Kit (design_handoff_seasons § Kitovi · Run): sezona s kitom crta svoje tlo,
-## materijal staze (pokošene pruge | kamenčići), daljinu (0,35×), blizinu (1,0×) i
-## ambijent iz UiSeasons.run_def; tint sezone se ne primjenjuje (modulate = kozmetika).
-## Daljina, blizina i kamenčići su STATIČNE mreže (računaju se jednom po sezoni) —
-## po frejmu se samo pomaknu (draw_set_transform), pa crtanje ne raste s frejmovima.
-
-const SeasonThemeScript := preload("res://scripts/seasons/season_theme.gd")
+## materijal staze (kind stripe | pebble | plank | rut — pločica iz kita), daljinu (0,35×),
+## blizinu (1,0×) i ambijent (isti generički format kao polje) iz UiSeasons.run_def; tint
+## sezone se ne primjenjuje (modulate = kozmetika).
+## Daljina, blizina i materijal staze su STATIČNE mreže (računaju se jednom po sezoni).
+## Kit se crta u slojevima-djeci (tlo, daljina, staze, materijal, rubovi, blizina, ambijent)
+## koji se nacrtaju JEDNOM; skrol samo pomjera daljinu, materijal i blizinu (position.y), a
+## svaki frejm se crta samo ambijent (perf 2026-10-06: ranije se cijela pozadina sa svim
+## mrežama slala RenderingServeru iznova svaki frejm).
 
 const _MOW_PERIOD := 124.0
 const _MOW_STRIPE := 40.0
@@ -20,19 +22,30 @@ const _LANE_EDGE := 4.0
 const _SEAM_W := 6.0
 const _SEAM_ON := 46.0
 const _SEAM_OFF := 62.0
-## Kamenčići staze po pločici 200 x period: (x, y, r).
-const _PEBBLES := [[30.0, 30.0, 7.0], [130.0, 78.0, 6.0], [84.0, 54.0, 5.0]]
-const _AMB_FADE := 0.1
-const _AMB_ALPHA := 0.85
+## Pločica materijala u kitu je široka kao unutrašnjost staze (surfaces.run: lane_w 200,
+## lane_inner 192) — stoji između rubova staze, od x = _LANE_EDGE.
+## Run ambijent: zone u % artboarda 1080 x 1920.
+const _RUN_RECT := Vector2(1080.0, 1920.0)
 
 var _scroll_px: float = 0.0
 var _run: Dictionary = {}
 var _far: Dictionary = {}
 var _near: Dictionary = {}
-var _pebbles: Dictionary = {}
+var _lane_tile: Dictionary = {}
 var _amb: Array = []
-var _amb_fan: PackedInt32Array
 var _time: float = 0.0
+var _layers: Dictionary = {}
+
+
+## Sloj pozadine: crta ga `paint` jednom (i pri promjeni veličine / sezone).
+class _Layer:
+	extends Node2D
+
+	var paint: Callable
+
+	func _draw() -> void:
+		if paint.is_valid():
+			paint.call(self)
 
 
 func _ready() -> void:
@@ -51,12 +64,16 @@ func apply_theme() -> void:
 	scale = Vector2.ONE
 	_build_kit(GameState.active_season_id)
 	_apply_meadow_cosmetic()
-	queue_redraw()
+	_ensure_layers()
+	_redraw_all()
 
 
 func add_scroll(distance: float) -> void:
 	_scroll_px += distance
-	queue_redraw()
+	if has_kit():
+		_sync_scroll()
+	else:
+		queue_redraw()
 
 
 func has_kit() -> bool:
@@ -67,32 +84,30 @@ func ambient_count() -> int:
 	return _amb.size()
 
 
+## modulate = samo kozmetika (Meadow BG); sezona je u bojama kita, ne u tintu.
 func _apply_meadow_cosmetic() -> void:
 	var bg_id := GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_MEADOW_BG)
-	var cosmetic := CosmeticCatalog.get_meadow_modulate(bg_id)
-	if has_kit():
-		modulate = cosmetic
-		return
-	var season: Color = SeasonThemeScript.bg_modulate(GameState.active_season_id)
-	modulate = cosmetic * season
+	modulate = CosmeticCatalog.get_meadow_modulate(bg_id)
 
 
 func _on_resized() -> void:
-	queue_redraw()
+	_redraw_all()
 
 
 func _process(delta: float) -> void:
 	_time += delta
+	if not _amb.is_empty() and _layers.has("Ambient"):
+		(_layers["Ambient"] as Node2D).queue_redraw()
 
 
 func _draw() -> void:
 	var vp := get_viewport_rect().size
 	if vp.x < 2.0 or vp.y < 2.0:
 		return
-	var sx := vp.x / 1080.0
+	# Kit crtaju slojevi-djeca; ovdje samo Smjer A (sezona bez kita).
 	if has_kit():
-		_draw_kit(vp, sx)
 		return
+	var sx := vp.x / 1080.0
 	draw_rect(Rect2(Vector2.ZERO, vp), UiRun.GROUND, true)
 	_draw_far(vp, sx, _scroll_px * 0.35)
 	for i in 3:
@@ -108,148 +123,195 @@ func _build_kit(season_id: String) -> void:
 	_run = UiSeasons.run_def(season_id)
 	_far = {}
 	_near = {}
-	_pebbles = {}
+	_lane_tile = {}
 	_amb = []
 	set_process(not _run.is_empty())
 	if _run.is_empty():
 		return
 	var far: Dictionary = _run["far"]
-	var far_items: Array = []
-	for a in far["at"]:
-		far_items.append([str(far["shape"]), far["pal"], float(a[0]) * 10.8, float(a[1]) * 7.2, float(a[2])])
-	_far = _tile_mesh(far_items, float(far.get("period", _FAR_PERIOD)))
+	_far = _tile_mesh(UiSeasons.run_items(season_id, "far"), float(far.get("period", _FAR_PERIOD)))
 	var near: Dictionary = _run["near"]
-	var near_items: Array = []
-	if near.has("posts"):
-		var posts: Dictionary = near["posts"]
-		var y := 0.0
-		while y < _NEAR_PERIOD:
-			for x in posts["x"]:
-				near_items.append(["post", posts["pal"], float(x), y + 150.0, float(posts["size"])])
-			y += float(posts["every"])
-	for key in ["tufts", "moss", "flowers", "glints"]:
-		if near.has(key):
-			var g: Dictionary = near[key]
-			for a in g["at"]:
-				near_items.append([str(g["shape"]), g["pal"], float(a[0]), float(a[1]), float(a[2])])
-	_near = _tile_mesh(near_items, float(near.get("period", _NEAR_PERIOD)))
-	var mat: Dictionary = _run["material"]
-	if mat.has("pebble"):
-		var period := float(mat["period"])
-		var meshes: Array = []
-		var y := -period
-		while y < _COVER_H + period:
-			for p in _PEBBLES:
-				meshes.append(SeasonBackdrop.shape_at("dot", [str(mat["pebble"])], Vector2(p[0], y + float(p[1])), float(p[2]) * 2.0))
-			y += period
-		_pebbles = SeasonBackdrop.merge_meshes(meshes)
-	_amb = _ambient(_run.get("ambient", {}))
+	_near = _tile_mesh(UiSeasons.run_items(season_id, "near"), float(near.get("period", _NEAR_PERIOD)))
+	_lane_tile = _lane_mesh(UiSeasons.lane_tile(season_id))
+	_amb = SeasonAmbient.build_parts(_run.get("ambient", {}))
 
 
-## Mreža pločica (period) od −1 do pokrivene visine: [shape, pal, x, y, size].
+## Mreža pločica (period) od −1 do pokrivene visine; items = [{shape, pal, at: [[x, y, size, rot]]}].
 func _tile_mesh(items: Array, period: float) -> Dictionary:
 	var meshes: Array = []
 	var t := -1
 	while float(t) * period < _COVER_H + period:
 		for it in items:
-			meshes.append(SeasonBackdrop.shape_at(str(it[0]), it[1], Vector2(float(it[2]), float(it[3]) + float(t) * period), float(it[4])))
+			for a in it["at"]:
+				var rot := float(a[3]) if (a as Array).size() > 3 else 0.0
+				meshes.append(SeasonBackdrop.shape_at(str(it["shape"]), it["pal"], Vector2(float(a[0]), float(a[1]) + float(t) * period), float(a[2]), rot))
 		t += 1
 	var m := SeasonBackdrop.merge_meshes(meshes)
 	m["period"] = period
 	return m
 
 
-## Ambijent runa (≤ 24, jedna petlja): R2 niz, let drift za sec, alpha 0 → ,85 → 0.
-static func _ambient(a: Dictionary) -> Array:
-	var out: Array = []
-	if a.is_empty():
-		return out
-	var q := UiSeasons.r2()
-	var sz: Array = a["size"]
-	var pal: Array = a["pal"]
-	var sec := float(a["sec"])
-	for i in mini(int(a["n"]), UiSeasons.AMBIENT_MAX):
-		out.append({
-			"pos": Vector2(40.0 + fposmod(0.21 + float(q["a1"]) * (i + 1), 1.0) * 1000.0, fposmod(0.63 + float(q["a2"]) * (i + 1), 1.0) * 1700.0),
-			"size": lerpf(float(sz[0]), float(sz[1]), fposmod(float(q["size"]) * (i + 1), 1.0)),
-			"col": UiSeasons.col(str(pal[i % pal.size()])),
-			"delay": -fposmod(float(q["rot"]) * (i + 1), 1.0) * sec,
-			"petal": str(a.get("shape", "")) == "petal",
-		})
-	return out
+## Materijal staze: pločica kita {period, items: [{k: rect | circle, x, y, w, h, r, f}]}
+## ponovljena vertikalno do pokrivene visine — jedna statična mreža (širina = staza igre).
+static func _lane_mesh(tile: Dictionary) -> Dictionary:
+	var items: Array = tile.get("items", [])
+	var period := float(tile.get("period", 0.0))
+	if items.is_empty() or period < 1.0:
+		return {}
+	var meshes: Array = []
+	var y0 := -period
+	while y0 < _COVER_H + period:
+		for it in items:
+			var c := UiSeasons.col(str(it["f"]))
+			var x := _LANE_EDGE + float(it["x"])
+			var pts: PackedVector2Array
+			if str(it["k"]) == "circle":
+				pts = SeasonBackdrop._ellipse(Vector2(x, y0 + float(it["y"])), float(it["r"]), float(it["r"]))
+			else:
+				pts = SeasonBackdrop._rect_points(
+					x, y0 + float(it["y"]), float(it["w"]), float(it["h"]),
+					float(it.get("r", 0.0)), SeasonBackdrop.RECT_CORNER_STEPS
+				)
+			var idx := PackedInt32Array()
+			for v in range(1, pts.size() - 1):
+				idx.append_array([0, v, v + 1])
+			meshes.append({"pts": pts, "idx": idx, "cols": SeasonBackdrop._filled(pts.size(), c)})
+		y0 += period
+	var m := SeasonBackdrop.merge_meshes(meshes)
+	m["period"] = period
+	return m
 
 
-func _draw_kit(vp: Vector2, sx: float) -> void:
-	var ci := get_canvas_item()
-	draw_rect(Rect2(Vector2.ZERO, vp), UiSeasons.col(str(_run["ground"])), true)
+func _ensure_layers() -> void:
+	if not _layers.is_empty():
+		return
+	var painters := {
+		"Ground": _paint_ground, "Far": _paint_far, "Lanes": _paint_lanes,
+		"LaneTiles": _paint_lane_tiles, "Edges": _paint_edges, "Near": _paint_near,
+		"Ambient": _paint_ambient,
+	}
+	for key in painters:
+		var layer := _Layer.new()
+		layer.name = str(key)
+		layer.paint = painters[key]
+		add_child(layer)
+		_layers[key] = layer
+
+
+## Novi kit / nova veličina ekrana: slojevi se crtaju iznova (jednom), pa skrol.
+func _redraw_all() -> void:
+	var kit := has_kit()
+	for key in _layers:
+		var layer: Node2D = _layers[key]
+		layer.visible = kit
+		layer.queue_redraw()
+	if kit:
+		_sync_scroll()
+	queue_redraw()
+
+
+func _vp_sx() -> Vector2:
+	var vp := get_viewport_rect().size
+	return Vector2(vp.x, vp.x / 1080.0) if vp.x >= 2.0 else Vector2(1080.0, 1.0)
+
+
+## Skrol = samo pomak slojeva (period pločice, bez crtanja).
+func _sync_scroll() -> void:
+	if _layers.is_empty():
+		return
+	var sx := _vp_sx().y
 	var far: Dictionary = _run["far"]
-	_draw_tiles(ci, _far, _scroll_px * float(far.get("speed", 0.35)), sx)
+	var near: Dictionary = _run["near"]
+	_set_scroll(_layers["Far"], _far, _scroll_px * float(far.get("speed", 0.35)), sx, true)
+	_set_scroll(_layers["Near"], _near, _scroll_px * float(near.get("speed", 1.0)), sx, true)
+	_set_scroll(_layers["LaneTiles"], _lane_tile, _scroll_px, sx, false)
+
+
+func _set_scroll(layer: Node2D, mesh: Dictionary, scroll: float, sx: float, scaled: bool) -> void:
+	if mesh.is_empty():
+		return
+	layer.position = Vector2(0.0, fposmod(scroll, float(mesh["period"])) * sx)
+	layer.scale = Vector2(sx, sx) if scaled else Vector2.ONE
+
+
+func _paint_ground(canvas: CanvasItem) -> void:
+	if has_kit():
+		var vp := get_viewport_rect().size
+		canvas.draw_rect(Rect2(Vector2.ZERO, vp), UiSeasons.col(str(_run["ground"])), true)
+
+
+func _paint_far(canvas: CanvasItem) -> void:
+	_paint_mesh(canvas, _far)
+
+
+func _paint_near(canvas: CanvasItem) -> void:
+	_paint_mesh(canvas, _near)
+
+
+func _paint_mesh(canvas: CanvasItem, mesh: Dictionary) -> void:
+	if not has_kit() or mesh.is_empty() or (mesh["pts"] as PackedVector2Array).is_empty():
+		return
+	RenderingServer.canvas_item_add_triangle_array(canvas.get_canvas_item(), mesh["idx"], mesh["pts"], mesh["cols"])
+
+
+func _paint_lanes(canvas: CanvasItem) -> void:
+	if not has_kit():
+		return
+	var vs := _vp_sx()
+	var vp := get_viewport_rect().size
 	var lane := UiSeasons.col(str(_run["lane"]))
-	var edge := UiSeasons.col(str(_run["laneEdge"]))
-	var mat: Dictionary = _run["material"]
+	var w := float(UiRun.LANE_WIDTH) * vs.y
 	for i in 3:
-		var cx := UiRun.lane_x(i, vp.x)
-		var w := float(UiRun.LANE_WIDTH) * sx
-		var left := cx - w * 0.5
-		draw_rect(Rect2(left, 0.0, w, vp.y), lane, true)
-		if mat.has("stripe"):
-			var period := float(mat.get("period", _MOW_PERIOD))
-			var on := float(mat.get("on", _MOW_STRIPE))
-			var stripe := UiSeasons.col(str(mat["stripe"]))
-			var y := fposmod(_scroll_px, period) - period
-			while y < vp.y:
-				draw_rect(Rect2(left + _LANE_EDGE * sx, y, w - _LANE_EDGE * 2.0 * sx, on), stripe, true)
-				y += period
-		elif not _pebbles.is_empty():
-			var period := float(mat["period"])
-			draw_set_transform(Vector2(left, fposmod(_scroll_px, period) * sx), 0.0, Vector2(sx, sx))
-			RenderingServer.canvas_item_add_triangle_array(ci, _pebbles["idx"], _pebbles["pts"], _pebbles["cols"])
-			draw_set_transform_matrix(Transform2D.IDENTITY)
-		draw_rect(Rect2(left, 0.0, _LANE_EDGE * sx, vp.y), edge, true)
-		draw_rect(Rect2(left + w - _LANE_EDGE * sx, 0.0, _LANE_EDGE * sx, vp.y), edge, true)
+		canvas.draw_rect(Rect2(UiRun.lane_x(i, vs.x) - w * 0.5, 0.0, w, vp.y), lane, true)
+
+
+## Materijal staze: ista pločica u sve tri staze (sloj se pomjera po y).
+func _paint_lane_tiles(canvas: CanvasItem) -> void:
+	if not has_kit() or _lane_tile.is_empty():
+		return
+	var vs := _vp_sx()
+	var w := float(UiRun.LANE_WIDTH) * vs.y
+	var ci := canvas.get_canvas_item()
+	for i in 3:
+		var left := UiRun.lane_x(i, vs.x) - w * 0.5
+		canvas.draw_set_transform(Vector2(left, 0.0), 0.0, Vector2(vs.y, vs.y))
+		RenderingServer.canvas_item_add_triangle_array(ci, _lane_tile["idx"], _lane_tile["pts"], _lane_tile["cols"])
+	canvas.draw_set_transform_matrix(Transform2D.IDENTITY)
+
+
+func _paint_edges(canvas: CanvasItem) -> void:
+	if not has_kit():
+		return
+	var vs := _vp_sx()
+	var sx := vs.y
+	var vp := get_viewport_rect().size
+	var edge := UiSeasons.col(str(_run["laneEdge"]))
+	var w := float(UiRun.LANE_WIDTH) * sx
+	for i in 3:
+		var left := UiRun.lane_x(i, vs.x) - w * 0.5
+		canvas.draw_rect(Rect2(left, 0.0, _LANE_EDGE * sx, vp.y), edge, true)
+		canvas.draw_rect(Rect2(left + w - _LANE_EDGE * sx, 0.0, _LANE_EDGE * sx, vp.y), edge, true)
 	var seam := UiSeasons.col(str(_run["seam"]))
 	for x in [405.0, 675.0]:
 		var y := 0.0
 		while y < vp.y:
-			draw_rect(Rect2(x * sx - _SEAM_W * 0.5 * sx, y, _SEAM_W * sx, minf(_SEAM_ON, vp.y - y)), seam, true)
+			canvas.draw_rect(Rect2(x * sx - _SEAM_W * 0.5 * sx, y, _SEAM_W * sx, minf(_SEAM_ON, vp.y - y)), seam, true)
 			y += _SEAM_ON + _SEAM_OFF
-	var near: Dictionary = _run["near"]
-	_draw_tiles(ci, _near, _scroll_px * float(near.get("speed", 1.0)), sx)
-	_draw_ambient(sx)
 
 
-func _draw_tiles(ci: RID, mesh: Dictionary, scroll: float, sx: float) -> void:
-	if mesh.is_empty() or (mesh["pts"] as PackedVector2Array).is_empty():
+## Ambijent runa: isti generički format i kod kao polje (SeasonAmbient), jedan draw poziv.
+## Jedini sloj koji se crta svaki frejm.
+func _paint_ambient(canvas: CanvasItem) -> void:
+	if not has_kit() or _amb.is_empty():
 		return
-	draw_set_transform(Vector2(0.0, fposmod(scroll, float(mesh["period"])) * sx), 0.0, Vector2(sx, sx))
-	RenderingServer.canvas_item_add_triangle_array(ci, mesh["idx"], mesh["pts"], mesh["cols"])
-	draw_set_transform_matrix(Transform2D.IDENTITY)
-
-
-func _draw_ambient(sx: float) -> void:
-	if _amb.is_empty():
-		return
-	var a: Dictionary = _run["ambient"]
-	var sec := float(a["sec"])
-	var d: Array = a["drift"]
-	var drift := Vector2(float(d[0]), float(d[1]))
-	if _amb_fan.is_empty():
-		for v in range(1, SeasonBackdrop.ELLIPSE_STEPS - 1):
-			_amb_fan.append_array([0, v, v + 1])
-	# Jedna mreža za sve čestice (jedan draw poziv).
+	var sx := _vp_sx().y
 	var pts := PackedVector2Array()
 	var cols := PackedColorArray()
 	var idx := PackedInt32Array()
-	for p in _amb:
-		var t := fposmod((_time - float(p["delay"])) / sec, 1.0)
-		var fade := t / _AMB_FADE if t < _AMB_FADE else ((1.0 - t) / _AMB_FADE if t > 1.0 - _AMB_FADE else 1.0)
-		var c: Color = p["col"]
-		c.a = _AMB_ALPHA * fade
-		var s := float(p["size"]) * sx
-		var at := ((p["pos"] as Vector2) + drift * t) * sx
-		var ry := s * (0.275 if bool(p["petal"]) else 0.5)
-		SeasonAmbient._push(pts, cols, idx, SeasonBackdrop._ellipse(at, s * 0.5, ry), _amb_fan, c)
-	RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), idx, pts, cols)
+	var still := UiSeasons.REDUCE_MOTION_STOPS_AMBIENT and GameState.reduce_motion
+	SeasonAmbient.append_frame(_amb, _time, Rect2(Vector2.ZERO, _RUN_RECT * sx), sx, 1.0, still, pts, cols, idx)
+	if not idx.is_empty():
+		RenderingServer.canvas_item_add_triangle_array(canvas.get_canvas_item(), idx, pts, cols)
 
 
 # --- Smjer A (sezone bez kita) ---

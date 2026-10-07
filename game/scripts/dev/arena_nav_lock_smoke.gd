@@ -7,8 +7,17 @@ extends SceneTree
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
 
 
+var _backup: String = ""
+
+
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _gs() -> Node:
@@ -30,20 +39,20 @@ func _run() -> void:
 	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
 	if err != OK:
 		push_error("arena_nav_lock_smoke: hub load failed %d" % err)
-		quit(1)
+		_quit(1)
 		return
 	for _i in 12:
 		await process_frame
 	var hubs := get_nodes_in_group("meta_hub")
 	if hubs.is_empty():
 		push_error("arena_nav_lock_smoke: no meta_hub")
-		quit(1)
+		_quit(1)
 		return
 	var hub: Node = hubs[0]
 	var gs := _gs()
 	if gs == null:
 		push_error("arena_nav_lock_smoke: GameState missing")
-		quit(1)
+		_quit(1)
 		return
 	gs.set("seed_bag", {"clover": 6, "daisy": 4})
 	gs.set("wallet_coins", 10)
@@ -58,7 +67,7 @@ func _run() -> void:
 	var arena: Node = host.get_node_or_null("Page_%d" % MetaHubPages.ARENA) if host else null
 	if arena == null:
 		push_error("arena_nav_lock_smoke: arena page missing")
-		quit(1)
+		_quit(1)
 		return
 	if arena.has_method("set_arena_page_active"):
 		arena.call("set_arena_page_active", true)
@@ -74,12 +83,12 @@ func _run() -> void:
 		locked = not bool(swipe.call("is_swipe_enabled"))
 	if not locked:
 		push_error("arena_nav_lock_smoke: expected hub nav locked after pour")
-		quit(1)
+		_quit(1)
 		return
 	var pill := hub.get_node_or_null("RootVBox/PageIndicator/NavPanel/Content/NavLockPill") as Control
 	if pill == null or not pill.visible:
 		push_error("arena_nav_lock_smoke: NavLockPill should show while nav locked")
-		quit(1)
+		_quit(1)
 		return
 	# Tabs must not switch away while locked.
 	var page_before := MetaHubPages.ARENA
@@ -90,7 +99,7 @@ func _run() -> void:
 	if swipe and "current_page" in swipe:
 		if int(swipe.get("current_page")) != page_before:
 			push_error("arena_nav_lock_smoke: page changed while nav locked")
-			quit(1)
+			_quit(1)
 			return
 	# Muncher pojede polje do kraja — sesija se mora zatvoriti sama, bez Done dugmeta.
 	var guard := 0
@@ -106,19 +115,19 @@ func _run() -> void:
 	await create_timer(1.2).timeout
 	if not _field_chips(arena).is_empty():
 		push_error("arena_nav_lock_smoke: field should be empty after the muncher clears it")
-		quit(1)
+		_quit(1)
 		return
 	if bool(arena.call("is_session_open")):
 		push_error("arena_nav_lock_smoke: empty field must close the session")
-		quit(1)
+		_quit(1)
 		return
 	if hub.has_method("is_nav_locked") and bool(hub.call("is_nav_locked")):
 		push_error("arena_nav_lock_smoke: hub should unlock itself once the field is empty")
-		quit(1)
+		_quit(1)
 		return
 	if pill.visible:
 		push_error("arena_nav_lock_smoke: NavLockPill should hide with the session")
-		quit(1)
+		_quit(1)
 		return
 	print("arena_nav_lock_smoke OK")
-	quit(0)
+	_quit(0)

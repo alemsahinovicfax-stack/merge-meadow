@@ -10,13 +10,16 @@
 <helmet>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
 <style>body{margin:0}a{color:#2D3436}a:hover{color:#9E6645}
-@keyframes ambPetal{0%{transform:translate(0,0) rotate(0deg);opacity:0}12%{opacity:.9}88%{opacity:.9}100%{transform:translate(180px,40px) rotate(220deg);opacity:0}}
-@keyframes ambTwinkle{0%,100%{opacity:.2}50%{opacity:1}}
-@keyframes ambMote{0%{transform:translate(0,0);opacity:0}20%{opacity:.85}100%{transform:translate(-24px,-170px);opacity:0}}
-@keyframes runAmb{0%{transform:translate(0,0);opacity:0}10%{opacity:.85}90%{opacity:.85}100%{transform:translate(var(--dx),var(--dy));opacity:0}}
-@keyframes flowerBow{0%{transform:rotate(0) scaleY(1)}35%{transform:rotate(-9deg) scaleY(.94)}70%{transform:rotate(4deg)}100%{transform:rotate(0)}}
+@keyframes ambMove{0%{transform:translate(0,0) rotate(0deg);opacity:0}12%{opacity:var(--a1)}88%{opacity:var(--a1)}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
+@keyframes ambSway{from{transform:translateX(calc(var(--sw) * -1))}to{transform:translateX(var(--sw))}}
+@keyframes ambFloat{0%,100%{transform:translate(0,0) scale(1);opacity:var(--a0)}25%{transform:translate(var(--dx),calc(var(--dy) * -1)) scale(var(--pu))}50%{transform:translate(0,0) scale(1);opacity:var(--a1)}75%{transform:translate(calc(var(--dx) * -1),var(--dy)) scale(var(--pu))}}
+@keyframes ambTw{0%,100%{opacity:var(--a0);transform:scale(1)}50%{opacity:var(--a1);transform:scale(var(--pu))}}
+@keyframes ambStreak{0%{transform:translate(0,0);opacity:0}3%{opacity:1}20%{transform:translate(var(--dx),var(--dy));opacity:0}100%{transform:translate(var(--dx),var(--dy));opacity:0}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes flowerBow{0%{transform:scale(1) rotate(0)}50%{transform:scale(1.08) rotate(-4deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes flowerSway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
 @keyframes flowerGrow{0%{transform:scale(0)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
-@keyframes puff{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),-80px) scale(.5);opacity:0}}
+@keyframes puff{0%{transform:translate(0,0) scale(.6);opacity:0}20%{opacity:1}100%{transform:translate(var(--dx),-80px) scale(1);opacity:0}}
 @keyframes zzz{0%{transform:translate(0,0) scale(.6);opacity:0}25%{opacity:1}100%{transform:translate(34px,-90px) scale(1.1);opacity:0}}
 @keyframes pipBob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-7px) scale(.97,1.03)}}
 @keyframes scrollY{from{transform:translateY(calc(var(--p) * -1))}to{transform:translateY(0)}}
@@ -97,7 +100,7 @@
 
       <sc-if value="{{ isShop }}" hint-placeholder-val="{{ false }}">
         <div data-layer="ShopPage" style="position:absolute;left:0;top:0;width:1080px;height:1633px;background:#FBEDD7;overflow:hidden">
-          <div style="position:absolute;left:24px;top:196px;width:1032px;display:flex;flex-direction:column;gap:32px">
+          <div data-layer="SeasonCards" style="{{ shopListStyle }}">
             <sc-for list="{{ shopCards }}" as="s" hint-placeholder-count="3">
               <div data-layer="SeasonCard" data-card="{{ s.id }}" style="position:relative;height:364px;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;box-shadow:0 10px 0 rgba(26,26,20,.22);overflow:hidden;background:{{ s.far }}">
                 <sc-if value="{{ s.kit }}" hint-placeholder-val="{{ false }}">
@@ -155,6 +158,61 @@
         </div>
       </sc-if>
 
+      <sc-if value="{{ isCamp }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="CampPage" style="position:absolute;left:0;top:0;width:1080px;height:1633px;box-sizing:border-box;padding:24px;display:flex;flex-direction:column;gap:20px">
+          <div data-layer="SeasonLinkCard" style="position:relative;width:1032px;height:318px;flex:0 0 auto;box-sizing:border-box;border-radius:26px;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.22);overflow:hidden">
+            <svg data-layer="SeasonLinkBackdrop" width="1026" height="312" viewBox="0 0 1026 312" style="position:absolute;left:0;top:0;display:block">
+              <sc-for list="{{ campBg }}" as="g" hint-placeholder-count="0"><path d="{{ g.d }}" fill="{{ g.f }}" stroke="{{ g.s }}" stroke-width="{{ g.sw }}" stroke-linecap="round" stroke-linejoin="round"></path></sc-for>
+            </svg>
+            <sc-if value="{{ burst }}" hint-placeholder-val="{{ false }}"><div data-layer="UnlockBurst" style="{{ burstStyle }}"></div></sc-if>
+            <div style="position:relative;box-sizing:border-box;padding:22px;display:flex;flex-direction:column;gap:20px">
+              <div data-layer="SeasonHead" style="height:120px;display:flex;align-items:center;gap:20px">
+                <div data-layer="SeasonTitle" style="flex:1;min-width:0;font:900 56px/1.1 Nunito,system-ui,sans-serif;color:#3D3D33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ campName }}</div>
+                <div data-layer="UnlockButton" style="{{ unlockStyle }}"><sc-if value="{{ unlockLock }}" hint-placeholder-val="{{ false }}"><img src="icons/icon_lock.svg" alt="" style="width:40px;height:40px;opacity:.8"></sc-if><span>{{ unlockText }}</span></div>
+              </div>
+              <div data-layer="SeasonProgress" style="height:128px;display:flex;align-items:stretch;gap:24px">
+                <div data-layer="CoinProgress" style="width:310px;flex:0 0 auto;display:flex;flex-direction:column;justify-content:flex-end;gap:6px">
+                  <div style="height:56px;display:flex;align-items:center;gap:14px"><img src="icons/icon_coin.svg" alt="" style="width:56px;height:56px;flex:0 0 auto"><span style="font:900 48px/1 Nunito,system-ui,sans-serif;color:#3D3D33;font-variant-numeric:tabular-nums;white-space:nowrap">{{ coinCount }}</span></div>
+                  <div style="margin-left:70px;height:18px;border-radius:9px;background:rgba(26,26,20,.20);position:relative;overflow:hidden"><div style="{{ coinBar }}"></div></div>
+                </div>
+                <div data-layer="SplitLine" style="width:5px;height:128px;flex:0 0 auto;border-radius:3px;background:rgba(26,26,20,.22)"></div>
+                <div data-layer="FlowerProgress" style="flex:1;min-width:0;display:flex;gap:20px">
+                  <div data-layer="FlowerArt" style="position:relative;width:128px;height:128px;flex:0 0 auto;box-sizing:border-box;border-radius:28px;background:#FFD56B;border:3px solid #D6A82F"><div style="position:absolute;left:7px;top:7px;width:108px;height:108px;overflow:hidden"><img src="{{ flowerArt }}" alt="" style="{{ flowerArtStyle }}"></div></div>
+                  <div data-layer="FlowerBody" style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between">
+                    <div style="font:800 42px/1 Nunito,system-ui,sans-serif;color:#3D3D33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ flowerName }}</div>
+                    <div style="font:900 48px/1 Nunito,system-ui,sans-serif;color:#3D3D33;font-variant-numeric:tabular-nums">{{ flowerCount }}</div>
+                    <div style="height:18px;border-radius:9px;background:rgba(26,26,20,.20);position:relative;overflow:hidden"><div style="{{ flowerBar }}"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div data-layer="StashSection" style="flex:1;min-height:0;box-sizing:border-box;border-radius:26px;background:#FFF8F0;border:2px solid rgba(45,52,54,.16);box-shadow:0 8px 0 rgba(26,26,20,.12);padding:18px;display:flex;flex-direction:column;gap:14px">
+            <div data-layer="StashTabs" style="height:120px;display:flex;gap:14px">
+              <div data-layer="SeedsTab" style="flex:1;box-sizing:border-box;border-radius:30px;background:#FFB88C;border:4px solid #E8A374;display:flex;align-items:center;gap:16px;padding:0 20px"><div style="width:76px;height:76px;flex:0 0 auto;box-sizing:border-box;border-radius:38px;background:#FFF8F0;border:3px solid #CBC2B6;display:grid;place-items:center"><img src="icons/icon_seed.svg" alt="" style="width:44px;height:44px"></div><div style="flex:1;font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436">Seeds</div><div style="height:56px;padding:0 18px;border-radius:28px;background:rgba(255,248,240,.8);display:flex;align-items:center;font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">112</div></div>
+              <div data-layer="FlowersTab" style="flex:1;box-sizing:border-box;border-radius:30px;background:#F1EBE4;border:2px solid #D9D3CC;display:flex;align-items:center;gap:16px;padding:0 20px"><div style="width:76px;height:76px;flex:0 0 auto;box-sizing:border-box;border-radius:22px;background:#FFD56B;border:3px solid #D6A82F;display:grid;place-items:center"><img src="icons/icon_flower.svg" alt="" style="width:44px;height:44px"></div><div style="flex:1;font:900 46px/1 Nunito,system-ui,sans-serif;color:#4A5153">Flowers</div><div style="height:56px;padding:0 18px;border-radius:28px;background:#E6DFD8;display:flex;align-items:center;font:900 38px/1 Nunito,system-ui,sans-serif;color:#4A5153">31</div></div>
+            </div>
+            <div data-layer="StashBody" style="flex:1;border-radius:20px;border:3px dashed rgba(45,52,54,.18)"></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isFlowers }}" hint-placeholder-val="{{ false }}">
+        <div data-layer="FlowerSheet" style="position:absolute;left:0;top:0;width:1080px;height:1633px;box-sizing:border-box;padding:36px 40px;display:flex;flex-direction:column;gap:18px">
+          <div style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#1A1A14;text-align:center;height:72px">{{ flowerTitle }}</div>
+          <sc-for list="{{ flowerRows }}" as="fr" hint-placeholder-count="6">
+            <div data-layer="FlowerRow" style="height:232px;display:flex;align-items:center;gap:24px">
+              <div style="width:300px;flex:0 0 auto;display:flex;flex-direction:column;gap:10px"><div style="font:900 40px/1.1 Nunito,system-ui,sans-serif;color:#1A1A14;text-wrap:balance">{{ fr.name }}</div><div style="font:800 26px/1.1 Nunito,system-ui,sans-serif;color:#555C5E">{{ fr.rar }}</div></div>
+              <sc-for list="{{ fr.tiers }}" as="t" hint-placeholder-count="3">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+                  <div style="position:relative;width:200px;height:200px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:4px solid #2D3436;overflow:hidden"><img src="{{ t.src }}" alt="" style="{{ t.art }}margin:8px;"></div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
       <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
         <div data-layer="SeasonSelect" style="position:absolute;left:0;top:0;width:1080px;height:1633px">
           <div data-layer="SeasonTabs" style="{{ tabsStyle }}">
@@ -209,6 +267,9 @@
                 <sc-if value="{{ stBuy }}" hint-placeholder-val="{{ false }}">
                   <div data-layer="PriceButton" style="height:140px;box-sizing:border-box;border-radius:70px;background:#FFD56B;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;gap:18px;padding:0 56px 0 40px"><img src="icons/icon_diamond.svg" alt="" style="width:64px;height:64px"><span style="font:900 60px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">{{ price }}</span></div>
                 </sc-if>
+                <sc-if value="{{ stSoon }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="SoonTag" style="height:120px;box-sizing:border-box;padding:0 48px;border-radius:60px;background:#FFF8F0;border:4px dashed #2D3436;display:flex;align-items:center;font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Coming soon</div>
+                </sc-if>
                 <sc-if value="{{ stOwned }}" hint-placeholder-val="{{ false }}">
                   <div data-layer="OwnedChip" style="height:120px;box-sizing:border-box;border-radius:60px;background:#A8E6CF;border:4px solid #2D3436;display:flex;align-items:center;gap:18px;padding:0 48px 0 36px"><div style="width:22px;height:40px;border-right:9px solid #2D3436;border-bottom:9px solid #2D3436;transform:rotate(45deg) translate(-4px,-6px)"></div><span style="font:900 50px/1 Nunito,system-ui,sans-serif;color:#2D3436">Yours</span></div>
                 </sc-if>
@@ -238,13 +299,14 @@
               </div>
               <div data-layer="UpgradeDot" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:24px;background:#FFD56B;border:4px solid #2D3436;box-sizing:border-box"></div>
             </div>
+            <div data-layer="LooksButton" style="position:absolute;left:876px;top:1265px;width:180px;height:180px;box-sizing:border-box;border-radius:32px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><div style="width:84px;height:84px;border-radius:18px;background:#FFCCD5;border:3px solid #2D3436;box-sizing:border-box;display:grid;place-items:center"><img src="icons/icon_wardrobe.svg" alt="" style="width:66px;height:66px"></div><div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Looks</div></div>
             <div data-layer="SeasonsButton" onClick="{{ onSeasons }}" style="{{ seasonsBtn }}"><div style="width:18px;height:18px;border-left:7px solid #2D3436;border-bottom:7px solid #2D3436;transform:rotate(45deg);margin-left:8px"></div><div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Seasons</div></div>
             <div data-layer="EndlessButton" style="{{ endlessBtn }}"><div style="display:flex;flex:0 0 auto"><div style="width:30px;height:30px;border-radius:15px;border:6px solid #2D3436;box-sizing:border-box"></div><div style="width:30px;height:30px;border-radius:15px;border:6px solid #2D3436;box-sizing:border-box;margin-left:-6px"></div></div><div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Endless</div></div>
           </div>
 
           <div data-layer="CardNav" style="{{ navStyle }}">
-            <div data-layer="PrevSeason" style="position:absolute;left:28px;top:680px;width:120px;height:120px;box-sizing:border-box;border-radius:60px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center;opacity:.0"><div style="width:26px;height:26px;border-left:9px solid #2D3436;border-bottom:9px solid #2D3436;transform:rotate(45deg);margin-left:12px"></div></div>
-            <div data-layer="NextSeason" style="position:absolute;right:28px;top:680px;width:120px;height:120px;box-sizing:border-box;border-radius:60px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center"><div style="width:26px;height:26px;border-right:9px solid #2D3436;border-top:9px solid #2D3436;transform:rotate(45deg);margin-right:12px"></div></div>
+            <div data-layer="PrevSeason" style="{{ prevStyle }}"><div style="width:26px;height:26px;border-left:9px solid #2D3436;border-bottom:9px solid #2D3436;transform:rotate(45deg);margin-left:12px"></div></div>
+            <div data-layer="NextSeason" style="{{ nextStyle }}"><div style="width:26px;height:26px;border-right:9px solid #2D3436;border-top:9px solid #2D3436;transform:rotate(45deg);margin-right:12px"></div></div>
             <div data-layer="SeasonDots" style="position:absolute;left:0;right:0;top:1180px;display:flex;justify-content:center;align-items:center;gap:22px">
               <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4"><div style="{{ d }}"></div></sc-for>
             </div>
@@ -274,28 +336,28 @@
       <div style="height:3px;background:rgba(255,248,240,.55)"></div>
       <div style="position:relative;height:141px;display:flex">
         <div data-layer="ActiveIndicator" style="{{ indicatorStyle }}"></div>
-        <div data-layer="Tab_Shop" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="{{ tabShopBox }}"><img src="{{ tabShopIcon }}" alt="Shop" style="{{ tabShopImg }}"></div></div>
-        <div data-layer="Tab_Journal" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;border-radius:20px;display:grid;place-items:center"><img src="icons/tab_journal_light.svg" alt="Journal" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
-        <div data-layer="Tab_Home" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="{{ tabHomeBox }}"><img src="{{ tabHomeIcon }}" alt="Home" style="{{ tabHomeImg }}"></div></div>
-        <div data-layer="Tab_Camp" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;border-radius:20px;display:grid;place-items:center"><img src="icons/tab_camp_light.svg" alt="Camp" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
-        <div data-layer="Tab_Arena" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;border-radius:20px;display:grid;place-items:center"><img src="icons/tab_arena_light.svg" alt="Arena" style="width:64px;height:64px;display:block;opacity:.82"></div></div>
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5"><div data-layer="Tab" data-tab="{{ t.name }}" style="width:216px;height:141px;flex:0 0 auto;position:relative"><div style="{{ t.box }}"><img src="{{ t.src }}" alt="{{ t.name }}" style="{{ t.img }}"></div></div></sc-for>
       </div>
     </div>
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;moonlit_warren&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;surface&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;card&quot;,&quot;field&quot;,&quot;shop&quot;,&quot;arena&quot;,&quot;run&quot;],&quot;default&quot;:&quot;card&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;lush&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:4,&quot;step&quot;:1,&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;},&quot;still&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;pip&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;walk&quot;,&quot;sniff&quot;,&quot;sleep&quot;],&quot;default&quot;:&quot;walk&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;u&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;default&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;grayscale&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;surface&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;card&quot;,&quot;field&quot;,&quot;shop&quot;,&quot;camp&quot;,&quot;arena&quot;,&quot;run&quot;,&quot;flowers&quot;],&quot;default&quot;:&quot;card&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;lush&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:4,&quot;step&quot;:1,&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;},&quot;still&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;sway&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;pip&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;walk&quot;,&quot;sniff&quot;,&quot;sleep&quot;],&quot;default&quot;:&quot;walk&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;u&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;default&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;grayscale&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
 const CARD = [24, 172, 1032, 1160], PAGE = [0, 0, 1080, 1633];
 const ROSTER6 = [[276, 256, 180], [516, 230, 220], [756, 256, 180], [276, 560, 180], [516, 560, 180], [756, 560, 180]];
 const NAME0 = { top: 244, size: 80, ls: -0.015 }, NAME1 = { top: 36, size: 56, ls: -0.01 };
-const PIP0 = { x: 425, y: 1027, s: 230 }, PIP_HOME = [756, 1404], PIP_ZONE = [151, 1306, 778, 131];
+const PIP0 = { x: 425, y: 1027, s: 230 }, PIP_HOME = [756, 1404], PIP_ZONE = [151, 1306, 614, 131];
 const PLAY0 = { x: 280, y: 1413, w: 520, h: 180, bw: 4, sy: 10, sa: 0.30, fs: 76, th: 30, tl: 48, ml: 8, gap: 24 };
 const PLAY1 = { x: 324, y: 1461, w: 432, h: 140, bw: 3, sy: 8, sa: 0.28, fs: 64, th: 26, tl: 42, ml: 6, gap: 22 };
-const W = { FLOWER_START: 0.20, FLOWER_STAGGER: 12 / 560, FLOWER_SETTLE: 200 / 560, FLOWER_FADE: 100 / 560, NOTE: [0.30, 0.60], CHROME: [0.60, 0.92], SLIDE: 254 };
-const INK = '#2D3436', VEIL = '#E3D9CC';
+const W = { FLOWER_START: 0.20, FLOWER_STAGGER: 12 / 560, FLOWER_SETTLE: 200 / 560, FLOWER_FADE: 100 / 560, CHROME: [0.60, 0.92], SLIDE: 254 };
+const INK = '#2D3436', VEIL = '#E3D9CC', ACTIVE = 'country_bloom';
+const SEASONS = ['country_bloom', 'frost_orchard', 'lantern_meadow', 'amber_canopy', 'moonlit_warren', 'coral_tide', 'starfall_glade', 'ember_fen'];
 const MISSING = { country_bloom: ['sunflower'], moonlit_warren: ['star_jasmine', 'umbral_lily'] };
-const PRICE = { moonlit_warren: '€2.99', coral_tide: '€3.49', starfall_glade: '€2.99' };
-const DEF_STATE = { card: { country_bloom: 'active', moonlit_warren: 'buy' }, field: '13', shop: 'buy', arena: 'full', run: 'mid' };
+const DEF_CARD = { country_bloom: 'active', frost_orchard: 'owned', lantern_meadow: 'locked', amber_canopy: 'locked', moonlit_warren: 'buy', coral_tide: 'buy', starfall_glade: 'buy', ember_fen: 'soon' };
+const DEF = { field: '13', shop: 'buy', camp: 'ready', arena: 'full', run: 'mid', flowers: '' };
+const CAMP = { short: { coins: 260, fl: 8, head: '260' }, ready: { coins: 500, fl: 20, head: '540' }, burst: { coins: 500, fl: 20, head: '40' } };
+const SHOP_ORDER = ['moonlit_warren', 'coral_tide', 'starfall_glade', 'ember_fen'];
+const TABS = [['Shop', 'tab_shop'], ['Journal', 'tab_journal'], ['Home', 'tab_home'], ['Camp', 'tab_camp'], ['Arena', 'tab_arena']];
 const clamp = v => Math.max(0, Math.min(1, v));
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 const easeOut = k => 1 - Math.pow(1 - k, 3);
@@ -304,9 +366,11 @@ const win = (u, a, b) => clamp((u - a) / (b - a));
 const f2 = v => (Math.round(v * 100) / 100).toString();
 const rect = r => 'position:absolute;left:' + f2(r[0]) + 'px;top:' + f2(r[1]) + 'px;width:' + f2(r[2]) + 'px;height:' + f2(r[3]) + 'px;';
 const lines = n => n.length <= 11 ? [n] : (() => { const w = n.split(' '); if (w.length < 2) return [n]; let best = [n], bw = 1e9; for (let i = 1; i < w.length; i++) { const a = w.slice(0, i).join(' '), b = w.slice(i).join(' '), m = Math.max(a.length, b.length); if (m < bw) { bw = m; best = [a, b]; } } return best; })();
+const svgOf = (groups, w, h, style, key) => React.createElement('svg', { key, width: w, height: h, viewBox: '0 0 ' + w + ' ' + h, style }, groups.map((g, i) => React.createElement('path', { key: i, d: g.d, fill: g.f, stroke: g.s, strokeWidth: g.sw, strokeLinecap: 'round', strokeLinejoin: 'round' })));
 
 class Component extends DCLogic {
-  state = { K: null, meta: null, u: null, moving: false, feet: PIP_HOME, pose: 'walk', walking: false, bow: -1, bowKey: 0, puffs: null, zzz: false, grow: -1 };
+  state = { K: null, meta: null, u: null, moving: false, feet: PIP_HOME, pose: 'walk', walking: false, bow: -1, puffs: null, zzz: false, grow: -1 };
+  _shape = new Map(); _scene = new Map();
   componentDidMount() {
     this._alive = true;
     import('./seasons_kit.js').then(K => this._alive && this.setState({ K }));
@@ -315,15 +379,16 @@ class Component extends DCLogic {
   }
   componentWillUnmount() { this._alive = false; this.stopAll(); }
   componentDidUpdate(pp) { const p = this.props; if (['surface', 'season', 'state', 'still', 'pip', 'u'].some(k => pp[k] !== p[k])) { this.stopAll(); this.setState({ u: null, moving: false, feet: PIP_HOME, pose: 'walk', bow: -1, puffs: null, zzz: false, grow: -1 }); setTimeout(() => this.kick(), 30); } }
-  stopAll() { ['_raf', '_wraf', '_t1', '_t2', '_t3'].forEach(k => clearTimeout(this[k])); }
+  stopAll() { ['_raf', '_wraf', '_t1', '_t3'].forEach(k => clearTimeout(this[k])); }
   surface() { return this.props.surface || 'card'; }
-  season() { return this.props.season === 'moonlit_warren' ? 'moonlit_warren' : 'country_bloom'; }
-  st() { const s = this.surface(), d = DEF_STATE[s], v = this.props.state; return String(v != null && v !== '' ? v : (typeof d === 'object' ? d[this.season()] : d)); }
+  season() { return SEASONS.includes(this.props.season) ? this.props.season : 'country_bloom'; }
+  st() { const s = this.surface(), v = this.props.state; if (v != null && v !== '') return String(v); return s === 'card' ? DEF_CARD[this.season()] : DEF[s]; }
+  scene(K, recipe, w, h, baseW, avoid, key) { const k = key + ':' + Math.round(w) + 'x' + Math.round(h); let g = this._scene.get(k); if (!g) { g = K.buildScene(recipe, w, h, baseW, avoid).groups; if (this._scene.size > 40) this._scene.clear(); this._scene.set(k, g); } return g; }
   curU() { if (this.props.u != null && this.surface() === 'card') return clamp(+this.props.u); if (this.surface() === 'field') return 1; return this.state.u ?? 0; }
   run(slot, ms, fn, done) { clearTimeout(this[slot]); const t0 = performance.now(); const step = () => { if (!this._alive) return; const k = clamp((performance.now() - t0) / ms); fn(k); if (k < 1) this[slot] = setTimeout(step, 16); else if (done) done(); }; this[slot] = setTimeout(step, 0); }
   kick() {
-    if (this.props.still || this.curU() < 1 || !this._alive) return;
-    if (this.st() === '13' || this.surface() === 'card') this._t3 = setTimeout(() => { this.setState({ grow: 12 }); this._t3 = setTimeout(() => this.setState({ grow: -1 }), 600); }, 500);
+    if (this.props.still || this.curU() < 1 || !this._alive || !['card', 'field'].includes(this.surface())) return;
+    this._t3 = setTimeout(() => { const g = this.grownSpots(); if (!g.length) return; this.setState({ grow: g[g.length - 1].i }); this._t3 = setTimeout(() => this.setState({ grow: -1 }), 600); }, 500);
     this._step = 0; this._t1 = setTimeout(() => this.pipNext(), 900);
   }
   grownSpots() { const K = this.state.K; if (!K) return []; const kit = K.KITS[this.season()], st = this.surface() === 'card' ? '13' : this.st(); return kit.spots.map((s, i) => ({ s, i })).filter(({ s }) => st === '13' || (st === '6' && s[4] === 1)); }
@@ -332,135 +397,137 @@ class Component extends DCLogic {
     const seq = ['walk', 'sniff', 'walk', 'sleep'], kind = seq[this._step++ % 4];
     const [x0, y0] = this.state.feet;
     const go = (d, then) => { const ms = Math.max(2.2, Math.min(5.5, Math.hypot(d[0] - x0, d[1] - y0) / 70)) * 1000; this.setState({ pose: 'walk', walking: true, zzz: false }); this.run('_wraf', ms, k => { const e = 0.5 - Math.cos(Math.PI * k) / 2; this.setState({ feet: [lerp(x0, d[0], e), lerp(y0, d[1], e)] }); }, () => { this.setState({ walking: false }); then(); }); };
-    if (kind === 'walk') { const i = this._step; const d = [PIP_ZONE[0] + ((0.31 + 0.7549 * i) % 1) * PIP_ZONE[2], PIP_ZONE[1] + ((0.62 + 0.5698 * i) % 1) * PIP_ZONE[3]]; return go(d, () => { this._t1 = setTimeout(() => this.pipNext(), 900); }); }
+    if (kind === 'walk') { const i = this._step; return go([PIP_ZONE[0] + ((0.31 + 0.7549 * i) % 1) * PIP_ZONE[2], PIP_ZONE[1] + ((0.62 + 0.5698 * i) % 1) * PIP_ZONE[3]], () => { this._t1 = setTimeout(() => this.pipNext(), 900); }); }
     if (kind === 'sniff') {
       const g = this.grownSpots(); if (!g.length) return this.pipNext();
       const pick = g.slice().sort((a, b) => Math.abs(a.s[0] * 10.8 - x0) - Math.abs(b.s[0] * 10.8 - x0))[Math.min(1, g.length - 1)];
       const cx = pick.s[0] * 10.8, by = 1633 - pick.s[1] * 16.33, sz = pick.s[2];
-      const d = [Math.max(PIP_ZONE[0], Math.min(PIP_ZONE[0] + PIP_ZONE[2], cx)), PIP_ZONE[1]];
-      return go(d, () => { this.setState({ pose: 'sniff', bow: pick.i, bowKey: this.state.bowKey + 1, puffs: { x: cx, y: by - sz * 0.7, key: Date.now() } }); this._t1 = setTimeout(() => { this.setState({ bow: -1, puffs: null }); this.pipNext(); }, 1300); });
+      return go([Math.max(PIP_ZONE[0], Math.min(PIP_ZONE[0] + PIP_ZONE[2], cx)), PIP_ZONE[1]], () => { this.setState({ pose: 'sniff', bow: pick.i, puffs: { x: cx, y: by - sz * 0.7, key: Date.now() } }); this._t1 = setTimeout(() => { this.setState({ bow: -1, puffs: null }); this.pipNext(); }, 1300); });
     }
     this.setState({ pose: 'sleep', zzz: true }); this._t1 = setTimeout(() => { this.setState({ zzz: false }); this.pipNext(); }, 3200);
   }
   open() { if (this.state.moving || this.curU() > 0 || this.props.u != null) return; this.setState({ moving: true, feet: PIP_HOME }); this.run('_raf', 560, k => this.setState({ u: k }), () => { this.setState({ moving: false, u: 1 }); this.kick(); }); }
   close() { if (this.state.moving || this.surface() !== 'card' || this.curU() < 1 || this.props.u != null) return; this.stopAll(); this.setState({ moving: true, bow: -1, puffs: null, zzz: false, pose: 'walk' }); this.run('_raf', 440, k => this.setState({ u: 1 - k }), () => this.setState({ moving: false, u: 0, feet: PIP_HOME })); }
-  crop(type, tier, box, bottom) { const m = this.state.meta && this.state.meta[type + '_t' + tier]; const c = m ? m.crop : [40, 20, 176, 224]; const s = box / Math.max(c[2], c[3]); const left = (box - c[2] * s) / 2 - c[0] * s, top = bottom ? box - (c[1] + c[3]) * s : (box - c[3] * s) / 2 - c[1] * s; return 'position:absolute;left:' + f2(left) + 'px;top:' + f2(top) + 'px;width:' + f2(256 * s) + 'px;height:' + f2(256 * s) + 'px;max-width:none;display:block'; }
+  crop(type, tier, box, bottom) { const m = this.state.meta && this.state.meta[type + '_t' + tier]; const c = m ? m.crop : [40, 20, 176, 224]; const s = box / Math.max(c[2], c[3]); const left = (box - c[2] * s) / 2 - c[0] * s, top = bottom ? box - (c[1] + c[3]) * s : (box - c[3] * s) / 2 - c[1] * s; return 'position:absolute;left:' + f2(left) + 'px;top:' + f2(top) + 'px;width:' + f2(256 * s) + 'px;height:' + f2(256 * s) + 'px;max-width:none;display:block;'; }
+  // Generički ambijent (isti format za polje i run): oblik iz SHAPES + motion. Po frejmu samo transform/opacity.
+  ambientEl(K, def, w, h, still, calm, key) {
+    const layers = K.ambientLayers(def); if (!layers.length) return null;
+    const kids = [];
+    layers.forEach((L, li) => L.parts.forEach(p => {
+      const pal = [p.col].concat(L.pal2 || []), sz = Math.round(p.size), ck = L.shape + '|' + pal.join(',') + '|' + sz;
+      let paths = this._shape.get(ck); if (!paths) { paths = K.shapePaths(L.shape, pal, sz); this._shape.set(ck, paths); }
+      const svg = svgOf(paths, sz * 2, sz * 2, { position: 'absolute', left: -sz, top: -sz, overflow: 'visible', transform: p.angle ? 'rotate(' + p.angle + 'deg)' : undefined });
+      const m = L.motion, A = L.alpha, d = p.delay.toFixed(2) + 's';
+      const name = m === 'float' ? 'ambFloat' : m === 'twinkle' ? 'ambTw' : m === 'streak' ? 'ambStreak' : 'ambMove';
+      const inner = L.sway && L.sway[0] && !still ? React.createElement('div', { style: { position: 'absolute', left: 0, top: 0, '--sw': L.sway[0] + 'px', animation: 'ambSway ' + (L.sec / Math.max(1, L.sway[1]) / 2).toFixed(2) + 's ease-in-out ' + d + ' infinite alternate' } }, svg) : svg;
+      kids.push(React.createElement('div', { key: li + '_' + p.i, style: { position: 'absolute', left: p.x / 100 * w, top: p.y / 100 * h, '--dx': L.drift[0] + 'px', '--dy': L.drift[1] + 'px', '--rot': (L.rot || 0) + 'deg', '--a0': A[0], '--a1': A[1], '--pu': 1 + (L.pulse || 0), opacity: still ? (m === 'streak' ? 0 : Math.min(1, (A[0] + A[1]) / 2 + 0.25)) : undefined, animation: still ? 'none' : name + ' ' + L.sec + 's ' + (m === 'float' || m === 'twinkle' ? 'ease-in-out' : 'linear') + ' ' + d + ' infinite' } }, inner));
+    }));
+    return React.createElement('div', { key, 'data-layer': 'Ambient', style: { position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', opacity: calm ? 0.35 : 1, transition: 'opacity 1.2s' } }, React.createElement('div', { style: { position: 'absolute', inset: 0, animation: still ? 'none' : 'fadeIn .3s ease-out both' } }, kids));
+  }
   renderVals() {
-    const p = this.props, s = this.state, K = s.K, surface = this.surface(), season = this.season(), st = this.st();
-    const still = !!p.still;
-    const base = { season, lush: +(p.lush ?? 0), label: season + ' · ' + surface + ' · ' + st, coinsText: '1,250', basketType: season === 'moonlit_warren' ? 'Moss' : 'Clover' };
+    const p = this.props, s = this.state, K = s.K, surface = this.surface(), season = this.season(), st = this.st(), still = !!p.still;
     const rootStyle = 'width:1080px;height:1920px;flex:0 0 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#2A2233;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;' + (p.grayscale ? 'filter:grayscale(1)' : '');
-    const empty = { ...base, rootStyle, isArena: false, isRun: false, isHub: false, isShop: false, isHome: false };
-    if (surface === 'arena') return { ...empty, isArena: true, arenaState: ['empty', 'full', 'hunting', 'eating', 'frozen', 'bag_empty'].includes(st) ? st : 'full' };
-    if (!K) return { ...empty, isHub: true, pageStyle: 'flex:0 0 1633px;height:1633px;position:relative;background:#F4F9EF', indicatorStyle: 'display:none', tabShopBox: '', tabShopIcon: 'icons/tab_shop_light.svg', tabShopImg: 'width:64px', tabHomeBox: '', tabHomeIcon: 'icons/tab_home.svg', tabHomeImg: 'width:64px' };
-    const kit = K.KITS[season], order = K.cardOrder(season), FD = K.FLOWER_DIR;
-    const sp = kit.ambient;
-    if (surface === 'run') return { ...empty, ...this.runVals(K, kit, st, still), isRun: true };
-
-    const shopOn = surface === 'shop';
-    const footer = { indicatorStyle: 'position:absolute;top:6px;left:' + (shopOn ? 72 : 504) + 'px;width:72px;height:8px;border-radius:4px;z-index:1;background:#FFB88C',
-      tabShopBox: 'position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;display:grid;place-items:center;' + (shopOn ? 'background:#FFB88C;border:2px solid rgba(45,52,54,.14)' : ''), tabShopIcon: shopOn ? 'icons/tab_shop.svg' : 'icons/tab_shop_light.svg', tabShopImg: shopOn ? 'width:72px;height:72px;display:block;transform:translateY(-2px)' : 'width:64px;height:64px;display:block;opacity:.82',
-      tabHomeBox: 'position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;display:grid;place-items:center;' + (!shopOn ? 'background:#FFB88C;border:2px solid rgba(45,52,54,.14)' : ''), tabHomeIcon: !shopOn ? 'icons/tab_home.svg' : 'icons/tab_home_light.svg', tabHomeImg: !shopOn ? 'width:72px;height:72px;display:block;transform:translateY(-2px)' : 'width:64px;height:64px;display:block;opacity:.82' };
-
-    if (shopOn) return { ...empty, ...footer, isHub: true, isShop: true, pageStyle: 'flex:0 0 1633px;height:1633px;position:relative;overflow:hidden', ...this.shopVals(K, st, still) };
+    const base = { season, lush: +(p.lush ?? 0), label: season + ' · ' + surface + ' · ' + st, rootStyle, isArena: false, isRun: false, isHub: false, isShop: false, isHome: false, isCamp: false, isFlowers: false, coinsText: '1,250', tabs: [], indicatorStyle: 'display:none', pageStyle: 'flex:0 0 1633px;height:1633px;position:relative' };
+    if (surface === 'arena') return { ...base, isArena: true, arenaState: ['empty', 'full', 'hunting', 'eating', 'frozen', 'bag_empty'].includes(st) ? st : 'full' };
+    if (!K) return { ...base, isHub: true };
+    const kit = K.KITS[season], FD = K.FLOWER_DIR;
+    if (surface === 'run') return { ...base, ...this.runVals(K, kit, st, still), isRun: true, basketType: K.ROSTER[season][0][1].split(' ').pop() };
+    const tabIdx = { shop: 0, flowers: 1, camp: 3 }[surface] ?? 2;
+    const chrome = {
+      isHub: true,
+      indicatorStyle: 'position:absolute;top:6px;left:' + (tabIdx * 216 + 72) + 'px;width:72px;height:8px;border-radius:4px;z-index:1;background:#FFB88C',
+      tabs: TABS.map(([name, icon], i) => ({ name, box: 'position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;display:grid;place-items:center;' + (i === tabIdx ? 'background:#FFB88C;border:2px solid rgba(45,52,54,.14)' : ''), src: 'icons/' + icon + (i === tabIdx && i !== 1 ? '' : '_light') + '.svg', img: i === tabIdx ? 'width:72px;height:72px;display:block;transform:translateY(-2px)' : 'width:64px;height:64px;display:block;opacity:.82' }))
+    };
+    if (surface === 'shop') return { ...base, ...chrome, isShop: true, pageStyle: 'flex:0 0 1633px;height:1633px;position:relative;overflow:hidden', ...this.shopVals(K, season, st, still) };
+    if (surface === 'camp') return { ...base, ...chrome, isCamp: true, ...this.campVals(K, season, st, still) };
+    if (surface === 'flowers') return { ...base, ...chrome, isFlowers: true, pageStyle: 'flex:0 0 1633px;height:1633px;position:relative;overflow:hidden;background:' + kit.palette.page, flowerTitle: kit.name, flowerRows: K.ROSTER[season].map(([id, name, r]) => ({ name, rar: '★' + r + ' · ' + id, tiers: [1, 2, 3].map(t => ({ t: 'T' + t, src: FD + id + '_t' + t + '.svg', art: this.crop(id, t, 176) })) })) };
 
     // ── Home: kartica ↔ polje (isti recept u rectu) ──
     const u = this.curU(), e = ease(u), inField = u >= 1, idle = u <= 0;
     const cr = CARD.map((v, i) => lerp(v, PAGE[i], e));
     const rad = lerp(48, 0, e), bw = lerp(4, 0, e), sh = lerp(12, 0, e);
-    const key = season + ':' + Math.round(cr[2]) + 'x' + Math.round(cr[3]);
-    if (this._bgKey !== key) { this._bgKey = key; this._bg = K.buildScene(kit.field, cr[2], cr[3]).groups; }
-    const pal = kit.palette, inkField = pal.ink_field;
+    const bg = this.scene(K, kit.field, cr[2], cr[3], undefined, undefined, season + ':field');
+    const pal = kit.palette, inkField = pal.ink_field, premium = kit.kind === 'paid';
     const cardSt = surface === 'card' ? st : 'active';
-    const premium = kit.kind === 'paid';
-    const playable = ['active', 'owned'].includes(cardSt);
     const status = cardSt === 'owned' ? (premium ? 'owned' : 'open') : cardSt;
-    const isActive = status === 'active';
-    const veiled = status === 'locked';
+    const isActive = status === 'active', veiled = status === 'locked', soon = status === 'soon';
+    const playable = isActive || status === 'open' || status === 'owned';
     const contentA = 1 - win(u, 0.02, 0.40), selOut = win(u, 0.02, 0.30);
-    const roster = order.map(([id, name], i) => {
-      const [cx, top, d] = ROSTER6[i];
-      const miss = playable && (MISSING[season] || []).includes(id);
+    const roster = K.cardOrder(season).map(([id, name], i) => {
+      const [cx, top, d] = ROSTER6[i], miss = playable && (MISSING[season] || []).includes(id);
       return {
         wrap: 'position:absolute;left:' + (cx - d / 2) + 'px;top:' + top + 'px;width:' + d + 'px;display:flex;flex-direction:column;align-items:center;gap:12px',
         disc: 'position:relative;width:' + d + 'px;height:' + d + 'px;flex:0 0 auto;box-sizing:border-box;border-radius:50%;background:' + (miss ? 'rgba(255,248,240,.55)' : '#FFF8F0') + ';border:4px ' + (miss ? 'dashed' : 'solid') + ' ' + INK + ';overflow:hidden',
         src: FD + id + '_t3.svg',
-        art: this.crop(id, 3, d * 0.82).replace('position:absolute;left:', 'position:absolute;margin:' + f2(d * 0.09 - 4) + 'px;left:') + ';' + (veiled ? 'display:none' : miss ? 'filter:brightness(0);opacity:.28' : ''),
+        art: this.crop(id, 3, d * 0.82).replace('position:absolute;left:', 'position:absolute;margin:' + f2(d * 0.09 - 4) + 'px;left:') + (veiled ? 'display:none' : miss ? 'filter:brightness(0);opacity:.28' : soon ? 'opacity:.5' : ''),
         veil: veiled ? 'position:absolute;inset:0;background:' + VEIL : 'display:none',
-        missing: miss, lines: miss ? lines(name) : [],
-        nameStyle: 'font:900 34px/1 Nunito,system-ui,sans-serif;color:' + inkField + ';white-space:nowrap'
+        missing: miss, lines: miss ? lines(name) : [], nameStyle: 'font:900 34px/1 Nunito,system-ui,sans-serif;color:' + inkField + ';white-space:nowrap'
       };
     });
     const grownSet = new Set(this.grownSpots().map(g => g.i));
     const spotsPx = K.spotRects(kit, cr[2], cr[3]);
-    const showFlowers = u > 0 || surface === 'field';
-    const spots = showFlowers ? spotsPx.map(r => {
+    const sway = (p.sway ?? true) && !still;
+    const spots = (u > 0 || surface === 'field') ? spotsPx.map(r => {
       const up = grownSet.has(r.i), type = K.ROSTER[season][r.idx][0];
       const stt = W.FLOWER_START + r.i * W.FLOWER_STAGGER;
       const a = inField ? 1 : clamp((u - stt) / W.FLOWER_FADE), k = inField ? 1 : 0.9 + 0.1 * easeOut(clamp((u - stt) / W.FLOWER_SETTLE));
       const bow = s.bow === r.i, grow = s.grow === r.i && up;
       return {
         wrap: 'position:absolute;left:' + f2(r.cx - r.size / 2) + 'px;top:' + f2(r.by - r.size) + 'px;width:' + f2(r.size) + 'px;height:' + f2(r.size) + 'px;transform-origin:50% 100%;opacity:' + a.toFixed(3) + ';transform:scale(' + k.toFixed(4) + ');' + (grow ? 'animation:flowerGrow .42s cubic-bezier(.34,1.56,.64,1)' : ''),
-        soil: up ? 'display:none' : 'position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:' + f2(r.size * 0.68) + 'px;height:' + f2(r.size * 0.27) + 'px;box-sizing:border-box;border-radius:999px;background:' + (premium ? 'rgba(0,0,10,.28)' : 'rgba(26,26,20,.10)') + ';border:3px solid ' + (premium ? 'rgba(160,168,240,.30)' : 'rgba(26,26,20,.19)'),
-        shade: up ? 'position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:' + f2(r.size * 0.56) + 'px;height:' + f2(r.size * 0.17) + 'px;border-radius:999px;background:' + (premium ? 'rgba(0,0,10,.32)' : 'rgba(26,26,20,.13)') : 'display:none',
-        box: up ? 'position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:50% 100%;' + (bow ? 'animation:flowerBow .6s ease-out' : '') : 'display:none',
-        src: FD + type + '_t3.svg', art: this.crop(type, 3, r.size, true)
+        soil: up ? 'display:none' : 'position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:' + f2(r.size * 0.68) + 'px;height:' + f2(r.size * 0.27) + 'px;box-sizing:border-box;border-radius:999px;background:' + (K.lum(pal.ink_field) > 0.5 ? 'rgba(0,0,10,.30)' : 'rgba(26,26,20,.10)') + ';border:3px solid ' + (K.lum(pal.ink_field) > 0.5 ? 'rgba(255,248,240,.24)' : 'rgba(26,26,20,.19)'),
+        shade: up ? 'position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:' + f2(r.size * 0.56) + 'px;height:' + f2(r.size * 0.17) + 'px;border-radius:999px;background:' + (K.lum(pal.ink_field) > 0.5 ? 'rgba(0,0,10,.34)' : 'rgba(26,26,20,.13)') : 'display:none',
+        box: up ? 'position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:50% 100%;' + (sway && inField ? 'animation:flowerSway ' + (3 + (r.i % 5) * 0.5) + 's ease-in-out ' + (-r.i * 0.37).toFixed(2) + 's infinite alternate' : '') : 'display:none',
+        src: FD + type + '_t3.svg', art: this.crop(type, 3, r.size, true) + 'transform-origin:50% 100%;' + (bow ? 'animation:flowerBow .3s ease-out' : '')
       };
     }) : [];
     const grown = grownSet.size;
-    // ambijent: samo na polju (u = 1), jedna petlja; still = statično
+    const pose = still ? (p.pip || 'walk') : s.pose;
     let ambient = null, fx = null;
     if (inField) {
-      const parts = K.ambientParticles(kit).map(q => {
-        const anim = still ? 'none' : q.kind === 'petal' ? 'ambPetal ' + sp.sec + 's linear ' + q.delay.toFixed(2) + 's infinite' : q.kind === 'twinkle' ? 'ambTwinkle ' + sp.sec + 's ease-in-out ' + q.delay.toFixed(2) + 's infinite' : 'ambMote ' + (sp.sec * 2) + 's linear ' + q.delay.toFixed(2) + 's infinite';
-        const isPetal = q.kind === 'petal';
-        const shape = q.kind === 'twinkle' ? { clipPath: 'polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%)' } : { borderRadius: '50%' };
-        return React.createElement('div', { key: q.i, style: { position: 'absolute', left: q.x * cr[2] / 100, top: q.y * cr[3] / 100, width: isPetal ? q.size : q.size, height: isPetal ? q.size * 0.55 : q.size, background: q.col, opacity: still ? (isPetal ? 0.85 : 0.9) : undefined, animation: anim, ...shape } });
-      });
-      ambient = React.createElement('div', { 'data-layer': 'Ambient', style: { position: 'absolute', inset: 0, pointerEvents: 'none' } }, parts);
-      if (s.puffs && !still) fx = React.createElement('div', { key: s.puffs.key, 'data-layer': 'SniffPuff', style: { position: 'absolute', left: s.puffs.x, top: s.puffs.y, pointerEvents: 'none' } }, [-30, -14, 0, 14, 30].map((dx, i) => React.createElement('div', { key: i, style: { position: 'absolute', left: dx * 0.4 - 7, top: -7, width: 14, height: 14, borderRadius: '50%', background: premium ? '#EDEBFF' : '#FFEAA7', border: '3px solid ' + (premium ? '#4A5290' : '#B98A2E'), boxSizing: 'border-box', '--dx': dx + 'px', animation: 'puff .7s ease-out ' + (i * 0.05) + 's both' } })));
+      ambient = this.ambientEl(K, kit.ambient, cr[2], cr[3], still, pose === 'sleep', 'amb');
+      if (s.puffs && !still) { const L = K.ambientLayers(kit.ambient)[0]; const pal2 = [L.pal[0]].concat(L.pal2 || []); const paths = K.shapePaths(L.shape, pal2, 14); fx = React.createElement('div', { key: s.puffs.key, 'data-layer': 'SniffPuff', style: { position: 'absolute', left: s.puffs.x, top: s.puffs.y, pointerEvents: 'none' } }, [-22, 0, 22].map((dx, i) => React.createElement('div', { key: i, style: { position: 'absolute', left: dx * 0.5, top: 0, '--dx': dx + 'px', animation: 'puff .7s ease-out ' + (i * 0.05) + 's both' } }, svgOf(paths, 28, 28, { position: 'absolute', left: -14, top: -14, overflow: 'visible' })))); }
     }
-    const dots = [0, 1, 2, 3].map(i => 'height:24px;border-radius:12px;box-sizing:border-box;flex:0 0 auto;width:' + (i === 0 ? 64 : 24) + 'px;background:' + (i === 0 && !premium ? '#FFB88C' : i === 0 ? INK : 'rgba(45,52,54,.28)') + ';border:' + (i === 0 && !premium ? '3px solid ' + INK : '0'));
+    const band = premium ? K.BANDS.premium : K.BANDS.free, idx = band.indexOf(season);
+    const dots = band.map((id, i) => 'height:24px;border-radius:12px;box-sizing:border-box;flex:0 0 auto;width:' + (i === idx ? 64 : 24) + 'px;background:' + (id === ACTIVE ? '#FFB88C' : i === idx ? INK : 'rgba(45,52,54,.28)') + ';border:' + (id === ACTIVE ? '3px solid ' + INK : '0'));
+    const arrow = side => 'position:absolute;' + side + ':28px;top:680px;width:120px;height:120px;box-sizing:border-box;border-radius:60px;background:#FFF8F0;border:4px solid ' + INK + ';box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center;';
     const tabBase = 'width:508px;height:108px;box-sizing:border-box;border-radius:54px;display:flex;align-items:center;justify-content:center;gap:16px;';
     const on = 'border:3px solid ' + INK + ';box-shadow:0 6px 0 rgba(26,26,20,.22);';
     const P = {}; Object.keys(PLAY0).forEach(k => { P[k] = lerp(PLAY0[k], PLAY1[k], e); });
-    const F = s.feet;
-    const pS = lerp(PIP0.s, 190, e), pX = lerp(PIP0.x, F[0] - 95, e), pY = lerp(PIP0.y, F[1] - 190, e);
-    const pose = still ? (p.pip || 'walk') : s.pose;
+    const F = s.feet, pS = lerp(PIP0.s, 190, e), pX = lerp(PIP0.x, F[0] - 95, e), pY = lerp(PIP0.y, F[1] - 190, e);
     const c = win(u, W.CHROME[0], W.CHROME[1]), ce = easeOut(c), slide = (1 - ce) * W.SLIDE;
     const side = 'position:absolute;top:1477px;width:236px;height:124px;box-sizing:border-box;border-radius:28px;border:3px solid ' + INK + ';box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;cursor:pointer;';
-    const activeKit = isActive ? kit : K.KITS.country_bloom;
-    const zzz = pose === 'sleep' && !still && s.zzz ? React.createElement('div', { 'data-layer': 'Zzz', style: { position: 'absolute', left: 120, top: 10 } }, [0, 1, 2].map(i => React.createElement('div', { key: i, style: { position: 'absolute', left: i * 18, top: -i * 16, font: '900 ' + (26 + i * 6) + 'px/1 Nunito,sans-serif', color: '#FFF8F0', WebkitTextStroke: '6px #2D3436', paintOrder: 'stroke', animation: 'zzz 2.4s ease-out ' + (i * 0.6) + 's infinite' } }, 'z'))) : (pose === 'sleep' && still ? React.createElement('div', { style: { position: 'absolute', left: 130, top: 0, font: '900 34px/1 Nunito,sans-serif', color: '#FFF8F0', WebkitTextStroke: '6px #2D3436', paintOrder: 'stroke' } }, 'z z') : null);
+    const zText = { font: '900 34px/1 Nunito,sans-serif', color: '#FFF8F0', WebkitTextStroke: '6px #2D3436', paintOrder: 'stroke' };
+    const zzz = pose === 'sleep' ? (still ? React.createElement('div', { style: { position: 'absolute', left: 130, top: 0, ...zText } }, 'z z') : s.zzz ? React.createElement('div', { 'data-layer': 'Zzz', style: { position: 'absolute', left: 120, top: 10 } }, [0, 1, 2].map(i => React.createElement('div', { key: i, style: { position: 'absolute', left: i * 18, top: -i * 16, ...zText, fontSize: 26 + i * 6, animation: 'zzz 2.4s ease-out ' + (i * 0.6) + 's infinite' } }, 'z'))) : null) : null;
+    const prev = K.PREV_FREE[season], prevArt = prev ? FD + K.ROSTER[prev][5][0] + '_t3.svg' : FD + 'pumpkin_t3.svg';
+    const lightInk = K.lum(inkField) > 0.5;
     return {
-      ...empty, ...footer, isHub: true, isHome: true,
+      ...base, ...chrome, isHome: true,
       pageStyle: 'flex:0 0 1633px;height:1633px;position:relative;overflow:hidden;background:' + pal.page,
       tabsStyle: 'position:absolute;left:24px;top:24px;width:1032px;height:124px;box-sizing:border-box;padding:8px;border-radius:62px;background:rgba(45,52,54,.10);display:flex;opacity:' + (1 - selOut).toFixed(3) + ';transform:translateY(' + f2(-24 * selOut) + 'px);' + (inField ? 'visibility:hidden' : ''),
       freeTabStyle: tabBase + (premium ? 'background:transparent;border:3px solid transparent' : 'background:#FFF8F0;' + on),
       premTabStyle: tabBase + (premium ? 'background:#FFD56B;' + on : 'background:transparent;border:3px solid transparent'),
       shadowStyle: rect([cr[0], cr[1] + sh, cr[2], cr[3]]) + 'border-radius:' + f2(rad) + 'px;background:rgba(26,26,20,.26);' + (inField ? 'display:none' : ''),
-      meadowStyle: rect(cr) + 'overflow:hidden;border-radius:' + f2(rad) + 'px;cursor:' + (idle && playable ? 'pointer' : 'default'),
-      mw: f2(cr[2]), mh: f2(cr[3]), mvb: '0 0 ' + f2(cr[2]) + ' ' + f2(cr[3]), bg: this._bg,
-      spots, ambient, fx,
+      meadowStyle: rect(cr) + 'overflow:hidden;border-radius:' + f2(rad) + 'px;cursor:' + (idle && isActive ? 'pointer' : 'default'),
+      mw: f2(cr[2]), mh: f2(cr[3]), mvb: '0 0 ' + f2(cr[2]) + ' ' + f2(cr[3]), bg, spots, ambient, fx,
       showNote: inField && grown === 0,
       noteStyle: 'position:absolute;left:130px;top:568px;width:820px;text-align:center;font:800 40px/1.1 Nunito,system-ui,sans-serif;text-wrap:balance;color:' + inkField,
       contentStyle: 'position:absolute;left:50%;top:0;width:1032px;height:1160px;margin-left:-516px;opacity:' + contentA.toFixed(3) + ';' + (contentA <= 0 ? 'visibility:hidden' : ''),
       premium, roster,
-      stOpen: status === 'open', stLocked: status === 'locked', stBuy: status === 'buy', stOwned: status === 'owned',
-      prevArt: FD + 'pumpkin_t3.svg', price: PRICE[season] || '€2.99',
-      edgeStyle: rect(cr) + 'box-sizing:border-box;border-radius:' + f2(rad) + 'px;border:' + f2(bw) + 'px solid ' + INK + ';pointer-events:none;' + (inField ? 'display:none' : ''),
+      stOpen: status === 'open', stLocked: veiled, stBuy: status === 'buy', stOwned: status === 'owned', stSoon: soon,
+      prevArt, price: K.PRICES[season] || '',
+      edgeStyle: rect(cr) + 'box-sizing:border-box;border-radius:' + f2(rad) + 'px;border:' + f2(bw) + 'px ' + (soon && !inField ? 'dashed' : 'solid') + ' ' + INK + ';pointer-events:none;' + (inField ? 'display:none' : ''),
       chromeStyle: 'position:absolute;left:0;top:0;width:1080px;height:1633px;pointer-events:' + (inField ? 'auto' : 'none') + ';opacity:' + (u > 0 ? c.toFixed(3) : '0') + ';transform:translateY(' + f2(-16 * (1 - ce)) + 'px)',
-      grownText: grown + ' / 13',
-      basketArt: FD + K.ROSTER[season][0][0] + '_t1.svg',
+      grownText: grown + ' / 13', basketArt: FD + K.ROSTER[season][0][0] + '_t1.svg',
       seasonsBtn: side + 'left:70px;background:#FFF8F0;gap:14px;transform:translateX(' + f2(slide) + 'px)',
       endlessBtn: side + 'left:774px;background:#D4A5FF;gap:12px;transform:translateX(' + f2(-slide) + 'px)',
       onSeasons: () => this.close(),
       navStyle: 'position:absolute;left:24px;top:172px;width:1032px;height:1300px;pointer-events:none;opacity:' + (1 - selOut).toFixed(3) + ';' + (inField ? 'visibility:hidden' : ''),
-      dots,
-      seasonName: kit.name,
+      prevStyle: arrow('left') + (idx > 0 ? '' : 'visibility:hidden'), nextStyle: arrow('right') + (idx < band.length - 1 ? '' : 'visibility:hidden'),
+      dots, seasonName: kit.name,
       nameStyle: 'position:absolute;left:0;top:' + f2(lerp(NAME0.top, NAME1.top, e)) + 'px;width:1080px;text-align:center;font-weight:900;font-size:' + f2(lerp(NAME0.size, NAME1.size, e)) + 'px;line-height:1;font-family:Nunito,system-ui,sans-serif;letter-spacing:' + lerp(NAME0.ls, NAME1.ls, e).toFixed(4) + 'em;color:' + inkField + ';white-space:nowrap;pointer-events:none',
       showPip: isActive || u > 0,
       pipStyle: rect([pX, pY, pS, pS]) + 'pointer-events:none;z-index:2',
-      pipShadow: 'position:absolute;left:' + f2(pS * 0.184) + 'px;bottom:' + f2(pS * 0.032) + 'px;width:' + f2(pS * 0.63) + 'px;height:' + f2(pS * 0.137) + 'px;border-radius:999px;background:' + (premium ? 'rgba(0,0,10,.34)' : 'rgba(26,26,20,.14)'),
+      pipShadow: 'position:absolute;left:' + f2(pS * 0.184) + 'px;bottom:' + f2(pS * 0.032) + 'px;width:' + f2(pS * 0.63) + 'px;height:' + f2(pS * 0.137) + 'px;border-radius:999px;background:' + (lightInk ? 'rgba(0,0,10,.34)' : 'rgba(26,26,20,.14)'),
       pipSrc: pose === 'sniff' ? '../assets/pip/pip_sniff.svg' : pose === 'sleep' ? '../assets/pip/pip_sleep.svg' : 'icons/pip_idle.svg',
       pipImg: 'position:relative;display:block;width:100%;height:100%;transform-origin:50% 92%;' + (pose === 'sniff' ? 'transform:rotate(' + (F[0] > 540 ? -7 : 7) + 'deg) translateY(6px)' : pose === 'sleep' ? 'transform:scale(1.04,.94)' : '') + (s.walking && !still ? ';animation:pipBob .42s ease-in-out infinite' : ''),
       zzz,
@@ -469,58 +536,65 @@ class Component extends DCLogic {
       triStyle: 'width:0;height:0;border-top:' + f2(P.th) + 'px solid transparent;border-bottom:' + f2(P.th) + 'px solid transparent;border-left:' + f2(P.tl) + 'px solid ' + INK + ';margin-left:' + f2(P.ml) + 'px',
       playText: 'font-weight:900;font-size:' + f2(P.fs) + 'px;line-height:1;font-family:Nunito,system-ui,sans-serif;color:' + INK,
       playOpens: isActive || !idle, playReturns: !isActive && idle,
-      backDisc: 'width:104px;height:104px;box-sizing:border-box;border-radius:52px;background:' + activeKit.palette.sky[1] + ';border:4px solid ' + INK + ';display:grid;place-items:center;overflow:hidden',
-      activeArt: FD + K.cardOrder(activeKit.id)[1][0] + '_t3.svg',
+      backDisc: 'width:104px;height:104px;box-sizing:border-box;border-radius:52px;background:' + K.KITS[ACTIVE].palette.sky[1] + ';border:4px solid ' + INK + ';display:grid;place-items:center;overflow:hidden',
+      activeArt: FD + K.cardOrder(ACTIVE)[1][0] + '_t3.svg',
       onPlay: () => { if (inField || !isActive) return; this.open(); },
       onCard: () => { if (idle && isActive) this.open(); }
     };
   }
-  shopVals(K, st, still) {
-    const kit = K.KITS.moonlit_warren;
-    if (!this._shopBg) this._shopBg = K.buildScene(kit.shop, 1024, 356, 1032, null).groups;
-    const portraits = (id, legacy) => K.ROSTER[id] ? K.ROSTER[id].map(([t, , r]) => { const d = r >= 3 ? 172 : 148; return { disc: 'position:relative;flex:0 0 auto;width:' + d + 'px;height:' + d + 'px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:4px solid ' + INK + ';overflow:hidden', src: K.FLOWER_DIR + t + '_t3.svg', art: this.crop(t, 3, d * 0.78).replace('left:', 'margin:' + f2(d * 0.11 - 4) + 'px;left:') }; }) : [148, 148, 148, 148, 148, 172].map(d => ({ disc: 'position:relative;flex:0 0 auto;width:' + d + 'px;height:' + d + 'px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:4px solid ' + INK + ';overflow:hidden;' + (legacy === 'soon' ? 'opacity:.5' : ''), src: '../assets/flowers/daisy_t3.svg', art: 'display:none' }));
-    const STATUS = { pending: ['Pending', '#FFE8B8'], failed: ['Didn’t go through', '#FFCCD5'], cancel: ['Cancelled', '#FFCCD5'] };
-    const sv = STATUS[st];
+  shopVals(K, season, st, still) {
+    const FD = K.FLOWER_DIR, sel = SHOP_ORDER.includes(season) ? season : 'moonlit_warren', selIdx = SHOP_ORDER.indexOf(sel);
+    const STATUS = { pending: ['Pending', '#FFE8B8'], restoring: ['Restoring', '#D4EEFF'], failed: ['Didn’t go through', '#FFCCD5'] };
     const dots = React.createElement('div', { style: { display: 'flex', gap: 14 } }, [0, 1, 2].map(i => React.createElement('div', { key: i, style: { width: 20, height: 20, borderRadius: '50%', background: INK, opacity: still ? [0.35, 0.7, 1][i] : undefined, animation: still ? 'none' : 'dots .9s ease-in-out ' + (i * 0.15) + 's infinite' } })));
-    const mw = { id: 'moonlit_warren', kit: true, legacy: false, far: '#1F2547', bg: this._shopBg, portraits: portraits('moonlit_warren'), name: kit.name, nameInk: kit.palette.ink_field, hasStatus: !!sv, statusText: sv ? sv[0] : '', statusBg: sv ? sv[1] : '#FFF8F0', soon: false,
-      btnBuy: ['buy', 'pending', 'failed', 'cancel'].includes(st), btnBusy: st === 'busy', btnDim: st === 'dim', btnPlay: st === 'play', price: PRICE.moonlit_warren, dots, onTap: () => {} };
-    const leg = ['coral_tide', 'starfall_glade', 'ember_fen'].map(id => { const L = K.LEGACY[id], b = K.legacyBands(L.g), soon = id === 'ember_fen'; return { id, kit: false, legacy: true, far: b.far, sky: b.sky, near: b.near, bg: [], portraits: portraits(id, soon ? 'soon' : ''), name: L.name === 'Coral Tide' ? 'Coral Tide Garden' : L.name, nameInk: '#1A1A14', hasStatus: false, statusText: '', statusBg: '#FFF8F0', soon, btnBuy: !soon && st !== 'busy', btnBusy: false, btnDim: !soon && st === 'busy', btnPlay: false, price: PRICE[id] || '', dots: null, onTap: () => {} }; });
-    return { shopCards: [mw, ...leg], awning: Array.from({ length: 18 }, (_, i) => ({ sh: 'position:absolute;left:' + (i * 60 - 4) + 'px;top:6px;width:68px;height:164px;border-radius:0 0 34px 34px;background:rgba(26,26,20,.16)', ink: 'position:absolute;left:' + (i * 60 - 4) + 'px;top:0;width:68px;height:164px;border-radius:0 0 34px 34px;background:#2D3436', fill: 'position:absolute;left:' + (i * 60) + 'px;top:0;width:60px;height:160px;border-radius:0 0 30px 30px;background:' + (i % 2 ? '#FFF8F0' : '#A8E6CF') })),
+    const busyOther = sel !== null && st === 'busy';
+    const cards = SHOP_ORDER.map(id => {
+      const kit = K.KITS[id], soon = !!K.SOON[id], mine = id === sel, cs = soon ? 'soon' : mine ? st : busyOther ? 'dim' : 'buy', sv = STATUS[cs];
+      return {
+        id, bg: this.scene(K, kit.shop, 1024, 356, 1032, null, id + ':shop'),
+        portraits: K.ROSTER[id].map(([t, , r]) => { const d = r >= 3 ? 172 : 148; return { disc: 'position:relative;flex:0 0 auto;width:' + d + 'px;height:' + d + 'px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:4px solid ' + INK + ';overflow:hidden;' + (soon ? 'opacity:.5' : ''), src: FD + t + '_t3.svg', art: this.crop(t, 3, d * 0.78).replace('left:', 'margin:' + f2(d * 0.11 - 4) + 'px;left:') }; }),
+        kit: true, legacy: false, far: '#2A2233', sky: '', near: '', name: kit.name, nameInk: kit.palette.ink_field, hasStatus: !!sv, statusText: sv ? sv[0] : '', statusBg: sv ? sv[1] : '#FFF8F0', soon,
+        btnBuy: ['buy', 'failed'].includes(cs), btnBusy: cs === 'busy' || cs === 'restoring', btnDim: cs === 'dim' || cs === 'pending', btnPlay: cs === 'play', price: K.PRICES[id] || '', dots, onTap: () => {}
+      };
+    });
+    return { shopCards: cards, shopListStyle: 'position:absolute;left:24px;top:' + (196 - (selIdx >= 3 ? 396 : 0)) + 'px;width:1032px;display:flex;flex-direction:column;gap:32px',
+      awning: Array.from({ length: 18 }, (_, i) => ({ sh: 'position:absolute;left:' + (i * 60 - 4) + 'px;top:6px;width:68px;height:164px;border-radius:0 0 34px 34px;background:rgba(26,26,20,.16)', ink: 'position:absolute;left:' + (i * 60 - 4) + 'px;top:0;width:68px;height:164px;border-radius:0 0 34px 34px;background:#2D3436', fill: 'position:absolute;left:' + (i * 60) + 'px;top:0;width:60px;height:160px;border-radius:0 0 30px 30px;background:' + (i % 2 ? '#FFF8F0' : '#A8E6CF') })),
       shopTabs: ['Seasons', 'Looks', 'Boosters', 'Support'].map((t, i) => ({ text: t, base: 'position:absolute;left:' + (i * 261) + 'px;top:0;width:249px;height:120px;box-sizing:border-box;border-radius:60px;background:#FFFFFF;border:3px solid #2D3436', label: 'position:absolute;left:' + (i * 261) + 'px;top:0;width:249px;height:120px;display:grid;place-items:center;font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap' })) };
   }
+  campVals(K, season, st, still) {
+    const id = K.PREV_FREE[season] ? season : 'frost_orchard', kit = K.KITS[id], prev = K.PREV_FREE[id], fl = K.ROSTER[prev][5];
+    const sc = CAMP[st] || CAMP.ready, ready = st !== 'short', burst = st === 'burst';
+    const BTN = { short: ['rgba(255,248,240,.55)', 'rgba(26,26,20,.30)', '#44443A', 'none', 'Unlock'], ready: ['#E8C44A', '#BA9D3B', '#2D3436', '0 6px 12px rgba(20,26,22,.26)', 'Unlock'], burst: ['#FFD56B', '#D6A82F', '#2D3436', 'none', 'Unlocked'] }[burst ? 'burst' : ready ? 'ready' : 'short'];
+    const t = 0.35, r = (0.2 + 0.8 * t) * 260;
+    return {
+      coinsText: sc.head, pageStyle: 'flex:0 0 1633px;height:1633px;position:relative;overflow:hidden;background:#F3EEE6',
+      campBg: this.scene(K, kit.camp, 1026, 312, 1032, null, id + ':camp'), campName: kit.name,
+      unlockStyle: 'width:300px;height:120px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;border:3px solid ' + BTN[1] + ';background:' + BTN[0] + ';box-shadow:' + BTN[3] + ';display:flex;align-items:center;justify-content:center;gap:14px;font:900 48px/1 Nunito,system-ui,sans-serif;color:' + BTN[2],
+      unlockText: BTN[4], unlockLock: !ready,
+      coinCount: sc.coins + ' / 500', coinBar: 'position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:#FFD56B;width:' + Math.min(100, sc.coins / 5) + '%',
+      flowerName: fl[1], flowerCount: sc.fl + ' / 20', flowerBar: 'position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:#FFF8F0;width:' + Math.min(100, sc.fl * 5) + '%',
+      flowerArt: K.FLOWER_DIR + fl[0] + '_t3.svg', flowerArtStyle: this.crop(fl[0], 3, 108),
+      burst, burstStyle: 'position:absolute;left:50%;top:50%;width:' + f2(2 * r + 14) + 'px;height:' + f2(2 * r + 14) + 'px;margin:' + f2(-(r + 7)) + 'px 0 0 ' + f2(-(r + 7)) + 'px;box-sizing:border-box;border-radius:50%;border:14px solid rgba(255,245,209,' + (0.55 * (1 - t)).toFixed(3) + ');pointer-events:none'
+    };
+  }
   runVals(K, kit, st, still) {
-    const R = kit.run, LANE = [270, 540, 810];
-    const kids = [];
-    const svgPrims = (shape, pal, x, y, size, rot, key) => { const g = K.buildScene({ layers: [{ k: 'shape', shape, at: [x / 10.8, y / 7.2], size, pal }] }, 1080, 720, 1080, null).groups; return g.map((q, i) => React.createElement('path', { key: key + '_' + i, d: q.d, fill: q.f, stroke: q.s, strokeWidth: q.sw })); };
-    const tile = (period, items, speed, name) => { const els = []; [0, 1, 2].forEach(t => items.forEach((it, i) => els.push(...svgPrims(it.shape, it.pal, it.x, it.y + (t - 1) * period, it.size, 0, name + t + '_' + i)))); return React.createElement('svg', { key: name, 'data-layer': name, width: 1080, height: period * 3, viewBox: '0 ' + (-period) + ' 1080 ' + (period * 3), style: { position: 'absolute', left: 0, top: -period, '--p': period + 'px', animation: still ? 'none' : 'scrollY ' + (period / (400 * speed)).toFixed(2) + 's linear infinite' } }, els); };
-    // tlo
+    const R = kit.run, LANE = [270, 540, 810], kids = [];
+    const scroll = (P, speed) => still ? 'none' : 'scrollY ' + (P / (400 * speed)).toFixed(3) + 's linear infinite';
+    const tile = (layer, name) => { const P = layer.period, items = K.runItems(layer); const rec = { layers: items.map(it => ({ k: 'shape', shape: it.shape, pal: it.pal, at: it.at.map(a => [a[0] / 10.8, a[1] / P * 100, a[2], a[3] || 0]) })) }; const g = this.scene(K, rec, 1080, P, 1080, null, kit.id + ':' + name); const rows = Math.ceil(1920 / P) + 1; return React.createElement('svg', { key: name, 'data-layer': name, width: 1080, height: P * (rows + 1), style: { position: 'absolute', left: 0, top: -P, '--p': P + 'px', animation: scroll(P, layer.speed) } }, Array.from({ length: rows + 1 }, (_, r) => React.createElement('g', { key: r, transform: 'translate(0 ' + r * P + ')' }, g.map((q, i) => React.createElement('path', { key: i, d: q.d, fill: q.f, stroke: q.s, strokeWidth: q.sw, strokeLinecap: 'round', strokeLinejoin: 'round' }))))); };
     kids.push(React.createElement('div', { key: 'g', style: { position: 'absolute', inset: 0, background: R.ground } }));
-    const farItems = R.far.at.map(([x, y, sz]) => ({ shape: R.far.shape, pal: R.far.pal, x: x * 10.8, y: y * 7.2, size: sz }));
-    kids.push(tile(720, farItems, R.far.speed, 'RunFar'));
-    // staze
-    LANE.forEach((cx, i) => {
-      const pat = R.material.on ? 'repeating-linear-gradient(180deg,' + R.material.stripe + ' 0 ' + R.material.on + 'px,rgba(0,0,0,0) ' + R.material.on + 'px ' + R.material.period + 'px)' : 'radial-gradient(circle at 30px 30px,' + R.material.pebble + ' 0 7px,rgba(0,0,0,0) 8px),radial-gradient(circle at 130px 78px,' + R.material.pebble + ' 0 6px,rgba(0,0,0,0) 7px),radial-gradient(circle at 84px 54px,' + R.material.pebble + ' 0 5px,rgba(0,0,0,0) 6px)';
-      kids.push(React.createElement('div', { key: 'lane' + i, 'data-layer': 'Lane', style: { position: 'absolute', left: cx - 100, top: 0, width: 200, height: 1920, boxSizing: 'border-box', background: R.lane, borderLeft: '4px solid ' + R.laneEdge, borderRight: '4px solid ' + R.laneEdge, overflow: 'hidden' } }, React.createElement('div', { style: { position: 'absolute', left: 0, right: 0, top: -R.material.period, height: 1920 + R.material.period * 2, backgroundImage: pat, backgroundSize: R.material.on ? 'auto' : '200px ' + R.material.period + 'px', '--p': R.material.period + 'px', animation: still ? 'none' : 'scrollY ' + (R.material.period / 400).toFixed(3) + 's linear infinite' } })));
-    });
+    kids.push(tile(R.far, 'RunFar'));
+    const lt = K.laneTile(R.material, 192), rows = Math.ceil(1920 / lt.period) + 1;
+    LANE.forEach((cx, i) => kids.push(React.createElement('div', { key: 'lane' + i, 'data-layer': 'Lane', style: { position: 'absolute', left: cx - 100, top: 0, width: 200, height: 1920, boxSizing: 'border-box', background: R.lane, borderLeft: '4px solid ' + R.laneEdge, borderRight: '4px solid ' + R.laneEdge, overflow: 'hidden' } },
+      React.createElement('svg', { width: 192, height: lt.period * (rows + 1), style: { position: 'absolute', left: 0, top: -lt.period, '--p': lt.period + 'px', animation: scroll(lt.period, 1) } }, Array.from({ length: rows + 1 }, (_, r) => React.createElement('g', { key: r, transform: 'translate(0 ' + r * lt.period + ')' }, lt.items.map((it, j) => it.k === 'circle' ? React.createElement('circle', { key: j, cx: it.x, cy: it.y, r: it.r, fill: it.f }) : React.createElement('rect', { key: j, x: it.x, y: it.y, width: it.w, height: it.h, rx: it.r || 0, fill: it.f }))))))));
     [405, 675].forEach(x => kids.push(React.createElement('div', { key: 'seam' + x, style: { position: 'absolute', left: x - 3, top: 0, width: 6, height: 1920, background: 'repeating-linear-gradient(180deg,' + R.seam + ' 0 46px,rgba(0,0,0,0) 46px 108px)' } })));
-    // blizina (1,0×)
-    const N = R.near, nearItems = [];
-    if (N.posts) for (let y = 0; y < 480; y += N.posts.every) N.posts.x.forEach(x => nearItems.push({ shape: 'post', pal: N.posts.pal, x, y: y + 150, size: N.posts.size }));
-    (N.tufts ? N.tufts.at : N.moss.at).forEach(([x, y, sz]) => nearItems.push({ shape: N.tufts ? N.tufts.shape : N.moss.shape, pal: N.tufts ? N.tufts.pal : N.moss.pal, x, y, size: sz }));
-    (N.flowers ? N.flowers.at : N.glints.at).forEach(([x, y, sz]) => nearItems.push({ shape: N.flowers ? N.flowers.shape : N.glints.shape, pal: N.flowers ? N.flowers.pal : N.glints.pal, x, y, size: sz }));
-    kids.push(tile(480, nearItems, 1, 'RunNear'));
-    if (N.posts) kids.push(React.createElement('div', { key: 'rails', style: { position: 'absolute', left: 0, top: 0, width: 1080, height: 1920, pointerEvents: 'none' } }, N.posts.x.map(x => [0.74, 0.36].map((fr0, j) => React.createElement('div', { key: x + '_' + j, style: { position: 'absolute', left: x - 5 + (j ? 1 : 0), top: 0, width: 8, height: 1920, background: N.posts.rail, opacity: 0.0 } })))));
-    // ambijent (≤ 24, jedna petlja)
-    const A = R.ambient;
-    for (let i = 0; i < A.n; i++) { const x = 40 + ((0.21 + 0.7549 * (i + 1)) % 1) * 1000, y = ((0.63 + 0.5698 * (i + 1)) % 1) * 1700, sz = A.size[0] + (A.size[1] - A.size[0]) * ((0.618 * (i + 1)) % 1); kids.push(React.createElement('div', { key: 'amb' + i, 'data-layer': 'RunAmbient', style: { position: 'absolute', left: x, top: y, width: sz, height: A.shape === 'petal' ? sz * 0.55 : sz, borderRadius: '50%', background: A.pal[i % 2], opacity: still ? 0.8 : undefined, '--dx': A.drift[0] + 'px', '--dy': A.drift[1] + 'px', animation: still ? 'none' : 'runAmb ' + A.sec + 's linear ' + (-((0.414 * (i + 1)) % 1) * A.sec).toFixed(2) + 's infinite' } })); }
-    const runField = React.createElement('div', { 'data-layer': 'LaneField', style: { position: 'absolute', inset: 0, overflow: 'hidden' } }, kids);
+    kids.push(tile(R.near, 'RunNear'));
+    kids.push(this.ambientEl(K, R.ambient, 1080, 1920, still, false, 'RunAmbient'));
     const box = (cx, cy, w, h) => 'position:absolute;left:' + (cx - w / 2) + 'px;top:' + (cy - h / 2) + 'px;width:' + w + 'px;height:' + h + 'px;z-index:2';
     const fail = st === 'fail';
     const obstacles = [{ o: R.obstacles[0], l: 0, y: 760 }, { o: R.obstacles[1], l: fail ? 1 : 2, y: fail ? 1500 : 1160 }].map(({ o, l, y }) => ({ id: o.id, pos: box(LANE[l], y, 260, 230), src: '../' + o.svg, collar: 'position:absolute;left:10px;top:158px;width:240px;height:52px;border-radius:50%;background:' + R.collar[0] + ';border:3px solid ' + R.collar[1] + ';box-sizing:border-box' }));
     const types = K.ROSTER[kit.id];
     const seedEnts = [[1, 560, types[0][0], 1], [0, 1240, types[4][0], 3]].map(([l, y, t, star]) => ({ pos: box(LANE[l], y, 120, 120), src: K.FLOWER_DIR + t + '_t1.svg', art: this.crop(t, 1, 76).replace('position:absolute;', 'position:absolute;margin:4px;'), pips: star === 3 ? [-118, -90, -62].map(a => 'position:absolute;left:60px;top:60px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#D6A82F;transform:rotate(' + a + 'deg) translateX(51px)') : [] }));
     const coinEnts = [[0, 1000], [2, 520], [2, 680]].map(([l, y]) => ({ pos: box(LANE[l], y, 96, 96) }));
-    return { runField, obstacles, seedEnts, coinEnts, runFail: fail, runPipStyle: 'position:absolute;left:-90px;top:-118px;width:180px;height:180px;' + (fail ? 'transform:rotate(-13deg)' : '') };
+    return { runField: React.createElement('div', { 'data-layer': 'LaneField', style: { position: 'absolute', inset: 0, overflow: 'hidden' } }, kids), obstacles, seedEnts, coinEnts, runFail: fail, runPipStyle: 'position:absolute;left:-90px;top:-118px;width:180px;height:180px;' + (fail ? 'transform:rotate(-13deg)' : '') };
   }
 }
 </script>

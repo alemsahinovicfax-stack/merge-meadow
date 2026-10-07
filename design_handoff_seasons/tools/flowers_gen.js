@@ -412,6 +412,188 @@ function generateFlowers() {
     emit('umbral_lily', 'moonlit_warren', 3, 2, [st, [bud2], bloomAt(166, 128, 0.58), stamenSet(166, 128, 0.58), bloomAt(cx, cy, 1), stamenSet(cx, cy, 1)], P.out);
     emit('umbral_lily', 'moonlit_warren', 3, 3, [st, [bud2], bloomAt(166, 128, 0.58, true), stamenSet(166, 128, 0.58, true), bloomAt(cx, cy, 1, true), stamenSet(cx, cy, 1, true)], P.out);
   }
+  // ======================= FAZA 2 — arhetipovi (isti jezik: jedan debeli rub siluete, tanke unutrašnje linije, ravni odsjaji; T3 = isti crtež kao brušeni kristal) =======================
+  Object.assign(GEM, {
+    aquamarine: { body: '#9FE3F0', light: '#E3FAFF', dark: '#5EB3CC', top: '#F4FDFF' },
+    sapphire: { body: '#7F9CF0', light: '#CCD9FF', dark: '#4A68C9', top: '#EDF1FF' },
+    garnet: { body: '#E0505F', light: '#FF9EA8', dark: '#A42840', top: '#FFD4DA' },
+    peridot: { body: '#B6E04A', light: '#E6FA9E', dark: '#7FA82A', top: '#F6FFD0' },
+    roseq: { body: '#F7B3C6', light: '#FFE1EA', dark: '#D97E9A', top: '#FFF2F6' },
+    copper: { body: '#E8914F', light: '#FFC896', dark: '#B05E22', top: '#FFE6CC' },
+    tourmaline: { body: '#F07AA0', light: '#FFC2D4', dark: '#BD4772', top: '#FFE6EE' },
+    pearl: { body: '#F4EEE6', light: '#FFFFFF', dark: '#D6CBBE', top: '#FFFFFF' },
+    coralG: { body: '#FF8A73', light: '#FFC5B8', dark: '#D9573F', top: '#FFE4DD' },
+    teal: { body: '#5FD1C2', light: '#B8F5EC', dark: '#2E9C8E', top: '#E6FFFB' },
+    fire: { body: '#FF7A3D', light: '#FFC08F', dark: '#D24A12', top: '#FFE0C7' },
+    smokeQ: { body: '#C2BACF', light: '#ECE8F3', dark: '#948AA6', top: '#F7F5FB' },
+    violet: { body: '#B98CF0', light: '#E8D8FF', dark: '#8558C9', top: '#F6F0FF' },
+    navy: { body: '#7684EA', light: '#C3CAFF', dark: '#4A55C2', top: '#E9ECFF' }
+  });
+  const notchP = (l, w) => [['M', 0, 0], ['C', w * 0.9, -l * 0.18, w * 1.12, -l * 0.8, w * 0.48, -l], ['Q', 0, -l * 0.84, -w * 0.48, -l], ['C', -w * 1.12, -l * 0.8, -w * 0.9, -l * 0.18, 0, 0], ['Z']];
+  const SHP = { petal: (l, w) => petal(l, w, 0.3), pin: (l, w) => petal(l, w, 0.2), round: rpetal, notch: notchP };
+  function gemStar(cx, cy, r, gem, OUT, k = 5) { const pts = []; for (let i = 0; i < k * 2; i++) { const a = (-90 + i * 180 / k) * D2R, rr = i % 2 ? r * 0.46 : r; pts.push([Math.cos(a) * rr, Math.sin(a) * rr]); } const det = []; for (let i = 0; i < k * 2; i++) det.push(DF(poly([[0, 0], pts[i], pts[(i + 1) % (k * 2)]]), i === 0 ? gem.top : i % 2 ? gem.dark : gem.light, T(cx, cy))); return F(poly(pts), gem.body, { tf: T(cx, cy), ink: mix(gem.body, OUT, 0.45), det }); }
+  function facetPoly(pts, gem, OUT) { const c = pts.reduce((a, p) => [a[0] + p[0] / pts.length, a[1] + p[1] / pts.length], [0, 0]); const ci = [c[0] - 3, c[1] - 4]; const tints = [gem.light, gem.top, gem.light, gem.body, gem.dark, gem.dark, gem.body, gem.body]; return F(poly(pts), gem.body, { ink: mix(gem.body, OUT, 0.45), det: pts.map((p, i) => DF(poly([p, pts[(i + 1) % pts.length], ci]), tints[Math.floor(i * 8 / pts.length) % 8])) }); }
+  function centerParts(c, cx, cy, k, stage, P) {
+    const r = c.r * k, x = cx + (c.dx || 0) * k, y = cy + (c.dy || 0) * k, sy = c.sq ?? 1;
+    if (stage === 3) return [c.kind === 'star' ? gemStar(x, y, r, c.gem, P.out) : r >= 16 ? gemCenter(x, y, r, c.gem, P.out) : gemSmall(x, y, r, c.gem, P.out)];
+    if (c.kind === 'star') return [F(star(5, r, r * 0.46, -90), c.col, { tf: T(x, y), det: [DF(ell(0, 0, r * 0.28, r * 0.28), c.col2, T(x, y))] })];
+    if (c.kind === 'stamens') { const det = [], n2 = c.n || 6, sp = c.spread || 60; for (let i = 0; i < n2; i++) { const a = (-90 - sp + i * 2 * sp / Math.max(1, n2 - 1)) * D2R, L = r * (c.len || 2.4), x2 = x + Math.cos(a) * L, y2 = y + Math.sin(a) * L; det.push(DS([['M', x, y], ['Q', x + Math.cos(a) * L * 0.5, y + Math.sin(a) * L * 0.62, x2, y2]], c.col2, 2.4)); det.push(DF(ell(x2, y2, 3.8, 3), c.tip || c.col)); } return [F(ell(x, y, r * 0.7, r * 0.6), c.col, { det })]; }
+    if (c.kind === 'swirl') return [F(ell(x, y, r, r * sy), c.col, { det: [DS([['M', x - r * 0.62, y], ['Q', x - r * 0.2, y - r * 0.85 * sy, x + r * 0.5, y - r * 0.25 * sy], ['Q', x + r * 0.25, y + r * 0.5 * sy, x - r * 0.15, y + r * 0.1 * sy]], c.col2, 2.4)] })];
+    const det = [DF(ell(x - r * 0.3, y - r * 0.3 * sy, r * 0.32, r * 0.24 * sy), c.hi || '#FFFFFF', ID, 0.5)];
+    if (c.kind === 'dots') for (let i = 0; i < 6; i++) { const a = i * 60 * D2R; det.push(DF(ell(x + Math.cos(a) * r * 0.56, y + Math.sin(a) * r * 0.56 * sy, Math.max(2, r * 0.13), Math.max(2, r * 0.13)), c.col2)); }
+    return [F(ell(x, y, r, r * sy), c.col, { det })];
+  }
+  // glava: prstenovi latica (puni krug ili lepeza `span`), 3/4 pogled preko sq/tilt. stage 1 = pupoljak (latice se skupe prema gore), 2 = cvijet, 3 = kristal
+  function head(o, cx, cy, k, stage, P) {
+    const groups = [], sq = o.sq ?? 1, tilt = o.tilt || 0, dir = o.dir || 0;
+    o.rings.forEach(R => {
+      if (stage === 1 && R.t1 === false) return;
+      const items = [];
+      for (let i = 0; i < R.n; i++) {
+        let a = R.span != null ? (R.n === 1 ? 0 : -R.span + i * 2 * R.span / (R.n - 1)) : (R.rot || 0) + i * 360 / R.n, l = R.l * k, w = R.w * k;
+        if (stage === 1) { a = ((((a + 180) % 360) + 360) % 360) - 180; a *= R.span != null ? 0.55 : 0.24; l *= 0.8; w *= 0.88; }
+        items.push({ a, l, w });
+      }
+      const fan = R.span != null || stage === 1;
+      items.sort((p, q) => fan ? Math.abs(q.a) - Math.abs(p.a) : Math.cos(q.a * D2R) - Math.cos(p.a * D2R));
+      groups.push(items.map(({ a, l, w }) => {
+        const tf = TS(cx, cy, a + dir, stage === 1 ? 1 : sq, stage === 1 ? 0 : tilt, 1);
+        if (stage === 3 && !R.keep) return crystalLite(l, w, tf, R.gem || o.gem, P.out);
+        const det = [];
+        if (R.blot) det.push(DF(ell(0, -l * 0.2, w * 0.42, l * 0.17), R.blot, tf, 0.95));
+        if (R.vein) det.push(DS([['M', 0, -l * 0.14], ['L', 0, -l * 0.74]], R.vein, 2.2, tf, 0.9));
+        if (R.hi) det.push(DF(ell(-w * 0.36, -l * 0.56, w * 0.17, l * 0.16), R.hi, tf, 0.9));
+        return F(SHP[R.shape || o.shape || 'petal'](l, w), R.col, { tf, det });
+      }));
+    });
+    if (stage === 1 && o.calyx !== false) groups.push([F(star(5, 13 * k, 6 * k, 90), P.leaf, { tf: T(cx, cy + 4 * k) })]);
+    if (o.center && stage !== 1) groups.push(centerParts(o.center, cx, cy, k, stage, P));
+    return groups;
+  }
+  function closedBud(x, y, a, l, w, col, stage, gem, P) { const tf = T(x, y, a); if (stage === 3) return crystalLite(l, w, tf, gem, P.out); return F([['M', 0, 0], ['C', w, -l * 0.25, w * 0.8, -l * 0.8, 0, -l], ['C', -w * 0.8, -l * 0.8, -w, -l * 0.25, 0, 0], ['Z']], col, { tf, det: [DS([['M', 0, -3], ['L', 0, -l * 0.85]], mix(col, P.out, 0.3), 2, tf, 0.7), DF(ell(-w * 0.35, -l * 0.5, w * 0.16, l * 0.16), mix(col, '#FFFFFF', 0.5), tf, 0.8)] }); }
+  function colLeaf(x, y, ang, l, w, col, P, stage, gem, flip = false) { if (stage === 3 && gem) return crystalLite(l, w * 0.9, T(x, y, ang + 90), gem, P.out); const tf = T(x, y, ang, 1, flip ? -1 : 1); return F(leaf(l, w), col, { tf, det: [DS([['M', l * 0.08, 0], ['L', l * 0.86, 0]], mix(col, P.out, 0.35), 2.2, tf, 0.8), DS([['M', l * 0.4, 0], ['L', l * 0.56, -w * 0.5]], mix(col, P.out, 0.35), 1.8, tf, 0.6), DS([['M', l * 0.28, 0], ['L', l * 0.44, w * 0.5]], mix(col, P.out, 0.35), 1.8, tf, 0.6), DF(ell(l * 0.36, -w * 0.32, l * 0.14, w * 0.14), mix(col, '#FFFFFF', 0.45), tf, 0.85)] }); }
+  function lobedLeaf(x, y, ang, l, w, col, P, lobes = 4) { const pts = [[0, 0]]; for (let i = 1; i <= lobes; i++) { const t = i / (lobes + 1); pts.push([w * (i % 2 ? 1 : 0.6) * Math.sin(Math.PI * t) * 1.1, -l * t]); } pts.push([0, -l]); for (let i = lobes; i >= 1; i--) { const t = i / (lobes + 1); pts.push([-w * (i % 2 ? 1 : 0.6) * Math.sin(Math.PI * t) * 1.1, -l * t]); } const tf = T(x, y, ang); return F(smoothPoly(pts), col, { tf, det: [DS([['M', 0, -2], ['L', 0, -l * 0.86]], mix(col, P.out, 0.35), 2.2, tf, 0.8), DF(ell(-w * 0.3, -l * 0.45, w * 0.18, l * 0.12), mix(col, '#FFFFFF', 0.4), tf, 0.8)] }); }
+  const padPart = (x, y, rx, ry, col, P) => F([['M', x, y], ['L', x + rx * 0.2, y - ry], ['C', x + rx * 0.9, y - ry * 1.05, x + rx * 1.05, y + ry * 0.7, x + rx * 0.2, y + ry], ['C', x - rx * 0.6, y + ry * 1.1, x - rx * 1.05, y + ry * 0.4, x - rx, y - ry * 0.1], ['C', x - rx * 0.9, y - ry * 0.8, x - rx * 0.35, y - ry * 1.05, x - rx * 0.1, y - ry], ['Z']], col, { det: [DS([['M', x, y], ['L', x - rx * 0.6, y + ry * 0.5]], mix(col, P.out, 0.25), 2, ID, 0.6), DS([['M', x, y], ['L', x + rx * 0.5, y + ry * 0.6]], mix(col, P.out, 0.25), 2, ID, 0.6), DF(ell(x - rx * 0.42, y - ry * 0.3, rx * 0.2, ry * 0.25), mix(col, '#FFFFFF', 0.35), ID, 0.8)] });
+  // biljka s glavom: stabljika, listovi, pupoljci, druge glave (rijetkost), kuke back/front(stage, hx, hy, hk)
+  function plant(o) {
+    const P = o.P, sw = o.stemW || 8, sc = o.stemCol || P.stem;
+    for (let stage = 1; stage <= 3; stage++) {
+      const [mx, my, mk] = o.main;
+      const hx = stage === 1 ? 128 + (mx - 128) * 0.7 : mx, hy = stage === 1 ? 244 - (244 - my) * (o.t1h || 0.66) : my, hk = stage === 1 ? mk * (o.t1k || 1.05) : mk;
+      const sp = [];
+      if (!o.noStem) sp.push(S([['M', 128, 244], ['C', 128 + (o.bend || 0), 244 - (244 - hy) * 0.4, hx - (o.bend || 0) * 0.5, hy + (244 - hy) * 0.3, hx, hy]], sc, sw));
+      const extras = stage === 1 ? [] : (o.extra || []);
+      extras.forEach(([ex, ey, , eb]) => sp.push(S([['M', 128, 244 - (244 - ey) * 0.4], ['Q', ex + (eb || 0), ey + 34, ex, ey]], sc, sw * 0.72)));
+      const buds = stage === 1 ? [] : (o.buds || []);
+      buds.forEach(([bx, by, ba, bl]) => { const r = ba * D2R; sp.push(S([['M', o.noStem ? bx : 128, o.noStem ? 244 : Math.min(236, by + 46)], ['Q', bx - Math.sin(r) * 14, by + 22, bx, by]], sc, sw * 0.6)); });
+      const lv = stage === 1 ? (o.leaves || []).slice(0, o.t1leaves || 2).map(L => [L[0], 244 - (244 - L[1]) * 0.7, L[2], L[3] * 0.8, L[4] * 0.8, L[5]]) : (o.leaves || []);
+      lv.forEach(([x, y, a, l, w, flip]) => sp.push(o.leafCol ? colLeaf(x, y, a, l, w, o.leafCol, P, 2, null, flip) : leafPart(x, y, a, l, w, P, flip)));
+      const g = [];
+      if (o.back) g.push(...o.back(stage, hx, hy, hk));
+      if (sp.length) g.push(sp);
+      if (o.mid) g.push(...o.mid(stage, hx, hy, hk));
+      if (buds.length) g.push(buds.map(([bx, by, ba, bl, bw]) => closedBud(bx, by, ba, bl, bw, o.budCol, stage, o.budGem || o.head.gem || o.head.rings[0].gem, P)));
+      extras.forEach(([ex, ey, ek]) => g.push(...head(o.head2 || o.head, ex, ey, ek, stage, P)));
+      g.push(...head(o.head, hx, hy, hk, stage, P));
+      if (o.front) g.push(...o.front(stage, hx, hy, hk));
+      emit(o.id, o.season, o.rarity, stage, g, P.out);
+    }
+  }
+  // vlati s vrhom (svitac, rogoz, kometa)
+  function spikePlant(o) {
+    const P = o.P;
+    for (let stage = 1; stage <= 3; stage++) {
+      const bl = stage === 1 ? o.blades.slice(0, o.t1n || 3).map(b => [b[0], b[1] * 0.8, b[2] * 0.66, b[3] * 0.9]) : o.blades;
+      const blades = [], tips = [], tails = [];
+      bl.forEach(([x0, ang, len, w], i) => {
+        const tf = T(x0, 244, ang), bc = o.bladeCol || P.leaf;
+        blades.push(F(petal(len, w, 0.14), bc, { tf, det: [DS([['M', 0, -6], ['L', 0, -len * 0.8]], mix(bc, P.out, 0.3), 2, tf, 0.7)] }));
+        const on = stage === 1 ? i === 0 : (!o.tipOn || o.tipOn.includes(i));
+        if (!on) return;
+        const [tx, ty] = tf(0, -len * 0.97), r = (o.tipR || 9) * (stage === 1 ? 0.8 : 1);
+        if (o.tip === 'glow') tips.push(stage === 3 ? gemSmall(tx, ty, r, o.gem, P.out) : F(ell(tx, ty, r, r), o.tipCol, { det: [DF(ell(tx - r * 0.3, ty - r * 0.3, r * 0.36, r * 0.3), o.tipHi)] }));
+        if (o.tip === 'seed') { const q = tf(0, -len * 0.6); tips.push(stage === 3 ? crystalLite(len * 0.32, w * 1.6, T(q[0], q[1], ang), o.gem, P.out) : F(ell(0, -len * 0.76, w * 1.3, len * 0.15), o.tipCol, { tf, det: [DS([['M', -w * 0.5, -len * 0.84], ['L', -w * 0.5, -len * 0.68]], o.tipHi, 2.2, tf, 0.9)] })); }
+        if (o.tip === 'comet') { tails.push(S([['M', tx, ty], ['Q', tx - 8, ty + 18, tx - 22, ty + 34]], o.tailCol, 5)); tips.push(stage === 3 ? gemStar(tx, ty, r * 1.35, o.gem, P.out) : F(star(5, r * 1.35, r * 0.62, -90), o.tipCol, { tf: T(tx, ty), det: [DF(ell(0, 0, r * 0.36, r * 0.36), o.tipHi, T(tx, ty))] })); }
+      });
+      if (o.extraGlow && stage > 1) o.extraGlow.forEach(([x, y, r]) => tips.push(stage === 3 ? gemSmall(x, y, r, o.gem, P.out) : F(ell(x, y, r, r), o.tipCol, { det: [DF(ell(x - r * 0.3, y - r * 0.3, r * 0.36, r * 0.3), o.tipHi)] })));
+      const g = [blades]; if (tails.length) g.push(tails); g.push(tips);
+      if (o.front) g.push(...o.front(stage));
+      emit(o.id, o.season, o.rarity, stage, g, P.out);
+    }
+  }
+  function podPts(x, y, w, h) { return [[x, y], [x + w * 0.62, y + h * 0.16], [x + w, y + h * 0.48], [x + w * 0.6, y + h * 0.84], [x, y + h], [x - w * 0.6, y + h * 0.84], [x - w, y + h * 0.48], [x - w * 0.62, y + h * 0.16]]; }
+  function pod(x, y, w, h, col, rib, glow, stage, gem, P) { const pts = podPts(x, y, w, h); if (stage === 3) return facetPoly(pts, gem, P.out); return F(smoothPoly(pts), col, { det: [DF(ell(x, y + h * 0.58, w * 0.42, h * 0.26), glow, ID, 0.9), DS([['M', x, y + 2], ['Q', x - w * 0.62, y + h * 0.5, x, y + h - 2]], rib, 2.2), DS([['M', x, y + 2], ['Q', x + w * 0.62, y + h * 0.5, x, y + h - 2]], rib, 2.2)] }); }
+  function floret(x, y, r, col, hi, stage, gem, P) { return stage === 3 ? gemSmall(x, y, r, gem, P.out) : F(ell(x, y, r, r * 0.88), col, { det: [DF(ell(x - r * 0.3, y - r * 0.3, r * 0.34, r * 0.26), hi, ID, 0.9)] }); }
+  function raceme(x, y, len, r0, n, cols, stage, gem, P, sway = 8) { const out2 = []; for (let i = 0; i < n; i++) { const t = i / Math.max(1, n - 1), rr = r0 * (1 - t * 0.5), px = x + Math.sin(t * 2.6) * sway + (i % 2 ? -1 : 1) * rr * 0.5, py = y + t * len; out2.push(floret(px, py, rr, t < 0.5 ? cols[0] : cols[1], cols[2], stage, gem, P)); } return out2; }
+  function ball(x, y, r, col, fl, stage, gem, P) { if (stage === 3) return gemCenter(x, y, r, gem, P.out); const det = [DF(ell(x - r * 0.3, y - r * 0.32, r * 0.3, r * 0.22), mix(col, '#FFFFFF', 0.5), ID, 0.8)]; for (let i = 0; i < 6; i++) { const a = (i * 60 + 20) * D2R, d = r * (i % 2 ? 0.5 : 0.62); det.push(DF(star(5, r * 0.18, r * 0.08, -90 + i * 12).map(c => c), fl, T(x + Math.cos(a) * d, y + Math.sin(a) * d))); } return F(ell(x, y, r, r), col, { det }); }
+  const blade = (x, ang, len, w, col, P) => { const tf = T(x, 244, ang); return F(petal(len, w, 0.14), col, { tf, det: [DS([['M', 0, -5], ['L', 0, -len * 0.8]], mix(col, P.out, 0.3), 2, tf, 0.7)] }); };
+  function trefoilPlant(o) {
+    const P = o.P;
+    const leaflets = (cx, cy, s, stage) => [0, 120, -120].map(a => { const tf = T(cx, cy, a); if (stage === 3) return crystalLite(s * 1.02, s * 0.6, tf, o.gem, P.out); return F(heart(s), o.col, { tf, det: [DS([['M', -s * 0.3, -s * 0.62], ['L', 0, -s * 0.4], ['L', s * 0.3, -s * 0.62]], o.mark, s * 0.07, tf, 0.9), DF(ell(-s * 0.26, -s * 0.78, 2.4, 2.4), o.speck, tf), DF(ell(s * 0.3, -s * 0.66, 2, 2), o.speck, tf)] }); });
+    for (let stage = 1; stage <= 3; stage++) {
+      const g = [];
+      if (stage === 1) { g.push([S([['M', 128, 244], ['C', 127, 226, 130, 204, 128, 184]], P.stem, 7)]); g.push(leaflets(128, 172, 32, 1)); }
+      else { g.push([S([['M', 128, 244], ['C', 124, 212, 134, 170, 127, 128]], P.stem, 8), S([['M', 128, 230], ['C', 140, 220, 158, 210, 168, 196]], P.stem, 6), leafPart(126, 222, -150, 30, 11, P, true)]); g.push(leaflets(170, 184, 24, stage)); g.push(leaflets(127, 112, 50, stage)); g.push([stage === 3 ? gemStar(127, 112, 11, GEM.goldGem, P.out) : F(star(5, 11, 5, -90), o.star, { tf: T(127, 112) })]); }
+      emit(o.id, o.season, o.rarity, stage, g, P.out);
+    }
+  }
+
+  const FP = { out: '#2B3550', stem: '#6FA39C', leaf: '#86B9AE', leafHi: '#C4E3DA' };
+  const LP = { out: '#24192F', stem: '#6E9B76', leaf: '#7FAF84', leafHi: '#BFE0B8' };
+  const AP = { out: '#3F2716', stem: '#7E9A4A', leaf: '#9DB55A', leafHi: '#D5E39A' };
+  const CP = { out: '#2E3542', stem: '#6FA88E', leaf: '#82BFA0', leafHi: '#C2E8D2' };
+  const SP = { out: '#1C1534', stem: '#6D9FA6', leaf: '#7DB3B3', leafHi: '#BDE3DE' };
+  const EP = { out: '#2A140E', stem: '#7C9654', leaf: '#93AE62', leafHi: '#CFE3A0' };
+  const two = (P, y = 222, l = 34, w = 12) => [[128, y, -150, l, w, true], [128, y, -30, l, w, false]];
+
+  // ── Frost Orchard ──
+  plant({ id: 'frost_snowdrop', season: 'frost_orchard', rarity: 1, P: FP, main: [160, 118, 1], bend: 34, stemW: 6, t1h: 0.72, head: { dir: 180, gem: GEM.quartz, rings: [{ span: 30, n: 3, l: 44, w: 17, shape: 'round', col: '#FAFCFF', vein: '#D2DDEC', hi: '#FFFFFF' }], center: { kind: 'disc', r: 8, col: '#9CCB8C', dy: -3, gem: GEM.peridot } }, leaves: [[122, 240, -104, 72, 9, true], [134, 240, -74, 62, 9, false]] });
+  plant({ id: 'ice_crocus', season: 'frost_orchard', rarity: 1, P: FP, main: [128, 132, 1], stemW: 7, head: { gem: GEM.sapphire, rings: [{ span: 40, n: 2, l: 46, w: 16, shape: 'round', col: '#9FB0EC', vein: '#7686D2' }, { span: 18, n: 3, l: 50, w: 17, shape: 'round', col: '#BDCBF7', vein: '#8796D8', hi: '#E8EEFF' }] }, leaves: [[124, 240, -102, 64, 7, true], [132, 240, -78, 60, 7, false], [128, 240, -92, 48, 6, false]], front: (st, hx, hy) => st === 1 ? [] : [[F(ell(hx, hy - 40, 5, 9), st === 3 ? GEM.amber.body : '#FF9E3D', { det: [DF(ell(hx - 1.5, hy - 44, 1.6, 3), '#FFE0B0')] })]] });
+  plant({ id: 'silver_aconite', season: 'frost_orchard', rarity: 1, P: FP, main: [128, 120, 1], head: { sq: 0.7, gem: GEM.goldGem, rings: [{ n: 6, l: 32, w: 15, shape: 'round', col: '#FFE98C', vein: '#D9C25C', rot: 30 }], center: { kind: 'dots', r: 10, sq: 0.7, col: '#F2B21C', col2: '#FFF2B0', gem: GEM.citrine } }, back: (st, hx, hy, hk) => [Array.from({ length: 8 }, (_, i) => F(petal(30 * hk, 8 * hk, 0.3), FP.leaf, { tf: TS(hx, hy + 6, i * 45 + 22, 0.6, 0, 1) }))], leaves: two(FP, 226, 30, 11) });
+  plant({ id: 'winter_camellia', season: 'frost_orchard', rarity: 2, P: { ...FP, leaf: '#5E9C88', leafHi: '#A9D6C6' }, main: [126, 104, 1], head: { sq: 0.8, tilt: -6, rings: [{ n: 6, l: 38, w: 21, shape: 'round', col: '#E5486A', hi: '#FF8FA5', gem: GEM.ruby }, { n: 5, l: 25, w: 15, shape: 'round', col: '#F2627F', rot: 36, hi: '#FFA3B6', gem: GEM.garnet }], center: { kind: 'stamens', r: 6, n: 7, spread: 70, col: '#FFE38A', col2: '#FFE38A', tip: '#F2B21C', gem: GEM.goldGem } }, buds: [[170, 150, 34, 26, 11]], budCol: '#E5486A', leaves: [[129, 200, -26, 46, 18], [127, 222, -154, 40, 15, true], [150, 168, -40, 30, 12]] });
+  plant({ id: 'hoarfrost_rose', season: 'frost_orchard', rarity: 2, P: FP, main: [130, 100, 1], head: { sq: 0.76, tilt: 6, rings: [{ n: 5, l: 42, w: 23, shape: 'round', col: '#E6D6F4', hi: '#FFFFFF', gem: GEM.opal }, { n: 5, l: 29, w: 17, shape: 'round', col: '#D8C2EE', rot: 36, gem: GEM.moonstone }, { n: 4, l: 17, w: 12, shape: 'round', col: '#C9AEE4', rot: 12, gem: GEM.iolite, t1: false }], center: { kind: 'swirl', r: 9, col: '#B994DA', col2: '#8E68B8', sq: 0.76, gem: GEM.amethyst } }, buds: [[88, 146, -30, 28, 11]], budCol: '#D8C2EE', leaves: [[129, 204, -28, 42, 16], [127, 222, -152, 38, 14, true]] });
+  plant({ id: 'crystal_peony', season: 'frost_orchard', rarity: 3, P: FP, main: [128, 96, 1], stemW: 9, head: { sq: 0.72, rings: [{ n: 8, l: 46, w: 21, shape: 'round', col: '#F7C6D6', hi: '#FFE6EE', gem: GEM.roseq }, { n: 6, l: 33, w: 18, shape: 'round', col: '#F2ABC2', rot: 22, gem: GEM.tourmaline }, { n: 4, l: 20, w: 13, shape: 'round', col: '#E68DAA', rot: 10, gem: GEM.garnet, t1: false }], center: { kind: 'swirl', r: 10, col: '#D9739A', col2: '#A84A72', sq: 0.72, gem: GEM.ruby } }, buds: [[66, 150, -34, 30, 13], [192, 158, 36, 26, 11]], budCol: '#F2ABC2', leaves: [[129, 196, -24, 48, 18], [127, 214, -156, 46, 17, true], [128, 232, -40, 34, 12]], t1leaves: 3 });
+
+  // ── Lantern Meadow ──
+  spikePlant({ id: 'dusk_firefly_grass', season: 'lantern_meadow', rarity: 1, P: LP, tip: 'glow', tipCol: '#FFE27A', tipHi: '#FFF8D6', tipR: 10, gem: GEM.peridot, blades: [[128, 4, 150, 7], [118, -14, 128, 6.5], [138, 18, 134, 6.5], [110, -30, 100, 6], [146, 32, 104, 6], [124, -4, 116, 6]], tipOn: [0, 1, 2, 4], extraGlow: [[92, 112, 6], [172, 98, 7]] });
+  (() => { const P = LP; for (let st = 1; st <= 3; st++) { const g = []; const sp = [S([['M', 128, 244], ['C', 124, 200, 136, 140, 168, 104], ['C', 180, 92, 194, 96, 198, 108]], P.stem, 7)]; if (st > 1) sp.push(S([['M', 140, 150], ['Q', 114, 132, 100, 136]], P.stem, 5), leafPart(130, 214, -150, 40, 15, P, true), leafPart(148, 128, -30, 34, 12, P)); else sp.push(leafPart(128, 222, -150, 30, 11, P, true)); g.push(sp); if (st === 1) g.push([pod(198, 110, 15, 30, '#B8D98A', '#86A85A', '#E2F2C0', 1, null, P)]); else { g.push([S([['M', 198, 108], ['L', 198, 116]], '#86A85A', 4), S([['M', 100, 136], ['L', 100, 142]], '#86A85A', 4)]); g.push([pod(100, 142, 22, 44, '#FF9A4A', '#D2661E', '#FFE0A8', st, GEM.amber, P), pod(198, 114, 28, 56, '#FF8A3D', '#CC5A16', '#FFE0A8', st, GEM.opalFire, P)]); g.push([st === 3 ? gemSmall(198, 112, 7, GEM.goldGem, P.out) : F(star(5, 9, 4, -90), '#86A85A', { tf: T(198, 114) })]); } emit('paper_lantern_bloom', 'lantern_meadow', 1, st, g, P.out); } })();
+  plant({ id: 'evening_primrose', season: 'lantern_meadow', rarity: 1, P: LP, main: [128, 108, 1], head: { sq: 0.86, gem: GEM.topaz, rings: [{ n: 4, l: 42, w: 25, shape: 'notch', col: '#FFE45C', vein: '#F2C230', hi: '#FFF6B8', rot: 45 }], center: { kind: 'stamens', r: 6, n: 5, spread: 60, col: '#F2C230', col2: '#FFF3A8', tip: '#E8A814', gem: GEM.goldGem } }, leaves: [[128, 220, -150, 40, 12, true], [128, 200, -28, 38, 11]] });
+  plant({ id: 'foxfire_lily', season: 'lantern_meadow', rarity: 2, P: LP, main: [124, 100, 1], head: { sq: 0.72, tilt: -10, rings: [{ n: 6, l: 54, w: 14, shape: 'petal', col: '#FF8A3D', vein: '#FFD08A', hi: '#FFC28A', gem: GEM.fire }], center: { kind: 'stamens', r: 6, n: 5, spread: 50, len: 3, col: '#9CE0C8', col2: '#B8F0DC', tip: '#5FD1C2', gem: GEM.teal } }, buds: [[172, 146, 30, 34, 9]], budCol: '#FF8A3D', leaves: [[128, 226, -150, 52, 9, true], [128, 206, -30, 50, 9], [128, 184, -152, 44, 8, true]], t1leaves: 2 });
+  (() => { const P = LP, cols = ['#D7BCFF', '#B48CF5', '#F2E8FF']; for (let st = 1; st <= 3; st++) { const g = []; const sp = [S([['M', 128, 244], ['C', 120, 200, 112, 150, 128, 104], ['C', 140, 74, 176, 66, 196, 80]], '#8A6E58', 8)]; if (st > 1) sp.push(S([['M', 124, 130], ['Q', 96, 112, 74, 116]], '#8A6E58', 6)); sp.push(leafPart(122, 200, -150, 36, 12, P, true), leafPart(150, 84, -10, 32, 11, P)); if (st > 1) sp.push(leafPart(96, 116, -160, 30, 10, P, true)); g.push(sp); if (st === 1) g.push(raceme(176, 84, 40, 9, 4, ['#BFE0B8', '#C9B2F0', '#F2E8FF'], 1, null, P, 4)); else g.push([...raceme(74, 120, 56, 13, 4, cols, st, GEM.amethyst, P, 6), ...raceme(190, 84, 84, 15, 6, cols, st, GEM.violet, P), ...raceme(140, 96, 56, 13, 4, cols, st, GEM.opal, P, 6)]); emit('glow_wisteria', 'lantern_meadow', 2, st, g, P.out); } })();
+  plant({ id: 'midnight_lotus', season: 'lantern_meadow', rarity: 3, P: LP, main: [128, 212, 1], noStem: true, t1h: 1, t1k: 0.85, head: { rings: [{ span: 72, n: 5, l: 54, w: 20, shape: 'petal', col: '#9C8CF5', vein: '#C9C0FF', gem: GEM.tanzanite }, { span: 42, n: 4, l: 50, w: 19, shape: 'petal', col: '#B3A6FF', vein: '#DCD6FF', gem: GEM.amethyst }, { span: 14, n: 2, l: 42, w: 16, shape: 'petal', col: '#D2CBFF', hi: '#F2F0FF', gem: GEM.opal, t1: false }], calyx: false }, back: (st) => [[padPart(128, 228, 92, 16, '#4F8F80', LP), ...(st > 1 ? [padPart(204, 236, 40, 8, '#4F8F80', LP)] : [])]], buds: [[204, 196, 14, 30, 10]], budCol: '#B3A6FF', front: (st, hx, hy) => st === 1 ? [] : [[st === 3 ? gemSmall(hx, hy - 22, 8, GEM.goldGem, LP.out) : F(ell(hx, hy - 22, 9, 6), '#FFE27A', { det: [DF(ell(hx - 3, hy - 24, 3, 2), '#FFF8D6')] })]] });
+
+  // ── Amber Canopy ──
+  (() => { const P = AP, twig = '#7A4E2C', cols = ['#E07B39', '#C9602A', '#F0A04B', '#D86B30', '#EE9440']; for (let st = 1; st <= 3; st++) { const g = []; const L = st === 1 ? [[132, 170, -60, 40, 16], [124, 196, -130, 34, 14, true]] : [[136, 120, -70, 52, 20], [126, 150, -126, 48, 19, true], [134, 176, -40, 46, 18], [126, 202, -142, 40, 16, true], [130, 104, -100, 40, 16]]; g.push([S([['M', 128, 244], ['C', 126, 210, 134, 150, 132, st === 1 ? 166 : 104]], twig, st === 1 ? 6 : 7)]); g.push(L.map(([x, y, a, l, w, f], i) => colLeaf(x, y, a, l, w, cols[i], P, st, i % 2 ? GEM.copper : GEM.amber, f))); emit('copper_leaf', 'amber_canopy', 1, st, g, P.out); } })();
+  plant({ id: 'maple_aster', season: 'amber_canopy', rarity: 1, P: AP, main: [128, 104, 1], head: { gem: GEM.garnet, rings: [{ n: 16, l: 36, w: 6, shape: 'pin', col: '#E0604A', vein: '#FF9C86' }], center: { kind: 'dots', r: 12, col: '#FFC53D', col2: '#E8901C', gem: GEM.citrine } }, leaves: two(AP, 214, 36, 12) });
+  plant({ id: 'russet_mallow', season: 'amber_canopy', rarity: 1, P: AP, main: [128, 108, 1], head: { sq: 0.9, gem: GEM.coralG, rings: [{ n: 5, l: 42, w: 23, shape: 'notch', col: '#EE9A86', vein: '#C25A4E', blot: '#C24E42' }], center: { kind: 'stamens', r: 5, n: 5, spread: 30, len: 2.6, col: '#FFE9D6', col2: '#FFF2E6', tip: '#FFD2B0', gem: GEM.roseq } }, leaves: [[128, 220, -150, 36, 15, true], [128, 198, -30, 34, 14]] });
+  plant({ id: 'cider_dahlia', season: 'amber_canopy', rarity: 2, P: AP, main: [128, 100, 1], head: { sq: 0.82, rings: [{ n: 8, l: 44, w: 13, shape: 'petal', col: '#F28A2E', vein: '#FFC27A', gem: GEM.opalFire }, { n: 6, l: 31, w: 12, shape: 'petal', col: '#F7A043', rot: 22, gem: GEM.amber }, { n: 4, l: 19, w: 9, shape: 'petal', col: '#FFBE63', rot: 10, gem: GEM.goldGem, t1: false }], center: { kind: 'disc', r: 7, col: '#B85A12', gem: GEM.smoky } }, buds: [[176, 154, 32, 28, 11]], budCol: '#F28A2E', leaves: [[129, 200, -26, 44, 16], [127, 220, -154, 40, 15, true]] });
+  (() => { const P = AP, gold = '#FFC93D', fl = '#E89A1C', oak = '#C98A3A', twig = '#7A4E2C'; for (let st = 1; st <= 3; st++) { const g = []; const sp = [S([['M', 128, 244], ['C', 124, 200, 132, 150, 128, 112]], twig, 8)]; if (st > 1) sp.push(S([['M', 128, 150], ['Q', 150, 130, 170, 112]], twig, 6), S([['M', 127, 176], ['Q', 104, 160, 88, 140]], twig, 5)); g.push(sp); g.push(st === 1 ? [lobedLeaf(128, 220, -40, 44, 14, oak, P)] : [lobedLeaf(128, 216, -44, 58, 18, oak, P), lobedLeaf(128, 200, 40, 52, 16, '#B87A30', P), lobedLeaf(126, 140, -70, 44, 14, '#D69A48', P)]); if (st === 1) g.push([ball(128, 104, 15, gold, fl, 1, null, P)]); else { g.push([ball(170, 104, 15, gold, fl, st, GEM.goldGem, P), ball(88, 132, 14, gold, fl, st, GEM.citrine, P), ball(110, 98, 13, '#FFD966', fl, st, GEM.topaz, P), ball(128, 94, 19, gold, fl, st, GEM.goldGem, P)]); g.push(st === 3 ? [crystalLite(22, 13, T(150, 196, 180), GEM.smoky, P.out)] : [F(ell(150, 206, 10, 12), '#B07A44', { det: [DF(ell(146, 202, 3, 4), '#D9A46A')] }), F([['M', 138, 196], ['C', 140, 186, 160, 186, 162, 196], ['Z']], '#6E4A28')]); } emit('golden_oak_bloom', 'amber_canopy', 2, st, g, P.out); } })();
+  plant({ id: 'amber_magnolia', season: 'amber_canopy', rarity: 3, P: AP, main: [134, 112, 1], stemCol: '#6E4A2C', stemW: 10, head: { rings: [{ span: 58, n: 4, l: 60, w: 23, shape: 'round', col: '#FFE2B8', hi: '#FFF4E0', gem: GEM.pearl }, { span: 26, n: 3, l: 58, w: 22, shape: 'round', col: '#FFD49A', blot: '#F2A65A', gem: GEM.amber }, { span: 0, n: 1, l: 52, w: 20, shape: 'round', col: '#FFEBD0', hi: '#FFFFFF', gem: GEM.goldGem, t1: false }], calyx: false }, head2: { rings: [{ span: 44, n: 3, l: 40, w: 17, shape: 'round', col: '#FFE2B8', gem: GEM.pearl }, { span: 0, n: 1, l: 38, w: 16, shape: 'round', col: '#FFD49A', gem: GEM.amber }], calyx: false }, extra: [[62, 140, 0.8, -12]], buds: [[198, 128, 28, 30, 12]], budCol: '#B98A5A', budGem: GEM.smoky, leaves: [[132, 196, -24, 54, 20], [126, 218, -158, 48, 18, true]] });
+
+  // ── Coral Tide Garden ──
+  (() => { const P = CP, pink = '#FF9EB6', fl = '#FFD6E0'; for (let st = 1; st <= 3; st++) { const g = []; const tuft = [blade(118, -26, 54, 8, P.leaf, P), blade(128, -6, 62, 8, P.leaf, P), blade(138, 20, 56, 8, P.leaf, P)]; if (st > 1) tuft.push(blade(110, -44, 44, 7, P.leaf, P), blade(146, 38, 46, 7, P.leaf, P)); const stalks = st === 1 ? [S([['M', 128, 236], ['C', 127, 200, 130, 170, 130, 150]], '#8FBF9F', 4)] : [S([['M', 126, 236], ['C', 120, 190, 104, 150, 96, 116]], '#8FBF9F', 4), S([['M', 130, 236], ['C', 134, 180, 148, 130, 160, 92]], '#8FBF9F', 4)]; g.push([...stalks, ...tuft]); g.push(st === 1 ? [ball(130, 144, 14, '#F7C1CF', fl, 1, null, P)] : [ball(96, 112, 20, pink, fl, st, GEM.roseq, P), ball(160, 88, 23, pink, fl, st, GEM.tourmaline, P)]); emit('sea_thrift', 'coral_tide', 1, st, g, P.out); } })();
+  plant({ id: 'salt_daisy', season: 'coral_tide', rarity: 1, P: CP, main: [128, 102, 1], head: { gem: GEM.diamond, rings: [{ n: 14, l: 42, w: 9, shape: 'round', col: '#FFFFFF', vein: '#D8E6EA' }], center: { kind: 'dots', r: 14, col: '#7FD6CC', col2: '#3FA79C', gem: GEM.teal } }, leaves: two(CP, 214, 36, 11) });
+  plant({ id: 'tide_anemone', season: 'coral_tide', rarity: 1, P: CP, main: [128, 108, 1], head: { sq: 0.9, gem: GEM.coralG, rings: [{ n: 6, l: 36, w: 20, shape: 'round', col: '#FF7A6B', vein: '#FFB3A8', hi: '#FFC4BA' }], center: { kind: 'dots', r: 13, col: '#3D3354', col2: '#9C8AC2', hi: '#9C8AC2', gem: GEM.tanzanite } }, leaves: [[128, 222, -150, 34, 13, true], [128, 222, -30, 34, 13]] });
+  plant({ id: 'coral_hibiscus', season: 'coral_tide', rarity: 2, P: CP, main: [126, 106, 1], head: { sq: 0.84, tilt: -8, gem: GEM.coralG, rings: [{ n: 5, l: 52, w: 31, shape: 'round', col: '#FF7A5E', blot: '#C2304A', vein: '#FFB0A0', hi: '#FFC9BC' }], center: { kind: 'stamens', r: 5, n: 5, spread: 22, len: 4.2, col: '#FFE38A', col2: '#FFE38A', tip: '#F2B21C', gem: GEM.goldGem } }, buds: [[176, 160, 36, 30, 11]], budCol: '#FF7A5E', leaves: [[129, 206, -26, 46, 18], [127, 224, -154, 40, 16, true]] });
+  plant({ id: 'pearl_waterlily', season: 'coral_tide', rarity: 2, P: CP, main: [126, 204, 1.25], noStem: true, t1h: 1, t1k: 0.9, head: { sq: 0.64, rings: [{ n: 8, l: 46, w: 14, shape: 'petal', col: '#FFF6EE', vein: '#E6D8CA', gem: GEM.pearl }, { n: 6, l: 32, w: 12, shape: 'petal', col: '#FFE2D4', rot: 30, gem: GEM.roseq }], center: { kind: 'disc', r: 10, sq: 0.64, col: '#FFD45E', gem: GEM.goldGem }, calyx: false }, back: (st) => [[padPart(124, 228, 84, 15, '#5FAE8C', CP), ...(st > 1 ? [padPart(206, 236, 42, 8, '#5FAE8C', CP)] : [])]], buds: [[204, 196, 12, 30, 10]], budCol: '#FFE2D4' });
+  plant({ id: 'reef_crown', season: 'coral_tide', rarity: 3, P: CP, main: [128, 104, 1], stemCol: '#E8836E', stemW: 11, head: { sq: 0.76, rings: [{ n: 9, l: 42, w: 10, shape: 'petal', col: '#FF8FA3', vein: '#FFD0DA', gem: GEM.tourmaline }, { n: 7, l: 28, w: 9, shape: 'petal', col: '#FFB46B', rot: 18, gem: GEM.amber }], center: { kind: 'dots', r: 11, sq: 0.76, col: '#FFE08A', col2: '#F2A63D', gem: GEM.goldGem } }, back: (st) => st === 1 ? [] : [[S([['M', 126, 220], ['C', 104, 196, 82, 186, 70, 150], ['M', 92, 182], ['Q', 72, 186, 58, 176]], '#F59A8B', 10), S([['M', 132, 214], ['C', 156, 196, 176, 176, 186, 140], ['M', 168, 180], ['Q', 190, 182, 202, 168]], '#F59A8B', 10)]], front: (st) => st === 1 ? [] : [[st === 3 ? crystalLite(26, 14, T(70, 150, -20), GEM.coralG, CP.out) : F(ell(70, 146, 9, 9), '#FFC5B8'), st === 3 ? crystalLite(26, 14, T(186, 140, 20), GEM.coralG, CP.out) : F(ell(186, 136, 9, 9), '#FFC5B8')]], leaves: [[128, 230, -150, 34, 12, true], [128, 230, -30, 34, 12]] });
+
+  // ── Starfall Glade ──
+  spikePlant({ id: 'comet_sprig', season: 'starfall_glade', rarity: 1, P: SP, tip: 'comet', tipCol: '#FFF2BF', tipHi: '#FFFFFF', tailCol: '#AFC0FF', tipR: 10, gem: GEM.diamond, bladeCol: '#7DB3B3', blades: [[128, 8, 160, 5], [120, -20, 126, 4.5], [136, 26, 120, 4.5], [112, -38, 90, 4], [144, 44, 88, 4]], tipOn: [0, 1, 2] });
+  trefoilPlant({ id: 'nebula_clover', season: 'starfall_glade', rarity: 1, P: SP, col: '#A68CF5', mark: '#E3D8FF', speck: '#FFFFFF', star: '#FFE27A', gem: GEM.amethyst });
+  plant({ id: 'meteor_daisy', season: 'starfall_glade', rarity: 1, P: SP, main: [128, 104, 1], head: { tilt: -16, sq: 0.9, gem: GEM.moonstone, rings: [{ n: 10, l: 44, w: 9, shape: 'pin', col: '#E9E0FF', vein: '#B8A8F0' }], center: { kind: 'star', r: 13, col: '#FFE27A', col2: '#FFF6C7', gem: GEM.goldGem } }, leaves: two(SP, 216, 36, 11) });
+  plant({ id: 'aurora_tulip', season: 'starfall_glade', rarity: 2, P: SP, main: [128, 128, 1], head: { rings: [{ span: 36, n: 2, l: 54, w: 22, shape: 'round', col: '#5FD1C2', vein: '#A68CF5', gem: GEM.teal }, { span: 0, n: 1, l: 58, w: 24, shape: 'round', col: '#8DE6C9', blot: '#C9A8FF', hi: '#D6FFF2', vein: '#A68CF5', gem: GEM.aquamarine }] }, buds: [[170, 160, 28, 34, 11]], budCol: '#8DE6C9', budGem: GEM.amethyst, leaves: [[124, 240, -112, 70, 13, true], [134, 240, -64, 64, 12, false]] });
+  plant({ id: 'galaxy_sunburst', season: 'starfall_glade', rarity: 2, P: SP, main: [128, 98, 1], stemW: 10, head: { rings: [{ n: 10, l: 50, w: 11, shape: 'petal', col: '#7684EA', rot: 18, keep: true }, { n: 10, l: 46, w: 11, shape: 'petal', col: '#FFC93D', vein: '#FFE79A', gem: GEM.goldGem }], center: { kind: 'dots', r: 22, col: '#2E2878', col2: '#E9E0FF', hi: '#8E84F0', gem: GEM.tanzanite } }, leaves: [[128, 200, -146, 52, 22, true], [128, 186, -34, 52, 22], [127, 226, -160, 34, 14, true]], t1leaves: 2 });
+  plant({ id: 'nova_bloom', season: 'starfall_glade', rarity: 3, P: SP, main: [128, 100, 1], head: { sq: 0.86, rings: [{ n: 8, l: 50, w: 14, shape: 'petal', col: '#FFE27A', vein: '#FFF6C7', gem: GEM.goldGem }, { n: 6, l: 34, w: 12, shape: 'petal', col: '#FFB4E0', rot: 30, gem: GEM.tourmaline }, { n: 4, l: 20, w: 9, shape: 'petal', col: '#FFFFFF', rot: 45, gem: GEM.diamond, t1: false }], center: { kind: 'star', r: 9, col: '#FFF2C7', col2: '#FFE27A', gem: GEM.diamond } }, buds: [[66, 156, -38, 30, 10], [192, 150, 38, 30, 10]], budCol: '#FFB4E0', leaves: [[129, 200, -26, 46, 16], [127, 220, -154, 42, 15, true], [128, 236, -36, 30, 11]], t1leaves: 2 });
+
+  // ── Ember Fen ──
+  spikePlant({ id: 'marsh_rush', season: 'ember_fen', rarity: 1, P: EP, tip: 'seed', tipCol: '#C98A55', tipHi: '#F2C08A', gem: GEM.copper, blades: [[128, 3, 168, 7], [118, -12, 136, 6.5], [138, 14, 144, 6.5], [110, -26, 96, 6], [146, 30, 100, 6]], tipOn: [0, 2] });
+  plant({ id: 'peat_violet', season: 'ember_fen', rarity: 1, P: EP, main: [128, 120, 1], head: { sq: 0.9, gem: GEM.violet, rings: [{ n: 5, l: 32, w: 18, shape: 'round', col: '#B98CF0', vein: '#7E5CC9', hi: '#E3D2FF', rot: 180 }], center: { kind: 'disc', r: 6, col: '#FFD45E', gem: GEM.goldGem } }, leaves: [[128, 226, -150, 36, 17, true], [128, 226, -30, 36, 17]] });
+  plant({ id: 'cinder_buttercup', season: 'ember_fen', rarity: 1, P: EP, main: [128, 110, 1], head: { gem: GEM.amber, rings: [{ n: 5, l: 36, w: 21, shape: 'round', col: '#FF9A4A', hi: '#FFCB96' }], center: { kind: 'dots', r: 12, col: '#4A2A20', col2: '#FFB074', hi: '#FFB074', gem: GEM.opalFire } }, leaves: two(EP, 220, 34, 13) });
+  plant({ id: 'flame_iris', season: 'ember_fen', rarity: 2, P: EP, main: [128, 108, 1], head: { sq: 0.8, rings: [{ n: 3, rot: 0, l: 40, w: 16, shape: 'round', col: '#FFA552', vein: '#FFD9A8', gem: GEM.amber }, { n: 3, rot: 60, l: 52, w: 21, shape: 'round', col: '#FF6E3D', blot: '#FFD08A', vein: '#FFE4C2', gem: GEM.fire }] }, buds: [[172, 150, 26, 34, 10]], budCol: '#FF6E3D', leaves: [[124, 240, -106, 84, 12, true], [134, 240, -72, 76, 12, false]] });
+  plant({ id: 'smoke_lotus', season: 'ember_fen', rarity: 2, P: EP, main: [128, 214, 1], noStem: true, t1h: 1, t1k: 0.85, head: { rings: [{ span: 64, n: 4, l: 48, w: 19, shape: 'petal', col: '#B7AFC4', vein: '#E6E1EE', gem: GEM.smokeQ }, { span: 28, n: 3, l: 44, w: 18, shape: 'petal', col: '#D2CBDD', hi: '#F2EFF7', gem: GEM.pearl }], calyx: false }, back: () => [[padPart(128, 230, 88, 15, '#6E8A5A', EP)]], front: (st, hx, hy) => st === 1 ? [] : [[st === 3 ? gemSmall(hx, hy - 20, 8, GEM.fire, EP.out) : F(ell(hx, hy - 20, 9, 6), '#FF9A4A', { det: [DF(ell(hx - 3, hy - 22, 3, 2), '#FFD3A8')] })]], buds: [[202, 200, 14, 28, 9]], budCol: '#D2CBDD' });
+  plant({ id: 'fenfire_crown', season: 'ember_fen', rarity: 3, P: EP, main: [128, 98, 1], stemW: 9, head: { sq: 0.8, rings: [{ n: 6, l: 52, w: 16, shape: 'petal', col: '#FF6A3D', vein: '#FFC28A', gem: GEM.fire }, { n: 6, l: 35, w: 12, shape: 'petal', col: '#FFA040', rot: 25, gem: GEM.amber }, { n: 3, l: 20, w: 10, shape: 'petal', col: '#FFE08A', rot: 0, gem: GEM.goldGem, t1: false }], center: { kind: 'star', r: 8, col: '#FFF2C7', col2: '#FFD45E', gem: GEM.goldGem } }, back: (st) => st === 1 ? [] : [[blade(96, -30, 120, 6, '#8A5536', EP), blade(162, 32, 116, 6, '#8A5536', EP)], [F(ell(0, -116 * 0.76, 8, 18), '#C98A55', { tf: T(96, 244, -30) }), F(ell(0, -112 * 0.76, 8, 18), '#C98A55', { tf: T(162, 244, 32) })]], buds: [[60, 162, -36, 30, 10], [198, 166, 36, 28, 10]], budCol: '#FF8A3D', leaves: [[129, 202, -26, 46, 14], [127, 222, -154, 42, 13, true]] });
+
   return { files: out, meta };
 }
 

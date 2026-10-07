@@ -1,7 +1,5 @@
 extends Area2D
 
-const SeasonThemeScript := preload("res://scripts/seasons/season_theme.gd")
-
 ## v1 visual motif. Collision shape stays 64×64 (not the drawn 176×150 body).
 var kind: String = "stone"
 
@@ -17,12 +15,9 @@ func _ready() -> void:
 	apply_season_tint()
 
 
+## Season Kit (faza 2): svih 8 sezona ima svoje prepreke u svojim bojama — bez tinta
+## sezone (tint sezone je ukinut). Ime ostaje jer ga run_controller zove pri spawnu.
 func apply_season_tint() -> void:
 	var visual := get_node_or_null("Visual") as CanvasItem
-	if visual == null:
-		return
-	# Season Kit: prepreke kita imaju svoje boje — bez tinta sezone.
-	if UiSeasons.has_kit(GameState.active_season_id):
+	if visual != null:
 		visual.modulate = Color.WHITE
-		return
-	visual.modulate = SeasonThemeScript.obstacle_modulate(GameState.active_season_id)

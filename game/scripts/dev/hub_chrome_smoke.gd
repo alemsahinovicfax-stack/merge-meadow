@@ -20,15 +20,22 @@ const TAB_SLOT_W := 216.0
 const TOLERANCE := 1.5
 
 var _failed: bool = false
+var _backup: String = ""
 
 
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
 	if err != OK:
 		push_error("hub_chrome_smoke: hub load failed %d" % err)
-		quit(1)
+		_quit(1)
 		return
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _run() -> void:
@@ -46,10 +53,10 @@ func _run() -> void:
 		_check_nav_lock(hub)
 		await _check_settings_toast(hub)
 	if _failed:
-		quit(1)
+		_quit(1)
 		return
 	print("hub_chrome_smoke OK")
-	quit(0)
+	_quit(0)
 
 
 func _check_icons() -> void:

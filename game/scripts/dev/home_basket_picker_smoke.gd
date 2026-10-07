@@ -5,8 +5,17 @@ extends SceneTree
 const SeedUnlockConfig := preload("res://scripts/progression/seed_unlock_config.gd")
 
 
+var _backup: String = ""
+
+
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _gs() -> Node:
@@ -15,7 +24,7 @@ func _gs() -> Node:
 
 func _fail(msg: String) -> void:
 	push_error("home_basket_picker_smoke: %s" % msg)
-	quit(1)
+	_quit(1)
 
 
 func _picker_labels(home: Node) -> PackedStringArray:
@@ -418,4 +427,4 @@ func _run() -> void:
 		_fail("camp chip must not set loadout")
 		return
 	print("home_basket_picker_smoke OK")
-	quit(0)
+	_quit(0)

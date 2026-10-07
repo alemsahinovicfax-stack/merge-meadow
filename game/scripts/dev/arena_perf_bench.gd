@@ -1,7 +1,8 @@
 extends SceneTree
 
-## Dev: mjeri cijenu frejma u Areni (CPU vrijeme frejma, draw pozivi, primitivi) u tri stanja:
-## mirno polje (muncher spava, korpa se klati), muncher lovi, combo talas + crossfade bujnosti.
+## Dev: mjeri cijenu frejma u Areni (CPU vrijeme frejma, draw pozivi, primitivi) u četiri
+## stanja: mirno polje (muncher spava, korpa se klati), muncher lovi, combo talas + crossfade
+## bujnosti, i sipanje sjemenki iz korpe (~30 sjemenki leti na polje, 3 puta).
 ## Pokretanje BEZ --headless (treba renderer):
 ##   godot --path game --rendering-driver opengl3 -s scripts/dev/arena_perf_bench.gd
 
@@ -18,6 +19,7 @@ func _initialize() -> void:
 func _run() -> void:
 	Engine.max_fps = 0
 	OS.low_processor_usage_mode = false
+	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 	if FileAccess.file_exists(SAVE_PATH):
 		_backup = FileAccess.get_file_as_string(SAVE_PATH)
 	var gs := get_root().get_node("GameState")
@@ -45,6 +47,7 @@ func _run() -> void:
 		await process_frame
 	await _measure("muncher hunting")
 	await _measure_combo(arena, bg)
+	await _measure_pour(arena, gs)
 	await _breakdown(arena)
 	if _backup.is_empty():
 		DirAccess.remove_absolute(SAVE_PATH)
@@ -108,6 +111,34 @@ func _prims() -> Vector2:
 		p += Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)
 		c += Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)
 	return Vector2(p / 10.0, c / 10.0)
+
+
+## Sipanje: prazno polje → tap na korpu → ~30 sjemenki leti iz korpe (0,42 s + 0,04 s razmak).
+func _measure_pour(arena: Node, gs: Node) -> void:
+	var total := 0
+	var worst := 0
+	var n := 0
+	var calls := 0.0
+	for _round in 3:
+		arena.call("_clear_field_chips")
+		arena.set("_session_open", false)
+		for _i in 10:
+			await process_frame
+		gs.set("seed_bag", {"clover": 10, "daisy": 10, "buttercup": 10, "tulip": 10})
+		var last := Time.get_ticks_usec()
+		arena.call("_on_bag_clicked")
+		for _i in 110:
+			await process_frame
+			var now := Time.get_ticks_usec()
+			var dt := now - last
+			last = now
+			total += dt
+			worst = maxi(worst, dt)
+			calls += Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)
+			n += 1
+	print("BENCH %-40s avg %6.2f ms  worst %6.2f ms  draw calls %6.0f  chips %d" % [
+		"seed pour (30 chips fly in)", total / 1000.0 / n, worst / 1000.0, calls / n, (arena.get("_chips") as Array).size()
+	])
 
 
 func _measure_combo(arena: Node, bg: Node) -> void:

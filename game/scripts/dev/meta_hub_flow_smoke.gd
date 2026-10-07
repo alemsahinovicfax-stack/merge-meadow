@@ -8,13 +8,22 @@ const UI_CHROME := preload("res://scripts/visual/ui_chrome.gd")
 const CHROME_ROW := "RootVBox/PageIndicator/NavPanel/Content"
 
 
+var _backup: String = ""
+
+
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
 	if err != OK:
 		push_error("meta_hub_flow_smoke: load failed %d" % err)
-		quit(1)
+		_quit(1)
 		return
 	call_deferred("_step")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _step() -> void:
@@ -23,12 +32,12 @@ func _step() -> void:
 	var hubs := get_nodes_in_group("meta_hub")
 	if hubs.is_empty():
 		push_error("meta_hub_flow_smoke: no meta_hub node")
-		quit(1)
+		_quit(1)
 		return
 	var hub: Node = hubs[0]
 	if not hub.has_method("go_to_page"):
 		push_error("meta_hub_flow_smoke: hub missing go_to_page")
-		quit(1)
+		_quit(1)
 		return
 	for page in MetaHubPages.PAGE_COUNT:
 		hub.go_to_page(page, false)
@@ -41,7 +50,7 @@ func _step() -> void:
 			var page_node := host.get_node_or_null("Page_%d" % page) if host else null
 			if page_node == null:
 				push_error("meta_hub_flow_smoke: Page_%d not loaded" % page)
-				quit(1)
+				_quit(1)
 				return
 			var expected_scene: String = MetaHubPages.PAGE_SCENES[page]
 			var actual_path := String(page_node.scene_file_path)
@@ -50,7 +59,7 @@ func _step() -> void:
 					"meta_hub_flow_smoke: Page_%d expected %s got %s"
 					% [page, expected_scene, actual_path]
 				)
-				quit(1)
+				_quit(1)
 				return
 	var expected_labels: Array[String] = ["Shop", "Journal", "Home", "Camp", "Arena"]
 	for i in expected_labels.size():
@@ -59,59 +68,59 @@ func _step() -> void:
 				"meta_hub_flow_smoke: PAGE_LABELS[%d] expected %s got %s"
 				% [i, expected_labels[i], MetaHubPages.PAGE_LABELS[i]]
 			)
-			quit(1)
+			_quit(1)
 			return
 	if MetaHubPages.MAIN != 2:
 		push_error("meta_hub_flow_smoke: MAIN must be center index 2")
-		quit(1)
+		_quit(1)
 		return
 	hub.go_to_page(MetaHubPages.SHOP, false)
 	for _i in 20:
 		await process_frame
 	if hub.find_child("CaptionLabel", true, false) != null:
 		push_error("meta_hub_flow_smoke: CaptionLabel should be removed (Bug-019)")
-		quit(1)
+		_quit(1)
 		return
 	var swipe := hub.get_node_or_null("RootVBox/SwipePager")
 	if swipe == null or not swipe.has_method("get_pages_host"):
 		push_error("meta_hub_flow_smoke: shop swipe host missing")
-		quit(1)
+		_quit(1)
 		return
 	var host: Node = swipe.get_pages_host()
 	var shop: Node = host.get_node_or_null("Page_%d" % MetaHubPages.SHOP) if host else null
 	if shop == null:
 		push_error("meta_hub_flow_smoke: shop page missing")
-		quit(1)
+		_quit(1)
 		return
 	var top_bar := shop.get_node_or_null("RootVBox/TopBar") as Control
 	var resource_bar := shop.get_node_or_null("RootVBox/ResourceBar") as Control
 	var top_progress := shop.get_node_or_null("RootVBox/TopProgress") as Control
 	if top_bar and top_bar.visible:
 		push_error("meta_hub_flow_smoke: shop TopBar should be hidden in hub")
-		quit(1)
+		_quit(1)
 		return
 	if resource_bar and resource_bar.visible:
 		push_error("meta_hub_flow_smoke: shop ResourceBar should be hidden in hub")
-		quit(1)
+		_quit(1)
 		return
 	if top_progress != null and top_progress.visible:
 		push_error("meta_hub_flow_smoke: shop TopProgress should be hidden or removed")
-		quit(1)
+		_quit(1)
 		return
 	var almanac := shop.get_node_or_null("RootVBox/MainScroll/MainContent/AlmanacList")
 	if almanac != null:
 		push_error("meta_hub_flow_smoke: AlmanacList should be removed from Shop")
-		quit(1)
+		_quit(1)
 		return
 	# Shop v2 (design_handoff_shop_v2): kozmetika je u Looks tabu, kartica po stavci iz kataloga.
 	var cosmetic_cards := shop.find_children("CosmeticCard_*", "", true, false).size()
 	if cosmetic_cards != 5:
 		push_error("meta_hub_flow_smoke: expected 5 cosmetic cards got %d" % cosmetic_cards)
-		quit(1)
+		_quit(1)
 		return
 	if str(shop.call("active_tab")) != "seasons":
 		push_error("meta_hub_flow_smoke: Shop should open on Seasons")
-		quit(1)
+		_quit(1)
 		return
 	var coin_icon := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/CoinChip/HBox/CoinIcon") as TextureRect
 	var seed_icon := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/SeedChip/HBox/SeedIcon") as TextureRect
@@ -121,24 +130,24 @@ func _step() -> void:
 	var flowers_label := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/FlowerChip/HBox/FlowersLabel") as Label
 	if flower_icon == null or flower_icon.texture == null or flowers_label == null:
 		push_error("meta_hub_flow_smoke: hub FlowerChip missing (v2 replaced DiamondChip)")
-		quit(1)
+		_quit(1)
 		return
 	if hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/DiamondChip") != null:
 		push_error("meta_hub_flow_smoke: DiamondChip should be gone from the header")
-		quit(1)
+		_quit(1)
 		return
 	if coin_icon == null or coin_icon.texture == null:
 		push_error("meta_hub_flow_smoke: hub CoinIcon missing texture")
-		quit(1)
+		_quit(1)
 		return
 	if seed_icon == null or seed_icon.texture == null:
 		push_error("meta_hub_flow_smoke: hub SeedIcon missing texture")
-		quit(1)
+		_quit(1)
 		return
 	var gs := get_root().get_node_or_null("GameState")
 	if gs == null or coins_label == null or seeds_label == null:
 		push_error("meta_hub_flow_smoke: hub count labels / GameState missing")
-		quit(1)
+		_quit(1)
 		return
 	if hub.has_method("refresh_top_bar"):
 		hub.call("refresh_top_bar")
@@ -150,7 +159,7 @@ func _step() -> void:
 				"meta_hub_flow_smoke: format_count(%d) got '%s' expected '%s'"
 				% [int(fc[0]), UI_CHROME.format_count(int(fc[0])), String(fc[1])]
 			)
-			quit(1)
+			_quit(1)
 			return
 	var want_coins := UI_CHROME.format_count(int(gs.get("wallet_coins")))
 	var want_seeds := UI_CHROME.format_count(int(gs.call("sum_seed_bag_only")))
@@ -160,27 +169,27 @@ func _step() -> void:
 			"meta_hub_flow_smoke: FlowersLabel got '%s' expected '%s'"
 			% [flowers_label.text, want_flowers]
 		)
-		quit(1)
+		_quit(1)
 		return
 	if coins_label.text != want_coins:
 		push_error(
 			"meta_hub_flow_smoke: CoinsLabel got '%s' expected '%s'"
 			% [coins_label.text, want_coins]
 		)
-		quit(1)
+		_quit(1)
 		return
 	if seeds_label.text != want_seeds:
 		push_error(
 			"meta_hub_flow_smoke: SeedsLabel got '%s' expected '%s'"
 			% [seeds_label.text, want_seeds]
 		)
-		quit(1)
+		_quit(1)
 		return
 	# v2: chip je tamni well, pa je broj krem (v1 je bio tamni ink na pastelnom chipu).
 	var coin_color: Color = coins_label.get_theme_color("font_color")
 	if coin_color.v < 0.9:
 		push_error("meta_hub_flow_smoke: CoinsLabel must be cream on the dark chip well")
-		quit(1)
+		_quit(1)
 		return
 	hub.go_to_page(MetaHubPages.CAMP, false)
 	for _j in 8:
@@ -188,22 +197,22 @@ func _step() -> void:
 	var camp: Node = host.get_node_or_null("Page_%d" % MetaHubPages.CAMP)
 	if camp == null:
 		push_error("meta_hub_flow_smoke: camp page missing")
-		quit(1)
+		_quit(1)
 		return
 	var camp_bar := camp.get_node_or_null("%ResourceBar") as Control
 	if camp_bar and camp_bar.visible:
 		push_error("meta_hub_flow_smoke: camp ResourceBar should be hidden in hub")
-		quit(1)
+		_quit(1)
 		return
 	# Brda Arene / brežuljci Home ne smiju se crtati preko susjedne stranice (Camp Trade bar).
 	for page in host.get_children():
 		if page is Control and not (page as Control).clip_contents:
 			push_error("meta_hub_flow_smoke: page %s must clip its contents" % page.name)
-			quit(1)
+			_quit(1)
 			return
 	if camp.get_node_or_null("%DailyChestCard") != null:
 		push_error("meta_hub_flow_smoke: camp DailyChestCard should be removed (Bug-022)")
-		quit(1)
+		_quit(1)
 		return
 	hub.go_to_page(MetaHubPages.MAIN, false)
 	for _k in 8:
@@ -211,50 +220,50 @@ func _step() -> void:
 	var home: Node = host.get_node_or_null("Page_%d" % MetaHubPages.MAIN)
 	if home == null:
 		push_error("meta_hub_flow_smoke: home page missing")
-		quit(1)
+		_quit(1)
 		return
 	# Home v3: dnevni poklon je samo Gift na polju sezone.
 	if home.get_node_or_null("%GiftChest") == null:
 		push_error("meta_hub_flow_smoke: home GiftChest missing")
-		quit(1)
+		_quit(1)
 		return
 	if home.get_node_or_null("Panel/VBox/CampButton") != null:
 		push_error("meta_hub_flow_smoke: Home CampButton should be removed")
-		quit(1)
+		_quit(1)
 		return
 	if home.get_node_or_null("Panel/VBox/ShopButton") != null:
 		push_error("meta_hub_flow_smoke: Home ShopButton should be removed")
-		quit(1)
+		_quit(1)
 		return
 	# Hub chrome: Settings živi u headeru (odluka 2026-09-10), ne na Home.
 	if home.find_child("SettingsButton", true, false) != null:
 		push_error("meta_hub_flow_smoke: Home SettingsButton should be removed (hub header owns it)")
-		quit(1)
+		_quit(1)
 		return
 	var hub_settings := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/SettingsButton") as Control
 	if hub_settings == null or not hub_settings.is_visible_in_tree():
 		push_error("meta_hub_flow_smoke: hub header SettingsButton missing")
-		quit(1)
+		_quit(1)
 		return
 	var tabs_row := hub.get_node_or_null(CHROME_ROW + "/TabsRow")
 	if tabs_row == null or tabs_row.get_child_count() != MetaHubPages.PAGE_COUNT:
 		push_error("meta_hub_flow_smoke: footer TabsRow expected %d tabs" % MetaHubPages.PAGE_COUNT)
-		quit(1)
+		_quit(1)
 		return
 	if hub.get_node_or_null(CHROME_ROW + "/ActiveIndicator") == null:
 		push_error("meta_hub_flow_smoke: footer ActiveIndicator missing")
-		quit(1)
+		_quit(1)
 		return
 	var home_tab := tabs_row.get_child(MetaHubPages.MAIN)
 	if not bool(home_tab.call("is_active")):
 		push_error("meta_hub_flow_smoke: Home tab should be active on Home page")
-		quit(1)
+		_quit(1)
 		return
 	var journal_tab := tabs_row.get_child(MetaHubPages.COLLECTION)
 	var news := int(gs.call("count_collection_journal_news"))
 	if int(journal_tab.call("get_badge_count")) != news:
 		push_error("meta_hub_flow_smoke: Journal badge != count_collection_journal_news (%d)" % news)
-		quit(1)
+		_quit(1)
 		return
 	print("meta_hub_flow_smoke OK")
-	quit(0)
+	_quit(0)

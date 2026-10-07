@@ -3,8 +3,17 @@ extends SceneTree
 ## FLOW-A — leftover T2 on Done becomes 2× T1 in the bag.
 
 
+var _backup: String = ""
+
+
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _gs() -> Node:
@@ -15,7 +24,7 @@ func _run() -> void:
 	var gs := _gs()
 	if gs == null:
 		push_error("arena_odd_t2_smoke: GameState missing")
-		quit(1)
+		_quit(1)
 		return
 	gs.set("seed_bag", {"clover": 2})
 	var before := int(gs.get("seed_bag")["clover"])
@@ -34,19 +43,19 @@ func _run() -> void:
 			"arena_odd_t2_smoke: expected clover bag %d got %d (summary=%s)"
 			% [before + 2, after, str(summary)]
 		)
-		quit(1)
+		_quit(1)
 		return
 	if int(summary.get("recycled", 0)) != 1:
 		push_error("arena_odd_t2_smoke: expected recycled=1 got %s" % str(summary))
-		quit(1)
+		_quit(1)
 		return
 	if int(summary.get("kept", 0)) != 0 or int(summary.get("donated", 0)) != 0:
 		push_error("arena_odd_t2_smoke: arena Done must not keep/donate")
-		quit(1)
+		_quit(1)
 		return
 	if not chips.is_empty():
 		push_error("arena_odd_t2_smoke: chip_data should be cleared")
-		quit(1)
+		_quit(1)
 		return
 	print("arena_odd_t2_smoke OK")
-	quit(0)
+	_quit(0)

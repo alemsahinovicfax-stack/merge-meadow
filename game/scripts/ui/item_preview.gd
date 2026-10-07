@@ -6,7 +6,7 @@ extends Control
 ## dolazi iz slot.preview u cosmetics.json:
 ##   companion — trake livade aktivne sezone + pravi pip_idle.svg s recolorom
 ##               (pozornica dodaje 2 cvijeta iz rostera sezone);
-##   meadow    — UiRun boje × look.tint × SeasonTheme.bg_modulate, Pip u skinu;
+##   meadow    — tlo i staza runa iz kita sezone × look.tint (kao lane_background), Pip u skinu;
 ##   album     — stranica Bloom Albuma kao u Shopu (okvir / papir / naslov);
 ##   swatch    — rezerva za slot bez vlastite vrste: naljepnica s 1–2 boje.
 ## Okvir (rub + zaobljeni uglovi) se crta ovdje: uglovi se prekriju bojom roditelja
@@ -212,24 +212,27 @@ func _draw_meadow(r: Rect2) -> void:
 	_draw_creature(r, "pip", pip_recolor, side, h - roundf(h * 0.06), RUN_SHADOW)
 
 
-## = UiShop.preview_lane_colors(): UiRun × tint × season modulate (+ blob / seam).
+## Boje pregleda staze = run sezone (kit: ground / lane) × tint kozmetike — isto što
+## lane_background crta u runu (Season Kit faza 2: bez tinta sezone). + blob / seam.
 static func run_colors(tint: Variant, season: String) -> Dictionary:
 	var t := Color.WHITE
 	if tint is Array and (tint as Array).size() >= 3:
 		var a: Array = tint
 		t = Color(float(a[0]), float(a[1]), float(a[2]), 1.0)
-	var m: Color = t * SeasonTheme.bg_modulate(season)
+	var m: Color = t
 	m.a = 1.0
-	var lane := UiRun.LANE
+	var run := UiSeasons.run_def(season)
+	var ground := UiSeasons.col(str(run["ground"])) if run.has("ground") else UiRun.GROUND
+	var lane := UiSeasons.col(str(run["lane"])) if run.has("lane") else UiRun.LANE
 	return {
-		"ground": _mul(UiRun.GROUND, m),
+		"ground": _mul(ground, m),
 		"lane": _mul(lane, m),
 		"edge": _mul(lane.lerp(CREAM, 0.20), m),
 		"mow": _mul(lane.lerp(CREAM, 0.055), m),
 		"tuft": _mul(UiRun.TUFT, m),
 		"petal": _mul(UiRun.PETAL, m),
-		"blob": _mul(UiRun.GROUND.lerp(CREAM, 0.05), m),
-		"seam": _mul(UiRun.GROUND.lerp(CREAM, 0.16), m),
+		"blob": _mul(ground.lerp(CREAM, 0.05), m),
+		"seam": _mul(ground.lerp(CREAM, 0.16), m),
 	}
 
 

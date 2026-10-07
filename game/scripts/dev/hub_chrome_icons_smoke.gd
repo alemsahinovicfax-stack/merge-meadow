@@ -16,20 +16,27 @@ const ICONS: Array[String] = [
 const GONE: Array[String] = ["icon_seed_light"]
 
 var _failed: bool = false
+var _backup: String = ""
 
 
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _run() -> void:
 	_check_files()
 	await _check_hub_icons()
 	if _failed:
-		quit(1)
+		_quit(1)
 		return
 	print("hub_chrome_icons_smoke OK")
-	quit(0)
+	_quit(0)
 
 
 func _check_files() -> void:

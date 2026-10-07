@@ -10,8 +10,17 @@ const SKU := "season_pack_moonlit_warren"
 const PAID := "moonlit_warren"
 
 
+var _backup: String = ""
+
+
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _gs() -> Node:
@@ -24,7 +33,7 @@ func _iap() -> Node:
 
 func _fail(msg: String) -> void:
 	push_error("season_iap_smoke: %s" % msg)
-	quit(1)
+	_quit(1)
 
 
 func _run() -> void:
@@ -129,4 +138,4 @@ func _run() -> void:
 		return
 
 	print("season_iap_smoke OK")
-	quit(0)
+	_quit(0)

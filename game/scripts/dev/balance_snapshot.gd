@@ -6,12 +6,21 @@ extends SceneTree
 const RUNS := 5
 
 
+var _backup: String = ""
+
+
 func _gs() -> Node:
 	return get_root().get_node("GameState")
 
 
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_step")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _step() -> void:
@@ -37,4 +46,4 @@ func _step() -> void:
 		]
 	)
 	print("balance_snapshot OK")
-	quit(0)
+	_quit(0)

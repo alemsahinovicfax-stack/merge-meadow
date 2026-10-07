@@ -429,6 +429,30 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** crtež koji mora ostati u okviru na ovom rendereru ne smije izaći iz svog recta; ne oslanjaj se na `clip_contents` / `clip_children` za ukrasne mreže.
 
+## #25 — smoke testovi pregaze pravi save
+
+**Datum:** 2026-10-05 (Sezone faza 1)
+
+**Simptom:** poslije punog headless prolaza kroz `scripts/dev/*_smoke.gd` pravi save (`%APPDATA%/Godot/app_userdata/Merge Meadow/player_save.json`) ima druge `active_season_id`, `owned_paid_seasons`, `magnet_level`, `wallet_coins`, `home_band`, `wardrobe_seen` i `lifetime_seeds_collected`.
+
+**Uzrok:** `--script` test i igra dijele isti `user://`. GameState snima skoro na svaku promjenu (`save_player_save()`), a 24 smoke testa i `balance_snapshot.gd` mijenjali su stanje ili brisali `player_save.json` bez backupa.
+
+**Rješenje:** test u `_initialize()` uzme `CampSmokeUtil.backup_save()` (to je prije nego GameState boota), a svaki izlaz ide kroz `_quit(code)`, koji zove `CampSmokeUtil.restore_save(self, _backup)` pa `quit(code)`. Prazan backup znači da savea nije bilo, pa `restore_save` briše fajl koji je test napravio.
+
+**Prevencija:** smoke test nikad ne zove `quit()` direktno, samo `_quit()`. Provjera: kopiraj save sa strane, pusti sve `*_smoke.gd`, pa `cmp` sa kopijom mora reći da su isti.
+
+## #26 — `PackedInt32Array` u Dictionaryju: `append` ne stiže nazad
+
+**Datum:** 2026-10-06 (Sezone faza 2, test kontrasta)
+
+**Simptom:** mreža ćelija `grid[key] = PackedInt32Array()` pa `(grid[key] as PackedInt32Array).append(i)` ostane prazna. Svaki uzorak boje je bio „bijel", a kontrast isti za svih 8 sezona.
+
+**Uzrok:** Packed nizovi (`PackedInt32Array`, `PackedVector2Array` …) su vrijednosni tipovi s copy-on-write. Čitanje iz Dictionaryja daje kopiju, pa `append` mijenja kopiju, ne vrijednost u rječniku.
+
+**Rješenje:** u rječniku drži `Array` (referentni tip), ili poslije izmjene vrati niz nazad (`grid[key] = arr`).
+
+**Prevencija:** Packed niz u Dictionaryju / Arrayu mijenjaj samo preko lokalne varijable koju na kraju upišeš nazad. Isto važi za `chunk["idx"]` u `SeasonBackdrop._append` (zato tamo stoji `chunk["idx"] = all_idx`).
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

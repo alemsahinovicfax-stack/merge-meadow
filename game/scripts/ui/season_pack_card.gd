@@ -1,25 +1,23 @@
 class_name SeasonPackCard
 extends ShopCard
 
-## Shop v2 · SeasonCard 1032 x 364 na trakama sezone (Home v3: nebo 0–115, daljina,
-## blizina 242–364). Šest portreta (5 × 148 + ★3 172, pravi crteži) i red: ime 52 + jedno
+## Shop v2 · SeasonCard 1032 x 364. Šest portreta (5 × 148 + ★3 172, pravi crteži) i red: ime 52 + jedno
 ## dugme (cijena u store stringu → kupi; kupljena → ▶ Play vodi na Home). Ember Fen:
 ## crteži 50 %, „Coming soon" s isprekidanim rubom, bez cijene i dugmeta.
-## Season Kit (design_handoff_seasons): sezona s receptom "shop" crta PANORAMU mjesta
-## (SeasonBackdrop, 1024 x 356 unutar ruba, ništa izvan) umjesto traka; ime je u boji kita.
+## Season Kit (design_handoff_seasons, faze 1 + 2): svaka plaćena sezona crta PANORAMU svog
+## mjesta (recept "shop", SeasonBackdrop 1024 x 356 unutar ruba, ništa izvan); ime je u boji
+## kita. Stare tri trake su obrisane; bez recepta kartica je ravna (boja livade).
 
 signal buy_pressed(sku: String)
 signal open_home_pressed(season_id: String)
 
-const SKY_H := 115.0
-const NEAR_TOP := 242.0
 const PORTRAIT_ROW_H := 176.0
 
 var sku: String = ""
 var season_id: String = ""
 var _def: SeasonDef
 var _state: String = ""
-var _bands: Array[Color] = []
+var _ground: Color = Color("e6f2db")
 var _panorama: Dictionary = {}
 var _portraits: Array[ShopFlowerPortrait] = []
 
@@ -37,8 +35,7 @@ func apply(pack_sku: String, busy_sku: String = "", pending: bool = false, resto
 	if buy == null:
 		_ready_now()
 	_state = UiShopV2.season_state(_def, busy_sku, pending, restoring)
-	var g: Color = UiHomeField.MEADOW_GROUND.get(season_id, Color("e6f2db"))
-	_bands = UiShopV2.season_bands(g)
+	_ground = UiHomeField.MEADOW_GROUND.get(season_id, Color("e6f2db"))
 	var recipe := UiSeasons.recipe(season_id, "shop")
 	_panorama = {} if recipe.is_empty() else SeasonBackdrop.scene(
 		"shop:" + season_id, recipe, float(recipe.get("w", UiShopV2.CARD_W)), []
@@ -129,7 +126,7 @@ func min_portrait_d() -> float:
 
 
 func _draw() -> void:
-	if _def == null or _bands.size() < 3:
+	if _def == null:
 		return
 	var w := float(UiShopV2.CARD_W)
 	var full := Rect2(Vector2.ZERO, Vector2(w, card_h))
@@ -138,16 +135,7 @@ func _draw() -> void:
 		_draw_front(w)
 		return
 	draw_style_box(UiShopV2.box(UiShopV2.SHADOW_CARD, UiShopV2.RADIUS_CARD), Rect2(Vector2(0, UiShopV2.SHADOW_CARD_Y), full.size))
-	draw_style_box(UiShopV2.box(_bands[1], UiShopV2.RADIUS_CARD), full)
-	var inner_r := UiShopV2.RADIUS_CARD - UiShopV2.BORDER
-	var sky := UiShopV2.box(_bands[0], 0)
-	sky.corner_radius_top_left = inner_r
-	sky.corner_radius_top_right = inner_r
-	draw_style_box(sky, Rect2(4, 4, w - 8.0, SKY_H))
-	var near := UiShopV2.box(_bands[2], 0)
-	near.corner_radius_bottom_left = inner_r
-	near.corner_radius_bottom_right = inner_r
-	draw_style_box(near, Rect2(4, 4.0 + NEAR_TOP, w - 8.0, card_h - 8.0 - NEAR_TOP))
+	draw_style_box(UiShopV2.box(_ground, UiShopV2.RADIUS_CARD), full)
 	var edge := UiShopV2.box(Color.TRANSPARENT, UiShopV2.RADIUS_CARD, UiShopV2.BORDER)
 	edge.draw_center = false
 	draw_style_box(edge, full)

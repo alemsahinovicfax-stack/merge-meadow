@@ -3,10 +3,19 @@ extends Control
 ## Journal / Bloom Album — smjer 1a (design_handoff_journal).
 ## PageHead 175 + lista. NEW ostaje vidljiv cijelu posjetu iako se tab badge
 ## briše na otvaranje. Sezonska poglavlja i auto-scroll na prvi NEW.
+## Redoslijed (2026-10-06): aktivna sezona, pa djelimično otključane, pa potpune, pa bez
+## ijednog cvijeta (UiJournal.order_seasons). Lista se puni po 3 sezone: na ulazu prve tri,
+## a kad igrač skrola do kraja učitanog, sljedeće tri — i tako dok ne ponestane sezona.
+## Svaki ulazak počinje opet od tri (izlazak zadrži samo prve tri). Redovi se grade u
+## frejmovima po vremenskom budžetu (tekstura cvijeta + red), pa ulazak ne zastaje.
 
 const JournalRow := preload("res://scripts/ui/collection_journal_row.gd")
 
-const ROWS_PER_FRAME := 6
+const SEASONS_PER_CHUNK := 3
+## Rad po frejmu (µs): učitavanje tekstura + gradnja redova; uvijek bar jedan red.
+const FRAME_BUDGET_USEC := 6000
+## Sljedeće tri sezone kreću kad je do kraja učitanog ostalo manje od ovoga (px).
+const LOAD_AHEAD_PX := 400.0
 
 @onready var root_vbox: VBoxContainer = %RootVBox
 @onready var page_head: VBoxContainer = %PageHead
@@ -26,16 +35,21 @@ const ROWS_PER_FRAME := 6
 @onready var golden_edge: Panel = %GoldenFrameEdge
 @onready var golden_band: Panel = %GoldenFrameGold
 
-## Potpis strukture liste (redoslijed cvjetova + brojaci i lokoti u zaglavljima).
-## Dok se ne promijeni, redovi se NE grade ponovo — samo im se osvjezi sadrzaj.
-var _built_signature: String = ""
-var _pending_entries: Array[Dictionary] = []
-var _slots: Array[Dictionary] = []
-var _build_index: int = 0
+## Sezone u redoslijedu prikaza: [{sid, entries, kept, total, unlocked}].
+var _order: Array[Dictionary] = []
+## Sezone koje su na listi (ili u gradnji), istim redom: [{sid, group, gap, rows, sig}].
+var _groups: Array[Dictionary] = []
+## Redovi koji čekaju gradnju: [{group_index, entry}].
+var _work: Array[Dictionary] = []
 var _building: bool = false
+var _bottom: Control = null
 var _new_snapshot: Dictionary = {}
 var _scroll_season: int = -1
 var _scroll_row: int = -1
+var _pending_scroll: bool = false
+## Igrač je na stranici: tek tada skrol do kraja učitava sljedeće tri (posle izlaska
+## skraćivanje liste pomjeri skrol, a to ne smije odmah vratiti obrisane sezone).
+var _active: bool = false
 
 
 func _ready() -> void:
@@ -44,6 +58,7 @@ func _ready() -> void:
 	$Bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	$Bg.color = UiJournal.PAGE_BG
 	back_button.clicked.connect(_on_back_pressed)
+	list_scroll.get_v_scroll_bar().value_changed.connect(_on_scrolled)
 	_style_head()
 	set_process(false)
 	if GameState.is_meta_hub_embedded(self):
@@ -52,23 +67,54 @@ func _ready() -> void:
 	_begin_visit()
 
 
+## Učitane sezone i redoslijed (testovi).
+func loaded_season_count() -> int:
+	return _groups.size()
+
+
+func total_season_count() -> int:
+	return _order.size()
+
+
+func is_building() -> bool:
+	return _building
+
+
+func season_order() -> Array[String]:
+	var out: Array[String] = []
+	for s in _order:
+		out.append(str(s["sid"]))
+	return out
+
+
 func _process(_delta: float) -> void:
 	if not _building or list == null:
 		set_process(false)
 		return
-	var n := 0
-	while n < ROWS_PER_FRAME and _build_index < _slots.size():
-		var slot: Dictionary = _slots[_build_index]
+	var t0 := Time.get_ticks_usec()
+	var built := 0
+	while not _work.is_empty() and (built == 0 or Time.get_ticks_usec() - t0 < FRAME_BUDGET_USEC):
+		var item: Dictionary = _work.pop_front()
+		var entry: Dictionary = item["entry"]
+		# Tekstura prije reda: crtež cvijeta se učita ovdje, u budžetu, a ne u _draw.
+		var filled := UiJournal.filled_tiers(str(entry.get("state", "locked")))
+		for tier in range(1, filled + 1):
+			FlowerAssets.get_texture(str(entry.get("type_id", "")), tier)
+		var g: Dictionary = _groups[int(item["group_index"])]
 		var row := JournalRow.new()
-		(slot["group"] as Node).add_child(row)
-		row.apply(slot["entry"])
-		_build_index += 1
-		n += 1
-	if _build_index >= _slots.size():
-		_building = false
-		set_process(false)
+		(g["group"] as Node).add_child(row)
+		row.apply(entry)
+		(g["rows"] as Array).append(row)
+		built += 1
+	if not _work.is_empty():
+		return
+	_building = false
+	set_process(false)
+	if _pending_scroll:
+		_pending_scroll = false
 		# Skrol tek kad lista ima punu visinu, inace se zaustavi na tadasnjem maksimumu.
 		call_deferred("_scroll_to_new")
+	call_deferred("_maybe_load_more")
 
 
 func _style_head() -> void:
@@ -81,37 +127,36 @@ func _style_head() -> void:
 
 
 func _begin_visit() -> void:
+	_active = true
 	var raw := GameState.get_collection_journal_entries()
+	GameState.mark_collection_journal_viewed()
+	_order = UiJournal.order_seasons(raw, GameState.active_season_id)
 	_new_snapshot.clear()
 	_scroll_season = -1
 	_scroll_row = -1
-	var season_i := -1
-	var row_i := 0
-	var last_sid := ""
-	for entry in raw:
-		var sid := SeedCatalog.season_id_for(str(entry.get("type_id", "")))
-		if sid != last_sid:
-			season_i += 1
-			row_i = 0
-			last_sid = sid
-		if bool(entry.get("is_new", false)) and _scroll_season < 0:
+	for si in _order.size():
+		var entries: Array = _order[si]["entries"]
+		for ri in entries.size():
+			var entry: Dictionary = entries[ri]
+			if not bool(entry.get("is_new", false)):
+				continue
 			_new_snapshot[str(entry.get("type_id", ""))] = int(entry.get("new_tier", 0))
-			_scroll_season = season_i
-			_scroll_row = row_i
-		elif bool(entry.get("is_new", false)):
-			_new_snapshot[str(entry.get("type_id", ""))] = int(entry.get("new_tier", 0))
-		row_i += 1
-	GameState.mark_collection_journal_viewed()
-	_pending_entries = raw
+			if _scroll_season < 0:
+				_scroll_season = si
+				_scroll_row = ri
 	_apply_frame()
-	var sig := _structure_signature(raw)
-	if sig == _built_signature and not _building and _reapply_rows():
-		summary_label.text = UiJournal.summary_text(_pending_entries)
-		call_deferred("_scroll_to_new")
+	summary_label.text = UiJournal.summary_text(raw)
+	# Prve tri sezone; ako je prvi NEW dalje, onoliko trojki koliko treba da se vidi.
+	var want := mini(SEASONS_PER_CHUNK, _order.size())
+	if _scroll_season >= 0:
+		want = mini(_order.size(), (_scroll_season / SEASONS_PER_CHUNK + 1) * SEASONS_PER_CHUNK)
+	_sync_groups(want)
+	if _scroll_season >= 0:
+		_pending_scroll = _building
+		if not _building:
+			call_deferred("_scroll_to_new")
 	else:
-		# _start_list_build() cisti listu (i potpis), pa se potpis upisuje POSLIJE.
-		_start_list_build()
-		_built_signature = sig
+		list_scroll.scroll_vertical = 0
 	if is_inside_tree():
 		get_tree().call_group("meta_hub", "refresh_top_bar")
 
@@ -120,121 +165,120 @@ func refresh_for_meta_hub() -> void:
 	_begin_visit()
 
 
+## Odlazak: NEW se gasi na izgrađenim redovima, a lista se skrati na prve tri sezone —
+## sljedeći ulazak opet učitava po tri.
 func on_meta_page_left() -> void:
+	_active = false
 	_new_snapshot.clear()
 	_scroll_season = -1
-	for entry in _pending_entries:
-		entry["is_new"] = false
-		entry["new_tier"] = 0
-	var built := _rows()
-	for i in built.size():
-		if i < _pending_entries.size():
-			built[i].apply(_pending_entries[i])
+	_pending_scroll = false
+	for s in _order:
+		for entry in s["entries"]:
+			entry["is_new"] = false
+			entry["new_tier"] = 0
+	for gi in _groups.size():
+		var entries: Array = _order[gi]["entries"] if gi < _order.size() else []
+		var rows: Array = _groups[gi]["rows"]
+		for i in rows.size():
+			if i < entries.size():
+				(rows[i] as CollectionJournalRow).apply(entries[i])
+	_trim_groups(SEASONS_PER_CHUNK)
 
 
-## Sve od cega ovisi STRUKTURA liste: koji cvjetovi i kojim redom (redovi i grupe),
-## te "N / 6 kept" i lokot u svakom zaglavlju. Napredak unutar reda i "novo" ne
-## ulaze — njih nosi row.apply().
-func _structure_signature(entries: Array[Dictionary]) -> String:
-	var parts := PackedStringArray()
-	for entry in entries:
+## Potpis sezone: sve što određuje redove i zaglavlje osim napretka unutar reda.
+func _season_signature(s: Dictionary) -> String:
+	var sid := str(s["sid"])
+	var parts := PackedStringArray([sid, str(s["kept"]), str(s["total"]), str(GameState.is_season_playable(sid))])
+	for entry in s["entries"]:
 		parts.append(str(entry.get("type_id", "")))
-	var counts := _season_counts(entries)
-	for sid in counts:
-		var c: Dictionary = counts[sid]
-		parts.append("%s=%d/%d/%d" % [
-			str(sid),
-			int(c.get("kept", 0)),
-			int(c.get("total", 0)),
-			1 if GameState.is_season_playable(str(sid)) else 0,
-		])
 	return "|".join(parts)
 
 
-## Osvjezi postojece redove umjesto da ih rusimo i gradimo iznova.
-## Vraca false ako lista ne odgovara podacima, pa pozivalac ide na punu gradnju.
-func _reapply_rows() -> bool:
-	var built := _rows()
-	if built.size() != _pending_entries.size():
-		return false
-	for i in built.size():
-		built[i].apply(_pending_entries[i])
-	return true
+## Lista = prvih `want` sezona iz _order. Sezona koja je već na istom mjestu s istim
+## potpisom i svim redovima samo osvježi redove (bez rušenja); od prve razlike nadalje
+## gradi se iznova.
+func _sync_groups(want: int) -> void:
+	var keep := 0
+	while keep < _groups.size() and keep < want:
+		var g: Dictionary = _groups[keep]
+		var entries: Array = _order[keep]["entries"]
+		if str(g["sig"]) != _season_signature(_order[keep]) or (g["rows"] as Array).size() != entries.size():
+			break
+		keep += 1
+	_trim_groups(keep)
+	for i in keep:
+		var rows: Array = _groups[i]["rows"]
+		var entries: Array = _order[i]["entries"]
+		for r in rows.size():
+			(rows[r] as CollectionJournalRow).apply(entries[r])
+	while _groups.size() < want:
+		_add_season(_groups.size())
 
 
-func _rows() -> Array[CollectionJournalRow]:
-	var out: Array[CollectionJournalRow] = []
-	if list == null:
-		return out
-	_collect_rows(list, out)
-	return out
+func _add_season(index: int) -> void:
+	if list == null or index >= _order.size():
+		return
+	if list.get_child_count() == 0:
+		list.add_child(_spacer(UiJournal.LIST_TOP))
+	if _bottom == null or not is_instance_valid(_bottom):
+		_bottom = _spacer(UiJournal.LIST_BOTTOM)
+		list.add_child(_bottom)
+	var s: Dictionary = _order[index]
+	var gap: Control = null
+	if index > 0:
+		gap = _spacer(UiJournal.SEASON_GAP)
+		list.add_child(gap)
+	var group := VBoxContainer.new()
+	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_theme_constant_override("separation", UiJournal.SEASON_HEADER_GAP)
+	group.add_child(_season_header(str(s["sid"]), s))
+	list.add_child(group)
+	list.move_child(_bottom, list.get_child_count() - 1)
+	_groups.append({"sid": s["sid"], "group": group, "gap": gap, "rows": [], "sig": _season_signature(s)})
+	for entry in s["entries"]:
+		_work.append({"group_index": index, "entry": entry})
+	_building = true
+	set_process(true)
 
 
-func _collect_rows(n: Node, out: Array[CollectionJournalRow]) -> void:
-	for child in n.get_children():
-		if child is CollectionJournalRow:
-			out.append(child)
-		else:
-			_collect_rows(child, out)
-
-
-func _start_list_build() -> void:
-	_clear_list()
-	_slots.clear()
-	_build_index = 0
-	summary_label.text = UiJournal.summary_text(_pending_entries)
-	var groups := _make_groups(_pending_entries)
-	for slot in groups:
-		_slots.append(slot)
-	_building = not _slots.is_empty()
+## Ostavi prvih `count` sezona; ostale (i njihov nedovršen rad) se brišu.
+func _trim_groups(count: int) -> void:
+	while _groups.size() > count:
+		var g: Dictionary = _groups.pop_back()
+		for key in ["group", "gap"]:
+			var n: Node = g.get(key)
+			if n != null and is_instance_valid(n):
+				n.get_parent().remove_child(n)
+				n.queue_free()
+	var kept: Array[Dictionary] = []
+	for item in _work:
+		if int(item["group_index"]) < _groups.size():
+			kept.append(item)
+	_work = kept
+	_building = not _work.is_empty()
 	set_process(_building)
-	if not _building:
-		list_scroll.scroll_vertical = 0
+	if _groups.is_empty():
+		_clear_list()
 
 
-func _make_groups(entries: Array[Dictionary]) -> Array[Dictionary]:
-	var slots: Array[Dictionary] = []
-	var counts := _season_counts(entries)
-	list.add_child(_spacer(UiJournal.LIST_TOP))
-	var season_i := -1
-	var row_i := 0
-	var last_sid := ""
-	var group: VBoxContainer = null
-	for entry in entries:
-		var sid := SeedCatalog.season_id_for(str(entry.get("type_id", "")))
-		if sid != last_sid:
-			if season_i >= 0:
-				list.add_child(_spacer(UiJournal.SEASON_GAP))
-			season_i += 1
-			row_i = 0
-			last_sid = sid
-			group = VBoxContainer.new()
-			group.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			group.add_theme_constant_override("separation", UiJournal.SEASON_HEADER_GAP)
-			group.add_child(_season_header(sid, counts.get(sid, {})))
-			list.add_child(group)
-		slots.append({
-			"group": group,
-			"entry": entry,
-			"season": season_i,
-			"row": row_i,
-		})
-		row_i += 1
-	list.add_child(_spacer(UiJournal.LIST_BOTTOM))
-	return slots
+func _on_scrolled(_value: float) -> void:
+	_maybe_load_more()
 
 
-func _season_counts(entries: Array[Dictionary]) -> Dictionary:
-	var out := {}
-	for entry in entries:
-		var sid := SeedCatalog.season_id_for(str(entry.get("type_id", "")))
-		if not out.has(sid):
-			out[sid] = {"kept": 0, "total": 0}
-		out[sid]["total"] = int(out[sid]["total"]) + 1
-		var state := str(entry.get("state", ""))
-		if state == "album_t2" or state == "album_t3":
-			out[sid]["kept"] = int(out[sid]["kept"]) + 1
-	return out
+## Do kraja učitanog je ostalo malo (ili lista ne puni ekran) — učitaj sljedeće tri.
+func _maybe_load_more() -> void:
+	if not _active or _building or list == null or list_scroll == null or _groups.size() >= _order.size():
+		return
+	if not list_scroll.is_visible_in_tree():
+		return
+	# Visina iz minimalne veličine, ne iz `size`: raspored kontejnera kasni frejm, a stara
+	# (mala) visina bi odmah učitala sve sezone.
+	var bottom := float(list_scroll.scroll_vertical) + list_scroll.size.y
+	if bottom < list.get_combined_minimum_size().y - LOAD_AHEAD_PX:
+		return
+	var want := mini(_order.size(), _groups.size() + SEASONS_PER_CHUNK)
+	while _groups.size() < want:
+		_add_season(_groups.size())
 
 
 func _season_header(season_id: String, count: Dictionary) -> HBoxContainer:
@@ -288,7 +332,10 @@ func _scroll_to_new() -> void:
 
 
 func _clear_list() -> void:
-	_built_signature = ""
+	_groups.clear()
+	_work.clear()
+	_building = false
+	_bottom = null
 	if list == null:
 		return
 	for child in list.get_children():

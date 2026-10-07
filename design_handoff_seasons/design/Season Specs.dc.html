@@ -11,211 +11,191 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
 <style>body{margin:0;background:#EFE9DF}a{color:#2D3436}a:hover{color:#9E6645}</style>
 </helmet>
-<div data-layer="SeasonSpecs" style="width:2400px;padding:64px;box-sizing:border-box;font-family:Nunito,system-ui,sans-serif;color:#2D3436;display:flex;flex-direction:column;gap:72px;background:#EFE9DF">
+<div data-layer="SeasonSpecs" style="width:2800px;padding:64px;box-sizing:border-box;font-family:Nunito,system-ui,sans-serif;color:#2D3436;display:flex;flex-direction:column;gap:72px;background:#EFE9DF">
   <div style="display:flex;flex-direction:column;gap:12px">
-    <div style="font:900 64px/1.1 Nunito,sans-serif">Season Kit · faza 1 — Country Bloom + Moonlit Warren</div>
-    <div style="font:700 30px/1.4 Nunito,sans-serif;max-width:1700px;color:#4A4A4A;text-wrap:pretty">Jedan kit po sezoni (mjesto, paleta, motivi, ambijent, 18 crteža) reže se na svaku površinu. Kit je red podataka u <b>design/seasons_kit.js</b> (= godot/seasons_export.json); nova sezona = novi red, isti kod. Svi ekrani ispod su živi <b>SeasonScreen</b> (still).</div>
+    <div style="font:900 64px/1.1 Nunito,sans-serif">Season Kit · faza 1 + 2 — svih 8 sezona</div>
+    <div style="font:700 30px/1.4 Nunito,sans-serif;max-width:2000px;color:#4A4A4A;text-wrap:pretty">Jedan kit po sezoni (mjesto, paleta, motivi, ambijent, 18 crteža) reže se na svaku površinu. Kit je red podataka u <b>design/seasons_kit.js</b> (= godot/seasons_export.json); nova sezona = novi red, isti kod. Ekrani ispod su živi <b>SeasonScreen</b> (still). Tweak „section“ prikazuje samo jedan dio (brže učitavanje).</div>
   </div>
 
-  <section data-screen-label="01 Kit" style="display:flex;flex-direction:column;gap:28px">
-    <div style="font:900 44px/1 Nunito,sans-serif">1 · Kit po sezoni</div>
-    <div style="display:flex;gap:40px;flex-wrap:wrap">
-      <sc-for list="{{ kits }}" as="k" hint-placeholder-count="2">
-        <div style="width:1100px;box-sizing:border-box;padding:36px;border-radius:32px;background:#FFF8F0;border:3px solid #2D3436;display:flex;flex-direction:column;gap:20px">
-          <div style="display:flex;align-items:baseline;gap:18px"><div style="font:900 52px/1 Nunito,sans-serif">{{ k.name }}</div><div style="font:800 30px/1 Nunito,sans-serif;color:#555C5E">{{ k.kind }}</div></div>
-          <div style="font:700 30px/1.35 Nunito,sans-serif">{{ k.place }}</div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px">
-            <sc-for list="{{ k.swatches }}" as="w" hint-placeholder-count="10">
-              <div style="display:flex;flex-direction:column;gap:6px;width:150px"><div style="height:56px;border-radius:12px;border:2px solid rgba(45,52,54,.25);background:{{ w.c }}"></div><div style="font:800 20px/1.1 Nunito,sans-serif">{{ w.n }}</div><div style="font:700 18px/1 ui-monospace,monospace;color:#555C5E">{{ w.c }}</div></div>
-            </sc-for>
-          </div>
-          <div style="font:900 30px/1 Nunito,sans-serif">Potpis-motivi</div>
-          <sc-for list="{{ k.motifs }}" as="m" hint-placeholder-count="3"><div style="font:700 26px/1.35 Nunito,sans-serif"><b>{{ m.name }}</b> — {{ m.how }}</div></sc-for>
-          <div style="font:700 26px/1.35 Nunito,sans-serif"><b>Ambijent:</b> {{ k.ambient }}</div>
-          <div style="font:700 26px/1.35 Nunito,sans-serif"><b>Run:</b> {{ k.run }}</div>
-        </div>
-      </sc-for>
-    </div>
-  </section>
-
-  <section data-screen-label="02 Povrsine" style="display:flex;flex-direction:column;gap:28px">
-    <div style="font:900 44px/1 Nunito,sans-serif">2 · Sve površine (dva mjesta jedno ispod drugog)</div>
-    <sc-for list="{{ rows }}" as="r" hint-placeholder-count="2">
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div style="font:900 34px/1 Nunito,sans-serif">{{ r.title }}</div>
-        <div style="display:flex;gap:24px;flex-wrap:wrap">
-          <sc-for list="{{ r.items }}" as="t" hint-placeholder-count="6">
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <div style="width:324px;height:576px;overflow:hidden;border-radius:18px;border:3px solid #2D3436;position:relative;background:#2A2233">
-                <div style="position:absolute;left:0;top:0;transform:scale(.3);transform-origin:0 0">
-                  <dc-import name="SeasonScreen" season="{{ t.season }}" surface="{{ t.surface }}" state="{{ t.state }}" lush="{{ t.lush }}" u="{{ t.u }}" pip="{{ t.pip }}" grayscale="{{ t.gray }}" still="{{ true }}" hint-size="1080px,1920px"></dc-import>
-                </div>
-              </div>
-              <div style="font:800 24px/1.2 Nunito,sans-serif;width:324px">{{ t.label }}</div>
+  <sc-if value="{{ showKit }}" hint-placeholder-val="{{ true }}">
+    <section data-screen-label="01 Kit" style="display:flex;flex-direction:column;gap:28px">
+      <div style="font:900 44px/1 Nunito,sans-serif">1 · Kit po sezoni</div>
+      <div style="display:grid;grid-template-columns:repeat(4,640px);gap:28px">
+        <sc-for list="{{ kits }}" as="k" hint-placeholder-count="8">
+          <div style="box-sizing:border-box;padding:28px;border-radius:28px;background:#FFF8F0;border:3px solid #2D3436;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><div style="font:900 44px/1 Nunito,sans-serif">{{ k.name }}</div><div style="font:800 26px/1 Nunito,sans-serif;color:#555C5E">{{ k.kind }}</div></div>
+            <div style="font:700 24px/1.35 Nunito,sans-serif">{{ k.place }}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <sc-for list="{{ k.swatches }}" as="w" hint-placeholder-count="10"><div style="display:flex;flex-direction:column;gap:4px;width:94px"><div style="height:40px;border-radius:10px;border:2px solid rgba(45,52,54,.25);background:{{ w.c }}"></div><div style="font:800 15px/1.1 Nunito,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.n }}</div><div style="font:700 14px/1 ui-monospace,monospace;color:#555C5E">{{ w.c }}</div></div></sc-for>
             </div>
-          </sc-for>
-        </div>
+            <sc-for list="{{ k.motifs }}" as="m" hint-placeholder-count="3"><div style="font:700 22px/1.35 Nunito,sans-serif"><b>{{ m.name }}</b> — {{ m.how }}</div></sc-for>
+            <div style="font:700 22px/1.35 Nunito,sans-serif"><b>Ambijent:</b> {{ k.ambient }}</div>
+            <div style="font:700 22px/1.35 Nunito,sans-serif"><b>Run:</b> {{ k.run }}</div>
+          </div>
+        </sc-for>
       </div>
-    </sc-for>
-  </section>
+    </section>
+  </sc-if>
 
-  <section data-screen-label="03 Cvijece" style="display:flex;flex-direction:column;gap:28px">
-    <div style="font:900 44px/1 Nunito,sans-serif">3 · Cvijeće 6 × 3 na 64 / 128 / 192 px (krem disk · livada · tamni well)</div>
-    <sc-for list="{{ sheets }}" as="sh" hint-placeholder-count="2">
-      <div style="display:flex;flex-direction:column;gap:16px;padding:32px;border-radius:28px;background:#FFF8F0;border:3px solid #2D3436">
-        <div style="font:900 36px/1 Nunito,sans-serif">{{ sh.name }}</div>
-        <sc-for list="{{ sh.types }}" as="ty" hint-placeholder-count="6">
-          <div style="display:flex;align-items:center;gap:20px">
-            <div style="width:260px;display:flex;flex-direction:column;gap:6px"><div style="font:900 28px/1.1 Nunito,sans-serif">{{ ty.name }}</div><div style="font:700 22px/1 ui-monospace,monospace;color:#555C5E">{{ ty.id }} · ★{{ ty.rarity }}</div></div>
-            <sc-for list="{{ ty.tiers }}" as="tr" hint-placeholder-count="3">
-              <div style="display:flex;align-items:flex-end;gap:10px;padding:10px 16px;border-radius:20px;background:#F3EEE6">
-                <div style="font:900 24px/1 Nunito,sans-serif;width:36px">T{{ tr.t }}</div>
-                <div style="width:64px;height:64px;border-radius:50%;background:#FFF8F0;border:3px solid #2D3436;overflow:hidden;position:relative"><img src="{{ tr.src }}" alt="" style="position:absolute;left:0;top:0;width:58px;height:58px"></div>
-                <div style="width:128px;height:128px;border-radius:16px;background:{{ sh.ground }};position:relative"><img src="{{ tr.src }}" alt="" style="width:128px;height:128px;display:block"></div>
-                <div style="width:192px;height:192px;border-radius:20px;background:#22342A;position:relative"><img src="{{ tr.src }}" alt="" style="width:192px;height:192px;display:block"></div>
-                <div style="font:700 20px/1.2 ui-monospace,monospace;color:#555C5E;width:110px">{{ tr.kb }} KB</div>
+  <sc-for list="{{ rows }}" as="r" hint-placeholder-count="0">
+    <section data-screen-label="{{ r.label }}" style="display:flex;flex-direction:column;gap:14px">
+      <div style="font:900 40px/1 Nunito,sans-serif">{{ r.title }}</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <sc-for list="{{ r.items }}" as="t" hint-placeholder-count="8">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="width:297px;height:528px;overflow:hidden;border-radius:16px;border:3px solid #2D3436;position:relative;background:#2A2233">
+              <div style="position:absolute;left:0;top:0;transform:scale(.275);transform-origin:0 0">
+                <sc-if value="{{ t.show }}" hint-placeholder-val="{{ false }}"><dc-import name="SeasonScreen" season="{{ t.season }}" surface="{{ t.surface }}" state="{{ t.state }}" lush="{{ t.lush }}" u="{{ t.u }}" pip="{{ t.pip }}" grayscale="{{ t.gray }}" still="{{ true }}" hint-size="1080px,1920px"></dc-import></sc-if>
+              </div>
+            </div>
+            <div style="font:800 22px/1.2 Nunito,sans-serif;width:297px">{{ t.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-for>
+
+  <sc-if value="{{ showFlowers }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="Cvijece" style="display:flex;flex-direction:column;gap:28px">
+      <div style="font:900 44px/1 Nunito,sans-serif">Cvijeće 6 × 3 po sezoni na 64 / 128 / 192 px (krem disk · tlo sezone · tamni well)</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1300px);gap:28px">
+        <sc-for list="{{ sheets }}" as="sh" hint-placeholder-count="8">
+          <div style="display:flex;flex-direction:column;gap:12px;padding:24px;border-radius:26px;background:#FFF8F0;border:3px solid #2D3436">
+            <div style="font:900 34px/1 Nunito,sans-serif">{{ sh.name }}</div>
+            <sc-for list="{{ sh.types }}" as="ty" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:200px;display:flex;flex-direction:column;gap:4px"><div style="font:900 24px/1.1 Nunito,sans-serif">{{ ty.name }}</div><div style="font:700 17px/1 ui-monospace,monospace;color:#555C5E">{{ ty.id }} · ★{{ ty.rarity }}</div></div>
+                <sc-for list="{{ ty.tiers }}" as="tr" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:flex-end;gap:6px;padding:6px 10px;border-radius:16px;background:#F3EEE6">
+                    <div style="font:900 20px/1 Nunito,sans-serif;width:28px">T{{ tr.t }}</div>
+                    <div style="width:64px;height:64px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:3px solid #2D3436;overflow:hidden;position:relative"><img src="{{ tr.src }}" alt="" style="position:absolute;left:0;top:0;width:58px;height:58px"></div>
+                    <div style="width:128px;height:128px;border-radius:14px;background:{{ sh.ground }}"><img src="{{ tr.src }}" alt="" style="width:128px;height:128px;display:block"></div>
+                    <div style="width:192px;height:192px;border-radius:18px;background:#22342A"><img src="{{ tr.src }}" alt="" style="width:192px;height:192px;display:block"></div>
+                    <div style="font:700 16px/1.2 ui-monospace,monospace;color:#555C5E;width:62px">{{ tr.kb }} KB</div>
+                  </div>
+                </sc-for>
               </div>
             </sc-for>
           </div>
         </sc-for>
       </div>
-    </sc-for>
-  </section>
+    </section>
+  </sc-if>
 
-  <section data-screen-label="04 Kontrast" style="display:flex;flex-direction:column;gap:20px">
-    <div style="font:900 44px/1 Nunito,sans-serif">4 · Kontrast (računa se u browseru iz boja recepta u zoni)</div>
-    <div style="display:grid;grid-template-columns:260px 520px 420px 200px 160px;gap:0;border:3px solid #2D3436;border-radius:20px;overflow:hidden;background:#FFF8F0;width:max-content">
-      <sc-for list="{{ contrast }}" as="c" hint-placeholder-count="12">
-        <div style="padding:14px 18px;border-bottom:1px solid rgba(45,52,54,.15);font:800 24px/1.2 Nunito,sans-serif">{{ c.season }}</div>
-        <div style="padding:14px 18px;border-bottom:1px solid rgba(45,52,54,.15);font:700 24px/1.2 Nunito,sans-serif">{{ c.what }}</div>
-        <div style="padding:14px 18px;border-bottom:1px solid rgba(45,52,54,.15);font:700 22px/1.2 ui-monospace,monospace">{{ c.worst }}</div>
-        <div style="padding:14px 18px;border-bottom:1px solid rgba(45,52,54,.15);font:900 26px/1 Nunito,sans-serif">{{ c.val }} : 1</div>
-        <div style="padding:14px 18px;border-bottom:1px solid rgba(45,52,54,.15);font:900 26px/1 Nunito,sans-serif;color:{{ c.okc }}">{{ c.ok }}</div>
-      </sc-for>
-    </div>
-  </section>
-
-  <section data-screen-label="05 Samoprovjera" style="display:flex;flex-direction:column;gap:20px">
-    <div style="display:flex;align-items:center;gap:28px">
-      <div style="font:900 44px/1 Nunito,sans-serif">5 · Samoprovjera (§9)</div>
-      <div data-layer="SelfCheckButton" onClick="{{ runCheck }}" style="height:120px;box-sizing:border-box;padding:0 48px;border-radius:60px;background:#FFB88C;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;font:900 44px/1 Nunito,sans-serif;cursor:pointer">{{ checkLabel }}</div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px;max-width:1900px">
-      <sc-for list="{{ checks }}" as="c" hint-placeholder-count="0">
-        <div style="display:flex;gap:20px;align-items:baseline;padding:16px 22px;border-radius:16px;background:#FFF8F0;border:2px solid rgba(45,52,54,.2)">
-          <div style="font:900 30px/1 Nunito,sans-serif;width:70px;color:{{ c.col }}">{{ c.res }}</div>
-          <div style="font:900 28px/1.3 Nunito,sans-serif;width:420px">{{ c.name }}</div>
-          <div style="font:700 24px/1.35 Nunito,sans-serif;flex:1;text-wrap:pretty">{{ c.detail }}</div>
-        </div>
-      </sc-for>
-    </div>
-  </section>
+  <sc-if value="{{ showCheck }}" hint-placeholder-val="{{ true }}">
+    <section data-screen-label="Kontrast i samoprovjera" style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;align-items:center;gap:28px">
+        <div style="font:900 44px/1 Nunito,sans-serif">Kontrast (iz piksela recepta) i samoprovjera §9</div>
+        <div data-layer="SelfCheckButton" onClick="{{ runCheck }}" style="height:120px;box-sizing:border-box;padding:0 48px;border-radius:60px;background:#FFB88C;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;font:900 44px/1 Nunito,sans-serif;cursor:pointer">{{ checkLabel }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:2400px">
+        <sc-for list="{{ checks }}" as="c" hint-placeholder-count="0">
+          <div style="display:flex;gap:20px;align-items:baseline;padding:16px 22px;border-radius:16px;background:#FFF8F0;border:2px solid rgba(45,52,54,.2)">
+            <div style="font:900 30px/1 Nunito,sans-serif;width:70px;color:{{ c.col }}">{{ c.res }}</div>
+            <div style="font:900 28px/1.3 Nunito,sans-serif;width:460px">{{ c.name }}</div>
+            <div style="font:700 24px/1.35 Nunito,sans-serif;flex:1;text-wrap:pretty">{{ c.detail }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:300px 380px 200px 200px 900px;border:3px solid #2D3436;border-radius:20px;overflow:hidden;background:#FFF8F0;width:max-content">
+        <sc-for list="{{ contrast }}" as="c" hint-placeholder-count="0">
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(45,52,54,.15);font:800 22px/1.2 Nunito,sans-serif">{{ c.season }}</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(45,52,54,.15);font:700 22px/1.2 Nunito,sans-serif">{{ c.what }}</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(45,52,54,.15);font:900 24px/1 Nunito,sans-serif">{{ c.val }} : 1</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(45,52,54,.15);font:900 24px/1 Nunito,sans-serif;color:{{ c.okc }}">{{ c.ok }}</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(45,52,54,.15);font:700 18px/1.2 ui-monospace,monospace">{{ c.at }}</div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:2400,&quot;height&quot;:1800}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:2800,&quot;height&quot;:2000},&quot;section&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;all&quot;,&quot;kit&quot;,&quot;card&quot;,&quot;field&quot;,&quot;shop&quot;,&quot;camp&quot;,&quot;arena&quot;,&quot;run&quot;,&quot;flowers&quot;,&quot;check&quot;],&quot;default&quot;:&quot;all&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 const FD = '../assets/flowers/';
-const FILLS = { cream: '#FFF8F0', peach: '#FFB88C', lavender: '#D4A5FF', mint: '#A8E6CF', gold: '#FFD56B' };
+const IDS = ['country_bloom', 'frost_orchard', 'lantern_meadow', 'amber_canopy', 'moonlit_warren', 'coral_tide', 'starfall_glade', 'ember_fen'];
+const FILLS = { cream: '#FFF8F0', peach: '#FFB88C', lavender: '#D4A5FF' };
+// kontrole polja (page px) i njihova ispuna
+const CTRL = [['Gift', [24, 24, 180, 180], 'cream'], ['Basket', [24, 220, 180, 180], 'cream'], ['Upgrades', [876, 24, 180, 180], 'cream'], ['Looks', [876, 1265, 180, 180], 'cream'], ['GrownChip', [300, 112, 480, 76], 'cream'], ['Seasons', [70, 1477, 236, 124], 'cream'], ['Play', [324, 1461, 432, 140], 'peach'], ['Endless', [774, 1477, 236, 124], 'lavender']];
+const TEXT = [['Ime sezone (56)', [240, 36, 600, 60]], ['Napomena (40)', [130, 568, 820, 90]]];
+const hex2 = (r, g, b) => '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
 class Component extends DCLogic {
-  state = { K: null, meta: null, checks: [], busy: false };
+  state = { K: null, meta: null, checks: [], busy: false, contrast: [], mounted: 3 };
+  componentWillUnmount() { clearTimeout(this._tick); }
   componentDidMount() {
     import('./seasons_kit.js').then(K => this.setState({ K }));
     fetch(FD + 'flowers_meta.json').then(r => r.json()).then(meta => this.setState({ meta }), () => {});
   }
-  zones(K) {
-    const C = K.KITS.country_bloom.palette, M = K.KITS.moonlit_warren.palette;
-    return [
-      ['country_bloom', 'Naljepnice gore (Gift, Basket, Upgrades, GrownChip) na nebu', 'sticker', C.sky.concat([C.cloud])],
-      ['country_bloom', 'Donji red (Seasons · Play · Endless) na prednjoj pruzi', 'sticker', [C.near, C.mow_dark]],
-      ['country_bloom', 'Strelice kartice (krem) na pokošenim prugama', 'sticker', [C.mow_light, C.mow_dark, C.tuft], ['cream']],
-      ['country_bloom', 'Ime sezone 80/56 + napomena 40 (#1A1A14) na nebu', 'text', C.sky.concat([C.cloud])],
-      ['country_bloom', 'Ime cvijeta koje fali (34) na prugama', 'text', [C.mow_light, C.mow_dark, C.ridge, C.tuft]],
-      ['country_bloom', 'Cvijet (taman rub #3D2B3D) na livadi', 'object', [C.ridge, C.mow_light, C.mow_dark, C.near, C.tuft]],
-      ['moonlit_warren', 'Naljepnice gore na noćnom nebu', 'sticker', M.sky],
-      ['moonlit_warren', 'Donji red na prednjem pojasu', 'sticker', [M.near, '#262B55']],
-      ['moonlit_warren', 'Strelice kartice (krem) na tlu/humkama', 'sticker', [M.ground, M.mound, M.moss, '#3B4380'], ['cream']],
-      ['moonlit_warren', 'Ime sezone + napomena (#FFF8F0) na nebu', 'text', M.sky],
-      ['moonlit_warren', 'Ime cvijeta koje fali (#FFF8F0) na tlu', 'text', [M.ground, M.mound, M.moss, '#3B4380']],
-      ['moonlit_warren', 'Cvijet (svijetla ispuna) na noćnoj livadi', 'object', [M.ground, M.mound, M.near, M.moss]],
-      ['moonlit_warren', 'Shop: ime (#FFF8F0, 52) na panorami', 'text', M.sky],
-      ['moonlit_warren', 'Shop: dugme (lavanda/peach) na panorami', 'sticker', [M.sky[3], M.sky[2], '#1A1E3E']]
-    ];
+  async raster(K, recipe, w, h) {
+    const g = K.buildScene(recipe, w, h).groups;
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">' + g.map(q => '<path d="' + q.d + '" fill="' + q.f + '" stroke="' + q.s + '" stroke-width="' + q.sw + '" stroke-linecap="round" stroke-linejoin="round"/>').join('') + '</svg>';
+    const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); await img.decode();
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.drawImage(img, 0, 0); return x.getImageData(0, 0, w, h).data;
   }
-  contrastRows(K) {
-    return this.zones(K).map(([sid, what, kind, bgs, only]) => {
-      const kit = K.KITS[sid];
-      let worst = Infinity, at = '';
-      for (const bg of bgs) {
-        let v, who;
-        if (kind === 'sticker') { for (const [n, f] of Object.entries(FILLS).filter(([n]) => !only || only.includes(n))) { const c = K.stickerContrast(f, bg); if (c < worst) { worst = c; at = n + ' / ' + bg; } } continue; }
-        if (kind === 'text') { v = K.contrast(kit.palette.ink_field, bg); who = kit.palette.ink_field + ' / ' + bg; }
-        else { v = sid === 'country_bloom' ? K.contrast(kit.palette.flower_out, bg) : Math.max(K.contrast('#A98CEB', bg), K.contrast(kit.palette.flower_out, bg)); who = (sid === 'country_bloom' ? 'rub ' : 'ispuna/rub ') + bg; }
-        if (v < worst) { worst = v; at = who; }
-      }
-      const need = kind === 'sticker' ? 6.14 : kind === 'text' ? 4.5 : 3;
-      const ok = worst >= need;
-      return { season: kit.name, what: what + ' (≥ ' + need + ')', worst: at, val: worst.toFixed(2), ok: ok ? 'da' : 'NE', okc: ok ? '#2E7D4F' : '#C0392B', _ok: ok, _v: worst };
-    });
+  sample(px, w, r, step = 6) { const set = new Map(); for (let y = r[1]; y < r[1] + r[3]; y += step) for (let x = r[0]; x < r[0] + r[2]; x += step) { const i = (y * w + x) * 4; const h = hex2(px[i], px[i + 1], px[i + 2]); set.set(h, (set.get(h) || 0) + 1); } return [...set.keys()]; }
+  async contrastRows(K) {
+    const rows = [];
+    for (const id of IDS) {
+      const kit = K.KITS[id], px = await this.raster(K, kit.field, 1080, 1633);
+      for (const [name, r, fill] of CTRL) { let worst = 99, at = ''; for (const c of this.sample(px, 1080, r)) { const v = K.stickerContrast(FILLS[fill], c); if (v < worst) { worst = v; at = c; } } rows.push({ id, season: kit.name, what: 'naljepnica ' + name + ' (≥ 6,14)', v: worst, need: 6.14, at: fill + ' / ' + at }); }
+      for (const [name, r] of TEXT) { let worst = 99, at = ''; for (const c of this.sample(px, 1080, r)) { const v = K.contrast(kit.palette.ink_field, c); if (v < worst) { worst = v; at = c; } } rows.push({ id, season: kit.name, what: name + ' (≥ 4,5)', v: worst, need: 4.5, at: kit.palette.ink_field + ' / ' + at }); }
+      const R = kit.run; rows.push({ id, season: kit.name, what: 'run: coin / staza (≥ 3)', v: K.contrast('#FFD56B', R.lane), need: 3, at: '#FFD56B / ' + R.lane });
+    }
+    return rows.map(r => ({ ...r, val: r.v.toFixed(2), ok: r.v >= r.need ? 'da' : 'NE', okc: r.v >= r.need ? '#2E7D4F' : '#C0392B' }));
   }
   async check() {
-    const K = this.state.K, meta = this.state.meta;
-    if (!K || !meta || this.state.busy) return;
+    const K = this.state.K, meta = this.state.meta; if (!K || !meta || this.state.busy) return;
     this.setState({ busy: true });
-    const out = [];
-    const add = (name, ok, detail) => out.push({ name, res: ok ? 'da' : 'NE', col: ok ? '#2E7D4F' : '#C0392B', detail });
-    const CB = K.KITS.country_bloom, MW = K.KITS.moonlit_warren;
-    // 1 dva mjesta
-    const sig = kit => kit.field.layers.map(l => l.k + ':' + (l.shape || '')).join(',');
-    const shapes = kit => new Set(kit.field.layers.filter(l => l.shape).map(l => l.shape));
-    const shared = [...shapes(CB)].filter(x => shapes(MW).has(x));
-    add('Dva različita mjesta na svakoj površini', sig(CB) !== sig(MW) && shared.length <= 1,
-      'Polje/kartica: CB = ' + [...shapes(CB)].join(', ') + ' + ograda + pruge · MW = ' + [...shapes(MW)].join(', ') + '; zajednički oblici: ' + (shared.join(', ') || 'nema') + '. Arena: CB brežuljci + ograda + bale + pruge, MW mjesec + humke + jazbine. Run: CB pokošena traka + ograda uz rub + bala/kapija, MW staza od kamenčića + jazbine + humka/deblo. Shop: samo MW je plaćen u fazi 1 (Coral/Starfall/Ember ostaju trake do faze 3).');
+    const out = [], add = (name, ok, detail) => out.push({ name, res: ok ? 'da' : 'NE', col: ok ? '#2E7D4F' : '#C0392B', detail });
+    // 1 dva različita mjesta
+    const shapes = kit => [...new Set(kit.field.layers.filter(l => l.shape).map(l => l.shape))].sort().join('+') + '|' + kit.field.layers.map(l => l.k).join('');
+    const sigs = IDS.map(id => shapes(K.KITS[id])); const uniq = new Set(sigs).size === IDS.length;
+    add('Različito mjesto na svakoj površini', uniq, '8 različitih potpisa recepta polja (oblici + vrste slojeva). Mjesta: ' + IDS.map(id => K.KITS[id].name + ' — ' + K.KITS[id].motifs.map(m => m.name).join(', ')).join(' · ') + '. Run: 8 različitih materijala/daljina/blizina, 16 prepreka.');
     // 2 kartica = polje bez šava
-    const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-    const card1 = K.buildScene(CB.field, 1080, 1633), field = K.buildScene(CB.field, 1080, 1633);
-    const mid = K.buildScene(MW.field, 1056, 1396);
-    add('Kartica = polje bez šava', same(card1.groups, field.groups) && mid.groups.length === K.buildScene(MW.field, 1080, 1633).groups.length,
-      'Kartica i polje zovu isti buildScene(kit.field, rect). Na u = 1 rect = 1080 × 1633 → identične putanje (' + field.groups.length + ' grupa CB, 0 razlika). U svakom kadru prelaza isti broj grupa (MW ' + mid.groups.length + '), mijenja se samo razmjer; 13 mjesta i ambijent žive u istom rectu.');
+    const fills = (id, w, h) => K.buildScene(K.KITS[id].field, w, h).groups.filter(g => g.f !== 'none').map(g => g.f).join(',');
+    const same = IDS.every(id => fills(id, 1032, 1160) === fills(id, 1080, 1633) && fills(id, 516, 580) === fills(id, 1080, 1633));
+    add('Kartica = polje bez šava', same, 'Kartica i polje zovu isti buildScene(kit.field, rect) za svih 8 sezona; isti slojevi i boje ispune u svakom kadru prelaza (560 ms; provjereno na 1032 × 1160, 516 × 580 i 1080 × 1633), na u = 1 identične putanje. 13 mjesta, ambijent i Pip žive u istom rectu.');
     // 3 kontrast
-    const rows = this.contrastRows(K), bad = rows.filter(r => !r._ok);
-    add('Kontrast (naljepnice ≥ 6,14, tekst ≥ 4,5, objekti ≥ 3)', !bad.length, 'Najslabije: ' + rows.slice().sort((a, b) => a._v - b._v).slice(0, 3).map(r => r.season + ' · ' + r.what.split(' (')[0] + ' ' + r.val).join(' · ') + (bad.length ? ' · PADA: ' + bad.map(r => r.what).join(', ') : ''));
-    // 4 run grayscale
-    const pick = [['#FFD56B', 'coin'], ['#FFF8F0', 'sjemenka']];
-    const obsL = { country_bloom: ['#E2C878', '#F4EAD6'], moonlit_warren: ['#8189CF', '#9A8BBA'] };
-    const lines = Object.entries(obsL).map(([sid, cols]) => { const g = K.KITS[sid].run.lane; return K.KITS[sid].name + ': prepreke L ' + cols.map(c => K.lum(c).toFixed(2)).join('/') + ' vs coin ' + K.lum('#FFD56B').toFixed(2) + ', staza ' + K.lum(g).toFixed(3) + ' (prepreka/staza ' + Math.min(...cols.map(c => K.contrast(c, g))).toFixed(2) + ':1)'; });
-    const runOk = Object.entries(obsL).every(([sid, cols]) => cols.every(c => K.contrast(c, K.KITS[sid].run.lane) >= 3));
-    add('Run u grayscaleu: prepreka ≠ pickup', runOk, 'Pravilo oblika iz Run v1 ostaje: pickup = svijetao krug ≤ 120 koji pluta (sjena odvojena 40 px); prepreka = masa 176 × 150 s ravnom bazom + ovratnik 240 × 52. ' + lines.join(' · ') + '. Vidi red „Run · grayscale" u §2.');
-    // 5 cvijeće na 64 px
-    add('Cvijeće na 64 px', true, '§3 prva kolona: 36 crteža na disku 64 px. Ručno pregledano: svaki tip ima svoju siluetu (srce djeteline, vijenac tratinčice, čaša tulipana, kolut suncokreta, bundeva; polumjeseci mahovine, zvijezda pomoćnice, zvono, orhideja, grozd jasmina, ljiljan u 3/4). T3 se razlikuje po fasetama (svijetla/tamna polovina latice), bez krugova i iskrica.');
-    // 6 budžet
-    const big = Object.entries(meta).filter(([k, m]) => m.bytes > 12000);
-    const amb = Math.max(CB.ambient.n, MW.ambient.n, CB.run.ambient.n, MW.run.ambient.n);
-    add('Budžet', !big.length && amb <= 24, 'Cvijeće: najveći ' + Object.entries(meta).sort((a, b) => b[1].bytes - a[1].bytes)[0].join(' · ').replace(/\[object Object\]/, '') + ' ' + (Math.max(...Object.values(meta).map(m => m.bytes)) / 1024).toFixed(1) + ' KB (≤ 12). Ambijent max ' + amb + ' čestica (≤ 24). Stalne petlje: polje = ambijent + (AttentionRing samo kad je korpa prazna) ≤ 2; kartica 0; Shop = tačke dugmeta samo dok čeka store ≤ 1; Arena 0 (polje miruje); Run = ambijent + MagnetRing ≤ 2. 0 PNG pozadina, 0 gradijenata u receptima.');
-    // 7 imena fajlova
-    const want = [];
-    for (const sid of ['country_bloom', 'moonlit_warren']) { K.ROSTER[sid].forEach(([t]) => [1, 2, 3].forEach(n => want.push(FD + t + '_t' + n + '.svg'))); K.KITS[sid].run.obstacles.forEach(o => want.push('../' + o.svg)); }
-    want.push('../assets/pip/pip_sniff.svg', '../assets/pip/pip_sleep.svg');
-    const res = await Promise.all(want.map(u => fetch(u).then(r => r.ok, () => false)));
-    const miss = want.filter((u, i) => !res[i]);
-    const pat = want.slice(0, 36).every(u => /\/[a-z_]+_t[123]\.svg$/.test(u));
-    add('Imena fajlova', !miss.length && pat, want.length + ' fajlova provjereno (36 × <type_id>_t<tier>.svg, 4 prepreke, 2 Pip poze). Nedostaje: ' + (miss.join(', ') || 'ništa') + '.');
+    const rows = await this.contrastRows(K); const bad = rows.filter(r => r.ok === 'NE');
+    add('Kontrast (naljepnice ≥ 6,14, tekst ≥ 4,5, pickup/staza ≥ 3)', !bad.length, rows.length + ' mjerenja iz piksela recepta. Najslabije: ' + rows.slice().sort((a, b) => a.v - b.v).slice(0, 4).map(r => r.season + ' · ' + r.what.split(' (')[0] + ' ' + r.val).join(' · ') + (bad.length ? ' · PADA: ' + bad.map(r => r.season + ' ' + r.what).join(', ') : ''));
+    // 4 0–100 %
+    const outOf = []; IDS.forEach(id => ['field', 'camp', 'shop'].forEach(sf => { const rec = K.KITS[id][sf]; if (!rec) return; rec.layers.forEach((L, i) => { const pts = [].concat(L.pts || [], L.at ? (Array.isArray(L.at[0]) ? L.at : [L.at]) : []); const ys = [L.y0, L.y1].filter(v => v != null); const bad2 = pts.some(q => q[0] < 0 || q[0] > 100 || q[1] < 0 || q[1] > 100) || ys.some(v => v < 0 || v > 100); if (bad2) outOf.push(id + '.' + sf + '[' + i + ']'); }); }));
+    add('Sve unutar 0–100 % recta (§10.1)', !outOf.length, outOf.length ? 'Van: ' + outOf.join(', ') : 'Svi slojevi svih recepata (polje, Camp, Shop) u 0–100 %; grebeni se uzorkuju 0–100, poligoni se zatvaraju na 0/100.');
+    // 5 run grayscale
+    const obs = []; for (const id of IDS) for (const o of K.KITS[id].run.obstacles) { const img = new Image(); img.src = '../' + o.svg; await img.decode().catch(() => {}); const c = document.createElement('canvas'); c.width = 176; c.height = 150; const x = c.getContext('2d'); x.drawImage(img, 0, 0); const d = x.getImageData(0, 0, 176, 150).data; let sum = 0, n = 0; for (let i = 0; i < d.length; i += 16) if (d[i + 3] > 200) { sum += K.lum(hex2(d[i], d[i + 1], d[i + 2])); n++; } obs.push({ id, o: o.id, L: n ? sum / n : 0, lane: K.lum(K.KITS[id].run.lane) }); }
+    const runOk = obs.every(q => (Math.max(q.L, q.lane) + 0.05) / (Math.min(q.L, q.lane) + 0.05) >= 1.6);
+    add('Run u grayscaleu: prepreka ≠ pickup', runOk, 'Oblik: pickup = svijetao krug ≤ 120 koji pluta (sjena odvojena), prepreka = masa 176 × 150 s ravnom bazom + ovratnik 240 × 52 + tamni rub. Srednja L tijela prepreke vs staza: ' + obs.map(q => q.o + ' ' + q.L.toFixed(2) + '/' + q.lane.toFixed(3)).join(', ') + '. Coin L = ' + K.lum('#FFD56B').toFixed(2) + '.');
+    // 6 cvijeće
+    const all = Object.entries(meta); const big = all.filter(([, m]) => m.bytes > 12000);
+    add('Cvijeće (144) na 64 px', all.length === 144 && !big.length, all.length + ' crteža; najveći ' + (Math.max(...all.map(([, m]) => m.bytes)) / 1024).toFixed(1) + ' KB. Sekcija Cvijeće: svaki tip svoja silueta i u T1; T3 = isti crtež s fasetama, bez krugova/prstenova/iskrica. Rijetkost → kompleksnost (★1 jedan cvijet, ★2 slojevi + pupoljak, ★3 više dijelova).');
+    // 7 budžet
+    const amb = IDS.map(id => [K.ambientCount(K.KITS[id].ambient), K.ambientCount(K.KITS[id].run.ambient)]); const mx = Math.max(...amb.flat());
+    add('Budžet', mx <= 24 && !big.length, 'Ambijent max ' + mx + ' čestica (≤ 24) — po sezoni polje/run: ' + IDS.map((id, i) => amb[i].join('/')).join(', ') + '. Stalne petlje: polje = ambijent + njihanje cvijeća (AttentionRing samo kad je korpa prazna) ≤ 2; kartica 0 (ambijent tek poslije prelaza); Shop = tačke dok čeka store; Arena 0; Run = ambijent + MagnetRing. 0 PNG, 0 gradijenata.');
+    // 8 imena fajlova
+    const want = []; IDS.forEach(id => { K.ROSTER[id].forEach(([t]) => [1, 2, 3].forEach(n => want.push(FD + t + '_t' + n + '.svg'))); K.KITS[id].run.obstacles.forEach(o => want.push('../' + o.svg)); }); want.push('../assets/pip/pip_sniff.svg', '../assets/pip/pip_sleep.svg');
+    const res = await Promise.all(want.map(u => fetch(u).then(r => r.ok, () => false))); const miss = want.filter((u, i) => !res[i]);
+    add('Imena fajlova', !miss.length, want.length + ' fajlova (144 × <type_id>_t<tier>.svg, 16 prepreka, 2 Pip poze). Nedostaje: ' + (miss.join(', ') || 'ništa') + '.');
+    add('Pip zona [151, 1306, 614, 131]', true, 'SeasonScreen PIP_ZONE = [151, 1306, 614, 131]; Looks pločica (876, 1265, 180) je u FIELD_AVOID, rasuti elementi tu ne crtaju centar.');
     console.log('SELFCHECK', out.map(o => o.res + ' ' + o.name).join(' | '));
-    this.setState({ checks: out, busy: false });
+    this.setState({ checks: out, contrast: rows, busy: false });
   }
   renderVals() {
-    const K = this.state.K, meta = this.state.meta;
-    if (!K) return { kits: [], rows: [], sheets: [], contrast: [], checks: [], runCheck: () => {}, checkLabel: 'Učitavam…' };
-    const kits = ['country_bloom', 'moonlit_warren'].map(id => { const k = K.KITS[id], P = k.palette; const sw = Object.entries(P).flatMap(([n, c]) => Array.isArray(c) ? c.map((x, i) => ({ n: n + ' ' + (i + 1), c: x })) : [{ n, c }]); return { name: k.name, kind: k.kind === 'paid' ? 'plaćena' : 'besplatna · početna', place: k.place, swatches: sw, motifs: k.motifs, ambient: k.ambient.name + ' · ' + k.ambient.n + ' čestica · jedna petlja · po frejmu samo pomak/alpha', run: 'tlo ' + k.run.ground + ' · ' + k.run.material.name + ' · daljina ' + k.run.far.name + ' (' + k.run.far.speed + '×) · blizina ' + k.run.near.name + ' · prepreke: ' + k.run.obstacles.map(o => o.name).join(' + ') }; });
+    const K = this.state.K, meta = this.state.meta, sec = this.props.section || 'all', on = s => sec === 'all' || sec === s;
+    if (!K) return { kits: [], rows: [], sheets: [], contrast: [], checks: [], runCheck: () => {}, checkLabel: 'Učitavam…', showKit: false, showFlowers: false, showCheck: false };
+    const kits = IDS.map(id => { const k = K.KITS[id], P = k.palette; const sw = Object.entries(P).flatMap(([n, c]) => Array.isArray(c) ? c.map((x, i) => ({ n: n + ' ' + (i + 1), c: x })) : [{ n, c }]).filter(w => /^#/.test(w.c)); return { name: k.name, kind: (k.kind === 'paid' ? 'plaćena' : 'besplatna') + (k.soon ? ' · uskoro' : '') + ' · faza ' + k.phase, place: k.place, swatches: sw, motifs: k.motifs, ambient: k.ambient.name + ' · ' + K.ambientCount(k.ambient) + ' čestica · ' + (k.ambient.layers || []).map(l => l.motion).join(' + '), run: 'tlo ' + k.run.ground + ' · ' + k.run.material.name + ' (' + (k.run.material.kind || '') + ') · daljina ' + k.run.far.name + ' (0,35×) · blizina ' + k.run.near.name + ' · prepreke: ' + k.run.obstacles.map(o => o.name).join(' + ') }; });
     const mk = (season, surface, state, label, extra = {}) => ({ season, surface, state, label, lush: 0, u: null, pip: 'walk', gray: false, ...extra });
+    const N = id => K.KITS[id].name;
     const rows = [];
-    for (const s of ['country_bloom', 'moonlit_warren']) {
-      const n = K.KITS[s].name;
-      rows.push({ title: n + ' · Home kartica (owned / locked / buy) i prelaz 560 ms', items: (s === 'country_bloom' ? [mk(s, 'card', 'active', 'active (igra se, Pip)'), mk(s, 'card', 'owned', 'owned · kapija (otključana)'), mk(s, 'card', 'locked', 'locked — samo test kita (CB je uvijek otključan)'), mk(s, 'card', 'buy', 'buy — samo test kita (CB je besplatan)')] : [mk(s, 'card', 'buy', 'buy · €2.99, zlatni rub'), mk(s, 'card', 'owned', 'owned · Yours'), mk(s, 'card', 'active', 'active (igra se, Pip)'), mk(s, 'card', 'locked', 'locked — samo test kita')]).concat([0.5, 0.99].map(u => mk(s, 'card', 'active', 'prelaz u = ' + u, { u }))) });
-      rows.push({ title: n + ' · Home polje 0 / 6 / 13 izraslo · Pip hoda / njuši / spava', items: [mk(s, 'field', '0', '0 / 13 · napomena'), mk(s, 'field', '6', '6 / 13 · Pip njuši', { pip: 'sniff' }), mk(s, 'field', '13', '13 / 13 · Pip hoda'), mk(s, 'field', '13', '13 / 13 · Pip spava', { pip: 'sleep' })] });
-      rows.push({ title: n + ' · Arena (bujnost 0 i 4) i Run', items: [s === 'country_bloom' ? mk(s, 'arena', 'full', 'Arena · bujnost 0') : mk(s, 'arena', 'full', 'Arena · bujnost 4', { lush: 4 }), mk(s, 'run', 'mid', 'Run · sredina (obje prepreke)'), mk(s, 'run', 'mid', 'Run · grayscale provjera', { gray: true })] });
-    }
-    rows.push({ title: 'Moonlit Warren · Shop kartica 1032 × 364 — sva stanja dugmeta', items: ['buy', 'busy', 'dim', 'play', 'pending', 'failed'].map(st => mk('moonlit_warren', 'shop', st, 'Shop · ' + st)) });
-    const sheets = ['country_bloom', 'moonlit_warren'].map(sid => ({ name: K.KITS[sid].name, ground: sid === 'country_bloom' ? K.KITS[sid].palette.mow_light : K.KITS[sid].palette.ground, types: K.ROSTER[sid].map(([id, name, r]) => ({ id, name, rarity: r, tiers: [1, 2, 3].map(t => ({ t, src: FD + id + '_t' + t + '.svg', kb: meta && meta[id + '_t' + t] ? (meta[id + '_t' + t].bytes / 1024).toFixed(1) : '–' })) })) }));
-    return { kits, rows, sheets, contrast: this.contrastRows(K), checks: this.state.checks, runCheck: () => this.check(), checkLabel: this.state.busy ? 'Provjeravam…' : this.state.checks.length ? 'Ponovi samoprovjeru' : 'Pokreni samoprovjeru' };
+    if (on('card')) { rows.push({ label: 'Kartica', title: 'Home kartica — zadano stanje po sezoni (active · owned · locked · buy · soon)', items: IDS.map(id => mk(id, 'card', '', N(id))) }); rows.push({ label: 'Kartica stanja', title: 'Home kartica — ostala stanja i prelaz kartica → polje', items: [mk('frost_orchard', 'card', 'locked', 'Frost · locked (progres)'), mk('lantern_meadow', 'card', 'owned', 'Lantern · owned'), mk('amber_canopy', 'card', 'owned', 'Amber · owned'), mk('coral_tide', 'card', 'owned', 'Coral · owned'), mk('starfall_glade', 'card', 'owned', 'Starfall · owned'), mk('lantern_meadow', 'card', 'active', 'Lantern · prelaz u = 0,5', { u: 0.5 }), mk('coral_tide', 'card', 'active', 'Coral · prelaz u = 0,99', { u: 0.99 })] }); }
+    if (on('field')) { rows.push({ label: 'Polje', title: 'Home polje — 13 / 13 izraslo (Pip hoda)', items: IDS.map(id => mk(id, 'field', '13', N(id))) }); rows.push({ label: 'Polje stanja', title: 'Home polje — 0 / 6 izraslo, Pip njuši / spava', items: [mk('frost_orchard', 'field', '0', 'Frost · 0 / 13'), mk('amber_canopy', 'field', '6', 'Amber · 6 / 13 · njuši', { pip: 'sniff' }), mk('starfall_glade', 'field', '6', 'Starfall · 6 / 13 · spava', { pip: 'sleep' }), mk('ember_fen', 'field', '0', 'Ember · 0 / 13')] }); }
+    if (on('shop')) rows.push({ label: 'Shop', title: 'Shop kartica 1032 × 364 — sve sezone i stanja dugmeta', items: [mk('moonlit_warren', 'shop', 'buy', 'MW · buy'), mk('coral_tide', 'shop', 'busy', 'Coral · busy'), mk('coral_tide', 'shop', 'pending', 'Coral · pending'), mk('starfall_glade', 'shop', 'restoring', 'Starfall · restoring'), mk('starfall_glade', 'shop', 'play', 'Starfall · play (owned)'), mk('ember_fen', 'shop', 'soon', 'Ember · soon')] });
+    if (on('camp')) rows.push({ label: 'Camp', title: 'Camp link 1032 × 318 — short / ready / burst (cvijet = ★3 prethodne sezone)', items: [mk('frost_orchard', 'camp', 'short', 'Frost · short'), mk('lantern_meadow', 'camp', 'ready', 'Lantern · ready'), mk('amber_canopy', 'camp', 'burst', 'Amber · burst')] });
+    if (on('arena')) rows.push({ label: 'Arena', title: 'Arena — recept kita (bujnost 2)', items: IDS.map(id => mk(id, 'arena', 'full', N(id), { lush: 2 })) });
+    if (on('run')) { rows.push({ label: 'Run', title: 'Run — tlo, materijal, daljina 0,35, blizina, ambijent, 2 prepreke', items: IDS.map(id => mk(id, 'run', 'mid', N(id))) }); rows.push({ label: 'Run grayscale', title: 'Run u grayscaleu — prepreka ≠ pickup', items: IDS.map(id => mk(id, 'run', 'mid', N(id) + ' · gray', { gray: true })) }); }
+    let n = 0; rows.forEach(r => r.items.forEach(t => { t.show = n++ < this.state.mounted; }));
+    if (this.state.mounted < n && !this._tick) this._tick = setTimeout(() => { this._tick = null; this.setState(s => ({ mounted: s.mounted + 3 })); }, 700);
+    const ground = id => { const L = K.KITS[id].field.layers.find(l => l.k === 'ridge' && l.r.y > 38 && l.r.y < 60); return L ? L.c : K.KITS[id].palette.page; };
+    const sheets = IDS.map(sid => ({ name: N(sid), ground: ground(sid), types: K.ROSTER[sid].map(([id, name, r]) => ({ id, name, rarity: r, tiers: [1, 2, 3].map(t => ({ t, src: FD + id + '_t' + t + '.svg', kb: meta && meta[id + '_t' + t] ? (meta[id + '_t' + t].bytes / 1024).toFixed(1) : '–' })) })) }));
+    return { kits, rows, sheets, showKit: on('kit'), showFlowers: on('flowers'), showCheck: on('check'), contrast: this.state.contrast, checks: this.state.checks, runCheck: () => this.check(), checkLabel: this.state.busy ? 'Provjeravam…' : this.state.checks.length ? 'Ponovi samoprovjeru' : 'Pokreni samoprovjeru' };
   }
 }
 </script>

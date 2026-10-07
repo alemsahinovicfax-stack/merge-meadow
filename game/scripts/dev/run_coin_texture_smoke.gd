@@ -8,22 +8,29 @@ const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
 const UI_RUN := preload("res://scripts/visual/ui_run.gd")
 
 var _failed: bool = false
+var _backup: String = ""
 
 
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _run() -> void:
 	var icon := UI_ASSETS.get_chrome_icon("icon_coin")
 	if icon == null:
 		_fail("icon_coin.svg not importable")
-		quit(1)
+		_quit(1)
 		return
 	var packed := load(COIN_SCENE) as PackedScene
 	if packed == null:
 		_fail("coin.tscn missing")
-		quit(1)
+		_quit(1)
 		return
 	var coin := packed.instantiate()
 	get_root().add_child(coin)
@@ -46,10 +53,10 @@ func _run() -> void:
 		_fail("coin draws at 96 px, got %d" % UI_RUN.COIN_SIZE)
 	coin.queue_free()
 	if _failed:
-		quit(1)
+		_quit(1)
 		return
 	print("run_coin_texture_smoke OK")
-	quit(0)
+	_quit(0)
 
 
 func _fail(msg: String) -> void:

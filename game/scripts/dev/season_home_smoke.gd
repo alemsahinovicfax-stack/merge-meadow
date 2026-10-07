@@ -414,22 +414,16 @@ func _run() -> void:
 			_fail("u %.2f: Play rect %s expected %s" % [u, _page_rect(play), want_play]); return
 		if absf(float(name_n.get("top")) - lerpf(244.0, 36.0, e)) > 0.01:
 			_fail("u %.2f: SeasonName top off the eased t" % u); return
-		# P5: trake kartice = trake livade (round(h * .32), round(h * .68)).
-		if u < 1.0:
-			var h: float = card_surf.size.y
-			var edges: Vector2 = card_surf.call("band_edges")
-			if absf(edges.x - roundf(h * 0.32)) > 0.01 or absf(edges.y - roundf(h * 0.68)) > 0.01:
-				_fail("u %.2f: card bands should be round(h * .32 / .68)" % u); return
+		# P5 (Season Kit faza 2): kartica i livada crtaju ISTI recept — Lantern ima kit.
+		if u < 1.0 and not bool(card_surf.call("has_kit")):
+			_fail("u %.2f: Lantern card should draw the kit recipe" % u); return
 		var ground := field.get_node("MeadowGround") as Control
 		if ground.visible != (u >= 1.0):
-			_fail("u %.2f: meadow bands draw only at u = 1 (card IS the meadow)" % u); return
-	var card_edges: Vector2 = card_surf.call("band_edges")
-	if card_edges != Vector2(523, 1110):
-		_fail("card bands at full page should be 523 / 1110, got %s" % card_edges); return
-	var sky := field.get_node("MeadowGround/MeadowSky") as Control
-	var far := field.get_node("MeadowGround/MeadowFar") as Control
-	if absf(sky.size.y - 523.0) > 0.01 or absf(far.position.y + far.size.y - 1110.0) > 0.01:
-		_fail("meadow bands should be 523 / 1110 (same px as the card)"); return
+			_fail("u %.2f: meadow draws only at u = 1 (card IS the meadow)" % u); return
+	if not bool(field.call("has_kit")):
+		_fail("Lantern field should draw the kit recipe (same as the card)"); return
+	if field.get_node_or_null("MeadowGround/MeadowSky") != null:
+		_fail("old meadow bands (MeadowSky) should be gone"); return
 	tw.kill()
 	stage.call("_on_field_tween_finished")
 	await _frames(3)

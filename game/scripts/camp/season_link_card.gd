@@ -4,6 +4,9 @@ extends PanelContainer
 ## Tap bilo gdje na kartici vodi na Home bez trosenja — bez "Details" pilule i bez
 ## "Next free season" natpisa. Unlock (300 x 120, jedna rijec) stoji desno od imena,
 ## trosi odmah (500 coina + 20 ★3), pokaze burst, pa skace na Home s fokusom.
+## Season Kit (design_handoff_seasons faza 2): sezona s receptom "camp" crta svoje mjesto
+## (SeasonBackdrop 1026 x 312 unutar ruba 3 #2D3436, ništa izvan) umjesto tinta, tekst
+## #3D3D33, jedna tvrda sjena 0 8 0; uglovi = maska u boji stranice Campa.
 
 @onready var title_label: Label = %SeasonLinkTitle
 @onready var coin_icon: TextureRect = %SeasonLinkCoinIcon
@@ -21,6 +24,8 @@ var _state: String = UiCamp.SEASON_SHORT
 var _pressing_card: bool = false
 var _unlocking: bool = false
 var _burst: float = -1.0
+var _scene: Dictionary = {}
+var _ink: Color = UiCamp.DARK_INK
 
 
 func _ready() -> void:
@@ -60,6 +65,15 @@ func get_state() -> String:
 	return _state
 
 
+## Kartica crta recept "camp" sezone (Season Kit).
+func has_kit() -> bool:
+	return not _scene.is_empty()
+
+
+func get_ink() -> Color:
+	return _ink
+
+
 func refresh() -> void:
 	if _unlocking:
 		return
@@ -79,7 +93,15 @@ func refresh() -> void:
 func _show(def: SeasonDef, coins: int, flowers: int) -> void:
 	var coins_need := def.coins_cost
 	var flowers_need := def.t3_flowers_required
-	add_theme_stylebox_override("panel", UiCamp.season_card_style(def.id))
+	var recipe := UiSeasons.recipe(def.id, "camp")
+	_scene = {} if recipe.is_empty() else SeasonBackdrop.scene(
+		"camp:" + def.id, recipe, float(recipe.get("w", UiSeasons.CAMP_CARD.x)), []
+	)
+	_ink = UiSeasons.CAMP_TEXT if has_kit() else UiCamp.DARK_INK
+	for lab in [title_label, coins_label, t3_label]:
+		(lab as Label).add_theme_color_override("font_color", _ink)
+	add_theme_stylebox_override("panel", UiCamp.season_card_kit_style() if has_kit() else UiCamp.season_card_style(def.id))
+	queue_redraw()
 	title_label.text = def.display_name
 	coins_label.text = "%d / %d" % [mini(coins, coins_need), coins_need]
 	t3_label.text = "%d / %d" % [mini(flowers, flowers_need), flowers_need]
@@ -109,7 +131,7 @@ func _show(def: SeasonDef, coins: int, flowers: int) -> void:
 func _fit_flower_name(text: String) -> void:
 	flower_name.text = text
 	for px in [UiCamp.FONT_SEASON_FLOWER, 38, 34]:
-		UiCamp.style_label(flower_name, px, UiCamp.DARK_INK)
+		UiCamp.style_label(flower_name, px, _ink)
 		var width := UiCamp.tight_font(px).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x
 		if width <= float(UiCamp.SEASON_NAME_W) or px == 34:
 			return
@@ -186,12 +208,36 @@ func _finish_unlock(season_id: String) -> void:
 
 
 func _draw() -> void:
+	if has_kit():
+		_draw_kit()
 	if _burst < 0.0:
 		return
 	var radius := lerpf(0.2, 1.0, _burst) * UiCamp.BURST_SIZE * 0.5
 	var color := UiCamp.BURST
 	color.a *= 1.0 - _burst
 	draw_arc(size * 0.5, radius, 0.0, TAU, 64, color, UiCamp.BURST_BORDER, true)
+
+
+## Sjena (sjena minus tijelo, ne ide ispod providnog ruba) → recept unutar ruba →
+## maske uglova u boji stranice → rub 3. Panel ne crta ništa (season_card_kit_style).
+func _draw_kit() -> void:
+	var full := Rect2(Vector2.ZERO, size)
+	var radius := float(UiPalette.CORNER_RADIUS_CTA)
+	var border := 3.0
+	var shadow := SeasonBackdrop.round_rect_points(Rect2(Vector2(0.0, UiSeasons.CAMP_SHADOW_Y), size), radius)
+	for poly in Geometry2D.clip_polygons(shadow, SeasonBackdrop.round_rect_points(full, radius)):
+		if poly.size() >= 3:
+			draw_colored_polygon(poly, UiSeasons.CAMP_SHADOW)
+	var inner := full.grow(-border)
+	SeasonBackdrop.draw(self, _scene, inner)
+	SeasonBackdrop.draw_corner_masks(self, inner, radius - border, UiCamp.MEADOW_BG)
+	var edge := StyleBoxFlat.new()
+	edge.draw_center = false
+	edge.set_border_width_all(int(border))
+	edge.border_color = UiCamp.INK
+	edge.set_corner_radius_all(int(radius))
+	edge.anti_aliasing = true
+	draw_style_box(edge, full)
 
 
 func _go_home(season_id: String) -> void:

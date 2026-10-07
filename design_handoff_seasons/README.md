@@ -1,70 +1,94 @@
-# Season Kit — faza 1 od 4 (Country Bloom + Moonlit Warren)
+# Season Kit — faze 1 + 2 (svih 8 sezona)
 
 ## Ideja
-Danas sezone imaju samo boju (iste 3 trake u 8 nijansi, ista staza s tintom, isti kamen i panj, 42 od 48 vrsta cvijeća su isti krug). Pravilo iz Arene v2 („svaka sezona je drugo MJESTO“) širi se na cijelu igru: **svaka sezona dobija jedan Season Kit** — mjesto, paleta, 2–4 potpis-motiva, ambijent i 18 crteža cvijeća — koji se reže na svaku površinu (Home kartica, Home polje, Shop kartica, Arena, Run). Kit je **red podataka** (`design/seasons_kit.js` = `godot/seasons_export.json`); renderer je jedan i generički. Faze 2 i 3 dodaju redove, ne kod.
-
-Faza 1 dokazuje oba kraja: **Country Bloom** (besplatna, svijetla: valoviti brežuljci, ograda na grebenu, pokošena trava) i **Moonlit Warren** (plaćena, tamna: veliki mjesec, humke, jazbine).
-
-> Napomena: `docs/04-experience/design-drafts/seasons-cd-brief.md` i `seasons-ref/` nisu bili na `master` grani u trenutku rada (2026-10-03). Rađeno po sažetku briefa iz poruke i po paketima Home v3, polje v2, Shop v2, Arena v2, Run, plant_frame. Mjere i raspored su iz tih paketa.
+Svaka sezona je **drugo mjesto**, ne druga boja. Svaka sezona ima jedan **Season Kit** — mjesto, paletu, 2–4 potpis-motiva, ambijent i 18 crteža cvijeća — koji se reže na svaku površinu: Home kartica, Home polje, Shop kartica, Camp link, Arena i Run. Kit je **red podataka** (`design/seasons_kit.js` = `godot/seasons_export.json`); renderer je jedan i generički. Faza 2 je dodala 6 redova (Frost, Lantern, Amber, Coral, Starfall, Ember), 108 crteža, 12 prepreka i nekoliko generičkih primitiva — bez posebnog koda po sezoni.
 
 ## Šta otvoriti
 | Fajl | Šta je |
 |---|---|
-| `design/SeasonScreen.dc.html` | Jedan ekran 1080 × 1920. Propovi: `season` (country_bloom · moonlit_warren), `surface` (card · field · shop · arena · run), `state` (card: active · owned · locked · buy · field: 0 · 6 · 13 · shop: buy · busy · dim · play · pending · failed · arena: empty · full · hunting · eating · frozen · bag_empty · run: mid · fail), `lush` (0–4, Arena), `still` (zamrzne animacije), + `pip` (walk · sniff · sleep kad je still), `u` (0–1, zamrznut kadar prelaza kartica → polje), `grayscale` (provjera runa). Na kartici „active“: tap na Play/karticu = prelaz 560 ms, Seasons na polju = nazad 440 ms. |
-| `design/Season Specs.dc.html` | Kit po sezoni (paleta, motivi, ambijent, run), sve površine za oba kita, prelaz u = 0,5 / 0,99, list cvijeća 6 × 3 na 64 / 128 / 192 (krem disk · livada · tamni well), tabela kontrasta (računa se u browseru) i dugme **Pokreni samoprovjeru**. |
-| `design/seasons_kit.js` | Jedini izvor brojeva: `KITS`, `SHAPES`, `buildScene()` (recept → putanje), `spotRects()`, `ambientParticles()`, kontrast. |
-| `design/ArenaScreen.dc.html` (+ ArenaField, SeedChip, SeedBasket, Muncher, `arena_v2_data.js`) | Kopija Arene v2; `arena_v2_data.js` uvozi kit i spaja `kits[id].arena` u `FIELDS` za CB i MW, rezove cvijeća čita iz `flowers_meta`, sjemenke u MW su MW tipovi. Raspored Arene nije diran. |
-| `assets/flowers/<type_id>_t<tier>.svg` | 36 crteža + `flowers_meta.json` (bajtovi, rez, rub). |
-| `assets/seasons/<id>/obstacle_*.svg` | 2 prepreke po sezoni (176 × 150). |
-| `assets/pip/pip_sniff.svg`, `pip_sleep.svg` | Pip poze za polje (izmjena `pip_idle.svg`, isti rub i boje). |
-| `tools/flowers_gen.js` | Generator cvijeća (`node tools/flowers_gen.js`), isti jezik kao `scripts/art/flowers_gen.py`. |
-| `godot/seasons_export.json`, `ui_seasons.gd`, `seasons_tree.txt` | Export, konstante + helperi (ridge, R2, spot_rects, kontrast), stablo i šta se mijenja. |
+| `design/SeasonScreen.dc.html` | Jedan ekran 1080 × 1920. Propovi: `season` (8), `surface` (card · field · shop · camp · arena · run · flowers), `state`, `lush`, `still`, + `sway` (njihanje cvijeća), `pip` (walk · sniff · sleep kad je still), `u` (zamrznut kadar prelaza), `grayscale`. Stanja: card active · owned · locked · buy · soon; field 0 · 6 · 13; shop buy · busy · pending · restoring · play · failed (Ember uvijek soon); camp short · ready · burst; arena empty · full · hunting · eating · frozen · bag_empty; run mid · fail. Bez `state` svaka sezona pokazuje svoje zadano stanje (CB active, Frost owned, Lantern/Amber locked, MW/Coral/Starfall buy, Ember soon). |
+| `design/Season Specs.dc.html` | Kit svih 8 sezona; sve površine s 8 sezona jedna pored druge (kartica, stanja, polje 13 i 0/6, Shop, Camp, Arena, Run, Run grayscale); list cvijeća 6 × 3 po sezoni na 64 / 128 / 192; kontrast iz piksela recepta i dugme **Pokreni samoprovjeru**. Ekrani se montiraju postepeno (3 svakih 0,7 s); tweak `section` pokazuje samo jedan dio. |
+| `design/seasons_kit.js` | Jedini izvor brojeva: `KITS`, `ROSTER`, `SHAPES`, `buildScene`, `spotRects`, `ambientLayers` / `ambientAt`, `laneTile`, `runItems`, `BANDS`, `PREV_FREE`, `PRICES`, `SOON`, kontrast. |
+| `design/ArenaScreen.dc.html` (+ `arena_v2_data.js`, djeca) | Arena v2; `arena_v2_data.js` spaja `kits[id].arena` u `FIELDS` za **svih 8** sezona, rezove cvijeća čita iz `flowers_meta`; sjemenke su tipovi sezone. Raspored Arene nije diran. |
+| `assets/flowers/<type_id>_t<tier>.svg` | **144** crteža + `flowers_meta.json` (bajtovi, rez, rub). |
+| `assets/seasons/<season_id>/obstacle_*.svg` | **16** prepreka (2 po sezoni, 176 × 150). |
+| `assets/pip/pip_sniff.svg`, `pip_sleep.svg` | Pip poze. |
+| `tools/flowers_gen.js` | Generator cvijeća (`node tools/flowers_gen.js`); faza 2 = arhetipovi (glava s prstenovima, vlati, mahune, grozd, kugla, trolist) + 36 redova konfiguracije. |
+| `godot/seasons_export.json` | meta, tokens, shapes, kits, surfaces, obstacles, animations, strings_en, godot_map, decisions, flowers. |
+| `godot/ui_seasons.gd`, `godot/seasons_tree.txt` | Konstante + helperi (ridge_y s tilt, scatter_at, spot_rects, ambient_layers, ambient_at, lane_tile, run_items, kontrast) i stablo čvorova. |
 
-## Status: sezona × površina
-| Sezona | Kartica | Polje | Shop | Arena | Run | Cvijeće |
-|---|---|---|---|---|---|---|
-| Country Bloom | **kit** | **kit** | — (besplatna) | **kit** | **kit** | **18 novih** |
-| Moonlit Warren | **kit** | **kit** | **kit (panorama)** | **kit** | **kit** | **18 novih** |
-| Frost · Lantern · Amber | danas (trake) | danas | — | Arena v2 recept | tint | proceduralno — faza 2 (+ Camp link) |
-| Coral · Starfall · Ember | danas | danas | danas (trake) | Arena v2 recept | tint | proceduralno — faza 3 |
+## Status: sezona × površina (2026-10-06)
+| Sezona | Faza | Kartica | Polje | Shop | Camp link | Arena | Run + 2 prepreke | Ambijent | Cvijeće |
+|---|---|---|---|---|---|---|---|---|---|
+| Country Bloom | 1 | ✅ active | ✅ | — besplatna | — početna | ✅ | ✅ bala · kapija | latice | ✅ 18 |
+| Frost Orchard | 2 | ✅ owned · locked | ✅ | — | ✅ (→ Pumpkin) | ✅ | ✅ blok leda · panj pod snijegom | pahulje | ✅ 18 |
+| Lantern Meadow | 2 | ✅ locked · owned | ✅ | — | ✅ (→ Crystal Peony) | ✅ | ✅ stub s fenjerom · kamen s mahovinom | svici | ✅ 18 |
+| Amber Canopy | 2 | ✅ locked · owned | ✅ | — | ✅ (→ Midnight Lotus) | ✅ | ✅ srušeno deblo · panj s gljivama | lišće + prašina | ✅ 18 |
+| Moonlit Warren | 1 | ✅ buy · owned | ✅ | ✅ | — | ✅ | ✅ humka · deblo | zvijezde + mrvice | ✅ 18 |
+| Coral Tide Garden | 2 | ✅ buy · owned | ✅ | ✅ | — | ✅ | ✅ stijena sa školjkama · koralj | odsjaji + mjehurići | ✅ 18 |
+| Starfall Glade | 2 | ✅ buy · owned | ✅ | ✅ | — | ✅ | ✅ meteorit · panj jele | zvijezde + meteori + latice | ✅ 18 |
+| Ember Fen | 2 | ✅ soon | ✅ | ✅ soon | — | ✅ | ✅ panj koji tinja · busen rogoza | žeravica + dim | ✅ 18 |
 
-## Kitovi
-**Country Bloom** — nebo u 4 stepenaste trake `#E3F0EE → #F5F9E2`, 2 oblaka, brežuljci `#D3E7C0 / #C3DDA8`, greben `#B4D497` s **ogradom** (stub `#F4EAD6`/sjena `#C9B48F`, letve `#E6D8BC`), **7 pokošenih pruga** `#BCDCA0 / #ACD18F`, prednja pruga `#C3E0A8`, **bale sijena** `#E8D28C`. Ambijent: 14 latica na vjetru. Tekst na livadi `#1A1A14`. Run: tlo `#2F4A33`, pokošena traka `#44663F` (pruge 40/124), daljina = mrlje djeteline (0,35×), blizina = ograda + čuperci + tratinčice uz rub (1,0×), latice; prepreke **bala sijena** i **kapija ograde**.
+## Kitovi faze 2
+- **Frost Orchard** (besplatna, svijetla) — ravan bijeli horizont, **dva reda voćki** s kapama snijega (`row` po grebenu), **zaleđena bara**, **nanosi**. Nebo `#D9E7F6 → #EEF5FC`, tlo `#EAF1F9`, voćke `#B9CBE0 / #A7BDD6`, led `#C6D8EC`. Ambijent: 18 pahulja padaju i njišu se. Run: ugažen snijeg s tragom sanki (`rut`), daljina zaleđene lokve, blizina voćke uz rub.
+- **Lantern Meadow** (besplatna, tamna — sumrak) — **girlanda papirnih fenjera** (svaki drugi upaljen, `row` duž `line`), **visoka trava sa strana** (`sideGrass`), noćurke u travi. Nebo `#120E22 → #241B3A`, tlo `#1C1730`. Ambijent: 16 svitaca lebdi. Camp: svjetliji sumrak (`#EEE6F7`) jer je tekst `#3D3D33`. Run: staza od kamenčića s mahovinom (`pebble`), fenjeri na stubovima uz rub.
+- **Amber Canopy** (besplatna, svijetla — sunčana krošnja) — **krošnja odozgo** (`ridge.up` + lišće koje visi samo između gornjih kontrola), **dva tamna debla** (L ≤ 0,036, izbočena samo između kontrola), **snopovi svjetla** i mrlje sunca. Tlo `#F7E8C9 → #EED6A8`, krošnja `#F2C46A / #E8AE58`. Ambijent: 12 listova pada + 8 zrna prašine. Run: staza prekrivena lišćem.
+- **Coral Tide Garden** (plaćena, svijetla) — **obala dijagonalno** (4 grebena s istim `tilt`), voda gore, pjena, mokar i suh pijesak, **koralj na rubu plime** (`row`), školjke i zvjezdače. Ambijent: odsjaji trepere + mjehurići. Shop panorama: voda gore, pijesak ispod imena. Run: daščana staza preko plićaka (`plank`).
+- **Starfall Glade** (plaćena, tamna) — **prsten jela** (spikes + dva bočna poligona), **zvjezdano nebo i meteori**, čistina s paprati. Ambijent: 12 zvijezda treperi, 2 meteora prelijeću (`streak`), 8 latica pada. Run: staza od zvjezdane prašine, jele uz rub.
+- **Ember Fen** (plaćena, tamna, uskoro) — **lokve s odsjajem vatre**, **rogoz uz rubove**, **dva pojasa dima** (puna boja, bez alpha/blura), tinjajuće žeravice. Ambijent: 14 žeravica se diže + 4 oblaka dima klize. Run: daščana staza preko močvare.
 
-**Moonlit Warren** — noćno nebo u 4 trake `#141833 → #262C53`, 16 zvijezda, **mjesec** `#EDEBFF` (desno, ispod Upgrades, na kartici ne dira disk), daleke humke `#2B3263` s osvijetljenim rubom `#4A5290`, tlo `#232955`, **2 humke s jazbinama** (`#0F1228` + rub `#4D5698`), **mahovina** `#2E4F5A` + kapi rose, tamni prednji pojas `#1A1E3E`. Ambijent: 10 zvijezda treperi + 8 mrvica mjesečine (18). Tekst na livadi `#FFF8F0`; stranica izbora ostaje svijetla `#DFE1FF`. Shop: panorama — mjesec izlazi između imena i dugmeta, humke na horizontu. Run: tlo `#1A1E3E`, staza od mjesečevog kamenčića `#323A6E`, daljina = jazbine (0,35×), blizina = mahovina + rosa, mrvice; prepreke **humka s jazbinom** i **oboreno deblo s mahovinom**.
+## § Novi primitivi (faza 2) — sve u `seasons_kit.js`, isti kod za svih 8
+- **Slojevi recepta:** `row` (motiv u redu duž grebena ili linije, veličina varira po R2), `poly` (+ `smooth` Catmull-Rom), `ellipse`, `line` (+ `smooth`), `ridge.up` (puni prema gore — krošnja), `ridge.tilt` (nagnut greben — obala), `shape` s listom tačaka `[x, y, size, rot]`, `scatter.noAvoid`. Pomoćnici `spikes()` (jele, rogoz, trava) i `sideGrass()`.
+- **25 novih oblika:** tree, fir, drift, puddle, flake, lantern, firefly, leaf, acorn, mushroom, dapple, trunk, ripple, shell, starfish, coral, thrift, rock, meteor, fern, cattail, ember, bubble, glint, pad, smoke — svi od 6 primitiva (c, e, p, r, l, a).
+- **Generički ambijent:** `layers: [{motion: drift | fall | rise | float | twinkle | streak, n, shape, size, pal, pal2, zone, drift, sway, sec, rot, angle, alpha, fade, pulse, duty, ph}]`; `ambientAt(L, t)` daje pomak/rot/skalu/alpha — po frejmu samo transform. Budžet 24 se poštuje i u `ambientLayers`. CB i MW su prevedeni na isti format (isti izgled).
+- **Run:** `material.kind` = stripe · pebble · plank · rut (`laneTile`), far/near = `items` (`runItems` prevodi i stare ključeve faze 1).
+- **Camp recept** `kits[id].camp` (1032 × 318) i **Shop recept** `kits[id].shop` (1032 × 364) — isti `buildScene`.
+- **Cvijeće:** arhetipovi u `tools/flowers_gen.js` — `plant` (glava s prstenovima latica, lepeza ili krug, 3/4 pogled; pupoljci; druge glave; listovi; lopoč), `spikePlant` (vlati s vrhom: svitac, rogoz, kometa), mahune fenjera, grozd (glicinija), kugla (karanfil, hrastov cvat), trolist, list-grančica; `crystalLite`, `gemSmall`, `gemCenter`, `gemStar`, `facetPoly` za T3.
 
-## § Odlučeno
-1. **Kit = red podataka, renderer = jedan.** `SeasonBackdrop` je generalizovani `ArenaMeadowBg`: slojevi `band` (nebo stepenasto), `ridge` (zbir sinusa, + osvijetljen rub), `mow` (pruge između pomaknutih grebena), `fence` (stubovi po grebenu + letve), `shape` (motiv), `scatter` (R2 niz, bez RNG-a). 0 PNG, 0 gradijenata; računa se jednom, po frejmu samo pomak/skala/alpha.
-2. **Kartica = minijatura polja po istom receptu.** Slojevi su u % recta, oblici i cvijeće uniformno `k = w / 1080`. Sve što je *mjesto* (pozadina, 13 mjesta, ambijent) živi u prostoru recta kartice; kontrole ostaju u prostoru stranice. Na u = 1 rect = stranica → isti pikseli; tokom prelaza cvijeće stoji na svojoj pruzi (nema klizanja preko tla).
-3. **Kontrast naljepnica = dvostruki rub:** `max(c(ink rub, livada), c(fill, livada)) ≥ 6,14`. Zato zone ispod kontrola moraju biti ili svijetle (CB, L ≥ 0,46) ili vrlo tamne (MW, L ≤ 0,036 zbog lavande Endless). Mid-tonovi su zabranjeni ispod kontrola; rasuti elementi ne crtaju centar u keepout zonama polja (mirne zone).
-4. **Tekst direktno na livadi je boja kita** (`ink_field`): `#1A1A14` na svijetlom, `#FFF8F0` na tamnom; Home ≥ 38 osim imena cvijeta 34 (fiksno iz v3).
-5. **13 mjesta:** broj, dubine (88 / 116 / 136 / 168), pragovi i indeksi isti kao polje v2. CB zadržava pozicije (F red stoji ispred ograde na grebenu); MW pomjera M red na humke (x 20 / 80) i krunu uz jazbinu.
-6. **Cvijeće:** taman vanjski rub po kitu (CB `#3D2B3D`, MW `#221B3A`) — jedan debeli rub siluete po grupi, tanke unutrašnje linije, ravni odsjaji. T1 pupoljak, T2 cvijet, **T3 = isti T2 crtež kao brušeni kristal** (fasete svijetlo/tamno/vrh, svjetlo gore-lijevo), **bez krugova, prstenova i iskrica**. Rijetkost → kompleksnost: ★1 jedan cvijet, ★2 slojevit cvijet + pupoljak/druga glava, ★3 više dijelova (bundeva + loza + cvijet + vitice; ljiljan s dva cvijeta u 3/4 pogledu).
-7. **Pip na polju:** postojeći FSM (walk .5 / sniff .25 / sleep .25) dobija poze: hod = bob 0,42 s; njuši = `pip_sniff.svg` + nagib prema cvijetu, **cvijet se nakloni** (0,6 s oko baze) + **5 čestica polena**; spava = `pip_sleep.svg` + sabijanje + 3 „z“. **Cvijet izraste** = 0 → 1,12 → 1 za 0,42 s kad mjesto pređe prag.
-8. **Petlje:** polje = ambijent + AttentionRing (samo prazna korpa) ≤ 2; kartica 0; Shop = tačke dugmeta samo dok čeka store; Arena 0 (polje miruje dok se igra); Run = ambijent + MagnetRing ≤ 2.
-9. **Run:** geometrija ista (staze 270/540/810 × 200, šavovi 405/675, daljina 0,35×). Prepreke su svijetle mase 176 × 150 s ravnom bazom + ovratnik 240 × 52 u boji kita, kolizija 64 × 64 ostaje; pickupi nedirnuti → razlika oblikom i u grayscaleu.
-10. **Pillar 2:** plaćena sezona dobija temu, ne snagu (isti brojevi, iste nagrade); besplatna je jednako bogata (3 motiva, ambijent, 18 crteža); Shop bez lažne hitnosti (nema tajmera, popusta ni „limited“).
+## § Odlučeno (faza 2)
+1. **Mjesto iz Arene v2** za svih 6 (opisi `place` iz `arena_v2_data.js`), boje polja uzete tako da prođu pravilo kontrole. Arena dobija `kits[id].arena` (base/layers/scatter/combo) — svih 6 je usklađeno s poljem (Lantern: tamno tlo `#1C1730`, crna bočna trava i girlanda, isti fenjeri).
+2. **Ispod kontrola** samo L ≥ 0,46 ili L ≤ 0,036. Tamne sezone (Lantern, Starfall, Ember) imaju skoro crno tlo i nebo, tekst `#FFF8F0`; svijetla stranica izbora ostaje svijetla (`page`).
+3. **Polje:** 13 mjesta, dubine i pragovi isti; Pip zona **[151, 1306, 614, 131]**; dodana **Looks** pločica (876, 1265, 180) iz `field_wardrobe_button.gd` i njen keepout.
+4. **Animacije polja:** njihanje cvijeća ±3° (3–5 s, faza po mjestu, prop `sway`), Pip njuši → cvijet 1 → 1,08 → 1 za 0,3 s + 3 čestice **oblika ambijenta sezone**; Pip spava → ambijent se smiri (alpha 0,35 za 1,2 s); cvijet izraste 0 → 1,12 → 1. Na kartici ambijent tek poslije prelaza (fade 0,3 s).
+5. **Kartice:** Ember = soon (crteži 50 %, „Coming soon“ isprekidan rub, isprekidan rub kartice); locked pokazuje 320 / 500 i ★3 prethodne sezone 14 / 20; tačke traka iz `BANDS`, aktivna sezona (CB) breskva.
+6. **Shop:** MW, Coral, Starfall, Ember; stanja buy · busy (ostali dim) · pending · restoring · play · failed; Ember bez cijene i dugmeta. Cijene iz store stringova (`PRICES`), bez lažne hitnosti.
+7. **Camp link:** Frost/Lantern/Amber; cvijet u okviru = ★3 **prethodne** besplatne sezone; recept iza teksta je svijetao (tekst `#3D3D33` ≥ 4,5).
+8. **Run:** geometrija ista; prepreke = masa s ravnom bazom + taman rub + ovratnik u boji kita; kolizija 64 × 64; pickup nedirnut.
+
+## § Ispravke faze 1 (lekcije §10.1)
+- Sve unutar 0–100 % recta: grebeni se uzorkuju 0–100 (bilo −2…102), zatvaraju se na 0/100 (bilo 101); MW Shop traka 64–101 → 64–100. Izgled CB i MW je isti.
+- Pip zona 778 → **614** (Looks pločica).
+- Ambijent CB/MW u generičkom formatu (stari `petals` / `stars_motes` ostaju u JSON-u dok se `season_ambient.gd` ne zamijeni).
 
 ## § Šta se briše
-- `SeasonTheme.bg_modulate / obstacle_modulate / home_field_tint` za sezone s kitom (ostaje fallback za ostalih 6 dok ne stignu).
-- `HomeV3Card._band()` trake i `SeasonField` `MeadowSky/Far/Near` → `SeasonBackdrop`.
-- 18 današnjih `game/assets/sprites/flowers/*.svg` (zamijenjeni; isti nazivi) i `CampPlantDraw` proceduralni krug za 6 MW tipova.
-- Run: zajednički kamen/panj i `SeasonTheme` tint pozadine za CB i MW.
+- `SeasonTheme.bg_modulate`, `SeasonTheme.obstacle_modulate`, `home_field_tint` — sve sezone imaju kit.
+- `UiCamp.season_tint` (Camp link crta recept `camp`).
+- `UiShopV2.season_bands` / `season_pack_card.gd` trake (Shop crta recept `shop`).
+- `SEASON_HUE` proceduralno cvijeće i `CampPlantDraw` krug za 42 tipa — svih 48 tipova ima crtež.
+- `HomeV3Card._band()`, `SeasonField._band_sky/_far/_near`, specijalni slučajevi u `season_ambient.gd`.
+- Zajednički kamen/panj u runu (16 prepreka po sezoni).
+- **Ne popunjavati** `run_bg_path` / `obstacle_theme_id` (§10.1) — run čita `kits[id].run`.
 
-## § Samoprovjera (§9) — Season Specs → „Pokreni samoprovjeru“, 2026-10-03
+## § Samoprovjera (§9) — Season Specs → „Pokreni samoprovjeru“, 2026-10-06
 | # | Stavka | | Mjereno |
 |---|---|---|---|
-| 1 | Dva različita mjesta na svakoj površini | **da** | različiti slojevi i oblici (CB: oblak, bala, ograda, pruge · MW: mjesec, humka, jazbina, mahovina); Shop ima samo MW jer je CB besplatna |
-| 2 | Kartica = polje bez šava | **da** | isti `buildScene(kit.field, rect)`; na u = 1 putanje identične (0 razlika); 13 mjesta u istom rectu |
-| 3 | Kontrast | **da** | najslabije: CB strelice (krem) na čupercima 6,18; MW naljepnice gore (lavanda) 6,78; MW ime cvijeta na mahovini 8,37; tekst svuda ≥ 8,5; cvijeće ≥ 3,2 |
-| 4 | Run grayscale: prepreka ≠ pickup | **da** | oblik (masa s ravnom bazom + ovratnik vs plutajući krug); prepreka/staza CB 3,97 / 5,46, MW 3,26 / 3,45 |
-| 5 | Cvijeće na 64 px | **da** (ručno) | 12 različitih silueta; T3 čitljiv po fasetama |
-| 6 | Budžet | **da** | cvijeće najviše 11,2 KB (star_jasmine_t3) (≤ 12); ambijent max 18 (≤ 24); ≤ 2 petlje po ekranu; 0 PNG |
-| 7 | Imena fajlova | **da** | 36 × `<type_id>_t<tier>.svg`, 4 prepreke, 2 Pip poze — sve se učitavaju |
+| 1 | Različito mjesto na svakoj površini | **da** | 8 različitih potpisa recepta (oblici + slojevi); 8 materijala staze, 16 prepreka |
+| 2 | Kartica = polje bez šava | **da** | isti `buildScene`; isti slojevi i boje na 1032 × 1160, 516 × 580 i 1080 × 1633 za svih 8 |
+| 3 | Kontrast iz piksela recepta | **da** | najslabije naljepnice: Amber 6,42 · Frost 7,35 · CB 7,41; tekst na livadi: Frost 5,54 · MW 6,87; coin/staza: Frost 3,26 · Coral 4,02 |
+| 4 | Sve unutar 0–100 % | **da** | svi slojevi polja, Camp i Shop recepata |
+| 5 | Run grayscale: prepreka ≠ pickup | **da** | oblik (masa s bazom + ovratnik + taman rub) vs plutajući krug; red „Run grayscale“ u Specs |
+| 6 | Cvijeće (144) na 64 px | **da** (+ ručno) | najveći nova_bloom_t3 11.7 KB (≤ 12); T1 svaki tip svoja silueta |
+| 7 | Budžet | **da** | ambijent max 22 čestice (Starfall polje), ≤ 2 petlje po ekranu, 0 PNG, 0 gradijenata u receptima |
+| 8 | Imena fajlova | **da** | 144 cvijeća + 16 prepreka + 2 Pip poze se učitavaju |
+| 9 | Pip zona | **da** | [151, 1306, 614, 131] |
 
-## Otvorena pitanja
-1. **Brief §5/§6 nije bio na masteru** — ako tabela cvijeća u §6 traži drugačije motive (npr. šta tačno crta T1), crteži se mijenjaju u `tools/flowers_gen.js`, izlaz ostaje isti.
-2. **Polje prikazuje T3** (kao `SeasonFieldFlower`, `plant_tier = 3`) — sve izraslo je kristal. Da li polje treba pokazivati T2 s kristalom samo na kruni?
-3. **Cijena** u mocku je store string `€2.99` (Shop v2 `PRICES.eur`); Home v3 je imao `$4.99` placeholder.
-4. **Godot SVG prepreke** — tijela su SVG (bolje od 3 crtana poligona), ali traže `.import`; ako želiš 0 asseta, iste oblike mogu prepisati u recept.
-5. Kartica CB u stanjima *locked/buy* postoji samo kao test kita (CB je uvijek otključan i besplatan).
+U toku rada samoprovjera je našla 4 greške koje su ispravljene: Amber lišće ispod GrownChip-a (5,94 → svjetlije lišće), Amber deblo ispod Basket-a (rub poligona → deblo izbočeno samo između kontrola), Ember žeravica i odsjaj lokve ispod napomene (pomjereno), MW Shop traka do 101 %.
+
+## Odluke po preporuci (2026-10-06)
+- **Lantern Arena** usklađena s poljem (`kits.lantern_meadow.arena`: base, far_grass, dusk_ground, side_grass, garland, fenjeri, vlati).
+- **Camp kartica**: jedna tvrda sjena `0 8 0 rgba(26,26,20,.22)` (pravilo §8), ne meka iz paketa Camp link.
+- **Polje** i dalje pokazuje T3 (kao faza 1).
+- **Specs**: ekrani se montiraju postepeno; tweak `section` za brz pregled.
+
+## Šta je na tebi / Claude Code
+Sve što ne mogu uraditi iz dizajna (stvarne cijene, Godot implementacija, brisanje starog koda) je u **`PREPORUKE_ZA_CLAUDE_CODE.md`** — redoslijed, fajlovi i kriterij gotovosti, spremno da se preda Claude Code-u.

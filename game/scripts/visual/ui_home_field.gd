@@ -113,7 +113,7 @@ const PIP_SIZE := 190
 const PIP_BASE_ZONE := Rect2i(151, 1306, 614, 131)
 const PIP_DEFAULT_BASE := Vector2i(756, 1404)
 
-## Boja livade po sezoni — postojeće vrijednosti iz SeasonTheme.home_field_tint().
+## Boja livade po sezoni (stare vrijednosti tinta) — rezerva i Shop/Ormar za sezonu bez kita.
 const MEADOW_GROUND := {
 	"country_bloom": Color("e6f2db"),
 	"frost_orchard": Color("d1e6ff"),

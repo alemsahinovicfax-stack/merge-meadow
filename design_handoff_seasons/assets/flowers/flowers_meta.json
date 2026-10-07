@@ -502,5 +502,1517 @@
    201
   ],
   "out": "#221B3A"
+ },
+ "frost_snowdrop_t1": {
+  "season": "frost_orchard",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 3991,
+  "parts": 7,
+  "crop": [
+   102,
+   141,
+   71,
+   111
+  ],
+  "out": "#2B3550"
+ },
+ "frost_snowdrop_t2": {
+  "season": "frost_orchard",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 4071,
+  "parts": 7,
+  "crop": [
+   99,
+   102,
+   93,
+   150
+  ],
+  "out": "#2B3550"
+ },
+ "frost_snowdrop_t3": {
+  "season": "frost_orchard",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 3420,
+  "parts": 7,
+  "crop": [
+   99,
+   103,
+   94,
+   149
+  ],
+  "out": "#2B3550"
+ },
+ "ice_crocus_t1": {
+  "season": "frost_orchard",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 4829,
+  "parts": 9,
+  "crop": [
+   103,
+   123,
+   50,
+   130
+  ],
+  "out": "#2B3550"
+ },
+ "ice_crocus_t2": {
+  "season": "frost_orchard",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 5428,
+  "parts": 10,
+  "crop": [
+   92,
+   77,
+   72,
+   176
+  ],
+  "out": "#2B3550"
+ },
+ "ice_crocus_t3": {
+  "season": "frost_orchard",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 4707,
+  "parts": 10,
+  "crop": [
+   90,
+   77,
+   76,
+   176
+  ],
+  "out": "#2B3550"
+ },
+ "silver_aconite_t1": {
+  "season": "frost_orchard",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 7385,
+  "parts": 18,
+  "crop": [
+   94,
+   130,
+   68,
+   123
+  ],
+  "out": "#2B3550"
+ },
+ "silver_aconite_t2": {
+  "season": "frost_orchard",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 8517,
+  "parts": 18,
+  "crop": [
+   91,
+   96,
+   74,
+   157
+  ],
+  "out": "#2B3550"
+ },
+ "silver_aconite_t3": {
+  "season": "frost_orchard",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 7303,
+  "parts": 18,
+  "crop": [
+   91,
+   95,
+   74,
+   158
+  ],
+  "out": "#2B3550"
+ },
+ "winter_camellia_t1": {
+  "season": "frost_orchard",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 7805,
+  "parts": 15,
+  "crop": [
+   93,
+   115,
+   74,
+   138
+  ],
+  "out": "#2B3550"
+ },
+ "winter_camellia_t2": {
+  "season": "frost_orchard",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 11146,
+  "parts": 18,
+  "crop": [
+   86,
+   69,
+   105,
+   184
+  ],
+  "out": "#2B3550"
+ },
+ "winter_camellia_t3": {
+  "season": "frost_orchard",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 8114,
+  "parts": 18,
+  "crop": [
+   86,
+   69,
+   107,
+   184
+  ],
+  "out": "#2B3550"
+ },
+ "hoarfrost_rose_t1": {
+  "season": "frost_orchard",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 6215,
+  "parts": 14,
+  "crop": [
+   95,
+   109,
+   69,
+   144
+  ],
+  "out": "#2B3550"
+ },
+ "hoarfrost_rose_t2": {
+  "season": "frost_orchard",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 8289,
+  "parts": 20,
+  "crop": [
+   67,
+   63,
+   109,
+   190
+  ],
+  "out": "#2B3550"
+ },
+ "hoarfrost_rose_t3": {
+  "season": "frost_orchard",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 8818,
+  "parts": 20,
+  "crop": [
+   65,
+   63,
+   111,
+   190
+  ],
+  "out": "#2B3550"
+ },
+ "crystal_peony_t1": {
+  "season": "frost_orchard",
+  "rarity": 3,
+  "tier": 1,
+  "bytes": 8569,
+  "parts": 19,
+  "crop": [
+   88,
+   103,
+   81,
+   151
+  ],
+  "out": "#2B3550"
+ },
+ "crystal_peony_t2": {
+  "season": "frost_orchard",
+  "rarity": 3,
+  "tier": 2,
+  "bytes": 11429,
+  "parts": 27,
+  "crop": [
+   43,
+   58,
+   170,
+   196
+  ],
+  "out": "#2B3550"
+ },
+ "crystal_peony_t3": {
+  "season": "frost_orchard",
+  "rarity": 3,
+  "tier": 3,
+  "bytes": 11610,
+  "parts": 27,
+  "crop": [
+   40,
+   58,
+   176,
+   196
+  ],
+  "out": "#2B3550"
+ },
+ "dusk_firefly_grass_t1": {
+  "season": "lantern_meadow",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 2146,
+  "parts": 4,
+  "crop": [
+   97,
+   135,
+   68,
+   114
+  ],
+  "out": "#24192F"
+ },
+ "dusk_firefly_grass_t2": {
+  "season": "lantern_meadow",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 6483,
+  "parts": 12,
+  "crop": [
+   55,
+   84,
+   159,
+   165
+  ],
+  "out": "#24192F"
+ },
+ "dusk_firefly_grass_t3": {
+  "season": "lantern_meadow",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 6520,
+  "parts": 12,
+  "crop": [
+   55,
+   85,
+   159,
+   164
+  ],
+  "out": "#24192F"
+ },
+ "paper_lantern_bloom_t1": {
+  "season": "lantern_meadow",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 2127,
+  "parts": 3,
+  "crop": [
+   97,
+   89,
+   121,
+   164
+  ],
+  "out": "#24192F"
+ },
+ "paper_lantern_bloom_t2": {
+  "season": "lantern_meadow",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 4962,
+  "parts": 9,
+  "crop": [
+   73,
+   89,
+   158,
+   164
+  ],
+  "out": "#24192F"
+ },
+ "paper_lantern_bloom_t3": {
+  "season": "lantern_meadow",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 4463,
+  "parts": 9,
+  "crop": [
+   73,
+   89,
+   158,
+   164
+  ],
+  "out": "#24192F"
+ },
+ "evening_primrose_t1": {
+  "season": "lantern_meadow",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 4761,
+  "parts": 8,
+  "crop": [
+   93,
+   113,
+   70,
+   140
+  ],
+  "out": "#24192F"
+ },
+ "evening_primrose_t2": {
+  "season": "lantern_meadow",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 6247,
+  "parts": 8,
+  "crop": [
+   85,
+   70,
+   86,
+   183
+  ],
+  "out": "#24192F"
+ },
+ "evening_primrose_t3": {
+  "season": "lantern_meadow",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 3825,
+  "parts": 8,
+  "crop": [
+   86,
+   72,
+   84,
+   181
+  ],
+  "out": "#24192F"
+ },
+ "foxfire_lily_t1": {
+  "season": "lantern_meadow",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 5931,
+  "parts": 10,
+  "crop": [
+   87,
+   99,
+   81,
+   154
+  ],
+  "out": "#24192F"
+ },
+ "foxfire_lily_t2": {
+  "season": "lantern_meadow",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 8735,
+  "parts": 13,
+  "crop": [
+   70,
+   57,
+   124,
+   196
+  ],
+  "out": "#24192F"
+ },
+ "foxfire_lily_t3": {
+  "season": "lantern_meadow",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 5935,
+  "parts": 13,
+  "crop": [
+   70,
+   57,
+   126,
+   196
+  ],
+  "out": "#24192F"
+ },
+ "glow_wisteria_t1": {
+  "season": "lantern_meadow",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 4083,
+  "parts": 7,
+  "crop": [
+   86,
+   65,
+   119,
+   188
+  ],
+  "out": "#24192F"
+ },
+ "glow_wisteria_t2": {
+  "season": "lantern_meadow",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 11376,
+  "parts": 19,
+  "crop": [
+   57,
+   65,
+   163,
+   188
+  ],
+  "out": "#24192F"
+ },
+ "glow_wisteria_t3": {
+  "season": "lantern_meadow",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 10681,
+  "parts": 19,
+  "crop": [
+   58,
+   65,
+   161,
+   188
+  ],
+  "out": "#24192F"
+ },
+ "midnight_lotus_t1": {
+  "season": "lantern_meadow",
+  "rarity": 3,
+  "tier": 1,
+  "bytes": 5097,
+  "parts": 10,
+  "crop": [
+   31,
+   170,
+   174,
+   79
+  ],
+  "out": "#24192F"
+ },
+ "midnight_lotus_t2": {
+  "season": "lantern_meadow",
+  "rarity": 3,
+  "tier": 2,
+  "bytes": 8453,
+  "parts": 16,
+  "crop": [
+   31,
+   153,
+   209,
+   98
+  ],
+  "out": "#24192F"
+ },
+ "midnight_lotus_t3": {
+  "season": "lantern_meadow",
+  "rarity": 3,
+  "tier": 3,
+  "bytes": 7909,
+  "parts": 16,
+  "crop": [
+   31,
+   153,
+   209,
+   98
+  ],
+  "out": "#24192F"
+ },
+ "copper_leaf_t1": {
+  "season": "amber_canopy",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 2252,
+  "parts": 3,
+  "crop": [
+   96,
+   130,
+   64,
+   122
+  ],
+  "out": "#3F2716"
+ },
+ "copper_leaf_t2": {
+  "season": "amber_canopy",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 5041,
+  "parts": 6,
+  "crop": [
+   89,
+   60,
+   85,
+   193
+  ],
+  "out": "#3F2716"
+ },
+ "copper_leaf_t3": {
+  "season": "amber_canopy",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 2535,
+  "parts": 6,
+  "crop": [
+   88,
+   60,
+   88,
+   193
+  ],
+  "out": "#3F2716"
+ },
+ "maple_aster_t1": {
+  "season": "amber_canopy",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 9461,
+  "parts": 20,
+  "crop": [
+   98,
+   116,
+   60,
+   137
+  ],
+  "out": "#3F2716"
+ },
+ "maple_aster_t2": {
+  "season": "amber_canopy",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 10437,
+  "parts": 20,
+  "crop": [
+   87,
+   63,
+   82,
+   190
+  ],
+  "out": "#3F2716"
+ },
+ "maple_aster_t3": {
+  "season": "amber_canopy",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 8849,
+  "parts": 20,
+  "crop": [
+   87,
+   63,
+   82,
+   190
+  ],
+  "out": "#3F2716"
+ },
+ "russet_mallow_t1": {
+  "season": "amber_canopy",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 5463,
+  "parts": 9,
+  "crop": [
+   93,
+   113,
+   70,
+   140
+  ],
+  "out": "#3F2716"
+ },
+ "russet_mallow_t2": {
+  "season": "amber_canopy",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 6886,
+  "parts": 9,
+  "crop": [
+   80,
+   65,
+   96,
+   188
+  ],
+  "out": "#3F2716"
+ },
+ "russet_mallow_t3": {
+  "season": "amber_canopy",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 4246,
+  "parts": 9,
+  "crop": [
+   83,
+   65,
+   90,
+   188
+  ],
+  "out": "#3F2716"
+ },
+ "cider_dahlia_t1": {
+  "season": "amber_canopy",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 7548,
+  "parts": 18,
+  "crop": [
+   93,
+   107,
+   73,
+   146
+  ],
+  "out": "#3F2716"
+ },
+ "cider_dahlia_t2": {
+  "season": "amber_canopy",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 9792,
+  "parts": 24,
+  "crop": [
+   79,
+   59,
+   118,
+   194
+  ],
+  "out": "#3F2716"
+ },
+ "cider_dahlia_t3": {
+  "season": "amber_canopy",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 10442,
+  "parts": 24,
+  "crop": [
+   79,
+   59,
+   121,
+   194
+  ],
+  "out": "#3F2716"
+ },
+ "golden_oak_bloom_t1": {
+  "season": "amber_canopy",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 3000,
+  "parts": 3,
+  "crop": [
+   94,
+   84,
+   54,
+   169
+  ],
+  "out": "#3F2716"
+ },
+ "golden_oak_bloom_t2": {
+  "season": "amber_canopy",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 10852,
+  "parts": 12,
+  "crop": [
+   69,
+   70,
+   121,
+   183
+  ],
+  "out": "#3F2716"
+ },
+ "golden_oak_bloom_t3": {
+  "season": "amber_canopy",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 9276,
+  "parts": 11,
+  "crop": [
+   70,
+   71,
+   119,
+   182
+  ],
+  "out": "#3F2716"
+ },
+ "amber_magnolia_t1": {
+  "season": "amber_canopy",
+  "rarity": 3,
+  "tier": 1,
+  "bytes": 5232,
+  "parts": 10,
+  "crop": [
+   85,
+   102,
+   91,
+   152
+  ],
+  "out": "#3F2716"
+ },
+ "amber_magnolia_t2": {
+  "season": "amber_canopy",
+  "rarity": 3,
+  "tier": 2,
+  "bytes": 7849,
+  "parts": 18,
+  "crop": [
+   33,
+   49,
+   186,
+   205
+  ],
+  "out": "#3F2716"
+ },
+ "amber_magnolia_t3": {
+  "season": "amber_canopy",
+  "rarity": 3,
+  "tier": 3,
+  "bytes": 7472,
+  "parts": 18,
+  "crop": [
+   32,
+   49,
+   190,
+   205
+  ],
+  "out": "#3F2716"
+ },
+ "sea_thrift_t1": {
+  "season": "coral_tide",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 3228,
+  "parts": 5,
+  "crop": [
+   89,
+   125,
+   73,
+   124
+  ],
+  "out": "#2E3542"
+ },
+ "sea_thrift_t2": {
+  "season": "coral_tide",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 5696,
+  "parts": 9,
+  "crop": [
+   71,
+   60,
+   117,
+   189
+  ],
+  "out": "#2E3542"
+ },
+ "sea_thrift_t3": {
+  "season": "coral_tide",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 5115,
+  "parts": 9,
+  "crop": [
+   73,
+   62,
+   113,
+   187
+  ],
+  "out": "#2E3542"
+ },
+ "salt_daisy_t1": {
+  "season": "coral_tide",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 8529,
+  "parts": 18,
+  "crop": [
+   98,
+   110,
+   60,
+   143
+  ],
+  "out": "#2E3542"
+ },
+ "salt_daisy_t2": {
+  "season": "coral_tide",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 9470,
+  "parts": 18,
+  "crop": [
+   82,
+   55,
+   92,
+   198
+  ],
+  "out": "#2E3542"
+ },
+ "salt_daisy_t3": {
+  "season": "coral_tide",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 8096,
+  "parts": 18,
+  "crop": [
+   82,
+   55,
+   92,
+   198
+  ],
+  "out": "#2E3542"
+ },
+ "tide_anemone_t1": {
+  "season": "coral_tide",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 5899,
+  "parts": 10,
+  "crop": [
+   98,
+   119,
+   59,
+   134
+  ],
+  "out": "#2E3542"
+ },
+ "tide_anemone_t2": {
+  "season": "coral_tide",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 6967,
+  "parts": 10,
+  "crop": [
+   92,
+   71,
+   72,
+   182
+  ],
+  "out": "#2E3542"
+ },
+ "tide_anemone_t3": {
+  "season": "coral_tide",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 4552,
+  "parts": 10,
+  "crop": [
+   90,
+   71,
+   76,
+   182
+  ],
+  "out": "#2E3542"
+ },
+ "coral_hibiscus_t1": {
+  "season": "coral_tide",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 6276,
+  "parts": 9,
+  "crop": [
+   87,
+   104,
+   80,
+   149
+  ],
+  "out": "#2E3542"
+ },
+ "coral_hibiscus_t2": {
+  "season": "coral_tide",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 8505,
+  "parts": 11,
+  "crop": [
+   70,
+   58,
+   129,
+   195
+  ],
+  "out": "#2E3542"
+ },
+ "coral_hibiscus_t3": {
+  "season": "coral_tide",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 4955,
+  "parts": 11,
+  "crop": [
+   70,
+   58,
+   132,
+   195
+  ],
+  "out": "#2E3542"
+ },
+ "pearl_waterlily_t1": {
+  "season": "coral_tide",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 6699,
+  "parts": 15,
+  "crop": [
+   35,
+   158,
+   160,
+   90
+  ],
+  "out": "#2E3542"
+ },
+ "pearl_waterlily_t2": {
+  "season": "coral_tide",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 8907,
+  "parts": 19,
+  "crop": [
+   35,
+   162,
+   209,
+   89
+  ],
+  "out": "#2E3542"
+ },
+ "pearl_waterlily_t3": {
+  "season": "coral_tide",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 9139,
+  "parts": 19,
+  "crop": [
+   35,
+   162,
+   209,
+   89
+  ],
+  "out": "#2E3542"
+ },
+ "reef_crown_t1": {
+  "season": "coral_tide",
+  "rarity": 3,
+  "tier": 1,
+  "bytes": 8471,
+  "parts": 20,
+  "crop": [
+   99,
+   111,
+   58,
+   144
+  ],
+  "out": "#2E3542"
+ },
+ "reef_crown_t2": {
+  "season": "coral_tide",
+  "rarity": 3,
+  "tier": 2,
+  "bytes": 10868,
+  "parts": 24,
+  "crop": [
+   48,
+   67,
+   164,
+   188
+  ],
+  "out": "#2E3542"
+ },
+ "reef_crown_t3": {
+  "season": "coral_tide",
+  "rarity": 3,
+  "tier": 3,
+  "bytes": 10458,
+  "parts": 24,
+  "crop": [
+   48,
+   67,
+   164,
+   188
+  ],
+  "out": "#2E3542"
+ },
+ "comet_sprig_t1": {
+  "season": "starfall_glade",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 2359,
+  "parts": 5,
+  "crop": [
+   92,
+   126,
+   77,
+   123
+  ],
+  "out": "#1C1534"
+ },
+ "comet_sprig_t2": {
+  "season": "starfall_glade",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 4905,
+  "parts": 11,
+  "crop": [
+   49,
+   72,
+   161,
+   177
+  ],
+  "out": "#1C1534"
+ },
+ "comet_sprig_t3": {
+  "season": "starfall_glade",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 6229,
+  "parts": 11,
+  "crop": [
+   49,
+   72,
+   161,
+   177
+  ],
+  "out": "#1C1534"
+ },
+ "nebula_clover_t1": {
+  "season": "starfall_glade",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 3266,
+  "parts": 4,
+  "crop": [
+   89,
+   134,
+   78,
+   119
+  ],
+  "out": "#1C1534"
+ },
+ "nebula_clover_t2": {
+  "season": "starfall_glade",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 7212,
+  "parts": 10,
+  "crop": [
+   69,
+   56,
+   132,
+   197
+  ],
+  "out": "#1C1534"
+ },
+ "nebula_clover_t3": {
+  "season": "starfall_glade",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 4761,
+  "parts": 10,
+  "crop": [
+   75,
+   56,
+   123,
+   197
+  ],
+  "out": "#1C1534"
+ },
+ "meteor_daisy_t1": {
+  "season": "starfall_glade",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 6605,
+  "parts": 14,
+  "crop": [
+   98,
+   110,
+   60,
+   143
+  ],
+  "out": "#1C1534"
+ },
+ "meteor_daisy_t2": {
+  "season": "starfall_glade",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 6625,
+  "parts": 14,
+  "crop": [
+   79,
+   61,
+   98,
+   192
+  ],
+  "out": "#1C1534"
+ },
+ "meteor_daisy_t3": {
+  "season": "starfall_glade",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 6750,
+  "parts": 14,
+  "crop": [
+   79,
+   61,
+   98,
+   192
+  ],
+  "out": "#1C1534"
+ },
+ "aurora_tulip_t1": {
+  "season": "starfall_glade",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 3715,
+  "parts": 7,
+  "crop": [
+   98,
+   114,
+   63,
+   139
+  ],
+  "out": "#1C1534"
+ },
+ "aurora_tulip_t2": {
+  "season": "starfall_glade",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 4159,
+  "parts": 8,
+  "crop": [
+   87,
+   65,
+   105,
+   188
+  ],
+  "out": "#1C1534"
+ },
+ "aurora_tulip_t3": {
+  "season": "starfall_glade",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 3439,
+  "parts": 8,
+  "crop": [
+   85,
+   65,
+   110,
+   188
+  ],
+  "out": "#1C1534"
+ },
+ "galaxy_sunburst_t1": {
+  "season": "starfall_glade",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 9946,
+  "parts": 24,
+  "crop": [
+   89,
+   101,
+   78,
+   153
+  ],
+  "out": "#1C1534"
+ },
+ "galaxy_sunburst_t2": {
+  "season": "starfall_glade",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 11215,
+  "parts": 25,
+  "crop": [
+   73,
+   45,
+   110,
+   209
+  ],
+  "out": "#1C1534"
+ },
+ "galaxy_sunburst_t3": {
+  "season": "starfall_glade",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 10467,
+  "parts": 25,
+  "crop": [
+   73,
+   45,
+   110,
+   209
+  ],
+  "out": "#1C1534"
+ },
+ "nova_bloom_t1": {
+  "season": "starfall_glade",
+  "rarity": 3,
+  "tier": 1,
+  "bytes": 7558,
+  "parts": 18,
+  "crop": [
+   92,
+   102,
+   75,
+   151
+  ],
+  "out": "#1C1534"
+ },
+ "nova_bloom_t2": {
+  "season": "starfall_glade",
+  "rarity": 3,
+  "tier": 2,
+  "bytes": 11154,
+  "parts": 27,
+  "crop": [
+   43,
+   52,
+   172,
+   201
+  ],
+  "out": "#1C1534"
+ },
+ "nova_bloom_t3": {
+  "season": "starfall_glade",
+  "rarity": 3,
+  "tier": 3,
+  "bytes": 11971,
+  "parts": 27,
+  "crop": [
+   40,
+   52,
+   178,
+   201
+  ],
+  "out": "#1C1534"
+ },
+ "marsh_rush_t1": {
+  "season": "ember_fen",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 2099,
+  "parts": 4,
+  "crop": [
+   98,
+   128,
+   63,
+   121
+  ],
+  "out": "#2A140E"
+ },
+ "marsh_rush_t2": {
+  "season": "ember_fen",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 3605,
+  "parts": 7,
+  "crop": [
+   63,
+   71,
+   138,
+   178
+  ],
+  "out": "#2A140E"
+ },
+ "marsh_rush_t3": {
+  "season": "ember_fen",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 3273,
+  "parts": 7,
+  "crop": [
+   63,
+   71,
+   138,
+   178
+  ],
+  "out": "#2A140E"
+ },
+ "peat_violet_t1": {
+  "season": "ember_fen",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 5245,
+  "parts": 9,
+  "crop": [
+   98,
+   131,
+   60,
+   122
+  ],
+  "out": "#2A140E"
+ },
+ "peat_violet_t2": {
+  "season": "ember_fen",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 5397,
+  "parts": 9,
+  "crop": [
+   92,
+   90,
+   72,
+   163
+  ],
+  "out": "#2A140E"
+ },
+ "peat_violet_t3": {
+  "season": "ember_fen",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 4329,
+  "parts": 9,
+  "crop": [
+   92,
+   89,
+   72,
+   164
+  ],
+  "out": "#2A140E"
+ },
+ "cinder_buttercup_t1": {
+  "season": "ember_fen",
+  "rarity": 1,
+  "tier": 1,
+  "bytes": 4538,
+  "parts": 9,
+  "crop": [
+   99,
+   120,
+   58,
+   133
+  ],
+  "out": "#2A140E"
+ },
+ "cinder_buttercup_t2": {
+  "season": "ember_fen",
+  "rarity": 1,
+  "tier": 2,
+  "bytes": 5668,
+  "parts": 9,
+  "crop": [
+   89,
+   69,
+   78,
+   184
+  ],
+  "out": "#2A140E"
+ },
+ "cinder_buttercup_t3": {
+  "season": "ember_fen",
+  "rarity": 1,
+  "tier": 3,
+  "bytes": 4218,
+  "parts": 9,
+  "crop": [
+   89,
+   69,
+   78,
+   184
+  ],
+  "out": "#2A140E"
+ },
+ "flame_iris_t1": {
+  "season": "ember_fen",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 5295,
+  "parts": 10,
+  "crop": [
+   90,
+   107,
+   69,
+   146
+  ],
+  "out": "#2A140E"
+ },
+ "flame_iris_t2": {
+  "season": "ember_fen",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 5706,
+  "parts": 11,
+  "crop": [
+   78,
+   71,
+   115,
+   182
+  ],
+  "out": "#2A140E"
+ },
+ "flame_iris_t3": {
+  "season": "ember_fen",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 4715,
+  "parts": 11,
+  "crop": [
+   78,
+   71,
+   117,
+   182
+  ],
+  "out": "#2A140E"
+ },
+ "smoke_lotus_t1": {
+  "season": "ember_fen",
+  "rarity": 2,
+  "tier": 1,
+  "bytes": 4334,
+  "parts": 8,
+  "crop": [
+   35,
+   177,
+   167,
+   73
+  ],
+  "out": "#2A140E"
+ },
+ "smoke_lotus_t2": {
+  "season": "ember_fen",
+  "rarity": 2,
+  "tier": 2,
+  "bytes": 5797,
+  "parts": 11,
+  "crop": [
+   35,
+   164,
+   182,
+   87
+  ],
+  "out": "#2A140E"
+ },
+ "smoke_lotus_t3": {
+  "season": "ember_fen",
+  "rarity": 2,
+  "tier": 3,
+  "bytes": 5299,
+  "parts": 11,
+  "crop": [
+   35,
+   164,
+   183,
+   87
+  ],
+  "out": "#2A140E"
+ },
+ "fenfire_crown_t1": {
+  "season": "ember_fen",
+  "rarity": 3,
+  "tier": 1,
+  "bytes": 6720,
+  "parts": 16,
+  "crop": [
+   92,
+   99,
+   75,
+   155
+  ],
+  "out": "#2A140E"
+ },
+ "fenfire_crown_t2": {
+  "season": "ember_fen",
+  "rarity": 3,
+  "tier": 2,
+  "bytes": 11189,
+  "parts": 27,
+  "crop": [
+   31,
+   51,
+   197,
+   203
+  ],
+  "out": "#2A140E"
+ },
+ "fenfire_crown_t3": {
+  "season": "ember_fen",
+  "rarity": 3,
+  "tier": 3,
+  "bytes": 11922,
+  "parts": 27,
+  "crop": [
+   31,
+   51,
+   197,
+   203
+  ],
+  "out": "#2A140E"
  }
 }

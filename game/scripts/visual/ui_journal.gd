@@ -132,7 +132,22 @@ static func rarity_stars(rarity: int) -> String:
 	return "★".repeat(r) + "☆".repeat(3 - r)
 
 
+## StyleBoxovi reda su nepromjenjivi i dijele se između redova (keš po ključu) —
+## Journal gradi do 48 redova, a svaki je tražio 5 novih StyleBoxova.
+static var _styles: Dictionary = {}
+
+
+static func _cached(key: String, make: Callable) -> StyleBoxFlat:
+	if not _styles.has(key):
+		_styles[key] = make.call()
+	return _styles[key]
+
+
 static func row_style(rarity: int, locked: bool) -> StyleBoxFlat:
+	return _cached("row:%d:%s" % [rarity, locked], _make_row_style.bind(rarity, locked))
+
+
+static func _make_row_style(rarity: int, locked: bool) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = UiPalette.rarity_bg_color(rarity, locked)
 	s.border_color = RARITY_EDGE_LOCKED if locked else [RARITY_EDGE_1, RARITY_EDGE_2, RARITY_EDGE_3][clampi(rarity, 1, 3) - 1]
@@ -150,6 +165,10 @@ static func row_style(rarity: int, locked: bool) -> StyleBoxFlat:
 
 ## kind: "empty" | "bloom" (T1/T2) | "crystal" (T3)
 static func tier_frame_style(kind: String) -> StyleBoxFlat:
+	return _cached("frame:" + kind, _make_tier_frame_style.bind(kind))
+
+
+static func _make_tier_frame_style(kind: String) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	match kind:
 		"bloom":
@@ -171,6 +190,10 @@ static func tier_frame_style(kind: String) -> StyleBoxFlat:
 
 
 static func tier_halo_style(crystal: bool) -> StyleBoxFlat:
+	return _cached("halo:%s" % crystal, _make_tier_halo_style.bind(crystal))
+
+
+static func _make_tier_halo_style(crystal: bool) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = NEW_PINK
 	s.border_color = INK
@@ -180,6 +203,10 @@ static func tier_halo_style(crystal: bool) -> StyleBoxFlat:
 
 
 static func new_badge_style() -> StyleBoxFlat:
+	return _cached("badge", _make_new_badge_style)
+
+
+static func _make_new_badge_style() -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = NEW_PINK
 	s.border_color = INK
@@ -252,6 +279,45 @@ static func tab_dot_style() -> StyleBoxFlat:
 
 
 ## y reda u sadržaju liste (redovi idu sezona po sezona, 6 po sezoni u seasons.json).
+## Redoslijed sezona u Albumu: aktivna sezona prva, pa sezone s bar jednim (ali ne svim)
+## otključanim cvijetom, pa potpune, pa one bez ijednog (zaključane). Unutar grupe red
+## kataloga. Cvijet je otključan kad nije „locked". → [{sid, entries, kept, total, unlocked}]
+static func order_seasons(entries: Array, active_id: String) -> Array[Dictionary]:
+	var by_sid := {}
+	var sids: Array[String] = []
+	for entry in entries:
+		var sid := SeedCatalog.season_id_for(str(entry.get("type_id", "")))
+		if not by_sid.has(sid):
+			var list: Array[Dictionary] = []
+			by_sid[sid] = {"sid": sid, "entries": list, "kept": 0, "total": 0, "unlocked": 0}
+			sids.append(sid)
+		var s: Dictionary = by_sid[sid]
+		(s["entries"] as Array[Dictionary]).append(entry)
+		s["total"] = int(s["total"]) + 1
+		var state := str(entry.get("state", "locked"))
+		if state != "locked":
+			s["unlocked"] = int(s["unlocked"]) + 1
+		if state == "album_t2" or state == "album_t3":
+			s["kept"] = int(s["kept"]) + 1
+	var buckets: Array = [[], [], [], []]
+	for sid in sids:
+		var s: Dictionary = by_sid[sid]
+		var unlocked := int(s["unlocked"])
+		var rank := 3
+		if sid == active_id:
+			rank = 0
+		elif unlocked > 0 and unlocked < int(s["total"]):
+			rank = 1
+		elif unlocked > 0:
+			rank = 2
+		(buckets[rank] as Array).append(s)
+	var out: Array[Dictionary] = []
+	for b in buckets:
+		for s in b:
+			out.append(s)
+	return out
+
+
 static func row_y(season_index: int, row_in_season: int) -> int:
 	var group_h := SEASON_HEADER_H + SEASON_HEADER_GAP + 6 * ROW_H + 5 * ROW_GAP
 	return LIST_TOP + season_index * (group_h + SEASON_GAP) + SEASON_HEADER_H + SEASON_HEADER_GAP + row_in_season * (ROW_H + ROW_GAP)

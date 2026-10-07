@@ -317,6 +317,8 @@ static func portrait_style() -> StyleBoxFlat:
 	return box(DISC, 999, BORDER)
 
 
-## Trake sezone (Home v3): nebo +30 % bijele, daljina, blizina × 0,93.
+## Trake sezone (Home v3): nebo +30 % bijele, daljina, blizina × 0,93. Season Kit faza 2:
+## SeasonCard u Shopu crta recept "shop"; trake ostaju samo u vinjeti Loot Bursta
+## (tamni tekst preko trake sljedeće besplatne sezone — van paketa sezona).
 static func season_bands(g: Color) -> Array[Color]:
 	return [g.lerp(Color.WHITE, 0.30), g, Color(g.r * 0.93, g.g * 0.93, g.b * 0.93)]

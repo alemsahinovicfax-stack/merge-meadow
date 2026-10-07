@@ -2,6 +2,9 @@ class_name ArenaSeedChip
 extends Control
 
 ## Sjeme u merge areni — T1/T2, drag + magnet snap merge. Crtez: ArenaChipDraw (smjer B).
+## Crtež je u djetetu `_art` (2026-10-06): let pri sipanju pomjera samo `_art` (transform),
+## bez ponovnog crtanja — prije je svaka od ~30 sjemenki svaki frejm iznova gradila 5
+## StyleBoxova i cvijet, pa je sipanje obaralo FPS.
 
 signal drag_started(chip: ArenaSeedChip)
 signal drag_released(chip: ArenaSeedChip)
@@ -38,7 +41,7 @@ var pulse_highlight: bool:
 			return
 		_pulse_highlight = value
 		set_process(value)
-		queue_redraw()
+		_redraw()
 	get:
 		return _pulse_highlight
 
@@ -49,7 +52,7 @@ var magnet_partner: bool = false:
 		magnet_partner = value
 		if not _dragging and not _being_eaten:
 			_tween_pose(_rest_scale(), 0.0)
-		queue_redraw()
+		_redraw()
 
 var _mythic: bool = false
 var _dragging: bool = false
@@ -59,6 +62,17 @@ var _merge_ring: float = 0.0
 var _fly_offset: Vector2 = Vector2.ZERO
 var _pose_tween: Tween = null
 var _fx_tween: Tween = null
+var _art: _Art = null
+
+
+## Crta sjemenku u svom rectu; let pomjera ovaj čvor, ne crtež.
+class _Art:
+	extends Control
+
+	var chip: ArenaSeedChip
+
+	func _draw() -> void:
+		chip._draw_art(self)
 
 
 func setup(id: int, seed_type: String, at: Vector2, seed_tier: int = 1) -> void:
@@ -72,12 +86,29 @@ func setup(id: int, seed_type: String, at: Vector2, seed_tier: int = 1) -> void:
 	position = at - Vector2(CHIP_RADIUS, CHIP_RADIUS)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	set_process(false)
-	queue_redraw()
+	_ensure_art()
+	_redraw()
+
+
+func _ensure_art() -> void:
+	if _art != null:
+		return
+	_art = _Art.new()
+	_art.name = "Art"
+	_art.chip = self
+	_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_art.size = size
+	add_child(_art)
+
+
+func _redraw() -> void:
+	if _art != null:
+		_art.queue_redraw()
 
 
 func set_tier(new_tier: int) -> void:
 	tier = new_tier
-	queue_redraw()
+	_redraw()
 
 
 func get_center() -> Vector2:
@@ -102,11 +133,17 @@ func play_pour_in(from_center: Vector2, delay: float) -> void:
 	if not is_inside_tree():
 		return
 	_fly_offset = from_center - get_center()
-	modulate.a = 0.0
 	scale = Vector2.ONE * POUR_START_SCALE
+	_set_fly_offset(_fly_offset)
+	# Skriven crtež se ne crta (ni ne gradi) dok ne dođe red: prvi crtež ~30 sjemenki se
+	# raspodijeli kroz razmak sipanja umjesto da padne u jedan frejm.
+	if _art != null:
+		_art.visible = false
 	var tw := create_tween()
 	tw.tween_interval(delay)
-	tw.tween_callback(func() -> void: modulate.a = 1.0)
+	tw.tween_callback(func() -> void:
+		if _art != null:
+			_art.visible = true)
 	tw.tween_method(_set_fly_offset, _fly_offset, Vector2.ZERO, POUR_SEC).set_trans(
 		Tween.TRANS_BACK
 	).set_ease(Tween.EASE_OUT)
@@ -146,7 +183,7 @@ func set_being_eaten(on: bool) -> void:
 	if _being_eaten == on:
 		return
 	_being_eaten = on
-	queue_redraw()
+	_redraw()
 	if not is_inside_tree():
 		return
 	_kill_tweens()
@@ -184,10 +221,10 @@ func _gui_input(event: InputEvent) -> void:
 
 func _process(_delta: float) -> void:
 	if pulse_highlight:
-		queue_redraw()
+		_redraw()
 
 
-func _draw() -> void:
+func _draw_art(canvas: CanvasItem) -> void:
 	var ring := ArenaChipDraw.Ring.NONE
 	var ring_alpha := 1.0
 	if _merge_ring > 0.0:
@@ -199,10 +236,8 @@ func _draw() -> void:
 		ring = ArenaChipDraw.Ring.PULSE
 		var phase := Time.get_ticks_msec() / 1000.0 * TAU / PULSE_PERIOD
 		ring_alpha = 0.55 + 0.45 * (0.5 + 0.5 * sin(phase))
-	# Crtez je u lokalnom (skaliranom) prostoru — pomak leta skaliraj natrag.
-	var offset := _fly_offset / maxf(scale.x, 0.01)
 	ArenaChipDraw.draw_chip(
-		self, size * 0.5 + offset, type_id, tier, _mythic, ring, ring_alpha, _dragging, _being_eaten
+		canvas, size * 0.5, type_id, tier, _mythic, ring, ring_alpha, _dragging, _being_eaten
 	)
 
 
@@ -211,7 +246,7 @@ func _begin_drag(local_pos: Vector2) -> void:
 	_drag_offset = local_pos
 	z_index = 10
 	_tween_pose(DRAG_SCALE, DRAG_ROT)
-	queue_redraw()
+	_redraw()
 	drag_started.emit(self)
 
 
@@ -221,7 +256,7 @@ func _end_drag() -> void:
 	_dragging = false
 	z_index = 0
 	_tween_pose(_rest_scale(), 0.0)
-	queue_redraw()
+	_redraw()
 	drag_released.emit(self)
 
 
@@ -248,11 +283,13 @@ func _kill_tweens() -> void:
 		_fx_tween.kill()
 
 
+## Let: samo transform djeteta (u lokalnom, skaliranom prostoru — pomak se skalira natrag).
 func _set_fly_offset(value: Vector2) -> void:
 	_fly_offset = value
-	queue_redraw()
+	if _art != null:
+		_art.position = _fly_offset / maxf(scale.x, 0.01)
 
 
 func _set_merge_ring(value: float) -> void:
 	_merge_ring = value
-	queue_redraw()
+	_redraw()

@@ -30,9 +30,10 @@ func _row(journal: Node) -> Node:
 	return _find_row(list)
 
 
+## Red s NEW cvijetom (clover) — prvi red na listi je aktivna sezona (redoslijed 2026-10-06).
 func _find_row(n: Node) -> Node:
 	for child in n.get_children():
-		if child.has_method("get_tier_icon"):
+		if child.has_method("get_tier_icon") and str(child.call("get_type_id")) == "clover":
 			return child
 		var found := _find_row(child)
 		if found:

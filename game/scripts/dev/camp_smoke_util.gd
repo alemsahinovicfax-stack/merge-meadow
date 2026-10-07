@@ -1,12 +1,14 @@
 class_name CampSmokeUtil
 extends RefCounted
 
-## Zajednicko za camp_*_smoke: backup/restore pravog save-a (Camp na izlazu
-## flushuje trade save) i provjera chipa iz design_handoff_camp.
+## Zajednicko za sve *_smoke: backup/restore pravog save-a (test i igra dijele
+## user://, a Camp na izlazu flushuje trade save) i provjera chipa iz
+## design_handoff_camp. Vidi greske-katalog #25.
 
 const SAVE_PATH := "user://player_save.json"
 
 
+## Prazan string = save nije postojao.
 static func backup_save() -> String:
 	if not FileAccess.file_exists(SAVE_PATH):
 		return ""
@@ -15,13 +17,17 @@ static func backup_save() -> String:
 
 static func restore_save(tree: SceneTree, backup: String) -> void:
 	if backup.is_empty():
-		return
-	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
-	if f:
-		f.store_string(backup)
-		f.close()
+		# Savea nije bilo prije testa — obrisi onaj koji je test napravio.
+		if FileAccess.file_exists(SAVE_PATH):
+			DirAccess.remove_absolute(SAVE_PATH)
+	else:
+		var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+		if f:
+			f.store_string(backup)
+			f.close()
+	# Izlaz iz _initialize(): GameState jos nije odradio _ready, nema sta ucitati.
 	var gs := tree.get_root().get_node_or_null("GameState")
-	if gs:
+	if gs and gs.is_node_ready():
 		gs.call("load_player_save")
 
 

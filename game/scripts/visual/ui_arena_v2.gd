@@ -102,6 +102,8 @@ static func _merge_kit(src: Dictionary, a: Dictionary) -> Dictionary:
 	for sc in f["scatter"]:
 		if pal.has(str(sc.get("id", ""))):
 			sc["palette"] = (pal[str(sc["id"])] as Array).duplicate()
+			# Kao u JS: paleta kita zamjenjuje i varijante (inače bi varijante pobijedile).
+			sc.erase("variants")
 	for sc in a.get("addScatter", []):
 		var add: Dictionary = {"grow": [1, 1], "rot": [0, 0]}
 		add.merge(sc, true)

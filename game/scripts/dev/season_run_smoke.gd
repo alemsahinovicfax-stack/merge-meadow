@@ -6,8 +6,17 @@ const SAVE_PATH := "user://player_save.json"
 const UnlockCfg := preload("res://scripts/progression/seed_unlock_config.gd")
 
 
+var _backup: String = ""
+
+
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _gs() -> Node:
@@ -16,7 +25,7 @@ func _gs() -> Node:
 
 func _fail(msg: String) -> void:
 	push_error("season_run_smoke: %s" % msg)
-	quit(1)
+	_quit(1)
 
 
 func _run() -> void:
@@ -79,17 +88,27 @@ func _run() -> void:
 	if bg == null or not bg.has_method("apply_theme"):
 		_fail("Background apply_theme missing")
 		return
+	# Season Kit faza 2: sezona je u kitu runa (tlo, materijal staze), ne u tintu —
+	# modulate je samo kozmetika i ostaje isti; mijenja se run kita.
 	var m1: Color = bg.get("modulate")
+	var run1: Dictionary = bg.get("_run")
 	gs.set("wallet_coins", 500)
 	gs.set("garden_crystal_stash", {"pumpkin": 20})
 	if not bool(gs.call("unlock_free", "frost_orchard")):
-		_fail("frost unlock before tint compare failed")
+		_fail("frost unlock before kit compare failed")
 		return
 	bg.call("apply_theme")
 	await process_frame
 	var m2: Color = bg.get("modulate")
-	if m1.is_equal_approx(m2):
-		_fail("BG modulate should change S1 vs frost")
+	var run2: Dictionary = bg.get("_run")
+	if not m1.is_equal_approx(m2):
+		_fail("BG modulate is cosmetic only — must not change with the season")
+		return
+	if not bool(bg.call("has_kit")) or str(run1.get("ground", "")) == str(run2.get("ground", "")):
+		_fail("run kit should change S1 vs frost (ground %s → %s)" % [run1.get("ground"), run2.get("ground")])
+		return
+	if str((run2.get("material", {}) as Dictionary).get("kind", "")) != "rut":
+		_fail("frost run material should be the sled rut")
 		return
 	var pickup_bar := run.get_node_or_null("HUD/TopHud/PickupBar") as Control
 	if pickup_bar == null:
@@ -97,4 +116,4 @@ func _run() -> void:
 		return
 
 	print("season_run_smoke OK")
-	quit(0)
+	_quit(0)

@@ -9,8 +9,17 @@ const S3 := "lantern_meadow"
 const PAID := "moonlit_warren"
 
 
+var _backup: String = ""
+
+
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _gs() -> Node:
@@ -19,7 +28,7 @@ func _gs() -> Node:
 
 func _fail(msg: String) -> void:
 	push_error("season_unlock_smoke: %s" % msg)
-	quit(1)
+	_quit(1)
 
 
 func _reset_new_game(gs: Node) -> void:
@@ -338,4 +347,4 @@ func _run() -> void:
 		return
 
 	print("season_unlock_smoke OK")
-	quit(0)
+	_quit(0)

@@ -1,24 +1,13 @@
 class_name SeedVisualConfig
 extends RefCounted
 
-## Boje i proceduralni crtež: Country Bloom 6 imaju bespoke paletu; ostali
-## catalog id-evi dobiju paletu iz sezonske nijanse (SEASON_HUE) + mali
-## per-type hue jitter, umjesto čistog hasha — sezone ostaju vizuelno
-## dosljedne, tipovi unutar sezone i dalje razlikuju nijansu.
+## Boje i proceduralni crtež: Country Bloom 6 imaju bespoke paletu; ostali id-evi
+## dobiju paletu iz nijanse id-a (hash). Season Kit faza 2: svih 48 tipova ima crtež
+## (assets/sprites/flowers), pa je proceduralni crtež samo rezerva kad SVG fali —
+## sezonske nijanse (SEASON_HUE) su obrisane.
 
 const STEM := Color(0.35, 0.62, 0.32, 1.0)
 const LEAF := Color(0.42, 0.76, 0.38, 1.0)
-
-## docs/04-experience/design-drafts/seeds-flowers-cd-brief.md §5 — akcent po sezoni.
-const SEASON_HUE: Dictionary = {
-	"frost_orchard": 0.55,
-	"lantern_meadow": 0.10,
-	"amber_canopy": 0.06,
-	"moonlit_warren": 0.65,
-	"coral_tide": 0.97,
-	"starfall_glade": 0.78,
-	"ember_fen": 0.02,
-}
 
 const PALETTES: Dictionary = {
 	"clover": {
@@ -67,9 +56,7 @@ static func palette(type_id: String) -> Dictionary:
 
 
 static func _seasonal_palette(type_id: String) -> Dictionary:
-	var base_hue: float = SEASON_HUE.get(SeedCatalog.season_id_for(type_id), -1.0)
-	if base_hue < 0.0:
-		base_hue = float(absi(type_id.hash()) % 360) / 360.0
+	var base_hue := float(absi(type_id.hash()) % 360) / 360.0
 	var jitter := (float(absi(type_id.hash()) % 100) / 100.0 - 0.5) * 0.08
 	var hue := fmod(base_hue + jitter + 1.0, 1.0)
 	var petal := Color.from_hsv(hue, 0.55, 0.92)

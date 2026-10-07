@@ -11,6 +11,9 @@ extends Control
 ## umjesto traka, 13 mjesta iz kita, ambijent (≤ 24 čestice, samo u = 1) i Pipove
 ## poze. Mjesto, cvijeće i ambijent žive u rectu livade: u prelazu je to rect kartice
 ## (apply_reveal(u, rect)), pa cvijeće stoji na svojoj pruzi — na u = 1 rect = stranica.
+## Faza 2: njihanje cvijeća ±3° (jedna petlja ovdje, samo na u = 1; Reduce motion je gasi),
+## Pip spava → ambijent 0,35; Pip njuši → čestice oblika prvog sloja ambijenta.
+## Na polju su najviše 2 stalne petlje: ambijent + njihanje.
 
 const FLOWER_SCRIPT := preload("res://scripts/ui/season_field_flower.gd")
 const SOIL_DARK_FILL := Color(0.0, 0.0, 0.039, 0.28)
@@ -42,9 +45,6 @@ var _pip_state: int = _PipState.NONE
 var _last_sniff_id: int = 0
 var _spot_count: int = 0
 var _grown_count: int = 0
-var _band_sky: ColorRect
-var _band_far: ColorRect
-var _band_near: ColorRect
 var _laid_out_size: Vector2 = Vector2.ZERO
 var _reveal_u: float = 1.0
 var _pip_hold: bool = false
@@ -59,18 +59,47 @@ var _meadow_rect: Rect2 = Rect2()
 static var _seen_grown: Dictionary = {}
 ## Stash rostera kakav je bio kad je polje zadnji put građeno (refresh_growth).
 var _built_stash: Dictionary = {}
+## Prvi sloj ambijenta sezone — oblik čestica kad Pip njuši cvijet.
+var _puff_layer: Dictionary = {}
+var _sway_t: float = 0.0
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	clip_contents = true
-	_ensure_bands()
+	set_process(false)
 	_ensure_kit_nodes()
 	_hide_pip_and_stop()
 	if meadow_note:
 		meadow_note.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_note_color = meadow_note.get_theme_color("font_color")
 	resized.connect(_on_resized)
+	visibility_changed.connect(_sync_sway)
+
+
+## Njihanje radi samo na otvorenom polju kita s izraslim cvijećem, bez Reduce motion.
+func is_swaying() -> bool:
+	return is_processing()
+
+
+func _sync_sway() -> void:
+	var on := _kit and _reveal_u >= 1.0 and _grown_count > 0 and not _open_season_id.is_empty() \
+		and is_visible_in_tree() and not GameState.reduce_motion
+	if on == is_processing():
+		return
+	set_process(on)
+	if not on:
+		for f in _meadow_flowers():
+			(f as SeasonFieldFlower).set_sway(0.0)
+
+
+## Jedna petlja za sve cvjetove: 3 · sin(2π (t − 0,37 i) / (3 + (i % 5) · 0,5)), pivot = baza.
+func _process(delta: float) -> void:
+	_sway_t += delta
+	for f in _meadow_flowers():
+		var i := int(f.get_meta("spot_index", 0))
+		var period := UiSeasons.SWAY_SEC + float(i % 5) * UiSeasons.SWAY_STEP
+		(f as SeasonFieldFlower).set_sway(UiSeasons.SWAY_DEG * sin(TAU * (_sway_t - 0.37 * float(i)) / period))
 
 
 func apply_season(season_id: String) -> void:
@@ -141,6 +170,7 @@ func dismiss_flowers() -> void:
 		meadow_note.visible = false
 	if _ambient:
 		_ambient.visible = false
+	_sync_sway()
 	grown_changed.emit(0, UiHomeField.MEADOW_SPOTS.size())
 
 
@@ -178,6 +208,7 @@ func apply_reveal(u: float, rect: Rect2 = Rect2()) -> void:
 		var k := UiHomeV3.ease_out(clampf((_reveal_u - start) / UiHomeV3.FLOWER_SETTLE, 0.0, 1.0))
 		c.modulate.a = a
 		_layout_spot(c, lerpf(UiHomeV3.FLOWER_SCALE_FROM, 1.0, k))
+	_sync_sway()
 
 
 ## Mjesto u rectu livade: baza = (x %, dno − y %), veličina × k = w / širina polja.
@@ -246,7 +277,6 @@ func is_pip_alive() -> bool:
 
 
 func _on_resized() -> void:
-	_layout_bands()
 	_place_pip_home()
 	if _open_season_id.is_empty():
 		return
@@ -266,31 +296,11 @@ func _is_shell_child(child: Node) -> bool:
 	var n := str(child.name)
 	return (
 		n == "MeadowGround"
-		or n == "MeadowSky"
-		or n == "MeadowFar"
-		or n == "MeadowNear"
 		or n == "SeasonsButton"
 		or n == "MeadowPip"
 		or n == "MeadowNote"
 		or n == "MeadowAmbient"
 	)
-
-
-func _ensure_bands() -> void:
-	if meadow_ground == null:
-		return
-	_band_sky = meadow_ground.get_node_or_null("MeadowSky") as ColorRect
-	_band_far = meadow_ground.get_node_or_null("MeadowFar") as ColorRect
-	_band_near = meadow_ground.get_node_or_null("MeadowNear") as ColorRect
-	if _band_sky == null:
-		_band_sky = _make_band("MeadowSky")
-		meadow_ground.add_child(_band_sky)
-	if _band_far == null:
-		_band_far = _make_band("MeadowFar")
-		meadow_ground.add_child(_band_far)
-	if _band_near == null:
-		_band_near = _make_band("MeadowNear")
-		meadow_ground.add_child(_band_near)
 
 
 ## SeasonBackdrop (u MeadowGround, ispod svega) i Ambient (iznad cvijeća, ispod Pipa).
@@ -310,13 +320,6 @@ func _ensure_kit_nodes() -> void:
 		add_child(_ambient)
 
 
-func _make_band(band_name: String) -> ColorRect:
-	var band := ColorRect.new()
-	band.name = band_name
-	band.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return band
-
-
 func _apply_meadow_fill(season_id: String) -> void:
 	var ground := UiHomeField.meadow_ground(season_id)
 	if meadow_ground:
@@ -325,50 +328,22 @@ func _apply_meadow_fill(season_id: String) -> void:
 		sb.bg_color = ground
 		meadow_ground.add_theme_stylebox_override("panel", sb)
 		meadow_ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_ensure_bands()
-	if _band_sky:
-		_band_sky.color = UiHomeField.meadow_sky(ground)
-	if _band_far:
-		_band_far.color = ground
-	if _band_near:
-		_band_near.color = UiHomeField.meadow_near(ground)
-	_layout_bands()
-	# Season Kit: recept umjesto traka; tekst na livadi u boji kita.
+	# Season Kit: recept (svih 8 sezona; stare tri trake su obrisane); tekst u boji kita.
 	_ensure_kit_nodes()
 	var scene := SeasonBackdrop.field_scene(season_id)
 	_kit = not scene.is_empty()
-	for band in [_band_sky, _band_far, _band_near]:
-		if band:
-			band.visible = not _kit
 	if _backdrop:
 		_backdrop.scene = scene
 		_backdrop.visible = _kit
 		_backdrop.queue_redraw()
 	if _ambient:
 		_ambient.set_season(season_id if _kit else "")
+		_ambient.set_still(GameState.reduce_motion and UiSeasons.REDUCE_MOTION_STOPS_AMBIENT)
 		_ambient.visible = _kit and _reveal_u >= 1.0
+	var layers := UiSeasons.ambient_layers(UiSeasons.ambient(season_id)) if _kit else []
+	_puff_layer = layers[0]["layer"] if not layers.is_empty() else {}
 	if meadow_note:
 		meadow_note.add_theme_color_override("font_color", UiSeasons.ink_field(season_id, _note_color))
-
-
-func _layout_bands() -> void:
-	if meadow_ground == null:
-		return
-	var inner := meadow_ground.size
-	if inner.x < 8.0:
-		inner = size
-	# Isti px kao trake kartice Homea: round(h * .32), round(h * .68).
-	var y1 := roundf(inner.y * float(UiHomeField.MEADOW_BANDS[0]))
-	var y2 := roundf(inner.y * float(UiHomeField.MEADOW_BANDS[1]))
-	if _band_sky:
-		_band_sky.position = Vector2.ZERO
-		_band_sky.size = Vector2(inner.x, y1)
-	if _band_far:
-		_band_far.position = Vector2(0.0, y1)
-		_band_far.size = Vector2(inner.x, y2 - y1)
-	if _band_near:
-		_band_near.position = Vector2(0.0, y2)
-		_band_near.size = Vector2(inner.x, maxf(0.0, inner.y - y2))
 
 
 func _rebuild_flowers(season_id: String) -> void:
@@ -407,6 +382,7 @@ func _rebuild_flowers(season_id: String) -> void:
 			flower.name = "MeadowSpot_%d" % i
 			flower.dark_kit = dark
 			flower.crop_fill = _kit
+			flower.puff_layer = _puff_layer
 			flower.shadow_color = FLOWER_SHADOW_DARK if dark else UiHomeField.FLOWER_SHADOW
 			add_child(flower)
 			flower.setup_spot(type_id, side, 3)
@@ -435,6 +411,7 @@ func _rebuild_flowers(season_id: String) -> void:
 	# Novo izraslo mjesto (prag pređen od zadnjeg prikaza): rast 0 → 1,12 → 1.
 	for j in fresh.size():
 		fresh[j].play_grow(GROW_STAGGER * j)
+	_sync_sway()
 	_restart_wander()
 
 
@@ -712,6 +689,9 @@ func _start_sleep() -> void:
 
 ## Poza Pipa po FSM stanju (Season Kit). Sezone bez kita: samo hod (bez poza).
 func _set_pip_pose(pose: String, walking: bool = false, tilt_dir: float = 1.0) -> void:
+	# Pip spava → ambijent se smiri (0,35 za 1,2 s); budi se → nazad.
+	if _ambient:
+		_ambient.set_calm(_kit and pose == "sleep")
 	if meadow_pip == null or not meadow_pip.has_method("set_pose"):
 		return
 	meadow_pip.call("set_pose", pose if _kit else "walk", walking and _kit, tilt_dir)

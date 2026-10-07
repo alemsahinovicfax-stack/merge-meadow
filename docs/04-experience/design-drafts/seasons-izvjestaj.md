@@ -15,6 +15,7 @@ ai_sažetak: "Izvještaj o prenosu CD paketa design_handoff_seasons (faza 1: Cou
 # Sezone, faza 1: izvještaj o prenosu
 
 > Roditelj: [[04-experience/_index|04-experience]] · brief: [[seasons-cd-brief]] · paket: `design_handoff_seasons/` · datum: 2026-10-05 · popravke poslije prenosa: § Popravke poslije playtesta (isti dan)
+> **Faza 2 (svih 8 sezona) je u igri 2026-10-06:** [[seasons-faza2-izvjestaj]]. Otvorene odluke ispod su prenesene tamo, uz objašnjenja.
 
 ## Ukratko
 
@@ -114,13 +115,13 @@ Testovi poslije popravki: 57 od 58 smoke testova prolazi. `ui_button_click_smoke
 ## Odluke koje čekaju tebe
 
 - [ ] **Odigraj polje CB i MW**: da li su ambijent i Pipove poze u redu po tempu? Da li je cvijeće prave veličine?
-- [ ] **CD-ovo otvoreno pitanje 2**: polje pokazuje T3 (kristal) na svih 13 mjesta. Da li polje treba pokazivati T2, s kristalom samo na kruni?
-- [ ] **C2PA metapodaci u SVG-ovima**: ostaviti (oznaka porijekla crteža, „content credentials", +0,3 MB) ili skinuti za manji APK?
+- [x] **CD-ovo otvoreno pitanje 2** (2026-10-06: ostaje T3): polje pokazuje T3 (kristal) na svih 13 mjesta. Da li polje treba pokazivati T2, s kristalom samo na kruni?
+- [x] **C2PA metapodaci u SVG-ovima** (2026-10-06: ostaju): ostaviti (oznaka porijekla crteža, „content credentials") ili skinuti? Ispravka u fazi 2: ne ulaze u APK (cvijeće ide kao tekstura), samo u repo.
 - [ ] **Swipe između kartica** (Nalaz 7): prihvatiti kratko „providno" ili popraviti?
-- [ ] **Raster 256 px** (Nalaz 3): ostaviti i za faze 2–3 (144 crteža × 256 KB ≈ 37 MB ako je sve učitano) ili praviti 192 px?
+- [x] **Raster 256 px** (2026-10-06: ostaje, mjeri se na uređaju) (Nalaz 3): ostaviti i za faze 2–3 (144 crteža × 256 KB ≈ 37 MB ako je sve učitano) ili praviti 192 px?
 - [x] **Prije faze 2**: brief, `seasons-ref/`, `seasons-faza1/`, ovaj izvještaj i paket faze 1 su na `master`. Faza 2 je sada svih 6 preostalih sezona odjednom, prompt je u brief §12.0.
 - [ ] **Vreća 100 / 40 u tvom saveu** (od dev skripte): smanjiti je na 40 da run opet puni vreću, ili je potrošiti u Areni?
-- [ ] **Scope**: sezone su v1.1 track (`scope-i-granice.md`, SEZ-01). Ova ugradnja nije launch blocker. Odluči da li faze 2–3 ugrađuješ odmah ili poslije D0-P / D0-M.
+- [x] **Scope**: sezone su v1.1 track (`scope-i-granice.md`, SEZ-01). Odlučeno 2026-10-06: faza 2 (svih 6 preostalih) ugrađena odmah.
 
 ## Povezano
 

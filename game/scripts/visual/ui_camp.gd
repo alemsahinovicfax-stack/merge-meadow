@@ -232,6 +232,8 @@ static func grid_budget(state: String, hero_visible: bool = true) -> int:
 	return section_height(hero_visible) - chrome - trade_height(state)
 
 
+## Season Kit faza 2: kartica sezone crta recept "camp" (season_link_card.gd); tint ostaje
+## za badge rezervisanog cvijeća (Kept · N / M) i rezervu kartice bez recepta.
 static func season_tint(season_id: String) -> Color:
 	match season_id:
 		"lantern_meadow":
@@ -610,6 +612,16 @@ static func season_card_style(season_id: String) -> StyleBoxFlat:
 	s.set_corner_radius_all(UiPalette.CORNER_RADIUS_CTA)
 	s.set_content_margin_all(SEASON_PAD)
 	_shadow(s, SHADOW, 8, 8)
+	return s
+
+
+## Kartica sezone s kitom (Season Kit faza 2): panel ne crta ništa osim razmaka — recept
+## "camp", rub 3 #2D3436 i jedna tvrda sjena 0 8 0 crta season_link_card.gd.
+static func season_card_kit_style() -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.draw_center = false
+	s.set_corner_radius_all(UiPalette.CORNER_RADIUS_CTA)
+	s.set_content_margin_all(SEASON_PAD)
 	return s
 
 

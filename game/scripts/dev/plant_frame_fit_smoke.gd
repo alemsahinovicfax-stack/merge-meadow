@@ -4,8 +4,17 @@ extends SceneTree
 ## da biljka stane unutra, a Journal red i dalje stane u 1032 × 200.
 
 
+var _backup: String = ""
+
+
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _run() -> void:
@@ -42,7 +51,7 @@ func _run() -> void:
 		return
 	pickup.free()
 	print("plant_frame_fit_smoke OK")
-	quit(0)
+	_quit(0)
 
 
 func _constants() -> String:
@@ -151,4 +160,4 @@ func _find_named(n: Node, wanted: String) -> Node:
 
 func _fail(msg: String) -> void:
 	push_error("plant_frame_fit_smoke: %s" % msg)
-	quit(1)
+	_quit(1)

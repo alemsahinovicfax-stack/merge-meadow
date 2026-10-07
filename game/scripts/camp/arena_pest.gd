@@ -25,6 +25,10 @@ const CHOMP_PERIOD := 0.25  # 2 x u 0,5 s
 const FREEZE_IN_SEC := 0.18
 const FREEZE_OUT_SEC := 0.25
 const SHADOW_DROP := 6.0
+## Spava U gnijezdu: segmenti sklupčani unutar vanjskog ruba gnijezda (250 x 112), pa prednji
+## rub pokrije donji dio tijela. Poza „sleep" iz paketa (y +56 / +64) bi virila ispod gnijezda
+## (playtest 2026-10-06); van gnijezda (SLEEPING_SPOT) ostaje poza iz paketa.
+const NEST_SLEEP_SEGS: Array[Vector2] = [Vector2(-62, 6), Vector2(-44, 16), Vector2(4, 26)]
 ## Segmenti prate glavu (lanac); ovoliko brzo sustizu cilj poze.
 const SEG_FOLLOW := 14.0
 const WAVE_WEIGHTS: Array[float] = [0.5, -0.8, 1.0]
@@ -300,9 +304,20 @@ func get_segment_positions() -> Array[Vector2]:
 
 
 func _snap_segments() -> void:
-	var pose: Dictionary = UiArenaV2.MUNCHER_POSES["sleep"]
 	for k in 3:
-		_segs[k] = _pest_center + _v(pose["segs"][k])
+		_segs[k] = _pest_center + _sleep_seg(k)
+
+
+## U gnijezdu (spava ili se tek budi na njemu) — tijelo je „u rupi".
+func _in_nest() -> bool:
+	var at_nest := _pest_center.distance_to(_nest_center) < 1.0
+	return _state == State.SLEEPING_NEST or (_state == State.WAKE_DELAY and at_nest)
+
+
+func _sleep_seg(k: int) -> Vector2:
+	if _state == State.SLEEPING_NEST:
+		return NEST_SLEEP_SEGS[k]
+	return _v(UiArenaV2.MUNCHER_POSES["sleep"]["segs"][k])
 
 
 ## Sleep/wake: fiksni pomaci poze. Hunt/eat: lanac — svaki segment na razmaku od prethodnog,
@@ -317,7 +332,7 @@ func _update_segments(delta: float) -> bool:
 	var follow := 1.0 - exp(-SEG_FOLLOW * delta)
 	if pose.has("segs"):
 		for k in 3:
-			var target := _pest_center + _v(pose["segs"][k])
+			var target := _pest_center + (_sleep_seg(k) if key == "sleep" else _v(pose["segs"][k]))
 			_segs[k] = target if _segs[k].distance_squared_to(target) < 0.0025 else _segs[k].lerp(target, follow)
 		return _segs_moved(before)
 	var spacing: Array = pose["spacing"]
@@ -348,8 +363,7 @@ func _draw() -> void:
 			_colors[k] = UiArenaV2.col(str(UiArenaV2.MUNCHER_COLORS[k]))
 	var key := get_pose_key()
 	var pose: Dictionary = UiArenaV2.MUNCHER_POSES[key]
-	var at_nest := _pest_center.distance_to(_nest_center) < 1.0
-	var in_nest := _state == State.SLEEPING_NEST or (_state == State.WAKE_DELAY and at_nest)
+	var in_nest := _in_nest()
 	var bob := sin(_bob_t * TAU / BOB_PERIOD) * BOB_AMP if key == "hunt" else 0.0
 	var off := Vector2(0.0, bob)
 	var head := _pest_center + off
@@ -375,10 +389,12 @@ func _draw() -> void:
 	for k in 3:
 		segs.append(_segs[k] + off + perp * wave * WAVE_WEIGHTS[k])
 	var sc := float(pose.get("head_scale", 1.0))
-	var shadow: Color = _colors["shadow"]
-	for k in range(2, -1, -1):
-		draw_circle(segs[k] + Vector2(0.0, SHADOW_DROP), UiArenaV2.MUNCHER_SEG_R[k], shadow)
-	draw_circle(head + Vector2(0.0, SHADOW_DROP), HEAD_R * sc, shadow)
+	# U gnijezdu nema sjene na tlu — tijelo je u rupi (sjena bi virila ispod ruba).
+	if not in_nest:
+		var shadow: Color = _colors["shadow"]
+		for k in range(2, -1, -1):
+			draw_circle(segs[k] + Vector2(0.0, SHADOW_DROP), UiArenaV2.MUNCHER_SEG_R[k], shadow)
+		draw_circle(head + Vector2(0.0, SHADOW_DROP), HEAD_R * sc, shadow)
 	for k in range(2, -1, -1):
 		var r: float = UiArenaV2.MUNCHER_SEG_R[k]
 		draw_circle(segs[k], r, edge)

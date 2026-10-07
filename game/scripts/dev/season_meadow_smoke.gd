@@ -287,6 +287,28 @@ func _assert_open_field_hub_swipe(home: Node, swipe: Node, field: Control) -> St
 	return ""
 
 
+## Season Kit faza 2: otvoreno polje = ambijent u petlji + njihanje; Reduce motion gasi
+## oboje (UiSeasons.REDUCE_MOTION_STOPS_AMBIENT, odluka 2026-10-06), bez njega se vraćaju.
+func _assert_reduce_motion(gs: Node, field: Node) -> String:
+	var amb: SeasonAmbient = field.call("get_ambient")
+	if amb == null or not amb.visible or not amb.is_looping() or amb.particle_count() != 14:
+		return "Bloom open: ambient should loop with 14 petals"
+	if not bool(field.call("is_swaying")):
+		return "Bloom open: flowers should sway"
+	gs.set("reduce_motion", true)
+	field.call("apply_season", "country_bloom")
+	await process_frame
+	var stopped := not bool(field.call("is_swaying")) and amb.is_still() and not amb.is_looping()
+	gs.set("reduce_motion", false)
+	field.call("apply_season", "country_bloom")
+	await process_frame
+	if not stopped:
+		return "Reduce motion should stop the sway and the ambient"
+	if not bool(field.call("is_swaying")) or amb.is_still() or not amb.is_looping():
+		return "sway and ambient should resume without Reduce motion"
+	return ""
+
+
 func _run() -> void:
 	_backup = CampSmokeUtil.backup_save()
 	if FileAccess.file_exists(SAVE_PATH):
@@ -509,6 +531,10 @@ func _run() -> void:
 	var bloom_flower_err := _assert_flowers(field, bloom_pool, "Bloom")
 	if not bloom_flower_err.is_empty():
 		_fail(bloom_flower_err)
+		return
+	var motion_err: String = await _assert_reduce_motion(gs, field)
+	if not motion_err.is_empty():
+		_fail(motion_err)
 		return
 	if not home.has_method("_on_basket_type_picked"):
 		_fail("missing _on_basket_type_picked")

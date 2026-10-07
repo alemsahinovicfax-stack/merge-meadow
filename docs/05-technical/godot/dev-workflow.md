@@ -69,6 +69,8 @@ foreach ($s in @("meta_hub_flow_smoke","loot_camp_nav_smoke","shop_open_smoke","
 
 Matrica: [[../../06-production/d0-functional-audit|d0-functional-audit]].
 
+**Save u testu:** smoke test dijeli `user://player_save.json` s igrom. Zato uzima backup u `_initialize()` (`CampSmokeUtil.backup_save()`) i izlazi samo kroz `_quit(code)`, koji vraća save prije `quit()`. Vidi [[greske-katalog|greske-katalog]] #25.
+
 **Desktop prozor (portrait kao telefon):** `project.godot` → `stretch/aspect=keep` + početni prozor 540×960. Viewport ostaje 1080×1920; široki monitor = crne trake lijevo/desno, ne širenje scene.
 
 ## 2b. Import novih asseta (PNG/SVG)

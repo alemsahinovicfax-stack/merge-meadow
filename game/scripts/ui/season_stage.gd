@@ -411,7 +411,6 @@ func _refresh_view() -> void:
 	var id := viewed_id()
 	var data := _card_data(id)
 	season_card.content.configure(data)
-	season_card.set_ground(UiHomeV3.ground(id))
 	season_card.set_season(id, UiSeasons.page_color(id, UiHomeV3.page_bg(UiHomeV3.ground(id))))
 	season_tabs.premium = _tab == TAB_PREMIUM
 	var active := GameState.active_season_id
@@ -470,6 +469,7 @@ func _apply() -> void:
 	card_edge.rect = Rect2(rect.position + Vector2(ox, 0.0), rect.size)
 	card_edge.border = lerpf(UiHomeV3.CARD_BORDER, 0.0, e)
 	card_edge.radius = rad
+	card_edge.dashed = season_card.content.status() == HomeV3CardContent.ST_SOON
 	card_edge.modulate.a = swap_a
 	card_edge.queue_redraw()
 

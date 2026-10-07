@@ -203,10 +203,15 @@ static func _chip_radius(tier: int) -> int:
 	return CHIP_T2_RADIUS if tier == 2 else 999
 
 
+## corner_detail 10 (bilo 16): na sjemenci r 67 odstupanje od kruga je ~0,2 px, a ~30
+## sjemenki × 5 StyleBoxova ima trećinu manje geometrije (perf sipanja, 2026-10-06).
+const CHIP_CORNER_DETAIL := 10
+
+
 static func _round(radius: float) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.set_corner_radius_all(int(radius))
-	s.corner_detail = 16
+	s.corner_detail = CHIP_CORNER_DETAIL
 	s.anti_aliasing = true
 	return s
 

@@ -1029,12 +1029,17 @@ func _spawn_poured_chips(entries: Array) -> Array[ArenaSeedChip]:
 		_chips.append(chip)
 		spawned.append(chip)
 		_chip_data[chip_id] = {"chip_id": chip_id, "type_id": type_id, "tier": tier, "pos": pos}
+	var moved_any := false
 	for chip in spawned:
-		_resolve_overlaps(chip)
-	# Pushes can shove older chips into each other — settle the whole field.
-	for _sweep in 3:
+		moved_any = _resolve_overlaps_any(chip) or moved_any
+	# Pushes can shove older chips into each other — settle the whole field (najviše 3
+	# prolaza; prolaz u kojem se ništa ne pomjeri ne mijenja ništa, pa se tu staje).
+	var sweeps := 0
+	while moved_any and sweeps < 3:
+		moved_any = false
 		for chip in _chips:
-			_resolve_overlaps(chip)
+			moved_any = _resolve_overlaps_any(chip) or moved_any
+		sweeps += 1
 	return spawned
 
 
@@ -1096,8 +1101,17 @@ func _can_merge_chips(a: ArenaSeedChip, b: ArenaSeedChip) -> bool:
 
 
 func _resolve_overlaps(moved: ArenaSeedChip) -> void:
+	_resolve_overlaps_any(moved)
+	_repel_chips_from_bag()
+
+
+## Razmakne `moved` od ostalih; vraća true ako je išta pomjereno (spawn zna kad da stane).
+## Bez guranja iz vreće — to radi pozivalac jednom (spawn: _pour_available_seeds).
+func _resolve_overlaps_any(moved: ArenaSeedChip) -> bool:
 	if not is_instance_valid(moved):
-		return
+		return false
+	var moved_any := false
+	var sep_sq := (CHIP_SEPARATION - 0.5) * (CHIP_SEPARATION - 0.5)
 	for _pass in 14:
 		var moved_center := moved.get_center()
 		var fixed_any := false
@@ -1105,9 +1119,10 @@ func _resolve_overlaps(moved: ArenaSeedChip) -> void:
 			if other == moved or not is_instance_valid(other):
 				continue
 			var other_center := other.get_center()
-			var dist := moved_center.distance_to(other_center)
-			if dist >= CHIP_SEPARATION - 0.5:
+			# Kvadrat udaljenosti prvo — većina parova je daleko, bez korijena.
+			if moved_center.distance_squared_to(other_center) >= sep_sq:
 				continue
+			var dist := moved_center.distance_to(other_center)
 			fixed_any = true
 			var overlap := CHIP_SEPARATION - maxf(dist, 0.001)
 			var dir: Vector2
@@ -1126,7 +1141,8 @@ func _resolve_overlaps(moved: ArenaSeedChip) -> void:
 			moved_center = moved.get_center()
 		if not fixed_any:
 			break
-	_repel_chips_from_bag()
+		moved_any = true
+	return moved_any
 
 
 func _on_chip_released(chip: ArenaSeedChip) -> void:

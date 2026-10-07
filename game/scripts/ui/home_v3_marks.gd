@@ -21,6 +21,8 @@ const KIND_TOAST := "toast"
 var dots: Array = []
 var rect := Rect2()
 var border: float = 0.0
+## edge: isprekidan rub (kartica sezone „uskoro").
+var dashed: bool = false
 var radius: float = 0.0
 var text: String = ""
 var top: float = 0.0
@@ -53,7 +55,10 @@ func _draw() -> void:
 		KIND_DOTS:
 			_draw_dots()
 		KIND_EDGE:
-			if border > 0.05 and rect.size.x > 1.0:
+			if border > 0.05 and rect.size.x > 1.0 and dashed:
+				# Season Kit faza 2: sezona „uskoro" (Ember Fen) ima isprekidan rub kartice.
+				UiHomeV3.draw_dashed_round_rect(self, rect, radius, border, UiHomeV3.INK)
+			elif border > 0.05 and rect.size.x > 1.0:
 				var sb := UiStage.box(Color.TRANSPARENT, roundi(radius), maxi(1, roundi(border)), UiHomeV3.INK)
 				sb.draw_center = false
 				if border < 0.5:

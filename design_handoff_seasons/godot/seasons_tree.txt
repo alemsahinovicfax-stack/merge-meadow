@@ -1,4 +1,4 @@
-Season Kit — stablo čvorova (faza 1). Novo = [+], mijenja se = [~], briše se = [-]. Raspored svih paketa ostaje.
+Season Kit — stablo čvorova (faza 1 + 2, svih 8 sezona). Novo = [+], mijenja se = [~], briše se = [-]. Raspored svih paketa ostaje.
 
 res://data/seasons/seasons_kit.json            [+] = godot/seasons_export.json
 res://scripts/visual/ui_seasons.gd             [+] UiSeasons (konstante + recept helperi)
@@ -6,9 +6,10 @@ res://scripts/visual/season_backdrop.gd        [+] SeasonBackdrop (Control) — 
                                                    slojevi band / ridge (+rim) / mow / fence / shape / scatter,
                                                    keš geometrije u lokalnom prostoru JEDNOM po sezoni,
                                                    po frejmu samo transform (rect kartice u prelazu) i alpha
-res://assets/sprites/flowers/*_t{1,2,3}.svg    [~] 18 Country Bloom zamijenjeno + [+] 18 Moonlit Warren (+ .import)
+res://assets/sprites/flowers/*_t{1,2,3}.svg    [~] 18 Country Bloom zamijenjeno + [+] 126 novih (MW + 6 sezona faze 2), ukupno 144 (+ .import)
 res://assets/sprites/pip_sniff.svg, pip_sleep.svg   [+]
-res://assets/sprites/seasons/<id>/obstacle_*.svg    [+] 4 (176 × 150)
+res://assets/sprites/seasons/<id>/obstacle_*.svg    [+] 16 (2 po sezoni, 176 × 150)
+res://scripts/visual/season_ambient_v2.gd     [+] SeasonAmbient (Node2D) — UiSeasons.ambient_layers/ambient_at, ≤ 24 čestice, 1 petlja
 
 SeasonSelect (Home v3)
 ├─ PageBg (ColorRect)                          [~] boja = UiSeasons.page_color(id)
@@ -39,3 +40,11 @@ run_scene › Obstacle › ObstacleVisual          [~] Sprite2D tekstura iz obst
 
 Briše se: SeasonTheme.bg_modulate / obstacle_modulate / home_field_tint za sezone s kitom; HomeV3Card._band() trake;
 SeasonField._band_sky/_far/_near; procedural CampPlantDraw fallback za 12 tipova s crtežom.
+
+Faza 2 — dodatno:
+FieldScreen › FieldChrome › LooksButton (876, 1265, 180)   (isto kao field_wardrobe_button.gd; u FIELD_AVOID)
+FieldScreen › MeadowPip                       [~] PIP_ZONE (151, 1306, 614, 131) — ne mijenjati
+SeasonSelect › SeasonCard (Ember Fen)         [~] soon: crteži 50 %, SoonTag "Coming soon" (isprekidan rub)
+CampScreen › SeasonLinkCard (season_link_card.gd)  [~] _draw tint → SeasonBackdrop(recipe "camp") 1026 × 312 unutar okvira; tekst #3D3D33
+ShopScreen › SeasonPackCard                   [~] Coral / Starfall / Ember dobijaju recipe "shop"; Ember bez cijene i dugmeta
+run_scene › LaneBackground                    [~] material_tile (stripe | pebble | plank | rut), far/near items

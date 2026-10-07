@@ -7,8 +7,17 @@ const SAVE_PATH := "user://player_save.json"
 const DIAMOND_SEED_RATIO := 300
 
 
+var _backup: String = ""
+
+
 func _initialize() -> void:
+	_backup = CampSmokeUtil.backup_save()
 	call_deferred("_run")
+
+
+func _quit(code: int) -> void:
+	CampSmokeUtil.restore_save(self, _backup)
+	quit(code)
 
 
 func _gs() -> Node:
@@ -19,7 +28,7 @@ func _run() -> void:
 	var gs := _gs()
 	if gs == null:
 		push_error("diamond_wallet_smoke: GameState missing")
-		quit(1)
+		_quit(1)
 		return
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
@@ -28,7 +37,7 @@ func _run() -> void:
 	gs.call("add_diamonds", 3)
 	if int(gs.call("get_diamonds")) != 3:
 		push_error("diamond_wallet_smoke: add_diamonds failed")
-		quit(1)
+		_quit(1)
 		return
 
 	gs.set("wallet_diamonds", 0)
@@ -38,7 +47,7 @@ func _run() -> void:
 			"diamond_wallet_smoke: load roundtrip diamonds=%s expected 3"
 			% str(gs.call("get_diamonds"))
 		)
-		quit(1)
+		_quit(1)
 		return
 
 	# Force-collect diamond pickup → wallet +1.
@@ -46,14 +55,14 @@ func _run() -> void:
 	var diamond_scene: PackedScene = load("res://scenes/run/diamond_pickup.tscn")
 	if diamond_scene == null:
 		push_error("diamond_wallet_smoke: diamond_pickup.tscn missing")
-		quit(1)
+		_quit(1)
 		return
 	var diamond: Node = diamond_scene.instantiate()
 	root.add_child(diamond)
 	await process_frame
 	if not diamond.has_method("collect"):
 		push_error("diamond_wallet_smoke: diamond missing collect()")
-		quit(1)
+		_quit(1)
 		return
 	# Mimic run_controller grant path.
 	gs.call("add_diamonds", 1)
@@ -61,7 +70,7 @@ func _run() -> void:
 	await process_frame
 	if int(gs.call("get_diamonds")) != before + 1:
 		push_error("diamond_wallet_smoke: force collect did not +1 wallet")
-		quit(1)
+		_quit(1)
 		return
 
 	# Soft rate check: 3000 seed-branch rolls → expect ~5–20 diamonds (mean 10).
@@ -76,14 +85,14 @@ func _run() -> void:
 		push_error(
 			"diamond_wallet_smoke: rate out of soft band 3–30 (got %d)" % diamond_hits
 		)
-		quit(1)
+		_quit(1)
 		return
 
 	var PickupAssets := preload("res://scripts/visual/pickup_assets.gd")
 	if PickupAssets.get_diamond_texture() == null:
 		push_error("diamond_wallet_smoke: get_diamond_texture null")
-		quit(1)
+		_quit(1)
 		return
 
 	print("diamond_wallet_smoke OK")
-	quit(0)
+	_quit(0)

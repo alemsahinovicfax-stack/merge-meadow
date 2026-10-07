@@ -2,8 +2,10 @@ class_name SeasonBackdrop
 extends RefCounted
 
 ## Season Kit renderer (design_handoff_seasons § Odlučeno 1–2): recept kita → mreža trokuta,
-## JEDNOM po receptu. Slojevi (band, ridge, mow) su u % recta, oblici (shape, scatter,
-## stubovi ograde) uniformno k = w / 1080 — isto kao buildScene u design/seasons_kit.js.
+## JEDNOM po receptu. Slojevi (band, ridge (+up, tilt, rim), mow, poly, ellipse, line) su u %
+## recta, oblici (shape, scatter, row, stubovi ograde) uniformno k = w / 1080 — isto kao
+## buildScene u design/seasons_kit.js (faza 2: row, poly, ellipse, line, ridge.up/tilt,
+## shape s listom tačaka, scatter.noAvoid).
 ## Zato ista mreža crta polje (1080 x 1633), karticu izbora (minijatura) i svaki kadar
 ## prelaza između: po crtanju se računaju samo tačke (Transform2D * PackedVector2Array),
 ## indeksi i boje ostaju. Generalizovani ArenaMeadowBg; 0 PNG, 0 gradijenata.
@@ -13,8 +15,13 @@ extends RefCounted
 ## omjera recta); oblik koji viri preko ivice reže se pri crtanju, trokut po trokut.
 
 const ELLIPSE_STEPS := 20
-const ARC_STEPS := 8
+## Elipsa sloja u % (bara, lokva) je velika — više tačaka da ivica ostane glatka.
+const LAYER_ELLIPSE_STEPS := 48
+## Luk oblika: 10 segmenata kao primAbs 'a' u seasons_kit.js.
+const ARC_STEPS := 10
 const RECT_CORNER_STEPS := 4
+## Catmull-Rom: segmenata između dvije tačke (smoothPts u JS).
+const SMOOTH_SEG := 6
 ## Preklop traka neba (u %) — kao u JS, bez AA šava između traka.
 const BAND_OVERLAP := 0.6
 const CORNER_STEPS := 12
@@ -166,7 +173,7 @@ static func _build(recipe: Dictionary, base_w: float, avoid: Array) -> Dictionar
 				_add_pct(chunk, pts, PackedInt32Array([0, 1, 2, 0, 2, 3]), UiSeasons.col(str(L["c"])))
 			"ridge":
 				var top := UiSeasons.ridge_points(L["r"])
-				_add_ground(chunk, top, UiSeasons.col(str(L["c"])))
+				_add_ground(chunk, top, UiSeasons.col(str(L["c"])), bool(L.get("up", false)))
 				if L.has("rim"):
 					var rim: Array = L["rim"]
 					chunks.append(chunk)
@@ -183,7 +190,8 @@ static func _build(recipe: Dictionary, base_w: float, avoid: Array) -> Dictionar
 					for wv in r.get("w", []):
 						waves.append([float(wv[0]) * (1.0 - t * (1.0 - flat)), wv[1], wv[2]])
 					var col_s := str(L["last"]) if i == ys.size() - 1 else str(cols[i % cols.size()])
-					_add_ground(chunk, UiSeasons.ridge_points({"y": ys[i], "w": waves}), UiSeasons.col(col_s))
+					var r0 := {"y": ys[i], "tilt": r.get("tilt", 0.0), "w": waves}
+					_add_ground(chunk, UiSeasons.ridge_points(r0), UiSeasons.col(col_s))
 			"fence":
 				var r: Dictionary = L["r"]
 				var x0 := float(L["x0"])
@@ -202,17 +210,102 @@ static func _build(recipe: Dictionary, base_w: float, avoid: Array) -> Dictionar
 				while x <= x1 + 0.01:
 					_add_shape(chunk, "post", L["pal"], Vector2(x, UiSeasons.ridge_y(r, x)), Vector2(0, 2), size, 0.0)
 					x += float(L["step"])
-			"shape":
+			"row":
+				# Motiv u redu duž grebena (r), linije (pts) ili na visini y; veličina
+				# varira po R2 (vary), alt paleta na svakom drugom — bez RNG-a.
+				var q := UiSeasons.r2()
+				var pts_line: Array = L.get("pts", [])
+				var i := 0
+				var x := float(L["x0"])
+				while x <= float(L["x1"]) + 0.01:
+					var y := float(L.get("y", 0.0))
+					if L.has("r"):
+						y = UiSeasons.ridge_y(L["r"], x)
+					elif not pts_line.is_empty():
+						y = _line_y(pts_line, x)
+					var sz := float(L["size"]) * (1.0 + float(L.get("vary", 0.0)) * (fposmod(float(q["size"]) * (i + 1), 1.0) - 0.5))
+					var pal: Array = L["alt"] if L.has("alt") and i % 2 == 1 else L["pal"]
+					_add_shape(chunk, str(L["shape"]), pal, Vector2(x, y + float(L.get("dy", 0.0))), Vector2.ZERO, sz, 0.0)
+					x += float(L["step"])
+					i += 1
+			"poly":
+				var poly := _pct_points(L["pts"])
+				if bool(L.get("smooth", false)):
+					poly = smooth_points(poly, true)
+				_add_fill(chunk, poly, UiSeasons.col(str(L["c"])))
+			"ellipse":
 				var at: Array = L["at"]
-				_add_shape(chunk, str(L["shape"]), L["pal"], Vector2(float(at[0]), float(at[1])), Vector2.ZERO, float(L["size"]), 0.0)
+				var rr: Array = L["r"]
+				var ell := PackedVector2Array()
+				for s in LAYER_ELLIPSE_STEPS:
+					var a := TAU * float(s) / LAYER_ELLIPSE_STEPS
+					ell.append(Vector2(float(at[0]) + cos(a) * float(rr[0]), float(at[1]) + sin(a) * float(rr[1])))
+				_add_fill(chunk, ell, UiSeasons.col(str(L["c"])))
+			"line":
+				var line := _pct_points(L["pts"])
+				if bool(L.get("smooth", false)):
+					line = smooth_points(line, false)
+				chunks.append(chunk)
+				chunks.append_array(_lines(line, Vector2.ZERO, float(L["w"]), UiSeasons.col(str(L["c"]))))
+				chunk = _new_chunk()
+			"shape":
+				# at = jedna tačka [x, y] ili lista [[x, y, size, rot], …] (faza 2).
+				var at: Array = L["at"]
+				var list: Array = at if not at.is_empty() and at[0] is Array else [at]
+				for p in list:
+					var sz := float(p[2]) if p.size() > 2 and float(p[2]) != 0.0 else float(L.get("size", 0.0))
+					var rot := float(p[3]) if p.size() > 3 else 0.0
+					_add_shape(chunk, str(L["shape"]), L["pal"], Vector2(float(p[0]), float(p[1])), Vector2.ZERO, sz, rot)
 			"scatter":
+				var no_avoid := bool(L.get("noAvoid", false))
 				for i in int(L["n"]):
 					var it := UiSeasons.scatter_at(L, i)
-					if not avoid.is_empty() and UiSeasons.in_avoid(it["pos"], avoid):
+					if not no_avoid and not avoid.is_empty() and UiSeasons.in_avoid(it["pos"], avoid):
 						continue
 					_add_shape(chunk, str(L["shape"]), L["pal"], it["pos"], Vector2.ZERO, float(it["size"]), float(it["rot"]))
 	chunks.append(chunk)
 	return {"base_w": base_w, "chunks": chunks}
+
+
+## Catmull-Rom kroz tačke → gusta lista (otvorena ili zatvorena); smoothPts u JS.
+static func smooth_points(pts: PackedVector2Array, closed: bool, seg: int = SMOOTH_SEG) -> PackedVector2Array:
+	var n := pts.size()
+	var out := PackedVector2Array()
+	if n < 2:
+		return pts
+	var last := n if closed else n - 1
+	for i in last:
+		var p0 := pts[posmod(i - 1, n)] if closed else pts[clampi(i - 1, 0, n - 1)]
+		var p1 := pts[posmod(i, n)] if closed else pts[clampi(i, 0, n - 1)]
+		var p2 := pts[posmod(i + 1, n)] if closed else pts[clampi(i + 1, 0, n - 1)]
+		var p3 := pts[posmod(i + 2, n)] if closed else pts[clampi(i + 2, 0, n - 1)]
+		for s in seg:
+			var t := float(s) / float(seg)
+			var t2 := t * t
+			var t3 := t2 * t
+			out.append(0.5 * (2.0 * p1 + (p2 - p0) * t + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2 + (3.0 * p1 - p0 - 3.0 * p2 + p3) * t3))
+	if not closed:
+		out.append(pts[n - 1])
+	return out
+
+
+## y linije (lista tačaka u %) na x — red motiva duž girlande (lineY u JS).
+static func _line_y(pts: Array, x: float) -> float:
+	for i in range(1, pts.size()):
+		if x <= float(pts[i][0]):
+			var a: Array = pts[i - 1]
+			var b: Array = pts[i]
+			var dx := float(b[0]) - float(a[0])
+			var t := (x - float(a[0])) / (dx if absf(dx) > 0.0 else 1.0)
+			return float(a[1]) + (float(b[1]) - float(a[1])) * t
+	return float(pts[pts.size() - 1][1])
+
+
+static func _pct_points(list: Array) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for q in list:
+		out.append(Vector2(float(q[0]), float(q[1])))
+	return out
 
 
 static func _new_chunk() -> Dictionary:
@@ -228,11 +321,19 @@ static func _lines(pts: PackedVector2Array, off: Vector2, w: float, c: Color) ->
 	return out
 
 
-## Tlo ispod grebena: vrh u %, dno na dnu recta; greben (−2 … 102 %) odrezan na [0, 100].
-static func _add_ground(chunk: Dictionary, top: PackedVector2Array, c: Color) -> void:
+## Tlo ispod grebena (up = krošnja: puni prema vrhu recta); greben odrezan na [0, 100].
+static func _add_ground(chunk: Dictionary, top: PackedVector2Array, c: Color, up: bool = false) -> void:
 	var poly := top.duplicate()
-	poly.append(Vector2(102.0, 101.0))
-	poly.append(Vector2(-2.0, 101.0))
+	var edge_y := -1.0 if up else 101.0
+	poly.append(Vector2(102.0, edge_y))
+	poly.append(Vector2(-2.0, edge_y))
+	_add_fill(chunk, poly, c)
+
+
+## Poligon u % odrezan na [0, 100] pa triangulisan (tlo, poly, elipsa sloja).
+static func _add_fill(chunk: Dictionary, poly: PackedVector2Array, c: Color) -> void:
+	if poly.size() < 3:
+		return
 	for pts in Geometry2D.intersect_polygons(poly, PackedVector2Array(PCT_BOX)):
 		if pts.size() < 3:
 			continue

@@ -180,6 +180,10 @@ var tutorial_step: int:
 	set(value): tutorial.step = value
 
 var ads_removed: bool = false
+## Settings → Reduce motion (Season Kit faza 2): gasi njihanje cvijeća na polju; ambijent
+## samo ako je UiSeasons.REDUCE_MOTION_STOPS_AMBIENT. Settings ekran još ne postoji (D0-P) —
+## kad ga napraviš, ovdje ga poveži i snimi u save.
+var reduce_motion: bool = false
 var starter_pack_owned: bool = false
 ## Unix vrijeme prvog pokretanja — Starter Pack se nudi 7 dana od njega
 ## (MonetizationConfig.STARTER_PACK_DAYS). Stari saveovi: počinje pri prvom
@@ -571,6 +575,8 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	if not is_seed_type_unlocked(loadout_type_id):
 		loadout_type_id = ""
 	_ensure_first_launch()
+	# Samo u memoriji — upiše se sa sljedećim snimanjem (učitavanje ne prepisuje fajl).
+	_repair_album_from_stash()
 	if boosters.migrate_legacy_inventory():
 		save_player_save()
 	return true
@@ -1818,13 +1824,45 @@ func get_bag_types_by_pour_priority() -> Array[String]:
 func stash_garden_crystal(type_id: String) -> void:
 	if type_id.is_empty():
 		return
-	discovered_blooms[type_id] = true
 	# Arena T3 auto-stashes — unlock Album T3 (player cannot Keep the chip).
+	record_star3_in_album(type_id)
+	crystal_stash_domain.add(type_id)
+	save_player_save()
+
+
+## ★3 cvijet koji uđe u stash (Arena T3, Loot Burst iz Shopa) je i u Albumu: otkriven,
+## kept T3 i NEW u Journalu. Bez ovoga Home / polje / Camp ga vide (čitaju stash), a
+## Journal ne (čita Album) — bug Crystal Peony iz Loot Bursta, 2026-10-06.
+func record_star3_in_album(type_id: String) -> void:
+	if type_id.is_empty():
+		return
+	discovered_blooms[type_id] = true
 	var prev_kept := int(collection_kept_tiers.get(type_id, 0))
 	collection_kept_tiers[type_id] = maxi(prev_kept, MAX_MERGE_TIER)
 	_mark_collection_journal_new(type_id, MAX_MERGE_TIER)
-	crystal_stash_domain.add(type_id)
-	save_player_save()
+
+
+## Stari saveovi: ★3 iz Loot Bursta je išao samo u stash. Pri učitavanju dobija T3 (i NEW)
+## u Albumu (1) svaki tip sa ★3 u stashu i (2) ★3 prethodne sezone svake otključane
+## besplatne sezone — otključavanje troši 20 tih ★3, pa ih je igrač sigurno imao, čak i
+## ako su potrošeni (npr. Crystal Peony za Lantern Meadow). Vraća true ako je nešto popravljeno.
+func _repair_album_from_stash() -> bool:
+	var owned: Array[String] = []
+	for type_id in garden_crystal_stash:
+		if int(garden_crystal_stash[type_id]) > 0:
+			owned.append(str(type_id))
+	for sid in unlocked_seasons:
+		var prev := previous_free_id_for(sid)
+		if not prev.is_empty():
+			var star3 := star3_type_id_for_season(prev)
+			if not star3.is_empty():
+				owned.append(star3)
+	var fixed := false
+	for type_id in owned:
+		if int(collection_kept_tiers.get(type_id, 0)) < MAX_MERGE_TIER:
+			record_star3_in_album(type_id)
+			fixed = true
+	return fixed
 
 
 func get_garden_crystal_total() -> int:

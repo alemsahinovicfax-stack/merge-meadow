@@ -1,7 +1,11 @@
 {
  "meta": {
   "name": "seasons_kit",
-  "phase": 1,
+  "phases": [
+   1,
+   2
+  ],
+  "seasons": 8,
   "artboard": [
    1080,
    1920
@@ -11,18 +15,48 @@
     1080,
     1633
    ],
-   "y": 143
+   "y": 143,
+   "header": 143,
+   "footer": 144
   },
-  "units": "px 1:1 (recepti u % recta)",
-  "renderer": "Godot 4.7 Compatibility (OpenGL 3.3)",
+  "units": "px 1:1; recepti u % recta (0–100)",
+  "renderer": "Godot 4.7 Compatibility (OpenGL 3.3), 60 fps",
   "source": "design/seasons_kit.js",
-  "rule": "nova sezona = novi red u kits; isti kod (SeasonBackdrop + UiSeasons)"
+  "rule": "nova sezona = novi red u kits; isti kod (SeasonBackdrop + SeasonAmbient + UiSeasons)",
+  "generated": "2026-10-06"
  },
- "r2": {
-  "a1": 0.7548776662466927,
-  "a2": 0.5698402909980532,
-  "size": 0.6180339887498949,
-  "rot": 0.41421356237309515
+ "tokens": {
+  "ink": "#2D3436",
+  "cream": "#FFF8F0",
+  "peach": "#FFB88C",
+  "lavender": "#D4A5FF",
+  "mint": "#A8E6CF",
+  "gold": "#FFD56B",
+  "ink_dark_text": "#1A1A14",
+  "ink_light_text": "#FFF8F0",
+  "camp_text": "#3D3D33",
+  "font": "Nunito",
+  "text_min": 34,
+  "text_min_home": 38,
+  "season_name_min": 52,
+  "touch_min": 120,
+  "contrast": {
+   "sticker": 6.14,
+   "text": 4.5,
+   "object": 3
+  },
+  "under_controls_rule": "L ≥ 0,46 (svijetlo) ili L ≤ 0,036 (tamno), bez mid-tonova",
+  "r2": {
+   "a1": 0.7548776662466927,
+   "a2": 0.5698402909980532,
+   "size": 0.6180339887498949,
+   "rot": 0.41421356237309515
+  },
+  "budget": {
+   "ambient_max": 24,
+   "loops_max": 2,
+   "flower_kb_max": 12
+  }
  },
  "shapes": {
   "tuft": [
@@ -537,6 +571,1267 @@
     0.08,
     0
    ]
+  ],
+  "tree": [
+   [
+    "r",
+    -0.05,
+    -0.46,
+    0.1,
+    0.46,
+    0.02,
+    1
+   ],
+   [
+    "c",
+    -0.19,
+    -0.54,
+    0.22,
+    0
+   ],
+   [
+    "c",
+    0.19,
+    -0.54,
+    0.22,
+    0
+   ],
+   [
+    "c",
+    0,
+    -0.66,
+    0.28,
+    0
+   ],
+   [
+    "e",
+    0,
+    -0.88,
+    0.2,
+    0.07,
+    2
+   ],
+   [
+    "e",
+    -0.24,
+    -0.72,
+    0.12,
+    0.05,
+    2
+   ],
+   [
+    "e",
+    0.24,
+    -0.72,
+    0.12,
+    0.05,
+    2
+   ]
+  ],
+  "fir": [
+   [
+    "r",
+    -0.04,
+    -0.14,
+    0.08,
+    0.14,
+    0.01,
+    1
+   ],
+   [
+    "p",
+    [
+     [
+      -0.36,
+      -0.12
+     ],
+     [
+      0,
+      -0.52
+     ],
+     [
+      0.36,
+      -0.12
+     ]
+    ],
+    0
+   ],
+   [
+    "p",
+    [
+     [
+      -0.29,
+      -0.4
+     ],
+     [
+      0,
+      -0.78
+     ],
+     [
+      0.29,
+      -0.4
+     ]
+    ],
+    0
+   ],
+   [
+    "p",
+    [
+     [
+      -0.2,
+      -0.68
+     ],
+     [
+      0,
+      -1
+     ],
+     [
+      0.2,
+      -0.68
+     ]
+    ],
+    0
+   ]
+  ],
+  "drift": [
+   [
+    "p",
+    [
+     [
+      -0.5,
+      0
+     ],
+     [
+      -0.49,
+      -0.03
+     ],
+     [
+      -0.45,
+      -0.07
+     ],
+     [
+      -0.39,
+      -0.09
+     ],
+     [
+      -0.31,
+      -0.12
+     ],
+     [
+      -0.22,
+      -0.14
+     ],
+     [
+      -0.11,
+      -0.15
+     ],
+     [
+      0,
+      -0.15
+     ],
+     [
+      0.11,
+      -0.15
+     ],
+     [
+      0.22,
+      -0.14
+     ],
+     [
+      0.31,
+      -0.12
+     ],
+     [
+      0.39,
+      -0.09
+     ],
+     [
+      0.45,
+      -0.07
+     ],
+     [
+      0.49,
+      -0.03
+     ],
+     [
+      0.5,
+      0
+     ]
+    ],
+    0
+   ],
+   [
+    "p",
+    [
+     [
+      -0.37,
+      -0.06
+     ],
+     [
+      -0.33,
+      -0.07
+     ],
+     [
+      -0.28,
+      -0.09
+     ],
+     [
+      -0.22,
+      -0.1
+     ],
+     [
+      -0.15,
+      -0.11
+     ],
+     [
+      -0.08,
+      -0.11
+     ],
+     [
+      -0.01,
+      -0.11
+     ],
+     [
+      0.06,
+      -0.1
+     ],
+     [
+      0.12,
+      -0.09
+     ],
+     [
+      0.17,
+      -0.07
+     ]
+    ],
+    1
+   ]
+  ],
+  "puddle": [
+   [
+    "e",
+    0,
+    0,
+    0.5,
+    0.18,
+    0
+   ],
+   [
+    "e",
+    -0.14,
+    -0.04,
+    0.2,
+    0.045,
+    1
+   ],
+   [
+    "l",
+    0.08,
+    0.05,
+    0.3,
+    0.03,
+    0.03,
+    1
+   ]
+  ],
+  "flake": [
+   [
+    "l",
+    0,
+    -0.5,
+    0,
+    0.5,
+    0.2,
+    1
+   ],
+   [
+    "l",
+    -0.43,
+    -0.25,
+    0.43,
+    0.25,
+    0.2,
+    1
+   ],
+   [
+    "l",
+    -0.43,
+    0.25,
+    0.43,
+    -0.25,
+    0.2,
+    1
+   ],
+   [
+    "l",
+    0,
+    -0.44,
+    0,
+    0.44,
+    0.08,
+    0
+   ],
+   [
+    "l",
+    -0.38,
+    -0.22,
+    0.38,
+    0.22,
+    0.08,
+    0
+   ],
+   [
+    "l",
+    -0.38,
+    0.22,
+    0.38,
+    -0.22,
+    0.08,
+    0
+   ]
+  ],
+  "lantern": [
+   [
+    "l",
+    0,
+    0,
+    0,
+    0.16,
+    0.035,
+    2
+   ],
+   [
+    "r",
+    -0.15,
+    0.13,
+    0.3,
+    0.07,
+    0.02,
+    2
+   ],
+   [
+    "e",
+    0,
+    0.44,
+    0.27,
+    0.3,
+    0
+   ],
+   [
+    "e",
+    0,
+    0.45,
+    0.12,
+    0.18,
+    1
+   ],
+   [
+    "r",
+    -0.11,
+    0.71,
+    0.22,
+    0.07,
+    0.02,
+    2
+   ]
+  ],
+  "firefly": [
+   [
+    "c",
+    0,
+    0,
+    0.5,
+    1
+   ],
+   [
+    "c",
+    0,
+    0,
+    0.22,
+    0
+   ]
+  ],
+  "leaf": [
+   [
+    "p",
+    [
+     [
+      0,
+      -0.5
+     ],
+     [
+      0.22,
+      -0.26
+     ],
+     [
+      0.34,
+      0.02
+     ],
+     [
+      0.17,
+      0.3
+     ],
+     [
+      0,
+      0.5
+     ],
+     [
+      -0.17,
+      0.3
+     ],
+     [
+      -0.34,
+      0.02
+     ],
+     [
+      -0.22,
+      -0.26
+     ]
+    ],
+    0
+   ],
+   [
+    "l",
+    0,
+    -0.4,
+    0,
+    0.46,
+    0.06,
+    1
+   ]
+  ],
+  "acorn": [
+   [
+    "e",
+    0,
+    0.08,
+    0.26,
+    0.32,
+    0
+   ],
+   [
+    "r",
+    -0.3,
+    -0.28,
+    0.6,
+    0.2,
+    0.1,
+    1
+   ],
+   [
+    "l",
+    0,
+    -0.28,
+    0.05,
+    -0.46,
+    0.07,
+    1
+   ]
+  ],
+  "mushroom": [
+   [
+    "r",
+    -0.1,
+    -0.48,
+    0.2,
+    0.48,
+    0.06,
+    1
+   ],
+   [
+    "p",
+    [
+     [
+      -0.42,
+      -0.42
+     ],
+     [
+      -0.41,
+      -0.5
+     ],
+     [
+      -0.38,
+      -0.58
+     ],
+     [
+      -0.33,
+      -0.66
+     ],
+     [
+      -0.26,
+      -0.72
+     ],
+     [
+      -0.18,
+      -0.76
+     ],
+     [
+      -0.09,
+      -0.79
+     ],
+     [
+      0,
+      -0.8
+     ],
+     [
+      0.09,
+      -0.79
+     ],
+     [
+      0.18,
+      -0.76
+     ],
+     [
+      0.26,
+      -0.72
+     ],
+     [
+      0.33,
+      -0.66
+     ],
+     [
+      0.38,
+      -0.58
+     ],
+     [
+      0.41,
+      -0.5
+     ],
+     [
+      0.42,
+      -0.42
+     ]
+    ],
+    0
+   ],
+   [
+    "c",
+    -0.15,
+    -0.6,
+    0.06,
+    1
+   ],
+   [
+    "c",
+    0.14,
+    -0.66,
+    0.05,
+    1
+   ],
+   [
+    "c",
+    0.02,
+    -0.52,
+    0.05,
+    1
+   ]
+  ],
+  "dapple": [
+   [
+    "e",
+    0,
+    0,
+    0.5,
+    0.2,
+    0
+   ]
+  ],
+  "trunk": [
+   [
+    "r",
+    -0.07,
+    -1,
+    0.14,
+    1,
+    0.02,
+    0
+   ],
+   [
+    "r",
+    0.02,
+    -1,
+    0.04,
+    1,
+    0.01,
+    1
+   ]
+  ],
+  "ripple": [
+   [
+    "a",
+    0,
+    0,
+    0.5,
+    200,
+    340,
+    0.07,
+    0
+   ],
+   [
+    "a",
+    0,
+    0.14,
+    0.3,
+    215,
+    325,
+    0.06,
+    0
+   ]
+  ],
+  "shell": [
+   [
+    "p",
+    [
+     [
+      0,
+      0.32
+     ],
+     [
+      -0.47,
+      -0.07
+     ],
+     [
+      -0.4,
+      -0.2
+     ],
+     [
+      -0.29,
+      -0.31
+     ],
+     [
+      -0.15,
+      -0.38
+     ],
+     [
+      0,
+      -0.4
+     ],
+     [
+      0.15,
+      -0.38
+     ],
+     [
+      0.29,
+      -0.31
+     ],
+     [
+      0.4,
+      -0.2
+     ],
+     [
+      0.47,
+      -0.07
+     ]
+    ],
+    0
+   ],
+   [
+    "l",
+    0,
+    0.3,
+    -0.36,
+    -0.14,
+    0.05,
+    1
+   ],
+   [
+    "l",
+    0,
+    0.3,
+    0,
+    -0.38,
+    0.05,
+    1
+   ],
+   [
+    "l",
+    0,
+    0.3,
+    0.36,
+    -0.14,
+    0.05,
+    1
+   ],
+   [
+    "r",
+    -0.12,
+    0.26,
+    0.24,
+    0.1,
+    0.04,
+    1
+   ]
+  ],
+  "starfish": [
+   [
+    "p",
+    [
+     [
+      0,
+      -0.5
+     ],
+     [
+      0.12,
+      -0.17
+     ],
+     [
+      0.48,
+      -0.15
+     ],
+     [
+      0.2,
+      0.06
+     ],
+     [
+      0.29,
+      0.4
+     ],
+     [
+      0,
+      0.21
+     ],
+     [
+      -0.29,
+      0.4
+     ],
+     [
+      -0.2,
+      0.06
+     ],
+     [
+      -0.48,
+      -0.15
+     ],
+     [
+      -0.12,
+      -0.17
+     ]
+    ],
+    0
+   ],
+   [
+    "c",
+    0,
+    0,
+    0.08,
+    1
+   ]
+  ],
+  "coral": [
+   [
+    "l",
+    0,
+    0,
+    0,
+    -0.62,
+    0.13,
+    0
+   ],
+   [
+    "l",
+    0,
+    -0.26,
+    -0.3,
+    -0.62,
+    0.11,
+    0
+   ],
+   [
+    "l",
+    0,
+    -0.32,
+    0.3,
+    -0.76,
+    0.11,
+    0
+   ],
+   [
+    "l",
+    -0.18,
+    -0.46,
+    -0.4,
+    -0.5,
+    0.09,
+    0
+   ],
+   [
+    "l",
+    0.18,
+    -0.52,
+    0.38,
+    -0.5,
+    0.09,
+    0
+   ],
+   [
+    "c",
+    0,
+    -0.66,
+    0.08,
+    1
+   ],
+   [
+    "c",
+    -0.3,
+    -0.66,
+    0.07,
+    1
+   ],
+   [
+    "c",
+    0.3,
+    -0.8,
+    0.07,
+    1
+   ]
+  ],
+  "thrift": [
+   [
+    "l",
+    0,
+    0,
+    0,
+    -0.62,
+    0.07,
+    1
+   ],
+   [
+    "c",
+    0,
+    -0.74,
+    0.22,
+    0
+   ],
+   [
+    "c",
+    -0.07,
+    -0.8,
+    0.07,
+    2
+   ]
+  ],
+  "rock": [
+   [
+    "p",
+    [
+     [
+      -0.5,
+      0
+     ],
+     [
+      -0.42,
+      -0.3
+     ],
+     [
+      -0.12,
+      -0.46
+     ],
+     [
+      0.24,
+      -0.4
+     ],
+     [
+      0.5,
+      -0.12
+     ],
+     [
+      0.46,
+      0
+     ]
+    ],
+    0
+   ],
+   [
+    "p",
+    [
+     [
+      -0.36,
+      -0.28
+     ],
+     [
+      -0.12,
+      -0.4
+     ],
+     [
+      0.1,
+      -0.36
+     ],
+     [
+      -0.16,
+      -0.24
+     ]
+    ],
+    1
+   ]
+  ],
+  "meteor": [
+   [
+    "p",
+    [
+     [
+      0.44,
+      -0.07
+     ],
+     [
+      -0.5,
+      -0.02
+     ],
+     [
+      -0.5,
+      0.02
+     ],
+     [
+      0.44,
+      0.07
+     ]
+    ],
+    1
+   ],
+   [
+    "c",
+    0.42,
+    0,
+    0.09,
+    0
+   ]
+  ],
+  "fern": [
+   [
+    "l",
+    0,
+    0,
+    0.04,
+    -1,
+    0.05,
+    0
+   ],
+   [
+    "p",
+    [
+     [
+      0,
+      -0.1
+     ],
+     [
+      -0.36,
+      -0.42
+     ],
+     [
+      -0.02,
+      -0.3
+     ]
+    ],
+    0
+   ],
+   [
+    "p",
+    [
+     [
+      0.01,
+      -0.14
+     ],
+     [
+      0.36,
+      -0.48
+     ],
+     [
+      0.02,
+      -0.34
+     ]
+    ],
+    0
+   ],
+   [
+    "p",
+    [
+     [
+      0.01,
+      -0.4
+     ],
+     [
+      -0.3,
+      -0.74
+     ],
+     [
+      0.02,
+      -0.58
+     ]
+    ],
+    0
+   ],
+   [
+    "p",
+    [
+     [
+      0.02,
+      -0.44
+     ],
+     [
+      0.3,
+      -0.8
+     ],
+     [
+      0.03,
+      -0.62
+     ]
+    ],
+    0
+   ]
+  ],
+  "cattail": [
+   [
+    "l",
+    0,
+    0,
+    0.02,
+    -1,
+    0.05,
+    1
+   ],
+   [
+    "r",
+    -0.07,
+    -0.88,
+    0.14,
+    0.36,
+    0.07,
+    0
+   ],
+   [
+    "p",
+    [
+     [
+      0.02,
+      0
+     ],
+     [
+      0.32,
+      -0.68
+     ],
+     [
+      0.07,
+      -0.08
+     ]
+    ],
+    1
+   ],
+   [
+    "p",
+    [
+     [
+      -0.02,
+      0
+     ],
+     [
+      -0.24,
+      -0.52
+     ],
+     [
+      -0.06,
+      -0.06
+     ]
+    ],
+    1
+   ]
+  ],
+  "ember": [
+   [
+    "p",
+    [
+     [
+      0,
+      -0.5
+     ],
+     [
+      0.28,
+      0
+     ],
+     [
+      0,
+      0.5
+     ],
+     [
+      -0.28,
+      0
+     ]
+    ],
+    0
+   ],
+   [
+    "p",
+    [
+     [
+      0,
+      -0.24
+     ],
+     [
+      0.12,
+      0
+     ],
+     [
+      0,
+      0.24
+     ],
+     [
+      -0.12,
+      0
+     ]
+    ],
+    1
+   ]
+  ],
+  "bubble": [
+   [
+    "a",
+    0,
+    0,
+    0.38,
+    0,
+    360,
+    0.16,
+    0
+   ],
+   [
+    "c",
+    -0.13,
+    -0.13,
+    0.09,
+    0
+   ]
+  ],
+  "glint": [
+   [
+    "e",
+    0,
+    0,
+    0.5,
+    0.1,
+    0
+   ]
+  ],
+  "pad": [
+   [
+    "p",
+    [
+     [
+      0,
+      0
+     ],
+     [
+      0.17,
+      -0.47
+     ],
+     [
+      0.32,
+      -0.38
+     ],
+     [
+      0.43,
+      -0.25
+     ],
+     [
+      0.49,
+      -0.09
+     ],
+     [
+      0.49,
+      0.09
+     ],
+     [
+      0.43,
+      0.25
+     ],
+     [
+      0.32,
+      0.38
+     ],
+     [
+      0.17,
+      0.47
+     ],
+     [
+      0,
+      0.5
+     ],
+     [
+      -0.17,
+      0.47
+     ],
+     [
+      -0.32,
+      0.38
+     ],
+     [
+      -0.43,
+      0.25
+     ],
+     [
+      -0.49,
+      0.09
+     ],
+     [
+      -0.49,
+      -0.09
+     ],
+     [
+      -0.43,
+      -0.25
+     ],
+     [
+      -0.32,
+      -0.38
+     ],
+     [
+      -0.17,
+      -0.47
+     ]
+    ],
+    0
+   ],
+   [
+    "l",
+    0,
+    0,
+    -0.3,
+    0.2,
+    0.04,
+    1
+   ],
+   [
+    "l",
+    0,
+    0,
+    0.32,
+    0.12,
+    0.04,
+    1
+   ]
+  ],
+  "smoke": [
+   [
+    "e",
+    -0.24,
+    0,
+    0.3,
+    0.16,
+    0
+   ],
+   [
+    "e",
+    0.1,
+    -0.05,
+    0.34,
+    0.18,
+    0
+   ],
+   [
+    "e",
+    0.36,
+    0.02,
+    0.18,
+    0.11,
+    0
+   ]
   ]
  },
  "field_avoid": [
@@ -563,192 +1858,27 @@
    88.5,
    90,
    11.5
+  ],
+  [
+   79.6,
+   76.5,
+   19.6,
+   13
   ]
  ],
- "budget": {
-  "ambient_max": 24,
-  "loops_max": 2,
-  "flower_kb_max": 12
- },
- "surfaces": {
-  "card": {
-   "rect": [
-    24,
-    172,
-    1032,
-    1160
-   ],
-   "radius": 48,
-   "border": 4,
-   "shadow_y": 12,
-   "recipe": "kits[id].field",
-   "note": "minijatura: slojevi u % recta, oblici/cvijeće uniformno k = w/1080; na u = 1 rect = stranica → isti pikseli"
-  },
-  "transition": {
-   "open_ms": 560,
-   "close_ms": 440,
-   "ease": "TRANS_CUBIC EASE_IN_OUT",
-   "meadow_space": [
-    "SeasonBackdrop",
-    "MeadowSpots (13)",
-    "Ambient"
-   ],
-   "page_space": [
-    "FieldChrome",
-    "SeasonName",
-    "MeadowPip",
-    "PlayButton"
-   ]
-  },
-  "field": {
-   "rect": [
-    0,
-    0,
-    1080,
-    1633
-   ],
-   "recipe": "kits[id].field",
-   "spots": "kits[id].spots [x%, y% od dna, size, roster idx (seed_type_ids), prag]",
-   "pip_zone_feet": [
-    151,
-    1306,
-    778,
-    131
-   ],
-   "pip_home": [
-    756,
-    1404
-   ],
-   "pip_poses": {
-    "walk": "res://assets/sprites/pip_idle.svg",
-    "sniff": "res://assets/sprites/pip_sniff.svg",
-    "sleep": "res://assets/sprites/pip_sleep.svg"
-   }
-  },
-  "shop": {
-   "card": [
-    1032,
-    364
-   ],
-   "recipe": "kits[id].shop (null = danas trake)",
-   "name_ink": "kits[id].palette.ink_field"
-  },
-  "arena": {
-   "recipe": "UiArenaV2.FIELDS[id] + kits[id].arena (base, layers, addLayers, scatter, addScatter, combo)"
-  },
-  "run": {
-   "lanes": [
-    270,
-    540,
-    810
-   ],
-   "lane_w": 200,
-   "seams": [
-    405,
-    675
-   ],
-   "far_speed": 0.35,
-   "near_speed": 1,
-   "obstacle_body": [
-    176,
-    150
-   ],
-   "obstacle_collar": [
-    240,
-    52
-   ],
-   "collision": [
-    64,
-    64
-   ]
-  }
- },
- "animations": {
-  "ambient": {
-   "max": 24,
-   "loop": 1,
-   "per_frame": "offset + alpha only"
-  },
-  "pip_sniff": {
-   "flower_bow": {
-    "sec": 0.6,
-    "keys": [
-     [
-      0,
-      0,
-      1
-     ],
-     [
-      0.35,
-      -9,
-      0.94
-     ],
-     [
-      0.7,
-      4,
-      1
-     ],
-     [
-      1,
-      0,
-      1
-     ]
-    ],
-    "pivot": "base"
-   },
-   "puff": {
-    "n": 5,
-    "sec": 0.7,
-    "rise": 80,
-    "stagger": 0.05
-   },
-   "hold": 1.3
-  },
-  "pip_sleep": {
-   "sec": [
-    2,
-    5
-   ],
-   "zzz": {
-    "n": 3,
-    "sec": 2.4,
-    "stagger": 0.6,
-    "fill": "#FFF8F0",
-    "outline": 6
-   },
-   "squash": [
-    1.04,
-    0.94
-   ]
-  },
-  "pip_walk": {
-   "bob": {
-    "sec": 0.42,
-    "y": -7,
-    "squash": [
-     0.97,
-     1.03
-    ]
-   },
-   "speed": 70
-  },
-  "flower_grow": {
-   "sec": 0.42,
-   "scale": [
-    0,
-    1.12,
-    1
-   ],
-   "ease": "TRANS_BACK EASE_OUT",
-   "when": "spot prijeđe prag (have >= need) ili prvi ulaz poslije runa"
-  },
-  "loops_per_screen": {
-   "field": "ambient + AttentionRing (samo prazna korpa) ≤ 2",
-   "card": 0,
-   "shop": "busy dots ≤ 1",
-   "arena": 0,
-   "run": "ambient + MagnetRing ≤ 2"
-  }
+ "bands": {
+  "free": [
+   "country_bloom",
+   "frost_orchard",
+   "lantern_meadow",
+   "amber_canopy"
+  ],
+  "premium": [
+   "moonlit_warren",
+   "coral_tide",
+   "starfall_glade",
+   "ember_fen"
+  ]
  },
  "kits": {
   "country_bloom": {
@@ -830,6 +1960,42 @@
     "alpha": [
      0,
      0.9
+    ],
+    "layers": [
+     {
+      "motion": "drift",
+      "n": 14,
+      "shape": "petal",
+      "size": [
+       12,
+       18
+      ],
+      "pal": [
+       "#FFCCD5",
+       "#FFF8F0"
+      ],
+      "zone": [
+       0,
+       18,
+       100,
+       62
+      ],
+      "drift": [
+       180,
+       40
+      ],
+      "sec": 11,
+      "rot": 220,
+      "alpha": [
+       0,
+       0.9
+      ],
+      "fade": 0.12,
+      "ph": [
+       0.21,
+       0.63
+      ]
+     }
     ]
    },
    "field": {
@@ -1302,7 +2468,8 @@
      "name": "Pokošena traka",
      "stripe": "rgba(255,248,240,.07)",
      "on": 40,
-     "period": 124
+     "period": 124,
+     "kind": "stripe"
     },
     "far": {
      "id": "clover_patches",
@@ -1344,6 +2511,46 @@
        88,
        150
       ]
+     ],
+     "items": [
+      {
+       "shape": "moss",
+       "pal": [
+        "#36553A"
+       ],
+       "at": [
+        [
+         172.8,
+         43.2,
+         180
+        ],
+        [
+         648,
+         230.4,
+         220
+        ],
+        [
+         928.8000000000001,
+         100.8,
+         160
+        ],
+        [
+         237.60000000000002,
+         446.40000000000003,
+         200
+        ],
+        [
+         777.6,
+         547.2,
+         210
+        ],
+        [
+         108,
+         633.6,
+         150
+        ]
+       ]
+      }
      ]
     },
     "near": {
@@ -1430,7 +2637,105 @@
         20
        ]
       ]
-     }
+     },
+     "items": [
+      {
+       "shape": "post",
+       "pal": [
+        "#E9DCC0",
+        "#B9A47E"
+       ],
+       "at": [
+        [
+         62,
+         150,
+         92
+        ],
+        [
+         1018,
+         150,
+         92
+        ],
+        [
+         62,
+         390,
+         92
+        ],
+        [
+         1018,
+         390,
+         92
+        ]
+       ]
+      },
+      {
+       "shape": "tuft",
+       "pal": [
+        "#4E7A4F"
+       ],
+       "at": [
+        [
+         30,
+         40,
+         40
+        ],
+        [
+         140,
+         210,
+         34
+        ],
+        [
+         96,
+         370,
+         38
+        ],
+        [
+         950,
+         90,
+         36
+        ],
+        [
+         1050,
+         280,
+         40
+        ],
+        [
+         930,
+         420,
+         34
+        ]
+       ]
+      },
+      {
+       "shape": "daisy",
+       "pal": [
+        "#FFF8F0",
+        "#FFD56B"
+       ],
+       "at": [
+        [
+         150,
+         120,
+         22
+        ],
+        [
+         40,
+         300,
+         20
+        ],
+        [
+         990,
+         200,
+         22
+        ],
+        [
+         1040,
+         430,
+         20
+        ]
+       ]
+      }
+     ]
     },
     "ambient": {
      "id": "petals",
@@ -1448,7 +2753,43 @@
       120,
       900
      ],
-     "sec": 6
+     "sec": 6,
+     "layers": [
+      {
+       "motion": "drift",
+       "n": 12,
+       "shape": "petal",
+       "size": [
+        14,
+        20
+       ],
+       "pal": [
+        "#FFCCD5",
+        "#FFF8F0"
+       ],
+       "zone": [
+        4,
+        0,
+        92,
+        90
+       ],
+       "drift": [
+        120,
+        900
+       ],
+       "sec": 6,
+       "rot": 220,
+       "alpha": [
+        0,
+        0.85
+       ],
+       "fade": 0.1,
+       "ph": [
+        0.21,
+        0.63
+       ]
+      }
+     ]
     },
     "collar": [
      "#C9B98A",
@@ -1465,8 +2806,22 @@
       "name": "Kapija ograde",
       "svg": "assets/seasons/country_bloom/obstacle_fence_gate.svg"
      }
-    ]
+    ],
+    "material_tile": {
+     "period": 124,
+     "items": [
+      {
+       "k": "rect",
+       "x": 0,
+       "y": 0,
+       "w": 192,
+       "h": 40,
+       "f": "rgba(255,248,240,.07)"
+      }
+     ]
+    }
    },
+   "camp": null,
    "roster": [
     {
      "id": "clover",
@@ -1536,7 +2891,3637 @@
     "daisy",
     "buttercup",
     "sunflower"
-   ]
+   ],
+   "price": null,
+   "soon": false,
+   "prev_free": null,
+   "camp_flower": null
+  },
+  "frost_orchard": {
+   "id": "frost_orchard",
+   "name": "Frost Orchard",
+   "kind": "free",
+   "order": 2,
+   "phase": 2,
+   "place": "Zaleđeni voćnjak: ravan bijeli horizont, dva reda voćki sa snijegom na krošnjama, nanosi i zaleđena bara u sredini.",
+   "palette": {
+    "sky": [
+     "#D9E7F6",
+     "#E0ECF8",
+     "#E7F0FA",
+     "#EEF5FC"
+    ],
+    "cloud": "#F6FAFE",
+    "tree_far": "#B9CBE0",
+    "tree_near": "#A7BDD6",
+    "trunk": "#7D93AE",
+    "snow": "#F7FAFE",
+    "ground": "#EAF1F9",
+    "ground_far": "#E2EAF4",
+    "drift": "#DCE7F4",
+    "ice": "#C6D8EC",
+    "ice_shine": "#F2F7FD",
+    "near": "#F3F7FC",
+    "frost_grass": "#B5C7DC",
+    "ink_field": "#1A1A14",
+    "page": "#EEF4FB",
+    "flower_out": "#2B3550"
+   },
+   "motifs": [
+    {
+     "id": "orchard_rows",
+     "name": "Dva reda voćki",
+     "how": "recept: row oblika tree na grebenu horizonta (13 malih) i na drugom grebenu (8 većih), kape snijega"
+    },
+    {
+     "id": "frozen_pond",
+     "name": "Zaleđena bara",
+     "how": "recept: ellipse leda + dva odsjaja (puddle)"
+    },
+    {
+     "id": "snow_drifts",
+     "name": "Nanosi",
+     "how": "recept: scatter oblika drift (sjena + svijetli vrh)"
+    }
+   ],
+   "ambient": {
+    "id": "snow",
+    "name": "Pahulje padaju i njišu se",
+    "n": 18,
+    "layers": [
+     {
+      "motion": "fall",
+      "n": 18,
+      "shape": "flake",
+      "size": [
+       12,
+       20
+      ],
+      "pal": [
+       "#FFFFFF"
+      ],
+      "pal2": [
+       "#9DB3CF"
+      ],
+      "zone": [
+       0,
+       0,
+       100,
+       56
+      ],
+      "drift": [
+       40,
+       560
+      ],
+      "sway": [
+       18,
+       1.5
+      ],
+      "sec": 10,
+      "rot": 140,
+      "alpha": [
+       0,
+       0.95
+      ],
+      "fade": 0.1,
+      "ph": [
+       0.13,
+       0.41
+      ]
+     }
+    ]
+   },
+   "field": {
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 9,
+      "c": "#D9E7F6"
+     },
+     {
+      "k": "band",
+      "y0": 9,
+      "y1": 17,
+      "c": "#E0ECF8"
+     },
+     {
+      "k": "band",
+      "y0": 17,
+      "y1": 25,
+      "c": "#E7F0FA"
+     },
+     {
+      "k": "band",
+      "y0": 25,
+      "y1": 36,
+      "c": "#EEF5FC"
+     },
+     {
+      "k": "shape",
+      "shape": "cloud",
+      "at": [
+       [
+        36,
+        15.6,
+        180
+       ],
+       [
+        70,
+        21,
+        130
+       ]
+      ],
+      "pal": [
+       "#F6FAFE"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 34.6,
+       "w": [
+        [
+         0.12,
+         2,
+         0.3
+        ]
+       ]
+      },
+      "c": "#E2EAF4"
+     },
+     {
+      "k": "row",
+      "shape": "tree",
+      "r": {
+       "y": 34.8,
+       "w": [
+        [
+         0.12,
+         2,
+         0.3
+        ]
+       ]
+      },
+      "x0": 3,
+      "x1": 97,
+      "step": 7.8,
+      "size": 72,
+      "vary": 0.25,
+      "pal": [
+       "#B9CBE0",
+       "#8EA3BC",
+       "#F7FAFE"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 40.2,
+       "w": [
+        [
+         0.3,
+         1.4,
+         1.1
+        ]
+       ]
+      },
+      "c": "#EAF1F9"
+     },
+     {
+      "k": "row",
+      "shape": "tree",
+      "r": {
+       "y": 40.6,
+       "w": [
+        [
+         0.3,
+         1.4,
+         1.1
+        ]
+       ]
+      },
+      "x0": 6,
+      "x1": 94,
+      "step": 12.6,
+      "size": 124,
+      "vary": 0.2,
+      "pal": [
+       "#A7BDD6",
+       "#7D93AE",
+       "#F7FAFE"
+      ]
+     },
+     {
+      "k": "ellipse",
+      "at": [
+       52,
+       62.5
+      ],
+      "r": [
+       21,
+       5.2
+      ],
+      "c": "#C6D8EC"
+     },
+     {
+      "k": "shape",
+      "shape": "puddle",
+      "at": [
+       [
+        46,
+        61.6,
+        150
+       ],
+       [
+        60,
+        63.6,
+        110
+       ]
+      ],
+      "pal": [
+       "#C6D8EC",
+       "#F2F7FD"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "drift",
+      "n": 9,
+      "size": [
+       120,
+       190
+      ],
+      "rot": [
+       0,
+       0
+      ],
+      "phase": [
+       0.21,
+       0.66,
+       0.35,
+       0
+      ],
+      "zones": [
+       [
+        2,
+        46,
+        96,
+        38
+       ]
+      ],
+      "pal": [
+       "#DCE7F4",
+       "#F7FAFE"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "sparkle",
+      "n": 10,
+      "size": [
+       12,
+       18
+      ],
+      "rot": [
+       0,
+       45
+      ],
+      "phase": [
+       0.05,
+       0.93,
+       0.44,
+       0.3
+      ],
+      "zones": [
+       [
+        4,
+        44,
+        92,
+        40
+       ]
+      ],
+      "pal": [
+       "#FFFFFF"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 84,
+       "w": [
+        [
+         0.6,
+         1.8,
+         0.4
+        ],
+        [
+         0.3,
+         4.2,
+         1.7
+        ]
+       ]
+      },
+      "c": "#F3F7FC"
+     },
+     {
+      "k": "scatter",
+      "shape": "tuft",
+      "n": 14,
+      "size": [
+       26,
+       40
+      ],
+      "rot": [
+       -6,
+       6
+      ],
+      "phase": [
+       0.31,
+       0.12,
+       0.6,
+       0.2
+      ],
+      "zones": [
+       [
+        2,
+        84.6,
+        96,
+        2
+       ]
+      ],
+      "noAvoid": true,
+      "pal": [
+       "#B5C7DC"
+      ]
+     }
+    ]
+   },
+   "spots": [
+    [
+     10,
+     55,
+     88,
+     3,
+     5
+    ],
+    [
+     26,
+     54,
+     88,
+     0,
+     5
+    ],
+    [
+     42,
+     55,
+     88,
+     1,
+     5
+    ],
+    [
+     58,
+     54,
+     88,
+     4,
+     5
+    ],
+    [
+     74,
+     55,
+     88,
+     2,
+     5
+    ],
+    [
+     90,
+     54,
+     88,
+     5,
+     5
+    ],
+    [
+     18,
+     40,
+     116,
+     0,
+     1
+    ],
+    [
+     50,
+     42,
+     116,
+     1,
+     1
+    ],
+    [
+     82,
+     40,
+     116,
+     2,
+     1
+    ],
+    [
+     12,
+     29,
+     136,
+     3,
+     1
+    ],
+    [
+     66,
+     28,
+     136,
+     4,
+     1
+    ],
+    [
+     88,
+     30,
+     136,
+     5,
+     1
+    ],
+    [
+     34,
+     26,
+     168,
+     5,
+     10
+    ]
+   ],
+   "camp": {
+    "w": 1032,
+    "h": 318,
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 20,
+      "c": "#E0ECF8"
+     },
+     {
+      "k": "band",
+      "y0": 20,
+      "y1": 40,
+      "c": "#E7F0FA"
+     },
+     {
+      "k": "band",
+      "y0": 40,
+      "y1": 56,
+      "c": "#EEF5FC"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 54,
+       "w": [
+        [
+         0.4,
+         2,
+         0.3
+        ]
+       ]
+      },
+      "c": "#E2EAF4"
+     },
+     {
+      "k": "row",
+      "shape": "tree",
+      "r": {
+       "y": 54.4,
+       "w": [
+        [
+         0.4,
+         2,
+         0.3
+        ]
+       ]
+      },
+      "x0": 2,
+      "x1": 98,
+      "step": 6.4,
+      "size": 92,
+      "vary": 0.25,
+      "pal": [
+       "#C6D5E7",
+       "#9FB2C8",
+       "#F7FAFE"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 66,
+       "w": [
+        [
+         0.6,
+         1.6,
+         1.1
+        ]
+       ]
+      },
+      "c": "#EAF1F9"
+     },
+     {
+      "k": "shape",
+      "shape": "drift",
+      "at": [
+       [
+        18,
+        86,
+        300
+       ],
+       [
+        74,
+        92,
+        360
+       ],
+       [
+        46,
+        98,
+        260
+       ]
+      ],
+      "pal": [
+       "#DCE7F4",
+       "#F7FAFE"
+      ]
+     }
+    ]
+   },
+   "shop": null,
+   "arena": {
+    "base": [
+     "#E3EEFB",
+     "#E9F2FC"
+    ],
+    "layers": {
+     "snowfield": [
+      "#E2EAF4",
+      "#E6EDF6"
+     ],
+     "frost_ground": [
+      "#C6D6E8",
+      "#CCDCEE"
+     ]
+    },
+    "scatter": {
+     "trees_far": [
+      "#B9CBE0",
+      "#8EA3BC"
+     ],
+     "trees_near": [
+      "#A7BDD6",
+      "#7D93AE"
+     ]
+    },
+    "combo": {
+     "light": "#FFFFFF",
+     "ring": "#FFFFFF"
+    }
+   },
+   "run": {
+    "ground": "#DCE7F3",
+    "lane": "#5F7894",
+    "laneEdge": "rgba(255,255,255,.55)",
+    "seam": "rgba(255,255,255,.30)",
+    "material": {
+     "kind": "rut",
+     "name": "Ugažen snijeg s tragom sanki",
+     "col": "#7890AC",
+     "xs": [
+      30,
+      70
+     ],
+     "w": 12,
+     "dash": 124,
+     "period": 124
+    },
+    "far": {
+     "id": "frozen_puddles",
+     "name": "Zaleđene lokve i nanosi",
+     "speed": 0.35,
+     "period": 720,
+     "items": [
+      {
+       "shape": "puddle",
+       "pal": [
+        "#C3D5EA",
+        "#F2F7FD"
+       ],
+       "at": [
+        [
+         130,
+         60,
+         150
+        ],
+        [
+         960,
+         260,
+         130
+        ],
+        [
+         60,
+         470,
+         120
+        ],
+        [
+         1010,
+         610,
+         140
+        ]
+       ]
+      },
+      {
+       "shape": "drift",
+       "pal": [
+        "#CCDBEC",
+        "#F7FAFE"
+       ],
+       "at": [
+        [
+         40,
+         200,
+         170
+        ],
+        [
+         1050,
+         420,
+         180
+        ],
+        [
+         120,
+         680,
+         150
+        ]
+       ]
+      }
+     ]
+    },
+    "near": {
+     "id": "orchard_edge",
+     "name": "Voćke uz rub",
+     "speed": 1,
+     "period": 480,
+     "items": [
+      {
+       "shape": "tree",
+       "pal": [
+        "#A7BDD6",
+        "#7D93AE",
+        "#F7FAFE"
+       ],
+       "at": [
+        [
+         70,
+         200,
+         190
+        ],
+        [
+         1010,
+         440,
+         200
+        ]
+       ]
+      },
+      {
+       "shape": "tuft",
+       "pal": [
+        "#9CB0C8"
+       ],
+       "at": [
+        [
+         140,
+         80,
+         40
+        ],
+        [
+         30,
+         360,
+         34
+        ],
+        [
+         940,
+         140,
+         38
+        ],
+        [
+         1060,
+         300,
+         34
+        ]
+       ]
+      }
+     ]
+    },
+    "ambient": {
+     "id": "snow",
+     "n": 14,
+     "layers": [
+      {
+       "motion": "fall",
+       "n": 14,
+       "shape": "flake",
+       "size": [
+        16,
+        24
+       ],
+       "pal": [
+        "#FFFFFF"
+       ],
+       "pal2": [
+        "#9DB3CF"
+       ],
+       "zone": [
+        0,
+        0,
+        100,
+        40
+       ],
+       "drift": [
+        60,
+        1100
+       ],
+       "sway": [
+        24,
+        1.5
+       ],
+       "sec": 6,
+       "rot": 160,
+       "alpha": [
+        0,
+        0.95
+       ],
+       "fade": 0.08,
+       "ph": [
+        0.4,
+        0.2
+       ]
+      }
+     ]
+    },
+    "collar": [
+     "#C9D7E6",
+     "#9FB2C8"
+    ],
+    "obstacles": [
+     {
+      "id": "ice_block",
+      "name": "Blok leda",
+      "svg": "assets/seasons/frost_orchard/obstacle_ice_block.svg"
+     },
+     {
+      "id": "snow_stump",
+      "name": "Panj pod snijegom",
+      "svg": "assets/seasons/frost_orchard/obstacle_snow_stump.svg"
+     }
+    ],
+    "material_tile": {
+     "period": 124,
+     "items": [
+      {
+       "k": "rect",
+       "x": 51.599999999999994,
+       "y": 0,
+       "w": 12,
+       "h": 124,
+       "f": "#7890AC",
+       "r": 6
+      },
+      {
+       "k": "rect",
+       "x": 128.39999999999998,
+       "y": 0,
+       "w": 12,
+       "h": 124,
+       "f": "#7890AC",
+       "r": 6
+      }
+     ]
+    }
+   },
+   "roster": [
+    {
+     "id": "frost_snowdrop",
+     "display_name": "Frost Snowdrop",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/frost_snowdrop_t1.svg",
+      "res://assets/sprites/flowers/frost_snowdrop_t2.svg",
+      "res://assets/sprites/flowers/frost_snowdrop_t3.svg"
+     ]
+    },
+    {
+     "id": "ice_crocus",
+     "display_name": "Ice Crocus",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/ice_crocus_t1.svg",
+      "res://assets/sprites/flowers/ice_crocus_t2.svg",
+      "res://assets/sprites/flowers/ice_crocus_t3.svg"
+     ]
+    },
+    {
+     "id": "silver_aconite",
+     "display_name": "Silver Aconite",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/silver_aconite_t1.svg",
+      "res://assets/sprites/flowers/silver_aconite_t2.svg",
+      "res://assets/sprites/flowers/silver_aconite_t3.svg"
+     ]
+    },
+    {
+     "id": "winter_camellia",
+     "display_name": "Winter Camellia",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/winter_camellia_t1.svg",
+      "res://assets/sprites/flowers/winter_camellia_t2.svg",
+      "res://assets/sprites/flowers/winter_camellia_t3.svg"
+     ]
+    },
+    {
+     "id": "hoarfrost_rose",
+     "display_name": "Hoarfrost Rose",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/hoarfrost_rose_t1.svg",
+      "res://assets/sprites/flowers/hoarfrost_rose_t2.svg",
+      "res://assets/sprites/flowers/hoarfrost_rose_t3.svg"
+     ]
+    },
+    {
+     "id": "crystal_peony",
+     "display_name": "Crystal Peony",
+     "rarity": 3,
+     "art": [
+      "res://assets/sprites/flowers/crystal_peony_t1.svg",
+      "res://assets/sprites/flowers/crystal_peony_t2.svg",
+      "res://assets/sprites/flowers/crystal_peony_t3.svg"
+     ]
+    }
+   ],
+   "card_order": [
+    "frost_snowdrop",
+    "crystal_peony",
+    "winter_camellia",
+    "ice_crocus",
+    "silver_aconite",
+    "hoarfrost_rose"
+   ],
+   "price": null,
+   "soon": false,
+   "prev_free": "country_bloom",
+   "camp_flower": "pumpkin"
+  },
+  "lantern_meadow": {
+   "id": "lantern_meadow",
+   "name": "Lantern Meadow",
+   "kind": "free",
+   "order": 3,
+   "phase": 2,
+   "place": "Livada u sumrak: visoka trava sa strana, girlanda papirnih fenjera preko sredine, svici iznad trave.",
+   "palette": {
+    "sky": [
+     "#120E22",
+     "#171229",
+     "#1D1631",
+     "#241B3A"
+    ],
+    "hill": "#191329",
+    "ground": "#1C1730",
+    "grass": "#120E1E",
+    "blade": "#2A2244",
+    "garland": "#0B0814",
+    "lantern_lit": "#FFB88C",
+    "lantern_glow": "#FFE3B8",
+    "lantern_dim": "#7E6698",
+    "lantern_cap": "#3B2F55",
+    "primrose": "#FFEAA7",
+    "primrose_eye": "#E8C44A",
+    "near": "#15112A",
+    "firefly": "#FFE27A",
+    "ink_field": "#FFF8F0",
+    "page": "#E9E1F5",
+    "flower_out": "#24192F"
+   },
+   "motifs": [
+    {
+     "id": "lantern_garland",
+     "name": "Girlanda fenjera",
+     "how": "recept: line (girlanda) + row oblika lantern duž iste linije, svaki drugi fenjer upaljen (alt paleta)"
+    },
+    {
+     "id": "tall_grass",
+     "name": "Visoka trava sa strana",
+     "how": "recept: poly sideGrass lijevo i desno (zupci po R2), skoro crna silueta"
+    },
+    {
+     "id": "primrose",
+     "name": "Noćurke u travi",
+     "how": "recept: scatter oblika daisy u boji noćurke"
+    }
+   ],
+   "ambient": {
+    "id": "fireflies",
+    "name": "Svici lebde i trepere",
+    "n": 16,
+    "layers": [
+     {
+      "motion": "float",
+      "n": 16,
+      "shape": "firefly",
+      "size": [
+       14,
+       22
+      ],
+      "pal": [
+       "#FFF8D6"
+      ],
+      "pal2": [
+       "#FFE27A"
+      ],
+      "zone": [
+       6,
+       30,
+       88,
+       50
+      ],
+      "drift": [
+       26,
+       18
+      ],
+      "sec": 5.5,
+      "alpha": [
+       0.25,
+       1
+      ],
+      "pulse": 0.12,
+      "ph": [
+       0.42,
+       0.28
+      ]
+     }
+    ]
+   },
+   "field": {
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 10,
+      "c": "#120E22"
+     },
+     {
+      "k": "band",
+      "y0": 10,
+      "y1": 20,
+      "c": "#171229"
+     },
+     {
+      "k": "band",
+      "y0": 20,
+      "y1": 29,
+      "c": "#1D1631"
+     },
+     {
+      "k": "band",
+      "y0": 29,
+      "y1": 40,
+      "c": "#241B3A"
+     },
+     {
+      "k": "scatter",
+      "shape": "dot",
+      "n": 12,
+      "size": [
+       5,
+       8
+      ],
+      "rot": [
+       0,
+       0
+      ],
+      "phase": [
+       0.3,
+       0.7,
+       0.2,
+       0
+      ],
+      "zones": [
+       [
+        20,
+        20,
+        60,
+        14
+       ]
+      ],
+      "pal": [
+       "#CFC4F0"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 36,
+       "w": [
+        [
+         1.2,
+         1.3,
+         0.6
+        ],
+        [
+         0.5,
+         3.1,
+         1.4
+        ]
+       ]
+      },
+      "c": "#191329"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 41,
+       "w": [
+        [
+         0.5,
+         1.1,
+         2.1
+        ]
+       ]
+      },
+      "c": "#1C1730"
+     },
+     {
+      "k": "scatter",
+      "shape": "blade",
+      "n": 26,
+      "size": [
+       50,
+       90
+      ],
+      "rot": [
+       -8,
+       8
+      ],
+      "phase": [
+       0.15,
+       0.62,
+       0.8,
+       0.45
+      ],
+      "zones": [
+       [
+        8,
+        44,
+        84,
+        40
+       ]
+      ],
+      "pal": [
+       "#2A2244"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "daisy",
+      "n": 14,
+      "size": [
+       18,
+       26
+      ],
+      "rot": [
+       0,
+       72
+      ],
+      "phase": [
+       0.9,
+       0.47,
+       0.31,
+       0.2
+      ],
+      "zones": [
+       [
+        8,
+        46,
+        84,
+        36
+       ]
+      ],
+      "pal": [
+       "#FFEAA7",
+       "#E8C44A"
+      ]
+     },
+     {
+      "k": "line",
+      "pts": [
+       [
+        0,
+        13.5
+       ],
+       [
+        12,
+        16.8
+       ],
+       [
+        25,
+        18.8
+       ],
+       [
+        38,
+        16.6
+       ],
+       [
+        50,
+        15.2
+       ],
+       [
+        62,
+        16.6
+       ],
+       [
+        75,
+        18.8
+       ],
+       [
+        88,
+        16.8
+       ],
+       [
+        100,
+        13.5
+       ]
+      ],
+      "smooth": true,
+      "c": "#0B0814",
+      "w": 5
+     },
+     {
+      "k": "row",
+      "shape": "lantern",
+      "pts": [
+       [
+        0,
+        13.5
+       ],
+       [
+        12,
+        16.8
+       ],
+       [
+        25,
+        18.8
+       ],
+       [
+        38,
+        16.6
+       ],
+       [
+        50,
+        15.2
+       ],
+       [
+        62,
+        16.6
+       ],
+       [
+        75,
+        18.8
+       ],
+       [
+        88,
+        16.8
+       ],
+       [
+        100,
+        13.5
+       ]
+      ],
+      "x0": 26,
+      "x1": 74,
+      "step": 8,
+      "size": 70,
+      "pal": [
+       "#FFB88C",
+       "#FFE3B8",
+       "#3B2F55"
+      ],
+      "alt": [
+       "#7E6698",
+       "#958099",
+       "#3B2F55"
+      ]
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        0,
+        34
+       ],
+       [
+        8.62,
+        37.3
+       ],
+       [
+        3.75,
+        40.6
+       ],
+       [
+        13.72,
+        43.9
+       ],
+       [
+        3.75,
+        47.2
+       ],
+       [
+        12.06,
+        50.5
+       ],
+       [
+        3.75,
+        53.8
+       ],
+       [
+        10.41,
+        57.1
+       ],
+       [
+        3.75,
+        60.4
+       ],
+       [
+        8.75,
+        63.7
+       ],
+       [
+        3.75,
+        67
+       ],
+       [
+        13.85,
+        70.3
+       ],
+       [
+        3.75,
+        73.6
+       ],
+       [
+        12.19,
+        76.9
+       ],
+       [
+        3.75,
+        80.2
+       ],
+       [
+        10.54,
+        83.5
+       ],
+       [
+        3.75,
+        86.8
+       ],
+       [
+        8.88,
+        90.1
+       ],
+       [
+        3.75,
+        93.4
+       ],
+       [
+        13.98,
+        96.7
+       ],
+       [
+        3.75,
+        100
+       ],
+       [
+        0,
+        100
+       ]
+      ],
+      "c": "#120E1E"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        100,
+        34
+       ],
+       [
+        88.68,
+        37.3
+       ],
+       [
+        96.25,
+        40.6
+       ],
+       [
+        90.33,
+        43.9
+       ],
+       [
+        96.25,
+        47.2
+       ],
+       [
+        85.24,
+        50.5
+       ],
+       [
+        96.25,
+        53.8
+       ],
+       [
+        86.89,
+        57.1
+       ],
+       [
+        96.25,
+        60.4
+       ],
+       [
+        88.55,
+        63.7
+       ],
+       [
+        96.25,
+        67
+       ],
+       [
+        90.2,
+        70.3
+       ],
+       [
+        96.25,
+        73.6
+       ],
+       [
+        85.11,
+        76.9
+       ],
+       [
+        96.25,
+        80.2
+       ],
+       [
+        86.76,
+        83.5
+       ],
+       [
+        96.25,
+        86.8
+       ],
+       [
+        88.42,
+        90.1
+       ],
+       [
+        96.25,
+        93.4
+       ],
+       [
+        90.07,
+        96.7
+       ],
+       [
+        96.25,
+        100
+       ],
+       [
+        100,
+        100
+       ]
+      ],
+      "c": "#120E1E"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 85,
+       "w": [
+        [
+         0.6,
+         1.8,
+         0.4
+        ],
+        [
+         0.3,
+         4.2,
+         1.7
+        ]
+       ]
+      },
+      "c": "#15112A"
+     },
+     {
+      "k": "scatter",
+      "shape": "tuft",
+      "n": 14,
+      "size": [
+       30,
+       46
+      ],
+      "rot": [
+       -6,
+       6
+      ],
+      "phase": [
+       0.31,
+       0.12,
+       0.6,
+       0.2
+      ],
+      "zones": [
+       [
+        2,
+        85.6,
+        96,
+        2
+       ]
+      ],
+      "noAvoid": true,
+      "pal": [
+       "#221B38"
+      ]
+     }
+    ]
+   },
+   "spots": [
+    [
+     10,
+     55,
+     88,
+     3,
+     5
+    ],
+    [
+     26,
+     54,
+     88,
+     0,
+     5
+    ],
+    [
+     42,
+     55,
+     88,
+     1,
+     5
+    ],
+    [
+     58,
+     54,
+     88,
+     4,
+     5
+    ],
+    [
+     74,
+     55,
+     88,
+     2,
+     5
+    ],
+    [
+     90,
+     54,
+     88,
+     5,
+     5
+    ],
+    [
+     18,
+     40,
+     116,
+     0,
+     1
+    ],
+    [
+     50,
+     42,
+     116,
+     1,
+     1
+    ],
+    [
+     82,
+     40,
+     116,
+     2,
+     1
+    ],
+    [
+     12,
+     29,
+     136,
+     3,
+     1
+    ],
+    [
+     66,
+     28,
+     136,
+     4,
+     1
+    ],
+    [
+     88,
+     30,
+     136,
+     5,
+     1
+    ],
+    [
+     34,
+     26,
+     168,
+     5,
+     10
+    ]
+   ],
+   "camp": {
+    "w": 1032,
+    "h": 318,
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 34,
+      "c": "#EEE6F7"
+     },
+     {
+      "k": "band",
+      "y0": 34,
+      "y1": 66,
+      "c": "#E6DBF3"
+     },
+     {
+      "k": "band",
+      "y0": 66,
+      "y1": 100,
+      "c": "#DDCFEE"
+     },
+     {
+      "k": "line",
+      "pts": [
+       [
+        0,
+        3
+       ],
+       [
+        16,
+        9
+       ],
+       [
+        33,
+        11
+       ],
+       [
+        50,
+        8
+       ],
+       [
+        67,
+        11
+       ],
+       [
+        84,
+        9
+       ],
+       [
+        100,
+        3
+       ]
+      ],
+      "smooth": true,
+      "c": "#8C7AA8",
+      "w": 3
+     },
+     {
+      "k": "row",
+      "shape": "lantern",
+      "pts": [
+       [
+        0,
+        3
+       ],
+       [
+        16,
+        9
+       ],
+       [
+        33,
+        11
+       ],
+       [
+        50,
+        8
+       ],
+       [
+        67,
+        11
+       ],
+       [
+        84,
+        9
+       ],
+       [
+        100,
+        3
+       ]
+      ],
+      "x0": 6,
+      "x1": 94,
+      "step": 8,
+      "size": 36,
+      "pal": [
+       "#FFC9A0",
+       "#FFEBD0",
+       "#8C7AA8"
+      ],
+      "alt": [
+       "#C9B6E6",
+       "#E2D6F3",
+       "#8C7AA8"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 86,
+       "w": [
+        [
+         1.2,
+         1.6,
+         0.4
+        ]
+       ]
+      },
+      "c": "#D2C2E6"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        0,
+        100
+       ],
+       [
+        0,
+        85.8
+       ],
+       [
+        1.1,
+        92
+       ],
+       [
+        2.2,
+        82.41
+       ],
+       [
+        3.3,
+        92
+       ],
+       [
+        4.4,
+        83.51
+       ],
+       [
+        5.5,
+        92
+       ],
+       [
+        6.6,
+        84.61
+       ],
+       [
+        7.7,
+        92
+       ],
+       [
+        8.8,
+        85.72
+       ],
+       [
+        9.9,
+        92
+       ],
+       [
+        11,
+        82.32
+       ],
+       [
+        12.1,
+        92
+       ],
+       [
+        13.2,
+        83.42
+       ],
+       [
+        14.3,
+        92
+       ],
+       [
+        15.4,
+        84.52
+       ],
+       [
+        16.5,
+        92
+       ],
+       [
+        17.6,
+        85.63
+       ],
+       [
+        18.7,
+        92
+       ],
+       [
+        19.8,
+        82.23
+       ],
+       [
+        20.9,
+        92
+       ],
+       [
+        22,
+        83.33
+       ],
+       [
+        23.1,
+        92
+       ],
+       [
+        24.2,
+        84.44
+       ],
+       [
+        25.3,
+        92
+       ],
+       [
+        26.4,
+        85.54
+       ],
+       [
+        27.5,
+        92
+       ],
+       [
+        28.6,
+        82.14
+       ],
+       [
+        29.7,
+        92
+       ],
+       [
+        30.8,
+        83.25
+       ],
+       [
+        31.9,
+        92
+       ],
+       [
+        33,
+        84.35
+       ],
+       [
+        34.1,
+        92
+       ],
+       [
+        35.2,
+        85.45
+       ],
+       [
+        36.3,
+        92
+       ],
+       [
+        37.4,
+        82.05
+       ],
+       [
+        38.5,
+        92
+       ],
+       [
+        39.6,
+        83.16
+       ],
+       [
+        40.7,
+        92
+       ],
+       [
+        41.8,
+        84.26
+       ],
+       [
+        42.9,
+        92
+       ],
+       [
+        44,
+        85.36
+       ],
+       [
+        45.1,
+        92
+       ],
+       [
+        46.2,
+        86.47
+       ],
+       [
+        47.3,
+        92
+       ],
+       [
+        48.4,
+        83.07
+       ],
+       [
+        49.5,
+        92
+       ],
+       [
+        50.6,
+        84.17
+       ],
+       [
+        51.7,
+        92
+       ],
+       [
+        52.8,
+        85.28
+       ],
+       [
+        53.9,
+        92
+       ],
+       [
+        55,
+        86.38
+       ],
+       [
+        56.1,
+        92
+       ],
+       [
+        57.2,
+        82.98
+       ],
+       [
+        58.3,
+        92
+       ],
+       [
+        59.4,
+        84.09
+       ],
+       [
+        60.5,
+        92
+       ],
+       [
+        61.6,
+        85.19
+       ],
+       [
+        62.7,
+        92
+       ],
+       [
+        63.8,
+        86.29
+       ],
+       [
+        64.9,
+        92
+       ],
+       [
+        66,
+        82.89
+       ],
+       [
+        67.1,
+        92
+       ],
+       [
+        68.2,
+        84
+       ],
+       [
+        69.3,
+        92
+       ],
+       [
+        70.4,
+        85.1
+       ],
+       [
+        71.5,
+        92
+       ],
+       [
+        72.6,
+        86.2
+       ],
+       [
+        73.7,
+        92
+       ],
+       [
+        74.8,
+        82.81
+       ],
+       [
+        75.9,
+        92
+       ],
+       [
+        77,
+        83.91
+       ],
+       [
+        78.1,
+        92
+       ],
+       [
+        79.2,
+        85.01
+       ],
+       [
+        80.3,
+        92
+       ],
+       [
+        81.4,
+        86.12
+       ],
+       [
+        82.5,
+        92
+       ],
+       [
+        83.6,
+        82.72
+       ],
+       [
+        84.7,
+        92
+       ],
+       [
+        85.8,
+        83.82
+       ],
+       [
+        86.9,
+        92
+       ],
+       [
+        88,
+        84.93
+       ],
+       [
+        89.1,
+        92
+       ],
+       [
+        90.2,
+        86.03
+       ],
+       [
+        91.3,
+        92
+       ],
+       [
+        92.4,
+        82.63
+       ],
+       [
+        93.5,
+        92
+       ],
+       [
+        94.6,
+        83.73
+       ],
+       [
+        95.7,
+        92
+       ],
+       [
+        96.8,
+        84.84
+       ],
+       [
+        97.9,
+        92
+       ],
+       [
+        99,
+        85.94
+       ],
+       [
+        100,
+        92
+       ],
+       [
+        100,
+        100
+       ]
+      ],
+      "c": "#C6B4DE"
+     }
+    ]
+   },
+   "shop": null,
+   "arena": {
+    "base": [
+     "#1C1730",
+     "#1F1934"
+    ],
+    "layers": {
+     "far_grass": [
+      "#191329",
+      "#1B152C"
+     ],
+     "dusk_ground": [
+      "#1C1730",
+      "#1F1934"
+     ],
+     "side_grass": [
+      "#120E1E",
+      "#120E1E"
+     ],
+     "garland": [
+      "#0B0814",
+      "#0B0814"
+     ]
+    },
+    "scatter": {
+     "blade": [
+      "#2A2244"
+     ],
+     "lantern_dim": [
+      "#7E6698",
+      "#958099",
+      "#3B2F55"
+     ],
+     "lantern_lit": [
+      "#FFB88C",
+      "#FFE3B8",
+      "#3B2F55"
+     ]
+    },
+    "combo": {
+     "light": "#FFD08A",
+     "ring": "#FFE3B8"
+    }
+   },
+   "run": {
+    "ground": "#15112A",
+    "lane": "#2C2450",
+    "laneEdge": "rgba(255,227,184,.26)",
+    "seam": "rgba(255,227,184,.16)",
+    "material": {
+     "kind": "pebble",
+     "name": "Staza od kamenčića s mahovinom",
+     "pal": [
+      "#463C74",
+      "#3A3266",
+      "#4F5A6E"
+     ],
+     "dots": [
+      [
+       18,
+       22,
+       9
+      ],
+      [
+       70,
+       70,
+       8
+      ],
+      [
+       42,
+       104,
+       7
+      ],
+      [
+       84,
+       28,
+       6
+      ],
+      [
+       30,
+       64,
+       5
+      ]
+     ],
+     "period": 124
+    },
+    "far": {
+     "id": "grass_tufts",
+     "name": "Busenje i noćurke",
+     "speed": 0.35,
+     "period": 720,
+     "items": [
+      {
+       "shape": "tuft",
+       "pal": [
+        "#241D3E"
+       ],
+       "at": [
+        [
+         120,
+         80,
+         70
+        ],
+        [
+         960,
+         300,
+         80
+        ],
+        [
+         60,
+         520,
+         64
+        ],
+        [
+         1010,
+         640,
+         70
+        ]
+       ]
+      },
+      {
+       "shape": "daisy",
+       "pal": [
+        "#E8D48F",
+        "#C9A84A"
+       ],
+       "at": [
+        [
+         150,
+         200,
+         22
+        ],
+        [
+         980,
+         120,
+         20
+        ],
+        [
+         40,
+         420,
+         22
+        ],
+        [
+         1040,
+         560,
+         20
+        ]
+       ]
+      }
+     ]
+    },
+    "near": {
+     "id": "lantern_posts",
+     "name": "Fenjeri na stubovima uz rub",
+     "speed": 1,
+     "period": 480,
+     "items": [
+      {
+       "shape": "post",
+       "pal": [
+        "#3B2F55",
+        "#2A2142"
+       ],
+       "at": [
+        [
+         60,
+         240,
+         110
+        ],
+        [
+         1020,
+         480,
+         110
+        ]
+       ]
+      },
+      {
+       "shape": "lantern",
+       "pal": [
+        "#FFB88C",
+        "#FFE3B8",
+        "#3B2F55"
+       ],
+       "at": [
+        [
+         60,
+         132,
+         64
+        ],
+        [
+         1020,
+         372,
+         64
+        ]
+       ]
+      },
+      {
+       "shape": "blade",
+       "pal": [
+        "#2E2650"
+       ],
+       "at": [
+        [
+         30,
+         60,
+         80
+        ],
+        [
+         140,
+         300,
+         70
+        ],
+        [
+         960,
+         120,
+         76
+        ],
+        [
+         1050,
+         330,
+         80
+        ]
+       ]
+      }
+     ]
+    },
+    "ambient": {
+     "id": "fireflies",
+     "n": 12,
+     "layers": [
+      {
+       "motion": "float",
+       "n": 12,
+       "shape": "firefly",
+       "size": [
+        16,
+        22
+       ],
+       "pal": [
+        "#FFF8D6"
+       ],
+       "pal2": [
+        "#FFE27A"
+       ],
+       "zone": [
+        2,
+        4,
+        96,
+        80
+       ],
+       "drift": [
+        30,
+        24
+       ],
+       "sec": 4.5,
+       "alpha": [
+        0.3,
+        1
+       ],
+       "pulse": 0.12,
+       "ph": [
+        0.2,
+        0.6
+       ]
+      }
+     ]
+    },
+    "collar": [
+     "#4A3E72",
+     "#6E5F9C"
+    ],
+    "obstacles": [
+     {
+      "id": "lantern_post",
+      "name": "Stub s fenjerom",
+      "svg": "assets/seasons/lantern_meadow/obstacle_lantern_post.svg"
+     },
+     {
+      "id": "mossy_stone",
+      "name": "Kamen s mahovinom",
+      "svg": "assets/seasons/lantern_meadow/obstacle_mossy_stone.svg"
+     }
+    ],
+    "material_tile": {
+     "period": 124,
+     "items": [
+      {
+       "k": "circle",
+       "x": 34.56,
+       "y": 22,
+       "r": 9,
+       "f": "#463C74"
+      },
+      {
+       "k": "circle",
+       "x": 134.39999999999998,
+       "y": 70,
+       "r": 8,
+       "f": "#3A3266"
+      },
+      {
+       "k": "circle",
+       "x": 80.64,
+       "y": 104,
+       "r": 7,
+       "f": "#4F5A6E"
+      },
+      {
+       "k": "circle",
+       "x": 161.28,
+       "y": 28,
+       "r": 6,
+       "f": "#463C74"
+      },
+      {
+       "k": "circle",
+       "x": 57.599999999999994,
+       "y": 64,
+       "r": 5,
+       "f": "#3A3266"
+      }
+     ]
+    }
+   },
+   "roster": [
+    {
+     "id": "dusk_firefly_grass",
+     "display_name": "Dusk Firefly Grass",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/dusk_firefly_grass_t1.svg",
+      "res://assets/sprites/flowers/dusk_firefly_grass_t2.svg",
+      "res://assets/sprites/flowers/dusk_firefly_grass_t3.svg"
+     ]
+    },
+    {
+     "id": "paper_lantern_bloom",
+     "display_name": "Paper Lantern Bloom",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/paper_lantern_bloom_t1.svg",
+      "res://assets/sprites/flowers/paper_lantern_bloom_t2.svg",
+      "res://assets/sprites/flowers/paper_lantern_bloom_t3.svg"
+     ]
+    },
+    {
+     "id": "evening_primrose",
+     "display_name": "Evening Primrose",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/evening_primrose_t1.svg",
+      "res://assets/sprites/flowers/evening_primrose_t2.svg",
+      "res://assets/sprites/flowers/evening_primrose_t3.svg"
+     ]
+    },
+    {
+     "id": "foxfire_lily",
+     "display_name": "Foxfire Lily",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/foxfire_lily_t1.svg",
+      "res://assets/sprites/flowers/foxfire_lily_t2.svg",
+      "res://assets/sprites/flowers/foxfire_lily_t3.svg"
+     ]
+    },
+    {
+     "id": "glow_wisteria",
+     "display_name": "Glow Wisteria",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/glow_wisteria_t1.svg",
+      "res://assets/sprites/flowers/glow_wisteria_t2.svg",
+      "res://assets/sprites/flowers/glow_wisteria_t3.svg"
+     ]
+    },
+    {
+     "id": "midnight_lotus",
+     "display_name": "Midnight Lotus",
+     "rarity": 3,
+     "art": [
+      "res://assets/sprites/flowers/midnight_lotus_t1.svg",
+      "res://assets/sprites/flowers/midnight_lotus_t2.svg",
+      "res://assets/sprites/flowers/midnight_lotus_t3.svg"
+     ]
+    }
+   ],
+   "card_order": [
+    "dusk_firefly_grass",
+    "midnight_lotus",
+    "foxfire_lily",
+    "paper_lantern_bloom",
+    "evening_primrose",
+    "glow_wisteria"
+   ],
+   "price": null,
+   "soon": false,
+   "prev_free": "frost_orchard",
+   "camp_flower": "crystal_peony"
+  },
+  "amber_canopy": {
+   "id": "amber_canopy",
+   "name": "Amber Canopy",
+   "kind": "free",
+   "order": 4,
+   "phase": 2,
+   "place": "Šumsko tlo pod visokom krošnjom: lišće visi odozgo, dva tamna debla sa strane, snopovi svjetla i mrlje sunca na tlu.",
+   "palette": {
+    "canopy": "#F2C46A",
+    "canopy_back": "#E8AE58",
+    "beam": "#FBF0D6",
+    "floor": [
+     "#F7E8C9",
+     "#F3DFB8",
+     "#EED6A8"
+    ],
+    "trunk": "#3A2614",
+    "dapple": "#FCF1D9",
+    "leaf": "#E07B39",
+    "leaf2": "#F0A04B",
+    "acorn": "#B07A44",
+    "mushroom": "#E8805A",
+    "near": "#EACB97",
+    "ink_field": "#1A1A14",
+    "page": "#FBF1DE",
+    "flower_out": "#3F2716"
+   },
+   "motifs": [
+    {
+     "id": "canopy",
+     "name": "Krošnja odozgo",
+     "how": "recept: dva cik-cak poligona prema gore + row oblika leaf koji visi s ruba (samo između gornjih kontrola)"
+    },
+    {
+     "id": "twin_trunks",
+     "name": "Dva debla sa strane",
+     "how": "recept: poly lijevo i desno, skoro crno (≤ 0,036 L) — smije ispod kontrola"
+    },
+    {
+     "id": "light_beams",
+     "name": "Snopovi svjetla i mrlje sunca",
+     "how": "recept: 3 kosa poligona svjetlije boje + scatter dapple"
+    }
+   ],
+   "ambient": {
+    "id": "leaves",
+    "name": "Lišće pada, prašina lebdi u snopu",
+    "n": 20,
+    "layers": [
+     {
+      "motion": "fall",
+      "n": 12,
+      "shape": "leaf",
+      "size": [
+       22,
+       32
+      ],
+      "pal": [
+       "#E07B39",
+       "#F0A04B",
+       "#C9602A"
+      ],
+      "pal2": [
+       "#8E4A1E"
+      ],
+      "zone": [
+       6,
+       8,
+       88,
+       40
+      ],
+      "drift": [
+       60,
+       620
+      ],
+      "sway": [
+       30,
+       1.2
+      ],
+      "sec": 11,
+      "rot": 300,
+      "alpha": [
+       0,
+       1
+      ],
+      "fade": 0.1,
+      "ph": [
+       0.58,
+       0.36
+      ]
+     },
+     {
+      "motion": "float",
+      "n": 8,
+      "shape": "dot",
+      "size": [
+       6,
+       10
+      ],
+      "pal": [
+       "#FFF8E6"
+      ],
+      "zone": [
+       16,
+       22,
+       60,
+       36
+      ],
+      "drift": [
+       20,
+       30
+      ],
+      "sec": 7,
+      "alpha": [
+       0.2,
+       0.9
+      ],
+      "ph": [
+       0.1,
+       0.5
+      ]
+     }
+    ]
+   },
+   "field": {
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 40,
+      "c": "#F7E8C9"
+     },
+     {
+      "k": "band",
+      "y0": 40,
+      "y1": 70,
+      "c": "#F3DFB8"
+     },
+     {
+      "k": "band",
+      "y0": 70,
+      "y1": 100,
+      "c": "#EED6A8"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        20,
+        10
+       ],
+       [
+        27,
+        10
+       ],
+       [
+        14,
+        72
+       ],
+       [
+        5,
+        72
+       ]
+      ],
+      "c": "#FBF0D6"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        56,
+        11
+       ],
+       [
+        62,
+        11
+       ],
+       [
+        48,
+        76
+       ],
+       [
+        40,
+        76
+       ]
+      ],
+      "c": "#FBF0D6"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        82,
+        10
+       ],
+       [
+        88,
+        10
+       ],
+       [
+        76,
+        68
+       ],
+       [
+        68,
+        68
+       ]
+      ],
+      "c": "#FBF0D6"
+     },
+     {
+      "k": "scatter",
+      "shape": "dapple",
+      "n": 10,
+      "size": [
+       100,
+       170
+      ],
+      "rot": [
+       0,
+       0
+      ],
+      "phase": [
+       0.33,
+       0.12,
+       0.7,
+       0
+      ],
+      "zones": [
+       [
+        8,
+        40,
+        84,
+        44
+       ]
+      ],
+      "pal": [
+       "#FCF1D9"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "leaf",
+      "n": 20,
+      "size": [
+       26,
+       38
+      ],
+      "rot": [
+       0,
+       360
+      ],
+      "phase": [
+       0.58,
+       0.36,
+       0.14,
+       0.9
+      ],
+      "zones": [
+       [
+        7,
+        42,
+        86,
+        42
+       ]
+      ],
+      "pal": [
+       "#E0904E",
+       "#A9652F"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "acorn",
+      "n": 6,
+      "size": [
+       20,
+       26
+      ],
+      "rot": [
+       -25,
+       25
+      ],
+      "phase": [
+       0.08,
+       0.77,
+       0.5,
+       0.25
+      ],
+      "zones": [
+       [
+        8,
+        44,
+        84,
+        40
+       ]
+      ],
+      "pal": [
+       "#B07A44",
+       "#6E4A28"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "mushroom",
+      "n": 5,
+      "size": [
+       30,
+       42
+      ],
+      "rot": [
+       0,
+       0
+      ],
+      "phase": [
+       0.72,
+       0.55,
+       0.3,
+       0
+      ],
+      "zones": [
+       [
+        8,
+        46,
+        84,
+        38
+       ]
+      ],
+      "pal": [
+       "#E8805A",
+       "#FFF1DC"
+      ]
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        0,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        2,
+        25.5
+       ],
+       [
+        4.8,
+        30
+       ],
+       [
+        5.6,
+        52
+       ],
+       [
+        4.6,
+        72
+       ],
+       [
+        2,
+        76.5
+       ],
+       [
+        2,
+        100
+       ],
+       [
+        0,
+        100
+       ]
+      ],
+      "c": "#3A2614"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        100,
+        0
+       ],
+       [
+        98,
+        0
+       ],
+       [
+        98,
+        13.5
+       ],
+       [
+        95,
+        20
+       ],
+       [
+        94.4,
+        48
+       ],
+       [
+        95.6,
+        72
+       ],
+       [
+        98,
+        76.5
+       ],
+       [
+        98,
+        100
+       ],
+       [
+        100,
+        100
+       ]
+      ],
+      "c": "#3A2614"
+     },
+     {
+      "k": "ridge",
+      "up": true,
+      "r": {
+       "y": 13,
+       "w": [
+        [
+         1.2,
+         6.5,
+         0.4
+        ],
+        [
+         0.5,
+         13,
+         1.1
+        ]
+       ]
+      },
+      "c": "#E8AE58"
+     },
+     {
+      "k": "ridge",
+      "up": true,
+      "r": {
+       "y": 8.4,
+       "w": [
+        [
+         1.4,
+         7.5,
+         1.4
+        ],
+        [
+         0.5,
+         15,
+         0.2
+        ]
+       ]
+      },
+      "c": "#F2C46A"
+     },
+     {
+      "k": "row",
+      "shape": "leaf",
+      "r": {
+       "y": 9.6,
+       "w": [
+        [
+         1.4,
+         7.5,
+         1.4
+        ],
+        [
+         0.5,
+         15,
+         0.2
+        ]
+       ]
+      },
+      "x0": 22,
+      "x1": 78,
+      "step": 5,
+      "size": 34,
+      "vary": 0.3,
+      "pal": [
+       "#F5B05C",
+       "#F2C46A"
+      ],
+      "alt": [
+       "#F7BE6E",
+       "#F2C46A"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 86,
+       "w": [
+        [
+         0.6,
+         1.8,
+         0.4
+        ],
+        [
+         0.3,
+         4.2,
+         1.7
+        ]
+       ]
+      },
+      "c": "#EACB97"
+     },
+     {
+      "k": "scatter",
+      "shape": "leaf",
+      "n": 10,
+      "size": [
+       24,
+       32
+      ],
+      "rot": [
+       0,
+       360
+      ],
+      "phase": [
+       0.2,
+       0.8,
+       0.4,
+       0.6
+      ],
+      "zones": [
+       [
+        6,
+        86.4,
+        72,
+        2
+       ]
+      ],
+      "noAvoid": true,
+      "pal": [
+       "#D98C4A",
+       "#A9652F"
+      ]
+     }
+    ]
+   },
+   "spots": [
+    [
+     10,
+     55,
+     88,
+     3,
+     5
+    ],
+    [
+     26,
+     54,
+     88,
+     0,
+     5
+    ],
+    [
+     42,
+     55,
+     88,
+     1,
+     5
+    ],
+    [
+     58,
+     54,
+     88,
+     4,
+     5
+    ],
+    [
+     74,
+     55,
+     88,
+     2,
+     5
+    ],
+    [
+     90,
+     54,
+     88,
+     5,
+     5
+    ],
+    [
+     18,
+     40,
+     116,
+     0,
+     1
+    ],
+    [
+     50,
+     42,
+     116,
+     1,
+     1
+    ],
+    [
+     82,
+     40,
+     116,
+     2,
+     1
+    ],
+    [
+     12,
+     29,
+     136,
+     3,
+     1
+    ],
+    [
+     66,
+     28,
+     136,
+     4,
+     1
+    ],
+    [
+     88,
+     30,
+     136,
+     5,
+     1
+    ],
+    [
+     34,
+     26,
+     168,
+     5,
+     10
+    ]
+   ],
+   "camp": {
+    "w": 1032,
+    "h": 318,
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 40,
+      "c": "#FBEFD6"
+     },
+     {
+      "k": "band",
+      "y0": 40,
+      "y1": 72,
+      "c": "#F7E6C4"
+     },
+     {
+      "k": "band",
+      "y0": 72,
+      "y1": 100,
+      "c": "#F2DDB4"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        30,
+        0
+       ],
+       [
+        36,
+        0
+       ],
+       [
+        26,
+        100
+       ],
+       [
+        18,
+        100
+       ]
+      ],
+      "c": "#FDF5E2"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        72,
+        0
+       ],
+       [
+        77,
+        0
+       ],
+       [
+        68,
+        100
+       ],
+       [
+        61,
+        100
+       ]
+      ],
+      "c": "#FDF5E2"
+     },
+     {
+      "k": "ridge",
+      "up": true,
+      "r": {
+       "y": 7,
+       "w": [
+        [
+         1.6,
+         9,
+         0.4
+        ],
+        [
+         0.8,
+         17,
+         1.2
+        ]
+       ]
+      },
+      "c": "#F2C46A"
+     },
+     {
+      "k": "row",
+      "shape": "leaf",
+      "r": {
+       "y": 8.6,
+       "w": [
+        [
+         1.6,
+         9,
+         0.4
+        ],
+        [
+         0.8,
+         17,
+         1.2
+        ]
+       ]
+      },
+      "x0": 4,
+      "x1": 96,
+      "step": 4.6,
+      "size": 30,
+      "vary": 0.3,
+      "pal": [
+       "#F0A04B",
+       "#E6AE55"
+      ],
+      "alt": [
+       "#F5B964",
+       "#E6AE55"
+      ]
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        0,
+        0
+       ],
+       [
+        1.6,
+        0
+       ],
+       [
+        2,
+        100
+       ],
+       [
+        0,
+        100
+       ]
+      ],
+      "c": "#3A2614"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        100,
+        0
+       ],
+       [
+        98.4,
+        0
+       ],
+       [
+        98,
+        100
+       ],
+       [
+        100,
+        100
+       ]
+      ],
+      "c": "#3A2614"
+     }
+    ]
+   },
+   "shop": null,
+   "arena": {
+    "base": [
+     "#F3DFB8",
+     "#F5E3BE"
+    ],
+    "layers": {
+     "light_beams": [
+      "#FBF0D6",
+      "#FCF3DE"
+     ],
+     "trunks": [
+      "#3A2614",
+      "#3A2614"
+     ],
+     "canopy_back": [
+      "#E8AE58",
+      "#EBB35E"
+     ],
+     "canopy_front": [
+      "#F2C46A",
+      "#F4C970"
+     ]
+    },
+    "scatter": {
+     "dapple": [
+      "#FCF1D9"
+     ]
+    },
+    "combo": {
+     "light": "#FFD56B",
+     "ring": "#FFEBC7"
+    }
+   },
+   "run": {
+    "ground": "#7A5434",
+    "lane": "#4A3220",
+    "laneEdge": "rgba(255,235,199,.28)",
+    "seam": "rgba(255,235,199,.16)",
+    "material": {
+     "kind": "pebble",
+     "name": "Staza prekrivena lišćem",
+     "pal": [
+      "#8E5A30",
+      "#A46A36",
+      "#6E4524"
+     ],
+     "dots": [
+      [
+       20,
+       20,
+       10
+      ],
+      [
+       72,
+       62,
+       9
+      ],
+      [
+       46,
+       100,
+       8
+      ],
+      [
+       86,
+       18,
+       7
+      ],
+      [
+       30,
+       76,
+       6
+      ]
+     ],
+     "period": 124
+    },
+    "far": {
+     "id": "dapple",
+     "name": "Mrlje sunca",
+     "speed": 0.35,
+     "period": 720,
+     "items": [
+      {
+       "shape": "dapple",
+       "pal": [
+        "#8E6440"
+       ],
+       "at": [
+        [
+         130,
+         80,
+         200
+        ],
+        [
+         960,
+         300,
+         220
+        ],
+        [
+         70,
+         520,
+         180
+        ],
+        [
+         1000,
+         660,
+         200
+        ]
+       ]
+      }
+     ]
+    },
+    "near": {
+     "id": "trunks_edge",
+     "name": "Debla i gljive uz rub",
+     "speed": 1,
+     "period": 480,
+     "items": [
+      {
+       "shape": "trunk",
+       "pal": [
+        "#3A2614",
+        "#2A1A0C"
+       ],
+       "at": [
+        [
+         40,
+         470,
+         420
+        ],
+        [
+         1044,
+         240,
+         420
+        ]
+       ]
+      },
+      {
+       "shape": "mushroom",
+       "pal": [
+        "#E8805A",
+        "#FFF1DC"
+       ],
+       "at": [
+        [
+         120,
+         300,
+         50
+        ],
+        [
+         960,
+         90,
+         46
+        ]
+       ]
+      },
+      {
+       "shape": "leaf",
+       "pal": [
+        "#E0904E",
+        "#A9652F"
+       ],
+       "at": [
+        [
+         150,
+         130,
+         34,
+         40
+        ],
+        [
+         60,
+         380,
+         30,
+         200
+        ],
+        [
+         930,
+         330,
+         34,
+         120
+        ],
+        [
+         1030,
+         420,
+         30,
+         300
+        ]
+       ]
+      }
+     ]
+    },
+    "ambient": {
+     "id": "leaves",
+     "n": 12,
+     "layers": [
+      {
+       "motion": "fall",
+       "n": 12,
+       "shape": "leaf",
+       "size": [
+        24,
+        34
+       ],
+       "pal": [
+        "#E07B39",
+        "#F0A04B",
+        "#C9602A"
+       ],
+       "pal2": [
+        "#8E4A1E"
+       ],
+       "zone": [
+        2,
+        0,
+        96,
+        40
+       ],
+       "drift": [
+        80,
+        1000
+       ],
+       "sway": [
+        34,
+        1.4
+       ],
+       "sec": 7,
+       "rot": 320,
+       "alpha": [
+        0,
+        1
+       ],
+       "fade": 0.08,
+       "ph": [
+        0.4,
+        0.2
+       ]
+      }
+     ]
+    },
+    "collar": [
+     "#9C6A3E",
+     "#6E4524"
+    ],
+    "obstacles": [
+     {
+      "id": "fallen_log",
+      "name": "Srušeno deblo",
+      "svg": "assets/seasons/amber_canopy/obstacle_fallen_log.svg"
+     },
+     {
+      "id": "mushroom_stump",
+      "name": "Panj s gljivama",
+      "svg": "assets/seasons/amber_canopy/obstacle_mushroom_stump.svg"
+     }
+    ],
+    "material_tile": {
+     "period": 124,
+     "items": [
+      {
+       "k": "circle",
+       "x": 38.400000000000006,
+       "y": 20,
+       "r": 10,
+       "f": "#8E5A30"
+      },
+      {
+       "k": "circle",
+       "x": 138.24,
+       "y": 62,
+       "r": 9,
+       "f": "#A46A36"
+      },
+      {
+       "k": "circle",
+       "x": 88.32000000000001,
+       "y": 100,
+       "r": 8,
+       "f": "#6E4524"
+      },
+      {
+       "k": "circle",
+       "x": 165.12,
+       "y": 18,
+       "r": 7,
+       "f": "#8E5A30"
+      },
+      {
+       "k": "circle",
+       "x": 57.599999999999994,
+       "y": 76,
+       "r": 6,
+       "f": "#A46A36"
+      }
+     ]
+    }
+   },
+   "roster": [
+    {
+     "id": "copper_leaf",
+     "display_name": "Copper Leaf",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/copper_leaf_t1.svg",
+      "res://assets/sprites/flowers/copper_leaf_t2.svg",
+      "res://assets/sprites/flowers/copper_leaf_t3.svg"
+     ]
+    },
+    {
+     "id": "maple_aster",
+     "display_name": "Maple Aster",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/maple_aster_t1.svg",
+      "res://assets/sprites/flowers/maple_aster_t2.svg",
+      "res://assets/sprites/flowers/maple_aster_t3.svg"
+     ]
+    },
+    {
+     "id": "russet_mallow",
+     "display_name": "Russet Mallow",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/russet_mallow_t1.svg",
+      "res://assets/sprites/flowers/russet_mallow_t2.svg",
+      "res://assets/sprites/flowers/russet_mallow_t3.svg"
+     ]
+    },
+    {
+     "id": "cider_dahlia",
+     "display_name": "Cider Dahlia",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/cider_dahlia_t1.svg",
+      "res://assets/sprites/flowers/cider_dahlia_t2.svg",
+      "res://assets/sprites/flowers/cider_dahlia_t3.svg"
+     ]
+    },
+    {
+     "id": "golden_oak_bloom",
+     "display_name": "Golden Oak Bloom",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/golden_oak_bloom_t1.svg",
+      "res://assets/sprites/flowers/golden_oak_bloom_t2.svg",
+      "res://assets/sprites/flowers/golden_oak_bloom_t3.svg"
+     ]
+    },
+    {
+     "id": "amber_magnolia",
+     "display_name": "Amber Magnolia",
+     "rarity": 3,
+     "art": [
+      "res://assets/sprites/flowers/amber_magnolia_t1.svg",
+      "res://assets/sprites/flowers/amber_magnolia_t2.svg",
+      "res://assets/sprites/flowers/amber_magnolia_t3.svg"
+     ]
+    }
+   ],
+   "card_order": [
+    "copper_leaf",
+    "amber_magnolia",
+    "cider_dahlia",
+    "maple_aster",
+    "russet_mallow",
+    "golden_oak_bloom"
+   ],
+   "price": null,
+   "soon": false,
+   "prev_free": "lantern_meadow",
+   "camp_flower": "midnight_lotus"
   },
   "moonlit_warren": {
    "id": "moonlit_warren",
@@ -1608,7 +6593,68 @@
      88,
      36
     ],
-    "sec": 4.5
+    "sec": 4.5,
+    "layers": [
+     {
+      "motion": "twinkle",
+      "n": 10,
+      "shape": "sparkle",
+      "size": [
+       7,
+       12
+      ],
+      "pal": [
+       "#DCDDFF"
+      ],
+      "zone": [
+       4,
+       2,
+       92,
+       24
+      ],
+      "sec": 4.5,
+      "alpha": [
+       0.2,
+       1
+      ],
+      "ph": [
+       0.4,
+       0.1
+      ]
+     },
+     {
+      "motion": "rise",
+      "n": 8,
+      "shape": "dot",
+      "size": [
+       6,
+       10
+      ],
+      "pal": [
+       "#EDEBFF"
+      ],
+      "zone": [
+       6,
+       40,
+       88,
+       36
+      ],
+      "drift": [
+       -24,
+       -170
+      ],
+      "sec": 9,
+      "alpha": [
+       0,
+       0.85
+      ],
+      "fade": 0.2,
+      "ph": [
+       0.7,
+       0.3
+      ]
+     }
+    ]
    },
    "field": {
     "layers": [
@@ -2014,7 +7060,7 @@
      {
       "k": "band",
       "y0": 64,
-      "y1": 101,
+      "y1": 100,
       "c": "#262C53"
      },
      {
@@ -2173,7 +7219,8 @@
      "id": "moon_path",
      "name": "Staza od mjesečevog kamenčića",
      "pebble": "rgba(237,235,255,.14)",
-     "period": 96
+     "period": 96,
+     "kind": "pebble"
     },
     "far": {
      "id": "burrows",
@@ -2216,6 +7263,47 @@
        90,
        100
       ]
+     ],
+     "items": [
+      {
+       "shape": "burrow",
+       "pal": [
+        "#0F1228",
+        "#2E3566"
+       ],
+       "at": [
+        [
+         151.20000000000002,
+         57.6,
+         120
+        ],
+        [
+         669.6,
+         216,
+         150
+        ],
+        [
+         950.4000000000001,
+         115.2,
+         110
+        ],
+        [
+         216,
+         432,
+         140
+        ],
+        [
+         799.2,
+         532.8000000000001,
+         130
+        ],
+        [
+         86.4,
+         648,
+         100
+        ]
+       ]
+      }
      ]
     },
     "near": {
@@ -2288,7 +7376,75 @@
         16
        ]
       ]
-     }
+     },
+     "items": [
+      {
+       "shape": "moss",
+       "pal": [
+        "#2E4F5A"
+       ],
+       "at": [
+        [
+         50,
+         60,
+         70
+        ],
+        [
+         120,
+         260,
+         60
+        ],
+        [
+         70,
+         420,
+         66
+        ],
+        [
+         980,
+         120,
+         64
+        ],
+        [
+         1040,
+         330,
+         70
+        ],
+        [
+         940,
+         440,
+         58
+        ]
+       ]
+      },
+      {
+       "shape": "sparkle",
+       "pal": [
+        "#CFD3FF"
+       ],
+       "at": [
+        [
+         150,
+         160,
+         18
+        ],
+        [
+         30,
+         350,
+         16
+        ],
+        [
+         1000,
+         40,
+         18
+        ],
+        [
+         920,
+         280,
+         16
+        ]
+       ]
+      }
+     ]
     },
     "ambient": {
      "id": "motes",
@@ -2306,7 +7462,42 @@
       -60,
       700
      ],
-     "sec": 7
+     "sec": 7,
+     "layers": [
+      {
+       "motion": "drift",
+       "n": 14,
+       "shape": "dot",
+       "size": [
+        6,
+        10
+       ],
+       "pal": [
+        "#EDEBFF",
+        "#DCDDFF"
+       ],
+       "zone": [
+        4,
+        0,
+        92,
+        90
+       ],
+       "drift": [
+        -60,
+        700
+       ],
+       "sec": 7,
+       "alpha": [
+        0,
+        0.85
+       ],
+       "fade": 0.1,
+       "ph": [
+        0.21,
+        0.63
+       ]
+      }
+     ]
     },
     "collar": [
      "#3B4380",
@@ -2323,8 +7514,35 @@
       "name": "Oboreno deblo s mahovinom",
       "svg": "assets/seasons/moonlit_warren/obstacle_mossy_log.svg"
      }
-    ]
+    ],
+    "material_tile": {
+     "period": 96,
+     "items": [
+      {
+       "k": "circle",
+       "x": 30.72,
+       "y": 30,
+       "r": 7,
+       "f": "rgba(237,235,255,.14)"
+      },
+      {
+       "k": "circle",
+       "x": 130.56,
+       "y": 78,
+       "r": 6,
+       "f": "rgba(237,235,255,.14)"
+      },
+      {
+       "k": "circle",
+       "x": 84.48,
+       "y": 54,
+       "r": 5,
+       "f": "rgba(237,235,255,.14)"
+      }
+     ]
+    }
    },
+   "camp": null,
    "roster": [
     {
      "id": "moon_moss",
@@ -2394,47 +7612,5043 @@
     "nightshade_petal",
     "silver_harebell",
     "star_jasmine"
+   ],
+   "price": "€2.99",
+   "soon": false,
+   "prev_free": null,
+   "camp_flower": null
+  },
+  "coral_tide": {
+   "id": "coral_tide",
+   "name": "Coral Tide Garden",
+   "kind": "paid",
+   "order": -2,
+   "phase": 2,
+   "place": "Plićak i pijesak: obala dijagonalno preko polja, voda gore, pjena, mokar i suh pijesak dolje, školjke i koralj na rubu plime.",
+   "palette": {
+    "water": "#CDEEF2",
+    "shallows": "#93D7D4",
+    "ripple": "#E6F7F8",
+    "foam": "#F4FAF6",
+    "wet_sand": "#E8C2A6",
+    "dry_sand": "#F2D6BC",
+    "near": "#F5DEC8",
+    "shell": "#FFF1E8",
+    "shell2": "#FFCCD5",
+    "starfish": "#F29B80",
+    "coral": "#F59A8B",
+    "thrift": "#FFB3C1",
+    "ink_field": "#1A1A14",
+    "page": "#EAF7F6",
+    "flower_out": "#2E3542"
+   },
+   "motifs": [
+    {
+     "id": "diagonal_shore",
+     "name": "Obala dijagonalno",
+     "how": "recept: 4 grebena s istim nagibom (ridge.tilt) — plićak, pjena, mokar i suh pijesak"
+    },
+    {
+     "id": "shells",
+     "name": "Školjke i zvjezdače",
+     "how": "recept: scatter shell + starfish na pijesku"
+    },
+    {
+     "id": "coral_edge",
+     "name": "Koralj na rubu plime",
+     "how": "recept: row oblika coral duž ruba pjene"
+    }
+   ],
+   "ambient": {
+    "id": "sea",
+    "name": "Odsjaji na vodi trepere, mjehurići se dižu",
+    "n": 16,
+    "layers": [
+     {
+      "motion": "twinkle",
+      "n": 8,
+      "shape": "glint",
+      "size": [
+       28,
+       44
+      ],
+      "pal": [
+       "#FFFFFF"
+      ],
+      "zone": [
+       22,
+       10,
+       56,
+       18
+      ],
+      "sec": 3.6,
+      "alpha": [
+       0,
+       0.95
+      ],
+      "pulse": 0.2,
+      "ph": [
+       0.19,
+       0.4
+      ]
+     },
+     {
+      "motion": "rise",
+      "n": 8,
+      "shape": "bubble",
+      "size": [
+       10,
+       16
+      ],
+      "pal": [
+       "#FFFFFF"
+      ],
+      "zone": [
+       24,
+       18,
+       52,
+       14
+      ],
+      "drift": [
+       0,
+       -140
+      ],
+      "sway": [
+       8,
+       1
+      ],
+      "sec": 6,
+      "alpha": [
+       0,
+       0.9
+      ],
+      "fade": 0.2,
+      "ph": [
+       0.6,
+       0.2
+      ]
+     }
+    ]
+   },
+   "field": {
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 14,
+      "c": "#CDEEF2"
+     },
+     {
+      "k": "band",
+      "y0": 14,
+      "y1": 46,
+      "c": "#C2EAEC"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 30,
+       "tilt": -12,
+       "w": [
+        [
+         0.6,
+         1.4,
+         0.4
+        ]
+       ]
+      },
+      "c": "#93D7D4"
+     },
+     {
+      "k": "scatter",
+      "shape": "ripple",
+      "n": 8,
+      "size": [
+       60,
+       100
+      ],
+      "rot": [
+       0,
+       0
+      ],
+      "phase": [
+       0.19,
+       0.4,
+       0.6,
+       0
+      ],
+      "zones": [
+       [
+        20,
+        12,
+        60,
+        18
+       ]
+      ],
+      "pal": [
+       "#E6F7F8"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 42,
+       "tilt": -12,
+       "w": [
+        [
+         0.7,
+         2.2,
+         0.4
+        ],
+        [
+         0.35,
+         4.1,
+         1.2
+        ]
+       ]
+      },
+      "c": "#F4FAF6"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 43.4,
+       "tilt": -12,
+       "w": [
+        [
+         0.7,
+         2.2,
+         0.4
+        ],
+        [
+         0.35,
+         4.1,
+         1.2
+        ]
+       ]
+      },
+      "c": "#E8C2A6"
+     },
+     {
+      "k": "row",
+      "shape": "coral",
+      "r": {
+       "y": 43.2,
+       "tilt": -12,
+       "w": [
+        [
+         0.7,
+         2.2,
+         0.4
+        ],
+        [
+         0.35,
+         4.1,
+         1.2
+        ]
+       ]
+      },
+      "x0": 24,
+      "x1": 76,
+      "step": 13,
+      "size": 58,
+      "vary": 0.3,
+      "pal": [
+       "#F59A8B",
+       "#FFC5B8"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 50,
+       "tilt": -9.600000000000001,
+       "w": [
+        [
+         0.5,
+         1.6,
+         2.2
+        ]
+       ]
+      },
+      "c": "#F2D6BC"
+     },
+     {
+      "k": "scatter",
+      "shape": "pebble",
+      "n": 7,
+      "size": [
+       16,
+       30
+      ],
+      "rot": [
+       0,
+       0
+      ],
+      "phase": [
+       0.7,
+       0.2,
+       0.45,
+       0
+      ],
+      "zones": [
+       [
+        4,
+        54,
+        92,
+        32
+       ]
+      ],
+      "pal": [
+       "#E3BFA4"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "shell",
+      "n": 10,
+      "size": [
+       30,
+       44
+      ],
+      "rot": [
+       -30,
+       30
+      ],
+      "phase": [
+       0.36,
+       0.81,
+       0.27,
+       0.6
+      ],
+      "zones": [
+       [
+        4,
+        54,
+        92,
+        32
+       ]
+      ],
+      "pal": [
+       "#FFF1E8",
+       "#E9C2AE"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "starfish",
+      "n": 4,
+      "size": [
+       34,
+       46
+      ],
+      "rot": [
+       0,
+       72
+      ],
+      "phase": [
+       0.93,
+       0.52,
+       0.15,
+       0.37
+      ],
+      "zones": [
+       [
+        6,
+        56,
+        88,
+        28
+       ]
+      ],
+      "pal": [
+       "#F29B80",
+       "#FFD0BE"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "thrift",
+      "n": 9,
+      "size": [
+       30,
+       40
+      ],
+      "rot": [
+       -8,
+       8
+      ],
+      "phase": [
+       0.11,
+       0.29,
+       0.73,
+       0.2
+      ],
+      "zones": [
+       [
+        4,
+        56,
+        92,
+        30
+       ]
+      ],
+      "pal": [
+       "#FFB3C1",
+       "#7FA46E",
+       "#FFE0E6"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 86,
+       "w": [
+        [
+         0.6,
+         1.8,
+         0.4
+        ],
+        [
+         0.3,
+         4.2,
+         1.7
+        ]
+       ]
+      },
+      "c": "#F5DEC8"
+     }
+    ]
+   },
+   "spots": [
+    [
+     10,
+     55,
+     88,
+     3,
+     5
+    ],
+    [
+     26,
+     54,
+     88,
+     0,
+     5
+    ],
+    [
+     42,
+     55,
+     88,
+     1,
+     5
+    ],
+    [
+     58,
+     54,
+     88,
+     4,
+     5
+    ],
+    [
+     74,
+     55,
+     88,
+     2,
+     5
+    ],
+    [
+     90,
+     54,
+     88,
+     5,
+     5
+    ],
+    [
+     18,
+     40,
+     116,
+     0,
+     1
+    ],
+    [
+     50,
+     42,
+     116,
+     1,
+     1
+    ],
+    [
+     82,
+     40,
+     116,
+     2,
+     1
+    ],
+    [
+     12,
+     29,
+     136,
+     3,
+     1
+    ],
+    [
+     66,
+     28,
+     136,
+     4,
+     1
+    ],
+    [
+     88,
+     30,
+     136,
+     5,
+     1
+    ],
+    [
+     34,
+     26,
+     168,
+     5,
+     10
+    ]
+   ],
+   "camp": null,
+   "shop": {
+    "w": 1032,
+    "h": 364,
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 30,
+      "c": "#CDEEF2"
+     },
+     {
+      "k": "band",
+      "y0": 30,
+      "y1": 70,
+      "c": "#C2EAEC"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 30,
+       "tilt": -16,
+       "w": [
+        [
+         0.8,
+         1.4,
+         0.4
+        ]
+       ]
+      },
+      "c": "#93D7D4"
+     },
+     {
+      "k": "shape",
+      "shape": "ripple",
+      "at": [
+       [
+        30,
+        18,
+        90
+       ],
+       [
+        62,
+        12,
+        70
+       ],
+       [
+        84,
+        22,
+        80
+       ]
+      ],
+      "pal": [
+       "#E6F7F8"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 52,
+       "tilt": -16,
+       "w": [
+        [
+         1.2,
+         2.2,
+         0.4
+        ],
+        [
+         0.6,
+         4.1,
+         1.2
+        ]
+       ]
+      },
+      "c": "#F4FAF6"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 55,
+       "tilt": -16,
+       "w": [
+        [
+         1.2,
+         2.2,
+         0.4
+        ],
+        [
+         0.6,
+         4.1,
+         1.2
+        ]
+       ]
+      },
+      "c": "#E8C2A6"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 66,
+       "tilt": -12,
+       "w": [
+        [
+         0.8,
+         1.6,
+         2.2
+        ]
+       ]
+      },
+      "c": "#F2D6BC"
+     },
+     {
+      "k": "shape",
+      "shape": "shell",
+      "at": [
+       [
+        52,
+        92,
+        40,
+        -20
+       ],
+       [
+        96,
+        80,
+        34,
+        20
+       ]
+      ],
+      "pal": [
+       "#FFF1E8",
+       "#E9C2AE"
+      ]
+     },
+     {
+      "k": "shape",
+      "shape": "starfish",
+      "at": [
+       [
+        57,
+        78,
+        38,
+        18
+       ]
+      ],
+      "pal": [
+       "#F29B80",
+       "#FFD0BE"
+      ]
+     }
+    ]
+   },
+   "arena": {
+    "base": [
+     "#93D7D4",
+     "#97DAD7"
+    ],
+    "layers": {
+     "shallows": [
+      "#CDEEF2",
+      "#D1F0F4"
+     ],
+     "wet_sand": [
+      "#E8C2A6",
+      "#EAC6AA"
+     ],
+     "dry_sand": [
+      "#F2D6BC",
+      "#F4D9C0"
+     ]
+    },
+    "scatter": {
+     "ripple": [
+      "#E6F7F8"
+     ],
+     "pebble": [
+      "#E3BFA4"
+     ]
+    },
+    "combo": {
+     "light": "#FFCCD5",
+     "ring": "#FFFFFF"
+    }
+   },
+   "run": {
+    "ground": "#E8C9A8",
+    "lane": "#3B6F78",
+    "laneEdge": "rgba(255,255,255,.40)",
+    "seam": "rgba(255,255,255,.22)",
+    "material": {
+     "kind": "plank",
+     "name": "Daščana staza preko plićaka",
+     "fill": "#4A7F88",
+     "seam": "#2C5A62",
+     "knot": "#3B6F78",
+     "plank": 54,
+     "gap": 8,
+     "period": 124
+    },
+    "far": {
+     "id": "tide_pools",
+     "name": "Plimne lokve i školjke",
+     "speed": 0.35,
+     "period": 720,
+     "items": [
+      {
+       "shape": "puddle",
+       "pal": [
+        "#B4E5E6",
+        "#F4FAF6"
+       ],
+       "at": [
+        [
+         120,
+         120,
+         170
+        ],
+        [
+         970,
+         340,
+         150
+        ],
+        [
+         60,
+         560,
+         140
+        ]
+       ]
+      },
+      {
+       "shape": "shell",
+       "pal": [
+        "#FFF1E8",
+        "#E9C2AE"
+       ],
+       "at": [
+        [
+         170,
+         300,
+         40,
+         20
+        ],
+        [
+         1020,
+         120,
+         36,
+         -20
+        ],
+        [
+         930,
+         600,
+         40,
+         10
+        ]
+       ]
+      }
+     ]
+    },
+    "near": {
+     "id": "coral_edge",
+     "name": "Koralj i karanfili uz rub",
+     "speed": 1,
+     "period": 480,
+     "items": [
+      {
+       "shape": "coral",
+       "pal": [
+        "#F59A8B",
+        "#FFC5B8"
+       ],
+       "at": [
+        [
+         60,
+         220,
+         120
+        ],
+        [
+         1020,
+         440,
+         120
+        ]
+       ]
+      },
+      {
+       "shape": "thrift",
+       "pal": [
+        "#FFB3C1",
+        "#7FA46E",
+        "#FFE0E6"
+       ],
+       "at": [
+        [
+         140,
+         90,
+         46
+        ],
+        [
+         30,
+         380,
+         42
+        ],
+        [
+         950,
+         150,
+         46
+        ],
+        [
+         1050,
+         300,
+         42
+        ]
+       ]
+      },
+      {
+       "shape": "starfish",
+       "pal": [
+        "#F29B80",
+        "#FFD0BE"
+       ],
+       "at": [
+        [
+         150,
+         420,
+         44,
+         20
+        ]
+       ]
+      }
+     ]
+    },
+    "ambient": {
+     "id": "foam",
+     "n": 10,
+     "layers": [
+      {
+       "motion": "rise",
+       "n": 10,
+       "shape": "bubble",
+       "size": [
+        14,
+        22
+       ],
+       "pal": [
+        "#FFFFFF"
+       ],
+       "zone": [
+        2,
+        20,
+        96,
+        76
+       ],
+       "drift": [
+        0,
+        -300
+       ],
+       "sway": [
+        12,
+        1
+       ],
+       "sec": 5,
+       "alpha": [
+        0,
+        0.85
+       ],
+       "fade": 0.2,
+       "ph": [
+        0.4,
+        0.2
+       ]
+      }
+     ]
+    },
+    "collar": [
+     "#E0BC9A",
+     "#B8916E"
+    ],
+    "obstacles": [
+     {
+      "id": "shell_rock",
+      "name": "Stijena sa školjkama",
+      "svg": "assets/seasons/coral_tide/obstacle_shell_rock.svg"
+     },
+     {
+      "id": "coral_branch",
+      "name": "Koralj",
+      "svg": "assets/seasons/coral_tide/obstacle_coral_branch.svg"
+     }
+    ],
+    "material_tile": {
+     "period": 124,
+     "items": [
+      {
+       "k": "rect",
+       "x": 4,
+       "y": 0,
+       "w": 184,
+       "h": 54,
+       "f": "#4A7F88",
+       "r": 6
+      },
+      {
+       "k": "rect",
+       "x": 4,
+       "y": 47,
+       "w": 184,
+       "h": 7,
+       "f": "#2C5A62",
+       "r": 3
+      },
+      {
+       "k": "circle",
+       "x": 120.4682559596825,
+       "y": 22.68,
+       "r": 5,
+       "f": "#3B6F78"
+      },
+      {
+       "k": "rect",
+       "x": 4,
+       "y": 62,
+       "w": 184,
+       "h": 54,
+       "f": "#4A7F88",
+       "r": 6
+      },
+      {
+       "k": "rect",
+       "x": 4,
+       "y": 109,
+       "w": 184,
+       "h": 7,
+       "f": "#2C5A62",
+       "r": 3
+      },
+      {
+       "k": "circle",
+       "x": 101.50012545999766,
+       "y": 84.68,
+       "r": 5,
+       "f": "#3B6F78"
+      }
+     ]
+    }
+   },
+   "roster": [
+    {
+     "id": "sea_thrift",
+     "display_name": "Sea Thrift",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/sea_thrift_t1.svg",
+      "res://assets/sprites/flowers/sea_thrift_t2.svg",
+      "res://assets/sprites/flowers/sea_thrift_t3.svg"
+     ]
+    },
+    {
+     "id": "salt_daisy",
+     "display_name": "Salt Daisy",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/salt_daisy_t1.svg",
+      "res://assets/sprites/flowers/salt_daisy_t2.svg",
+      "res://assets/sprites/flowers/salt_daisy_t3.svg"
+     ]
+    },
+    {
+     "id": "tide_anemone",
+     "display_name": "Tide Anemone",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/tide_anemone_t1.svg",
+      "res://assets/sprites/flowers/tide_anemone_t2.svg",
+      "res://assets/sprites/flowers/tide_anemone_t3.svg"
+     ]
+    },
+    {
+     "id": "coral_hibiscus",
+     "display_name": "Coral Hibiscus",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/coral_hibiscus_t1.svg",
+      "res://assets/sprites/flowers/coral_hibiscus_t2.svg",
+      "res://assets/sprites/flowers/coral_hibiscus_t3.svg"
+     ]
+    },
+    {
+     "id": "pearl_waterlily",
+     "display_name": "Pearl Waterlily",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/pearl_waterlily_t1.svg",
+      "res://assets/sprites/flowers/pearl_waterlily_t2.svg",
+      "res://assets/sprites/flowers/pearl_waterlily_t3.svg"
+     ]
+    },
+    {
+     "id": "reef_crown",
+     "display_name": "Reef Crown",
+     "rarity": 3,
+     "art": [
+      "res://assets/sprites/flowers/reef_crown_t1.svg",
+      "res://assets/sprites/flowers/reef_crown_t2.svg",
+      "res://assets/sprites/flowers/reef_crown_t3.svg"
+     ]
+    }
+   ],
+   "card_order": [
+    "sea_thrift",
+    "reef_crown",
+    "coral_hibiscus",
+    "salt_daisy",
+    "tide_anemone",
+    "pearl_waterlily"
+   ],
+   "price": "€3.49",
+   "soon": false,
+   "prev_free": null,
+   "camp_flower": null
+  },
+  "starfall_glade": {
+   "id": "starfall_glade",
+   "name": "Starfall Glade",
+   "kind": "paid",
+   "order": -3,
+   "phase": 2,
+   "place": "Proplanak u šumi jela: jele u prstenu oko čistine, nebo puno zvijezda, meteori preko neba.",
+   "palette": {
+    "sky": [
+     "#0C0A1F",
+     "#100D26",
+     "#14102D",
+     "#191434"
+    ],
+    "fir": "#0B0919",
+    "ground": "#1E1840",
+    "clearing": "#261F4C",
+    "fern": "#342C5C",
+    "star": "#FFF2BF",
+    "star2": "#E9E0FF",
+    "meteor": "#FFF2BF",
+    "near": "#171233",
+    "ink_field": "#FFF8F0",
+    "page": "#E6E0FA",
+    "flower_out": "#1C1534"
+   },
+   "motifs": [
+    {
+     "id": "fir_ring",
+     "name": "Prsten jela",
+     "how": "recept: poly spikes (jele u pozadini) + dva bočna poligona jela (ogledalo)"
+    },
+    {
+     "id": "star_sky",
+     "name": "Zvjezdano nebo i meteori",
+     "how": "recept: scatter dot + sparkle na nebu, shape meteor (statični) — ambijent dodaje padajuće"
+    },
+    {
+     "id": "clearing",
+     "name": "Čistina",
+     "how": "recept: ellipse svjetlijeg tla + scatter fern i zvjezdane latice"
+    }
+   ],
+   "ambient": {
+    "id": "starfall",
+    "name": "Zvijezde trepere, meteori prelijeću, latice padaju",
+    "n": 22,
+    "layers": [
+     {
+      "motion": "twinkle",
+      "n": 12,
+      "shape": "sparkle",
+      "size": [
+       12,
+       22
+      ],
+      "pal": [
+       "#FFF2BF",
+       "#E9E0FF"
+      ],
+      "zone": [
+       22,
+       13,
+       56,
+       12
+      ],
+      "sec": 3.8,
+      "alpha": [
+       0.15,
+       1
+      ],
+      "pulse": 0.25,
+      "ph": [
+       0.66,
+       0.13
+      ]
+     },
+     {
+      "motion": "streak",
+      "n": 2,
+      "shape": "meteor",
+      "size": [
+       120,
+       150
+      ],
+      "pal": [
+       "#FFF2BF"
+      ],
+      "pal2": [
+       "#FFF2BF"
+      ],
+      "zone": [
+       40,
+       12,
+       40,
+       6
+      ],
+      "drift": [
+       -420,
+       240
+      ],
+      "angle": [
+       150,
+       150
+      ],
+      "duty": 0.22,
+      "sec": 7,
+      "alpha": [
+       0,
+       1
+      ],
+      "ph": [
+       0.2,
+       0.5
+      ]
+     },
+     {
+      "motion": "fall",
+      "n": 8,
+      "shape": "sparkle",
+      "size": [
+       12,
+       18
+      ],
+      "pal": [
+       "#D9CCFF"
+      ],
+      "zone": [
+       10,
+       34,
+       80,
+       20
+      ],
+      "drift": [
+       30,
+       380
+      ],
+      "sway": [
+       16,
+       1.2
+      ],
+      "sec": 9,
+      "rot": 180,
+      "alpha": [
+       0,
+       0.9
+      ],
+      "fade": 0.12,
+      "ph": [
+       0.81,
+       0.36
+      ]
+     }
+    ]
+   },
+   "field": {
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 8,
+      "c": "#0C0A1F"
+     },
+     {
+      "k": "band",
+      "y0": 8,
+      "y1": 16,
+      "c": "#100D26"
+     },
+     {
+      "k": "band",
+      "y0": 16,
+      "y1": 24,
+      "c": "#14102D"
+     },
+     {
+      "k": "band",
+      "y0": 24,
+      "y1": 34,
+      "c": "#191434"
+     },
+     {
+      "k": "scatter",
+      "shape": "dot",
+      "n": 20,
+      "size": [
+       5,
+       9
+      ],
+      "rot": [
+       0,
+       0
+      ],
+      "phase": [
+       0.3,
+       0.7,
+       0.2,
+       0
+      ],
+      "zones": [
+       [
+        20,
+        12,
+        60,
+        18
+       ],
+       [
+        2,
+        26,
+        18,
+        6
+       ],
+       [
+        80,
+        26,
+        18,
+        6
+       ]
+      ],
+      "pal": [
+       "#E9E0FF"
+      ]
+     },
+     {
+      "k": "shape",
+      "shape": "meteor",
+      "at": [
+       [
+        64,
+        16,
+        150,
+        150
+       ]
+      ],
+      "pal": [
+       "#FFF2BF",
+       "#B8A8F0"
+      ]
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        0,
+        40
+       ],
+       [
+        0,
+        22.99
+       ],
+       [
+        2.5,
+        31
+       ],
+       [
+        5,
+        23.99
+       ],
+       [
+        7.5,
+        31
+       ],
+       [
+        10,
+        24.98
+       ],
+       [
+        12.5,
+        31
+       ],
+       [
+        15,
+        25.97
+       ],
+       [
+        17.5,
+        31
+       ],
+       [
+        20,
+        22.91
+       ],
+       [
+        22.5,
+        31
+       ],
+       [
+        25,
+        23.91
+       ],
+       [
+        27.5,
+        31
+       ],
+       [
+        30,
+        24.9
+       ],
+       [
+        32.5,
+        31
+       ],
+       [
+        35,
+        25.89
+       ],
+       [
+        37.5,
+        31
+       ],
+       [
+        40,
+        22.83
+       ],
+       [
+        42.5,
+        31
+       ],
+       [
+        45,
+        23.83
+       ],
+       [
+        47.5,
+        31
+       ],
+       [
+        50,
+        24.82
+       ],
+       [
+        52.5,
+        31
+       ],
+       [
+        55,
+        25.81
+       ],
+       [
+        57.5,
+        31
+       ],
+       [
+        60,
+        22.76
+       ],
+       [
+        62.5,
+        31
+       ],
+       [
+        65,
+        23.75
+       ],
+       [
+        67.5,
+        31
+       ],
+       [
+        70,
+        24.74
+       ],
+       [
+        72.5,
+        31
+       ],
+       [
+        75,
+        25.73
+       ],
+       [
+        77.5,
+        31
+       ],
+       [
+        80,
+        22.68
+       ],
+       [
+        82.5,
+        31
+       ],
+       [
+        85,
+        23.67
+       ],
+       [
+        87.5,
+        31
+       ],
+       [
+        90,
+        24.66
+       ],
+       [
+        92.5,
+        31
+       ],
+       [
+        95,
+        25.65
+       ],
+       [
+        97.5,
+        31
+       ],
+       [
+        100,
+        22.6
+       ],
+       [
+        100,
+        31
+       ],
+       [
+        100,
+        40
+       ]
+      ],
+      "c": "#0B0919"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 35,
+       "w": [
+        [
+         0.4,
+         1.2,
+         0.4
+        ]
+       ]
+      },
+      "c": "#1E1840"
+     },
+     {
+      "k": "ellipse",
+      "at": [
+       50,
+       64
+      ],
+      "r": [
+       40,
+       22
+      ],
+      "c": "#261F4C"
+     },
+     {
+      "k": "scatter",
+      "shape": "fern",
+      "n": 12,
+      "size": [
+       40,
+       60
+      ],
+      "rot": [
+       -8,
+       8
+      ],
+      "phase": [
+       0.57,
+       0.91,
+       0.62,
+       0
+      ],
+      "zones": [
+       [
+        4,
+        40,
+        92,
+        44
+       ]
+      ],
+      "pal": [
+       "#342C5C"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "sparkle",
+      "n": 14,
+      "size": [
+       12,
+       18
+      ],
+      "rot": [
+       0,
+       45
+      ],
+      "phase": [
+       0.81,
+       0.36,
+       0.09,
+       0.2
+      ],
+      "zones": [
+       [
+        10,
+        44,
+        80,
+        38
+       ]
+      ],
+      "pal": [
+       "#D9CCFF"
+      ]
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        0,
+        30
+       ],
+       [
+        7,
+        36
+       ],
+       [
+        3,
+        37
+       ],
+       [
+        9,
+        46
+       ],
+       [
+        4,
+        47
+       ],
+       [
+        10,
+        57
+       ],
+       [
+        4,
+        58
+       ],
+       [
+        9,
+        68
+       ],
+       [
+        0,
+        73
+       ]
+      ],
+      "c": "#0B0919"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        100,
+        30
+       ],
+       [
+        93,
+        36
+       ],
+       [
+        97,
+        37
+       ],
+       [
+        91,
+        46
+       ],
+       [
+        96,
+        47
+       ],
+       [
+        90,
+        57
+       ],
+       [
+        96,
+        58
+       ],
+       [
+        91,
+        68
+       ],
+       [
+        100,
+        73
+       ]
+      ],
+      "c": "#0B0919"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 86,
+       "w": [
+        [
+         0.6,
+         1.8,
+         0.4
+        ],
+        [
+         0.3,
+         4.2,
+         1.7
+        ]
+       ]
+      },
+      "c": "#171233"
+     },
+     {
+      "k": "scatter",
+      "shape": "fern",
+      "n": 10,
+      "size": [
+       40,
+       56
+      ],
+      "rot": [
+       -8,
+       8
+      ],
+      "phase": [
+       0.2,
+       0.4,
+       0.6,
+       0
+      ],
+      "zones": [
+       [
+        2,
+        86.8,
+        96,
+        2
+       ]
+      ],
+      "noAvoid": true,
+      "pal": [
+       "#221C42"
+      ]
+     }
+    ]
+   },
+   "spots": [
+    [
+     10,
+     55,
+     88,
+     3,
+     5
+    ],
+    [
+     26,
+     54,
+     88,
+     0,
+     5
+    ],
+    [
+     42,
+     55,
+     88,
+     1,
+     5
+    ],
+    [
+     58,
+     54,
+     88,
+     4,
+     5
+    ],
+    [
+     74,
+     55,
+     88,
+     2,
+     5
+    ],
+    [
+     90,
+     54,
+     88,
+     5,
+     5
+    ],
+    [
+     18,
+     40,
+     116,
+     0,
+     1
+    ],
+    [
+     50,
+     42,
+     116,
+     1,
+     1
+    ],
+    [
+     82,
+     40,
+     116,
+     2,
+     1
+    ],
+    [
+     12,
+     29,
+     136,
+     3,
+     1
+    ],
+    [
+     66,
+     28,
+     136,
+     4,
+     1
+    ],
+    [
+     88,
+     30,
+     136,
+     5,
+     1
+    ],
+    [
+     34,
+     26,
+     168,
+     5,
+     10
+    ]
+   ],
+   "camp": null,
+   "shop": {
+    "w": 1032,
+    "h": 364,
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 25,
+      "c": "#0C0A1F"
+     },
+     {
+      "k": "band",
+      "y0": 25,
+      "y1": 50,
+      "c": "#100D26"
+     },
+     {
+      "k": "band",
+      "y0": 50,
+      "y1": 72,
+      "c": "#14102D"
+     },
+     {
+      "k": "band",
+      "y0": 72,
+      "y1": 100,
+      "c": "#191434"
+     },
+     {
+      "k": "scatter",
+      "shape": "dot",
+      "n": 26,
+      "size": [
+       4,
+       7
+      ],
+      "rot": [
+       0,
+       0
+      ],
+      "phase": [
+       0.3,
+       0.7,
+       0.2,
+       0
+      ],
+      "zones": [
+       [
+        1,
+        3,
+        98,
+        54
+       ]
+      ],
+      "pal": [
+       "#E9E0FF"
+      ]
+     },
+     {
+      "k": "shape",
+      "shape": "sparkle",
+      "at": [
+       [
+        60,
+        60,
+        26
+       ],
+       [
+        74,
+        52,
+        18
+       ],
+       [
+        92,
+        64,
+        22
+       ],
+       [
+        52,
+        10,
+        16
+       ]
+      ],
+      "pal": [
+       "#FFF2BF"
+      ]
+     },
+     {
+      "k": "shape",
+      "shape": "meteor",
+      "at": [
+       [
+        70,
+        22,
+        150,
+        150
+       ]
+      ],
+      "pal": [
+       "#FFF2BF",
+       "#B8A8F0"
+      ]
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        0,
+        100
+       ],
+       [
+        0,
+        70.28
+       ],
+       [
+        2,
+        84
+       ],
+       [
+        4,
+        71.83
+       ],
+       [
+        6,
+        84
+       ],
+       [
+        8,
+        73.37
+       ],
+       [
+        10,
+        84
+       ],
+       [
+        12,
+        74.92
+       ],
+       [
+        14,
+        84
+       ],
+       [
+        16,
+        70.16
+       ],
+       [
+        18,
+        84
+       ],
+       [
+        20,
+        71.71
+       ],
+       [
+        22,
+        84
+       ],
+       [
+        24,
+        73.25
+       ],
+       [
+        26,
+        84
+       ],
+       [
+        28,
+        74.79
+       ],
+       [
+        30,
+        84
+       ],
+       [
+        32,
+        70.04
+       ],
+       [
+        34,
+        84
+       ],
+       [
+        36,
+        71.58
+       ],
+       [
+        38,
+        84
+       ],
+       [
+        40,
+        73.13
+       ],
+       [
+        42,
+        84
+       ],
+       [
+        44,
+        74.67
+       ],
+       [
+        46,
+        84
+       ],
+       [
+        48,
+        76.22
+       ],
+       [
+        50,
+        84
+       ],
+       [
+        52,
+        71.46
+       ],
+       [
+        54,
+        84
+       ],
+       [
+        56,
+        73
+       ],
+       [
+        58,
+        84
+       ],
+       [
+        60,
+        74.55
+       ],
+       [
+        62,
+        84
+       ],
+       [
+        64,
+        76.09
+       ],
+       [
+        66,
+        84
+       ],
+       [
+        68,
+        71.34
+       ],
+       [
+        70,
+        84
+       ],
+       [
+        72,
+        72.88
+       ],
+       [
+        74,
+        84
+       ],
+       [
+        76,
+        74.43
+       ],
+       [
+        78,
+        84
+       ],
+       [
+        80,
+        75.97
+       ],
+       [
+        82,
+        84
+       ],
+       [
+        84,
+        71.21
+       ],
+       [
+        86,
+        84
+       ],
+       [
+        88,
+        72.76
+       ],
+       [
+        90,
+        84
+       ],
+       [
+        92,
+        74.3
+       ],
+       [
+        94,
+        84
+       ],
+       [
+        96,
+        75.85
+       ],
+       [
+        98,
+        84
+       ],
+       [
+        100,
+        71.09
+       ],
+       [
+        100,
+        84
+       ],
+       [
+        100,
+        100
+       ]
+      ],
+      "c": "#0B0919"
+     }
+    ]
+   },
+   "arena": {
+    "base": [
+     "#14102D",
+     "#161131"
+    ],
+    "layers": {
+     "firs_back": [
+      "#0B0919",
+      "#0B0919"
+     ],
+     "glade_ground": [
+      "#1E1840",
+      "#201A44"
+     ],
+     "firs_sides": [
+      "#0B0919",
+      "#0B0919"
+     ],
+     "clearing": [
+      "#261F4C",
+      "#282150"
+     ]
+    },
+    "combo": {
+     "light": "#DBCCFF",
+     "ring": "#FFF2BF"
+    }
+   },
+   "run": {
+    "ground": "#100D26",
+    "lane": "#2A2456",
+    "laneEdge": "rgba(233,224,255,.26)",
+    "seam": "rgba(233,224,255,.16)",
+    "material": {
+     "kind": "pebble",
+     "name": "Staza od zvjezdane prašine",
+     "pal": [
+      "#4A4288",
+      "#E9E0FF",
+      "#3D366E"
+     ],
+     "dots": [
+      [
+       16,
+       24,
+       7
+      ],
+      [
+       70,
+       70,
+       4
+      ],
+      [
+       44,
+       100,
+       6
+      ],
+      [
+       86,
+       30,
+       3
+      ],
+      [
+       30,
+       80,
+       5
+      ]
+     ],
+     "period": 124
+    },
+    "far": {
+     "id": "ferns",
+     "name": "Paprat i zvjezdane latice",
+     "speed": 0.35,
+     "period": 720,
+     "items": [
+      {
+       "shape": "fern",
+       "pal": [
+        "#241E48"
+       ],
+       "at": [
+        [
+         120,
+         160,
+         90
+        ],
+        [
+         960,
+         380,
+         100
+        ],
+        [
+         60,
+         600,
+         80
+        ]
+       ]
+      },
+      {
+       "shape": "sparkle",
+       "pal": [
+        "#8E84C8"
+       ],
+       "at": [
+        [
+         160,
+         320,
+         18
+        ],
+        [
+         1000,
+         120,
+         16
+        ],
+        [
+         920,
+         620,
+         18
+        ]
+       ]
+      }
+     ]
+    },
+    "near": {
+     "id": "firs_edge",
+     "name": "Jele uz rub",
+     "speed": 1,
+     "period": 480,
+     "items": [
+      {
+       "shape": "fir",
+       "pal": [
+        "#0B0919",
+        "#1A1436"
+       ],
+       "at": [
+        [
+         56,
+         300,
+         260
+        ],
+        [
+         1024,
+         470,
+         260
+        ]
+       ]
+      },
+      {
+       "shape": "fern",
+       "pal": [
+        "#2E2754"
+       ],
+       "at": [
+        [
+         150,
+         120,
+         60
+        ],
+        [
+         940,
+         210,
+         60
+        ]
+       ]
+      }
+     ]
+    },
+    "ambient": {
+     "id": "starfall",
+     "n": 12,
+     "layers": [
+      {
+       "motion": "twinkle",
+       "n": 10,
+       "shape": "sparkle",
+       "size": [
+        12,
+        20
+       ],
+       "pal": [
+        "#FFF2BF",
+        "#E9E0FF"
+       ],
+       "zone": [
+        2,
+        2,
+        96,
+        86
+       ],
+       "sec": 3.2,
+       "alpha": [
+        0.1,
+        1
+       ],
+       "pulse": 0.25,
+       "ph": [
+        0.2,
+        0.6
+       ]
+      },
+      {
+       "motion": "streak",
+       "n": 2,
+       "shape": "meteor",
+       "size": [
+        140,
+        160
+       ],
+       "pal": [
+        "#FFF2BF"
+       ],
+       "pal2": [
+        "#FFF2BF"
+       ],
+       "zone": [
+        30,
+        4,
+        50,
+        10
+       ],
+       "drift": [
+        -500,
+        300
+       ],
+       "angle": [
+        150,
+        150
+       ],
+       "duty": 0.2,
+       "sec": 6,
+       "alpha": [
+        0,
+        1
+       ],
+       "ph": [
+        0.5,
+        0.3
+       ]
+      }
+     ]
+    },
+    "collar": [
+     "#3D366E",
+     "#5E569C"
+    ],
+    "obstacles": [
+     {
+      "id": "meteorite",
+      "name": "Meteorit",
+      "svg": "assets/seasons/starfall_glade/obstacle_meteorite.svg"
+     },
+     {
+      "id": "fir_stump",
+      "name": "Panj jele",
+      "svg": "assets/seasons/starfall_glade/obstacle_fir_stump.svg"
+     }
+    ],
+    "material_tile": {
+     "period": 124,
+     "items": [
+      {
+       "k": "circle",
+       "x": 30.72,
+       "y": 24,
+       "r": 7,
+       "f": "#4A4288"
+      },
+      {
+       "k": "circle",
+       "x": 134.39999999999998,
+       "y": 70,
+       "r": 4,
+       "f": "#E9E0FF"
+      },
+      {
+       "k": "circle",
+       "x": 84.48,
+       "y": 100,
+       "r": 6,
+       "f": "#3D366E"
+      },
+      {
+       "k": "circle",
+       "x": 165.12,
+       "y": 30,
+       "r": 3,
+       "f": "#4A4288"
+      },
+      {
+       "k": "circle",
+       "x": 57.599999999999994,
+       "y": 80,
+       "r": 5,
+       "f": "#E9E0FF"
+      }
+     ]
+    }
+   },
+   "roster": [
+    {
+     "id": "comet_sprig",
+     "display_name": "Comet Sprig",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/comet_sprig_t1.svg",
+      "res://assets/sprites/flowers/comet_sprig_t2.svg",
+      "res://assets/sprites/flowers/comet_sprig_t3.svg"
+     ]
+    },
+    {
+     "id": "nebula_clover",
+     "display_name": "Nebula Clover",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/nebula_clover_t1.svg",
+      "res://assets/sprites/flowers/nebula_clover_t2.svg",
+      "res://assets/sprites/flowers/nebula_clover_t3.svg"
+     ]
+    },
+    {
+     "id": "meteor_daisy",
+     "display_name": "Meteor Daisy",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/meteor_daisy_t1.svg",
+      "res://assets/sprites/flowers/meteor_daisy_t2.svg",
+      "res://assets/sprites/flowers/meteor_daisy_t3.svg"
+     ]
+    },
+    {
+     "id": "aurora_tulip",
+     "display_name": "Aurora Tulip",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/aurora_tulip_t1.svg",
+      "res://assets/sprites/flowers/aurora_tulip_t2.svg",
+      "res://assets/sprites/flowers/aurora_tulip_t3.svg"
+     ]
+    },
+    {
+     "id": "galaxy_sunburst",
+     "display_name": "Galaxy Sunburst",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/galaxy_sunburst_t1.svg",
+      "res://assets/sprites/flowers/galaxy_sunburst_t2.svg",
+      "res://assets/sprites/flowers/galaxy_sunburst_t3.svg"
+     ]
+    },
+    {
+     "id": "nova_bloom",
+     "display_name": "Nova Bloom",
+     "rarity": 3,
+     "art": [
+      "res://assets/sprites/flowers/nova_bloom_t1.svg",
+      "res://assets/sprites/flowers/nova_bloom_t2.svg",
+      "res://assets/sprites/flowers/nova_bloom_t3.svg"
+     ]
+    }
+   ],
+   "card_order": [
+    "comet_sprig",
+    "nova_bloom",
+    "aurora_tulip",
+    "nebula_clover",
+    "meteor_daisy",
+    "galaxy_sunburst"
+   ],
+   "price": "€2.99",
+   "soon": false,
+   "prev_free": null,
+   "camp_flower": null
+  },
+  "ember_fen": {
+   "id": "ember_fen",
+   "name": "Ember Fen",
+   "kind": "paid",
+   "order": -4,
+   "phase": 2,
+   "soon": true,
+   "place": "Močvara u sumrak vatre: tresetno tlo, tamne lokve, rogoz uz rubove, dva pojasa dima, žeravica se diže.",
+   "palette": {
+    "sky": [
+     "#160B08",
+     "#1C0F0B",
+     "#22120D",
+     "#2A1610"
+    ],
+    "reeds": "#120806",
+    "peat": "#24130E",
+    "pool": "#120808",
+    "pool_glint": "#C8643A",
+    "smoke": "#3A221C",
+    "cattail": "#8A5536",
+    "ember": "#FFB074",
+    "near": "#1A0D09",
+    "ink_field": "#FFF8F0",
+    "page": "#F7E4D8",
+    "flower_out": "#2A140E"
+   },
+   "motifs": [
+    {
+     "id": "pools",
+     "name": "Lokve s odsjajem vatre",
+     "how": "recept: tri glatka poligona (smooth) + puddle odsjaj"
+    },
+    {
+     "id": "cattails",
+     "name": "Rogoz uz rubove",
+     "how": "recept: scatter cattail u dvije bočne zone + daleki rogoz kao spikes"
+    },
+    {
+     "id": "smoke_bands",
+     "name": "Dva pojasa dima",
+     "how": "recept: dva glatka pojasa tamnije-svijetle boje (bez alpha, bez blura)"
+    }
+   ],
+   "ambient": {
+    "id": "embers",
+    "name": "Žeravica se diže, dim klizi",
+    "n": 18,
+    "layers": [
+     {
+      "motion": "rise",
+      "n": 14,
+      "shape": "ember",
+      "size": [
+       10,
+       16
+      ],
+      "pal": [
+       "#FFB074",
+       "#FFD3A8"
+      ],
+      "pal2": [
+       "#FFE0B8"
+      ],
+      "zone": [
+       8,
+       50,
+       84,
+       34
+      ],
+      "drift": [
+       30,
+       -460
+      ],
+      "sway": [
+       14,
+       1
+      ],
+      "sec": 7,
+      "rot": 90,
+      "alpha": [
+       0,
+       1
+      ],
+      "fade": 0.15,
+      "ph": [
+       0.14,
+       0.73
+      ]
+     },
+     {
+      "motion": "drift",
+      "n": 4,
+      "shape": "smoke",
+      "size": [
+       140,
+       200
+      ],
+      "pal": [
+       "#3A221C"
+      ],
+      "zone": [
+       0,
+       24,
+       70,
+       40
+      ],
+      "drift": [
+       220,
+       0
+      ],
+      "sec": 18,
+      "alpha": [
+       0,
+       0.8
+      ],
+      "fade": 0.3,
+      "ph": [
+       0.3,
+       0.6
+      ]
+     }
+    ]
+   },
+   "field": {
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 6,
+      "c": "#160B08"
+     },
+     {
+      "k": "band",
+      "y0": 6,
+      "y1": 12,
+      "c": "#1C0F0B"
+     },
+     {
+      "k": "band",
+      "y0": 12,
+      "y1": 18,
+      "c": "#22120D"
+     },
+     {
+      "k": "band",
+      "y0": 18,
+      "y1": 24,
+      "c": "#2A1610"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        0,
+        24
+       ],
+       [
+        0,
+        14.2
+       ],
+       [
+        1.2,
+        19
+       ],
+       [
+        2.4,
+        14.86
+       ],
+       [
+        3.6,
+        19
+       ],
+       [
+        4.8,
+        15.53
+       ],
+       [
+        6,
+        19
+       ],
+       [
+        7.2,
+        13.49
+       ],
+       [
+        8.4,
+        19
+       ],
+       [
+        9.6,
+        14.15
+       ],
+       [
+        10.8,
+        19
+       ],
+       [
+        12,
+        14.81
+       ],
+       [
+        13.2,
+        19
+       ],
+       [
+        14.4,
+        15.47
+       ],
+       [
+        15.6,
+        19
+       ],
+       [
+        16.8,
+        13.43
+       ],
+       [
+        18,
+        19
+       ],
+       [
+        19.2,
+        14.1
+       ],
+       [
+        20.4,
+        19
+       ],
+       [
+        21.6,
+        14.76
+       ],
+       [
+        22.8,
+        19
+       ],
+       [
+        24,
+        15.42
+       ],
+       [
+        25.2,
+        19
+       ],
+       [
+        26.4,
+        13.38
+       ],
+       [
+        27.6,
+        19
+       ],
+       [
+        28.8,
+        14.04
+       ],
+       [
+        30,
+        19
+       ],
+       [
+        31.2,
+        14.71
+       ],
+       [
+        32.4,
+        19
+       ],
+       [
+        33.6,
+        15.37
+       ],
+       [
+        34.8,
+        19
+       ],
+       [
+        36,
+        13.33
+       ],
+       [
+        37.2,
+        19
+       ],
+       [
+        38.4,
+        13.99
+       ],
+       [
+        39.6,
+        19
+       ],
+       [
+        40.8,
+        14.65
+       ],
+       [
+        42,
+        19
+       ],
+       [
+        43.2,
+        15.31
+       ],
+       [
+        44.4,
+        19
+       ],
+       [
+        45.6,
+        13.28
+       ],
+       [
+        46.8,
+        19
+       ],
+       [
+        48,
+        13.94
+       ],
+       [
+        49.2,
+        19
+       ],
+       [
+        50.4,
+        14.6
+       ],
+       [
+        51.6,
+        19
+       ],
+       [
+        52.8,
+        15.26
+       ],
+       [
+        54,
+        19
+       ],
+       [
+        55.2,
+        13.22
+       ],
+       [
+        56.4,
+        19
+       ],
+       [
+        57.6,
+        13.89
+       ],
+       [
+        58.8,
+        19
+       ],
+       [
+        60,
+        14.55
+       ],
+       [
+        61.2,
+        19
+       ],
+       [
+        62.4,
+        15.21
+       ],
+       [
+        63.6,
+        19
+       ],
+       [
+        64.8,
+        13.17
+       ],
+       [
+        66,
+        19
+       ],
+       [
+        67.2,
+        13.83
+       ],
+       [
+        68.4,
+        19
+       ],
+       [
+        69.6,
+        14.49
+       ],
+       [
+        70.8,
+        19
+       ],
+       [
+        72,
+        15.16
+       ],
+       [
+        73.2,
+        19
+       ],
+       [
+        74.4,
+        13.12
+       ],
+       [
+        75.6,
+        19
+       ],
+       [
+        76.8,
+        13.78
+       ],
+       [
+        78,
+        19
+       ],
+       [
+        79.2,
+        14.44
+       ],
+       [
+        80.4,
+        19
+       ],
+       [
+        81.6,
+        15.1
+       ],
+       [
+        82.8,
+        19
+       ],
+       [
+        84,
+        13.07
+       ],
+       [
+        85.2,
+        19
+       ],
+       [
+        86.4,
+        13.73
+       ],
+       [
+        87.6,
+        19
+       ],
+       [
+        88.8,
+        14.39
+       ],
+       [
+        90,
+        19
+       ],
+       [
+        91.2,
+        15.05
+       ],
+       [
+        92.4,
+        19
+       ],
+       [
+        93.6,
+        13.01
+       ],
+       [
+        94.8,
+        19
+       ],
+       [
+        96,
+        13.68
+       ],
+       [
+        97.2,
+        19
+       ],
+       [
+        98.4,
+        14.34
+       ],
+       [
+        99.6,
+        19
+       ],
+       [
+        100,
+        24
+       ]
+      ],
+      "c": "#120806"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 22,
+       "w": [
+        [
+         0.3,
+         1.4,
+         0.2
+        ]
+       ]
+      },
+      "c": "#24130E"
+     },
+     {
+      "k": "poly",
+      "smooth": true,
+      "pts": [
+       [
+        0,
+        26.4
+       ],
+       [
+        20,
+        25
+       ],
+       [
+        46,
+        26.2
+       ],
+       [
+        72,
+        24.6
+       ],
+       [
+        100,
+        25.6
+       ],
+       [
+        100,
+        30
+       ],
+       [
+        74,
+        30.8
+       ],
+       [
+        46,
+        29.4
+       ],
+       [
+        20,
+        31
+       ],
+       [
+        0,
+        29.8
+       ]
+      ],
+      "c": "#3A221C"
+     },
+     {
+      "k": "poly",
+      "smooth": true,
+      "pts": [
+       [
+        12,
+        44
+       ],
+       [
+        24,
+        41.6
+       ],
+       [
+        36,
+        43.6
+       ],
+       [
+        40,
+        48
+       ],
+       [
+        30,
+        51.4
+       ],
+       [
+        16,
+        50.4
+       ]
+      ],
+      "c": "#120808"
+     },
+     {
+      "k": "poly",
+      "smooth": true,
+      "pts": [
+       [
+        58,
+        50
+       ],
+       [
+        72,
+        47.6
+       ],
+       [
+        86,
+        50.2
+       ],
+       [
+        88,
+        55.5
+       ],
+       [
+        74,
+        58.6
+       ],
+       [
+        60,
+        56.4
+       ]
+      ],
+      "c": "#120808"
+     },
+     {
+      "k": "poly",
+      "smooth": true,
+      "pts": [
+       [
+        16,
+        70
+       ],
+       [
+        30,
+        68.4
+       ],
+       [
+        38,
+        71.6
+       ],
+       [
+        34,
+        76.8
+       ],
+       [
+        20,
+        77.2
+       ],
+       [
+        12,
+        74
+       ]
+      ],
+      "c": "#120808"
+     },
+     {
+      "k": "shape",
+      "shape": "puddle",
+      "at": [
+       [
+        26,
+        46.6,
+        100
+       ],
+       [
+        73,
+        53,
+        110
+       ],
+       [
+        25,
+        72.8,
+        90
+       ]
+      ],
+      "pal": [
+       "#120808",
+       "#C8643A"
+      ]
+     },
+     {
+      "k": "poly",
+      "smooth": true,
+      "pts": [
+       [
+        0,
+        60.5
+       ],
+       [
+        24,
+        59
+       ],
+       [
+        52,
+        60.6
+       ],
+       [
+        78,
+        58.8
+       ],
+       [
+        100,
+        60
+       ],
+       [
+        100,
+        64.4
+       ],
+       [
+        78,
+        63.2
+       ],
+       [
+        52,
+        65
+       ],
+       [
+        24,
+        63.6
+       ],
+       [
+        0,
+        64.6
+       ]
+      ],
+      "c": "#3A221C"
+     },
+     {
+      "k": "scatter",
+      "shape": "tuft",
+      "n": 12,
+      "size": [
+       30,
+       46
+      ],
+      "rot": [
+       -6,
+       6
+      ],
+      "phase": [
+       0.68,
+       0.2,
+       0.84,
+       0
+      ],
+      "zones": [
+       [
+        4,
+        32,
+        92,
+        50
+       ]
+      ],
+      "pal": [
+       "#3E261C"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "cattail",
+      "n": 16,
+      "size": [
+       80,
+       120
+      ],
+      "rot": [
+       -6,
+       6
+      ],
+      "phase": [
+       0.24,
+       0.55,
+       0.47,
+       0.3
+      ],
+      "zones": [
+       [
+        1,
+        30,
+        13,
+        52
+       ],
+       [
+        86,
+        30,
+        13,
+        40
+       ]
+      ],
+      "pal": [
+       "#8A5536",
+       "#2E1E1C"
+      ]
+     },
+     {
+      "k": "scatter",
+      "shape": "ember",
+      "n": 10,
+      "size": [
+       10,
+       16
+      ],
+      "rot": [
+       0,
+       0
+      ],
+      "phase": [
+       0.14,
+       0.73,
+       0.28,
+       0
+      ],
+      "zones": [
+       [
+        4,
+        42,
+        92,
+        42
+       ]
+      ],
+      "pal": [
+       "#FFB074",
+       "#FFE0B8"
+      ]
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 86,
+       "w": [
+        [
+         0.6,
+         1.8,
+         0.4
+        ],
+        [
+         0.3,
+         4.2,
+         1.7
+        ]
+       ]
+      },
+      "c": "#1A0D09"
+     },
+     {
+      "k": "scatter",
+      "shape": "cattail",
+      "n": 8,
+      "size": [
+       70,
+       96
+      ],
+      "rot": [
+       -6,
+       6
+      ],
+      "phase": [
+       0.2,
+       0.4,
+       0.6,
+       0
+      ],
+      "zones": [
+       [
+        2,
+        87,
+        96,
+        2
+       ]
+      ],
+      "noAvoid": true,
+      "pal": [
+       "#4A2E22",
+       "#24130E"
+      ]
+     }
+    ]
+   },
+   "spots": [
+    [
+     10,
+     55,
+     88,
+     3,
+     5
+    ],
+    [
+     26,
+     54,
+     88,
+     0,
+     5
+    ],
+    [
+     42,
+     55,
+     88,
+     1,
+     5
+    ],
+    [
+     58,
+     54,
+     88,
+     4,
+     5
+    ],
+    [
+     74,
+     55,
+     88,
+     2,
+     5
+    ],
+    [
+     90,
+     54,
+     88,
+     5,
+     5
+    ],
+    [
+     18,
+     40,
+     116,
+     0,
+     1
+    ],
+    [
+     50,
+     42,
+     116,
+     1,
+     1
+    ],
+    [
+     82,
+     40,
+     116,
+     2,
+     1
+    ],
+    [
+     12,
+     29,
+     136,
+     3,
+     1
+    ],
+    [
+     66,
+     28,
+     136,
+     4,
+     1
+    ],
+    [
+     88,
+     30,
+     136,
+     5,
+     1
+    ],
+    [
+     34,
+     26,
+     168,
+     5,
+     10
+    ]
+   ],
+   "camp": null,
+   "shop": {
+    "w": 1032,
+    "h": 364,
+    "layers": [
+     {
+      "k": "band",
+      "y0": 0,
+      "y1": 25,
+      "c": "#160B08"
+     },
+     {
+      "k": "band",
+      "y0": 25,
+      "y1": 50,
+      "c": "#1C0F0B"
+     },
+     {
+      "k": "band",
+      "y0": 50,
+      "y1": 100,
+      "c": "#22120D"
+     },
+     {
+      "k": "poly",
+      "smooth": true,
+      "pts": [
+       [
+        0,
+        40
+       ],
+       [
+        30,
+        37
+       ],
+       [
+        60,
+        41
+       ],
+       [
+        100,
+        38
+       ],
+       [
+        100,
+        46
+       ],
+       [
+        60,
+        49
+       ],
+       [
+        30,
+        45
+       ],
+       [
+        0,
+        48
+       ]
+      ],
+      "c": "#3A221C"
+     },
+     {
+      "k": "poly",
+      "pts": [
+       [
+        0,
+        100
+       ],
+       [
+        0,
+        60.56
+       ],
+       [
+        1.1,
+        68
+       ],
+       [
+        2.2,
+        56.49
+       ],
+       [
+        3.3,
+        68
+       ],
+       [
+        4.4,
+        57.81
+       ],
+       [
+        5.5,
+        68
+       ],
+       [
+        6.6,
+        59.13
+       ],
+       [
+        7.7,
+        68
+       ],
+       [
+        8.8,
+        60.46
+       ],
+       [
+        9.9,
+        68
+       ],
+       [
+        11,
+        56.38
+       ],
+       [
+        12.1,
+        68
+       ],
+       [
+        13.2,
+        57.71
+       ],
+       [
+        14.3,
+        68
+       ],
+       [
+        15.4,
+        59.03
+       ],
+       [
+        16.5,
+        68
+       ],
+       [
+        17.6,
+        60.35
+       ],
+       [
+        18.7,
+        68
+       ],
+       [
+        19.8,
+        56.28
+       ],
+       [
+        20.9,
+        68
+       ],
+       [
+        22,
+        57.6
+       ],
+       [
+        23.1,
+        68
+       ],
+       [
+        24.2,
+        58.92
+       ],
+       [
+        25.3,
+        68
+       ],
+       [
+        26.4,
+        60.25
+       ],
+       [
+        27.5,
+        68
+       ],
+       [
+        28.6,
+        56.17
+       ],
+       [
+        29.7,
+        68
+       ],
+       [
+        30.8,
+        57.49
+       ],
+       [
+        31.9,
+        68
+       ],
+       [
+        33,
+        58.82
+       ],
+       [
+        34.1,
+        68
+       ],
+       [
+        35.2,
+        60.14
+       ],
+       [
+        36.3,
+        68
+       ],
+       [
+        37.4,
+        56.07
+       ],
+       [
+        38.5,
+        68
+       ],
+       [
+        39.6,
+        57.39
+       ],
+       [
+        40.7,
+        68
+       ],
+       [
+        41.8,
+        58.71
+       ],
+       [
+        42.9,
+        68
+       ],
+       [
+        44,
+        60.04
+       ],
+       [
+        45.1,
+        68
+       ],
+       [
+        46.2,
+        61.36
+       ],
+       [
+        47.3,
+        68
+       ],
+       [
+        48.4,
+        57.28
+       ],
+       [
+        49.5,
+        68
+       ],
+       [
+        50.6,
+        58.61
+       ],
+       [
+        51.7,
+        68
+       ],
+       [
+        52.8,
+        59.93
+       ],
+       [
+        53.9,
+        68
+       ],
+       [
+        55,
+        61.26
+       ],
+       [
+        56.1,
+        68
+       ],
+       [
+        57.2,
+        57.18
+       ],
+       [
+        58.3,
+        68
+       ],
+       [
+        59.4,
+        58.5
+       ],
+       [
+        60.5,
+        68
+       ],
+       [
+        61.6,
+        59.83
+       ],
+       [
+        62.7,
+        68
+       ],
+       [
+        63.8,
+        61.15
+       ],
+       [
+        64.9,
+        68
+       ],
+       [
+        66,
+        57.07
+       ],
+       [
+        67.1,
+        68
+       ],
+       [
+        68.2,
+        58.4
+       ],
+       [
+        69.3,
+        68
+       ],
+       [
+        70.4,
+        59.72
+       ],
+       [
+        71.5,
+        68
+       ],
+       [
+        72.6,
+        61.04
+       ],
+       [
+        73.7,
+        68
+       ],
+       [
+        74.8,
+        56.97
+       ],
+       [
+        75.9,
+        68
+       ],
+       [
+        77,
+        58.29
+       ],
+       [
+        78.1,
+        68
+       ],
+       [
+        79.2,
+        59.62
+       ],
+       [
+        80.3,
+        68
+       ],
+       [
+        81.4,
+        60.94
+       ],
+       [
+        82.5,
+        68
+       ],
+       [
+        83.6,
+        56.86
+       ],
+       [
+        84.7,
+        68
+       ],
+       [
+        85.8,
+        58.19
+       ],
+       [
+        86.9,
+        68
+       ],
+       [
+        88,
+        59.51
+       ],
+       [
+        89.1,
+        68
+       ],
+       [
+        90.2,
+        60.83
+       ],
+       [
+        91.3,
+        68
+       ],
+       [
+        92.4,
+        56.76
+       ],
+       [
+        93.5,
+        68
+       ],
+       [
+        94.6,
+        58.08
+       ],
+       [
+        95.7,
+        68
+       ],
+       [
+        96.8,
+        59.4
+       ],
+       [
+        97.9,
+        68
+       ],
+       [
+        99,
+        60.73
+       ],
+       [
+        100,
+        68
+       ],
+       [
+        100,
+        100
+       ]
+      ],
+      "c": "#120806"
+     },
+     {
+      "k": "ridge",
+      "r": {
+       "y": 78,
+       "w": [
+        [
+         0.6,
+         1.4,
+         0.2
+        ]
+       ]
+      },
+      "c": "#24130E"
+     },
+     {
+      "k": "shape",
+      "shape": "cattail",
+      "at": [
+       [
+        56,
+        100,
+        120
+       ],
+       [
+        60,
+        100,
+        96
+       ],
+       [
+        94,
+        100,
+        110
+       ]
+      ],
+      "pal": [
+       "#8A5536",
+       "#2E1E1C"
+      ]
+     },
+     {
+      "k": "shape",
+      "shape": "ember",
+      "at": [
+       [
+        40,
+        20,
+        14
+       ],
+       [
+        66,
+        30,
+        12
+       ],
+       [
+        82,
+        14,
+        14
+       ],
+       [
+        30,
+        54,
+        10
+       ]
+      ],
+      "pal": [
+       "#FFB074",
+       "#FFE0B8"
+      ]
+     }
+    ]
+   },
+   "arena": {
+    "base": [
+     "#1C0F0B",
+     "#200F0C"
+    ],
+    "layers": {
+     "far_reeds": [
+      "#120806",
+      "#120806"
+     ],
+     "peat": [
+      "#24130E",
+      "#26140F"
+     ],
+     "pools": [
+      "#120808",
+      "#140909"
+     ],
+     "smoke": [
+      "#3A221C",
+      "#3A221C"
+     ]
+    },
+    "scatter": {
+     "pool_glint": [
+      "#C8643A"
+     ],
+     "peat_tuft": [
+      "#3E261C"
+     ]
+    },
+    "combo": {
+     "light": "#FFB88C",
+     "ring": "#FFC79E"
+    }
+   },
+   "run": {
+    "ground": "#1C0F0B",
+    "lane": "#3E2A22",
+    "laneEdge": "rgba(255,199,158,.26)",
+    "seam": "rgba(255,199,158,.16)",
+    "material": {
+     "kind": "plank",
+     "name": "Daščana staza preko močvare",
+     "fill": "#4E362A",
+     "seam": "#2A1A14",
+     "knot": "#2E1E18",
+     "plank": 52,
+     "gap": 10,
+     "period": 124
+    },
+    "far": {
+     "id": "pools",
+     "name": "Lokve s odsjajem",
+     "speed": 0.35,
+     "period": 720,
+     "items": [
+      {
+       "shape": "puddle",
+       "pal": [
+        "#120808",
+        "#A8542E"
+       ],
+       "at": [
+        [
+         120,
+         140,
+         180
+        ],
+        [
+         960,
+         380,
+         170
+        ],
+        [
+         70,
+         600,
+         150
+        ]
+       ]
+      }
+     ]
+    },
+    "near": {
+     "id": "cattail_edge",
+     "name": "Rogoz uz rub",
+     "speed": 1,
+     "period": 480,
+     "items": [
+      {
+       "shape": "cattail",
+       "pal": [
+        "#8A5536",
+        "#2E1E1C"
+       ],
+       "at": [
+        [
+         40,
+         200,
+         170
+        ],
+        [
+         110,
+         260,
+         130
+        ],
+        [
+         1030,
+         420,
+         170
+        ],
+        [
+         960,
+         460,
+         130
+        ]
+       ]
+      },
+      {
+       "shape": "tuft",
+       "pal": [
+        "#3E261C"
+       ],
+       "at": [
+        [
+         150,
+         60,
+         46
+        ],
+        [
+         920,
+         200,
+         44
+        ]
+       ]
+      }
+     ]
+    },
+    "ambient": {
+     "id": "embers",
+     "n": 14,
+     "layers": [
+      {
+       "motion": "rise",
+       "n": 14,
+       "shape": "ember",
+       "size": [
+        12,
+        18
+       ],
+       "pal": [
+        "#FFB074",
+        "#FFD3A8"
+       ],
+       "pal2": [
+        "#FFE0B8"
+       ],
+       "zone": [
+        2,
+        40,
+        96,
+        56
+       ],
+       "drift": [
+        30,
+        -700
+       ],
+       "sway": [
+        18,
+        1
+       ],
+       "sec": 5,
+       "rot": 90,
+       "alpha": [
+        0,
+        1
+       ],
+       "fade": 0.15,
+       "ph": [
+        0.4,
+        0.2
+       ]
+      }
+     ]
+    },
+    "collar": [
+     "#5A3E30",
+     "#7E5844"
+    ],
+    "obstacles": [
+     {
+      "id": "smoldering_stump",
+      "name": "Panj koji tinja",
+      "svg": "assets/seasons/ember_fen/obstacle_smoldering_stump.svg"
+     },
+     {
+      "id": "rush_tussock",
+      "name": "Busen rogoza u blatu",
+      "svg": "assets/seasons/ember_fen/obstacle_rush_tussock.svg"
+     }
+    ],
+    "material_tile": {
+     "period": 124,
+     "items": [
+      {
+       "k": "rect",
+       "x": 4,
+       "y": 0,
+       "w": 184,
+       "h": 52,
+       "f": "#4E362A",
+       "r": 6
+      },
+      {
+       "k": "rect",
+       "x": 4,
+       "y": 45,
+       "w": 184,
+       "h": 7,
+       "f": "#2A1A14",
+       "r": 3
+      },
+      {
+       "k": "circle",
+       "x": 120.4682559596825,
+       "y": 21.84,
+       "r": 5,
+       "f": "#2E1E18"
+      },
+      {
+       "k": "rect",
+       "x": 4,
+       "y": 62,
+       "w": 184,
+       "h": 52,
+       "f": "#4E362A",
+       "r": 6
+      },
+      {
+       "k": "rect",
+       "x": 4,
+       "y": 107,
+       "w": 184,
+       "h": 7,
+       "f": "#2A1A14",
+       "r": 3
+      },
+      {
+       "k": "circle",
+       "x": 101.50012545999766,
+       "y": 83.84,
+       "r": 5,
+       "f": "#2E1E18"
+      }
+     ]
+    }
+   },
+   "roster": [
+    {
+     "id": "marsh_rush",
+     "display_name": "Marsh Rush",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/marsh_rush_t1.svg",
+      "res://assets/sprites/flowers/marsh_rush_t2.svg",
+      "res://assets/sprites/flowers/marsh_rush_t3.svg"
+     ]
+    },
+    {
+     "id": "peat_violet",
+     "display_name": "Peat Violet",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/peat_violet_t1.svg",
+      "res://assets/sprites/flowers/peat_violet_t2.svg",
+      "res://assets/sprites/flowers/peat_violet_t3.svg"
+     ]
+    },
+    {
+     "id": "cinder_buttercup",
+     "display_name": "Cinder Buttercup",
+     "rarity": 1,
+     "art": [
+      "res://assets/sprites/flowers/cinder_buttercup_t1.svg",
+      "res://assets/sprites/flowers/cinder_buttercup_t2.svg",
+      "res://assets/sprites/flowers/cinder_buttercup_t3.svg"
+     ]
+    },
+    {
+     "id": "flame_iris",
+     "display_name": "Flame Iris",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/flame_iris_t1.svg",
+      "res://assets/sprites/flowers/flame_iris_t2.svg",
+      "res://assets/sprites/flowers/flame_iris_t3.svg"
+     ]
+    },
+    {
+     "id": "smoke_lotus",
+     "display_name": "Smoke Lotus",
+     "rarity": 2,
+     "art": [
+      "res://assets/sprites/flowers/smoke_lotus_t1.svg",
+      "res://assets/sprites/flowers/smoke_lotus_t2.svg",
+      "res://assets/sprites/flowers/smoke_lotus_t3.svg"
+     ]
+    },
+    {
+     "id": "fenfire_crown",
+     "display_name": "Fenfire Crown",
+     "rarity": 3,
+     "art": [
+      "res://assets/sprites/flowers/fenfire_crown_t1.svg",
+      "res://assets/sprites/flowers/fenfire_crown_t2.svg",
+      "res://assets/sprites/flowers/fenfire_crown_t3.svg"
+     ]
+    }
+   ],
+   "card_order": [
+    "marsh_rush",
+    "fenfire_crown",
+    "flame_iris",
+    "peat_violet",
+    "cinder_buttercup",
+    "smoke_lotus"
+   ],
+   "price": null,
+   "prev_free": null,
+   "camp_flower": null
+  }
+ },
+ "legacy_removed": [
+  "frost_orchard",
+  "lantern_meadow",
+  "amber_canopy",
+  "coral_tide",
+  "starfall_glade",
+  "ember_fen"
+ ],
+ "surfaces": {
+  "card": {
+   "rect": [
+    24,
+    172,
+    1032,
+    1160
+   ],
+   "radius": 48,
+   "border": 4,
+   "shadow_y": 12,
+   "recipe": "kits[id].field",
+   "states": [
+    "active",
+    "owned",
+    "locked",
+    "buy",
+    "soon"
+   ],
+   "soon": {
+    "art_alpha": 0.5,
+    "tag": "Coming soon",
+    "tag_border": "dashed 4"
+   },
+   "swipe": {
+    "sec": 0.22,
+    "kind": "crossfade"
+   }
+  },
+  "transition": {
+   "open_ms": 560,
+   "close_ms": 440,
+   "ease": "TRANS_CUBIC EASE_IN_OUT",
+   "meadow_space": [
+    "SeasonBackdrop",
+    "MeadowSpots (13)",
+    "Ambient"
+   ],
+   "page_space": [
+    "FieldChrome",
+    "SeasonName",
+    "MeadowPip",
+    "PlayButton"
+   ],
+   "ambient_after": "u = 1, fade 0,3 s"
+  },
+  "field": {
+   "rect": [
+    0,
+    0,
+    1080,
+    1633
+   ],
+   "recipe": "kits[id].field",
+   "spots": "kits[id].spots [x%, y% od dna, size, roster idx, prag]",
+   "pip_zone_feet": [
+    151,
+    1306,
+    614,
+    131
+   ],
+   "pip_home": [
+    756,
+    1404
+   ],
+   "controls": {
+    "gift": [
+     24,
+     24,
+     180,
+     180
+    ],
+    "basket": [
+     24,
+     220,
+     180,
+     180
+    ],
+    "upgrades": [
+     876,
+     24,
+     180,
+     180
+    ],
+    "looks": [
+     876,
+     1265,
+     180,
+     180
+    ],
+    "grown_chip": [
+     228,
+     112,
+     624,
+     76
+    ],
+    "seasons": [
+     70,
+     1477,
+     236,
+     124
+    ],
+    "play": [
+     324,
+     1461,
+     432,
+     140
+    ],
+    "endless": [
+     774,
+     1477,
+     236,
+     124
+    ]
+   },
+   "pip_poses": {
+    "walk": "res://assets/sprites/pip_idle.svg",
+    "sniff": "res://assets/sprites/pip_sniff.svg",
+    "sleep": "res://assets/sprites/pip_sleep.svg"
+   }
+  },
+  "shop": {
+   "card": [
+    1032,
+    364
+   ],
+   "recipe": "kits[id].shop",
+   "seasons": [
+    "moonlit_warren",
+    "coral_tide",
+    "starfall_glade",
+    "ember_fen"
+   ],
+   "states": [
+    "buy",
+    "busy",
+    "pending",
+    "restoring",
+    "play",
+    "soon"
+   ],
+   "name_ink": "kits[id].palette.ink_field",
+   "soon_no_price": true
+  },
+  "camp": {
+   "card": [
+    1032,
+    318
+   ],
+   "padding": 22,
+   "recipe": "kits[id].camp",
+   "seasons": [
+    "frost_orchard",
+    "lantern_meadow",
+    "amber_canopy"
+   ],
+   "states": [
+    "short",
+    "ready",
+    "burst"
+   ],
+   "text": "#3D3D33",
+   "flower": "★3 prethodne besplatne sezone (prev_free)",
+   "burst": {
+    "r": "(0,2 + 0,8·t)·260",
+    "border": 14,
+    "color": "rgba(255,245,209,0,55·(1−t))"
+   }
+  },
+  "arena": {
+   "recipe": "UiArenaV2.FIELDS[id] + kits[id].arena (base, layers, addLayers, scatter, addScatter, combo); nepoznati ključevi se ignorišu"
+  },
+  "run": {
+   "lanes": [
+    270,
+    540,
+    810
+   ],
+   "lane_w": 200,
+   "lane_inner": 192,
+   "seams": [
+    405,
+    675
+   ],
+   "far_speed": 0.35,
+   "near_speed": 1,
+   "scroll_px_s": 400,
+   "material_kinds": [
+    "stripe",
+    "pebble",
+    "plank",
+    "rut"
+   ],
+   "obstacle_body": [
+    176,
+    150
+   ],
+   "obstacle_collar": [
+    240,
+    52
+   ],
+   "collision": [
+    64,
+    64
    ]
   }
  },
- "legacy": {
-  "frost_orchard": {
-   "name": "Frost Orchard",
-   "g": "#D1E6FF",
-   "kind": "free",
-   "phase": 2
+ "obstacles": {
+  "hay_bale": {
+   "season": "country_bloom",
+   "name": "Bala sijena",
+   "svg": "res://assets/sprites/seasons/country_bloom/obstacle_hay_bale.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#C9B98A",
+    "#A99A6A"
+   ],
+   "collision": [
+    64,
+    64
+   ]
   },
-  "lantern_meadow": {
-   "name": "Lantern Meadow",
-   "g": "#EBD6FF",
-   "kind": "free",
-   "phase": 2
+  "fence_gate": {
+   "season": "country_bloom",
+   "name": "Kapija ograde",
+   "svg": "res://assets/sprites/seasons/country_bloom/obstacle_fence_gate.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#C9B98A",
+    "#A99A6A"
+   ],
+   "collision": [
+    64,
+    64
+   ]
   },
-  "amber_canopy": {
-   "name": "Amber Canopy",
-   "g": "#FFEBC7",
-   "kind": "free",
-   "phase": 2
+  "ice_block": {
+   "season": "frost_orchard",
+   "name": "Blok leda",
+   "svg": "res://assets/sprites/seasons/frost_orchard/obstacle_ice_block.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#C9D7E6",
+    "#9FB2C8"
+   ],
+   "collision": [
+    64,
+    64
+   ]
   },
-  "coral_tide": {
-   "name": "Coral Tide",
-   "g": "#FFE0D6",
-   "kind": "paid",
-   "phase": 3
+  "snow_stump": {
+   "season": "frost_orchard",
+   "name": "Panj pod snijegom",
+   "svg": "res://assets/sprites/seasons/frost_orchard/obstacle_snow_stump.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#C9D7E6",
+    "#9FB2C8"
+   ],
+   "collision": [
+    64,
+    64
+   ]
   },
-  "starfall_glade": {
-   "name": "Starfall Glade",
-   "g": "#DBCCFF",
-   "kind": "paid",
-   "phase": 3
+  "lantern_post": {
+   "season": "lantern_meadow",
+   "name": "Stub s fenjerom",
+   "svg": "res://assets/sprites/seasons/lantern_meadow/obstacle_lantern_post.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#4A3E72",
+    "#6E5F9C"
+   ],
+   "collision": [
+    64,
+    64
+   ]
   },
-  "ember_fen": {
-   "name": "Ember Fen",
-   "g": "#FFC79E",
-   "kind": "paid",
-   "phase": 3
+  "mossy_stone": {
+   "season": "lantern_meadow",
+   "name": "Kamen s mahovinom",
+   "svg": "res://assets/sprites/seasons/lantern_meadow/obstacle_mossy_stone.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#4A3E72",
+    "#6E5F9C"
+   ],
+   "collision": [
+    64,
+    64
+   ]
+  },
+  "fallen_log": {
+   "season": "amber_canopy",
+   "name": "Srušeno deblo",
+   "svg": "res://assets/sprites/seasons/amber_canopy/obstacle_fallen_log.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#9C6A3E",
+    "#6E4524"
+   ],
+   "collision": [
+    64,
+    64
+   ]
+  },
+  "mushroom_stump": {
+   "season": "amber_canopy",
+   "name": "Panj s gljivama",
+   "svg": "res://assets/sprites/seasons/amber_canopy/obstacle_mushroom_stump.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#9C6A3E",
+    "#6E4524"
+   ],
+   "collision": [
+    64,
+    64
+   ]
+  },
+  "burrow_mound": {
+   "season": "moonlit_warren",
+   "name": "Humka s jazbinom",
+   "svg": "res://assets/sprites/seasons/moonlit_warren/obstacle_burrow_mound.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#3B4380",
+    "#5A62A8"
+   ],
+   "collision": [
+    64,
+    64
+   ]
+  },
+  "mossy_log": {
+   "season": "moonlit_warren",
+   "name": "Oboreno deblo s mahovinom",
+   "svg": "res://assets/sprites/seasons/moonlit_warren/obstacle_mossy_log.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#3B4380",
+    "#5A62A8"
+   ],
+   "collision": [
+    64,
+    64
+   ]
+  },
+  "shell_rock": {
+   "season": "coral_tide",
+   "name": "Stijena sa školjkama",
+   "svg": "res://assets/sprites/seasons/coral_tide/obstacle_shell_rock.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#E0BC9A",
+    "#B8916E"
+   ],
+   "collision": [
+    64,
+    64
+   ]
+  },
+  "coral_branch": {
+   "season": "coral_tide",
+   "name": "Koralj",
+   "svg": "res://assets/sprites/seasons/coral_tide/obstacle_coral_branch.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#E0BC9A",
+    "#B8916E"
+   ],
+   "collision": [
+    64,
+    64
+   ]
+  },
+  "meteorite": {
+   "season": "starfall_glade",
+   "name": "Meteorit",
+   "svg": "res://assets/sprites/seasons/starfall_glade/obstacle_meteorite.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#3D366E",
+    "#5E569C"
+   ],
+   "collision": [
+    64,
+    64
+   ]
+  },
+  "fir_stump": {
+   "season": "starfall_glade",
+   "name": "Panj jele",
+   "svg": "res://assets/sprites/seasons/starfall_glade/obstacle_fir_stump.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#3D366E",
+    "#5E569C"
+   ],
+   "collision": [
+    64,
+    64
+   ]
+  },
+  "smoldering_stump": {
+   "season": "ember_fen",
+   "name": "Panj koji tinja",
+   "svg": "res://assets/sprites/seasons/ember_fen/obstacle_smoldering_stump.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#5A3E30",
+    "#7E5844"
+   ],
+   "collision": [
+    64,
+    64
+   ]
+  },
+  "rush_tussock": {
+   "season": "ember_fen",
+   "name": "Busen rogoza u blatu",
+   "svg": "res://assets/sprites/seasons/ember_fen/obstacle_rush_tussock.svg",
+   "body": [
+    176,
+    150
+   ],
+   "collar": [
+    240,
+    52
+   ],
+   "collar_colors": [
+    "#5A3E30",
+    "#7E5844"
+   ],
+   "collision": [
+    64,
+    64
+   ]
   }
  },
+ "animations": {
+  "ambient": {
+   "max": 24,
+   "loops": 1,
+   "per_frame": "samo offset/rot/scale/alpha",
+   "motions": {
+    "drift": "pomak drift po ciklusu, fade na ivicama",
+    "fall": "drift + njihanje sway [px, talasa]",
+    "rise": "kao fall, drift prema gore",
+    "float": "ljuljanje ±drift oko tačke, alpha diše",
+    "twinkle": "stoji; alpha [min,max] + pulse",
+    "streak": "preleti drift u prvih duty (0,22) ciklusa"
+   },
+   "fields": [
+    "motion",
+    "n",
+    "shape",
+    "size",
+    "pal",
+    "pal2",
+    "zone",
+    "drift",
+    "sway",
+    "sec",
+    "rot",
+    "angle",
+    "alpha",
+    "fade",
+    "pulse",
+    "duty",
+    "ph"
+   ],
+   "sample": "ambientAt(L, t) u seasons_kit.js"
+  },
+  "flower_sway": {
+   "deg": 3,
+   "sec": "3 + (i % 5) · 0,5",
+   "phase": "−0,37 · i s",
+   "loop": "alternate",
+   "optional": true
+  },
+  "pip_sniff": {
+   "flower_bow": {
+    "sec": 0.3,
+    "scale": [
+     1,
+     1.08,
+     1
+    ],
+    "rot": [
+     0,
+     -4,
+     0
+    ],
+    "pivot": "base"
+   },
+   "puff": {
+    "n": 3,
+    "sec": 0.7,
+    "rise": 80,
+    "shape": "prvi sloj ambijenta sezone",
+    "stagger": 0.05
+   },
+   "hold": 1.3
+  },
+  "pip_sleep": {
+   "zzz": {
+    "n": 3,
+    "sec": 2.4,
+    "stagger": 0.6
+   },
+   "squash": [
+    1.04,
+    0.94
+   ],
+   "ambient_alpha": 0.35,
+   "ambient_fade": 1.2
+  },
+  "pip_walk": {
+   "bob": {
+    "sec": 0.42,
+    "y": -7,
+    "squash": [
+     0.97,
+     1.03
+    ]
+   },
+   "speed": 70,
+   "pause": [
+    0.7,
+    2.5
+   ]
+  },
+  "flower_grow": {
+   "sec": 0.42,
+   "scale": [
+    0,
+    1.12,
+    1
+   ],
+   "ease": "TRANS_BACK EASE_OUT"
+  },
+  "loops_per_screen": {
+   "field": "ambijent + njihanje (AttentionRing samo prazna korpa)",
+   "card": 0,
+   "shop": "busy tačke",
+   "camp": 0,
+   "arena": 0,
+   "run": "ambijent + MagnetRing"
+  }
+ },
+ "strings_en": {
+  "coming_soon": "Coming soon",
+  "unlock": "Unlock",
+  "unlocked": "Unlocked",
+  "yours": "Yours",
+  "back": "Back",
+  "play": "Play",
+  "seasons": "Seasons",
+  "endless": "Endless",
+  "looks": "Looks",
+  "grown": "grown",
+  "pending": "Pending",
+  "restoring": "Restoring",
+  "failed": "Didn’t go through",
+  "field_empty": "Nothing has grown here yet. Bring seeds back from a run.",
+  "season_names": {
+   "country_bloom": "Country Bloom",
+   "frost_orchard": "Frost Orchard",
+   "lantern_meadow": "Lantern Meadow",
+   "amber_canopy": "Amber Canopy",
+   "moonlit_warren": "Moonlit Warren",
+   "coral_tide": "Coral Tide Garden",
+   "starfall_glade": "Starfall Glade",
+   "ember_fen": "Ember Fen"
+  },
+  "flower_names": {
+   "clover": "Meadow Clover",
+   "daisy": "Field Daisy",
+   "buttercup": "Buttercup Lane",
+   "tulip": "Barn Tulip",
+   "sunflower": "Sunfence",
+   "pumpkin": "Harvest Pumpkin",
+   "frost_snowdrop": "Frost Snowdrop",
+   "ice_crocus": "Ice Crocus",
+   "silver_aconite": "Silver Aconite",
+   "winter_camellia": "Winter Camellia",
+   "hoarfrost_rose": "Hoarfrost Rose",
+   "crystal_peony": "Crystal Peony",
+   "dusk_firefly_grass": "Dusk Firefly Grass",
+   "paper_lantern_bloom": "Paper Lantern Bloom",
+   "evening_primrose": "Evening Primrose",
+   "foxfire_lily": "Foxfire Lily",
+   "glow_wisteria": "Glow Wisteria",
+   "midnight_lotus": "Midnight Lotus",
+   "copper_leaf": "Copper Leaf",
+   "maple_aster": "Maple Aster",
+   "russet_mallow": "Russet Mallow",
+   "cider_dahlia": "Cider Dahlia",
+   "golden_oak_bloom": "Golden Oak Bloom",
+   "amber_magnolia": "Amber Magnolia",
+   "moon_moss": "Moon Moss",
+   "nightshade_petal": "Nightshade Petal",
+   "silver_harebell": "Silver Harebell",
+   "lunar_orchid": "Lunar Orchid",
+   "star_jasmine": "Star Jasmine",
+   "umbral_lily": "Umbral Lily",
+   "sea_thrift": "Sea Thrift",
+   "salt_daisy": "Salt Daisy",
+   "tide_anemone": "Tide Anemone",
+   "coral_hibiscus": "Coral Hibiscus",
+   "pearl_waterlily": "Pearl Waterlily",
+   "reef_crown": "Reef Crown",
+   "comet_sprig": "Comet Sprig",
+   "nebula_clover": "Nebula Clover",
+   "meteor_daisy": "Meteor Daisy",
+   "aurora_tulip": "Aurora Tulip",
+   "galaxy_sunburst": "Galaxy Sunburst",
+   "nova_bloom": "Nova Bloom",
+   "marsh_rush": "Marsh Rush",
+   "peat_violet": "Peat Violet",
+   "cinder_buttercup": "Cinder Buttercup",
+   "flame_iris": "Flame Iris",
+   "smoke_lotus": "Smoke Lotus",
+   "fenfire_crown": "Fenfire Crown"
+  }
+ },
+ "godot_map": {
+  "res://data/seasons/seasons_kit.json": "ovaj fajl",
+  "UiSeasons (godot/ui_seasons.gd)": "konstante + helperi (ridge_y, scatter_at, spot_rects, ambient_at, lane_tile, kontrast)",
+  "SeasonBackdrop (novo, Control)": "crta recept (band/ridge/mow/fence/row/poly/ellipse/line/shape/scatter) — zamjenjuje ArenaMeadowBg za Home/Shop/Camp",
+  "SeasonAmbient (novo, Node2D)": "čestice iz kits[id].ambient / run.ambient — zamjenjuje season_ambient.gd specijalne slučajeve",
+  "home_v3_card.gd / season_field.gd": "SeasonBackdrop(recipe \"field\") u rectu kartice/polja",
+  "season_pack_card.gd (UiShopV2)": "SeasonBackdrop(recipe \"shop\")",
+  "season_link_card.gd (UiCamp)": "SeasonBackdrop(recipe \"camp\")",
+  "ui_arena_v2.gd": "FIELDS[id] spojen s kits[id].arena",
+  "lane_background.gd": "run.ground/lane/material_tile/far/near",
+  "obstacle_visual.gd": "Sprite2D iz obstacles[...].svg + collar",
+  "flower_assets.gd": "144 SVG po <type_id>_t<tier>"
+ },
+ "decisions": [
+  "Kit = red podataka, renderer = jedan; faza 2 dodaje 6 redova + generičke primitive (row, poly, ellipse, line, ridge.up/tilt, shape s listom tačaka).",
+  "Sve u 0–100 % recta (lekcija §10.1): grebeni se uzorkuju 0–100, zatvaraju na 0/100; MW Shop traka 101 → 100.",
+  "Ispod kontrola samo L ≥ 0,46 ili L ≤ 0,036; tamne sezone (Lantern, Starfall, Ember, MW) imaju svijetlu stranicu izbora i ink_field #FFF8F0.",
+  "Jedan format čestica (motion) za polje i run svih 8 sezona; legacy id petals/stars_motes ostaju u JSON-u radi postojećeg koda.",
+  "Run materijal generički (kind stripe/pebble/plank/rut); far/near = items [{shape, pal, at:[x,y,size,rot]}].",
+  "Ember Fen = soon: crteži 50 %, Coming soon s isprekidanim rubom, bez cijene i dugmeta u Shopu.",
+  "Camp cvijet = ★3 prethodne besplatne sezone (Frost → Harvest Pumpkin, Lantern → Crystal Peony, Amber → Midnight Lotus).",
+  "T3 na polju ostaje (kao faza 1); crteži su kristal bez krugova/prstenova/iskrica.",
+  "Camp link: jedna tvrda sjena 0 8 0 rgba(26,26,20,.22) umjesto meke 0 8 16 (pravilo §8); Lantern Arena usklađena s poljem (tamno tlo, crna trava i girlanda)."
+ ],
  "flowers": {
   "clover_t1": {
    "season": "country_bloom",
@@ -2903,6 +13117,1410 @@
     201
    ],
    "path": "res://assets/sprites/flowers/umbral_lily_t3.svg"
+  },
+  "frost_snowdrop_t1": {
+   "season": "frost_orchard",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 3991,
+   "crop": [
+    102,
+    141,
+    71,
+    111
+   ],
+   "path": "res://assets/sprites/flowers/frost_snowdrop_t1.svg"
+  },
+  "frost_snowdrop_t2": {
+   "season": "frost_orchard",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 4071,
+   "crop": [
+    99,
+    102,
+    93,
+    150
+   ],
+   "path": "res://assets/sprites/flowers/frost_snowdrop_t2.svg"
+  },
+  "frost_snowdrop_t3": {
+   "season": "frost_orchard",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 3420,
+   "crop": [
+    99,
+    103,
+    94,
+    149
+   ],
+   "path": "res://assets/sprites/flowers/frost_snowdrop_t3.svg"
+  },
+  "ice_crocus_t1": {
+   "season": "frost_orchard",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 4829,
+   "crop": [
+    103,
+    123,
+    50,
+    130
+   ],
+   "path": "res://assets/sprites/flowers/ice_crocus_t1.svg"
+  },
+  "ice_crocus_t2": {
+   "season": "frost_orchard",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 5428,
+   "crop": [
+    92,
+    77,
+    72,
+    176
+   ],
+   "path": "res://assets/sprites/flowers/ice_crocus_t2.svg"
+  },
+  "ice_crocus_t3": {
+   "season": "frost_orchard",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 4707,
+   "crop": [
+    90,
+    77,
+    76,
+    176
+   ],
+   "path": "res://assets/sprites/flowers/ice_crocus_t3.svg"
+  },
+  "silver_aconite_t1": {
+   "season": "frost_orchard",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 7385,
+   "crop": [
+    94,
+    130,
+    68,
+    123
+   ],
+   "path": "res://assets/sprites/flowers/silver_aconite_t1.svg"
+  },
+  "silver_aconite_t2": {
+   "season": "frost_orchard",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 8517,
+   "crop": [
+    91,
+    96,
+    74,
+    157
+   ],
+   "path": "res://assets/sprites/flowers/silver_aconite_t2.svg"
+  },
+  "silver_aconite_t3": {
+   "season": "frost_orchard",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 7303,
+   "crop": [
+    91,
+    95,
+    74,
+    158
+   ],
+   "path": "res://assets/sprites/flowers/silver_aconite_t3.svg"
+  },
+  "winter_camellia_t1": {
+   "season": "frost_orchard",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 7805,
+   "crop": [
+    93,
+    115,
+    74,
+    138
+   ],
+   "path": "res://assets/sprites/flowers/winter_camellia_t1.svg"
+  },
+  "winter_camellia_t2": {
+   "season": "frost_orchard",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 11146,
+   "crop": [
+    86,
+    69,
+    105,
+    184
+   ],
+   "path": "res://assets/sprites/flowers/winter_camellia_t2.svg"
+  },
+  "winter_camellia_t3": {
+   "season": "frost_orchard",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 8114,
+   "crop": [
+    86,
+    69,
+    107,
+    184
+   ],
+   "path": "res://assets/sprites/flowers/winter_camellia_t3.svg"
+  },
+  "hoarfrost_rose_t1": {
+   "season": "frost_orchard",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 6215,
+   "crop": [
+    95,
+    109,
+    69,
+    144
+   ],
+   "path": "res://assets/sprites/flowers/hoarfrost_rose_t1.svg"
+  },
+  "hoarfrost_rose_t2": {
+   "season": "frost_orchard",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 8289,
+   "crop": [
+    67,
+    63,
+    109,
+    190
+   ],
+   "path": "res://assets/sprites/flowers/hoarfrost_rose_t2.svg"
+  },
+  "hoarfrost_rose_t3": {
+   "season": "frost_orchard",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 8818,
+   "crop": [
+    65,
+    63,
+    111,
+    190
+   ],
+   "path": "res://assets/sprites/flowers/hoarfrost_rose_t3.svg"
+  },
+  "crystal_peony_t1": {
+   "season": "frost_orchard",
+   "rarity": 3,
+   "tier": 1,
+   "bytes": 8569,
+   "crop": [
+    88,
+    103,
+    81,
+    151
+   ],
+   "path": "res://assets/sprites/flowers/crystal_peony_t1.svg"
+  },
+  "crystal_peony_t2": {
+   "season": "frost_orchard",
+   "rarity": 3,
+   "tier": 2,
+   "bytes": 11429,
+   "crop": [
+    43,
+    58,
+    170,
+    196
+   ],
+   "path": "res://assets/sprites/flowers/crystal_peony_t2.svg"
+  },
+  "crystal_peony_t3": {
+   "season": "frost_orchard",
+   "rarity": 3,
+   "tier": 3,
+   "bytes": 11610,
+   "crop": [
+    40,
+    58,
+    176,
+    196
+   ],
+   "path": "res://assets/sprites/flowers/crystal_peony_t3.svg"
+  },
+  "dusk_firefly_grass_t1": {
+   "season": "lantern_meadow",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 2146,
+   "crop": [
+    97,
+    135,
+    68,
+    114
+   ],
+   "path": "res://assets/sprites/flowers/dusk_firefly_grass_t1.svg"
+  },
+  "dusk_firefly_grass_t2": {
+   "season": "lantern_meadow",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 6483,
+   "crop": [
+    55,
+    84,
+    159,
+    165
+   ],
+   "path": "res://assets/sprites/flowers/dusk_firefly_grass_t2.svg"
+  },
+  "dusk_firefly_grass_t3": {
+   "season": "lantern_meadow",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 6520,
+   "crop": [
+    55,
+    85,
+    159,
+    164
+   ],
+   "path": "res://assets/sprites/flowers/dusk_firefly_grass_t3.svg"
+  },
+  "paper_lantern_bloom_t1": {
+   "season": "lantern_meadow",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 2127,
+   "crop": [
+    97,
+    89,
+    121,
+    164
+   ],
+   "path": "res://assets/sprites/flowers/paper_lantern_bloom_t1.svg"
+  },
+  "paper_lantern_bloom_t2": {
+   "season": "lantern_meadow",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 4962,
+   "crop": [
+    73,
+    89,
+    158,
+    164
+   ],
+   "path": "res://assets/sprites/flowers/paper_lantern_bloom_t2.svg"
+  },
+  "paper_lantern_bloom_t3": {
+   "season": "lantern_meadow",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 4463,
+   "crop": [
+    73,
+    89,
+    158,
+    164
+   ],
+   "path": "res://assets/sprites/flowers/paper_lantern_bloom_t3.svg"
+  },
+  "evening_primrose_t1": {
+   "season": "lantern_meadow",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 4761,
+   "crop": [
+    93,
+    113,
+    70,
+    140
+   ],
+   "path": "res://assets/sprites/flowers/evening_primrose_t1.svg"
+  },
+  "evening_primrose_t2": {
+   "season": "lantern_meadow",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 6247,
+   "crop": [
+    85,
+    70,
+    86,
+    183
+   ],
+   "path": "res://assets/sprites/flowers/evening_primrose_t2.svg"
+  },
+  "evening_primrose_t3": {
+   "season": "lantern_meadow",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 3825,
+   "crop": [
+    86,
+    72,
+    84,
+    181
+   ],
+   "path": "res://assets/sprites/flowers/evening_primrose_t3.svg"
+  },
+  "foxfire_lily_t1": {
+   "season": "lantern_meadow",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 5931,
+   "crop": [
+    87,
+    99,
+    81,
+    154
+   ],
+   "path": "res://assets/sprites/flowers/foxfire_lily_t1.svg"
+  },
+  "foxfire_lily_t2": {
+   "season": "lantern_meadow",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 8735,
+   "crop": [
+    70,
+    57,
+    124,
+    196
+   ],
+   "path": "res://assets/sprites/flowers/foxfire_lily_t2.svg"
+  },
+  "foxfire_lily_t3": {
+   "season": "lantern_meadow",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 5935,
+   "crop": [
+    70,
+    57,
+    126,
+    196
+   ],
+   "path": "res://assets/sprites/flowers/foxfire_lily_t3.svg"
+  },
+  "glow_wisteria_t1": {
+   "season": "lantern_meadow",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 4083,
+   "crop": [
+    86,
+    65,
+    119,
+    188
+   ],
+   "path": "res://assets/sprites/flowers/glow_wisteria_t1.svg"
+  },
+  "glow_wisteria_t2": {
+   "season": "lantern_meadow",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 11376,
+   "crop": [
+    57,
+    65,
+    163,
+    188
+   ],
+   "path": "res://assets/sprites/flowers/glow_wisteria_t2.svg"
+  },
+  "glow_wisteria_t3": {
+   "season": "lantern_meadow",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 10681,
+   "crop": [
+    58,
+    65,
+    161,
+    188
+   ],
+   "path": "res://assets/sprites/flowers/glow_wisteria_t3.svg"
+  },
+  "midnight_lotus_t1": {
+   "season": "lantern_meadow",
+   "rarity": 3,
+   "tier": 1,
+   "bytes": 5097,
+   "crop": [
+    31,
+    170,
+    174,
+    79
+   ],
+   "path": "res://assets/sprites/flowers/midnight_lotus_t1.svg"
+  },
+  "midnight_lotus_t2": {
+   "season": "lantern_meadow",
+   "rarity": 3,
+   "tier": 2,
+   "bytes": 8453,
+   "crop": [
+    31,
+    153,
+    209,
+    98
+   ],
+   "path": "res://assets/sprites/flowers/midnight_lotus_t2.svg"
+  },
+  "midnight_lotus_t3": {
+   "season": "lantern_meadow",
+   "rarity": 3,
+   "tier": 3,
+   "bytes": 7909,
+   "crop": [
+    31,
+    153,
+    209,
+    98
+   ],
+   "path": "res://assets/sprites/flowers/midnight_lotus_t3.svg"
+  },
+  "copper_leaf_t1": {
+   "season": "amber_canopy",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 2252,
+   "crop": [
+    96,
+    130,
+    64,
+    122
+   ],
+   "path": "res://assets/sprites/flowers/copper_leaf_t1.svg"
+  },
+  "copper_leaf_t2": {
+   "season": "amber_canopy",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 5041,
+   "crop": [
+    89,
+    60,
+    85,
+    193
+   ],
+   "path": "res://assets/sprites/flowers/copper_leaf_t2.svg"
+  },
+  "copper_leaf_t3": {
+   "season": "amber_canopy",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 2535,
+   "crop": [
+    88,
+    60,
+    88,
+    193
+   ],
+   "path": "res://assets/sprites/flowers/copper_leaf_t3.svg"
+  },
+  "maple_aster_t1": {
+   "season": "amber_canopy",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 9461,
+   "crop": [
+    98,
+    116,
+    60,
+    137
+   ],
+   "path": "res://assets/sprites/flowers/maple_aster_t1.svg"
+  },
+  "maple_aster_t2": {
+   "season": "amber_canopy",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 10437,
+   "crop": [
+    87,
+    63,
+    82,
+    190
+   ],
+   "path": "res://assets/sprites/flowers/maple_aster_t2.svg"
+  },
+  "maple_aster_t3": {
+   "season": "amber_canopy",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 8849,
+   "crop": [
+    87,
+    63,
+    82,
+    190
+   ],
+   "path": "res://assets/sprites/flowers/maple_aster_t3.svg"
+  },
+  "russet_mallow_t1": {
+   "season": "amber_canopy",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 5463,
+   "crop": [
+    93,
+    113,
+    70,
+    140
+   ],
+   "path": "res://assets/sprites/flowers/russet_mallow_t1.svg"
+  },
+  "russet_mallow_t2": {
+   "season": "amber_canopy",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 6886,
+   "crop": [
+    80,
+    65,
+    96,
+    188
+   ],
+   "path": "res://assets/sprites/flowers/russet_mallow_t2.svg"
+  },
+  "russet_mallow_t3": {
+   "season": "amber_canopy",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 4246,
+   "crop": [
+    83,
+    65,
+    90,
+    188
+   ],
+   "path": "res://assets/sprites/flowers/russet_mallow_t3.svg"
+  },
+  "cider_dahlia_t1": {
+   "season": "amber_canopy",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 7548,
+   "crop": [
+    93,
+    107,
+    73,
+    146
+   ],
+   "path": "res://assets/sprites/flowers/cider_dahlia_t1.svg"
+  },
+  "cider_dahlia_t2": {
+   "season": "amber_canopy",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 9792,
+   "crop": [
+    79,
+    59,
+    118,
+    194
+   ],
+   "path": "res://assets/sprites/flowers/cider_dahlia_t2.svg"
+  },
+  "cider_dahlia_t3": {
+   "season": "amber_canopy",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 10442,
+   "crop": [
+    79,
+    59,
+    121,
+    194
+   ],
+   "path": "res://assets/sprites/flowers/cider_dahlia_t3.svg"
+  },
+  "golden_oak_bloom_t1": {
+   "season": "amber_canopy",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 3000,
+   "crop": [
+    94,
+    84,
+    54,
+    169
+   ],
+   "path": "res://assets/sprites/flowers/golden_oak_bloom_t1.svg"
+  },
+  "golden_oak_bloom_t2": {
+   "season": "amber_canopy",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 10852,
+   "crop": [
+    69,
+    70,
+    121,
+    183
+   ],
+   "path": "res://assets/sprites/flowers/golden_oak_bloom_t2.svg"
+  },
+  "golden_oak_bloom_t3": {
+   "season": "amber_canopy",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 9276,
+   "crop": [
+    70,
+    71,
+    119,
+    182
+   ],
+   "path": "res://assets/sprites/flowers/golden_oak_bloom_t3.svg"
+  },
+  "amber_magnolia_t1": {
+   "season": "amber_canopy",
+   "rarity": 3,
+   "tier": 1,
+   "bytes": 5232,
+   "crop": [
+    85,
+    102,
+    91,
+    152
+   ],
+   "path": "res://assets/sprites/flowers/amber_magnolia_t1.svg"
+  },
+  "amber_magnolia_t2": {
+   "season": "amber_canopy",
+   "rarity": 3,
+   "tier": 2,
+   "bytes": 7849,
+   "crop": [
+    33,
+    49,
+    186,
+    205
+   ],
+   "path": "res://assets/sprites/flowers/amber_magnolia_t2.svg"
+  },
+  "amber_magnolia_t3": {
+   "season": "amber_canopy",
+   "rarity": 3,
+   "tier": 3,
+   "bytes": 7472,
+   "crop": [
+    32,
+    49,
+    190,
+    205
+   ],
+   "path": "res://assets/sprites/flowers/amber_magnolia_t3.svg"
+  },
+  "sea_thrift_t1": {
+   "season": "coral_tide",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 3228,
+   "crop": [
+    89,
+    125,
+    73,
+    124
+   ],
+   "path": "res://assets/sprites/flowers/sea_thrift_t1.svg"
+  },
+  "sea_thrift_t2": {
+   "season": "coral_tide",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 5696,
+   "crop": [
+    71,
+    60,
+    117,
+    189
+   ],
+   "path": "res://assets/sprites/flowers/sea_thrift_t2.svg"
+  },
+  "sea_thrift_t3": {
+   "season": "coral_tide",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 5115,
+   "crop": [
+    73,
+    62,
+    113,
+    187
+   ],
+   "path": "res://assets/sprites/flowers/sea_thrift_t3.svg"
+  },
+  "salt_daisy_t1": {
+   "season": "coral_tide",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 8529,
+   "crop": [
+    98,
+    110,
+    60,
+    143
+   ],
+   "path": "res://assets/sprites/flowers/salt_daisy_t1.svg"
+  },
+  "salt_daisy_t2": {
+   "season": "coral_tide",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 9470,
+   "crop": [
+    82,
+    55,
+    92,
+    198
+   ],
+   "path": "res://assets/sprites/flowers/salt_daisy_t2.svg"
+  },
+  "salt_daisy_t3": {
+   "season": "coral_tide",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 8096,
+   "crop": [
+    82,
+    55,
+    92,
+    198
+   ],
+   "path": "res://assets/sprites/flowers/salt_daisy_t3.svg"
+  },
+  "tide_anemone_t1": {
+   "season": "coral_tide",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 5899,
+   "crop": [
+    98,
+    119,
+    59,
+    134
+   ],
+   "path": "res://assets/sprites/flowers/tide_anemone_t1.svg"
+  },
+  "tide_anemone_t2": {
+   "season": "coral_tide",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 6967,
+   "crop": [
+    92,
+    71,
+    72,
+    182
+   ],
+   "path": "res://assets/sprites/flowers/tide_anemone_t2.svg"
+  },
+  "tide_anemone_t3": {
+   "season": "coral_tide",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 4552,
+   "crop": [
+    90,
+    71,
+    76,
+    182
+   ],
+   "path": "res://assets/sprites/flowers/tide_anemone_t3.svg"
+  },
+  "coral_hibiscus_t1": {
+   "season": "coral_tide",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 6276,
+   "crop": [
+    87,
+    104,
+    80,
+    149
+   ],
+   "path": "res://assets/sprites/flowers/coral_hibiscus_t1.svg"
+  },
+  "coral_hibiscus_t2": {
+   "season": "coral_tide",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 8505,
+   "crop": [
+    70,
+    58,
+    129,
+    195
+   ],
+   "path": "res://assets/sprites/flowers/coral_hibiscus_t2.svg"
+  },
+  "coral_hibiscus_t3": {
+   "season": "coral_tide",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 4955,
+   "crop": [
+    70,
+    58,
+    132,
+    195
+   ],
+   "path": "res://assets/sprites/flowers/coral_hibiscus_t3.svg"
+  },
+  "pearl_waterlily_t1": {
+   "season": "coral_tide",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 6699,
+   "crop": [
+    35,
+    158,
+    160,
+    90
+   ],
+   "path": "res://assets/sprites/flowers/pearl_waterlily_t1.svg"
+  },
+  "pearl_waterlily_t2": {
+   "season": "coral_tide",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 8907,
+   "crop": [
+    35,
+    162,
+    209,
+    89
+   ],
+   "path": "res://assets/sprites/flowers/pearl_waterlily_t2.svg"
+  },
+  "pearl_waterlily_t3": {
+   "season": "coral_tide",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 9139,
+   "crop": [
+    35,
+    162,
+    209,
+    89
+   ],
+   "path": "res://assets/sprites/flowers/pearl_waterlily_t3.svg"
+  },
+  "reef_crown_t1": {
+   "season": "coral_tide",
+   "rarity": 3,
+   "tier": 1,
+   "bytes": 8471,
+   "crop": [
+    99,
+    111,
+    58,
+    144
+   ],
+   "path": "res://assets/sprites/flowers/reef_crown_t1.svg"
+  },
+  "reef_crown_t2": {
+   "season": "coral_tide",
+   "rarity": 3,
+   "tier": 2,
+   "bytes": 10868,
+   "crop": [
+    48,
+    67,
+    164,
+    188
+   ],
+   "path": "res://assets/sprites/flowers/reef_crown_t2.svg"
+  },
+  "reef_crown_t3": {
+   "season": "coral_tide",
+   "rarity": 3,
+   "tier": 3,
+   "bytes": 10458,
+   "crop": [
+    48,
+    67,
+    164,
+    188
+   ],
+   "path": "res://assets/sprites/flowers/reef_crown_t3.svg"
+  },
+  "comet_sprig_t1": {
+   "season": "starfall_glade",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 2359,
+   "crop": [
+    92,
+    126,
+    77,
+    123
+   ],
+   "path": "res://assets/sprites/flowers/comet_sprig_t1.svg"
+  },
+  "comet_sprig_t2": {
+   "season": "starfall_glade",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 4905,
+   "crop": [
+    49,
+    72,
+    161,
+    177
+   ],
+   "path": "res://assets/sprites/flowers/comet_sprig_t2.svg"
+  },
+  "comet_sprig_t3": {
+   "season": "starfall_glade",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 6229,
+   "crop": [
+    49,
+    72,
+    161,
+    177
+   ],
+   "path": "res://assets/sprites/flowers/comet_sprig_t3.svg"
+  },
+  "nebula_clover_t1": {
+   "season": "starfall_glade",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 3266,
+   "crop": [
+    89,
+    134,
+    78,
+    119
+   ],
+   "path": "res://assets/sprites/flowers/nebula_clover_t1.svg"
+  },
+  "nebula_clover_t2": {
+   "season": "starfall_glade",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 7212,
+   "crop": [
+    69,
+    56,
+    132,
+    197
+   ],
+   "path": "res://assets/sprites/flowers/nebula_clover_t2.svg"
+  },
+  "nebula_clover_t3": {
+   "season": "starfall_glade",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 4761,
+   "crop": [
+    75,
+    56,
+    123,
+    197
+   ],
+   "path": "res://assets/sprites/flowers/nebula_clover_t3.svg"
+  },
+  "meteor_daisy_t1": {
+   "season": "starfall_glade",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 6605,
+   "crop": [
+    98,
+    110,
+    60,
+    143
+   ],
+   "path": "res://assets/sprites/flowers/meteor_daisy_t1.svg"
+  },
+  "meteor_daisy_t2": {
+   "season": "starfall_glade",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 6625,
+   "crop": [
+    79,
+    61,
+    98,
+    192
+   ],
+   "path": "res://assets/sprites/flowers/meteor_daisy_t2.svg"
+  },
+  "meteor_daisy_t3": {
+   "season": "starfall_glade",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 6750,
+   "crop": [
+    79,
+    61,
+    98,
+    192
+   ],
+   "path": "res://assets/sprites/flowers/meteor_daisy_t3.svg"
+  },
+  "aurora_tulip_t1": {
+   "season": "starfall_glade",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 3715,
+   "crop": [
+    98,
+    114,
+    63,
+    139
+   ],
+   "path": "res://assets/sprites/flowers/aurora_tulip_t1.svg"
+  },
+  "aurora_tulip_t2": {
+   "season": "starfall_glade",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 4159,
+   "crop": [
+    87,
+    65,
+    105,
+    188
+   ],
+   "path": "res://assets/sprites/flowers/aurora_tulip_t2.svg"
+  },
+  "aurora_tulip_t3": {
+   "season": "starfall_glade",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 3439,
+   "crop": [
+    85,
+    65,
+    110,
+    188
+   ],
+   "path": "res://assets/sprites/flowers/aurora_tulip_t3.svg"
+  },
+  "galaxy_sunburst_t1": {
+   "season": "starfall_glade",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 9946,
+   "crop": [
+    89,
+    101,
+    78,
+    153
+   ],
+   "path": "res://assets/sprites/flowers/galaxy_sunburst_t1.svg"
+  },
+  "galaxy_sunburst_t2": {
+   "season": "starfall_glade",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 11215,
+   "crop": [
+    73,
+    45,
+    110,
+    209
+   ],
+   "path": "res://assets/sprites/flowers/galaxy_sunburst_t2.svg"
+  },
+  "galaxy_sunburst_t3": {
+   "season": "starfall_glade",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 10467,
+   "crop": [
+    73,
+    45,
+    110,
+    209
+   ],
+   "path": "res://assets/sprites/flowers/galaxy_sunburst_t3.svg"
+  },
+  "nova_bloom_t1": {
+   "season": "starfall_glade",
+   "rarity": 3,
+   "tier": 1,
+   "bytes": 7558,
+   "crop": [
+    92,
+    102,
+    75,
+    151
+   ],
+   "path": "res://assets/sprites/flowers/nova_bloom_t1.svg"
+  },
+  "nova_bloom_t2": {
+   "season": "starfall_glade",
+   "rarity": 3,
+   "tier": 2,
+   "bytes": 11154,
+   "crop": [
+    43,
+    52,
+    172,
+    201
+   ],
+   "path": "res://assets/sprites/flowers/nova_bloom_t2.svg"
+  },
+  "nova_bloom_t3": {
+   "season": "starfall_glade",
+   "rarity": 3,
+   "tier": 3,
+   "bytes": 11971,
+   "crop": [
+    40,
+    52,
+    178,
+    201
+   ],
+   "path": "res://assets/sprites/flowers/nova_bloom_t3.svg"
+  },
+  "marsh_rush_t1": {
+   "season": "ember_fen",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 2099,
+   "crop": [
+    98,
+    128,
+    63,
+    121
+   ],
+   "path": "res://assets/sprites/flowers/marsh_rush_t1.svg"
+  },
+  "marsh_rush_t2": {
+   "season": "ember_fen",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 3605,
+   "crop": [
+    63,
+    71,
+    138,
+    178
+   ],
+   "path": "res://assets/sprites/flowers/marsh_rush_t2.svg"
+  },
+  "marsh_rush_t3": {
+   "season": "ember_fen",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 3273,
+   "crop": [
+    63,
+    71,
+    138,
+    178
+   ],
+   "path": "res://assets/sprites/flowers/marsh_rush_t3.svg"
+  },
+  "peat_violet_t1": {
+   "season": "ember_fen",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 5245,
+   "crop": [
+    98,
+    131,
+    60,
+    122
+   ],
+   "path": "res://assets/sprites/flowers/peat_violet_t1.svg"
+  },
+  "peat_violet_t2": {
+   "season": "ember_fen",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 5397,
+   "crop": [
+    92,
+    90,
+    72,
+    163
+   ],
+   "path": "res://assets/sprites/flowers/peat_violet_t2.svg"
+  },
+  "peat_violet_t3": {
+   "season": "ember_fen",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 4329,
+   "crop": [
+    92,
+    89,
+    72,
+    164
+   ],
+   "path": "res://assets/sprites/flowers/peat_violet_t3.svg"
+  },
+  "cinder_buttercup_t1": {
+   "season": "ember_fen",
+   "rarity": 1,
+   "tier": 1,
+   "bytes": 4538,
+   "crop": [
+    99,
+    120,
+    58,
+    133
+   ],
+   "path": "res://assets/sprites/flowers/cinder_buttercup_t1.svg"
+  },
+  "cinder_buttercup_t2": {
+   "season": "ember_fen",
+   "rarity": 1,
+   "tier": 2,
+   "bytes": 5668,
+   "crop": [
+    89,
+    69,
+    78,
+    184
+   ],
+   "path": "res://assets/sprites/flowers/cinder_buttercup_t2.svg"
+  },
+  "cinder_buttercup_t3": {
+   "season": "ember_fen",
+   "rarity": 1,
+   "tier": 3,
+   "bytes": 4218,
+   "crop": [
+    89,
+    69,
+    78,
+    184
+   ],
+   "path": "res://assets/sprites/flowers/cinder_buttercup_t3.svg"
+  },
+  "flame_iris_t1": {
+   "season": "ember_fen",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 5295,
+   "crop": [
+    90,
+    107,
+    69,
+    146
+   ],
+   "path": "res://assets/sprites/flowers/flame_iris_t1.svg"
+  },
+  "flame_iris_t2": {
+   "season": "ember_fen",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 5706,
+   "crop": [
+    78,
+    71,
+    115,
+    182
+   ],
+   "path": "res://assets/sprites/flowers/flame_iris_t2.svg"
+  },
+  "flame_iris_t3": {
+   "season": "ember_fen",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 4715,
+   "crop": [
+    78,
+    71,
+    117,
+    182
+   ],
+   "path": "res://assets/sprites/flowers/flame_iris_t3.svg"
+  },
+  "smoke_lotus_t1": {
+   "season": "ember_fen",
+   "rarity": 2,
+   "tier": 1,
+   "bytes": 4334,
+   "crop": [
+    35,
+    177,
+    167,
+    73
+   ],
+   "path": "res://assets/sprites/flowers/smoke_lotus_t1.svg"
+  },
+  "smoke_lotus_t2": {
+   "season": "ember_fen",
+   "rarity": 2,
+   "tier": 2,
+   "bytes": 5797,
+   "crop": [
+    35,
+    164,
+    182,
+    87
+   ],
+   "path": "res://assets/sprites/flowers/smoke_lotus_t2.svg"
+  },
+  "smoke_lotus_t3": {
+   "season": "ember_fen",
+   "rarity": 2,
+   "tier": 3,
+   "bytes": 5299,
+   "crop": [
+    35,
+    164,
+    183,
+    87
+   ],
+   "path": "res://assets/sprites/flowers/smoke_lotus_t3.svg"
+  },
+  "fenfire_crown_t1": {
+   "season": "ember_fen",
+   "rarity": 3,
+   "tier": 1,
+   "bytes": 6720,
+   "crop": [
+    92,
+    99,
+    75,
+    155
+   ],
+   "path": "res://assets/sprites/flowers/fenfire_crown_t1.svg"
+  },
+  "fenfire_crown_t2": {
+   "season": "ember_fen",
+   "rarity": 3,
+   "tier": 2,
+   "bytes": 11189,
+   "crop": [
+    31,
+    51,
+    197,
+    203
+   ],
+   "path": "res://assets/sprites/flowers/fenfire_crown_t2.svg"
+  },
+  "fenfire_crown_t3": {
+   "season": "ember_fen",
+   "rarity": 3,
+   "tier": 3,
+   "bytes": 11922,
+   "crop": [
+    31,
+    51,
+    197,
+    203
+   ],
+   "path": "res://assets/sprites/flowers/fenfire_crown_t3.svg"
   }
  }
 }

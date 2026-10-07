@@ -17,6 +17,9 @@ var _icons: Array[Control] = []
 var _halos: Array[Panel] = []
 var _entry: Dictionary = {}
 var _built: bool = false
+## Ključevi zadnjeg stila — _refresh ne dira theme override koji se nije promijenio
+## (svaki override ponovo računa raspored, a Journal ima do 48 redova).
+var _applied: Dictionary = {}
 
 
 func apply(entry: Dictionary) -> void:
@@ -47,6 +50,10 @@ func get_caption_text() -> String:
 
 func get_name_text() -> String:
 	return _name.text if _name else ""
+
+
+func get_type_id() -> String:
+	return str(_entry.get("type_id", ""))
 
 
 func is_new_visible() -> bool:
@@ -183,33 +190,45 @@ func _refresh() -> void:
 	var caption_ink := UiJournal.DISABLED_INK if locked else (UiJournal.INK if show_new else UiJournal.CAPTION_INK)
 	var caption_weight := 800 if show_new else 700
 
-	_panel.add_theme_stylebox_override("panel", UiJournal.row_style(rarity, locked))
+	if _changed("panel", "%d:%s" % [rarity, locked]):
+		_panel.add_theme_stylebox_override("panel", UiJournal.row_style(rarity, locked))
 	_name.text = str(_entry.get("display_name", "???"))
 	_stars.text = UiJournal.rarity_stars(rarity)
 	_caption.text = UiJournal.caption_for(_entry, show_new)
-	UiStage.style(_name, 900, UiJournal.NAME_FONT, ink)
-	UiStage.style(_stars, 800, UiJournal.STARS_FONT, ink)
-	UiStage.style(_caption, caption_weight, UiJournal.CAPTION_FONT, caption_ink, float(UiJournal.CAPTION_LINE) / float(UiJournal.CAPTION_FONT))
+	if _changed("ink", str(locked)):
+		UiStage.style(_name, 900, UiJournal.NAME_FONT, ink)
+		UiStage.style(_stars, 800, UiJournal.STARS_FONT, ink)
+	if _changed("caption", "%s:%s" % [locked, show_new]):
+		UiStage.style(_caption, caption_weight, UiJournal.CAPTION_FONT, caption_ink, float(UiJournal.CAPTION_LINE) / float(UiJournal.CAPTION_FONT))
 
 	for i in 3:
 		var tier := i + 1
 		var on := tier <= filled
 		var crystal := on and tier == 3
 		var kind := "crystal" if crystal else ("bloom" if on else "empty")
-		_frames[i].add_theme_stylebox_override("panel", UiJournal.tier_frame_style(kind))
+		if _changed("frame%d" % i, kind):
+			_frames[i].add_theme_stylebox_override("panel", UiJournal.tier_frame_style(kind))
 		var icon := _icons[i]
 		icon.visible = on
 		if icon.has_method("apply"):
 			icon.call("apply", type_id, tier if on else 0, not on)
 		_halos[i].visible = show_new and tier == new_tier
-		if _halos[i].visible:
+		if _halos[i].visible and _changed("halo%d" % i, str(crystal)):
 			_halos[i].add_theme_stylebox_override("panel", UiJournal.tier_halo_style(crystal))
 
 	_badge.visible = show_new
 	if show_new:
-		UiStage.style(_badge_label, 900, UiJournal.NEW_BADGE_FONT, UiJournal.INK, 1.0, 0.06)
+		if _changed("badge", "on"):
+			UiStage.style(_badge_label, 900, UiJournal.NEW_BADGE_FONT, UiJournal.INK, 1.0, 0.06)
 		_badge.reset_size()
 	_fit_name()
+
+
+func _changed(slot: String, key: String) -> bool:
+	if _applied.get(slot, "") == key:
+		return false
+	_applied[slot] = key
+	return true
 
 
 ## Ime stoji uz zvjezdice; ako ne stane, samo se ime reže.
