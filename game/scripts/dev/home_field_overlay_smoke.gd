@@ -11,16 +11,11 @@ const PAGE := Vector2(1080.0, 1633.0)
 const TOL := 1.5
 
 var _failed: bool = false
-var _backup: String = ""
+var _backup := ""
 
 
 func _initialize() -> void:
 	_backup = CampSmokeUtil.backup_save()
-	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
-	if err != OK:
-		push_error("home_field_overlay_smoke: hub load failed %d" % err)
-		_quit(1)
-		return
 	call_deferred("_run")
 
 
@@ -40,12 +35,26 @@ func _settle(frames: int = 6) -> void:
 
 
 func _run() -> void:
+	var gs := get_root().get_node_or_null("GameState")
+	if gs == null:
+		_fail("GameState missing")
+		_quit(1)
+		return
+	# Stanje ne smije zavisiti od developerovog save-a: fokus na nekupljenoj
+	# premium sezoni (home_band "paid") ne otvara polje.
+	gs.set("skip_debug_season_unlock", true)
+	gs.call("reset_seasons_to_s1")
+	gs.set("tutorial_complete", true)
+	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
+	if err != OK:
+		_fail("hub load failed %d" % err)
+		_quit(1)
+		return
 	for _i in 14:
 		await process_frame
-	var gs := get_root().get_node_or_null("GameState")
 	var hubs := get_nodes_in_group("meta_hub")
-	if gs == null or hubs.is_empty():
-		_fail("GameState / meta_hub missing")
+	if hubs.is_empty():
+		_fail("meta_hub missing")
 		_quit(1)
 		return
 	var hub := hubs[0] as Control
