@@ -94,13 +94,49 @@ func _run() -> void:
 	arena.call("_on_bag_clicked")
 	for _n in 6:
 		await process_frame
-	if _field_chips(arena).size() != 4:
+	if not _field_chips(arena).is_empty():
 		_restore_save(backup)
-		_fail("4 clover should pour, got %d chips" % _field_chips(arena).size())
+		_fail("4 clover is under the arena gate, got %d chips" % _field_chips(arena).size())
+		return
+	if overlay == null or not overlay.visible:
+		_restore_save(backup)
+		_fail("under-50 bag should show the gate")
+		return
+	var gate_title := str(arena.call("get_need_title"))
+	if not gate_title.contains("Not enough seeds"):
+		_restore_save(backup)
+		_fail("gate title should be Not enough seeds, got %s" % gate_title)
+		return
+	arena.call("_hide_need_more_overlay")
+	gs.set("seed_bag", {"clover": 49})
+	arena.call("_on_bag_clicked")
+	for _n49 in 4:
+		await process_frame
+	if not _field_chips(arena).is_empty() or not str(arena.call("get_need_title")).contains("Not enough seeds"):
+		_restore_save(backup)
+		_fail("49 of one type must stay under the gate")
+		return
+	arena.call("_hide_need_more_overlay")
+	gs.set("seed_bag", {"clover": 12, "daisy": 12, "buttercup": 12, "tulip": 12})
+	arena.call("_on_bag_clicked")
+	for _n48 in 4:
+		await process_frame
+	if not _field_chips(arena).is_empty():
+		_restore_save(backup)
+		_fail("four stacks of 12 are 48 and must not start")
+		return
+	arena.call("_hide_need_more_overlay")
+	gs.set("seed_bag", {"clover": 13, "daisy": 3, "buttercup": 40})
+	arena.call("_on_bag_clicked")
+	for _n2 in 6:
+		await process_frame
+	if _field_chips(arena).is_empty():
+		_restore_save(backup)
+		_fail("13+40 should open the arena, daisy 3 stays out of the sum")
 		return
 	if overlay.visible:
 		_restore_save(backup)
-		_fail("successful pour must not show overlay")
+		_fail("a bag at 53 mergeable must not show the gate")
 		return
 
 	arena = await _boot_arena(backup)
@@ -172,9 +208,9 @@ func _run() -> void:
 		_fail("stuck bag should show overlay")
 		return
 	var title := str(arena.call("get_need_title"))
-	if not title.contains("You need more seeds"):
+	if not title.contains("Not enough seeds"):
 		_restore_save(backup)
-		_fail("title should contain You need more seeds, got %s" % title)
+		_fail("title should contain Not enough seeds, got %s" % title)
 		return
 	# Popups v2: mreža pločica — svi tipovi iz korpe vidljivi (bug jednog reda).
 	var tiles: Array = arena.call("get_need_tiles")

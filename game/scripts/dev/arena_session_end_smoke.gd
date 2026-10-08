@@ -81,11 +81,12 @@ func _run() -> void:
 		return
 
 	gs.call("lock_arena_pour_type", "daisy")
-	gs.set("seed_bag", {"clover": 8})
+	gs.set("seed_bag", {"clover": 50})
 	arena.call("_on_bag_clicked")
 	await _frames(6)
-	if _field_chips(arena).size() != 8:
-		_fail("tap should pour 8 clover, got %d" % _field_chips(arena).size())
+	var poured := int(gs.get_script().get_script_constant_map().get("ARENA_MAX_CHIPS", 30))
+	if _field_chips(arena).size() != poured:
+		_fail("tap should pour %d clover, got %d" % [poured, _field_chips(arena).size()])
 		_finish(backup, gs)
 		return
 	if not bool(arena.call("is_session_open")):
@@ -96,6 +97,9 @@ func _run() -> void:
 		_fail("a new session should clear pour locks")
 		_finish(backup, gs)
 		return
+	# Tacna uzme 30 od 50. Ostatak bi se sam dolio dok Muncher jede, pa ga skini
+	# da se sesija može ugasiti na praznom polju.
+	gs.set("seed_bag", {})
 
 	arena.call("register_arena_combo_merge")
 	arena.call("register_arena_combo_merge")
@@ -133,8 +137,8 @@ func _run() -> void:
 		_finish(backup, gs)
 		return
 
-	# Novi tap otvara novu sesiju.
-	gs.set("seed_bag", {"clover": 4})
+	# Novi tap otvara novu sesiju. Prag je 50 mergeable sjemenki.
+	gs.set("seed_bag", {"clover": 50})
 	arena.call("_on_bag_clicked")
 	await _frames(6)
 	if not bool(arena.call("is_session_open")):

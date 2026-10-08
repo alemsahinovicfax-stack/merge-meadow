@@ -628,12 +628,14 @@ func _on_coin_collected(at: Vector2) -> void:
 
 
 func _on_seed_collected(type_id: String, at: Vector2) -> void:
-	seeds_by_type[type_id] = int(seeds_by_type.get(type_id, 0)) + 1
+	var amount := 2 if randf() < UiCamp.twin_chance(GameState.get_twin_seeds_level()) else 1
+	seeds_by_type[type_id] = int(seeds_by_type.get(type_id, 0)) + amount
+	# +2 ide u loot prije množitelja. Lanac otključavanja i dalje broji jedan pickup.
 	GameState.record_seed_pickup_lifetime(type_id, 1)
 	_pip_play("pickup_seed", "hud_happy")
 	_update_hud()
 	if pickup_feed and pickup_feed.has_method("push_seed"):
-		pickup_feed.push_seed(type_id, at)
+		pickup_feed.push_seed(type_id, at, amount)
 
 
 func _on_diamond_collected(at: Vector2) -> void:

@@ -57,12 +57,8 @@ func unlock_all_seasons() -> void:
 		if not _owner.owned_paid_seasons.has(def.id):
 			_owner.owned_paid_seasons.append(def.id)
 	var s2 := "frost_orchard"
-	if _owner.unlocked_seasons.has(s2):
-		_owner.focus_season_id = s2
-		_owner.active_season_id = s2
-	else:
-		_owner.focus_season_id = SeasonCatalog.DEFAULT_SEASON_ID
-		_owner.active_season_id = SeasonCatalog.DEFAULT_SEASON_ID
+	var next_id := s2 if _owner.unlocked_seasons.has(s2) else SeasonCatalog.DEFAULT_SEASON_ID
+	_owner.set_active_season(next_id)
 	_owner._normalize_season_progress()
 	_owner.save_player_save()
 

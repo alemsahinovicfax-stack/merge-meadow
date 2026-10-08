@@ -230,7 +230,7 @@ func _draw_kit() -> void:
 			draw_colored_polygon(poly, UiSeasons.CAMP_SHADOW)
 	var inner := full.grow(-border)
 	SeasonBackdrop.draw(self, _scene, inner)
-	SeasonBackdrop.draw_corner_masks(self, inner, radius - border, UiCamp.MEADOW_BG)
+	SeasonBackdrop.draw_corner_masks(self, inner, radius - border, UiCamp.PAGE_BG)
 	var edge := StyleBoxFlat.new()
 	edge.draw_center = false
 	edge.set_border_width_all(int(border))

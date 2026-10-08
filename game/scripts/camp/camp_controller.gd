@@ -86,6 +86,9 @@ func _ready() -> void:
 
 
 func _setup_stash() -> void:
+	var meadow := get_node_or_null("MeadowBg") as ColorRect
+	if meadow:
+		meadow.color = UiCamp.PAGE_BG
 	stash_section.add_theme_stylebox_override("panel", UiCamp.section_style())
 	seeds_tab.setup(UiCamp.TAB_SEEDS)
 	flowers_tab.setup(UiCamp.TAB_FLOWERS)
@@ -509,6 +512,7 @@ func _refresh_trade_bar() -> void:
 				if flowers
 				else GameState.seed_exchange_coins_per_seed(type_id)
 			),
+			"count": _count_of(type_id),
 		}
 		var reserve := _reserve_for(type_id)
 		if not reserve.is_empty():

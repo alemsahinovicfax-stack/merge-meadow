@@ -30,6 +30,8 @@ var _at_floor: bool = false
 var _art: CampArtFrame
 var _name_label: Label
 var _pips_label: Label
+var _merge_mark: PanelContainer
+var _merge_icon: TextureRect
 var _badge: PanelContainer
 var _badge_icon: TextureRect
 var _badge_label: Label
@@ -89,9 +91,11 @@ func get_badge_text() -> String:
 
 ## Lagani update za hold-trade — bez ponovnog crtanja arta.
 func set_count(count: int) -> void:
+	var was_mergeable := _kind == "seed" and UiCamp.is_mergeable(_count)
 	_count = count
 	if _count_label:
 		_count_label.text = str(count)
+	_apply_merge_mark(was_mergeable != (_kind == "seed" and UiCamp.is_mergeable(_count)))
 	_apply_style()
 
 
@@ -150,9 +154,29 @@ func _ensure_children() -> void:
 	_name_label.custom_minimum_size = Vector2(1, 0)
 	name_block.add_child(_name_label)
 
+	var pips_row := HBoxContainer.new()
+	pips_row.name = "PipsRow"
+	pips_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pips_row.add_theme_constant_override("separation", 8)
+	name_block.add_child(pips_row)
 	_pips_label = Label.new()
 	_pips_label.name = "RarityPips"
-	name_block.add_child(_pips_label)
+	_pips_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	pips_row.add_child(_pips_label)
+	var pips_gap := Control.new()
+	pips_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pips_gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pips_row.add_child(pips_gap)
+	_merge_mark = PanelContainer.new()
+	_merge_mark.name = "MergeableMark"
+	_merge_mark.visible = false
+	_merge_mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_merge_mark.custom_minimum_size = UiCamp.MERGE_MARK
+	_merge_mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	pips_row.add_child(_merge_mark)
+	_merge_icon = _make_icon(UiCamp.MERGE_MARK_ICON)
+	_merge_icon.texture = UiAssets.get_camp_icon("icon_mergeable")
+	_merge_mark.add_child(_merge_icon)
 
 	_badge = PanelContainer.new()
 	_badge.name = "ReservedBadge"
@@ -256,6 +280,7 @@ func _apply_all() -> void:
 	)
 	UiCamp.style_label(_price_label, UiCamp.FONT_PRICE, UiCamp.INK)
 	_apply_badge()
+	_apply_merge_mark(false)
 	_apply_style()
 
 
@@ -266,6 +291,8 @@ func _apply_badge() -> void:
 		return
 	_badge.visible = _reserved
 	_pips_label.visible = not _reserved
+	if _merge_mark and _reserved:
+		_merge_mark.visible = false
 	custom_minimum_size = Vector2(0, UiCamp.CHIP_H_RESERVED if _reserved else UiCamp.CHIP_SIZE.y)
 	if not _reserved:
 		return
@@ -273,6 +300,24 @@ func _apply_badge() -> void:
 	_badge_icon.texture = UiAssets.get_camp_icon("icon_hold_stop" if _at_floor else "icon_reserved")
 	_badge_label.text = UiCamp.reserved_badge_text(_have, _need, _at_floor)
 	UiCamp.style_label(_badge_label, UiCamp.FONT_BADGE, UiCamp.DARK_INK)
+
+
+func _apply_merge_mark(animate: bool) -> void:
+	if _merge_mark == null:
+		return
+	var show := _kind == "seed" and not _reserved and UiCamp.is_mergeable(_count)
+	_merge_mark.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(_count == UiCamp.MERGE_MIN))
+	if show == _merge_mark.visible and not animate:
+		return
+	_merge_mark.visible = show
+	if not show or not animate or not is_inside_tree():
+		_merge_mark.scale = Vector2.ONE
+		return
+	_merge_mark.pivot_offset = UiCamp.MERGE_MARK * 0.5
+	_merge_mark.scale = Vector2.ONE * 0.6
+	var tw := create_tween()
+	tw.tween_property(_merge_mark, "scale", Vector2.ONE, UiCamp.T_MERGE_MARK) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _apply_style() -> void:

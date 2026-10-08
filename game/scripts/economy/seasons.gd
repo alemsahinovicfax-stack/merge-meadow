@@ -191,16 +191,17 @@ func unlock_free(season_id: String) -> bool:
 	_owner._try_spend_coins(def.coins_cost)
 	spend_star3_flowers_for_unlock(season_id, def.t3_flowers_required)
 	unlocked.append(season_id)
-	active_id = season_id
-	focus_season_id = season_id
-	_owner.save_player_save()
+	set_active(season_id)
 	return true
 
 
 func set_active(season_id: String, sync_strip: bool = true) -> bool:
 	if not is_playable(season_id):
 		return false
+	if season_id != active_id:
+		_owner.stash_upgrade_levels(active_id)
 	active_id = season_id
+	_owner.apply_active_upgrade_levels()
 	if sync_strip:
 		var def := SeasonCatalog.get_def(season_id)
 		if def != null and def.is_free():
@@ -219,9 +220,7 @@ func grant_paid(season_id: String) -> bool:
 		return false
 	if not owned_paid.has(season_id):
 		owned_paid.append(season_id)
-	active_id = season_id
-	paid_strip_focus_id = season_id
-	_owner.save_player_save()
+	set_active(season_id)
 	return true
 
 

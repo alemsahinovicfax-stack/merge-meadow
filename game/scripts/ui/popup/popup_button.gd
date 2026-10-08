@@ -23,6 +23,9 @@ var icon_tex: Texture2D = null
 var art_type: String = ""
 var art_tier: int = 3
 var art_size: float = 81.0
+var coin_text: String = ""
+var flower_short: bool = false
+var coin_short: bool = false
 var check: bool = false
 ## Nacrtan znak umjesto ikone: "play" (pun ink trougao).
 var glyph: String = ""
@@ -43,6 +46,9 @@ func configure(p_kind: String, p_label: String, p_ad: bool = false, p_icon: Text
 	label = p_label
 	ad = p_ad
 	icon_tex = p_icon
+	coin_text = ""
+	flower_short = false
+	coin_short = false
 	dots = kind == "loading"
 	check = kind == "done"
 	_sync()
@@ -97,6 +103,8 @@ func content_width() -> float:
 		parts.append(CHECK)
 	if not label.is_empty():
 		parts.append(UiPopups.text_w(900, px, label))
+	if not coin_text.is_empty():
+		parts.append(40.0 + UiPopups.text_w(900, px, coin_text))
 	if dots:
 		parts.append(DOT * 3.0 + DOT_GAP * 2.0)
 	var w := 0.0
@@ -134,16 +142,40 @@ func _draw() -> void:
 		draw_texture_rect(icon_tex, Rect2(Vector2(x, cy - ICON * 0.5), Vector2(ICON, ICON)), false, col)
 		x += ICON + GAP
 	elif not art_type.is_empty():
+		var flower_w := art_size
+		if flower_short and not label.is_empty():
+			flower_w += GAP + UiPopups.text_w(900, px, label)
+		if flower_short:
+			_draw_short_pill(Rect2(x - 8.0, cy - 36.0, flower_w + 16.0, 72.0))
 		UiPopups.draw_flower(self, Vector2(x + art_size * 0.5, cy), art_type, art_tier, art_size)
 		x += art_size + GAP
 	if check:
 		UiPopups.draw_check(self, Vector2(x + CHECK * 0.5, cy), CHECK, ink, 6.0)
 		x += CHECK + GAP
 	if not label.is_empty():
+		var lw := UiPopups.text_w(900, px, label)
+		if flower_short and art_type.is_empty():
+			_draw_short_pill(Rect2(x - 10.0, cy - 36.0, lw + 20.0, 72.0))
 		UiPopups.draw_text(self, 900, px, label, Vector2(x, cy - px * 0.5), ink)
-		x += UiPopups.text_w(900, px, label) + GAP
+		x += lw + GAP
+	if not coin_text.is_empty():
+		var cw := 40.0 + UiPopups.text_w(900, px, coin_text)
+		if coin_short:
+			_draw_short_pill(Rect2(x - 8.0, cy - 36.0, cw + 16.0, 72.0))
+		var coin := UiAssets.get_chrome_icon("icon_coin")
+		if coin:
+			draw_texture_rect(coin, Rect2(Vector2(x, cy - 20.0), Vector2(40, 40)), false, Color.WHITE)
+		UiPopups.draw_text(self, 900, px, coin_text, Vector2(x + 44.0, cy - px * 0.5), ink)
+		x += cw + GAP
 	if dots:
 		for i in 3:
 			var phase := fmod(_dot_t - i * 0.15 + UiPopups.ANIM.dots, UiPopups.ANIM.dots) / UiPopups.ANIM.dots
 			var a := 0.25 + 0.75 * clampf(1.0 - absf(phase - 0.4) / 0.4, 0.0, 1.0)
 			draw_circle(Vector2(x + DOT * 0.5 + i * (DOT + DOT_GAP), cy), DOT * 0.5, Color(ink, a))
+
+
+func _draw_short_pill(rect: Rect2) -> void:
+	var s := StyleBoxFlat.new()
+	s.bg_color = Color("#FFCCD5")
+	s.set_corner_radius_all(24)
+	draw_style_box(s, rect)

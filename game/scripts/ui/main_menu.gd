@@ -44,6 +44,9 @@ var _transition_blocker: Control
 var _basket_locked: bool = false
 var _upgrade_flash_kind: String = ""
 var _magnet_effect: Label
+var _twin_title: Label
+var _twin_button: PopupButton
+var _twin_effect: Label
 var _loot_effect: Label
 ## H3 · poklon (PopupModal „RewardOverlay"), H2 · oblačić na korpi.
 var reward_overlay: PopupModal
@@ -381,45 +384,99 @@ func _refresh_field_upgrades() -> void:
 	if not GameState.home_season_field_open:
 		return
 	_ensure_upgrade_extras()
-	var flower_id := GameState.pick_upgrade_flower_type("")
-	var have := int(GameState.garden_crystal_stash.get(flower_id, 0)) if not flower_id.is_empty() else 0
-	_apply_upgrade_card(
-		"magnet",
-		magnet_button,
-		magnet_title,
-		null,
-		_magnet_effect,
-		null,
-		null,
-		GameState.magnet_level,
-		GameState.MAGNET_MAX_LEVEL,
-		UiHomeField.magnet_effect(GameState.magnet_level),
-		flower_id,
-		have
-	)
-	_apply_upgrade_card(
-		"loot",
-		loot_boost_button,
-		loot_boost_title,
-		null,
-		_loot_effect,
-		null,
-		null,
-		GameState.multiplier_level,
-		GameState.MULTIPLIER_MAX_LEVEL,
-		UiHomeField.loot_effect(GameState.multiplier_level),
-		flower_id,
-		have
-	)
+	_style_upgrade_season_title()
+	var season_id := GameState.upgrade_sheet_season_id()
+	var flower_id := GameState.star3_type_id_for_season(season_id)
+	var have := GameState.spendable_upgrade_flowers(season_id)
+	for spec in [
+		["magnet", magnet_button, magnet_title, _magnet_effect],
+		["loot", loot_boost_button, loot_boost_title, _loot_effect],
+		["twin", _twin_button, _twin_title, _twin_effect],
+	]:
+		_apply_upgrade_card(
+			str(spec[0]), spec[1], spec[2], null, spec[3], null, null,
+			GameState.get_upgrade_level(str(spec[0]), season_id),
+			UiCamp.UP_LEVELS, "", flower_id, have
+		)
 
 
 ## H5 · kartica nadogradnje (design_handoff_popups): ime 52 · 4 segmenta 96 × 22 · efekat 40/800;
 ## desno dugme koje JE cijena (crtež cvijeta T3 + „×2", „Need N", „✓ Max", „✓ Done").
 func _ensure_upgrade_extras() -> void:
+	_ensure_twin_card()
 	_magnet_effect = _ensure_extra_label(magnet_title, "MagnetEffect", _magnet_effect)
 	_ensure_segment_row(magnet_title, "MagnetSegments")
 	_loot_effect = _ensure_extra_label(loot_boost_title, "LootEffect", _loot_effect)
 	_ensure_segment_row(loot_boost_title, "LootSegments")
+	_twin_effect = _ensure_extra_label(_twin_title, "TwinEffect", _twin_effect)
+	_ensure_segment_row(_twin_title, "TwinSegments")
+
+
+func _ensure_twin_card() -> void:
+	if _twin_button != null:
+		return
+	if upgrades_vbox == null:
+		return
+	var cards := upgrades_vbox.get_node_or_null("Cards")
+	var src := cards.get_node_or_null("LootBoostRow") if cards else null
+	if src == null:
+		return
+	var twin := src.duplicate()
+	twin.name = "TwinRow"
+	_clear_unique_names(twin)
+	cards.add_child(twin)
+	_twin_title = twin.find_child("LootBoostTitle", true, false) as Label
+	if _twin_title:
+		_twin_title.name = "TwinTitle"
+		_twin_title.text = "Twin Seeds"
+	_twin_button = twin.find_child("LootBoostButton", true, false) as PopupButton
+	if _twin_button:
+		_twin_button.name = "TwinButton"
+		if not _twin_button.clicked.is_connected(_on_field_twin_pressed):
+			_twin_button.clicked.connect(_on_field_twin_pressed)
+
+
+func _clear_unique_names(node: Node) -> void:
+	node.unique_name_in_owner = false
+	for child in node.get_children():
+		_clear_unique_names(child)
+
+
+func _style_upgrade_season_title() -> void:
+	if upgrades_title == null:
+		return
+	var season_id := GameState.upgrade_sheet_season_id()
+	var def: SeasonDef = GameState.get_season_def(season_id)
+	upgrades_title.text = def.display_name if def != null else "Upgrades"
+	upgrades_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var host := upgrades_title.get_parent()
+	if host == null or host.name == "SeasonTitle":
+		if host is PanelContainer:
+			(host as PanelContainer).add_theme_stylebox_override("panel", _season_title_style(season_id))
+		return
+	var pill := PanelContainer.new()
+	pill.name = "SeasonTitle"
+	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pill.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var idx := upgrades_title.get_index()
+	host.remove_child(upgrades_title)
+	pill.add_child(upgrades_title)
+	host.add_child(pill)
+	host.move_child(pill, idx)
+	pill.add_theme_stylebox_override("panel", _season_title_style(season_id))
+
+
+func _season_title_style(season_id: String) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = UiCamp.season_tint(season_id)
+	s.border_color = UiCamp.season_tint_edge(season_id)
+	s.set_border_width_all(3)
+	s.set_corner_radius_all(48)
+	s.content_margin_left = 36.0
+	s.content_margin_right = 36.0
+	s.content_margin_top = 12.0
+	s.content_margin_bottom = 12.0
+	return s
 
 
 func _ensure_segment_row(after: Label, row_name: String) -> HBoxContainer:
@@ -473,8 +530,18 @@ func _ensure_extra_label(after: Label, extra_name: String, existing: Label) -> L
 func _effect_text(kind: String, level: int, max_level: int) -> String:
 	if kind == "magnet":
 		if level >= max_level:
-			return "Pull %d px" % UiHomeField.magnet_radius(max_level)
-		return "Pull %d → %d px" % [UiHomeField.magnet_radius(level), UiHomeField.magnet_radius(level + 1)]
+			return "Pull %d px" % int(GameState.get_magnet_radius_for_level(max_level))
+		return "Pull %d → %d px" % [
+			int(GameState.get_magnet_radius_for_level(level)),
+			int(GameState.get_magnet_radius_for_level(level + 1)),
+		]
+	if kind == "twin":
+		if level >= max_level:
+			return "Twins %d %%" % int(round(UiCamp.twin_chance(max_level) * 100.0))
+		return "Twins %d %% → %d %%" % [
+			int(round(UiCamp.twin_chance(level) * 100.0)),
+			int(round(UiCamp.twin_chance(level + 1) * 100.0)),
+		]
 	if level >= max_level:
 		return "Loot ×%s" % str(UiHomeField.loot_multiplier(max_level))
 	return "Loot ×%s → ×%s" % [str(UiHomeField.loot_multiplier(level)), str(UiHomeField.loot_multiplier(level + 1))]
@@ -494,8 +561,8 @@ func _apply_upgrade_card(
 	flower_id: String,
 	have: int
 ) -> void:
-	var maxed := level >= max_level
-	var ready := not maxed and have >= GameState.UPGRADE_FLOWER_COST
+	var state := GameState.upgrade_button_state(kind)
+	var maxed := state == UiCamp.UP_MAX
 	var flash := _upgrade_flash_kind == kind
 	var row: PanelContainer = null
 	if btn and btn.get_parent():
@@ -509,25 +576,29 @@ func _apply_upgrade_card(
 		sb.content_margin_bottom = 24.0
 		row.add_theme_stylebox_override("panel", sb)
 	if title:
-		title.text = "Magnet" if kind == "magnet" else "Loot Boost"
-	_paint_segments(title, "MagnetSegments" if kind == "magnet" else "LootSegments", level, flash)
+		title.text = "Magnet" if kind == "magnet" else ("Twin Seeds" if kind == "twin" else "Loot Boost")
+	var seg_name := "MagnetSegments" if kind == "magnet" else ("TwinSegments" if kind == "twin" else "LootSegments")
+	_paint_segments(title, seg_name, level, flash)
 	if effect_lab:
 		effect_lab.text = _effect_text(kind, level, max_level)
 		_style_sheet_label(effect_lab, 800, 40, UiPopups.INK_SOFT)
 	if btn == null:
 		return
-	btn.custom_minimum_size = Vector2(UiPopups.UPGRADE_BTN)
+	btn.custom_minimum_size = Vector2(340, 132)
 	btn.art_type = ""
 	if flash:
 		btn.configure("done", UiPopups.S_UPGRADE_DONE)
 	elif maxed:
 		btn.configure("done", UiPopups.S_UPGRADE_MAX)
-	elif ready:
-		btn.configure("primary", "×%d" % GameState.UPGRADE_FLOWER_COST)
-		btn.set_art(flower_id, 3, 81.0)
 	else:
-		btn.configure("disabled", UiPopups.S_UPGRADE_NEED % maxi(1, GameState.UPGRADE_FLOWER_COST - have))
-		btn.set_art(flower_id, 3, 81.0)
+		var cost := UiCamp.upgrade_coin_cost(level)
+		var can := state == UiCamp.UP_CAN
+		btn.configure("primary" if can else "disabled", "×%d" % UiCamp.UP_FLOWER_COST)
+		btn.set_art(flower_id, 3, 64.0)
+		btn.coin_text = str(cost)
+		btn.flower_short = state == UiCamp.UP_SHORT_FLOWER or state == UiCamp.UP_SHORT_BOTH
+		btn.coin_short = state == UiCamp.UP_SHORT_COIN or state == UiCamp.UP_SHORT_BOTH
+		btn.queue_redraw()
 
 
 func _on_field_magnet_pressed() -> void:
@@ -544,6 +615,15 @@ func _on_field_loot_boost_pressed() -> void:
 		return
 	if GameState.try_upgrade_multiplier(""):
 		_flash_upgrade("loot")
+	_refresh_field_upgrades()
+	_notify_hub_chrome()
+
+
+func _on_field_twin_pressed() -> void:
+	if not GameState.home_season_field_open:
+		return
+	if GameState.try_upgrade_twin():
+		_flash_upgrade("twin")
 	_refresh_field_upgrades()
 	_notify_hub_chrome()
 
@@ -868,16 +948,34 @@ func _rebuild_picker_list() -> void:
 		picker_list.remove_child(child)
 		child.queue_free()
 	var current := GameState.get_loadout_type()
+	var seen: Array[String] = []
+	for type_id in SeedCatalog.types_for_season(GameState.home_season_field_id):
+		if int(GameState.lifetime_seeds_collected.get(type_id, 0)) < 1:
+			continue
+		if not GameState.is_seed_type_unlocked(type_id):
+			continue
+		seen.append(type_id)
+	if not current.is_empty() and not seen.has(current):
+		GameState.clear_loadout()
+		current = ""
 	if picker_clear_button:
 		picker_clear_button.configure("disabled" if current.is_empty() else "secondary", UiPopups.S_BASKET_CLEAR, false, UiPopups.icon("icon_basket"))
-	for type_id in SeedCatalog.types_for_season(GameState.home_season_field_id):
-		var unlocked := GameState.is_seed_type_unlocked(type_id)
+	if seen.is_empty():
+		var empty := Label.new()
+		empty.name = "BasketEmpty"
+		empty.text = "Seeds you catch in a run show up here"
+		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		empty.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		UiCamp.style_label(empty, 40, UiCamp.INK)
+		picker_list.add_child(empty)
+		return
+	for type_id in seen:
 		var tile := SeedTile.new().setup(
 			type_id, GameState.get_seed_display_name(type_id), GameState.get_seed_rarity(type_id),
-			not unlocked, unlocked and type_id == current
+			false, type_id == current
 		)
-		if unlocked:
-			tile.clicked.connect(func() -> void: _on_basket_type_picked(type_id))
+		tile.clicked.connect(func() -> void: _on_basket_type_picked(type_id))
 		picker_list.add_child(tile)
 
 
@@ -952,16 +1050,15 @@ func _refresh_upgrades_button() -> void:
 	upgrades_button.visible = GameState.home_season_field_open
 	if not upgrades_button.visible:
 		return
-	var flower_id := GameState.pick_upgrade_flower_type("")
-	var have := int(GameState.garden_crystal_stash.get(flower_id, 0)) if not flower_id.is_empty() else 0
-	var room := (
-		GameState.magnet_level < GameState.MAGNET_MAX_LEVEL
-		or GameState.multiplier_level < GameState.MULTIPLIER_MAX_LEVEL
-	)
+	var season_id := GameState.upgrade_sheet_season_id()
+	var ready := false
+	for track in ["magnet", "loot", "twin"]:
+		if GameState.upgrade_button_state(track, season_id) == UiCamp.UP_CAN:
+			ready = true
 	upgrades_button.set_levels(
-		GameState.magnet_level,
-		GameState.multiplier_level,
-		room and have >= GameState.UPGRADE_FLOWER_COST
+		GameState.get_upgrade_level("magnet", season_id),
+		GameState.get_upgrade_level("loot", season_id),
+		ready
 	)
 
 

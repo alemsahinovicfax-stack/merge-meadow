@@ -67,7 +67,7 @@ func _check_layout(arena: Control) -> void:
 
 func _check_full_pour(arena: Control, gs: Node) -> void:
 	arena.call("_clear_field_chips")
-	gs.set("seed_bag", {"clover": 8, "daisy": 8, "buttercup": 8, "tulip": 8})
+	gs.set("seed_bag", {"clover": 26, "daisy": 8, "buttercup": 8, "tulip": 8})
 	arena.call("_on_bag_clicked")
 	for _i in 6:
 		await process_frame

@@ -52,7 +52,7 @@ func _run() -> void:
 	await _frames(6)
 	var bg := _arena.get_node("Bg")
 	var pest := _arena.get_node("RootVBox/Playfield/MuncherPest")
-	_gs.set("seed_bag", {"clover": 14, "daisy": 12, "buttercup": 10, "tulip": 12})
+	_gs.set("seed_bag", {"clover": 16, "daisy": 12, "buttercup": 10, "tulip": 12})
 	_arena.call("_on_bag_clicked")
 	await _frames(40)
 	for id in SEASONS:

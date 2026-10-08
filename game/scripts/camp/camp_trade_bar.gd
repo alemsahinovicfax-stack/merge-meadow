@@ -31,6 +31,11 @@ var _bump: Panel = null
 var _bump_tween: Tween
 var _feedback_tween: Tween
 var _strip_tween: Tween
+var _merge_row: HBoxContainer
+var _merge_disc: PanelContainer
+var _merge_icon: TextureRect
+var _merge_label: Label
+var _merge_text: String = ""
 
 
 func _ready() -> void:
@@ -63,6 +68,7 @@ func _ready() -> void:
 	button.set_fonts(UiCamp.FONT_BTN)
 	button.set_press_scale(0.97)
 	button.clip_contents = true
+	_build_merge_line()
 	apply_state(UiCamp.TRADE_DISABLED, {})
 
 
@@ -82,6 +88,63 @@ func get_selected_text() -> String:
 	return selected_label.text
 
 
+func get_merge_line() -> String:
+	return _merge_text if _merge_row != null and _merge_row.visible else ""
+
+
+func _build_merge_line() -> void:
+	var box := panel.get_node_or_null("TradeVBox") as VBoxContainer
+	if box == null:
+		return
+	box.add_theme_constant_override("separation", UiCamp.MERGE_LINE_GAP)
+	_merge_row = HBoxContainer.new()
+	_merge_row.name = "MergeableWarning"
+	_merge_row.visible = false
+	_merge_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_merge_row.custom_minimum_size.y = UiCamp.MERGE_LINE_H
+	_merge_row.add_theme_constant_override("separation", 14)
+	box.add_child(_merge_row)
+	_merge_disc = PanelContainer.new()
+	_merge_disc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_merge_disc.custom_minimum_size = UiCamp.MERGE_MARK
+	_merge_disc.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_merge_row.add_child(_merge_disc)
+	_merge_icon = TextureRect.new()
+	_merge_icon.custom_minimum_size = Vector2(UiCamp.MERGE_LINE_ICON, UiCamp.MERGE_LINE_ICON)
+	_merge_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_merge_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_merge_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_merge_icon.texture = UiAssets.get_camp_icon("icon_mergeable")
+	_merge_disc.add_child(_merge_icon)
+	_merge_label = Label.new()
+	_merge_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_merge_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_merge_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_merge_label.clip_text = true
+	_merge_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_merge_row.add_child(_merge_label)
+	UiCamp.style_label(_merge_label, 36, UiCamp.INK)
+
+
+func _apply_merge_line(text: String) -> void:
+	if _merge_row == null:
+		return
+	var show := not text.is_empty()
+	_merge_row.visible = show
+	if not show:
+		_merge_text = ""
+		return
+	var count := int(_info.get("count", 0))
+	_merge_disc.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(count == UiCamp.MERGE_MIN))
+	if text == _merge_text:
+		return
+	_merge_text = text
+	_merge_label.text = text
+	_merge_label.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_property(_merge_label, "modulate:a", 1.0, 0.08)
+
+
 ## `info`: kind, type_id, label, rarity, price, need, season_name, left.
 func apply_state(state: String, info: Dictionary) -> void:
 	var prev := _state
@@ -89,7 +152,8 @@ func apply_state(state: String, info: Dictionary) -> void:
 	_info = info
 	var seed := str(info.get("kind", "seed")) == "seed"
 	var disabled := state == UiCamp.TRADE_DISABLED
-	custom_minimum_size.y = UiCamp.trade_height(state)
+	var merge_text := UiCamp.merge_line_text(int(info.get("count", 0))) if seed and not disabled else ""
+	custom_minimum_size.y = UiCamp.trade_height_v3(state, not merge_text.is_empty())
 
 	if disabled:
 		# Bez imena i bez "Nothing selected" — prazan okvir sam kaze da nema sta prodati.
@@ -131,6 +195,7 @@ func apply_state(state: String, info: Dictionary) -> void:
 		button.set_hold_fill(button.get_hold_fill(), UiPalette.PEACH)
 	elif prev == UiCamp.TRADE_HOLD:
 		button.reset_hold_fill(UiCamp.T_HOLD_RESET)
+	_apply_merge_line(merge_text)
 
 
 ## Jedan tik drzanja: fill je prodani dio gomile, a novcic odleti prema headeru.

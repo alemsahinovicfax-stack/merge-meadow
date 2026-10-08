@@ -54,7 +54,7 @@ func _run() -> void:
 		push_error("arena_nav_lock_smoke: GameState missing")
 		_quit(1)
 		return
-	gs.set("seed_bag", {"clover": 6, "daisy": 4})
+	gs.set("seed_bag", {"clover": 50})
 	gs.set("wallet_coins", 10)
 	if hub.has_method("go_to_page"):
 		hub.go_to_page(MetaHubPages.ARENA, false)

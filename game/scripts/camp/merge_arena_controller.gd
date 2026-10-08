@@ -53,6 +53,12 @@ const CUE_PEST_AWAKE := "Muncher's awake — a T3 freezes it 2s."
 ## svi tipovi iz korpe vidljivi), linija „Every type needs 4" i jedno dugme Back to Camp.
 var need_more_overlay: PopupModal
 var need_more_tiles: HFlowContainer
+var need_more_line: Label
+var need_more_note: Label
+var _gate_count: PanelContainer
+var _gate_n: Label
+var _gate_mark: PanelContainer
+var _gate_play_run: bool = false
 var back_to_camp_button: PopupButton
 
 var _chips: Array[ArenaSeedChip] = []
@@ -130,6 +136,7 @@ func _setup_bag() -> void:
 	_seed_bag.name = "SeedBag"
 	playfield.add_child(_seed_bag)
 	_seed_bag.bag_clicked.connect(_on_bag_clicked)
+	_build_gate_count(playfield)
 	_layout_bag()
 
 
@@ -142,6 +149,12 @@ func _layout_bag() -> void:
 	var x := (field.x - UiArenaV2.BASKET_HIT.x) * 0.5
 	var y := field.y - UiArenaV2.BASKET_BOTTOM_GAP - UiArenaV2.BASKET_HIT.y
 	_seed_bag.set_layout_position(Vector2(x, y))
+	if _gate_count != null:
+		var gw := _gate_count.get_combined_minimum_size().x
+		if gw < 80.0:
+			gw = 280.0
+		_gate_count.position = Vector2(x + (UiArenaV2.BASKET_HIT.x - gw) * 0.5, y - 88.0)
+		_gate_count.size = Vector2(gw, 100.0)
 
 
 func _layout_playfield_chrome() -> void:
@@ -754,6 +767,11 @@ func _on_bag_clicked() -> void:
 		_refresh_bag()
 		return
 	var bag_count := GameState.sum_seed_bag_only()
+	# Prag od 50 vrijedi samo za prvi tap nove sesije. Dolijevanje usred sesije ostaje.
+	if not _session_open and _chips.is_empty() and not GameState.arena_gate_open():
+		_show_arena_gate()
+		_refresh_bag()
+		return
 	if bag_count <= 0:
 		_punch_seed_bag()
 		_refresh_bag()
@@ -809,7 +827,32 @@ func _bag_has_pourable_set() -> bool:
 
 
 func _show_need_more_seeds_overlay() -> void:
-	_rebuild_need_more_list()
+	_gate_play_run = false
+	need_more_overlay.set_title(UiPopups.S_NEED_TITLE)
+	if need_more_line:
+		need_more_line.text = UiPopups.S_NEED_LINE
+	if need_more_note:
+		need_more_note.visible = false
+	if back_to_camp_button:
+		back_to_camp_button.configure("primary", UiPopups.S_BACK_TO_CAMP, false, UiAssets.get_chrome_icon("tab_camp"))
+	_rebuild_need_more_list(null)
+	need_more_overlay.open(true)
+
+
+func _show_arena_gate() -> void:
+	var n := GameState.mergeable_seed_count()
+	var small := _small_seed_entries()
+	_gate_play_run = GameState.sum_seed_bag_only() <= 0
+	need_more_overlay.set_title(UiPopups.S_GATE_TITLE)
+	if need_more_line:
+		need_more_line.text = UiPopups.S_GATE_COUNT % [n, UiCamp.GATE_MIN]
+	if need_more_note:
+		need_more_note.visible = not small.is_empty()
+		need_more_note.text = UiPopups.S_NEED_LINE
+	if back_to_camp_button:
+		var label := "Play a run" if _gate_play_run else UiPopups.S_BACK_TO_CAMP
+		back_to_camp_button.configure("primary", label, false, UiAssets.get_chrome_icon("tab_camp" if not _gate_play_run else "icon_seed"))
+	_rebuild_need_more_list(small)
 	need_more_overlay.open(true)
 
 
@@ -833,11 +876,19 @@ func _build_need_more_overlay() -> void:
 	var line := Label.new()
 	line.name = "ModalLine"
 	line.text = UiPopups.S_NEED_LINE
+	need_more_line = line
 	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	line.add_theme_font_override("font", UiPopups.font(900, 44))
 	line.add_theme_font_size_override("font_size", 44)
 	line.add_theme_color_override("font_color", UiPopups.OUTLINE)
 	need_more_overlay.content.add_child(line)
+	need_more_note = Label.new()
+	need_more_note.name = "ModalNote"
+	need_more_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	need_more_note.add_theme_font_override("font", UiPopups.font(800, 36))
+	need_more_note.add_theme_font_size_override("font_size", 36)
+	need_more_note.add_theme_color_override("font_color", UiPopups.INK_SOFT)
+	need_more_overlay.content.add_child(need_more_note)
 	need_more_tiles = HFlowContainer.new()
 	need_more_tiles.name = "NeedSeedTiles"
 	need_more_tiles.alignment = FlowContainer.ALIGNMENT_CENTER
@@ -852,11 +903,21 @@ func _build_need_more_overlay() -> void:
 	need_more_overlay.content.add_child(back_to_camp_button)
 
 
-func _rebuild_need_more_list() -> void:
+func _small_seed_entries() -> Array:
+	var out: Array = []
+	for entry in GameState.get_seed_bag_entries():
+		var count := int(entry.get("count", 0))
+		if count > 0 and count < UiCamp.MERGE_MIN:
+			out.append(entry)
+	return out
+
+
+func _rebuild_need_more_list(only: Variant = null) -> void:
 	for child in need_more_tiles.get_children():
 		need_more_tiles.remove_child(child)
 		child.queue_free()
-	for entry in GameState.get_seed_bag_entries():
+	var rows: Array = GameState.get_seed_bag_entries() if only == null else only
+	for entry in rows:
 		var tile := NeedSeedTile.new().setup(str(entry.get("type_id", "")), int(entry.get("count", 0)))
 		need_more_tiles.add_child(tile)
 
@@ -871,7 +932,75 @@ func get_need_tiles() -> Array:
 
 ## Overlay se zatvara samo preko "Back to Camp" (ne tap bilo gdje).
 func _on_back_to_camp_pressed() -> void:
+	if _gate_play_run:
+		_gate_play_run = false
+		_hide_need_more_overlay()
+		GameState.go_to_scene(GameState.SCENE_MAIN)
+		return
 	_end_session_to_camp()
+
+
+func _build_gate_count(playfield: Node) -> void:
+	_gate_count = PanelContainer.new()
+	_gate_count.name = "GateCount"
+	_gate_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_gate_count.z_index = 60
+	playfield.add_child(_gate_count)
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+	_gate_count.add_child(row)
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(60, 60)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.texture = UiAssets.get_chrome_icon("icon_seed")
+	row.add_child(icon)
+	_gate_n = Label.new()
+	_gate_n.name = "N"
+	_gate_n.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(_gate_n)
+	_gate_mark = PanelContainer.new()
+	_gate_mark.custom_minimum_size = UiCamp.MERGE_MARK
+	_gate_mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_gate_mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(_gate_mark)
+	var mark_icon := TextureRect.new()
+	mark_icon.custom_minimum_size = Vector2(UiCamp.MERGE_MARK_ICON, UiCamp.MERGE_MARK_ICON)
+	mark_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	mark_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	mark_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mark_icon.texture = UiAssets.get_camp_icon("icon_mergeable")
+	_gate_mark.add_child(mark_icon)
+
+
+func _apply_gate_count(show: bool) -> void:
+	if _gate_count == null:
+		return
+	_gate_count.visible = show
+	if not show:
+		return
+	var n := GameState.mergeable_seed_count()
+	var open := n >= UiCamp.GATE_MIN
+	_gate_n.text = UiPopups.S_GATE_COUNT % [n, UiCamp.GATE_MIN]
+	UiCamp.style_label(_gate_n, 60, UiCamp.INK)
+	var plate := StyleBoxFlat.new()
+	plate.bg_color = UiCamp.MINT if open else Color("#FFF8F0")
+	plate.border_color = UiCamp.INK
+	plate.set_border_width_all(4)
+	plate.set_corner_radius_all(50)
+	plate.content_margin_left = 28.0
+	plate.content_margin_right = 28.0
+	plate.content_margin_top = 16.0
+	plate.content_margin_bottom = 16.0
+	plate.shadow_color = UiCamp.PAGE_SHADOW
+	plate.shadow_offset = Vector2(0, 8)
+	plate.shadow_size = 0
+	_gate_count.add_theme_stylebox_override("panel", plate)
+	_gate_mark.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(false))
+	_gate_mark.modulate.a = 1.0 if open else 0.28
 
 
 func _arena_slots_available() -> int:
@@ -1503,8 +1632,12 @@ func _refresh_bag() -> void:
 		return
 	var bag_count := GameState.sum_seed_bag_only()
 	var slots := _arena_slots_available()
-	var can_pour := bag_count > 0 and slots > 0
+	var gate_open := _session_open or not _chips.is_empty() or GameState.arena_gate_open()
+	var can_pour := bag_count > 0 and slots > 0 and gate_open
 	_seed_bag.set_state(bag_count, can_pour, GameState.get_bag_preview_types())
+	var show_gate := not _session_open and _chips.is_empty()
+	_seed_bag.set_counter_visible(not show_gate)
+	_apply_gate_count(show_gate)
 	_layout_bag()
 	_repel_chips_from_bag()
 

@@ -23,7 +23,9 @@ const UNLOCK_GOLD_EDGE := Color("#BA9D3B") # UiPalette.GOLD, 20 % tamnije
 const RIM_EDGE := Color("#CBC2B6")         # WARM_WHITE #FFF8F0, 20 % tamnije
 const WELL := Color("#22342A")             # livada #293D2E, 20 % tamnije
 const WELL_EDGE := Color("#16211B")        # WELL, 30 % tamnije
-const MEADOW_BG := Color("#2E4733")        # pozadina stranice, iz hub chromea
+const MEADOW_BG := Color("#2E4733")        # stara livada; Camp stranica je PAGE_BG
+const PAGE_BG := Color("#4E3F5A")          # dusk heather, uz chrome #2A2233
+const PAGE_SHADOW := Color(0.078, 0.055, 0.102, 0.34)
 const DARK_INK := Color("#1A1A14")         # tekst na tintu sezone
 const SUB_INK := Color("#555C5E")          # INK posvijetljen do 6,5:1 na krem
 const TAB_INK := Color("#4A5153")          # neaktivan tab, 7,7:1 na krem
@@ -81,6 +83,25 @@ const GRID_COLS := 2
 const GRID_GAP := 14
 const TRADE_H := 152
 const TRADE_H_STRIP := 224             # + ReservedWarning 60 + gap 12
+const MERGE_MIN := 4
+const GATE_MIN := 50
+const MERGE_MARK := Vector2(64, 42)
+const MERGE_MARK_ICON := 40
+const MERGE_LINE_H := 48
+const MERGE_LINE_GAP := 12
+const MERGE_LINE_ICON := 34
+const MINT := Color("#A8E6CF")
+const MERGE_LAST := Color("#FFE8B8")
+const T_MERGE_MARK := 0.14
+const UP_LEVELS := 4
+const UP_FLOWER_COST := 2
+const UP_COIN_COST: Array[int] = [10, 20, 40, 60]
+const TWIN_STEP := 0.08
+const UP_CAN := "can"
+const UP_SHORT_FLOWER := "short_flower"
+const UP_SHORT_COIN := "short_coin"
+const UP_SHORT_BOTH := "short_both"
+const UP_MAX := "max"
 const TRADE_PAD := 14
 const TRADE_ROW_H := 120
 const TRADE_ART := 104
@@ -232,6 +253,75 @@ static func grid_budget(state: String, hero_visible: bool = true) -> int:
 	return section_height(hero_visible) - chrome - trade_height(state)
 
 
+static func is_mergeable(count: int) -> bool:
+	return count >= MERGE_MIN
+
+
+## Cijeli stog ulazi samo ako ga ima >= 4. Sitni daju 0.
+static func gate_count(counts: Array) -> int:
+	var n := 0
+	for c in counts:
+		if int(c) >= MERGE_MIN:
+			n += int(c)
+	return n
+
+
+static func gate_open(counts: Array) -> bool:
+	return gate_count(counts) >= GATE_MIN
+
+
+static func merge_mark_style(last: bool = false) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = MERGE_LAST if last else MINT
+	s.border_color = INK
+	s.set_border_width_all(2)
+	s.set_corner_radius_all(int(MERGE_MARK.y / 2.0))
+	s.content_margin_left = 8.0
+	s.content_margin_right = 8.0
+	s.content_margin_top = 1.0
+	s.content_margin_bottom = 1.0
+	return s
+
+
+## "" = sakrij (tip ispod 4 ili Flowers tab).
+static func merge_line_text(count: int) -> String:
+	if count < MERGE_MIN:
+		return ""
+	if count == MERGE_MIN:
+		return "Arena takes all 4 · sell 1 and none go"
+	return "Arena takes all %d" % count
+
+
+static func trade_height_v3(state: String, merge_line: bool) -> int:
+	return trade_height(state) + (MERGE_LINE_GAP + MERGE_LINE_H if merge_line else 0)
+
+
+static func grid_budget_v3(state: String, hero_visible: bool, merge_line: bool) -> int:
+	var chrome := 2 * (SECTION_PAD + SECTION_BORDER) + TABS_H + 2 * SECTION_INNER_GAP
+	return section_height(hero_visible) - chrome - trade_height_v3(state, merge_line)
+
+
+static func twin_chance(level: int) -> float:
+	return TWIN_STEP * float(clampi(level, 0, UP_LEVELS))
+
+
+## spendable_flowers = ★3 te sezone minus Kept (nikad < 0).
+static func upgrade_state(level: int, spendable_flowers: int, coins: int) -> String:
+	if level >= UP_LEVELS:
+		return UP_MAX
+	var ok_f := spendable_flowers >= UP_FLOWER_COST
+	var ok_c := coins >= int(UP_COIN_COST[clampi(level, 0, UP_COIN_COST.size() - 1)])
+	if ok_f and ok_c:
+		return UP_CAN
+	if not ok_f and not ok_c:
+		return UP_SHORT_BOTH
+	return UP_SHORT_FLOWER if not ok_f else UP_SHORT_COIN
+
+
+static func upgrade_coin_cost(level: int) -> int:
+	return int(UP_COIN_COST[clampi(level, 0, UP_COIN_COST.size() - 1)])
+
+
 ## Season Kit faza 2: kartica sezone crta recept "camp" (season_link_card.gd); tint ostaje
 ## za badge rezervisanog cvijeća (Kept · N / M) i rezervu kartice bez recepta.
 static func season_tint(season_id: String) -> Color:
@@ -326,7 +416,7 @@ static func section_style() -> StyleBoxFlat:
 	s.set_border_width_all(SECTION_BORDER)
 	s.set_corner_radius_all(UiPalette.CORNER_RADIUS_CTA)
 	s.set_content_margin_all(SECTION_PAD + SECTION_BORDER)
-	_shadow(s, SHADOW, 8, 8)
+	_shadow(s, PAGE_SHADOW, 8, 8)
 	return s
 
 
@@ -611,7 +701,7 @@ static func season_card_style(season_id: String) -> StyleBoxFlat:
 	s.set_border_width_all(3)
 	s.set_corner_radius_all(UiPalette.CORNER_RADIUS_CTA)
 	s.set_content_margin_all(SEASON_PAD)
-	_shadow(s, SHADOW, 8, 8)
+	_shadow(s, PAGE_SHADOW, 8, 8)
 	return s
 
 

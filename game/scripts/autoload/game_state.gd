@@ -29,6 +29,9 @@ const ARENA_PEST_TARGET_REEVAL := 0.25
 const CAMP_BED_COUNT := 9
 const GREENHOUSE_SLOT_COUNT := 2
 const SEED_BAG_SOFT_CAP := 40
+## Arena ne krene dok zbroj stogova od 4+ nije barem ovoliko. Tip s 1–3 ne ulazi.
+const ARENA_GATE_MIN := 50
+const ARENA_MERGE_STACK := 4
 const DAILY_CHEST_COINS := 8
 const DAILY_CHEST_SEEDS := 3
 const MAX_MERGE_TIER := 3
@@ -164,6 +167,9 @@ var merge_hint_owned: bool:
 	set(value): boosters.merge_hint_owned = value
 
 var magnet_level: int = 0
+## Po sezoni: { season_id: { magnet, loot, twin } }. Stari save bez ključa prepisuje
+## globalne nivoe na aktivnu sezonu; nova sezona kreće od 0.
+var season_upgrades: Dictionary = {}
 var multiplier_level: int = 0
 var discovered_blooms: Dictionary = {}
 
@@ -313,12 +319,14 @@ func load_player_save() -> bool:
 
 
 func save_player_save() -> void:
+	stash_upgrade_levels(active_season_id)
 	var data := {
 		"version": SAVE_VERSION,
 		"wallet_coins": wallet_coins,
 		"wallet_diamonds": wallet_diamonds,
 		"magnet_level": magnet_level,
 		"multiplier_level": multiplier_level,
+		"season_upgrades": _export_season_upgrades(),
 		"loadout_type_id": loadout_type_id,
 		"discovered_blooms": discovered_blooms.duplicate(),
 		"garden_beds": _serialize_beds(garden_beds),
@@ -573,6 +581,11 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	bloom_inbox_domain.apply_from_save(data)
 	seasons_domain.apply_from_save(data)
 	_normalize_season_progress()
+	if data.has("season_upgrades"):
+		season_upgrades = _parse_season_upgrades(data.get("season_upgrades", {}))
+		apply_active_upgrade_levels()
+	else:
+		stash_upgrade_levels(active_season_id)
 	if int(data.get("version", 0)) < SAVE_VERSION:
 		save_migrations.migrate_legacy_beds_to_inbox()
 	_clear_legacy_beds()
@@ -1692,14 +1705,12 @@ func spend_flowers_for_upgrade(preferred: String = "") -> bool:
 	return true
 
 
-func try_upgrade_magnet(preferred: String = "") -> bool:
-	if magnet_level >= MAGNET_MAX_LEVEL:
-		return false
-	if not spend_flowers_for_upgrade(preferred):
-		return false
-	magnet_level += 1
-	save_player_save()
-	return true
+func try_upgrade_magnet(_preferred: String = "") -> bool:
+	return _try_upgrade_track("magnet")
+
+
+func try_upgrade_twin() -> bool:
+	return _try_upgrade_track("twin")
 
 
 func get_loot_multiplier() -> float:
@@ -1718,14 +1729,136 @@ func format_loot_multiplier_label() -> String:
 	return "Loot Boost Lv %d / %d (x%.2f)" % [multiplier_level, MULTIPLIER_MAX_LEVEL, mult]
 
 
-func try_upgrade_multiplier(preferred: String = "") -> bool:
-	if multiplier_level >= MULTIPLIER_MAX_LEVEL:
+func try_upgrade_multiplier(_preferred: String = "") -> bool:
+	return _try_upgrade_track("loot")
+
+
+func upgrade_sheet_season_id() -> String:
+	if home_season_field_open and not home_season_field_id.is_empty():
+		return home_season_field_id
+	return active_season_id
+
+
+func get_upgrade_level(track: String, season_id: String = "") -> int:
+	var id := season_id if not season_id.is_empty() else upgrade_sheet_season_id()
+	if id == active_season_id and track == "magnet":
+		return magnet_level
+	if id == active_season_id and track == "loot":
+		return multiplier_level
+	return int(_upgrade_row(id).get(track, 0))
+
+
+func get_twin_seeds_level() -> int:
+	return int(_upgrade_row(active_season_id).get("twin", 0))
+
+
+## Kept granica sljedeće sezone, samo za njen ★3. Inače 0.
+func upgrade_flower_reserve(type_id: String) -> int:
+	var next_id := next_locked_free_id()
+	if next_id.is_empty() or type_id.is_empty():
+		return 0
+	var def: SeasonDef = get_season_def(next_id)
+	if def == null or def.t3_flowers_required <= 0:
+		return 0
+	var prev := previous_free_id_for(next_id)
+	if star3_type_id_for_season(prev) != type_id:
+		return 0
+	return def.t3_flowers_required
+
+
+func spendable_upgrade_flowers(season_id: String) -> int:
+	var type_id := star3_type_id_for_season(season_id)
+	if type_id.is_empty():
+		return 0
+	var have := int(garden_crystal_stash.get(type_id, 0))
+	return maxi(0, have - upgrade_flower_reserve(type_id))
+
+
+func upgrade_button_state(track: String, season_id: String = "") -> String:
+	var id := season_id if not season_id.is_empty() else upgrade_sheet_season_id()
+	return UiCamp.upgrade_state(
+		get_upgrade_level(track, id),
+		spendable_upgrade_flowers(id),
+		wallet_coins
+	)
+
+
+func _try_upgrade_track(track: String) -> bool:
+	var season_id := upgrade_sheet_season_id()
+	if season_id.is_empty():
 		return false
-	if not spend_flowers_for_upgrade(preferred):
+	var level := get_upgrade_level(track, season_id)
+	if UiCamp.upgrade_state(level, spendable_upgrade_flowers(season_id), wallet_coins) != UiCamp.UP_CAN:
 		return false
-	multiplier_level += 1
+	var type_id := star3_type_id_for_season(season_id)
+	var have := int(garden_crystal_stash.get(type_id, 0))
+	var left := have - UiCamp.UP_FLOWER_COST
+	if left <= 0:
+		garden_crystal_stash.erase(type_id)
+	else:
+		garden_crystal_stash[type_id] = left
+	wallet_coins -= UiCamp.upgrade_coin_cost(level)
+	var row := _upgrade_row(season_id)
+	row[track] = level + 1
+	season_upgrades[season_id] = row
+	if season_id == active_season_id:
+		if track == "magnet":
+			magnet_level = level + 1
+		elif track == "loot":
+			multiplier_level = level + 1
 	save_player_save()
 	return true
+
+
+func _upgrade_row(season_id: String) -> Dictionary:
+	if season_id.is_empty():
+		return {"magnet": 0, "loot": 0, "twin": 0}
+	if not season_upgrades.has(season_id) or not (season_upgrades[season_id] is Dictionary):
+		season_upgrades[season_id] = {"magnet": 0, "loot": 0, "twin": 0}
+	return season_upgrades[season_id]
+
+
+func stash_upgrade_levels(season_id: String) -> void:
+	if season_id.is_empty():
+		return
+	var row := _upgrade_row(season_id)
+	row["magnet"] = clampi(magnet_level, 0, MAGNET_MAX_LEVEL)
+	row["loot"] = clampi(multiplier_level, 0, MULTIPLIER_MAX_LEVEL)
+	season_upgrades[season_id] = row
+
+
+func apply_active_upgrade_levels() -> void:
+	var row := _upgrade_row(active_season_id)
+	magnet_level = clampi(int(row.get("magnet", 0)), 0, MAGNET_MAX_LEVEL)
+	multiplier_level = clampi(int(row.get("loot", 0)), 0, MULTIPLIER_MAX_LEVEL)
+
+
+func _export_season_upgrades() -> Dictionary:
+	var out := {}
+	for season_id in season_upgrades:
+		var row: Dictionary = season_upgrades[season_id]
+		out[str(season_id)] = {
+			"magnet": int(row.get("magnet", 0)),
+			"loot": int(row.get("loot", 0)),
+			"twin": int(row.get("twin", 0)),
+		}
+	return out
+
+
+func _parse_season_upgrades(raw: Variant) -> Dictionary:
+	var out := {}
+	if raw is not Dictionary:
+		return out
+	for season_id in raw:
+		var row: Variant = raw[season_id]
+		if row is not Dictionary:
+			continue
+		out[str(season_id)] = {
+			"magnet": clampi(int(row.get("magnet", 0)), 0, MAGNET_MAX_LEVEL),
+			"loot": clampi(int(row.get("loot", 0)), 0, MULTIPLIER_MAX_LEVEL),
+			"twin": clampi(int(row.get("twin", 0)), 0, UiCamp.UP_LEVELS),
+		}
+	return out
 
 
 func get_magnet_radius_for_level(level: int) -> float:
@@ -1913,6 +2046,18 @@ func exchange_garden_crystal(type_id: String = "", save: bool = true) -> bool:
 
 func sum_seed_bag_only() -> int:
 	return seed_bag_domain.sum()
+
+
+## Cijeli stog ulazi samo ako ga ima >= 4. Sitni stogovi daju 0.
+func mergeable_seed_count() -> int:
+	var counts: Array = []
+	for type_id in seed_bag:
+		counts.append(int(seed_bag[type_id]))
+	return UiCamp.gate_count(counts)
+
+
+func arena_gate_open() -> bool:
+	return mergeable_seed_count() >= UiCamp.GATE_MIN
 
 
 func get_bag_preview_types(limit: int = 3) -> Array[String]:

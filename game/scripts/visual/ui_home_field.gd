@@ -82,7 +82,7 @@ const ENDLESS_BTN  := Rect2i(774, 1477, 236, 124)
 const PLAY_DISC    := 88
 
 const SHEET_BASKET_H   := 1326
-const SHEET_UPGRADES_H := 922
+const SHEET_UPGRADES_H := 1200
 const PICKER_ROW_H     := 148
 const PICKER_PORTRAIT  := 112
 const UPGRADE_CARD     := Vector2i(1032, 264)

@@ -34,10 +34,11 @@ func push_coin(from: Vector2 = Vector2.ZERO) -> void:
 	_fly(from, _coin_target, UiAssets.get_chrome_icon("icon_coin"), "")
 
 
-func push_seed(type_id: String, from: Vector2 = Vector2.ZERO) -> void:
+func push_seed(type_id: String, from: Vector2 = Vector2.ZERO, amount: int = 1) -> void:
 	var flower_name: String = GameState.SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
-	_fly(from, _seed_target, null, type_id)
-	_push_toast(type_id, flower_name)
+	var pop := "+%d" % maxi(1, amount)
+	_fly(from, _seed_target, null, type_id, pop)
+	_push_toast(type_id, flower_name, pop)
 
 
 func push_diamond(from: Vector2 = Vector2.ZERO) -> void:
@@ -52,10 +53,10 @@ func get_toast_texts() -> PackedStringArray:
 	return out
 
 
-func _fly(from: Vector2, target: Control, icon: Texture2D, type_id: String) -> void:
+func _fly(from: Vector2, target: Control, icon: Texture2D, type_id: String, pop_text: String = "+1") -> void:
 	if _fly_parent == null or target == null or from == Vector2.ZERO:
 		return
-	var pop := FloatPop.new().setup("+1", false, icon, FLY_PX)
+	var pop := FloatPop.new().setup(pop_text, false, icon, FLY_PX)
 	if not type_id.is_empty():
 		pop.with_seed(type_id)
 	pop.modulate.a = 0.9
@@ -89,12 +90,12 @@ func _burst(at: Vector2) -> void:
 	tw.chain().tween_callback(ring.queue_free)
 
 
-func _push_toast(type_id: String, flower_name: String) -> void:
+func _push_toast(type_id: String, flower_name: String, pop_text: String = "+1") -> void:
 	while _toasts.size() >= MAX_TOASTS:
 		var old: Control = _toasts.pop_front()
 		if is_instance_valid(old):
 			old.queue_free()
-	var pop := FloatPop.new().setup("+1", false, null, NAME_PX)
+	var pop := FloatPop.new().setup(pop_text, false, null, NAME_PX)
 	pop.with_seed(type_id, flower_name)
 	add_child(pop)
 	_toasts.append(pop)

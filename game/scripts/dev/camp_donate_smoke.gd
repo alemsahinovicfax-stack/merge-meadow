@@ -36,64 +36,47 @@ func _run() -> void:
 		_fail("UpgradeCards should be removed from Camp (upgrades live on Home field)")
 		return
 
-	_reset_upgrade_state(gs, {"clover": 2}, 0, 0)
+	var flower := str(gs.call("star3_type_id_for_season", str(gs.get("active_season_id"))))
+	var reserve := int(gs.call("upgrade_flower_reserve", flower))
+	# Iznad Kept granice treba točno 2 ★3 te sezone, plus 10 coina za prvi nivo.
+	_reset_upgrade_state(gs, {flower: reserve + 2}, 0, 0, 10)
 	if not bool(gs.call("try_upgrade_magnet", "")):
-		_fail("try_upgrade_magnet with 2 clover failed")
+		_fail("magnet upgrade with %s above the reserve failed" % flower)
 		return
-	if int(gs.get("magnet_level")) != 1:
-		_fail("magnet_level expected 1 got %s" % str(gs.get("magnet_level")))
+	if int(gs.get("magnet_level")) != 1 or int(gs.get("wallet_coins")) != 0:
+		_fail("magnet should reach 1 and spend 10 coins")
 		return
 	var stash: Dictionary = gs.get("garden_crystal_stash")
-	if int(stash.get("clover", 0)) != 0:
-		_fail("clover stash should be 0 after magnet upgrade")
+	if int(stash.get(flower, 0)) != reserve:
+		_fail("upgrade must leave the Kept reserve, got %s" % str(stash.get(flower, 0)))
 		return
 
-	_reset_upgrade_state(gs, {"clover": 1}, 0, 0)
+	_reset_upgrade_state(gs, {flower: reserve + 1}, 0, 0, 10)
 	if bool(gs.call("try_upgrade_magnet", "")):
-		_fail("try_upgrade_magnet should fail with 1 flower")
-		return
-	stash = gs.get("garden_crystal_stash")
-	if int(gs.get("magnet_level")) != 0 or int(stash.get("clover", 0)) != 1:
-		_fail("failed magnet upgrade must not change level or stash")
+		_fail("magnet must fail when only 1 flower is above the reserve")
 		return
 
-	_reset_upgrade_state(gs, {"clover": 2}, 0, 0)
+	_reset_upgrade_state(gs, {flower: reserve + 2}, 0, 0, 9)
+	if bool(gs.call("try_upgrade_magnet", "")) or int(gs.get("wallet_coins")) != 9:
+		_fail("magnet must fail when coins are short and must not spend")
+		return
+
+	_reset_upgrade_state(gs, {flower: reserve + 2}, 0, 0, 20)
 	if not bool(gs.call("try_upgrade_multiplier", "")):
-		_fail("try_upgrade_multiplier with 2 clover failed")
+		_fail("loot upgrade failed")
 		return
-	stash = gs.get("garden_crystal_stash")
-	if int(gs.get("multiplier_level")) != 1 or int(stash.get("clover", 0)) != 0:
-		_fail("loot upgrade should reach 1 and spend 2 clover")
-		return
-
-	_reset_upgrade_state(gs, {"clover": 1}, 0, 0)
-	if bool(gs.call("try_upgrade_multiplier", "")) or int(gs.get("multiplier_level")) != 0:
-		_fail("try_upgrade_multiplier should fail with 1 flower")
+	if int(gs.get("multiplier_level")) != 1 or int(gs.get("wallet_coins")) != 10:
+		_fail("loot should reach 1 and spend 10 of 20 coins")
 		return
 
 	var max_lv := 4
-	_reset_upgrade_state(gs, {"clover": 5}, max_lv, 0)
+	_reset_upgrade_state(gs, {flower: reserve + 5}, max_lv, 0, 100)
 	if bool(gs.call("try_upgrade_magnet", "")):
 		_fail("try_upgrade_magnet at max should fail")
 		return
 	stash = gs.get("garden_crystal_stash")
-	if int(gs.get("magnet_level")) != max_lv or int(stash.get("clover", 0)) != 5:
+	if int(gs.get("magnet_level")) != max_lv or int(stash.get(flower, 0)) != reserve + 5:
 		_fail("maxed upgrade must not spend flowers")
-		return
-
-	_reset_upgrade_state(gs, {"clover": 3, "daisy": 2}, 0, 0)
-	if str(gs.call("pick_upgrade_flower_type", "")) != "clover":
-		_fail("C11 no-select should pick clover (higher count)")
-		return
-	if str(gs.call("pick_upgrade_flower_type", "daisy")) != "daisy":
-		_fail("C11 preferred daisy should pick daisy")
-		return
-	if not bool(gs.call("try_upgrade_magnet", "daisy")):
-		_fail("C11 spend daisy failed")
-		return
-	stash = gs.get("garden_crystal_stash")
-	if int(stash.get("daisy", 0)) != 0 or int(stash.get("clover", 0)) != 3:
-		_fail("C11 should spend daisy and keep clover 3")
 		return
 
 	print("camp_donate_smoke OK")
@@ -101,7 +84,8 @@ func _run() -> void:
 	quit(0)
 
 
-func _reset_upgrade_state(gs: Node, stash: Dictionary, magnet: int, loot: int) -> void:
+func _reset_upgrade_state(gs: Node, stash: Dictionary, magnet: int, loot: int, coins: int) -> void:
 	gs.set("garden_crystal_stash", stash.duplicate())
 	gs.set("magnet_level", magnet)
 	gs.set("multiplier_level", loot)
+	gs.set("wallet_coins", coins)

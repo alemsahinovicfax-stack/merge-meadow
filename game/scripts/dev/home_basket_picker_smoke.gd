@@ -226,6 +226,8 @@ func _run() -> void:
 			break
 	await process_frame
 	await process_frame
+	for seen_id in ["clover", "daisy", "buttercup", "tulip", "sunflower", "pumpkin"]:
+		gs.call("record_seed_pickup_lifetime", seen_id, 1)
 	if str(gs.get("home_season_field_id")) != "country_bloom":
 		_fail("field_id expected country_bloom got %s" % str(gs.get("home_season_field_id")))
 		return
@@ -296,25 +298,18 @@ func _run() -> void:
 		_fail("open picker should show BasketPickerOverlay")
 		return
 	var list: Node = home.get_node_or_null("%PickerList")
-	if list == null or list.get_child_count() != 6:
-		_fail("Bloom picker should list all 6 seeds, got %d" % (list.get_child_count() if list else -1))
+	# Index 1 otvara clover i daisy. Viđeno, ali još zaključano, se ne lista i nema katanca.
+	if list == null or list.get_child_count() != 2:
+		_fail("Bloom picker should list the 2 caught unlocked seeds, got %d" % (list.get_child_count() if list else -1))
 		return
 	for child in list.get_children():
 		var row_label := str(child.get("label_text"))
 		if row_label.findn("watermelon") >= 0 or row_label.findn("Patch Watermelon") >= 0:
 			_fail("Bloom picker must not list watermelon, got %s" % row_label)
 			return
-	var pumpkin_row: Control = null
-	for child in list.get_children():
-		if str(child.get_meta("seed_type_id", "")) == "pumpkin":
-			pumpkin_row = child as Control
-			break
-	if pumpkin_row == null:
-		_fail("Bloom picker must include locked pumpkin row")
-		return
-	if not bool(pumpkin_row.call("is_locked")):
-		_fail("locked pumpkin tile should show the lock state")
-		return
+		if row_label.findn("pumpkin") >= 0:
+			_fail("unopened pumpkin must not get a lock row")
+			return
 	var row_err := _assert_picker_rows(home)
 	if not row_err.is_empty():
 		_fail(row_err)

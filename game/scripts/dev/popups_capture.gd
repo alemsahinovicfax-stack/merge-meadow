@@ -187,7 +187,7 @@ func _arena_shots() -> void:
 	await _wait(0.3)
 	await _capture("A1_default")
 	cue.call("set_tutorial_visible", false)
-	_gs.set("seed_bag", {"clover": 8, "daisy": 4})
+	_gs.set("seed_bag", {"clover": 46, "daisy": 4})
 	arena.call("_on_bag_clicked")
 	await _frames(40)
 	cue.call("show_message", "Muncher's awake — a T3 freezes it 2s.")

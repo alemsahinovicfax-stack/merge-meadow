@@ -108,9 +108,9 @@ func _run() -> void:
 		_fail("stuck bag should show overlay")
 		return
 	var title := str(arena.call("get_need_title"))
-	if not title.contains("You need more seeds"):
+	if not title.contains("Not enough seeds"):
 		_restore_save(backup)
-		_fail("title should contain You need more seeds")
+		_fail("title should contain Not enough seeds")
 		return
 
 	arena.call("set_arena_page_active", false)

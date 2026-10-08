@@ -58,7 +58,7 @@ const CHIP_NUMBER := 56
 const CHIP_WAS := 40
 
 const SHEET_BASKET_H := 1326     # = UiHomeField.SHEET_BASKET_H
-const SHEET_UPGRADES_H := 922    # = UiHomeField.SHEET_UPGRADES_H
+const SHEET_UPGRADES_H := 1200    # = UiHomeField.SHEET_UPGRADES_H · treća kartica Twin Seeds
 const SHEET_RADIUS := 36
 const SHEET_EDGE := 4            # Ormar 3 → 4 (README § Sistem)
 const HANDLE := Vector2i(120, 12)
@@ -313,6 +313,8 @@ const S_MUNCHER_AWAKE := "Muncher’s awake!"
 const S_MUNCHER_FREEZE := "A T3 freezes it 2s"
 const S_NEED_TITLE := "You need more seeds!"
 const S_NEED_LINE := "Every type needs 4"
+const S_GATE_TITLE := "Not enough seeds"
+const S_GATE_COUNT := "%d / %d"
 const S_BACK_TO_CAMP := "Back to Camp"
 const S_RUN_TUT_COINS := "Coins for the shop!"
 const S_PAUSED := "Paused"

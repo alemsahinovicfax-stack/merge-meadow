@@ -124,7 +124,7 @@ func _measure_pour(arena: Node, gs: Node) -> void:
 		arena.set("_session_open", false)
 		for _i in 10:
 			await process_frame
-		gs.set("seed_bag", {"clover": 10, "daisy": 10, "buttercup": 10, "tulip": 10})
+		gs.set("seed_bag", {"clover": 20, "daisy": 10, "buttercup": 10, "tulip": 10})
 		var last := Time.get_ticks_usec()
 		arena.call("_on_bag_clicked")
 		for _i in 110:

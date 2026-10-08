@@ -36,6 +36,7 @@ var _seed_count: int = 0
 var _preview_types: Array[String] = []
 var _wiggle_t: float = 0.0
 var _can_pour: bool = false
+var _show_counter: bool = true
 var _base_position: Vector2 = Vector2.ZERO
 var _pour_tilt: float = 0.0
 var _pour_fly: float = 0.0
@@ -103,10 +104,7 @@ func set_state(seed_count: int, can_pour: bool, preview_types: Array) -> void:
 	for t in preview_types:
 		_preview_types.append(str(t))
 	visible = true
-	mouse_filter = (
-		Control.MOUSE_FILTER_STOP if seed_count > 0
-		else Control.MOUSE_FILTER_IGNORE
-	)
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	_redraw_all()
 
 
@@ -157,9 +155,12 @@ func get_mouth_position() -> Vector2:
 	return _base_position + UiArenaV2.BASKET_MOUTH
 
 
+func set_counter_visible(on: bool) -> void:
+	_show_counter = on
+	_redraw_all()
+
+
 func _on_gui_input(event: InputEvent) -> void:
-	if _seed_count <= 0:
-		return
 	if SceneRouter.is_input_blocked():
 		return
 	if event is InputEventMouseButton:
@@ -292,6 +293,8 @@ func _draw_flyers(c: CanvasItem) -> void:
 
 
 func _draw_counter(c: CanvasItem) -> void:
+	if not _show_counter:
+		return
 	var cfg := UiArenaV2.BASKET_COUNTER
 	var center := Vector2(cfg["c"][0], cfg["c"][1])
 	var r := float(cfg["r"])
