@@ -36,6 +36,7 @@ var _merge_disc: PanelContainer
 var _merge_icon: TextureRect
 var _merge_label: Label
 var _merge_text: String = ""
+var _height_tween: Tween
 
 
 func _ready() -> void:
@@ -126,6 +127,22 @@ func _build_merge_line() -> void:
 	UiCamp.style_label(_merge_label, 36, UiCamp.INK)
 
 
+## Visina bara: pojava / nestanak linije (152 ↔ 212) ide glatko (T_MERGE_LINE 0,16 s);
+## ostale promjene (strip rezervisanog) ostaju trenutne kao u v2.
+func _set_bar_height(h: int) -> void:
+	var target := float(h)
+	if is_equal_approx(custom_minimum_size.y, target):
+		return
+	if _height_tween != null and _height_tween.is_valid():
+		_height_tween.kill()
+	var line_step := absf(custom_minimum_size.y - target) == float(UiCamp.MERGE_LINE_GAP + UiCamp.MERGE_LINE_H)
+	if not is_inside_tree() or not line_step or GameState.reduce_motion:
+		custom_minimum_size.y = target
+		return
+	_height_tween = create_tween()
+	_height_tween.tween_property(self, "custom_minimum_size:y", target, UiCamp.T_MERGE_LINE) 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+
 func _apply_merge_line(text: String) -> void:
 	if _merge_row == null:
 		return
@@ -153,7 +170,7 @@ func apply_state(state: String, info: Dictionary) -> void:
 	var seed := str(info.get("kind", "seed")) == "seed"
 	var disabled := state == UiCamp.TRADE_DISABLED
 	var merge_text := UiCamp.merge_line_text(int(info.get("count", 0))) if seed and not disabled else ""
-	custom_minimum_size.y = UiCamp.trade_height_v3(state, not merge_text.is_empty())
+	_set_bar_height(UiCamp.trade_height_v3(state, not merge_text.is_empty()))
 
 	if disabled:
 		# Bez imena i bez "Nothing selected" — prazan okvir sam kaze da nema sta prodati.

@@ -93,6 +93,7 @@ const MERGE_LINE_ICON := 34
 const MINT := Color("#A8E6CF")
 const MERGE_LAST := Color("#FFE8B8")
 const T_MERGE_MARK := 0.14
+const T_MERGE_LINE := 0.16                   # TradeBar 152 ↔ 212 kad se linija pojavi / nestane
 const UP_LEVELS := 4
 const UP_FLOWER_COST := 2
 const UP_COIN_COST: Array[int] = [10, 20, 40, 60]
@@ -332,6 +333,33 @@ static func season_tint(season_id: String) -> Color:
 			return SEASON_AMBER
 		_:
 			return SEASON_FROST
+
+
+## Pilula s imenom sezone na sheetu nadogradnji (camp v3 SeasonTitle) — radi za svih 8
+## sezona: Country Bloom iz paketa, Frost / Lantern / Amber kao kartica u Campu, ostale
+## iz Season Kita (page tint, 7 % tamniji, da se vidi na krem sheetu). Tekst je DARK_INK.
+const SEASON_COUNTRY := Color("#E6F2DB")
+const SEASON_COUNTRY_EDGE := Color("#B8C2AF")
+
+
+static func sheet_season_tint(season_id: String) -> Color:
+	match season_id:
+		"country_bloom":
+			return SEASON_COUNTRY
+		"frost_orchard", "lantern_meadow", "amber_canopy":
+			return season_tint(season_id)
+		_:
+			return UiSeasons.page_color(season_id, SEASON_COUNTRY).darkened(0.07)
+
+
+static func sheet_season_tint_edge(season_id: String) -> Color:
+	match season_id:
+		"country_bloom":
+			return SEASON_COUNTRY_EDGE
+		"frost_orchard", "lantern_meadow", "amber_canopy":
+			return season_tint_edge(season_id)
+		_:
+			return UiSeasons.page_color(season_id, SEASON_COUNTRY).darkened(0.24)
 
 
 static func season_tint_edge(season_id: String) -> Color:

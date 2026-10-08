@@ -14,8 +14,6 @@ var actor: UiPip
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ensure_size()
-	clip_contents = true
-	clip_children = Control.CLIP_CHILDREN_AND_DRAW
 	_sync_actor()
 	if not GameState.cosmetics_changed.is_connected(_on_cosmetics_changed):
 		GameState.cosmetics_changed.connect(_on_cosmetics_changed)
@@ -68,6 +66,10 @@ func _sync_actor() -> void:
 	actor.visible = true
 	var side := minf(size.x, size.y)
 	var hud := crop_head or side <= 100.0
+	# Reže se samo HUD portret (crop glave). Arena Pip stoji u kutiji 150, a uši riga
+	# izlaze iznad nje — rezanje im je odsijecalo vrhove (playtest 2026-10-08).
+	clip_contents = hud
+	clip_children = Control.CLIP_CHILDREN_AND_DRAW if hud else Control.CLIP_CHILDREN_DISABLED
 	actor.crop_head = hud
 	actor.view = "front"
 	actor.box_px = side

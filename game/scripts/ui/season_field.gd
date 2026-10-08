@@ -37,7 +37,6 @@ signal grown_changed(grown: int, total: int)
 
 @onready var meadow_ground: Panel = $MeadowGround
 @onready var meadow_pip: Control = $MeadowPip
-@onready var meadow_note: Label = $MeadowNote
 
 var _open_season_id: String = ""
 var _wander_tween: Tween = null
@@ -51,7 +50,6 @@ var _pip_hold: bool = false
 var _backdrop: SeasonBackdropView
 var _ambient: SeasonAmbient
 var _kit: bool = false
-var _note_color: Color = Color(0.102, 0.102, 0.078, 1)
 ## Rect livade u prostoru polja (prelaz: rect kartice; prazno = cijelo polje).
 var _meadow_rect: Rect2 = Rect2()
 ## Mjesta koja su igraču već pokazana kao izrasla (po sezoni, za ovu sesiju): rast
@@ -70,9 +68,6 @@ func _ready() -> void:
 	set_process(false)
 	_ensure_kit_nodes()
 	_hide_pip_and_stop()
-	if meadow_note:
-		meadow_note.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_note_color = meadow_note.get_theme_color("font_color")
 	resized.connect(_on_resized)
 	visibility_changed.connect(_sync_sway)
 
@@ -166,8 +161,6 @@ func dismiss_flowers() -> void:
 	_laid_out_size = Vector2.ZERO
 	_hide_pip_and_stop()
 	clear_flowers()
-	if meadow_note:
-		meadow_note.visible = false
 	if _ambient:
 		_ambient.visible = false
 	_sync_sway()
@@ -183,8 +176,6 @@ func apply_reveal(u: float, rect: Rect2 = Rect2()) -> void:
 	_meadow_rect = rect
 	if meadow_ground:
 		meadow_ground.visible = _reveal_u >= 1.0
-	if meadow_note:
-		meadow_note.modulate.a = UiHomeV3.win(_reveal_u, UiHomeV3.NOTE_IN.x, UiHomeV3.NOTE_IN.y)
 	if _ambient:
 		var show := _kit and _reveal_u >= 1.0 and not _open_season_id.is_empty()
 		if show and not _ambient.visible:
@@ -342,8 +333,6 @@ func _apply_meadow_fill(season_id: String) -> void:
 		_ambient.visible = _kit and _reveal_u >= 1.0
 	var layers := UiSeasons.ambient_layers(UiSeasons.ambient(season_id)) if _kit else []
 	_puff_layer = layers[0]["layer"] if not layers.is_empty() else {}
-	if meadow_note:
-		meadow_note.add_theme_color_override("font_color", UiSeasons.ink_field(season_id, _note_color))
 
 
 func _rebuild_flowers(season_id: String) -> void:
@@ -422,11 +411,8 @@ func is_any_flower_growing() -> bool:
 	return false
 
 
+## Prazno polje nema rečenicu (playtest 2026-10-08) — brojač „0 / 13 grown" je dovoljan.
 func _refresh_meadow_chrome(grown: int) -> void:
-	if meadow_note:
-		meadow_note.visible = grown <= 0
-		if grown <= 0:
-			meadow_note.text = "Nothing has grown here yet. Bring seeds back from a run."
 	grown_changed.emit(grown, UiHomeField.MEADOW_SPOTS.size())
 
 

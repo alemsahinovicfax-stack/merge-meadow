@@ -2,17 +2,22 @@ class_name FieldUpgradesButton
 extends Control
 
 ## Ulaz u nadogradnje (design_handoff_home_field_v2) — treca plocica iste porodice,
-## gore desno. Nosi znak ︽ i dvije mini trake nivoa (Magnet, Loot), pa se napredak
-## vidi prije tapa; zlatna tacka znaci da se nesto moze kupiti sada.
+## gore desno. Nosi znak ︽ i tri mini trake nivoa (Magnet, Loot, Twin Seeds — Camp v3),
+## pa se napredak vidi prije tapa; zlatna tacka znaci da se nesto moze kupiti sada.
+## Tri reda stanu jer je znak podignut (y 20) a redovi su gusci (korak 18 umjesto 20).
 
 signal clicked
 
 const GLYPH_BOX := 84.0
-const ROWS := 2
+const GLYPH_Y := 20.0
+const ROWS := 3
 const SEGMENTS := 4
+const ROW_Y0 := 112.0
+const ROW_STEP := 18.0
 
 var _magnet_level: int = 0
 var _loot_level: int = 0
+var _twin_level: int = 0
 var _dot_on: bool = false
 var _glyph: Panel = null
 var _dot: Panel = null
@@ -27,17 +32,18 @@ func _ready() -> void:
 	add_theme_stylebox_override("panel", UiHomeField.tile())
 	_build()
 	gui_input.connect(_on_gui_input)
-	set_levels(_magnet_level, _loot_level, _dot_on)
+	set_levels(_magnet_level, _loot_level, _twin_level, _dot_on)
 
 
-func set_levels(magnet: int, loot: int, ready_dot: bool) -> void:
+func set_levels(magnet: int, loot: int, twin: int, ready_dot: bool) -> void:
 	_magnet_level = magnet
 	_loot_level = loot
+	_twin_level = twin
 	_dot_on = ready_dot
 	if _rows.is_empty():
 		return
 	for r in ROWS:
-		var level: int = _magnet_level if r == 0 else _loot_level
+		var level: int = [_magnet_level, _loot_level, _twin_level][r]
 		var segs: Array = _rows[r]
 		for i in segs.size():
 			var seg: Panel = segs[i]
@@ -64,7 +70,7 @@ func _build() -> void:
 	_glyph.name = "Glyph"
 	_glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_glyph.add_theme_stylebox_override("panel", UiHomeField.tile_icon(UiHomeField.MINT))
-	_glyph.position = Vector2(glyph_x, 25.0)
+	_glyph.position = Vector2(glyph_x, GLYPH_Y)
 	_glyph.size = Vector2(GLYPH_BOX, GLYPH_BOX)
 	_glyph.draw.connect(_draw_chevrons.bind(_glyph))
 	add_child(_glyph)
@@ -80,7 +86,7 @@ func _build() -> void:
 			seg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			seg.position = Vector2(
 				row_x + i * (UiHomeField.LEVEL_SEG.x + UiHomeField.LEVEL_SEG_GAP),
-				121.0 + r * float(UiHomeField.LEVEL_SEG.y + UiHomeField.LEVEL_SEG_GAP)
+				ROW_Y0 + r * ROW_STEP
 			)
 			seg.size = Vector2(UiHomeField.LEVEL_SEG)
 			add_child(seg)

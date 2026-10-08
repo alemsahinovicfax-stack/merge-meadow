@@ -306,7 +306,7 @@ func _apply_merge_mark(animate: bool) -> void:
 	if _merge_mark == null:
 		return
 	var show := _kind == "seed" and not _reserved and UiCamp.is_mergeable(_count)
-	_merge_mark.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(_count == UiCamp.MERGE_MIN))
+	_merge_mark.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(false))  # chip je uvijek mint; amber disk samo u liniji ispod Tradea
 	if show == _merge_mark.visible and not animate:
 		return
 	_merge_mark.visible = show

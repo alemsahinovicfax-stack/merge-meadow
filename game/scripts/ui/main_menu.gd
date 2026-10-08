@@ -429,6 +429,9 @@ func _ensure_twin_card() -> void:
 	if _twin_title:
 		_twin_title.name = "TwinTitle"
 		_twin_title.text = "Twin Seeds"
+		# Kopija može nastati prije _setup_typography — tada nosi zadanu bijelu boju i ime
+		# se ne vidi na krem kartici (playtest 2026-10-08). Stil se zato daje ovdje.
+		_style_sheet_label(_twin_title, 900, 52, UiPopups.OUTLINE)
 	_twin_button = twin.find_child("LootBoostButton", true, false) as PopupButton
 	if _twin_button:
 		_twin_button.name = "TwinButton"
@@ -448,7 +451,13 @@ func _style_upgrade_season_title() -> void:
 	var season_id := GameState.upgrade_sheet_season_id()
 	var def: SeasonDef = GameState.get_season_def(season_id)
 	upgrades_title.text = def.display_name if def != null else "Upgrades"
+	# SeasonTitle (camp v3): pilula 96, ime 56 / DARK_INK centrirano u njoj. Natpis iz scene
+	# ima min. visinu 92 i tekst na dnu, pa je ime sjedilo nisko — zato se ovdje poništava.
+	upgrades_title.custom_minimum_size = Vector2.ZERO
 	upgrades_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	upgrades_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	upgrades_title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_style_sheet_label(upgrades_title, 900, 56, UiCamp.DARK_INK)
 	var host := upgrades_title.get_parent()
 	if host == null or host.name == "SeasonTitle":
 		if host is PanelContainer:
@@ -458,6 +467,7 @@ func _style_upgrade_season_title() -> void:
 	pill.name = "SeasonTitle"
 	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pill.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	pill.custom_minimum_size = Vector2(0, 96)
 	var idx := upgrades_title.get_index()
 	host.remove_child(upgrades_title)
 	pill.add_child(upgrades_title)
@@ -468,14 +478,14 @@ func _style_upgrade_season_title() -> void:
 
 func _season_title_style(season_id: String) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
-	s.bg_color = UiCamp.season_tint(season_id)
-	s.border_color = UiCamp.season_tint_edge(season_id)
+	s.bg_color = UiCamp.sheet_season_tint(season_id)
+	s.border_color = UiCamp.sheet_season_tint_edge(season_id)
 	s.set_border_width_all(3)
 	s.set_corner_radius_all(48)
 	s.content_margin_left = 36.0
 	s.content_margin_right = 36.0
-	s.content_margin_top = 12.0
-	s.content_margin_bottom = 12.0
+	s.content_margin_top = 0.0
+	s.content_margin_bottom = 0.0
 	return s
 
 
@@ -966,6 +976,9 @@ func _rebuild_picker_list() -> void:
 		empty.text = "Seeds you catch in a run show up here"
 		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		empty.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		# PickerList je mreža s 3 kolone: natpis s prelomom bez širine lomi riječ po riječ
+		# i rasteže sheet (1326 → 1581). Uzima punu širinu sadržaja sheeta.
+		empty.custom_minimum_size.x = 1080.0 - SHEET_PAD.x - SHEET_PAD.z
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		UiCamp.style_label(empty, 40, UiCamp.INK)
 		picker_list.add_child(empty)
@@ -1058,6 +1071,7 @@ func _refresh_upgrades_button() -> void:
 	upgrades_button.set_levels(
 		GameState.get_upgrade_level("magnet", season_id),
 		GameState.get_upgrade_level("loot", season_id),
+		GameState.get_upgrade_level("twin", season_id),
 		ready
 	)
 

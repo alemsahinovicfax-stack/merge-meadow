@@ -16,7 +16,7 @@ const CTRL := [
 	["GrownChip", [300, 112, 480, 76], "cream"], ["Seasons", [70, 1477, 236, 124], "cream"],
 	["Play", [324, 1461, 432, 140], "peach"], ["Endless", [774, 1477, 236, 124], "lavender"],
 ]
-const TEXT := [["SeasonName", [240, 36, 600, 60]], ["MeadowNote", [130, 568, 820, 90]]]
+const TEXT := [["SeasonName", [240, 36, 600, 60]]]
 const SAMPLE_STEP := 12
 const CELL := 64.0
 ## Run pozadina se učitava u _run(): skripta koristi autoload GameState (greske-katalog #21).

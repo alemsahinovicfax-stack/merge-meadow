@@ -144,7 +144,6 @@ const FLOWER_STAGGER := 12.0 / 560.0
 const FLOWER_FADE := 100.0 / 560.0
 const FLOWER_SETTLE := 200.0 / 560.0
 const FLOWER_SCALE_FROM := 0.9
-const NOTE_IN := Vector2(0.30, 0.60)
 const FIELD_CHROME_IN := Vector2(0.60, 0.92)
 const FIELD_CHROME_Y := 16.0
 const FIELD_SIDE_SLIDE := 254.0

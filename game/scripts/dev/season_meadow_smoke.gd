@@ -799,6 +799,13 @@ func _run() -> void:
 		if not frost_pool.has(type_id):
 			_fail("Frost picker type %s not in Frost seed_type_ids" % str(type_id))
 			return
+	# Camp v3: picker korpe lista samo sjeme te sezone skupljeno barem jednom u runu.
+	var lifetime: Dictionary = gs.get("lifetime_seeds_collected")
+	lifetime.erase("frost_snowdrop")
+	if " ".join(_picker_labels(home)).findn("snowdrop") >= 0:
+		_fail("Frost picker must not list Frost Snowdrop before it is caught in a run")
+		return
+	lifetime["frost_snowdrop"] = 1
 	var frost_labels := _picker_labels(home)
 	var frost_joined := " ".join(frost_labels)
 	if frost_joined.findn("snowdrop") < 0:

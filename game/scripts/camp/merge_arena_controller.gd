@@ -58,7 +58,13 @@ var need_more_note: Label
 var _gate_count: PanelContainer
 var _gate_n: Label
 var _gate_mark: PanelContainer
+var _gate_of: Label
+var _gate_last_n: int = -1
+var _gate_last_open: bool = false
+var _gate_tween: Tween
 var _gate_play_run: bool = false
+var _modal_count: HBoxContainer
+var _modal_count_n: Label
 var back_to_camp_button: PopupButton
 
 var _chips: Array[ArenaSeedChip] = []
@@ -831,6 +837,9 @@ func _show_need_more_seeds_overlay() -> void:
 	need_more_overlay.set_title(UiPopups.S_NEED_TITLE)
 	if need_more_line:
 		need_more_line.text = UiPopups.S_NEED_LINE
+		need_more_line.visible = true
+	if _modal_count:
+		_modal_count.visible = false
 	if need_more_note:
 		need_more_note.visible = false
 	if back_to_camp_button:
@@ -844,8 +853,13 @@ func _show_arena_gate() -> void:
 	var small := _small_seed_entries()
 	_gate_play_run = GameState.sum_seed_bag_only() <= 0
 	need_more_overlay.set_title(UiPopups.S_GATE_TITLE)
+	# ModalCount (camp v3): ikona sjemena 84 · N 96/900 · „/ 50" 56 — umjesto obične linije.
 	if need_more_line:
 		need_more_line.text = UiPopups.S_GATE_COUNT % [n, UiCamp.GATE_MIN]
+		need_more_line.visible = _modal_count == null
+	if _modal_count:
+		_modal_count.visible = true
+		_modal_count_n.text = str(n)
 	if need_more_note:
 		need_more_note.visible = not small.is_empty()
 		need_more_note.text = UiPopups.S_NEED_LINE
@@ -869,7 +883,9 @@ func _hide_need_more_overlay() -> void:
 func _build_need_more_overlay() -> void:
 	need_more_overlay = PopupModal.new()
 	need_more_overlay.name = "NeedMoreSeedsOverlay"
-	need_more_overlay.z_index = 30
+	# Iznad brojača „N / 50" (z 60) i combo oznake (60): modal i scrim pokrivaju cijelu
+	# Arenu (playtest 2026-10-08: modal je bio iza brojača). Leteći coini (100) su prolazni.
+	need_more_overlay.z_index = 90
 	need_more_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(need_more_overlay)
 	need_more_overlay.setup(UiPopups.S_NEED_TITLE, "decision")
@@ -882,6 +898,7 @@ func _build_need_more_overlay() -> void:
 	line.add_theme_font_size_override("font_size", 44)
 	line.add_theme_color_override("font_color", UiPopups.OUTLINE)
 	need_more_overlay.content.add_child(line)
+	_build_modal_count(need_more_overlay.content)
 	need_more_note = Label.new()
 	need_more_note.name = "ModalNote"
 	need_more_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -901,6 +918,39 @@ func _build_need_more_overlay() -> void:
 	back_to_camp_button.configure("primary", UiPopups.S_BACK_TO_CAMP, false, UiAssets.get_chrome_icon("tab_camp"))
 	back_to_camp_button.clicked.connect(_on_back_to_camp_pressed)
 	need_more_overlay.content.add_child(back_to_camp_button)
+
+
+func _build_modal_count(host: Control) -> void:
+	_modal_count = HBoxContainer.new()
+	_modal_count.name = "ModalCount"
+	_modal_count.visible = false
+	_modal_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_modal_count.alignment = BoxContainer.ALIGNMENT_CENTER
+	_modal_count.add_theme_constant_override("separation", 16)
+	host.add_child(_modal_count)
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(84, 84)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.texture = UiAssets.get_chrome_icon("icon_seed")
+	_modal_count.add_child(icon)
+	_modal_count_n = Label.new()
+	_modal_count_n.name = "N"
+	_modal_count_n.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_modal_count_n.add_theme_font_override("font", UiPopups.font(900, 96))
+	_modal_count_n.add_theme_font_size_override("font_size", 96)
+	_modal_count_n.add_theme_color_override("font_color", UiPopups.OUTLINE)
+	_modal_count.add_child(_modal_count_n)
+	var of := Label.new()
+	of.name = "Of"
+	of.text = "/ %d" % UiCamp.GATE_MIN
+	of.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	of.add_theme_font_override("font", UiPopups.font(800, 56))
+	of.add_theme_font_size_override("font_size", 56)
+	of.add_theme_color_override("font_color", UiPopups.INK_SOFT)
+	_modal_count.add_child(of)
 
 
 func _small_seed_entries() -> Array:
@@ -962,6 +1012,13 @@ func _build_gate_count(playfield: Node) -> void:
 	_gate_n.name = "N"
 	_gate_n.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(_gate_n)
+	# „/ 50" je sitniji i siv (40 · #555C5E) — broj N nosi pilulu.
+	_gate_of = Label.new()
+	_gate_of.name = "Of"
+	_gate_of.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_gate_of.text = "/ %d" % UiCamp.GATE_MIN
+	UiCamp.style_label(_gate_of, 40, UiCamp.SUB_INK)
+	row.add_child(_gate_of)
 	_gate_mark = PanelContainer.new()
 	_gate_mark.custom_minimum_size = UiCamp.MERGE_MARK
 	_gate_mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -984,15 +1041,15 @@ func _apply_gate_count(show: bool) -> void:
 		return
 	var n := GameState.mergeable_seed_count()
 	var open := n >= UiCamp.GATE_MIN
-	_gate_n.text = UiPopups.S_GATE_COUNT % [n, UiCamp.GATE_MIN]
+	_gate_n.text = str(n)
 	UiCamp.style_label(_gate_n, 60, UiCamp.INK)
 	var plate := StyleBoxFlat.new()
 	plate.bg_color = UiCamp.MINT if open else Color("#FFF8F0")
 	plate.border_color = UiCamp.INK
 	plate.set_border_width_all(4)
 	plate.set_corner_radius_all(50)
-	plate.content_margin_left = 28.0
-	plate.content_margin_right = 28.0
+	plate.content_margin_left = 16.0
+	plate.content_margin_right = 22.0
 	plate.content_margin_top = 16.0
 	plate.content_margin_bottom = 16.0
 	plate.shadow_color = UiCamp.PAGE_SHADOW
@@ -1001,6 +1058,34 @@ func _apply_gate_count(show: bool) -> void:
 	_gate_count.add_theme_stylebox_override("panel", plate)
 	_gate_mark.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(false))
 	_gate_mark.modulate.a = 1.0 if open else 0.28
+	_pop_gate(n, open)
+
+
+## GateCount: novi broj = pop 1 → 1,08 → 1 (0,09 s); prelaz na 50 = oznaka 0,6 → 1,08 → 1 (0,18 s).
+func _pop_gate(n: int, open: bool) -> void:
+	var first := _gate_last_n < 0
+	var n_changed := n != _gate_last_n
+	var opened := open and not _gate_last_open
+	_gate_last_n = n
+	_gate_last_open = open
+	if first or not _gate_count.is_inside_tree() or GameState.reduce_motion:
+		return
+	if not n_changed and not opened:
+		return
+	if _gate_tween != null and _gate_tween.is_valid():
+		_gate_tween.kill()
+	_gate_tween = create_tween().set_parallel()
+	if n_changed:
+		_gate_n.pivot_offset = _gate_n.size * 0.5
+		_gate_n.scale = Vector2.ONE
+		_gate_tween.tween_property(_gate_n, "scale", Vector2.ONE * 1.08, 0.045)
+		_gate_tween.chain().tween_property(_gate_n, "scale", Vector2.ONE, 0.045)
+	if opened:
+		_gate_mark.pivot_offset = _gate_mark.size * 0.5
+		_gate_mark.scale = Vector2.ONE * 0.6
+		var mk := create_tween()
+		mk.tween_property(_gate_mark, "scale", Vector2.ONE * 1.08, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		mk.tween_property(_gate_mark, "scale", Vector2.ONE, 0.06)
 
 
 func _arena_slots_available() -> int:

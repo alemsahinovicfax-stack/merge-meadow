@@ -89,22 +89,6 @@ offset_bottom = 1404.0
 mouse_filter = 2
 script = ExtResource("8_pip")
 
-[node name="MeadowNote" type="Label" parent="FieldClip/SeasonField"]
-unique_name_in_owner = true
-visible = false
-z_index = 8
-layout_mode = 0
-offset_left = 130.0
-offset_top = 568.0
-offset_right = 950.0
-offset_bottom = 688.0
-mouse_filter = 2
-theme_override_colors/font_color = Color(0.102, 0.102, 0.078, 1)
-theme_override_font_sizes/font_size = 40
-text = "Nothing has grown here yet. Bring seeds back from a run."
-horizontal_alignment = 1
-autowrap_mode = 2
-
 [node name="CardNav" type="Control" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
