@@ -31,7 +31,7 @@ collision_layer = 1
 collision_mask = 2
 script = ExtResource("2_player")
 
-[node name="PipVisual" type="Sprite2D" parent="Player"]
+[node name="PipVisual" type="Node2D" parent="Player"]
 script = ExtResource("4_pip_visual")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]

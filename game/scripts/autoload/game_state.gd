@@ -185,6 +185,9 @@ var ads_removed: bool = false
 ## kad ga napraviš, ovdje ga poveži i snimi u save.
 var reduce_motion: bool = false
 var starter_pack_owned: bool = false
+## Tokeni IAP kupovina koje su već dodijelile potrošni Loot Burst. Opcioni ključ
+## u saveu — stari save bez njega ostaje prazan (ne diže SAVE_VERSION).
+var granted_purchase_tokens: Array[String] = []
 ## Unix vrijeme prvog pokretanja — Starter Pack se nudi 7 dana od njega
 ## (MonetizationConfig.STARTER_PACK_DAYS). Stari saveovi: počinje pri prvom
 ## pokretanju verzije koja ga zna.
@@ -322,6 +325,7 @@ func save_player_save() -> void:
 		"greenhouse_beds": _serialize_beds(greenhouse_beds),
 		"ads_removed": ads_removed,
 		"starter_pack_owned": starter_pack_owned,
+		"granted_purchase_tokens": granted_purchase_tokens.duplicate(),
 		"first_launch_unix": first_launch_unix,
 		"run_level": run_level,
 		"endless_runs_completed": endless_runs_completed,
@@ -549,6 +553,7 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	boosters.apply_from_save(data)
 	ads_removed = bool(data.get("ads_removed", false))
 	starter_pack_owned = bool(data.get("starter_pack_owned", false))
+	granted_purchase_tokens = _parse_string_array(data.get("granted_purchase_tokens", []))
 	first_launch_unix = maxi(0, int(data.get("first_launch_unix", 0)))
 	run_level = clampi(int(data.get("run_level", 1)), 1, RunLevelLibrary.MAX_RUN_LEVEL)
 	endless_runs_completed = maxi(0, int(data.get("endless_runs_completed", 0)))
@@ -646,6 +651,18 @@ func _parse_string_bool_dict(data: Variant) -> Dictionary:
 	for key in data:
 		if bool(data[key]):
 			out[str(key)] = true
+	return out
+
+
+func _parse_string_array(data: Variant) -> Array[String]:
+	var out: Array[String] = []
+	if not data is Array:
+		return out
+	for item in data:
+		var token := str(item)
+		if token.is_empty() or out.has(token):
+			continue
+		out.append(token)
 	return out
 
 
@@ -937,10 +954,10 @@ func is_loadout_in_active_season_pool() -> bool:
 	return get_active_season_spawn_types().has(loadout)
 
 
+## Tip sjemena u runu je ravnomjeran iz poola aktivne sezone. Korpa ne bira tip —
+## samo +LOADOUT_SPAWN_BONUS na šansu da pickup uopšte bude sjeme.
 func pick_random_run_seed_type() -> String:
 	var pool := get_active_season_spawn_types()
-	if is_loadout_in_active_season_pool():
-		return get_loadout_type()
 	if pool.is_empty():
 		return SEED_TYPE_CLOVER
 	return pool[randi() % pool.size()]
@@ -1449,8 +1466,12 @@ func double_loot_placeholder() -> bool:
 func request_revive() -> bool:
 	if not last_failed or revive_used_this_run or loot_doubled:
 		return false
+	# Fail je već upisao ceil(50%) u novčanik. Revive nastavlja s punim carryjem,
+	# pa se taj iznos skida da sljedeći finish ne plati coine još jednom.
+	wallet_coins = maxi(0, wallet_coins - last_run_coins)
 	revive_used_this_run = true
 	resume_pending = true
+	save_player_save()
 	go_to_scene(SCENE_RUN)
 	return true
 
@@ -1971,6 +1992,17 @@ func get_loot_burst_target() -> Dictionary:
 
 func can_buy_loot_burst() -> bool:
 	return boosters.can_buy_loot_burst()
+
+
+func has_granted_purchase_token(token: String) -> bool:
+	return not token.is_empty() and granted_purchase_tokens.has(token)
+
+
+## Ne snima sam — pozivalac (IAP) snima odmah nakon granta.
+func record_granted_purchase_token(token: String) -> void:
+	if token.is_empty() or granted_purchase_tokens.has(token):
+		return
+	granted_purchase_tokens.append(token)
 
 
 ## Starter Pack sadržaj (MonetizationConfig): coini, Pip Blossom (ako nije tvoj, odmah se

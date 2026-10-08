@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-layer="HubChrome" style="width:1080px;display:flex;flex-direction:column;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+  <sc-if value="{{ showHeader }}" hint-placeholder-val="{{ true }}">
+    <div data-layer="Header" style="flex:0 0 auto;position:relative;z-index:2;height:143px;background:#2A2233;box-shadow:0 6px 14px rgba(20,14,26,.34)">
+      <div style="height:140px;display:flex;align-items:center;gap:16px;padding:0 0 0 20px;box-sizing:border-box">
+        <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="3">
+          <div data-layer="{{ chip.layer }}" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)">
+            <img src="{{ chip.icon }}" alt="" style="width:64px;height:64px;flex:0 0 auto">
+            <div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;letter-spacing:-.01em;white-space:nowrap">{{ chip.value }}</div>
+          </div>
+        </sc-for>
+        <div data-layer="SettingsSlot" style="width:124px;height:140px;flex:0 0 auto;display:flex;align-items:center;padding-left:4px;box-sizing:border-box">
+          <div data-layer="SettingsButton" style="width:100px;height:100px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center">
+            <img src="icons/icon_settings_light.svg" alt="" style="width:56px;height:56px">
+          </div>
+        </div>
+      </div>
+      <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ showPage }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="PageArea" style="{{ pageStyle }}"></div>
+  </sc-if>
+  <sc-if value="{{ showFooter }}" hint-placeholder-val="{{ true }}">
+    <div data-layer="Footer" style="flex:0 0 auto;position:relative;z-index:2;height:144px;background:#2A2233;box-shadow:0 -6px 14px rgba(20,14,26,.34)">
+      <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+      <div style="position:relative;height:141px;display:flex">
+        <div data-layer="ActiveIndicator" style="{{ indicatorStyle }}"></div>
+        <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="5">
+          <div data-layer="{{ tab.layer }}" style="width:216px;height:141px;flex:0 0 auto;position:relative">
+            <div style="{{ tab.tileStyle }}">
+              <img data-layer="TabIcon" src="{{ tab.icon }}" alt="{{ tab.label }}" style="{{ tab.iconStyle }}">
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;part&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;full&quot;,&quot;header&quot;,&quot;footer&quot;],&quot;default&quot;:&quot;full&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;active&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:3,&quot;min&quot;:0,&quot;max&quot;:4,&quot;tsType&quot;:&quot;number&quot;},&quot;coins&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;260&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;seeds&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;41&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;flowers&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;27&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;pageBg&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;}}">
+const TABS = [['Tab_Shop', 'Shop', 'shop'], ['Tab_Journal', 'Journal', 'journal'], ['Tab_Home', 'Home', 'home'], ['Tab_Camp', 'Camp', 'camp'], ['Tab_Arena', 'Arena', 'arena']];
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const part = p.part ?? 'full';
+    const active = p.active ?? 3;
+    const vals = [p.coins ?? '260', p.seeds ?? '41', p.flowers ?? '27'];
+    const chips = [['CoinChip', 'icons/icon_coin.svg'], ['SeedChip', 'icons/icon_seed.svg'], ['FlowerChip', 'icons/icon_flower.svg']]
+      .map((c, i) => ({ layer: c[0], icon: c[1], value: String(vals[i]) }));
+    const tabs = TABS.map((t, i) => {
+      const on = i === active;
+      return {
+        layer: t[0], label: t[1],
+        icon: 'icons/tab_' + t[2] + (on ? '' : '_light') + '.svg',
+        tileStyle: 'position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;display:grid;place-items:center;background:' + (on ? '#FFB88C' : 'transparent') + ';border:2px solid ' + (on ? 'rgba(45,52,54,.14)' : 'transparent'),
+        iconStyle: on ? 'width:72px;height:72px;display:block;transform:translateY(-2px)' : 'width:64px;height:64px;display:block;opacity:.82'
+      };
+    });
+    return {
+      chips, tabs,
+      showHeader: part !== 'footer', showFooter: part !== 'header', showPage: part === 'full',
+      pageStyle: 'height:1633px;background:' + (p.pageBg || '#4E3F5A'),
+      indicatorStyle: 'position:absolute;top:6px;left:' + (active * 216 + 72) + 'px;width:72px;height:8px;border-radius:4px;z-index:1;background:#FFB88C'
+    };
+  }
+}
+</script>
+</body>
+</html>

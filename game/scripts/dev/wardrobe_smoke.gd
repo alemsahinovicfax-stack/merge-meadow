@@ -8,7 +8,7 @@ extends SceneTree
 ##  4. najviše 1 ShopLink po ekranu, 0 stavki iz Shopa koje igrač nema, 0 cijena;
 ##  5. proširenje samo podacima: 8 slotova / Pip 11 + Default; demoN 1 / 5 / 30;
 ##  6. katalog iz cosmetics.json: 5 id / slot / cijena kao prije;
-##  7. svaki recolor ključ postoji u pip_idle.svg, skin rasterizovan (0 PipDraw);
+##  7. svaki recolor ključ postoji u pip parts SVG-ima, atlas skina se rasterizuje;
 ##  8. Android back zatvara (i snima) ormar, ne polje; nema riječi „Save".
 ## Bez statičkih tipova za klase koje vide GameState (-s skripta se kompajlira prije autoloada).
 
@@ -123,9 +123,19 @@ func _check_catalog() -> void:
 
 # 7 — recolor na pravom artu
 func _check_recolor() -> void:
-	var src := PipAssets.svg_source()
+	var src := ""
+	var dir := DirAccess.open("res://assets/pip/parts")
+	if dir == null:
+		_fail("assets/pip/parts not readable")
+		return
+	dir.list_dir_begin()
+	var fname := dir.get_next()
+	while not fname.is_empty():
+		if fname.ends_with(".svg"):
+			src += FileAccess.get_file_as_string("res://assets/pip/parts/" + fname)
+		fname = dir.get_next()
 	if src.is_empty():
-		_fail("pip_idle.svg source not readable")
+		_fail("pip part SVGs not readable")
 		return
 	for it in CosmeticCatalog.items_in_slot("pip_skin"):
 		var id := str(it.get("id", ""))
@@ -134,14 +144,15 @@ func _check_recolor() -> void:
 			_fail("%s has no recolor" % id)
 		for k in map:
 			if src.findn(str(k)) < 0:
-				_fail("%s recolor key %s not in pip_idle.svg" % [id, k])
+				_fail("%s recolor key %s not in pip parts" % [id, k])
 		if not UiWardrobe.skin_body_ok(Color(str(map.get("#A8E6CF", "#A8E6CF")))):
 			_fail("%s body too dark for the double edge" % id)
-		var tex := PipAssets.get_skin_texture(id)
-		if tex == null or tex.get_width() < 256:
-			_fail("%s did not rasterize" % id)
-	if PipAssets.get_texture("") == null:
-		_fail("classic Pip texture missing")
+		var key := UiPip.skin_key_from_cosmetic(id)
+		var atlas: Dictionary = UiPip.atlas_for(key)
+		if atlas.is_empty() or atlas.get("texture") == null:
+			_fail("%s atlas missing" % id)
+	if UiPip.atlas_for("classic").get("texture") == null:
+		_fail("classic Pip atlas missing")
 
 
 # 1 — polje

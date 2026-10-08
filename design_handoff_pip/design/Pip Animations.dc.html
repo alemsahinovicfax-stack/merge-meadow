@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="pip_art.js"></script>
+<script src="pip_runtime.js"></script>
+<script src="pip_anim.js"></script>
+<style>body{margin:0;background:#FFF8F0;color:#2D3436;font-family:Nunito,system-ui,sans-serif}a{color:#2E7F8C}a:hover{color:#2D3436}input[type=range]{accent-color:#2D3436}</style>
+</helmet>
+<div style="min-height:100vh;display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:0">
+  <aside style="border-right:3px solid #2D3436;background:#FFFFFF;height:100vh;overflow:auto;position:sticky;top:0;padding:20px 16px;display:flex;flex-direction:column;gap:18px;box-sizing:border-box">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <div style="font:500 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#555C5E">design_handoff_pip</div>
+      <div style="font-size:30px;font-weight:900;line-height:1">Pip Animations</div>
+      <div style="font-size:15px;font-weight:700;color:#555C5E">{{ count }} animations · each one plays from animations.json</div>
+    </div>
+    <sc-for list="{{ groups }}" as="g" hint-placeholder-count="5">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#555C5E">{{ g.name }}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="6">
+            <button onClick="{{ it.pick }}" style="font:700 13px 'JetBrains Mono',monospace;padding:7px 10px;border-radius:12px;border:2px solid {{ it.edge }};background:{{ it.bg }};color:#2D3436;cursor:pointer">{{ it.id }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </aside>
+  <main style="padding:24px 28px 60px;display:flex;flex-direction:column;gap:20px;min-width:0">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+        <div style="font:500 13px 'JetBrains Mono',monospace;color:#555C5E">{{ meta }}</div>
+        <div style="font-size:44px;font-weight:900;line-height:1.05">{{ sel }}</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ skins }}" as="s" hint-placeholder-count="3">
+          <button onClick="{{ s.pick }}" style="font:800 15px Nunito,sans-serif;padding:10px 16px;border-radius:16px;border:3px solid #2D3436;background:{{ s.bg }};cursor:pointer;color:#2D3436">{{ s.title }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,360px);gap:20px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <div ref="{{ groundRef }}" style="position:relative;height:460px;border:3px solid #2D3436;border-radius:28px;overflow:hidden;background:#EAF3DF">
+          <div data-r="sky" style="position:absolute;left:0;right:0;top:0;height:62%;background:#BCD9A3"></div>
+          <div data-r="lane" style="position:absolute;top:0;bottom:0;left:50%;width:400px;margin-left:-200px;display:none;background:#3A5C41;border-left:8px solid #5F7A61;border-right:8px solid #5F7A61;box-sizing:border-box;overflow:hidden">
+            <div data-r="mow" style="position:absolute;left:0;right:0;height:52px;background:#45664B"></div>
+            <div data-r="mow" style="position:absolute;left:0;right:0;height:52px;background:#45664B"></div>
+            <div data-r="mow" style="position:absolute;left:0;right:0;height:52px;background:#45664B"></div>
+            <div data-r="mow" style="position:absolute;left:0;right:0;height:52px;background:#45664B"></div>
+          </div>
+          <div ref="{{ stageRef }}" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)"></div>
+          <div style="position:absolute;left:16px;top:14px;display:flex;gap:8px;flex-wrap:wrap">
+            <div style="font:700 13px 'JetBrains Mono',monospace;background:rgba(26,36,30,.84);color:#FFF8F0;border-radius:12px;padding:6px 10px">{{ stageNote }}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:#FFFFFF;border:3px solid #2D3436;border-radius:20px;padding:12px 16px">
+          <button onClick="{{ togglePlay }}" style="font:900 16px Nunito,sans-serif;min-width:96px;height:48px;border-radius:24px;border:3px solid #2D3436;background:#FFB88C;cursor:pointer;color:#2D3436">{{ playLabel }}</button>
+          <input type="range" min="0" max="1000" value="{{ scrub }}" onInput="{{ onScrub }}" style="flex:1;min-width:160px">
+          <div style="font:700 14px 'JetBrains Mono',monospace;min-width:110px;text-align:right">{{ timeLabel }}</div>
+          <div style="display:flex;gap:6px">
+            <sc-for list="{{ speeds }}" as="sp" hint-placeholder-count="3">
+              <button onClick="{{ sp.pick }}" style="font:800 13px 'JetBrains Mono',monospace;padding:8px 10px;border-radius:12px;border:2px solid #2D3436;background:{{ sp.bg }};cursor:pointer;color:#2D3436">{{ sp.label }}</button>
+            </sc-for>
+          </div>
+          <button onClick="{{ toggleRm }}" style="font:800 14px Nunito,sans-serif;padding:9px 14px;border-radius:14px;border:2px solid #2D3436;background:{{ rmBg }};cursor:pointer;color:#2D3436">reduce_motion: {{ rmLabel }}</button>
+        </div>
+        <sc-if value="{{ isRun }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:#FFFFFF;border:3px solid #2D3436;border-radius:20px;padding:12px 16px">
+            <div style="font-weight:900">World scroll</div>
+            <input type="range" min="400" max="800" step="5" value="{{ scroll }}" onInput="{{ onScroll }}" style="flex:1;min-width:160px">
+            <div style="font:700 14px 'JetBrains Mono',monospace">{{ scrollLabel }}</div>
+          </div>
+        </sc-if>
+        <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-weight:900;font-size:16px">Tracks · keys</div>
+          <div style="position:relative;display:flex;flex-direction:column;gap:3px">
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+              <div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px;align-items:center;height:18px">
+                <div style="font:500 12px 'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.label }}</div>
+                <div style="position:relative;height:14px;background:#F1EAE0;border-radius:7px">
+                  <sc-for list="{{ r.keys }}" as="k" hint-placeholder-count="3">
+                    <div style="position:absolute;top:3px;left:{{ k.left }};width:8px;height:8px;margin-left:-4px;border-radius:4px;background:{{ k.c }}"></div>
+                  </sc-for>
+                  <div style="position:absolute;top:-2px;bottom:-2px;width:2px;background:#E07A7A;left:{{ head }}"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-weight:900;font-size:18px">What it does</div>
+          <div style="font-size:16px;font-weight:600;line-height:1.4;text-wrap:pretty">{{ desc }}</div>
+        </div>
+        <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:900;font-size:18px">Data</div>
+          <sc-for list="{{ facts }}" as="f" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;font-size:14px">
+              <div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E;padding-top:2px">{{ f.k }}</div>
+              <div style="font-weight:700;overflow-wrap:anywhere">{{ f.v }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:900;font-size:18px">Events fired</div>
+          <div style="font:500 13px 'JetBrains Mono',monospace;line-height:1.6;white-space:pre-wrap">{{ evLog }}</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;start&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;idle&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;skin&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;classic&quot;,&quot;blossom&quot;,&quot;sky&quot;],&quot;default&quot;:&quot;classic&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;reduceMotion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const GROUPS = [
+  ['Home · field · card', a => /^(shared|home)/.test(a.ctx) && !/^hud/.test(a.id)],
+  ['Season interactions', a => a.ctx.startsWith('season:')],
+  ['Arena', a => a.ctx === 'arena'],
+  ['Run (top view)', a => a.ctx.startsWith('run') && a.ctx !== 'run_hud'],
+  ['Run HUD portrait 88', a => a.ctx === 'run_hud'],
+  ['Shop · Wardrobe', a => a.ctx === 'shop' || a.ctx === 'wardrobe']
+];
+const GROUND = { country_bloom: '#7DAA67', frost_orchard: '#9FB6CF', lantern_meadow: '#463E66', amber_canopy: '#7F5C3B', moonlit_warren: '#3B4175', coral_tide: '#E2B196', starfall_glade: '#3A3163', ember_fen: '#58392F' };
+const SKY = { country_bloom: '#BCD9A3', frost_orchard: '#C7D8EC', lantern_meadow: '#CDB6E6', amber_canopy: '#B7792F', moonlit_warren: '#252A55', coral_tide: '#86C9C6', starfall_glade: '#2A2350', ember_fen: '#C8744E' };
+class Component extends DCLogic {
+  state = { sel: this.props.start || 'idle', skin: this.props.skin || 'classic', playing: true, speed: 1, rm: !!this.props.reduceMotion, scroll: 400, ready: false, ev: [] };
+  stageRef = React.createRef(); groundRef = React.createRef(); t = 0; bt = 0; off = 0; last = 0; lastUi = 0;
+  componentDidMount() { this.boot(); }
+  componentWillUnmount() { cancelAnimationFrame(this.raf); this.inst && this.inst.destroy(); }
+  boot() { try { this.boot2(); } catch (e) { console.log('ERR', 'boot', e.stack); } }
+  boot2() { if (!window.Pip || !Pip.ANIMS || !Pip.ANIMS.sig_sky || !this.stageRef.current) { setTimeout(() => this.boot(), 60); return; } Pip.reduceMotion = this.state.rm; this.mount(); this.ready = true; this.setState({ ready: true }); this.raf = requestAnimationFrame(this.frame); }
+  anim() { return Pip.ANIMS[this.state.sel] || Pip.ANIMS.idle; }
+  baseFor(a) { return a.layer !== 'overlay' ? null : a.view === 'top' ? Pip.ANIMS.run_gallop : a.ctx === 'run_hud' ? Pip.ANIMS.hud_idle : a.view === 'three_q' ? Pip.ANIMS.stage_idle : Pip.ANIMS.idle; }
+  mount() {
+    const a = this.anim(); if (this.inst) this.inst.destroy();
+    const hud = a.ctx === 'run_hud';
+    this.inst = Pip.create(this.stageRef.current, { view: a.view, skin: this.state.skin, size: a.view === 'top' ? 300 : hud ? 264 : 380, still: true, crop: hud ? [40, 40, 176, 176] : null });
+    this.inst.on((n, g) => this.pushEv(n, g));
+    this.t = 0; this.bt = 0; this.paint();
+  }
+  pushEv(n, g) { const s = (this.t).toFixed(2) + ' s  ' + n + (g != null ? ' (' + g + ')' : ''); this.setState(st => ({ ev: [s].concat(st.ev).slice(0, 6) })); }
+  paint() {
+    const a = this.anim(), b = this.baseFor(a), rm = Pip.reduceMotion, pose = {};
+    let t = this.t; if (rm && a.rm && a.rm.type === 'end') t = a.len;
+    if (b) Pip.sample(b, this.bt % b.len, pose, rm);
+    Pip.sample(a, Math.min(t, a.len), pose, rm);
+    this.inst.render(pose);
+    const g = this.groundRef.current; if (!g) return;
+    const sky = g.querySelector('[data-r=sky]'), lane = g.querySelector('[data-r=lane]');
+    if (a.view === 'top') { g.style.background = '#26382C'; sky.style.display = 'none'; lane.style.display = ''; const per = 248, o = (this.off * 2) % per; g.querySelectorAll('[data-r=mow]').forEach((m, i) => { m.style.transform = 'translateY(' + (o + (i - 1) * per).toFixed(1) + 'px)'; }); }
+    else { const sid = (a.ctx.split(':')[1]) || 'country_bloom'; g.style.background = GROUND[sid] || '#7DAA67'; sky.style.display = ''; sky.style.background = SKY[sid] || '#BCD9A3'; lane.style.display = 'none'; }
+  }
+  frame = (ts) => { try { this.frame2(ts); } catch (e) { console.log('ERR', 'frame', e.stack); } this.raf = requestAnimationFrame(this.frame); };
+  frame2(ts) {
+    const dt = this.last ? Math.min(.05, (ts - this.last) / 1000) : 0; this.last = ts;
+    const a = this.anim();
+    if (this.state.playing && this.inst) {
+      const run = a.view === 'top', sc = run ? this.state.scroll / 400 : 1, sp = this.state.speed;
+      const rate = a.id === 'run_gallop' || a.speed_bind && run ? sc : 1;
+      const pt = this.t; this.t += dt * sp * rate; this.bt += dt * sp * sc;
+      a.events.forEach(([et, n, g]) => { if (pt < et && this.t >= et) this.pushEv(n, g); });
+      if (this.t > a.len + (a.loop ? 0 : .6)) { this.t = a.loop ? this.t % a.len : 0; }
+      if (run && !(a.id === 'fail' || a.id === 'fail_dizzy' || (a.id === 'finish' && this.t > .3))) this.off += dt * sp * this.state.scroll;
+      this.paint();
+    }
+    if (ts - this.lastUi > 66) { this.lastUi = ts; this.forceUpdate(); }
+  }
+  pick(id) { this.setState({ sel: id, ev: [] }, () => this.mount()); }
+  renderVals() { try { return this.rv(); } catch (e) { console.log('ERR', 'rv', e.stack); return {}; } }
+  rv() {
+    const ready = this.state.ready && window.Pip && Pip.ANIMS.idle;
+    const a = ready ? this.anim() : { id: this.state.sel, len: 1, tracks: {}, events: [], ctx: '', view: 'front', layer: 'base', rm: {}, desc: '' };
+    const groups = ready ? GROUPS.map(([name, f]) => ({ name, items: Pip.ORDER.map(id => Pip.ANIMS[id]).filter(f).map(x => ({ id: x.id, pick: () => this.pick(x.id), bg: x.id === this.state.sel ? '#FFB88C' : '#FFFFFF', edge: x.id === this.state.sel ? '#2D3436' : 'rgba(45,52,54,.25)' })) })) : [];
+    const rows = [];
+    const C = { p: '#2E7F8C', r: '#D6A82F', s: '#A275CD', a: '#7FB98B', v: '#555C5E', f: '#E07A7A' };
+    for (const n in a.tracks) for (const q in a.tracks[n]) rows.push({ label: n + '.' + q, keys: a.tracks[n][q].map(k => ({ left: (k[0] / a.len * 100).toFixed(1) + '%', c: C[q] })) });
+    if (a.events.length) rows.push({ label: 'events', keys: a.events.map(e => ({ left: (e[0] / a.len * 100).toFixed(1) + '%', c: '#2D3436' })) });
+    const t = Math.min(this.t, a.len);
+    const ch = [...new Set(rows.map(r => r.label))].length;
+    return {
+      count: ready ? Pip.ORDER.length : '…', groups, sel: a.id, stageRef: this.stageRef, groundRef: this.groundRef,
+      meta: (a.ctx || '') + ' · view ' + a.view + ' · ' + a.layer + (a.loop ? ' · loop' : ''),
+      skins: ready ? Pip.PipSkins || window.PipArt.SKINS.map(s => ({ title: s.title, pick: () => this.setState({ skin: s.key }, () => this.mount()), bg: s.key === this.state.skin ? s.tokens.fur : '#FFFFFF' })) : [],
+      stageNote: a.view === 'top' ? 'top view · 150 px frame × 2 · lane 200 px' : a.ctx === 'run_hud' ? 'HUD portrait crop · shown at 3× of 88' : a.view + ' · 256 px frame · 1.48×',
+      togglePlay: () => this.setState({ playing: !this.state.playing }), playLabel: this.state.playing ? 'Pause' : 'Play',
+      scrub: Math.round(t / a.len * 1000), onScrub: e => { this.t = +e.target.value / 1000 * a.len; this.setState({ playing: false }); this.paint(); },
+      timeLabel: t.toFixed(2) + ' / ' + a.len.toFixed(2) + ' s',
+      speeds: [.25, .5, 1].map(v => ({ label: v + '×', pick: () => this.setState({ speed: v }), bg: this.state.speed === v ? '#FFEAA7' : '#FFFFFF' })),
+      toggleRm: () => { const v = !this.state.rm; Pip.reduceMotion = v; this.setState({ rm: v }); }, rmLabel: this.state.rm ? 'on' : 'off', rmBg: this.state.rm ? '#A8E6CF' : '#FFFFFF',
+      isRun: a.view === 'top', scroll: this.state.scroll, onScroll: e => this.setState({ scroll: +e.target.value }),
+      scrollLabel: this.state.scroll + ' px/s · ramp ×' + (this.state.scroll / 400).toFixed(2) + ' · speed_scale ' + (this.state.scroll / 400).toFixed(2),
+      rows, head: (t / a.len * 100).toFixed(1) + '%', desc: a.desc,
+      facts: [
+        { k: 'length', v: a.len + ' s' + (a.loop ? ' (loop)' : '') + (a.hold ? ' · holds last frame' : '') },
+        { k: 'layer', v: a.layer === 'overlay' ? 'overlay — plays over ' + ((this.baseFor(a) || {}).id || '') : 'base (Body player)' },
+        { k: 'tracks', v: rows.length - (a.events.length ? 1 : 0) + ' tracks on ' + Object.keys(a.tracks).length + ' nodes' },
+        { k: 'speed_bind', v: a.speed_bind || '—' },
+        { k: 'reduce_motion', v: JSON.stringify(a.rm) },
+        { k: 'transitions', v: 'Godot key transition: 1 lin · 0 hold · 0.5 out · 2 in · −2 in-out' }
+      ],
+      evLog: this.state.ev.length ? this.state.ev.join('\n') : '—'
+    };
+  }
+}
+</script>
+</body>
+</html>

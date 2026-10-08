@@ -1,0 +1,192 @@
+{
+ "schema": 1,
+ "generated": "2026-10-07T12:46:16.672Z",
+ "source": "design_handoff_pip/design/pip_*.js",
+ "boxes_game_px": {
+  "home_card": {
+   "size": 230,
+   "pos": [
+    425,
+    1027
+   ]
+  },
+  "field": {
+   "size": 190,
+   "zone_feet": [
+    151,
+    1306,
+    614,
+    131
+   ],
+   "default_base": [
+    756,
+    1404
+   ]
+  },
+  "arena": {
+   "size": 150,
+   "inset_from_bottom_left": [
+    30,
+    26
+   ]
+  },
+  "run": {
+   "size": 150,
+   "lanes_x": [
+    270,
+    540,
+    810
+   ],
+   "feet_y": 1574,
+   "collision": [
+    56,
+    56
+   ],
+   "lane_tween_s": 0.12
+  },
+  "run_hud": {
+   "portrait": 88,
+   "chip": [
+    40,
+    232,
+    268,
+    120
+   ]
+  },
+  "shop_looks_card": [
+   984,
+   300
+  ],
+  "wardrobe_stage": [
+   1032,
+   300
+  ],
+  "wardrobe_thumb": [
+   210,
+   150
+  ]
+ },
+ "view_scale": {
+  "front_three_q_side_back": "frame 256 → box: scale = box / 256 (field .742, card .898, arena .586, stage .78)",
+  "top": "frame 150 = game px 1:1"
+ },
+ "counts": {
+  "animations": 77,
+  "loops": 10,
+  "overlays": 14,
+  "expressions": 24,
+  "season_interactions": 16
+ },
+ "per_view": {
+  "front": {
+   "nodes": 33,
+   "sprite_parts_max": 21,
+   "overlays": 3,
+   "fx_nodes": 10,
+   "worst_skin_parts": 19
+  },
+  "three_q": {
+   "nodes": 35,
+   "sprite_parts_max": 23,
+   "overlays": 5,
+   "fx_nodes": 10,
+   "worst_skin_parts": 21
+  },
+  "side": {
+   "nodes": 33,
+   "sprite_parts_max": 21,
+   "overlays": 5,
+   "fx_nodes": 10,
+   "worst_skin_parts": 19
+  },
+  "back": {
+   "nodes": 27,
+   "sprite_parts_max": 15,
+   "overlays": 5,
+   "fx_nodes": 10,
+   "worst_skin_parts": 13
+  },
+  "top": {
+   "nodes": 32,
+   "sprite_parts_max": 20,
+   "overlays": 5,
+   "fx_nodes": 10,
+   "worst_skin_parts": 18
+  }
+ },
+ "atlas_per_skin": {
+  "classic": {
+   "at_1x": {
+    "w": 1024,
+    "h": 223,
+    "sprites": 52,
+    "scale": 1
+   },
+   "at_1_5x": {
+    "w": 1024,
+    "h": 429,
+    "sprites": 52,
+    "scale": 1.5
+   },
+   "at_2x": {
+    "w": 1024,
+    "h": 796,
+    "sprites": 52,
+    "scale": 2
+   }
+  },
+  "blossom": {
+   "at_1x": {
+    "w": 1024,
+    "h": 223,
+    "sprites": 54,
+    "scale": 1
+   },
+   "at_1_5x": {
+    "w": 1024,
+    "h": 429,
+    "sprites": 54,
+    "scale": 1.5
+   },
+   "at_2x": {
+    "w": 1024,
+    "h": 802,
+    "sprites": 54,
+    "scale": 2
+   }
+  },
+  "sky": {
+   "at_1x": {
+    "w": 1024,
+    "h": 227,
+    "sprites": 55,
+    "scale": 1
+   },
+   "at_1_5x": {
+    "w": 1024,
+    "h": 435,
+    "sprites": 55,
+    "scale": 1.5
+   },
+   "at_2x": {
+    "w": 1024,
+    "h": 810,
+    "sprites": 55,
+    "scale": 2
+   }
+  }
+ },
+ "fx_atlas": {
+  "sprites": 29,
+  "area_px": 48157
+ },
+ "svg_bytes_total": 61095,
+ "svg_files": 89,
+ "checks": {
+  "overlay_channels_ok": true,
+  "overlay_violations": [],
+  "gallop_contact_speed_px_s": 400,
+  "gallop_feet_locked": true,
+  "every_anim_has_reduce_motion": true
+ }
+}

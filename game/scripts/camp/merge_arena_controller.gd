@@ -167,7 +167,7 @@ func _layout_arena_pip() -> void:
 func _add_session_t3() -> void:
 	_session_t3_count += 1
 	_apply_meadow_tint(true)
-	_react_arena_pip()
+	_react_arena_pip(ARENA_PIP_REACT_SCALE, ARENA_PIP_REACT_SEC, "merge_t3")
 
 
 func get_session_t3_count() -> int:
@@ -187,9 +187,16 @@ func _apply_meadow_tint(animated: bool = false) -> void:
 
 
 func _react_arena_pip(
-	react_scale: float = ARENA_PIP_REACT_SCALE, react_sec: float = ARENA_PIP_REACT_SEC
+	react_scale: float = ARENA_PIP_REACT_SCALE, react_sec: float = ARENA_PIP_REACT_SEC,
+	anim: String = ""
 ) -> void:
 	if arena_pip == null:
+		return
+	if arena_pip.has_method("play_pip"):
+		var id := anim
+		if id.is_empty():
+			id = "combo_big" if react_scale >= 1.24 else "combo_hop"
+		arena_pip.call("play_pip", id)
 		return
 	if _pip_react_tween != null:
 		_pip_react_tween.kill()

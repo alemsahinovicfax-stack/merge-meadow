@@ -268,6 +268,7 @@ func _build() -> void:
 	_stage_preview = ItemPreview.new()
 	_stage_preview.name = "ItemPreview"
 	_stage_preview.preview_size = ItemPreview.SIZE_STAGE
+	_stage_preview.live_pose = true
 	_stage_preview.size = Vector2(UiWardrobe.STAGE)
 	_stage_preview.set_frame(
 		float(UiWardrobe.STAGE_BORDER), float(UiWardrobe.STAGE_RADIUS), UiWardrobe.STICKER_EDGE, UiWardrobe.STICKER

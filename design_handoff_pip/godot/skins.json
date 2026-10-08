@@ -1,0 +1,460 @@
+{
+ "schema": 1,
+ "rule": "new skin = one entry: tokens (7 hex) + overlays[] (+ optional showcase / signature anim ids). Parts are drawn in classic hexes; recolor = PipAssets.recolor_svg(part, classic→skin).",
+ "token_names": [
+  "fur",
+  "fur_sh",
+  "fur_lt",
+  "ear_in",
+  "cheek",
+  "nose",
+  "iris"
+ ],
+ "classic": {
+  "fur": "#A8E6CF",
+  "fur_sh": "#7CCBAE",
+  "fur_lt": "#D4F5E4",
+  "ear_in": "#FFCCD5",
+  "cheek": "#FFB88C",
+  "nose": "#F2899F",
+  "iris": "#3E7D69"
+ },
+ "skins": [
+  {
+   "key": "classic",
+   "cosmetic_id": "",
+   "title": "Classic Pip",
+   "coin_cost": 0,
+   "tokens": {
+    "fur": "#A8E6CF",
+    "fur_sh": "#7CCBAE",
+    "fur_lt": "#D4F5E4",
+    "ear_in": "#FFCCD5",
+    "cheek": "#FFB88C",
+    "nose": "#F2899F",
+    "iris": "#3E7D69"
+   },
+   "recolor": {},
+   "overlays": [],
+   "showcase_anim": "pose_classic",
+   "signature_anim": "sig_classic",
+   "detail": "Mint coat, folded right-ear tip and the three-lock forehead tuft. The base every skin keeps."
+  },
+  {
+   "key": "blossom",
+   "cosmetic_id": "pip_blossom",
+   "title": "Pip Blossom",
+   "coin_cost": 250,
+   "tokens": {
+    "fur": "#FFD3DE",
+    "fur_sh": "#F2AEC1",
+    "fur_lt": "#FFF0F3",
+    "ear_in": "#FF9FB8",
+    "cheek": "#FF94AE",
+    "nose": "#E5678A",
+    "iris": "#8C4560"
+   },
+   "recolor": {
+    "#A8E6CF": "#FFD3DE",
+    "#7CCBAE": "#F2AEC1",
+    "#D4F5E4": "#FFF0F3",
+    "#FFCCD5": "#FF9FB8",
+    "#FFB88C": "#FF94AE",
+    "#F2899F": "#E5678A",
+    "#3E7D69": "#8C4560"
+   },
+   "overlays": [
+    {
+     "id": "ov_sprig",
+     "file": {
+      "file": "res://assets/pip/overlays/ov_sprig.svg",
+      "offset": [
+       -21,
+       -22
+      ],
+      "size": [
+       45,
+       36
+      ]
+     },
+     "attach": {
+      "front": {
+       "parent": "ear_L",
+       "pos": [
+        4,
+        -2
+       ],
+       "z": 6,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "three_q": {
+       "parent": "ear_L",
+       "pos": [
+        4,
+        -2
+       ],
+       "z": 6,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "side": {
+       "parent": "ear_R",
+       "pos": [
+        2,
+        -6
+       ],
+       "z": 8,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "back": {
+       "parent": "ear_L",
+       "pos": [
+        -2,
+        -2
+       ],
+       "z": 6,
+       "scale": [
+        -1,
+        1
+       ]
+      },
+      "top": {
+       "parent": "head",
+       "pos": [
+        -13,
+        -2
+       ],
+       "z": 4,
+       "scale": [
+        0.8,
+        0.8
+       ]
+      }
+     }
+    },
+    {
+     "id": "ov_btail",
+     "file": {
+      "file": "res://assets/pip/overlays/ov_btail.svg",
+      "offset": [
+       -21,
+       -21
+      ],
+      "size": [
+       41,
+       42
+      ]
+     },
+     "attach": {
+      "front": null,
+      "three_q": {
+       "parent": "tail",
+       "pos": [
+        0,
+        0
+       ],
+       "z": 1,
+       "scale": [
+        0.85,
+        0.85
+       ]
+      },
+      "side": {
+       "parent": "tail",
+       "pos": [
+        -2,
+        0
+       ],
+       "z": 1,
+       "scale": [
+        0.85,
+        0.85
+       ]
+      },
+      "back": {
+       "parent": "tail",
+       "pos": [
+        0,
+        0
+       ],
+       "z": 1,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "top": {
+       "parent": "tail",
+       "pos": [
+        0,
+        0
+       ],
+       "z": 1,
+       "scale": [
+        1,
+        1
+       ]
+      }
+     }
+    }
+   ],
+   "showcase_anim": "pose_blossom",
+   "signature_anim": "sig_blossom",
+   "detail": "Cherry-blossom sprig at the left ear root (two flowers + leaf) and a five-petal blossom tail. Signature: twirl that sheds six petals."
+  },
+  {
+   "key": "sky",
+   "cosmetic_id": "pip_sky",
+   "title": "Pip Sky",
+   "coin_cost": 200,
+   "tokens": {
+    "fur": "#C2E2FA",
+    "fur_sh": "#96C3EC",
+    "fur_lt": "#EAF5FE",
+    "ear_in": "#FFCDD6",
+    "cheek": "#FFB98D",
+    "nose": "#F2899E",
+    "iris": "#3B6A9B"
+   },
+   "recolor": {
+    "#A8E6CF": "#C2E2FA",
+    "#7CCBAE": "#96C3EC",
+    "#D4F5E4": "#EAF5FE",
+    "#FFCCD5": "#FFCDD6",
+    "#FFB88C": "#FFB98D",
+    "#F2899F": "#F2899E",
+    "#3E7D69": "#3B6A9B"
+   },
+   "overlays": [
+    {
+     "id": "ov_ctip_l",
+     "file": {
+      "file": "res://assets/pip/overlays/ov_ctip_l.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     },
+     "attach": {
+      "front": {
+       "parent": "ear_L",
+       "pos": [
+        0,
+        -62
+       ],
+       "z": 2,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "three_q": {
+       "parent": "ear_L",
+       "pos": [
+        0,
+        -62
+       ],
+       "z": 2,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "side": {
+       "parent": "ear_L",
+       "pos": [
+        0,
+        -62
+       ],
+       "z": 2,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "back": {
+       "parent": "ear_L",
+       "pos": [
+        0,
+        -62
+       ],
+       "z": 2,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "top": {
+       "parent": "ear_L",
+       "pos": [
+        0,
+        -62
+       ],
+       "z": 2,
+       "scale": [
+        1,
+        1
+       ]
+      }
+     }
+    },
+    {
+     "id": "ov_ctip_r",
+     "file": {
+      "file": "res://assets/pip/overlays/ov_ctip_r.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     },
+     "attach": {
+      "front": {
+       "parent": "ear_R_tip",
+       "pos": [
+        0,
+        -22
+       ],
+       "z": 2,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "three_q": {
+       "parent": "ear_R_tip",
+       "pos": [
+        0,
+        -22
+       ],
+       "z": 2,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "side": {
+       "parent": "ear_R_tip",
+       "pos": [
+        0,
+        -22
+       ],
+       "z": 2,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "back": {
+       "parent": "ear_R_tip",
+       "pos": [
+        0,
+        -22
+       ],
+       "z": 2,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "top": {
+       "parent": "ear_R_tip",
+       "pos": [
+        0,
+        -22
+       ],
+       "z": 2,
+       "scale": [
+        1,
+        1
+       ]
+      }
+     }
+    },
+    {
+     "id": "ov_ctail",
+     "file": {
+      "file": "res://assets/pip/overlays/ov_ctail.svg",
+      "offset": [
+       -25,
+       -25
+      ],
+      "size": [
+       53,
+       42
+      ]
+     },
+     "attach": {
+      "front": null,
+      "three_q": {
+       "parent": "tail",
+       "pos": [
+        -2,
+        0
+       ],
+       "z": 1,
+       "scale": [
+        0.85,
+        0.85
+       ]
+      },
+      "side": {
+       "parent": "tail",
+       "pos": [
+        -4,
+        0
+       ],
+       "z": 1,
+       "scale": [
+        -0.85,
+        0.85
+       ]
+      },
+      "back": {
+       "parent": "tail",
+       "pos": [
+        0,
+        0
+       ],
+       "z": 1,
+       "scale": [
+        1,
+        1
+       ]
+      },
+      "top": {
+       "parent": "tail",
+       "pos": [
+        0,
+        0
+       ],
+       "z": 1,
+       "scale": [
+        1,
+        1
+       ]
+      }
+     }
+    }
+   ],
+   "showcase_anim": "pose_sky",
+   "signature_anim": "sig_sky",
+   "detail": "Cloud-dipped ear tips and a three-puff cloud tail. Signature: a cloud hop — rises on two puffs and floats down."
+  }
+ ]
+}

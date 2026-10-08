@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-layer="CampSpecs" style="width:2400px;box-sizing:border-box;padding:80px;display:flex;flex-direction:column;gap:96px;background:#1A1420;color:#FFF8F0;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="font:900 72px/1 Nunito,system-ui,sans-serif">Camp v3 · Arena gate · Upgrades sheet</div>
+    <div style="font:700 30px/1.4 Nunito,system-ui,sans-serif;color:#CFC6D6;max-width:1500px">Jedan dizajn. Raspored Campa v2 ostaje; mijenja se pozadina stranice (#2E4733 → #4E3F5A dusk heather), dodaje se MergeableMark / MergeableWarning, i dolaze ArenaGate + UpgradesSheet. Artboard 1080 × 1920, prikaz 32 %.</div>
+  </div>
+
+  <section data-screen-label="1 Camp states" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 48px/1 Nunito,system-ui,sans-serif">1 · Camp — stanja</div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px">
+      <sc-for list="{{ campScenes }}" as="t" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="position:relative;width:346px;height:614px;overflow:hidden;border-radius:12px;box-shadow:0 0 0 2px rgba(255,248,240,.14)">
+            <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:scale(.32);transform-origin:0 0">
+              <dc-import name="CampScreen" scene="{{ t.id }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="width:346px;display:flex;flex-direction:column;gap:6px">
+            <div style="font:800 26px/1.2 ui-monospace,Menlo,monospace;color:#FFB88C">{{ t.id }}</div>
+            <div style="font:700 26px/1.3 Nunito,system-ui,sans-serif;color:#E6DEEB">{{ t.note }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="2 Arena gate" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 48px/1 Nunito,system-ui,sans-serif">2 · ArenaGate — prije runde</div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px">
+      <sc-for list="{{ gateScenes }}" as="t" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="position:relative;width:346px;height:614px;overflow:hidden;border-radius:12px;box-shadow:0 0 0 2px rgba(255,248,240,.14)">
+            <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:scale(.32);transform-origin:0 0">
+              <dc-import name="ArenaGate" scene="{{ t.id }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="width:346px;display:flex;flex-direction:column;gap:6px">
+            <div style="font:800 26px/1.2 ui-monospace,Menlo,monospace;color:#FFB88C">{{ t.id }}</div>
+            <div style="font:700 26px/1.3 Nunito,system-ui,sans-serif;color:#E6DEEB">{{ t.note }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="3 Upgrades sheet" style="display:flex;flex-direction:column;gap:32px">
+    <div style="font:900 48px/1 Nunito,system-ui,sans-serif">3 · UpgradesSheet — Home</div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px">
+      <sc-for list="{{ upScenes }}" as="t" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="position:relative;width:346px;height:614px;overflow:hidden;border-radius:12px;box-shadow:0 0 0 2px rgba(255,248,240,.14)">
+            <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:scale(.32);transform-origin:0 0">
+              <dc-import name="UpgradesSheet" scene="{{ t.id }}" hint-size="1080px,1920px"></dc-import>
+            </div>
+          </div>
+          <div style="width:346px;display:flex;flex-direction:column;gap:6px">
+            <div style="font:800 26px/1.2 ui-monospace,Menlo,monospace;color:#FFB88C">{{ t.id }}</div>
+            <div style="font:700 26px/1.3 Nunito,system-ui,sans-serif;color:#E6DEEB">{{ t.note }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="4 Rules" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px">
+    <div style="box-sizing:border-box;border-radius:26px;background:#FFF8F0;color:#2D3436;padding:40px;display:flex;flex-direction:column;gap:22px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Arena zbroj · samo stog ≥ 4, cijeli</div>
+      <sc-for list="{{ examples }}" as="e" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:18px;padding:14px 0;border-top:2px solid rgba(45,52,54,.12)">
+          <div style="flex:1;min-width:0;font:800 32px/1.25 ui-monospace,Menlo,monospace">{{ e.expr }}</div>
+          <div style="{{ e.tagS }}">{{ e.verdict }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="box-sizing:border-box;border-radius:26px;background:#FFF8F0;color:#2D3436;padding:40px;display:flex;flex-direction:column;gap:26px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Oznaka ≠ katanac</div>
+      <div style="display:flex;align-items:center;gap:22px">
+        <div data-layer="MergeableMark" style="flex:0 0 auto;box-sizing:border-box;width:64px;height:42px;border-radius:21px;background:#A8E6CF;border:2px solid #2D3436;display:grid;place-items:center"><img src="icons/icon_mergeable.svg" alt="" style="width:40px;height:40px;display:block"></div>
+        <div style="font:700 30px/1.3 Nunito,system-ui,sans-serif">Mint pilula, ink rub 2, dva kruga koji se dodiruju (jezik Arene). Bez teksta. Sjeme se smije prodati.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:22px">
+        <div data-layer="ReservedBadge" style="flex:0 0 auto;box-sizing:border-box;height:42px;padding:0 12px;border-radius:12px;display:flex;align-items:center;gap:8px;background:#C5D5E8;border:2px solid #9FB4CC"><img src="icons/icon_lock.svg" alt="" style="width:28px;height:28px;display:block"><div style="font:800 34px/1 Nunito,system-ui,sans-serif;color:#1A1A14;white-space:nowrap">Kept · 12 / 20</div></div>
+        <div style="font:700 30px/1.3 Nunito,system-ui,sans-serif">Tint sezone, kvadrat r 12, katanac + tekst. Samo Flowers tab.</div>
+      </div>
+      <div style="font:700 28px/1.35 Nunito,system-ui,sans-serif;color:#555C5E">Razlike: boja (mint vs tint), oblik (pilula r 21 vs r 12), ikona (krugovi vs katanac), tekst (nema vs ima), tab (Seeds vs Flowers). Nikad na istom chipu.</div>
+    </div>
+    <div style="box-sizing:border-box;border-radius:26px;background:#FFF8F0;color:#2D3436;padding:40px;display:flex;flex-direction:column;gap:22px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">UpgradeButton · 5 stanja</div>
+      <sc-for list="{{ btnStates }}" as="b" hint-placeholder-count="5">
+        <div style="display:flex;align-items:center;gap:22px">
+          <div style="flex:0 0 220px;font:800 28px/1.2 ui-monospace,Menlo,monospace;color:#555C5E">{{ b.id }}</div>
+          <div style="flex:1;min-width:0;font:700 28px/1.3 Nunito,system-ui,sans-serif">{{ b.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="box-sizing:border-box;border-radius:26px;background:#FFF8F0;color:#2D3436;padding:40px;display:flex;flex-direction:column;gap:18px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Vertikalni budžet (Camp)</div>
+      <sc-for list="{{ budget }}" as="r" hint-placeholder-count="5">
+        <div style="font:700 28px/1.35 ui-monospace,Menlo,monospace">{{ r }}</div>
+      </sc-for>
+    </div>
+    <div style="box-sizing:border-box;border-radius:26px;background:#FFF8F0;color:#2D3436;padding:40px;display:flex;flex-direction:column;gap:18px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Animacije (0,08–0,42 s)</div>
+      <sc-for list="{{ anims }}" as="r" hint-placeholder-count="5">
+        <div style="font:700 28px/1.35 Nunito,system-ui,sans-serif">{{ r }}</div>
+      </sc-for>
+    </div>
+    <div style="box-sizing:border-box;border-radius:26px;background:#FFF8F0;color:#2D3436;padding:40px;display:flex;flex-direction:column;gap:18px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Pozadina stranice</div>
+      <div style="display:flex;gap:16px">
+        <div style="flex:1;height:140px;border-radius:18px;background:#2A2233;display:grid;place-items:center;font:800 26px/1 ui-monospace,Menlo,monospace;color:#FFF8F0">chrome #2A2233</div>
+        <div style="flex:1;height:140px;border-radius:18px;background:#4E3F5A;display:grid;place-items:center;font:800 26px/1 ui-monospace,Menlo,monospace;color:#FFF8F0">page #4E3F5A</div>
+        <div style="flex:1;height:140px;border-radius:18px;background:#2E4733;display:grid;place-items:center;font:800 26px/1 ui-monospace,Menlo,monospace;color:#FFF8F0;opacity:.5">v2 #2E4733</div>
+      </div>
+      <div style="font:700 28px/1.35 Nunito,system-ui,sans-serif">Krem kartica na stranici 9,2 : 1 · stranica prema chromeu 1,6 : 1 (ista porodica, rub 3 px warm white ih dijeli) · sjena stranice rgba(20,14,26,.34) kao chrome.</div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const tag = ok => 'flex:0 0 auto;height:56px;padding:0 20px;border-radius:28px;display:flex;align-items:center;font:900 30px/1 Nunito,system-ui,sans-serif;border:3px solid #2D3436;background:' + (ok ? '#A8E6CF' : '#FFCCD5');
+    const ex = [
+      ['13 + 3 + 40 → 13 + 40 = 53', true], ['49 (jedan tip) = 49', false], ['12 + 12 + 12 + 12 = 48', false],
+      ['50 (jedan tip) = 50', true], ['12+4+9+6+5 (3,2,1 van) = 36', false]
+    ];
+    return {
+      campScenes: [
+        ['seeds_full', 'Seeds; 5 od 8 tipova nose oznaku; odabran Clover ×12 → linija'], ['seeds_small', 'Odabran Sunflower ×3: bez oznake i bez linije'],
+        ['sell_mergeable', 'Drži se: 12 → 7, linija prati broj'], ['trade_hold', 'Na 4: linija upozori (amber disk)'], ['sell_dropped', 'Na 3: oznaka i linija nestaju, prodaja ide dalje'],
+        ['seeds_few', '2 tipa, sekcija ista'], ['seeds_empty', 'Prazno'], ['flowers_reserved', 'Rezervisano · Kept 12 / 20'], ['flowers_holdstop', 'Granica · Sell 1'],
+        ['season_ready', 'Unlock spreman'], ['unlocking', 'Unlocked + burst'], ['no_season', 'Bez kartice, 14 tipova'], ['flowers_empty', 'Prazno cvijeće']
+      ].map(a => ({ id: a[0], note: a[1] })),
+      gateScenes: [
+        ['ok_53', 'Polje vidljivo; pilula mint 53 / 50 → tap na korpu sipa'], ['short_49', '49: krem pilula, korpa ista'], ['short_48', '4 × 12 = 48'],
+        ['short_tap', 'Tap na korpu ispod 50 → modal: N / 50 + sitni tipovi s 4 tačke'], ['ok_50', '50 tačno: mint'], ['empty_tap', 'Prazno + tap → modal, CTA Play a run']
+      ].map(a => ({ id: a[0], note: a[1] })),
+      upScenes: [
+        ['fresh', 'Sve tri: može'], ['mixed', 'max · fali coin · može'], ['short_flower', 'Fali cvijet (dijeljen fond)'], ['short_both', 'Fali oboje'],
+        ['max', 'Sve max'], ['buy', 'Trenutak kupovine 0,4 s'], ['new_season', 'Frost Orchard: kreće od 0'], ['returning', 'Country Bloom: stari nivoi vraćeni']
+      ].map(a => ({ id: a[0], note: a[1] })),
+      examples: ex.map(e => ({ expr: e[0], verdict: e[1] ? 'može' : 'ne može', tagS: tag(e[1]) })),
+      btnStates: [
+        ['can', 'Peach, ink 4, sjena 0 8 0. Cvijet ×2 + coin N.'], ['short_flower', 'Ravno #F1EAE0, bez sjene; pink pilula oko cvijeta.'],
+        ['short_coin', 'Isto; pink pilula oko coina.'], ['short_both', 'Isto; pink oko oba.'], ['max', 'Mint, ✓ Max, bez cijene.']
+      ].map(a => ({ id: a[0], note: a[1] })),
+      budget: [
+        'page 1633 = 24 + 276 + 20 + 1289 + 24', 'bez sezone: 24 + 1585 + 24',
+        'sekcija 1289 = 2+18+120+14+grid+14+bar+18+2', 'bar 152 · +strip 224 · +linija +60',
+        'grid: 949 / 889 (linija) / 877 (strip)'
+      ],
+      anims: [
+        'MergeableMark in/out: scale 0.6→1 + alpha, 0,14 s (kad stog pređe 3↔4)', 'MergeableWarning tekst: swap 0,08 s; disk mint→amber na 4, 0,12 s',
+        'MergeableWarning visina 0→48 (bar +60): 0,16 s', 'GateBar fill: 0,30 s ease-out; na 50 mint + GateReady pop 0,18 s',
+        'GateButton ugašen→peach: 0,16 s', 'Upgrade buy: segment gold→mint + kartica rim, 0,40 s', 'Sheet ulaz 0,32 s, izlaz 0,28 s'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

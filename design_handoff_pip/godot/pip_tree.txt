@@ -1,0 +1,36 @@
+UiPip (Node2D, ui_pip.gd)            scale = box_px / frame (256 | 150 top)
+├─ root                              ground point under the feet (origin 128,240 | 75,75)
+│  ├─ shadow          z −50          Sprite2D (alpha .14 / .22) — replaces PIP_SHADOW stylebox
+│  ├─ pip             z 0            whole-body mover (hops, flops, tumble, lane lean)
+│  │  ├─ foot_L / foot_R             z 4 (top: −1)
+│  │  ├─ arm_L / arm_R               z 8 (top: −1, under pip)
+│  │  └─ body         z 0
+│  │     ├─ tail      z −5 | +1–3    (+ ov_btail | ov_ctail)
+│  │     └─ head      z 6
+│  │        ├─ ear_L  z −2 (back: +2)   + ov_sprig, ov_ctip_l
+│  │        ├─ ear_R  z −2
+│  │        │  └─ ear_R_tip  rest 122°  (folded tip, + ov_ctip_r)
+│  │        ├─ tuft
+│  │        ├─ eye_L / eye_R    swap: open blink happy wide half x spin spark heart squint squint_r down
+│  │        ├─ brow_L / brow_R  swap: none flat up worried cross (R = scale.x −1)
+│  │        ├─ nose
+│  │        └─ mouth            swap: w smile grin o flat frown blep wobble chew
+│  ├─ fx_ring  z −40  ·  prop2 z −30 (burrow)  ·  prop z 30  ·  fx_a…fx_f z 40  ·  emote z 42
+├─ Body     AnimationPlayer  (base: one loop at a time)
+└─ Overlay  AnimationPlayer  (one-shots: pip.rotation/scale/position, head.rotation, swaps, fx)
+
+Views (rig.json): front · three_q · side · back · top. Same node ids → the same animation plays in any view;
+missing nodes are skipped.
+
+Install
+  data      → res://data/pip/  rig.json animations.json skins.json behaviors.json pip_export.json
+  art       → res://assets/pip/parts | overlays | fx | hud   (SVG, classic hexes; recolor per skin)
+  script    → res://scripts/visual/ui_pip.gd
+  Replace, by surface:
+    season_field_pip.gd   draw_texture_rect(...)        → child UiPip(box 190), FSM from behaviors.json.field
+    UiHomeV3.draw_pip     card                          → UiPip(box 230, loop card_idle)
+    pip_placeholder_control.gd (Arena, Camp, run HUD)   → UiPip(box 150 | 88 crop)
+    pip_visual.gd  (run)  Sprite2D texture              → UiPip(view top, box 150); keep magnet ring + ground
+                          shadow polygon is replaced by rig node `shadow`; set_scroll_speed(scroll_speed) each frame
+    item_preview.gd       _draw_creature                → UiPip child (stage: loop stage_idle; thumb: pose())
+    Shop Looks card       CosmeticPreview               → UiPip(three_q, still = true, pose pose_<skin>, tap → signature)

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-layer="ArenaGateScreen" data-screen-label="Arena gate" style="width:1080px;height:1920px;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#2A2233;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+  <div style="position:relative;z-index:3"><dc-import name="HubScreen" part="header" coins="260" seeds="{{ seedTotal }}" flowers="27" hint-size="1080px,143px"></dc-import></div>
+
+  <div data-layer="MergeArena" style="flex:0 0 auto;position:relative;width:1080px;height:1633px;overflow:hidden">
+    <div data-layer="Bg" style="position:absolute;left:0;top:0">
+      <dc-import name="ArenaField" season="country_bloom" lush="{{ 0 }}" width="{{ 1080 }}" hint-size="1080px,1633px"></dc-import>
+    </div>
+    <div data-layer="MuncherSlot" style="position:absolute;left:300px;top:-72px;width:480px;height:360px;pointer-events:none">
+      <dc-import name="Muncher" state="sleep_nest" dir="{{ 0 }}" chomp="{{ 0.85 }}" hint-size="480px,360px"></dc-import>
+    </div>
+    <div data-layer="ArenaPip" style="position:absolute;left:30px;top:1413px;width:150px;height:150px">
+      <img src="icons/pip_idle.svg" alt="Pip" style="width:150px;height:150px;display:block">
+    </div>
+
+    <div data-layer="SeedBag" onClick="{{ onBag }}" style="position:absolute;left:390px;top:1269px;width:300px;height:280px;cursor:pointer">
+      <dc-import name="SeedBasket" count="{{ bagCount }}" state="idle" types="{{ bagTypes }}" hide-count="{{ true }}" hint-size="300px,280px"></dc-import>
+    </div>
+
+    <div data-layer="GateCountWrap" style="position:absolute;left:0;top:1141px;width:1080px;display:flex;justify-content:center;pointer-events:none">
+      <div data-layer="GateCount" data-state="{{ gateState }}" style="{{ pillS }}">
+        <img src="icons/icon_seed.svg" alt="" style="width:60px;height:60px;display:block;flex:0 0 auto">
+        <span style="font:900 60px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#2D3436">{{ n }}</span>
+        <span style="font:900 40px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#555C5E;white-space:nowrap">/ 50</span>
+        <div data-layer="MergeableMark" style="flex:0 0 auto;box-sizing:border-box;width:64px;height:42px;border-radius:21px;background:{{ markBg }};border:2px solid #2D3436;display:grid;place-items:center;margin-left:4px"><img src="icons/icon_mergeable.svg" alt="" style="width:40px;height:40px;display:block"></div>
+      </div>
+    </div>
+
+    <sc-if value="{{ modalOn }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="PopupScrim" onClick="{{ onClose }}" style="position:absolute;left:0;top:0;width:1080px;height:1633px;background:rgba(26,22,30,.55);z-index:5"></div>
+      <div data-layer="ModalArea" style="position:absolute;left:48px;top:0;width:984px;height:1633px;display:flex;align-items:center;z-index:6;pointer-events:none">
+        <div data-layer="NeedSeedsModal" style="position:relative;width:984px;box-sizing:border-box;background:#FFF8F0;border:4px solid #2D3436;border-radius:48px;box-shadow:0 14px 0 rgba(20,14,26,.45);padding:92px 48px 48px;display:flex;flex-direction:column;gap:36px;pointer-events:auto">
+          <div data-layer="ModalPlate" style="position:absolute;left:50%;top:-56px;transform:translateX(-50%);height:112px;box-sizing:border-box;padding:0 52px;border-radius:56px;background:#FFF6D6;border:4px solid #2D3436;display:flex;align-items:center;font:900 56px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Not enough seeds</div>
+          <div data-layer="ModalCount" style="display:flex;align-items:center;justify-content:center;gap:16px">
+            <img src="icons/icon_seed.svg" alt="" style="width:84px;height:84px;display:block">
+            <span style="font:900 96px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#2D3436">{{ n }}</span>
+            <span style="font:900 56px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#555C5E">/ 50</span>
+          </div>
+          <sc-if value="{{ hasLoose }}" hint-placeholder-val="{{ true }}">
+            <div data-layer="ModalLine" style="text-align:center;font:900 44px/1.15 Nunito,system-ui,sans-serif;color:#2D3436">Every type needs 4</div>
+            <div data-layer="NeedSeedTiles" style="display:flex;flex-wrap:wrap;justify-content:center;gap:24px">
+              <sc-for list="{{ loose }}" as="t" hint-placeholder-count="3">
+                <div data-layer="NeedSeedTile" style="width:264px;height:244px;box-sizing:border-box;border-radius:32px;background:#FFFFFF;border:3px solid rgba(45,52,54,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px">
+                  <div style="position:relative;width:136px;height:136px;overflow:hidden"><img src="{{ t.art.src }}" alt="" style="{{ t.art.style }}"></div>
+                  <div data-layer="NeedDots" style="display:flex;gap:10px">
+                    <sc-for list="{{ t.dots }}" as="d" hint-placeholder-count="4"><div style="{{ d.style }}"></div></sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <div data-layer="PopupButton" data-kind="primary" style="height:132px;box-sizing:border-box;border-radius:36px;background:#FFB88C;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:16px">
+            <img src="{{ ctaIcon }}" alt="" style="width:56px;height:56px;display:block">
+            <span style="font:900 48px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ ctaLabel }}</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="position:relative;z-index:3"><dc-import name="HubScreen" part="footer" active="{{ 4 }}" hint-size="1080px,144px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ok_53&quot;,&quot;short_49&quot;,&quot;short_48&quot;,&quot;short_tap&quot;,&quot;ok_50&quot;,&quot;empty_tap&quot;],&quot;default&quot;:&quot;ok_53&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;}}">
+const MIN = 4, GATE = 50;
+const CROP = { clover_t1: [80, 89, 96, 164], daisy_t1: [90, 119, 76, 134], buttercup_t1: [90, 125, 76, 128], tulip_t1: [83, 117, 89, 136], sunflower_t1: [88, 116, 80, 138], pumpkin_t1: [85, 99, 86, 154] };
+const r2 = v => Math.round(v * 100) / 100;
+const crop = (key, box) => { const c = CROP[key] || CROP.clover_t1; const s = box / Math.max(c[2], c[3]); return { src: 'icons/flowers/' + (CROP[key] ? key : 'clover_t1') + '.svg', style: 'position:absolute;max-width:none;display:block;width:' + r2(256 * s) + 'px;height:' + r2(256 * s) + 'px;left:' + r2((box - c[2] * s) / 2 - c[0] * s) + 'px;top:' + r2((box - c[3] * s) / 2 - c[1] * s) + 'px' }; };
+// [tip, broj]
+const SCENES = {
+  ok_53:     { s: [['clover', 13], ['daisy', 3], ['buttercup', 40]] },
+  short_49:  { s: [['clover', 49]] },
+  short_48:  { s: [['clover', 12], ['daisy', 12], ['buttercup', 12], ['tulip', 12]] },
+  short_tap: { s: [['clover', 12], ['daisy', 4], ['buttercup', 9], ['tulip', 6], ['sunflower', 3], ['pumpkin', 2], ['daisy', 0]].slice(0, 6), modal: true },
+  ok_50:     { s: [['clover', 50]] },
+  empty_tap: { s: [], modal: true }
+};
+// Jedino pravilo: tip ulazi cijelim stogom samo ako ga ima >= 4.
+const gateCount = st => st.reduce((a, s) => a + (s[1] >= MIN ? s[1] : 0), 0);
+class Component extends DCLogic {
+  state = { open: null };
+  renderVals() {
+    const S = SCENES[this.props.scene ?? 'ok_53'] || SCENES.ok_53;
+    const n = gateCount(S.s), ok = n >= GATE, empty = S.s.length === 0;
+    const open = this.state.open ?? (!!S.modal && !ok);
+    const loose = S.s.filter(s => s[1] > 0 && s[1] < MIN).map(s => ({
+      art: crop(s[0] + '_t1', 136),
+      dots: [0, 1, 2, 3].map(i => ({ style: 'width:44px;height:22px;border-radius:11px;box-sizing:border-box;' + (i < s[1] ? 'background:#A8E6CF;border:3px solid #2D3436' : 'background:rgba(45,52,54,.16)') }))
+    }));
+    const total = S.s.reduce((a, s) => a + s[1], 0);
+    return {
+      n: String(n), gateState: ok ? 'open' : 'short', modalOn: open, loose, hasLoose: loose.length > 0,
+      seedTotal: String(total), bagCount: Math.min(40, total), bagTypes: S.s.length ? S.s.map(s => s[0]) : ['clover'],
+      markBg: ok ? '#A8E6CF' : 'rgba(45,52,54,.10)',
+      pillS: 'height:100px;box-sizing:border-box;padding:0 22px 0 16px;border-radius:50px;display:flex;align-items:center;gap:10px;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);background:' + (ok ? '#A8E6CF' : '#FFF8F0'),
+      ctaIcon: empty ? 'icons/icon_seed.svg' : 'icons/tab_camp.svg',
+      ctaLabel: empty ? 'Play a run' : 'Back to Camp',
+      onBag: () => { if (!ok) this.setState({ open: true }); },
+      onClose: () => this.setState({ open: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

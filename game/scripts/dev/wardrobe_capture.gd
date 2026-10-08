@@ -106,10 +106,7 @@ func _run() -> void:
 	await _capture("05_sheet_pick_blossom")
 	w.call("close", false)
 	await _frames(4)
-	(_stage.get_node("%SeasonField").get_node("MeadowPip") as Control).set("_hop_k", 0.5)
-	(_stage.get_node("%SeasonField").get_node("MeadowPip") as Control).set("_ring_a", 0.7)
-	(_stage.get_node("%SeasonField").get_node("MeadowPip") as Control).set("_ring_r", 150.0)
-	(_stage.get_node("%SeasonField").get_node("MeadowPip") as Control).queue_redraw()
+	(_stage.get_node("%SeasonField").get_node("MeadowPip") as Control).call("play_apply")
 	await _frames(2)
 	await _capture("06_apply_hop")
 	await create_timer(1.0).timeout

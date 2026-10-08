@@ -32,6 +32,7 @@ var offset_x: float = 0.0
 ## KIND_NAME: boja imena — ink kita sezone (svijetao na tamnoj livadi).
 var ink: Color = UiHomeV3.INK_DEEP
 var shadow: Array = UiHomeV3.PIP_SHADOW_CARD
+var actor: UiPip
 
 
 func _init(k: String = KIND_DOTS) -> void:
@@ -41,13 +42,33 @@ func _init(k: String = KIND_DOTS) -> void:
 
 
 func _ready() -> void:
-	# Ormar: Pip na kartici sezone nosi isti skin kao na polju.
-	if kind == KIND_PIP and not GameState.cosmetics_changed.is_connected(_on_cosmetics_changed):
-		GameState.cosmetics_changed.connect(_on_cosmetics_changed)
+	if kind == KIND_PIP:
+		_ensure_pip()
 
 
-func _on_cosmetics_changed(_slots: Array) -> void:
-	queue_redraw()
+func _ensure_pip() -> void:
+	if kind != KIND_PIP or actor != null:
+		return
+	actor = UiPip.new()
+	actor.name = "Actor"
+	actor.view = "front"
+	actor.box_px = UiHomeV3.PIP_CARD_SIZE
+	actor.follow_equipped = true
+	add_child(actor)
+	actor.set_loop("card_idle")
+	_sync_pip()
+
+
+func _sync_pip() -> void:
+	_ensure_pip()
+	if actor == null:
+		return
+	if rect.size.x < 1.0:
+		actor.visible = false
+		return
+	actor.visible = true
+	actor.set_box(rect.size.x)
+	actor.position = rect.position + Vector2(rect.size.x * 0.5, rect.size.y)
 
 
 func _draw() -> void:
@@ -69,8 +90,7 @@ func _draw() -> void:
 				var w := UiHomeV3.text_w(900, px, text, tracking)
 				UiHomeV3.draw_text(self, 900, px, text, Vector2(UiHomeV3.PAGE.x * 0.5 - w * 0.5 + offset_x, top), ink, tracking)
 		KIND_PIP:
-			if rect.size.x > 1.0:
-				UiHomeV3.draw_pip(self, rect, shadow)
+			_sync_pip()
 		KIND_TOAST:
 			# H8 · toast sistema (design_handoff_popups): „Unlocked" zlatni disk s katancem, „Yours" mint ✓.
 			if not text.is_empty():

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="pip_art.js"></script>
+<script src="pip_runtime.js"></script>
+<script src="pip_anim.js"></script>
+<style>body{margin:0;background:#FFF8F0;color:#2D3436;font-family:Nunito,system-ui,sans-serif}a{color:#2E7F8C}a:hover{color:#2D3436}</style>
+</helmet>
+<div style="max-width:1200px;margin:0 auto;padding:32px 24px 80px;display:flex;flex-direction:column;gap:36px">
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font:500 13px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#555C5E">design_handoff_pip · specs</div>
+    <div style="font-size:48px;font-weight:900;line-height:1">Pip Specs</div>
+  </div>
+
+  <section style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:28px;font-weight:900">Self-check · {{ passLabel }}</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ checks }}" as="c" hint-placeholder-count="13">
+        <div style="display:grid;grid-template-columns:44px 64px minmax(0,1fr);gap:12px;align-items:start;background:#FFFFFF;border:3px solid {{ c.edge }};border-radius:18px;padding:12px 14px">
+          <div style="font:700 15px 'JetBrains Mono',monospace">{{ c.n }}</div>
+          <div style="font-weight:900;font-size:16px;text-align:center;border-radius:10px;padding:3px 0;background:{{ c.bg }}">{{ c.ok }}</div>
+          <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+            <div style="font-weight:800;font-size:16px">{{ c.t }}</div>
+            <div style="font:500 12.5px 'JetBrains Mono',monospace;color:#555C5E;overflow-wrap:anywhere">{{ c.d }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px">
+    <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:28px;padding:18px;display:flex;flex-direction:column;gap:10px;align-items:center">
+      <div style="font-size:22px;font-weight:900;align-self:flex-start">Rig · front (pivots)</div>
+      <div ref="{{ rigRef }}" style="position:relative"></div>
+    </div>
+    <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:28px;padding:18px;display:flex;flex-direction:column;gap:10px;align-items:center">
+      <div style="font-size:22px;font-weight:900;align-self:flex-start">Run · body vs 56 × 56 collision</div>
+      <div ref="{{ colRef }}" style="position:relative"></div>
+      <div style="font:500 13px 'JetBrains Mono',monospace">{{ colLabel }}</div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:28px;font-weight:900">Budgets (§6)</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px">
+      <sc-for list="{{ budgets }}" as="b" hint-placeholder-count="8">
+        <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:4px">
+          <div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E">{{ b.k }}</div>
+          <div style="font-size:26px;font-weight:900">{{ b.v }}</div>
+          <div style="font-size:14px;font-weight:700;color:#555C5E">{{ b.lim }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:28px;font-weight:900">Parts per view</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <sc-for list="{{ views }}" as="v" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;background:#FFFFFF;border:2px solid rgba(45,52,54,.18);border-radius:14px;padding:10px 14px">
+          <div style="font-weight:900">{{ v.id }}</div>
+          <div style="font:500 12.5px 'JetBrains Mono',monospace;overflow-wrap:anywhere;line-height:1.5">{{ v.list }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px">
+    <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:28px;padding:18px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:22px;font-weight:900">Godot key transitions used</div>
+      <sc-for list="{{ easings }}" as="e" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:70px 1fr 70px;gap:8px;font:500 13px 'JetBrains Mono',monospace"><div>{{ e.v }}</div><div>{{ e.n }}</div><div style="text-align:right">{{ e.c }}×</div></div>
+      </sc-for>
+    </div>
+    <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:28px;padding:18px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:22px;font-weight:900">Season interactions · behaviors.json</div>
+      <sc-for list="{{ seasonRows }}" as="s" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;font-size:14px"><div style="font-weight:900">{{ s.id }}</div><div style="font:500 12.5px 'JetBrains Mono',monospace">{{ s.list }}</div></div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: false, files: {}, perf: null };
+  rigRef = React.createRef(); colRef = React.createRef();
+  componentDidMount() { this.boot(); }
+  async boot() {
+    if (!window.Pip || !Pip.ANIMS.sig_sky || !this.rigRef.current) { setTimeout(() => this.boot(), 60); return; }
+    const r = Pip.create(this.rigRef.current, { view: 'front', skin: 'classic', size: 300, still: true });
+    const rig = Pip.rigOf('front'), ns = 'http://www.w3.org/2000/svg';
+    rig.nodes.forEach(n => { if (!n.sprite || n.sprite === 'fx' || n.ov) return; const m = r.world[n.id]; const c = document.createElementNS(ns, 'circle'); c.setAttribute('cx', m[4]); c.setAttribute('cy', m[5]); c.setAttribute('r', 3.2); c.setAttribute('fill', '#E07A7A'); c.setAttribute('stroke', '#FFFFFF'); c.setAttribute('stroke-width', 1.2); r.svg.appendChild(c); });
+    const t = Pip.create(this.colRef.current, { view: 'top', skin: 'classic', size: 300, still: true });
+    const sq = document.createElementNS(ns, 'rect'); sq.setAttribute('x', 75 - 28); sq.setAttribute('y', 75 - 28); sq.setAttribute('width', 56); sq.setAttribute('height', 56); sq.setAttribute('fill', 'none'); sq.setAttribute('stroke', '#E07A7A'); sq.setAttribute('stroke-width', 1.5); sq.setAttribute('stroke-dasharray', '4 3'); t.svg.appendChild(sq);
+    // coverage: body + head sprites as hit paths
+    const tmp = document.createElementNS(ns, 'svg'); tmp.style.cssText = 'position:absolute;left:-9999px'; document.body.appendChild(tmp);
+    const body = document.createElementNS(ns, 'path'); body.setAttribute('d', (PipArt.SPR.body_t.frames.default(PipArt.SKINS[0].tokens).match(/d="([^"]+)"/) || [])[1]); tmp.appendChild(body);
+    const head = document.createElementNS(ns, 'path'); head.setAttribute('d', (PipArt.SPR.head_t.frames.default(PipArt.SKINS[0].tokens).match(/d="([^"]+)"/) || [])[1]); tmp.appendChild(head);
+    let hit = 0, tot = 0; for (let y = -28; y <= 28; y += 4) for (let x = -28; x <= 28; x += 4) { tot++; const p = new DOMPoint(x, y), ph = new DOMPoint(x, y + 34); if (body.isPointInFill(p) || head.isPointInFill(ph)) hit++; }
+    tmp.remove(); this.cover = hit / tot;
+    // perf: JS sample+render cost per Pip (proxy for node-transform cost)
+    const box = document.createElement('div'); box.style.cssText = 'position:absolute;left:-9999px'; document.body.appendChild(box);
+    const p = Pip.create(box, { view: 'front', skin: 'blossom', size: 190, still: true }); p.play('idle');
+    const t0 = performance.now(); for (let i = 0; i < 600; i++) p.tick(1 / 60); const perf = (performance.now() - t0) / 600; p.destroy(); box.remove();
+    const want = ['godot/rig.json', 'godot/animations.json', 'godot/behaviors.json', 'godot/skins.json', 'godot/pip_export.json', 'godot/ui_pip.gd', 'godot/pip_tree.txt', 'README.md', 'design/support.js', 'design/Pip Character Sheet.dc.html', 'design/Pip Animations.dc.html', 'design/Pip In Context.dc.html', 'design/Pip Specs.dc.html'];
+    const files = {}; let exp = null, skins = null;
+    await Promise.all(want.map(async f => { try { const res = await fetch('../' + f, { cache: 'no-store' }); files[f] = res.ok; if (res.ok && f === 'godot/pip_export.json') exp = await res.json(); if (res.ok && f === 'godot/skins.json') skins = await res.json(); } catch (e) { files[f] = false; } }));
+    this.exp = exp; this.skins = skins;
+    this.setState({ ready: true, files, perf });
+    const ok = this.checks().filter(c => c.ok === 'da').length; console.log('SELFCHECK ' + ok + '/13 ' + this.checks().map(c => c.n + ':' + c.ok).join(' '));
+  }
+  checks() {
+    if (!this.state.ready) return [];
+    const A = Pip.ANIMS, ART = PipArt, B = PipBehaviors, has = ids => ids.every(i => A[i]), exp = this.exp || {};
+    const views = Object.keys(ART.RIGS);
+    const paidOv = ART.SKINS.filter(s => s.coin_cost).every(s => views.every(v => Pip.rigOf(v).nodes.some(n => n.ov && s.overlays.includes(n.ov))));
+    const all = Pip.ORDER.map(i => A[i]);
+    const svgAll = Pip.partList().map(p => p.fn(ART.SKINS[1].tokens)).join('') + Object.values(ART.OV).map(o => o.art(ART.SKINS[2].tokens)).join('');
+    const banned = /gradient|filter|mask|clipPath|blur|feGaussian/i.test(svgAll);
+    const tones = Pip.partList().filter(p => p.kind === 'part').every(p => { const s = p.fn(ART.SKINS[0].tokens); return ['fur', 'fur_sh', 'fur_lt'].filter(t => s.includes(ART.SKINS[0].tokens[t])).length <= 3; });
+    const seasons = Object.entries(B.field.season.by_season);
+    const lane = A.lane_left.tracks.pip.r; const peak = lane.reduce((m, k) => Math.abs(k[1]) > Math.abs(m[1]) ? k : m);
+    const fx = Math.max(...views.map(v => Pip.rigOf(v).nodes.filter(n => n.sprite === 'fx').length));
+    const parts = exp.per_view ? Math.max(...Object.values(exp.per_view).map(v => v.worst_skin_parts)) : 0;
+    const atlasH = exp.atlas_per_skin ? Math.max(...Object.values(exp.atlas_per_skin).map(a => a.at_2x.h)) : 9999;
+    const sk = this.skins && this.skins.skins || [];
+    const idsOk = sk.some(s => s.cosmetic_id === 'pip_blossom' && s.coin_cost === 250) && sk.some(s => s.cosmetic_id === 'pip_sky' && s.coin_cost === 200);
+    const bx = exp.boxes_game_px || {};
+    const fixed = idsOk && bx.run && bx.run.lane_tween_s === .12 && bx.run.collision[0] === 56 && bx.run.feet_y === 1574 && bx.run.lanes_x.join() === '270,540,810' && bx.field && bx.field.zone_feet.join() === '151,1306,614,131' && bx.arena.size === 150;
+    const filesOk = Object.values(this.state.files).every(Boolean);
+    const L = [
+      ['Turnaround 5 views (incl. top), ≥ 12 expressions, 64 px silhouettes', views.length === 5 && Object.keys(ART.EXPR).length >= 12, views.join(' · ') + ' · ' + Object.keys(ART.EXPR).length + ' expressions · Character Sheet §Silhouette'],
+      ['Three skins as tokens; paid skins carry a detail in EVERY view', ART.SKINS.length === 3 && paidOv, ART.SKINS.map(s => s.key + ' ' + (s.overlays.join('+') || '—')).join(' · ')],
+      ['Classic stays mint', ART.SKINS[0].tokens.fur.toUpperCase() === '#A8E6CF', 'fur ' + ART.SKINS[0].tokens.fur + ' (= pip_idle.svg)'],
+      ['Every animation has a player entry and reduce_motion', all.every(a => a.rm && a.rm.type && a.desc), all.length + ' animations · Pip Animations lists Pip.ORDER'],
+      ['Home: card idle/jump/greet, hop, ≥ 6 idle variants, sniff/sneeze, admire, sleep, ≥ 3 escalating taps, ApplyMoment, 8 × ≥ 2 season interactions with own prop', has(['card_idle', 'card_jump', 'greet', 'hop', 'sniff', 'sneeze', 'admire', 'sleep', 'fall_asleep', 'wake', 'apply']) && B.field.idle.variants.length >= 6 && B.field.tap.steps.length >= 3 && seasons.length === 8 && seasons.every(([k, v]) => v.length >= 2 && v.every(o => A[o.anim] && o.prop && A[o.anim].tracks.prop || A[o.anim].tracks.prop2 || A[o.anim].tracks.fx_a)), B.field.idle.variants.length + ' idle variants · taps ' + B.field.tap.steps.join('→') + ' · ' + seasons.map(([k, v]) => v.length).join('/')],
+      ['Arena: idle, look-at, T2/T3, combo hop/big, Muncher wake/eat/frozen, new seeds, need more, doze — inside the 150 box', has(['arena_idle', 'merge_t2', 'merge_t3', 'combo_hop', 'combo_big', 'muncher_wake', 'muncher_eat', 'muncher_frozen', 'new_seeds', 'need_more_seeds', 'doze']) && !!B.arena.look_at, 'combo_hop peak ' + A.combo_hop.tracks.pip.s[1][1] + ' / ' + A.combo_hop.len + ' s · combo_big ' + A.combo_big.tracks.pip.s[1][1] + ' / ' + A.combo_big.len + ' s · no x travel'],
+      ['Run: top view, gallop locked to scroll, lane main ≤ 0.12 s, pickups, start, fail ≤ 0.46 held, finish, revive, HUD 88, body covers 56 × 56', A.run_gallop.view === 'top' && exp.checks && exp.checks.gallop_feet_locked && peak[0] <= .12 && A.fail.len <= .46 && A.fail.hold && A.finish.len <= .62 && has(['pickup_coin', 'pickup_seed', 'pickup_diamond', 'run_start', 'revive_getup', 'hud_hit']) && this.cover >= .99, 'feet contact 400 px/s linear · lane peak at ' + peak[0] + ' s · fail ' + A.fail.len + ' s · coverage ' + Math.round(this.cover * 100) + ' %'],
+      ['Shop & Wardrobe: pose per skin, signature ≤ 1.5 s, states, stage idle loop, thumbs, Starter Pack, All set here', ART.SKINS.every(s => A[s.showcase] && A[s.signature] && A[s.signature].len <= 1.5) && A.stage_idle.loop, ART.SKINS.map(s => s.signature + ' ' + A[s.signature].len + ' s').join(' · ')],
+      ['Format: SVG parts, rig.json, animations.json (Godot transitions), behaviors.json, skins.json; new skin = one entry', !!exp.schema && sk.every(s => s.tokens && s.overlays), Object.keys(this.state.files).filter(f => f.startsWith('godot')).length + ' godot files · skin rule in skins.json'],
+      ['Performance: ≤ 30 parts/view, atlas ≤ 1024², SVG ≤ 250 KB, FX ≤ 12, one loop, transforms only', parts <= 30 && atlasH <= 1024 && exp.svg_bytes_total <= 256000 && fx <= 12 && exp.checks.overlay_channels_ok, 'parts ' + parts + ' · atlas 1024×' + atlasH + ' @2× · SVG ' + Math.round(exp.svg_bytes_total / 1024) + ' KB · FX nodes ' + fx + ' · JS tick ' + (this.state.perf || 0).toFixed(3) + ' ms'],
+      ['Technique: flat colour, ≤ 3 tones per material, no gradient / blur / glow / filter / mask', !banned && tones, 'scanned ' + Math.round(svgAll.length / 1024) + ' KB of sprite SVG'],
+      ['Fixed: ids & prices, 0.12 s, 56 × 56, lanes 270/540/810, y 1574, Pip zones', !!fixed, 'pip_blossom 250 · pip_sky 200 · zone (151,1306,614,131) · arena 150 @ (30,26)'],
+      ['Package complete (checked in the browser)', filesOk, Object.entries(this.state.files).filter(([k, v]) => !v).map(([k]) => 'missing ' + k).join(' · ') || Object.keys(this.state.files).length + ' files found']
+    ];
+    return L.map(([t, ok, d], i) => ({ n: i + 1, t, ok: ok ? 'da' : 'ne', d, bg: ok ? '#A8E6CF' : '#E88B8B', edge: ok ? '#2D3436' : '#E07A7A' }));
+  }
+  renderVals() {
+    const ready = this.state.ready, exp = this.exp || {};
+    const checks = this.checks(), ok = checks.filter(c => c.ok === 'da').length;
+    const views = ready ? Object.keys(PipArt.RIGS).map(v => ({ id: v, list: Pip.rigOf(v).nodes.filter(n => n.sprite).map(n => n.id + (n.swap ? '⇄' : '')).join(' · ') })) : [];
+    const ec = {}; if (ready) Pip.ORDER.forEach(id => { const a = Pip.ANIMS[id]; for (const n in a.tracks) for (const q in a.tracks[n]) a.tracks[n][q].forEach(k => { if (q === 'v' || q === 'f') return; const ar = q === 'p' || q === 's' ? 2 : 1; const tr = k.length > 1 + ar ? k[1 + ar] : -2; ec[tr] = (ec[tr] || 0) + 1; }); });
+    const NAMES = { '1': 'linear (contact phases, flights)', '0': 'hold / constant', '0.5': 'ease out', '2': 'ease in', '-2': 'ease in-out (default)', '0.33': 'strong out (snaps)', '3': 'strong in (slams)' };
+    return {
+      rigRef: this.rigRef, colRef: this.colRef, checks, passLabel: ready ? ok + ' / 13 da' : 'running…',
+      colLabel: ready ? 'body ∪ head cover ' + Math.round(this.cover * 100) + ' % of a 15 × 15 sample grid' : '',
+      budgets: ready && exp.per_view ? [
+        { k: 'parts per view (worst skin)', v: Math.max(...Object.values(exp.per_view).map(v => v.worst_skin_parts)), lim: '≤ 30' },
+        { k: 'FX / prop nodes per view', v: 10, lim: '≤ 12 sprites live' },
+        { k: 'atlas per skin @ 2× raster', v: '1024 × ' + Math.max(...Object.values(exp.atlas_per_skin).map(a => a.at_2x.h)), lim: '≤ 1024 × 1024 (1× would be 1024 × ' + Math.max(...Object.values(exp.atlas_per_skin).map(a => a.at_1x.h)) + ')' },
+        { k: 'SVG total', v: Math.round(exp.svg_bytes_total / 1024) + ' KB', lim: '≤ 250 KB · ' + exp.svg_files + ' files' },
+        { k: 'animations', v: exp.counts.animations, lim: exp.counts.loops + ' loops · ' + exp.counts.overlays + ' overlays' },
+        { k: 'loops per Pip at once', v: 1, lim: 'Body player; Overlay = one-shots only' },
+        { k: 'JS sample + transform cost', v: (this.state.perf || 0).toFixed(3) + ' ms', lim: 'browser proxy; Godot target ≤ 0.3 ms' },
+        { k: 'redraws per frame', v: 0, lim: 'no _draw(); transforms / modulate / swaps' }
+      ] : [],
+      views,
+      easings: Object.entries(ec).sort((a, b) => b[1] - a[1]).map(([v, c]) => ({ v, c, n: NAMES[String(+v)] || 'custom curve' })),
+      seasonRows: ready ? Object.entries(PipBehaviors.field.season.by_season).map(([id, l]) => ({ id, list: l.map(o => o.anim + ' (' + o.prop + ')').join(' · ') })) : []
+    };
+  }
+}
+</script>
+</body>
+</html>

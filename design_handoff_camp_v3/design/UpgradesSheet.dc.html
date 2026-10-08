@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-layer="UpgradesScreen" data-screen-label="Upgrades sheet" style="width:1080px;height:1920px;position:relative;overflow:hidden;background:#2A2233;font-family:Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased">
+  <div style="position:absolute;left:0;top:0;width:1080px;z-index:3">
+    <dc-import name="HubScreen" part="header" coins="{{ coinsHdr }}" seeds="41" flowers="{{ flowersHdr }}" hint-size="1080px,143px"></dc-import>
+  </div>
+  <div data-layer="HomePage_ref" style="position:absolute;left:0;top:143px;width:1080px;height:1633px;background:{{ homeBg }};display:flex;align-items:flex-start;justify-content:center">
+    <div style="margin-top:180px;font:700 26px/1 ui-monospace,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase;color:rgba(45,52,54,.45)">Home · not drawn</div>
+  </div>
+  <div data-layer="PopupScrim" style="position:absolute;left:0;top:143px;width:1080px;height:1633px;background:rgba(26,22,30,.55)"></div>
+
+  <div data-layer="UpgradesSheet" data-season="{{ seasonId }}" style="position:absolute;left:0;top:576px;width:1080px;height:1200px;box-sizing:border-box;background:#FFF8F0;border-top:4px solid #2D3436;border-radius:36px 36px 0 0;padding:20px 24px 20px;display:flex;flex-direction:column;z-index:4">
+    <div data-layer="SheetHandle" style="width:120px;height:12px;border-radius:6px;background:rgba(45,52,54,.28);margin:0 auto 24px;flex:0 0 auto"></div>
+    <div data-layer="SeasonTitle" style="{{ titleS }}">
+      <div style="font:900 56px/1 Nunito,system-ui,sans-serif;color:#1A1A14;white-space:nowrap">{{ seasonName }}</div>
+    </div>
+    <div style="margin-top:36px;display:flex;flex-direction:column;gap:24px;flex:0 0 auto">
+      <sc-for list="{{ cards }}" as="u" hint-placeholder-count="3">
+        <div data-layer="{{ u.layer }}" data-state="{{ u.state }}" style="{{ u.style }}">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:22px">
+            <div style="font:900 52px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ u.name }}</div>
+            <div data-layer="UpgradeLevel" style="display:flex;gap:10px">
+              <sc-for list="{{ u.segs }}" as="g" hint-placeholder-count="4"><div style="{{ g.style }}"></div></sc-for>
+            </div>
+            <div style="font:800 40px/1 Nunito,system-ui,sans-serif;color:#555C5E;white-space:nowrap">{{ u.effect }}</div>
+          </div>
+          <div data-layer="UpgradeButton" data-state="{{ u.state }}" style="{{ u.btn.style }}">
+            <sc-if value="{{ u.btn.hasPrice }}" hint-placeholder-val="{{ true }}">
+              <div data-layer="FlowerPrice" style="{{ u.btn.flS }}">
+                <div style="position:relative;flex:0 0 auto;box-sizing:border-box;width:56px;height:56px;border-radius:14px;background:#FFD56B;border:2px solid #D6A82F;display:grid;place-items:center">
+                  <div style="position:absolute;inset:5px;border-radius:10px;background:#22342A"></div>
+                  <img src="{{ flowerArt }}" alt="" style="position:relative;display:block;width:40px;height:40px">
+                </div>
+                <span style="{{ u.btn.txtS }}">×2</span>
+              </div>
+              <div data-layer="CoinPrice" style="{{ u.btn.coS }}">
+                <img src="icons/icon_coin.svg" alt="" style="width:44px;height:44px;display:block;flex:0 0 auto">
+                <span style="{{ u.btn.txtS }}">{{ u.btn.coin }}</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ u.btn.hasCheck }}" hint-placeholder-val="{{ false }}">
+              <div style="width:16px;height:32px;border-right:8px solid #2D3436;border-bottom:8px solid #2D3436;transform:rotate(45deg) translate(-2px,-4px)"></div>
+              <span style="font:900 48px/1 Nunito,system-ui,sans-serif;color:#2D3436">{{ u.btn.label }}</span>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="flex:1 1 auto"></div>
+    <div data-layer="PopupButton" data-kind="secondary" style="flex:0 0 132px;height:132px;margin-bottom:8px;box-sizing:border-box;border-radius:36px;background:#FFFFFF;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;font:900 48px/1 Nunito,system-ui,sans-serif;color:#2D3436">Close</div>
+  </div>
+
+  <div style="position:absolute;left:0;top:1776px;width:1080px;z-index:3">
+    <dc-import name="HubScreen" part="footer" active="{{ 2 }}" hint-size="1080px,144px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;scene&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;fresh&quot;,&quot;mixed&quot;,&quot;short_flower&quot;,&quot;short_both&quot;,&quot;max&quot;,&quot;buy&quot;,&quot;new_season&quot;,&quot;returning&quot;],&quot;default&quot;:&quot;mixed&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;}}">
+const INK = '#2D3436', RIM = '#FFF6D6', WHITE = '#FFFFFF', MINT = '#A8E6CF', GOLD = '#FFD56B', PEACH = '#FFB88C', PINK = '#FFCCD5', DIS = '#F1EAE0', SOFT = '#555C5E';
+const COIN_COST = [10, 20, 40, 60];      // cijena za nivo 1..4 (nacrt, ostaje)
+const FLOWER_COST = 2;                    // ★3 cvijeta TE sezone, samo iznad Kept granice
+const LOOT = [1, 1.25, 1.5, 1.75, 2];
+const TWIN = L => 8 * L;                  // % šanse da pickup sjemena da 2 umjesto 1
+const SEASONS = {
+  country_bloom: { name: 'Country Bloom', tint: ['#E6F2DB', '#B8C2AF'], art: 'pumpkin', home: '#E6F2DB' },
+  frost_orchard: { name: 'Frost Orchard', tint: ['#C5D5E8', '#9FB4CC'], art: 'silver_aconite', home: '#D1E6FF' }
+};
+// lv = [magnet, loot, third]; fl = ★3 te sezone iznad Kept granice; coins = header
+const SCENES = {
+  fresh:        { s: 'country_bloom', lv: [0, 0, 0], coins: 14, fl: 4 },
+  mixed:        { s: 'country_bloom', lv: [4, 2, 0], coins: 30, fl: 2 },
+  short_flower: { s: 'country_bloom', lv: [1, 1, 0], coins: 120, fl: 1 },
+  short_both:   { s: 'country_bloom', lv: [3, 2, 1], coins: 15, fl: 0 },
+  max:          { s: 'country_bloom', lv: [4, 4, 4], coins: 240, fl: 6 },
+  buy:          { s: 'country_bloom', lv: [2, 2, 1], coins: 40, fl: 2, flash: 0 },
+  new_season:   { s: 'frost_orchard', lv: [0, 0, 0], coins: 30, fl: 0 },
+  returning:    { s: 'country_bloom', lv: [3, 2, 1], coins: 80, fl: 2 }
+};
+function stateOf(lv, coins, fl) {
+  if (lv >= 4) return 'max';
+  const okF = fl >= FLOWER_COST, okC = coins >= COIN_COST[lv];
+  return okF && okC ? 'can' : !okF && !okC ? 'short_both' : !okF ? 'short_flower' : 'short_coin';
+}
+const fmtX = v => '×' + (v % 1 ? String(v) : String(v));
+class Component extends DCLogic {
+  renderVals() {
+    const S = SCENES[this.props.scene ?? 'mixed'] || SCENES.mixed;
+    const se = SEASONS[S.s];
+    const defs = [
+      ['MagnetCard', 'Magnet', L => L >= 4 ? 'Pull 232 px' : 'Pull ' + (40 + 48 * L) + ' → ' + (40 + 48 * (L + 1)) + ' px'],
+      ['LootCard', 'Loot Boost', L => L >= 4 ? 'Loot ×2' : 'Loot ' + fmtX(LOOT[L]) + ' → ' + fmtX(LOOT[L + 1])],
+      ['ThirdCard', 'Twin Seeds', L => L >= 4 ? 'Twins 32 %' : 'Twins ' + TWIN(L) + ' % → ' + TWIN(L + 1) + ' %']
+    ];
+    const cards = defs.map((d, i) => {
+      const flash = S.flash === i;
+      const L = S.lv[i];
+      const st = flash ? 'buy' : stateOf(L, S.coins, S.fl);
+      const missF = st === 'short_flower' || st === 'short_both', missC = st === 'short_coin' || st === 'short_both';
+      const dis = st.startsWith('short');
+      const done = st === 'max' || flash;
+      const part = miss => 'box-sizing:border-box;height:72px;padding:0 12px 0 ' + (miss ? 8 : 0) + 'px;border-radius:24px;display:flex;align-items:center;gap:6px;' +
+        (miss ? 'background:' + PINK + ';border:3px solid ' + INK : 'border:3px solid transparent');
+      return {
+        layer: d[0], name: d[1], state: st, effect: d[2](L),
+        segs: [0, 1, 2, 3].map(k => ({ style: 'width:96px;height:22px;border-radius:11px;box-sizing:border-box;flex:0 0 auto;' + (k < L ? 'background:' + (flash && k === L - 1 ? GOLD : MINT) + ';border:3px solid ' + INK : 'background:rgba(45,52,54,.16)') })),
+        style: 'height:264px;box-sizing:border-box;border-radius:32px;padding:0 32px;display:flex;align-items:center;gap:24px;' + (flash ? 'background:' + RIM + ';border:4px solid ' + INK : 'background:' + WHITE + ';border:3px solid rgba(45,52,54,.18)'),
+        btn: {
+          hasPrice: !done, hasCheck: done, label: flash ? 'Done' : 'Max', coin: done ? '' : String(COIN_COST[L]),
+          flS: part(missF), coS: part(missC),
+          txtS: 'font:900 44px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:' + (dis ? SOFT : INK) + ';white-space:nowrap',
+          style: 'flex:0 0 340px;height:132px;box-sizing:border-box;border-radius:36px;display:flex;align-items:center;justify-content:center;gap:' + (done ? 16 : 4) + 'px;padding:0 14px;' +
+            (done ? 'background:' + MINT + ';border:4px solid ' + INK :
+              dis ? 'background:' + DIS + ';border:4px solid rgba(45,52,54,.30)' :
+                'background:' + PEACH + ';border:4px solid ' + INK + ';box-shadow:0 8px 0 rgba(26,26,20,.28)')
+        }
+      };
+    });
+    return {
+      cards, seasonName: se.name, seasonId: S.s, homeBg: se.home,
+      flowerArt: 'icons/flowers/ph_' + se.art + '.svg',
+      coinsHdr: String(S.coins), flowersHdr: String(S.fl + 20),
+      titleS: 'flex:0 0 auto;align-self:flex-start;box-sizing:border-box;height:96px;padding:0 36px;border-radius:48px;background:' + se.tint[0] + ';border:3px solid ' + se.tint[1] + ';display:flex;align-items:center'
+    };
+  }
+}
+</script>
+</body>
+</html>

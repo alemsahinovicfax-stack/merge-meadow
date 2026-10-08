@@ -1,34 +1,42 @@
 extends Control
 
-## Companion portrait — run HUD, main menu, camp. Uses active companion from GameState by default.
-
-const COMPANION_ASSETS := preload("res://scripts/visual/companion_assets.gd")
-const COMPANION_CONFIG := preload("res://scripts/visual/companion_config.gd")
+## Companion portrait — run HUD (88, crop glave), Arena (150), Camp.
+## Pip = UiPip cutout rig; Mochi ostaje crtež.
 
 @export var companion_id: String = ""
 @export var follow_active_companion: bool = true
+@export var pip_loop: String = ""
+@export var crop_head: bool = false
+
+var actor: UiPip
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ensure_size()
-	queue_redraw()
-	# Ormar: novi Pip skin se vidi bez restarta (Arena, Camp, run HUD).
+	clip_contents = true
+	clip_children = Control.CLIP_CHILDREN_AND_DRAW
+	_sync_actor()
 	if not GameState.cosmetics_changed.is_connected(_on_cosmetics_changed):
 		GameState.cosmetics_changed.connect(_on_cosmetics_changed)
 
 
 func _on_cosmetics_changed(_slots: Array) -> void:
-	queue_redraw()
+	_sync_actor()
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
-		queue_redraw()
+		_sync_actor()
 
 
 func refresh_portrait() -> void:
-	queue_redraw()
+	_sync_actor()
+
+
+func play_pip(id: String) -> void:
+	if actor != null and actor.visible:
+		actor.play(id)
 
 
 func _ensure_size() -> void:
@@ -44,10 +52,40 @@ func _resolve_companion_id() -> String:
 	return CompanionConfig.ID_PIP
 
 
+func _sync_actor() -> void:
+	_ensure_size()
+	var id := _resolve_companion_id()
+	if id != CompanionConfig.ID_PIP:
+		if actor != null:
+			actor.visible = false
+		queue_redraw()
+		return
+	if actor == null:
+		actor = UiPip.new()
+		actor.name = "Actor"
+		actor.follow_equipped = true
+		add_child(actor)
+	actor.visible = true
+	var side := minf(size.x, size.y)
+	var hud := crop_head or side <= 100.0
+	actor.crop_head = hud
+	actor.view = "front"
+	actor.box_px = side
+	actor.place_feet_in(self)
+	var loop := pip_loop
+	if loop.is_empty():
+		loop = "hud_idle" if hud else "arena_idle"
+	if actor.loop_id != loop:
+		actor.set_loop(loop)
+	queue_redraw()
+
+
 func _draw() -> void:
 	_ensure_size()
+	var id := _resolve_companion_id()
+	if id == CompanionConfig.ID_PIP:
+		return
 	var side := minf(size.x, size.y)
 	if side < 1.0:
 		return
-	var center := size * 0.5
-	COMPANION_ASSETS.draw_portrait(self, _resolve_companion_id(), center, side)
+	CompanionAssets.draw_portrait(self, id, size * 0.5, side)

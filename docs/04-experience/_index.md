@@ -14,6 +14,9 @@ tags: [hub, iskustvo]
 - [[art-direction|art-direction]] — stil, paleta, mood
 - [[audio-direction|audio-direction]] — muzika, SFX, ambient
 - [[pristupacnost|pristupacnost]] — font, kontrast, difficulty
+- [[design-drafts/pip-cd-brief|pip-cd-brief]] — brief za Claude Design (redizajn Pipa)
+- [[design-drafts/pip-izvjestaj|pip-izvjestaj]] — prenos Pip riga (2026-10-07)
+- [[design-drafts/camp-v3-cd-brief|camp-v3-cd-brief]] — brief za Claude Design (camp bez zelene, ulaz u arenu od 50, upgradei po sezoni)
 
 ## Povezano
 

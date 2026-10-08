@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="pip_art.js"></script>
+<script src="pip_runtime.js"></script>
+<script src="pip_anim.js"></script>
+<style>body{margin:0;background:#FFF8F0;color:#2D3436;font-family:Nunito,system-ui,sans-serif}a{color:#2E7F8C}a:hover{color:#2D3436}button{font-family:Nunito,sans-serif}</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:32px 24px 80px;display:flex;flex-direction:column;gap:36px">
+  <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font:500 13px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#555C5E">design_handoff_pip · in context · game px × display scale</div>
+      <div style="font-size:48px;font-weight:900;line-height:1">Pip in the game</div>
+      <div style="font-size:16px;font-weight:600;color:#555C5E;max-width:760px;text-wrap:pretty">Boxes and positions are the real constants (UiHomeV3, UiHomeField, UiArena, UiRun, UiWardrobe). Surroundings are simplified excerpts — only Pip is new.</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <sc-for list="{{ skins }}" as="s" hint-placeholder-count="3">
+        <button onClick="{{ s.pick }}" style="font-weight:800;font-size:15px;padding:10px 16px;border-radius:16px;border:3px solid #2D3436;background:{{ s.bg }};cursor:pointer;color:#2D3436">{{ s.title }}</button>
+      </sc-for>
+      <button onClick="{{ toggleRm }}" style="font-weight:800;font-size:15px;padding:10px 16px;border-radius:16px;border:3px solid #2D3436;background:{{ rmBg }};cursor:pointer;color:#2D3436">reduce motion {{ rmLabel }}</button>
+    </div>
+  </div>
+
+  <section data-screen-label="Home" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">1 · Home — season card (230) and field (190)</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+      <sc-for list="{{ seasons }}" as="se" hint-placeholder-count="8">
+        <button onClick="{{ se.pick }}" style="font:700 13px 'JetBrains Mono',monospace;padding:7px 10px;border-radius:12px;border:2px solid #2D3436;background:{{ se.bg }};cursor:pointer;color:#2D3436">{{ se.id }}</button>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:20px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div ref="{{ cardRef }}" style="position:relative;width:300px;height:300px;border:3px solid #2D3436;border-radius:28px;overflow:hidden;background:{{ ground }}">
+          <div style="position:absolute;left:0;right:0;top:0;height:38%;background:{{ sky }}"></div>
+          <div style="position:absolute;left:14px;top:12px;font-weight:900;font-size:18px;color:#FFF8F0;background:rgba(26,36,30,.84);padding:4px 10px;border-radius:12px">{{ seasonName }}</div>
+          <div data-slot="card" style="position:absolute;left:35px;top:48px"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onClick="{{ cardJump }}" style="font-weight:800;padding:10px 14px;border-radius:14px;border:3px solid #2D3436;background:#FFB88C;cursor:pointer">Open field (jump)</button>
+          <button onClick="{{ cardGreet }}" style="font-weight:800;padding:10px 14px;border-radius:14px;border:3px solid #2D3436;background:#FFFFFF;cursor:pointer">Return home</button>
+        </div>
+        <div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E">card Pip 230 at (425, 1027) · shown ×1.0 of a 300 crop</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+        <div ref="{{ fieldRef }}" onClick="{{ fieldTap }}" style="position:relative;width:100%;max-width:820px;aspect-ratio:1080/560;border:3px solid #2D3436;border-radius:28px;overflow:hidden;background:{{ ground }};cursor:pointer">
+          <div style="position:absolute;left:0;right:0;top:0;height:26%;background:{{ sky }}"></div>
+          <div style="position:absolute;left:14%;top:40.9%;width:56.9%;height:23.4%;border:2px dashed rgba(255,248,240,.55);border-radius:10px;box-sizing:border-box"></div>
+          <div style="position:absolute;left:81.1%;top:33.6%;width:16.7%;aspect-ratio:1;border:3px solid #2D3436;border-radius:18px;background:#FFF8F0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px">Looks</div>
+          <div data-slot="field" style="position:absolute;top:0;left:0;width:17.6%;aspect-ratio:1"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onClick="{{ fApply }}" style="font-weight:800;padding:9px 12px;border-radius:14px;border:3px solid #2D3436;background:#FFB88C;cursor:pointer">ApplyMoment</button>
+          <button onClick="{{ fFlower }}" style="font-weight:800;padding:9px 12px;border-radius:14px;border:3px solid #2D3436;background:#FFFFFF;cursor:pointer">New flower grew</button>
+          <button onClick="{{ fSniff }}" style="font-weight:800;padding:9px 12px;border-radius:14px;border:3px solid #2D3436;background:#FFFFFF;cursor:pointer">Sniff + sneeze</button>
+          <button onClick="{{ fSeason }}" style="font-weight:800;padding:9px 12px;border-radius:14px;border:3px solid #2D3436;background:#FFFFFF;cursor:pointer">Season interaction</button>
+          <button onClick="{{ fSleep }}" style="font-weight:800;padding:9px 12px;border-radius:14px;border:3px solid #2D3436;background:#FFFFFF;cursor:pointer">Skip to sleep</button>
+          <button onClick="{{ fWalk }}" style="font-weight:800;padding:9px 12px;border-radius:14px;border:3px solid #2D3436;background:#FFFFFF;cursor:pointer">Walk</button>
+        </div>
+        <div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E;white-space:pre-wrap;line-height:1.5">tap the field = tap Pip (escalates within 3 s) · zone_feet (151, 1306, 614, 131) · page rows 1077–1633 shown{{ brainLog }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="Arena" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">2 · Arena — box 150, bottom-left inset (30, 26), never leaves it</div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);gap:20px;align-items:start">
+      <div ref="{{ arenaRef }}" onPointerMove="{{ arenaMove }}" onPointerDown="{{ arenaDown }}" onPointerUp="{{ arenaUp }}" onPointerLeave="{{ arenaUp }}" style="position:relative;width:100%;max-width:640px;aspect-ratio:1080/800;border:3px solid #2D3436;border-radius:28px;overflow:hidden;background:#EAF3DF;touch-action:none;cursor:grab">
+        <div style="position:absolute;left:0;right:0;top:0;height:14%;background:#BCD9A3"></div>
+        <div data-seed style="position:absolute;width:12.4%;aspect-ratio:1;border-radius:50%;background:#FFF8F0;border:4px solid #2D3436;box-sizing:border-box;left:{{ seedX }};top:{{ seedY }};transform:translate(-50%,-50%)"><div style="position:absolute;inset:18%;border-radius:50%;background:#2E4733"></div><div style="position:absolute;inset:36%;border-radius:50%;background:#FFEAA7"></div></div>
+        <div style="position:absolute;left:2.78%;bottom:3.25%;width:13.9%;aspect-ratio:1;outline:2px dashed rgba(45,52,54,.35)"><div data-slot="arena" style="position:absolute;inset:0"></div></div>
+        <div style="position:absolute;right:3%;bottom:4%;font:700 12px 'JetBrains Mono',monospace;background:rgba(26,36,30,.84);color:#FFF8F0;padding:5px 9px;border-radius:10px">drag the seed — Pip looks at it</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start">
+        <sc-for list="{{ arenaEvents }}" as="ae" hint-placeholder-count="10">
+          <button onClick="{{ ae.go }}" style="font:700 13px 'JetBrains Mono',monospace;padding:9px 11px;border-radius:12px;border:2px solid #2D3436;background:#FFFFFF;cursor:pointer;color:#2D3436">{{ ae.id }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="Run" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">3 · Run — top view, lanes 270 / 540 / 810, feet at y 1574</div>
+    <div style="display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:20px;align-items:start">
+      <div ref="{{ runRef }}" style="position:relative;width:100%;max-width:380px;aspect-ratio:1080/1920;border:3px solid #2D3436;border-radius:28px;overflow:hidden;background:#26382C">
+        <div data-lane style="position:absolute;top:0;bottom:0;left:15.74%;width:18.52%;background:#3A5C41;overflow:hidden"></div>
+        <div data-lane style="position:absolute;top:0;bottom:0;left:40.74%;width:18.52%;background:#3A5C41;overflow:hidden"></div>
+        <div data-lane style="position:absolute;top:0;bottom:0;left:65.74%;width:18.52%;background:#3A5C41;overflow:hidden"></div>
+        <div style="position:absolute;left:3.7%;top:12.08%;width:24.8%;height:6.25%;background:#FFF8F0;border:3px solid #2D3436;border-radius:12px;box-sizing:border-box;display:flex;align-items:center;gap:4px;padding-left:2px;overflow:hidden"><div data-slot="hud" style="flex:none"></div><div style="font-weight:900;font-size:13px">Pip</div></div>
+        <div data-runbox style="position:absolute;width:13.89%;aspect-ratio:1;top:78.07%;left:43.06%;transition:left .12s cubic-bezier(.25,.46,.45,.94)"><div data-slot="run" style="position:absolute;inset:0"></div></div>
+        <sc-if value="{{ lootOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:rgba(22,33,27,.62);display:flex;align-items:flex-start;justify-content:center;padding-top:22%"><div style="background:#FFF8F0;border:3px solid #2D3436;border-radius:20px;padding:10px 16px;font-weight:900;font-size:18px">Loot · Pip waits dizzy</div></div>
+        </sc-if>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ runEvents }}" as="re" hint-placeholder-count="9">
+            <button onClick="{{ re.go }}" style="font:700 13px 'JetBrains Mono',monospace;padding:9px 11px;border-radius:12px;border:2px solid #2D3436;background:#FFFFFF;cursor:pointer;color:#2D3436">{{ re.id }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="font-weight:900">Scroll</div>
+          <input type="range" min="400" max="800" step="5" value="{{ scroll }}" onInput="{{ onScroll }}" style="flex:1;min-width:160px;accent-color:#2D3436">
+          <div style="font:700 13px 'JetBrains Mono',monospace">{{ scrollLabel }}</div>
+        </div>
+        <div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E;line-height:1.6">← / → keys also change lane (tween 0.12 s quad-out). Body covers the 56 × 56 collision (see Specs). HUD portrait = 88 px crop of the front rig inside CompanionChip (40, 232, 268, 120).</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="Shop" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">4 · Shop · Looks cards (984 × 300) — still pose, tap = signature move</div>
+    <div ref="{{ shopRef }}" style="display:flex;flex-direction:column;gap:16px;max-width:984px">
+      <sc-for list="{{ looks }}" as="l" hint-placeholder-count="3">
+        <div style="position:relative;width:100%;aspect-ratio:984/300;border:3px solid #2D3436;border-radius:28px;background:{{ l.card }};box-shadow:0 8px 0 rgba(26,26,20,.28);display:grid;grid-template-columns:44% 1fr;overflow:hidden">
+          <div onClick="{{ l.tap }}" style="position:relative;background:#BCD9A3;border-right:3px solid #2D3436;cursor:pointer;overflow:hidden">
+            <div style="position:absolute;left:0;right:0;bottom:0;height:34%;background:#7DAA67"></div>
+            <div data-look="{{ l.key }}" style="position:absolute;left:50%;bottom:2%;transform:translateX(-50%)"></div>
+          </div>
+          <div style="padding:5% 6%;display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-width:0">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="font-size:clamp(20px,3.2vw,34px);font-weight:900">{{ l.title }}</div>
+              <div style="font-size:clamp(13px,1.6vw,17px);font-weight:700;color:#555C5E;text-wrap:pretty">{{ l.detail }}</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ l.states }}" as="st" hint-placeholder-count="3">
+                <button onClick="{{ st.pick }}" style="font-weight:900;font-size:clamp(13px,1.6vw,18px);padding:10px 16px;border-radius:30px;border:3px solid #2D3436;background:{{ st.bg }};cursor:pointer;color:#2D3436">{{ st.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Wardrobe" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">5 · Wardrobe stage (1032 × 300) · thumbs 210 × 150 · Starter Pack · All set here</div>
+    <div ref="{{ wardRef }}" style="display:flex;flex-direction:column;gap:16px;max-width:1032px">
+      <div onClick="{{ stageTap }}" style="position:relative;width:100%;aspect-ratio:1032/300;border:3px solid #2D3436;border-radius:28px;overflow:hidden;background:#98C27F;cursor:pointer">
+        <div style="position:absolute;left:0;right:0;top:0;height:32%;background:#BCD9A3"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:32%;background:#7DAA67"></div>
+        <div data-slot="stage" style="position:absolute;left:50%;bottom:3%;transform:translateX(-50%)"></div>
+        <div style="position:absolute;left:16px;top:16px;background:rgba(26,36,30,.84);border:2px solid rgba(255,248,240,.4);color:#FFF8F0;border-radius:18px;padding:6px 14px;font-weight:900;font-size:clamp(14px,2vw,22px)">{{ stageName }}</div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <sc-for list="{{ thumbs }}" as="th" hint-placeholder-count="3">
+          <div onClick="{{ th.pick }}" style="width:220px;background:{{ th.card }};border:{{ th.edge }};border-radius:24px;padding:10px;display:flex;flex-direction:column;gap:8px;cursor:pointer;box-sizing:border-box">
+            <div style="position:relative;width:200px;height:143px;border:3px solid #16211B;border-radius:18px;overflow:hidden;background:#98C27F">
+              <div style="position:absolute;left:0;right:0;bottom:0;height:32%;background:#7DAA67"></div>
+              <div data-thumb="{{ th.key }}" style="position:absolute;left:50%;bottom:2%;transform:translateX(-50%)"></div>
+            </div>
+            <div style="font-weight:900;font-size:17px;text-align:center">{{ th.title }}</div>
+          </div>
+        </sc-for>
+        <div style="width:300px;background:#FFFFFF;border:3px solid #2D3436;border-radius:24px;padding:14px;display:flex;flex-direction:column;gap:8px;box-sizing:border-box">
+          <div style="font-weight:900;font-size:20px">Starter Pack</div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:110px;height:100px;border-radius:16px;border:3px solid #2D3436;background:#FFF6D6;position:relative;overflow:hidden"><div data-slot="starter" style="position:absolute;left:50%;bottom:0;transform:translateX(-50%)"></div></div>
+            <div style="font-weight:700;font-size:15px;line-height:1.35">100 coins · Pip Blossom · 10 × 5 seeds</div>
+          </div>
+        </div>
+        <div style="width:300px;background:#FBEDD7;border:3px solid #2D3436;border-radius:24px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:6px;box-sizing:border-box">
+          <div data-slot="allset"></div>
+          <div style="font-weight:900;font-size:20px">All set here</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;skin&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;classic&quot;,&quot;blossom&quot;,&quot;sky&quot;],&quot;default&quot;:&quot;classic&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const SEASONS = { country_bloom: ['Country Bloom', '#7DAA67', '#BCD9A3'], frost_orchard: ['Frost Orchard', '#9FB6CF', '#C7D8EC'], lantern_meadow: ['Lantern Meadow', '#463E66', '#CDB6E6'], amber_canopy: ['Amber Canopy', '#7F5C3B', '#B7792F'], moonlit_warren: ['Moonlit Warren', '#3B4175', '#252A55'], coral_tide: ['Coral Tide Garden', '#E2B196', '#86C9C6'], starfall_glade: ['Starfall Glade', '#3A3163', '#2A2350'], ember_fen: ['Ember Fen', '#58392F', '#C8744E'] };
+const ZONE = [151, 1306, 614, 131], PAGE_Y0 = 1077, PAGE_H = 560;
+class Component extends DCLogic {
+  state = { skin: this.props.skin || 'classic', season: this.props.season || 'country_bloom', rm: false, log: [], seed: [52, 46], scroll: 400, lane: 1, loot: false, owned: { classic: true, blossom: false, sky: true }, worn: 'classic', stage: 'classic' };
+  cardRef = React.createRef(); fieldRef = React.createRef(); arenaRef = React.createRef(); runRef = React.createRef(); shopRef = React.createRef(); wardRef = React.createRef();
+  P = {};
+  componentDidMount() { this.boot(); this.key = e => { if (e.key === 'ArrowLeft') this.lane(-1); if (e.key === 'ArrowRight') this.lane(1); }; window.addEventListener('keydown', this.key); }
+  componentWillUnmount() { window.removeEventListener('keydown', this.key); cancelAnimationFrame(this.raf); Object.values(this.P).forEach(p => p.destroy && p.destroy()); }
+  boot() { if (!window.Pip || !Pip.ANIMS.sig_sky || !this.fieldRef.current || !this.wardRef.current.querySelector('[data-thumb]')) { setTimeout(() => this.boot(), 60); return; } this.build(); this.raf = requestAnimationFrame(this.tick); }
+  q(ref, sel) { return ref.current.querySelector(sel); }
+  build() {
+    Object.values(this.P).forEach(p => p.destroy && p.destroy()); this.P = {};
+    const sk = this.state.skin, F = this.fieldRef.current;
+    this.P.card = Pip.create(this.q(this.cardRef, '[data-slot=card]'), { view: 'front', skin: sk, size: 230, loop: 'card_idle' });
+    const fw = F.clientWidth, k = fw / 1080, box = this.q(this.fieldRef, '[data-slot=field]');
+    this.k = k; this.P.field = Pip.create(box, { view: 'front', skin: sk, size: 190 * k, loop: 'idle' });
+    this.fx = this.fx || 756;
+    this.brain = new Pip.Brain(this.P.field, PipBehaviors.field, { season: this.state.season, walk: true, zone: ZONE, x: this.fx, onMove: x => { this.fx = x; this.place(); } });
+    this.brain.d = PipBehaviors.field; this.place();
+    this.P.arena = Pip.create(this.q(this.arenaRef, '[data-slot=arena]'), { view: 'front', skin: sk, size: this.q(this.arenaRef, '[data-slot=arena]').clientWidth, loop: 'arena_idle' });
+    const rb = this.q(this.runRef, '[data-slot=run]');
+    this.P.run = Pip.create(rb, { view: 'top', skin: sk, size: rb.clientWidth, loop: 'run_gallop' });
+    this.P.hud = Pip.create(this.q(this.runRef, '[data-slot=hud]'), { view: 'front', skin: sk, size: Math.round(88 * this.runRef.current.clientWidth / 1080), crop: [40, 40, 176, 176], shadow: false, loop: 'hud_idle' });
+    this.shopPips = {};
+    this.shopRef.current.querySelectorAll('[data-look]').forEach(el => { const key = el.getAttribute('data-look'); const s = PipArt.SKINS.find(x => x.key === key); const h = el.parentNode.clientHeight; const p = Pip.create(el, { view: 'three_q', skin: key, size: h * .95 }); p.seek(s.showcase); this.shopPips[key] = p; this.P['shop_' + key] = p; });
+    const st = this.q(this.wardRef, '[data-slot=stage]'); this.P.stage = Pip.create(st, { view: 'three_q', skin: this.state.stage, size: st.parentNode.clientHeight * .82, loop: 'stage_idle' });
+    this.wardRef.current.querySelectorAll('[data-thumb]').forEach(el => { const key = el.getAttribute('data-thumb'); const s = PipArt.SKINS.find(x => x.key === key); this.P['th_' + key] = Pip.create(el, { view: 'three_q', skin: key, size: 126, still: true }).seek(s.showcase); });
+    this.P.starter = Pip.create(this.q(this.wardRef, '[data-slot=starter]'), { view: 'three_q', skin: 'blossom', size: 100, still: true }).seek('pose_blossom');
+    this.P.allset = Pip.create(this.q(this.wardRef, '[data-slot=allset]'), { view: 'front', skin: sk, size: 130, still: true, face: 'happy' });
+    this.P.run.on(n => { if (n === 'fail_end') { this.setState({ loot: true }); this.P.run.play('fail_dizzy'); } });
+  }
+  place() { const box = this.q(this.fieldRef, '[data-slot=field]'); if (!box) return; const k = this.k, s = 190 * k; box.style.left = (this.fx * k - s / 2) + 'px'; box.style.top = ((ZONE[1] + ZONE[3] * .75 - PAGE_Y0) * k - (s - 19 * k)) + 'px'; box.style.width = s + 'px'; }
+  tick = ts => {
+    const dt = this.lt ? Math.min(.05, (ts - this.lt) / 1000) : 0; this.lt = ts;
+    if (this.brain) this.brain.tick(dt);
+    if (this.P.run) this.P.run.speed = this.state.loot ? 1 : this.state.scroll / 400;
+    this.off = (this.off || 0) + dt * this.state.scroll;
+    if (this.runRef.current) { const k = this.runRef.current.clientWidth / 1080; this.runRef.current.querySelectorAll('[data-lane]').forEach(l => { if (!l.firstChild) { for (let i = 0; i < 12; i++) { const m = document.createElement('div'); m.style.cssText = 'position:absolute;left:4px;right:4px;height:' + (40 * k) + 'px;background:#45664B'; l.appendChild(m); } } const per = 124 * k * 1.6; [...l.children].forEach((m, i) => m.style.top = (((this.state.loot ? this.offStop : this.off) * k % per) + (i - 1) * per) + 'px'); }); if (!this.state.loot) this.offStop = this.off; }
+    if (this.brain && ts - (this.ul || 0) > 500) { this.ul = ts; const lg = this.brain.log.map(l => l.join(' ')).slice(0, 5); if (lg.join() !== this.state.log.join()) this.setState({ log: lg }); }
+    if (this.dragT && this.P.arena) { const A = this.arenaRef.current.getBoundingClientRect(), B = this.q(this.arenaRef, '[data-slot=arena]').getBoundingClientRect(); const sc = 256 / B.width; this.P.arena.lookAt([(A.left + this.state.seed[0] / 100 * A.width - B.left) * sc, (A.top + this.state.seed[1] / 100 * A.height - B.top) * sc]); }
+    this.raf = requestAnimationFrame(this.tick);
+  };
+  lane(d) { if (this.state.loot) return; const l = Math.max(0, Math.min(2, this.state.lane + d)); if (l === this.state.lane) return; this.setState({ lane: l }); const box = this.q(this.runRef, '[data-runbox]'); box.style.left = ([270, 540, 810][l] / 1080 * 100 - 6.94) + '%'; this.P.run.play(d < 0 ? 'lane_left' : 'lane_right'); }
+  setSkin(k) { this.setState({ skin: k }, () => this.build()); }
+  renderVals() {
+    const S = SEASONS[this.state.season];
+    const fb = () => this.brain;
+    const runEv = { start: () => { this.setState({ loot: false }); this.P.run.play('run_start', { then: () => this.P.run.setLoop('run_gallop') }); this.P.hud.play('hud_go'); }, lane_left: () => this.lane(-1), lane_right: () => this.lane(1),
+      coin: () => { this.P.run.play('pickup_coin'); this.P.hud.play('hud_happy'); }, seed: () => { this.P.run.play('pickup_seed'); this.P.hud.play('hud_happy'); }, diamond: () => { this.P.run.play('pickup_diamond'); this.P.hud.play('hud_wow'); },
+      low_time: () => this.P.hud.play('hud_worried'), hit: () => { this.P.run.play('fail', { hold: true }); this.P.hud.play('hud_hit', { hold: true }); }, revive: () => { this.setState({ loot: false }); this.P.hud.over = null; this.P.run.play('revive_getup', { then: () => this.P.run.setLoop('run_gallop') }); },
+      finish: () => { this.P.run.play('finish', { hold: true }); this.P.hud.play('hud_proud'); } };
+    const arenaEv = ['merge_t2', 'merge_t3', 'combo_hop', 'combo_big', 'muncher_wake', 'muncher_eat', 'muncher_frozen', 'new_seeds', 'need_more_seeds', 'doze', 'arena_idle'];
+    const s0 = PipArt.SKINS;
+    return {
+      skins: s0.map(s => ({ title: s.title, pick: () => this.setSkin(s.key), bg: s.key === this.state.skin ? s.tokens.fur : '#FFFFFF' })),
+      toggleRm: () => { Pip.reduceMotion = !this.state.rm; this.setState({ rm: !this.state.rm }); }, rmLabel: this.state.rm ? 'on' : 'off', rmBg: this.state.rm ? '#A8E6CF' : '#FFFFFF',
+      seasons: Object.keys(SEASONS).map(id => ({ id, bg: id === this.state.season ? '#FFB88C' : '#FFFFFF', pick: () => { this.setState({ season: id }); if (this.brain) { this.brain.ctx.season = id; this.brain.event('season_change'); } } })),
+      ground: S[1], sky: S[2], seasonName: S[0], cardRef: this.cardRef, fieldRef: this.fieldRef, arenaRef: this.arenaRef, runRef: this.runRef, shopRef: this.shopRef, wardRef: this.wardRef,
+      cardJump: () => this.P.card && this.P.card.play('card_jump'), cardGreet: () => this.P.card && this.P.card.play('greet'),
+      fieldTap: () => fb() && fb().event('tap'), fApply: e => { e.stopPropagation(); fb() && fb().event('apply'); }, fFlower: e => { e.stopPropagation(); fb() && fb().event('flower_grown'); },
+      fSniff: e => { e.stopPropagation(); fb() && fb().run('sniff', () => fb().run('sneeze', null, 'pollen'), 'near flower'); },
+      fSeason: e => { e.stopPropagation(); if (fb()) fb().nextSeason = 0; }, fSleep: e => { e.stopPropagation(); if (fb()) fb().idleT = 999; }, fWalk: e => { e.stopPropagation(); fb() && !fb().busy && fb().startWalk(); },
+      brainLog: this.state.log.length ? '\nbrain: ' + this.state.log.join('  ·  ') : '',
+      seedX: this.state.seed[0] + '%', seedY: this.state.seed[1] + '%',
+      arenaDown: e => { this.dragT = true; this.arenaMove(e, true); }, arenaUp: () => { this.dragT = false; this.P.arena && this.P.arena.lookAt(null); }, arenaMove: e => this.arenaMove(e),
+      arenaEvents: arenaEv.map(id => ({ id, go: () => this.P.arena && (id === 'doze' || id === 'arena_idle' ? this.P.arena.setLoop(id) : this.P.arena.play(id)) })),
+      runEvents: Object.keys(runEv).map(id => ({ id, go: runEv[id] })), lootOn: this.state.loot,
+      scroll: this.state.scroll, onScroll: e => this.setState({ scroll: +e.target.value }), scrollLabel: this.state.scroll + ' px/s · speed_scale ' + (this.state.scroll / 400).toFixed(2),
+      looks: s0.map(s => { const owned = this.state.owned[s.key], worn = this.state.worn === s.key; return { key: s.key, title: s.title, detail: s.key === 'classic' ? 'Default look' : s.detail.split('. Signature')[0] + '.', card: owned ? '#FFF6D6' : '#FFFFFF',
+        tap: () => { const p = this.shopPips && this.shopPips[s.key]; if (p) { p.loopId = null; p.play(s.signature, { then: () => p.seek(s.showcase) }); } },
+        states: s.key === 'classic' ? [{ label: worn ? '✓ Wearing' : 'Owned', bg: '#A8E6CF', pick: () => this.setState({ worn: 'classic' }) }] : owned ? [{ label: worn ? '✓ Wearing' : 'Owned · wear', bg: '#A8E6CF', pick: () => this.setState({ worn: s.key }) }, { label: 'reset: not bought', bg: '#FFFFFF', pick: () => this.setState({ owned: Object.assign({}, this.state.owned, { [s.key]: false }), worn: worn ? 'classic' : this.state.worn }) }] : [{ label: '● ' + s.coin_cost, bg: '#FFD56B', pick: () => this.setState({ owned: Object.assign({}, this.state.owned, { [s.key]: true }), worn: s.key }) }] }; }),
+      stageTap: () => this.P.stage && this.P.stage.play('stage_hop'), stageName: (s0.find(s => s.key === this.state.stage) || s0[0]).title,
+      thumbs: s0.map(s => ({ key: s.key, title: s.title, card: s.key === this.state.stage ? '#FFF6D6' : '#FFFFFF', edge: s.key === this.state.stage ? '4px solid #2D3436' : '3px solid rgba(45,52,54,.18)', pick: () => { this.setState({ stage: s.key }); if (this.P.stage) { this.P.stage.set({ skin: s.key }); this.P.stage.play('stage_hop'); } } }))
+    };
+  }
+  ensureTick(p) { if (!p._ticking) { p._ticking = true; const f = ts => { const dt = p._lt ? Math.min(.05, (ts - p._lt) / 1000) : 0; p._lt = ts; p.tick(dt); if (p.base && p.base.speed !== 0) requestAnimationFrame(f); else { p._ticking = false; p._lt = 0; } }; requestAnimationFrame(f); } }
+  arenaMove(e, force) { if (!this.dragT && !force) return; const r = this.arenaRef.current.getBoundingClientRect(); this.setState({ seed: [Math.max(6, Math.min(94, (e.clientX - r.left) / r.width * 100)), Math.max(8, Math.min(92, (e.clientY - r.top) / r.height * 100))] }); }
+}
+</script>
+</body>
+</html>

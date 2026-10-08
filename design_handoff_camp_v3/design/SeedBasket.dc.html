@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div data-layer="SeedBasket" style="position:relative;width:300px;height:280px">
+  <div data-layer="BasketShadow" style="position:absolute;left:30px;top:261px;width:240px;height:24px;border-radius:50%;background:rgba(20,26,22,.28)"></div>
+  <div data-layer="BasketBody" style="position:absolute;inset:0;transform-origin:150px 272px;transform:rotate({{ tilt }}deg)">
+    <svg width="300" height="280" viewBox="0 0 300 280" style="position:absolute;left:0;top:0;overflow:visible;display:block">
+      <path data-layer="Handle" d="M44 156 C44 -2 256 -2 256 156" fill="none" stroke="#3A2A1B" stroke-width="24" stroke-linecap="round"></path>
+      <path d="M44 156 C44 -2 256 -2 256 156" fill="none" stroke="#B88A55" stroke-width="14" stroke-linecap="round"></path>
+      <ellipse data-layer="Opening" cx="150" cy="154" rx="114" ry="20" fill="#5A4230" stroke="#3A2A1B" stroke-width="4"></ellipse>
+    </svg>
+    <sc-for list="{{ pile }}" as="f" hint-placeholder-count="0">
+      <div data-layer="PileFlower" style="position:absolute;left:{{ f.l }}px;top:{{ f.t }}px;width:{{ f.s }}px;height:{{ f.s }}px;overflow:hidden;transform:rotate({{ f.r }}deg)">
+        <img src="{{ f.src }}" alt="" style="position:absolute;left:{{ f.il }}px;top:{{ f.it }}px;width:{{ f.is }}px;height:{{ f.is }}px;max-width:none;display:block">
+      </div>
+    </sc-for>
+    <svg width="300" height="280" viewBox="0 0 300 280" style="position:absolute;left:0;top:0;overflow:visible;display:block">
+      <path data-layer="Wicker" d="M30 166 L270 166 L249 256 Q246 270 232 270 L68 270 Q54 270 51 256 Z" fill="#C99A5F" stroke="#3A2A1B" stroke-width="5" stroke-linejoin="round"></path>
+      <path data-layer="Weave" d="M40 202 L260 202 M47 236 L253 236" stroke="#A87B48" stroke-width="6" stroke-linecap="round"></path>
+      <path d="M84 172 L88 264 M117 172 L119 264 M150 172 L150 264 M183 172 L181 264 M216 172 L212 264" stroke="#A87B48" stroke-width="4" stroke-linecap="round"></path>
+      <rect data-layer="Rim" x="22" y="146" width="256" height="30" rx="15" fill="#F0DDB4" stroke="#3A2A1B" stroke-width="4"></rect>
+      <path d="M40 152 l10 18 M62 152 l10 18 M84 152 l10 18 M206 152 l10 18 M228 152 l10 18 M250 152 l8 14" stroke="#D8BC8A" stroke-width="3" stroke-linecap="round"></path>
+      <path data-layer="Cloth" d="M98 150 L202 150 L202 178 Q196 192 186 180 Q177 194 168 180 Q159 194 150 180 Q141 194 132 180 Q123 194 114 180 Q104 192 98 178 Z" fill="#FFB88C" stroke="#E8A374" stroke-width="3" stroke-linejoin="round"></path>
+      <circle cx="122" cy="164" r="4" fill="#FFF8F0"></circle>
+      <circle cx="150" cy="168" r="4" fill="#FFF8F0"></circle>
+      <circle cx="178" cy="164" r="4" fill="#FFF8F0"></circle>
+    </svg>
+  </div>
+  <sc-for list="{{ flying }}" as="f" hint-placeholder-count="0">
+    <div data-layer="PourFlower" style="position:absolute;left:{{ f.l }}px;top:{{ f.t }}px;width:{{ f.s }}px;height:{{ f.s }}px;overflow:hidden;transform:rotate({{ f.r }}deg)">
+      <img src="{{ f.src }}" alt="" style="position:absolute;left:{{ f.il }}px;top:{{ f.it }}px;width:{{ f.is }}px;height:{{ f.is }}px;max-width:none;display:block">
+    </div>
+  </sc-for>
+  <sc-if value="{{ hasCount }}" hint-placeholder-val="{{ true }}">
+    <div data-layer="BagCounter" style="position:absolute;left:210px;top:194px;width:84px;height:84px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:4px solid #CBC2B6;box-shadow:0 0 0 3px #3A2A1B;display:grid;place-items:center;font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">{{ count }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:300,&quot;height&quot;:280},&quot;count&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:0,&quot;max&quot;:40,&quot;default&quot;:24,&quot;tsType&quot;:&quot;number&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;idle&quot;,&quot;pour&quot;],&quot;default&quot;:&quot;idle&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;tilt&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;},&quot;types&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string[]&quot;}}">
+const CROP = { clover_t1: [80, 89, 96, 164], daisy_t1: [90, 119, 76, 134], buttercup_t1: [90, 125, 76, 128], tulip_t1: [83, 117, 89, 136], sunflower_t1: [88, 116, 80, 138], pumpkin_t1: [85, 99, 86, 154] };
+const PILE = [[150, 138, 62, -4], [110, 141, 60, 8], [190, 141, 60, 12], [70, 147, 56, -14], [230, 147, 56, -10], [132, 103, 62, -8], [172, 103, 62, 6], [92, 109, 58, 10], [212, 109, 58, -12], [154, 66, 64, 4], [114, 72, 60, -6], [194, 74, 60, 12]];
+const DRAW_ORDER = [9, 10, 11, 5, 6, 7, 8, 0, 1, 2, 3, 4];
+function flower(type, x, y, s, r) {
+  const key = CROP[type + '_t1'] ? type + '_t1' : 'clover_t1', c = CROP[key];
+  const k = s / Math.max(c[2], c[3]);
+  return { l: x - s / 2, t: y - s / 2, s, r, src: 'icons/flowers/' + key + '.svg', is: 256 * k, il: (s - c[2] * k) / 2 - c[0] * k, it: (s - c[3] * k) / 2 - c[1] * k };
+}
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const count = Math.max(0, Math.min(40, +(p.count ?? 24)));
+    const types = (p.types && p.types.length ? p.types : ['clover', 'daisy', 'buttercup', 'tulip']);
+    const pour = (p.state ?? 'idle') === 'pour';
+    const vis = count <= 0 ? 0 : Math.max(1, Math.min(12, Math.round(count * 12 / 40)));
+    const shown = pour ? Math.max(0, vis - 2) : vis;
+    const pile = DRAW_ORDER.filter(i => i < shown).map(i => { const q = PILE[i]; return flower(types[i % types.length], q[0], q[1], q[2], q[3]); });
+    const flying = pour && count > 0 ? [[36, 44, 56, -30], [-6, -4, 52, 20], [64, -44, 50, -10]].map((q, i) => flower(types[(i + 1) % types.length], q[0], q[1], q[2], q[3])) : [];
+    return { tilt: pour ? -12 : +(p.tilt ?? 0), pile, flying, hasCount: count > 0 && !p.hideCount, count };
+  }
+}
+</script>
+</body>
+</html>

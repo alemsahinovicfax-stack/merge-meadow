@@ -1,0 +1,5471 @@
+{
+ "schema": 1,
+ "units": "px of the view frame (256 for front/three_q/side/back, 150 for top = run game px)",
+ "views": {
+  "front": {
+   "frame": [
+    256,
+    256
+   ],
+   "origin": [
+    128,
+    240
+   ],
+   "nodes": [
+    {
+     "id": "root",
+     "parent": null,
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "shadow",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -50,
+     "sprite": {
+      "file": "res://assets/pip/parts/shadow.svg",
+      "offset": [
+       -55,
+       -10
+      ],
+      "size": [
+       110,
+       20
+      ]
+     }
+    },
+    {
+     "id": "pip",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "foot_L",
+     "parent": "pip",
+     "pos": [
+      -30,
+      -9
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 4,
+     "sprite": {
+      "file": "res://assets/pip/parts/foot_f.svg",
+      "offset": [
+       -28,
+       -14
+      ],
+      "size": [
+       55,
+       27
+      ]
+     }
+    },
+    {
+     "id": "foot_R",
+     "parent": "pip",
+     "pos": [
+      30,
+      -9
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": 4,
+     "sprite": {
+      "file": "res://assets/pip/parts/foot_f.svg",
+      "offset": [
+       -28,
+       -14
+      ],
+      "size": [
+       55,
+       27
+      ]
+     }
+    },
+    {
+     "id": "body",
+     "parent": "pip",
+     "pos": [
+      0,
+      -8
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0,
+     "sprite": {
+      "file": "res://assets/pip/parts/body_f.svg",
+      "offset": [
+       -57,
+       -87
+      ],
+      "size": [
+       113,
+       95
+      ]
+     }
+    },
+    {
+     "id": "tail",
+     "parent": "body",
+     "pos": [
+      0,
+      -20
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -5,
+     "sprite": {
+      "file": "res://assets/pip/parts/tail.svg",
+      "offset": [
+       -21,
+       -21
+      ],
+      "size": [
+       40,
+       41
+      ]
+     },
+     "visible": false
+    },
+    {
+     "id": "arm_L",
+     "parent": "body",
+     "pos": [
+      -22,
+      -30
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 8,
+     "sprite": {
+      "file": "res://assets/pip/parts/paw_f.svg",
+      "offset": [
+       -12,
+       -3
+      ],
+      "size": [
+       24,
+       23
+      ]
+     }
+    },
+    {
+     "id": "arm_R",
+     "parent": "body",
+     "pos": [
+      22,
+      -30
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": 8,
+     "sprite": {
+      "file": "res://assets/pip/parts/paw_f.svg",
+      "offset": [
+       -12,
+       -3
+      ],
+      "size": [
+       24,
+       23
+      ]
+     }
+    },
+    {
+     "id": "head",
+     "parent": "body",
+     "pos": [
+      0,
+      -72
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 6,
+     "sprite": {
+      "file": "res://assets/pip/parts/head_f.svg",
+      "offset": [
+       -67,
+       -95
+      ],
+      "size": [
+       134,
+       109
+      ]
+     }
+    },
+    {
+     "id": "ear_L",
+     "parent": "head",
+     "pos": [
+      -24,
+      -78
+     ],
+     "rot_deg": -10,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -2,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_l.svg",
+      "offset": [
+       -23,
+       -79
+      ],
+      "size": [
+       40,
+       87
+      ]
+     }
+    },
+    {
+     "id": "ear_R",
+     "parent": "head",
+     "pos": [
+      24,
+      -78
+     ],
+     "rot_deg": 12,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -2,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_rb.svg",
+      "offset": [
+       -21,
+       -61
+      ],
+      "size": [
+       38,
+       69
+      ]
+     }
+    },
+    {
+     "id": "ear_R_tip",
+     "parent": "ear_R",
+     "pos": [
+      0,
+      -50
+     ],
+     "rot_deg": 122,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 1,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_tip.svg",
+      "offset": [
+       -15,
+       -31
+      ],
+      "size": [
+       33,
+       41
+      ]
+     }
+    },
+    {
+     "id": "tuft",
+     "parent": "head",
+     "pos": [
+      0,
+      -88
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/pip/parts/tuft.svg",
+      "offset": [
+       -18,
+       -24
+      ],
+      "size": [
+       37,
+       32
+      ]
+     }
+    },
+    {
+     "id": "eye_L",
+     "parent": "head",
+     "pos": [
+      -23,
+      -47
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 3,
+     "swap_group": "eye",
+     "frames": {
+      "open": {
+       "file": "res://assets/pip/parts/eye__open.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "blink": {
+       "file": "res://assets/pip/parts/eye__blink.svg",
+       "offset": [
+        -14,
+        -2
+       ],
+       "size": [
+        28,
+        12
+       ]
+      },
+      "happy": {
+       "file": "res://assets/pip/parts/eye__happy.svg",
+       "offset": [
+        -14,
+        -13
+       ],
+       "size": [
+        28,
+        20
+       ]
+      },
+      "wide": {
+       "file": "res://assets/pip/parts/eye__wide.svg",
+       "offset": [
+        -15,
+        -19
+       ],
+       "size": [
+        29,
+        36
+       ]
+      },
+      "half": {
+       "file": "res://assets/pip/parts/eye__half.svg",
+       "offset": [
+        -16,
+        -5
+       ],
+       "size": [
+        31,
+        17
+       ]
+      },
+      "x": {
+       "file": "res://assets/pip/parts/eye__x.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        20,
+        20
+       ]
+      },
+      "spin": {
+       "file": "res://assets/pip/parts/eye__spin.svg",
+       "offset": [
+        -14,
+        -14
+       ],
+       "size": [
+        24,
+        24
+       ]
+      },
+      "spark": {
+       "file": "res://assets/pip/parts/eye__spark.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "heart": {
+       "file": "res://assets/pip/parts/eye__heart.svg",
+       "offset": [
+        -17,
+        -14
+       ],
+       "size": [
+        33,
+        26
+       ]
+      },
+      "squint": {
+       "file": "res://assets/pip/parts/eye__squint.svg",
+       "offset": [
+        -12,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "squint_r": {
+       "file": "res://assets/pip/parts/eye__squint_r.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "down": {
+       "file": "res://assets/pip/parts/eye__down.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      }
+     },
+     "default_frame": "open"
+    },
+    {
+     "id": "eye_R",
+     "parent": "head",
+     "pos": [
+      23,
+      -47
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 3,
+     "swap_group": "eye",
+     "frames": {
+      "open": {
+       "file": "res://assets/pip/parts/eye__open.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "blink": {
+       "file": "res://assets/pip/parts/eye__blink.svg",
+       "offset": [
+        -14,
+        -2
+       ],
+       "size": [
+        28,
+        12
+       ]
+      },
+      "happy": {
+       "file": "res://assets/pip/parts/eye__happy.svg",
+       "offset": [
+        -14,
+        -13
+       ],
+       "size": [
+        28,
+        20
+       ]
+      },
+      "wide": {
+       "file": "res://assets/pip/parts/eye__wide.svg",
+       "offset": [
+        -15,
+        -19
+       ],
+       "size": [
+        29,
+        36
+       ]
+      },
+      "half": {
+       "file": "res://assets/pip/parts/eye__half.svg",
+       "offset": [
+        -16,
+        -5
+       ],
+       "size": [
+        31,
+        17
+       ]
+      },
+      "x": {
+       "file": "res://assets/pip/parts/eye__x.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        20,
+        20
+       ]
+      },
+      "spin": {
+       "file": "res://assets/pip/parts/eye__spin.svg",
+       "offset": [
+        -14,
+        -14
+       ],
+       "size": [
+        24,
+        24
+       ]
+      },
+      "spark": {
+       "file": "res://assets/pip/parts/eye__spark.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "heart": {
+       "file": "res://assets/pip/parts/eye__heart.svg",
+       "offset": [
+        -17,
+        -14
+       ],
+       "size": [
+        33,
+        26
+       ]
+      },
+      "squint": {
+       "file": "res://assets/pip/parts/eye__squint.svg",
+       "offset": [
+        -12,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "squint_r": {
+       "file": "res://assets/pip/parts/eye__squint_r.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "down": {
+       "file": "res://assets/pip/parts/eye__down.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      }
+     },
+     "default_frame": "open"
+    },
+    {
+     "id": "brow_L",
+     "parent": "head",
+     "pos": [
+      -24,
+      -66
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 3,
+     "swap_group": "brow",
+     "frames": {
+      "none": {
+       "file": "res://assets/pip/parts/brow__none.svg",
+       "offset": [
+        0,
+        0
+       ],
+       "size": [
+        1,
+        1
+       ]
+      },
+      "flat": {
+       "file": "res://assets/pip/parts/brow__flat.svg",
+       "offset": [
+        -10,
+        -5
+       ],
+       "size": [
+        20,
+        9
+       ]
+      },
+      "up": {
+       "file": "res://assets/pip/parts/brow__up.svg",
+       "offset": [
+        -10,
+        -11
+       ],
+       "size": [
+        20,
+        11
+       ]
+      },
+      "worried": {
+       "file": "res://assets/pip/parts/brow__worried.svg",
+       "offset": [
+        -10,
+        -8
+       ],
+       "size": [
+        20,
+        12
+       ]
+      },
+      "cross": {
+       "file": "res://assets/pip/parts/brow__cross.svg",
+       "offset": [
+        -10,
+        -7
+       ],
+       "size": [
+        20,
+        13
+       ]
+      }
+     },
+     "default_frame": "none"
+    },
+    {
+     "id": "brow_R",
+     "parent": "head",
+     "pos": [
+      24,
+      -66
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": 3,
+     "swap_group": "brow",
+     "frames": {
+      "none": {
+       "file": "res://assets/pip/parts/brow__none.svg",
+       "offset": [
+        0,
+        0
+       ],
+       "size": [
+        1,
+        1
+       ]
+      },
+      "flat": {
+       "file": "res://assets/pip/parts/brow__flat.svg",
+       "offset": [
+        -10,
+        -5
+       ],
+       "size": [
+        20,
+        9
+       ]
+      },
+      "up": {
+       "file": "res://assets/pip/parts/brow__up.svg",
+       "offset": [
+        -10,
+        -11
+       ],
+       "size": [
+        20,
+        11
+       ]
+      },
+      "worried": {
+       "file": "res://assets/pip/parts/brow__worried.svg",
+       "offset": [
+        -10,
+        -8
+       ],
+       "size": [
+        20,
+        12
+       ]
+      },
+      "cross": {
+       "file": "res://assets/pip/parts/brow__cross.svg",
+       "offset": [
+        -10,
+        -7
+       ],
+       "size": [
+        20,
+        13
+       ]
+      }
+     },
+     "default_frame": "none"
+    },
+    {
+     "id": "nose",
+     "parent": "head",
+     "pos": [
+      0,
+      -29
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 4,
+     "sprite": {
+      "file": "res://assets/pip/parts/nose.svg",
+      "offset": [
+       -9,
+       -9
+      ],
+      "size": [
+       17,
+       20
+      ]
+     }
+    },
+    {
+     "id": "mouth",
+     "parent": "head",
+     "pos": [
+      0,
+      -17
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 4,
+     "swap_group": "mouth",
+     "frames": {
+      "w": {
+       "file": "res://assets/pip/parts/mouth__w.svg",
+       "offset": [
+        -12,
+        -5
+       ],
+       "size": [
+        23,
+        13
+       ]
+      },
+      "smile": {
+       "file": "res://assets/pip/parts/mouth__smile.svg",
+       "offset": [
+        -11,
+        -5
+       ],
+       "size": [
+        21,
+        15
+       ]
+      },
+      "grin": {
+       "file": "res://assets/pip/parts/mouth__grin.svg",
+       "offset": [
+        -14,
+        -6
+       ],
+       "size": [
+        27,
+        19
+       ]
+      },
+      "o": {
+       "file": "res://assets/pip/parts/mouth__o.svg",
+       "offset": [
+        -7,
+        -5
+       ],
+       "size": [
+        13,
+        15
+       ]
+      },
+      "flat": {
+       "file": "res://assets/pip/parts/mouth__flat.svg",
+       "offset": [
+        -9,
+        -2
+       ],
+       "size": [
+        17,
+        5
+       ]
+      },
+      "frown": {
+       "file": "res://assets/pip/parts/mouth__frown.svg",
+       "offset": [
+        -10,
+        -5
+       ],
+       "size": [
+        19,
+        11
+       ]
+      },
+      "blep": {
+       "file": "res://assets/pip/parts/mouth__blep.svg",
+       "offset": [
+        -12,
+        -5
+       ],
+       "size": [
+        23,
+        15
+       ]
+      },
+      "wobble": {
+       "file": "res://assets/pip/parts/mouth__wobble.svg",
+       "offset": [
+        -12,
+        -5
+       ],
+       "size": [
+        23,
+        13
+       ]
+      },
+      "chew": {
+       "file": "res://assets/pip/parts/mouth__chew.svg",
+       "offset": [
+        -8,
+        -3
+       ],
+       "size": [
+        15,
+        10
+       ]
+      }
+     },
+     "default_frame": "w"
+    },
+    {
+     "id": "ov_sprig",
+     "parent": "ear_L",
+     "pos": [
+      4,
+      -2
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 6,
+     "overlay": "ov_sprig",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_sprig.svg",
+      "offset": [
+       -21,
+       -22
+      ],
+      "size": [
+       45,
+       36
+      ]
+     }
+    },
+    {
+     "id": "ov_ctip_l",
+     "parent": "ear_L",
+     "pos": [
+      0,
+      -62
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "overlay": "ov_ctip_l",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctip_l.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     }
+    },
+    {
+     "id": "ov_ctip_r",
+     "parent": "ear_R_tip",
+     "pos": [
+      0,
+      -22
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "overlay": "ov_ctip_r",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctip_r.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     }
+    },
+    {
+     "id": "fx_ring",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "prop2",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -30,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_a",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_b",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_c",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_d",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_e",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_f",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "emote",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 42,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "prop",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 30,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    }
+   ]
+  },
+  "three_q": {
+   "frame": [
+    256,
+    256
+   ],
+   "origin": [
+    128,
+    240
+   ],
+   "nodes": [
+    {
+     "id": "root",
+     "parent": null,
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "shadow",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -50,
+     "sprite": {
+      "file": "res://assets/pip/parts/shadow.svg",
+      "offset": [
+       -55,
+       -10
+      ],
+      "size": [
+       110,
+       20
+      ]
+     }
+    },
+    {
+     "id": "pip",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "foot_R",
+     "parent": "pip",
+     "pos": [
+      30,
+      -11
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -0.85,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/pip/parts/foot_f.svg",
+      "offset": [
+       -28,
+       -14
+      ],
+      "size": [
+       55,
+       27
+      ]
+     }
+    },
+    {
+     "id": "foot_L",
+     "parent": "pip",
+     "pos": [
+      -24,
+      -8
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 4,
+     "sprite": {
+      "file": "res://assets/pip/parts/foot_f.svg",
+      "offset": [
+       -28,
+       -14
+      ],
+      "size": [
+       55,
+       27
+      ]
+     }
+    },
+    {
+     "id": "body",
+     "parent": "pip",
+     "pos": [
+      0,
+      -8
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0,
+     "sprite": {
+      "file": "res://assets/pip/parts/body_q.svg",
+      "offset": [
+       -57,
+       -87
+      ],
+      "size": [
+       113,
+       95
+      ]
+     }
+    },
+    {
+     "id": "tail",
+     "parent": "body",
+     "pos": [
+      -50,
+      -16
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -5,
+     "sprite": {
+      "file": "res://assets/pip/parts/tail.svg",
+      "offset": [
+       -21,
+       -21
+      ],
+      "size": [
+       40,
+       41
+      ]
+     }
+    },
+    {
+     "id": "ov_btail",
+     "parent": "tail",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.85,
+      0.85
+     ],
+     "z": 1,
+     "overlay": "ov_btail",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_btail.svg",
+      "offset": [
+       -21,
+       -21
+      ],
+      "size": [
+       41,
+       42
+      ]
+     }
+    },
+    {
+     "id": "ov_ctail",
+     "parent": "tail",
+     "pos": [
+      -2,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.85,
+      0.85
+     ],
+     "z": 1,
+     "overlay": "ov_ctail",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctail.svg",
+      "offset": [
+       -25,
+       -25
+      ],
+      "size": [
+       53,
+       42
+      ]
+     }
+    },
+    {
+     "id": "arm_L",
+     "parent": "body",
+     "pos": [
+      -10,
+      -30
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 8,
+     "sprite": {
+      "file": "res://assets/pip/parts/paw_f.svg",
+      "offset": [
+       -12,
+       -3
+      ],
+      "size": [
+       24,
+       23
+      ]
+     }
+    },
+    {
+     "id": "arm_R",
+     "parent": "body",
+     "pos": [
+      30,
+      -32
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -0.9,
+      1
+     ],
+     "z": 8,
+     "sprite": {
+      "file": "res://assets/pip/parts/paw_f.svg",
+      "offset": [
+       -12,
+       -3
+      ],
+      "size": [
+       24,
+       23
+      ]
+     }
+    },
+    {
+     "id": "head",
+     "parent": "body",
+     "pos": [
+      4,
+      -72
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 6,
+     "sprite": {
+      "file": "res://assets/pip/parts/head_q.svg",
+      "offset": [
+       -65,
+       -96
+      ],
+      "size": [
+       135,
+       110
+      ]
+     }
+    },
+    {
+     "id": "ear_L",
+     "parent": "head",
+     "pos": [
+      -30,
+      -76
+     ],
+     "rot_deg": -16,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -2,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_l.svg",
+      "offset": [
+       -23,
+       -79
+      ],
+      "size": [
+       40,
+       87
+      ]
+     }
+    },
+    {
+     "id": "ear_R",
+     "parent": "head",
+     "pos": [
+      14,
+      -82
+     ],
+     "rot_deg": 8,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -3,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_rb.svg",
+      "offset": [
+       -21,
+       -61
+      ],
+      "size": [
+       38,
+       69
+      ]
+     }
+    },
+    {
+     "id": "ear_R_tip",
+     "parent": "ear_R",
+     "pos": [
+      0,
+      -50
+     ],
+     "rot_deg": 118,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 1,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_tip.svg",
+      "offset": [
+       -15,
+       -31
+      ],
+      "size": [
+       33,
+       41
+      ]
+     }
+    },
+    {
+     "id": "tuft",
+     "parent": "head",
+     "pos": [
+      -4,
+      -88
+     ],
+     "rot_deg": -4,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/pip/parts/tuft.svg",
+      "offset": [
+       -18,
+       -24
+      ],
+      "size": [
+       37,
+       32
+      ]
+     }
+    },
+    {
+     "id": "eye_L",
+     "parent": "head",
+     "pos": [
+      -12,
+      -47
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 3,
+     "swap_group": "eye",
+     "frames": {
+      "open": {
+       "file": "res://assets/pip/parts/eye__open.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "blink": {
+       "file": "res://assets/pip/parts/eye__blink.svg",
+       "offset": [
+        -14,
+        -2
+       ],
+       "size": [
+        28,
+        12
+       ]
+      },
+      "happy": {
+       "file": "res://assets/pip/parts/eye__happy.svg",
+       "offset": [
+        -14,
+        -13
+       ],
+       "size": [
+        28,
+        20
+       ]
+      },
+      "wide": {
+       "file": "res://assets/pip/parts/eye__wide.svg",
+       "offset": [
+        -15,
+        -19
+       ],
+       "size": [
+        29,
+        36
+       ]
+      },
+      "half": {
+       "file": "res://assets/pip/parts/eye__half.svg",
+       "offset": [
+        -16,
+        -5
+       ],
+       "size": [
+        31,
+        17
+       ]
+      },
+      "x": {
+       "file": "res://assets/pip/parts/eye__x.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        20,
+        20
+       ]
+      },
+      "spin": {
+       "file": "res://assets/pip/parts/eye__spin.svg",
+       "offset": [
+        -14,
+        -14
+       ],
+       "size": [
+        24,
+        24
+       ]
+      },
+      "spark": {
+       "file": "res://assets/pip/parts/eye__spark.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "heart": {
+       "file": "res://assets/pip/parts/eye__heart.svg",
+       "offset": [
+        -17,
+        -14
+       ],
+       "size": [
+        33,
+        26
+       ]
+      },
+      "squint": {
+       "file": "res://assets/pip/parts/eye__squint.svg",
+       "offset": [
+        -12,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "squint_r": {
+       "file": "res://assets/pip/parts/eye__squint_r.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "down": {
+       "file": "res://assets/pip/parts/eye__down.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      }
+     },
+     "default_frame": "open"
+    },
+    {
+     "id": "eye_R",
+     "parent": "head",
+     "pos": [
+      35,
+      -46
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.76,
+      0.97
+     ],
+     "z": 3,
+     "swap_group": "eye",
+     "frames": {
+      "open": {
+       "file": "res://assets/pip/parts/eye__open.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "blink": {
+       "file": "res://assets/pip/parts/eye__blink.svg",
+       "offset": [
+        -14,
+        -2
+       ],
+       "size": [
+        28,
+        12
+       ]
+      },
+      "happy": {
+       "file": "res://assets/pip/parts/eye__happy.svg",
+       "offset": [
+        -14,
+        -13
+       ],
+       "size": [
+        28,
+        20
+       ]
+      },
+      "wide": {
+       "file": "res://assets/pip/parts/eye__wide.svg",
+       "offset": [
+        -15,
+        -19
+       ],
+       "size": [
+        29,
+        36
+       ]
+      },
+      "half": {
+       "file": "res://assets/pip/parts/eye__half.svg",
+       "offset": [
+        -16,
+        -5
+       ],
+       "size": [
+        31,
+        17
+       ]
+      },
+      "x": {
+       "file": "res://assets/pip/parts/eye__x.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        20,
+        20
+       ]
+      },
+      "spin": {
+       "file": "res://assets/pip/parts/eye__spin.svg",
+       "offset": [
+        -14,
+        -14
+       ],
+       "size": [
+        24,
+        24
+       ]
+      },
+      "spark": {
+       "file": "res://assets/pip/parts/eye__spark.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "heart": {
+       "file": "res://assets/pip/parts/eye__heart.svg",
+       "offset": [
+        -17,
+        -14
+       ],
+       "size": [
+        33,
+        26
+       ]
+      },
+      "squint": {
+       "file": "res://assets/pip/parts/eye__squint.svg",
+       "offset": [
+        -12,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "squint_r": {
+       "file": "res://assets/pip/parts/eye__squint_r.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "down": {
+       "file": "res://assets/pip/parts/eye__down.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      }
+     },
+     "default_frame": "open"
+    },
+    {
+     "id": "brow_L",
+     "parent": "head",
+     "pos": [
+      -12,
+      -66
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 3,
+     "swap_group": "brow",
+     "frames": {
+      "none": {
+       "file": "res://assets/pip/parts/brow__none.svg",
+       "offset": [
+        0,
+        0
+       ],
+       "size": [
+        1,
+        1
+       ]
+      },
+      "flat": {
+       "file": "res://assets/pip/parts/brow__flat.svg",
+       "offset": [
+        -10,
+        -5
+       ],
+       "size": [
+        20,
+        9
+       ]
+      },
+      "up": {
+       "file": "res://assets/pip/parts/brow__up.svg",
+       "offset": [
+        -10,
+        -11
+       ],
+       "size": [
+        20,
+        11
+       ]
+      },
+      "worried": {
+       "file": "res://assets/pip/parts/brow__worried.svg",
+       "offset": [
+        -10,
+        -8
+       ],
+       "size": [
+        20,
+        12
+       ]
+      },
+      "cross": {
+       "file": "res://assets/pip/parts/brow__cross.svg",
+       "offset": [
+        -10,
+        -7
+       ],
+       "size": [
+        20,
+        13
+       ]
+      }
+     },
+     "default_frame": "none"
+    },
+    {
+     "id": "brow_R",
+     "parent": "head",
+     "pos": [
+      35,
+      -65
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -0.76,
+      1
+     ],
+     "z": 3,
+     "swap_group": "brow",
+     "frames": {
+      "none": {
+       "file": "res://assets/pip/parts/brow__none.svg",
+       "offset": [
+        0,
+        0
+       ],
+       "size": [
+        1,
+        1
+       ]
+      },
+      "flat": {
+       "file": "res://assets/pip/parts/brow__flat.svg",
+       "offset": [
+        -10,
+        -5
+       ],
+       "size": [
+        20,
+        9
+       ]
+      },
+      "up": {
+       "file": "res://assets/pip/parts/brow__up.svg",
+       "offset": [
+        -10,
+        -11
+       ],
+       "size": [
+        20,
+        11
+       ]
+      },
+      "worried": {
+       "file": "res://assets/pip/parts/brow__worried.svg",
+       "offset": [
+        -10,
+        -8
+       ],
+       "size": [
+        20,
+        12
+       ]
+      },
+      "cross": {
+       "file": "res://assets/pip/parts/brow__cross.svg",
+       "offset": [
+        -10,
+        -7
+       ],
+       "size": [
+        20,
+        13
+       ]
+      }
+     },
+     "default_frame": "none"
+    },
+    {
+     "id": "nose",
+     "parent": "head",
+     "pos": [
+      16,
+      -29
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 4,
+     "sprite": {
+      "file": "res://assets/pip/parts/nose.svg",
+      "offset": [
+       -9,
+       -9
+      ],
+      "size": [
+       17,
+       20
+      ]
+     }
+    },
+    {
+     "id": "mouth",
+     "parent": "head",
+     "pos": [
+      16,
+      -17
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 4,
+     "swap_group": "mouth",
+     "frames": {
+      "w": {
+       "file": "res://assets/pip/parts/mouth__w.svg",
+       "offset": [
+        -12,
+        -5
+       ],
+       "size": [
+        23,
+        13
+       ]
+      },
+      "smile": {
+       "file": "res://assets/pip/parts/mouth__smile.svg",
+       "offset": [
+        -11,
+        -5
+       ],
+       "size": [
+        21,
+        15
+       ]
+      },
+      "grin": {
+       "file": "res://assets/pip/parts/mouth__grin.svg",
+       "offset": [
+        -14,
+        -6
+       ],
+       "size": [
+        27,
+        19
+       ]
+      },
+      "o": {
+       "file": "res://assets/pip/parts/mouth__o.svg",
+       "offset": [
+        -7,
+        -5
+       ],
+       "size": [
+        13,
+        15
+       ]
+      },
+      "flat": {
+       "file": "res://assets/pip/parts/mouth__flat.svg",
+       "offset": [
+        -9,
+        -2
+       ],
+       "size": [
+        17,
+        5
+       ]
+      },
+      "frown": {
+       "file": "res://assets/pip/parts/mouth__frown.svg",
+       "offset": [
+        -10,
+        -5
+       ],
+       "size": [
+        19,
+        11
+       ]
+      },
+      "blep": {
+       "file": "res://assets/pip/parts/mouth__blep.svg",
+       "offset": [
+        -12,
+        -5
+       ],
+       "size": [
+        23,
+        15
+       ]
+      },
+      "wobble": {
+       "file": "res://assets/pip/parts/mouth__wobble.svg",
+       "offset": [
+        -12,
+        -5
+       ],
+       "size": [
+        23,
+        13
+       ]
+      },
+      "chew": {
+       "file": "res://assets/pip/parts/mouth__chew.svg",
+       "offset": [
+        -8,
+        -3
+       ],
+       "size": [
+        15,
+        10
+       ]
+      }
+     },
+     "default_frame": "w"
+    },
+    {
+     "id": "ov_sprig",
+     "parent": "ear_L",
+     "pos": [
+      4,
+      -2
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 6,
+     "overlay": "ov_sprig",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_sprig.svg",
+      "offset": [
+       -21,
+       -22
+      ],
+      "size": [
+       45,
+       36
+      ]
+     }
+    },
+    {
+     "id": "ov_ctip_l",
+     "parent": "ear_L",
+     "pos": [
+      0,
+      -62
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "overlay": "ov_ctip_l",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctip_l.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     }
+    },
+    {
+     "id": "ov_ctip_r",
+     "parent": "ear_R_tip",
+     "pos": [
+      0,
+      -22
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "overlay": "ov_ctip_r",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctip_r.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     }
+    },
+    {
+     "id": "fx_ring",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "prop2",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -30,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_a",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_b",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_c",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_d",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_e",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_f",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "emote",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 42,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "prop",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 30,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    }
+   ]
+  },
+  "side": {
+   "frame": [
+    256,
+    256
+   ],
+   "origin": [
+    128,
+    240
+   ],
+   "nodes": [
+    {
+     "id": "root",
+     "parent": null,
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "shadow",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1.12,
+      1
+     ],
+     "z": -50,
+     "sprite": {
+      "file": "res://assets/pip/parts/shadow.svg",
+      "offset": [
+       -55,
+       -10
+      ],
+      "size": [
+       110,
+       20
+      ]
+     }
+    },
+    {
+     "id": "pip",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "foot_L",
+     "parent": "pip",
+     "pos": [
+      -10,
+      -7
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -2,
+     "sprite": {
+      "file": "res://assets/pip/parts/foot_s.svg",
+      "offset": [
+       -33,
+       -15
+      ],
+      "size": [
+       66,
+       24
+      ]
+     }
+    },
+    {
+     "id": "foot_R",
+     "parent": "pip",
+     "pos": [
+      -2,
+      -5
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 4,
+     "sprite": {
+      "file": "res://assets/pip/parts/foot_s.svg",
+      "offset": [
+       -33,
+       -15
+      ],
+      "size": [
+       66,
+       24
+      ]
+     }
+    },
+    {
+     "id": "body",
+     "parent": "pip",
+     "pos": [
+      0,
+      -8
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0,
+     "sprite": {
+      "file": "res://assets/pip/parts/body_s.svg",
+      "offset": [
+       -61,
+       -73
+      ],
+      "size": [
+       110,
+       81
+      ]
+     }
+    },
+    {
+     "id": "tail",
+     "parent": "body",
+     "pos": [
+      -52,
+      -22
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -2,
+     "sprite": {
+      "file": "res://assets/pip/parts/tail.svg",
+      "offset": [
+       -21,
+       -21
+      ],
+      "size": [
+       40,
+       41
+      ]
+     }
+    },
+    {
+     "id": "ov_btail",
+     "parent": "tail",
+     "pos": [
+      -2,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.85,
+      0.85
+     ],
+     "z": 1,
+     "overlay": "ov_btail",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_btail.svg",
+      "offset": [
+       -21,
+       -21
+      ],
+      "size": [
+       41,
+       42
+      ]
+     }
+    },
+    {
+     "id": "ov_ctail",
+     "parent": "tail",
+     "pos": [
+      -4,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -0.85,
+      0.85
+     ],
+     "z": 1,
+     "overlay": "ov_ctail",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctail.svg",
+      "offset": [
+       -25,
+       -25
+      ],
+      "size": [
+       53,
+       42
+      ]
+     }
+    },
+    {
+     "id": "arm_L",
+     "parent": "body",
+     "pos": [
+      38,
+      -16
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/pip/parts/paw_f.svg",
+      "offset": [
+       -12,
+       -3
+      ],
+      "size": [
+       24,
+       23
+      ]
+     }
+    },
+    {
+     "id": "arm_R",
+     "parent": "body",
+     "pos": [
+      30,
+      -14
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 8,
+     "sprite": {
+      "file": "res://assets/pip/parts/paw_f.svg",
+      "offset": [
+       -12,
+       -3
+      ],
+      "size": [
+       24,
+       23
+      ]
+     }
+    },
+    {
+     "id": "head",
+     "parent": "body",
+     "pos": [
+      12,
+      -60
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 6,
+     "sprite": {
+      "file": "res://assets/pip/parts/head_s.svg",
+      "offset": [
+       -51,
+       -95
+      ],
+      "size": [
+       124,
+       107
+      ]
+     }
+    },
+    {
+     "id": "ear_L",
+     "parent": "head",
+     "pos": [
+      -16,
+      -80
+     ],
+     "rot_deg": -34,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -3,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_l.svg",
+      "offset": [
+       -23,
+       -79
+      ],
+      "size": [
+       40,
+       87
+      ]
+     }
+    },
+    {
+     "id": "ear_R",
+     "parent": "head",
+     "pos": [
+      -4,
+      -82
+     ],
+     "rot_deg": -20,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -2,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_rb.svg",
+      "offset": [
+       -21,
+       -61
+      ],
+      "size": [
+       38,
+       69
+      ]
+     }
+    },
+    {
+     "id": "ear_R_tip",
+     "parent": "ear_R",
+     "pos": [
+      0,
+      -50
+     ],
+     "rot_deg": -118,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 1,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_tip.svg",
+      "offset": [
+       -15,
+       -31
+      ],
+      "size": [
+       33,
+       41
+      ]
+     }
+    },
+    {
+     "id": "tuft",
+     "parent": "head",
+     "pos": [
+      10,
+      -88
+     ],
+     "rot_deg": 12,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/pip/parts/tuft.svg",
+      "offset": [
+       -18,
+       -24
+      ],
+      "size": [
+       37,
+       32
+      ]
+     }
+    },
+    {
+     "id": "eye_R",
+     "parent": "head",
+     "pos": [
+      30,
+      -50
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.84,
+      1
+     ],
+     "z": 3,
+     "swap_group": "eye",
+     "frames": {
+      "open": {
+       "file": "res://assets/pip/parts/eye__open.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "blink": {
+       "file": "res://assets/pip/parts/eye__blink.svg",
+       "offset": [
+        -14,
+        -2
+       ],
+       "size": [
+        28,
+        12
+       ]
+      },
+      "happy": {
+       "file": "res://assets/pip/parts/eye__happy.svg",
+       "offset": [
+        -14,
+        -13
+       ],
+       "size": [
+        28,
+        20
+       ]
+      },
+      "wide": {
+       "file": "res://assets/pip/parts/eye__wide.svg",
+       "offset": [
+        -15,
+        -19
+       ],
+       "size": [
+        29,
+        36
+       ]
+      },
+      "half": {
+       "file": "res://assets/pip/parts/eye__half.svg",
+       "offset": [
+        -16,
+        -5
+       ],
+       "size": [
+        31,
+        17
+       ]
+      },
+      "x": {
+       "file": "res://assets/pip/parts/eye__x.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        20,
+        20
+       ]
+      },
+      "spin": {
+       "file": "res://assets/pip/parts/eye__spin.svg",
+       "offset": [
+        -14,
+        -14
+       ],
+       "size": [
+        24,
+        24
+       ]
+      },
+      "spark": {
+       "file": "res://assets/pip/parts/eye__spark.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "heart": {
+       "file": "res://assets/pip/parts/eye__heart.svg",
+       "offset": [
+        -17,
+        -14
+       ],
+       "size": [
+        33,
+        26
+       ]
+      },
+      "squint": {
+       "file": "res://assets/pip/parts/eye__squint.svg",
+       "offset": [
+        -12,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "squint_r": {
+       "file": "res://assets/pip/parts/eye__squint_r.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "down": {
+       "file": "res://assets/pip/parts/eye__down.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      }
+     },
+     "default_frame": "open"
+    },
+    {
+     "id": "brow_R",
+     "parent": "head",
+     "pos": [
+      30,
+      -69
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -0.84,
+      1
+     ],
+     "z": 3,
+     "swap_group": "brow",
+     "frames": {
+      "none": {
+       "file": "res://assets/pip/parts/brow__none.svg",
+       "offset": [
+        0,
+        0
+       ],
+       "size": [
+        1,
+        1
+       ]
+      },
+      "flat": {
+       "file": "res://assets/pip/parts/brow__flat.svg",
+       "offset": [
+        -10,
+        -5
+       ],
+       "size": [
+        20,
+        9
+       ]
+      },
+      "up": {
+       "file": "res://assets/pip/parts/brow__up.svg",
+       "offset": [
+        -10,
+        -11
+       ],
+       "size": [
+        20,
+        11
+       ]
+      },
+      "worried": {
+       "file": "res://assets/pip/parts/brow__worried.svg",
+       "offset": [
+        -10,
+        -8
+       ],
+       "size": [
+        20,
+        12
+       ]
+      },
+      "cross": {
+       "file": "res://assets/pip/parts/brow__cross.svg",
+       "offset": [
+        -10,
+        -7
+       ],
+       "size": [
+        20,
+        13
+       ]
+      }
+     },
+     "default_frame": "none"
+    },
+    {
+     "id": "nose",
+     "parent": "head",
+     "pos": [
+      64,
+      -31
+     ],
+     "rot_deg": 12,
+     "scale": [
+      0.75,
+      1
+     ],
+     "z": 4,
+     "sprite": {
+      "file": "res://assets/pip/parts/nose.svg",
+      "offset": [
+       -9,
+       -9
+      ],
+      "size": [
+       17,
+       20
+      ]
+     }
+    },
+    {
+     "id": "mouth",
+     "parent": "head",
+     "pos": [
+      56,
+      -15
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.7,
+      1
+     ],
+     "z": 4,
+     "swap_group": "mouth",
+     "frames": {
+      "w": {
+       "file": "res://assets/pip/parts/mouth__w.svg",
+       "offset": [
+        -12,
+        -5
+       ],
+       "size": [
+        23,
+        13
+       ]
+      },
+      "smile": {
+       "file": "res://assets/pip/parts/mouth__smile.svg",
+       "offset": [
+        -11,
+        -5
+       ],
+       "size": [
+        21,
+        15
+       ]
+      },
+      "grin": {
+       "file": "res://assets/pip/parts/mouth__grin.svg",
+       "offset": [
+        -14,
+        -6
+       ],
+       "size": [
+        27,
+        19
+       ]
+      },
+      "o": {
+       "file": "res://assets/pip/parts/mouth__o.svg",
+       "offset": [
+        -7,
+        -5
+       ],
+       "size": [
+        13,
+        15
+       ]
+      },
+      "flat": {
+       "file": "res://assets/pip/parts/mouth__flat.svg",
+       "offset": [
+        -9,
+        -2
+       ],
+       "size": [
+        17,
+        5
+       ]
+      },
+      "frown": {
+       "file": "res://assets/pip/parts/mouth__frown.svg",
+       "offset": [
+        -10,
+        -5
+       ],
+       "size": [
+        19,
+        11
+       ]
+      },
+      "blep": {
+       "file": "res://assets/pip/parts/mouth__blep.svg",
+       "offset": [
+        -12,
+        -5
+       ],
+       "size": [
+        23,
+        15
+       ]
+      },
+      "wobble": {
+       "file": "res://assets/pip/parts/mouth__wobble.svg",
+       "offset": [
+        -12,
+        -5
+       ],
+       "size": [
+        23,
+        13
+       ]
+      },
+      "chew": {
+       "file": "res://assets/pip/parts/mouth__chew.svg",
+       "offset": [
+        -8,
+        -3
+       ],
+       "size": [
+        15,
+        10
+       ]
+      }
+     },
+     "default_frame": "w"
+    },
+    {
+     "id": "ov_sprig",
+     "parent": "ear_R",
+     "pos": [
+      2,
+      -6
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 8,
+     "overlay": "ov_sprig",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_sprig.svg",
+      "offset": [
+       -21,
+       -22
+      ],
+      "size": [
+       45,
+       36
+      ]
+     }
+    },
+    {
+     "id": "ov_ctip_l",
+     "parent": "ear_L",
+     "pos": [
+      0,
+      -62
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "overlay": "ov_ctip_l",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctip_l.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     }
+    },
+    {
+     "id": "ov_ctip_r",
+     "parent": "ear_R_tip",
+     "pos": [
+      0,
+      -22
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "overlay": "ov_ctip_r",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctip_r.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     }
+    },
+    {
+     "id": "fx_ring",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "prop2",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -30,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_a",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_b",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_c",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_d",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_e",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_f",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "emote",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 42,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "prop",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 30,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    }
+   ]
+  },
+  "back": {
+   "frame": [
+    256,
+    256
+   ],
+   "origin": [
+    128,
+    240
+   ],
+   "nodes": [
+    {
+     "id": "root",
+     "parent": null,
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "shadow",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -50,
+     "sprite": {
+      "file": "res://assets/pip/parts/shadow.svg",
+      "offset": [
+       -55,
+       -10
+      ],
+      "size": [
+       110,
+       20
+      ]
+     }
+    },
+    {
+     "id": "pip",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "foot_L",
+     "parent": "pip",
+     "pos": [
+      28,
+      -6
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/pip/parts/foot_b.svg",
+      "offset": [
+       -25,
+       -15
+      ],
+      "size": [
+       49,
+       29
+      ]
+     }
+    },
+    {
+     "id": "foot_R",
+     "parent": "pip",
+     "pos": [
+      -28,
+      -6
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/pip/parts/foot_b.svg",
+      "offset": [
+       -25,
+       -15
+      ],
+      "size": [
+       49,
+       29
+      ]
+     }
+    },
+    {
+     "id": "body",
+     "parent": "pip",
+     "pos": [
+      0,
+      -8
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0,
+     "sprite": {
+      "file": "res://assets/pip/parts/body_b.svg",
+      "offset": [
+       -57,
+       -87
+      ],
+      "size": [
+       113,
+       95
+      ]
+     }
+    },
+    {
+     "id": "tail",
+     "parent": "body",
+     "pos": [
+      0,
+      -22
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1.15,
+      1.15
+     ],
+     "z": 3,
+     "sprite": {
+      "file": "res://assets/pip/parts/tail.svg",
+      "offset": [
+       -21,
+       -21
+      ],
+      "size": [
+       40,
+       41
+      ]
+     }
+    },
+    {
+     "id": "ov_btail",
+     "parent": "tail",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 1,
+     "overlay": "ov_btail",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_btail.svg",
+      "offset": [
+       -21,
+       -21
+      ],
+      "size": [
+       41,
+       42
+      ]
+     }
+    },
+    {
+     "id": "ov_ctail",
+     "parent": "tail",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 1,
+     "overlay": "ov_ctail",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctail.svg",
+      "offset": [
+       -25,
+       -25
+      ],
+      "size": [
+       53,
+       42
+      ]
+     }
+    },
+    {
+     "id": "head",
+     "parent": "body",
+     "pos": [
+      0,
+      -72
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 6,
+     "sprite": {
+      "file": "res://assets/pip/parts/head_b.svg",
+      "offset": [
+       -67,
+       -95
+      ],
+      "size": [
+       134,
+       109
+      ]
+     }
+    },
+    {
+     "id": "ear_L",
+     "parent": "head",
+     "pos": [
+      24,
+      -78
+     ],
+     "rot_deg": 10,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_back.svg",
+      "offset": [
+       -23,
+       -79
+      ],
+      "size": [
+       40,
+       87
+      ]
+     }
+    },
+    {
+     "id": "ear_R",
+     "parent": "head",
+     "pos": [
+      -24,
+      -78
+     ],
+     "rot_deg": -12,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_backb.svg",
+      "offset": [
+       -21,
+       -61
+      ],
+      "size": [
+       38,
+       69
+      ]
+     }
+    },
+    {
+     "id": "ear_R_tip",
+     "parent": "ear_R",
+     "pos": [
+      0,
+      -50
+     ],
+     "rot_deg": 122,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 1,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_tip.svg",
+      "offset": [
+       -15,
+       -31
+      ],
+      "size": [
+       33,
+       41
+      ]
+     }
+    },
+    {
+     "id": "tuft",
+     "parent": "head",
+     "pos": [
+      0,
+      -88
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": 1,
+     "sprite": {
+      "file": "res://assets/pip/parts/tuft.svg",
+      "offset": [
+       -18,
+       -24
+      ],
+      "size": [
+       37,
+       32
+      ]
+     }
+    },
+    {
+     "id": "ov_sprig",
+     "parent": "ear_L",
+     "pos": [
+      -2,
+      -2
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": 6,
+     "overlay": "ov_sprig",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_sprig.svg",
+      "offset": [
+       -21,
+       -22
+      ],
+      "size": [
+       45,
+       36
+      ]
+     }
+    },
+    {
+     "id": "ov_ctip_l",
+     "parent": "ear_L",
+     "pos": [
+      0,
+      -62
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "overlay": "ov_ctip_l",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctip_l.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     }
+    },
+    {
+     "id": "ov_ctip_r",
+     "parent": "ear_R_tip",
+     "pos": [
+      0,
+      -22
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "overlay": "ov_ctip_r",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctip_r.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     }
+    },
+    {
+     "id": "fx_ring",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "prop2",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -30,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_a",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_b",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_c",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_d",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_e",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_f",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "emote",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 42,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "prop",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 30,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    }
+   ]
+  },
+  "top": {
+   "frame": [
+    150,
+    150
+   ],
+   "origin": [
+    75,
+    75
+   ],
+   "nodes": [
+    {
+     "id": "root",
+     "parent": null,
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "shadow",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -50,
+     "sprite": {
+      "file": "res://assets/pip/parts/shadow_t.svg",
+      "offset": [
+       -41,
+       -39
+      ],
+      "size": [
+       82,
+       94
+      ]
+     }
+    },
+    {
+     "id": "pip",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "foot_L",
+     "parent": "pip",
+     "pos": [
+      -22,
+      40
+     ],
+     "rot_deg": 8,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/pip/parts/foot_t.svg",
+      "offset": [
+       -13,
+       -23
+      ],
+      "size": [
+       25,
+       47
+      ]
+     }
+    },
+    {
+     "id": "foot_R",
+     "parent": "pip",
+     "pos": [
+      22,
+      40
+     ],
+     "rot_deg": -8,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/pip/parts/foot_t.svg",
+      "offset": [
+       -13,
+       -23
+      ],
+      "size": [
+       25,
+       47
+      ]
+     }
+    },
+    {
+     "id": "arm_L",
+     "parent": "pip",
+     "pos": [
+      -29,
+      -40
+     ],
+     "rot_deg": -14,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/pip/parts/paw_t.svg",
+      "offset": [
+       -10,
+       -12
+      ],
+      "size": [
+       19,
+       24
+      ]
+     }
+    },
+    {
+     "id": "arm_R",
+     "parent": "pip",
+     "pos": [
+      29,
+      -40
+     ],
+     "rot_deg": 14,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/pip/parts/paw_t.svg",
+      "offset": [
+       -10,
+       -12
+      ],
+      "size": [
+       19,
+       24
+      ]
+     }
+    },
+    {
+     "id": "body",
+     "parent": "pip",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0,
+     "sprite": {
+      "file": "res://assets/pip/parts/body_t.svg",
+      "offset": [
+       -42,
+       -41
+      ],
+      "size": [
+       83,
+       85
+      ]
+     }
+    },
+    {
+     "id": "tail",
+     "parent": "body",
+     "pos": [
+      0,
+      42
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.8,
+      0.8
+     ],
+     "z": 1,
+     "sprite": {
+      "file": "res://assets/pip/parts/tail.svg",
+      "offset": [
+       -21,
+       -21
+      ],
+      "size": [
+       40,
+       41
+      ]
+     }
+    },
+    {
+     "id": "ov_btail",
+     "parent": "tail",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 1,
+     "overlay": "ov_btail",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_btail.svg",
+      "offset": [
+       -21,
+       -21
+      ],
+      "size": [
+       41,
+       42
+      ]
+     }
+    },
+    {
+     "id": "ov_ctail",
+     "parent": "tail",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 1,
+     "overlay": "ov_ctail",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctail.svg",
+      "offset": [
+       -25,
+       -25
+      ],
+      "size": [
+       53,
+       42
+      ]
+     }
+    },
+    {
+     "id": "head",
+     "parent": "body",
+     "pos": [
+      0,
+      -34
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/pip/parts/head_t.svg",
+      "offset": [
+       -30,
+       -35
+      ],
+      "size": [
+       59,
+       55
+      ]
+     }
+    },
+    {
+     "id": "ear_L",
+     "parent": "head",
+     "pos": [
+      -13,
+      4
+     ],
+     "rot_deg": -140,
+     "scale": [
+      0.64,
+      0.66
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_back.svg",
+      "offset": [
+       -23,
+       -79
+      ],
+      "size": [
+       40,
+       87
+      ]
+     }
+    },
+    {
+     "id": "ear_R",
+     "parent": "head",
+     "pos": [
+      13,
+      4
+     ],
+     "rot_deg": 141,
+     "scale": [
+      0.64,
+      0.66
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_backb.svg",
+      "offset": [
+       -21,
+       -61
+      ],
+      "size": [
+       38,
+       69
+      ]
+     }
+    },
+    {
+     "id": "ear_R_tip",
+     "parent": "ear_R",
+     "pos": [
+      0,
+      -50
+     ],
+     "rot_deg": 40,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 1,
+     "sprite": {
+      "file": "res://assets/pip/parts/ear_tip.svg",
+      "offset": [
+       -15,
+       -31
+      ],
+      "size": [
+       33,
+       41
+      ]
+     }
+    },
+    {
+     "id": "tuft",
+     "parent": "head",
+     "pos": [
+      0,
+      -12
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.7,
+      0.7
+     ],
+     "z": 3,
+     "sprite": {
+      "file": "res://assets/pip/parts/tuft.svg",
+      "offset": [
+       -18,
+       -24
+      ],
+      "size": [
+       37,
+       32
+      ]
+     }
+    },
+    {
+     "id": "eye_L",
+     "parent": "head",
+     "pos": [
+      -22,
+      -12
+     ],
+     "rot_deg": -16,
+     "scale": [
+      0.3,
+      0.4
+     ],
+     "z": 2,
+     "swap_group": "eye",
+     "frames": {
+      "open": {
+       "file": "res://assets/pip/parts/eye__open.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "blink": {
+       "file": "res://assets/pip/parts/eye__blink.svg",
+       "offset": [
+        -14,
+        -2
+       ],
+       "size": [
+        28,
+        12
+       ]
+      },
+      "happy": {
+       "file": "res://assets/pip/parts/eye__happy.svg",
+       "offset": [
+        -14,
+        -13
+       ],
+       "size": [
+        28,
+        20
+       ]
+      },
+      "wide": {
+       "file": "res://assets/pip/parts/eye__wide.svg",
+       "offset": [
+        -15,
+        -19
+       ],
+       "size": [
+        29,
+        36
+       ]
+      },
+      "half": {
+       "file": "res://assets/pip/parts/eye__half.svg",
+       "offset": [
+        -16,
+        -5
+       ],
+       "size": [
+        31,
+        17
+       ]
+      },
+      "x": {
+       "file": "res://assets/pip/parts/eye__x.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        20,
+        20
+       ]
+      },
+      "spin": {
+       "file": "res://assets/pip/parts/eye__spin.svg",
+       "offset": [
+        -14,
+        -14
+       ],
+       "size": [
+        24,
+        24
+       ]
+      },
+      "spark": {
+       "file": "res://assets/pip/parts/eye__spark.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "heart": {
+       "file": "res://assets/pip/parts/eye__heart.svg",
+       "offset": [
+        -17,
+        -14
+       ],
+       "size": [
+        33,
+        26
+       ]
+      },
+      "squint": {
+       "file": "res://assets/pip/parts/eye__squint.svg",
+       "offset": [
+        -12,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "squint_r": {
+       "file": "res://assets/pip/parts/eye__squint_r.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "down": {
+       "file": "res://assets/pip/parts/eye__down.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      }
+     },
+     "default_frame": "open"
+    },
+    {
+     "id": "eye_R",
+     "parent": "head",
+     "pos": [
+      22,
+      -12
+     ],
+     "rot_deg": 16,
+     "scale": [
+      0.3,
+      0.4
+     ],
+     "z": 2,
+     "swap_group": "eye",
+     "frames": {
+      "open": {
+       "file": "res://assets/pip/parts/eye__open.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "blink": {
+       "file": "res://assets/pip/parts/eye__blink.svg",
+       "offset": [
+        -14,
+        -2
+       ],
+       "size": [
+        28,
+        12
+       ]
+      },
+      "happy": {
+       "file": "res://assets/pip/parts/eye__happy.svg",
+       "offset": [
+        -14,
+        -13
+       ],
+       "size": [
+        28,
+        20
+       ]
+      },
+      "wide": {
+       "file": "res://assets/pip/parts/eye__wide.svg",
+       "offset": [
+        -15,
+        -19
+       ],
+       "size": [
+        29,
+        36
+       ]
+      },
+      "half": {
+       "file": "res://assets/pip/parts/eye__half.svg",
+       "offset": [
+        -16,
+        -5
+       ],
+       "size": [
+        31,
+        17
+       ]
+      },
+      "x": {
+       "file": "res://assets/pip/parts/eye__x.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        20,
+        20
+       ]
+      },
+      "spin": {
+       "file": "res://assets/pip/parts/eye__spin.svg",
+       "offset": [
+        -14,
+        -14
+       ],
+       "size": [
+        24,
+        24
+       ]
+      },
+      "spark": {
+       "file": "res://assets/pip/parts/eye__spark.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      },
+      "heart": {
+       "file": "res://assets/pip/parts/eye__heart.svg",
+       "offset": [
+        -17,
+        -14
+       ],
+       "size": [
+        33,
+        26
+       ]
+      },
+      "squint": {
+       "file": "res://assets/pip/parts/eye__squint.svg",
+       "offset": [
+        -12,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "squint_r": {
+       "file": "res://assets/pip/parts/eye__squint_r.svg",
+       "offset": [
+        -10,
+        -10
+       ],
+       "size": [
+        22,
+        20
+       ]
+      },
+      "down": {
+       "file": "res://assets/pip/parts/eye__down.svg",
+       "offset": [
+        -12,
+        -15
+       ],
+       "size": [
+        24,
+        30
+       ]
+      }
+     },
+     "default_frame": "open"
+    },
+    {
+     "id": "nose",
+     "parent": "head",
+     "pos": [
+      0,
+      -31
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.7,
+      0.7
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/pip/parts/nose.svg",
+      "offset": [
+       -9,
+       -9
+      ],
+      "size": [
+       17,
+       20
+      ]
+     }
+    },
+    {
+     "id": "ov_sprig",
+     "parent": "head",
+     "pos": [
+      -13,
+      -2
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.8,
+      0.8
+     ],
+     "z": 4,
+     "overlay": "ov_sprig",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_sprig.svg",
+      "offset": [
+       -21,
+       -22
+      ],
+      "size": [
+       45,
+       36
+      ]
+     }
+    },
+    {
+     "id": "ov_ctip_l",
+     "parent": "ear_L",
+     "pos": [
+      0,
+      -62
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "overlay": "ov_ctip_l",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctip_l.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     }
+    },
+    {
+     "id": "ov_ctip_r",
+     "parent": "ear_R_tip",
+     "pos": [
+      0,
+      -22
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "overlay": "ov_ctip_r",
+     "sprite": {
+      "file": "res://assets/pip/overlays/ov_ctip_r.svg",
+      "offset": [
+       -19,
+       -18
+      ],
+      "size": [
+       38,
+       31
+      ]
+     }
+    },
+    {
+     "id": "fx_ring",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "prop2",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -30,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_a",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_b",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_c",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_d",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_e",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_f",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "emote",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 42,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "prop",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 30,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    }
+   ]
+  }
+ },
+ "fx_frames": {
+  "ring": {
+   "file": "res://assets/pip/fx/ring.svg",
+   "offset": [
+    -105,
+    -47
+   ],
+   "size": [
+    210,
+    94
+   ]
+  },
+  "petal": {
+   "file": "res://assets/pip/fx/petal.svg",
+   "offset": [
+    -13,
+    -12
+   ],
+   "size": [
+    26,
+    23
+   ]
+  },
+  "petal2": {
+   "file": "res://assets/pip/fx/petal2.svg",
+   "offset": [
+    -13,
+    -12
+   ],
+   "size": [
+    26,
+    23
+   ]
+  },
+  "cloud": {
+   "file": "res://assets/pip/fx/cloud.svg",
+   "offset": [
+    -25,
+    -25
+   ],
+   "size": [
+    53,
+    42
+   ]
+  },
+  "sparkle": {
+   "file": "res://assets/pip/fx/sparkle.svg",
+   "offset": [
+    -15,
+    -15
+   ],
+   "size": [
+    29,
+    29
+   ]
+  },
+  "star": {
+   "file": "res://assets/pip/fx/star.svg",
+   "offset": [
+    -13,
+    -14
+   ],
+   "size": [
+    26,
+    25
+   ]
+  },
+  "heart": {
+   "file": "res://assets/pip/fx/heart.svg",
+   "offset": [
+    -17,
+    -14
+   ],
+   "size": [
+    33,
+    26
+   ]
+  },
+  "zzz": {
+   "file": "res://assets/pip/fx/zzz.svg",
+   "offset": [
+    -11,
+    -11
+   ],
+   "size": [
+    21,
+    21
+   ]
+  },
+  "dust": {
+   "file": "res://assets/pip/fx/dust.svg",
+   "offset": [
+    -16,
+    -15
+   ],
+   "size": [
+    28,
+    29
+   ]
+  },
+  "pollen": {
+   "file": "res://assets/pip/fx/pollen.svg",
+   "offset": [
+    -12,
+    -10
+   ],
+   "size": [
+    21,
+    19
+   ]
+  },
+  "sweat": {
+   "file": "res://assets/pip/fx/sweat.svg",
+   "offset": [
+    -10,
+    -12
+   ],
+   "size": [
+    19,
+    25
+   ]
+  },
+  "bang": {
+   "file": "res://assets/pip/fx/bang.svg",
+   "offset": [
+    -7,
+    -19
+   ],
+   "size": [
+    13,
+    35
+   ]
+  },
+  "note": {
+   "file": "res://assets/pip/fx/note.svg",
+   "offset": [
+    -13,
+    -15
+   ],
+   "size": [
+    23,
+    26
+   ]
+  },
+  "butterfly": {
+   "file": "res://assets/pip/fx/butterfly.svg",
+   "offset": [
+    -17,
+    -15
+   ],
+   "size": [
+    33,
+    27
+   ]
+  },
+  "dandelion": {
+   "file": "res://assets/pip/fx/dandelion.svg",
+   "offset": [
+    -15,
+    -21
+   ],
+   "size": [
+    29,
+    54
+   ]
+  },
+  "seedfluff": {
+   "file": "res://assets/pip/fx/seedfluff.svg",
+   "offset": [
+    -6,
+    -10
+   ],
+   "size": [
+    12,
+    18
+   ]
+  },
+  "snowflake": {
+   "file": "res://assets/pip/fx/snowflake.svg",
+   "offset": [
+    -11,
+    -12
+   ],
+   "size": [
+    22,
+    24
+   ]
+  },
+  "snowclump": {
+   "file": "res://assets/pip/fx/snowclump.svg",
+   "offset": [
+    -19,
+    -21
+   ],
+   "size": [
+    37,
+    41
+   ]
+  },
+  "firefly": {
+   "file": "res://assets/pip/fx/firefly.svg",
+   "offset": [
+    -11,
+    -11
+   ],
+   "size": [
+    22,
+    22
+   ]
+  },
+  "leaf": {
+   "file": "res://assets/pip/fx/leaf.svg",
+   "offset": [
+    -14,
+    -19
+   ],
+   "size": [
+    27,
+    37
+   ]
+  },
+  "acorn": {
+   "file": "res://assets/pip/fx/acorn.svg",
+   "offset": [
+    -12,
+    -14
+   ],
+   "size": [
+    23,
+    27
+   ]
+  },
+  "burrow": {
+   "file": "res://assets/pip/fx/burrow.svg",
+   "offset": [
+    -43,
+    -17
+   ],
+   "size": [
+    86,
+    34
+   ]
+  },
+  "dirt": {
+   "file": "res://assets/pip/fx/dirt.svg",
+   "offset": [
+    -11,
+    -8
+   ],
+   "size": [
+    20,
+    16
+   ]
+  },
+  "bubble": {
+   "file": "res://assets/pip/fx/bubble.svg",
+   "offset": [
+    -15,
+    -15
+   ],
+   "size": [
+    29,
+    29
+   ]
+  },
+  "shell": {
+   "file": "res://assets/pip/fx/shell.svg",
+   "offset": [
+    -17,
+    -19
+   ],
+   "size": [
+    33,
+    29
+   ]
+  },
+  "meteor": {
+   "file": "res://assets/pip/fx/meteor.svg",
+   "offset": [
+    -34,
+    -18
+   ],
+   "size": [
+    51,
+    30
+   ]
+  },
+  "starpetal": {
+   "file": "res://assets/pip/fx/starpetal.svg",
+   "offset": [
+    -11,
+    -11
+   ],
+   "size": [
+    22,
+    22
+   ]
+  },
+  "smoke": {
+   "file": "res://assets/pip/fx/smoke.svg",
+   "offset": [
+    -18,
+    -20
+   ],
+   "size": [
+    35,
+    39
+   ]
+  },
+  "ember": {
+   "file": "res://assets/pip/fx/ember.svg",
+   "offset": [
+    -9,
+    -9
+   ],
+   "size": [
+    17,
+    17
+   ]
+  }
+ },
+ "expressions": {
+  "nodes": [
+   "eye_L",
+   "eye_R",
+   "brow_L",
+   "brow_R",
+   "mouth"
+  ],
+  "sets": {
+   "neutral": [
+    "open",
+    "open",
+    "none",
+    "none",
+    "w"
+   ],
+   "happy": [
+    "happy",
+    "happy",
+    "none",
+    "none",
+    "smile"
+   ],
+   "joy": [
+    "happy",
+    "happy",
+    "up",
+    "up",
+    "grin"
+   ],
+   "curious": [
+    "open",
+    "open",
+    "up",
+    "flat",
+    "o"
+   ],
+   "surprised": [
+    "wide",
+    "wide",
+    "up",
+    "up",
+    "o"
+   ],
+   "admire": [
+    "spark",
+    "spark",
+    "up",
+    "up",
+    "smile"
+   ],
+   "love": [
+    "heart",
+    "heart",
+    "none",
+    "none",
+    "w"
+   ],
+   "sleepy": [
+    "half",
+    "half",
+    "none",
+    "none",
+    "w"
+   ],
+   "asleep": [
+    "blink",
+    "blink",
+    "none",
+    "none",
+    "w"
+   ],
+   "blink": [
+    "blink",
+    "blink",
+    "none",
+    "none",
+    "w"
+   ],
+   "squint": [
+    "squint",
+    "squint_r",
+    "cross",
+    "cross",
+    "o"
+   ],
+   "sneeze": [
+    "squint",
+    "squint_r",
+    "none",
+    "none",
+    "grin"
+   ],
+   "dizzy": [
+    "spin",
+    "x",
+    "worried",
+    "worried",
+    "wobble"
+   ],
+   "worried": [
+    "open",
+    "open",
+    "worried",
+    "worried",
+    "frown"
+   ],
+   "sad": [
+    "down",
+    "down",
+    "worried",
+    "worried",
+    "frown"
+   ],
+   "annoyed": [
+    "half",
+    "half",
+    "cross",
+    "cross",
+    "flat"
+   ],
+   "determined": [
+    "open",
+    "open",
+    "cross",
+    "cross",
+    "w"
+   ],
+   "wink": [
+    "happy",
+    "open",
+    "none",
+    "up",
+    "blep"
+   ],
+   "proud": [
+    "happy",
+    "happy",
+    "up",
+    "up",
+    "w"
+   ],
+   "munch": [
+    "happy",
+    "happy",
+    "none",
+    "none",
+    "chew"
+   ],
+   "yawn": [
+    "blink",
+    "blink",
+    "none",
+    "none",
+    "o"
+   ],
+   "blow": [
+    "squint",
+    "squint_r",
+    "none",
+    "none",
+    "o"
+   ],
+   "wish": [
+    "blink",
+    "blink",
+    "up",
+    "up",
+    "smile"
+   ],
+   "cross": [
+    "open",
+    "open",
+    "up",
+    "up",
+    "o"
+   ]
+  }
+ }
+}

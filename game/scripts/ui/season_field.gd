@@ -22,7 +22,7 @@ const FLOWER_SHADOW_DARK := Color(0.0, 0.0, 0.039, 0.32)
 ## Razmak rasta između mjesta kad ih izraste više odjednom (poslije runa).
 const GROW_STAGGER := 0.08
 const PIP_MIN_MOVE := 80.0
-const PIP_WALK_SPEED := 70.0
+const PIP_WALK_SPEED := 95.0
 const PIP_WALK_MIN := 2.2
 const PIP_WALK_MAX := 5.5
 const PIP_SNIFF_NEAR := 72.0

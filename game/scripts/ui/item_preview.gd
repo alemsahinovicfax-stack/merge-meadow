@@ -37,6 +37,10 @@ var corner_bg: Color = Color.WHITE
 
 var _hop_k: float = 0.0
 var _hop_tween: Tween
+## true = Ormar pozornica (stage_idle loop); false = Shop / sličica (poza).
+var live_pose: bool = false
+var actor: UiPip
+var _skin_key: String = "classic"
 
 static var _title_tex: Texture2D
 static var _lock_tex: Texture2D
@@ -45,6 +49,7 @@ static var _lock_tex: Texture2D
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	clip_contents = true
+	clip_children = Control.CLIP_CHILDREN_AND_DRAW
 
 
 func configure(p_kind: String, p_look: Dictionary, p_pip: Dictionary, p_season: String, p_subject: String = "pip") -> void:
@@ -53,6 +58,7 @@ func configure(p_kind: String, p_look: Dictionary, p_pip: Dictionary, p_season: 
 	pip_recolor = p_pip
 	season_id = p_season
 	subject = p_subject if not p_subject.is_empty() else "pip"
+	_sync_actor()
 	queue_redraw()
 
 
@@ -66,6 +72,11 @@ func set_frame(border: float, radius: float, color: Color, parent_bg: Color) -> 
 
 ## Pozornica: izabrani lik skoči (1 → 1,12 → 1, y −11 % visine), 280 ms.
 func hop() -> void:
+	_sync_actor()
+	if actor != null and actor.visible:
+		actor.play("stage_hop")
+		actor.loop_id = "stage_idle"
+		return
 	if _hop_tween != null and _hop_tween.is_valid():
 		_hop_tween.kill()
 	_hop_tween = create_tween()
@@ -84,7 +95,55 @@ func _set_hop(k: float) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
+		_sync_actor()
 		queue_redraw()
+
+
+func _skin_for_preview() -> String:
+	if kind == "companion":
+		return UiPip.skin_key_from_recolor(look.get("recolor", {}))
+	return UiPip.skin_key_from_recolor(pip_recolor)
+
+
+func _sync_actor() -> void:
+	var want := subject == "pip" and (kind == "companion" or kind == "meadow")
+	if not want:
+		if actor != null:
+			actor.visible = false
+		return
+	if actor == null:
+		actor = UiPip.new()
+		actor.name = "Actor"
+		actor.view = "three_q"
+		actor.follow_equipped = false
+		add_child(actor)
+	actor.visible = true
+	_skin_key = _skin_for_preview()
+	actor.set_skin(_skin_key)
+	var inner := Rect2(Vector2(frame_border, frame_border), size - Vector2(frame_border, frame_border) * 2.0)
+	var stage := preview_size == SIZE_STAGE
+	var h := inner.size.y
+	var side := roundf(h * (0.80 if stage else 0.84)) if kind == "companion" else roundf(h * (0.56 if stage else 0.62))
+	var feet := h - roundf(h * (0.05 if kind == "companion" else 0.06))
+	actor.box_px = side
+	actor.position = inner.position + Vector2(inner.size.x * 0.5, feet)
+	if live_pose:
+		actor.still = false
+		actor.set_loop("stage_idle")
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+	else:
+		actor.pose(UiPip.pose_for_skin(_skin_key))
+		mouse_filter = Control.MOUSE_FILTER_PASS if stage else Control.MOUSE_FILTER_IGNORE
+
+
+func _gui_input(event: InputEvent) -> void:
+	if live_pose or actor == null or not actor.visible:
+		return
+	var mouse := event as InputEventMouseButton
+	if mouse == null or not mouse.pressed or mouse.button_index != MOUSE_BUTTON_LEFT:
+		return
+	actor.play_then_pose(UiPip.signature_for_skin(_skin_key), UiPip.pose_for_skin(_skin_key))
+	accept_event()
 
 
 func _season() -> String:
@@ -149,6 +208,8 @@ func _draw_creature(r: Rect2, who: String, recolor: Dictionary, side: float, fee
 	var ratio := 0.95 if who == "mochi" else 0.926
 	var cx := r.position.x + r.size.x * 0.5
 	var fy := r.position.y + feet
+	if who == "pip" and actor != null and actor.visible:
+		return
 	var sh := Rect2(cx - side * 0.315, fy - side * 0.075, side * 0.63, side * 0.137)
 	draw_style_box(UiStage.box(shadow, roundi(sh.size.y * 0.5)), sh)
 	var arc := sin(PI * _hop_k)

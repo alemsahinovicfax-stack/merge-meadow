@@ -251,12 +251,12 @@ func _process_purchase(purchase: Dictionary, from_user_flow: bool) -> void:
 	var sku := CONFIG.sku_for_play_product_id(play_id)
 	if from_user_flow:
 		_pending_purchase_sku = sku
+	var token := str(purchase.get("purchase_token", ""))
 	if bool(purchase.get("is_acknowledged", false)):
-		_grant_product(sku)
+		_grant_product(sku, token, from_user_flow)
 		if from_user_flow:
 			_complete_purchase(sku)
 		return
-	var token := str(purchase.get("purchase_token", ""))
 	if token.is_empty():
 		if from_user_flow:
 			_fail_purchase(sku, "missing_token")
@@ -265,7 +265,7 @@ func _process_purchase(purchase: Dictionary, from_user_flow: bool) -> void:
 	_billing_client.call("acknowledge_purchase", token)
 
 
-func _grant_product(sku: String) -> void:
+func _grant_product(sku: String, purchase_token: String = "", from_user_flow: bool = true) -> void:
 	match sku:
 		CONFIG.SKU_REMOVE_ADS:
 			GameState.ads_removed = true
@@ -276,12 +276,27 @@ func _grant_product(sku: String) -> void:
 		CONFIG.SKU_BOOSTER_MERGE_HINT:
 			GameState.merge_hint_owned = true
 		CONFIG.SKU_BOOSTER_LOOT_BURST:
-			last_loot_burst = GameState.boosters.grant_loot_burst()
+			if not _try_grant_loot_burst(purchase_token, from_user_flow):
+				return
 		_:
 			var season_id := CONFIG.season_id_for_sku(sku)
 			if not season_id.is_empty():
 				GameState.grant_paid_season(season_id)
 	GameState.save_player_save()
+
+
+## Loot Burst je potrošan: svaki purchase_token jednom. Restore bez tokena ne smije
+## kovati +5 na svakom billing connectu. Prava kupovina (from_user_flow) i dalje daje.
+func _try_grant_loot_burst(token: String, from_user_flow: bool) -> bool:
+	if token.is_empty():
+		if not from_user_flow:
+			return false
+	elif GameState.has_granted_purchase_token(token):
+		return false
+	last_loot_burst = GameState.boosters.grant_loot_burst()
+	if not token.is_empty():
+		GameState.record_granted_purchase_token(token)
+	return true
 
 
 func _complete_purchase(sku: String) -> void:

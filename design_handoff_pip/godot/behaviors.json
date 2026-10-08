@@ -1,0 +1,316 @@
+{
+ "schema": 1,
+ "note": "Seasonal interactions spawn their own prop on the Pip rig (nodes prop / prop2 / fx_*). They never read or drive SeasonAmbient particles.",
+ "field": {
+  "box": 190,
+  "view": "front",
+  "rest_view": "front",
+  "zone_feet": [
+   151,
+   1306,
+   614,
+   131
+  ],
+  "default_base": [
+   756,
+   1404
+  ],
+  "move": {
+   "anim": "hop",
+   "view": "side",
+   "speed_px_s": 95,
+   "walk_chance": 0.35,
+   "flip_when_left": true
+  },
+  "idle": {
+   "loop": "idle",
+   "gap_s": [
+    3,
+    7
+   ],
+   "variants": [
+    {
+     "anim": "idle_look",
+     "w": 3
+    },
+    {
+     "anim": "ear_twitch",
+     "w": 3
+    },
+    {
+     "anim": "groom",
+     "w": 2
+    },
+    {
+     "anim": "periscope",
+     "w": 2
+    },
+    {
+     "anim": "yawn",
+     "w": 1
+    },
+    {
+     "anim": "binky",
+     "w": 1,
+     "cooldown_s": 30
+    },
+    {
+     "anim": "flop",
+     "w": 1,
+     "cooldown_s": 60
+    },
+    {
+     "anim": "thump",
+     "w": 0.5,
+     "cooldown_s": 45
+    }
+   ]
+  },
+  "flower": {
+   "sniff": {
+    "anim": "sniff",
+    "near_px": 120,
+    "chance": 0.35
+   },
+   "sneeze": {
+    "anim": "sneeze",
+    "after": "sniff",
+    "chance": 0.3
+   },
+   "admire": {
+    "anim": "admire",
+    "on": "flower_grown",
+    "walk_to": true
+   }
+  },
+  "sleep": {
+   "after_idle_s": 25,
+   "enter": "fall_asleep",
+   "loop": "sleep",
+   "exit": "wake",
+   "wake_on": [
+    "tap",
+    "apply",
+    "season_change",
+    "flower_grown"
+   ]
+  },
+  "tap": {
+   "window_s": 3,
+   "steps": [
+    "tap_giggle",
+    "tap_hop",
+    "tap_huff",
+    "tap_flop"
+   ]
+  },
+  "season": {
+   "gap_s": [
+    14,
+    28
+   ],
+   "by_season": {
+    "country_bloom": [
+     {
+      "anim": "cb_butterfly",
+      "prop": "butterfly",
+      "cooldown_s": 40
+     },
+     {
+      "anim": "cb_dandelion",
+      "prop": "dandelion",
+      "cooldown_s": 50
+     }
+    ],
+    "frost_orchard": [
+     {
+      "anim": "fo_snowflake",
+      "prop": "snowflake",
+      "cooldown_s": 35
+     },
+     {
+      "anim": "fo_shake",
+      "prop": "snowclump",
+      "cooldown_s": 50
+     }
+    ],
+    "lantern_meadow": [
+     {
+      "anim": "lm_firefly",
+      "prop": "firefly",
+      "cooldown_s": 35
+     },
+     {
+      "anim": "lm_eartip",
+      "prop": "firefly",
+      "cooldown_s": 50
+     }
+    ],
+    "amber_canopy": [
+     {
+      "anim": "ac_leafhat",
+      "prop": "leaf",
+      "cooldown_s": 40
+     },
+     {
+      "anim": "ac_acorn",
+      "prop": "acorn",
+      "cooldown_s": 50
+     }
+    ],
+    "moonlit_warren": [
+     {
+      "anim": "mw_burrow",
+      "prop": "burrow + dirt",
+      "cooldown_s": 50
+     },
+     {
+      "anim": "mw_moon",
+      "prop": "sparkle ×3",
+      "cooldown_s": 40
+     }
+    ],
+    "coral_tide": [
+     {
+      "anim": "ct_bubble",
+      "prop": "bubble",
+      "cooldown_s": 35
+     },
+     {
+      "anim": "ct_shell",
+      "prop": "shell + notes",
+      "cooldown_s": 50
+     }
+    ],
+    "starfall_glade": [
+     {
+      "anim": "sg_wish",
+      "prop": "meteor",
+      "cooldown_s": 45
+     },
+     {
+      "anim": "sg_petal",
+      "prop": "starpetal",
+      "cooldown_s": 40
+     }
+    ],
+    "ember_fen": [
+     {
+      "anim": "ef_smoke",
+      "prop": "smoke",
+      "cooldown_s": 40
+     },
+     {
+      "anim": "ef_ember",
+      "prop": "ember",
+      "cooldown_s": 45
+     }
+    ]
+   }
+  },
+  "events": {
+   "apply": "apply",
+   "return_home": "greet",
+   "flower_grown": "admire",
+   "sniff": "sniff"
+  }
+ },
+ "card": {
+  "box": 230,
+  "loop": "card_idle",
+  "events": {
+   "open_field": "card_jump",
+   "return_home": "greet",
+   "apply": "apply"
+  }
+ },
+ "arena": {
+  "box": 150,
+  "anchor": "bottom-left, inset (30, 26)",
+  "loop": "arena_idle",
+  "look_at": {
+   "while": "seed dragged",
+   "head_rot_max_deg": 7,
+   "eye_offset_max_px": [
+    3.5,
+    3
+   ],
+   "follow_rate": 9
+  },
+  "events": {
+   "merge_t2": "merge_t2",
+   "merge_t3": "merge_t3",
+   "combo_hop": "combo_hop",
+   "combo_big": "combo_big",
+   "muncher_wake": "muncher_wake",
+   "muncher_eat": "muncher_eat",
+   "muncher_frozen": "muncher_frozen",
+   "new_seeds": "new_seeds",
+   "need_more_seeds": "need_more_seeds"
+  },
+  "doze": {
+   "after_no_input_s": 20,
+   "loop": "doze",
+   "exit": "wake"
+  }
+ },
+ "run": {
+  "view": "top",
+  "loop": "run_gallop",
+  "speed_scale": "scroll_speed / 400",
+  "events": {
+   "start": "run_start",
+   "lane_left": "lane_left",
+   "lane_right": "lane_right",
+   "coin": "pickup_coin",
+   "seed": "pickup_seed",
+   "diamond": "pickup_diamond",
+   "hit": "fail",
+   "finish": "finish",
+   "revive": "revive_getup"
+  },
+  "after": {
+   "fail": "fail_dizzy (Loot backdrop)"
+  },
+  "hud": {
+   "box": 88,
+   "loop": "hud_idle",
+   "events": {
+    "start": "hud_go",
+    "coin": "hud_happy",
+    "seed": "hud_happy",
+    "diamond": "hud_wow",
+    "low_time": "hud_worried",
+    "hit": "hud_hit",
+    "finish": "hud_proud"
+   }
+  }
+ },
+ "shop": {
+  "looks_card": [
+   984,
+   300
+  ],
+  "still": true,
+  "pose_by_skin": {
+   "classic": "pose_classic",
+   "blossom": "pose_blossom",
+   "sky": "pose_sky"
+  },
+  "on_tap": "signature (≤ 1.5 s), then back to pose",
+  "list_pips": "static pose, no loop"
+ },
+ "wardrobe": {
+  "stage": [
+   1032,
+   300
+  ],
+  "loop": "stage_idle",
+  "on_pick": "stage_hop",
+  "thumbs": [
+   210,
+   150
+  ],
+  "thumb": "static pose_<skin>"
+ }
+}

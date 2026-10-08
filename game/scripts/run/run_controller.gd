@@ -145,6 +145,7 @@ func _set_icon(rect: TextureRect, tex: Texture2D) -> void:
 
 
 func start_run() -> void:
+	_pip_play("run_start", "hud_go")
 	elapsed = 0.0
 	coin_count = 0
 	seeds_by_type = {}
@@ -299,12 +300,10 @@ func _capture_snapshot() -> void:
 
 
 func _play_fail_beat() -> void:
-	var pip := player.get_node_or_null("PipVisual") as Node2D
+	_pip_play("fail", "hud_hit")
 	var tw := create_tween()
 	tw.tween_interval(UiRun.FAIL_FREEZE)
 	tw.tween_callback(func() -> void:
-		if pip:
-			pip.rotation_degrees = -13.0
 		_spill_tokens()
 		_shake()
 		_show_banner(false)
@@ -314,11 +313,13 @@ func _play_fail_beat() -> void:
 		fail_flash.visible = true
 	)
 	await get_tree().create_timer(UiRun.FAIL_TOTAL).timeout
+	_pip_play("fail_dizzy")
 	fail_flash.visible = false
 	position.x = 0.0
 
 
 func _play_finish_beat() -> void:
+	_pip_play("finish", "hud_proud")
 	if timer_ring and timer_ring.has_method("set_progress"):
 		timer_ring.set_progress(0.0, UiRun.RING_OK)
 	_show_banner(true)
@@ -452,19 +453,24 @@ func _layout_popup_root() -> void:
 	finish_banner.size = Vector2(base.x, 300.0)
 
 
-## R3 · „If you quit": šta nosiš, precrtano na pola (isto pravilo kao pad: ceil pola).
+## R3 · „If you quit": isti kept/was kao finish_run na padu — prvo × loot multiplier, pa ceil 50 %.
 func _fill_pause() -> void:
 	for b in [keep_button, quit_button]:
 		if b.get_parent() != null:
 			b.get_parent().remove_child(b)
 	pause_overlay.clear_content()
 	var chips: Array = []
+	var mult := GameState.get_loot_multiplier()
 	if coin_count > 0:
-		chips.append(RewardChip.new().setup("coin", "", int(ceil(coin_count * 0.5)), coin_count, false, false))
+		var scaled_coins := int(round(float(coin_count) * mult))
+		var kept_coins := int(ceil(float(scaled_coins) * 0.5))
+		chips.append(RewardChip.new().setup("coin", "", kept_coins, scaled_coins, false, false))
 	for type_id in seeds_by_type:
 		var n := int(seeds_by_type[type_id])
 		if n > 0:
-			chips.append(RewardChip.new().setup("seed", str(type_id), int(ceil(n * 0.5)), n, false, false))
+			var scaled_n := int(round(float(n) * mult))
+			var kept_n := int(ceil(float(scaled_n) * 0.5))
+			chips.append(RewardChip.new().setup("seed", str(type_id), kept_n, scaled_n, false, false))
 	var tray := RewardTray.new().setup(880.0, chips, UiPopups.S_IF_YOU_QUIT)
 	tray.name = "RewardTray"
 	pause_overlay.content.add_child(PopupModal.centered(tray))
@@ -605,8 +611,17 @@ func _pick_seed_type_id() -> String:
 	return GameState.pick_random_run_seed_type()
 
 
+func _pip_play(run_id: String, hud_id: String = "") -> void:
+	var pv := player.get_node_or_null("PipVisual") if player != null else null
+	if pv != null and pv.has_method("play_event"):
+		pv.call("play_event", run_id)
+	if not hud_id.is_empty() and pip_portrait != null and pip_portrait.has_method("play_pip"):
+		pip_portrait.call("play_pip", hud_id)
+
+
 func _on_coin_collected(at: Vector2) -> void:
 	coin_count += 1
+	_pip_play("pickup_coin", "hud_happy")
 	_update_hud()
 	if pickup_feed and pickup_feed.has_method("push_coin"):
 		pickup_feed.push_coin(at)
@@ -615,6 +630,7 @@ func _on_coin_collected(at: Vector2) -> void:
 func _on_seed_collected(type_id: String, at: Vector2) -> void:
 	seeds_by_type[type_id] = int(seeds_by_type.get(type_id, 0)) + 1
 	GameState.record_seed_pickup_lifetime(type_id, 1)
+	_pip_play("pickup_seed", "hud_happy")
 	_update_hud()
 	if pickup_feed and pickup_feed.has_method("push_seed"):
 		pickup_feed.push_seed(type_id, at)
@@ -622,6 +638,7 @@ func _on_seed_collected(type_id: String, at: Vector2) -> void:
 
 func _on_diamond_collected(at: Vector2) -> void:
 	GameState.add_diamonds(1)
+	_pip_play("pickup_diamond", "hud_wow")
 	_update_hud()
 	if pickup_feed and pickup_feed.has_method("push_diamond"):
 		pickup_feed.push_diamond(at)

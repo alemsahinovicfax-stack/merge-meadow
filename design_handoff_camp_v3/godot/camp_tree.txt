@@ -1,0 +1,51 @@
+Camp v3 — samo novi / promijenjeni čvorovi (px baze 1080 x 1920). Ostalo = camp_v2 camp_tree.txt.
+
+camp_scene.tscn
+CampPage                         Control           1080 x 1633   bg UiCamp.PAGE_BG #4E3F5A (bio #2E4733)
+└ ContentStack ...
+  └ StashSection                 PanelContainer    1032 x 1289   shadow PAGE_SHADOW
+    └ SectionVBox
+      ├ StashScroll / StashGrid
+      │ └ CampChip ×N
+      │   └ ChipBody
+      │     ├ PipsRow            HBoxContainer     315 x 42      NOVO: drži RarityPips + MergeableMark (space-between)
+      │     │ ├ RarityPips       Label             34 px
+      │     │ └ MergeableMark    PanelContainer    64 x 42       merge_mark_style() · icon_mergeable 40 · samo Seeds, count >= 4
+      │     └ ReservedBadge      (nepromijenjen, zamjenjuje PipsRow na Flowers)
+      └ TradeBar                 PanelContainer    992 x 152 / 224 / 212 (linija)
+        └ VBox                   separation 12
+          ├ ReservedWarning      (nepromijenjen, iznad)
+          ├ TradeRow             (nepromijenjen)
+          └ MergeableWarning     HBoxContainer     960 x 48      NOVO, ispod · separation 14
+            ├ Disc               PanelContainer    64 x 42       merge_mark_style(count == 4) · ikona 34
+            └ Label              Label             36 px / 800   UiCamp.merge_line_text(count)
+
+arena_screen.tscn (Arena tab, prije runde — polje ostaje vidljivo)
+MergeArena                       Control           1080 x 1633   postojeće polje, muncher, Pip, SeedBag
+├ SeedBag                        (postojeći)       300 x 280     brojač sakriven dok je GateCount vidljiv · tap: open → sipa, short → NeedSeedsModal
+└ GateCount                      PanelContainer    auto x 100    centriran, y 1141 · r 50 · ink 4 · sjena 0 8 0 · mouse IGNORE
+  ├ SeedIcon                     TextureRect       60
+  ├ N                            Label             60 / 900
+  ├ Of                           Label             "/ 50" 40 #555C5E
+  └ MergeableMark                PanelContainer    64 x 42       mint na >= 50, inače ink 10 %
+
+NeedSeedsModal (UiPopups modal, preko stranice)
+├ ModalPlate                     "Not enough seeds" · decision plate
+├ ModalCount                     ikona 84 · N 96 · "/ 50" 56
+├ ModalLine                      "Every type needs 4"   [samo kad ima sitnih]
+├ NeedSeedTiles                  HFlow · NeedSeedTile 264 x 244 · 4 tačke   [tipovi s 1–3]
+└ PopupButton primary            "Back to Camp" / "Play a run"
+
+UpgradesOverlay (main_menu.gd · Home) — zamjenjuje H5 922
+├ PopupScrim                     Panel             (0, 143, 1080, 1633)
+└ UpgradesSheet                  PanelContainer    1080 x 1200   y 576 · UiPopups.sheet_panel()
+  └ VBox
+    ├ SheetHandle                Panel             120 x 12
+    ├ SeasonTitle                PanelContainer    auto x 96     tint sezone · ime 56 (zamjenjuje "Upgrades")
+    ├ Cards                      VBoxContainer     1032 x 840    separation 24
+    │ ├ MagnetCard               PanelContainer    1032 x 264    UiPopups.upgrade_card()
+    │ ├ LootCard                 PanelContainer    1032 x 264
+    │ └ ThirdCard                PanelContainer    1032 x 264    Twin Seeds
+    │   ├ Info                   VBox              ime 52 · UpgradeLevel 4 × (96 x 22) · efekat 40
+    │   └ UpgradeButton          HubPressable      340 x 132     FlowerPrice + CoinPrice (h 72 · r 24) · stanje iz UiCamp.upgrade_state()
+    └ Close                      PopupButton secondary 132

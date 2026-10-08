@@ -1,0 +1,584 @@
+{
+  "$schema_version": "1.0",
+  "generated": "2026-10-08",
+  "source": "design_handoff_camp_v3/design/*.dc.html",
+  "brief": "docs/04-experience/design-drafts/camp-v3-cd-brief.md (fajl nije u repou na master; rađeno po promptu)",
+  "direction": "jedan dizajn — treća runda nad Camp v2; raspored v2 ostaje",
+  "note": "px baze 1080 x 1920, prenos 1:1. Samo novo/promijenjeno; ostalo važi iz camp_v2_export.json i ui_camp.gd.",
+  "meta": {
+    "base": {
+      "w": 1080,
+      "h": 1920
+    },
+    "header": {
+      "h": 143,
+      "given": true,
+      "bg": "#2A2233"
+    },
+    "footer": {
+      "h": 144,
+      "given": true,
+      "bg": "#2A2233",
+      "top": 1776
+    },
+    "page": {
+      "w": 1080,
+      "h": 1633,
+      "y": 143,
+      "padding": 24
+    },
+    "page_bg": {
+      "old": "#2E4733",
+      "new": "#4E3F5A",
+      "name": "dusk heather"
+    },
+    "page_shadow": "rgba(20,14,26,0.34)",
+    "contrast": {
+      "cream_card_on_page": 9.2,
+      "page_vs_chrome": 1.6,
+      "chrome_edge": "3 px warm white @ 55 %"
+    }
+  },
+  "tokens": {
+    "palette_new": {
+      "page_bg": "#4E3F5A",
+      "mergeable": "#A8E6CF",
+      "mergeable_edge": "#2D3436",
+      "mergeable_last": "#FFE8B8",
+      "upgrade_short_tag": "#FFCCD5",
+      "season_tint_country_bloom": [
+        "#E6F2DB",
+        "#B8C2AF"
+      ]
+    },
+    "reused_from": [
+      "ui_camp.gd",
+      "ui_chrome.gd",
+      "design_handoff_popups/godot/ui_popups.gd"
+    ]
+  },
+  "layout": {
+    "CampPage": {
+      "rect": [
+        0,
+        143,
+        1080,
+        1633
+      ],
+      "bg": "#4E3F5A"
+    },
+    "SeasonLinkCard": {
+      "rect": [
+        24,
+        24,
+        1032,
+        276
+      ],
+      "note": "v2 kartica; ako igra koristi Season Kit 318, sekcija je 1247 — v3 dodaci ne ovise o tome"
+    },
+    "StashSection": {
+      "rect": [
+        24,
+        320,
+        1032,
+        1289
+      ],
+      "no_season": [
+        24,
+        24,
+        1032,
+        1585
+      ]
+    },
+    "StashGrid": {
+      "h_by_state": {
+        "idle": 949,
+        "mergeable_line": 889,
+        "warn": 877,
+        "no_season": 1245,
+        "no_season_line": 1185
+      }
+    },
+    "TradeBar": {
+      "h": 152,
+      "h_strip": 224,
+      "h_mergeable_line": 212
+    },
+    "budget_check": "24 + 276 + 20 + 1289 + 24 = 1633; sekcija 2+18+120+14+949+14+152+18+2 = 1289"
+  },
+  "rules": {
+    "mergeable": {
+      "min_stack": 4,
+      "gate_sum": "N = Σ count(tip) za svaki tip s count >= 4; tip s 1–3 daje 0",
+      "examples": [
+        {
+          "stacks": [
+            13,
+            3,
+            40
+          ],
+          "n": 53,
+          "open": true
+        },
+        {
+          "stacks": [
+            49
+          ],
+          "n": 49,
+          "open": false
+        },
+        {
+          "stacks": [
+            12,
+            12,
+            12,
+            12
+          ],
+          "n": 48,
+          "open": false
+        },
+        {
+          "stacks": [
+            50
+          ],
+          "n": 50,
+          "open": true
+        }
+      ],
+      "gate_min": 50,
+      "sell": "mergeable sjeme se smije prodati: tap = 1, držanje = 10/s; držanje NE staje na 4"
+    }
+  },
+  "components": {
+    "MergeableMark": {
+      "where": "CampChip → PipsRow desno od RarityPips; samo Seeds tab; samo count >= 4",
+      "size": [
+        64,
+        42
+      ],
+      "radius": 21,
+      "bg": "#A8E6CF",
+      "border": "2 #2D3436",
+      "icon": "icon_mergeable.svg 40",
+      "text": null,
+      "not_like_reserved": "ReservedBadge = tint sezone, r 12, katanac + 'Kept · N / M', samo Flowers"
+    },
+    "MergeableWarning": {
+      "where": "TradeBar, ispod TradeRow; vidljiv kad je odabran Seeds stog s count >= 4 (idle i hold)",
+      "h": 48,
+      "gap_above": 12,
+      "pad_x": 6,
+      "gap": 14,
+      "disc": {
+        "size": [
+          64,
+          42
+        ],
+        "radius": 21,
+        "border": "2 #2D3436",
+        "bg": "#A8E6CF",
+        "bg_at_4": "#FFE8B8",
+        "icon": 34
+      },
+      "font": 36,
+      "weight": 800,
+      "ink": "#2D3436",
+      "text": {
+        "n_ge_5": "Arena takes all {n}",
+        "n_eq_4": "Arena takes all 4 · sell 1 and none go",
+        "n_lt_4": null
+      }
+    },
+    "ArenaGate": {
+      "page": "Arena polje vidljivo (ArenaField + Muncher sleep_nest + Pip + SeedBasket iz arena_v2), ništa ga ne prekriva prije tapa",
+      "GateCount": {
+        "anchor": "centriran, y stranice 1141 (iznad korpe 1269)",
+        "h": 100,
+        "radius": 50,
+        "pad": [
+          0,
+          22,
+          0,
+          16
+        ],
+        "gap": 10,
+        "border": "4 #2D3436",
+        "shadow": "0 8 0 rgba(26,26,20,.28)",
+        "seed_icon": 60,
+        "n_font": 60,
+        "of_font": 40,
+        "of_ink": "#555C5E",
+        "text": "{n} / 50",
+        "mark": {
+          "size": [
+            64,
+            42
+          ],
+          "bg_short": "rgba(45,52,54,.10)",
+          "bg_open": "#A8E6CF"
+        },
+        "bg": {
+          "short": "#FFF8F0",
+          "open": "#A8E6CF"
+        },
+        "mouse_filter": "IGNORE"
+      },
+      "SeedBasket": {
+        "hide_count": true,
+        "note": "brojač korpe sakriven dok je GateCount vidljiv (korpa broji max 40, gate može 53+)"
+      },
+      "tap": {
+        "open": "postojeće sipanje / start runde",
+        "short": "otvara NeedSeedsModal (UiPopups modal)"
+      },
+      "NeedSeedsModal": {
+        "kind": "UiPopups modal, plate decision #FFF6D6",
+        "title": "Not enough seeds",
+        "count": {
+          "seed_icon": 84,
+          "n_font": 96,
+          "of_font": 56
+        },
+        "line": "Every type needs 4 (samo kad ima sitnih tipova; postojeći A3 string)",
+        "tiles": "NeedSeedTile 264 x 244 · crtež 136 · NeedDots 4 × (44 x 22) — samo tipovi s 1–3",
+        "button": {
+          "short": "Back to Camp (tab_camp)",
+          "empty": "Play a run (icon_seed)"
+        },
+        "close": "tap scrim / dugme / back"
+      }
+    },
+    "UpgradesSheet": {
+      "h": 1200,
+      "top": 576,
+      "radius": "36 36 0 0",
+      "border_top": 4,
+      "pad": [
+        20,
+        24,
+        20,
+        24
+      ],
+      "SeasonTitle": {
+        "h": 96,
+        "radius": 48,
+        "pad_x": 36,
+        "bg": "tint sezone",
+        "border": "3 tint_edge",
+        "font": 56,
+        "ink": "#1A1A14"
+      },
+      "card": {
+        "h": 264,
+        "radius": 32,
+        "pad_x": 32,
+        "gap": 24,
+        "name_font": 52,
+        "seg": [
+          96,
+          22
+        ],
+        "seg_gap": 10,
+        "effect_font": 40,
+        "effect_ink": "#555C5E"
+      },
+      "cards": [
+        "MagnetCard",
+        "LootCard",
+        "ThirdCard"
+      ],
+      "UpgradeButton": {
+        "size": [
+          340,
+          132
+        ],
+        "radius": 36,
+        "border": 4,
+        "font": 44,
+        "price": "FlowerPrice [okvir 56 / art 40 + '×2'] · CoinPrice [coin 44 + N]; svaki dio h 72, r 24",
+        "states": {
+          "can": {
+            "bg": "#FFB88C",
+            "border": "#2D3436",
+            "shadow": "0 8 0 rgba(26,26,20,.28)"
+          },
+          "short_flower": {
+            "bg": "#F1EAE0",
+            "border": "rgba(45,52,54,.30)",
+            "ink": "#555C5E",
+            "FlowerPrice": "pink #FFCCD5 + 3 ink"
+          },
+          "short_coin": {
+            "bg": "#F1EAE0",
+            "border": "rgba(45,52,54,.30)",
+            "ink": "#555C5E",
+            "CoinPrice": "pink #FFCCD5 + 3 ink"
+          },
+          "short_both": {
+            "bg": "#F1EAE0",
+            "border": "rgba(45,52,54,.30)",
+            "ink": "#555C5E",
+            "both": "pink"
+          },
+          "max": {
+            "bg": "#A8E6CF",
+            "border": "#2D3436",
+            "content": "✓ Max"
+          },
+          "buy_flash": {
+            "card": "#FFF6D6 + 4 ink",
+            "segment": "#FFD56B → #A8E6CF",
+            "button": "✓ Done",
+            "dur_s": 0.4
+          }
+        }
+      }
+    }
+  },
+  "upgrades": {
+    "per_season": true,
+    "levels": 4,
+    "new_season_starts": 0,
+    "return_restores": true,
+    "storage": "upgrades[season_id] = { magnet, loot, third }",
+    "flower_cost": {
+      "count": 2,
+      "rarity": 3,
+      "season": "ista sezona; tuđi ne važi",
+      "spendable": "samo iznad Kept granice rezervisanog cvijeća"
+    },
+    "coin_cost": [
+      10,
+      20,
+      40,
+      60
+    ],
+    "coin_cost_reason": "nacrt ostaje: 130 coina po boostu ≈ 16 runova (≈8/run), sva tri ≈ 49 runova; prvi nivo 1–2 runa; daleko ispod 500",
+    "magnet": {
+      "radius_px": "40 + 48 * L",
+      "values": [
+        40,
+        88,
+        136,
+        184,
+        232
+      ]
+    },
+    "loot": {
+      "mult": [
+        1,
+        1.25,
+        1.5,
+        1.75,
+        2
+      ]
+    },
+    "third_boost": {
+      "id": "twin_seeds",
+      "name": "Twin Seeds",
+      "player_feels": "Ponekad pokupljeno sjeme iskoči kao '+2' umjesto '+1' — stogovi brže stignu do 4 i vreća brže do Arene.",
+      "formula": "p_twin(L) = 0.08 * L; na pickup sjemena: if randf() < p_twin → +2 tog tipa, inače +1",
+      "at_0": "0 % (uvijek +1)",
+      "at_4": "32 %",
+      "values_pct": [
+        0,
+        8,
+        16,
+        24,
+        32
+      ],
+      "example": "Run s 20 pickupa sjemena na L2 (16 %): očekivano 20 + 20 × 0,16 = 23,2 sjemena prije loot množitelja.",
+      "applies": "u trenutku pickupa, prije loot množitelja; loot množitelj se i dalje primjenjuje na ukupno kao danas",
+      "unchanged": [
+        "magnet radijus",
+        "loot množitelj",
+        "fail 50 %",
+        "revive",
+        "trajanje runa",
+        "plaćene sezone",
+        "cap torbe 40 (twin seme se broji u cap; višak i dalje nestaje)",
+        "nema nove valute",
+        "šansa da pickup bude sjeme (korpa +5 % ostaje odvojena)",
+        "coini u runu"
+      ],
+      "effect_text": {
+        "lt_4": "Twins {p} % → {p_next} %",
+        "max": "Twins 32 %"
+      },
+      "run_feedback": "R2 FloatPop '+2' umjesto '+1' (postojeći stil)",
+      "button_states": {
+        "can": {
+          "when": "L < 4, spendable ★3 >= 2, coins >= cost[L]",
+          "look": "peach, ×2 + coin",
+          "tap": "kupuje: −2 ★3, −cost coina, L+1, flash 0,4 s"
+        },
+        "short_flower": {
+          "when": "L < 4, spendable ★3 < 2, coins >= cost[L]",
+          "look": "ravno, pink oko cvijeta",
+          "tap": "ništa"
+        },
+        "short_coin": {
+          "when": "L < 4, spendable ★3 >= 2, coins < cost[L]",
+          "look": "ravno, pink oko coina",
+          "tap": "ništa"
+        },
+        "short_both": {
+          "when": "L < 4, spendable ★3 < 2, coins < cost[L]",
+          "look": "ravno, pink oko oba",
+          "tap": "ništa"
+        },
+        "max": {
+          "when": "L == 4",
+          "look": "mint ✓ Max",
+          "tap": "ništa"
+        }
+      }
+    }
+  },
+  "basket": {
+    "drawn": false,
+    "rule": "U picker ulazi samo sjeme te sezone koje je igrač barem jednom skupio u lane runu (seen_in_run[season][type] = true). Nikad skupljeno se ne lista. Nema reda s katancem po tipu.",
+    "bonus": "+5 % šanse da pickup bude sjeme (ne 100 % tog tipa); tip sjemena se i dalje bira po normalnoj tablici",
+    "not_unlocking": [
+      "starter pack",
+      "daily",
+      "trade"
+    ],
+    "empty_picker_en": "Seeds you catch in a run show up here"
+  },
+  "scenes": {
+    "CampScreen": [
+      "seeds_full",
+      "seeds_small",
+      "sell_mergeable",
+      "trade_hold",
+      "sell_dropped",
+      "seeds_few",
+      "seeds_empty",
+      "flowers_reserved",
+      "flowers_holdstop",
+      "season_ready",
+      "unlocking",
+      "no_season",
+      "flowers_empty"
+    ],
+    "ArenaGate": [
+      "ok_53",
+      "short_49",
+      "short_48",
+      "short_tap",
+      "ok_50",
+      "empty_tap"
+    ],
+    "UpgradesSheet": [
+      "fresh",
+      "mixed",
+      "short_flower",
+      "short_both",
+      "max",
+      "buy",
+      "new_season",
+      "returning"
+    ]
+  },
+  "animations": [
+    {
+      "what": "MergeableMark in/out",
+      "target": "scale 0.6→1 + alpha",
+      "dur_s": 0.14
+    },
+    {
+      "what": "MergeableWarning text",
+      "target": "swap",
+      "dur_s": 0.08
+    },
+    {
+      "what": "MergeableWarning disc 4",
+      "target": "mint → amber",
+      "dur_s": 0.12
+    },
+    {
+      "what": "MergeableWarning show/hide",
+      "target": "TradeBar h 152 ↔ 212",
+      "dur_s": 0.16
+    },
+    {
+      "what": "Upgrade buy",
+      "target": "segment gold→mint, card rim",
+      "dur_s": 0.4
+    },
+    {
+      "what": "Sheet in / out",
+      "target": "position:y",
+      "dur_s": [
+        0.32,
+        0.28
+      ]
+    },
+    {
+      "what": "GateCount short→open",
+      "target": "bg krem→mint + mark pop 0.6→1.08→1",
+      "dur_s": 0.18
+    },
+    {
+      "what": "GateCount n",
+      "target": "broj swap + pop 1→1.08→1",
+      "dur_s": 0.09
+    },
+    {
+      "what": "NeedSeedsModal",
+      "target": "UiPopups.tween_modal_in",
+      "dur_s": 0.22
+    }
+  ],
+  "strings_en": {
+    "mergeable_line": "Arena takes all {n}",
+    "mergeable_line_last": "Arena takes all 4 · sell 1 and none go",
+    "gate_count": "{n} / 50",
+    "upgrade_max": "Max",
+    "upgrade_done": "Done",
+    "magnet": "Magnet",
+    "magnet_effect": "Pull {a} → {b} px",
+    "magnet_effect_max": "Pull 232 px",
+    "loot": "Loot Boost",
+    "loot_effect": "Loot ×{a} → ×{b}",
+    "loot_effect_max": "Loot ×2",
+    "twin": "Twin Seeds",
+    "twin_effect": "Twins {a} % → {b} %",
+    "twin_effect_max": "Twins 32 %",
+    "basket_empty": "Seeds you catch in a run show up here",
+    "not_returned": [
+      "Next free season",
+      "Details",
+      "Unlock podnaslov",
+      "Merge ↗",
+      "Arena fuel",
+      "reward",
+      "1 coin each",
+      "hold 10 / s",
+      "Upgrades (naslov sheeta — zamijenjen imenom sezone)",
+      "Need N"
+    ],
+    "gate_short_title": "Not enough seeds",
+    "gate_short_line": "Every type needs 4",
+    "gate_back": "Back to Camp",
+    "gate_empty_cta": "Play a run"
+  },
+  "assets": {
+    "new": [
+      "icon_mergeable.svg (2 kruga + tačka, 128, obris 7 #2D3436)"
+    ],
+    "reused": [
+      "icon_basket.svg (popups/run)",
+      "icon_coin / icon_seed / icon_flower / tab_* (chrome v2)",
+      "icon_lock / icon_hold_stop (Camp)"
+    ]
+  },
+  "decisions": [
+    "vidi README § Odlučeno"
+  ],
+  "open_decisions": [
+    "SeasonLinkCard v2 (276) vs Season Kit u igri (318): v3 ne dira karticu",
+    "Gdje se N broji: sjeme iz Camp Seeds taba (cijela vreća, sve sezone) — potvrditi u merge-arena-v1.1"
+  ]
+}
