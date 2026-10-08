@@ -11,6 +11,22 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
 ## 2026-10-08
 
+- **Camp v3: popravke iz playtesta i provjera paketa** — Camp v3 (rađen u drugoj sesiji) commitan pa pregledan prema `design_handoff_camp_v3/`.
+  - Modal „Not enough seeds” je bio iza brojača `N / 50` (brojač z 60, modal z 30); modal je sada z 90, s velikim brojem iz paketa (ikona 84 · N 96 · „/ 50” 56).
+  - Pip u Areni je gubio vrhove ušiju: kontrola od 150 px je rezala crtež, a rezanje treba samo HUD portretu (crop glave).
+  - Pločica nadogradnji na polju dobija treći red (Twin Seeds); znak je podignut na y 20, redovi idu korakom 18.
+  - Ime „Twin Seeds” se nije vidjelo: kartica se kopirala od Loot kartice prije stila, pa je natpis ostao bijel na krem podlozi.
+  - Ime sezone u sheetu je sjedilo nisko (natpis iz scene ima visinu 92 i tekst na dnu). Sada je centrirano u pilulici 96, a pilula ima boju te sezone (Country Bloom `#E6F2DB`, ostale iz Season Kita) umjesto plave Frost.
+  - `icon_mergeable.svg` nije imao `.import`, pa se oznaka nije učitavala.
+  - Oznaka na kartici je uvijek mint; žuti disk na 4 ostaje samo u liniji ispod Tradea.
+  - Brojač `N / 50`: „/ 50” je manji i siv, uz kratki pop kad se broj promijeni i kad se vrata otvore.
+  - Traka Trade mijenja visinu glatko (0,16 s).
+  - Polje sezone više nema natpis „Nothing has grown here yet…” (čvor `MeadowNote` obrisan).
+- **Brief za Claude Design: run header, traka napretka, grm** (`docs/04-experience/design-drafts/run-hud-v2-cd-brief.md`, traka RUN-HUD-02).
+  - Header u jednom redu: Level · coini · sjemenke · pauza; Pip portret, prsten, sekunde, dijamant čip i korpa idu van.
+  - Vertikalna traka napretka uz rub staze, iz ideje od 2026-07-04.
+  - Nagradni grm na šavu između traka, iz `ideje-gameplay-ekonomija.md` §7–8; pravila su nacrt.
+  - Slike današnjeg HUD-a u `run-hud-ref/` (`run_hud_capture.gd`).
 - **Camp v3 u igri** — stranica `#4E3F5A` i plum sjena. Sjeme sa stogom ≥ 4 dobije mint oznaku, a traka kaže „Arena takes all N” (na 4: prodaj 1 i ništa ne ide). Prodaja i dalje ne staje na 4. Arena prije runde pokazuje pilulu `N / 50`; ispod 50 tap otvori „Not enough seeds”. Nadogradnje su po sezoni (nova sezona od 0, povratak vraća nivo): 2 ★3 te sezone iznad Kept granice i coini 10/20/40/60. Treći je Twin Seeds, `8 % × nivo` da pickup u runu broji +2 prije loot množitelja; lifetime i lanac otključavanja i dalje broje +1. Korpa nudi samo sjeme te sezone pokupljeno barem jednom u runu.
 - **Arena: prag od 50 mergeable sjemenki** — prvi tap na korpu ne otvara rundu dok zbroj stogova od 4+ nije barem 50. Tip s 1–3 ne ulazi u zbroj i ne nestaje. Ispod praga modal kaže „Not enough seeds” i `N / 50`; stari „You need more seeds!” ostaje samo kad nijedan tip nema 4. Iznad korpe piše isti broj dok runda nije otvorena. Dolijevanje usred runde se ne dira.
 - **Paket `design_handoff_camp_v3/`** — Claude Design, raspakovan, nije prenesen u igru. Camp pozadina `#4E3F5A`, mergeable oznaka (dva kruga, mint), vrata arene `N / 50`, upgradei po sezoni (2 ★3 iznad Kept + coini 10/20/40/60). Treći boost je Twin Seeds: na nivou L, `8 % × L` da pickup sjemena u runu broji +2 umjesto +1, prije loot množitelja. Prije koda treba zaključati da ti +2 ne ubrzavaju i lanac otključavanja sjemena (lifetime).
