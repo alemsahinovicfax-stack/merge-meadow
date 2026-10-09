@@ -255,8 +255,7 @@ Igra cilja slabiji Android; animacije su već jednom oborile FPS.
 
 ## 10. Scope
 
-- **Header i traka napretka** su UX runa koji je već na launch listi (M8). Bez nove mehanike, samo prikaz napretka.
-- **Grm** je nova mala mehanika nagrade. U `ideje-gameplay-ekonomija.md` je bio označen za v1.1, nije na OUT listi i ne krši Pillar 2. Brief traži samo dizajn; prije prenosa u igru potvrdi da grm ide u launch, pa se ažurira `scope-i-granice.md`.
+Header, traka napretka i nagradni grm idu u launch (M8) — u `scope-i-granice.md` od 2026-10-09. Grm je nagrada iz igre, bez kupovine, pa Pillar 2 ostaje netaknut.
 
 ## 11. Prompt za Claude Design
 

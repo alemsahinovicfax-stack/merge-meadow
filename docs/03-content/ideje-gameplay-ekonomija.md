@@ -105,6 +105,8 @@ Moguće kategorije shopa:
 
 ### 7. Tri trake + grmovi IZMEĐU traka (nagrada)
 
+> **2026-10-09:** nagradni grm ide u launch (M8) — dizajn traži [[../04-experience/design-drafts/run-hud-v2-cd-brief|run-hud-v2-cd-brief]]. Isto i vertikalna traka napretka (§ „Ideje — UI run progress").
+
 Između laneova (u "mrtvoj zoni" između vertikalnih linija) — **grmovi s nagradom**:
 - Pip prođe kroz grm → pokupi **nekoliko novčića** ili sjeme/cvijet.
 - Motivira **swerve / srednji lane** ili riskantniji put (ovisno o kontrolama).

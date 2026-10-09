@@ -9,6 +9,10 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-09
+
+- **Scope: run header, traka napretka i nagradni grm idu u launch** (na zahtjev) — upisano u `scope-i-granice.md` (Core gameplay); brief `run-hud-v2-cd-brief.md` §10 više nema uslov „potvrdi scope”, a grm u `ideje-gameplay-ekonomija.md` §7 više nije v1.1.
+
 ## 2026-10-08
 
 - **Camp v3: popravke iz playtesta i provjera paketa** — Camp v3 (rađen u drugoj sesiji) commitan pa pregledan prema `design_handoff_camp_v3/`.

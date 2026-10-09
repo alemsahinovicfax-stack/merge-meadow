@@ -23,6 +23,7 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - Endless mode (osnovni procedural spawn)
 - Merge kamp — 2→1 merge, min 3 tiera orbova
 - Upgradei: magnet, množitelj (min 4 levela svaki)
+- Run: header u jednom redu, vertikalna traka napretka umjesto sekundi, nagradni grm između traka (pokupi se pri promjeni trake) — dodano 2026-10-09 na zahtjev, [[../04-experience/design-drafts/run-hud-v2-cd-brief|run-hud-v2-cd-brief]]
 - 2 ljubimca (Pip default + 1 unlock)
 
 ### UX / flow
