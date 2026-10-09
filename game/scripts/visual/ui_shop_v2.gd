@@ -3,7 +3,7 @@ extends RefCounted
 
 ## Shop v2 — design_handoff_shop_v2/README.md · design/ShopScreen.dc.html
 ## Px baze 1080x1920. Stranica 1633 između headera 143 i footera 144 (hub chrome v2).
-## Ravne boje, jedna tvrda sjena (shadow_size 0 + offset), bez blura/glowa/gradijenata.
+## Ravne boje, jedna tvrda sjena (shadow_size 1 + offset), bez blura/glowa/gradijenata.
 ## Paste iz paketa; funkcije ispod su prilagođene stvarnom API-ju igre (GameState, IAPManager).
 
 # --- Boje ---
@@ -257,7 +257,7 @@ static func box(fill: Color, radius: int, border: int = 0, edge: Color = INK) ->
 
 static func hard_shadow(s: StyleBoxFlat, color: Color, y: int) -> StyleBoxFlat:
 	s.shadow_color = color
-	s.shadow_size = 0
+	s.shadow_size = 1  # 1 = tvrda sjena (0 je ne crta)
 	s.shadow_offset = Vector2(0, y)
 	return s
 
