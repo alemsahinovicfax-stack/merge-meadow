@@ -79,7 +79,6 @@ func _base_state() -> void:
 	_gs.set("skip_debug_season_unlock", true)
 	_gs.set("tutorial_complete", true)
 	_gs.set("wallet_coins", 320)
-	_gs.set("wallet_diamonds", 12)
 	_gs.set("seed_bag", {"clover": 14, "daisy": 9, "buttercup": 5})
 	var stash := {}
 	for type_id in SeedCatalog.all_type_ids():

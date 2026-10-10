@@ -1,7 +1,7 @@
 extends SceneTree
 
 ## Run redizajn (smjer A, design_handoff_run) na 1080×1920:
-## fiksan TimerChip, brojevi ≥ 44, Pause ≥ 120, lane field, magnet 0 vs 2,
+## LevelChip (Run HUD v2), brojevi ≥ 44, Pause ≥ 120, lane field, magnet 0 vs 2,
 ## kolizije netaknute, stump+stone, Quit = fail loot bez revivea.
 
 const SAVE_PATH := "user://player_save.json"
@@ -52,7 +52,8 @@ func _check_rules(run: Node, gs: Node) -> void:
 	_expect_eq("spawn chance", run_map.get("SPAWN_CHANCE", -1), 0.7)
 	_expect_eq("obstacle chance", run_map.get("OBSTACLE_CHANCE", -1), 0.25)
 	_expect_eq("seed chance", run_map.get("PICKUP_SEED_CHANCE", -1), 0.30)
-	_expect_eq("diamond ratio", run_map.get("DIAMOND_SEED_RATIO", -1), 300)
+	if run_map.has("DIAMOND_SEED_RATIO") or ResourceLoader.exists("res://scenes/run/diamond_pickup.tscn"):
+		_fail("diamonds were removed from the game (2026-10-09) — no diamond spawn")
 	var player := run.get_node_or_null("Player")
 	if player == null:
 		_fail("player missing")
@@ -71,24 +72,20 @@ func _check_rules(run: Node, gs: Node) -> void:
 
 
 func _check_layout(run: Node) -> void:
-	var chip := run.get_node_or_null("HUD/TopHud/TimerChip") as Control
+	var chip := run.get_node_or_null("HUD/TopHud/LevelChip") as Control
 	if chip == null:
-		_fail("TimerChip missing")
+		_fail("LevelChip missing")
 		return
 	var scale := _scale(run)
-	_expect_near("TimerChip w", chip.size.x, UiRun.TIMER_RECT.size.x * scale)
-	_expect_near("TimerChip h", chip.size.y, UiRun.TIMER_RECT.size.y * scale)
+	_expect_near("LevelChip h", chip.size.y, 128.0 * scale)
 	var pause := run.get_node_or_null("HUD/TopHud/PauseButton") as Control
 	if pause == null or pause.size.x < 120.0 * scale - TOLERANCE or pause.size.y < 120.0 * scale - TOLERANCE:
 		_fail("Pause hit %.1f×%.1f < 120" % [pause.size.x if pause else -1, pause.size.y if pause else -1])
-	var seconds := run.get_node_or_null("HUD/TopHud/TimerChip/Row/TextCol/SecondsLabel") as Label
-	var mode := run.get_node_or_null("HUD/TopHud/TimerChip/Row/TextCol/ModeLabel") as Label
-	var coin := run.get_node_or_null("HUD/TopHud/PickupBar/CoinChip/Row/CoinLabel") as Label
-	if seconds == null or mode == null or coin == null:
-		_fail("timer or counter labels missing")
+	var mode := run.get_node_or_null("HUD/TopHud/LevelChip/Row/ModeLabel") as Label
+	var coin := run.get_node_or_null("HUD/TopHud/CoinChip/Row/CoinLabel") as Label
+	if mode == null or coin == null:
+		_fail("level or counter labels missing")
 		return
-	if seconds.get_theme_font_size("font_size") < 44:
-		_fail("seconds font %d < 44" % seconds.get_theme_font_size("font_size"))
 	if mode.get_theme_font_size("font_size") < 38:
 		_fail("mode font %d < 38" % mode.get_theme_font_size("font_size"))
 	if coin.get_theme_font_size("font_size") < 44:
@@ -101,37 +98,31 @@ func _check_layout(run: Node) -> void:
 		_fail("PickupFeed should be the toast control, not a text dump")
 
 
+## Run HUD v2: LevelChip ne skače po visini između modova, „Endless · Hard" stane bez rezanja,
+## a stari čipovi (PickupBar, TimerChip, CompanionChip, BasketBadge) su obrisani.
 func _check_timer_stable(run: Node, gs: Node) -> void:
 	var was_endless: bool = bool(gs.get("run_is_endless"))
 	var was_diff: int = int(gs.get("endless_difficulty"))
-	var chip := run.get_node_or_null("HUD/TopHud/TimerChip") as Control
-	var mode := run.get_node_or_null("HUD/TopHud/TimerChip/Row/TextCol/ModeLabel") as Label
+	var chip := run.get_node_or_null("HUD/TopHud/LevelChip") as Control
+	var mode := run.get_node_or_null("HUD/TopHud/LevelChip/Row/ModeLabel") as Label
 	gs.set("run_is_endless", true)
 	gs.set("endless_difficulty", 2)
 	run.call("_update_hud")
 	var h_endless := chip.size.y
 	if mode.text != "Endless · Hard":
 		_fail("endless mode line got '%s'" % mode.text)
-	if mode.get_minimum_size().x > mode.size.x + 4.0:
-		_fail("Endless · Hard does not fit (min %.1f > width %.1f)" % [mode.get_minimum_size().x, mode.size.x])
+	if mode.clip_text:
+		_fail("Endless · Hard does not fit the LevelChip (clipped)")
 	gs.set("run_is_endless", false)
 	run.call("_update_hud")
 	if absf(chip.size.y - h_endless) > TOLERANCE:
-		_fail("TimerChip jumped %.1f → %.1f when leaving endless" % [h_endless, chip.size.y])
+		_fail("LevelChip jumped %.1f → %.1f when leaving endless" % [h_endless, chip.size.y])
 	gs.set("run_is_endless", was_endless)
 	gs.set("endless_difficulty", was_diff)
 	run.call("_update_hud")
-	gs.set("wallet_diamonds", 0)
-	run.call("_update_hud")
-	var diamond := run.get_node_or_null("HUD/TopHud/PickupBar/DiamondChip") as CanvasItem
-	if diamond == null or diamond.visible:
-		_fail("diamond counter should hide at 0")
-	gs.set("wallet_diamonds", 2)
-	run.call("_update_hud")
-	if diamond == null or not diamond.visible:
-		_fail("diamond counter should show when wallet > 0")
-	gs.set("wallet_diamonds", 0)
-	run.call("_update_hud")
+	for gone in ["HUD/TopHud/PickupBar", "HUD/TopHud/TimerChip", "HUD/TopHud/CompanionChip", "HUD/TopHud/BasketBadge"]:
+		if run.get_node_or_null(gone) != null:
+			_fail("%s should be gone in run HUD v2" % gone)
 
 
 func _check_collisions() -> void:
@@ -150,11 +141,6 @@ func _check_collisions() -> void:
 	if seed_shape == null or not is_equal_approx(seed_shape.radius, 26.0):
 		_fail("seed collision radius changed")
 	seed.free()
-	var diamond := (load("res://scenes/run/diamond_pickup.tscn") as PackedScene).instantiate()
-	var diamond_shape := diamond.get_node("CollisionShape2D").shape as CircleShape2D
-	if diamond_shape == null or not is_equal_approx(diamond_shape.radius, 18.0):
-		_fail("diamond collision radius changed")
-	diamond.free()
 
 
 func _check_obstacles(run: Node) -> void:

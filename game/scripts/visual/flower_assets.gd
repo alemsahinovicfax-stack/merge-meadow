@@ -9,6 +9,8 @@ const DIR := "res://assets/sprites/flowers/"
 
 ## Misses are cached too — draw_plant runs every frame in Arena/Camp.
 static var _cache: Dictionary = {}
+## key → putanja koja se učitava u pozadinskom threadu (prefetch).
+static var _pending: Dictionary = {}
 
 
 static func get_texture(type_id: String, tier: int) -> Texture2D:
@@ -17,7 +19,31 @@ static func get_texture(type_id: String, tier: int) -> Texture2D:
 		return _cache[key]
 	var tex: Texture2D = null
 	var path := DIR + key + ".svg"
-	if ResourceLoader.exists(path):
+	if _pending.has(key):
+		_pending.erase(key)
+		tex = ResourceLoader.load_threaded_get(path) as Texture2D
+	elif ResourceLoader.exists(path):
 		tex = load(path) as Texture2D
 	_cache[key] = tex
 	return tex
+
+
+## Teksture unaprijed, u pozadinskom threadu (perf 2026-10-10): prvi crtež cvijeća sezone
+## (Home kartica, Shop kartica, polje) sinhrono je učitavao 5 tekstura = ~30 ms u jednom frejmu.
+static func prefetch(type_ids: Array, tier: int) -> void:
+	for type_id in type_ids:
+		var key := "%s_t%d" % [str(type_id), tier]
+		if _cache.has(key) or _pending.has(key):
+			continue
+		var path := DIR + key + ".svg"
+		if ResourceLoader.exists(path) and ResourceLoader.load_threaded_request(path) == OK:
+			_pending[key] = path
+
+
+## Roster (tier 3) svake sezone — ono što Home i Shop kartice crtaju pri prvom prikazu.
+static func prefetch_rosters() -> void:
+	for def in SeasonCatalog.all_defs():
+		var ids: Array = []
+		for r in def.roster:
+			ids.append(str(r.get("id", "")))
+		prefetch(ids, 3)

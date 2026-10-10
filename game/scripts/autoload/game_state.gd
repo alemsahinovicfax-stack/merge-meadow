@@ -104,7 +104,6 @@ var last_run_coins: int = 0
 var last_raw_coins: int = 0
 var last_loot: int = 0
 var wallet_coins: int = 0
-var wallet_diamonds: int = 0
 var last_failed: bool = false
 var last_raw_seed_total: int = 0
 var loot_doubled: bool = false
@@ -312,18 +311,65 @@ func load_player_save() -> bool:
 	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.READ)
 	if file == null:
 		return false
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	var text := file.get_as_text()
+	_save_disk_hash = text.hash()
+	var parsed: Variant = JSON.parse_string(text)
 	if not parsed is Dictionary:
 		return false
 	return _apply_save_dict(parsed)
 
 
+## Arena (sipanje, combo coini, dnevni zadatak, ★3) snima više puta u par sekundi, a save na
+## disku je 1,6–3,9 ms na laptopu (perf 2026-10-09) i padao je baš u frejm mergea. Ti pozivi
+## idu ovuda: jedan save SAVE_SOON_SEC kasnije. Obični save_player_save(), promjena scene,
+## zatvaranje i pauza aplikacije odmah ga isprazne.
+const SAVE_SOON_SEC := 0.5
+var _save_soon_pending: bool = false
+## Hash sadržaja koji je GameState zadnji put sam napisao ili učitao. Odgođeni save ne prepisuje
+## fajl koji je u međuvremenu promijenio neko drugi — smoke test koji vrati svoju kopiju savea
+## pa izađe (flush na izlazu je inače upisivao testno stanje preko nje, 2026-10-10).
+var _save_disk_hash: int = 0
+
+
+func save_player_save_soon() -> void:
+	if _save_soon_pending:
+		return
+	if not is_inside_tree():
+		save_player_save()
+		return
+	_save_soon_pending = true
+	get_tree().create_timer(SAVE_SOON_SEC, true).timeout.connect(flush_save_soon)
+
+
+func flush_save_soon() -> void:
+	if not _save_soon_pending:
+		return
+	if _save_changed_on_disk():
+		_save_soon_pending = false
+		return
+	save_player_save()
+
+
+func _save_changed_on_disk() -> bool:
+	if _save_disk_hash == 0:
+		return false
+	if not FileAccess.file_exists(PLAYER_SAVE_PATH):
+		return true
+	return FileAccess.get_file_as_string(PLAYER_SAVE_PATH).hash() != _save_disk_hash
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED \
+			or what == NOTIFICATION_PREDELETE:
+		flush_save_soon()
+
+
 func save_player_save() -> void:
+	_save_soon_pending = false
 	stash_upgrade_levels(active_season_id)
 	var data := {
 		"version": SAVE_VERSION,
 		"wallet_coins": wallet_coins,
-		"wallet_diamonds": wallet_diamonds,
 		"magnet_level": magnet_level,
 		"multiplier_level": multiplier_level,
 		"season_upgrades": _export_season_upgrades(),
@@ -357,7 +403,9 @@ func save_player_save() -> void:
 	if file == null:
 		push_error("GameState: could not write %s" % PLAYER_SAVE_PATH)
 		return
-	file.store_string(JSON.stringify(data))
+	var text := JSON.stringify(data)
+	file.store_string(text)
+	_save_disk_hash = text.hash()
 
 
 func t3_flower_count() -> int:
@@ -547,8 +595,8 @@ func _apply_save_dict(data: Dictionary) -> bool:
 		return false
 	tutorial.apply_from_save(data)
 	wallet_coins = maxi(0, int(data.get("wallet_coins", 0)))
-	# SAVE_VERSION 8 — older saves default to 0 diamonds.
-	wallet_diamonds = maxi(0, int(data.get("wallet_diamonds", 0)))
+	# Dijamanti su izbačeni (2026-10-09): stari save još nosi "wallet_diamonds" — ignoriše se,
+	# a sljedeće snimanje ga ne piše.
 	seed_bag_domain.apply_from_save(data)
 	magnet_level = clampi(int(data.get("magnet_level", 0)), 0, MAGNET_MAX_LEVEL)
 	multiplier_level = clampi(int(data.get("multiplier_level", 0)), 0, MULTIPLIER_MAX_LEVEL)
@@ -710,6 +758,7 @@ func reset_greenhouse_beds() -> void:
 
 
 func go_to_scene(path: String) -> void:
+	flush_save_soon()
 	SceneRouter.change_to(path)
 
 
@@ -1120,17 +1169,6 @@ func get_almanac_chain_ui_data() -> Array[Dictionary]:
 func format_shop_resources_line() -> String:
 	var seeds := sum_seed_bag(seed_bag)
 	return "%d coins  ·  %d / %d seeds in bag" % [wallet_coins, seeds, SEED_BAG_SOFT_CAP]
-
-
-func get_diamonds() -> int:
-	return wallet_diamonds
-
-
-func add_diamonds(amount: int) -> void:
-	if amount <= 0:
-		return
-	wallet_diamonds += amount
-	save_player_save()
 
 
 ## Economy indirection (plan-arhitektura-refaktor.md Stage 1). Every domain that
@@ -1981,7 +2019,7 @@ func stash_garden_crystal(type_id: String) -> void:
 	# Arena T3 auto-stashes — unlock Album T3 (player cannot Keep the chip).
 	record_star3_in_album(type_id)
 	crystal_stash_domain.add(type_id)
-	save_player_save()
+	save_player_save_soon()
 
 
 ## ★3 cvijet koji uđe u stash (Arena T3, Loot Burst iz Shopa) je i u Albumu: otkriven,

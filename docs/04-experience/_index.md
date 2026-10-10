@@ -17,6 +17,9 @@ tags: [hub, iskustvo]
 - [[design-drafts/pip-cd-brief|pip-cd-brief]] — brief za Claude Design (redizajn Pipa)
 - [[design-drafts/pip-izvjestaj|pip-izvjestaj]] — prenos Pip riga (2026-10-07)
 - [[design-drafts/camp-v3-cd-brief|camp-v3-cd-brief]] — brief za Claude Design (camp bez zelene, ulaz u arenu od 50, upgradei po sezoni)
+- [[design-drafts/camp-v3-izvjestaj|camp-v3-izvjestaj]] — provjera Camp v3 paketa u igri (2026-10-09)
+- [[design-drafts/run-hud-v2-cd-brief|run-hud-v2-cd-brief]] — brief za Claude Design (header runa u jednom redu, traka napretka, nagradni grm)
+- [[design-drafts/run-hud-v2-izvjestaj|run-hud-v2-izvjestaj]] — prenos Run HUD v2 (2026-10-09)
 
 ## Povezano
 

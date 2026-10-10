@@ -57,7 +57,6 @@ func _base_state(coins: int = 320, stars: int = 14) -> void:
 	_gs.call("set_home_band", "free")
 	_gs.set("tutorial_complete", true)
 	_gs.set("wallet_coins", coins)
-	_gs.set("wallet_diamonds", 12)
 	_gs.set("seed_bag", {"dusk_firefly_grass": 112})
 	_gs.set("garden_crystal_stash", {
 		"midnight_lotus": stars, "dusk_firefly_grass": 7, "paper_lantern_bloom": 5,

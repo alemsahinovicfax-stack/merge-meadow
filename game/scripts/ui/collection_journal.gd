@@ -13,7 +13,9 @@ const JournalRow := preload("res://scripts/ui/collection_journal_row.gd")
 
 const SEASONS_PER_CHUNK := 3
 ## Rad po frejmu (µs): učitavanje tekstura + gradnja redova; uvijek bar jedan red.
-const FRAME_BUDGET_USEC := 6000
+## 3 ms (perf 2026-10-09; bilo 6): novi redovi se još i raspoređuju i prvi put crtaju u istom
+## frejmu, pa je 6 ms budžeta uz to prelazilo 16,7 ms dok igrač skrola.
+const FRAME_BUDGET_USEC := 3000
 ## Sljedeće tri sezone kreću kad je do kraja učitanog ostalo manje od ovoga (px).
 const LOAD_AHEAD_PX := 400.0
 

@@ -37,11 +37,31 @@ var _colors: Dictionary = {}
 var _chunks: Array = []
 var _cache_size: Vector2 = Vector2.ZERO
 var _dirty: bool = false
+## Rasuti elementi (cvjetići, kamenčići…) crtaju se u svom sloju: naklon pri combou mijenja samo
+## njih, pa brda i slojevi ostaju kao keširan crtež (perf 2026-10-09: naklon je svaki frejm
+## iznova slao cijelu livadu, 1,2–2,6 ms).
+var _scatter_layer: Control = null
+var _scatter_dirty: bool = false
 static var _shape_cache: Dictionary = {}
+
+
+class _ScatterLayer:
+	extends Control
+
+	var bg: ArenaMeadowBg
+
+	func _draw() -> void:
+		bg._draw_chunks(self, true)
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_scatter_layer = _ScatterLayer.new()
+	_scatter_layer.name = "ScatterLayer"
+	_scatter_layer.bg = self
+	_scatter_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_scatter_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_scatter_layer)
 	_combo_light = ColorRect.new()
 	_combo_light.name = "ComboLight"
 	_combo_light.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -119,41 +139,62 @@ func play_bow(center: Vector2, radius: float) -> void:
 	_bow_center = center
 	_bow_radius = maxf(radius, 1.0)
 	_bow_t = 0.0
-	_request_redraw()
+	_scatter_dirty = true
+	if is_inside_tree():
+		set_process(true)
 
 
 ## Crtez se trazi ovdje, a obnavlja iz _process — tako tween (koji se vrti poslije _process)
-## ne izazove drugo crtanje u istom frejmu.
+## ne izazove drugo crtanje u istom frejmu. Nivo / velicina / sezona = oba sloja.
 func _request_redraw() -> void:
 	_dirty = true
+	_scatter_dirty = true
 	if is_inside_tree():
 		set_process(true)
 	else:
 		queue_redraw()
+		if _scatter_layer != null:
+			_scatter_layer.queue_redraw()
 
 
 func _process(delta: float) -> void:
 	if _bow_t >= 0.0:
 		_bow_t += delta
-		_dirty = true
+		_scatter_dirty = true
 		if _bow_t > float(UiArenaV2.COMBO_BOW["sec"]) + float(UiArenaV2.COMBO_BOW["delay_per_ring"]):
 			_bow_t = -1.0
+	var drew := false
 	if _dirty:
 		_dirty = false
 		queue_redraw()
-	elif _bow_t < 0.0 and (_tween == null or not _tween.is_valid() or not _tween.is_running()):
+		drew = true
+	if _scatter_dirty:
+		_scatter_dirty = false
+		if _scatter_layer != null:
+			_scatter_layer.queue_redraw()
+		drew = true
+	if not drew and _bow_t < 0.0 and (_tween == null or not _tween.is_valid() or not _tween.is_running()):
 		set_process(false)
 
 
 ## Cijela livada ide u jedan mesh po dijelu (jedan draw poziv; girlanda je zaseban AA poziv).
+## Ovdje se crta sve osim rasutih elemenata (njih crta _ScatterLayer).
 func _draw() -> void:
+	_draw_chunks(self, false)
+
+
+func _draw_chunks(canvas: CanvasItem, scatter: bool) -> void:
 	if _field.is_empty():
 		return
 	if _cache_size != size:
 		_build_cache()
 	for chunk in _chunks:
+		if bool(chunk.get("scatter", false)) != scatter:
+			continue
 		if chunk["line"]:
-			draw_polyline(chunk["pts"], UiArenaV2.layer_color(chunk["fill"], _level), chunk["w"], true)
+			canvas.draw_polyline(chunk["pts"], UiArenaV2.layer_color(chunk["fill"], _level), chunk["w"], true)
+			continue
+		if (chunk["entries"] as Array).is_empty():
 			continue
 		# Boje ovise samo o nivou bujnosti — za naklon (combo) se ne racunaju ponovo.
 		if chunk["cols_level"] != _level:
@@ -165,7 +206,7 @@ func _draw() -> void:
 		var pts := PackedVector2Array()
 		for e in chunk["entries"]:
 			pts.append_array(_entry_points(e))
-		RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), chunk["idx"], pts, chunk["cols"])
+		RenderingServer.canvas_item_add_triangle_array(canvas.get_canvas_item(), chunk["idx"], pts, chunk["cols"])
 
 
 ## Tacke unosa za trenutni nivo i naklon; rasuti element se preracuna samo kad mu se
@@ -234,6 +275,10 @@ func _build_cache() -> void:
 				for v in range(1, pts.size() - 1):
 					idx.append_array([0, v, v + 1])
 			_add_entry(chunk, {"k": 0, "pts": pts, "n": pts.size(), "fill": layer["fill"]}, idx)
+	# Rasuti elementi su uvijek zadnji — idu u svoj dio, koji crta _ScatterLayer.
+	_chunks.append(chunk)
+	chunk = _new_chunk()
+	chunk["scatter"] = true
 	for s in _field["scatter"]:
 		var parts := _shape_mesh(str(s["shape"]))
 		var n: Array = s["n"]

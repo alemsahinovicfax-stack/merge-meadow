@@ -29,8 +29,8 @@ func _run() -> void:
 		if not FileAccess.file_exists(p):
 			_fail("missing %s" % p)
 	UiPip.data()
-	if UiPip._anims.size() != 77:
-		_fail("expected 77 animations, got %d" % UiPip._anims.size())
+	if UiPip._anims.size() != 75:  # 77 − pickup_diamond − hud_wow (dijamanti izbačeni 2026-10-09)
+		_fail("expected 75 animations, got %d" % UiPip._anims.size())
 	if UiPip._skins.size() != 3:
 		_fail("expected 3 skins, got %d" % UiPip._skins.size())
 	if UiPip.skin_key_from_cosmetic("pip_blossom") != "blossom":

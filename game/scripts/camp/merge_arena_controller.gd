@@ -116,9 +116,34 @@ func _exit_tree() -> void:
 	_set_hub_nav_locked(false)
 
 
+## Back / Esc zatvara samo modal vrata (Camp v3); stari „need seeds" i dalje ide dugmetom.
+func _unhandled_input(event: InputEvent) -> void:
+	if not _gate_modal_open() or event.is_echo():
+		return
+	var back := event.is_action_pressed("ui_cancel")
+	if not back and event is InputEventKey:
+		var k := event as InputEventKey
+		back = k.pressed and k.keycode == KEY_ESCAPE
+	if back:
+		get_viewport().set_input_as_handled()
+		_hide_need_more_overlay()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST and _gate_modal_open():
+		_hide_need_more_overlay()
+
+
+func _gate_modal_open() -> bool:
+	return need_more_overlay != null and need_more_overlay.is_open() and need_more_overlay.dismiss_on_scrim
+
+
 func _deferred_boot() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
+	# Osnove sjemenki se iscrtaju u teksture odmah pri učitavanju stranice (8 frejmova), prije
+	# prvog sipanja — inače svaka sjemenka crta 4–6 StyleBoxova (perf 2026-10-09).
+	ArenaChipBake.ensure(self)
 	GameState.apply_debug_leftover_test_bag()
 	GameState.flush_bloom_inbox_to_album()
 	var legacy := $RootVBox.get_node_or_null("InboxPanel")
@@ -834,6 +859,7 @@ func _bag_has_pourable_set() -> bool:
 
 func _show_need_more_seeds_overlay() -> void:
 	_gate_play_run = false
+	need_more_overlay.dismiss_on_scrim = false
 	need_more_overlay.set_title(UiPopups.S_NEED_TITLE)
 	if need_more_line:
 		need_more_line.text = UiPopups.S_NEED_LINE
@@ -852,6 +878,8 @@ func _show_arena_gate() -> void:
 	var n := GameState.mergeable_seed_count()
 	var small := _small_seed_entries()
 	_gate_play_run = GameState.sum_seed_bag_only() <= 0
+	# Camp v3: modal vrata se zatvara tapom van, dugmetom ili Back (ostaje se u Areni).
+	need_more_overlay.dismiss_on_scrim = true
 	need_more_overlay.set_title(UiPopups.S_GATE_TITLE)
 	# ModalCount (camp v3): ikona sjemena 84 · N 96/900 · „/ 50" 56 — umjesto obične linije.
 	if need_more_line:
@@ -980,7 +1008,8 @@ func get_need_tiles() -> Array:
 	return need_more_tiles.get_children() if need_more_tiles else []
 
 
-## Overlay se zatvara samo preko "Back to Camp" (ne tap bilo gdje).
+## Dugme modala: „Back to Camp" (ili „Play a run" kad je vreća prazna). Modal vrata se
+## zatvara i tapom van / Back; stari „need seeds" samo ovim dugmetom.
 func _on_back_to_camp_pressed() -> void:
 	if _gate_play_run:
 		_gate_play_run = false
@@ -999,7 +1028,7 @@ func _build_gate_count(playfield: Node) -> void:
 	var row := HBoxContainer.new()
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 12)
+	row.add_theme_constant_override("separation", 10)
 	_gate_count.add_child(row)
 	var icon := TextureRect.new()
 	icon.custom_minimum_size = Vector2(60, 60)
@@ -1052,17 +1081,19 @@ func _apply_gate_count(show: bool) -> void:
 	plate.content_margin_right = 22.0
 	plate.content_margin_top = 16.0
 	plate.content_margin_bottom = 16.0
-	plate.shadow_color = UiCamp.PAGE_SHADOW
+	# Tvrda sjena 0 8 0 rgba(26,26,20,.28) iz paketa; shadow_size 0 je Godot uopšte ne crta.
+	plate.shadow_color = UiPopups.DROP
 	plate.shadow_offset = Vector2(0, 8)
-	plate.shadow_size = 0
+	plate.shadow_size = 1
 	_gate_count.add_theme_stylebox_override("panel", plate)
 	_gate_mark.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(false))
 	_gate_mark.modulate.a = 1.0 if open else 0.28
-	_pop_gate(n, open)
+	_pop_gate(n, open, plate)
 
 
-## GateCount: novi broj = pop 1 → 1,08 → 1 (0,09 s); prelaz na 50 = oznaka 0,6 → 1,08 → 1 (0,18 s).
-func _pop_gate(n: int, open: bool) -> void:
+## GateCount: novi broj = pop 1 → 1,08 → 1 (0,09 s); prelaz na 50 = krem → mint i oznaka
+## 0,6 → 1,08 → 1 (0,18 s).
+func _pop_gate(n: int, open: bool, plate: StyleBoxFlat) -> void:
 	var first := _gate_last_n < 0
 	var n_changed := n != _gate_last_n
 	var opened := open and not _gate_last_open
@@ -1081,6 +1112,8 @@ func _pop_gate(n: int, open: bool) -> void:
 		_gate_tween.tween_property(_gate_n, "scale", Vector2.ONE * 1.08, 0.045)
 		_gate_tween.chain().tween_property(_gate_n, "scale", Vector2.ONE, 0.045)
 	if opened:
+		plate.bg_color = Color("#FFF8F0")
+		_gate_tween.tween_property(plate, "bg_color", UiCamp.MINT, 0.18)
 		_gate_mark.pivot_offset = _gate_mark.size * 0.5
 		_gate_mark.scale = Vector2.ONE * 0.6
 		var mk := create_tween()

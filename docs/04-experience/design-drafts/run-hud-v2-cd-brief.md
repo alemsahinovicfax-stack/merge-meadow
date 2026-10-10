@@ -16,7 +16,9 @@ ai_sažetak: "Brief za Claude Design: novi header runa u jednom redu (Level, coi
 
 # Run — novi header, traka napretka i nagradni grm — Claude Design brief
 
-> **Status 2026-10-08: brief spreman, čeka CD.** Prompt je u §11. Paket se vraća kao `design_handoff_run_hud_v2/` (zip). Slike današnjeg stanja: `run-hud-ref/`.
+> **Status 2026-10-09: paket stigao i prenesen u igru** — vidi [[run-hud-v2-izvjestaj]]. Paket: `design_handoff_run_hud_v2/`.
+>
+> ~~Status 2026-10-08: brief spreman, čeka CD.~~ Prompt je u §11. Slike stanja prije v2: `run-hud-ref/`.
 
 Run je već jednom dizajniran ([[run-cd-brief|run-cd-brief]], paket `design_handoff_run/`). Ovo je druga runda, ali samo za tri stvari:
 - **header** (HUD na vrhu);

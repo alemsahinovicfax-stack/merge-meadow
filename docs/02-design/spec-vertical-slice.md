@@ -50,7 +50,7 @@ Prijelazi idu kroz `GameState.go_to_*` / `SceneRouter`. Stanje između scena ču
 | Arena | 4 | `merge_arena.tscn` |
 
 - Swipe lijevo/desno ili tabovi. **Hub chrome** (smjer B iz Claude Designa, 2026-09-11): tamna traka `#1A241E` gore i dolje, ista na svih 5 stranica — [[../04-experience/design-drafts/hub-header-footer-cd-brief|brief + implementacija]].
-- **Header:** coin · seed · diamond chip (chrome SVG ikona + broj bez riječi, `UiChrome.format_count`) + **Settings** (placeholder toast; puni ekran → D0-P). Page ResourceBar skriven kad je stranica ugrađena u hub.
+- **Header:** coin · seed · flower chip (chrome SVG ikona + broj bez riječi, `UiChrome.format_count`; dijamanti izbačeni iz igre 2026-10-09) + **Settings** (placeholder toast; puni ekran → D0-P). Page ResourceBar skriven kad je stranica ugrađena u hub.
 - **Footer:** 5 tabova (ikona + labela), aktivan = peach tile, `ActiveIndicator` prati swipe; Journal badge za nova otkrića; tokom Arena sesije nav lock (gold rub + "ROUND IN PROGRESS"). Page dots i caption uklonjeni (Bug-019).
 - Ugrađene stranice imaju `meta_hub_embedded = true`; Back/Home/Settings gumbi stranica skriveni gdje dupliciraju hub chrome.
 

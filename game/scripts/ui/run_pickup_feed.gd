@@ -1,8 +1,8 @@
 extends Control
 
 ## R2 · Leteće poruke u runu (design_handoff_popups): „+1" leti do brojača (sjeme u disku ili coin),
-## a za sjemenke iskoči poruka „[sjeme] +1 Ime" ispod brojača (centar x 944 → lokalno 344, korak 80,
-## najviše 2, 1,4 s). Stara tamna traka s imenom je izbačena.
+## a za sjemenke iskoči poruka „[sjeme] +1 Ime" ispod SeedChipa (Run HUD v2: centar x 806, y 214 →
+## lokalno 344, korak 80, najviše 2, 1,4 s).
 
 const TOAST_LIFE := 1.4
 const MAX_TOASTS := 2
@@ -15,7 +15,6 @@ const RING_SCRIPT := preload("res://scripts/run/run_ring_fx.gd")
 var _toasts: Array[Control] = []
 var _coin_target: Control
 var _seed_target: Control
-var _diamond_target: Control
 var _fly_parent: Node
 
 
@@ -23,10 +22,9 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
-func bind_targets(coin: Control, seed: Control, diamond: Control, fly_parent: Node) -> void:
+func bind_targets(coin: Control, seed: Control, fly_parent: Node) -> void:
 	_coin_target = coin
 	_seed_target = seed
-	_diamond_target = diamond
 	_fly_parent = fly_parent
 
 
@@ -41,8 +39,10 @@ func push_seed(type_id: String, from: Vector2 = Vector2.ZERO, amount: int = 1) -
 	_push_toast(type_id, flower_name, pop)
 
 
-func push_diamond(from: Vector2 = Vector2.ZERO) -> void:
-	_fly(from, _diamond_target, UiAssets.get_chrome_icon("icon_diamond"), "")
+## Grm (Run HUD v2): nagrada sama leti do čipa (RunBushFx), ovdje ide samo poruka s imenom.
+func push_seed_toast(type_id: String, amount: int = 1) -> void:
+	var flower_name: String = GameState.SEED_DISPLAY_NAMES.get(type_id, type_id.capitalize())
+	_push_toast(type_id, flower_name, "+%d" % maxi(1, amount))
 
 
 func get_toast_texts() -> PackedStringArray:

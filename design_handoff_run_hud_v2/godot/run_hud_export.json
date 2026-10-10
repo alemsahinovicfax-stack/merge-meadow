@@ -1,0 +1,433 @@
+{
+  "meta": {
+    "package": "design_handoff_run_hud_v2",
+    "brief": "docs/04-experience/design-drafts/run-hud-v2-cd-brief.md",
+    "artboard": [
+      1080,
+      1920
+    ],
+    "engine": "Godot 4.7, GL Compatibility",
+    "date": "2026-10-09",
+    "scope": [
+      "TopHud",
+      "ProgressRail",
+      "RewardBush",
+      "DiamondPop"
+    ]
+  },
+  "tokens": {
+    "chip_bg": "#FFF8F0",
+    "chip_rim": "#CBC2B6",
+    "chip_rim_px": 3,
+    "chip_radius": 30,
+    "shadow": {
+      "offset": [
+        0,
+        6
+      ],
+      "color": "rgba(18,28,22,0.42)",
+      "blur": 0
+    },
+    "ink": "#2D3436",
+    "rail_fill": "#A8E6CF",
+    "rail_fill_low": "#FFB88C",
+    "rail_low_threshold_remaining": 0.17,
+    "diamond_rim": "#8FC4DE",
+    "font": "Nunito",
+    "text_min_px": 34,
+    "number_px": 56
+  },
+  "layout": {
+    "TopHud": {
+      "rect": [
+        0,
+        60,
+        1080,
+        128
+      ]
+    },
+    "LevelChip": {
+      "rect": [
+        40,
+        60,
+        200,
+        128
+      ],
+      "min_w": 200,
+      "max_w": 464,
+      "pad_x": 32,
+      "font_px": 48,
+      "font_px_endless": 42,
+      "flag_icon": [
+        38,
+        57
+      ]
+    },
+    "CoinChip": {
+      "rect": [
+        520,
+        60,
+        180,
+        128
+      ],
+      "icon": 52,
+      "font_px": 56
+    },
+    "SeedChip": {
+      "rect": [
+        716,
+        60,
+        180,
+        128
+      ],
+      "icon": 52,
+      "font_px": 56
+    },
+    "PauseButton": {
+      "rect": [
+        912,
+        60,
+        128,
+        128
+      ],
+      "icon": 60
+    },
+    "PickupFeed": {
+      "center_x": 806,
+      "y": 214,
+      "font_px": 38
+    },
+    "ProgressRail": {
+      "rect": [
+        24,
+        200,
+        116,
+        1540
+      ],
+      "side": "left"
+    },
+    "RailTrack": {
+      "rect": [
+        70,
+        300,
+        28,
+        1400
+      ],
+      "radius": 14,
+      "rim": 3,
+      "mid_tick_y": 997
+    },
+    "ProgressStart": {
+      "rect": [
+        60,
+        1688,
+        48,
+        24
+      ]
+    },
+    "ProgressFlag": {
+      "rect": [
+        73,
+        206,
+        64,
+        96
+      ],
+      "pivot": [
+        11,
+        92
+      ]
+    },
+    "ProgressPip": {
+      "size": 92,
+      "center_x": 82,
+      "y_at_0": 1700,
+      "y_at_1": 300,
+      "rim": 4,
+      "art": "design_handoff_pip/assets/pip/hud/pip_hud_classic.svg"
+    },
+    "RewardBush": {
+      "size": [
+        120,
+        140
+      ],
+      "seams_x": [
+        405,
+        675
+      ],
+      "pivot": [
+        60,
+        124
+      ],
+      "lane_overlap_px": 25
+    },
+    "DiamondPop": {
+      "height": 92,
+      "icon": 60,
+      "font_px": 56,
+      "offset_from_pickup": [
+        0,
+        -60
+      ]
+    }
+  },
+  "components": {
+    "LevelChip": {
+      "text": "mode_text",
+      "flag_visible": "has_goal"
+    },
+    "CoinChip": {
+      "value": "run_coins",
+      "fly_target": true
+    },
+    "SeedChip": {
+      "value": "run_seeds",
+      "fly_target": true
+    },
+    "PauseButton": {
+      "touch_min": [
+        120,
+        120
+      ],
+      "opens": "pause_sheet (unchanged)"
+    },
+    "ProgressRail": {
+      "value": "elapsed / GameState.get_run_duration()",
+      "visible": "not GameState.is_endless_mode()"
+    },
+    "RewardBush": {
+      "parts": [
+        "back",
+        "reward",
+        "front"
+      ],
+      "files": "assets/run/bush/bush_<season>_{back,front,leaf}.svg"
+    }
+  },
+  "states": {
+    "header": [
+      "level",
+      "endless_easy",
+      "endless_normal",
+      "endless_hard",
+      "tutorial"
+    ],
+    "rail": {
+      "p0": 0,
+      "p50": 0.5,
+      "p90": 0.9,
+      "p100": 1,
+      "endless": "hidden",
+      "tutorial": "visible"
+    },
+    "bush": [
+      "idle",
+      "cross",
+      "burst",
+      "fly",
+      "missed"
+    ],
+    "diamond": [
+      "pop"
+    ]
+  },
+  "animations": {
+    "bush_idle": {
+      "target": "RewardBush root",
+      "props": {
+        "rotation_deg": [
+          -5,
+          5
+        ],
+        "scale_y": [
+          1,
+          1.04
+        ]
+      },
+      "period_s": 0.9,
+      "loop": "ping-pong",
+      "ease": "sine_in_out"
+    },
+    "bush_burst": {
+      "duration_s": 0.25,
+      "ring": {
+        "scale": [
+          0.4,
+          1
+        ],
+        "alpha": [
+          1,
+          0
+        ]
+      },
+      "leaves": {
+        "count": 6,
+        "distance_px": [
+          92,
+          106
+        ],
+        "angles_deg": [
+          -160,
+          -115,
+          -65,
+          -20,
+          25,
+          155
+        ],
+        "alpha": [
+          1,
+          0
+        ]
+      }
+    },
+    "bush_reward_fly": {
+      "delay_s": 0.15,
+      "duration_s": 0.35,
+      "arc_px": 140,
+      "scale": [
+        1,
+        0.7
+      ],
+      "stagger_s": 0.04,
+      "max_sprites": 4,
+      "to": "CoinChip | SeedChip"
+    },
+    "chip_bump": {
+      "scale": [
+        1,
+        1.08,
+        1
+      ],
+      "duration_s": 0.18
+    },
+    "rail_pip": {
+      "property": "position.y",
+      "driver": "progress",
+      "redraw": false
+    },
+    "flag_finish": {
+      "scale": [
+        1,
+        1.18
+      ],
+      "rotation_deg": [
+        0,
+        -6
+      ],
+      "duration_s": 0.2
+    },
+    "diamond_pop": {
+      "scale": [
+        0.6,
+        1.1,
+        1
+      ],
+      "rise_px": 60,
+      "duration_s": 0.5,
+      "fade_last_s": 0.2
+    }
+  },
+  "strings_en": {
+    "level": "Level {n}",
+    "endless": "Endless · {difficulty}",
+    "tutorial": "Practice",
+    "diamond_pop": "+{n}",
+    "finish": "Time!"
+  },
+  "bush": {
+    "where": {
+      "seam_x": [
+        405,
+        675
+      ],
+      "pick": "random"
+    },
+    "when": {
+      "max_on_screen": 1,
+      "gap_s": [
+        8,
+        12
+      ],
+      "first_after_s": 6,
+      "never_in": "tutorial run 1"
+    },
+    "pickup": {
+      "trigger": "lane change crossing the bush seam",
+      "hitbox": [
+        120,
+        160
+      ],
+      "player_box": [
+        56,
+        56
+      ]
+    },
+    "fair": {
+      "no_obstacle_in_adjacent_lanes_px": 300,
+      "no_obstacle_spawn_window": "±300 px from bush y in both adjacent lanes"
+    },
+    "reward": {
+      "coin": {
+        "weight": 0.6,
+        "amount": [
+          3,
+          5
+        ]
+      },
+      "seed": {
+        "weight": 0.4,
+        "amount": [
+          1,
+          2
+        ],
+        "pool": "season pickup pool"
+      }
+    },
+    "modifiers_ignored": [
+      "twin_seeds",
+      "basket",
+      "magnet"
+    ],
+    "fail": "never; bush is not an obstacle",
+    "endless": "same as level mode",
+    "notes": "first_after_s 6 added so the first bush never meets the run-start obstacle wave"
+  },
+  "seasons": {
+    "files": "assets/run/bush/bush_<season>_{back,front,leaf}.svg",
+    "ids": [
+      "country_bloom",
+      "frost_orchard",
+      "lantern_meadow",
+      "amber_canopy",
+      "moonlit_warren",
+      "coral_tide",
+      "starfall_glade",
+      "ember_fen"
+    ],
+    "rule": "crown is always lighter than the season's obstacle and lane; rim is a dark shade of the same hue; exact hex per file"
+  },
+  "godot_map": {
+    "TopHud": "HUD/TopHud (HBox replaced by fixed rects)",
+    "LevelChip": "HUD/TopHud/LevelChip (was TimerChip; ring + seconds removed)",
+    "CoinChip": "HUD/TopHud/CoinChip (moved from PickupBar)",
+    "SeedChip": "HUD/TopHud/SeedChip (moved from PickupBar)",
+    "PauseButton": "HUD/TopHud/PauseButton",
+    "ProgressRail": "HUD/ProgressRail (new)",
+    "RewardBush": "World/Bushes/RewardBush (new, pooled 1)",
+    "BushBurst": "World/Bushes/BushBurst (CPUParticles2D not used; 11 Sprite2D + Tween)",
+    "DiamondPop": "HUD/DiamondPop (new, pooled 1)",
+    "removed": [
+      "CompanionChip",
+      "BasketBadge",
+      "PickupBar/DiamondChip",
+      "TimerChip/Ring",
+      "TimerChip/Seconds"
+    ]
+  },
+  "decisions": [
+    "Tutorial: LevelChip shows 'Practice' + flag; rail is visible because the tutorial has a real duration.",
+    "Endless: ProgressRail hidden. There is no goal, and anything else (distance, best) would need data the game doesn't have.",
+    "Rail on the left: pause is top-right; the left band keeps the right thumb area clear.",
+    "Low-time warning kept on the rail fill (mint -> peach under 17% remaining), not in the header.",
+    "Bush hitbox stays 120 x 160; first bush not before 6 s."
+  ]
+}

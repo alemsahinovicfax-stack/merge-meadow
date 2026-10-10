@@ -49,6 +49,9 @@ var _selected_trade_type: String = ""
 var _selected_crystal_type: String = ""
 var _force_default_trade_select: bool = false
 var _force_default_crystal_select: bool = false
+## Potpis zadnje izgrađenih gridova (_rebuild_*): isti sadržaj = bez novih čipova.
+var _seed_grid_sig: String = ""
+var _crystal_grid_sig: String = ""
 var _pending_trade_save: bool = false
 var _trades_since_save: int = 0
 var _hold_repeating: bool = false
@@ -343,14 +346,23 @@ func _next_type_after(entries_before: Array, depleted_type: String, source: Dict
 	return ""
 
 
+## Grid se gradi iznova samo kad se stavke promijene (perf 2026-10-09: svaki ulaz u Camp je
+## brisao i pravio sve čipove — 18 ms + 10 ms prvog frejma, pa je swipe na Camp štekao).
+## Isti sadržaj = samo nova selekcija.
 func _rebuild_seed_bag_grid() -> void:
-	_clear_grid(seed_bag_grid)
 	var entries := GameState.get_seed_bag_entries()
 	if _force_default_trade_select:
 		_force_default_trade_select = false
 		_selected_trade_type = str(entries[0].get("type_id", "")) if not entries.is_empty() else ""
 	else:
 		_validate_trade_selection()
+	var sig := var_to_str(entries)
+	if sig == _seed_grid_sig and seed_bag_grid.get_child_count() == entries.size():
+		for chip in seed_bag_grid.get_children():
+			(chip as CampStashChip).set_selected(chip.get_type_id() == _selected_trade_type)
+		return
+	_seed_grid_sig = sig
+	_clear_grid(seed_bag_grid)
 	for entry in entries:
 		var type_id := str(entry.get("type_id", ""))
 		var chip := CampStashChip.new()
@@ -364,7 +376,6 @@ func _rebuild_seed_bag_grid() -> void:
 
 
 func _rebuild_crystal_grid() -> void:
-	_clear_grid(crystal_grid)
 	var entries := GameState.get_garden_crystal_entries()
 	if _force_default_crystal_select:
 		_force_default_crystal_select = false
@@ -372,6 +383,13 @@ func _rebuild_crystal_grid() -> void:
 	else:
 		_validate_crystal_selection()
 	var reserve := _reserve_info()
+	var sig := var_to_str([entries, reserve])
+	if sig == _crystal_grid_sig and crystal_grid.get_child_count() == entries.size():
+		for chip in crystal_grid.get_children():
+			(chip as CampStashChip).set_selected(chip.get_type_id() == _selected_crystal_type)
+		return
+	_crystal_grid_sig = sig
+	_clear_grid(crystal_grid)
 	for entry in entries:
 		var type_id := str(entry.get("type_id", ""))
 		var chip := CampStashChip.new()

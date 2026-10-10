@@ -441,6 +441,8 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** smoke test nikad ne zove `quit()` direktno, samo `_quit()`. Provjera: kopiraj save sa strane, pusti sve `*_smoke.gd`, pa `cmp` sa kopijom mora reći da su isti.
 
+**Dopuna 2026-10-10:** odgođeni save (`save_player_save_soon`, Arena i swipe sezona) se isprazni i na izlazu (`NOTIFICATION_PREDELETE`) — **poslije** testovog vraćanja kopije. Testovi s vlastitim `_restore_save` (samo upišu fajl) su tako ostavljali testno stanje u saveu (testni save 1447 → 2003 bajta između dva mjerenja). Rješenje u `GameState`: pamti hash sadržaja koji je sam napisao ili učitao (`_save_disk_hash`); `flush_save_soon` preskače ako je fajl u međuvremenu promijenio neko drugi.
+
 ## #26 — `PackedInt32Array` u Dictionaryju: `append` ne stiže nazad
 
 **Datum:** 2026-10-06 (Sezone faza 2, test kontrasta)
@@ -452,6 +454,71 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 **Rješenje:** u rječniku drži `Array` (referentni tip), ili poslije izmjene vrati niz nazad (`grid[key] = arr`).
 
 **Prevencija:** Packed niz u Dictionaryju / Arrayu mijenjaj samo preko lokalne varijable koju na kraju upišeš nazad. Isto važi za `chunk["idx"]` u `SeasonBackdrop._append` (zato tamo stoji `chunk["idx"] = all_idx`).
+
+## #27 — StyleBoxFlat sjena ne crta se sa `shadow_size = 0`
+
+**Datum:** 2026-10-09 (Run HUD v2, pilula `N / 50` u Areni)
+
+**Simptom:** „tvrda sjena 0 6 0" iz dizajna se ne vidi ispod čipa.
+
+**Uzrok:** StyleBoxFlat crta sjenu samo kad je `shadow_size > 0`; `shadow_offset` sam ništa ne radi.
+
+**Rješenje:** `shadow_size = 1` (gotovo tvrda sjena), kao `UiPopups._hard_shadow`.
+
+**Prevencija:** za CSS `box-shadow: 0 Npx 0` uvijek `shadow_size = 1` + `shadow_offset`. Shop v2 `hard_shadow()` popravljen istim putem (commit 6655a82).
+
+## #28 — Label s `text_overrun_behavior` ima minimalnu širinu 0
+
+**Datum:** 2026-10-09 (Run HUD v2, LevelChip)
+
+**Simptom:** „Level 12" se ne vidi u čipu; zastavica je tu, tekst ne.
+
+**Uzrok:** kad je overrun uključen (ili `clip_text`), Label ne traži širinu teksta — u `PanelContainer`/`HBox` dobije 0 px i sav tekst se odreže.
+
+**Rješenje:** overrun samo kad tekst stvarno ne stane, uz fiksnu `custom_minimum_size.x` (vidi `run_controller._layout_level_chip`).
+
+**Prevencija:** test provjerava da je širina labele ≥ širine teksta (`font.get_string_size`), ne samo da tekst postoji.
+
+## #29 — skupo crtanje: AA StyleBoxFlat i AA linije po komadu
+
+**Datum:** 2026-10-09 (FPS pregled cijele igre, `perf_suite_bench.gd`)
+
+**Simptom:** Arena šteka pri svakom spajanju (frejm 28–46 ms); Home kartica sezone bez cvijeća ima ~1300 draw poziva.
+
+**Uzrok:**
+- `draw_style_box` sa zaobljenim AA StyleBoxFlat košta ~0,15 ms CPU po pozivu; sjemenka u Areni ih je crtala 4–6 (0,7 ms), a posle mergea se prekrtalo ~25 sjemenki.
+- Svaki AA `draw_polyline` / `draw_line` je svoj draw poziv; isprekidan rub kao niz crtica = stotine poziva svaki frejm.
+- Puls / animacija rješavana kroz `queue_redraw()` cijelog crteža svaki frejm.
+
+**Rješenje:** statični dio se iscrta jednom u teksturu (`ArenaChipBake`); sve crtice jednim `draw_multiline(..., true)`; animirani dio u zaseban čvor, pa se mijenja samo `modulate` / transform (prsten sjemenke, glava munchera, sloj rasutih elemenata livade).
+
+**Prevencija:** prije nego nešto animiraš kroz `queue_redraw()`, provjeri cijenu crteža (`perf_suite_bench.gd`, `MM_ROOT=1 MM_VSYNC=1`). Pravilo: po frejmu se mijenjaju transformi i modulate, ne geometrija.
+
+**Dopuna 2026-10-10:** `draw_multiline(..., true)` s **poluprozirnom** bojom za luk iz ravnih segmenata daje pruge: meki rubovi susjednih segmenata se preklapaju i dvaput miješaju (magnet prsten u runu). Za isprekidan luk: jedna mreža trouglova s trakom alfa 0 na rubu (`pip_visual._draw_dash_ring`, `RenderingServer.canvas_item_add_triangle_array`) = 1 draw poziv, pravi luk.
+
+## #30 — `load_threaded_get` čeka sve ispred sebe u redu threadova
+
+**Datum:** 2026-10-10 (start huba, prefetch cvijeća)
+
+**Simptom:** posle dodavanja prefetcha tekstura start huba je duži 1,2 s; kasnije jedan frejm od ~650 ms baš kad se doda Arena stranica.
+
+**Uzrok:** pozadinska učitavanja (`ResourceLoader.load_threaded_request`) idu kroz isti red niskog prioriteta u `WorkerThreadPool` — praktično redom. Tekstura cvijeća zatražena posle Shop i Arena scena čeka da se one učitaju (~0,6 s). Kad kartica u tom trenutku nacrta cvijeće, `load_threaded_get` (a i obični `load()` iste putanje) blokira glavni thread do kraja cijelog reda ispred.
+
+**Rješenje:** male stvari koje UI uskoro crta (cvijeće, ~100 ms za 48 tekstura) zatraži **prije** velikih scena; ono što početna stranica crta odmah ne ide u pozadinu (`meta_hub_controller._finish_boot`: frejm kasnije prvo `FlowerAssets.prefetch_rosters()`, pa stranice).
+
+**Prevencija:** pri dodavanju `load_threaded_request` pitaj: ko će ovo `get`-ovati i šta je ispred u redu? Mjeri vremensku liniju starta (frejm po frejm, koja stranica je dodana kad), ne samo prosjek.
+
+## #31 — GDScript u `WorkerThreadPool` pri izlasku = pad (exit 139)
+
+**Datum:** 2026-10-10 (Pip atlas u pozadini)
+
+**Simptom:** smoke test ispiše „OK", pa proces padne s kodom 139 (segfault) — samo testovi koji grade Shop.
+
+**Uzrok:** zadatak (`WorkerThreadPool.add_task` s GDScript lambdom) je još radio dok se SceneTree gasio i skripte oslobađale.
+
+**Rješenje:** pri prvom zadatku `root.tree_exiting.connect(_drain_jobs)` — sačekaj (`wait_for_task_completion`) sve zadatke prije gašenja (`UiPip`). Svaki `add_task` mora imati tačno jedan `wait_for_task_completion`.
+
+**Prevencija:** svaki posao u threadu treba vlasnika koji ga sačeka i na izlazu; smoke testovi gledaju i exit kod, ne samo „OK" u izlazu.
 
 ## Brza dijagnostika (kad nešto "ne radi")
 

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<meta name="design_doc_mode" content="canvas">
+<style>body{margin:0;background:#EFE8DD}a{color:#2D3436}a:hover{color:#4A4A4A}</style>
+</helmet>
+<div data-layer="RunHudSpecs" style="padding:64px;display:flex;flex-direction:column;gap:72px;font-family:Nunito,sans-serif;color:#2D3436;background:#EFE8DD;min-width:1200px">
+
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:1100px">
+    <div style="font:900 56px/1.05 Nunito,sans-serif">Run HUD v2 — header, traka napretka, nagradni grm</div>
+    <div style="font:700 24px/1.45 Nunito,sans-serif;color:#5A5F5C;text-wrap:pretty">Artboard 1080 × 1920. Sve ostalo u runu (staze, prepreke, pickupi, Pip, banner, Loot, pauza-sheet) je nepromijenjeno. Pip u runu je ovdje samo okvir mjesta — art i animacije su iz design_handoff_pip/.</div>
+  </div>
+
+  <sc-for list="{{ sections }}" as="s" hint-placeholder-count="8">
+    <section data-screen-label="{{ s.label }}" style="display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;flex-direction:column;gap:6px;max-width:1200px">
+        <div style="font:900 36px/1.1 Nunito,sans-serif">{{ s.title }}</div>
+        <div style="font:700 22px/1.45 Nunito,sans-serif;color:#5A5F5C;text-wrap:pretty">{{ s.note }}</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+        <sc-for list="{{ s.frames }}" as="f" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="{{ f.box }}">
+              <div style="{{ f.inner }}">
+                <dc-import name="RunScreen" mode="{{ f.mode }}" season="{{ f.season }}" progress="{{ f.progress }}" bush="{{ f.bush }}" reward="{{ f.reward }}" bush-seam="{{ f.seam }}" level="{{ f.level }}" difficulty="{{ f.difficulty }}" coins="{{ f.coins }}" seeds="{{ f.seeds }}" diamond-pop="{{ f.diamond }}" hint-size="1080px,1920px"></dc-import>
+              </div>
+            </div>
+            <div style="font:800 20px/1.3 Nunito,sans-serif;color:#2D3436;max-width:540px">{{ f.cap }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-for>
+
+  <section data-screen-label="Anatomija" style="display:flex;flex-direction:column;gap:22px;max-width:1200px">
+    <div style="font:900 36px/1.1 Nunito,sans-serif">Mjere (px, baza 1080 × 1920)</div>
+    <div style="display:grid;grid-template-columns:260px minmax(0,1fr);gap:0;border:3px solid #CBC2B6;border-radius:20px;overflow:hidden;background:#FFF8F0">
+      <sc-for list="{{ specRows }}" as="r" hint-placeholder-count="10">
+        <div style="padding:14px 20px;border-bottom:2px solid #E6DED2;font:900 22px/1.3 Nunito,sans-serif">{{ r.k }}</div>
+        <div style="padding:14px 20px;border-bottom:2px solid #E6DED2;font:700 22px/1.4 Nunito,sans-serif;color:#3B403D">{{ r.v }}</div>
+      </sc-for>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ALL = ['country_bloom','frost_orchard','lantern_meadow','amber_canopy','moonlit_warren','coral_tide','starfall_glade','ember_fen'];
+const NAMES = { country_bloom:'Country Bloom', frost_orchard:'Frost Orchard', lantern_meadow:'Lantern Meadow', amber_canopy:'Amber Canopy', moonlit_warren:'Moonlit Warren', coral_tide:'Coral Tide', starfall_glade:'Starfall Glade', ember_fen:'Ember Fen' };
+function frame(cap, o, crop, s) {
+  const c = crop || [0, 0, 1080, 1920];
+  return {
+    cap,
+    mode: o.mode || 'level', season: o.season || 'country_bloom', progress: o.progress ?? 0.5,
+    bush: o.bush || 'none', reward: o.reward || 'coin', seam: o.seam || 675, level: o.level ?? 12,
+    difficulty: o.difficulty || 'Hard', coins: o.coins ?? 12, seeds: o.seeds ?? 5, diamond: !!o.diamond,
+    box: 'position:relative;overflow:hidden;width:' + Math.round(c[2] * s) + 'px;height:' + Math.round(c[3] * s) + 'px;border-radius:16px;border:3px solid #2D3436;background:#2D3436',
+    inner: 'position:absolute;left:' + Math.round(-c[0] * s) + 'px;top:' + Math.round(-c[1] * s) + 'px;width:1080px;height:1920px;transform:scale(' + s + ');transform-origin:0 0'
+  };
+}
+const HEAD = [0, 40, 1080, 170];
+class Component extends DCLogic {
+  renderVals() {
+    const F = 0.25, H = 0.5;
+    const sections = [
+      { label: '01 Header level', title: '1 · Header — level mod', note: 'Jedan red: LevelChip · CoinChip · SeedChip · PauseButton (128 × 128). Brojevi 56 px, tamni tekst #2D3436 na kremi #FFF8F0 (kontrast 12,6 : 1) — čip nosi kontrast, pa radi na svakoj sezoni.', frames: [
+        frame('Country Bloom · 0 / 0', { coins: 0, seeds: 0, level: 1 }, HEAD, H),
+        frame('Country Bloom · 128 / 47', { coins: 128, seeds: 47, level: 12 }, HEAD, H),
+        frame('Starfall Glade · 0 / 0', { season: 'starfall_glade', coins: 0, seeds: 0, level: 1 }, HEAD, H),
+        frame('Starfall Glade · 128 / 47', { season: 'starfall_glade', coins: 128, seeds: 47, level: 48 }, HEAD, H)
+      ] },
+      { label: '02 Header endless', title: '2 · Header — Endless i tutorial', note: 'Endless: „Endless · Easy / Normal / Hard" (42 px), bez zastavice. Tutorial nema broj nivoa → slot kaže „Practice" sa zastavicom (traka napretka postoji, cilj je stvaran).', frames: [
+        frame('Endless · Easy', { mode: 'endless', difficulty: 'Easy', coins: 34, seeds: 9 }, HEAD, H),
+        frame('Endless · Normal', { mode: 'endless', difficulty: 'Normal', coins: 34, seeds: 9 }, HEAD, H),
+        frame('Endless · Hard · Starfall', { mode: 'endless', difficulty: 'Hard', season: 'starfall_glade', coins: 128, seeds: 47 }, HEAD, H),
+        frame('Tutorial run', { mode: 'tutorial', coins: 6, seeds: 2 }, HEAD, H)
+      ] },
+      { label: '03 Traka', title: '3 · Traka napretka (lijevo, x 24–140)', note: 'Dno = start, vrh = zastavica. ProgressPip (glava iz Pip HUD kropa) se penje transformom po elapsed / duration. Ispod 17 % preostalog vremena punjenje postaje peach #FFB88C. Na 100 % zastavica se podigne i dobije mint prsten, dolazi „Time!". Endless: traka sakrivena.', frames: [
+        frame('0 %', { progress: 0 }, null, F),
+        frame('50 %', { progress: 0.5 }, null, F),
+        frame('90 % — peach', { progress: 0.9 }, null, F),
+        frame('100 % — Time!', { progress: 1 }, null, F),
+        frame('Endless — bez trake', { mode: 'endless', progress: 0.5 }, null, F),
+        frame('Tutorial — 40 %', { mode: 'tutorial', progress: 0.4 }, null, F)
+      ] },
+      { label: '04 Grm sezone', title: '4 · Nagradni grm — 8 sezona, mirovanje', note: 'Jedan oblik: stražnja kruna + prednji red lišća, nagrada viri između. 120 × 140, centar na šavu: viri 25 px u svaku traku. Svijetla kruna + tamni rub iste nijanse — svjetliji od prepreka, i trese se (±5°, 0,9 s loop).', frames: ALL.map((id) => frame(NAMES[id], { season: id, bush: 'idle', reward: id === 'frost_orchard' || id === 'moonlit_warren' || id === 'ember_fen' ? 'seed' : 'coin' }, [495, 840, 360, 280], 0.75)) },
+      { label: '05 Grm pokupljen', title: '5 · Grm pokupljen', note: 'Pip prelazi šav dok je grm u njegovoj visini → lišće pukne (prsten + 6 listova, 0,25 s) → nagrada iskoči i luči do čipa (0,35 s); čip se kratko poveća. Sjemenka pokazuje i PickupFeed toast.', frames: [
+        frame('a · prelaz preko šava', { bush: 'cross' }, null, F),
+        frame('b · burst', { bush: 'burst' }, null, F),
+        frame('c · coini lete do CoinChip', { bush: 'fly', reward: 'coin' }, null, F),
+        frame('c′ · sjemenka do SeedChip', { bush: 'fly', reward: 'seed', season: 'starfall_glade' }, null, F)
+      ] },
+      { label: '06 Grm promasen', title: '6 · Grm promašen i dijamant', note: 'Promašen grm samo prođe ispod Pipa, i dalje se trese, bez reakcije. Dijamant nema čip: pop „+1" na mjestu pickupa (scale 0.6 → 1.1 → 1, gore 60 px, fade 0,5 s).', frames: [
+        frame('Promašen — prolazi ispod', { bush: 'missed', seam: 405 }, null, F),
+        frame('DiamondPop', { diamond: true }, null, F)
+      ] },
+      { label: '07 Cijeli ekran', title: '7 · Cijeli ekran runa', note: 'Novi header, traka i jedan grm, svijetla i tamna sezona.', frames: [
+        frame('Country Bloom', { bush: 'idle', progress: 0.42, coins: 23, seeds: 6 }, null, 0.4),
+        frame('Starfall Glade', { season: 'starfall_glade', bush: 'idle', reward: 'seed', progress: 0.68, coins: 41, seeds: 11, seam: 675 }, null, 0.4)
+      ] }
+    ];
+    const specRows = [
+      { k: 'TopHud', v: 'y 60 (safe area), visina 128, jedan red' },
+      { k: 'LevelChip', v: 'x 40, min 200 / max 464 širine, tekst 48 px (Endless 42 px); zastavica 38 × 57 kad run ima cilj' },
+      { k: 'CoinChip', v: 'x 520, 180 × 128, ikona 52, broj 56 px tabular' },
+      { k: 'SeedChip', v: 'x 716, 180 × 128, ikona 52, broj 56 px tabular' },
+      { k: 'PauseButton', v: 'x 912, 128 × 128 (dodir ≥ 120), ikona 60' },
+      { k: 'Stil čipa', v: 'krem #FFF8F0, rub 3 px #CBC2B6, radius 30, tvrda sjena 0 6 0 rgba(18,28,22,.42)' },
+      { k: 'ProgressRail', v: 'x 24–140 (116), y 200–1740; staza 28 × 1400 na x 70–98; punjenje mint #A8E6CF → peach #FFB88C ispod 17 %; oznaka 50 % na sredini' },
+      { k: 'ProgressPip', v: '92 × 92 krug, rub 4 #2D3436, centar x 82; y = 1700 − 1400 × progress' },
+      { k: 'ProgressFlag', v: '64 × 96 na vrhu trake; na 100 % scale 1.18 + mint prsten 108' },
+      { k: 'RewardBush', v: '120 × 140, centar x 405 ili 675 → x 345–465 / 615–735 (≤ 25 px u trake 170–370 / 440–640 / 710–910); 3 dijela' },
+      { k: 'BushBurst', v: 'prsten 160 + 6 listova 36 × 24 + ≤ 4 nagrade = ≤ 11 spriteova, 0,6 s ukupno' },
+      { k: 'DiamondPop', v: 'pilula 92 visine, ikona 60, „+1" 56 px, na mjestu pickupa' }
+    ];
+    return { sections, specRows };
+  }
+}
+</script>
+</body>
+</html>

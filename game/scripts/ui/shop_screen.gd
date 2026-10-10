@@ -17,6 +17,9 @@ const ENTRY_OVERRIDE_MSEC := 2000
 
 var _hub_embedded: bool = false
 var _built: bool = false
+## Hub gradi Shop dok je igrač na Homeu (perf 2026-10-10): sve kartice u _ready su bile jedan
+## frejm od ~140 ms. U hubu ide jedan korak (kartica) po frejmu; ulaz i getteri dovrše odmah.
+var _build_steps: Array[Callable] = []
 var _tab: String = "seasons"
 var _tab_bar: ShopTabBar
 var _pages: Dictionary = {}
@@ -68,10 +71,10 @@ func _build() -> void:
 	_built = true
 	for tab_id in UiShopV2.TABS:
 		_make_page(tab_id)
-	_build_seasons()
-	_build_looks()
-	_build_boosters()
-	_build_support()
+	_queue_seasons()
+	_queue_looks()
+	_queue_boosters()
+	_queue_support()
 	_tab_bar = ShopTabBar.new()
 	_tab_bar.name = "ShopTabBar"
 	_tab_bar.z_index = 3
@@ -84,6 +87,27 @@ func _build() -> void:
 	_toast.size = TOAST_RECT.size
 	add_child(_toast)
 	_show_page(_tab, false)
+	if _hub_embedded and is_inside_tree():
+		get_tree().process_frame.connect(_build_next_step)
+	else:
+		_finish_build()
+
+
+## Ostatak gradnje odmah: ulaz u Shop, tabovi, getteri.
+func _finish_build() -> void:
+	while not _build_steps.is_empty():
+		_build_steps.pop_front().call()
+	if is_inside_tree() and get_tree().process_frame.is_connected(_build_next_step):
+		get_tree().process_frame.disconnect(_build_next_step)
+		refresh_shop()
+
+
+func _build_next_step() -> void:
+	if not _build_steps.is_empty():
+		_build_steps.pop_front().call()
+	if _build_steps.is_empty():
+		get_tree().process_frame.disconnect(_build_next_step)
+		refresh_shop()
 
 
 func _make_page(tab_id: String) -> void:
@@ -112,23 +136,23 @@ func _make_page(tab_id: String) -> void:
 	_contents[tab_id] = box
 
 
-func _build_seasons() -> void:
-	var box: VBoxContainer = _contents["seasons"]
+func _queue_seasons() -> void:
 	for def in SeasonCatalog.paid_defs():
-		var sku := def.iap_product_id
-		if sku.is_empty():
-			continue
-		var card := SeasonPackCard.new()
-		card.name = "SeasonCard_%s" % def.id
-		box.add_child(card)
-		card.apply(sku)
-		card.buy_pressed.connect(_on_money_buy)
-		card.open_home_pressed.connect(_on_open_on_home)
-		_season_cards[sku] = card
+		if not def.iap_product_id.is_empty():
+			_build_steps.append(_add_season_card.bind(def.id, def.iap_product_id))
 
 
-func _build_looks() -> void:
-	var box: VBoxContainer = _contents["looks"]
+func _add_season_card(season_id: String, sku: String) -> void:
+	var card := SeasonPackCard.new()
+	card.name = "SeasonCard_%s" % season_id
+	(_contents["seasons"] as VBoxContainer).add_child(card)
+	card.apply(sku)
+	card.buy_pressed.connect(_on_money_buy)
+	card.open_home_pressed.connect(_on_open_on_home)
+	_season_cards[sku] = card
+
+
+func _queue_looks() -> void:
 	for slot in CosmeticCatalog.slots():
 		var slot_id := str(slot.get("id", ""))
 		var items: Array[String] = []
@@ -138,30 +162,44 @@ func _build_looks() -> void:
 				items.append(iid)
 		if items.is_empty():
 			continue
-		var group := VBoxContainer.new()
-		group.name = "LooksSlot_%s" % slot_id
-		group.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		group.add_theme_constant_override("separation", 20)
-		box.add_child(group)
-		var head := _SlotHeader.new()
-		head.name = "SlotHeader"
-		head.title = str(slot.get("title", slot_id))
-		head.icon = UiWardrobe.icon(str(slot.get("icon", "")))
-		group.add_child(head)
-		_slot_headers[slot_id] = head
+		_build_steps.append(_add_slot_group.bind(slot))
 		for iid in items:
-			var card := ShopCosmeticCard.new()
-			card.name = "CosmeticCard_%s" % iid
-			group.add_child(card)
-			card.configure(iid)
-			card.buy_requested.connect(_on_cosmetic_buy_requested)
-			card.buy_confirmed.connect(_on_cosmetic_buy_confirmed)
-			card.short_tapped.connect(_on_cosmetic_short)
-			_cosmetic_cards[iid] = card
+			_build_steps.append(_add_cosmetic_card.bind(slot_id, iid))
+	_build_steps.append(_add_looks_end)
+
+
+func _add_slot_group(slot: Dictionary) -> void:
+	var slot_id := str(slot.get("id", ""))
+	var group := VBoxContainer.new()
+	group.name = "LooksSlot_%s" % slot_id
+	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_theme_constant_override("separation", 20)
+	(_contents["looks"] as VBoxContainer).add_child(group)
+	var head := _SlotHeader.new()
+	head.name = "SlotHeader"
+	head.title = str(slot.get("title", slot_id))
+	head.icon = UiWardrobe.icon(str(slot.get("icon", "")))
+	group.add_child(head)
+	_slot_headers[slot_id] = head
+
+
+func _add_cosmetic_card(slot_id: String, iid: String) -> void:
+	var group := (_contents["looks"] as Node).get_node("LooksSlot_%s" % slot_id)
+	var card := ShopCosmeticCard.new()
+	card.name = "CosmeticCard_%s" % iid
+	group.add_child(card)
+	card.configure(iid)
+	card.buy_requested.connect(_on_cosmetic_buy_requested)
+	card.buy_confirmed.connect(_on_cosmetic_buy_confirmed)
+	card.short_tapped.connect(_on_cosmetic_short)
+	_cosmetic_cards[iid] = card
+
+
+func _add_looks_end() -> void:
 	var end := CenterContainer.new()
 	end.name = "TabEnd"
 	end.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(end)
+	(_contents["looks"] as VBoxContainer).add_child(end)
 	var link := _PillLink.new()
 	link.name = "WardrobeLink"
 	link.text = UiShopV2.S_WARDROBE
@@ -172,33 +210,47 @@ func _build_looks() -> void:
 	link.clicked.connect(_on_wardrobe_link)
 
 
-func _build_boosters() -> void:
-	var box: VBoxContainer = _contents["boosters"]
+func _queue_boosters() -> void:
 	for booster_id in CONFIG.all_booster_ids():
-		var card := ShopBoosterCard.new()
-		card.name = "BoosterCard_%s" % booster_id
-		box.add_child(card)
-		card.setup(booster_id)
-		card.buy_pressed.connect(_on_money_buy)
-		_booster_cards[booster_id] = card
+		_build_steps.append(_add_booster_card.bind(booster_id))
+	_build_steps.append(_add_boosters_end)
+
+
+func _add_booster_card(booster_id: String) -> void:
+	var card := ShopBoosterCard.new()
+	card.name = "BoosterCard_%s" % booster_id
+	(_contents["boosters"] as VBoxContainer).add_child(card)
+	card.setup(booster_id)
+	card.buy_pressed.connect(_on_money_buy)
+	_booster_cards[booster_id] = card
+
+
+func _add_boosters_end() -> void:
 	_boosters_end = _AllSet.new()
 	_boosters_end.name = "TabEnd"
-	box.add_child(_boosters_end)
+	(_contents["boosters"] as VBoxContainer).add_child(_boosters_end)
 
 
-func _build_support() -> void:
-	var box: VBoxContainer = _contents["support"]
+func _queue_support() -> void:
 	for sku in [CONFIG.SKU_REMOVE_ADS, CONFIG.SKU_STARTER_PACK]:
-		var card := ShopSupportCard.new()
-		card.name = "SupportCard_%s" % sku
-		box.add_child(card)
-		card.setup(sku)
-		card.buy_pressed.connect(_on_money_buy)
-		_support_cards[sku] = card
+		_build_steps.append(_add_support_card.bind(sku))
+	_build_steps.append(_add_support_end)
+
+
+func _add_support_card(sku: String) -> void:
+	var card := ShopSupportCard.new()
+	card.name = "SupportCard_%s" % sku
+	(_contents["support"] as VBoxContainer).add_child(card)
+	card.setup(sku)
+	card.buy_pressed.connect(_on_money_buy)
+	_support_cards[sku] = card
+
+
+func _add_support_end() -> void:
 	var end := CenterContainer.new()
 	end.name = "TabEnd"
 	end.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(end)
+	(_contents["support"] as VBoxContainer).add_child(end)
 	_restore = _RestoreLink.new()
 	_restore.name = "RestoreLink"
 	end.add_child(_restore)
@@ -209,6 +261,7 @@ func _build_support() -> void:
 
 
 func select_tab(tab_id: String, animated: bool = true) -> void:
+	_finish_build()
 	if not _pages.has(tab_id):
 		return
 	if tab_id == _tab and (_pages[tab_id] as Control).visible:
@@ -252,6 +305,7 @@ func _show_page(tab_id: String, animated: bool) -> void:
 ## Ulaz u Shop (hub ga zove kad Shop postane aktivna stranica): Seasons od vrha, osim
 ## kad je upravo stigao link iz Ormara.
 func _enter_shop() -> void:
+	_finish_build()
 	for id in _pages:
 		(_pages[id] as ScrollContainer).scroll_vertical = 0
 	if not _entry_override.is_empty() and Time.get_ticks_msec() - _entry_override_at < ENTRY_OVERRIDE_MSEC:
@@ -266,6 +320,7 @@ func _enter_shop() -> void:
 
 ## Ormar · „More in Shop": Looks, skrol na zaglavlje slota, zaglavlje bljesne 1,2 s.
 func show_cosmetic_slot(slot: String) -> void:
+	_finish_build()
 	_entry_override = "looks"
 	_entry_override_slot = slot
 	_entry_override_at = Time.get_ticks_msec()
@@ -295,7 +350,7 @@ func active_tab() -> String:
 
 
 func refresh_shop() -> void:
-	if not _built or not is_inside_tree():
+	if not _built or not _build_steps.is_empty() or not is_inside_tree():
 		return
 	var restoring := _busy_sku == "restore"
 	for iid in _cosmetic_cards:
@@ -464,6 +519,7 @@ func _on_restore_completed() -> void:
 
 
 func _card_for(sku: String) -> ShopCard:
+	_finish_build()
 	if _season_cards.has(sku):
 		return _season_cards[sku]
 	if _support_cards.has(sku):
@@ -502,18 +558,22 @@ func _notify_hub_chrome() -> void:
 
 
 func get_cosmetic_card(item_id: String) -> ShopCosmeticCard:
+	_finish_build()
 	return _cosmetic_cards.get(item_id) as ShopCosmeticCard
 
 
 func get_booster_card(booster_id: String) -> ShopBoosterCard:
+	_finish_build()
 	return _booster_cards.get(booster_id) as ShopBoosterCard
 
 
 func get_season_card(sku: String) -> SeasonPackCard:
+	_finish_build()
 	return _season_cards.get(sku) as SeasonPackCard
 
 
 func get_support_card(sku: String) -> ShopSupportCard:
+	_finish_build()
 	return _support_cards.get(sku) as ShopSupportCard
 
 
@@ -522,14 +582,17 @@ func get_tab_bar() -> ShopTabBar:
 
 
 func page_node(tab_id: String) -> ScrollContainer:
+	_finish_build()
 	return _pages.get(tab_id) as ScrollContainer
 
 
 func is_restore_visible() -> bool:
+	_finish_build()
 	return _restore != null and _restore.visible
 
 
 func is_all_set_visible() -> bool:
+	_finish_build()
 	return _boosters_end != null and _boosters_end.visible
 
 

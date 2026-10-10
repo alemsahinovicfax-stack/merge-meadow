@@ -31,6 +31,23 @@ static func draw_chip(
 		return
 	var side := ArenaSeedChip.CHIP_RADIUS * 2.0
 	var rect := Rect2(center - Vector2(side, side) * 0.5, Vector2(side, side))
+	# Osnova je jedna tekstura iz ArenaChipBake (perf 2026-10-09); prije baka — StyleBoxovi.
+	var baked := ArenaChipBake.get_base(tier, mythic, dragging)
+	if baked != null:
+		canvas.draw_texture(baked, rect.position - ArenaChipBake.origin())
+	else:
+		draw_base(canvas, rect, tier, mythic, dragging)
+	var box := UiArena.FLOWER_SIZE_T2 if tier == 2 else UiArena.FLOWER_SIZE_T1
+	draw_flower(canvas, center, type_id, tier, box)
+	if chomp:
+		_draw_chomp(canvas, rect)
+	# Hint ide iznad rima: inace cream pojede 2 px kojima prsten prelazi rub.
+	_draw_ring(canvas, rect, tier, UiArena.chip_corner_radius(tier), ring, ring_alpha)
+
+
+## Sve ispod cvijeta: SeedBase, sjena, rim, well, T2 hairline i mythic crtice (crtice su van
+## rima, pa im redoslijed prema cvijetu ne smeta). ArenaChipBake ovo iscrta jednom po varijanti.
+static func draw_base(canvas: CanvasItem, rect: Rect2, tier: int, mythic: bool, dragging: bool) -> void:
 	var corner := UiArena.chip_corner_radius(tier)
 	var drop := UiArena.CHIP_SHADOW_OFFSET_DRAG if dragging else UiArena.CHIP_SHADOW_OFFSET
 	canvas.draw_style_box(UiArena.chip_base_style(tier), rect.grow(UiArenaV2.SEED_BASE_W))
@@ -41,17 +58,21 @@ static func draw_chip(
 	canvas.draw_style_box(UiArena.chip_well_style(tier), rect.grow(-UiArena.chip_well_inset(tier)))
 	if tier == 2:
 		canvas.draw_style_box(UiArena.chip_hairline_style(mythic), rect.grow(-UiArena.T2_HAIRLINE_INSET))
-	var box := UiArena.FLOWER_SIZE_T2 if tier == 2 else UiArena.FLOWER_SIZE_T1
-	draw_flower(canvas, center, type_id, tier, box)
 	if mythic:
-		var nub_radius := corner + 7.0 if tier == 2 else side * 0.5 + 7.0
+		var nub_radius := corner + 7.0 if tier == 2 else rect.size.x * 0.5 + 7.0
 		draw_dashed_round_rect(
 			canvas, rect.grow(7.0), nub_radius, 4.0, Color(UiArena.GOLD_EDGE, 0.9), MYTHIC_DASH, MYTHIC_GAP
 		)
-	if chomp:
-		_draw_chomp(canvas, rect)
-	# Hint ide iznad rima: inace cream pojede 2 px kojima prsten prelazi rub.
-	_draw_ring(canvas, rect, tier, corner, ring, ring_alpha)
+
+
+## Samo prsten (pulse / partner / merge) oko sjemenke u `center` — ArenaSeedChip ga crta u
+## zasebnom sloju, pa puls mijenja samo modulate, a ne crtež sjemenke.
+static func draw_ring(canvas: CanvasItem, center: Vector2, tier: int, ring: int, alpha: float = 1.0) -> void:
+	if tier >= 3 or ring == Ring.NONE:
+		return
+	var side := ArenaSeedChip.CHIP_RADIUS * 2.0
+	var rect := Rect2(center - Vector2(side, side) * 0.5, Vector2(side, side))
+	_draw_ring(canvas, rect, tier, UiArena.chip_corner_radius(tier), ring, alpha)
 
 
 ## Cvijet u kutiji `box`: odrezan SVG (vidljivi crtež puni dužu stranu) ili proceduralni fallback.

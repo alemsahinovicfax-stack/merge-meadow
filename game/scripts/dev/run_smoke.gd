@@ -39,17 +39,18 @@ func _test() -> void:
 		push_error("run_smoke: TopHud missing")
 		_quit(1)
 		return
-	var pickup_bar := run.get_node_or_null("HUD/TopHud/PickupBar") as Control
-	if pickup_bar == null:
-		push_error("run_smoke: PickupBar missing")
+	# Run HUD v2: brojači su u gornjem redu (y 60), ne pri dnu.
+	var coin_chip := run.get_node_or_null("HUD/TopHud/CoinChip") as Control
+	if coin_chip == null:
+		push_error("run_smoke: CoinChip missing")
 		_quit(1)
 		return
-	if is_equal_approx(pickup_bar.anchor_top, 1.0):
-		push_error("run_smoke: PickupBar still bottom-anchored")
+	if is_equal_approx(coin_chip.anchor_top, 1.0) or coin_chip.position.y > 400.0:
+		push_error("run_smoke: CoinChip is not in the top row")
 		_quit(1)
 		return
-	var coin := run.get_node_or_null("HUD/TopHud/PickupBar/CoinChip/Row/CoinLabel") as Label
-	var seed := run.get_node_or_null("HUD/TopHud/PickupBar/SeedChip/Row/SeedLabel") as Label
+	var coin := run.get_node_or_null("HUD/TopHud/CoinChip/Row/CoinLabel") as Label
+	var seed := run.get_node_or_null("HUD/TopHud/SeedChip/Row/SeedLabel") as Label
 	if coin == null or seed == null:
 		push_error("run_smoke: counter labels missing")
 		_quit(1)

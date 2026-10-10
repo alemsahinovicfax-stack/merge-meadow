@@ -31,6 +31,7 @@ func _ensure() -> void:
 	preview = ItemPreview.new()
 	preview.name = "CosmeticPreview"
 	preview.preview_size = ItemPreview.SIZE_STAGE
+	preview.async_atlas = true
 	preview.position = PREVIEW_POS
 	preview.size = UiShopV2.PREVIEW_SIZE
 	add_child(preview)

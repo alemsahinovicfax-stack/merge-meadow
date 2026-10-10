@@ -110,9 +110,8 @@ func _run() -> void:
 	if str((run2.get("material", {}) as Dictionary).get("kind", "")) != "rut":
 		_fail("frost run material should be the sled rut")
 		return
-	var pickup_bar := run.get_node_or_null("HUD/TopHud/PickupBar") as Control
-	if pickup_bar == null:
-		_fail("PickupBar missing (run layout)")
+	if run.get_node_or_null("HUD/TopHud/CoinChip") == null or run.get_node_or_null("HUD/TopHud/SeedChip") == null:
+		_fail("Coin/Seed chips missing (run HUD v2 layout)")
 		return
 
 	print("season_run_smoke OK")

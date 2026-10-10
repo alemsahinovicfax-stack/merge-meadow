@@ -111,10 +111,14 @@ func _handle_swipe(end_pos: Vector2) -> void:
 func _on_area_entered(area: Area2D) -> void:
 	if area.is_in_group("pickup") and area.has_method("collect"):
 		area.collect()
+	elif area.is_in_group(RewardBush.GROUP) and area.has_method("collect"):
+		# Grm stoji na šavu: tijelo Pipa ga dotakne samo dok prelazi u susjednu stazu.
+		area.collect()
 	elif area.is_in_group("obstacle"):
 		hit_obstacle.emit()
 
 
+## Magnet vuče samo „pickup" grupu — grm (Run HUD v2) ignoriše.
 func _on_magnet_area_entered(area: Area2D) -> void:
 	if area.is_in_group("pickup") and area.has_method("collect"):
 		area.collect()

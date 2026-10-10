@@ -1,6 +1,6 @@
 extends Control
 
-## Companion portrait — run HUD (88, crop glave), Arena (150), Camp.
+## Companion portrait — HUD krop glave (≤ 100), Arena (150), Camp. Run HUD v2 više nema portret.
 ## Pip = UiPip cutout rig; Mochi ostaje crtež.
 
 @export var companion_id: String = ""

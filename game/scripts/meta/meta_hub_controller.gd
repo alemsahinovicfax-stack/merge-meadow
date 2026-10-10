@@ -34,6 +34,11 @@ const COIN_POP_POS := Vector2(150, 132)  # design_handoff_shop · CoinSpendPop
 
 var _tabs: Array[HubTab] = []
 var _pages_loaded: Array[bool] = []
+## Stranice koje se učitavaju u pozadinskom threadu (perf 2026-10-09): lijeno učitavanje susjeda
+## padalo je usred swipea (Shop hladno ~0,8 s, toplo ~48 ms), a sve odjednom na otvaranju huba
+## produžava start za 1–2 s. Zato: početna + susjedi odmah, ostale preko load_threaded_request,
+## a instancira se po jedna, kad je gotova i kad pager stoji.
+var _bg_pages: Array[int] = []
 var _arena_page: Control = null
 var _tabs_enabled: bool = true
 var _nav_locked: bool = false
@@ -67,6 +72,33 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	_sync_active_indicator()
+	_poll_background_pages()
+
+
+func _queue_background_pages() -> void:
+	for i in MetaHubPagesScript.PAGE_COUNT:
+		if _pages_loaded[i] or _bg_pages.has(i):
+			continue
+		var path: String = MetaHubPagesScript.PAGE_SCENES[i]
+		if ResourceLoader.exists(path) and ResourceLoader.load_threaded_request(path) == OK:
+			_bg_pages.append(i)
+
+
+## Jedna gotova stranica po frejmu, samo dok pager stoji (ne usred swipea).
+func _poll_background_pages() -> void:
+	if _bg_pages.is_empty() or swipe_pager == null or swipe_pager.is_moving():
+		return
+	for i in _bg_pages:
+		var path: String = MetaHubPagesScript.PAGE_SCENES[i]
+		var status := ResourceLoader.load_threaded_get_status(path)
+		if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			continue
+		if status == ResourceLoader.THREAD_LOAD_LOADED and not _pages_loaded[i]:
+			_load_page(i)
+			_apply_page_activity(_current_page)
+		else:
+			_bg_pages.erase(i)
+		return
 
 
 func _setup_chrome() -> void:
@@ -140,6 +172,13 @@ func _finish_boot(start: int) -> void:
 		_ensure_page_slots(host)
 	_load_page(start)
 	_load_neighbors(start)
+	# Frejm kasnije: početna stranica je već nacrtala svoje cvijeće (sinhrono). Cvijeće ostalih
+	# sezona ide u red threadova PRIJE Shopa i Arene — red je FIFO, a kartica koja traži teksturu
+	# iz reda čeka sve ispred nje (Arena ~650 ms u probi 2026-10-10).
+	get_tree().process_frame.connect(func() -> void:
+		FlowerAssets.prefetch_rosters()
+		_queue_background_pages()
+	, CONNECT_ONE_SHOT)
 	swipe_pager.go_to_page(start, false)
 	_on_page_changed(start)
 	_show_swipe_hint_if_needed()
@@ -213,6 +252,23 @@ func _load_neighbors(index: int) -> void:
 		_load_page(index - 1)
 	if index < MetaHubPagesScript.PAGE_COUNT - 1:
 		_load_page(index + 1)
+	_apply_page_activity(index)
+
+
+## Stranice van ekrana ne vrte _process ni tweenove (Home ambijent, njihanje cvijeća, Pip,
+## Journal…): učitane ostaju žive, a inače ih je plaćala i stranica na kojoj igrač jeste
+## (perf 2026-10-09: Arena je štekala dok je Home iza nje animirao). Arena ima svoj
+## set_arena_page_active (sesija, nav lock), pa je ovdje preskočena.
+func _apply_page_activity(index: int) -> void:
+	var host: Control = swipe_pager.get_pages_host() as Control if swipe_pager else null
+	if host == null:
+		return
+	for i in MetaHubPagesScript.PAGE_COUNT:
+		if i == MetaHubPagesScript.ARENA:
+			continue
+		var page := host.get_node_or_null("Page_%d" % i)
+		if page != null:
+			page.process_mode = Node.PROCESS_MODE_INHERIT if i == index else Node.PROCESS_MODE_DISABLED
 
 
 func _load_page(index: int) -> void:
@@ -232,7 +288,13 @@ func _load_page(index: int) -> void:
 	if slot:
 		host.remove_child(slot)
 		slot.queue_free()
-	var packed: PackedScene = load(scene_path)
+	var packed: PackedScene = null
+	if _bg_pages.has(index):
+		# Već se učitava u pozadini — preuzmi (čeka samo ono što još nije gotovo).
+		_bg_pages.erase(index)
+		packed = ResourceLoader.load_threaded_get(scene_path) as PackedScene
+	if packed == null:
+		packed = load(scene_path)
 	var page := packed.instantiate() as Control
 	page.name = "Page_%d" % index
 	page.set_meta("meta_hub_embedded", true)

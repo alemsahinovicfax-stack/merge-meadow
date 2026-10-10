@@ -9,8 +9,42 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-10
+
+- **FPS pregled, nastavak: start huba, prvi prikazi, Pip u runu** (`performanse.md` § Rezultati 2026-10-10).
+  - **Start huba:** ~1 s posle otvaranja, dok igrač gleda Home, pozadinsko dodavanje Shop stranice je zamrzavalo igru 466–498 ms. Sada: Pip atlasi Shopa se rasterizuju u `WorkerThreadPool` (`UiPip.request_atlas` / `atlas_ready`; `ItemPreview.async_atlas` — samo Shop, Ormar ostaje sinhron), a Shop u hubu gradi jednu karticu po frejmu (ulaz u Shop, tab i getteri dovrše ostatak odmah). Frejm dodavanja ~17 ms.
+  - **Pip rig:** animacija se pretvara iz JSON-a tek kad se prvi put pusti (ranije cijela biblioteka od 75 animacija, ~45 ms za prvi Pip po pogledu — Home, Shop, Ormar, run); putanje čvorova keširane. Prvi Pip ~2 ms.
+  - **Home, prvi prikaz sezone:** cvijeće (tier 3) svih sezona se učitava u pozadini frejm posle starta, prije Shopa i Arene (`FlowerAssets.prefetch_rosters`). Najgori frejm prvog prikaza 47–75 → 5–26 ms.
+  - **Run:** magnet prsten oko Pipa je jedna mreža trouglova umjesto 14 AA lukova — Pip 45 → 4 draw poziva, cijeli run frejm 73 → 32.
+  - **Home, swipe sezone:** fokus trake i „band" se snimaju odgođeno (`save_player_save_soon`, ranije 2 sinhrona save-a po swipeu); livada svake sezone je svoj sloj kartice (`HomeV3Card`), nacrtan jednom — swipe na već viđenu sezonu je preko 20 ms u 2 od 8 prelaza umjesto 5 od 8.
+  - **Save:** odgođeni save ne prepisuje `player_save.json` ako ga je u međuvremenu promijenio neko drugi (`GameState._save_disk_hash`) — smoke testovi koji vrate svoju kopiju savea više ne ostave testno stanje (`greske-katalog.md` #25, dopuna).
+  - Bench: novi scenarij `hub_boot_5s` u `perf_suite_bench.gd`. Novi unosi u `greske-katalog.md` #30–#31 (#29 dopunjen).
+
 ## 2026-10-09
 
+- **FPS pregled cijele igre** (na zahtjev: „Arena šteka"). Novi `perf_suite_bench.gd` mjeri 30 scenarija (sve stranice huba, swipe, Home kartice / polje / sheet / Ormar, Camp, skrol Journala i Shopa, Arena: sipanje, merge, drag, muncher, usisavanje; run, pauza, loot) — prosjek, p95/p99, najgori frejm, preskočeni frejmovi, draw pozivi, CPU / GPU rendera; `MM_ROOT=1 MM_VSYNC=1` = kao igra na laptopu. Detalji i brojke: `performanse.md` § Rezultati 2026-10-09.
+  - **Arena, merge:** frejm posle spajanja 28–46 ms → 11–15 ms. Osnova sjemenke (4–6 AA StyleBoxova, 0,7 ms) se iscrta jednom u teksturu (`ArenaChipBake`); prsten pulsa / partnera / mergea je zaseban sloj (puls = `modulate`, ne novi crtež); korpa se crta samo kad joj se stanje promijeni; save iz Arene (combo coini, dnevni zadatak, ★3, sipanje) ide kroz `save_player_save_soon()` — jedan save 0,5 s kasnije, flush na promjeni scene / izlazu / pauzi; rasuti elementi livade u svom sloju (naklon više ne šalje cijelu livadu); muncher u slojevima (glava se pomjera transformom, gradi se samo kad se promijeni poza / pogled).
+  - **Home:** isprekidan rub (`UiHomeV3.draw_dashed_round_rect`) je jedan `draw_multiline` umjesto po jednog AA poziva po crtici — kartica sezone bez cvijeća 1313 → 79 draw poziva (Ember Fen 8,1 → 3,3 ms po frejmu); isto pomaže Shop kartice, Ormar i oznake.
+  - **Camp:** grid sjemenki / cvijeća se gradi iznova samo kad se stavke promijene (ulaz u Camp 18 + 10 ms → 2 + 4 ms).
+  - **Hub:** stranice van ekrana su zamrznute (`process_mode`); stranice koje nisu susjedi se učitavaju u pozadinskom threadu i instanciraju po jedna kad pager stoji (ranije su se učitavale usred swipea).
+  - **Journal:** budžet gradnje redova 6 → 3 ms po frejmu (skrol bez preskočenih frejmova).
+  - **Run:** traka napretka bez `clip_children` na stazi.
+  - Novi unosi u `greske-katalog.md` #27–#29.
+- **Dijamanti izbačeni iz igre** (na zahtjev; `scope-i-granice.md` → OUT). Valuta se nigdje nije trošila — samo se skupljala u runu.
+  - Run: nema više pickupa dijamanta (bila je ~1/300 grane sjemena; sad je to uvijek sjeme), ni „+1” popa. Obrisani `diamond_pickup.tscn`, `diamond_pickup.gd`, `diamond_visual.gd`, `run_diamond_pop.gd`, `PickupAssets.get_diamond_texture()` i `DIAMOND_*` konstante u `UiRun`.
+  - Save: `wallet_diamonds`, `get_diamonds()` i `add_diamonds()` su izbačeni. Stari save s ključem `wallet_diamonds` se normalno učita (ključ se ignoriše), a sljedeće snimanje ga ne piše. `SAVE_VERSION` ostaje 12.
+  - Pip: animacije `pickup_diamond` i `hud_wow` i njihovi „diamond” događaji izbačeni iz `data/pip/` (77 → 75 animacija).
+  - Home: Premium tab je bez ikone (prepoznaje se po zlatnom tabu), dugme za kupovinu premium sezone je zlatna cijena bez ikone. `icon_diamond.svg` obrisan.
+  - Testovi: `diamond_wallet_smoke` i tri GUT testa za dijamante obrisani; novi GUT test da se stari save s dijamantima učita; `run_hud_v2_smoke` i `run_redesign_smoke` sada provjeravaju da dijamanata nema.
+- **Run HUD v2 u igri** (paket `design_handoff_run_hud_v2/`, izvještaj `run-hud-v2-izvjestaj.md`).
+  - Header je jedan red na y 60: LevelChip (x 40, „Level N” 48 px / „Endless · X” 42 px bez zastavice / „Practice” sa zastavicom) · CoinChip (x 520) · SeedChip (x 716) · pauza 128 (x 912). Pip portret, prsten, sekunde, dijamant čip i korpa su obrisani (`run_timer_ring.gd` izbačen).
+  - Traka napretka lijevo (x 24–140, `RunProgressRail`): Pip glava se penje 1700 → 300, punjenje mint → peach ispod 17 %, zastavica se podigne i dobije mint prsten na 100 %. U Endlessu je sakrivena.
+  - ~~Dijamant nema čip: krem pilula „+1” iskoči na mjestu pickupa (`RunDiamondPop`, 0,5 s); dijamant i dalje ide u wallet.~~ Isti dan izbačeno zajedno s dijamantima (vidi gore).
+  - Nagradni grm (`RewardBush`) na šavu 405 / 675: prvi posle 6 s, pa svakih 8–12 s, jedan na ekranu, nikad u tutorial runu 1; nema prepreka ±300 px u susjednim stazama. Pokupi se samo prelazom preko šava (magnet ga ignoriše): 60 % 3–5 coina, 40 % 1–2 sjemena sezone; Twin / korpa / magnet se ne primjenjuju. Burst (prsten + 6 listova + ≤ 4 nagrade) je pool napravljen na startu runa (`RunBushFx`).
+  - Tvrda sjena 0 6 0 na čipovima se sada stvarno crta (`shadow_size` 1 — 0 je u Godotu ne crta).
+  - Bench (`run_hud_perf_bench.gd`, `run_perf_bench.gd`): frame isti kao prije (Country Bloom 3,58 vs 3,56 ms, Starfall 3,34 vs 3,40 ms); grm u mirovanju ~0 ms; burst +0,1–0,2 ms, bez skoka posle poola.
+  - Novi test `run_hud_v2_smoke.gd`; `run_redesign_smoke`, `run_smoke` i `season_run_smoke` prešli na nove čvorove.
+- **Camp v3 provjeren do kraja** (izvještaj `camp-v3-izvjestaj.md`): modal vrata u Areni se zatvara i tapom van i dugmetom Back, kako paket kaže (stari „need seeds” i dalje samo dugmetom); pilula `N / 50` na 50 prelazi krem → mint za 0,18 s i ima tvrdu sjenu 0 8 0 (bila `shadow_size 0`, koju Godot ne crta); razmak u pilulici 12 → 10; popravljen spojen red u `camp_trade_bar.gd`.
 - **Scope: run header, traka napretka i nagradni grm idu u launch** (na zahtjev) — upisano u `scope-i-granice.md` (Core gameplay); brief `run-hud-v2-cd-brief.md` §10 više nema uslov „potvrdi scope”, a grm u `ideje-gameplay-ekonomija.md` §7 više nije v1.1.
 
 ## 2026-10-08

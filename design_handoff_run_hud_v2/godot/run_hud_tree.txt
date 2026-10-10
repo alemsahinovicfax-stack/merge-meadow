@@ -1,0 +1,42 @@
+HUD (CanvasLayer)
+├─ TopHud (Control, 0,60 1080×128)
+│  ├─ LevelChip (PanelContainer)  ← was TimerChip
+│  │  ├─ FlagIcon (TextureRect 38×57, hidden in Endless)
+│  │  └─ ModeLabel (Label 48 / 42 px)
+│  ├─ CoinChip (PanelContainer 180×128)  ← moved from PickupBar
+│  │  ├─ Icon (TextureRect 52)
+│  │  └─ Value (Label 56 px)
+│  ├─ SeedChip (PanelContainer 180×128)  ← moved from PickupBar
+│  │  ├─ Icon (TextureRect 52)
+│  │  └─ Value (Label 56 px)
+│  └─ PauseButton (TextureButton 128×128)
+├─ PickupFeed (unchanged, toast y 214)
+├─ ProgressRail (Control 24,200 116×1540, hidden in Endless)
+│  ├─ RailTrack (Panel 28×1400, StyleBoxFlat)
+│  │  ├─ RailFill (ColorRect, size.y = progress)
+│  │  └─ MidTick (ColorRect 4 px)
+│  ├─ ProgressStart (TextureRect)
+│  ├─ FinishRing (Panel, visible at 100 %)
+│  ├─ ProgressFlag (TextureRect)
+│  └─ ProgressPip (Panel 92 circle → TextureRect pip_hud_classic)
+└─ DiamondPop (PanelContainer, pooled ×1)
+
+World
+└─ Bushes (Node2D, pool size 1)
+   ├─ RewardBush (Node2D, pivot 60,124)
+   │  ├─ Back (Sprite2D bush_<season>_back)
+   │  ├─ Reward (Sprite2D coin | seed)
+   │  ├─ Front (Sprite2D bush_<season>_front)
+   │  └─ Hit (Area2D 120×160)
+   └─ BushBurst (Node2D, 11 Sprite2D: ring + 6 leaves + ≤4 reward)
+
+DELETE: HUD/CompanionChip, HUD/BasketBadge, HUD/PickupBar/DiamondChip,
+        HUD/TopHud/TimerChip/Ring, HUD/TopHud/TimerChip/Seconds
+
+ORDER OF PORT
+1. TopHud: build the row, move Coin/Seed chips, point run_pickup_feed.gd fly targets at the new chips.
+2. Remove CompanionChip, BasketBadge, DiamondChip, ring, seconds.
+3. DiamondPop at the pickup position (diamond still goes to the wallet).
+4. ProgressRail + UiRun.rail_pip_y / rail_fill_color in _process (no redraw).
+5. RewardBush spawn in run_controller.gd with bush rules (run_hud_export.json → bush).
+6. Lane-change crossing check in player.gd → burst → fly → chip bump.

@@ -140,11 +140,36 @@ func _draw_magnet_ring(canvas: CanvasItem) -> void:
 			Color(1.0, 0.973, 0.941, 0.20), 4.0, true
 		)
 		return
-	var radius := _magnet_radius
-	var color := Color(1.0, 0.973, 0.941, 0.42)
-	var dashes := 14
+	_draw_dash_ring(canvas, _magnet_radius, 14, 0.55, 7.0, Color(1.0, 0.973, 0.941, 0.42))
+
+
+## Isprekidan prsten kao jedna mreža trouglova = 1 draw poziv. AA draw_arc po crtici je ~3
+## poziva (bilo 44 od 45 poziva Pipa); draw_multiline je 1 poziv, ali se meki rubovi segmenata
+## preklapaju na poluprozirnoj boji (pruge). Meki rub je traka s alfa 0 na vanjskoj ivici.
+func _draw_dash_ring(canvas: CanvasItem, radius: float, dashes: int, fill: float, width: float,
+		color: Color) -> void:
+	const STEPS := 8
+	const FEATHER := 1.5
+	var radii := [radius - width * 0.5 - FEATHER, radius - width * 0.5,
+		radius + width * 0.5, radius + width * 0.5 + FEATHER]
+	var clear := Color(color, 0.0)
+	var band_colors := [clear, color, color, clear]
+	var points := PackedVector2Array()
+	var colors := PackedColorArray()
+	var indices := PackedInt32Array()
 	var span := TAU / float(dashes)
 	for i in dashes:
 		var a0 := float(i) * span
-		var a1 := a0 + span * 0.55
-		canvas.draw_arc(Vector2.ZERO, radius, a0, a1, 8, color, 7.0, true)
+		var step := span * fill / float(STEPS)
+		var base := points.size()
+		for k in STEPS + 1:
+			var dir := Vector2.from_angle(a0 + step * float(k))
+			for b in 4:
+				points.append(dir * float(radii[b]))
+				colors.append(band_colors[b])
+		for k in STEPS:
+			var row := base + k * 4
+			for b in 3:
+				var p := row + b
+				indices.append_array([p, p + 1, p + 4, p + 1, p + 5, p + 4])
+	RenderingServer.canvas_item_add_triangle_array(canvas.get_canvas_item(), indices, points, colors)

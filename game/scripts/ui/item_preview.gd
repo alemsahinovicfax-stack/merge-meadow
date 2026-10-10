@@ -41,6 +41,10 @@ var _hop_tween: Tween
 var live_pose: bool = false
 var actor: UiPip
 var _skin_key: String = "classic"
+## Shop u hubu (gradi se dok je igrač na Homeu): atlas skina u pozadini, Pip kad je spreman.
+## Ormar ostaje sinhron — tap na skin odmah mijenja pregled.
+var async_atlas: bool = false
+var _atlas_wait: bool = false
 
 static var _title_tex: Texture2D
 static var _lock_tex: Texture2D
@@ -111,14 +115,22 @@ func _sync_actor() -> void:
 		if actor != null:
 			actor.visible = false
 		return
+	_skin_key = _skin_for_preview()
+	if async_atlas and is_inside_tree() and not UiPip.atlas_ready(_skin_key):
+		UiPip.request_atlas(_skin_key)
+		if actor != null:
+			actor.visible = false
+		_wait_for_atlas()
+		return
 	if actor == null:
 		actor = UiPip.new()
 		actor.name = "Actor"
 		actor.view = "three_q"
 		actor.follow_equipped = false
+		# Skin prije add_child: _ready gradi rig jednom, ne classic pa još jednom.
+		actor.skin = _skin_key
 		add_child(actor)
 	actor.visible = true
-	_skin_key = _skin_for_preview()
 	actor.set_skin(_skin_key)
 	var inner := Rect2(Vector2(frame_border, frame_border), size - Vector2(frame_border, frame_border) * 2.0)
 	var stage := preview_size == SIZE_STAGE
@@ -134,6 +146,17 @@ func _sync_actor() -> void:
 	else:
 		actor.pose(UiPip.pose_for_skin(_skin_key))
 		mouse_filter = Control.MOUSE_FILTER_PASS if stage else Control.MOUSE_FILTER_IGNORE
+
+
+func _wait_for_atlas() -> void:
+	if _atlas_wait:
+		return
+	_atlas_wait = true
+	while is_inside_tree() and not UiPip.atlas_ready(_skin_for_preview()):
+		await get_tree().process_frame
+	_atlas_wait = false
+	if is_inside_tree():
+		_sync_actor()
 
 
 func _gui_input(event: InputEvent) -> void:

@@ -75,11 +75,12 @@ func _draw() -> void:
 			var fill := UiHomeV3.GOLD if tab == PREMIUM else UiHomeV3.CREAM
 			UiHomeV3.draw_panel(self, r, fill, 54.0, 3.0, UiHomeV3.INK, 6.0, UiHomeV3.TAB_SHADOW)
 		var label := "Premium" if tab == PREMIUM else "Free"
-		var icon := UiAssets.get_chrome_icon("icon_diamond" if tab == PREMIUM else "icon_seed")
+		# Premium nema ikonu (dijamanti su izbačeni 2026-10-09) — prepoznaje se po zlatnom tabu.
+		var icon: Texture2D = UiAssets.get_chrome_icon("icon_seed") if tab == FREE else null
+		var icon_w: float = UiHomeV3.TAB_ICON + 16.0 if icon != null else 0.0
 		var tw := UiHomeV3.text_w(900, UiHomeV3.TAB_LABEL, label)
-		var row := UiHomeV3.TAB_ICON + 16.0 + tw
-		var x := r.get_center().x - row * 0.5
+		var x := r.get_center().x - (icon_w + tw) * 0.5
 		var cy := r.get_center().y
 		if icon:
 			draw_texture_rect(icon, Rect2(x, cy - UiHomeV3.TAB_ICON * 0.5, UiHomeV3.TAB_ICON, UiHomeV3.TAB_ICON), false)
-		UiHomeV3.draw_text(self, 900, UiHomeV3.TAB_LABEL, label, Vector2(x + UiHomeV3.TAB_ICON + 16.0, cy - UiHomeV3.TAB_LABEL * 0.5), UiHomeV3.INK)
+		UiHomeV3.draw_text(self, 900, UiHomeV3.TAB_LABEL, label, Vector2(x + icon_w, cy - UiHomeV3.TAB_LABEL * 0.5), UiHomeV3.INK)

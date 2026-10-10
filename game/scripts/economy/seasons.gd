@@ -352,8 +352,9 @@ func close_home_season_field() -> void:
 
 
 func set_home_band(band: String) -> void:
+	# Swipe sezone na Homeu: fokus i band ne idu na disk u frejmu prelaza (perf 2026-10-10).
 	home_band = "paid" if band == "paid" else "free"
-	_owner.save_player_save()
+	_owner.save_player_save_soon()
 
 
 func set_paid_strip_focus(season_id: String) -> bool:
@@ -361,7 +362,7 @@ func set_paid_strip_focus(season_id: String) -> bool:
 	if def == null or not def.is_paid():
 		return false
 	paid_strip_focus_id = season_id
-	_owner.save_player_save()
+	_owner.save_player_save_soon()
 	return true
 
 
@@ -372,7 +373,7 @@ func set_free_strip_focus(season_id: String) -> bool:
 	if not is_free_selectable(season_id):
 		return false
 	focus_season_id = season_id
-	_owner.save_player_save()
+	_owner.save_player_save_soon()
 	return true
 
 

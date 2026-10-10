@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0}a{color:#2D3436}a:hover{color:#4A4A4A}</style>
+</helmet>
+<div data-layer="RunScreen" data-screen-label="{{ label }}" style="{{ rootStyle }}">
+
+  <div data-layer="LaneField" style="position:absolute;inset:0">
+    <div style="{{ lane1 }}"></div>
+    <div style="{{ lane2 }}"></div>
+    <div style="{{ lane3 }}"></div>
+    <sc-for list="{{ dashes }}" as="d" hint-placeholder-count="0">
+      <div style="{{ d.style }}"></div>
+    </sc-for>
+    <sc-for list="{{ tufts }}" as="t" hint-placeholder-count="0">
+      <div style="{{ t.style }}"></div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ hasObstacle }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="Obstacle" style="position:absolute;left:140px;top:1000px;width:260px;height:220px;z-index:2">
+      <div style="{{ collarStyle }}"></div>
+      <img src="{{ obstacleSrc }}" alt="" style="position:absolute;left:42px;top:12px;width:176px;height:150px">
+    </div>
+  </sc-if>
+
+  <div data-layer="CoinPickup" style="position:absolute;left:222px;top:382px;width:96px;height:96px;z-index:2">
+    <img src="icons/icon_coin.svg" alt="" style="width:96px;height:96px;display:block">
+  </div>
+  <div data-layer="CoinPickup" style="position:absolute;left:222px;top:532px;width:96px;height:96px;z-index:2">
+    <img src="icons/icon_coin.svg" alt="" style="width:96px;height:96px;display:block">
+  </div>
+  <div data-layer="SeedPickup" style="position:absolute;left:480px;top:700px;width:120px;height:120px;z-index:2;border-radius:50%;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box;display:grid;place-items:center">
+    <div style="width:84px;height:84px;border-radius:50%;background:#22342A;display:grid;place-items:center">
+      <img src="icons/icon_seed.svg" alt="" style="width:60px;height:60px;filter:none">
+    </div>
+  </div>
+
+  <sc-if value="{{ showBush }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="RewardBush" style="{{ bushWrap }}">
+      <div ref="{{ bushRef }}" style="position:absolute;inset:0;transform-origin:60px 124px">
+        <img src="{{ bushBack }}" alt="" style="position:absolute;left:0;top:0;width:120px;height:140px">
+        <sc-if value="{{ rewardCoin }}" hint-placeholder-val="{{ true }}">
+          <img src="icons/icon_coin.svg" alt="" style="position:absolute;left:28px;top:10px;width:64px;height:64px">
+        </sc-if>
+        <sc-if value="{{ rewardSeed }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:31px;top:18px;width:58px;height:58px;border-radius:50%;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box;display:grid;place-items:center">
+            <img src="icons/icon_seed.svg" alt="" style="width:40px;height:40px">
+          </div>
+        </sc-if>
+        <img src="{{ bushFront }}" alt="" style="position:absolute;left:0;top:0;width:120px;height:140px">
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showBurst }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="BushBurst" style="{{ burstWrap }}">
+      <div style="position:absolute;left:-80px;top:-80px;width:160px;height:160px;border-radius:50%;border:6px solid #FFF8F0;box-sizing:border-box"></div>
+      <sc-for list="{{ burstLeaves }}" as="l" hint-placeholder-count="0">
+        <img src="{{ l.src }}" alt="" style="{{ l.style }}">
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-for list="{{ flyers }}" as="f" hint-placeholder-count="0">
+    <div style="{{ f.style }}">
+      <sc-if value="{{ f.coin }}" hint-placeholder-val="{{ true }}">
+        <img src="icons/icon_coin.svg" alt="" style="width:100%;height:100%;display:block">
+      </sc-if>
+      <sc-if value="{{ f.seed }}" hint-placeholder-val="{{ false }}">
+        <div style="width:100%;height:100%;border-radius:50%;background:#FFF8F0;border:3px solid #CBC2B6;box-sizing:border-box;display:grid;place-items:center">
+          <img src="icons/icon_seed.svg" alt="" style="width:70%;height:70%">
+        </div>
+      </sc-if>
+    </div>
+  </sc-for>
+
+  <div data-layer="PlayerRunner" style="{{ pipWrap }}">
+    <div style="position:absolute;left:-70px;top:60px;width:140px;height:34px;border-radius:50%;background:rgba(18,28,22,.34)"></div>
+    <div data-layer="PipVisual" style="position:absolute;left:-75px;top:-75px;width:150px;height:150px;border-radius:40px;border:4px dashed rgba(255,248,240,.75);background:rgba(168,230,207,.22);box-sizing:border-box;display:grid;place-items:center;font:900 34px/1.1 Nunito,sans-serif;color:#FFF8F0;text-align:center">Pip</div>
+  </div>
+
+  <sc-if value="{{ showDiamond }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="DiamondPop" style="position:absolute;left:270px;top:1330px;transform:translate(-50%,-50%);z-index:5;height:92px;padding:0 28px 0 18px;border-radius:46px;background:#FFF8F0;border:3px solid #8FC4DE;box-shadow:0 6px 0 rgba(18,28,22,.42);box-sizing:border-box;display:flex;align-items:center;gap:10px">
+      <img src="icons/icon_diamond.svg" alt="" style="width:60px;height:60px">
+      <div style="font:900 56px/1 Nunito,sans-serif;color:#2D3436">+1</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showRail }}" hint-placeholder-val="{{ true }}">
+    <div data-layer="ProgressRail" style="position:absolute;left:24px;top:200px;width:116px;height:1540px;z-index:6">
+      <div data-layer="RailTrack" style="position:absolute;left:46px;top:100px;width:28px;height:1400px;border-radius:14px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 5px 0 rgba(18,28,22,.42);box-sizing:border-box;overflow:hidden">
+        <div style="{{ railFill }}"></div>
+        <div style="position:absolute;left:0;right:0;top:697px;height:4px;background:#2D3436"></div>
+      </div>
+      <img data-layer="ProgressStart" src="../assets/run/progress/progress_start.svg" alt="" style="position:absolute;left:36px;top:1488px;width:48px;height:24px">
+      <sc-if value="{{ railDone }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:4px;top:2px;width:108px;height:108px;border-radius:50%;border:6px solid #A8E6CF;box-sizing:border-box"></div>
+      </sc-if>
+      <img data-layer="ProgressFlag" src="../assets/run/progress/progress_flag.svg" alt="" style="{{ flagStyle }}">
+      <div data-layer="ProgressPip" style="{{ markerStyle }}">
+        <img src="icons/pip_hud_classic.svg" alt="" style="width:84px;height:84px;display:block;margin:2px 0 0 0">
+      </div>
+    </div>
+  </sc-if>
+
+  <div data-layer="TopHud" style="position:absolute;left:0;top:60px;width:1080px;height:128px;z-index:7">
+    <div data-layer="LevelChip" style="position:absolute;left:40px;top:0;height:128px;min-width:200px;max-width:464px;padding:0 32px;border-radius:30px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:12px">
+      <sc-if value="{{ hasFlag }}" hint-placeholder-val="{{ true }}">
+        <img src="../assets/run/progress/progress_flag.svg" alt="" style="width:38px;height:57px;flex:0 0 auto">
+      </sc-if>
+      <div style="{{ levelText }}">{{ modeText }}</div>
+    </div>
+    <div data-layer="CoinChip" style="{{ coinChip }}">
+      <img src="icons/icon_coin.svg" alt="" style="width:52px;height:52px;flex:0 0 auto">
+      <div style="font:900 56px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">{{ coinText }}</div>
+    </div>
+    <div data-layer="SeedChip" style="{{ seedChip }}">
+      <img src="icons/icon_seed.svg" alt="" style="width:52px;height:52px;flex:0 0 auto">
+      <div style="font:900 56px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">{{ seedText }}</div>
+    </div>
+    <div data-layer="PauseButton" style="position:absolute;left:912px;top:0;width:128px;height:128px;border-radius:30px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);box-sizing:border-box;display:grid;place-items:center">
+      <img src="icons/icon_pause.svg" alt="Pause" style="width:60px;height:60px">
+    </div>
+  </div>
+
+  <sc-if value="{{ showToast }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="PickupFeed" style="position:absolute;left:806px;top:214px;transform:translateX(-50%);z-index:7;padding:12px 26px;border-radius:22px;background:rgba(22,33,27,.78);font:800 38px/1.1 Nunito,sans-serif;color:#FFF8F0;white-space:nowrap">+1 Meadow Clover</div>
+  </sc-if>
+
+  <sc-if value="{{ isFinish }}" hint-placeholder-val="{{ false }}">
+    <div data-layer="FinishBanner" style="position:absolute;inset:0;z-index:8;pointer-events:none">
+      <div style="position:absolute;left:150px;top:760px;width:780px;height:180px;border-radius:26px;background:rgba(22,33,27,.78);display:grid;place-items:center">
+        <div style="font:900 96px/1 Nunito,sans-serif;color:#FFF8F0">Time!</div>
+      </div>
+      <div style="position:absolute;left:150px;top:960px;width:780px;height:70px;display:grid;place-items:center;font:700 40px/1 Nunito,sans-serif;color:#FFF8F0">Full basket — nothing lost</div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:1920},&quot;mode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;level&quot;,&quot;endless&quot;,&quot;tutorial&quot;],&quot;default&quot;:&quot;level&quot;,&quot;tsType&quot;:&quot;'level'|'endless'|'tutorial'&quot;,&quot;section&quot;:&quot;Run&quot;},&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Run&quot;},&quot;progress&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.5,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.01,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Run&quot;},&quot;bush&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;idle&quot;,&quot;cross&quot;,&quot;burst&quot;,&quot;fly&quot;,&quot;missed&quot;],&quot;default&quot;:&quot;idle&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Grm&quot;},&quot;reward&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;coin&quot;,&quot;seed&quot;],&quot;default&quot;:&quot;coin&quot;,&quot;tsType&quot;:&quot;'coin'|'seed'&quot;,&quot;section&quot;:&quot;Grm&quot;},&quot;bushSeam&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[405,675],&quot;default&quot;:675,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Grm&quot;},&quot;level&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:1,&quot;max&quot;:99,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;HUD&quot;},&quot;difficulty&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Easy&quot;,&quot;Normal&quot;,&quot;Hard&quot;],&quot;default&quot;:&quot;Hard&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;HUD&quot;},&quot;coins&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:0,&quot;max&quot;:999,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;HUD&quot;},&quot;seeds&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:5,&quot;min&quot;:0,&quot;max&quot;:99,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;HUD&quot;},&quot;diamondPop&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;HUD&quot;}}">
+const SEASONS = {
+  country_bloom:  { ground: '#2F4A33', lane: '#44663F', edge: 'rgba(255,248,240,.20)', seam: 'rgba(255,248,240,.16)', side: '#4E7A4F', collar: ['#C9B98A', '#A99A6A'], obstacle: 'ref/obstacle_country_bloom.svg' },
+  frost_orchard:  { ground: '#DCE7F3', lane: '#5F7894', edge: 'rgba(255,255,255,.55)', seam: 'rgba(95,120,148,.45)', side: '#9CB0C8' },
+  lantern_meadow: { ground: '#15112A', lane: '#2C2450', edge: 'rgba(255,227,184,.26)', seam: 'rgba(255,227,184,.16)', side: '#2E2650' },
+  amber_canopy:   { ground: '#7A5434', lane: '#4A3220', edge: 'rgba(255,235,199,.28)', seam: 'rgba(255,235,199,.16)', side: '#A9652F' },
+  moonlit_warren: { ground: '#1A1E3E', lane: '#323A6E', edge: 'rgba(237,235,255,.24)', seam: 'rgba(237,235,255,.16)', side: '#2E4F5A' },
+  coral_tide:     { ground: '#E8C9A8', lane: '#3B6F78', edge: 'rgba(255,255,255,.40)', seam: 'rgba(59,111,120,.40)', side: '#F59A8B' },
+  starfall_glade: { ground: '#100D26', lane: '#2A2456', edge: 'rgba(233,224,255,.26)', seam: 'rgba(233,224,255,.16)', side: '#2E2754', collar: ['#3D366E', '#5E569C'], obstacle: 'ref/obstacle_starfall_glade.svg' },
+  ember_fen:      { ground: '#1C0F0B', lane: '#3E2A22', edge: 'rgba(255,199,158,.26)', seam: 'rgba(255,199,158,.16)', side: '#3E261C' }
+};
+const PIP_Y = 1574;
+const RAIL_TOP = 300, RAIL_H = 1400;
+const COIN_DST = [610, 124], SEED_DST = [806, 124];
+
+class Component extends DCLogic {
+  bushRef = React.createRef();
+  componentDidMount() { this.syncAnim(); }
+  componentDidUpdate() { this.syncAnim(); }
+  componentWillUnmount() { if (this.anim) this.anim.cancel(); }
+  syncAnim() {
+    const el = this.bushRef.current;
+    const b = this.props.bush ?? 'idle';
+    const want = el && (b === 'idle' || b === 'missed');
+    if (this.animEl === el && !!this.anim === !!want) return;
+    if (this.anim) { this.anim.cancel(); this.anim = null; }
+    this.animEl = el;
+    if (want && el.animate) {
+      this.anim = el.animate(
+        [{ transform: 'rotate(-5deg) scaleY(1)' }, { transform: 'rotate(5deg) scaleY(1.04)' }],
+        { duration: 450, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' });
+    }
+  }
+
+  renderVals() {
+    const p = this.props;
+    const mode = p.mode ?? 'level';
+    const seasonId = SEASONS[p.season] ? p.season : 'country_bloom';
+    const S = SEASONS[seasonId];
+    const progress = Math.max(0, Math.min(1, Number(p.progress ?? 0.5)));
+    const bush = p.bush ?? 'idle';
+    const reward = p.reward === 'seed' ? 'seed' : 'coin';
+    const seam = Number(p.bushSeam ?? 675) === 405 ? 405 : 675;
+    let coins = Number(p.coins ?? 12), seeds = Number(p.seeds ?? 5);
+
+    const rootStyle = 'position:relative;width:1080px;height:1920px;flex:0 0 auto;overflow:hidden;font-family:Nunito,sans-serif;-webkit-font-smoothing:antialiased;background:' + S.ground;
+    const lane = (l) => 'position:absolute;left:' + l + 'px;top:0;width:200px;height:1920px;box-sizing:border-box;background:' + S.lane + ';border-left:4px solid ' + S.edge + ';border-right:4px solid ' + S.edge;
+    const dashes = [];
+    [405, 675].forEach((x) => { for (let y = -20; y < 1920; y += 108) dashes.push({ style: 'position:absolute;left:' + (x - 3) + 'px;top:' + y + 'px;width:6px;height:46px;border-radius:3px;background:' + S.seam }); });
+    const tufts = [];
+    const tp = [[40, 260], [110, 520], [52, 880], [118, 1240], [44, 1660], [960, 330], [1030, 700], [948, 1060], [1020, 1420], [960, 1800]];
+    tp.forEach(([x, y], i) => { const h = 38 + (i % 3) * 8; tufts.push({ style: 'position:absolute;left:' + x + 'px;top:' + y + 'px;width:' + Math.round(h * 0.6) + 'px;height:' + h + 'px;background:' + S.side + ';clip-path:polygon(50% 0%,100% 100%,0% 100%)' }); });
+
+    // bush frames
+    let bushY = 980, bushX = seam, pipX = 540, flyers = [], showBurst = false, burstLeaves = [], showBush = bush !== 'none';
+    const fly = (src, dst, t, size, kind) => {
+      const x = src[0] + (dst[0] - src[0]) * t, y = src[1] + (dst[1] - src[1]) * t - Math.sin(t * Math.PI) * 140;
+      const s = Math.round(size * (1 - 0.3 * t));
+      return { coin: kind === 'coin', seed: kind === 'seed', style: 'position:absolute;left:' + Math.round(x - s / 2) + 'px;top:' + Math.round(y - s / 2) + 'px;width:' + s + 'px;height:' + s + 'px;z-index:6' };
+    };
+    const nFly = reward === 'coin' ? 4 : 2;
+    if (bush === 'cross') { bushY = PIP_Y - 30; pipX = seam; }
+    if (bush === 'burst') {
+      bushY = PIP_Y - 30; pipX = seam + 135; showBush = false; showBurst = true;
+      const ang = [-160, -115, -65, -20, 25, 155];
+      burstLeaves = ang.map((a, i) => { const r = (a * Math.PI) / 180, d = 92 + (i % 2) * 14; return { src: '../assets/run/bush/bush_' + seasonId + '_leaf.svg', style: 'position:absolute;left:' + Math.round(Math.cos(r) * d - 18) + 'px;top:' + Math.round(Math.sin(r) * d - 12) + 'px;width:36px;height:24px;transform:rotate(' + (a + 90) + 'deg)' }; });
+      for (let i = 0; i < nFly; i++) { const ox = (i - (nFly - 1) / 2) * 58; flyers.push({ coin: reward === 'coin', seed: reward === 'seed', style: 'position:absolute;left:' + Math.round(seam + ox - 32) + 'px;top:' + Math.round(bushY - 150 - (i % 2) * 34) + 'px;width:64px;height:64px;z-index:6' }); }
+    }
+    if (bush === 'fly') {
+      bushY = PIP_Y - 30; pipX = seam + 135; showBush = false;
+      const dst = reward === 'coin' ? COIN_DST : SEED_DST;
+      const ts = reward === 'coin' ? [0.55, 0.68, 0.81, 0.94] : [0.7, 0.9];
+      ts.forEach((t) => flyers.push(fly([seam, bushY - 150], dst, t, 64, reward)));
+      if (reward === 'coin') coins += 3; else seeds += 1;
+    }
+    if (bush === 'missed') { bushX = 405; bushY = 1790; }
+    const bushWrap = 'position:absolute;left:' + (bushX - 60) + 'px;top:' + (bushY - 70) + 'px;width:120px;height:140px;z-index:4';
+    const burstWrap = 'position:absolute;left:' + seam + 'px;top:' + bushY + 'px;width:0;height:0;z-index:5';
+    const pipWrap = 'position:absolute;left:' + pipX + 'px;top:' + PIP_Y + 'px;width:0;height:0;z-index:3';
+
+    // rail
+    const showRail = mode !== 'endless';
+    const low = progress >= 0.83;
+    const fillH = Math.round(progress * (RAIL_H - 6));
+    const railFill = 'position:absolute;left:3px;right:3px;bottom:3px;height:' + Math.max(0, fillH - 6) + 'px;border-radius:9px;background:' + (low ? '#FFB88C' : '#A8E6CF');
+    const cy = RAIL_TOP + RAIL_H * (1 - progress) - 200; // local to rail wrapper (top 200)
+    const railDone = progress >= 1;
+    const markerStyle = 'position:absolute;left:12px;top:' + Math.round(cy - 46) + 'px;width:92px;height:92px;border-radius:50%;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(18,28,22,.42);box-sizing:border-box;overflow:hidden;display:grid;place-items:center';
+    const flagStyle = 'position:absolute;left:49px;top:' + (railDone ? 0 : 6) + 'px;width:64px;height:96px;transform-origin:11px 92px;transform:' + (railDone ? 'scale(1.18) rotate(-6deg)' : 'none');
+
+    // header
+    const diff = p.difficulty ?? 'Hard';
+    const modeText = mode === 'endless' ? 'Endless · ' + diff : mode === 'tutorial' ? 'Practice' : 'Level ' + (p.level ?? 12);
+    const levelText = 'font:900 ' + (mode === 'endless' ? 42 : 48) + 'px/1 Nunito,sans-serif;color:#2D3436;white-space:nowrap';
+    const bump = (on) => on ? ';transform:scale(1.08)' : '';
+    const chip = (l) => 'position:absolute;left:' + l + 'px;top:0;width:180px;height:128px;border-radius:30px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:10px';
+    const coinChip = chip(520) + bump(bush === 'fly' && reward === 'coin');
+    const seedChip = chip(716) + bump(bush === 'fly' && reward === 'seed');
+
+    return {
+      label: 'Run ' + mode + ' · ' + seasonId + ' · ' + Math.round(progress * 100) + '% · bush ' + bush,
+      rootStyle, lane1: lane(170), lane2: lane(440), lane3: lane(710), dashes, tufts,
+      hasObstacle: !!S.obstacle && bush !== 'cross' && bush !== 'burst' && bush !== 'fly',
+      obstacleSrc: S.obstacle || '',
+      collarStyle: S.collar ? 'position:absolute;left:10px;top:136px;width:240px;height:52px;border-radius:50%;background:' + S.collar[0] + ';border:3px solid ' + S.collar[1] + ';box-sizing:border-box' : 'display:none',
+      showBush, bushWrap, bushRef: this.bushRef,
+      bushBack: '../assets/run/bush/bush_' + seasonId + '_back.svg',
+      bushFront: '../assets/run/bush/bush_' + seasonId + '_front.svg',
+      rewardCoin: reward === 'coin', rewardSeed: reward === 'seed',
+      showBurst, burstWrap, burstLeaves, flyers, pipWrap,
+      showDiamond: !!p.diamondPop,
+      showRail, railFill, railDone, markerStyle, flagStyle,
+      hasFlag: mode !== 'endless', modeText, levelText, coinChip, seedChip,
+      coinText: String(coins), seedText: String(seeds),
+      showToast: bush === 'fly' && reward === 'seed',
+      isFinish: railDone && showRail
+    };
+  }
+}
+</script>
+</body>
+</html>

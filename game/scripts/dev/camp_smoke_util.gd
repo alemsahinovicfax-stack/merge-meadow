@@ -16,6 +16,10 @@ static func backup_save() -> String:
 
 
 static func restore_save(tree: SceneTree, backup: String) -> void:
+	# Odgođeni save iz Arene (save_player_save_soon) ne smije poslije prepisati vraćeni save.
+	var pending := tree.get_root().get_node_or_null("GameState")
+	if pending and "_save_soon_pending" in pending:
+		pending.set("_save_soon_pending", false)
 	if backup.is_empty():
 		# Savea nije bilo prije testa — obrisi onaj koji je test napravio.
 		if FileAccess.file_exists(SAVE_PATH):

@@ -85,7 +85,7 @@ Legenda: ✅ OK · 🟡 djelomično / placeholder · ❌ broken · ⏸ odgođeno
 | Bug-017 | Shop | Cosmetics dugmad ne skidaju coins | Buy → wallet−; Equip radi | P0 | ✅ |
 | Bug-018 | Camp Garden | Nema izbora basket tipa; footer Merge/Play suvišan u hubu | Tap tip → loadout; sakrij Merge/Play u hub mode | P1 | ✅ |
 | Bug-019 | Meta hub | Bottom caption sekcije oduzima prostor | Ukloniti CaptionLabel; tabovi+swipe ostaju | P2 | ✅ |
-| Bug-020 | Wallet + Run | Nema dijamant valute / rare drop | Hub+run diamond chip; ~1/300 seed pickupa | P1 | ✅ |
+| Bug-020 | Wallet + Run | Nema dijamant valute / rare drop | Hub+run diamond chip; ~1/300 seed pickupa — **izbačeno 2026-10-09** (valuta se nigdje nije trošila) | P1 | ✅ |
 | Bug-021 | Journal | Jedan vizual po tipu | T1/T2/T3 ikone; locked sivo, unlocked boja | P2 | ✅ |
 | Bug-022 | Home | Camp/Shop CTA; Settings u headeru; chest u Campu | Home polish; Settings+DailyChest na Home | P0 | ✅ |
 | Bug-023 | Home + Camp | Basket biranje u Campu | Basket picker na Home; ukloni camp basket UX | P0 | ✅ |

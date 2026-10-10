@@ -64,6 +64,7 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 | Web build | Nije revenue target |
 | Level generator na launch | Mjesec 2 — launch s 100 + endless |
 | **SEZ-01 sezone / teme** | v1.1+ (P0 freeze) — nije launch blocker |
+| Dijamanti (valuta, rijetki pickup u runu, „+1” pop, ikona) | Izbačeno 2026-10-09 na zahtjev — valuta se nigdje nije trošila. Premium sezone ostaju IAP (zlatni tab / zlatna cijena bez ikone) |
 
 ## v1.1+ — IN scope ✅ (SEZ-P0, 2026-08-19)
 

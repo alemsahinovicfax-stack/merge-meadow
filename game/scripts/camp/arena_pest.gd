@@ -68,6 +68,12 @@ var _drawn_pose: String = ""
 var _boxes: Dictionary = {}
 var _ice_box: StyleBoxFlat = null
 var _ice_rim: StyleBoxFlat = null
+var _layer_back: _Layer = null
+var _layer_body: _Layer = null
+var _layer_head: _Layer = null
+var _layer_front: _Layer = null
+var _drawn_in_nest: bool = false
+var _drawn_look: Vector2 = Vector2.INF
 
 var _get_edible_chips: Callable
 var _get_keepout_rect: Callable
@@ -89,6 +95,7 @@ func setup(
 	z_index = 50
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	visible = true
+	_redraw_all()
 
 
 func reset_to_nest() -> void:
@@ -101,7 +108,7 @@ func reset_to_nest() -> void:
 	_set_shell(0.0)
 	_pest_center = _nest_center
 	_snap_segments()
-	queue_redraw()
+	_redraw_all()
 
 
 func set_nest_position(center: Vector2) -> void:
@@ -109,7 +116,7 @@ func set_nest_position(center: Vector2) -> void:
 	if _state == State.SLEEPING_NEST:
 		_pest_center = center
 		_snap_segments()
-		queue_redraw()
+		_redraw_all()
 
 
 func on_seeds_poured(has_chips_on_field: bool) -> void:
@@ -118,7 +125,7 @@ func on_seeds_poured(has_chips_on_field: bool) -> void:
 	if _state == State.SLEEPING_NEST or _state == State.SLEEPING_SPOT:
 		_state = State.WAKE_DELAY
 		_wake_timer = GameState.ARENA_PEST_WAKE_DELAY
-		queue_redraw()
+		_redraw_all()
 
 
 func on_field_chip_count_changed(count: int) -> void:
@@ -132,7 +139,7 @@ func on_t3_created() -> void:
 	_freeze_timer = GameState.ARENA_PEST_T3_FREEZE
 	_eat_timer = 0.0
 	_tween_shell(1.0, FREEZE_IN_SEC, Tween.TRANS_BACK, Tween.EASE_OUT)
-	queue_redraw()
+	_redraw_all()
 
 
 func is_active() -> bool:
@@ -167,12 +174,25 @@ func tick(delta: float) -> void:
 			if _eat_timer <= 0.0:
 				_finish_eating()
 	var moved := _update_segments(delta)
-	# Crtez se obnavlja samo kad se nesto vidljivo mijenja: kretanje/jedenje, segmenti koji se
-	# jos namjestaju ili nova poza. Usnuli ili zaleđeni muncher ne trosi frejm.
+	# Crtez se obnavlja samo kad se nesto vidljivo mijenja. Nova poza / ulaz-izlaz iz gnijezda =
+	# svi slojevi; kretanje = tijelo (krugovi) + transform glave; glava se gradi iznova samo kad
+	# se pogled pomjeri ili žvaće. Usnuli ili zaleđeni muncher ne troši frejm.
 	var key := get_pose_key()
-	if moved or key != _drawn_pose or _state == State.HUNTING or _state == State.EATING:
+	_ensure_layers()
+	var in_nest := _in_nest()
+	if key != _drawn_pose or in_nest != _drawn_in_nest:
 		_drawn_pose = key
-		queue_redraw()
+		_drawn_in_nest = in_nest
+		_drawn_look = _look_offset(key)
+		_redraw_all()
+		return
+	if moved or _state == State.HUNTING or _state == State.EATING:
+		_layer_body.queue_redraw()
+		_sync_head()
+		var look := _look_offset(key)
+		if _state == State.EATING or look.distance_squared_to(_drawn_look) > 0.04:
+			_drawn_look = look
+			_layer_head.queue_redraw()
 
 
 func _tick_hunting(delta: float) -> void:
@@ -357,79 +377,164 @@ func _segs_moved(before: Array[Vector2]) -> bool:
 	return false
 
 
-func _draw() -> void:
+## Slojevi crteža (perf 2026-10-09): prije je cijeli muncher (gnijezdo, tijelo, glava s licem,
+## led, zzz) svaki frejm lova iznova gradio ~2,5 ms. Sada:
+##   Back  — zadnji dio gnijezda (samo dok spava u njemu)
+##   Body  — sjene i 3 segmenta: obični krugovi, jeftino, crta se dok se tijelo pomjera
+##   Head  — antene, glava, pjege i lice; Node2D na poziciji glave — pomjera ga transform, a
+##           crtež se gradi samo kad se promijeni poza, pogled (4 px) ili žvakanje
+##   Front — prednji rub gnijezda, led, zzz / „!" / mrvice
+class _Layer:
+	extends Node2D
+
+	var painter: Callable
+
+	func _draw() -> void:
+		if painter.is_valid():
+			painter.call(self)
+
+
+func _ensure_layers() -> void:
+	if _layer_body != null:
+		return
+	_ensure_colors()
+	_layer_back = _make_layer("Back", _paint_back)
+	_layer_body = _make_layer("Body", _paint_body)
+	_layer_head = _make_layer("Head", _paint_head)
+	_layer_front = _make_layer("Front", _paint_front)
+
+
+func _make_layer(node_name: String, painter: Callable) -> _Layer:
+	var layer := _Layer.new()
+	layer.name = node_name
+	layer.painter = painter
+	add_child(layer)
+	return layer
+
+
+func _ensure_colors() -> void:
 	if _colors.is_empty():
 		for k in UiArenaV2.MUNCHER_COLORS:
 			_colors[k] = UiArenaV2.col(str(UiArenaV2.MUNCHER_COLORS[k]))
+
+
+## Sve iznova (poza, gnijezdo, led, reset).
+func _redraw_all() -> void:
+	_ensure_layers()
+	_sync_head()
+	for layer in [_layer_back, _layer_body, _layer_head, _layer_front]:
+		layer.queue_redraw()
+
+
+func _bob_offset() -> Vector2:
 	var key := get_pose_key()
+	return Vector2(0.0, sin(_bob_t * TAU / BOB_PERIOD) * BOB_AMP if key == "hunt" else 0.0)
+
+
+func _head_pos() -> Vector2:
+	return _pest_center + _bob_offset()
+
+
+## Glava se pomjera transformom; crtež joj se mijenja samo s pozom, pogledom ili žvakanjem.
+func _sync_head() -> void:
+	if _layer_head == null:
+		return
+	var pose: Dictionary = UiArenaV2.MUNCHER_POSES[get_pose_key()]
+	var sc := float(pose.get("head_scale", 1.0))
+	_layer_head.position = _head_pos()
+	_layer_head.rotation = deg_to_rad(float(pose.get("head_rot", 0.0)))
+	_layer_head.scale = Vector2(sc, sc)
+
+
+func _look_offset(key: String) -> Vector2:
+	return _dir * LOOK_PX if key == "hunt" or key == "eat" else Vector2.ZERO
+
+
+func _segs_now(key: String) -> Array[Vector2]:
 	var pose: Dictionary = UiArenaV2.MUNCHER_POSES[key]
-	var in_nest := _in_nest()
-	var bob := sin(_bob_t * TAU / BOB_PERIOD) * BOB_AMP if key == "hunt" else 0.0
-	var off := Vector2(0.0, bob)
-	var head := _pest_center + off
-	var body: Color = _colors["body"]
-	var deep: Color = _colors["body_deep"]
-	var edge: Color = _colors["edge"]
-	var spot: Color = _colors["spot"]
-	if key == "frozen":
-		body = _colors["frozen_body"]
-		deep = _colors["frozen_deep"]
-		edge = _colors["frozen_edge"]
-		spot = _colors["frozen_spot"]
-	elif key == "sleep":
-		body = _colors["asleep_body"]
-		deep = _colors["asleep_deep"]
-		edge = _colors["asleep_edge"]
-		spot = ASLEEP_SPOT
-	if in_nest:
-		_draw_nest_back(_nest_center)
-	var segs: Array[Vector2] = []
+	var off := _bob_offset()
 	var perp := Vector2(-_dir.y, _dir.x)
 	var wave := float(pose.get("wave", 0.0)) * cos(_bob_t * TAU / BOB_PERIOD)
+	var segs: Array[Vector2] = []
 	for k in 3:
 		segs.append(_segs[k] + off + perp * wave * WAVE_WEIGHTS[k])
+	return segs
+
+
+func _pose_colors(key: String) -> Array[Color]:
+	if key == "frozen":
+		return [_colors["frozen_body"], _colors["frozen_deep"], _colors["frozen_edge"], _colors["frozen_spot"]]
+	if key == "sleep":
+		return [_colors["asleep_body"], _colors["asleep_deep"], _colors["asleep_edge"], ASLEEP_SPOT]
+	return [_colors["body"], _colors["body_deep"], _colors["edge"], _colors["spot"]]
+
+
+func _paint_back(cv: CanvasItem) -> void:
+	if _in_nest():
+		_draw_nest_back(cv, _nest_center)
+
+
+func _paint_body(cv: CanvasItem) -> void:
+	var key := get_pose_key()
+	var pose: Dictionary = UiArenaV2.MUNCHER_POSES[key]
+	var cols := _pose_colors(key)
+	var segs := _segs_now(key)
+	var head := _head_pos()
 	var sc := float(pose.get("head_scale", 1.0))
 	# U gnijezdu nema sjene na tlu — tijelo je u rupi (sjena bi virila ispod ruba).
-	if not in_nest:
+	if not _in_nest():
 		var shadow: Color = _colors["shadow"]
 		for k in range(2, -1, -1):
-			draw_circle(segs[k] + Vector2(0.0, SHADOW_DROP), UiArenaV2.MUNCHER_SEG_R[k], shadow)
-		draw_circle(head + Vector2(0.0, SHADOW_DROP), HEAD_R * sc, shadow)
+			cv.draw_circle(segs[k] + Vector2(0.0, SHADOW_DROP), UiArenaV2.MUNCHER_SEG_R[k], shadow)
+		cv.draw_circle(head + Vector2(0.0, SHADOW_DROP), HEAD_R * sc, shadow)
 	for k in range(2, -1, -1):
 		var r: float = UiArenaV2.MUNCHER_SEG_R[k]
-		draw_circle(segs[k], r, edge)
-		draw_circle(segs[k], r - EDGE_W, body if k == 0 else deep)
-		draw_circle(segs[k] + Vector2(4.0 - 0.36 * r, 4.0 - 0.44 * r), r * 0.28, spot)
-	draw_set_transform(head, deg_to_rad(float(pose.get("head_rot", 0.0))), Vector2(sc, sc))
+		cv.draw_circle(segs[k], r, cols[2])
+		cv.draw_circle(segs[k], r - EDGE_W, cols[0] if k == 0 else cols[1])
+		cv.draw_circle(segs[k] + Vector2(4.0 - 0.36 * r, 4.0 - 0.44 * r), r * 0.28, cols[3])
+
+
+## Lokalno oko centra glave (Head layer nosi poziciju, rotaciju i scale poze).
+func _paint_head(cv: CanvasItem) -> void:
+	var key := get_pose_key()
+	var pose: Dictionary = UiArenaV2.MUNCHER_POSES[key]
+	var cols := _pose_colors(key)
+	var edge := cols[2]
+	var spot := cols[3]
 	for tip in pose["antenna"]:
 		var t := _v(tip)
 		var base := Vector2(ANTENNA_BASE_X * signf(t.x), ANTENNA_BASE_Y)
-		draw_line(base, t, edge, ANTENNA_W, true)
-		draw_circle(base, ANTENNA_W * 0.5, edge)
-		draw_circle(t, BULB_R, edge)
-		draw_circle(t, BULB_R - EDGE_W, spot)
-	draw_circle(Vector2.ZERO, HEAD_R, edge)
-	draw_circle(Vector2.ZERO, HEAD_R - EDGE_W, body)
-	draw_circle(Vector2(-28.5, -18.5), 5.5, spot)
-	draw_circle(Vector2(36.0, -16.0), 4.0, spot)
-	_draw_face(key)
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	if in_nest:
-		_draw_nest_front(_nest_center)
+		cv.draw_line(base, t, edge, ANTENNA_W, true)
+		cv.draw_circle(base, ANTENNA_W * 0.5, edge)
+		cv.draw_circle(t, BULB_R, edge)
+		cv.draw_circle(t, BULB_R - EDGE_W, spot)
+	cv.draw_circle(Vector2.ZERO, HEAD_R, edge)
+	cv.draw_circle(Vector2.ZERO, HEAD_R - EDGE_W, cols[0])
+	cv.draw_circle(Vector2(-28.5, -18.5), 5.5, spot)
+	cv.draw_circle(Vector2(36.0, -16.0), 4.0, spot)
+	_draw_face(cv, key)
+
+
+func _paint_front(cv: CanvasItem) -> void:
+	var key := get_pose_key()
+	var head := _head_pos()
+	if _in_nest():
+		_draw_nest_front(cv, _nest_center)
 	if _shell > 0.001:
-		_draw_ice(head + (segs[0] - head) * 0.35)
+		var segs := _segs_now(key)
+		_draw_ice(cv, head + (segs[0] - head) * 0.35)
 	if key == "sleep":
-		_draw_zzz(head)
+		_draw_zzz(cv, head)
 	elif key == "wake":
-		_draw_alarm(head + ALARM_OFFSET)
+		_draw_alarm(cv, head + ALARM_OFFSET)
 	elif key == "eat":
 		for c in CRUMBS:
-			draw_set_transform(head + Vector2(c[0], c[1]), deg_to_rad(float(c[3])), Vector2.ONE)
-			draw_colored_polygon(_ellipse_pts(Vector2.ZERO, Vector2(7.5, 5.0), 16), Color(str(c[2])))
-		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+			cv.draw_set_transform(head + Vector2(c[0], c[1]), deg_to_rad(float(c[3])), Vector2.ONE)
+			cv.draw_colored_polygon(_ellipse_pts(Vector2.ZERO, Vector2(7.5, 5.0), 16), Color(str(c[2])))
+		cv.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
-func _draw_face(key: String) -> void:
+func _draw_face(cv: CanvasItem, key: String) -> void:
 	var ink: Color = _colors["ink"]
 	var mouth: Color = _colors["mouth"]
 	var tooth: Color = _colors["tooth"]
@@ -442,71 +547,71 @@ func _draw_face(key: String) -> void:
 			eye = Vector3(28, 30, 8)
 		for side in [-1.0, 1.0]:
 			var c := Vector2(EYE_CX * side, EYE_CY)
-			draw_colored_polygon(_ellipse_pts(c, Vector2(eye.x, eye.y) * 0.5, 24), ink)
-			draw_colored_polygon(_ellipse_pts(c, Vector2(eye.x, eye.y) * 0.5 - Vector2(3, 3), 24), _colors["eye"])
-			draw_circle(c + look, eye.z * 0.5, ink)
+			cv.draw_colored_polygon(_ellipse_pts(c, Vector2(eye.x, eye.y) * 0.5, 24), ink)
+			cv.draw_colored_polygon(_ellipse_pts(c, Vector2(eye.x, eye.y) * 0.5 - Vector2(3, 3), 24), _colors["eye"])
+			cv.draw_circle(c + look, eye.z * 0.5, ink)
 	elif key == "sleep":
 		for side in [-1.0, 1.0]:
-			draw_arc(Vector2(EYE_CX * side, -20.0), 9.5, 0.0, PI, 12, ink, 5.0, true)
+			cv.draw_arc(Vector2(EYE_CX * side, -20.0), 9.5, 0.0, PI, 12, ink, 5.0, true)
 	elif key == "eat":
 		for side in [-1.0, 1.0]:
-			draw_arc(Vector2(EYE_CX * side, -8.0), 9.5, PI, TAU, 12, ink, 5.0, true)
+			cv.draw_arc(Vector2(EYE_CX * side, -8.0), 9.5, PI, TAU, 12, ink, 5.0, true)
 	if key == "hunt" or key == "eat" or key == "frozen":
 		var brow_y := -36.0 if key == "frozen" else -32.0
 		var tilt := -14.0 if key == "frozen" else 20.0
 		for side in [-1.0, 1.0]:
 			var c := Vector2(EYE_CX * side, brow_y)
 			var d := Vector2.from_angle(deg_to_rad(tilt * -side)) * 14.0
-			draw_line(c - d, c + d, ink, 8.0, true)
-			draw_circle(c - d, 4.0, ink)
-			draw_circle(c + d, 4.0, ink)
+			cv.draw_line(c - d, c + d, ink, 8.0, true)
+			cv.draw_circle(c - d, 4.0, ink)
+			cv.draw_circle(c + d, 4.0, ink)
 	match key:
 		"sleep":
-			_rounded(Rect2(-12, 14, 24, 6), mouth, 3)
-			_rounded(Rect2(3, 18, 8, 8), tooth, 0, 3, mouth, 2)
+			_rounded(cv, Rect2(-12, 14, 24, 6), mouth, 3)
+			_rounded(cv, Rect2(3, 18, 8, 8), tooth, 0, 3, mouth, 2)
 		"hunt":
-			_rounded(Rect2(-26, 4, 52, 24), mouth, 6, 12)
-			draw_colored_polygon(_ellipse_pts(Vector2(0, 22), Vector2(11, 4.5), 16), _colors["tongue"])
-			_rounded(Rect2(-16, 4, 10, 9), tooth, 0, 3)
-			_rounded(Rect2(6, 4, 10, 9), tooth, 0, 3)
+			_rounded(cv, Rect2(-26, 4, 52, 24), mouth, 6, 12)
+			cv.draw_colored_polygon(_ellipse_pts(Vector2(0, 22), Vector2(11, 4.5), 16), _colors["tongue"])
+			_rounded(cv, Rect2(-16, 4, 10, 9), tooth, 0, 3)
+			_rounded(cv, Rect2(6, 4, 10, 9), tooth, 0, 3)
 		"eat":
 			var chomp := absf(sin(_chomp_t * PI / CHOMP_PERIOD))
 			var mouth_h := 12.0 + 36.0 * chomp
-			draw_colored_polygon(_ellipse_pts(Vector2(0, 20), Vector2(32, mouth_h * 0.5), 28), _colors["edge"])
-			draw_colored_polygon(_ellipse_pts(Vector2(0, 20), Vector2(29, mouth_h * 0.5 - 3.0), 28), mouth)
+			cv.draw_colored_polygon(_ellipse_pts(Vector2(0, 20), Vector2(32, mouth_h * 0.5), 28), _colors["edge"])
+			cv.draw_colored_polygon(_ellipse_pts(Vector2(0, 20), Vector2(29, mouth_h * 0.5 - 3.0), 28), mouth)
 			if mouth_h > 22.0:
 				var ty := 20.0 + mouth_h * 0.5 - 9.0
-				draw_colored_polygon(_ellipse_pts(Vector2(0, ty), Vector2(14, 5), 16), _colors["tongue"])
+				cv.draw_colored_polygon(_ellipse_pts(Vector2(0, ty), Vector2(14, 5), 16), _colors["tongue"])
 				var top := 20.0 - mouth_h * 0.5 + 2.0
-				_rounded(Rect2(-17, top, 11, 10), tooth, 0, 3)
-				_rounded(Rect2(6, top, 11, 10), tooth, 0, 3)
+				_rounded(cv, Rect2(-17, top, 11, 10), tooth, 0, 3)
+				_rounded(cv, Rect2(6, top, 11, 10), tooth, 0, 3)
 		"wake":
-			draw_colored_polygon(_ellipse_pts(Vector2(0, 20), Vector2(9, 10), 20), mouth)
+			cv.draw_colored_polygon(_ellipse_pts(Vector2(0, 20), Vector2(9, 10), 20), mouth)
 		"frozen":
-			_rounded(Rect2(-13, 14, 26, 8), mouth, 4)
+			_rounded(cv, Rect2(-13, 14, 26, 8), mouth, 4)
 
 
 ## Gnijezdo 250 x 112: prsten od grancica s ukradenim laticama (straznji dio, ispod tijela).
-func _draw_nest_back(c: Vector2) -> void:
+func _draw_nest_back(cv: CanvasItem, c: Vector2) -> void:
 	var nest := UiArenaV2.MUNCHER_NEST
 	var outer := Vector2(float(nest["w"]), float(nest["h"])) * 0.5
-	draw_colored_polygon(_ellipse_pts(c, outer + Vector2(2.5, 2.5), 48), Color(str(nest["edge"])))
-	draw_colored_polygon(_ellipse_pts(c, outer - Vector2(2.5, 2.5), 48), Color(str(nest["fill"])))
+	cv.draw_colored_polygon(_ellipse_pts(c, outer + Vector2(2.5, 2.5), 48), Color(str(nest["edge"])))
+	cv.draw_colored_polygon(_ellipse_pts(c, outer - Vector2(2.5, 2.5), 48), Color(str(nest["fill"])))
 	var bed_c := c + Vector2(0.0, 3.0)
 	var bed := Vector2(float(nest["bed_w"]), float(nest["bed_h"])) * 0.5
-	draw_colored_polygon(_ellipse_pts(bed_c, bed, 40), Color(str(nest["bed_edge"])))
-	draw_colored_polygon(_ellipse_pts(bed_c, bed - Vector2(4, 4), 40), Color(str(nest["bed"])))
+	cv.draw_colored_polygon(_ellipse_pts(bed_c, bed, 40), Color(str(nest["bed_edge"])))
+	cv.draw_colored_polygon(_ellipse_pts(bed_c, bed - Vector2(4, 4), 40), Color(str(nest["bed"])))
 	var petals: Array = nest["petals"]
 	var spots := [[-61, 3.5, 11, 6.5, -20], [-25, 17.5, 11, 6.5, 15], [41, 15.5, 11, 6.5, -10], [70, -1, 10, 6, 25]]
 	for i in spots.size():
 		var p: Array = spots[i]
-		draw_set_transform(c + Vector2(p[0], p[1]), deg_to_rad(float(p[4])), Vector2.ONE)
-		draw_colored_polygon(_ellipse_pts(Vector2.ZERO, Vector2(p[2], p[3]), 16), Color(str(petals[i])))
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		cv.draw_set_transform(c + Vector2(p[0], p[1]), deg_to_rad(float(p[4])), Vector2.ONE)
+		cv.draw_colored_polygon(_ellipse_pts(Vector2.ZERO, Vector2(p[2], p[3]), 16), Color(str(petals[i])))
+	cv.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 ## Prednji rub gnijezda preko tijela — muncher „lezi u" gnijezdu.
-func _draw_nest_front(c: Vector2) -> void:
+func _draw_nest_front(cv: CanvasItem, c: Vector2) -> void:
 	var nest := UiArenaV2.MUNCHER_NEST
 	var outer := Vector2(float(nest["w"]), float(nest["h"])) * 0.5
 	var inner := outer - Vector2(22.0, 17.0)
@@ -524,20 +629,20 @@ func _draw_nest_front(c: Vector2) -> void:
 	var band := outer_arc.duplicate()
 	for i in range(inner_arc.size() - 1, -1, -1):
 		band.append(inner_arc[i])
-	draw_colored_polygon(band, Color(str(nest["fill"])))
-	draw_polyline(_offset_arc(c, outer + Vector2(2.5, 2.5), a0), Color(str(nest["edge"])), 5.0, true)
-	draw_polyline(inner_arc, Color(str(nest["bed_edge"])), 4.0, true)
+	cv.draw_colored_polygon(band, Color(str(nest["fill"])))
+	cv.draw_polyline(_offset_arc(c, outer + Vector2(2.5, 2.5), a0), Color(str(nest["edge"])), 5.0, true)
+	cv.draw_polyline(inner_arc, Color(str(nest["bed_edge"])), 4.0, true)
 	var twig := Color(str(nest["edge"]))
 	for tw in [[-68, 37, 34, 12], [50, 39, 30, -10]]:
 		var d := Vector2.from_angle(deg_to_rad(float(tw[3]))) * float(tw[2]) * 0.5
 		var m := c + Vector2(tw[0], tw[1])
-		draw_line(m - d, m + d, twig, 5.0, true)
+		cv.draw_line(m - d, m + d, twig, 5.0, true)
 
 
-func _draw_ice(center: Vector2) -> void:
+func _draw_ice(cv: CanvasItem, center: Vector2) -> void:
 	var a := _shell
 	var s := 0.8 + 0.2 * _shell
-	draw_set_transform(center, 0.0, Vector2(s, s))
+	cv.draw_set_transform(center, 0.0, Vector2(s, s))
 	var box := Rect2(-ICE_SIZE * 0.5, ICE_SIZE)
 	if _ice_box == null:
 		_ice_box = StyleBoxFlat.new()
@@ -555,32 +660,32 @@ func _draw_ice(center: Vector2) -> void:
 	sb.border_color = Color(_colors["ice_edge"], a)
 	var rim := _ice_rim
 	rim.border_color = Color(_colors["frozen_edge"], a)
-	draw_style_box(rim, box.grow(2.0))
-	draw_style_box(sb, box)
+	cv.draw_style_box(rim, box.grow(2.0))
+	cv.draw_style_box(sb, box)
 	var tl := box.position
 	var white := Color(_colors["ice_hi"], a)
 	var shine := Vector2.from_angle(deg_to_rad(-35.0))
-	draw_line(tl + Vector2(57, 34.5) - shine * 30.5, tl + Vector2(57, 34.5) + shine * 30.5, white, 9.0, true)
-	draw_line(tl + Vector2(57, 58.5) - shine * 12.5, tl + Vector2(57, 58.5) + shine * 12.5, white, 9.0, true)
+	cv.draw_line(tl + Vector2(57, 34.5) - shine * 30.5, tl + Vector2(57, 34.5) + shine * 30.5, white, 9.0, true)
+	cv.draw_line(tl + Vector2(57, 58.5) - shine * 12.5, tl + Vector2(57, 58.5) + shine * 12.5, white, 9.0, true)
 	var icicle := Color(_colors["ice_edge"], a)
 	for ic in [[34, 18, 24], [86, 16, 18], [134, 18, 28]]:
 		var x := float(ic[0])
-		draw_colored_polygon(PackedVector2Array([
+		cv.draw_colored_polygon(PackedVector2Array([
 			tl + Vector2(x, 168), tl + Vector2(x + float(ic[1]), 168), tl + Vector2(x + float(ic[1]) * 0.5, 168 + float(ic[2]))
 		]), icicle)
 	for cap in [[36, 2, 16], [64, 0, 20], [91, 3, 13]]:
-		draw_circle(tl + Vector2(cap[0], cap[1]), float(cap[2]), white)
+		cv.draw_circle(tl + Vector2(cap[0], cap[1]), float(cap[2]), white)
 	for sp in [[213, 23, 7], [-16.5, 109.5, 5.5]]:
 		var p := tl + Vector2(sp[0], sp[1])
 		var r := float(sp[2]) * 1.414
-		draw_colored_polygon(PackedVector2Array([
+		cv.draw_colored_polygon(PackedVector2Array([
 			p + Vector2(0, -r), p + Vector2(r, 0), p + Vector2(0, r), p + Vector2(-r, 0)
 		]), white)
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	cv.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 ## Zzz desno i nisko — vrh ~16 px od polja kad je gnijezdo na y 108.
-func _draw_zzz(head: Vector2) -> void:
+func _draw_zzz(cv: CanvasItem, head: Vector2) -> void:
 	var z := UiArenaV2.MUNCHER_ZZZ
 	var font := UiChrome.heavy_font(UiChrome.EMBOLDEN_800)
 	var fill := Color(str(z["fill"]))
@@ -590,30 +695,30 @@ func _draw_zzz(head: Vector2) -> void:
 		var o := _v(z["offsets"][i])
 		var top := head.y + o.y - size_px * 0.8
 		var pos := Vector2(head.x + o.x, top + font.get_ascent(size_px))
-		draw_string_outline(font, pos, "z", HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, int(z["outline"]), ink)
-		draw_string(font, pos, "z", HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, fill)
+		cv.draw_string_outline(font, pos, "z", HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, int(z["outline"]), ink)
+		cv.draw_string(font, pos, "z", HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, fill)
 
 
-func _draw_alarm(center: Vector2) -> void:
+func _draw_alarm(cv: CanvasItem, center: Vector2) -> void:
 	var outer := PackedVector2Array()
 	var inner := PackedVector2Array()
 	for q in ALARM_STAR:
 		var p := Vector2(float(q[0]) / 100.0 - 0.5, float(q[1]) / 100.0 - 0.5)
 		outer.append(center + p * ALARM_SIZE)
 		inner.append(center + p * (ALARM_SIZE - 10.0))
-	draw_colored_polygon(outer, _colors["ink"])
-	draw_colored_polygon(inner, _colors["alarm"])
+	cv.draw_colored_polygon(outer, _colors["ink"])
+	cv.draw_colored_polygon(inner, _colors["alarm"])
 	var font := UiChrome.heavy_font(UiChrome.EMBOLDEN_800)
 	var baseline := center.y + (font.get_ascent(36) - font.get_descent(36)) * 0.5
-	draw_string(font, Vector2(center.x - 20.0, baseline), "!", HORIZONTAL_ALIGNMENT_CENTER, 40.0, 36, _colors["ink"])
+	cv.draw_string(font, Vector2(center.x - 20.0, baseline), "!", HORIZONTAL_ALIGNMENT_CENTER, 40.0, 36, _colors["ink"])
 
 
 func _rounded(
-	rect: Rect2, fill: Color, top_r: int, bottom_r: int = -1, border: Color = Color.TRANSPARENT, border_w: int = 0
+	cv: CanvasItem, rect: Rect2, fill: Color, top_r: int, bottom_r: int = -1, border: Color = Color.TRANSPARENT, border_w: int = 0
 ) -> void:
 	var cache_key := "%s|%s|%d|%d|%s|%d" % [rect.size, fill.to_html(), top_r, bottom_r, border.to_html(), border_w]
 	if _boxes.has(cache_key):
-		draw_style_box(_boxes[cache_key], rect)
+		cv.draw_style_box(_boxes[cache_key], rect)
 		return
 	var s := StyleBoxFlat.new()
 	_boxes[cache_key] = s
@@ -628,7 +733,7 @@ func _rounded(
 	if border_w > 0:
 		s.border_color = border
 		s.set_border_width_all(border_w)
-	draw_style_box(s, rect)
+	cv.draw_style_box(s, rect)
 
 
 static func _offset_arc(c: Vector2, r: Vector2, a0: float) -> PackedVector2Array:
@@ -661,6 +766,8 @@ func _tween_shell(target: float, sec: float, trans: Tween.TransitionType, ease_t
 	_shell_tween.tween_method(_set_shell, _shell, target, sec).set_trans(trans).set_ease(ease_type)
 
 
+## Led je samo u prednjem sloju — tween ne gradi glavu ni tijelo iznova.
 func _set_shell(value: float) -> void:
 	_shell = value
-	queue_redraw()
+	if _layer_front != null:
+		_layer_front.queue_redraw()

@@ -28,11 +28,18 @@ func test_apply_save_dict_rejects_version_below_1() -> void:
 	assert_eq(_gs.wallet_coins, wallet_before, "a rejected dict must not mutate any state")
 
 
+## Dijamanti su izbačeni (2026-10-09): stari save s "wallet_diamonds" se učita, ključ se ignoriše.
+func test_old_save_with_diamonds_still_loads() -> void:
+	var ok: bool = _gs.call("_apply_save_dict", {"version": 1, "wallet_coins": 12, "wallet_diamonds": 7})
+	assert_true(ok, "a save that still carries wallet_diamonds must load")
+	assert_eq(_gs.wallet_coins, 12)
+	assert_false("wallet_diamonds" in _gs, "GameState must not keep a diamond wallet")
+
+
 func test_apply_save_dict_defaults_missing_fields() -> void:
 	var ok: bool = _gs.call("_apply_save_dict", {"version": 1})
 	assert_true(ok)
 	assert_eq(_gs.wallet_coins, 0)
-	assert_eq(_gs.wallet_diamonds, 0)
 	assert_eq(_gs.seed_bag, {})
 	assert_eq(_gs.magnet_level, 0)
 	assert_eq(_gs.multiplier_level, 0)

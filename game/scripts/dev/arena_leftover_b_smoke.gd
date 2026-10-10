@@ -1,6 +1,6 @@
 extends SceneTree
 
-## ARENA-02 LEFTOVER-B — stuck bag overlay n/4; tap → Camp; auto-refill does not open it.
+## ARENA-02 LEFTOVER-B — stuck bag overlay n/4; tap → Camp (ili tap van zatvara, camp v3); auto-refill does not open it.
 
 
 const SAVE_PATH := "user://player_save.json"
@@ -245,15 +245,16 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("wallet must not change on overlay, got %d" % int(gs.get("wallet_coins")))
 		return
-	# Zatvara se samo preko "Back to Camp".
+	# Camp v3 (design_handoff_camp_v3 · NeedSeedsModal „close: tap scrim / dugme / back"):
+	# modal vrata ima Back to Camp, a zatvara se i tapom van (ostaje se u Areni).
 	var back_btn := arena.get("back_to_camp_button") as Control
 	if back_btn == null or not back_btn.is_visible_in_tree():
 		_restore_save(backup)
 		_fail("overlay should offer a Back to Camp CTA")
 		return
-	if bool(overlay.get("dismiss_on_scrim")):
+	if not bool(overlay.get("dismiss_on_scrim")):
 		_restore_save(backup)
-		_fail("overlay must not close on any tap — only Back to Camp")
+		_fail("gate modal should also close on a scrim tap (camp v3)")
 		return
 	arena.call("_on_back_to_camp_pressed")
 	if overlay.visible:

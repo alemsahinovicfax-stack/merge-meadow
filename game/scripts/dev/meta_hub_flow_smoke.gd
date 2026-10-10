@@ -129,11 +129,7 @@ func _step() -> void:
 	var flower_icon := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/FlowerChip/HBox/FlowerIcon") as TextureRect
 	var flowers_label := hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/FlowerChip/HBox/FlowersLabel") as Label
 	if flower_icon == null or flower_icon.texture == null or flowers_label == null:
-		push_error("meta_hub_flow_smoke: hub FlowerChip missing (v2 replaced DiamondChip)")
-		_quit(1)
-		return
-	if hub.get_node_or_null("RootVBox/TopBar/Panel/HBox/DiamondChip") != null:
-		push_error("meta_hub_flow_smoke: DiamondChip should be gone from the header")
+		push_error("meta_hub_flow_smoke: hub FlowerChip missing")
 		_quit(1)
 		return
 	if coin_icon == null or coin_icon.texture == null:

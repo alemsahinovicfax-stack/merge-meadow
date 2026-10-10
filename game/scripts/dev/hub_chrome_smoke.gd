@@ -1,7 +1,7 @@
 extends SceneTree
 
 ## Hub chrome v2 (design_handoff_hub_chrome_v2) — geometrija iz handoffa, ikone bez
-## labela, FlowerChip umjesto dijamanta, badge, nav lock, Settings toast.
+## labela, FlowerChip, badge, nav lock, Settings toast.
 
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
 const UI_CHROME := preload("res://scripts/visual/ui_chrome.gd")
@@ -9,7 +9,7 @@ const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
 const HEADER_ROW := "RootVBox/TopBar/Panel/HBox"
 const FOOTER_CONTENT := "RootVBox/PageIndicator/NavPanel/Content"
 const CHROME_ICONS: Array[String] = [
-	"icon_coin", "icon_seed", "icon_flower", "icon_diamond", "icon_lock",
+	"icon_coin", "icon_seed", "icon_flower", "icon_lock",
 	"icon_settings", "icon_settings_light",
 	"tab_shop", "tab_shop_light", "tab_journal", "tab_journal_light", "tab_home", "tab_home_light",
 	"tab_camp", "tab_camp_light", "tab_arena", "tab_arena_light",

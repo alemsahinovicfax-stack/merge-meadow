@@ -259,7 +259,11 @@ static func draw_dashed_round_rect(canvas: CanvasItem, rect: Rect2, radius: floa
 	var count := maxi(1, roundi(total / period))
 	period = total / float(count)
 	var dash := period * 0.62
-	var seg := PackedVector2Array()
+	# Sve crtice idu u JEDAN draw_multiline (parovi tačaka). Prije je svaka crtica bila svoj
+	# AA draw_polyline = svoj draw poziv: Home kartica sezone bez cvijeća (6 diskova) je
+	# imala ~1300 draw poziva svaki frejm (perf 2026-10-09).
+	var lines := PackedVector2Array()
+	var prev := Vector2.INF
 	var cursor := 0.0
 	for i in pts.size() - 1:
 		var a := pts[i]
@@ -272,18 +276,17 @@ static func draw_dashed_round_rect(canvas: CanvasItem, rect: Rect2, radius: floa
 			var step := (dash - phase) if on else (period - phase)
 			var t2 := minf(seg_len, t + maxf(step, 0.001))
 			if on:
-				if seg.is_empty():
-					seg.append(a.lerp(b, t / seg_len))
-				seg.append(a.lerp(b, t2 / seg_len))
-			elif seg.size() >= 2:
-				canvas.draw_polyline(seg, color, width, true)
-				seg = PackedVector2Array()
+				var p0 := a.lerp(b, t / seg_len) if prev == Vector2.INF else prev
+				var p1 := a.lerp(b, t2 / seg_len)
+				lines.append(p0)
+				lines.append(p1)
+				prev = p1
 			else:
-				seg = PackedVector2Array()
+				prev = Vector2.INF
 			t = t2
 		cursor += seg_len
-	if seg.size() >= 2:
-		canvas.draw_polyline(seg, color, width, true)
+	if not lines.is_empty():
+		canvas.draw_multiline(lines, color, width, true)
 
 ## Chevron iz CSS kvadrata `size x size` s rubom `w` na dvije strane, rotiran 45°.
 ## left: rub lijevo + dolje (‹); inace desno + gore (›). `center` = centar kvadrata.

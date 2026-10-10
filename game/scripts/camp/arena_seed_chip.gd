@@ -5,6 +5,8 @@ extends Control
 ## Crtež je u djetetu `_art` (2026-10-06): let pri sipanju pomjera samo `_art` (transform),
 ## bez ponovnog crtanja — prije je svaka od ~30 sjemenki svaki frejm iznova gradila 5
 ## StyleBoxova i cvijet, pa je sipanje obaralo FPS.
+## Prsten (pulse / partner / merge) je u svom sloju `_ring` (perf 2026-10-09): puls para dok
+## igrač vuče sjemenku mijenja samo `_ring.modulate`, a crtež sjemenke se ne gradi svaki frejm.
 
 signal drag_started(chip: ArenaSeedChip)
 signal drag_released(chip: ArenaSeedChip)
@@ -41,7 +43,7 @@ var pulse_highlight: bool:
 			return
 		_pulse_highlight = value
 		set_process(value)
-		_redraw()
+		_update_ring()
 	get:
 		return _pulse_highlight
 
@@ -52,7 +54,7 @@ var magnet_partner: bool = false:
 		magnet_partner = value
 		if not _dragging and not _being_eaten:
 			_tween_pose(_rest_scale(), 0.0)
-		_redraw()
+		_update_ring()
 
 var _mythic: bool = false
 var _dragging: bool = false
@@ -63,6 +65,7 @@ var _fly_offset: Vector2 = Vector2.ZERO
 var _pose_tween: Tween = null
 var _fx_tween: Tween = null
 var _art: _Art = null
+var _ring: _Ring = null
 
 
 ## Crta sjemenku u svom rectu; let pomjera ovaj čvor, ne crtež.
@@ -73,6 +76,17 @@ class _Art:
 
 	func _draw() -> void:
 		chip._draw_art(self)
+
+
+## Prsten oko sjemenke; prozirnost (puls, merge flash) ide kroz modulate, ne kroz crtež.
+class _Ring:
+	extends Control
+
+	var chip: ArenaSeedChip
+	var kind: int = ArenaChipDraw.Ring.NONE
+
+	func _draw() -> void:
+		ArenaChipDraw.draw_ring(self, size * 0.5, chip.tier, kind)
 
 
 func setup(id: int, seed_type: String, at: Vector2, seed_tier: int = 1) -> void:
@@ -99,6 +113,13 @@ func _ensure_art() -> void:
 	_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_art.size = size
 	add_child(_art)
+	_ring = _Ring.new()
+	_ring.name = "Ring"
+	_ring.chip = self
+	_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_ring.size = size
+	_ring.visible = false
+	add_child(_ring)
 
 
 func _redraw() -> void:
@@ -106,9 +127,38 @@ func _redraw() -> void:
 		_art.queue_redraw()
 
 
+## Prioritet kao prije: merge flash > partner > puls. Crtež prstena se gradi samo kad se vrsta
+## promijeni; puls i merge mijenjaju samo modulate.
+func _update_ring() -> void:
+	if _ring == null:
+		return
+	var kind := ArenaChipDraw.Ring.NONE
+	var alpha := 1.0
+	if _merge_ring > 0.0:
+		kind = ArenaChipDraw.Ring.MERGE
+		alpha = _merge_ring
+	elif magnet_partner:
+		kind = ArenaChipDraw.Ring.PARTNER
+	elif _pulse_highlight:
+		kind = ArenaChipDraw.Ring.PULSE
+		alpha = _pulse_alpha()
+	_ring.visible = kind != ArenaChipDraw.Ring.NONE
+	_ring.modulate.a = alpha
+	if kind != _ring.kind:
+		_ring.kind = kind
+		_ring.queue_redraw()
+
+
+func _pulse_alpha() -> float:
+	var phase := Time.get_ticks_msec() / 1000.0 * TAU / PULSE_PERIOD
+	return 0.55 + 0.45 * (0.5 + 0.5 * sin(phase))
+
+
 func set_tier(new_tier: int) -> void:
 	tier = new_tier
 	_redraw()
+	if _ring != null:
+		_ring.queue_redraw()
 
 
 func get_center() -> Vector2:
@@ -220,24 +270,13 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
-	if pulse_highlight:
-		_redraw()
+	if _pulse_highlight and _ring != null and _ring.kind == ArenaChipDraw.Ring.PULSE:
+		_ring.modulate.a = _pulse_alpha()
 
 
 func _draw_art(canvas: CanvasItem) -> void:
-	var ring := ArenaChipDraw.Ring.NONE
-	var ring_alpha := 1.0
-	if _merge_ring > 0.0:
-		ring = ArenaChipDraw.Ring.MERGE
-		ring_alpha = _merge_ring
-	elif magnet_partner:
-		ring = ArenaChipDraw.Ring.PARTNER
-	elif pulse_highlight:
-		ring = ArenaChipDraw.Ring.PULSE
-		var phase := Time.get_ticks_msec() / 1000.0 * TAU / PULSE_PERIOD
-		ring_alpha = 0.55 + 0.45 * (0.5 + 0.5 * sin(phase))
 	ArenaChipDraw.draw_chip(
-		canvas, size * 0.5, type_id, tier, _mythic, ring, ring_alpha, _dragging, _being_eaten
+		canvas, size * 0.5, type_id, tier, _mythic, ArenaChipDraw.Ring.NONE, 1.0, _dragging, _being_eaten
 	)
 
 
@@ -288,8 +327,10 @@ func _set_fly_offset(value: Vector2) -> void:
 	_fly_offset = value
 	if _art != null:
 		_art.position = _fly_offset / maxf(scale.x, 0.01)
+	if _ring != null:
+		_ring.position = _fly_offset / maxf(scale.x, 0.01)
 
 
 func _set_merge_ring(value: float) -> void:
 	_merge_ring = value
-	_redraw()
+	_update_ring()

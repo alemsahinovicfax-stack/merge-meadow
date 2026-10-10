@@ -67,6 +67,11 @@ func get_pages_host() -> Control:
 	return _pages_host
 
 
+## Prst je na ekranu ili stranica još klizi — hub tada ne instancira stranice u pozadini.
+func is_moving() -> bool:
+	return _touch_active or _dragging or (_snap_tween != null and _snap_tween.is_valid() and _snap_tween.is_running())
+
+
 ## Živa pozicija u stranicama (npr. 2.4 usred swipea Home → Camp) — hub ActiveIndicator.
 func get_scroll_page() -> float:
 	if _pages_host == null or _page_width < 1.0:

@@ -279,7 +279,8 @@ func _layout() -> void:
 	var unlock_w := 4.0 + 36.0 + 56.0 + 18.0 + UiHomeV3.text_w(900, 54, "Unlock") + 18.0 + 15.0 + 18.0 \
 		+ 56.0 + 18.0 + UiHomeV3.text_w(900, 54, str(_i("coins_need")), 0.0, true) + 48.0 + 4.0
 	_unlock = Rect2(cx - unlock_w * 0.5, mid - UiHomeV3.ACTION_H * 0.5, unlock_w, UiHomeV3.ACTION_H)
-	var buy_w := 4.0 + 40.0 + 64.0 + 18.0 + UiHomeV3.text_w(900, 60, _price(), 0.0, true) + 56.0 + 4.0
+	# Zlatna cijena bez ikone (dijamanti izbačeni 2026-10-09): padding 56 s obje strane.
+	var buy_w := 4.0 + 56.0 + UiHomeV3.text_w(900, 60, _price(), 0.0, true) + 56.0 + 4.0
 	_buy = Rect2(cx - buy_w * 0.5, mid - UiHomeV3.ACTION_H * 0.5, buy_w, UiHomeV3.ACTION_H)
 	var owned_w := 4.0 + 36.0 + 31.0 + 18.0 + UiHomeV3.text_w(900, 50, "Yours") + 48.0 + 4.0
 	_owned = Rect2(cx - owned_w * 0.5, mid - 60.0, owned_w, 120.0)
@@ -441,9 +442,7 @@ func _draw_buy() -> void:
 	var busy := bool(data.get("buying", false))
 	UiHomeV3.draw_panel(self, b, UiHomeV3.GOLD, 70.0, 4.0, UiHomeV3.INK, 4.0 if down else 8.0)
 	var cy := b.get_center().y
-	var x := b.position.x + 4.0 + 40.0
-	_icon("icon_diamond", Vector2(x + 32.0, cy), 64.0)
-	x += 64.0 + 18.0
+	var x := b.position.x + 4.0 + 56.0
 	UiHomeV3.draw_text(self, 900, 60, _price(), Vector2(x, cy - 30.0), UiHomeV3.INK, 0.0, true)
 	if busy:
 		draw_style_box(UiStage.box(Color(UiHomeV3.CREAM, 0.45), 70), b)

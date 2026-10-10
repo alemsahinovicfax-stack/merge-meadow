@@ -26,7 +26,13 @@ static var _anims: Dictionary = {}
 static var _skins: Dictionary = {}
 static var _behaviors: Dictionary = {}
 static var _atlas: Dictionary = {}
+## key → {"task", "raster"} (najviše jedan) i red čekanja za request_atlas.
+static var _jobs: Dictionary = {}
+static var _job_queue: Array[String] = []
+## Biblioteka po "pogled|reduce_motion", puni se po animaciji (_ensure_anim).
 static var _libs: Dictionary = {}
+static var _by_view: Dictionary = {}
+static var _paths: Dictionary = {}
 
 var nodes: Dictionary = {}
 var sprites: Dictionary = {}
@@ -38,6 +44,8 @@ var _look := Vector3.ZERO
 var _face_left: bool = false
 var _after_pose: String = ""
 var _built: bool = false
+var _lib_view: String = ""
+var _lib_rm: bool = false
 
 
 static func reduce_motion() -> bool:
@@ -170,6 +178,75 @@ static func atlas_for(key: String) -> Dictionary:
 	data()
 	if _atlas.has(key):
 		return _atlas[key]
+	if _jobs.has(key):
+		_finish_job(key)
+		return _atlas[key]
+	_job_queue.erase(key)
+	_atlas[key] = _atlas_from(_raster(key))
+	return _atlas[key]
+
+
+## Atlas bez čekanja na glavnom threadu (perf 2026-10-10): Shop u hubu je rasterizovao 3 skina
+## u jednom frejmu (~400 ms). SVG → Image ide u WorkerThreadPool, jedan posao u isto vrijeme
+## (ThorVG + slab telefon); tekstura se pravi na glavnom threadu u atlas_ready / atlas_for.
+static func request_atlas(key: String) -> void:
+	data()
+	if _atlas.has(key) or _jobs.has(key) or _job_queue.has(key):
+		return
+	_job_queue.append(key)
+	_pump_jobs()
+
+
+## true kad je atlas spreman (završen posao se ovdje preuzme); inače pokreće sljedeći u redu.
+static func atlas_ready(key: String) -> bool:
+	if _atlas.has(key):
+		return true
+	if _jobs.has(key) and WorkerThreadPool.is_task_completed(int(_jobs[key]["task"])):
+		_finish_job(key)
+		return true
+	_pump_jobs()
+	return false
+
+
+static func _pump_jobs() -> void:
+	for k in _jobs:
+		if not WorkerThreadPool.is_task_completed(int(_jobs[k]["task"])):
+			return
+		_finish_job(k)
+		break
+	if not _jobs.is_empty() or _job_queue.is_empty():
+		return
+	var key: String = _job_queue.pop_front()
+	var job := {}
+	job["task"] = WorkerThreadPool.add_task(func() -> void: job["raster"] = _raster(key))
+	_jobs[key] = job
+	# GDScript u threadu dok se skripte gase pri izlasku = pad (exit 139): sačekaj posao.
+	var loop := Engine.get_main_loop() as SceneTree
+	if loop != null and loop.root != null and not loop.root.tree_exiting.is_connected(_drain_jobs):
+		loop.root.tree_exiting.connect(_drain_jobs)
+
+
+static func _drain_jobs() -> void:
+	_job_queue.clear()
+	for k in _jobs.keys():
+		WorkerThreadPool.wait_for_task_completion(int(_jobs[k]["task"]))
+	_jobs.clear()
+
+
+static func _finish_job(key: String) -> void:
+	var job: Dictionary = _jobs[key]
+	WorkerThreadPool.wait_for_task_completion(int(job["task"]))
+	_jobs.erase(key)
+	_atlas[key] = _atlas_from(job["raster"])
+
+
+static func _atlas_from(raster: Dictionary) -> Dictionary:
+	var atlas: Image = raster["image"]
+	return {"texture": ImageTexture.create_from_image(atlas), "regions": raster["regions"], "subs": {}}
+
+
+## Samo Image / string operacije — sigurno van glavnog threada.
+static func _raster(key: String) -> Dictionary:
 	var sk: Dictionary = _skins.get(key, _skins.get("classic", {}))
 	var recolor: Dictionary = sk.get("recolor", {})
 	var files: Dictionary = {}
@@ -210,9 +287,7 @@ static func atlas_for(key: String) -> Dictionary:
 	atlas.fill(Color(0, 0, 0, 0))
 	for f in regions:
 		atlas.blit_rect(imgs[f], Rect2i(Vector2i.ZERO, imgs[f].get_size()), Vector2i(regions[f].position))
-	var out := {"texture": ImageTexture.create_from_image(atlas), "regions": regions, "subs": {}}
-	_atlas[key] = out
-	return out
+	return {"image": atlas, "regions": regions}
 
 
 ## Rig z slaže dijelove unutar lika (±50). Godot ga zbraja na z hosta (polje 20),
@@ -310,7 +385,9 @@ func build() -> void:
 	overlay = AnimationPlayer.new()
 	overlay.name = "Overlay"
 	add_child(overlay)
-	var lib := library(view, reduce_motion())
+	_lib_view = view
+	_lib_rm = reduce_motion()
+	var lib := library(_lib_view, _lib_rm)
 	body.add_animation_library("", lib)
 	overlay.add_animation_library("", lib)
 	if not body.animation_finished.is_connected(_on_body_done):
@@ -404,20 +481,34 @@ func library(v: String, rm: bool) -> AnimationLibrary:
 	if _libs.has(key):
 		return _libs[key]
 	var lib := AnimationLibrary.new()
-	for id in _anims:
-		lib.add_animation(id, _to_animation(_anims[id], v, rm))
 	_libs[key] = lib
 	return lib
 
 
+## Animacija se pretvara iz JSON-a tek kad se prvi put pusti (perf 2026-10-10): cijela
+## biblioteka (75 animacija) je ~45 ms po pogledu, a plaćao ju je prvi Pip u Shopu, Ormaru i runu.
+func _ensure_anim(id: String) -> void:
+	if body == null or not _anims.has(id):
+		return
+	var lib := library(_lib_view, _lib_rm)
+	if not lib.has_animation(id):
+		lib.add_animation(id, _to_animation(_anims[id], _lib_view, _lib_rm))
+
+
 func _view_nodes(v: String) -> Dictionary:
+	if _by_view.has(v):
+		return _by_view[v]
 	var out: Dictionary = {}
 	for n in _rig["views"][v]["nodes"]:
 		out[str(n["id"])] = n
+	_by_view[v] = out
 	return out
 
 
 func _node_path(v: String, id: String) -> NodePath:
+	var pkey := v + "|" + id
+	if _paths.has(pkey):
+		return _paths[pkey]
 	var by_id := _view_nodes(v)
 	var chain: PackedStringArray = PackedStringArray()
 	var cur := id
@@ -428,7 +519,8 @@ func _node_path(v: String, id: String) -> NodePath:
 		var p: Variant = n.get("parent", null)
 		cur = "" if p == null else str(p)
 		guard += 1
-	return NodePath("/".join(chain))
+	_paths[pkey] = NodePath("/".join(chain))
+	return _paths[pkey]
 
 
 func _rest_of(n: Dictionary) -> Array:
@@ -515,6 +607,7 @@ func play(id: String) -> void:
 	var rm := reduce_motion()
 	if rm and str(a.get("reduce_motion", {}).get("type", "")) == "skip":
 		return
+	_ensure_anim(id)
 	if str(a.get("layer", "base")) == "overlay":
 		overlay.stop()
 		overlay.play(id)
@@ -537,6 +630,7 @@ func pose(id: String) -> void:
 	if not _anims.has(id) or body == null:
 		return
 	still = true
+	_ensure_anim(id)
 	body.play(id)
 	body.seek(float(_anims[id]["length"]), true)
 	body.pause()
@@ -565,6 +659,7 @@ func _on_body_done(id: StringName) -> void:
 	if bool(_anims.get(str(id), {}).get("hold_last", false)):
 		return
 	if not loop_id.is_empty() and not still:
+		_ensure_anim(loop_id)
 		body.play(loop_id)
 
 

@@ -37,6 +37,7 @@ var _preview_types: Array[String] = []
 var _wiggle_t: float = 0.0
 var _can_pour: bool = false
 var _show_counter: bool = true
+var _state_drawn: bool = false
 var _base_position: Vector2 = Vector2.ZERO
 var _pour_tilt: float = 0.0
 var _pour_fly: float = 0.0
@@ -96,16 +97,23 @@ func get_base_position() -> Vector2:
 	return _base_position
 
 
+## Korpa se iscrtava samo kad se nešto vidljivo promijeni: Arena zove _refresh_bag posle svakog
+## mergea, a crtež korpe (pleter, gomila od 12 cvjetova) košta 2–4 ms (perf 2026-10-09).
 func set_state(seed_count: int, can_pour: bool, preview_types: Array) -> void:
+	var types: Array[String] = []
+	for t in preview_types:
+		types.append(str(t))
+	var changed := seed_count != _seed_count or can_pour != _can_pour or types != _preview_types \
+		or not _state_drawn
 	_seed_count = seed_count
 	_can_pour = can_pour
 	_open = seed_count >= 2
-	_preview_types.clear()
-	for t in preview_types:
-		_preview_types.append(str(t))
+	_preview_types = types
 	visible = true
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	_redraw_all()
+	if changed:
+		_state_drawn = true
+		_redraw_all()
 
 
 func _redraw_all() -> void:
@@ -156,6 +164,8 @@ func get_mouth_position() -> Vector2:
 
 
 func set_counter_visible(on: bool) -> void:
+	if on == _show_counter:
+		return
 	_show_counter = on
 	_redraw_all()
 

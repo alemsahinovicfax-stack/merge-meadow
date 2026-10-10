@@ -1,6 +1,6 @@
 extends HubPressable
 
-## Pause — 128 px hit. Ikona iz assets/ui/run; dva stupca ako SVG još nije importan.
+## Pause — 128 px hit (Run HUD v2: krem čip r 30, ikona 60). Dva stupca ako SVG još nije importan.
 
 var _style: StyleBoxFlat
 var _icon: Texture2D
@@ -9,7 +9,7 @@ var _icon: Texture2D
 func _ready() -> void:
 	super._ready()
 	custom_minimum_size = Vector2(UiRun.PAUSE_RECT.size.x, UiRun.PAUSE_RECT.size.y)
-	_style = UiRun.chip_style(32)
+	_style = UiRun.chip_style()
 	_icon = UiAssets.get_run_icon("icon_pause")
 	resized.connect(queue_redraw)
 	queue_redraw()
@@ -20,7 +20,7 @@ func _draw() -> void:
 		return
 	_style.draw(get_canvas_item(), Rect2(Vector2.ZERO, size))
 	if _icon != null:
-		var side := minf(size.x, size.y) * 0.5
+		var side := float(UiRun.PAUSE_ICON) * minf(size.x, size.y) / UiRun.PAUSE_RECT.size.x
 		var rect := Rect2((size.x - side) * 0.5, (size.y - side) * 0.5, side, side)
 		draw_texture_rect(_icon, rect, false)
 		return

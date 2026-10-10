@@ -75,7 +75,7 @@ func grant_combo_coins() -> int:
 	var grant := mini(COMBO_COINS, remaining)
 	_owner._add_coins(grant)
 	combo_coins_granted_today += grant
-	_owner.save_player_save()
+	_owner.save_player_save_soon()
 	return grant
 
 
@@ -102,7 +102,7 @@ func ensure_daily_task() -> void:
 	daily_kind = _daily_kind_for_day(today)
 	daily_goal = _daily_goal_for_kind(daily_kind)
 	daily_progress = 0
-	_owner.save_player_save()
+	_owner.save_player_save_soon()
 
 
 func note_daily_event(kind: String) -> void:
@@ -112,7 +112,7 @@ func note_daily_event(kind: String) -> void:
 	if daily_progress >= daily_goal:
 		return
 	daily_progress += 1
-	_owner.save_player_save()
+	_owner.save_player_save_soon()
 
 
 func can_claim_daily() -> bool:
@@ -202,7 +202,7 @@ func pull_seeds(max_count: int, _field_type_counts: Dictionary = {}) -> Array:
 		out.append({"chip_id": chip_id, "type_id": type_id, "tier": 1})
 		pulled += 1
 	if pulled > 0:
-		_owner.save_player_save()
+		_owner.save_player_save_soon()
 	return out
 
 

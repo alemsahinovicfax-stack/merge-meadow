@@ -5,37 +5,16 @@
 extends "res://test/unit/game_state_test_base.gd"
 
 var _coins_before: int
-var _diamonds_before: int
 
 
 func before_each() -> void:
 	super.before_each()
 	_coins_before = _gs.wallet_coins
-	_diamonds_before = _gs.wallet_diamonds
 
 
 func after_each() -> void:
 	_gs.wallet_coins = _coins_before
-	_gs.wallet_diamonds = _diamonds_before
 	super.after_each()
-
-
-func test_add_diamonds_increases_wallet() -> void:
-	_gs.wallet_diamonds = 5
-	_gs.add_diamonds(3)
-	assert_eq(_gs.get_diamonds(), 8, "add_diamonds should add the given amount")
-
-
-func test_add_diamonds_ignores_zero_amount() -> void:
-	_gs.wallet_diamonds = 5
-	_gs.add_diamonds(0)
-	assert_eq(_gs.get_diamonds(), 5, "add_diamonds(0) must be a no-op")
-
-
-func test_add_diamonds_ignores_negative_amount() -> void:
-	_gs.wallet_diamonds = 5
-	_gs.add_diamonds(-10)
-	assert_eq(_gs.get_diamonds(), 5, "add_diamonds(negative) must be a no-op, not subtract")
 
 
 func test_try_coin_unlock_next_seed_reports_missing_funds() -> void:

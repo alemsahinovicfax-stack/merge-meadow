@@ -2,13 +2,14 @@ extends Node2D
 
 ## Lane runner. Mechanics (lanes, swipe, spawn, magnet, 50/100 loot) stay as in §2.
 ## Visuals: design_handoff_run direction A. Obstacle collision stays 64×64.
+## HUD: design_handoff_run_hud_v2 — jedan red (Level · coin · seed · pauza), traka napretka
+## lijevo i nagradni grm na šavu staza.
 
 const BASE_SCROLL_SPEED := 400.0
 const SPAWN_INTERVAL := 1.2
 const SPAWN_CHANCE := 0.7
 const OBSTACLE_CHANCE := 0.25
 const PICKUP_SEED_CHANCE := 0.30
-const DIAMOND_SEED_RATIO := 300
 const RAMP_STEP := 0.05
 const RAMP_EVERY := 15.0
 
@@ -17,32 +18,21 @@ const _STATE_ENDED := 1
 const _STATE_PAUSED := 2
 
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
-const UI_PALETTE := preload("res://scripts/visual/ui_palette.gd")
 const TOKEN_SCRIPT := preload("res://scripts/run/run_token.gd")
 const RING_SCRIPT := preload("res://scripts/run/run_ring_fx.gd")
 
 @onready var background: Sprite2D = $Background
 @onready var top_hud: Control = $HUD/TopHud
-@onready var timer_chip: Panel = $HUD/TopHud/TimerChip
-@onready var timer_ring: Control = $HUD/TopHud/TimerChip/Row/Ring
-@onready var mode_label: Label = $HUD/TopHud/TimerChip/Row/TextCol/ModeLabel
-@onready var seconds_label: Label = $HUD/TopHud/TimerChip/Row/TextCol/SecondsLabel
+@onready var level_chip: PanelContainer = $HUD/TopHud/LevelChip
+@onready var flag_icon: TextureRect = $HUD/TopHud/LevelChip/Row/FlagIcon
+@onready var mode_label: Label = $HUD/TopHud/LevelChip/Row/ModeLabel
 @onready var pause_button: Control = $HUD/TopHud/PauseButton
-@onready var companion_chip: Panel = $HUD/TopHud/CompanionChip
-@onready var pip_name_label: Label = $HUD/TopHud/CompanionChip/Row/PipName
-@onready var pip_portrait: Control = $HUD/TopHud/CompanionChip/Row/PipPortrait
-@onready var coin_chip: Panel = $HUD/TopHud/PickupBar/CoinChip
-@onready var seed_chip: Panel = $HUD/TopHud/PickupBar/SeedChip
-@onready var diamond_chip: Panel = $HUD/TopHud/PickupBar/DiamondChip
-@onready var coin_counter_label: Label = $HUD/TopHud/PickupBar/CoinChip/Row/CoinLabel
-@onready var seed_counter_label: Label = $HUD/TopHud/PickupBar/SeedChip/Row/SeedLabel
-@onready var diamond_counter_label: Label = $HUD/TopHud/PickupBar/DiamondChip/Row/DiamondLabel
-@onready var coin_hud_icon: TextureRect = $HUD/TopHud/PickupBar/CoinChip/Row/CoinIcon
-@onready var seed_hud_icon: TextureRect = $HUD/TopHud/PickupBar/SeedChip/Row/SeedIcon
-@onready var diamond_hud_icon: TextureRect = $HUD/TopHud/PickupBar/DiamondChip/Row/DiamondIcon
-@onready var basket_badge: Panel = $HUD/TopHud/BasketBadge
-@onready var basket_icon: TextureRect = $HUD/TopHud/BasketBadge/Row/BasketIcon
-@onready var loadout_label: Label = $HUD/TopHud/BasketBadge/Row/LoadoutLabel
+@onready var coin_chip: PanelContainer = $HUD/TopHud/CoinChip
+@onready var seed_chip: PanelContainer = $HUD/TopHud/SeedChip
+@onready var coin_counter_label: Label = $HUD/TopHud/CoinChip/Row/CoinLabel
+@onready var seed_counter_label: Label = $HUD/TopHud/SeedChip/Row/SeedLabel
+@onready var coin_hud_icon: TextureRect = $HUD/TopHud/CoinChip/Row/CoinIcon
+@onready var seed_hud_icon: TextureRect = $HUD/TopHud/SeedChip/Row/SeedIcon
 @onready var pickup_feed: Control = $HUD/TopHud/PickupFeed
 @onready var fail_flash: ColorRect = $HUD/FailFlash
 @onready var fly_layer: Node2D = $HUD/FlyLayer
@@ -51,7 +41,6 @@ const RING_SCRIPT := preload("res://scripts/run/run_ring_fx.gd")
 
 var _coin_scene: PackedScene = preload("res://scenes/run/coin.tscn")
 var _seed_scene: PackedScene = preload("res://scenes/run/seed_pickup.tscn")
-var _diamond_scene: PackedScene = preload("res://scenes/run/diamond_pickup.tscn")
 var _obstacle_scene: PackedScene = preload("res://scenes/run/obstacle.tscn")
 
 var _state: int = _STATE_RUNNING
@@ -83,6 +72,15 @@ var quit_button: PopupButton
 var finish_banner: RunBanner
 var _banner_shown_at: float = -1.0
 
+## Run HUD v2: traka napretka (sakrivena u Endlessu) i nagradni grm.
+var progress_rail: RunProgressRail
+var bush_fx: RunBushFx
+var _mode_shown: String = ""
+var _bush: RewardBush
+var _next_bush_at: float = UiRun.BUSH_FIRST_AFTER
+var bushes_spawned: int = 0
+var bushes_collected: int = 0
+
 
 func _ready() -> void:
 	player.hit_obstacle.connect(_on_player_hit_obstacle)
@@ -90,10 +88,11 @@ func _ready() -> void:
 	_build_popups()
 	keep_button.clicked.connect(_on_keep_running)
 	quit_button.clicked.connect(_on_quit_to_camp)
+	_build_hud_v2()
 	_apply_hud_styles()
 	_setup_pickup_hud_icons()
 	if pickup_feed and pickup_feed.has_method("bind_targets"):
-		pickup_feed.bind_targets(coin_chip, seed_chip, diamond_chip, fly_layer)
+		pickup_feed.bind_targets(coin_chip, seed_chip, fly_layer)
 	_hide_tutorial()
 	pause_overlay.close(false)
 	fail_flash.visible = false
@@ -132,8 +131,17 @@ func _setup_safe_area() -> void:
 func _setup_pickup_hud_icons() -> void:
 	_set_icon(coin_hud_icon, UiAssets.get_chrome_icon("icon_coin"))
 	_set_icon(seed_hud_icon, UiAssets.get_chrome_icon("icon_seed"))
-	_set_icon(diamond_hud_icon, UiAssets.get_chrome_icon("icon_diamond"))
-	_set_icon(basket_icon, UiAssets.get_run_icon("icon_basket"))
+	if ResourceLoader.exists(RunProgressRail.FLAG_TEX):
+		_set_icon(flag_icon, load(RunProgressRail.FLAG_TEX) as Texture2D)
+
+
+## Traka napretka ide iza čipova u TopHud (pomjera se sa safe area); burst grma u FlyLayer.
+func _build_hud_v2() -> void:
+	progress_rail = RunProgressRail.new()
+	top_hud.add_child(progress_rail)
+	top_hud.move_child(progress_rail, 0)
+	bush_fx = RunBushFx.new()
+	fly_layer.add_child(bush_fx)
 
 
 func _set_icon(rect: TextureRect, tex: Texture2D) -> void:
@@ -145,7 +153,7 @@ func _set_icon(rect: TextureRect, tex: Texture2D) -> void:
 
 
 func start_run() -> void:
-	_pip_play("run_start", "hud_go")
+	_pip_play("run_start")
 	elapsed = 0.0
 	coin_count = 0
 	seeds_by_type = {}
@@ -154,6 +162,7 @@ func start_run() -> void:
 	_coins_callout_hide_at = -1.0
 	_tutorial_obstacle_done = false
 	_next_obstacle_stump = false
+	_next_bush_at = UiRun.BUSH_FIRST_AFTER
 	_reset_common()
 
 
@@ -165,6 +174,7 @@ func _resume_run() -> void:
 	_guaranteed_seed_done = true
 	_coins_callout_done = true
 	_tutorial_obstacle_done = true
+	_next_bush_at = elapsed + UiRun.BUSH_FIRST_AFTER
 	_reset_common()
 
 
@@ -181,9 +191,14 @@ func _reset_common() -> void:
 	_apply_run_level_config()
 	spawn_timer = 0.0
 	_clear_world_entities()
+	_bush = null
 	player.reset_lane()
 	player.set_magnet_radius(GameState.get_magnet_radius())
 	player.set_input_enabled(true)
+	if progress_rail:
+		progress_rail.reset()
+	if bush_fx:
+		bush_fx.prepare(GameState.active_season_id)
 	_update_hud()
 
 
@@ -206,9 +221,11 @@ func _process(delta: float) -> void:
 	if spawn_timer >= _spawn_interval:
 		spawn_timer = 0.0
 		_try_spawn()
+	_update_bush_spawn()
 
 	_shift_world(delta, scroll_speed)
-	_update_hud()
+	# Brojevi u headeru se mijenjaju samo na pickupu; po frejmu ide samo traka.
+	_update_rail()
 
 
 func _update_tutorial_run_events() -> void:
@@ -224,7 +241,8 @@ func _update_tutorial_run_events() -> void:
 			_spawn_guaranteed_seed(GameState.SEED_TYPE_CLOVER, 1)
 			_guaranteed_seed_done = true
 	elif GameState.is_tutorial_run2():
-		if not _tutorial_obstacle_done and elapsed >= 25.0:
+		# Fer grm: prepreka čeka dok grm ne ode ±300 px od linije spawna.
+		if not _tutorial_obstacle_done and elapsed >= 25.0 and not _bush_blocks_lane(1, -80.0):
 			_spawn_obstacle_at_lane(1)
 			_tutorial_obstacle_done = true
 
@@ -300,7 +318,7 @@ func _capture_snapshot() -> void:
 
 
 func _play_fail_beat() -> void:
-	_pip_play("fail", "hud_hit")
+	_pip_play("fail")
 	var tw := create_tween()
 	tw.tween_interval(UiRun.FAIL_FREEZE)
 	tw.tween_callback(func() -> void:
@@ -319,9 +337,10 @@ func _play_fail_beat() -> void:
 
 
 func _play_finish_beat() -> void:
-	_pip_play("finish", "hud_proud")
-	if timer_ring and timer_ring.has_method("set_progress"):
-		timer_ring.set_progress(0.0, UiRun.RING_OK)
+	_pip_play("finish")
+	# Traka: na 100 % zastavica se podigne i dobije mint prsten, pa „Time!".
+	if progress_rail and progress_rail.visible:
+		progress_rail.finish()
 	_show_banner(true)
 	_spawn_finish_burst()
 	var start_speed := scroll_speed
@@ -366,10 +385,13 @@ func _shake() -> void:
 func _spawn_finish_burst() -> void:
 	var ring := Node2D.new()
 	ring.set_script(RING_SCRIPT)
-	ring.ring_color = Color(UiRun.RING_OK.r, UiRun.RING_OK.g, UiRun.RING_OK.b, 0.9)
+	ring.ring_color = Color(UiRun.RAIL_FILL.r, UiRun.RAIL_FILL.g, UiRun.RAIL_FILL.b, 0.9)
 	ring.ring_width = 8.0
 	ring.scale = Vector2(16, 16)
-	ring.position = timer_chip.get_global_rect().get_center()
+	var from := level_chip.get_global_rect().get_center()
+	if progress_rail and progress_rail.visible:
+		from = progress_rail.flag_center()
+	ring.position = from
 	fly_layer.add_child(ring)
 	var tw := create_tween()
 	tw.set_parallel(true)
@@ -561,22 +583,21 @@ func _try_spawn() -> void:
 	var lane := randi() % 3
 	var spawn_pos := Vector2(lane_x_positions[lane], -80.0)
 
-	if GameState.obstacles_enabled_for_run() and randf() < _obstacle_chance:
+	# Fer grm: nema prepreke u susjednim stazama ±300 px od grma — umjesto nje ide pickup.
+	if GameState.obstacles_enabled_for_run() and randf() < _obstacle_chance \
+			and not _bush_blocks_lane(lane, spawn_pos.y):
 		var obstacle := _obstacle_scene.instantiate()
 		obstacle.position = spawn_pos
 		_decorate_obstacle(obstacle)
 		world.add_child(obstacle)
 	elif randf() < _effective_seed_spawn_chance():
-		if randf() < 1.0 / float(DIAMOND_SEED_RATIO):
-			_spawn_diamond(spawn_pos)
-		else:
-			var seed := _seed_scene.instantiate()
-			seed.position = spawn_pos
-			var type_id := _pick_seed_type_id()
-			if seed.has_method("setup"):
-				seed.setup(type_id, GameState.get_seed_rarity(type_id))
-			seed.collected.connect(_on_seed_collected)
-			world.add_child(seed)
+		var seed := _seed_scene.instantiate()
+		seed.position = spawn_pos
+		var type_id := _pick_seed_type_id()
+		if seed.has_method("setup"):
+			seed.setup(type_id, GameState.get_seed_rarity(type_id))
+		seed.collected.connect(_on_seed_collected)
+		world.add_child(seed)
 	else:
 		var coin := _coin_scene.instantiate()
 		coin.position = spawn_pos
@@ -593,13 +614,6 @@ func _decorate_obstacle(obstacle: Node) -> void:
 		obstacle.call("apply_season_tint")
 
 
-func _spawn_diamond(spawn_pos: Vector2) -> void:
-	var diamond := _diamond_scene.instantiate()
-	diamond.position = spawn_pos
-	diamond.collected.connect(_on_diamond_collected)
-	world.add_child(diamond)
-
-
 func _effective_seed_spawn_chance() -> float:
 	var chance := _pickup_seed_chance
 	if GameState.is_loadout_in_active_season_pool():
@@ -611,17 +625,16 @@ func _pick_seed_type_id() -> String:
 	return GameState.pick_random_run_seed_type()
 
 
-func _pip_play(run_id: String, hud_id: String = "") -> void:
+## Pip portret u headeru je izbačen (Run HUD v2) — animacija ide samo Pipu na stazi.
+func _pip_play(run_id: String) -> void:
 	var pv := player.get_node_or_null("PipVisual") if player != null else null
 	if pv != null and pv.has_method("play_event"):
 		pv.call("play_event", run_id)
-	if not hud_id.is_empty() and pip_portrait != null and pip_portrait.has_method("play_pip"):
-		pip_portrait.call("play_pip", hud_id)
 
 
 func _on_coin_collected(at: Vector2) -> void:
 	coin_count += 1
-	_pip_play("pickup_coin", "hud_happy")
+	_pip_play("pickup_coin")
 	_update_hud()
 	if pickup_feed and pickup_feed.has_method("push_coin"):
 		pickup_feed.push_coin(at)
@@ -632,18 +645,94 @@ func _on_seed_collected(type_id: String, at: Vector2) -> void:
 	seeds_by_type[type_id] = int(seeds_by_type.get(type_id, 0)) + amount
 	# +2 ide u loot prije množitelja. Lanac otključavanja i dalje broji jedan pickup.
 	GameState.record_seed_pickup_lifetime(type_id, 1)
-	_pip_play("pickup_seed", "hud_happy")
+	_pip_play("pickup_seed")
 	_update_hud()
 	if pickup_feed and pickup_feed.has_method("push_seed"):
 		pickup_feed.push_seed(type_id, at, amount)
 
 
-func _on_diamond_collected(at: Vector2) -> void:
-	GameState.add_diamonds(1)
-	_pip_play("pickup_diamond", "hud_wow")
+# --- nagradni grm (design_handoff_run_hud_v2 · run_hud_export.json → bush) ---
+
+## Jedan grm na ekranu; prvi tek posle 6 s, pa svakih 8–12 s; nikad u tutorial runu 1.
+func _update_bush_spawn() -> void:
+	if GameState.is_tutorial_run1() or elapsed < _next_bush_at:
+		return
+	if _bush != null and is_instance_valid(_bush):
+		return
+	var y := -80.0
+	var first := randi() % 2
+	for k in 2:
+		var seam := (first + k) % 2
+		if _obstacle_near_seam(seam, y):
+			continue
+		_spawn_bush(seam, y)
+		_next_bush_at = elapsed + randf_range(UiRun.BUSH_GAP_MIN, UiRun.BUSH_GAP_MAX)
+		return
+	# Oba šava blokirana preprekom — probaj u sljedećem frejmu.
+
+
+func _spawn_bush(seam: int, y: float) -> RewardBush:
+	var reward := UiRun.roll_bush_reward(randf(), randf())
+	var bush := RewardBush.new().setup(seam, GameState.active_season_id, reward)
+	bush.name = "RewardBush"
+	bush.position = Vector2(UiRun.bush_seam_x(seam, _viewport_size().x), y)
+	bush.collected.connect(_on_bush_collected)
+	world.add_child(bush)
+	_bush = bush
+	bushes_spawned += 1
+	return bush
+
+
+## Staze uz šav `seam` su `seam` i `seam + 1`.
+func _obstacle_near_seam(seam: int, y: float) -> bool:
+	for child in world.get_children():
+		if not child.is_in_group("obstacle"):
+			continue
+		var lane := _lane_of(child.position.x)
+		if (lane == seam or lane == seam + 1) and absf(child.position.y - y) < UiRun.BUSH_FAIR_PX:
+			return true
+	return false
+
+
+func _bush_blocks_lane(lane: int, y: float) -> bool:
+	if _bush == null or not is_instance_valid(_bush) or _bush.is_collected():
+		return false
+	if lane != _bush.seam and lane != _bush.seam + 1:
+		return false
+	return absf(_bush.position.y - y) < UiRun.BUSH_FAIR_PX
+
+
+func _lane_of(x: float) -> int:
+	var best := 0
+	for i in lane_x_positions.size():
+		if absf(lane_x_positions[i] - x) < absf(lane_x_positions[best] - x):
+			best = i
+	return best
+
+
+## Twin Seeds, korpa i magnet se ne primjenjuju; nagrada ide u isti run bag / coin brojač.
+func _on_bush_collected(bush: RewardBush) -> void:
+	if _state == _STATE_ENDED:
+		return
+	bushes_collected += 1
+	var at := bush.global_position
+	var kind := bush.reward_kind
+	var amount := bush.reward_amount
+	var target: Control = coin_chip
+	if kind == "coin":
+		coin_count += amount
+		_pip_play("pickup_coin")
+	else:
+		var type_id := _pick_seed_type_id()
+		seeds_by_type[type_id] = int(seeds_by_type.get(type_id, 0)) + amount
+		GameState.record_seed_pickup_lifetime(type_id, 1)
+		_pip_play("pickup_seed")
+		target = seed_chip
+		if pickup_feed and pickup_feed.has_method("push_seed_toast"):
+			pickup_feed.push_seed_toast(type_id, amount)
 	_update_hud()
-	if pickup_feed and pickup_feed.has_method("push_diamond"):
-		pickup_feed.push_diamond(at)
+	if bush_fx:
+		bush_fx.play(at, bush.season_id, kind, amount, target)
 
 
 func _on_player_hit_obstacle() -> void:
@@ -655,39 +744,56 @@ func _update_hud() -> void:
 		return
 	coin_counter_label.text = "%d" % coin_count
 	seed_counter_label.text = "%d" % _sum_run_seeds()
-	var diamonds := GameState.get_diamonds()
-	if diamond_counter_label:
-		diamond_counter_label.text = "%d" % diamonds
-	if diamond_chip:
-		diamond_chip.visible = diamonds > 0
-	_layout_counters()
-	if pip_name_label:
-		pip_name_label.text = GameState.get_companion_display_name()
-	if pip_portrait and pip_portrait.has_method("refresh_portrait"):
-		pip_portrait.refresh_portrait()
-	if not GameState.get_loadout_type().is_empty():
-		var flower_name: String = GameState.SEED_DISPLAY_NAMES.get(
-			GameState.get_loadout_type(),
-			GameState.get_loadout_type().capitalize()
-		)
-		loadout_label.text = flower_name
-		basket_badge.visible = true
-	else:
-		basket_badge.visible = false
-	var duration := GameState.get_run_duration()
-	var remaining := maxf(0.0, duration - elapsed)
-	var lines: Array = UiRun.timer_lines(
-		remaining,
-		GameState.is_endless_mode(),
+	var endless := GameState.is_endless_mode()
+	var text := UiRun.mode_text(
+		endless,
 		GameState.get_endless_difficulty_label(),
 		GameState.uses_run_level_config(),
 		GameState.run_level,
 	)
-	mode_label.text = str(lines[0])
-	seconds_label.text = str(lines[1])
-	if timer_ring and timer_ring.has_method("set_progress"):
-		var pct := 1.0 if duration <= 0.0 else remaining / duration
-		timer_ring.set_progress(pct, UiRun.ring_color(remaining, duration))
+	if text != _mode_shown:
+		_apply_mode(text, endless)
+	_update_rail()
+
+
+## LevelChip: „Level N" 48 px / „Endless · X" 42 px bez zastavice / „Practice" sa zastavicom.
+## Širina raste s tekstom (min 200, max 464); traka napretka samo kad run ima cilj.
+func _apply_mode(text: String, endless: bool) -> void:
+	_mode_shown = text
+	var px := UiRun.FONT_LEVEL_ENDLESS if endless else UiRun.FONT_LEVEL
+	mode_label.add_theme_font_override("font", UiPopups.font(900, px))
+	mode_label.add_theme_font_size_override("font_size", px)
+	mode_label.text = text
+	flag_icon.visible = UiRun.has_goal(endless)
+	if progress_rail:
+		progress_rail.visible = UiRun.rail_visible(endless)
+	_layout_level_chip()
+
+
+func _layout_level_chip() -> void:
+	var s := _ui_scale()
+	var flag_w := (UiRun.LEVEL_FLAG.x + UiRun.LEVEL_GAP) if flag_icon.visible else 0.0
+	var room := float(UiRun.LEVEL_CHIP_MAX_W - 2 * UiRun.LEVEL_CHIP_PAD_X) - flag_w
+	# Bez rezanja label nosi punu širinu teksta; tek preko max 464 dobije „…" na fiksnoj širini
+	# (Label s overrunom ima min širinu 0, pa ga ne smijemo ostaviti uključenog).
+	mode_label.custom_minimum_size.x = 0.0
+	mode_label.clip_text = false
+	mode_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+	if mode_label.get_minimum_size().x > room:
+		mode_label.clip_text = true
+		mode_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		mode_label.custom_minimum_size.x = room
+	var w := clampf(level_chip.get_combined_minimum_size().x / maxf(s, 0.01),
+		UiRun.LEVEL_CHIP_RECT.size.x, float(UiRun.LEVEL_CHIP_MAX_W))
+	var r := UiRun.LEVEL_CHIP_RECT
+	_place_rect(level_chip, Rect2(r.position, Vector2(w, r.size.y)), s)
+
+
+func _update_rail() -> void:
+	if progress_rail == null or not progress_rail.visible:
+		return
+	var duration := GameState.get_run_duration()
+	progress_rail.set_progress(1.0 if duration <= 0.0 else elapsed / duration)
 
 
 func _sum_run_seeds() -> int:
@@ -699,35 +805,15 @@ func _sum_run_seeds() -> int:
 
 func _layout_hud() -> void:
 	var s := _ui_scale()
-	_place_rect(timer_chip, UiRun.TIMER_RECT, s)
+	_place_rect(coin_chip, UiRun.COIN_CHIP_RECT, s)
+	_place_rect(seed_chip, UiRun.SEED_CHIP_RECT, s)
 	_place_rect(pause_button, UiRun.PAUSE_RECT, s)
-	_place_rect(companion_chip, UiRun.COMPANION_RECT, s)
-	_place_rect(basket_badge, UiRun.BASKET_RECT, s)
-	var toast := Rect2(600, UiRun.TOAST_TOP, 440, 150)
-	_place_rect(pickup_feed, toast, s)
+	_place_rect(pickup_feed, UiRun.FEED_RECT, s)
+	if progress_rail:
+		progress_rail.scale = Vector2(s, s)
+		progress_rail.position = UiRun.RAIL_RECT.position * s
+	_layout_level_chip()
 	_layout_popup_root()
-	_layout_counters()
-
-
-func _layout_counters() -> void:
-	var s := _ui_scale()
-	var right := (1080.0 - float(UiRun.BAR_RIGHT)) * s
-	var top := float(UiRun.BAR_TOP) * s
-	var gap := float(UiRun.COUNTER_GAP) * s
-	var coin_size := UiRun.COUNTER_SIZE * s
-	var seed_size := UiRun.COUNTER_SIZE * s
-	var dia_size := UiRun.COUNTER_DIAMOND_SIZE * s
-	var x := right
-	if diamond_chip.visible:
-		x -= dia_size.x
-		_place_xy(diamond_chip, x, top, dia_size)
-		x -= gap
-	x -= seed_size.x
-	_place_xy(seed_chip, x, top, seed_size)
-	x -= gap + coin_size.x
-	_place_xy(coin_chip, x, top, coin_size)
-
-
 
 
 func _place_rect(node: Control, rect: Rect2, s: float) -> void:
@@ -745,23 +831,17 @@ func _place_xy(node: Control, x: float, y: float, size: Vector2) -> void:
 
 
 func _apply_hud_styles() -> void:
-	var ink := UI_PALETTE.UI_TEXT
-	timer_chip.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(28), 16, 12))
-	companion_chip.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(26), 16, 12))
-	coin_chip.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(26), 14, 8))
-	seed_chip.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(26), 14, 8))
-	diamond_chip.add_theme_stylebox_override("panel", _padded(UiRun.diamond_chip_style(), 12, 8))
-	basket_badge.add_theme_stylebox_override("panel", _padded(UiRun.basket_style(), 14, 8))
+	var ink := UiRun.INK
+	level_chip.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(), UiRun.LEVEL_CHIP_PAD_X, 0))
+	coin_chip.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(), 4, 0))
+	seed_chip.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(), 4, 0))
 	fail_flash.color = Color(UiRun.FAIL.r, UiRun.FAIL.g, UiRun.FAIL.b, 0.26)
-	_style_label(mode_label, UiRun.FONT_MODE, ink, HORIZONTAL_ALIGNMENT_LEFT)
-	_style_label(seconds_label, UiRun.FONT_SECONDS, ink, HORIZONTAL_ALIGNMENT_LEFT)
-	_style_label(pip_name_label, UiRun.FONT_NAME, ink, HORIZONTAL_ALIGNMENT_LEFT)
+	_style_label(mode_label, UiRun.FONT_LEVEL, ink, HORIZONTAL_ALIGNMENT_LEFT)
 	_style_label(coin_counter_label, UiRun.FONT_COUNTER, ink, HORIZONTAL_ALIGNMENT_LEFT)
 	_style_label(seed_counter_label, UiRun.FONT_COUNTER, ink, HORIZONTAL_ALIGNMENT_LEFT)
-	_style_label(diamond_counter_label, UiRun.FONT_COUNTER, ink, HORIZONTAL_ALIGNMENT_LEFT)
-	_style_label(loadout_label, UiRun.FONT_BASKET, ink, HORIZONTAL_ALIGNMENT_LEFT)
-	mode_label.clip_text = true
-	seconds_label.clip_text = true
+	for c in [coin_hud_icon, seed_hud_icon]:
+		(c as TextureRect).custom_minimum_size = Vector2(UiRun.CHIP_ICON, UiRun.CHIP_ICON)
+	flag_icon.custom_minimum_size = UiRun.LEVEL_FLAG
 
 
 func _padded(style: StyleBoxFlat, x: float, y: float) -> StyleBoxFlat:
@@ -772,9 +852,11 @@ func _padded(style: StyleBoxFlat, x: float, y: float) -> StyleBoxFlat:
 	return style
 
 
+## Brojevi i nivo: Nunito 900, tamni tekst na kremi (12,6 : 1 na svakoj sezoni).
 func _style_label(label: Label, size: int, color: Color, align: HorizontalAlignment) -> void:
 	if label == null:
 		return
+	label.add_theme_font_override("font", UiPopups.font(900, size))
 	label.add_theme_font_size_override("font_size", size)
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_constant_override("outline_size", 0)

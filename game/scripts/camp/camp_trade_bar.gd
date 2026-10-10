@@ -140,7 +140,8 @@ func _set_bar_height(h: int) -> void:
 		custom_minimum_size.y = target
 		return
 	_height_tween = create_tween()
-	_height_tween.tween_property(self, "custom_minimum_size:y", target, UiCamp.T_MERGE_LINE) 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_height_tween.tween_property(self, "custom_minimum_size:y", target, UiCamp.T_MERGE_LINE) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
 func _apply_merge_line(text: String) -> void:
