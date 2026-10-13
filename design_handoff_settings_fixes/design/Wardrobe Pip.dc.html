@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<script src="pip_art.js"></script>
+<script src="pip_runtime.js"></script>
+<script src="pip_anim.js"></script>
+<style>body{margin:0;background:#E9E2D8}a{color:#2D3436}a:hover{color:#9E6645}</style>
+</helmet>
+<section data-screen-label="B · Classic Pip as a skin" style="padding:80px;display:flex;flex-direction:column;gap:48px;font-family:Nunito,system-ui,sans-serif;color:#2D3436">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="font:700 28px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#555C5E">DESIGN_HANDOFF_SETTINGS_FIXES · B · WARDROBE</div>
+    <div style="font:900 96px/1 Nunito,sans-serif">Classic Pip is a real skin</div>
+    <div style="font:700 40px/1.35 Nunito,sans-serif;color:#555C5E;max-width:2000px;text-wrap:pretty">The “Default” card is gone. Classic Pip is a skin card like Blossom and Sky: same pose (pose_classic), same thumb, a “Free” tag instead of a price, and it can be Wearing. It is never sold. Tap the cards.</div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:64px;align-items:flex-start">
+    <sc-for list="{{ sheets }}" as="sh" hint-placeholder-count="3">
+      <div id="{{ sh.id }}" style="display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;align-items:center;gap:20px">
+          <div style="height:72px;min-width:72px;padding:0 20px;box-sizing:border-box;border-radius:36px;background:#2D3436;color:#FFF8F0;display:grid;place-items:center;font:900 36px/1 Nunito,sans-serif">{{ sh.id }}</div>
+          <div style="font:900 48px/1 Nunito,sans-serif">{{ sh.title }}</div>
+        </div>
+        <div data-layer="WardrobeSheet" style="position:relative;width:1080px;height:1326px;box-sizing:border-box;background:#FFF8F0;border-top:4px solid #2D3436;border-radius:36px 36px 0 0;padding:20px 24px 28px;display:flex;flex-direction:column;box-shadow:0 12px 0 rgba(45,52,54,.18)">
+          <div style="width:120px;height:12px;border-radius:6px;background:rgba(45,52,54,.28);margin:0 auto 24px"></div>
+          <div style="font:900 56px/1 Nunito,sans-serif">Wardrobe</div>
+          <div style="margin-top:12px;font:800 40px/1 Nunito,sans-serif;color:#555C5E">Looks only. Tap one to wear it.</div>
+          <div data-layer="PreviewStage" style="position:relative;margin-top:28px;flex:0 0 300px;height:300px;box-sizing:border-box;border-radius:28px;overflow:hidden;border:3px solid #2D3436;background:#98C27F">
+            <div style="position:absolute;left:0;right:0;top:0;height:96px;background:#BCD9A3"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;height:96px;background:#7DAA67"></div>
+            <div data-pip="{{ sh.stagePip }}" style="position:absolute;left:74%;bottom:6px;transform:translateX(-50%)"></div>
+            <div style="position:absolute;left:16px;bottom:16px;height:60px;box-sizing:border-box;padding:0 20px;border-radius:18px;background:rgba(26,36,30,.84);border:2px solid rgba(255,248,240,.40);display:flex;align-items:center;font:900 40px/1 Nunito,sans-serif;color:#FFF8F0">{{ sh.stageName }}</div>
+            <div style="position:absolute;left:16px;top:16px;height:56px;box-sizing:border-box;padding:0 18px;border-radius:16px;background:rgba(26,36,30,.84);border:2px solid rgba(255,248,240,.40);display:flex;align-items:center;font:800 36px/1 Nunito,sans-serif;color:#FFF8F0">Home · Arena · Runs · Camp</div>
+          </div>
+          <div style="margin-top:24px;height:120px;display:flex;gap:12px">
+            <div style="flex:1;height:120px;box-sizing:border-box;border-radius:24px;display:flex;align-items:center;justify-content:center;gap:12px;background:#FFB88C;border:3px solid #2D3436"><img src="icons/slot_pip.svg" alt="" style="width:56px;height:56px"><span style="font:900 40px/1 Nunito,sans-serif">Pip</span></div>
+            <div style="flex:1;height:120px;box-sizing:border-box;border-radius:24px;display:flex;align-items:center;justify-content:center;gap:12px;background:#FFFFFF;border:3px solid rgba(45,52,54,.18)"><img src="icons/slot_meadow.svg" alt="" style="width:56px;height:56px"><span style="font:900 40px/1 Nunito,sans-serif">Meadow</span></div>
+            <div style="flex:1;height:120px;box-sizing:border-box;border-radius:24px;display:flex;align-items:center;justify-content:center;gap:12px;background:#FFFFFF;border:3px solid rgba(45,52,54,.18)"><img src="icons/slot_album.svg" alt="" style="width:56px;height:56px"><span style="font:900 40px/1 Nunito,sans-serif">Album</span></div>
+          </div>
+          <div data-layer="ItemGrid" style="margin-top:30px;display:grid;grid-template-columns:repeat(4,240px);gap:24px">
+            <sc-for list="{{ sh.cards }}" as="c" hint-placeholder-count="3">
+              <div data-layer="SkinCard" onClick="{{ c.tap }}" style="{{ c.style }}">
+                <div style="position:relative;width:210px;height:150px;box-sizing:border-box;border-radius:18px;overflow:hidden;border:3px solid #16211B;background:#98C27F">
+                  <div style="position:absolute;left:0;right:0;bottom:0;height:46px;background:#7DAA67"></div>
+                  <div data-pip="{{ c.pip }}" style="position:absolute;left:50%;bottom:2px;transform:translateX(-50%)"></div>
+                  <sc-if value="{{ c.veil }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:0;background:rgba(241,234,224,.55)"></div></sc-if>
+                </div>
+                <div style="{{ c.nameStyle }}">{{ c.title }}</div>
+                <sc-if value="{{ c.worn }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="EquippedBadge" style="position:absolute;right:18px;top:18px;width:60px;height:60px;box-sizing:border-box;border-radius:30px;background:#2D3436;border:4px solid #FFF8F0;display:grid;place-items:center"><svg width="32" height="32" viewBox="0 0 32 32"><path d="M7 16.5l6 6L25 10" fill="none" stroke="#FFF8F0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                </sc-if>
+                <sc-if value="{{ c.free }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="FreeTag" style="position:absolute;left:18px;top:18px;height:52px;box-sizing:border-box;padding:0 14px;border-radius:16px;background:#FFF8F0;border:3px solid #2D3436;display:flex;align-items:center;font:900 34px/1 Nunito,sans-serif">Free</div>
+                </sc-if>
+              </div>
+            </sc-for>
+            <div data-layer="ShopLink" style="width:240px;height:272px;box-sizing:border-box;border-radius:28px;border:3px dashed rgba(45,52,54,.40);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center"><img src="icons/icon_shop_ink.svg" alt="" style="width:72px;height:72px"><div style="font:900 38px/40px Nunito,sans-serif">More in Shop</div></div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="height:132px;box-sizing:border-box;border-radius:36px;background:#FFFFFF;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;font:900 46px/1 Nunito,sans-serif">Close</div>
+        </div>
+        <div style="font:500 26px/1.5 'JetBrains Mono',monospace;color:#555C5E;max-width:1080px">{{ sh.note }}</div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section data-screen-label="B · Every surface" style="padding:0 80px 120px;display:flex;flex-direction:column;gap:40px;font-family:Nunito,system-ui,sans-serif;color:#2D3436">
+  <div id="B4" style="display:flex;align-items:center;gap:20px">
+    <div style="height:72px;padding:0 20px;border-radius:36px;background:#2D3436;color:#FFF8F0;display:grid;place-items:center;font:900 36px/1 Nunito,sans-serif">B4</div>
+    <div style="font:900 64px/1 Nunito,sans-serif">Classic · Blossom · Sky on every surface</div>
+  </div>
+  <div style="display:grid;grid-template-columns:260px repeat(7,auto);gap:28px;align-items:end">
+    <div></div>
+    <sc-for list="{{ surfaces }}" as="su" hint-placeholder-count="7"><div style="font:900 36px/1.15 Nunito,sans-serif">{{ su.title }}<div style="font:500 24px/1.4 'JetBrains Mono',monospace;color:#555C5E">{{ su.sub }}</div></div></sc-for>
+    <sc-for list="{{ board }}" as="row" hint-placeholder-count="3">
+      <div style="font:900 44px/1 Nunito,sans-serif;align-self:center">{{ row.title }}</div>
+      <sc-for list="{{ row.cells }}" as="cell" hint-placeholder-count="7">
+        <div style="{{ cell.box }}">
+          <div style="{{ cell.ground }}"></div>
+          <div data-pip="{{ cell.pip }}" style="{{ cell.pos }}"></div>
+          <sc-if value="{{ cell.hud }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:112px;top:0;bottom:0;display:flex;align-items:center;font:900 40px/1 Nunito,sans-serif">Pip</div></sc-if>
+        </div>
+      </sc-for>
+    </sc-for>
+  </div>
+  <div style="font:500 26px/1.5 'JetBrains Mono',monospace;color:#555C5E;max-width:2200px">Field 190 front idle · season card 230 card_idle · Arena 150 arena_idle · run top 150 run_gallop · HUD 88 = front crop [40,40,176,176] · Camp front still · Shop/Wardrobe thumb three_q pose_*. All from design_handoff_pip (unchanged). Classic uses the classic tokens; nothing is recoloured.</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PIPS = new WeakMap();
+const SK = [['classic', 'Classic Pip'], ['blossom', 'Pip Blossom'], ['sky', 'Pip Sky']];
+const POSE = { classic: 'pose_classic', blossom: 'pose_blossom', sky: 'pose_sky' };
+const SURF = [
+  ['Field', 'front · 190', 260, '#7DAA67', '#BCD9A3', 'front|190|idle'],
+  ['Season card', 'front · 230', 260, '#7DAA67', '#BCD9A3', 'front|230|card_idle'],
+  ['Arena', 'front · 150', 190, '#EAF3DF', '#BCD9A3', 'front|150|arena_idle'],
+  ['Run', 'top · 150', 190, '#3A5C41', '#3A5C41', 'top|150|run_gallop'],
+  ['Run HUD', 'crop · 88', 0, '', '', 'front|88|hud_idle|crop'],
+  ['Camp', 'front · 150', 190, '#2E4733', '#3B5A40', 'front|150||still'],
+  ['Shop / Wardrobe', 'three_q · 126', 190, '#98C27F', '#98C27F', 'three_q|126|pose|still']
+];
+class Component extends DCLogic {
+  state = { worn: { B1: 'classic', B2: 'blossom', B3: 'classic' }, stage: {} };
+  componentDidMount() { this.boot(); }
+  boot() { if (!window.Pip || !Pip.ANIMS || !Pip.ANIMS.sig_sky) { this.iv = setTimeout(() => this.boot(), 60); return; } this.mount(); }
+  componentDidUpdate() { clearTimeout(this.mt); this.mt = setTimeout(() => this.mount(), 30); }
+  componentWillUnmount() { clearTimeout(this.iv); }
+  mount() {
+    if (!window.Pip || !Pip.ANIMS.sig_sky) return;
+    document.querySelectorAll('[data-pip]').forEach(el => {
+      const key = el.getAttribute('data-pip'); const prev = PIPS.get(el); if (!key || (prev && prev.k === key)) return;
+      if (prev) prev.p.destroy();
+      const [view, skin, size, anim, flag, hop] = key.split('|');
+      const o = { view, skin, size: +size };
+      if (flag === 'crop') { o.crop = [40, 40, 176, 176]; o.shadow = false; }
+      const live = anim === 'stage_idle';
+      o.still = !live;
+      if (live) o.loop = anim;
+      const p = Pip.create(el, o);
+      if (anim === 'pose') p.seek(POSE[skin]);
+      else if (anim && !live && Pip.ANIMS[anim]) p.seek(anim, Pip.ANIMS[anim].len * 0.3);
+      if (hop === 'hop') p.play('stage_hop');
+      if (!live) {
+        const svg = el.querySelector('svg'); svg.querySelectorAll('[style*="display: none"],[style*="display:none"]').forEach(n => n.remove());
+        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        const img = new Image(); img.width = +svg.getAttribute('width'); img.height = +svg.getAttribute('height'); img.style.display = 'block'; img.style.overflow = 'visible';
+        img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.outerHTML); el.replaceChildren(img);
+      }
+      PIPS.set(el, { k: key, p });
+    });
+  }
+  sheet(id, title, owned, note) {
+    const worn = this.state.worn[id];
+    const name = SK.find(s => s[0] === worn)[1];
+    return {
+      id, title, note, stageName: name, stagePip: 'three_q|' + worn + '|246|stage_idle||' + (this.state.stage[id] ? 'hop|' + this.state.stage[id] : ''),
+      cards: SK.map(([k, t]) => {
+        const own = owned.includes(k), w = own && worn === k;
+        return {
+          title: t, worn: w, free: k === 'classic', veil: !own,
+          pip: 'three_q|' + k + '|126|pose|still',
+          tap: () => { if (own) this.setState({ worn: Object.assign({}, this.state.worn, { [id]: k }), stage: Object.assign({}, this.state.stage, { [id]: (this.state.stage[id] || 0) + 1 }) }); },
+          style: 'position:relative;width:240px;height:272px;box-sizing:border-box;border-radius:28px;padding:12px;display:flex;flex-direction:column;gap:12px;cursor:' + (own ? 'pointer' : 'default') + ';background:' + (w ? '#FFF6D6' : own ? '#FFFFFF' : '#F1EAE0') + ';border:' + (w ? '4px solid #2D3436' : own ? '3px solid rgba(45,52,54,.18)' : '3px solid rgba(45,52,54,.10)'),
+          nameStyle: 'height:80px;overflow:hidden;font:900 38px/40px Nunito,sans-serif;text-wrap:balance;color:' + (own ? '#2D3436' : '#555C5E')
+        };
+      })
+    };
+  }
+  renderVals() {
+    const fixKey = s => s; // pip key: view|skin|size|anim|flag
+    const sheets = [
+      this.sheet('B1', 'Classic worn', ['classic', 'blossom', 'sky'], 'Classic Pip: Free tag + Wearing ✓, same 210 × 150 thumb and pose as the others.'),
+      this.sheet('B2', 'Blossom worn', ['classic', 'blossom'], 'Classic stays Owned (“Free”) — tap it to switch back. Sky not owned yet: veiled, no tap.'),
+      this.sheet('B3', 'New player', ['classic'], 'A new player sees three Pips at once and knows the green one is theirs.')
+    ];
+    const board = SK.map(([k, t]) => ({
+      title: t,
+      cells: SURF.map(([, , box, g1, g2, spec]) => {
+        const [view, size, anim, flag] = spec.split('|');
+        if (flag === 'crop') return { hud: true, box: 'position:relative;width:268px;height:120px;box-sizing:border-box;border-radius:12px;background:#FFF8F0;border:3px solid #2D3436;overflow:hidden', ground: 'display:none', pos: 'position:absolute;left:8px;top:13px', pip: view + '|' + k + '|' + size + '|' + anim + '|crop' };
+        return {
+          hud: false, box: 'position:relative;width:' + box + 'px;height:' + box + 'px;box-sizing:border-box;border-radius:24px;border:3px solid #2D3436;overflow:hidden;background:' + g2,
+          ground: 'position:absolute;left:0;right:0;bottom:0;height:' + (view === 'top' ? '100%' : '34%') + ';background:' + g1,
+          pos: 'position:absolute;left:50%;bottom:' + (view === 'top' ? 20 : 6) + 'px;transform:translateX(-50%)',
+          pip: view + '|' + k + '|' + size + '|' + (anim || '') + '|' + (flag || '')
+        };
+      })
+    }));
+    return { sheets, board, surfaces: SURF.map(s => ({ title: s[0], sub: s[1] })) };
+  }
+}
+</script>
+</body>
+</html>

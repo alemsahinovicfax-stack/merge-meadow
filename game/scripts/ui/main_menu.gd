@@ -106,8 +106,6 @@ func _ready() -> void:
 	_bind_meadow_signal()
 	_setup_typography()
 	_setup_safe_area()
-	if OS.is_debug_build() and not GameState.skip_debug_season_unlock:
-		GameState.debug_playtest_two_free()
 	_refresh_menu()
 	_refresh_chest_card()
 	_refresh_basket_card()

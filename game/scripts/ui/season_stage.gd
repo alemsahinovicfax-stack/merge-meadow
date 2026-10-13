@@ -101,6 +101,12 @@ func refresh() -> void:
 		_sync_field_content()
 		_set_u(1.0)
 		_release_pip()
+	elif GameState.home_season_field_open and not _moving 			and viewed_id() != GameState.home_season_field_id:
+		# Polje otvoreno izvana na drugoj sezoni (Shop „Play" kupljene sezone): odmah ta
+		# livada, ne stara (2026-10-12).
+		_view_season(GameState.home_season_field_id)
+		_sync_field_content()
+		_release_pip()
 	elif GameState.home_season_field_open and not _moving:
 		# Polje ostalo otvoreno dok je igrač spajao u Areni: novi ★3 izrastaju odmah.
 		if season_field.has_method("refresh_growth"):
@@ -963,7 +969,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		_try_close_field_on_back()
+		# Back zatvara Settings koji je iznad, ne i polje ispod njega.
+		if not SettingsScreen.is_open(get_tree()):
+			_try_close_field_on_back()
 	elif what == NOTIFICATION_RESIZED:
 		_apply()
 

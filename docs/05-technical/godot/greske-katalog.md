@@ -429,6 +429,8 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** crtež koji mora ostati u okviru na ovom rendereru ne smije izaći iz svog recta; ne oslanjaj se na `clip_contents` / `clip_children` za ukrasne mreže.
 
+
+**Dopuna 2026-10-12 (Album):** lista u `ScrollContainer` iza okvira je izlazila ispod donje ivice zlatnog okvira. Obrazac koji radi: lista je pravougaona „rupa", oko nje četiri neprozirna `ColorRect` poklopca (z iznad liste), pa obrub prozora (`draw_center = false`, z iznad poklopaca) — `UiJournal.list_window()`, test `album_window_smoke.gd`. Isti princip ima Settings: neproziran TopBar iznad liste.
 ## #25 — smoke testovi pregaze pravi save
 
 **Datum:** 2026-10-05 (Sezone faza 1)
@@ -519,6 +521,30 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 **Rješenje:** pri prvom zadatku `root.tree_exiting.connect(_drain_jobs)` — sačekaj (`wait_for_task_completion`) sve zadatke prije gašenja (`UiPip`). Svaki `add_task` mora imati tačno jedan `wait_for_task_completion`.
 
 **Prevencija:** svaki posao u threadu treba vlasnika koji ga sačeka i na izlazu; smoke testovi gledaju i exit kod, ne samo „OK" u izlazu.
+
+## #32 — debug pomoć koja sama mijenja save briše pravi napredak
+
+**Datum:** 2026-10-12 (prijava: sezone se ne slažu između sekcija, kupljene nestaju)
+
+**Simptom:** posle runa (ili novog pokretanja) kupljene premium sezone nisu „tvoje", otključana sezona iz Campa je opet zaključana, Home polje pokazuje jednu sezonu, Arena drugu.
+
+**Uzrok:** `meta_hub_controller._ready()` i `main_menu._ready()` u debug buildu su zvali `GameState.debug_playtest_two_free()` (playtest iz CAMP-02 ere): svaki put kad se hub napravi — start, povratak iz runa — obriše `owned_paid_seasons`, vrati `unlocked_seasons` na S1 + S2, postavi aktivnu na Frost i snimi. Igrač igra debug build (`godot-run.ps1`), pa je to izgledalo kao nasumične greške sinhronizacije. Smoke testovi su to sakrili jer postavljaju `skip_debug_season_unlock = true`.
+
+**Rješenje:** poziv izbačen; debug pomoći se zovu samo ručno (Dev sekcija u Settingsu). `season_sync_smoke.gd` namjerno NE postavlja `skip_debug_season_unlock` i provjerava da povratak u hub ne mijenja sezone.
+
+**Prevencija:** debug pomoć koja piše u save nikad ne ide u `_ready()` ni u bilo koji automatski tok. Bar jedan test mora ići kroz igru bez „skip" zastavica koje gase dev ponašanje.
+
+## #33 — Pip rig crta preko susjednih oznaka (z do 11)
+
+**Datum:** 2026-10-12 (Ormar, oznaka „Free" na Classic Pipu; veo na nekupljenim skinovima)
+
+**Simptom:** oznaka „Free" je pola sakrivena iza glave Pipa; Pip na kartici pod velom ostaje pun boje.
+
+**Uzrok:** `UiPip` daje dijelovima riga `z_index` do 11 (`_part_z`, relativno). Sve što je u istom pregledu sa z 0 (oznake, kvačica, veo nacrtan u `_draw` pregleda) crta se ispod njih.
+
+**Rješenje:** oznake kartice `z_index = 12` (`ItemCard.TAG_Z`); pod velom se Pip priguši `modulate.a = 0.45` (`ItemPreview.veil` setter).
+
+**Prevencija:** UI iznad Pipa u istom kontejneru mora imati z > 11; veo koji treba da prekrije Pipa ide kao čvor sa z > 11, ne u `_draw`.
 
 ## Brza dijagnostika (kad nešto "ne radi")
 

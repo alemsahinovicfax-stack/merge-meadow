@@ -336,7 +336,6 @@ const S_AD_NONE := "No ad now"
 const S_RETRY := "Retry"
 const S_TO_CAMP := "To Camp"
 const S_ROUND_IN_PROGRESS := "Round in progress"
-const S_SETTINGS_SOON := "Settings coming soon"
 const S_UNLOCKED := "Unlocked"
 const S_YOURS := "Yours"
 

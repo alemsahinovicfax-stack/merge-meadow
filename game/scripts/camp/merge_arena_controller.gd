@@ -130,7 +130,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_GO_BACK_REQUEST and _gate_modal_open():
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST and _gate_modal_open() and not SettingsScreen.is_open(get_tree()):
 		_hide_need_more_overlay()
 
 
@@ -1066,6 +1066,9 @@ func _apply_gate_count(show: bool) -> void:
 	if _gate_count == null:
 		return
 	_gate_count.visible = show
+	# Oblačić tutoriala stoji iznad pilule kad je vidljiva (ArenaCue._bag_tip).
+	if _cue != null and playfield != null:
+		_cue.call_deferred("layout", playfield.size)
 	if not show:
 		return
 	var n := GameState.mergeable_seed_count()

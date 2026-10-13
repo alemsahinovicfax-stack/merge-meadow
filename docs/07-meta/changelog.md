@@ -9,6 +9,27 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-12
+
+- **Sezone između sekcija** (prijava: „na Homeu i u polju jedna sezona, u Areni druga", „kupim sezonu preko linka u Campu, ne primijeni se na Arenu i run", „kupim premium sezonu, kasnije ne piše da je imam"):
+  - Hub (i Home stranica) u debug buildu na svakom otvaranju — start igre, povratak iz runa — zvao je `debug_playtest_two_free()`: kupljene premium sezone obrisane, otključane free vraćene na S1 + S2, aktivna prebačena na Frost Orchard, a otvoreno polje ostajalo na staroj sezoni. Ugašeno; pomoć ostaje samo za ručno pozivanje (Dev sekcija u Settingsu, SET-01).
+  - Promjena aktivne sezone (kupovina u Shopu, otključavanje u Campu) zatvara polje na Homeu ako je otvoreno na drugoj sezoni (`SeasonsDomain.set_active`).
+  - Shop „Play" na kupljenoj sezoni otvara njeno polje na Homeu (ranije samo fokus kartice); Home, kad zatekne polje otvoreno izvana na drugoj sezoni, odmah pokaže tu livadu.
+  - Novi test `season_sync_smoke.gd`: 12 koraka kroz Home, polje, Arenu, Camp link, Home i Shop kupovinu, Shop Play, otključavanje na kartici, run i Endless s povratkom u novi hub, ponovo učitan save; poslije svakog koraka iste sezone svuda (Home kartica, polje, Arena livada, Shop kartica, IAP vlasništvo, save na disku). Na starom kodu pada. Korak 12: Dev „Reset seasons" + „Reset tutorial" u Settingsu.
+- **Paket `design_handoff_settings_fixes/` u igri** (izvještaj `ispravke-settings-izvjestaj.md`):
+  - **Album:** lista skroluje u prozoru; četiri neprozirna poklopca + obrub prozora (zlatni 8 `#D6A82F` / obični 3 `#E3DCD3`) pokrivaju sve van njega — zlatni okvir više ne prelazi preko redova. U zlatnom prozoru tier krugovi 120 (opis ostaje u dva reda). Novi `album_window_smoke`.
+  - **Ormar:** Classic Pip je kartica skina s oznakom „Free"; u Pip slotu se vide i nekupljeni skinovi pod velom (prigušeni). Glava na traci napretka u runu prati skin.
+  - **Shop:** Starter Pack i „All set here" crtaju Pipa iz riga (ranije stari zec).
+  - **Settings:** zupčanik otvara pun ekran — Music / Sound effects (slider + mute, busovi `Music` / `SFX` u `default_bus_layout.tres`), Vibration, Reduce motion, Restore purchases (4 stanja), Remove Ads status, Privacy choices / policy, Contact support, Credits, verzija; Dev sekcija samo u debug buildu (unlock / reset sezona, +1000 coina, reset tutoriala). Postavke u `user://settings.cfg`, primijene se na startu. Ekran se gradi unaprijed u pozadini. Novi `settings_screen_smoke`; toast „Settings coming soon" obrisan.
+- **Brief za Claude Design** `ispravke-settings-cd-brief.md` (+ 8 slika u `ispravke-settings-ref/`): zlatni okvir Albuma sa skrolom, Classic Pip kao pravi skin, novi Pip umjesto starog crteža u Shopu (Starter Pack, All set), pun Settings ekran (zvuk spreman za muziku i SFX). U `scope-i-granice.md` (launch IN) na zahtjev.
+- **Sitne ispravke poslije playtesta** (bez CD-a):
+  - Dev „Reset seasons" u Settingsu vraćao je samo Home na prvu sezonu, a Arena i run su ostajali na drugoj: pozivao je staru debug pomoć (otključa S1 + S2, aktivna Frost). Sada `reset_seasons_to_s1()` — prva sezona svuda, polje zatvoreno, nadogradnje sezone sačuvane i učitane. Pokriveno korakom 12 u `season_sync_smoke`.
+  - Tutorial u Areni: oblačić s uputstvom bio je iza pilule „koliko sjemena treba za Arenu". Oblačić se sada postavlja iznad pilule kad je ona vidljiva (`arena_cue.gd`).
+  - Album: red sažetka („Album: 10 bloom…") izbačen; prozor liste pomjeren 54 px gore (zlatni i obični).
+  - Pip u pogledu three_q (Shop, Ormar) nije imao drugu nogu: `foot_R` je bio iza tijela (`z -1` → `3` u `rig.json`). Popravljeno za sve skinove i poze.
+  - Pregled Pipa u kartici više ne crta stari crtež zeca dok se atlas skina pravi.
+- **Brief za Claude Design** `muncher-premium-pip-cd-brief.md` (+ 9 slika u `muncher-premium-pip-ref/`): (A) potpuni redizajn munchera u Areni — novi lik, cutout rig, sva stanja i novo gnijezdo; (B) prvi premium Pip skin za pravi novac — potpuno drugačiji dizajn i tema, vlastiti dijelovi i animacije, Shop i Ormar kartica. U `scope-i-granice.md` (launch IN) na zahtjev.
+
 ## 2026-10-10
 
 - **FPS pregled, nastavak: start huba, prvi prikazi, Pip u runu** (`performanse.md` § Rezultati 2026-10-10).

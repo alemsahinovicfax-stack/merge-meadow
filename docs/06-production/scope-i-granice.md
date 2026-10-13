@@ -30,12 +30,16 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - Splash → tutorial run (prvi launch) → main menu
 - Loot ekran: ×2 rewarded, revive rewarded (max 1/run), retry, u kamp
 - Kamp: merge, upgrade, daily chest
+- Settings ekran (zupčanik u headeru): Music i Sound effects (slider + mute), Vibration, Reduce motion, Restore purchases, Remove Ads status, Privacy choices (pristanak za reklame), Privacy policy, Contact support, Credits, Version; Dev sekcija samo u debug buildu — dodano 2026-10-12 na zahtjev, [[../04-experience/design-drafts/ispravke-settings-cd-brief|ispravke-settings-cd-brief]]
+- Classic Pip je pravi skin u Ormaru (besplatan, ne prodaje se); zlatni okvir Albuma radi sa skrolom — 2026-10-12, isti brief
+- Muncher u Areni: novi lik (cutout rig + animacije svih stanja, novo gnijezdo); pravila ponašanja ostaju — dodano 2026-10-12 na zahtjev, [[../04-experience/design-drafts/muncher-premium-pip-cd-brief|muncher-premium-pip-cd-brief]]
+- Premium Pip skin (1 komad, pravi novac): potpuno drugačiji dizajn i tema, vlastiti dijelovi i animacije, Shop Looks + Ormar; samo kozmetika (Pillar 2) — 2026-10-12, isti brief
 - Shop: remove ads, starter pack (7 dana od prvog pokretanja), boosteri (Merge Hint jednokratan, Loot Burst consumable) — Shop v2, 2026-10-02
 
 ### Monetizacija
 - AdMob rewarded video (×2 loot, revive)
 - Opcionalni interstitial **samo** na loot ekranu (A/B post-launch)
-- IAP: remove ads, starter pack, boosters
+- IAP: remove ads, starter pack, boosters, premium Pip skin (samo kozmetika, od 2026-10-12)
 - Offline gameplay; IAP zahtijeva mrežu
 
 ### Tech

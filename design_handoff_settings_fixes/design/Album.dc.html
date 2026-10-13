@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E2D8}a{color:#2D3436}a:hover{color:#9E6645}</style>
+</helmet>
+<section data-screen-label="A · Album window" style="padding:80px;display:flex;flex-direction:column;gap:48px;font-family:Nunito,system-ui,sans-serif;color:#2D3436">
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:2400px">
+    <div style="font:700 28px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#555C5E">DESIGN_HANDOFF_SETTINGS_FIXES · A · ALBUM</div>
+    <div style="font:900 96px/1 Nunito,sans-serif">Album: a frame with a window</div>
+    <div style="font:700 40px/1.35 Nunito,sans-serif;color:#555C5E;max-width:2000px;text-wrap:pretty">The list scrolls only inside the window. Everything outside it is four opaque cream caps (top, bottom, left, right) drawn above the ScrollContainer, then the window rim, then the page frame. The game does not clip, so the caps do the clipping. Toggle X-ray to see rows running under the caps.</div>
+    <div style="display:flex;gap:16px;margin-top:12px">
+      <div onClick="{{ toggleXray }}" style="height:96px;padding:0 40px;border-radius:48px;border:4px solid #2D3436;display:flex;align-items:center;font:900 40px/1 Nunito,sans-serif;cursor:pointer;background:{{ xrayBg }}">X-ray {{ xrayLabel }}</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:64px;align-items:flex-start">
+    <sc-for list="{{ screens }}" as="sc" hint-placeholder-count="6">
+      <div id="{{ sc.id }}" style="display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;align-items:center;gap:20px">
+          <div style="height:72px;min-width:72px;padding:0 20px;box-sizing:border-box;border-radius:36px;background:#2D3436;color:#FFF8F0;display:grid;place-items:center;font:900 36px/1 Nunito,sans-serif">{{ sc.id }}</div>
+          <div style="font:900 48px/1 Nunito,sans-serif">{{ sc.title }}</div>
+        </div>
+        <div data-layer="HubScreen" data-live="{{ sc.live }}" style="width:1080px;height:1920px;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#FFF8F0;border-radius:24px;box-shadow:0 12px 0 rgba(45,52,54,.18)">
+          <div data-layer="Header" style="flex:0 0 auto;position:relative;z-index:6;background:#2A2233;box-shadow:0 6px 14px rgba(20,14,26,.34)">
+            <div style="height:140px;display:flex;align-items:center;gap:16px;padding:0 0 0 20px;box-sizing:border-box">
+              <div style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="icons/icon_coin.svg" alt="" style="width:64px;height:64px"><div style="flex:1;text-align:right;font:800 48px/1 Nunito,sans-serif;color:#FFF8F0">12,450</div></div>
+              <div style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="icons/icon_seed.svg" alt="" style="width:64px;height:64px"><div style="flex:1;text-align:right;font:800 48px/1 Nunito,sans-serif;color:#FFF8F0">340</div></div>
+              <div style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="icons/icon_flower.svg" alt="" style="width:64px;height:64px"><div style="flex:1;text-align:right;font:800 48px/1 Nunito,sans-serif;color:#FFF8F0">27</div></div>
+              <div style="width:124px;height:140px;flex:0 0 auto;display:flex;align-items:center;padding-left:4px;box-sizing:border-box"><div style="width:100px;height:100px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center"><img src="icons/icon_settings_light.svg" alt="" style="width:56px;height:56px"></div></div>
+            </div>
+            <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+          </div>
+
+          <div data-layer="JournalPage" style="position:relative;flex:0 0 1633px;height:1633px;background:#FFF8F0">
+            <div data-layer="ListScroll" style="{{ sc.scrollStyle }}">
+              <div data-layer="List" data-list="1" style="{{ sc.listStyle }}">
+                <sc-for list="{{ sc.groups }}" as="g" hint-placeholder-count="3">
+                  <div data-layer="SeasonGroup" style="{{ g.style }}">
+                    <div data-layer="SeasonHeader" style="height:60px;display:flex;align-items:center;gap:18px">
+                      <div style="font:900 40px/1 Nunito,sans-serif;white-space:nowrap">{{ g.name }}</div>
+                      <div style="flex:1;height:3px;border-radius:2px;background:rgba(45,52,54,.14)"></div>
+                      <img src="icons/icon_lock_ink.svg" alt="" style="{{ g.lockStyle }}">
+                      <div style="font:800 36px/1 Nunito,sans-serif;color:#555C5E;white-space:nowrap">{{ g.count }}</div>
+                    </div>
+                    <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="6">
+                      <div data-layer="BloomRow" style="{{ r.rowStyle }}">
+                        <div style="flex:1;min-width:0;height:150px;display:flex;flex-direction:column;gap:12px">
+                          <div style="display:flex;align-items:baseline;gap:16px;min-width:0">
+                            <div style="{{ r.nameStyle }}">{{ r.name }}</div>
+                            <div style="{{ r.starsStyle }}">{{ r.stars }}</div>
+                          </div>
+                          <div style="{{ r.capStyle }}">{{ r.caption }}</div>
+                        </div>
+                        <div style="flex:0 0 auto;display:flex;gap:18px">
+                          <sc-for list="{{ r.tiers }}" as="t" hint-placeholder-count="3">
+                            <div style="width:112px;display:flex;flex-direction:column;align-items:center;gap:8px">
+                              <div style="{{ t.frame }}"><div style="{{ t.well }}"></div><img src="{{ t.src }}" alt="" style="{{ t.art }}"></div>
+                              <div style="{{ t.label }}">T{{ t.n }}</div>
+                            </div>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div data-layer="CapTop" style="{{ sc.capTop }}"></div>
+            <div data-layer="CapBottom" style="{{ sc.capBottom }}"></div>
+            <div data-layer="CapLeft" style="{{ sc.capLeft }}"></div>
+            <div data-layer="CapRight" style="{{ sc.capRight }}"></div>
+            <div data-layer="WindowRim" style="{{ sc.rim }}"></div>
+            <div data-layer="ScrollGrabber" data-grab="1" style="{{ sc.grab }}"></div>
+
+            <sc-if value="{{ sc.gold }}" hint-placeholder-val="{{ true }}">
+              <div data-layer="GoldenFrame" style="position:absolute;left:12px;top:12px;right:12px;bottom:12px;box-sizing:border-box;border-radius:38px;border:13px solid #D6A82F;z-index:5">
+                <div style="position:absolute;inset:-10px;box-sizing:border-box;border-radius:35px;border:7px solid #FFD56B"></div>
+              </div>
+              <div data-layer="PageHead" style="position:absolute;left:44px;top:0;width:992px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:40px">
+                <div style="height:92px;box-sizing:border-box;padding:0 44px;border-radius:22px;background:#FFD56B;border:3px solid #D6A82F;box-shadow:0 5px 0 #D6A82F;display:flex;align-items:center;font:900 56px/1 Nunito,sans-serif;white-space:nowrap">Bloom Album</div>
+                <div style="font:800 38px/46px Nunito,sans-serif;color:#555C5E;white-space:nowrap">Album: 4 blooms kept · 2 spotted</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ sc.plain }}" hint-placeholder-val="{{ false }}">
+              <div data-layer="PageHead" style="position:absolute;left:24px;top:0;width:1032px;z-index:5;display:flex;flex-direction:column;gap:8px;padding-top:30px">
+                <div style="display:flex;align-items:center;gap:18px">
+                  <div style="width:10px;height:56px;border-radius:5px;background:#FFD56B"></div>
+                  <div style="font:900 60px/64px Nunito,sans-serif;white-space:nowrap">Bloom Album</div>
+                </div>
+                <div style="padding-left:28px;font:800 38px/46px Nunito,sans-serif;color:#555C5E;white-space:nowrap">Album: 4 blooms kept · 2 spotted</div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div data-layer="Footer" style="flex:0 0 auto;position:relative;z-index:6;background:#2A2233;box-shadow:0 -6px 14px rgba(20,14,26,.34)">
+            <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+            <div style="position:relative;height:141px;display:flex">
+              <div style="position:absolute;top:6px;left:288px;width:72px;height:8px;border-radius:4px;background:#FFB88C"></div>
+              <div style="width:216px;height:141px;display:grid;place-items:center"><img src="icons/tab_shop_light.svg" alt="" style="width:64px;height:64px;opacity:.82"></div>
+              <div style="width:216px;height:141px;position:relative"><div style="position:absolute;left:16px;top:20px;width:184px;height:108px;box-sizing:border-box;border-radius:20px;display:grid;place-items:center;background:#FFB88C;border:2px solid rgba(45,52,54,.14)"><img src="icons/tab_journal.svg" alt="" style="width:72px;height:72px;transform:translateY(-2px)"></div></div>
+              <div style="width:216px;height:141px;display:grid;place-items:center"><img src="icons/tab_home_light.svg" alt="" style="width:64px;height:64px;opacity:.82"></div>
+              <div style="width:216px;height:141px;display:grid;place-items:center"><img src="icons/tab_camp_light.svg" alt="" style="width:64px;height:64px;opacity:.82"></div>
+              <div style="width:216px;height:141px;display:grid;place-items:center"><img src="icons/tab_arena_light.svg" alt="" style="width:64px;height:64px;opacity:.82"></div>
+            </div>
+          </div>
+        </div>
+        <div style="font:500 26px/1.5 'JetBrains Mono',monospace;color:#555C5E;max-width:1080px">{{ sc.note }}</div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const NUN = 'Nunito,system-ui,sans-serif', INK = '#2D3436';
+const RB = { 1: ['#B8D4F0', '#93AAC0'], 2: ['#E0C4FF', '#B39DCC'], 3: ['#FFE8B8', '#CCBA93'] }, LOCKED = ['#E4E4E0', '#B6B6B2'];
+const CAPTION = { locked: 'Keep playing to discover this bloom.', seen: 'Spotted in runs — merge to T2, then Keep in Album.', album_t2: 'In your Album (T2 bloom). Merge to T3 for crystal.', album_t3: 'Crystal bloom saved in Album!' };
+const RAR = [1, 1, 1, 2, 2, 3];
+const DATA = [
+  ['Country Bloom', true, [['clover', 'Meadow Clover', 'album_t3'], ['daisy', 'Field Daisy', 'album_t2'], ['buttercup', 'Buttercup Lane', 'album_t2'], ['tulip', 'Barn Tulip', 'seen'], ['sunflower', 'Sunfence', 'seen'], ['pumpkin', 'Harvest Pumpkin', 'album_t3']]],
+  ['Frost Orchard', false, 6], ['Lantern Meadow', false, 6]
+];
+// Geometry (page px, 1080 × 1633). W' = rim outer box, W'' = ScrollContainer = hole in the caps.
+const G = {
+  gold: { rim: [44, 212, 992, 1349], b: 8, r: 30, rimColor: '#D6A82F', pad: 12 },
+  plain: { rim: [24, 175, 1032, 1434], b: 3, r: 26, rimColor: '#E3DCD3', pad: 12 }
+};
+const HEADER_H = 60, HG = 20, ROW_H = 200, RG = 20, SG = 36, TOP = 16, BOT = 24;
+const GROUP_H = HEADER_H + HG + 6 * ROW_H + 5 * RG;
+const CONTENT_H = TOP + 3 * GROUP_H + 2 * SG + BOT;
+function geo(kind) { const g = G[kind]; const [x, y, w, h] = g.rim; return Object.assign({}, g, { hole: [x + g.b, y + g.b, w - 2 * g.b, h - 2 * g.b] }); }
+
+class Component extends DCLogic {
+  state = { xray: false };
+  componentDidMount() { this.bind(); }
+  componentDidUpdate() { this.bind(); }
+  bind() {
+    document.querySelectorAll('[data-live="1"]').forEach(el => {
+      if (el._b) return; el._b = 1;
+      const list = el.querySelector('[data-list]'), grab = el.querySelector('[data-grab]');
+      const g = geo(el._kind || 'gold'), H = g.hole[3], max = CONTENT_H - H, gh = Math.max(64, Math.round(H * H / CONTENT_H));
+      let y = 0, drag = null;
+      const set = v => { y = Math.max(0, Math.min(max, v)); list.style.transform = 'translateY(' + (-y) + 'px)'; grab.style.transform = 'translateY(' + Math.round(y / max * (H - gh)) + 'px)'; };
+      el.addEventListener('wheel', e => { e.preventDefault(); set(y + e.deltaY); }, { passive: false });
+      el.addEventListener('pointerdown', e => { drag = [e.clientY, y]; });
+      window.addEventListener('pointermove', e => { if (drag) { const k = el.getBoundingClientRect().height / 1920; set(drag[1] - (e.clientY - drag[0]) / k); } });
+      window.addEventListener('pointerup', () => drag = null);
+    });
+  }
+  rows(rowW) {
+    let gi = 0;
+    return DATA.map(([name, open, rows]) => {
+      const list = (Array.isArray(rows) ? rows : Array.from({ length: rows }, () => [null, '???', 'locked'])).map(([type, label, state], j) => {
+        const locked = state === 'locked', r = RAR[j], [bg, edge] = locked ? LOCKED : RB[r];
+        const kept = state === 'album_t3' ? 3 : state === 'album_t2' ? 2 : locked ? 0 : 1;
+        return {
+          name: locked ? '???' : label, stars: '★'.repeat(r) + '☆'.repeat(3 - r), caption: CAPTION[state],
+          rowStyle: 'position:relative;flex:0 0 auto;box-sizing:border-box;width:' + rowW + 'px;height:200px;border-radius:26px;background:' + bg + ';border:3px solid ' + edge + ';box-shadow:0 4px 0 rgba(45,52,54,.12);padding:0 24px 0 28px;display:flex;align-items:center;gap:24px',
+          nameStyle: 'flex:0 1 auto;min-width:0;font:900 44px/48px ' + NUN + ';color:' + (locked ? '#5C5C58' : INK) + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+          starsStyle: 'flex:0 0 auto;font:800 34px/1 ' + NUN + ';letter-spacing:.04em;color:' + (locked ? '#5C5C58' : INK),
+          capStyle: 'height:90px;font:700 38px/45px ' + NUN + ';color:' + (locked ? '#5C5C58' : '#3F4547') + ';overflow:hidden;text-wrap:pretty',
+          tiers: [1, 2, 3].map(n => {
+            const on = n <= kept, cr = n === 3;
+            return {
+              n, src: on ? 'flowers/' + type + '_t' + n + '.svg' : 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+              frame: 'position:relative;width:112px;height:112px;box-sizing:border-box;border-radius:' + (on && cr ? '30px' : '50%') + ';' + (on ? 'background:' + (cr ? '#FFD56B' : '#FFF8F0') + ';border:3px solid ' + (cr ? '#D6A82F' : '#CBC2B6') : 'background:rgba(45,52,54,.05);border:4px solid rgba(45,52,54,.32)'),
+              well: on ? 'position:absolute;inset:7px;box-sizing:border-box;border-radius:' + (cr ? '20px' : '50%') + ';background:#22342A;border:2px solid #16211B' : 'display:none',
+              art: on ? 'position:absolute;left:15.7px;top:13px;width:74.7px;height:74.7px' : 'display:none',
+              label: 'font:900 34px/36px ' + NUN + ';color:' + (on ? INK : '#5C5C58')
+            };
+          })
+        };
+      });
+      const kept = list.filter((x, i) => Array.isArray(rows) && /album/.test(rows[i][2])).length;
+      const st = 'flex:0 0 auto;display:flex;flex-direction:column;gap:' + RG + 'px;margin-top:' + (gi++ === 0 ? TOP : SG) + 'px';
+      return { name, count: kept + ' / 6 kept', lockStyle: open ? 'display:none' : 'width:34px;height:34px', rows: list, style: st };
+    });
+  }
+  screen(id, title, kind, pos, note, live) {
+    const g = geo(kind), [hx, hy, hw, hh] = g.hole, [rx, ry, rw, rh] = g.rim, x = this.state.xray;
+    const max = CONTENT_H - hh, scroll = pos === 'top' ? 0 : pos === 'bottom' ? max : Math.round(max * 0.45);
+    const gh = Math.max(64, Math.round(hh * hh / CONTENT_H)), gt = Math.round(scroll / max * (hh - gh));
+    const cap = (l, t, w, h) => 'position:absolute;left:' + l + 'px;top:' + t + 'px;width:' + w + 'px;height:' + h + 'px;z-index:3;background:' + (x ? 'rgba(255,204,213,.55);outline:3px dashed #E5678A;outline-offset:-3px' : '#FFF8F0');
+    return {
+      id, title, note, gold: kind === 'gold', plain: kind === 'plain', live: live ? '1' : '0',
+      groups: this.rows(hw - 2 * g.pad),
+      scrollStyle: 'position:absolute;left:' + hx + 'px;top:' + hy + 'px;width:' + hw + 'px;height:' + hh + 'px;z-index:1',
+      listStyle: 'display:flex;flex-direction:column;padding:0 ' + g.pad + 'px;transform:translateY(' + (-scroll) + 'px)',
+      capTop: cap(0, 0, 1080, hy), capBottom: cap(0, hy + hh, 1080, 1633 - hy - hh),
+      capLeft: cap(0, hy, hx, hh), capRight: cap(hx + hw, hy, 1080 - hx - hw, hh),
+      rim: 'position:absolute;left:' + rx + 'px;top:' + ry + 'px;width:' + rw + 'px;height:' + rh + 'px;box-sizing:border-box;border-radius:' + g.r + 'px;border:' + g.b + 'px solid ' + g.rimColor + ';z-index:4',
+      grab: 'position:absolute;left:' + (hx + hw - 14) + 'px;top:' + (hy + 10 + gt) + 'px;width:8px;height:' + (gh - 20) + 'px;border-radius:4px;background:rgba(45,52,54,.22);z-index:2'
+    };
+  }
+  renderVals() {
+    const sg = geo('gold').hole, sp = geo('plain').hole;
+    return {
+      xrayBg: this.state.xray ? '#FFCCD5' : '#FFFFFF', xrayLabel: this.state.xray ? 'on' : 'off',
+      toggleXray: () => this.setState({ xray: !this.state.xray }),
+      screens: [
+        this.screen('A1', 'Golden · top', 'gold', 'top', 'Window ' + sg.join(' · ') + ' (ScrollContainer). Rim 8 #D6A82F r 30 on 44 · 212 · 992 × 1349.', false),
+        this.screen('A2', 'Golden · middle', 'gold', 'mid', 'Rows enter under the top cap and leave under the bottom cap (y 1553). Caps are opaque ColorRects, z above the list.', false),
+        this.screen('A3', 'Golden · end of list', 'gold', 'bottom', 'Last row stops 24 px above the rim. Bottom cap 80 px + page frame close the page.', false),
+        this.screen('A4', 'Plain · top', 'plain', 'top', 'Window ' + sp.join(' · ') + '. Rim 3 #E3DCD3 (opaque = ink 10 % on cream) r 26.', false),
+        this.screen('A5', 'Plain · middle', 'plain', 'mid', 'Same four caps. Head 175 is the top cap; 24 px bottom cap above the footer.', false),
+        this.screen('A6', 'Golden · live (wheel / drag)', 'gold', 'top', 'Only List.transform and Grabber.transform change while scrolling. Caps, rim, frame and head never redraw.', true)
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

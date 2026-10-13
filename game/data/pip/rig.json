@@ -1254,7 +1254,7 @@
       -0.85,
       1
      ],
-     "z": -1,
+     "z": 3,
      "sprite": {
       "file": "res://assets/pip/parts/foot_f.svg",
       "offset": [

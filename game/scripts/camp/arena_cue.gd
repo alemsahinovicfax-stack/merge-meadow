@@ -96,7 +96,13 @@ func layout(field_size: Vector2) -> void:
 		cue.point_at(_bag_tip(field_size), 0.5, bounds)
 
 
+## Rep pokazuje na korpu. Kad je iznad nje pilula „N / 50" (z 60), oblačić ide iznad pilule —
+## inače mu ona pokrije drugi red (tutorial, 2026-10-12).
 func _bag_tip(field_size: Vector2) -> Vector2:
+	var gate: Control = _owner.get("_gate_count")
+	if gate != null and gate.visible:
+		var g := gate.get_rect()
+		return Vector2(g.get_center().x, g.position.y + BAG_TIP_GAP)
 	var bag: Control = _owner.get("_seed_bag")
 	if bag != null:
 		var r := bag.get_rect()

@@ -472,6 +472,9 @@ func _on_open_on_home(season_id: String) -> void:
 		return
 	GameState.set_paid_strip_focus(season_id)
 	GameState.set_home_band("paid")
+	# Play na kartici kupljene sezone = njeno polje na Homeu (aktivna sezona), kao u Campu.
+	# Ranije samo fokus kartice: otvoreno polje druge sezone je ostajalo, a Play ga je igrao.
+	GameState.open_home_season_field()
 	if GameState.meta_hub_active:
 		GameState.go_to_meta_page(MetaHubPages.MAIN)
 	else:
@@ -688,20 +691,59 @@ class _RestoreLink:
 		draw_line(Vector2(x, 41.0 + 38.0 + 8.0), Vector2(x + w, 41.0 + 38.0 + 8.0), ink, 3.0)
 
 
-## Boosters bez ponude: Pip + „All set here".
+## Boosters bez ponude: Pip + „All set here". Pip je iz riga (settings_fixes · C): prednji
+## pogled u nošenom skinu, nasmijan, miran — ranije stari crtež zeca.
 class _AllSet:
 	extends Control
+
+	const PIP_BOX := 190.0
+	var pip: UiPip
+	var _syncing := false
 
 	func _init() -> void:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		custom_minimum_size = Vector2(UiShopV2.CARD_W, 24.0 + 180.0 + 8.0 + 40.0)
+		GameState.cosmetics_changed.connect(_on_cosmetics)
+
+	func _on_cosmetics(_slots: Array) -> void:
+		_sync_pip()
+
+	func _ready() -> void:
+		_sync_pip()
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_RESIZED and pip != null:
+			pip.position = Vector2(size.x * 0.5, 24.0 + 180.0)
+
+	func _sync_pip() -> void:
+		if not is_inside_tree() or _syncing:
+			return
+		_syncing = true
+		var key := UiPip.equipped_skin_key()
+		while not UiPip.atlas_ready(key):
+			UiPip.request_atlas(key)
+			await get_tree().process_frame
+			if not is_inside_tree():
+				_syncing = false
+				return
+		_syncing = false
+		if pip == null:
+			pip = UiPip.new()
+			pip.name = "AllSetPip"
+			pip.view = "front"
+			pip.follow_equipped = false
+			pip.still = true
+			pip.box_px = PIP_BOX
+			pip.skin = key
+			add_child(pip)
+		else:
+			pip.set_skin(key)
+		for eye in ["eye_L", "eye_R"]:
+			pip.set_frame(eye, "happy")
+		pip.set_frame("mouth", "smile")
+		pip.position = Vector2(size.x * 0.5, 24.0 + 180.0)
 
 	func _draw() -> void:
-		var pip := PipAssets.get_texture()
-		if pip != null:
-			var ps := pip.get_size()
-			var k := 180.0 / maxf(ps.x, ps.y)
-			draw_texture_rect(pip, Rect2(Vector2(size.x * 0.5 - ps.x * k * 0.5, 24.0), ps * k), false)
 		var w := UiHomeV3.text_w(900, 40, UiShopV2.S_ALL_SET)
 		UiHomeV3.draw_text(self, 900, 40, UiShopV2.S_ALL_SET, Vector2(size.x * 0.5 - w * 0.5, 24.0 + 180.0 + 8.0), UiShopV2.INK_SUB)
 

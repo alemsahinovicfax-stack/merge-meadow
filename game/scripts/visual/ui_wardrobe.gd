@@ -118,6 +118,8 @@ const SUB          := "Looks only. Tap one to wear it."
 const CLOSE_TEXT   := "Close"
 const SHOP_LINK    := "More in Shop"
 const NEW_TEXT     := "New"
+## Classic Pip (settings_fixes · B): oznaka umjesto cijene — besplatan, uvijek tvoj.
+const FREE_TEXT    := "Free"
 const TOAST_MANY   := "New looks are on"
 
 # ── Asseti ────────────────────────────────────────────────────────────────────
@@ -157,19 +159,23 @@ static func card_state(item_id: String, owned: bool, worn_id: String) -> String:
 
 
 ## Ćelije mreže jednog slota: "" = Default, id = stavka, "@shop" = ShopLink, "@empty" = EmptyState.
+## Pip slot (settings_fixes · B): Classic je prva kartica skina, a Blossom i Sky se vide i prije
+## kupovine (pod velom) — igrač odmah vidi sva tri Pipa i zna da je zeleni njegov. Zato tu
+## uvijek ide ShopLink, nikad EmptyState.
 static func grid_cells(slot: Dictionary, items: Array, owned_ids: Dictionary) -> PackedStringArray:
 	var out := PackedStringArray()
 	if bool(slot.get("allow_default", true)):
 		out.append("")
+	var pip := str(slot.get("id", "")) == CosmeticCatalog.SLOT_PIP_SKIN
 	var any_owned := false
 	for it in items:
 		var d: Dictionary = it
 		var iid := str(d.get("id", ""))
 		var own := bool(owned_ids.get(iid, false))
 		any_owned = any_owned or own
-		if item_visible(d, own):
+		if pip or item_visible(d, own):
 			out.append(iid)
-	out.append("@shop" if any_owned else "@empty")
+	out.append("@shop" if any_owned or pip else "@empty")
 	return out
 
 
@@ -304,6 +310,11 @@ static func badge() -> StyleBoxFlat:
 
 static func new_tag() -> StyleBoxFlat:
 	return _box(MINT, 16, 3, STICKER_EDGE)
+
+
+## „Free" na Classic Pipu: krem pločica, rub 3, r 16 (mjesto NewTaga — Classic nikad nije New).
+static func free_tag() -> StyleBoxFlat:
+	return _box(STICKER, 16, 3, STICKER_EDGE)
 
 
 ## ShopLink kartica i EmptyState: isprekidan rub se crta u _draw() (dash 14 / gap 10, 3 px) — StyleBox nema dash.

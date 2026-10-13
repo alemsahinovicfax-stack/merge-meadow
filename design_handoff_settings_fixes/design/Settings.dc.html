@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E9E2D8}a{color:#2D3436}a:hover{color:#9E6645}</style>
+</helmet>
+<section data-screen-label="D · Settings" style="padding:80px;display:flex;flex-direction:column;gap:48px;font-family:Nunito,system-ui,sans-serif;color:#2D3436">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="font:700 28px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#555C5E">DESIGN_HANDOFF_SETTINGS_FIXES · D · SETTINGS</div>
+    <div style="font:900 96px/1 Nunito,sans-serif">Settings, full screen</div>
+    <div style="font:700 40px/1.35 Nunito,sans-serif;color:#555C5E;max-width:2000px;text-wrap:pretty">The gear opens a full screen that slides up over the hub (0.24 s). X sits exactly where the gear was; Android Back closes it too. Every control works now and saves on change — Music and Sound effects are stored even though no sound exists yet. All screens are live: drag sliders, flip toggles, tap Restore.</div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:64px;align-items:flex-start">
+    <sc-for list="{{ screens }}" as="sc" hint-placeholder-count="5">
+      <div id="{{ sc.id }}" style="display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;align-items:center;gap:20px">
+          <div style="height:72px;min-width:72px;padding:0 20px;box-sizing:border-box;border-radius:36px;background:#2D3436;color:#FFF8F0;display:grid;place-items:center;font:900 36px/1 Nunito,sans-serif">{{ sc.id }}</div>
+          <div style="font:900 48px/1 Nunito,sans-serif">{{ sc.title }}</div>
+        </div>
+        <div data-layer="SettingsScreen" style="width:1080px;height:1920px;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#FFF8F0;border-radius:24px;box-shadow:0 12px 0 rgba(45,52,54,.18)">
+          <div data-layer="TopBar" style="flex:0 0 143px;position:relative;z-index:3;background:#2A2233;box-shadow:0 6px 14px rgba(20,14,26,.34)">
+            <div style="height:140px;display:flex;align-items:center;padding:0 10px 0 48px;box-sizing:border-box;gap:24px">
+              <div style="flex:1;font:900 56px/1 Nunito,sans-serif;color:#FFF8F0">{{ sc.barTitle }}</div>
+              <div data-layer="CloseButton" onClick="{{ sc.close }}" style="width:120px;height:120px;box-sizing:border-box;border-radius:24px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center;cursor:pointer" style-active="transform:scale(.96)"><img src="icons/icon_close_light.svg" alt="Close" style="width:64px;height:64px"></div>
+            </div>
+            <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+          </div>
+
+          <div data-layer="SettingsScroll" data-scroll="{{ sc.scrollTo }}" style="flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none">
+            <sc-if value="{{ sc.main }}" hint-placeholder-val="{{ true }}">
+            <div style="box-sizing:border-box;padding:40px 24px 120px;display:flex;flex-direction:column;gap:44px">
+              <sc-for list="{{ sc.sections }}" as="s" hint-placeholder-count="4">
+                <div data-layer="Section" style="display:flex;flex-direction:column;gap:16px">
+                  <div style="display:flex;align-items:center;gap:16px;padding-left:12px">
+                    <div style="font:900 44px/1 Nunito,sans-serif">{{ s.title }}</div>
+                    <sc-if value="{{ s.tag }}" hint-placeholder-val="{{ false }}"><div style="height:52px;box-sizing:border-box;padding:0 16px;border-radius:16px;background:#2D3436;color:#FFF8F0;display:flex;align-items:center;font:900 34px/1 Nunito,sans-serif">Debug build</div></sc-if>
+                  </div>
+                  <div data-layer="SectionCard" style="{{ s.card }}">
+                    <sc-for list="{{ s.rows }}" as="r" hint-placeholder-count="2">
+                      <div style="{{ r.wrap }}">
+
+                        <sc-if value="{{ r.isSlider }}" hint-placeholder-val="{{ false }}">
+                          <div style="display:flex;flex-direction:column;gap:4px">
+                            <div style="font:900 44px/1.2 Nunito,sans-serif">{{ r.label }}</div>
+                            <div style="display:flex;align-items:center;gap:24px">
+                              <div data-layer="MuteButton" onClick="{{ r.mute }}" style="{{ r.muteStyle }}" style-active="transform:translateY(4px)"><sc-if value="{{ r.isSlider }}" hint-placeholder-val="{{ false }}"><img src="{{ r.muteIcon }}" alt="" style="width:64px;height:64px"></sc-if></div>
+                              <div data-layer="Slider" onPointerDown="{{ r.down }}" onPointerMove="{{ r.move }}" onPointerUp="{{ r.up }}" onPointerCancel="{{ r.up }}" style="position:relative;flex:0 0 672px;width:672px;height:120px;touch-action:none;cursor:pointer">
+                                <div data-layer="Track" style="position:absolute;left:0;right:0;top:44px;height:32px;box-sizing:border-box;border-radius:16px;background:#FFF8F0;border:4px solid #2D3436;overflow:hidden">
+                                  <div data-layer="Fill" style="{{ r.fill }}"></div>
+                                </div>
+                                <div data-layer="Thumb" style="{{ r.thumb }}"></div>
+                              </div>
+                              <div data-layer="Value" style="{{ r.valStyle }}">{{ r.valText }}</div>
+                            </div>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ r.isToggle }}" hint-placeholder-val="{{ false }}">
+                          <div onClick="{{ r.flip }}" style="display:flex;align-items:center;gap:24px;min-height:120px;cursor:pointer">
+                            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                              <div style="font:900 44px/1.2 Nunito,sans-serif">{{ r.label }}</div>
+                              <sc-if value="{{ r.sub }}" hint-placeholder-val="{{ false }}"><div style="font:800 36px/1.25 Nunito,sans-serif;color:#555C5E;text-wrap:pretty">{{ r.sub }}</div></sc-if>
+                            </div>
+                            <div data-layer="Toggle" style="{{ r.track }}"><div data-layer="Knob" style="{{ r.knob }}"></div></div>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ r.isRestore }}" hint-placeholder-val="{{ false }}">
+                          <div style="display:flex;flex-direction:column;gap:14px">
+                            <div data-layer="RestoreButton" onClick="{{ r.tap }}" style="{{ r.btn }}">{{ r.btnText }}</div>
+                            <div style="{{ r.lineStyle }}">{{ r.line }}</div>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ r.isStatus }}" hint-placeholder-val="{{ false }}">
+                          <div style="display:flex;align-items:center;gap:24px;min-height:120px">
+                            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                              <div style="font:900 44px/1.2 Nunito,sans-serif">Remove Ads</div>
+                              <div style="font:800 36px/1.25 Nunito,sans-serif;color:#555C5E">{{ r.sub }}</div>
+                            </div>
+                            <div data-layer="AdsStatus" style="{{ r.chip }}">{{ r.chipText }}</div>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ r.isLink }}" hint-placeholder-val="{{ false }}">
+                          <div onClick="{{ r.tap }}" style="display:flex;align-items:center;gap:24px;min-height:132px;cursor:pointer" style-active="opacity:.7">
+                            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                              <div style="font:900 44px/1.2 Nunito,sans-serif">{{ r.label }}</div>
+                              <sc-if value="{{ r.sub }}" hint-placeholder-val="{{ false }}"><div style="font:800 36px/1.25 Nunito,sans-serif;color:#555C5E">{{ r.sub }}</div></sc-if>
+                            </div>
+                            <div style="width:120px;height:120px;display:grid;place-items:center"><sc-if value="{{ r.isLink }}" hint-placeholder-val="{{ false }}"><img src="{{ r.icon }}" alt="" style="width:56px;height:56px"></sc-if></div>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ r.isDev }}" hint-placeholder-val="{{ false }}">
+                          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+                            <sc-for list="{{ r.buttons }}" as="b" hint-placeholder-count="4">
+                              <div onClick="{{ b.tap }}" style="{{ b.style }}" style-active="transform:translateY(4px);box-shadow:0 4px 0 rgba(26,26,20,.28)">{{ b.label }}</div>
+                            </sc-for>
+                          </div>
+                        </sc-if>
+
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+              <div data-layer="Version" style="text-align:center;font:800 36px/1.4 Nunito,sans-serif;color:#555C5E">Merge Meadow · Version 0.9.3 (412)</div>
+            </div>
+            </sc-if>
+
+            <sc-if value="{{ sc.credits }}" hint-placeholder-val="{{ false }}">
+              <div style="box-sizing:border-box;padding:40px 24px 120px;display:flex;flex-direction:column;gap:32px">
+                <sc-for list="{{ credits }}" as="c" hint-placeholder-count="4">
+                  <div style="box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;background:#FFFFFF;box-shadow:0 10px 0 rgba(26,26,20,.22);padding:32px;display:flex;flex-direction:column;gap:10px">
+                    <div style="font:900 44px/1.2 Nunito,sans-serif">{{ c.t }}</div>
+                    <div style="font:800 38px/1.35 Nunito,sans-serif;color:#555C5E;text-wrap:pretty">{{ c.d }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ sc.toastOn }}" hint-placeholder-val="{{ false }}">
+            <div data-layer="Toast" style="position:absolute;left:90px;right:90px;top:1720px;height:100px;box-sizing:border-box;border-radius:50px;background:#2D3436;border:3px solid #FFF8F0;display:grid;place-items:center;font:900 44px/1 Nunito,sans-serif;color:#FFF8F0;z-index:4;white-space:nowrap">{{ sc.toast }}</div>
+          </sc-if>
+        </div>
+        <div style="font:500 26px/1.5 'JetBrains Mono',monospace;color:#555C5E;max-width:1080px">{{ sc.note }}</div>
+      </div>
+    </sc-for>
+
+    <div id="D6" style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="height:72px;padding:0 20px;border-radius:36px;background:#2D3436;color:#FFF8F0;display:grid;place-items:center;font:900 36px/1 Nunito,sans-serif">D6</div>
+        <div style="font:900 48px/1 Nunito,sans-serif">Restore purchases · 4 states</div>
+      </div>
+      <div style="width:1080px;box-sizing:border-box;padding:40px 24px;background:#FFF8F0;border-radius:24px;display:flex;flex-direction:column;gap:32px;box-shadow:0 12px 0 rgba(45,52,54,.18)">
+        <sc-for list="{{ restoreBoard }}" as="rb" hint-placeholder-count="4">
+          <div style="display:flex;flex-direction:column;gap:14px;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;background:#FFFFFF;padding:28px 32px">
+            <div style="font:700 28px 'JetBrains Mono',monospace;color:#555C5E">{{ rb.name }}</div>
+            <div style="{{ rb.btn }}">{{ rb.btnText }}</div>
+            <div style="{{ rb.lineStyle }}">{{ rb.line }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const N = 'Nunito,system-ui,sans-serif', INK = '#2D3436', SLW = 672, TH = 76;
+const BTN = 'height:120px;box-sizing:border-box;border-radius:60px;border:4px solid #2D3436;display:flex;align-items:center;justify-content:center;gap:14px;font:900 44px/1 ' + N + ';white-space:nowrap;cursor:pointer;';
+const RESTORE = {
+  idle: [BTN + 'background:#FFFFFF;box-shadow:0 8px 0 rgba(26,26,20,.28)', 'Restore purchases', 'Brings back Remove Ads and Starter Pack on this device.'],
+  busy: [BTN + 'background:#EAD2FF;transform:translateY(8px);cursor:default', 'Restoring  •••', 'Talking to the store…'],
+  done: [BTN + 'background:#A8E6CF', '✓ Restored', 'Remove Ads is back on.'],
+  none: [BTN + 'background:#A8E6CF', '✓ Checked', 'Nothing to restore on this account.'],
+  fail: [BTN + 'background:#FFCCD5;box-shadow:0 8px 0 rgba(26,26,20,.28)', 'Didn’t go through', 'Check your connection, then tap again.']
+};
+const BASE = { music: 80, musicMute: false, sfx: 100, sfxMute: false, vib: true, rm: false, restore: 'idle', ads: false, toast: '', page: 'main' };
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = {
+      D1: Object.assign({}, BASE),
+      D2: Object.assign({}, BASE, { musicMute: true, sfx: 40, vib: false, rm: true, ads: true }),
+      D3: Object.assign({}, BASE, { restore: 'fail' }),
+      D4: Object.assign({}, BASE, { ads: true, restore: 'done' }),
+      D5: Object.assign({}, BASE, { page: 'credits' })
+    };
+  }
+  componentDidMount() { this.endTries = 0; this.toEnd(); }
+  componentDidUpdate() { this.toEnd(true); }
+  toEnd(once) {
+    let pending = 0;
+    document.querySelectorAll('[data-scroll="end"]').forEach(el => {
+      if (el._ended) return;
+      const max = el.scrollHeight - el.clientHeight;
+      if (max > 0) { el.scrollTop = max; if (el.scrollTop > 0) { el._ended = 1; return; } }
+      pending++;
+    });
+    if (!once && (pending || !document.querySelector('[data-scroll="end"]')) && this.endTries++ < 60) this.et = setTimeout(() => this.toEnd(), 150);
+  }
+  componentWillUnmount() { clearTimeout(this.tt); clearTimeout(this.rt); clearTimeout(this.et); }
+  upd(id, o) { this.setState(s => ({ [id]: Object.assign({}, s[id], o) })); }
+  toast(id, t) { this.upd(id, { toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.upd(id, { toast: '' }), 1600); }
+  slider(id, key, label) {
+    const s = this.state[id], v = s[key], muted = s[key + 'Mute'];
+    const set = e => { const r = e.currentTarget.getBoundingClientRect(), k = r.width / SLW; const x = (e.clientX - r.left) / k; this.upd(id, { [key]: Math.round(Math.max(0, Math.min(1, (x - TH / 2) / (SLW - TH))) * 100), [key + 'Mute']: false }); };
+    return {
+      isSlider: true, label, valText: muted ? 'Off' : String(v),
+      muteIcon: muted ? 'icons/icon_sound_off.svg' : 'icons/icon_sound.svg',
+      muteStyle: 'flex:0 0 120px;width:120px;height:120px;box-sizing:border-box;border-radius:28px;border:4px solid #2D3436;display:grid;place-items:center;cursor:pointer;background:' + (muted ? '#E3DCD3' : '#FFFFFF') + ';box-shadow:' + (muted ? 'none' : '0 6px 0 rgba(26,26,20,.24)'),
+      mute: () => this.upd(id, { [key + 'Mute']: !muted }),
+      fill: 'position:absolute;left:0;top:0;bottom:0;width:100%;background:' + (muted ? '#E3DCD3' : '#A8E6CF') + ';transform-origin:0 50%;transform:scaleX(' + (v / 100).toFixed(3) + ')',
+      thumb: 'position:absolute;left:0;top:22px;width:' + TH + 'px;height:' + TH + 'px;box-sizing:border-box;border-radius:50%;background:' + (muted ? '#F1EAE0' : '#FFFFFF') + ';border:4px solid #2D3436;box-shadow:0 4px 0 rgba(26,26,20,.28);transform:translateX(' + Math.round(v / 100 * (SLW - TH)) + 'px)',
+      valStyle: 'flex:0 0 120px;text-align:right;font:900 56px/1 ' + N + ';font-variant-numeric:tabular-nums;color:' + (muted ? '#555C5E' : INK),
+      down: e => { this._drag = id + key; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} set(e); },
+      move: e => { if (this._drag === id + key) set(e); }, up: () => { this._drag = null; }
+    };
+  }
+  toggle(id, key, label, sub, after) {
+    const on = this.state[id][key];
+    return {
+      isToggle: true, label, sub: sub || '',
+      track: 'position:relative;flex:0 0 168px;width:168px;height:96px;box-sizing:border-box;border-radius:48px;border:4px solid #2D3436;background:' + (on ? '#A8E6CF' : '#E3DCD3'),
+      knob: 'position:absolute;left:6px;top:6px;width:76px;height:76px;box-sizing:border-box;border-radius:50%;background:#FFFFFF;border:4px solid #2D3436;transition:transform .15s cubic-bezier(.33,1,.68,1);transform:translateX(' + (on ? 72 : 0) + 'px)',
+      flip: () => { this.upd(id, { [key]: !on }); if (after) after(!on); }
+    };
+  }
+  restoreRow(id) {
+    const st = this.state[id].restore, R = RESTORE[st];
+    return {
+      isRestore: true, btn: R[0], btnText: R[1], line: R[2],
+      lineStyle: 'text-align:center;font:800 36px/1.3 ' + N + ';color:' + (st === 'fail' ? INK : '#555C5E'),
+      tap: () => {
+        if (st === 'busy') return;
+        this.upd(id, { restore: 'busy' });
+        clearTimeout(this.rt); this.rt = setTimeout(() => this.upd(id, this.state[id].ads ? { restore: 'none' } : { restore: 'done', ads: true }), 1400);
+      }
+    };
+  }
+  screen(id, title, debug, scrollTo, note) {
+    const s = this.state[id], W = 'padding:12px 0;';
+    const sep = 'border-top:3px solid rgba(45,52,54,.10);';
+    const card = 'box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;background:#FFFFFF;box-shadow:0 10px 0 rgba(26,26,20,.22);padding:12px 32px';
+    const wrap = rows => rows.map((r, i) => Object.assign({ wrap: W + (i ? sep : '') }, r));
+    const link = (label, sub, icon, t) => ({ isLink: true, label, sub, icon: 'icons/' + icon + '.svg', tap: () => this.toast(id, t) });
+    const sections = [
+      { title: 'Sound', rows: wrap([this.slider(id, 'music', 'Music'), this.slider(id, 'sfx', 'Sound effects'), this.toggle(id, 'vib', 'Vibration', '', on => { if (on && navigator.vibrate) navigator.vibrate(30); })]) },
+      { title: 'Gameplay', rows: wrap([this.toggle(id, 'rm', 'Reduce motion', 'Fewer bounces and sparkles. Pip shows feelings with his face.')]) },
+      { title: 'Purchases', rows: wrap([this.restoreRow(id), { isStatus: true, sub: s.ads ? 'Bought on this account' : 'Not bought', chipText: s.ads ? '✓ Ads off' : 'Ads on', chip: 'height:72px;box-sizing:border-box;padding:0 26px;border-radius:36px;border:4px solid #2D3436;display:flex;align-items:center;font:900 40px/1 ' + N + ';white-space:nowrap;background:' + (s.ads ? '#A8E6CF' : '#FFF8F0') }]) },
+      { title: 'Privacy & help', rows: wrap([link('Privacy choices', 'How ads may use your data', 'icon_chevron', 'Opens the ad privacy form'), link('Privacy policy', '', 'icon_external', 'Opens in your browser'), link('Contact support', 'Opens your email app', 'icon_external', 'Opens your email app'), Object.assign(link('Credits', '', 'icon_chevron', ''), { tap: () => this.upd(id, { page: 'credits' }) })]) }
+    ];
+    if (debug) sections.push({ title: 'Developer', tag: true, dashed: true, rows: [{ wrap: 'padding:20px 0', isDev: true, buttons: [['Unlock all seasons', 0], ['Reset seasons', 1], ['+1000 coins', 0], ['Reset tutorial', 1]].map(([l, d]) => ({ label: l, style: BTN + 'height:120px;font-size:40px;background:' + (d ? '#FFCCD5' : '#FFFFFF') + ';box-shadow:0 8px 0 rgba(26,26,20,.28)', tap: () => this.toast(id, 'Done: ' + l) })) }] });
+    sections.forEach(x => { x.card = x.dashed ? card.replace('border:4px solid #2D3436;background:#FFFFFF;box-shadow:0 10px 0 rgba(26,26,20,.22)', 'border:4px dashed #2D3436;background:#F1EAE0') : card; x.tag = !!x.tag; });
+    const cr = s.page === 'credits';
+    return {
+      id, title, note, sections, scrollTo: scrollTo || 'top', main: !cr, credits: cr, barTitle: cr ? 'Credits' : 'Settings',
+      close: () => cr ? this.upd(id, { page: 'main' }) : this.toast(id, 'Closes · back to the hub'),
+      toastOn: !!s.toast, toast: s.toast
+    };
+  }
+  renderVals() {
+    return {
+      screens: [
+        this.screen('D1', 'Default · top', true, 'top', 'Debug build. Sliders: track 672 × 32, thumb 76 (hit 120 tall), fill = scale.x, thumb = position.x. Value 56 px.'),
+        this.screen('D2', 'Muted & calm', false, 'top', 'Music muted (icon + grey fill + “Off”, value kept for unmute), Sound effects 40, Vibration off, Reduce motion on.'),
+        this.screen('D3', 'End of list · debug build', true, 'end', 'Restore failed state; Developer card only when OS.is_debug_build(). Dashed card = not for players.'),
+        this.screen('D4', 'End of list · release', false, 'end', 'Release build: no Developer section. Version is the last line.'),
+        this.screen('D5', 'Credits (from Privacy & help)', false, 'top', 'X on a sub-page goes back to Settings, X on Settings closes. Same top bar.')
+      ],
+      credits: [{ t: 'Merge Meadow', d: 'Design and code by the Merge Meadow team.' }, { t: 'Engine', d: 'Godot Engine — MIT license.' }, { t: 'Font', d: 'Nunito — SIL Open Font License.' }, { t: 'Thank you', d: 'For playing, and for every bloom you keep.' }],
+      restoreBoard: ['idle', 'busy', 'done', 'fail'].map(k => ({ name: { idle: '1 · idle', busy: '2 · restoring (one loop: dots)', done: '3 · restored (or “✓ Checked · Nothing to restore”)', fail: '4 · failed — tap again' }[k], btn: RESTORE[k][0], btnText: RESTORE[k][1], line: RESTORE[k][2], lineStyle: 'text-align:center;font:800 36px/1.3 ' + N + ';color:' + (k === 'fail' ? INK : '#555C5E') }))
+    };
+  }
+}
+</script>
+</body>
+</html>

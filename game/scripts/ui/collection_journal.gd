@@ -26,16 +26,20 @@ const LOAD_AHEAD_PX := 400.0
 @onready var title_label: Label = %BloomAlbumTitle
 @onready var golden_plaque: PanelContainer = %GoldenPlaque
 @onready var plaque_label: Label = %PlaqueLabel
-@onready var summary_wrap: HBoxContainer = %SummaryWrap
-@onready var summary_pad: Control = %SummaryPad
-@onready var summary_label: Label = %SummaryLabel
 @onready var divider_gap: Control = %DividerGap
-@onready var head_divider: ColorRect = %HeadDivider
 @onready var list_scroll: ScrollContainer = %ListScroll
 @onready var list: VBoxContainer = %List
 @onready var back_button: UiClickButton = %BackButton
 @onready var golden_edge: Panel = %GoldenFrameEdge
 @onready var golden_band: Panel = %GoldenFrameGold
+## Prozor liste (design_handoff_settings_fixes · A): GL Compat ne reže crtanje, pa sve van
+## prozora pokrivaju četiri neprozirna poklopca iznad liste, pa obrub prozora (z 3 / 4).
+@onready var cap_top: ColorRect = %CapTop
+@onready var cap_bottom: ColorRect = %CapBottom
+@onready var cap_left: ColorRect = %CapLeft
+@onready var cap_right: ColorRect = %CapRight
+@onready var window_rim: Panel = %WindowRim
+@onready var grabber: Panel = %Grabber
 
 ## Sezone u redoslijedu prikaza: [{sid, entries, kept, total, unlocked}].
 var _order: Array[Dictionary] = []
@@ -52,6 +56,7 @@ var _pending_scroll: bool = false
 ## Igrač je na stranici: tek tada skrol do kraja učitava sljedeće tri (posle izlaska
 ## skraćivanje liste pomjeri skrol, a to ne smije odmah vratiti obrisane sezone).
 var _active: bool = false
+var _golden: bool = false
 
 
 func _ready() -> void:
@@ -61,6 +66,9 @@ func _ready() -> void:
 	$Bg.color = UiJournal.PAGE_BG
 	back_button.clicked.connect(_on_back_pressed)
 	list_scroll.get_v_scroll_bar().value_changed.connect(_on_scrolled)
+	list_scroll.get_v_scroll_bar().value_changed.connect(func(_v: float) -> void: _update_grabber())
+	list.resized.connect(_update_grabber)
+	grabber.add_theme_stylebox_override("panel", UiJournal.grabber_style())
 	_style_head()
 	set_process(false)
 	if GameState.is_meta_hub_embedded(self):
@@ -104,6 +112,7 @@ func _process(_delta: float) -> void:
 			FlowerAssets.get_texture(str(entry.get("type_id", "")), tier)
 		var g: Dictionary = _groups[int(item["group_index"])]
 		var row := JournalRow.new()
+		_size_row(row)
 		(g["group"] as Node).add_child(row)
 		row.apply(entry)
 		(g["rows"] as Array).append(row)
@@ -122,7 +131,6 @@ func _process(_delta: float) -> void:
 func _style_head() -> void:
 	title_accent.add_theme_stylebox_override("panel", UiJournal.flat(UiJournal.COIN_GOLD, 5))
 	UiStage.style(title_label, 900, UiJournal.TITLE_FONT, UiJournal.INK)
-	UiStage.style(summary_label, 800, UiJournal.SUMMARY_FONT, UiJournal.SUB_INK)
 	UiStage.style(plaque_label, 900, UiJournal.PLAQUE_FONT, UiJournal.INK)
 	golden_plaque.add_theme_stylebox_override("panel", UiJournal.golden_plaque_style())
 	golden_plaque.custom_minimum_size.y = UiJournal.PLAQUE_H
@@ -147,7 +155,6 @@ func _begin_visit() -> void:
 				_scroll_season = si
 				_scroll_row = ri
 	_apply_frame()
-	summary_label.text = UiJournal.summary_text(raw)
 	# Prve tri sezone; ako je prvi NEW dalje, onoliko trojki koliko treba da se vidi.
 	var want := mini(SEASONS_PER_CHUNK, _order.size())
 	if _scroll_season >= 0:
@@ -363,10 +370,7 @@ func _apply_frame() -> void:
 	title_accent.visible = not golden
 	title_label.visible = not golden
 	golden_plaque.visible = golden
-	summary_pad.visible = not golden
-	summary_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER if golden else HORIZONTAL_ALIGNMENT_LEFT
-	head_divider.color = Color(UiJournal.GOLD_EDGE, 0.45) if golden else Color(UiJournal.INK, 0.1)
-	page_head.custom_minimum_size.y = 219.0 if golden else float(UiJournal.HEAD_H)
+	page_head.custom_minimum_size.y = float(UiJournal.HEAD_H_GOLD if golden else UiJournal.HEAD_H)
 	var top_pad := page_head.get_node_or_null("TopPad") as Control
 	if top_pad:
 		top_pad.custom_minimum_size.y = 40.0 if golden else 30.0
@@ -374,6 +378,65 @@ func _apply_frame() -> void:
 	if root_vbox:
 		root_vbox.offset_left = 44.0 if golden else float(UiJournal.PAD_X)
 		root_vbox.offset_right = -44.0 if golden else -float(UiJournal.PAD_X)
+	window_rim.add_theme_stylebox_override("panel", UiJournal.window_rim_style(golden))
+	_golden = golden
+	_layout_window()
+
+
+## ListScroll = rupa prozora; poklopci i obrub oko nje. Mijenja se samo pri promjeni okvira
+## ili veličine stranice — skrol pomjera samo listu i grabber.
+func _layout_window() -> void:
+	var page_h := size.y if size.y >= 600.0 else float(UiJournal.PAGE_H)
+	var win := UiJournal.list_window(_golden, page_h)
+	var hole: Rect2 = win["scroll"]
+	list_scroll.position = hole.position
+	list_scroll.size = hole.size
+	var caps: Array = win["caps"]
+	var nodes: Array[ColorRect] = [cap_top, cap_bottom, cap_left, cap_right]
+	for i in nodes.size():
+		var r: Rect2 = caps[i]
+		nodes[i].position = r.position
+		nodes[i].size = r.size
+	var rim: Rect2 = win["rim"]
+	window_rim.position = rim.position
+	window_rim.size = rim.size
+	for g in _groups:
+		for row in g["rows"]:
+			if is_instance_valid(row):
+				_size_row(row)
+	_update_grabber()
+
+
+func _size_row(row: Node) -> void:
+	row.set("row_width", list_scroll.size.x - 2.0 * UiJournal.WIN_LIST_PAD_X)
+	if _golden:
+		row.call("set_slot_size", float(UiJournal.SLOT_COMPACT), float(UiJournal.ART_COMPACT))
+	else:
+		row.call("set_slot_size", float(UiJournal.SLOT), float(UiJournal.ART))
+
+
+## Grabber 8 px, 6 px od desne ivice prozora, visina = udio vidljivog dijela; samo position.y.
+func _update_grabber() -> void:
+	if grabber == null or list_scroll == null:
+		return
+	var hole := Rect2(list_scroll.position, list_scroll.size)
+	var content := maxf(1.0, list.get_combined_minimum_size().y)
+	var max_scroll := content - hole.size.y
+	grabber.visible = max_scroll > 1.0
+	if not grabber.visible:
+		return
+	var gh := maxf(64.0, roundf(hole.size.y * hole.size.y / content))
+	var t := clampf(float(list_scroll.scroll_vertical) / max_scroll, 0.0, 1.0)
+	grabber.size = Vector2(UiJournal.WIN_GRABBER_W, gh - 20.0)
+	grabber.position = Vector2(
+		hole.end.x - UiJournal.WIN_GRABBER_W - UiJournal.WIN_GRABBER_INSET,
+		hole.position.y + 10.0 + roundf(t * (hole.size.y - gh))
+	)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED and is_node_ready():
+		_layout_window()
 
 
 func _on_back_pressed() -> void:

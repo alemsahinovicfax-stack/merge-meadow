@@ -8,7 +8,9 @@ extends Control
 
 const START_TEX := "res://assets/run/progress/progress_start.svg"
 const FLAG_TEX := "res://assets/run/progress/progress_flag.svg"
+## Glava po nošenom skinu (classic / blossom / sky); classic je rezerva.
 const PIP_TEX := "res://assets/pip/hud/pip_hud_classic.svg"
+const PIP_TEX_SKIN := "res://assets/pip/hud/pip_hud_%s.svg"
 
 var track: Panel
 var fill: Panel
@@ -121,12 +123,15 @@ func _build_marker_art() -> void:
 	var inset := float(UiRun.RAIL_PIP_RIM)
 	var id := GameState.get_active_companion_id()
 	if id == CompanionConfig.ID_PIP or not ResourceLoader.exists(PIP_TEX):
+		var tex_path := PIP_TEX_SKIN % UiPip.equipped_skin_key()
+		if not ResourceLoader.exists(tex_path):
+			tex_path = PIP_TEX
 		var pip := TextureRect.new()
 		pip.name = "Art"
 		pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		pip.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		pip.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		pip.texture = load(PIP_TEX) as Texture2D if ResourceLoader.exists(PIP_TEX) else null
+		pip.texture = load(tex_path) as Texture2D if ResourceLoader.exists(tex_path) else null
 		pip.position = Vector2(inset, inset + 2.0)
 		pip.size = Vector2(art, art)
 		marker.add_child(pip)

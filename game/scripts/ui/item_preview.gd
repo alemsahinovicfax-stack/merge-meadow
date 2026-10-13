@@ -20,6 +20,7 @@ const ALBUM_ROWS: Array[Color] = [Color("b8d4f0"), Color("e0c4ff"), Color("ffe8b
 const CREATURE_SHADOW := Color(0.102, 0.102, 0.078, 0.16)
 const RUN_SHADOW := Color(0.071, 0.110, 0.086, 0.28)
 const CREAM := Color("fff8f0")
+const VEIL_PIP_ALPHA := 0.45
 
 var kind: String = "companion"
 var subject: String = "pip"
@@ -28,7 +29,11 @@ var look: Dictionary = {}
 var pip_recolor: Dictionary = {}
 var season_id: String = ""
 var preview_size: String = SIZE_THUMB
-var veil: bool = false
+## Nekupljena stavka: veo + prigušen Pip (rig crta iznad vela jer dijelovi imaju z do 11).
+var veil: bool = false:
+	set(v):
+		veil = v
+		_apply_veil_alpha()
 
 var frame_border: float = 3.0
 var frame_radius: float = 18.0
@@ -132,6 +137,7 @@ func _sync_actor() -> void:
 		add_child(actor)
 	actor.visible = true
 	actor.set_skin(_skin_key)
+	_apply_veil_alpha()
 	var inner := Rect2(Vector2(frame_border, frame_border), size - Vector2(frame_border, frame_border) * 2.0)
 	var stage := preview_size == SIZE_STAGE
 	var h := inner.size.y
@@ -146,6 +152,11 @@ func _sync_actor() -> void:
 	else:
 		actor.pose(UiPip.pose_for_skin(_skin_key))
 		mouse_filter = Control.MOUSE_FILTER_PASS if stage else Control.MOUSE_FILTER_IGNORE
+
+
+func _apply_veil_alpha() -> void:
+	if actor != null:
+		actor.modulate.a = VEIL_PIP_ALPHA if veil else 1.0
 
 
 func _wait_for_atlas() -> void:
@@ -231,7 +242,9 @@ func _draw_creature(r: Rect2, who: String, recolor: Dictionary, side: float, fee
 	var ratio := 0.95 if who == "mochi" else 0.926
 	var cx := r.position.x + r.size.x * 0.5
 	var fy := r.position.y + feet
-	if who == "pip" and actor != null and actor.visible:
+	# Pip je uvijek rig (UiPip). Dok se atlas skina pravi u pozadini, ne crta se stari
+	# pip_idle.svg zec (drugi crtež, jedna noga u three_q — prijava 2026-10-12).
+	if who == "pip" and ((actor != null and actor.visible) or _atlas_wait):
 		return
 	var sh := Rect2(cx - side * 0.315, fy - side * 0.075, side * 0.63, side * 0.137)
 	draw_style_box(UiStage.box(shadow, roundi(sh.size.y * 0.5)), sh)

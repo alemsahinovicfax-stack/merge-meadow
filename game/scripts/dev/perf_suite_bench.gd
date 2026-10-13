@@ -12,6 +12,8 @@ extends SceneTree
 ##                 usisavanje ostataka
 ##   run         — run s promjenom staze svakih 0,7 s (pickupi, grm, burst)
 ##   loot        — loot ekran posle runa
+##   journal_scroll_gold — Album sa zlatnim okvirom (prozor + poklopci)
+##   settings_*  — Settings: ulaz / izlaz, vučenje slidera, skrol
 ## Filter: MM_ONLY=arena,run (početak imena scenarija). MM_ROOT=1 crta u prozor igre (540 × 960,
 ## kao na laptopu) umjesto SubViewporta 1080 × 1920; MM_VSYNC=1 ostavlja vsync (60 Hz) — tada je
 ## frejm > 20 ms stvarno preskočen frejm. Kolone cpu / gpu = vrijeme renderovanja viewporta.
@@ -32,10 +34,14 @@ var _gs: Node
 var _only: PackedStringArray = []
 var _rows: Array[String] = []
 var _vsync := false
+var _settings_backup := ""
+const SETTINGS_CFG := "user://settings.cfg"
 
 
 func _initialize() -> void:
 	_backup = CampSmokeUtil.backup_save()
+	if FileAccess.file_exists(SETTINGS_CFG):
+		_settings_backup = FileAccess.get_file_as_string(SETTINGS_CFG)
 	call_deferred("_run")
 
 
@@ -125,7 +131,7 @@ func _run() -> void:
 	if _wants("save"):
 		_save_cost()
 	if _wants("hub") or _wants("swipe") or _wants("home") or _wants("arena") or _wants("camp") \
-			or _wants("journal") or _wants("shop"):
+			or _wants("journal") or _wants("shop") or _wants("settings"):
 		await _hub_suite()
 	if _wants("run") or _wants("loot"):
 		await _run_suite()
@@ -133,6 +139,14 @@ func _run() -> void:
 	for r in _rows:
 		print(r)
 	CampSmokeUtil.restore_save(self, _backup)
+	# Settings scenariji vuku slider — vrati settings.cfg kakav je bio.
+	if _settings_backup.is_empty():
+		if FileAccess.file_exists(SETTINGS_CFG):
+			DirAccess.remove_absolute(SETTINGS_CFG)
+	else:
+		var f := FileAccess.open(SETTINGS_CFG, FileAccess.WRITE)
+		f.store_string(_settings_backup)
+		f.close()
 	quit(0)
 
 
@@ -273,10 +287,59 @@ func _hub_suite() -> void:
 		await _sample(str(page_scroll[1]), 5.0, func(t: float) -> void:
 			var span := maxf(1.0, scroll.get_v_scroll_bar().max_value - scroll.size.y)
 			scroll.scroll_vertical = int((0.5 - 0.5 * cos(t * 1.6)) * span))
+	if _wants("journal"):
+		# Zlatni okvir (settings_fixes · A): prozor + 4 poklopca; skrol mijenja samo listu i grabber.
+		var cos: Object = _gs.get("cosmetics")
+		var owned: Dictionary = (cos.get("owned") as Dictionary).duplicate()
+		owned["journal_gold"] = true
+		cos.set("owned", owned)
+		_gs.call("equip_cosmetic", "journal_gold")
+		hub.call("go_to_page", MetaHubPages.COLLECTION, false)
+		await _frames(30)
+		var gscroll := _page(hub, MetaHubPages.COLLECTION).get_node("%ListScroll") as ScrollContainer
+		await _sample("journal_scroll_gold", 5.0, func(t: float) -> void:
+			var span := maxf(1.0, gscroll.get_v_scroll_bar().max_value - gscroll.size.y)
+			gscroll.scroll_vertical = int((0.5 - 0.5 * cos(t * 1.6)) * span))
+		_gs.call("unequip_cosmetic", "journal_frame")
+	if _wants("settings"):
+		await _settings_suite(hub)
 	if _wants("arena"):
 		await _arena_suite(hub)
 	hub.queue_free()
 	await _frames(4)
+
+
+## Settings (settings_fixes · D): ulaz / izlaz (0,24 / 0,20 s) svakih 0,8 s, pa vučenje
+## slidera (fill.scale + thumb.position, bez ponovnog crtanja) i skrol liste.
+func _settings_suite(hub: Node) -> void:
+	hub.call("go_to_page", MetaHubPages.MAIN, false)
+	await _frames(10)
+	var so := {"next": 0.0}
+	await _sample("settings_open_close", 6.0, func(t: float) -> void:
+		if t < float(so["next"]):
+			return
+		so["next"] = t + 0.8
+		var open: Node = hub.get_node_or_null("SettingsScreen")
+		if open != null and bool(open.call("is_showing")):
+			open.call("close")
+		elif open == null or not (open as Control).visible:
+			hub.call("_on_settings_pressed"))
+	await create_timer(0.5).timeout
+	var shown: Node = hub.get_node_or_null("SettingsScreen")
+	if shown == null or not (shown as Control).visible:
+		hub.call("_on_settings_pressed")
+		await create_timer(0.5).timeout
+	var screen: Node = hub.get_node_or_null("SettingsScreen")
+	if screen == null:
+		return
+	await _sample("settings_slider_drag", 4.0, func(t: float) -> void:
+		screen.call("_on_slider", int(50.0 + 50.0 * sin(t * 3.0)), "music"))
+	var body := screen.get_node("ScrollBody") as ScrollContainer
+	await _sample("settings_scroll", 4.0, func(t: float) -> void:
+		var span := maxf(1.0, body.get_v_scroll_bar().max_value - body.size.y)
+		body.scroll_vertical = int((0.5 - 0.5 * cos(t * 1.6)) * span))
+	screen.call("close")
+	await create_timer(0.5).timeout
 
 
 func _first_scroll(page: Node) -> ScrollContainer:

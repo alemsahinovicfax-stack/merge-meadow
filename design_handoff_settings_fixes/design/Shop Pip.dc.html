@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<script src="pip_art.js"></script>
+<script src="pip_runtime.js"></script>
+<script src="pip_anim.js"></script>
+<style>body{margin:0;background:#E9E2D8}a{color:#2D3436}a:hover{color:#9E6645}</style>
+</helmet>
+<section data-screen-label="C · Pip in Shop" style="padding:80px;display:flex;flex-direction:column;gap:48px;font-family:Nunito,system-ui,sans-serif;color:#2D3436">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="font:700 28px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#555C5E">DESIGN_HANDOFF_SETTINGS_FIXES · C · SHOP</div>
+    <div style="font:900 96px/1 Nunito,sans-serif">The rig Pip replaces the old bunny</div>
+    <div style="font:700 40px/1.35 Nunito,sans-serif;color:#555C5E;max-width:2000px;text-wrap:pretty">Starter Pack shows Pip Blossom from the rig (three_q, pose_blossom, still). “All set here” shows the Pip you wear (front, happy, still). Looks sells only Blossom and Sky — Classic is never a product. Shop page area 1080 × 1633 between the fixed header and footer.</div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:64px;align-items:flex-start">
+    <sc-for list="{{ screens }}" as="sc" hint-placeholder-count="6">
+      <div id="{{ sc.id }}" style="display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;align-items:center;gap:20px">
+          <div style="height:72px;min-width:72px;padding:0 20px;box-sizing:border-box;border-radius:36px;background:#2D3436;color:#FFF8F0;display:grid;place-items:center;font:900 36px/1 Nunito,sans-serif">{{ sc.id }}</div>
+          <div style="font:900 48px/1 Nunito,sans-serif">{{ sc.title }}</div>
+        </div>
+        <div data-layer="ShopPage" style="position:relative;width:1080px;height:1633px;overflow:hidden;background:#FBEDD7;border-radius:24px;box-shadow:0 12px 0 rgba(45,52,54,.18)">
+          <div data-layer="ShopTabBar" style="position:absolute;left:0;top:0;width:1080px;height:172px;z-index:3">
+            <sc-for list="{{ awning }}" as="a" hint-placeholder-count="18"><div style="{{ a.ink }}"></div><div style="{{ a.fill }}"></div></sc-for>
+            <div style="position:absolute;left:24px;top:10px;width:1032px;height:128px">
+              <sc-for list="{{ sc.tabs }}" as="t" hint-placeholder-count="4"><div style="{{ t.style }}">{{ t.label }}</div></sc-for>
+            </div>
+          </div>
+          <div style="position:absolute;left:0;top:0;width:1080px;box-sizing:border-box;padding:196px 24px 64px;display:flex;flex-direction:column;gap:32px">
+
+            <sc-if value="{{ sc.support }}" hint-placeholder-val="{{ true }}">
+              <div data-layer="SupportCard" style="position:relative;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;box-shadow:0 10px 0 rgba(26,26,20,.22);padding:20px 20px 20px 32px;display:flex;align-items:center;gap:20px;background:#FFFFFF">
+                <div style="flex:1;min-width:0;height:120px;display:flex;flex-direction:column;justify-content:center;gap:10px">
+                  <div style="font:900 52px/1.05 Nunito,sans-serif">Remove Ads</div>
+                  <div style="font:800 36px/1.1 Nunito,sans-serif;color:#555C5E">No ads between runs</div>
+                </div>
+                <div style="height:120px;min-width:280px;box-sizing:border-box;padding:0 36px;border-radius:60px;border:4px solid #2D3436;background:#D4A5FF;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;font:900 52px/1 Nunito,sans-serif">€2.99</div>
+              </div>
+              <div data-layer="StarterPackCard" style="{{ sc.stCard }}">
+                <div data-layer="StarterContent" style="height:228px;display:flex;gap:16px">
+                  <div style="flex:0 0 236px;box-sizing:border-box;border-radius:24px;border:4px solid #2D3436;background:#FFE8B8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><img src="icons/icon_coin.svg" alt="" style="width:96px;height:96px"><div style="font:900 52px/1 Nunito,sans-serif">100</div></div>
+                  <div data-layer="StarterSkin" style="position:relative;flex:0 0 296px;box-sizing:border-box;border-radius:24px;border:4px solid #2D3436;background:#FFF6D6;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;padding-bottom:16px">
+                    <div data-pip="three_q|blossom|164|pose|still" style="height:150px;display:flex;align-items:flex-end"></div>
+                    <div style="font:900 34px/1 Nunito,sans-serif">Pip Blossom</div>
+                    <sc-if value="{{ sc.skinOwned }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:12px;top:12px;width:60px;height:60px;box-sizing:border-box;border-radius:30px;background:#2D3436;border:4px solid #FFF8F0;display:grid;place-items:center"><svg width="32" height="32" viewBox="0 0 32 32"><path d="M7 16.5l6 6L25 10" fill="none" stroke="#FFF8F0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></sc-if>
+                  </div>
+                  <div style="flex:1;min-width:0;box-sizing:border-box;border-radius:24px;border:4px solid #2D3436;background:#DCF5EC;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+                    <div style="display:flex;gap:8px">
+                      <sc-for list="{{ seeds }}" as="sd" hint-placeholder-count="5"><div style="position:relative;width:68px;height:68px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:3px solid #2D3436"><div style="position:absolute;left:5px;top:5px;width:52px;height:52px;box-sizing:border-box;border-radius:50%;background:#22342A;border:2px solid #16211B;overflow:hidden;display:grid;place-items:center"><img src="{{ sd }}" alt="" style="width:44px;height:44px"></div></div></sc-for>
+                    </div>
+                    <div style="font:900 48px/1 Nunito,sans-serif">×10</div>
+                  </div>
+                </div>
+                <div style="height:120px;display:flex;align-items:center;gap:20px">
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                    <div style="font:900 52px/1.05 Nunito,sans-serif">Starter Pack</div>
+                    <sc-if value="{{ sc.timeOn }}" hint-placeholder-val="{{ true }}"><div style="display:flex"><div style="height:56px;box-sizing:border-box;padding:0 22px 0 14px;border-radius:28px;border:3px solid #2D3436;background:#FFF8F0;display:flex;align-items:center;gap:10px;font:900 34px/1 Nunito,sans-serif;white-space:nowrap"><div style="position:relative;flex:0 0 30px;width:30px;height:30px;box-sizing:border-box;border-radius:50%;border:4px solid #2D3436"><div style="position:absolute;left:9px;top:3px;width:4px;height:10px;border-radius:2px;background:#2D3436"></div><div style="position:absolute;left:9px;top:9px;width:9px;height:4px;border-radius:2px;background:#2D3436"></div></div>6d left</div></div></sc-if>
+                  </div>
+                  <div style="{{ sc.btnStyle }}">{{ sc.btnText }}</div>
+                </div>
+                <sc-if value="{{ sc.expired }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="ExpiredVeil" style="position:absolute;left:-4px;top:-4px;right:-4px;bottom:-4px;border-radius:36px;background:rgba(227,217,204,.84);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+                    <div style="width:128px;height:128px;box-sizing:border-box;border-radius:64px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center"><img src="icons/icon_lock.svg" alt="" style="width:64px;height:64px"></div>
+                    <div style="height:72px;box-sizing:border-box;padding:0 30px;border-radius:36px;background:#FFF8F0;border:4px solid #2D3436;display:flex;align-items:center;font:900 44px/1 Nunito,sans-serif">Expired</div>
+                  </div>
+                </sc-if>
+              </div>
+              <div style="display:flex;justify-content:center"><div style="height:120px;padding:0 32px;display:flex;align-items:center;font:800 38px/1 Nunito,sans-serif;text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:8px">Restore purchases</div></div>
+            </sc-if>
+
+            <sc-if value="{{ sc.allSet }}" hint-placeholder-val="{{ false }}">
+              <div data-layer="TabEnd" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:24px">
+                <div data-pip="{{ sc.allSetPip }}" style="height:200px;display:flex;align-items:flex-end"></div>
+                <div style="font:900 40px/1 Nunito,sans-serif;color:#555C5E">All set here</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ sc.looks }}" hint-placeholder-val="{{ false }}">
+              <div style="height:96px;box-sizing:border-box;border-radius:48px;padding:0 24px 0 16px;display:flex;align-items:center;gap:16px;background:#FFFFFF;border:4px solid #2D3436"><img src="icons/slot_pip.svg" alt="" style="width:64px;height:64px"><div style="font:900 48px/1 Nunito,sans-serif">Pip</div></div>
+              <sc-for list="{{ looks }}" as="l" hint-placeholder-count="2">
+                <div data-layer="CosmeticCard" style="position:relative;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;box-shadow:0 10px 0 rgba(26,26,20,.22);padding:20px;display:flex;flex-direction:column;gap:20px;background:#FFFFFF">
+                  <div style="position:relative;width:984px;height:300px;box-sizing:border-box;border-radius:24px;border:4px solid #2D3436;overflow:hidden;background:#98C27F">
+                    <div style="position:absolute;left:0;right:0;top:0;height:96px;background:#BCD9A3"></div>
+                    <div style="position:absolute;left:0;right:0;bottom:0;height:96px;background:#7DAA67"></div>
+                    <div data-pip="{{ l.pip }}" style="position:absolute;left:50%;bottom:6px;transform:translateX(-50%)"></div>
+                  </div>
+                  <div style="height:120px;display:flex;align-items:center;gap:20px">
+                    <div style="flex:1;font:900 52px/1.2 Nunito,sans-serif">{{ l.title }}</div>
+                    <div style="height:120px;min-width:280px;box-sizing:border-box;padding:0 36px;border-radius:60px;border:4px solid #2D3436;background:#FFD56B;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:12px;font:900 52px/1 Nunito,sans-serif"><img src="icons/icon_coin.svg" alt="" style="width:60px;height:60px">{{ l.price }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </sc-if>
+          </div>
+        </div>
+        <div style="font:500 26px/1.5 'JetBrains Mono',monospace;color:#555C5E;max-width:1080px">{{ sc.note }}</div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const TABS = ['Seasons', 'Looks', 'Boosters', 'Support'];
+const BTN = 'height:120px;min-width:280px;box-sizing:border-box;padding:0 36px;border-radius:60px;border:4px solid #2D3436;display:flex;align-items:center;justify-content:center;gap:12px;font:900 52px/1 Nunito,sans-serif;white-space:nowrap;';
+class Component extends DCLogic {
+  P = new Map();
+  componentDidMount() { this.boot(); }
+
+  componentWillUnmount() { this.P.forEach(p => p.destroy()); clearTimeout(this.t); }
+  boot() { if (!window.Pip || !Pip.ANIMS || !Pip.ANIMS.sig_sky) { this.t = setTimeout(() => this.boot(), 60); return; } this.mount(); }
+  mount() {
+    if (!window.Pip || !Pip.ANIMS.sig_sky) return;
+    document.querySelectorAll('[data-pip]').forEach(el => {
+      const key = el.getAttribute('data-pip'); if (!key || el._k === key) return;
+      const old = this.P.get(el); if (old) old.destroy();
+      const [view, skin, size, anim, flag, face] = key.split('|');
+      const p = Pip.create(el, { view, skin, size: +size, still: flag === 'still', face: face || 'neutral' });
+      if (anim === 'pose') p.seek('pose_' + skin);
+      el.onclick = anim === 'pose' && flag === 'tap' ? () => p.play('sig_' + skin, { then: () => p.seek('pose_' + skin) }) : null;
+      this.P.set(el, p); el._k = key;
+      if (flag === 'still') {
+        const svg = el.querySelector('svg'); svg.querySelectorAll('[style*="display: none"],[style*="display:none"]').forEach(n => n.remove());
+        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        const img = new Image(); img.width = +svg.getAttribute('width'); img.height = +svg.getAttribute('height'); img.style.display = 'block';
+        img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.outerHTML); el.replaceChildren(img);
+      }
+    });
+  }
+  scr(id, title, tab, o, note) {
+    return Object.assign({
+      id, title, note, support: tab === 3, allSet: false, looks: tab === 1, expired: false, skinOwned: false, timeOn: true,
+      tabs: TABS.map((l, i) => ({ label: l, style: 'position:absolute;left:' + i * 261 + 'px;top:0;width:249px;height:120px;box-sizing:border-box;border-radius:60px;display:grid;place-items:center;font:900 44px/1 Nunito,sans-serif;' + (i === tab ? 'background:#FFB88C;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24)' : 'background:#FFFFFF;border:3px solid #2D3436') })),
+      stCard: 'position:relative;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;box-shadow:0 10px 0 rgba(26,26,20,.22);padding:20px;display:flex;flex-direction:column;gap:20px;background:' + (o && o.bought ? '#FFF6D6' : '#FFFFFF'),
+      btnStyle: BTN + 'background:#D4A5FF;box-shadow:0 8px 0 rgba(26,26,20,.28)', btnText: '€4.99'
+    }, o || {});
+  }
+  renderVals() {
+    const awning = Array.from({ length: 18 }, (_, i) => ({
+      ink: 'position:absolute;left:' + (i * 60 - 4) + 'px;top:0;width:68px;height:164px;border-radius:0 0 34px 34px;background:#2D3436',
+      fill: 'position:absolute;left:' + i * 60 + 'px;top:0;width:60px;height:160px;border-radius:0 0 30px 30px;background:' + (i % 2 ? '#FFF8F0' : '#A8E6CF')
+    }));
+    return {
+      awning,
+      seeds: ['clover', 'daisy', 'buttercup', 'tulip', 'sunflower'].map(t => 'icons/flowers/' + t + '_t1.svg'),
+      looks: [['blossom', 'Pip Blossom', 250], ['sky', 'Pip Sky', 200]].map(([k, t, c]) => ({ title: t, price: c, pip: 'three_q|' + k + '|285|pose|tap' })),
+      screens: [
+        this.scr('C1', 'Support · Starter Pack available', 3, null, 'Skin tile 296 × 228: rig three_q pose_blossom at 164 (box 256 → k 0.64), bottom-aligned, still. Replaces PipAssets.get_texture() + draw_texture_rect().'),
+        this.scr('C2', 'Support · Starter Pack bought', 3, { bought: true, timeOn: false, skinOwned: true, btnStyle: BTN + 'background:#A8E6CF', btnText: '✓ Claimed' }, 'Bought: card #FFF6D6, ✓ on the skin tile, mint “Claimed”. Same still pose — no loop in the list.'),
+        this.scr('C3', 'Support · Starter Pack expired', 3, { expired: true, timeOn: false, btnStyle: BTN + 'background:#EAD2FF;border-color:rgba(45,52,54,.3);color:#555C5E' }, 'Expired: the 84 % veil covers the Pip like everything else; the rig sprite stays (no separate grey art).'),
+        this.scr('C4', 'Boosters · All set · Classic worn', 2, { support: false, allSet: true, allSetPip: 'front|classic|190|still|still|happy' }, 'All set: front, face happy, 190 px, still. Skin = equipped pip_skin (empty → classic).'),
+        this.scr('C5', 'Boosters · All set · Blossom worn', 2, { support: false, allSet: true, allSetPip: 'front|blossom|190|still|still|happy' }, 'Changes with cosmetics_changed — rebuilt once, never per frame.'),
+        this.scr('C6', 'Looks · Pip slot (Classic not sold)', 1, { support: false }, 'Pip slot lists source == "shop" items only: Blossom 250, Sky 200. Classic has no item in cosmetics.json → no card. Tap a preview = signature move.')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

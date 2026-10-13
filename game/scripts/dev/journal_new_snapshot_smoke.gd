@@ -89,9 +89,9 @@ func _run() -> void:
 	if row == null or bool(row.call("is_new_visible")):
 		_fail("a later visit must not replay NEW")
 		return
-	var summary := journal.get_node_or_null("%SummaryLabel") as Label
-	if summary == null or summary.text.find("kept") < 0:
-		_fail("summary missing")
+	# Red „Album: N blooms kept · M spotted" je izbačen (2026-10-12).
+	if journal.find_child("SummaryLabel", true, false) != null:
+		_fail("album summary line should be gone")
 		return
 	CampSmokeUtil.restore_save(self, _backup)
 	print("journal_new_snapshot_smoke OK")

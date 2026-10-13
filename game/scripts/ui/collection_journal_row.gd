@@ -17,6 +17,13 @@ var _icons: Array[Control] = []
 var _halos: Array[Panel] = []
 var _entry: Dictionary = {}
 var _built: bool = false
+var _strip: HBoxContainer
+var _slot_boxes: Array[Control] = []
+var _slot := float(UiJournal.SLOT)
+var _art := float(UiJournal.ART)
+## Širina reda iz prozora Albuma (0 = nepoznata). Ime se uklapa prema njoj, ne prema
+## trenutnoj širini linije — ta zna ostati šira iz ranijeg rasporeda pa red viri iz prozora.
+var row_width: float = 0.0
 ## Ključevi zadnjeg stila — _refresh ne dira theme override koji se nije promijenio
 ## (svaki override ponovo računa raspored, a Journal ima do 48 redova).
 var _applied: Dictionary = {}
@@ -131,38 +138,34 @@ func _ensure_built() -> void:
 	strip.name = "TierStrip"
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	strip.alignment = BoxContainer.ALIGNMENT_CENTER
-	strip.custom_minimum_size = Vector2(UiJournal.SLOT * 3 + UiJournal.SLOT_GAP * 2, UiJournal.SLOT)
 	strip.add_theme_constant_override("separation", UiJournal.SLOT_GAP)
 	row.add_child(strip)
+	_strip = strip
 
 	for tier in [1, 2, 3]:
 		var slot := Control.new()
 		slot.name = "SlotBox"
-		slot.custom_minimum_size = Vector2(UiJournal.SLOT, UiJournal.SLOT)
 		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		strip.add_child(slot)
+		_slot_boxes.append(slot)
 		var halo := Panel.new()
 		halo.name = "NewHalo"
 		halo.visible = false
 		halo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		halo.position = Vector2(-UiJournal.HALO_GROW, -UiJournal.HALO_GROW)
-		halo.size = Vector2(UiJournal.SLOT + UiJournal.HALO_GROW * 2, UiJournal.SLOT + UiJournal.HALO_GROW * 2)
 		slot.add_child(halo)
 		var frame := Panel.new()
 		frame.name = "Frame"
 		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		frame.size = Vector2(UiJournal.SLOT, UiJournal.SLOT)
 		slot.add_child(frame)
 		var icon: Control = BloomIcon.new()
 		icon.name = "TierIcon%d" % tier
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		icon.position = Vector2((UiJournal.SLOT - UiJournal.ART) * 0.5, (UiJournal.SLOT - UiJournal.ART) * 0.5)
-		icon.size = Vector2(UiJournal.ART, UiJournal.ART)
-		icon.custom_minimum_size = icon.size
 		slot.add_child(icon)
 		_halos.append(halo)
 		_frames.append(frame)
 		_icons.append(icon)
+	_layout_slots()
 
 	_badge = PanelContainer.new()
 	_badge.name = "NewBadge"
@@ -231,6 +234,30 @@ func _changed(slot: String, key: String) -> bool:
 	return true
 
 
+## Krugovi tiera: 136 (obično) ili 124 (zlatni prozor Albuma, uži red).
+func set_slot_size(slot: float, art: float) -> void:
+	if is_equal_approx(slot, _slot) and is_equal_approx(art, _art):
+		return
+	_slot = slot
+	_art = art
+	if _built:
+		_layout_slots()
+		_fit_name()
+
+
+func _layout_slots() -> void:
+	var gap := UiJournal.SLOT_GAP if _slot >= float(UiJournal.SLOT) else UiJournal.SLOT_GAP_COMPACT
+	_strip.add_theme_constant_override("separation", gap)
+	_strip.custom_minimum_size = Vector2(_slot * 3.0 + gap * 2, _slot)
+	for i in _slot_boxes.size():
+		_slot_boxes[i].custom_minimum_size = Vector2(_slot, _slot)
+		_halos[i].size = Vector2(_slot + UiJournal.HALO_GROW * 2, _slot + UiJournal.HALO_GROW * 2)
+		_frames[i].size = Vector2(_slot, _slot)
+		_icons[i].position = Vector2((_slot - _art) * 0.5, (_slot - _art) * 0.5)
+		_icons[i].size = Vector2(_art, _art)
+		_icons[i].custom_minimum_size = _icons[i].size
+
+
 ## Ime stoji uz zvjezdice; ako ne stane, samo se ime reže.
 func _fit_name() -> void:
 	if _name == null or _stars == null:
@@ -238,8 +265,11 @@ func _fit_name() -> void:
 	var line := _name.get_parent() as Control
 	if line == null or line.size.x < 120.0:
 		return
+	var line_w := line.size.x
+	if row_width > 0.0:
+		line_w = row_width - UiJournal.ROW_PAD_X - _strip.custom_minimum_size.x - UiJournal.ROW_INNER_GAP
 	var natural := UiStage.text_w(UiStage.font(900, UiJournal.NAME_FONT), UiJournal.NAME_FONT, _name.text)
-	var max_w := line.size.x - _stars.get_combined_minimum_size().x - float(UiJournal.NAME_STARS_GAP)
+	var max_w := line_w - _stars.get_combined_minimum_size().x - float(UiJournal.NAME_STARS_GAP)
 	if max_w < 80.0:
 		return
 	_name.custom_minimum_size.x = minf(natural, max_w)

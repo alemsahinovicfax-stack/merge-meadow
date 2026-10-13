@@ -5,8 +5,9 @@ extends SceneTree
 ##  2. mjere: kartica 240 x 272, tab 120, Close 132, sheet 1326 od y 307;
 ##  3. svaki slot tačno 1 DefaultCard; Blossom → Close → Pip na polju u Blossomu;
 ##     Default → tap na scrim → Pip opet klasičan; povlačenje > 160 zatvara;
-##  4. najviše 1 ShopLink po ekranu, 0 stavki iz Shopa koje igrač nema, 0 cijena;
-##  5. proširenje samo podacima: 8 slotova / Pip 11 + Default; demoN 1 / 5 / 30;
+##  4. najviše 1 ShopLink po ekranu, 0 cijena; stavke iz Shopa koje igrač nema samo u Pip
+##     slotu i samo pod velom (settings_fixes · B: igrač vidi sva tri Pipa);
+##  5. proširenje samo podacima: 8 slotova / Pip 12 + Classic; demoN 1 / 5 / 30;
 ##  6. katalog iz cosmetics.json: 5 id / slot / cijena kao prije;
 ##  7. svaki recolor ključ postoji u pip parts SVG-ima, atlas skina se rasterizuje;
 ##  8. Android back zatvara (i snima) ormar, ne polje; nema riječi „Save".
@@ -217,7 +218,10 @@ func _check_screen(slot_id: String) -> void:
 			if c.size != Vector2(240, 272):
 				_fail("card size %s" % c.size)
 			var id := str(c.get("item_id"))
-			if not id.is_empty() and CosmeticCatalog.is_shop_item(id) and not bool(_gs.call("owns_cosmetic", id)):
+			# Pip slot (settings_fixes · B) pokazuje i nekupljene skinove — samo pod velom.
+			var unowned_shop := not id.is_empty() and CosmeticCatalog.is_shop_item(id) and not bool(_gs.call("owns_cosmetic", id))
+			var veiled := str(c.get("state")) == UiWardrobe.CARD_NONE
+			if unowned_shop and (slot_id != "pip_skin" or not veiled):
 				_fail("%s shows a Shop item the player does not own: %s" % [slot_id, id])
 			var t := str(c.get("title")).to_lower()
 			for word in ["buy", "coins", "price", "$", "€", "save"]:
@@ -355,8 +359,9 @@ func _check_extra() -> void:
 	if tabs.size() != 8:
 		_fail("extra: %d tabs, expected 8" % tabs.size())
 	var cards: Array = _w.call("get_cards")
-	if cards.size() != 12:
-		_fail("extra: %d Pip cards, expected 11 + Default" % cards.size())
+	# 12 skinova (Blossom, Sky pod velom, 9 demo, Frost iz sezone pod velom) + Classic.
+	if cards.size() != 13:
+		_fail("extra: %d Pip cards, expected 12 + Classic" % cards.size())
 	var veiled := 0
 	var fresh := 0
 	for c in cards:
@@ -364,8 +369,8 @@ func _check_extra() -> void:
 			veiled += 1
 		if bool(c.get("is_new")):
 			fresh += 1
-	if veiled != 1 or fresh != 1:
-		_fail("extra: veiled %d / new %d, expected 1 / 1" % [veiled, fresh])
+	if veiled != 2 or fresh != 1:
+		_fail("extra: veiled %d / new %d, expected 2 / 1" % [veiled, fresh])
 	var last := tabs[tabs.size() - 1] as Control
 	var scroll := _w.call("tabs_scroll") as ScrollContainer
 	if last.position.x + last.size.x <= scroll.size.x:

@@ -20,6 +20,9 @@ tags: [hub, iskustvo]
 - [[design-drafts/camp-v3-izvjestaj|camp-v3-izvjestaj]] — provjera Camp v3 paketa u igri (2026-10-09)
 - [[design-drafts/run-hud-v2-cd-brief|run-hud-v2-cd-brief]] — brief za Claude Design (header runa u jednom redu, traka napretka, nagradni grm)
 - [[design-drafts/run-hud-v2-izvjestaj|run-hud-v2-izvjestaj]] — prenos Run HUD v2 (2026-10-09)
+- [[design-drafts/ispravke-settings-cd-brief|ispravke-settings-cd-brief]] — brief za Claude Design (zlatni okvir Albuma sa skrolom, Classic Pip kao skin, novi Pip u Shopu, Settings ekran)
+- [[design-drafts/ispravke-settings-izvjestaj|ispravke-settings-izvjestaj]] — prenos ispravki + Settings ekrana (2026-10-12)
+- [[design-drafts/muncher-premium-pip-cd-brief|muncher-premium-pip-cd-brief]] — brief za Claude Design (potpuni redizajn munchera u Areni sa svim animacijama; prvi premium Pip skin za pravi novac, potpuno drugačiji dizajn)
 
 ## Povezano
 

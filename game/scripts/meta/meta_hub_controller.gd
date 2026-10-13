@@ -7,9 +7,6 @@ const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
 const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
 
 ## Settings ekran je D0-P — do tada kratka poruka ispod headera (kao ranije na Home).
-const SETTINGS_TOAST_TEXT := UiPopups.S_SETTINGS_SOON
-const SETTINGS_TOAST_HOLD := 1.6  # s
-const SETTINGS_TOAST_GAP := 24.0  # px ispod headera
 const COIN_POP_POS := Vector2(150, 132)  # design_handoff_shop · CoinSpendPop
 
 @onready var swipe_pager: SwipePager = $RootVBox/SwipePager
@@ -44,13 +41,11 @@ var _tabs_enabled: bool = true
 var _nav_locked: bool = false
 var _current_page: int = MetaHubPagesScript.MAIN
 var _safe_insets: Vector4 = Vector4.ZERO
-var _settings_toast: PopupToast = null
+var _settings: SettingsScreen = null
 
 
 func _ready() -> void:
 	add_to_group("meta_hub")
-	if OS.is_debug_build() and not GameState.skip_debug_season_unlock:
-		GameState.debug_playtest_two_free()
 	GameState.meta_hub_active = true
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	swipe_pager.page_changed.connect(_on_page_changed)
@@ -86,7 +81,13 @@ func _queue_background_pages() -> void:
 
 ## Jedna gotova stranica po frejmu, samo dok pager stoji (ne usred swipea).
 func _poll_background_pages() -> void:
-	if _bg_pages.is_empty() or swipe_pager == null or swipe_pager.is_moving():
+	if swipe_pager == null or swipe_pager.is_moving():
+		return
+	if _bg_pages.is_empty():
+		# Sve stranice su tu: Settings se gradi skriven, dio po frejm (prvo otvaranje bez ~65 ms).
+		if _settings == null and _pages_loaded.count(false) == 0:
+			_settings = SettingsScreen.prebuild_over(self, settings_button.get_global_rect())
+			_settings.closed.connect(_on_settings_closed)
 		return
 	for i in _bg_pages:
 		var path: String = MetaHubPagesScript.PAGE_SCENES[i]
@@ -386,8 +387,25 @@ func _on_tab_pressed(index: int) -> void:
 	go_to_page(index)
 
 
+## Settings (design_handoff_settings_fixes · D): pun ekran iznad huba; X na mjestu zupčanika.
+## Po zatvaranju se osvježi stranica na kojoj si (Dev dugmad mijenjaju sezone / coine).
 func _on_settings_pressed() -> void:
-	_show_settings_toast()
+	if is_instance_valid(_settings):
+		if not _settings.visible:
+			_settings.reopen()
+			_settings.place_close(self, settings_button.get_global_rect())
+		return
+	_settings = SettingsScreen.open_over(self, settings_button.get_global_rect())
+	_settings.closed.connect(_on_settings_closed)
+
+
+func _on_settings_closed() -> void:
+	refresh_top_bar()
+	_refresh_embedded_page(_current_page)
+
+
+func is_settings_open() -> bool:
+	return is_instance_valid(_settings) and _settings.is_showing()
 
 
 func _notify_arena_page_active(active: bool) -> void:
@@ -526,17 +544,6 @@ func _coin_pop_origin() -> Vector2:
 
 
 ## X1 · toast sistema 24 px ispod headera (traka čvora „SettingsToast").
-func _show_settings_toast() -> void:
-	if _settings_toast == null:
-		_settings_toast = PopupToast.new()
-		_settings_toast.name = "SettingsToast"
-		_settings_toast.z_index = 60
-		add_child(_settings_toast)
-	_settings_toast.position = Vector2(0.0, top_bar.position.y + top_bar.size.y + SETTINGS_TOAST_GAP)
-	_settings_toast.setup(0.0, SETTINGS_TOAST_HOLD, size.x * 0.5)
-	_settings_toast.show_text(SETTINGS_TOAST_TEXT, UI_ASSETS.get_chrome_icon("icon_settings"))
-
-
 func _show_swipe_hint_if_needed() -> void:
 	# Bug-019: caption removed; tab labels already name each page.
 	pass

@@ -1,0 +1,55 @@
+SETTINGS — scenes/ui/settings_screen.tscn (novo) · skripta scripts/ui/settings_screen.gd · stil UiSettings
+Otvara: meta_hub_controller._on_settings_pressed()  (danas toast „coming soon“ → add_child(SettingsScreen) iznad huba)
+Zatvara: CloseButton, ui_cancel / NOTIFICATION_WM_GO_BACK_REQUEST
+
+SettingsScreen (Control, full rect 1080 × 1920, mouse_filter STOP, z_index 50)
+├─ Bg (ColorRect #FFF8F0)
+├─ ScrollBody (ScrollContainer 0,143 · 1080 × 1777, vertical SHOW_NEVER)
+│  └─ List (VBox, margin 24 / 40 / 24 / 120, separation 44)
+│     ├─ Section "Sound" (VBox sep 16) ─ Title (Label 44/900) ─ Card (PanelContainer UiSettings.section_card(false))
+│     │  ├─ SliderRow "Music"      : Label 44 · HBox(sep 24)[ MuteButton 120×120 · Slider 672×120 · Value Label 56 (w 120, right) ]
+│     │  │     Slider (Control, mouse STOP) ├─ Track (Panel 672×32 @ y44, r16, rub 4, #FFF8F0)
+│     │  │                              │    └─ Fill (ColorRect full track inset 4, pivot 0, scale.x = v/100)
+│     │  │                              └─ Thumb (Panel 76×76 @ y22, position.x = UiSettings.thumb_x(v))
+│     │  ├─ Separator (ColorRect 3, SEP)
+│     │  ├─ SliderRow "Sound effects"
+│     │  ├─ Separator
+│     │  └─ ToggleRow "Vibration"  : Label · Toggle (Panel 168×96 r48) └─ Knob (Panel 76, position.x tween 0.15)
+│     ├─ Section "Gameplay"   ─ Card ─ ToggleRow "Reduce motion" (+ sub Label 36, autowrap)
+│     ├─ Section "Purchases"  ─ Card
+│     │  ├─ RestoreRow : RestoreButton (PanelContainer h120 r60, UiSettings.restore_style) · Sub Label 36 centered
+│     │  ├─ Separator
+│     │  └─ AdsRow : Label „Remove Ads“ + sub · AdsStatus chip (h 72)
+│     ├─ Section "Privacy & help" ─ Card ─ LinkRow ×4 (h 132: Labels · Icon 56 in 120×120)
+│     │     Privacy choices › (Consent / UMP form) · Privacy policy ↗ (OS.shell_open) · Contact support ↗ (mailto:) · Credits › (CreditsPage)
+│     ├─ Section "Developer" (visible = OS.is_debug_build()) ─ Title + DevTag chip ─ Card(dev) ─ GridContainer 2 col, sep 20, 4 × UiClickButton h120
+│     └─ Version (Label 36/800 #555C5E, centered)
+├─ CreditsPage (Control, isti ScrollBody raspored, visible=false) ─ 4 kartice (naslov 44 + tekst 38)
+├─ TopBar (Panel BAR_BG 1080 × 140, z iznad ScrollBody = neproziran poklopac) ─ Rule (ColorRect 3)
+│  ├─ Title (Label 56/900 #FFF8F0 @ x48)            „Settings“ / „Credits“
+│  └─ CloseButton (HubIconButton 120×120 @ 950,10, icon_close_light 64)   Credits → back na Settings
+└─ Toast (UiPopups toast, y 1720, mouse IGNORE)
+
+Ulaz: position.y 1920 → 0, 0,24 s cubic-out. Izlaz: 0 → 1920, 0,20 s. Reduce motion: bez klizanja (alpha 0 → 1, 0,12 s).
+Promjena → UiSettings.apply(values) odmah; save_settings() na pušten slider / svaki toggle (+ debounce 0,3 s dok se vuče).
+Restore: IAPManager.restore_purchases() → BUSY (tri tačke = jedini loop) → DONE | NONE | FAIL; rezultat pop 1 → 1,06 → 1 / 0,22 s.
+
+ALBUM — scenes/ui/collection_journal.tscn (izmjena)
+CollectionJournal
+├─ Bg
+├─ RootVBox ─ PageHead (175 / golden 219, bez HeadDivider) ─ …
+├─ ListScroll (izvađen iz RootVBox: anchors po UiJournal.list_window(golden).scroll, z 1)
+│  └─ List (margin x 12)
+├─ Grabber (Panel 8 px, unutar prozora, position.y iz scroll — postojeći SHOW_NEVER)
+├─ CapTop / CapBottom / CapLeft / CapRight (ColorRect PAGE_BG, mouse IGNORE, z 3) ← list_window().caps
+├─ WindowRim (Panel, UiJournal.window_rim_style(golden), z 4)
+├─ PageHead premješten iznad poklopaca (z 5)
+└─ GoldenFrameEdge / GoldenFrameGold (postojeći, z 5, samo golden)
+Sve se postavlja u _apply_frame(); _process ne dira ništa od ovoga.
+
+WARDROBE / SHOP (izmjene, bez novih scena)
+wardrobe_sheet.gd: Pip slot → Classic kartica iz skins.json (key "classic", cosmetic_id "") umjesto Default kartice; FreeTag (Panel h52 + Label 34).
+item_card.gd: prop is_free → FreeTag; is_default više ne crta „Default“ naslov za pip_skin.
+item_preview.gd: companion/pip → UiPip three_q pose_<skin> (still) za sve tri, i za classic.
+shop_support_card.gd _Tiles: PipAssets.get_texture() → dijete UiPip (three_q, blossom, 164, seek pose_blossom) u skin pločici.
+shop_screen.gd „All set here“: pip_idle.svg TextureRect → UiPip (front, skin = equipped, face happy, 190, still).

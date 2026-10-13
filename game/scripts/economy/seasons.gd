@@ -201,6 +201,12 @@ func set_active(season_id: String, sync_strip: bool = true) -> bool:
 	if season_id != active_id:
 		_owner.stash_upgrade_levels(active_id)
 	active_id = season_id
+	# Polje na Homeu uvijek prikazuje aktivnu sezonu: kupovina u Shopu ili otključavanje u
+	# Campu promijeni aktivnu dok je polje otvoreno na drugoj — polje se zatvara, Home
+	# pokaže karticu (ranije: polje stare sezone, a Arena i Play nove; 2026-10-12).
+	if field_open and field_id != season_id:
+		field_open = false
+		field_id = ""
 	_owner.apply_active_upgrade_levels()
 	if sync_strip:
 		var def := SeasonCatalog.get_def(season_id)

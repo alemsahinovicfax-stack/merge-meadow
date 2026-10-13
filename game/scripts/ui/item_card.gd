@@ -2,7 +2,7 @@ class_name ItemCard
 extends WardrobePressable
 
 ## Ormar · ItemCard (design_handoff_wardrobe/design/ItemCard.dc.html) — JEDNA kartica
-## za sve slotove i za Default. 240 x 272, padding 12, ItemPreview 210 x 150,
+## za sve slotove i za Default (u Pip slotu je to Classic Pip s oznakom „Free", settings_fixes). 240 x 272, padding 12, ItemPreview 210 x 150,
 ## ime 38/40 (2 reda, balance). Stanja: worn (ACTIVE_RIM + rub 4 + ✓ 60),
 ## owned (bijela, rub 3 ROW_EDGE), none (DISABLED + veo s katancem, ne prima tap —
 ## samo za stavke drugog izvora: season / event).
@@ -16,6 +16,9 @@ var title: String = ""
 var preview: ItemPreview
 var _badge: Control
 var _new_tag: Control
+var _free_tag: Control
+
+const TAG_Z := 12
 
 
 func _ready() -> void:
@@ -28,6 +31,11 @@ func _ready() -> void:
 
 func is_default() -> bool:
 	return item_id.is_empty()
+
+
+## Classic Pip: zadana kartica Pip slota je pravi skin s oznakom „Free".
+func is_free_skin() -> bool:
+	return is_default() and slot_id == CosmeticCatalog.SLOT_PIP_SKIN
 
 
 ## slot: zapis slota iz kataloga; item: zapis stavke ({} = Default).
@@ -88,6 +96,14 @@ func _build() -> void:
 	_new_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_new_tag.draw.connect(_draw_new_tag)
 	add_child(_new_tag)
+	_free_tag = Control.new()
+	_free_tag.name = "FreeTag"
+	_free_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_free_tag.draw.connect(_draw_free_tag)
+	add_child(_free_tag)
+	# Dijelovi Pip riga imaju z do 11 (UiPip._part_z): oznake i kvačica moraju biti iznad.
+	for tag in [_badge, _new_tag, _free_tag]:
+		tag.z_index = TAG_Z
 
 
 func _sync() -> void:
@@ -106,8 +122,13 @@ func _sync() -> void:
 	var tag_w := UiHomeV3.text_w(900, UiWardrobe.MIN_TEXT, UiWardrobe.NEW_TEXT) + 28.0 + 6.0
 	_new_tag.size = Vector2(ceilf(tag_w), UiWardrobe.NEW_TAG_H)
 	_new_tag.position = Vector2(b + UiWardrobe.BADGE_INSET, b + UiWardrobe.BADGE_INSET)
+	_free_tag.visible = is_free_skin()
+	var free_w := UiHomeV3.text_w(900, UiWardrobe.MIN_TEXT, UiWardrobe.FREE_TEXT) + 28.0 + 6.0
+	_free_tag.size = Vector2(ceilf(free_w), UiWardrobe.NEW_TAG_H)
+	_free_tag.position = _new_tag.position
 	_badge.queue_redraw()
 	_new_tag.queue_redraw()
+	_free_tag.queue_redraw()
 	queue_redraw()
 
 
@@ -137,6 +158,16 @@ func _draw_badge() -> void:
 	)
 	for p in [o + Vector2(7, 16.5), o + Vector2(25, 10)]:
 		_badge.draw_circle(p, 2.5, UiWardrobe.STICKER)
+
+
+func _draw_free_tag() -> void:
+	var r := Rect2(Vector2.ZERO, _free_tag.size)
+	_free_tag.draw_style_box(UiWardrobe.free_tag(), r)
+	var w := UiHomeV3.text_w(900, UiWardrobe.MIN_TEXT, UiWardrobe.FREE_TEXT)
+	UiHomeV3.draw_text(
+		_free_tag, 900, UiWardrobe.MIN_TEXT, UiWardrobe.FREE_TEXT,
+		Vector2((r.size.x - w) * 0.5, (r.size.y - float(UiWardrobe.MIN_TEXT)) * 0.5), UiWardrobe.INK
+	)
 
 
 func _draw_new_tag() -> void:

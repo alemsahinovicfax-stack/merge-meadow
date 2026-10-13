@@ -2,6 +2,7 @@ class_name UiJournal
 extends RefCounted
 
 ## Journal / Bloom Album — Claude Design handoff (design_handoff_journal/README.md).
+## Izmjene 2026-10-12: design_handoff_settings_fixes (prozor liste, tekst ≥ 34).
 ## Sve mjere u px baze 1080x1920, prenos 1:1. Smjer 1a (Varijanta A, pastel hub) je default.
 ## Ide u game/scripts/visual/ui_journal.gd. Isti obrazac kao ui_chrome.gd / ui_camp.gd.
 
@@ -26,10 +27,12 @@ const CHROME_DEEP := Color("#1A241E")
 # --- Page ---
 const PAGE_H := 1633
 const PAD_X := 24
-const HEAD_H := 175            # A: 30 + naslov 64 + 8 + summary 46 + 24 + divider 3
+## Zaglavlje bez reda „Album: N blooms kept · M spotted" (izbačen 2026-10-12, −54 = 8 + 46):
+## obično 30 + naslov 64 + 24 + 3; zlatno 40 + pločica 92 + 14 + 19.
+const HEAD_H := 121
+const HEAD_H_GOLD := 165
 const HEAD_H_B := 174
 const TITLE_FONT := 60
-const SUMMARY_FONT := 38
 const ACCENT_W := 10
 const ACCENT_H := 56
 
@@ -50,7 +53,7 @@ const AUTO_SCROLL_LEAD := 330   # 1,5 × (ROW_H + ROW_GAP)
 const ROW_W_A := 1032
 const ROW_W_B := 992
 const NAME_FONT := 44
-const STARS_FONT := 32
+const STARS_FONT := 34          # 2026-10-12: 32 → 34 (tekst ≥ 34, settings_fixes)
 const CAPTION_FONT := 38
 const CAPTION_LINE := 45
 const CAPTION_MAX_LINES := 2
@@ -62,6 +65,14 @@ const ROW_INNER_GAP := 24       # InfoColumn ↔ TierStrip
 const SLOT := 136
 const SLOT_GAP := 14
 const ART := 110                # odrezan crtež, bez tamnog wella
+## Zlatni prozor (settings_fixes · A) daje redu 952 umjesto 1032: uz krugove od 136 za ime i
+## opis ostaje 434 px, pa se opis od 38 px reže na treći red. Krugovi 120 / razmak 10 /
+## crtež 96 → 490 px (opis „Spotted in runs — merge to T2, then Keep in Album." u dva reda).
+const SLOT_COMPACT := 120
+const SLOT_GAP_COMPACT := 10
+const ART_COMPACT := 96
+## Lijevi + desni unutrašnji rub reda (row_style content_margin 31 + 27).
+const ROW_PAD_X := 58
 const CRYSTAL_RADIUS := 36
 const HALO_GROW := 9
 
@@ -73,6 +84,74 @@ const NEW_BADGE_OFFSET := Vector2(28, -18)   # od gornjeg lijevog ugla reda (izv
 
 # --- Journal tab ---
 const TAB_DOT := 30             # samo za opciju 1f; 1e = postojeći HubTab badge
+
+# --- Tier label (2026-10-12: 32 → 34) ---
+const TIER_LABEL_FONT := 34
+
+# --- Prozor liste (design_handoff_settings_fixes · A) ---
+## Igra ne reže crtanje (GL Compatibility): sve van prozora pokrivaju četiri neprozirna
+## poklopca (ColorRect PAGE_BG, z iznad ListScroll), pa obrub prozora, pa okvir stranice.
+## Rupa u poklopcima = ListScroll (kvadrat); obrub (draw_center=false) prekriva vanjske
+## uglove svoje kutije i crta zaobljene unutrašnje uglove. Ništa se ne crta po frejmu.
+## Rect = [x, y, w, h] u px stranice 1080 × 1633.
+const WIN_GOLD_RIM := Rect2(44, 158, 992, 1403)   # paket: y 212 — zaglavlje je kraće za 54
+const WIN_GOLD_RIM_W := 8
+const WIN_GOLD_RIM_R := 30
+const WIN_PLAIN_RIM := Rect2(24, 121, 1032, 1488)  # paket: y 175 — isto
+const WIN_PLAIN_RIM_W := 3
+const WIN_PLAIN_RIM_R := 26
+const WIN_PLAIN_EDGE := Color("#E3DCD3")   # = INK 10 % na PAGE_BG, ali neprozirno
+const WIN_LIST_PAD_X := 12                 # red = širina prozora − 2 × 12 (952 / 1002)
+const WIN_GRABBER_W := 8
+const WIN_GRABBER_INSET := 6
+
+
+## Prozor liste: ListScroll rect i četiri poklopca za stanje (golden / plain).
+## → {"scroll": Rect2, "rim": Rect2, "rim_w": int, "rim_r": int, "caps": [Rect2 ×4]}
+## `page_h`: stvarna visina stranice (u hubu 1633; samostalna scena je viša) — prozor se
+## produži za razliku, donji poklopac ostaje iste visine.
+static func list_window(golden: bool, page_h: float = PAGE_H) -> Dictionary:
+	var rim := WIN_GOLD_RIM if golden else WIN_PLAIN_RIM
+	rim.size.y += page_h - float(PAGE_H)
+	var bw := WIN_GOLD_RIM_W if golden else WIN_PLAIN_RIM_W
+	var hole := rim.grow(-float(bw))
+	var page := Vector2(1080, page_h)
+	return {
+		"scroll": hole,
+		"rim": rim,
+		"rim_w": bw,
+		"rim_r": WIN_GOLD_RIM_R if golden else WIN_PLAIN_RIM_R,
+		"caps": [
+			Rect2(0, 0, page.x, hole.position.y),
+			Rect2(0, hole.end.y, page.x, page.y - hole.end.y),
+			Rect2(0, hole.position.y, hole.position.x, hole.size.y),
+			Rect2(hole.end.x, hole.position.y, page.x - hole.end.x, hole.size.y),
+		],
+	}
+
+
+## Grabber skrola: 8 px, r 4, tinta 22 % (Album.dc.html · ScrollGrabber).
+static func grabber_style() -> StyleBoxFlat:
+	return _cached("grabber", func() -> StyleBoxFlat:
+		var s := StyleBoxFlat.new()
+		s.bg_color = Color(INK, 0.22)
+		s.set_corner_radius_all(4)
+		return s)
+
+
+static func window_rim_style(golden: bool) -> StyleBoxFlat:
+	return _cached("rim:%s" % golden, _make_window_rim_style.bind(golden))
+
+
+static func _make_window_rim_style(golden: bool) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.draw_center = false
+	s.border_color = GOLD_EDGE if golden else WIN_PLAIN_EDGE
+	s.set_border_width_all(WIN_GOLD_RIM_W if golden else WIN_PLAIN_RIM_W)
+	s.set_corner_radius_all(WIN_GOLD_RIM_R if golden else WIN_PLAIN_RIM_R)
+	s.anti_aliasing = true
+	return s
+
 
 # --- Golden Album ---
 const GOLD_FRAME_INSET := 12
@@ -100,19 +179,6 @@ static func caption_for(entry: Dictionary, show_new: bool) -> String:
 	if show_new and state != "locked" and new_tier > 0:
 		return str(NEW_CAPTION.get(clampi(new_tier, 1, 3), CAPTION[state]))
 	return str(CAPTION.get(state, CAPTION["locked"]))
-
-
-## "Album: 5 blooms kept · 4 spotted" — kept = album_t2 + album_t3, spotted = samo seen.
-static func summary_text(entries: Array) -> String:
-	var kept := 0
-	var spotted := 0
-	for e in entries:
-		match str(e.get("state", "")):
-			"album_t2", "album_t3":
-				kept += 1
-			"seen":
-				spotted += 1
-	return "Album: %d %s kept · %d spotted" % [kept, "bloom" if kept == 1 else "blooms", spotted]
 
 
 ## Koliko tiera je popunjeno (0–3). T1 je popunjen za svako stanje osim locked (isto kao danas).

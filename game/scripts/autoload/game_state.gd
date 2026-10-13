@@ -189,6 +189,8 @@ var ads_removed: bool = false
 ## samo ako je UiSeasons.REDUCE_MOTION_STOPS_AMBIENT. Settings ekran još ne postoji (D0-P) —
 ## kad ga napraviš, ovdje ga poveži i snimi u save.
 var reduce_motion: bool = false
+## Settings (user://settings.cfg, ne u saveu napretka): vibracija na merge / pickup.
+var vibration_enabled: bool = true
 var starter_pack_owned: bool = false
 ## Tokeni IAP kupovina koje su već dodijelile potrošni Loot Burst. Opcioni ključ
 ## u saveu — stari save bez njega ostaje prazan (ne diže SAVE_VERSION).
@@ -277,10 +279,14 @@ var unlocked_seasons: Array[String]:
 var owned_paid_seasons: Array[String]:
 	get: return seasons_domain.owned_paid
 	set(value): seasons_domain.owned_paid = value
+## Ranije: hub u debug buildu na svakom otvaranju vraćao sezone na S1 + S2 i brisao kupljene
+## (debug_playtest_two_free). Ugašeno 2026-10-12 — brisalo je pravi napredak; testovi ga još postavljaju.
 var skip_debug_season_unlock: bool = false
 
 
 func _ready() -> void:
+	# Settings (zvuk, vibracija, pokreti) prije svega ostalog — busovi postoje i bez zvukova.
+	UiSettings.apply(UiSettings.load_settings())
 	cosmetics = Cosmetics.new(self)
 	boosters = Boosters.new(self)
 	companions = Companions.new(self)

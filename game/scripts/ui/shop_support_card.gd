@@ -3,7 +3,7 @@ extends ShopCard
 
 ## Shop v2 · Support kartice.
 ##   remove_ads   — jedan red: ime + „No ads between runs" · dugme (kupljeno → „Ads off").
-##   starter_pack — pločice sadržaja (100 coina · Pip Blossom · 5 sjemenki × 10) + red s
+##   starter_pack — pločice sadržaja (100 coina · Pip Blossom iz riga · 5 sjemenki × 10) + red s
 ##                  „6d left" (zadnji dan u satima) · dugme. Istekao (7 dana, nije kupljen):
 ##                  siv veo 84 % preko cijele kartice + katanac 128 + „Expired"; veo guta tap.
 
@@ -112,9 +112,41 @@ class _Tiles:
 	extends Control
 
 	var card: ShopSupportCard
+	var pip: UiPip
 
 	func _init() -> void:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _ready() -> void:
+		_add_pip()
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_RESIZED and pip != null:
+			_place_pip()
+
+	## Pip Blossom iz riga (settings_fixes · C): three_q, 164, mirna poza skina, stopala iznad
+	## imena. Atlas skina se pravi u threadu (Shop se u hubu gradi u pozadini).
+	func _add_pip() -> void:
+		var key := UiPip.skin_key_from_cosmetic(MonetizationConfig.STARTER_PACK_COSMETIC)
+		while not UiPip.atlas_ready(key):
+			UiPip.request_atlas(key)
+			await get_tree().process_frame
+			if not is_inside_tree():
+				return
+		pip = UiPip.new()
+		pip.name = "StarterPip"
+		pip.view = "three_q"
+		pip.follow_equipped = false
+		pip.skin = key
+		pip.box_px = 164.0
+		add_child(pip)
+		pip.pose(UiPip.pose_for_skin(key))
+		_place_pip()
+
+	func _place_pip() -> void:
+		var skin_x := ShopSupportCard.COIN_TILE_W + ShopSupportCard.TILE_GAP + ShopSupportCard.SKIN_TILE_W * 0.5
+		var top := (size.y - 152.0 - 4.0 - 34.0) * 0.5
+		pip.position = Vector2(skin_x, top + 152.0)
 
 	func _draw() -> void:
 		var h := size.y
@@ -131,15 +163,9 @@ class _Tiles:
 			draw_texture_rect(tex, Rect2(coin.get_center().x - 48.0, top, 96, 96), false)
 		var cw := UiHomeV3.text_w(900, 52, coin_txt, 0.0, true)
 		UiHomeV3.draw_text(self, 900, 52, coin_txt, Vector2(coin.get_center().x - cw * 0.5, top + 108.0), UiShopV2.INK, 0.0, true)
-		# Pip Blossom
-		var pip := PipAssets.get_texture(MonetizationConfig.STARTER_PACK_COSMETIC)
+		# Pip Blossom: crta ga dijete UiPip (_add_pip), ovdje samo ime.
 		var skin_name := CosmeticCatalog.get_title(MonetizationConfig.STARTER_PACK_COSMETIC)
 		top = (h - 152.0 - 4.0 - 34.0) * 0.5
-		if pip != null:
-			var ps := pip.get_size()
-			var k := 152.0 / maxf(ps.x, ps.y)
-			var dw := ps * k
-			draw_texture_rect(pip, Rect2(Vector2(skin.get_center().x - dw.x * 0.5, top + (152.0 - dw.y) * 0.5), dw), false)
 		var nw := UiHomeV3.text_w(900, 34, skin_name)
 		UiHomeV3.draw_text(self, 900, 34, skin_name, Vector2(skin.get_center().x - nw * 0.5, top + 156.0), UiShopV2.INK)
 		if GameState.owns_cosmetic(MonetizationConfig.STARTER_PACK_COSMETIC) and not GameState.starter_pack_owned:

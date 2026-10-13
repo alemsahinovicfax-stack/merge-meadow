@@ -24,6 +24,7 @@ color = Color(1, 0.972549, 0.941176, 1)
 
 [node name="RootVBox" type="VBoxContainer" parent="."]
 unique_name_in_owner = true
+z_index = 5
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -93,62 +94,82 @@ text = "Bloom Album"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TitleGap" type="Control" parent="RootVBox/PageHead"]
-custom_minimum_size = Vector2(0, 8)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="SummaryWrap" type="HBoxContainer" parent="RootVBox/PageHead"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 46)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="SummaryPad" type="Control" parent="RootVBox/PageHead/SummaryWrap"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(28, 0)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="SummaryLabel" type="Label" parent="RootVBox/PageHead/SummaryWrap"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Album: 0 blooms kept · 0 spotted"
-vertical_alignment = 1
-
 [node name="DividerGap" type="Control" parent="RootVBox/PageHead"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="HeadDivider" type="ColorRect" parent="RootVBox/PageHead"]
+[node name="ListScroll" type="ScrollContainer" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 3)
-layout_mode = 2
-mouse_filter = 2
-color = Color(0.176471, 0.203922, 0.211765, 0.1)
-
-[node name="ListScroll" type="ScrollContainer" parent="RootVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
+z_index = 1
+layout_mode = 0
+offset_left = 27.0
+offset_top = 178.0
+offset_right = 1053.0
+offset_bottom = 1606.0
 mouse_filter = 0
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 3
 
-[node name="List" type="VBoxContainer" parent="RootVBox/ListScroll"]
+[node name="ListPad" type="MarginContainer" parent="ListScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+
+[node name="List" type="VBoxContainer" parent="ListScroll/ListPad"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 theme_override_constants/separation = 0
 
+[node name="Grabber" type="Panel" parent="."]
+unique_name_in_owner = true
+z_index = 2
+layout_mode = 0
+mouse_filter = 2
+
+[node name="CapTop" type="ColorRect" parent="."]
+unique_name_in_owner = true
+z_index = 3
+layout_mode = 0
+mouse_filter = 2
+color = Color(1, 0.972549, 0.941176, 1)
+
+[node name="CapBottom" type="ColorRect" parent="."]
+unique_name_in_owner = true
+z_index = 3
+layout_mode = 0
+mouse_filter = 2
+color = Color(1, 0.972549, 0.941176, 1)
+
+[node name="CapLeft" type="ColorRect" parent="."]
+unique_name_in_owner = true
+z_index = 3
+layout_mode = 0
+mouse_filter = 2
+color = Color(1, 0.972549, 0.941176, 1)
+
+[node name="CapRight" type="ColorRect" parent="."]
+unique_name_in_owner = true
+z_index = 3
+layout_mode = 0
+mouse_filter = 2
+color = Color(1, 0.972549, 0.941176, 1)
+
+[node name="WindowRim" type="Panel" parent="."]
+unique_name_in_owner = true
+z_index = 4
+layout_mode = 0
+mouse_filter = 2
+
 [node name="GoldenFrameEdge" type="Panel" parent="."]
 unique_name_in_owner = true
 visible = false
-z_index = 4
+z_index = 5
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -164,7 +185,7 @@ mouse_filter = 2
 [node name="GoldenFrameGold" type="Panel" parent="."]
 unique_name_in_owner = true
 visible = false
-z_index = 4
+z_index = 5
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

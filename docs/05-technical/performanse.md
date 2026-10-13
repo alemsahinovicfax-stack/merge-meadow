@@ -35,7 +35,7 @@ Pokretanje BEZ `--headless` (treba renderer), na laptopu s OpenGL-om:
 |-----|---------|-------|
 | Arena | `godot --path game --rendering-driver opengl3 -s res://scripts/dev/arena_perf_bench.gd` (`MM_FRAMES`) | mirno polje, muncher lovi, combo, **sipanje 30 sjemenki**; primitivi i draw pozivi po dijelu |
 | Run | `godot --path game --rendering-driver opengl3 -s res://scripts/dev/run_perf_bench.gd` (`MM_SECONDS`, `MM_SEASONS`) | prosjek i najgori frejm po sezoni; pozadina / svijet / Pip / HUD: primitivi, draw pozivi, ms |
-| **Cijela igra** | `godot --path game --rendering-driver opengl3 -s res://scripts/dev/perf_suite_bench.gd` (`MM_ONLY=arena,run…`, `MM_ROOT=1`, `MM_VSYNC=1`) | 30 scenarija (hub, swipe, Home, Camp, Journal, Shop, Arena, run, loot): prosjek, p95/p99, najgori, preskočeni frejmovi, draw pozivi, CPU/GPU rendera |
+| **Cijela igra** | `godot --path game --rendering-driver opengl3 -s res://scripts/dev/perf_suite_bench.gd` (`MM_ONLY=arena,run,settings…`, `MM_ROOT=1`, `MM_VSYNC=1`) | 35 scenarija (+ `hub_boot_5s`, `journal_scroll_gold`, `settings_*`) (hub, swipe, Home, Camp, Journal, Shop, Arena, run, loot): prosjek, p95/p99, najgori, preskočeni frejmovi, draw pozivi, CPU/GPU rendera |
 | Run HUD v2 | `godot --path game --rendering-driver opengl3 -s res://scripts/dev/run_hud_perf_bench.gd` | grm u mirovanju i burst |
 
 - **`MM_ROOT=1 MM_VSYNC=1`** = kao igra na laptopu (prozor 540 × 960, 60 Hz): kolona `>20ms` su stvarno preskočeni frejmovi — to je „štekanje". Bez toga (SubViewport 1080 × 1920, vsync off) mjeri se propusnost.
@@ -92,6 +92,15 @@ Isti laptop. Vremenska linija starta huba = frejm po frejm prvih 5 s, koja stran
 
 **Bench posle svih izmjena** (`MM_ROOT=1 MM_VSYNC=1`, laptop bez drugog opterećenja): `hub_boot_5s` 7–11 kasnih od ~290 (najgori 37–55 ms, nema više frejma od pola sekunde); `home_season_cards` 3 kasna (bilo 5–7); `arena_merges` 0–1; `run_play` 37–39 draw poziva (bilo 76–82); ostali scenariji 0–3 kasna, osim prvog ulaza u Journal (7) i swipea stranica (8) — naizmjenični A/B bez vsynca (stara / nova kartica) daje isti ili bolji prosjek (swipe 4,3–4,6 vs 4,5–5,2 ms), pa je to šum laptopa. Dva prolaza dok je drugi program trošio ~46 % procesora dala su 5–25 kasnih i u scenama koje se nisu mijenjale (run, loot) — mjeri na mirnom laptopu.
 
+## Rezultati 2026-10-12 — paket settings_fixes (Album prozor, Settings)
+
+| Scenarij | vsync (kasni > 20 ms) | bez vsynca (prosjek) | Napomena |
+|---|---|---|---|
+| `journal_scroll_gold` | 0 | 4,3 ms (obični 3,9) | prozor + 4 poklopca su statični; skrol mijenja listu i grabber |
+| `settings_open_close` | 1 frejm ≤ 33 ms (bio ~67 ms pri svakom otvaranju) | 2,6 ms | ekran se gradi unaprijed u pozadini (dio po frejmu), zatvaranje ga sakrije |
+| `settings_slider_drag` | 0 | 3,4 ms | `Fill.scale.x` + `Thumb.position.x`, bez crtanja |
+| `settings_scroll` | 0 | 3,1 ms | — |
+
 ## Pravila za animacije (iz ovih popravki)
 
 1. **Ne crtaj iznova ono što se samo pomjera.** Crtež ide u dijete, a animacija mijenja `position` / `scale` / `modulate` (sjemenka u letu, slojevi run pozadine, magnet prsten). `queue_redraw()` svaki frejm je skup kad crtež ima StyleBoxove ili mnogo oblika.
@@ -107,6 +116,7 @@ Isti laptop. Vremenska linija starta huba = frejm po frejm prvih 5 s, koja stran
 11. **Stranica koja se gradi u pozadini ne smije sve u jednom frejmu** — dok je igrač na drugoj stranici, i 100 ms je vidljiv zastoj. Gradi po komad u frejmu (Shop `_build_steps`), a teško (rasterizacija SVG-a) u thread.
 12. **Red pozadinskog učitavanja je FIFO** (`greske-katalog.md` #30): ono što UI uskoro crta traži prije velikih scena; `load_threaded_get` čeka sve ispred.
 13. **Isprekidan krug / luk = jedna mreža trouglova** (`RenderingServer.canvas_item_add_triangle_array`), ne AA luk po crtici; `draw_multiline` s poluprozirnom bojom daje pruge na spojevima.
+14. **Ekran s mnogo kontrola (Settings, ~40–67 ms gradnje) se ne gradi na tap** — gradi se unaprijed u pozadini, dio po frejmu, i zatvaranje ga sakrije umjesto da ga obriše.
 
 ## Plan (još nije urađeno)
 

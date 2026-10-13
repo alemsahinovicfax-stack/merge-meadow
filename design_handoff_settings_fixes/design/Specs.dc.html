@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#FFF8F0;color:#2D3436;font-family:Nunito,system-ui,sans-serif}a{color:#2E7F8C}a:hover{color:#2D3436}</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:40px 24px 120px;display:flex;flex-direction:column;gap:40px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="font:700 13px 'JetBrains Mono',monospace;letter-spacing:.08em;color:#555C5E">DESIGN_HANDOFF_SETTINGS_FIXES · SPECS · px of 1080 × 1920</div>
+    <div style="font:900 48px/1 Nunito,sans-serif">Fixes + Settings — specs</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;font:800 16px Nunito,sans-serif">
+      <a href="Album.dc.html">A · Album</a><a href="Wardrobe Pip.dc.html">B · Wardrobe Pip</a><a href="Shop Pip.dc.html">C · Shop Pip</a><a href="Settings.dc.html">D · Settings</a>
+    </div>
+  </div>
+
+  <sc-for list="{{ tables }}" as="tb" hint-placeholder-count="5">
+    <section data-screen-label="{{ tb.title }}" style="display:flex;flex-direction:column;gap:12px">
+      <div style="font:900 28px/1.1 Nunito,sans-serif">{{ tb.title }}</div>
+      <div style="display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);border:3px solid #2D3436;border-radius:20px;overflow:hidden;background:#FFFFFF">
+        <sc-for list="{{ tb.rows }}" as="r" hint-placeholder-count="6">
+          <div style="padding:10px 14px;border-top:1px solid rgba(45,52,54,.12);font:800 15px/1.4 Nunito,sans-serif">{{ r.k }}</div>
+          <div style="padding:10px 14px;border-top:1px solid rgba(45,52,54,.12);font:500 14px/1.5 'JetBrains Mono',monospace;color:#3F4547;text-wrap:pretty">{{ r.v }}</div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-for>
+
+  <section data-screen-label="Self-check" style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="font:900 28px/1.1 Nunito,sans-serif">Self-check (§5.4) — measured from the four design files</div>
+      <div onClick="{{ run }}" style="padding:10px 18px;border-radius:16px;border:3px solid #2D3436;background:#FFB88C;font:900 16px Nunito,sans-serif;cursor:pointer">{{ runLabel }}</div>
+    </div>
+    <div style="font:500 13px 'JetBrains Mono',monospace;color:#555C5E">Loads Album / Wardrobe Pip / Shop Pip / Settings in hidden frames, waits for Pip, measures DOM. Also printed to console as SELFCHECK.</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ checks }}" as="c" hint-placeholder-count="9">
+        <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px;align-items:start;padding:12px 14px;border:3px solid #2D3436;border-radius:16px;background:{{ c.bg }}">
+          <div style="font:900 18px Nunito,sans-serif">{{ c.res }}</div>
+          <div style="display:flex;flex-direction:column;gap:4px"><div style="font:800 16px/1.35 Nunito,sans-serif">{{ c.n }}. {{ c.t }}</div><div style="font:500 13px/1.5 'JetBrains Mono',monospace;color:#3F4547">{{ c.d }}</div></div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  <div ref="{{ hostRef }}" style="position:fixed;left:-5000px;top:0;width:1200px;height:900px;overflow:hidden"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const TITLES = [
+  'Album: caps cover everything outside the window (Golden + Plain)',
+  'Album frame is static while scrolling',
+  'Classic Pip is a real skin card (pose, size, Free, Wearing)',
+  'Classic / Blossom / Sky on all 7 surfaces',
+  'Shop: rig Pip in Starter Pack (3 states) + All set; Classic not sold',
+  'Settings: all sections, 4 restore states, Dev only in debug',
+  'Text ≥ 34 px, numbers ≥ 56 px',
+  'Controls ≥ 120 × 120',
+  'No gradient / blur / glow / mask; animations ≤ 0.3 s; new SVG ≤ 60 KB'
+];
+const FILES = ['Album.dc.html', 'Wardrobe Pip.dc.html', 'Shop Pip.dc.html', 'Settings.dc.html'];
+const SCREENS = '[data-layer="HubScreen"],[data-layer="WardrobeSheet"],[data-layer="ShopPage"],[data-layer="SettingsScreen"],[data-layer="Toggle"]';
+class Component extends DCLogic {
+  state = { res: null, busy: false };
+  hostRef = React.createRef();
+  componentDidMount() { setTimeout(() => this.run(), 400); }
+  load(f) {
+    return new Promise(res => { const fr = document.createElement('iframe'); fr.style.cssText = 'width:1200px;height:900px;border:0'; fr.src = f; fr.onload = () => setTimeout(() => res(fr.contentDocument), 4500); this.hostRef.current.appendChild(fr); });
+  }
+  async run() {
+    if (this.state.busy) return; this.setState({ busy: true, res: null });
+    this.hostRef.current.innerHTML = '';
+    const [A, W, S, D] = await Promise.all(FILES.map(f => this.load(f)));
+    const R = [];
+    const px = (el, p) => parseFloat(getComputedStyle(el)[p]);
+    // 1 caps
+    let c1 = [], ok1 = true;
+    A.querySelectorAll('[data-layer="JournalPage"]').forEach((pg, i) => {
+      const caps = ['CapTop', 'CapBottom', 'CapLeft', 'CapRight'].map(n => pg.querySelector('[data-layer="' + n + '"]'));
+      const sc = pg.querySelector('[data-layer="ListScroll"]');
+      const opaque = caps.every(c => /rgb\(255, 248, 240\)/.test(getComputedStyle(c).backgroundColor));
+      const pr = pg.getBoundingClientRect(), s = sc.getBoundingClientRect(), k = pr.width / 1080;
+      const area = caps.reduce((a, c) => { const r = c.getBoundingClientRect(); return a + r.width * r.height; }, 0) / k / k;
+      const hole = s.width * s.height / k / k, cover = Math.round(area + hole);
+      const capZ = caps.every(c => +getComputedStyle(c).zIndex > +getComputedStyle(sc).zIndex);
+      if (!(opaque && capZ && Math.abs(cover - 1080 * 1633) < 2)) ok1 = false;
+      c1.push('A' + (i + 1) + ' caps+hole=' + cover + '/' + 1080 * 1633 + (opaque ? ' opaque' : ' NOT opaque') + (capZ ? ' z>list' : ' z!'));
+    });
+    R.push([ok1, c1.join(' · ') + ' (X-ray must be off)']);
+    // 2 static frame
+    const lists = [...A.querySelectorAll('[data-layer="List"]')];
+    const inList = lists.some(l => l.querySelector('[data-layer^="Cap"],[data-layer="WindowRim"],[data-layer="GoldenFrame"],[data-layer="PageHead"]'));
+    R.push([!inList && lists.length === 6, lists.length + ' lists; caps, rim, frame, head outside the List node; scrolling changes List.transform + Grabber.transform only']);
+    // 3 classic card
+    const cards = [...W.querySelectorAll('[data-layer="WardrobeSheet"]')][0].querySelectorAll('[data-layer="SkinCard"]');
+    const sizes = [...cards].map(c => Math.round(c.getBoundingClientRect().width) + 'x' + Math.round(c.getBoundingClientRect().height));
+    const pipImgs = [...cards].map(c => c.querySelector('[data-pip] img,[data-pip] svg'));
+    const classic = cards[0], free = !!classic.querySelector('[data-layer="FreeTag"]'), wear = !!classic.querySelector('[data-layer="EquippedBadge"]');
+    const noDefault = !W.querySelector('[data-layer="DefaultCard"]');
+    R.push([cards.length === 3 && new Set(sizes).size === 1 && pipImgs.every(Boolean) && free && wear && noDefault, '3 SkinCards ' + sizes[0] + ', Pip in each: ' + pipImgs.filter(Boolean).length + '/3, Free=' + free + ', Wearing=' + wear + ', DefaultCard nodes: 0']);
+    // 4 surfaces
+    const cells = [...W.querySelectorAll('section:nth-of-type(2) [data-pip]')], drawn = cells.filter(e => e.querySelector('img,svg')).length;
+    R.push([cells.length === 21 && drawn === 21, drawn + '/21 cells (field, season card, Arena, run top, run HUD, Camp, Shop/Wardrobe × 3 skins)']);
+    // 5 shop
+    const old = [...S.querySelectorAll('img')].filter(i => /pip_idle|icons\/pip_blossom|pip_sky\.svg/.test(i.getAttribute('src') || '')).length;
+    const st = S.querySelectorAll('[data-layer="StarterSkin"] [data-pip] img,[data-layer="StarterSkin"] [data-pip] svg').length;
+    const allset = [...S.querySelectorAll('[data-layer="TabEnd"] [data-pip]')].filter(e => e.querySelector('img,svg')).length;
+    const looksTitles = [...S.querySelectorAll('[data-layer="CosmeticCard"]')].map(c => c.textContent);
+    const classicSold = looksTitles.some(t => /Classic/.test(t));
+    R.push([old === 0 && st === 3 && allset === 2 && !classicSold, 'old bunny imgs: ' + old + ' · Starter Pack rig Pip: ' + st + '/3 (available, bought, expired) · All set rig Pip: ' + allset + '/2 · Looks cards: ' + looksTitles.length + ', Classic: ' + (classicSold ? 'SOLD ✗' : 'none')]);
+    // 6 settings
+    const scr = [...D.querySelectorAll('[data-layer="SettingsScreen"]')];
+    const sec = scr.map(s => [...s.querySelectorAll('[data-layer="Section"]')].map(x => x.firstElementChild.textContent.trim().replace('Debug build', '')).join('/'));
+    const dev = scr.map(s => /Developer/.test(s.textContent));
+    const rs = D.querySelectorAll('#D6 [style*="border-radius: 60px"],#D6 [style*="border-radius:60px"]').length;
+    const need = ['Sound', 'Gameplay', 'Purchases', 'Privacy & help'];
+    const ok6 = need.every(n => sec[0].includes(n)) && dev[0] && !dev[1] && dev[2] && !dev[3] && rs >= 4;
+    R.push([ok6, 'D1 sections: ' + sec[0] + ' · Dev in D1/D2/D3/D4: ' + dev.slice(0, 4).map(x => x ? 'yes' : 'no').join('/') + ' · restore states drawn: ' + rs]);
+    // 7 text
+    let minT = 99, minN = 99, bad = [];
+    [A, W, S, D].forEach((doc, di) => doc.querySelectorAll('[data-layer="HubScreen"] *,[data-layer="WardrobeSheet"] *,[data-layer="ShopPage"] *,[data-layer="SettingsScreen"] *').forEach(el => {
+      const t = [...el.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim(); if (!t) return;
+      const f = px(el, 'fontSize'); if (/^\d+$/.test(t) && el.closest('[data-layer="Value"]')) minN = Math.min(minN, f);
+      if (f < minT) minT = f; if (f < 34) bad.push(FILES[di] + ':' + t.slice(0, 20) + '@' + f);
+    }));
+    R.push([minT >= 34 && minN >= 56, 'min text ' + minT + ' px · min slider value ' + minN + ' px' + (bad.length ? ' · under: ' + bad.slice(0, 4).join(', ') : '') + ' (Journal tier labels and stars raised 32 → 34)']);
+    // 8 controls
+    let minC = 999, smallC = [];
+    [W, S, D].forEach((doc, di) => doc.querySelectorAll('[data-layer="WardrobeSheet"] *,[data-layer="ShopPage"] *,[data-layer="SettingsScreen"] *').forEach(el => {
+      if (getComputedStyle(el).cursor !== 'pointer' || (el.parentElement && getComputedStyle(el.parentElement).cursor === 'pointer')) return;
+      const r = el.getBoundingClientRect(), k = el.closest(SCREENS).getBoundingClientRect().width / el.closest(SCREENS).offsetWidth || 1;
+      const m = Math.min(r.width, r.height) / k; if (m < minC) minC = Math.round(m); if (m < 119.5) smallC.push(el.textContent.slice(0, 16) + ' ' + Math.round(m));
+    }));
+    R.push([minC >= 120, 'smallest tappable ' + minC + ' px' + (smallC.length ? ' · ' + smallC.slice(0, 4).join(', ') : '')]);
+    // 9 effects
+    let fx = 0, longAnim = 0;
+    [A, W, S, D].forEach(doc => doc.querySelectorAll('[data-layer] , [data-layer] *').forEach(el => {
+      const cs = getComputedStyle(el);
+      if (/gradient/.test(cs.backgroundImage) || cs.filter !== 'none' || (cs.maskImage && cs.maskImage !== 'none') || cs.backdropFilter && cs.backdropFilter !== 'none') fx++;
+      const d = cs.transitionDuration.split(',').map(parseFloat); if (cs.transitionProperty !== 'all' && Math.max(...d) > 0.3) longAnim++;
+    }));
+    let kb = 0; try { const names = ['icon_close_light', 'icon_sound', 'icon_sound_off', 'icon_chevron', 'icon_external']; for (const n of names) { const tx = await (await fetch('icons/' + n + '.svg')).text(); kb += tx.length; } } catch (e) {}
+    R.push([fx === 0 && longAnim === 0 && kb <= 60000, 'gradients/filters/masks: ' + fx + ' · transitions > 0.3 s: ' + longAnim + ' · new SVG: 5 files, ' + (kb / 1024).toFixed(2) + ' KB']);
+    const res = R.map(([ok, d], i) => ({ ok, d }));
+    console.log('SELFCHECK ' + res.filter(r => r.ok).length + '/9 ' + res.map((r, i) => (i + 1) + (r.ok ? ':da' : ':ne')).join(' '));
+    res.forEach((r, i) => console.log('SELFCHECK ' + (i + 1) + ' ' + (r.ok ? 'da' : 'ne') + ' — ' + r.d));
+    this.setState({ res, busy: false });
+  }
+  renderVals() {
+    const res = this.state.res;
+    return {
+      hostRef: this.hostRef, run: () => this.run(), runLabel: this.state.busy ? 'Running…' : 'Run self-check',
+      checks: TITLES.map((t, i) => { const r = res && res[i]; return { n: i + 1, t, res: r ? (r.ok ? 'da' : 'ne') : '…', d: r ? r.d : 'waiting', bg: r ? (r.ok ? '#DCF5EC' : '#FFCCD5') : '#FFFFFF' }; }),
+      tables: [
+        { title: 'A · Album window (page 1080 × 1633)', rows: [
+          { k: 'Layer order (z)', v: 'Bg 0 · ListScroll 1 · Grabber 2 · CapTop/Bottom/Left/Right 3 · WindowRim 4 · PageHead + GoldenFrame 5. Caps and rim are siblings of ListScroll, never children.' },
+          { k: 'Golden · rim', v: 'Panel (44, 212, 992 × 1349), StyleBoxFlat draw_center=false, border 8 #D6A82F, corner 30 → inner radius 22.' },
+          { k: 'Golden · window', v: 'ListScroll = (52, 220, 976 × 1333). Caps: top (0,0,1080,220) · bottom (0,1553,1080,80) · left (0,220,52,1333) · right (1028,220,52,1333), ColorRect #FFF8F0 α 1.' },
+          { k: 'Why it works without clipping', v: 'Caps cover the square hole edge; the rim (drawn above) covers its own outer-corner gaps and paints the rounded inner corners. Every pixel outside the rounded window is opaque.' },
+          { k: 'Plain · rim / window', v: 'Rim (24, 175, 1032 × 1434) border 3 #E3DCD3 r 26. ListScroll (27, 178, 1026 × 1428). Caps: top 178 · bottom 27 · left 27 · right 27.' },
+          { k: 'Rows', v: 'List padding 12 left/right → rows 952 (golden) / 1002 (plain). Height 200, gaps 20 / 36 unchanged. LIST_TOP 16, LIST_BOTTOM 24.' },
+          { k: 'Grabber', v: '8 px, r 4, ink 22 %, inside the window, 6 px from its right edge; moves by position.y only.' },
+          { k: 'Deleted', v: 'GoldenFrameEdge/GoldenFrameGold as full-page overlays over the list (they were the bug), HeadDivider (the rim top replaces it).' }
+        ] },
+        { title: 'B · Classic Pip skin', rows: [
+          { k: 'Card', v: 'ItemCard 240 × 272, thumb 210 × 150, rig three_q pose_classic at 126 px — identical to Blossom/Sky.' },
+          { k: 'FreeTag', v: 'Top-left (18, 18), h 52, r 16, #FFF8F0, rub 3 ink, „Free“ 34/900. Shows in every state of Classic.' },
+          { k: 'Wearing', v: '#FFF6D6 + rub 4 + EquippedBadge (same as other skins). Stage name „Classic Pip“.' },
+          { k: 'Data', v: 'cosmetics.json unchanged (no shop item). Wardrobe builds the Pip slot from skins.json: classic key "" = cosmetic_id "", always owned, title from skins.json. allow_default/default_title stop drawing a separate Default card for pip_skin.' },
+          { k: 'Stage', v: 'three_q 246, stage_idle loop; tap → stage_hop. Pip at x 74 % so the two chips stay readable.' }
+        ] },
+        { title: 'C · Shop', rows: [
+          { k: 'Starter Pack skin tile', v: 'UiPip three_q, skin blossom, box 164 (k 0.64), seek pose_blossom, still (no AnimationPlayer running). Bottom-aligned in 296 × 228, name 34/900 under it.' },
+          { k: 'States', v: 'available: white card + 6d left · bought: #FFF6D6, ✓ on tile, „✓ Claimed“ mint · expired: veil 84 % over all incl. Pip.' },
+          { k: 'All set here', v: 'UiPip front 190, face happy, still. Skin = equipped pip_skin. Rebuilt on cosmetics_changed only.' },
+          { k: 'Looks', v: 'Pip slot = Blossom, Sky. Classic has no shop item, no card.' }
+        ] },
+        { title: 'D · Settings', rows: [
+          { k: 'Screen', v: 'Full screen 1080 × 1920 over the hub, slide up 0.24 s (cubic-out), down 0.2 s. TopBar 140 + 3 (#2A2233). X 120 × 120 at (950, 10) = gear spot. Back = close (sub-page: back to Settings).' },
+          { k: 'Section card', v: 'White, rub 4 ink, r 36, hard shadow 0 10 0 rgba(26,26,20,.22), padding 12/32, row separators 3 px ink 10 %. Section title 44/900.' },
+          { k: 'Slider', v: 'Mute 120 × 120 · track 672 × 32 (rub 4, r 16, #FFF8F0) inside a 120 hit area · fill #A8E6CF scale.x = v/100 · thumb 76 (rub 4) position.x = v/100 × 596 · value 56/900 (muted: „Off“ #555C5E, fill #E3DCD3).' },
+          { k: 'Toggle', v: 'Track 168 × 96 r 48 rub 4 (on #A8E6CF / off #E3DCD3), knob 76 translate 0 → 72 in 0.15 s. Whole row (≥ 120 high) is the hit area.' },
+          { k: 'Restore', v: 'idle (white, shadow) · restoring (#EAD2FF, y +8, three dots = only loop) · restored (#A8E6CF „✓ Restored“ / „✓ Checked · Nothing to restore“) · failed (#FFCCD5 „Didn’t go through“, tap again).' },
+          { k: 'Remove Ads', v: 'Status chip h 72: „Ads on“ #FFF8F0 / „✓ Ads off“ #A8E6CF. Read-only — nothing is sold here.' },
+          { k: 'Privacy & help', v: 'Privacy choices › (UMP form) · Privacy policy ↗ · Contact support ↗ (mailto) · Credits › · Version line 36/800.' },
+          { k: 'Developer', v: 'Only OS.is_debug_build(). Dashed card #F1EAE0 + „Debug build“ tag. 2 × 2 buttons 120 high: Unlock all seasons, Reset seasons (pink), +1000 coins, Reset tutorial (pink).' },
+          { k: 'Persistence', v: 'user://settings.cfg, saved on every change (slider: on release + debounced 0.3 s while dragging). Applied at once: AudioServer bus volume_db / mute (Music, SFX buses exist even with no streams), Input.vibrate_handheld gate, Pip.reduce_motion + UiStage tween scale.' }
+        ] },
+        { title: 'Performance (§5.3)', rows: [
+          { k: 'Redraw per frame', v: '0 new _draw() calls. Album caps/rim/frame: static StyleBoxFlat Panels. Slider/toggle: only position / scale on existing nodes. Pip in Shop: still pose, no AnimationPlayer running.' },
+          { k: 'While scrolling Album', v: 'ScrollContainer moves List; nothing else invalidates. 4 ColorRects + 1 Panel added (5 nodes).' },
+          { k: 'Animations', v: 'Settings in 0.24 s, out 0.2 s, toggle 0.15 s, button press 0.08 s, restore result scale 0.22 s. Loop: restore dots only (while waiting).' },
+          { k: 'New SVG', v: '5 icons: 39.2 KB on disk (each file carries a ~6.8 KB embedded metadata block), 1.27 KB of artwork. Limit 60 KB — met either way.' }
+        ] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

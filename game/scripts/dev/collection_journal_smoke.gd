@@ -106,7 +106,7 @@ func _find_row(journal: Node, list: Node, type_id: String) -> Node:
 
 
 func _scroll_to_end(journal: Node) -> void:
-	var scroll := journal.get_node("RootVBox/ListScroll") as ScrollContainer
+	var scroll := journal.get_node("ListScroll") as ScrollContainer
 	await process_frame
 	scroll.scroll_vertical = 1000000
 	await process_frame
@@ -171,7 +171,7 @@ func _run() -> void:
 		push_error("collection_journal_smoke: journal scene missing")
 		_quit(1)
 		return
-	var list := journal.get_node_or_null("RootVBox/ListScroll/List") as VBoxContainer
+	var list := journal.get_node_or_null("ListScroll/ListPad/List") as VBoxContainer
 	if list == null or _bloom_rows(list).is_empty():
 		push_error("collection_journal_smoke: journal list empty")
 		_quit(1)
@@ -208,7 +208,7 @@ func _run() -> void:
 		await process_frame
 	journal = current_scene as Control
 	await _wait_built(journal)
-	list = journal.get_node_or_null("RootVBox/ListScroll/List") as VBoxContainer
+	list = journal.get_node_or_null("ListScroll/ListPad/List") as VBoxContainer
 	if list == null or _bloom_rows(list).is_empty():
 		push_error("collection_journal_smoke: journal list empty after reload")
 		_quit(1)
@@ -243,7 +243,7 @@ func _run() -> void:
 		await process_frame
 	journal = current_scene as Control
 	await _wait_built(journal)
-	list = journal.get_node_or_null("RootVBox/ListScroll/List") as VBoxContainer
+	list = journal.get_node_or_null("ListScroll/ListPad/List") as VBoxContainer
 	if list == null or _bloom_rows(list).is_empty():
 		push_error("collection_journal_smoke: journal list empty after stash")
 		_quit(1)

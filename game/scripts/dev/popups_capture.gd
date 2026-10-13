@@ -150,7 +150,6 @@ func _home_shots() -> void:
 
 func _hub_shots() -> void:
 	var hub: Node = await _new_hub()
-	hub.call("_show_settings_toast")
 	await _wait(0.3)
 	await _capture("X1_default")
 	hub.call("go_to_page", MetaHubPages.SHOP, false)

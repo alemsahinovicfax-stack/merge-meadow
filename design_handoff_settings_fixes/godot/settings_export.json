@@ -1,0 +1,51 @@
+{
+  "meta": { "package": "design_handoff_settings_fixes", "date": "2026-10-12", "base": [1080, 1920], "units": "px", "lang": "en" },
+  "album_window": {
+    "page": [1080, 1633],
+    "golden": { "rim": [44, 212, 992, 1349], "rim_w": 8, "rim_r": 30, "rim_color": "#D6A82F", "scroll": [52, 220, 976, 1333],
+      "caps": [[0, 0, 1080, 220], [0, 1553, 1080, 80], [0, 220, 52, 1333], [1028, 220, 52, 1333]], "row_w": 952 },
+    "plain": { "rim": [24, 175, 1032, 1434], "rim_w": 3, "rim_r": 26, "rim_color": "#E3DCD3", "scroll": [27, 178, 1026, 1428],
+      "caps": [[0, 0, 1080, 178], [0, 1606, 1080, 27], [0, 178, 27, 1428], [1053, 178, 27, 1428]], "row_w": 1002 },
+    "cap_color": "#FFF8F0", "list_pad_x": 12, "z": { "list": 1, "grabber": 2, "caps": 3, "rim": 4, "head_frame": 5 },
+    "text": { "tier_label": 34, "stars": 34 }
+  },
+  "pip_skin_cards": {
+    "source": "game/data/pip/skins.json", "order": ["classic", "blossom", "sky"],
+    "card": [240, 272], "thumb": [210, 150], "pip": { "view": "three_q", "size": 126, "pose": "pose_<key>", "still": true },
+    "free_tag": { "pos": [18, 18], "h": 52, "r": 16, "bg": "#FFF8F0", "edge": 3, "font": 34, "text": "Free" },
+    "classic": { "cosmetic_id": "", "owned": "always", "sold": false, "title": "Classic Pip" },
+    "stage": { "view": "three_q", "size": 246, "loop": "stage_idle", "select": "stage_hop", "x": 0.74 }
+  },
+  "surfaces": {
+    "field": { "view": "front", "size": 190, "loop": "idle" }, "season_card": { "view": "front", "size": 230, "loop": "card_idle" },
+    "arena": { "view": "front", "size": 150, "loop": "arena_idle" }, "run": { "view": "top", "size": 150, "loop": "run_gallop" },
+    "run_hud": { "view": "front", "size": 88, "crop": [40, 40, 176, 176], "loop": "hud_idle" },
+    "camp": { "view": "front", "size": 150, "still": true }, "shop_wardrobe": { "view": "three_q", "size": 126, "pose": true }
+  },
+  "shop": {
+    "starter_pack_skin": { "view": "three_q", "skin": "blossom", "size": 164, "pose": "pose_blossom", "still": true, "tile": [296, 228] },
+    "starter_states": ["available", "bought", "expired"],
+    "all_set": { "view": "front", "skin": "equipped", "size": 190, "face": "happy", "still": true },
+    "looks_pip_slot": ["pip_blossom", "pip_sky"]
+  },
+  "settings": {
+    "bar": { "h": 140, "rule": 3, "bg": "#2A2233", "title_font": 56, "close": [950, 10, 120, 120] },
+    "list": { "pad": [24, 40, 24, 120], "section_gap": 44, "title_font": 44, "title_gap": 16 },
+    "card": { "bg": "#FFFFFF", "edge": 4, "r": 36, "shadow_y": 10, "pad": [32, 12], "sep": 3 },
+    "slider": { "mute": [120, 120], "w": 672, "hit_h": 120, "track_h": 32, "track_y": 44, "thumb": 76, "value_w": 120, "value_font": 56, "fill": "#A8E6CF", "muted_fill": "#E3DCD3", "range": [0, 100], "step": 1 },
+    "toggle": { "track": [168, 96], "knob": 76, "travel": 72, "sec": 0.15, "on": "#A8E6CF", "off": "#E3DCD3" },
+    "restore": { "states": ["idle", "busy", "done", "none", "fail"], "h": 120, "r": 60 },
+    "sections": [
+      { "id": "sound", "title": "Sound", "rows": ["music", "sfx", "vibration"] },
+      { "id": "gameplay", "title": "Gameplay", "rows": ["reduce_motion"] },
+      { "id": "purchases", "title": "Purchases", "rows": ["restore", "remove_ads_status"] },
+      { "id": "privacy", "title": "Privacy & help", "rows": ["privacy_choices", "privacy_policy", "contact_support", "credits"] },
+      { "id": "dev", "title": "Developer", "debug_only": true, "rows": ["unlock_all_seasons", "reset_seasons", "coins_1000", "reset_tutorial"] }
+    ],
+    "defaults": { "music": 80, "music_mute": false, "sfx": 100, "sfx_mute": false, "vibration": true, "reduce_motion": false },
+    "storage": "user://settings.cfg",
+    "motion": { "in": 0.24, "out": 0.2, "press": 0.08, "result_pop": [1.06, 0.22] },
+    "optional": { "how_to_play": false, "reset_progress": false }
+  },
+  "new_svg": ["icon_close_light", "icon_sound", "icon_sound_off", "icon_chevron", "icon_external"]
+}

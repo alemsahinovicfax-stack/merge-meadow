@@ -176,7 +176,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_GO_BACK_REQUEST and _is_open:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST and _is_open and not SettingsScreen.is_open(get_tree()):
 		close()
 	elif what == NOTIFICATION_RESIZED and _sheet != null and _is_open and not _closing and _tween == null:
 		_sheet.position.y = open_y()

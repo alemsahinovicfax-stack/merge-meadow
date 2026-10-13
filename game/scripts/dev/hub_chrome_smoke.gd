@@ -217,20 +217,26 @@ func _check_nav_lock(hub: Control) -> void:
 		_expect_near("unlocked tab %d alpha" % i, tab.modulate.a, 1.0)
 
 
+## Zupčanik otvara Settings (settings_fixes · D): pun ekran iznad huba, X tačno na mjestu
+## zupčanika; X ga zatvara.
 func _check_settings_toast(hub: Control) -> void:
-	var settings := hub.get_node_or_null(HEADER_ROW + "/SettingsButton")
+	var settings := hub.get_node_or_null(HEADER_ROW + "/SettingsButton") as Control
 	if settings == null:
 		return
 	settings.emit_signal("clicked")
-	for _i in 3:
-		await process_frame
-	var toast := hub.get_node_or_null("SettingsToast") as Control
-	if toast == null or not toast.visible:
-		_fail("Settings tap should show SettingsToast")
+	await create_timer(0.6).timeout
+	var screen := hub.get_node_or_null("SettingsScreen") as Control
+	if screen == null or not screen.visible:
+		_fail("Settings tap should open SettingsScreen")
 		return
-	var header_bottom := (hub.get_node("RootVBox/TopBar") as Control).get_global_rect().end.y
-	if toast.get_global_rect().position.y < header_bottom:
-		_fail("SettingsToast should sit below the header")
+	var close := screen.find_child("CloseButton", true, false) as Control
+	if close == null or close.get_global_rect().position.distance_to(settings.get_global_rect().position) > 2.0:
+		_fail("Settings X should sit where the gear is")
+		return
+	close.emit_signal("clicked")
+	await create_timer(0.6).timeout
+	if is_instance_valid(screen) and screen.visible:
+		_fail("Settings X should close the screen")
 
 
 func _expect_near(what: String, got: float, want: float) -> void:
