@@ -34,13 +34,13 @@ Mekan, „cozy" zvuk: drvo, staklo, zvonca, mjehurići, harfa — ništa oštro,
 
 ## Muzika
 
-**Svaka sezona ima svoje tri teme** — `<sezona>_home` (hub i loot ekran), `<sezona>_arena` (stranica Arena), `<sezona>_run` (run) — ukupno 24. Tabela sezona (tonalitet, mjera, instrumenti, ambijent): [[muzika-sezone|muzika-sezone]].
+**Svaka sezona ima svoje tri teme** — `<sezona>_home` (hub i loot ekran), `<sezona>_arena` (stranica Arena), `<sezona>_run` (run) — ukupno 24. Svaka sezona je žanr (svoji instrumenti, ritam melodije, harmonija, tempo, soba): [[muzika-sezone|muzika-sezone]].
 
 | Nivo | Gdje svira | Karakter | Loop | U igri |
 |------|-----------|----------|------|--------|
-| `home` | hub (Home, Camp, Shop, Album), loot ekran | glavna tema sezone, melodija u prvom planu | 16 taktova, 32–55 s | ~−25 LUFS |
-| `arena` | stranica Arena | razigranije: ostinato, brži tempo, motiv home teme u taktovima 5–8 | 16 taktova, 25–40 s | ~−25 LUFS |
-| `run` | run (sve vrste) | skoro ambijent: pad na 4 akorda + okolina sezone, home motiv takt po takt | 32 s | ~−28 LUFS |
+| `home` | hub (Home, Camp, Shop, Album), loot ekran | glavna tema sezone, melodija u prvom planu | 8–32 takta, 30–62 s | ~−25 LUFS |
+| `arena` | stranica Arena | razigranije, forma po žanru (jig A + B, pitanje–odgovor, gradnja pa „drop"), home motiv u taktovima 5–8 | 16 taktova, 23–45 s | ~−25 LUFS |
+| `run` | run (sve vrste) | skoro ambijent s vlastitim tempom i ritamskim potpisom + okolina sezone, home motiv citiran | 6–16 taktova, 29–37 s | ~−28 LUFS |
 
 - Kod bira samo nivo: `Sfx.music_level("home" | "arena" | "run")`; `AudioManager.play_level` uzme temu **aktivne sezone** (nema li je — Country Bloom).
 - Promjena sezone (Home, kupovina, otključavanje, Dev reset): `AudioManager` provjerava `GameState.active_season_id` svakih 0,25 s i sam pretopi na temu nove sezone.
@@ -48,6 +48,13 @@ Mekan, „cozy" zvuk: drvo, staklo, zvonca, mjehurići, harfa — ništa oštro,
 - Duck (muzika se utiša pa vrati): T3 spajanje, kupovina, otključavanje sezone, čišćenje polja, kraj runa, revive.
 - Reklama: muzika stoji dok traje (`AdManager` → `Sfx.set_ad_playing`); app u pozadini: stoji.
 - Prva tema (home aktivne sezone) se traži u threadu čim se igra upali; ostale kad zatrebaju (stara počne da se gasi odmah, nova uđe frejm-dva kasnije). U memoriji su najviše 4 teme.
+- **Generator** (`scripts/audio/`, privremena muzika):
+  - `theory.py` — akordi, voicing, mjere, zapis melodije (klizanja, predudari, vezane note, triole), `--lint` harmonije;
+  - `instruments.py` — instrumenti, udaraljke i ambijenti;
+  - `fx.py` — soba: reverb, eho, chorus, nagib boje, sidechain, zasićenje;
+  - `season_songs.py` — kompozicije (+ „feel" izvođenja);
+  - `music_gen.py` — aranžman, miks, loop, render;
+  - `music_report.py` — koliko su sezone različite: zvuk, `--structure`, `--melody`, `--harmony`.
 
 ## Efekti — mapa događaja
 

@@ -168,8 +168,9 @@ def ep_soft(f, dur):
 def music_box(f, dur):
     """Muzička kutija: zupčić s neharmonijskim parcijalom, kratko, bez drška."""
     total = max(dur, 0.6) + 0.9
-    body = partials(f, total, [(1.0, 1.0), (2.0, 0.22), (5.4, 0.14), (8.9, 0.04)],
-                    decays=[1.1, 0.5, 0.16, 0.07])
+    # visoki neharmonijski parcijali zvone malo duže — kutija „svjetluca" i na zvučniku telefona
+    body = partials(f, total, [(1.0, 1.0), (2.0, 0.26), (5.4, 0.16), (8.9, 0.05)],
+                    decays=[1.1, 0.55, 0.3, 0.12])
     click = lowpass2(env_exp(highpass(noise(0.012, int(f) % 91), 2500), 0.0003, 0.003), 7000)
     sig = add((body, 1.0), (click, 0.08))
     return env_note(sig, 0.0015, 0.0, total, 0.05)
@@ -648,12 +649,12 @@ def owl(sec, at, seed=51, level=0.12):
     return out[: n_samples(sec)]
 
 
-def waves(sec, seed=61, period=7.0, level=0.5):
-    """More: niskopropusni šum u talasima + pjena na vrhu talasa."""
+def waves(sec, seed=61, period=7.0, level=0.5, dark=False):
+    """More: niskopropusni šum u talasima + pjena na vrhu talasa (dark = dublje, manje pjene)."""
     n = n_samples(sec)
     cycles = max(1, round(sec / period))
-    body = lowpass(noise(sec, seed, "pink"), 700)
-    foam = highpass(noise(sec, seed + 1), 3500)
+    body = lowpass(noise(sec, seed, "pink"), 420 if dark else 700)
+    foam = highpass(noise(sec, seed + 1), 3500) if not dark else lowpass(highpass(noise(sec, seed + 1), 1800), 4000)
     out = [0.0] * n
     s = math.sin
     for i in range(n):
@@ -776,3 +777,591 @@ def ride(seed=1):
                     decays=[0.45, 0.35, 0.3, 0.25])
     hiss = env_exp(highpass(noise(0.3, seed), 7000), 0.001, 0.08)
     return add((ping, 0.5), (hiss, 0.25))
+
+
+# ══ v2 (drugi ciklus): instrumenti koji pripadaju jednoj sezoni ═══════════════
+# Country Bloom: harmonika, lap steel, čelična gitara, bendžo · Frost: celesta, staklena
+# harmonika, harfa, gudači tremolo · Lantern: shakuhachi, koto tremolo, sho, hramsko zvono,
+# taiko · Amber: tin whistle, harmonika (akordeon), buzuki, violončelo sekcija, bodhrán ·
+# Moonlit: filcani klavir, muzička kutija, hor „ooh", vibrafon, kontrabas · Coral: najlon
+# gitara, alt flauta, steel pan, ukulele, marimba, konge / bongo / guiro · Starfall: supersaw,
+# synth bas, 808, gated hat · Ember: duduk, tanpura, oud, handpan, darbuka, riq.
+
+LN2_12 = math.log(2.0) / 12.0
+
+
+def tone(f, sec, harm, vib=(0.0, 0.0, 0.0), bend=(0.0, 0.08), trem=(0.0, 0.0), detune=0.0):
+    """Tabelarni ton: vibrato (rate, depth, delay), klizanje u notu (polutonovi, s), tremolo."""
+    tab = _table(_limit(f, tuple(harm)))
+    n = n_samples(sec)
+    out = [0.0] * n
+    N = TABLE_N
+    inc0 = f * (1.0 + detune) * N / SR
+    ph = 0.0
+    sin = math.sin
+    exp = math.exp
+    v_rate, v_depth, v_delay = vib
+    wv = TAU * v_rate / SR
+    d0 = n_samples(v_delay)
+    ramp_len = 0.3 * SR
+    b_semi, b_time = bend
+    bN = max(1, n_samples(b_time))
+    kb = b_semi * LN2_12
+    t_rate, t_depth = trem
+    wt = TAU * t_rate / SR
+    for i in range(n):
+        m = 1.0
+        if b_semi and i < bN:
+            m = exp(kb * (1.0 - i / bN))
+        if v_depth and i > d0:
+            m *= 1.0 + v_depth * min(1.0, (i - d0) / ramp_len) * sin(wv * i)
+        ph += inc0 * m
+        while ph >= N:
+            ph -= N
+        j = int(ph)
+        a = tab[j]
+        v = a + (tab[j + 1 if j + 1 < N else 0] - a) * (ph - j)
+        if t_depth:
+            v *= 1.0 - t_depth * (0.5 + 0.5 * sin(wt * i))
+        out[i] = v
+    return out
+
+
+def fast_partials(freqs, amps, decays, sec):
+    """Aditivno: sinusi s eksponencijalnim padom (rotacija, bez sin po uzorku)."""
+    n = n_samples(sec)
+    out = [0.0] * n
+    for f, a, d in zip(freqs, amps, decays):
+        if f >= SR * 0.45 or a == 0:
+            continue
+        w = TAU * f / SR
+        cw, sw = math.cos(w), math.sin(w)
+        k = math.exp(-1.0 / (d * SR)) if d > 0 else 1.0
+        c, s = 1.0, 0.0
+        amp = a
+        for i in range(n):
+            out[i] += amp * s
+            c, s = c * cw - s * sw, s * cw + c * sw
+            amp *= k
+    return out
+
+
+def _shape(sig, attack, release, dur):
+    return env_note(sig, attack, 0.0, dur, release)
+
+
+# ── Country Bloom ─────────────────────────────────────────────────────────────
+
+@lru_cache(maxsize=None)
+def harmonica(f, dur, slide=False):
+    total = dur + 0.12
+    reed = tone(f, total, ((1, 1.0), (2, 0.7), (3, 0.55), (4, 0.3), (5, 0.22), (6, 0.12), (7, 0.08)),
+                vib=(5.4, 0.008, 0.28), bend=(-1.6 if slide else -0.3, 0.1 if slide else 0.04), trem=(5.4, 0.16))
+    nasal = bandpass(reed, 1400.0, 1.1)
+    body = lowpass2(reed, 3400)
+    br = bandpass(noise(total, int(f) % 61 + 3), min(f * 2.5, 6000.0), 1.0)
+    sig = [0.55 * b + 0.6 * n_ + 0.05 * r for b, n_, r in zip(body, nasal, br)]
+    return _shape(sig, 0.03, 0.08, dur)
+
+
+@lru_cache(maxsize=None)
+def lap_steel(f, dur, slide=False):
+    total = dur + 0.7
+    sig = tone(f, total, ((1, 1.0), (2, 0.45), (3, 0.25), (4, 0.12), (5, 0.06)),
+               vib=(4.2, 0.006, 0.3), bend=(-2.0 if slide else -0.5, 0.2 if slide else 0.06))
+    return lowpass2(env_note(sig, 0.12, 2.2, dur, 0.6), 3000)
+
+
+@lru_cache(maxsize=None)
+def guitar_steel(f, dur, seed=1):
+    total = dur + 0.6
+    sig = pluck(f, total, 0.9975, 0.7, seed)
+    body = bandpass(sig, 220.0, 1.2)
+    sig = [x + 0.3 * b for x, b in zip(sig, body)]
+    return lowpass2(env_note(sig, 0.001, 0.0, dur + 0.2, 0.3), 5200)
+
+
+@lru_cache(maxsize=None)
+def harmonium(f, dur):
+    """Harmonij (orgulje na mijeh) za Country Bloom run: jezičci, mijeh „diše"."""
+    total = dur + 0.6
+    h = ((1, 1.0), (2, 0.55), (3, 0.4), (4, 0.22), (5, 0.16), (6, 0.08))
+    a = tone(f, total, h, trem=(2.6, 0.12))
+    b = tone(f, total, h, detune=0.0025)
+    sig = [x + 0.6 * y for x, y in zip(a, b)]
+    return lowpass2(env_note(sig, 0.25, 0.0, dur, 0.5), 2400)
+
+
+@lru_cache(maxsize=None)
+def bass_round(f, dur):
+    """Okrugli „električni" bas (Country Bloom): prsti, malo tijela."""
+    total = dur + 0.15
+    sig = tone(f, total, ((1, 1.0), (2, 0.35), (3, 0.12), (4, 0.05)))
+    return lowpass2(env_note(sig, 0.006, 0.9, dur, 0.1), 1100)
+
+
+# ── Frost Orchard ─────────────────────────────────────────────────────────────
+
+@lru_cache(maxsize=None)
+def glass_harmonica(f, dur):
+    """Staklena harmonika: čist ton koji „treperi" (dva glasa 0,7 Hz razmaknuta), spor napad."""
+    total = dur + 0.9
+    a = tone(f, total, ((1, 1.0), (2, 0.1), (3, 0.03)))
+    b = tone(f + 0.7, total, ((1, 0.7),))
+    sig = [x + y for x, y in zip(a, b)]
+    return lowpass(env_note(sig, 0.28, 0.0, dur, 0.8), 6000)
+
+
+@lru_cache(maxsize=None)
+def string_trem(f, dur):
+    """Gudači tremolo (gudalom brzo naprijed-nazad) — svjetluca kao inje."""
+    total = dur + 0.4
+    a = tone(f, total, saw_harm(8), vib=(5.0, 0.004, 0.2), trem=(12.5, 0.5), detune=-0.003)
+    b = tone(f, total, saw_harm(8), vib=(5.3, 0.004, 0.2), trem=(11.7, 0.5), detune=0.003)
+    sig = [x + y for x, y in zip(a, b)]
+    return lowpass2(env_note(sig, 0.15, 0.0, dur, 0.4), 3400)
+
+
+@lru_cache(maxsize=None)
+def icicle(f, dur=0.3):
+    return lowpass2(env_exp(fm(f, 0.5, 2.0, 0.6, 0.0), 0.001, 0.07), 9000)
+
+
+# ── Lantern Meadow ────────────────────────────────────────────────────────────
+
+@lru_cache(maxsize=None)
+def shakuhachi(f, dur, slide=False):
+    """Shakuhachi: puno daha, kasni dubok vibrato, „meri" klizanje u ton."""
+    total = dur + 0.3
+    sig = tone(f, total, ((1, 1.0), (2, 0.28), (3, 0.08)),
+               vib=(4.6, 0.013, 0.45), bend=(-1.2 if slide else -0.35, 0.18 if slide else 0.08))
+    br = bandpass(noise(total, int(f) % 73 + 5), min(f * 1.7, 7000.0), 0.8)
+    hiss = highpass(noise(total, int(f) % 71 + 9), 3000)
+    chiff = env_exp(bandpass(noise(0.06, int(f) % 17 + 1), min(f * 3, 7500.0), 1.5), 0.002, 0.02)
+    out = add((sig, 1.0), (br, 0.24), (hiss, 0.03), (chiff, 0.45))
+    return lowpass(env_note(out, 0.07, 0.0, dur, 0.22), 5200)
+
+
+@lru_cache(maxsize=None)
+def koto_trem(f, dur, seed=1):
+    """Koto tremolo: brzo ponavljanje trzaja (~14/s) dok traje nota."""
+    out = []
+    t = 0.0
+    k = 0
+    while t < dur:
+        mix_into(out, koto(f, 0.12, (seed + k) % 4 + 1), t, 0.75 if k % 2 else 1.0)
+        t += 1.0 / 14.0
+        k += 1
+    return out
+
+
+@lru_cache(maxsize=None)
+def sho(f, dur):
+    """Sho (japanske usne orgulje): klaster jezičaka, dugo „disanje"."""
+    total = dur + 1.4
+    sig = tone(f, total, ((1, 1.0), (2, 0.42), (3, 0.3), (4, 0.16), (5, 0.1), (6, 0.05)),
+               vib=(4.9, 0.0025, 0.0), trem=(0.4, 0.15))
+    br = bandpass(noise(total, int(f) % 57 + 2), min(f * 2.0, 6000.0), 1.0)
+    out = add((sig, 1.0), (br, 0.05))
+    return lowpass(env_note(out, 0.9, 0.0, dur, 1.2), 3200)
+
+
+@lru_cache(maxsize=None)
+def temple_bell(f, dur=6.0):
+    """Hramsko zvono: hum (½), osnovni, mala terca, kvinta, oktava — dug rep, lagano udaranje."""
+    sec = max(dur, 6.0)
+    ratios = (0.5, 0.503, 1.0, 1.004, 1.19, 1.5, 2.0, 2.52, 3.0)
+    amps = (0.55, 0.3, 1.0, 0.5, 0.45, 0.3, 0.38, 0.16, 0.1)
+    decays = (5.0, 5.0, 3.8, 3.6, 2.6, 2.2, 1.8, 1.0, 0.7)
+    body = fast_partials([f * r for r in ratios], amps, decays, sec)
+    strike = env_exp(lowpass(noise(0.05, int(f) % 31 + 4), 1800), 0.001, 0.012)
+    return lowpass(add((body, 1.0), (strike, 0.3)), 5000)
+
+
+@lru_cache(maxsize=None)
+def taiko(vel=1.0, seed=1):
+    tone_ = env_exp(osc(70, 0.6, "sine", 43), 0.003, 0.32)
+    thump = env_exp(lowpass(noise(0.25, seed), 260), 0.002, 0.08)
+    skin = env_exp(bandpass(noise(0.06, seed + 5), 1100, 1.2), 0.0006, 0.012)
+    return lowpass([x * vel for x in add((tone_, 1.0), (thump, 0.6), (skin, 0.25))], 3000)
+
+
+@lru_cache(maxsize=None)
+def temple_block(pitch=1.0):
+    imp = [0.0] * n_samples(0.12)
+    imp[0] = 1.0
+    ring = bandpass(imp, 820.0 * pitch, 14.0)
+    ping = env_exp(osc(820.0 * pitch, 0.08, "sine"), 0.0005, 0.025)
+    sig = add((ring, 6.0), (ping, 0.6))
+    return env_exp(sig, 0.0005, 0.05)
+
+
+# ── Amber Canopy ──────────────────────────────────────────────────────────────
+
+@lru_cache(maxsize=None)
+def tin_whistle(f, dur, slide=False):
+    total = dur + 0.1
+    sig = tone(f, total, ((1, 1.0), (2, 0.32), (3, 0.12), (4, 0.05)),
+               vib=(5.9, 0.005, 0.32), bend=(-0.9 if slide else 0.0, 0.07))
+    br = bandpass(noise(total, int(f) % 67 + 3), min(f * 2.0, 8000.0), 1.4)
+    out = add((sig, 1.0), (br, 0.05))
+    return lowpass(env_note(out, 0.018, 0.0, dur, 0.05), 7500)
+
+
+@lru_cache(maxsize=None)
+def accordion(f, dur):
+    """Harmonika (musette): tri jezička razdešena → živo treperenje, mijeh."""
+    total = dur + 0.12
+    h = ((1, 1.0), (2, 0.5), (3, 0.45), (4, 0.25), (5, 0.2), (6, 0.1), (7, 0.08))
+    a = tone(f, total, h, trem=(4.0, 0.06))
+    b = tone(f, total, h, detune=0.0035)
+    c = tone(f, total, h, detune=-0.0035)
+    sig = [x + 0.7 * y + 0.7 * z for x, y, z in zip(a, b, c)]
+    return lowpass2(env_note(sig, 0.05, 0.0, dur, 0.1), 3600)
+
+
+@lru_cache(maxsize=None)
+def bouzouki(f, dur, seed=1):
+    """Buzuki: dupli žičani parovi (blago razdešeni), svijetao, kratak."""
+    total = dur + 0.5
+    a = pluck(f, total, 0.996, 0.8, seed)
+    b = pluck(f * 1.004, total, 0.996, 0.8, seed + 2)
+    sig = [x + y for x, y in zip(a, b)]
+    if f < 260:
+        c = pluck(f * 2.0, total, 0.995, 0.8, seed + 4)
+        sig = [x + 0.5 * y for x, y in zip(sig, c)]
+    return lowpass2(env_note(sig, 0.001, 0.0, dur + 0.15, 0.2), 6000)
+
+
+@lru_cache(maxsize=None)
+def cello_section(f, dur):
+    total = dur + 0.9
+    parts = [tone(f, total, saw_harm(6), vib=(4.8 + k * 0.3, 0.005, 0.25), detune=d) for k, d in enumerate((-0.004, 0.0, 0.0045))]
+    sig = [a + b + c for a, b, c in zip(*parts)]
+    return lowpass2(env_note(sig, 0.45, 0.0, dur, 0.8), 1500)
+
+
+@lru_cache(maxsize=None)
+def bodhran(kind="low", seed=1):
+    if kind == "low":
+        t = env_exp(osc(78, 0.35, "sine", 54), 0.002, 0.2)
+        s = env_exp(bandpass(noise(0.08, seed), 320, 1.0), 0.001, 0.04)
+        return lowpass(add((t, 1.0), (s, 0.5)), 2000)
+    t = env_exp(osc(150, 0.15, "sine", 124), 0.001, 0.07)
+    s = env_exp(bandpass(noise(0.05, seed + 3), 950, 1.2), 0.0006, 0.018)
+    return lowpass(add((t, 0.8), (s, 0.6)), 3500)
+
+
+# ── Moonlit Warren ────────────────────────────────────────────────────────────
+
+@lru_cache(maxsize=None)
+def felt_piano(f, dur):
+    """Filcani klavir (tih, mekan): blago neharmonijski parcijali, filc umjesto čekića."""
+    total = dur + 1.2
+    B = 0.00035
+    freqs, amps, decays = [], [], []
+    for k in range(1, 9):
+        fk = f * k * math.sqrt(1.0 + B * k * k)
+        freqs.append(fk)
+        amps.append(1.0 / (k ** 1.6))
+        decays.append(2.8 / (k ** 0.7) if f < 500 else 1.8 / (k ** 0.7))
+    body = fast_partials(freqs, amps, decays, total)
+    felt = env_exp(lowpass(noise(0.05, int(f) % 29 + 6), 420), 0.002, 0.015)
+    sig = add((body, 1.0), (felt, 0.35))
+    return lowpass(env_note(sig, 0.008, 0.0, dur + 0.15, 0.45), 2600)
+
+
+@lru_cache(maxsize=None)
+def choir_ooh(f, dur):
+    total = dur + 1.2
+    raw = vib_osc(f, total, 4.4, 0.005, 0.0, tuple((h, 1.0 / h) for h in range(1, 12)))
+    f1 = bandpass(raw, 330.0, 3.0)
+    f2 = bandpass(raw, 820.0, 4.0)
+    low = lowpass(raw, 360.0)
+    sig = [0.9 * a + 0.35 * b + 0.4 * c for a, b, c in zip(f1, f2, low)]
+    return env_note(sig, 0.7, 0.0, dur, 1.1)
+
+
+# ── Coral Tide Garden ─────────────────────────────────────────────────────────
+
+@lru_cache(maxsize=None)
+def nylon(f, dur, seed=1):
+    total = dur + 0.7
+    sig = pluck(f, total, 0.998, 0.32, seed)
+    body = bandpass(sig, 180.0, 1.3)
+    sig = [x + 0.35 * b for x, b in zip(sig, body)]
+    return lowpass2(env_note(sig, 0.0015, 0.0, dur + 0.3, 0.4), 3600)
+
+
+@lru_cache(maxsize=None)
+def ukulele(f, dur, seed=1):
+    total = dur + 0.3
+    sig = pluck(f, total, 0.993, 0.6, seed)
+    body = bandpass(sig, 420.0, 1.5)
+    sig = [x + 0.3 * b for x, b in zip(sig, body)]
+    return lowpass2(env_note(sig, 0.001, 0.0, dur + 0.05, 0.08), 5200)
+
+
+@lru_cache(maxsize=None)
+def alto_flute(f, dur, slide=False):
+    total = dur + 0.25
+    sig = tone(f, total, ((1, 1.0), (2, 0.12), (3, 0.03)),
+               vib=(4.9, 0.005, 0.35), bend=(-0.7 if slide else 0.0, 0.1))
+    br = bandpass(noise(total, int(f) % 53 + 8), min(f * 2.0, 6000.0), 1.2)
+    out = add((sig, 1.0), (br, 0.08))
+    return lowpass(env_note(out, 0.08, 0.0, dur, 0.16), 3400)
+
+
+@lru_cache(maxsize=None)
+def bongo(pitch=1.0, seed=1):
+    t = env_exp(osc(430 * pitch, 0.12, "sine", 360 * pitch), 0.001, 0.05)
+    s = env_exp(bandpass(noise(0.03, seed), 2200, 1.4), 0.0005, 0.008)
+    return add((t, 1.0), (s, 0.5))
+
+
+@lru_cache(maxsize=None)
+def guiro(seed=1):
+    out = []
+    rng = random.Random(seed)
+    for k in range(16):
+        tick = env_exp(bandpass(noise(0.01, rng.randint(1, 99)), 2900, 4.0), 0.0005, 0.003)
+        mix_into(out, tick, k * 0.011, 0.6 + 0.4 * (k / 15))
+    return out
+
+
+# ── Starfall Glade ────────────────────────────────────────────────────────────
+
+@lru_cache(maxsize=None)
+def supersaw(f, dur):
+    total = dur + 1.0
+    voices = [tone(f, total, saw_harm(10), detune=d) for d in (-0.012, -0.005, 0.0, 0.005, 0.012)]
+    sig = [sum(v) for v in zip(*voices)]
+    return lowpass2(env_note(sig, 0.3, 0.0, dur, 0.9), 2300)
+
+
+@lru_cache(maxsize=None)
+def synth_bass(f, dur):
+    total = dur + 0.2
+    raw = saw_band(f, total, 12)
+    sig = lowpass(raw, 1300.0, 260.0)
+    subw = osc(f, total, "sine")
+    sig = [x + 0.6 * y for x, y in zip(sig, subw)]
+    return env_note(env_exp(sig, 0.003, 0.35), 0.003, 0.0, dur, 0.06)
+
+
+@lru_cache(maxsize=None)
+def synth_choir(f, dur):
+    total = dur + 1.0
+    raw = vib_osc(f, total, 5.0, 0.004, 0.0, tuple((h, 1.0 / h) for h in range(1, 14)))
+    raw2 = vib_osc(f * 1.006, total, 4.6, 0.004, 0.0, tuple((h, 1.0 / h) for h in range(1, 14)))
+    mixd = [a + b for a, b in zip(raw, raw2)]
+    f1 = bandpass(mixd, 760.0, 3.0)
+    f2 = bandpass(mixd, 1250.0, 4.0)
+    sig = [0.9 * a + 0.6 * b for a, b in zip(f1, f2)]
+    return env_note(sig, 0.5, 0.0, dur, 0.9)
+
+
+@lru_cache(maxsize=None)
+def kick808():
+    body = env_exp(osc(150, 0.45, "sine", 46), 0.002, 0.28)
+    click = env_exp(highpass(noise(0.01, 3), 2000), 0.0003, 0.002)
+    return lowpass(add((body, 1.0), (click, 0.25)), 2500)
+
+
+@lru_cache(maxsize=None)
+def hat_gated(seed=1):
+    return lowpass2(env_exp(highpass(noise(0.04, seed), 8000), 0.0005, 0.011), 12000)
+
+
+# ── Ember Fen ─────────────────────────────────────────────────────────────────
+
+@lru_cache(maxsize=None)
+def duduk(f, dur, slide=False):
+    """Duduk: dvostruki jezičak, nazalan i topao, izražajan vibrato, klizanja."""
+    total = dur + 0.25
+    raw = tone(f, total, ((1, 1.0), (2, 0.75), (3, 0.6), (4, 0.35), (5, 0.25), (6, 0.15), (7, 0.1), (8, 0.06)),
+               vib=(5.1, 0.011, 0.35), bend=(-1.4 if slide else -0.3, 0.17 if slide else 0.06))
+    f1 = bandpass(raw, 650.0, 1.3)
+    f2 = bandpass(raw, 1250.0, 2.0)
+    low = lowpass(raw, 420.0)
+    br = bandpass(noise(total, int(f) % 47 + 2), min(f * 3.0, 6000.0), 1.0)
+    sig = [0.9 * a + 0.5 * b + 0.45 * c + 0.03 * d for a, b, c, d in zip(f1, f2, low, br)]
+    return env_note(sig, 0.07, 0.0, dur, 0.15)
+
+
+@lru_cache(maxsize=None)
+def oud(f, dur, seed=1):
+    total = dur + 0.6
+    sig = pluck(f, total, 0.9965, 0.42, seed)
+    body = bandpass(sig, 300.0, 1.0)
+    sig = [x + 0.4 * b for x, b in zip(sig, body)]
+    return lowpass2(env_note(sig, 0.001, 0.0, dur + 0.25, 0.3), 3200)
+
+
+@lru_cache(maxsize=None)
+def darbuka(kind="doum", seed=1):
+    if kind == "doum":
+        t = env_exp(osc(132, 0.3, "sine", 96), 0.002, 0.15)
+        b = env_exp(lowpass(noise(0.1, seed), 420), 0.001, 0.03)
+        return add((t, 1.0), (b, 0.3))
+    if kind == "tek":
+        s = env_exp(bandpass(noise(0.04, seed + 2), 3600, 2.0), 0.0004, 0.022)
+        t = env_exp(osc(1100, 0.04, "sine"), 0.0004, 0.016)
+        return add((s, 1.0), (t, 0.35))
+    s = env_exp(bandpass(noise(0.04, seed + 4), 2500, 2.0), 0.0004, 0.028)
+    t = env_exp(osc(880, 0.05, "sine"), 0.0004, 0.02)
+    return add((s, 0.8), (t, 0.3))
+
+
+@lru_cache(maxsize=None)
+def riq(seed=1):
+    rng = random.Random(seed + 11)
+    jing = partials(1.0, 0.15, [(rng.uniform(5000, 5400), 0.5), (rng.uniform(6700, 7100), 0.4),
+                                (rng.uniform(8600, 9000), 0.25)], decays=[0.04, 0.03, 0.025])
+    hiss = env_exp(highpass(noise(0.06, seed + 7), 7000), 0.0005, 0.015)
+    return add((jing, 0.6), (hiss, 0.4))
+
+
+@lru_cache(maxsize=None)
+def chick(seed=1):
+    """Zatvoren hi-hat (Country Bloom kit)."""
+    hiss = env_exp(highpass(noise(0.05, seed), 7500), 0.0005, 0.018)
+    metal = partials(1.0, 0.05, [(6800, 0.3), (8300, 0.2)], decays=[0.015, 0.012])
+    return lowpass2(add((hiss, 1.0), (metal, 0.3)), 11000)
+
+
+# ── ambijent v2 ───────────────────────────────────────────────────────────────
+
+def tanpura(sec, root_hz, fifth_hz, seed=161, period=4.4):
+    """Tanpura bordun: Pa – Sa' – Sa' – Sa, svaka žica dugo zvoni; „jawari" — pojas prizvuka
+    koji se diže kroz notu (svjetlucavo zujanje)."""
+    out = layer(sec)
+    order = [fifth_hz, root_hz * 2, root_hz * 2, root_hz]
+    t = 0.0
+    k = 0
+    cache = {}
+    while t < sec:
+        f = order[k % 4]
+        if f not in cache:
+            ring = 3.6
+            raw = tone(f, ring, saw_harm(18))
+            bloom = bandpass(raw, 900.0, 2.2, 2800.0)
+            body = lowpass(raw, 600.0)
+            sig = [0.5 * a + 0.7 * b for a, b in zip(body, bloom)]
+            cache[f] = env_exp(sig, 0.004, 1.6)
+        mix_into(out, cache[f], t, 0.9 if k % 4 else 1.0)
+        t += period / 4.0
+        k += 1
+    return out[: n_samples(sec)]
+
+
+def sheep_bells(sec, at, seed=171, level=0.08):
+    out = layer(sec)
+    rng = random.Random(seed)
+    base = rng.uniform(900, 1250)
+    clank = fast_partials([base, base * 2.32, base * 4.1, base * 5.9], [1.0, 0.6, 0.35, 0.2], [0.5, 0.3, 0.15, 0.08], 1.0)
+    t = at
+    for _ in range(rng.randint(2, 4)):
+        mix_into(out, clank, t, level * rng.uniform(0.5, 1.0))
+        t += rng.uniform(0.25, 0.6)
+    return out[: n_samples(sec)]
+
+
+def icicles(sec, seed=181, rate=0.7, level=0.05):
+    out = layer(sec)
+    rng = random.Random(seed)
+    t = rng.uniform(0.2, 1.0)
+    while t < sec - 0.5:
+        mix_into(out, icicle(round(rng.uniform(2300, 4400), 1)), t, level * rng.uniform(0.4, 1.0))
+        t += rng.expovariate(rate)
+    return out[: n_samples(sec)]
+
+
+def sleigh_pass(sec, at, seed=191, length=6.0, level=0.07):
+    """Saonice prolaze u daljini: praporci 8/s, priđu pa odu (glasnoća + tama)."""
+    out = layer(sec)
+    rng = random.Random(seed)
+    t = 0.0
+    while t < length:
+        x = t / length
+        g = math.sin(math.pi * x) ** 2
+        mix_into(out, sleigh(rng.randint(1, 3)), at + t, level * g)
+        t += 0.125 + rng.uniform(-0.01, 0.01)
+    return lowpass2(out[: n_samples(sec)], 6500)
+
+
+def woodpecker(sec, at, seed=201, level=0.1):
+    out = layer(sec)
+    rng = random.Random(seed)
+    tap = temple_block(1.9)
+    n = rng.randint(10, 16)
+    for k in range(n):
+        mix_into(out, tap, at + k * 0.062, level * (1.0 - 0.04 * k))
+    return out[: n_samples(sec)]
+
+
+def crow(sec, at, seed=211, level=0.07):
+    out = layer(sec)
+    rng = random.Random(seed)
+    for k in range(rng.randint(1, 3)):
+        d = 0.33
+        f0 = rng.uniform(560, 650)
+        raw = saw_band(f0, d, 10)
+        rough = [x * (0.6 + 0.4 * math.sin(TAU * 38 * i / SR)) for i, x in enumerate(raw)]
+        caw = env_swell(bandpass(rough, 1250.0, 1.6, 1000.0), 0.15, 0.85)
+        mix_into(out, caw, at + k * 0.5, level)
+    return out[: n_samples(sec)]
+
+
+def katydids(sec, seed=221, level=0.04):
+    """Noćni skakavci (Moonlit): niže, „ch-ch-ch" grupe — drugačije od cvrčaka (Lantern)."""
+    out = layer(sec)
+    rng = random.Random(seed)
+    for v in range(2):
+        f = rng.uniform(2700, 3300)
+        burst = env_exp(bandpass(noise(0.05, seed + v), f, 3.0), 0.003, 0.012)
+        t = rng.uniform(0.0, 1.0)
+        while t < sec - 0.5:
+            for p in range(rng.randint(2, 3)):
+                mix_into(out, burst, t + p * 0.09, level * rng.uniform(0.6, 1.0))
+            t += rng.uniform(0.9, 1.6)
+    return out[: n_samples(sec)]
+
+
+def cosmic_hum(sec, seed=231):
+    n = n_samples(sec)
+    a = osc(55.0, sec, "sine")
+    b = osc(82.6, sec, "sine")
+    c = osc(110.3, sec, "sine")
+    air = bandpass(noise(sec, seed, "pink"), 1800.0, 0.7)
+    s = math.sin
+    return [0.5 * x + 0.3 * y + 0.2 * z + 0.15 * w * (0.5 + 0.5 * s(TAU * 2 * i / n)) for i, (x, y, z, w) in enumerate(zip(a, b, c, air))]
+
+
+def drips(sec, seed=241, rate=0.5, level=0.06):
+    out = layer(sec)
+    rng = random.Random(seed)
+    t = rng.uniform(0.3, 1.5)
+    while t < sec - 0.3:
+        f = rng.uniform(700, 1100)
+        plip = env_exp(osc(f, 0.06, "sine", f * 2.0), 0.002, 0.018)
+        mix_into(out, plip, t, level * rng.uniform(0.5, 1.0))
+        t += rng.expovariate(rate)
+    return out[: n_samples(sec)]
+
+
+@lru_cache(maxsize=None)
+def snare_soft(seed=1):
+    """Mekani doboš (Country Bloom kit): kratak ton tijela + šum žica, bez oštrine."""
+    body = env_exp(osc(196, 0.12, "sine", 168), 0.001, 0.05)
+    wires = env_exp(bandpass(noise(0.2, seed), 2600, 0.8), 0.001, 0.07)
+    return lowpass2(add((body, 0.7), (wires, 0.8)), 7000)
+
+
+@lru_cache(maxsize=None)
+def riser(f, dur):
+    """Uzlazni šum (Starfall Arena prije „dropa"): pojas klizi 400 → 6000 Hz, glasnoća raste."""
+    sec = max(dur, 0.5)
+    sig = bandpass(noise(sec, 251, "pink"), 400.0, 1.6, 6000.0)
+    n = len(sig)
+    return [x * (i / n) ** 2 for i, x in enumerate(sig)]

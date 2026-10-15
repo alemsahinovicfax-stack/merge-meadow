@@ -142,6 +142,7 @@ Paket `design_handoff_muncher_premium_pip/`, izvještaj [[../04-experience/desig
 - Arena A/B 2×: `arena_merges` 12–15 (bez) / 14–24 (sa), `arena_muncher_eats` 10–11 / 1–5, ostali 0–5 u oba — šum.
 - Paket (Android pck): zvuk +1,55 MB (efekti 549 KB, teme 1 038 KB) od 7,75 MB.
 - **Muzika po sezoni (24 teme):** OGG mono 24 kHz q3 ≈ 6 KB/s → 4,6 MB izvorno (3 stare teme na 44,1 kHz q4 bile 1 MB). U memoriji najviše 4 teme (`MUSIC_CACHE`), učitavanje u threadu kao i prije; provjera aktivne sezone svakih 0,25 s (poređenje stringa). `hub_boot_5s` sa sezonskom muzikom 11–17 kasnih (bilo 16–24), `settings_open_close` 1. Android pck 7,75 → 11,65 MB (teme u paketu 5,0 MB).
+- **Muzika, drugi ciklus (2026-10-15):** isti format i broj tema; teme 5,1 MB (bilo 4,6), Android pck 12,4 → 12,8 MB, `audio_smoke` budžet 7,6 / 8 MB. Kod i učitavanje bez promjene. Render svih 24 tema ≈ 9–10 min (čisti Python, 3 procesa); jedna tema `--only` ≈ 40–140 s.
 
 ## Pravila za animacije (iz ovih popravki)
 

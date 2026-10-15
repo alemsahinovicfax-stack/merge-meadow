@@ -758,10 +758,10 @@
    "season": "country_bloom",
    "level": "home",
    "title": "Sunny Pasture",
-   "sec": 45.71,
-   "bpm": 84,
-   "lufs": -18.0,
-   "db": -6.0
+   "sec": 38.4,
+   "bpm": 100,
+   "lufs": -13.9,
+   "db": -10.1
   },
   "country_bloom_arena": {
    "file": "res://assets/audio/music/country_bloom_arena.ogg",
@@ -770,10 +770,10 @@
    "season": "country_bloom",
    "level": "arena",
    "title": "Sunny Pasture",
-   "sec": 38.4,
-   "bpm": 100,
-   "lufs": -17.5,
-   "db": -6.5
+   "sec": 29.09,
+   "bpm": 132,
+   "lufs": -16.2,
+   "db": -7.8
   },
   "country_bloom_run": {
    "file": "res://assets/audio/music/country_bloom_run.ogg",
@@ -782,10 +782,10 @@
    "season": "country_bloom",
    "level": "run",
    "title": "Sunny Pasture",
-   "sec": 32.0,
-   "bpm": 60,
-   "lufs": -16.4,
-   "db": -10.6
+   "sec": 34.29,
+   "bpm": 84,
+   "lufs": -15.7,
+   "db": -11.3
   },
   "frost_orchard_home": {
    "file": "res://assets/audio/music/frost_orchard_home.ogg",
@@ -794,10 +794,10 @@
    "season": "frost_orchard",
    "level": "home",
    "title": "Silver Waltz",
-   "sec": 32.73,
-   "bpm": 88,
-   "lufs": -14.8,
-   "db": -9.2
+   "sec": 43.64,
+   "bpm": 132,
+   "lufs": -12.6,
+   "db": -11.4
   },
   "frost_orchard_arena": {
    "file": "res://assets/audio/music/frost_orchard_arena.ogg",
@@ -806,10 +806,10 @@
    "season": "frost_orchard",
    "level": "arena",
    "title": "Silver Waltz",
-   "sec": 36.92,
-   "bpm": 104,
-   "lufs": -16.6,
-   "db": -7.4
+   "sec": 34.29,
+   "bpm": 112,
+   "lufs": -15.9,
+   "db": -8.1
   },
   "frost_orchard_run": {
    "file": "res://assets/audio/music/frost_orchard_run.ogg",
@@ -818,10 +818,10 @@
    "season": "frost_orchard",
    "level": "run",
    "title": "Silver Waltz",
-   "sec": 32.0,
-   "bpm": 60,
-   "lufs": -12.4,
-   "db": -14.6
+   "sec": 30.0,
+   "bpm": 72,
+   "lufs": -12.6,
+   "db": -14.4
   },
   "lantern_meadow_home": {
    "file": "res://assets/audio/music/lantern_meadow_home.ogg",
@@ -830,10 +830,10 @@
    "season": "lantern_meadow",
    "level": "home",
    "title": "Lantern Walk",
-   "sec": 53.33,
-   "bpm": 72,
-   "lufs": -14.7,
-   "db": -9.3
+   "sec": 56.47,
+   "bpm": 68,
+   "lufs": -15.3,
+   "db": -8.7
   },
   "lantern_meadow_arena": {
    "file": "res://assets/audio/music/lantern_meadow_arena.ogg",
@@ -844,8 +844,8 @@
    "title": "Lantern Walk",
    "sec": 40.0,
    "bpm": 96,
-   "lufs": -17.9,
-   "db": -6.1
+   "lufs": -15.4,
+   "db": -8.6
   },
   "lantern_meadow_run": {
    "file": "res://assets/audio/music/lantern_meadow_run.ogg",
@@ -854,8 +854,8 @@
    "season": "lantern_meadow",
    "level": "run",
    "title": "Lantern Walk",
-   "sec": 32.0,
-   "bpm": 60,
+   "sec": 36.92,
+   "bpm": 52,
    "lufs": -13.5,
    "db": -13.5
   },
@@ -868,8 +868,8 @@
    "title": "Copper Leaves",
    "sec": 32.0,
    "bpm": 180,
-   "lufs": -13.4,
-   "db": -10.6
+   "lufs": -13.9,
+   "db": -10.1
   },
   "amber_canopy_arena": {
    "file": "res://assets/audio/music/amber_canopy_arena.ogg",
@@ -878,10 +878,10 @@
    "season": "amber_canopy",
    "level": "arena",
    "title": "Copper Leaves",
-   "sec": 25.26,
-   "bpm": 228,
-   "lufs": -15.4,
-   "db": -8.6
+   "sec": 22.86,
+   "bpm": 252,
+   "lufs": -14.2,
+   "db": -9.8
   },
   "amber_canopy_run": {
    "file": "res://assets/audio/music/amber_canopy_run.ogg",
@@ -890,10 +890,10 @@
    "season": "amber_canopy",
    "level": "run",
    "title": "Copper Leaves",
-   "sec": 32.0,
-   "bpm": 60,
-   "lufs": -16.8,
-   "db": -10.2
+   "sec": 35.56,
+   "bpm": 162,
+   "lufs": -13.8,
+   "db": -13.2
   },
   "moonlit_warren_home": {
    "file": "res://assets/audio/music/moonlit_warren_home.ogg",
@@ -902,10 +902,10 @@
    "season": "moonlit_warren",
    "level": "home",
    "title": "Moon Lullaby",
-   "sec": 43.64,
-   "bpm": 66,
-   "lufs": -14.2,
-   "db": -9.8
+   "sec": 41.74,
+   "bpm": 138,
+   "lufs": -15.2,
+   "db": -8.8
   },
   "moonlit_warren_arena": {
    "file": "res://assets/audio/music/moonlit_warren_arena.ogg",
@@ -914,10 +914,10 @@
    "season": "moonlit_warren",
    "level": "arena",
    "title": "Moon Lullaby",
-   "sec": 40.0,
-   "bpm": 96,
-   "lufs": -15.1,
-   "db": -8.9
+   "sec": 43.64,
+   "bpm": 88,
+   "lufs": -14.0,
+   "db": -10.0
   },
   "moonlit_warren_run": {
    "file": "res://assets/audio/music/moonlit_warren_run.ogg",
@@ -926,10 +926,10 @@
    "season": "moonlit_warren",
    "level": "run",
    "title": "Moon Lullaby",
-   "sec": 32.0,
-   "bpm": 60,
-   "lufs": -15.6,
-   "db": -11.4
+   "sec": 36.0,
+   "bpm": 120,
+   "lufs": -13.5,
+   "db": -13.5
   },
   "coral_tide_home": {
    "file": "res://assets/audio/music/coral_tide_home.ogg",
@@ -938,10 +938,10 @@
    "season": "coral_tide",
    "level": "home",
    "title": "Seashell Bossa",
-   "sec": 38.4,
-   "bpm": 100,
-   "lufs": -15.1,
-   "db": -8.9
+   "sec": 30.0,
+   "bpm": 128,
+   "lufs": -17.0,
+   "db": -7.0
   },
   "coral_tide_arena": {
    "file": "res://assets/audio/music/coral_tide_arena.ogg",
@@ -950,10 +950,10 @@
    "season": "coral_tide",
    "level": "arena",
    "title": "Seashell Bossa",
-   "sec": 34.29,
-   "bpm": 112,
-   "lufs": -15.0,
-   "db": -9.0
+   "sec": 36.92,
+   "bpm": 104,
+   "lufs": -16.2,
+   "db": -7.8
   },
   "coral_tide_run": {
    "file": "res://assets/audio/music/coral_tide_run.ogg",
@@ -962,10 +962,10 @@
    "season": "coral_tide",
    "level": "run",
    "title": "Seashell Bossa",
-   "sec": 32.0,
-   "bpm": 60,
-   "lufs": -15.0,
-   "db": -12.0
+   "sec": 29.09,
+   "bpm": 66,
+   "lufs": -14.1,
+   "db": -12.9
   },
   "starfall_glade_home": {
    "file": "res://assets/audio/music/starfall_glade_home.ogg",
@@ -974,10 +974,10 @@
    "season": "starfall_glade",
    "level": "home",
    "title": "Falling Stars",
-   "sec": 48.0,
-   "bpm": 80,
-   "lufs": -13.3,
-   "db": -10.7
+   "sec": 35.56,
+   "bpm": 108,
+   "lufs": -12.7,
+   "db": -11.3
   },
   "starfall_glade_arena": {
    "file": "res://assets/audio/music/starfall_glade_arena.ogg",
@@ -986,10 +986,10 @@
    "season": "starfall_glade",
    "level": "arena",
    "title": "Falling Stars",
-   "sec": 35.56,
-   "bpm": 108,
-   "lufs": -13.6,
-   "db": -10.4
+   "sec": 32.54,
+   "bpm": 118,
+   "lufs": -13.4,
+   "db": -10.6
   },
   "starfall_glade_run": {
    "file": "res://assets/audio/music/starfall_glade_run.ogg",
@@ -999,9 +999,9 @@
    "level": "run",
    "title": "Falling Stars",
    "sec": 32.0,
-   "bpm": 60,
-   "lufs": -14.6,
-   "db": -12.4
+   "bpm": 90,
+   "lufs": -13.6,
+   "db": -13.4
   },
   "ember_fen_home": {
    "file": "res://assets/audio/music/ember_fen_home.ogg",
@@ -1010,10 +1010,10 @@
    "season": "ember_fen",
    "level": "home",
    "title": "Firelight Marsh",
-   "sec": 54.86,
-   "bpm": 70,
-   "lufs": -14.7,
-   "db": -9.3
+   "sec": 61.94,
+   "bpm": 62,
+   "lufs": -13.9,
+   "db": -10.1
   },
   "ember_fen_arena": {
    "file": "res://assets/audio/music/ember_fen_arena.ogg",
@@ -1022,10 +1022,10 @@
    "season": "ember_fen",
    "level": "arena",
    "title": "Firelight Marsh",
-   "sec": 40.0,
-   "bpm": 96,
-   "lufs": -15.4,
-   "db": -8.6
+   "sec": 44.8,
+   "bpm": 150,
+   "lufs": -17.6,
+   "db": -6.4
   },
   "ember_fen_run": {
    "file": "res://assets/audio/music/ember_fen_run.ogg",
@@ -1036,8 +1036,8 @@
    "title": "Firelight Marsh",
    "sec": 32.0,
    "bpm": 60,
-   "lufs": -16.5,
-   "db": -10.5
+   "lufs": -16.9,
+   "db": -10.1
   }
  },
  "note": "Generisano: scripts/audio/sfx_gen.py (efekti) i music_gen.py (muzika). db = pomak do ciljne glasnoće kategorije; source real = pravi zvuk, generator ga ne dira."

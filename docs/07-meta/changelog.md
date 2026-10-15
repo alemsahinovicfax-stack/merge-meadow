@@ -9,6 +9,23 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-15
+
+- **Muzika po sezoni — drugi ciklus** (zahtjev „radi na unikatnosti, nemoj da zvuči slično kao druge sezone", izvještaj `zvuk-izvjestaj.md` § Drugi ciklus, dizajn `muzika-sezone.md`):
+  - Svih 24 tema napravljeno ponovo u 10 rundi, s mjerenjem poslije svake. Svaka sezona je žanr: country / bluegrass, klasični valcer / polka, japanski festival, keltski folk / jig, uspavanka / swing, bossa / calypso, elektronika, modalni „world" (7/8).
+  - **Instrumenti:** 101 zvuk, nijedan se ne dijeli između sezona (u prvom ciklusu npr. shaker u 7 sezona, topli pad u 5).
+  - **Ritam melodije po žanru:** country „push", valcer s vezanim notama, shakuhachi *ma*, hemiola uspavanke, bossa anticipacije, calypso 3+3+2, tresillo, duduk triole. Ranije su sve sezone koristile iste ćelije (♩♩ u svih 8), bez sinkopa.
+  - **Harmonija po žanru:** country II7, klasični V/V i silazni bas, „royal road", keltski bVII, pedal + molska iv, tritonusna zamjena, lidijsko I–II. Ranije je 5 od 8 runova imalo identičnu progresiju.
+  - **„Osjećaj" izvođenja:** elektronika kvantizovana, folk labav, jazz melodija kasni iza dobe. Plus tempo, mjera i „soba" (reverb, eho, nagib, sidechain) po sezoni.
+  - **Generator:**
+    - `fx.py` (soba);
+    - zapis vezanih nota (`E5:0.5+1` / `=:1`) i triola (`1/3`);
+    - stroži `--lint`: anticipacija prema sljedećem akordu, nota pola tona ispod akorda, nota držana preko promjene akorda;
+    - balans dijelova mjeren dok sviraju;
+    - akord `7#11`.
+  - **`music_report.py`:** sličnost tema po zvuku (MFCC boja, ritam, svjetlina) i iz zapisa — `--structure`, `--melody`, `--harmony`.
+  - Kod igre bez promjene: isti nazivi fajlova, katalog `db` preračunat.
+
 ## 2026-10-14
 
 - **Muzika po sezoni** (zahtjev „za svaku sezonu posebno muziku na sva tri nivoa", dizajn `muzika-sezone.md`):

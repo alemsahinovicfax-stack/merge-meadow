@@ -18,6 +18,7 @@ CHORD_TYPES = {
     "add9": (0, 4, 7, 14), "madd9": (0, 3, 7, 14),
     "sus2": (0, 2, 7), "sus4": (0, 5, 7), "7sus4": (0, 5, 7, 10), "9sus4": (0, 5, 7, 10, 14),
     "maj7#11": (0, 4, 7, 11, 18), "13": (0, 4, 7, 10, 21),
+    "7#11": (0, 4, 7, 10, 18),   # lidijski dominantni (tritonusna zamjena u bossi)
     "dim": (0, 3, 6), "m7b5": (0, 3, 6, 10), "aug": (0, 4, 8),
 }
 
@@ -90,7 +91,7 @@ class Chord:
             return "sus"
         if q.startswith("m") and not q.startswith("maj"):
             return "minor"
-        if q in ("7", "9", "13"):
+        if q in ("7", "9", "13", "7#11"):
             return "dominant"
         return "major"
 
@@ -169,6 +170,32 @@ def voicing(chord, lo=55, hi=76, prev=None, voices=4):
     return best
 
 
+def spread_voicing(chord, lo=43, hi=72, voices=5):
+    """Otvoren položaj (gitara, klavir): korijen dolje, ostali tonovi akorda iznad kvinte."""
+    root = place(chord.bass, lo)
+    upper = voicing(chord, root + 7, hi, None, voices - 1)
+    return [root] + [m for m in upper if m > root]
+
+
+def stack_voicing(chord, scale_pcs, lo=55, hi=80, voices=4):
+    """Kvartalno / pentatonsko slaganje (Lantern): od korijena svaki drugi ton ljestvice —
+    otvoren, „istočni" zvuk umjesto terci. Korijen van ljestvice → blizak položaj."""
+    sc = sorted(set(scale_pcs))
+    if chord.root not in sc:
+        return voicing(chord, lo, hi, None, voices)
+    k = sc.index(chord.root)
+    out = []
+    cur = place(chord.root, lo)
+    out.append(cur)
+    while len(out) < voices:
+        k = (k + 2) % len(sc)
+        cur = place(sc[k], cur + 1)
+        if cur > hi:
+            break
+        out.append(cur)
+    return out
+
+
 def bass_note(pc, lo=36):
     """Bas u oktavi 2 (C2..B2 = 36..47)."""
     return place(pc, lo)
@@ -177,9 +204,13 @@ def bass_note(pc, lo=36):
 # ── mjera i vrijeme ───────────────────────────────────────────────────────────
 
 METERS = {
-    "4/4": {"beats": 4, "strong": (0, 2)},
-    "3/4": {"beats": 3, "strong": (0,)},
-    "6/8": {"beats": 6, "strong": (0, 3)},
+    "4/4": {"beats": 4, "strong": (0, 2), "unit": "q"},
+    "3/4": {"beats": 3, "strong": (0,), "unit": "q"},
+    "6/8": {"beats": 6, "strong": (0, 3), "unit": "e"},
+    # 12/8: četiri „ljuljajuće" dobe po tri osmine (uspavanka); jake 0 i 6
+    "12/8": {"beats": 12, "strong": (0, 6), "unit": "e"},
+    # 7/8: 2+2+3 (balkanski / bliskoistočni ples); naglasci 0, 2, 4
+    "7/8": {"beats": 7, "strong": (0,), "unit": "e"},
 }
 
 
@@ -193,7 +224,8 @@ class Grid:
         self.meter = meter
         self.beats = METERS[meter]["beats"]
         self.strong = METERS[meter]["strong"]
-        self.swing = swing if meter != "6/8" else 0.5
+        self.swing = swing if METERS[meter]["unit"] == "q" else 0.5
+        self.unit = METERS[meter]["unit"]
         self.beat_sec = 60.0 / bpm
         self.bar_sec = self.beats * self.beat_sec
         self.length = bars * self.bar_sec
@@ -250,28 +282,69 @@ class Progression:
         return out
 
 
-def parse_line(text):
-    """"A5:2 F#5:1 r:1" → [(beat, midi|None, dur)]."""
+def _beats(x):
+    """"0.5" ili razlomak "1/3" (triola)."""
+    num, _, den = x.partition("/")
+    return float(num) / float(den) if den else float(num)
+
+
+def parse_line_ex(text):
+    """Zapis s ukrasima → [{beat, midi|None, dur, tie, grace, slide}].
+    "~A5:1"    = klizanje u notu odozdo (flauta, harmonika, lap steel, duduk)
+    "B5>A5:1"  = predudar B5 (kratko, prije dobe) pa A5
+    "E5:0.5+1" = vezana nota: zauzme 0,5 dobe ovog takta i zvuči još 1 dobu u sljedećem
+                 (anticipacija — bossa, country „push"); sljedeći takt počinje sa "=:1"
+    "=:1"      = nastavak vezane note (broji se u takt, ne svira)
+    "G4:1/3"   = trajanje kao razlomak (triole: melizmi duduka)"""
     notes = []
     t = 0.0
     for tok in text.split():
         name, _, dur = tok.partition(":")
-        d = float(dur) if dur else 1.0
-        notes.append((t, None if name in ("r", "-") else midi(name), d))
+        tie = 0.0
+        if "+" in dur:
+            dur, _, extra = dur.partition("+")
+            tie = _beats(extra)
+        d = _beats(dur) if dur else 1.0
+        slide = name.startswith("~")
+        name = name.lstrip("~")
+        grace = None
+        if ">" in name:
+            g, _, name = name.partition(">")
+            grace = midi(g)
+        m = None if name in ("r", "-", "=") else midi(name)
+        notes.append({"beat": t, "midi": m, "dur": d, "tie": tie, "grace": grace, "slide": slide})
         t += d
     return notes
 
 
-def melody_events(bars):
-    """{takt: "zapis"} ili lista zapisa → [(bar, beat, midi, dur)] bez pauza."""
+def parse_line(text):
+    """"A5:2 F#5:1 r:1" → [(beat, midi|None, dur)] (ukrasi se ignorišu; dur = dio u ovom taktu)."""
+    return [(n["beat"], n["midi"], n["dur"]) for n in parse_line_ex(text)]
+
+
+def melody_events_ex(bars):
+    """{takt: "zapis"} → [(bar, nota-dict)] bez pauza, s ukrasima."""
     items = bars.items() if isinstance(bars, dict) else enumerate(bars)
     out = []
     for bar, text in items:
         if not text:
             continue
-        for beat, m, dur in parse_line(text):
-            if m is not None:
-                out.append((int(bar), beat, m, dur))
+        for n in parse_line_ex(text):
+            if n["midi"] is not None:
+                out.append((int(bar), n))
+    out.sort(key=lambda x: (x[0], x[1]["beat"]))
+    return out
+
+
+def melody_events(bars):
+    """{takt: "zapis"} ili lista zapisa → [(bar, beat, midi, dur)] bez pauza. Vezana nota
+    (anticipacija) se provjerava i kao nota na prvoj dobi sljedećeg takta — mora pripadati
+    sljedećem akordu."""
+    out = []
+    for bar, n in melody_events_ex(bars):
+        out.append((bar, n["beat"], n["midi"], n["dur"]))
+        if n["tie"]:
+            out.append((bar + 1, 0.0, n["midi"], n["tie"]))
     out.sort()
     return out
 
@@ -302,12 +375,19 @@ def lint(name, prog, events, grid, scale_pcs):
             warns.append("van ljestvice: " + where)
         if strong and pc not in ch.allowed():
             warns.append("jaka doba, nije ton akorda: " + where)
-        long_dur = 2.0 if grid.meter == "6/8" else 1.0   # duga nota = bar četvrtina
-        if dur >= long_dur and pc not in ch.pcs:
+        long_dur = 2.0 if grid.unit == "e" else 1.0   # duga nota = bar četvrtina
+        if dur >= long_dur and pc not in ch.pcs and pc not in ch.allowed():
             for cpc in ch.pcs:
-                if (pc - cpc) % 12 == 1 and pc not in ch.allowed():
+                if (pc - cpc) % 12 == 1:
                     warns.append("sudar (mala sekunda iznad %s): %s" % (name_of(60 + cpc)[:-1], where))
                     break
+                if (cpc - pc) % 12 == 1:
+                    warns.append("sudar (mala sekunda ispod %s): %s" % (name_of(60 + cpc)[:-1], where))
+                    break
+        # nota koja se drži preko promjene akorda u taktu mora pristajati i novom akordu
+        for s0, _, ch2 in prog.segments(bar, grid.beats):
+            if beat + 1e-6 < s0 < beat + dur - 1e-6 and pc not in ch2.allowed():
+                warns.append("držana preko promjene u %s: %s" % (ch2.symbol, where))
     return warns
 
 

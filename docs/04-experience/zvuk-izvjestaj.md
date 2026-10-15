@@ -9,7 +9,7 @@ povezano:
   - performanse
   - CHECKPOINT
   - changelog
-ai_sažetak: "Zvuk cijele igre (2026-10-14): AudioManager + katalog, 59 efekata i 3 teme sintetizovane skriptom (privremeno), spojeno na svaki događaj; provjereno mjerenjem (snimak miksa iz igre, LUFS, vrh −0,7 dBTP), FPS bez razlike u A/B; tura za slušanje i šta je sljedeće (pravi zvuk)."
+ai_sažetak: "Zvuk cijele igre (2026-10-14): AudioManager + katalog, 59 efekata i 24 sezonske teme sintetizovane skriptom (privremeno; drugi ciklus 2026-10-15 — svaka sezona svoj žanr: instrumenti, ritam melodije, harmonija), spojeno na svaki događaj; provjereno mjerenjem (snimak miksa iz igre, LUFS, vrh −0,7 dBTP), FPS bez razlike u A/B; tura za slušanje i šta je sljedeće (pravi zvuk)."
 ---
 
 # Zvuk cijele igre — izvještaj
@@ -80,6 +80,95 @@ Na zahtjev „za svaku sezonu posebno muziku na sva tri nivoa": **24 teme**, sva
 | Amber Arena | jig u 6/8 — najživlja Arena; javi ako je prebrza |
 | Ember Fen run | žar i žabe ispod muzike — ne smiju biti „strašni" |
 
+## Drugi ciklus muzike (2026-10-15)
+
+Na zahtjev „radi na unikatnosti, nemoj da zvuči slično kao druge sezone": svih 24 tema napravljeno ponovo, u 10 rundi, s mjerenjem poslije svake. Dizajn i tabele po sezoni: [[muzika-sezone]].
+
+### Šta je bio problem (izmjereno)
+
+1. **Isti zvučni pribor.** Iste FM zvona, trzalice i reverb u svim sezonama. Na primjer, shaker je svirao u 7 sezona, a topli pad u 5.
+2. **Isti ritam melodija.** Ritmičku ćeliju ♩♩ koristilo je svih 8 sezona, a još tri ćelije po 5–7 sezona. Nijedna melodija nije imala sinkopu.
+3. **Ista harmonija.** 5 od 8 run tema je imalo *identičnu* progresiju (I–vi–IV–V s maj9 akordima). Home teme pet sezona su sve bile I–vi–ii–V.
+
+Prve runde (novi instrumenti po žanru) riješile su (1), ali mjera melodija je tada pokazala da su (2) i (3) ostali isti — ritam melodija je čak bio sličniji nego u prvom ciklusu. Zato su runde 6–10 prepisale melodije i akorde u jeziku svakog žanra.
+
+### Šta je urađeno
+
+| Sloj | Prvi ciklus | Drugi ciklus |
+|------|-------------|--------------|
+| Instrumenti | zajednički FM / trzaj „pribor" | 101 zvuk, svaki samo u jednoj sezoni |
+| Ritam melodije | iste ćelije svuda | po žanru: country „push", valcer s vezanim notama, shakuhachi *ma*, hemiola uspavanke, bossa anticipacije, calypso 3+3+2, tresillo, duduk triole |
+| Harmonija | I–vi–IV–V / ii–V svuda | po žanru: country II7, klasični V/V i silazni bas, „royal road", keltski bVII, pedal + molska iv, tritonusna zamjena, lidijsko I–II |
+| Izvedba | isti „ljudski" šum za sve | kvantizovano (elektronika) … labavo (folk); jazz melodija kasni iza dobe |
+| Soba | sličan reverb | reverb, eho, nagib boje, zasićenje i sidechain po sezoni |
+| Tempo / mjera (doba = ♩ ili ♩.) | home 60–100, Arene 76–112; 4/4, 3/4, 6/8; svi runovi isti predložak bez tempa | home 46–132, Arene 84–132 (+ Ember 7/8 ♪ 150); 4/4, 3/4, 6/8, 12/8, 7/8; svaki run svoj tempo i ritamski potpis |
+
+Usput u generatoru:
+- `fx.py` — soba sezone;
+- zapis vezanih nota i triola;
+- „feel" izvođenja;
+- dijelovi se balansiraju dok sviraju (motiv od 4 takta više ne ispada glasniji);
+- stroži `--lint` (anticipacija prema sljedećem akordu, nota pola tona ispod akorda, nota držana preko promjene akorda) — našao je 4 sudara, ispravljeni; valcer dobio pravu 4–3 zadržicu (A7sus4 → A7);
+- Moonlit home je dobio svjetliju muzičku kutiju: na zvučniku telefona je bio pretaman (visoke −27 → −24 dB ispod ukupnog).
+
+### Mjere — prije i poslije
+
+`music_report.py` (zvuk iz OGG fajlova; melodija i harmonija iz zapisa). **Zvuk: udaljenost** — veće = različitije. **Melodija i harmonija: sličnost** — manje = različitije.
+
+| Mjera | Prvi ciklus | Ciklus 2 prije runde 6 | Ciklus 2 završno |
+|-------|-------------|------------------------|------------------|
+| Zvuk home — najbliži par / prosjek | 0,55 / 0,74 | 0,67 / 0,76 | **0,69 / 0,78** |
+| Zvuk arena | 0,42 / 0,72 | 0,52 / 0,73 | **0,62 / 0,76** |
+| Zvuk run | 0,50 / 0,69 | 0,61 / 0,70 | **0,65 / 0,77** |
+| Ritam melodije home — najsličniji par / prosjek najbližeg | 0,93 / 0,84 | 0,94 / 0,93 | **0,68 / 0,41** |
+| Ritam melodije arena | 0,99 / 0,88 | 0,92 / 0,76 | **0,65 / 0,43** |
+| Ćelije koje dijeli 4+ sezone (home + arena) | 4 + 6 | 4 + 5 | **0 + 1** |
+| Harmonija home — najsličniji par / prosjek | 0,90 / 0,72 | 0,88 / 0,71 | **0,75 / 0,62** |
+| Harmonija arena | 0,88 / 0,68 | 0,88 / 0,68 | **0,68 / 0,59** |
+| Harmonija run | 1,00 / 0,89 | 1,00 / 0,86 | **0,57 / 0,47** |
+| Parovi sličnosti ≥ 0,8 (melodija + harmonija, sva 3 nivoa) | 53 | 49 | **0** |
+| Instrumenti dijeljeni između sezona | npr. shaker u 7, pad u 5 | 0 | **0** |
+
+Šta mjere ne vide:
+- **Preostali najbliži parovi po zvuku** (≈ 0,6–0,7) su bliski samo po gruboj svjetlini i gustini. Po boji i ritmu su daleko (boja ≥ 0,67, ritam ≥ 0,5).
+- **Srodni žanrovi ostaju srodni.** Bluegrass i keltski jig dijele porijeklo, polka i calypso su obje plesne I–IV–V7. Razlikuje ih instrument, ritam i tempo, ne akordi.
+- **Mjera ne zna da li je lijepo** — to odlučuje tvoje uho.
+
+### Provjereno
+
+- **U igri** (snimak Master busa, sve sezone × 3 nivoa, default slideri):
+  - home −24,7 … −26,0 LUFS, run −26,8 … −28,8 — sezone ujednačene unutar ~2 dB;
+  - Arene −24,4 … −27,2; jedino Starfall Arena počinje na −29,3, jer je njen početak „gradnja" pa „drop". Uvod je podignut 2 dB da Arena ne zvuči prazno.
+  - Vrhovi −12 … −20 dBFS — efekti imaju prostora.
+- **Loopovi:** šav bez skoka i klika na svih 24. Razlika glasnoće na šavu je prirodna: kraj fraze → prvi takt.
+- **Testovi:**
+  - `--lint` 0 upozorenja;
+  - suita 72 / 72, exit 0, save nijednom nije promijenjen;
+  - GUT 42 / 42;
+  - `audio_smoke`: 24 teme, budžet 7,6 / 8 MB.
+- **Android pck** 12,4 → 12,8 MB; svih 24 tema u paketu, Python skripte nisu.
+- **Veličina:** teme 5,1 MB (bilo 4,6); render svih 24 ≈ 9–10 min (3 procesa).
+
+### Tura za slušanje (drugi ciklus)
+
+Najbrže: Settings → Dev → otključaj sezone, pa otvaraj polja jednu po jednu (home), Arena, run.
+
+| Sezona | Home | Arena | Run |
+|--------|------|-------|-----|
+| Country Bloom | harmonika s ponovljenim notama, lap steel u B dijelu, „ragtime" akordi | bluegrass: bendžo + harmonika u osminama, dobro citira motiv | šetnja: gitara + harmonij, ovčja zvona |
+| Frost Orchard | valcer: celesta, pa staklena harmonika; duge note preko takta | polka: pizzicato + celesta | celesta treperi nad silaznim basom, molski akord „zime" |
+| Lantern Meadow | shakuhachi: duga nota, brzi ukras, tišina | festival: taiko, flauta zove – koto odgovara | sho na jednom basu, hramsko zvono |
+| Amber Canopy | 6/8 tin whistle s predudarima, bodhrán, F-dur akord (keltski) | jig: violina + whistle, buzuki | gitara prstima, violončela |
+| Moonlit Warren | uspavanka: muzička kutija, „tri note preko četiri dobe" | swing: vibrafon kasni iza dobe, walking bas | lomljeni akordi filcanog klavira, sova |
+| Coral Tide | bossa: flauta ulazi „na i", kromatski akordi | calypso: marimba 3+3+2, ukulele chop | steel pan ostinato, tamni talasi |
+| Starfall Glade | elektronika tačna kao mašina, supersaw „diše" | gradnja pa drop | puls nad jednim basom, meteori |
+| Ember Fen | duduk s melizmima, tanpura, darbuka od polovine | 7/8 (2+2+3), oud | otkucaj srca, žabe |
+
+**Pitanja za tebe:**
+1. Da li te ijedna sezona još podsjeća na drugu? Koje dvije?
+2. Koji žanr najbolje „sjeda" na sezonu, a koji najlošije?
+3. Je li Starfall previše mašinski, a Moonlit pretaman na telefonu?
+
 ## Kako radi
 
 - **`AudioManager`** (autoload): pool od 12 playera za efekte i 2 za muziku.
@@ -90,7 +179,8 @@ Na zahtjev „za svaku sezonu posebno muziku na sva tri nivoa": **24 teme**, sva
 - **Generatori** `scripts/audio/`:
   - `dsp.py` — gradivni blokovi: FM zvona, Karplus-Strong trzaj, filteri, reverb, loop bez šava;
   - `sfx_gen.py` — 59 efekata + katalog;
-  - `music_gen.py` — 3 teme;
+  - muzika: `theory.py` (akordi, zapis, `--lint`), `instruments.py`, `fx.py` (soba), `season_songs.py` (kompozicije), `music_gen.py` (aranžman, miks, render) — 24 teme;
+  - `music_report.py` — koliko su sezone različite (zvuk, `--structure`, `--melody`, `--harmony`);
   - `--measure` — glasnoća pravih fajlova.
 
 ## Provjera bez sluha

@@ -35,21 +35,31 @@ Može se mijenjati **sezona po sezona**: fajl `game/assets/audio/music/<sezona>_
 
 > **Project:** *Merge Meadow* — a cozy mobile game (Android first). You merge seeds into flowers in a small arena, then run through seasonal meadows as Pip, a little bunny, collecting seeds. Pastel, flat-cartoon art; soft, friendly, never stressful. Sessions are short and often played on a phone speaker, sometimes on public transport.
 >
-> **What I need:** the game has **8 seasons**, each with its own look and mood. Each season needs **3 instrumental loops** that share the same key and main motif:
+> **What I need:** the game has **8 seasons**, each with its own look, mood **and musical genre** — no two seasons should sound alike (different instruments, tempo, meter and groove). Each season needs **3 instrumental loops** that share the same key and main motif:
 > - **Home** — menus, home screen, shop, collection album (heard the most): the season's main theme, melody in front, calm.
 > - **Arena** — the merge puzzle screen: same theme, more playful (ostinato, a bit faster).
 > - **Run** — the running level: almost ambient (pad + nature sounds of the season); the home motif may appear slowly; must not fight with sound effects; no drums.
 >
 > | # | Season | Mood | Key / meter | Home tempo · instruments | Arena | Run ambience |
 > |---|--------|------|-------------|--------------------------|-------|--------------|
-> | 1 | **Country Bloom** | warm fields, sunny afternoon | F major, 4/4 swing | 84 · Rhodes, harp, glockenspiel, brushes | 100 · marimba, whistle | birds, wind |
-> | 2 | **Frost Orchard** | crisp winter orchard, silver blossom | D major (Lydian sparkle), **waltz 3/4** | 88 · music box / celesta, harp, pizzicato, strings, triangle | 104 · pizzicato polka, sleigh bells | snowy wind, wind chimes |
-> | 3 | **Lantern Meadow** | dusk, paper lanterns, fireflies in tall grass | Eb major **pentatonic** | 72 · bamboo flute, koto, kalimba, frame drum | 96 · kalimba ostinato, woodblock | crickets, fireflies |
-> | 4 | **Amber Canopy** | late-autumn sun through high leaves | G major, **6/8** | 60 (dotted ♩) · clarinet, fingerpicked guitar, cello, tambourine | 76 · **jig**: banjo, fiddle, bodhrán | rustling leaves, wind |
-> | 5 | **Moonlit Warren** | night blooms under a quiet moon, bunny burrows | Ab major, **lullaby 3/4** | 66 · vibraphone, harp, soft choir | 96 · **brush-swing**: upright bass, Rhodes, vibes | crickets, owl, stars |
-> | 6 | **Coral Tide Garden** | salt breeze, seashell petals | A major, **bossa nova** | 100 · flute, nylon guitar, Rhodes, rim clicks | 112 · **calypso**: steel pan, marimba, congas | waves, gulls |
-> | 7 | **Starfall Glade** | petals catching the night sky, falling stars | Bb **Lydian** | 80 · airy lead, glassy arpeggio, warm synth pad | 108 · synth arpeggio, soft pulse | sparkles, meteors |
-> | 8 | **Ember Fen** | low firelight over marsh blooms — mysterious but warm, never scary | D **Dorian** | 70 · low flute, tongue drum / handpan, D–A drone, frame drum | 96 · tongue drum ostinato, clarinet | crackling embers, frogs |
+> | 1 | **Country Bloom** | warm fields, sunny afternoon — country / bluegrass | F major, 4/4 straight eighths | 100 · harmonica, lap steel, steel-string guitar boom-chick, light kit | 132 · **bluegrass**: banjo rolls, whistle | walking strum, harmonium, birds, sheep bells |
+> | 2 | **Frost Orchard** | crisp winter orchard, silver blossom — classical | D major (Lydian sparkle), **waltz 3/4** | 132 · celesta then glass harmonica, harp oom-pah-pah, string tremolo, sleigh bells | 112 · **polka**: pizzicato, celesta + glockenspiel | twinkling celesta, glass pad, icicles, distant sleigh |
+> | 3 | **Lantern Meadow** | dusk lantern festival in tall grass — Japanese | Eb major **pentatonic** | 68 · shakuhachi (bends, echo), koto, sho, taiko, temple bell | 96 · **festival drums**: taiko, flute call – koto answer | very slow: sho, temple bell, crickets, wind chimes |
+> | 4 | **Amber Canopy** | late-autumn sun through high leaves — Celtic folk | G major, **6/8** | 60 (dotted ♩) · tin whistle (cuts), fiddle harmony, fingerpicked guitar, accordion, bodhrán | 84 · **jig** (A + B part): fiddle, whistle, bouzouki | 6/8 fingerpicking, cellos, leaves, woodpecker, crow |
+> | 5 | **Moonlit Warren** | night blooms under a quiet moon, bunny burrows — lullaby + night jazz | Ab major, **12/8 lullaby** | 46 (dotted ♩) · music box, felt piano, soft choir, upright bass | 88 · **brush swing**: vibes head, Rhodes, walking bass | broken chords on felt piano, choir, katydids, owl |
+> | 6 | **Coral Tide Garden** | salt breeze, seashell petals — Brazil + Caribbean | A major, **bossa nova** | 128 · alto flute, nylon guitar, steel pan counter-line, marimba bass | 104 · **calypso**: marimba riff, steel pan, ukulele chops, congas | steel pan ostinato, deep waves, gulls |
+> | 7 | **Starfall Glade** | petals catching the night sky, falling stars — electronic | Bb **Lydian** | 108 · airy lead, pumping supersaw, 16th arpeggio, 808, sub | 118 · **build-up then drop** | pumping pulse, sparkles, meteors |
+> | 8 | **Ember Fen** | low firelight over marsh blooms — modal world, mysterious but warm | D **Dorian** | 62 · duduk, handpan, tanpura drone, oud, darbuka | **7/8** (2+2+3) · darbuka, oud melody, duduk | heartbeat darbuka, tanpura, embers, frogs |
+>
+> **Write in each genre's own language, not one style for all.** The placeholders share no instruments, but an earlier version still sounded alike because every melody used the same rhythms and every season the same I–vi–IV–V chords. Please make each season idiomatic:
+> - **Country Bloom:** eighth-note pickups, repeated notes, a few "push" anticipations; triads and dominant 7ths (I–VI7–II7–V7).
+> - **Frost Orchard:** long notes tied over the bar, appoggiaturas; classical harmony (V/V, inversions), a minor iv for winter.
+> - **Lantern Meadow:** long tones, quick ornaments, silence (*ma*); the "royal road" IV–V–iii–vi, sus2 chords, pedal.
+> - **Amber Canopy:** jig rhythms; mixolydian bVII (F in G major).
+> - **Moonlit Warren:** lullaby with hemiola over a tonic pedal; the Arena is real swing (laid back, ii–V).
+> - **Coral Tide:** bossa anticipations and tritone substitutions; calypso with 3+3+2 sixteenths and sixth chords.
+> - **Starfall Glade:** tresillo (3+3+2) toplines, Lydian I–II; tight, quantized.
+> - **Ember Fen:** duduk melismas (triplet turns), Dorian i–IV over a drone; 7/8 phrased 2+2+3.
 >
 > **References for the feel** (not to copy): Animal Crossing (New Horizons) hourly music, Stardew Valley seasons, A Short Hike, Unpacking.
 >
