@@ -25,7 +25,8 @@ const VEIL_PIP_ALPHA := 0.45
 var kind: String = "companion"
 var subject: String = "pip"
 var look: Dictionary = {}
-## recolor mapa Pipa koja se nosi uz ovaj pregled (meadow: Pip u izabranom skinu).
+## Look Pipa koji se nosi uz ovaj pregled (meadow: Pip u izabranom skinu) —
+## CosmeticCatalog.get_pip_look; gola recolor mapa i dalje radi.
 var pip_recolor: Dictionary = {}
 var season_id: String = ""
 var preview_size: String = SIZE_THUMB
@@ -108,10 +109,12 @@ func _notification(what: int) -> void:
 		queue_redraw()
 
 
+## Skin iz looka stavke (companion) ili Pipa koji se nosi uz pregled; look može biti
+## {"skin": "knight"} (premium, bez recolora) ili {"recolor": …}.
 func _skin_for_preview() -> String:
 	if kind == "companion":
-		return UiPip.skin_key_from_recolor(look.get("recolor", {}))
-	return UiPip.skin_key_from_recolor(pip_recolor)
+		return UiPip.skin_key_from_look(look)
+	return UiPip.skin_key_from_look(pip_recolor)
 
 
 func _sync_actor() -> void:
@@ -132,6 +135,8 @@ func _sync_actor() -> void:
 		actor.name = "Actor"
 		actor.view = "three_q"
 		actor.follow_equipped = false
+		# Pregled sam crta pozadinu: bez pomaka sjena i ogrtač (z < 0) padnu pod nju.
+		actor.z_index = UiPip.HOST_LIFT
 		# Skin prije add_child: _ready gradi rig jednom, ne classic pa još jednom.
 		actor.skin = _skin_key
 		add_child(actor)
@@ -164,6 +169,10 @@ func _wait_for_atlas() -> void:
 		return
 	_atlas_wait = true
 	while is_inside_tree() and not UiPip.atlas_ready(_skin_for_preview()):
+		await get_tree().process_frame
+	# atlas_ready je upravo napravio teksturu (1024 × 2048, 5–10 ms); rig ide frejm kasnije,
+	# da se upload i gradnja (~7 ms) ne saberu u isti frejm starta huba.
+	if is_inside_tree():
 		await get_tree().process_frame
 	_atlas_wait = false
 	if is_inside_tree():

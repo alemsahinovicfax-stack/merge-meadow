@@ -44,7 +44,7 @@ Autoloads:
 | **GameState** | Orbs, tiers, upgrade levels | Autoload Resource/RefCounted |
 | **SaveManager** | Persist kamp + settings | `user://save.json` |
 | **UIManager** | Screen transitions | Scene change + fade |
-| **AudioManager** | SFX pool, music bus | AudioStreamPlayer pool |
+| **AudioManager** | Efekti (pool 12, bus `SFX`) + muzika (2 playera, crossfade, bus `Music`); katalog `data/audio/sounds.json`; poziv iz bilo koje klase preko `Sfx` — u igri od 2026-10-14, [[../04-experience/audio-direction\|audio-direction]] | Autoload + AudioStreamPlayer pool, učitavanje u threadu |
 | **AdManager** | Rewarded callbacks | Plugin singleton (M7) |
 | **IAPManager** | Purchase flow | Plugin (launch) |
 

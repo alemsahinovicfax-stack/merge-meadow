@@ -151,9 +151,9 @@ func _check_arena() -> void:
 		_fail("T3 should freeze muncher")
 		return
 	pest.call("reset_to_nest")
-	var segs: Array = pest.call("get_segment_positions")
-	if segs.size() != 3:
-		_fail("muncher needs 3 segments")
+	# Nibbs (muncher_premium_pip): rig spava u krtičnjaku, prednja usna preko njega.
+	if str(pest.call("get_clip")) != "m_sleep_nest" or not bool(pest.call("is_nest_front_over")):
+		_fail("muncher rig should sleep in the nest (clip %s)" % str(pest.call("get_clip")))
 		return
 	await process_frame
 

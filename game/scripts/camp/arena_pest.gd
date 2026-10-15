@@ -2,9 +2,10 @@ extends Control
 class_name ArenaPest
 
 ## MA-01b — Muncher pest: spava, jede T1/T2, freeze na T3.
-## Vizual (Arena v2, design_handoff_arena_v2 § Muncher): ljubicasta gusjenica sa zutim pjegama —
-## glava r 50 (centar = centar jedenja) + 3 segmenta koji prate put glave. Stanja se citaju
-## pozom: sklupcana + zzz · rep gore + „!" · ispruzena + obrve V · usta sirom + mrvice · kocka leda.
+## Vizual (design_handoff_muncher_premium_pip · A): Nibbs, seed-mole — MuncherRig (cutout,
+## 3 pogleda, klipovi stanja) + krtičnjak (zadnji dio ispod, prednja usna preko njega samo dok
+## spava / budi se u njemu) + baner „Muncher's awake!" pri prvom buđenju u sesiji. Pravila
+## (brzina, cilj, jedenje, led 2 s) su ista; kod samo bira klip. Ništa se ne crta po frejmu.
 
 enum State {
 	SLEEPING_NEST,
@@ -15,39 +16,25 @@ enum State {
 	FROZEN,
 }
 
-## Vizuelni radius (clamp u polje). Jedenje ide po GameState.ARENA_PEST_EAT_RADIUS od centra.
-const PEST_RADIUS := UiArena.MUNCHER_VISUAL_R
-const EDGE_W := UiArenaV2.MUNCHER_EDGE_W
-const HEAD_R := UiArenaV2.MUNCHER_HEAD_R
-const BOB_PERIOD := 0.6
-const BOB_AMP := 5.0
-const CHOMP_PERIOD := 0.25  # 2 x u 0,5 s
-const FREEZE_IN_SEC := 0.18
+## Vizuelni radius (clamp u polje): r 58 × 52 iz paketa. Jedenje ide po
+## GameState.ARENA_PEST_EAT_RADIUS od centra (= usta).
+const PEST_RADIUS := 58.0
 const FREEZE_OUT_SEC := 0.25
-const SHADOW_DROP := 6.0
-## Spava U gnijezdu: segmenti sklupčani unutar vanjskog ruba gnijezda (250 x 112), pa prednji
-## rub pokrije donji dio tijela. Poza „sleep" iz paketa (y +56 / +64) bi virila ispod gnijezda
-## (playtest 2026-10-06); van gnijezda (SLEEPING_SPOT) ostaje poza iz paketa.
-const NEST_SLEEP_SEGS: Array[Vector2] = [Vector2(-62, 6), Vector2(-44, 16), Vector2(4, 26)]
-## Segmenti prate glavu (lanac); ovoliko brzo sustizu cilj poze.
-const SEG_FOLLOW := 14.0
-const WAVE_WEIGHTS: Array[float] = [0.5, -0.8, 1.0]
-const ANTENNA_BASE_X := 16.0
-const ANTENNA_BASE_Y := -40.0
-const ANTENNA_W := 7.0
-const BULB_R := 9.0
-const EYE_CX := 19.0
-const EYE_CY := -13.0
-const LOOK_PX := 4.0
-const ASLEEP_SPOT := Color("#EADB9E")
-const ALARM_OFFSET := Vector2(-70.0, -46.0)
-const ALARM_SIZE := 64.0
-const ALARM_STAR := [
-	[50, 0], [62, 30], [96, 22], [72, 50], [96, 78], [62, 70],
-	[50, 100], [38, 70], [4, 78], [28, 50], [4, 22], [38, 30],
-]
-const CRUMBS := [[-56, 40, "#FFCCD5", 30], [46, 48, "#FFEAA7", -20], [-8, 70, "#B8E0F5", 60]]
-const ICE_SIZE := Vector2(200, 170)
+## Polje: pest ispod oblačića tutoriala (z 56); dijelovi riga su −4 … 9 relativno.
+const PEST_Z := 45
+const NEST_BACK_Z := -5
+const NEST_FRONT_OVER_Z := 10
+const BANNER_Z := 10
+## Smjer lova (paket): |dx| ≥ 0,8·|dy| → bočno, inače naprijed / nazad; najmanje 0,2 s po pogledu.
+const SIDE_RATIO := 0.8
+const VIEW_MIN_SEC := 0.2
+## Baner: vrh na 13 % polja (207 od 1589) = 112 ispod centra gnijezda; uleti 0,32 s, stoji 1,6 s.
+const BANNER_BELOW_NEST := 112.0
+const BANNER_HOLD := 1.6
+const BANNER_SLIDE := 0.32
+const BANNER_TEXT := "Muncher's awake!"
+const BANNER_PX := 44
+const BANNER_TEXT_MAX_W := 330.0
 
 var _state: State = State.SLEEPING_NEST
 var _pest_center: Vector2 = Vector2.ZERO
@@ -57,23 +44,27 @@ var _eat_timer: float = 0.0
 var _freeze_timer: float = 0.0
 var _wake_timer: float = 0.0
 var _target_reeval: float = 0.0
-var _bob_t: float = 0.0
-var _chomp_t: float = 0.0
-var _shell: float = 0.0
-var _shell_tween: Tween = null
-var _segs: Array[Vector2] = [Vector2.ZERO, Vector2.ZERO, Vector2.ZERO]
 var _dir: Vector2 = Vector2(cos(deg_to_rad(200.0)), sin(deg_to_rad(200.0)))
-var _colors: Dictionary = {}
-var _drawn_pose: String = ""
-var _boxes: Dictionary = {}
-var _ice_box: StyleBoxFlat = null
-var _ice_rim: StyleBoxFlat = null
-var _layer_back: _Layer = null
-var _layer_body: _Layer = null
-var _layer_head: _Layer = null
-var _layer_front: _Layer = null
-var _drawn_in_nest: bool = false
-var _drawn_look: Vector2 = Vector2.INF
+
+## Prvo buđenje u sesiji: baner + m_awake (1,4 s) prije lova.
+var _first_wake: bool = true
+var _awake_pending: bool = false
+var _thawing: bool = false
+var _escaped: bool = false
+var _target_held: bool = false
+## Drugi zalogaj (0,25 s) u jedenju od 0,5 s — zvuk griza ide dvaput.
+var _second_bite: bool = false
+
+var _rig: MuncherRig = null
+var _nest_back: Node2D = null
+var _nest_front: Node2D = null
+var _banner: _Banner = null
+var _banner_tween: Tween = null
+var _shown_state: int = -1
+var _force_clip: bool = false
+var _hunt_view: String = ""
+var _hunt_flip: bool = false
+var _view_t: float = 0.0
 
 var _get_edible_chips: Callable
 var _get_keepout_rect: Callable
@@ -92,10 +83,12 @@ func setup(
 	_get_playfield_bounds = get_playfield_bounds
 	_on_eat_chip = on_eat_chip
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	z_index = 50
+	z_index = PEST_Z
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	visible = true
-	_redraw_all()
+	# Atlas (46 SVG) u pozadini dok se Arena gradi; rig se složi čim je spreman.
+	MuncherRig.request_atlas()
+	_ensure_visual()
 
 
 func reset_to_nest() -> void:
@@ -105,18 +98,22 @@ func reset_to_nest() -> void:
 	_freeze_timer = 0.0
 	_wake_timer = 0.0
 	_target_reeval = 0.0
-	_set_shell(0.0)
+	_first_wake = true
+	_awake_pending = false
+	_thawing = false
+	_escaped = false
 	_pest_center = _nest_center
-	_snap_segments()
-	_redraw_all()
+	_force_clip = true
+	hide_awake_banner()
+	_sync_visual(0.0)
 
 
 func set_nest_position(center: Vector2) -> void:
 	_nest_center = center
 	if _state == State.SLEEPING_NEST:
 		_pest_center = center
-		_snap_segments()
-		_redraw_all()
+	_place_nest()
+	_sync_visual(0.0)
 
 
 func on_seeds_poured(has_chips_on_field: bool) -> void:
@@ -125,7 +122,11 @@ func on_seeds_poured(has_chips_on_field: bool) -> void:
 	if _state == State.SLEEPING_NEST or _state == State.SLEEPING_SPOT:
 		_state = State.WAKE_DELAY
 		_wake_timer = GameState.ARENA_PEST_WAKE_DELAY
-		_redraw_all()
+		if _first_wake:
+			_first_wake = false
+			_awake_pending = true
+			_show_awake_banner()
+		_sync_visual(0.0)
 
 
 func on_field_chip_count_changed(count: int) -> void:
@@ -138,8 +139,9 @@ func on_t3_created() -> void:
 	_state = State.FROZEN
 	_freeze_timer = GameState.ARENA_PEST_T3_FREEZE
 	_eat_timer = 0.0
-	_tween_shell(1.0, FREEZE_IN_SEC, Tween.TRANS_BACK, Tween.EASE_OUT)
-	_redraw_all()
+	_thawing = false
+	_force_clip = true
+	_sync_visual(0.0)
 
 
 func is_active() -> bool:
@@ -147,19 +149,32 @@ func is_active() -> bool:
 
 
 func tick(delta: float) -> void:
-	_bob_t += delta
 	match _state:
 		State.SLEEPING_NEST, State.SLEEPING_SPOT:
 			pass
 		State.WAKE_DELAY:
 			_wake_timer -= delta
 			if _wake_timer <= 0.0:
-				_state = State.HUNTING
-				_pick_target(true)
+				if _awake_pending:
+					# „Muncher's awake!": protezanje 1,4 s, pa lov (samo prvi put u sesiji).
+					_awake_pending = false
+					_wake_timer = maxf(0.01, MuncherRig.anim_length("m_awake"))
+					if _rig != null:
+						_rig.play("m_awake")
+					Sfx.play("muncher_awake")
+				else:
+					_state = State.HUNTING
+					_pick_target(true)
 		State.FROZEN:
 			_freeze_timer -= delta
+			# Led ukupno 2 s: zadnjih 0,25 s je pucanje (m_thaw), pravila se ne mijenjaju.
+			if not _thawing and _freeze_timer <= FREEZE_OUT_SEC:
+				_thawing = true
+				if _rig != null:
+					_rig.play("m_thaw")
+				Sfx.play("muncher_thaw")
 			if _freeze_timer <= 0.0:
-				_tween_shell(0.0, FREEZE_OUT_SEC, Tween.TRANS_CUBIC, Tween.EASE_IN)
+				_thawing = false
 				var chips: Array = _get_edible_chips.call() if _get_edible_chips.is_valid() else []
 				if chips.is_empty():
 					_go_sleep_at_current_spot()
@@ -169,33 +184,22 @@ func tick(delta: float) -> void:
 		State.HUNTING:
 			_tick_hunting(delta)
 		State.EATING:
-			_chomp_t += delta
 			_eat_timer -= delta
+			if not _second_bite and _eat_timer <= GameState.ARENA_PEST_EAT_DURATION * 0.5:
+				_second_bite = true
+				Sfx.play("muncher_chomp")
 			if _eat_timer <= 0.0:
 				_finish_eating()
-	var moved := _update_segments(delta)
-	# Crtez se obnavlja samo kad se nesto vidljivo mijenja. Nova poza / ulaz-izlaz iz gnijezda =
-	# svi slojevi; kretanje = tijelo (krugovi) + transform glave; glava se gradi iznova samo kad
-	# se pogled pomjeri ili žvaće. Usnuli ili zaleđeni muncher ne troši frejm.
-	var key := get_pose_key()
-	_ensure_layers()
-	var in_nest := _in_nest()
-	if key != _drawn_pose or in_nest != _drawn_in_nest:
-		_drawn_pose = key
-		_drawn_in_nest = in_nest
-		_drawn_look = _look_offset(key)
-		_redraw_all()
-		return
-	if moved or _state == State.HUNTING or _state == State.EATING:
-		_layer_body.queue_redraw()
-		_sync_head()
-		var look := _look_offset(key)
-		if _state == State.EATING or look.distance_squared_to(_drawn_look) > 0.04:
-			_drawn_look = look
-			_layer_head.queue_redraw()
+	_sync_visual(delta)
 
 
 func _tick_hunting(delta: float) -> void:
+	# Meta je nestala usred lova (spojena / u korpu): „hmph" preko lova, novi cilj odmah.
+	# Oslobođen objekt se u Godotu 4 poredi kao null, pa se pamti da je meta postojala.
+	if _target_held and (not is_instance_valid(_target_chip) or _target_chip.is_queued_for_deletion()):
+		_target_chip = null
+		_escaped = true
+	_target_held = false
 	_target_reeval -= delta
 	if _target_reeval <= 0.0:
 		_target_reeval = GameState.ARENA_PEST_TARGET_REEVAL
@@ -205,10 +209,12 @@ func _tick_hunting(delta: float) -> void:
 		if _target_chip == null:
 			_go_sleep_at_current_spot()
 			return
+	_target_held = true
 	var chip_center := _target_chip.get_center()
 	var dir := chip_center - _pest_center
 	var dist := dir.length()
 	if dist <= GameState.ARENA_PEST_EAT_RADIUS:
+		_target_held = false
 		_begin_eating()
 		return
 	if dist > 1.0:
@@ -225,7 +231,8 @@ func _tick_hunting(delta: float) -> void:
 func _begin_eating() -> void:
 	_state = State.EATING
 	_eat_timer = GameState.ARENA_PEST_EAT_DURATION
-	_chomp_t = 0.0
+	_second_bite = false
+	Sfx.play("muncher_chomp")
 	if _target_chip != null and is_instance_valid(_target_chip):
 		_target_chip.set_being_eaten(true)
 
@@ -241,12 +248,15 @@ func _finish_eating() -> void:
 	else:
 		_state = State.HUNTING
 		_pick_target(true)
+		# Novi lov poslije obroka: klip lova iznova (isti state, novi plijen).
+		_force_clip = true
 
 
 func _go_sleep_at_current_spot() -> void:
 	_release_target()
 	_state = State.SLEEPING_SPOT
 	_eat_timer = 0.0
+	_awake_pending = false
 
 
 ## Plijen koji je prezivio (freeze, reset) vraca se u normalu.
@@ -254,6 +264,7 @@ func _release_target() -> void:
 	if _target_chip != null and is_instance_valid(_target_chip) and _target_chip.is_being_eaten():
 		_target_chip.set_being_eaten(false)
 	_target_chip = null
+	_target_held = false
 
 
 func _pick_target(force: bool) -> void:
@@ -305,7 +316,7 @@ func _avoid_keepout(center: Vector2) -> Vector2:
 	return _clamp_to_bounds(zone_center + dir * push)
 
 
-## Kljuc poze u UiArenaV2.MUNCHER_POSES.
+## Ključ stanja za testove i Pipove reakcije.
 func get_pose_key() -> String:
 	match _state:
 		State.SLEEPING_NEST, State.SLEEPING_SPOT:
@@ -319,455 +330,202 @@ func get_pose_key() -> String:
 	return "hunt"
 
 
-func get_segment_positions() -> Array[Vector2]:
-	return _segs.duplicate()
-
-
-func _snap_segments() -> void:
-	for k in 3:
-		_segs[k] = _pest_center + _sleep_seg(k)
-
-
-## U gnijezdu (spava ili se tek budi na njemu) — tijelo je „u rupi".
+## U gnijezdu (spava ili se tek budi na njemu) — prednja usna krtičnjaka ga pokriva.
 func _in_nest() -> bool:
 	var at_nest := _pest_center.distance_to(_nest_center) < 1.0
 	return _state == State.SLEEPING_NEST or (_state == State.WAKE_DELAY and at_nest)
 
 
-func _sleep_seg(k: int) -> Vector2:
-	if _state == State.SLEEPING_NEST:
-		return NEST_SLEEP_SEGS[k]
-	return _v(UiArenaV2.MUNCHER_POSES["sleep"]["segs"][k])
+# ── vizual (MuncherRig) ───────────────────────────────────────────────────────
 
-
-## Sleep/wake: fiksni pomaci poze. Hunt/eat: lanac — svaki segment na razmaku od prethodnog,
-## pa tijelo prati put glave. Frozen: tijelo stoji.
-## Vraca true ako se neki segment pomjerio vise od 0,05 px (treba novi crtez).
-func _update_segments(delta: float) -> bool:
-	var key := get_pose_key()
-	if key == "frozen":
+## Rig i krtičnjak se slože kad je atlas gotov (Arena se gradi u pozadini na startu huba).
+func _ensure_visual() -> bool:
+	if _rig != null:
+		return true
+	if not MuncherRig.atlas_ready():
 		return false
-	var before := _segs.duplicate()
-	var pose: Dictionary = UiArenaV2.MUNCHER_POSES[key]
-	var follow := 1.0 - exp(-SEG_FOLLOW * delta)
-	if pose.has("segs"):
-		for k in 3:
-			var target := _pest_center + (_sleep_seg(k) if key == "sleep" else _v(pose["segs"][k]))
-			_segs[k] = target if _segs[k].distance_squared_to(target) < 0.0025 else _segs[k].lerp(target, follow)
-		return _segs_moved(before)
-	var spacing: Array = pose["spacing"]
-	var prev := _pest_center
-	var prev_d := 0.0
-	for k in 3:
-		var gap := float(spacing[k]) - prev_d
-		var v := _segs[k] - prev
-		if v.length_squared() < 0.01:
-			v = -_dir
-		var target := prev + v.normalized() * gap
-		_segs[k] = _segs[k].lerp(target, follow) if key == "eat" else target
-		prev = _segs[k]
-		prev_d = float(spacing[k])
-	return _segs_moved(before)
+	var nest: Dictionary = MuncherRig.rig_data().get("nest", {})
+	for n in nest.get("nodes", []):
+		var holder := Node2D.new()
+		holder.name = "NestBack" if str(n["id"]) == "nest_back" else "NestFront"
+		holder.add_child(MuncherRig.make_sprite(n["sprite"]))
+		add_child(holder)
+		if str(n["id"]) == "nest_back":
+			_nest_back = holder
+		else:
+			_nest_front = holder
+	_rig = MuncherRig.new()
+	_rig.name = "Muncher"
+	add_child(_rig)
+	_rig.body.animation_finished.connect(_on_clip_done)
+	_banner = _Banner.new()
+	_banner.name = "AwakeBanner"
+	_banner.z_index = BANNER_Z
+	_banner.visible = false
+	add_child(_banner)
+	_place_nest()
+	_force_clip = true
+	return true
 
 
-func _segs_moved(before: Array[Vector2]) -> bool:
-	for k in 3:
-		if _segs[k].distance_squared_to(before[k]) > 0.0025:
-			return true
-	return false
+func _place_nest() -> void:
+	if _nest_back == null:
+		return
+	_nest_back.position = _nest_center
+	_nest_front.position = _nest_center
+	_nest_back.z_index = NEST_BACK_Z
+	if _banner != null and not _banner.visible:
+		_banner.position = _banner_home()
 
 
-## Slojevi crteža (perf 2026-10-09): prije je cijeli muncher (gnijezdo, tijelo, glava s licem,
-## led, zzz) svaki frejm lova iznova gradio ~2,5 ms. Sada:
-##   Back  — zadnji dio gnijezda (samo dok spava u njemu)
-##   Body  — sjene i 3 segmenta: obični krugovi, jeftino, crta se dok se tijelo pomjera
-##   Head  — antene, glava, pjege i lice; Node2D na poziciji glave — pomjera ga transform, a
-##           crtež se gradi samo kad se promijeni poza, pogled (4 px) ili žvakanje
-##   Front — prednji rub gnijezda, led, zzz / „!" / mrvice
-class _Layer:
+func _sync_visual(delta: float) -> void:
+	if not _ensure_visual():
+		return
+	_rig.position = _pest_center
+	if _force_clip or int(_state) != _shown_state:
+		_force_clip = false
+		_shown_state = int(_state)
+		_enter_state_clip()
+	if _state == State.HUNTING:
+		_update_hunt_view(delta)
+		if _escaped:
+			_escaped = false
+			if _hunt_view == "back":
+				_hunt_view = "front"
+				_hunt_flip = false
+				_rig.play("m_hunt_front")
+			var hmph := "m_escaped_side" if _hunt_view == "side" else "m_escaped_front"
+			_rig.play_overlay(hmph)
+			Sfx.play("muncher_hmph")
+			# Pogled stoji dok traje „hmph" (0,8 s): promjena pogleda bi prekinula klip.
+			_view_t = MuncherRig.anim_length(hmph)
+	_escaped = false
+	# Usna krtičnjaka preko munchera samo dok je u rupi; inače je cijeli krtičnjak ispod.
+	_nest_front.z_index = NEST_FRONT_OVER_Z if _in_nest() else NEST_BACK_Z
+
+
+func _enter_state_clip() -> void:
+	_rig.stop_overlay()
+	match _state:
+		State.SLEEPING_NEST:
+			_rig.play("m_sleep_nest")
+		State.WAKE_DELAY:
+			_rig.play("m_wake_nest" if _in_nest() else "m_wake_spot")
+			Sfx.play("muncher_wake")
+		State.HUNTING:
+			_hunt_view = ""
+			_view_t = 0.0
+			_update_hunt_view(0.0)
+		State.EATING:
+			if _hunt_view == "side":
+				_rig.play("m_eat_side", _hunt_flip)
+			else:
+				_hunt_view = "front"
+				_hunt_flip = false
+				_rig.play("m_eat_front")
+		State.FROZEN:
+			_rig.play("m_freeze")
+			Sfx.play("muncher_freeze")
+		State.SLEEPING_SPOT:
+			_rig.play("m_doze")
+			Sfx.play("muncher_yawn")
+
+
+## Pogled lova po smjeru prema cilju; isti pogled najmanje 0,2 s (bez treptanja).
+func _update_hunt_view(delta: float) -> void:
+	_view_t -= delta
+	if _target_chip == null or not is_instance_valid(_target_chip):
+		if _hunt_view.is_empty():
+			_hunt_view = "front"
+			_rig.play("m_hunt_front")
+		return
+	var d := _target_chip.get_center() - _pest_center
+	var v := "side" if absf(d.x) >= SIDE_RATIO * absf(d.y) else ("front" if d.y > 0.0 else "back")
+	var f := v == "side" and d.x < 0.0
+	if _hunt_view.is_empty() or (_view_t <= 0.0 and (v != _hunt_view or f != _hunt_flip)):
+		_hunt_view = v
+		_hunt_flip = f
+		_view_t = VIEW_MIN_SEC
+		_rig.play("m_hunt_" + v, f)
+
+
+func _on_clip_done(id: StringName) -> void:
+	match str(id):
+		"m_freeze":
+			if _state == State.FROZEN and not _thawing:
+				_rig.play("m_frozen")
+		"m_doze":
+			if _state == State.SLEEPING_SPOT:
+				_rig.play("m_sleep_spot")
+
+
+# ── baner „Muncher's awake!" ─────────────────────────────────────────────────
+
+func _banner_home() -> Vector2:
+	return _nest_center + Vector2(0.0, BANNER_BELOW_NEST)
+
+
+func _show_awake_banner() -> void:
+	if _banner == null or not is_inside_tree():
+		return
+	if _banner_tween != null and _banner_tween.is_valid():
+		_banner_tween.kill()
+	var home := _banner_home()
+	var hidden := home - Vector2(0.0, BANNER_BELOW_NEST + 120.0)
+	_banner.position = hidden
+	_banner.visible = true
+	_banner_tween = create_tween()
+	_banner_tween.tween_property(_banner, "position", home, BANNER_SLIDE).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_banner_tween.tween_interval(BANNER_HOLD)
+	_banner_tween.tween_property(_banner, "position", hidden, BANNER_SLIDE).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	_banner_tween.tween_callback(func() -> void: _banner.visible = false)
+
+
+## Tutorial Arene već piše „Muncher's awake" u oblačiću — tada baner ne treba.
+func hide_awake_banner() -> void:
+	if _banner_tween != null and _banner_tween.is_valid():
+		_banner_tween.kill()
+	if _banner != null:
+		_banner.visible = false
+
+
+func is_banner_showing() -> bool:
+	return _banner != null and _banner.visible
+
+
+func get_clip() -> String:
+	return _rig.clip if _rig != null else ""
+
+
+func get_view() -> String:
+	return _rig.view if _rig != null else ""
+
+
+func is_nest_front_over() -> bool:
+	return _nest_front != null and _nest_front.z_index == NEST_FRONT_OVER_Z
+
+
+func get_rig() -> MuncherRig:
+	return _rig
+
+
+## Pločica banera (m_banner.svg) + tekst: crta se jednom, kreće se transformom.
+class _Banner:
 	extends Node2D
 
-	var painter: Callable
-
 	func _draw() -> void:
-		if painter.is_valid():
-			painter.call(self)
-
-
-func _ensure_layers() -> void:
-	if _layer_body != null:
-		return
-	_ensure_colors()
-	_layer_back = _make_layer("Back", _paint_back)
-	_layer_body = _make_layer("Body", _paint_body)
-	_layer_head = _make_layer("Head", _paint_head)
-	_layer_front = _make_layer("Front", _paint_front)
-
-
-func _make_layer(node_name: String, painter: Callable) -> _Layer:
-	var layer := _Layer.new()
-	layer.name = node_name
-	layer.painter = painter
-	add_child(layer)
-	return layer
-
-
-func _ensure_colors() -> void:
-	if _colors.is_empty():
-		for k in UiArenaV2.MUNCHER_COLORS:
-			_colors[k] = UiArenaV2.col(str(UiArenaV2.MUNCHER_COLORS[k]))
-
-
-## Sve iznova (poza, gnijezdo, led, reset).
-func _redraw_all() -> void:
-	_ensure_layers()
-	_sync_head()
-	for layer in [_layer_back, _layer_body, _layer_head, _layer_front]:
-		layer.queue_redraw()
-
-
-func _bob_offset() -> Vector2:
-	var key := get_pose_key()
-	return Vector2(0.0, sin(_bob_t * TAU / BOB_PERIOD) * BOB_AMP if key == "hunt" else 0.0)
-
-
-func _head_pos() -> Vector2:
-	return _pest_center + _bob_offset()
-
-
-## Glava se pomjera transformom; crtež joj se mijenja samo s pozom, pogledom ili žvakanjem.
-func _sync_head() -> void:
-	if _layer_head == null:
-		return
-	var pose: Dictionary = UiArenaV2.MUNCHER_POSES[get_pose_key()]
-	var sc := float(pose.get("head_scale", 1.0))
-	_layer_head.position = _head_pos()
-	_layer_head.rotation = deg_to_rad(float(pose.get("head_rot", 0.0)))
-	_layer_head.scale = Vector2(sc, sc)
-
-
-func _look_offset(key: String) -> Vector2:
-	return _dir * LOOK_PX if key == "hunt" or key == "eat" else Vector2.ZERO
-
-
-func _segs_now(key: String) -> Array[Vector2]:
-	var pose: Dictionary = UiArenaV2.MUNCHER_POSES[key]
-	var off := _bob_offset()
-	var perp := Vector2(-_dir.y, _dir.x)
-	var wave := float(pose.get("wave", 0.0)) * cos(_bob_t * TAU / BOB_PERIOD)
-	var segs: Array[Vector2] = []
-	for k in 3:
-		segs.append(_segs[k] + off + perp * wave * WAVE_WEIGHTS[k])
-	return segs
-
-
-func _pose_colors(key: String) -> Array[Color]:
-	if key == "frozen":
-		return [_colors["frozen_body"], _colors["frozen_deep"], _colors["frozen_edge"], _colors["frozen_spot"]]
-	if key == "sleep":
-		return [_colors["asleep_body"], _colors["asleep_deep"], _colors["asleep_edge"], ASLEEP_SPOT]
-	return [_colors["body"], _colors["body_deep"], _colors["edge"], _colors["spot"]]
-
-
-func _paint_back(cv: CanvasItem) -> void:
-	if _in_nest():
-		_draw_nest_back(cv, _nest_center)
-
-
-func _paint_body(cv: CanvasItem) -> void:
-	var key := get_pose_key()
-	var pose: Dictionary = UiArenaV2.MUNCHER_POSES[key]
-	var cols := _pose_colors(key)
-	var segs := _segs_now(key)
-	var head := _head_pos()
-	var sc := float(pose.get("head_scale", 1.0))
-	# U gnijezdu nema sjene na tlu — tijelo je u rupi (sjena bi virila ispod ruba).
-	if not _in_nest():
-		var shadow: Color = _colors["shadow"]
-		for k in range(2, -1, -1):
-			cv.draw_circle(segs[k] + Vector2(0.0, SHADOW_DROP), UiArenaV2.MUNCHER_SEG_R[k], shadow)
-		cv.draw_circle(head + Vector2(0.0, SHADOW_DROP), HEAD_R * sc, shadow)
-	for k in range(2, -1, -1):
-		var r: float = UiArenaV2.MUNCHER_SEG_R[k]
-		cv.draw_circle(segs[k], r, cols[2])
-		cv.draw_circle(segs[k], r - EDGE_W, cols[0] if k == 0 else cols[1])
-		cv.draw_circle(segs[k] + Vector2(4.0 - 0.36 * r, 4.0 - 0.44 * r), r * 0.28, cols[3])
-
-
-## Lokalno oko centra glave (Head layer nosi poziciju, rotaciju i scale poze).
-func _paint_head(cv: CanvasItem) -> void:
-	var key := get_pose_key()
-	var pose: Dictionary = UiArenaV2.MUNCHER_POSES[key]
-	var cols := _pose_colors(key)
-	var edge := cols[2]
-	var spot := cols[3]
-	for tip in pose["antenna"]:
-		var t := _v(tip)
-		var base := Vector2(ANTENNA_BASE_X * signf(t.x), ANTENNA_BASE_Y)
-		cv.draw_line(base, t, edge, ANTENNA_W, true)
-		cv.draw_circle(base, ANTENNA_W * 0.5, edge)
-		cv.draw_circle(t, BULB_R, edge)
-		cv.draw_circle(t, BULB_R - EDGE_W, spot)
-	cv.draw_circle(Vector2.ZERO, HEAD_R, edge)
-	cv.draw_circle(Vector2.ZERO, HEAD_R - EDGE_W, cols[0])
-	cv.draw_circle(Vector2(-28.5, -18.5), 5.5, spot)
-	cv.draw_circle(Vector2(36.0, -16.0), 4.0, spot)
-	_draw_face(cv, key)
-
-
-func _paint_front(cv: CanvasItem) -> void:
-	var key := get_pose_key()
-	var head := _head_pos()
-	if _in_nest():
-		_draw_nest_front(cv, _nest_center)
-	if _shell > 0.001:
-		var segs := _segs_now(key)
-		_draw_ice(cv, head + (segs[0] - head) * 0.35)
-	if key == "sleep":
-		_draw_zzz(cv, head)
-	elif key == "wake":
-		_draw_alarm(cv, head + ALARM_OFFSET)
-	elif key == "eat":
-		for c in CRUMBS:
-			cv.draw_set_transform(head + Vector2(c[0], c[1]), deg_to_rad(float(c[3])), Vector2.ONE)
-			cv.draw_colored_polygon(_ellipse_pts(Vector2.ZERO, Vector2(7.5, 5.0), 16), Color(str(c[2])))
-		cv.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-
-
-func _draw_face(cv: CanvasItem, key: String) -> void:
-	var ink: Color = _colors["ink"]
-	var mouth: Color = _colors["mouth"]
-	var tooth: Color = _colors["tooth"]
-	var look := _dir * LOOK_PX if key == "hunt" or key == "eat" else Vector2.ZERO
-	if key == "hunt" or key == "wake" or key == "frozen":
-		var eye := Vector3(26, 30, 14)
-		if key == "wake":
-			eye = Vector3(32, 34, 10)
-		elif key == "frozen":
-			eye = Vector3(28, 30, 8)
-		for side in [-1.0, 1.0]:
-			var c := Vector2(EYE_CX * side, EYE_CY)
-			cv.draw_colored_polygon(_ellipse_pts(c, Vector2(eye.x, eye.y) * 0.5, 24), ink)
-			cv.draw_colored_polygon(_ellipse_pts(c, Vector2(eye.x, eye.y) * 0.5 - Vector2(3, 3), 24), _colors["eye"])
-			cv.draw_circle(c + look, eye.z * 0.5, ink)
-	elif key == "sleep":
-		for side in [-1.0, 1.0]:
-			cv.draw_arc(Vector2(EYE_CX * side, -20.0), 9.5, 0.0, PI, 12, ink, 5.0, true)
-	elif key == "eat":
-		for side in [-1.0, 1.0]:
-			cv.draw_arc(Vector2(EYE_CX * side, -8.0), 9.5, PI, TAU, 12, ink, 5.0, true)
-	if key == "hunt" or key == "eat" or key == "frozen":
-		var brow_y := -36.0 if key == "frozen" else -32.0
-		var tilt := -14.0 if key == "frozen" else 20.0
-		for side in [-1.0, 1.0]:
-			var c := Vector2(EYE_CX * side, brow_y)
-			var d := Vector2.from_angle(deg_to_rad(tilt * -side)) * 14.0
-			cv.draw_line(c - d, c + d, ink, 8.0, true)
-			cv.draw_circle(c - d, 4.0, ink)
-			cv.draw_circle(c + d, 4.0, ink)
-	match key:
-		"sleep":
-			_rounded(cv, Rect2(-12, 14, 24, 6), mouth, 3)
-			_rounded(cv, Rect2(3, 18, 8, 8), tooth, 0, 3, mouth, 2)
-		"hunt":
-			_rounded(cv, Rect2(-26, 4, 52, 24), mouth, 6, 12)
-			cv.draw_colored_polygon(_ellipse_pts(Vector2(0, 22), Vector2(11, 4.5), 16), _colors["tongue"])
-			_rounded(cv, Rect2(-16, 4, 10, 9), tooth, 0, 3)
-			_rounded(cv, Rect2(6, 4, 10, 9), tooth, 0, 3)
-		"eat":
-			var chomp := absf(sin(_chomp_t * PI / CHOMP_PERIOD))
-			var mouth_h := 12.0 + 36.0 * chomp
-			cv.draw_colored_polygon(_ellipse_pts(Vector2(0, 20), Vector2(32, mouth_h * 0.5), 28), _colors["edge"])
-			cv.draw_colored_polygon(_ellipse_pts(Vector2(0, 20), Vector2(29, mouth_h * 0.5 - 3.0), 28), mouth)
-			if mouth_h > 22.0:
-				var ty := 20.0 + mouth_h * 0.5 - 9.0
-				cv.draw_colored_polygon(_ellipse_pts(Vector2(0, ty), Vector2(14, 5), 16), _colors["tongue"])
-				var top := 20.0 - mouth_h * 0.5 + 2.0
-				_rounded(cv, Rect2(-17, top, 11, 10), tooth, 0, 3)
-				_rounded(cv, Rect2(6, top, 11, 10), tooth, 0, 3)
-		"wake":
-			cv.draw_colored_polygon(_ellipse_pts(Vector2(0, 20), Vector2(9, 10), 20), mouth)
-		"frozen":
-			_rounded(cv, Rect2(-13, 14, 26, 8), mouth, 4)
-
-
-## Gnijezdo 250 x 112: prsten od grancica s ukradenim laticama (straznji dio, ispod tijela).
-func _draw_nest_back(cv: CanvasItem, c: Vector2) -> void:
-	var nest := UiArenaV2.MUNCHER_NEST
-	var outer := Vector2(float(nest["w"]), float(nest["h"])) * 0.5
-	cv.draw_colored_polygon(_ellipse_pts(c, outer + Vector2(2.5, 2.5), 48), Color(str(nest["edge"])))
-	cv.draw_colored_polygon(_ellipse_pts(c, outer - Vector2(2.5, 2.5), 48), Color(str(nest["fill"])))
-	var bed_c := c + Vector2(0.0, 3.0)
-	var bed := Vector2(float(nest["bed_w"]), float(nest["bed_h"])) * 0.5
-	cv.draw_colored_polygon(_ellipse_pts(bed_c, bed, 40), Color(str(nest["bed_edge"])))
-	cv.draw_colored_polygon(_ellipse_pts(bed_c, bed - Vector2(4, 4), 40), Color(str(nest["bed"])))
-	var petals: Array = nest["petals"]
-	var spots := [[-61, 3.5, 11, 6.5, -20], [-25, 17.5, 11, 6.5, 15], [41, 15.5, 11, 6.5, -10], [70, -1, 10, 6, 25]]
-	for i in spots.size():
-		var p: Array = spots[i]
-		cv.draw_set_transform(c + Vector2(p[0], p[1]), deg_to_rad(float(p[4])), Vector2.ONE)
-		cv.draw_colored_polygon(_ellipse_pts(Vector2.ZERO, Vector2(p[2], p[3]), 16), Color(str(petals[i])))
-	cv.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-
-
-## Prednji rub gnijezda preko tijela — muncher „lezi u" gnijezdu.
-func _draw_nest_front(cv: CanvasItem, c: Vector2) -> void:
-	var nest := UiArenaV2.MUNCHER_NEST
-	var outer := Vector2(float(nest["w"]), float(nest["h"])) * 0.5
-	var inner := outer - Vector2(22.0, 17.0)
-	var cut := 4.0
-	var a0 := asin(cut / outer.y)
-	var b0 := asin(cut / inner.y)
-	var outer_arc := PackedVector2Array()
-	var inner_arc := PackedVector2Array()
-	for i in 25:
-		var t := float(i) / 24.0
-		var a := lerpf(a0, PI - a0, t)
-		outer_arc.append(c + Vector2(cos(a) * outer.x, sin(a) * outer.y))
-		var b := lerpf(b0, PI - b0, t)
-		inner_arc.append(c + Vector2(cos(b) * inner.x, sin(b) * inner.y))
-	var band := outer_arc.duplicate()
-	for i in range(inner_arc.size() - 1, -1, -1):
-		band.append(inner_arc[i])
-	cv.draw_colored_polygon(band, Color(str(nest["fill"])))
-	cv.draw_polyline(_offset_arc(c, outer + Vector2(2.5, 2.5), a0), Color(str(nest["edge"])), 5.0, true)
-	cv.draw_polyline(inner_arc, Color(str(nest["bed_edge"])), 4.0, true)
-	var twig := Color(str(nest["edge"]))
-	for tw in [[-68, 37, 34, 12], [50, 39, 30, -10]]:
-		var d := Vector2.from_angle(deg_to_rad(float(tw[3]))) * float(tw[2]) * 0.5
-		var m := c + Vector2(tw[0], tw[1])
-		cv.draw_line(m - d, m + d, twig, 5.0, true)
-
-
-func _draw_ice(cv: CanvasItem, center: Vector2) -> void:
-	var a := _shell
-	var s := 0.8 + 0.2 * _shell
-	cv.draw_set_transform(center, 0.0, Vector2(s, s))
-	var box := Rect2(-ICE_SIZE * 0.5, ICE_SIZE)
-	if _ice_box == null:
-		_ice_box = StyleBoxFlat.new()
-		_ice_box.set_border_width_all(4)
-		_ice_box.set_corner_radius_all(28)
-		_ice_box.corner_detail = 10
-		_ice_box.anti_aliasing = true
-		_ice_rim = StyleBoxFlat.new()
-		_ice_rim.draw_center = false
-		_ice_rim.set_border_width_all(2)
-		_ice_rim.set_corner_radius_all(30)
-		_ice_rim.corner_detail = 10
-	var sb := _ice_box
-	sb.bg_color = Color(_colors["ice"], _colors["ice"].a * a)
-	sb.border_color = Color(_colors["ice_edge"], a)
-	var rim := _ice_rim
-	rim.border_color = Color(_colors["frozen_edge"], a)
-	cv.draw_style_box(rim, box.grow(2.0))
-	cv.draw_style_box(sb, box)
-	var tl := box.position
-	var white := Color(_colors["ice_hi"], a)
-	var shine := Vector2.from_angle(deg_to_rad(-35.0))
-	cv.draw_line(tl + Vector2(57, 34.5) - shine * 30.5, tl + Vector2(57, 34.5) + shine * 30.5, white, 9.0, true)
-	cv.draw_line(tl + Vector2(57, 58.5) - shine * 12.5, tl + Vector2(57, 58.5) + shine * 12.5, white, 9.0, true)
-	var icicle := Color(_colors["ice_edge"], a)
-	for ic in [[34, 18, 24], [86, 16, 18], [134, 18, 28]]:
-		var x := float(ic[0])
-		cv.draw_colored_polygon(PackedVector2Array([
-			tl + Vector2(x, 168), tl + Vector2(x + float(ic[1]), 168), tl + Vector2(x + float(ic[1]) * 0.5, 168 + float(ic[2]))
-		]), icicle)
-	for cap in [[36, 2, 16], [64, 0, 20], [91, 3, 13]]:
-		cv.draw_circle(tl + Vector2(cap[0], cap[1]), float(cap[2]), white)
-	for sp in [[213, 23, 7], [-16.5, 109.5, 5.5]]:
-		var p := tl + Vector2(sp[0], sp[1])
-		var r := float(sp[2]) * 1.414
-		cv.draw_colored_polygon(PackedVector2Array([
-			p + Vector2(0, -r), p + Vector2(r, 0), p + Vector2(0, r), p + Vector2(-r, 0)
-		]), white)
-	cv.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-
-
-## Zzz desno i nisko — vrh ~16 px od polja kad je gnijezdo na y 108.
-func _draw_zzz(cv: CanvasItem, head: Vector2) -> void:
-	var z := UiArenaV2.MUNCHER_ZZZ
-	var font := UiChrome.heavy_font(UiChrome.EMBOLDEN_800)
-	var fill := Color(str(z["fill"]))
-	var ink: Color = _colors["ink"]
-	for i in 3:
-		var size_px := int(z["sizes"][i])
-		var o := _v(z["offsets"][i])
-		var top := head.y + o.y - size_px * 0.8
-		var pos := Vector2(head.x + o.x, top + font.get_ascent(size_px))
-		cv.draw_string_outline(font, pos, "z", HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, int(z["outline"]), ink)
-		cv.draw_string(font, pos, "z", HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, fill)
-
-
-func _draw_alarm(cv: CanvasItem, center: Vector2) -> void:
-	var outer := PackedVector2Array()
-	var inner := PackedVector2Array()
-	for q in ALARM_STAR:
-		var p := Vector2(float(q[0]) / 100.0 - 0.5, float(q[1]) / 100.0 - 0.5)
-		outer.append(center + p * ALARM_SIZE)
-		inner.append(center + p * (ALARM_SIZE - 10.0))
-	cv.draw_colored_polygon(outer, _colors["ink"])
-	cv.draw_colored_polygon(inner, _colors["alarm"])
-	var font := UiChrome.heavy_font(UiChrome.EMBOLDEN_800)
-	var baseline := center.y + (font.get_ascent(36) - font.get_descent(36)) * 0.5
-	cv.draw_string(font, Vector2(center.x - 20.0, baseline), "!", HORIZONTAL_ALIGNMENT_CENTER, 40.0, 36, _colors["ink"])
-
-
-func _rounded(
-	cv: CanvasItem, rect: Rect2, fill: Color, top_r: int, bottom_r: int = -1, border: Color = Color.TRANSPARENT, border_w: int = 0
-) -> void:
-	var cache_key := "%s|%s|%d|%d|%s|%d" % [rect.size, fill.to_html(), top_r, bottom_r, border.to_html(), border_w]
-	if _boxes.has(cache_key):
-		cv.draw_style_box(_boxes[cache_key], rect)
-		return
-	var s := StyleBoxFlat.new()
-	_boxes[cache_key] = s
-	s.bg_color = fill
-	s.corner_radius_top_left = top_r
-	s.corner_radius_top_right = top_r
-	var b := top_r if bottom_r < 0 else bottom_r
-	s.corner_radius_bottom_left = b
-	s.corner_radius_bottom_right = b
-	s.corner_detail = 8
-	s.anti_aliasing = true
-	if border_w > 0:
-		s.border_color = border
-		s.set_border_width_all(border_w)
-	cv.draw_style_box(s, rect)
-
-
-static func _offset_arc(c: Vector2, r: Vector2, a0: float) -> PackedVector2Array:
-	var pts := PackedVector2Array()
-	for i in 25:
-		var a := lerpf(a0, PI - a0, float(i) / 24.0)
-		pts.append(c + Vector2(cos(a) * r.x, sin(a) * r.y))
-	return pts
-
-
-static func _ellipse_pts(c: Vector2, r: Vector2, steps: int) -> PackedVector2Array:
-	var pts := PackedVector2Array()
-	for i in steps:
-		var a := TAU * float(i) / steps
-		pts.append(c + Vector2(cos(a) * r.x, sin(a) * r.y))
-	return pts
-
-
-static func _v(a: Array) -> Vector2:
-	return Vector2(float(a[0]), float(a[1]))
-
-
-func _tween_shell(target: float, sec: float, trans: Tween.TransitionType, ease_type: Tween.EaseType) -> void:
-	if not is_inside_tree():
-		_set_shell(target)
-		return
-	if _shell_tween != null and _shell_tween.is_valid():
-		_shell_tween.kill()
-	_shell_tween = create_tween()
-	_shell_tween.tween_method(_set_shell, _shell, target, sec).set_trans(trans).set_ease(ease_type)
-
-
-## Led je samo u prednjem sloju — tween ne gradi glavu ni tijelo iznova.
-func _set_shell(value: float) -> void:
-	_shell = value
-	if _layer_front != null:
-		_layer_front.queue_redraw()
+		var spec: Dictionary = MuncherRig.rig_data().get("banner", {})
+		if not spec.is_empty():
+			var a := MuncherRig.atlas()
+			var region: Rect2 = a["regions"].get(str(spec["file"]), Rect2())
+			var off: Array = spec["offset"]
+			draw_texture_rect_region(
+				a["texture"], Rect2(Vector2(float(off[0]), float(off[1])), region.size / MuncherRig.RASTER), region
+			)
+		# Pločica je 372 px (bez repova): 44 px Nunito 900 je preširok, tekst se smanji da stane.
+		var px := ArenaPest.BANNER_PX
+		var w := UiHomeV3.text_w(900, px, ArenaPest.BANNER_TEXT)
+		if w > ArenaPest.BANNER_TEXT_MAX_W:
+			px = int(floorf(float(px) * ArenaPest.BANNER_TEXT_MAX_W / w))
+			w = UiHomeV3.text_w(900, px, ArenaPest.BANNER_TEXT)
+		UiHomeV3.draw_text(self, 900, px, ArenaPest.BANNER_TEXT, Vector2(-w * 0.5, -px * 0.5 - 2.0), Color("#2D3436"))

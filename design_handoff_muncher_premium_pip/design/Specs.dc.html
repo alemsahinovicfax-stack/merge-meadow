@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="pip_art.js"></script>
+<script src="pip_runtime.js"></script>
+<script src="pip_anim.js"></script>
+<script src="knight.js"></script>
+<script src="muncher.js"></script>
+<style>body{margin:0;background:#FFF8F0;color:#2D3436;font-family:Nunito,system-ui,sans-serif}a{color:#2E7F8C}a:hover{color:#2D3436}</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:32px 24px 80px;display:flex;flex-direction:column;gap:32px">
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font:500 13px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#555C5E">design_handoff_muncher_premium_pip · specs</div>
+    <div style="font-size:48px;font-weight:900;line-height:1">Measures, pivots, budgets, self-check</div>
+  </div>
+
+  <section data-screen-label="Self-check" style="display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><div style="font-size:30px;font-weight:900">§5.3 Samoprovjera — live in this browser</div><div style="font:700 16px 'JetBrains Mono',monospace;padding:6px 12px;border-radius:12px;border:3px solid #2D3436;background:{{ scoreBg }}">{{ score }}</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ checks }}" as="c" hint-placeholder-count="10">
+        <div style="display:grid;grid-template-columns:44px 64px minmax(0,1fr);gap:12px;align-items:start;background:#FFFFFF;border:3px solid {{ c.edge }};border-radius:18px;padding:10px 14px">
+          <div style="font:700 18px 'JetBrains Mono',monospace">{{ c.n }}</div>
+          <div style="font-weight:900;font-size:16px;text-align:center;border:3px solid #2D3436;border-radius:12px;padding:3px 0;background:{{ c.bg }}">{{ c.ok }}</div>
+          <div style="display:flex;flex-direction:column;gap:3px;min-width:0"><div style="font-weight:800;font-size:16px;text-wrap:pretty">{{ c.t }}</div><div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E;line-height:1.5;overflow-wrap:anywhere">{{ c.d }}</div></div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Muncher measures" style="display:flex;flex-direction:column;gap:12px">
+    <div style="font-size:30px;font-weight:900">Muncher — rig, pivots, eat centre</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+      <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:22px;padding:12px;display:flex;flex-direction:column;gap:8px">
+        <div ref="{{ pivRef }}" style="position:relative;width:100%;aspect-ratio:320/300;background:#EAF3DF;border-radius:14px"></div>
+        <div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E;line-height:1.6">red = node pivots · blue ring = eat radius 36 around root (= mouth) · dashed = visual radius 58 × 52</div>
+      </div>
+      <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:22px;padding:12px;display:flex;flex-direction:column;gap:8px">
+        <div ref="{{ sideRef }}" style="position:relative;width:100%;aspect-ratio:320/300;background:#EAF3DF;border-radius:14px"></div>
+        <div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E;line-height:1.6">side: length 136 px (≤ 260) · mouth 2 px from root</div>
+      </div>
+      <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:22px;padding:12px;display:flex;flex-direction:column;gap:8px">
+        <div ref="{{ nestRef }}" style="position:relative;width:100%;aspect-ratio:300/160;background:#EAF3DF;border-radius:14px"></div>
+        <div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E;line-height:1.6">molehill 270 × 124 (≤ 280 × 130) · back + front lip</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <sc-for list="{{ mViews }}" as="v" hint-placeholder-count="3">
+        <div style="font:500 12px 'JetBrains Mono',monospace;line-height:1.6;overflow-wrap:anywhere"><b>{{ v.id }}</b> · {{ v.list }}</div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Budgets" style="display:flex;flex-direction:column;gap:12px">
+    <div style="font-size:30px;font-weight:900">§4 Budgets — measured from godot/budgets.json</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">
+      <sc-for list="{{ budgets }}" as="b" hint-placeholder-count="10">
+        <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:4px">
+          <div style="font:700 12px 'JetBrains Mono',monospace;color:#555C5E">{{ b.k }}</div>
+          <div style="font-size:24px;font-weight:900">{{ b.v }}</div>
+          <div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E">{{ b.lim }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Knight rig" style="display:flex;flex-direction:column;gap:12px">
+    <div style="font-size:30px;font-weight:900">Sir Pip — added nodes and swapped parts per view</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <sc-for list="{{ kViews }}" as="v" hint-placeholder-count="5">
+        <div style="font:500 12px 'JetBrains Mono',monospace;line-height:1.6;overflow-wrap:anywhere"><b>{{ v.id }}</b> · + {{ v.add }} · swap {{ v.swap }}</div>
+      </sc-for>
+    </div>
+    <div ref="{{ silRef }}" style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end"></div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const SEASON_GROUND = { country_bloom: '#7DAA67', frost_orchard: '#9FB6CF', lantern_meadow: '#463E66', amber_canopy: '#7F5C3B', moonlit_warren: '#3B4175', coral_tide: '#E2B196', starfall_glade: '#3A3163', ember_fen: '#58392F' };
+const lum = h => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4)); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
+const cr = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+const WANT = ['README.md', 'design/Muncher.dc.html', 'design/PremiumPip.dc.html', 'design/Specs.dc.html', 'design/support.js', 'design/pip_art.js', 'design/pip_runtime.js', 'design/pip_anim.js', 'design/knight.js', 'design/muncher.js',
+  'godot/muncher_rig.json', 'godot/muncher_animations.json', 'godot/skins_knight.json', 'godot/rig_additions.json', 'godot/animations_additions.json', 'godot/shop_export.json', 'godot/budgets.json', 'assets/pip/hud/pip_hud_knight.svg', 'assets/muncher/nest/m_nest_back.svg', 'assets/muncher/nest/m_nest_front.svg'];
+class Component extends DCLogic {
+  state = { ready: false };
+  pivRef = React.createRef(); sideRef = React.createRef(); nestRef = React.createRef(); silRef = React.createRef();
+  componentDidMount() { this.boot(); }
+  boot() { if (!window.Muncher || !window.Knight || !Pip.ANIMS.goal_knight || !this.pivRef.current) { setTimeout(() => this.boot(), 60); return; } this.run(); }
+  async run() {
+    const ns = 'http://www.w3.org/2000/svg';
+    const dot = (svg, x, y, r, fill, stroke, dash) => { const c = document.createElementNS(ns, 'circle'); c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', r); c.setAttribute('fill', fill); if (stroke) { c.setAttribute('stroke', stroke); c.setAttribute('stroke-width', 1.6); } if (dash) c.setAttribute('stroke-dasharray', '5 4'); svg.appendChild(c); };
+    const piv = (el, view) => { const m = Muncher.create(el, { view, size: el.clientWidth }); const O = m.rig.origin; dot(m.svg, O[0], O[1], 36, 'none', '#3B82C4'); if (view === 'front') { const e = document.createElementNS(ns, 'ellipse'); e.setAttribute('cx', O[0]); e.setAttribute('cy', O[1] - 10); e.setAttribute('rx', 58); e.setAttribute('ry', 52); e.setAttribute('fill', 'none'); e.setAttribute('stroke', '#2D3436'); e.setAttribute('stroke-dasharray', '5 4'); m.svg.appendChild(e); }
+      m.rig.nodes.forEach(n => { if (!n.sprite || n.sprite === 'fx' || n.id === 'ice') return; const w = m.world[n.id]; dot(m.svg, w[4], w[5], 3, '#E07A7A', '#FFFFFF'); }); return m; };
+    this.mf = piv(this.pivRef.current, 'front'); this.ms = piv(this.sideRef.current, 'side');
+    Muncher.create(this.nestRef.current, { rig: Muncher.NEST, size: this.nestRef.current.clientWidth });
+    // eat centre: mouth world pos vs root in eat clips
+    const mouthOff = v => { const d = document.createElement('div'); const m = Muncher.create(d, { view: v, size: 320 }); m.seek('m_eat_' + v, 0); const o = m.rig.origin, w = m.world.mouth; return Math.hypot(w[4] - o[0], w[5] - o[1]); };
+    this.mouth = { front: mouthOff('front'), side: mouthOff('side') };
+    // shared clips identical on knight (world matrices of every Classic node)
+    let tested = 0, diff = 0, worst = 0; const views = Object.keys(PipArt.RIGS), box = document.createElement('div');
+    const insts = {}; views.forEach(v => insts[v] = { c: Pip.create(box.appendChild(document.createElement('div')), { view: v, skin: 'classic', size: 100, still: true }), k: Pip.create(box.appendChild(document.createElement('div')), { view: v, skin: 'knight', size: 100, still: true }) });
+    const shared = Pip.ORDER.filter(id => !Knight.anims.includes(id));
+    for (const id of shared) { const a = Pip.ANIMS[id]; const v = a.view === 'any' ? 'front' : a.view; const { c, k } = insts[v];
+      for (const f of [0, .37, .71, 1]) { c.base = { a, t: a.len * f, hold: true }; k.base = { a, t: a.len * f, hold: true }; c.render(); k.render(); tested++;
+        for (const n of c.rig.nodes) { if (n.skin) continue; const A = c.world[n.id], B = k.world[n.id]; if (!B) { diff++; continue; } const e = Math.max(...A.map((x, i) => Math.abs(x - B[i]))); worst = Math.max(worst, e); if (e > 1e-6) diff++; } } }
+    this.eq = { anims: shared.length, samples: tested, diff, worst };
+    // silhouettes: knight vs classic at HUD 88 and run top 150
+    const rast = (o) => new Promise(res => { const d = document.createElement('div'); const p = Pip.create(d, Object.assign({ still: true, shadow: false }, o)); const s = d.querySelector('svg').cloneNode(true); s.querySelectorAll('[style*="display: none"]').forEach(n => n.remove()); s.setAttribute('xmlns', ns);
+      s.querySelectorAll('[fill]').forEach(e => { if (e.getAttribute('fill') !== 'none') e.setAttribute('fill', '#000'); e.removeAttribute('fill-opacity'); }); s.querySelectorAll('[stroke]').forEach(e => e.setAttribute('stroke', '#000'));
+      const im = new Image(); im.onload = () => { const cv = document.createElement('canvas'); cv.width = cv.height = o.size; const x = cv.getContext('2d'); x.drawImage(im, 0, 0, o.size, o.size); res({ data: x.getImageData(0, 0, o.size, o.size).data, url: cv.toDataURL() }); }; im.onerror = () => res(null); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s.outerHTML); });
+    const cmp = async (o, sk) => { const a = await rast(Object.assign({ skin: 'classic' }, o)), b = await rast(Object.assign({ skin: sk || 'knight' }, o)); if (!a || !b) return { r: 0 }; let u = 0, x = 0; for (let i = 3; i < a.data.length; i += 4) { const p = a.data[i] > 100, q = b.data[i] > 100; if (p || q) u++; if (p !== q) x++; } return { r: x / u, a: a.url, b: b.url }; };
+    this.sil88 = await cmp({ view: 'front', size: 88, crop: [40, 40, 176, 176] }); this.silTop = await cmp({ view: 'top', size: 150 });
+    this.coinSil = 0; for (const sk of ['blossom', 'sky']) { const h = await cmp({ view: 'front', size: 88, crop: [40, 40, 176, 176] }, sk), t = await cmp({ view: 'top', size: 150 }, sk); this.coinSil = Math.max(this.coinSil, h.r, t.r); }
+    const row = this.silRef.current; row.innerHTML = '';
+    [[this.sil88, 'HUD 88'], [this.silTop, 'run top 150']].forEach(([s, l]) => { ['a', 'b'].forEach(k => { const im = new Image(); im.src = s[k]; im.style.cssText = 'background:#FFF;border:2px solid #2D3436;border-radius:10px'; row.appendChild(im); }); const t = document.createElement('div'); t.style.cssText = "font:500 12px 'JetBrains Mono',monospace;color:#555C5E;max-width:160px"; t.textContent = l + ': ' + Math.round(s.r * 100) + ' % of the silhouette differs from Classic'; row.appendChild(t); });
+    // files
+    const files = {}; let bud = null, shop = null, kAdd = null, mAnim = null; const svgText = [];
+    await Promise.all(WANT.map(async f => { try { const r = await fetch('../' + f, { cache: 'no-store' }); files[f] = r.ok; if (!r.ok) return; if (f.endsWith('budgets.json')) bud = await r.json(); else if (f.endsWith('shop_export.json')) shop = await r.json(); else if (f.endsWith('rig_additions.json')) kAdd = await r.json(); else if (f.endsWith('muncher_animations.json')) mAnim = await r.json(); else if (f.endsWith('.svg')) svgText.push(await r.text()); } catch (e) { files[f] = false; } }));
+    Object.assign(this, { files, bud, shop, kAdd, mAnim, svgText });
+    this.setState({ ready: true });
+    const L = this.checks(); console.log('SELFCHECK ' + L.filter(c => c.ok === 'da').length + '/10 ' + L.map(c => c.n + ':' + c.ok).join(' '));
+  }
+  checks() {
+    if (!this.state.ready) return [];
+    const M = Muncher, A = PipArt, K = Knight, b = this.bud || {}, mb = b.muncher || {}, kb = b.knight || {}, lim = b.limits || {};
+    const fur = M.C.fur, grounds = Object.entries(SEASON_GROUND);
+    const read = grounds.map(([s, g]) => Math.max(cr(fur, g), cr('#2D3436', g))); const minRead = Math.min(...read), chip = cr(fur, '#22302A');
+    const need = ['m_sleep_nest', 'm_sleep_spot', 'm_wake_nest', 'm_wake_spot', 'm_awake', 'm_hunt_front', 'm_hunt_side', 'm_hunt_back', 'm_eat_front', 'm_eat_side', 'm_freeze', 'm_frozen', 'm_thaw', 'm_doze', 'm_escaped_front', 'm_escaped_side'];
+    const views5 = Object.keys(A.RIGS), sk = A.SKINS.find(s => s.key === 'knight');
+    const ownEvery = views5.every(v => A.RIGS[v].nodes.some(n => n.skin === 'knight') && A.RIGS[v].nodes.some(n => n.sprite && !n.skin && Pip.partFor(sk, v, n.sprite) !== n.sprite));
+    const own6 = ['pose_knight', 'sig_knight', 'idle_knight', 't3_knight', 'goal_knight'].every(i => Pip.ANIMS[i]) && sk.idle_detail.gap_s[0] >= 6 && sk.idle_detail.gap_s[1] <= 10 && this.files['assets/pip/hud/pip_hud_knight.svg'];
+    const sh = this.shop || {}, sc = sh.shop_card || {}, wc = sh.wardrobe_card || {};
+    const shopOk = ['available', 'busy', 'owned', 'wearing'].every(s => sc.states && sc.states[s]) && ['locked', 'owned', 'wearing'].every(s => wc.states && wc.states[s]) && wc.classic && wc.classic.tag === 'Free' && wc.knight && wc.knight.tag === 'Premium' && sh.cosmetics_item && sh.cosmetics_item.source === 'iap';
+    const addMax = Math.max(...Object.values(kb.added_nodes_per_view || { x: 99 }));
+    const fxLen = Math.max(...M.ORDER.map(id => { const a = M.ANIMS[id]; let mx = 0; ['fx_a', 'fx_b', 'fx_c', 'fx_d', 'emote'].forEach(n => { const v = a.tracks[n] && a.tracks[n].v; if (v && !a.loop) { const on = v.find(k => k[1] === 1), off = v.find(k => k[1] === 0 && on && k[0] > on[0]); if (on && off) mx = Math.max(mx, off[0] - on[0]); } }); return mx; }));
+    const budOk = mb.nodes_total <= 24 && mb.atlas && mb.atlas.at_1_5x.h <= 1024 && kb.atlas && kb.atlas.at_1_5x.h <= 1024 && mb.svg_bytes <= lim.muncher_svg && kb.svg_bytes <= lim.knight_svg && addMax <= 10 && mb.fx_frames <= 12 && fxLen <= .6;
+    const allSvg = this.svgText.join('') + M.parts().map(p => p.fn()).join('') + K.sprites().map(s => Object.values(A.SPR[s].frames).map(f => f(sk.tokens)).join('')).join('') + ['k_star', 'k_tink', 'k_flag'].map(f => A.FX[f]()).join('');
+    const banned = /gradient|<filter|filter=|<mask|mask=|clipPath|blur|feGaussian|glow/i.test(allSvg);
+    const eq = this.eq;
+    const L = [
+      ['Muncher je novi lik u stilu Pipa, simpatičan, ne strašan; čita se na svijetloj i tamnoj livadi.', minRead >= 3 && chip >= 3 && M.RIGS.front.nodes.length > 0, 'Nibbs the seed-mole · min. contrast fur-or-ink vs 8 meadows ' + minRead.toFixed(2) + ':1 · fur vs dark seed chip ' + chip.toFixed(2) + ':1 · round body, big eyes, buck teeth, bandit mask (cute, not scary — see Muncher §3/§4)'],
+      ['Muncher ima sva stanja iz §2.1, prelaze i kretanje u 4 pravca.', need.every(i => M.ANIMS[i]) && ['front', 'side', 'back'].every(v => M.RIGS[v]), need.length + ' clips · views front ↓ / back ↑ / side → (← = scale.x −1) · transitions in Muncher §3'],
+      ['Centar jedenja = usta; mjere iz §2.2.6.', this.mouth.front <= 4 && this.mouth.side <= 4, 'mouth → root: front ' + this.mouth.front.toFixed(1) + ' px, side ' + this.mouth.side.toFixed(1) + ' px (eat radius 36) · visual r 58 × 52 · length ≤ 136 px (≤ 260) · nest 270 × 124 (≤ 280 × 130)'],
+      ['Premium skin nije recolor: ima vlastite dijelove / dodatke u svih 5 pogleda.', ownEvery, Object.entries(kb.added_nodes_per_view || {}).map(([v, n]) => v + ' +' + n + ' nodes / ' + (kb.replaced_parts_per_view || {})[v] + ' parts').join(' · ')],
+      ['Svih postojećih Pip animacija radi sa skinom (isti pivoti).', eq.diff === 0 && eq.anims >= 75, eq.anims + ' shared clips × 4 samples · ' + eq.samples + ' poses · world matrices of every Classic node identical (worst Δ ' + eq.worst.toExponential(1) + ') · package has 77 = the 75 in game + 2'],
+      ['Skin ima pozu, potpis, idle detalj, reakciju na T3 i cilj, i HUD glavu.', !!own6, 'pose_knight · sig_knight ' + Pip.ANIMS.sig_knight.len + ' s · idle_knight every ' + sk.idle_detail.gap_s.join('–') + ' s · t3_knight · goal_knight · pip_hud_knight.svg'],
+      ['Skin je prepoznatljiv na 88 px i u runu odozgo.', Math.min(this.sil88.r, this.silTop.r) >= .1 && Math.min(this.sil88.r, this.silTop.r) >= 5 * this.coinSil, 'silhouette alone (no colour) differs from Classic: HUD 88 ' + (this.sil88.r * 100).toFixed(1) + ' % · run top ' + (this.silTop.r * 100).toFixed(1) + ' % — rule ≥ 10 % and ≥ 5 × the most-changed coin skin (Blossom / Sky ' + (this.coinSil * 100).toFixed(1) + ' %) · helmet + plume + cape'],
+      ['Shop i Ormar kartice imaju sva stanja; Classic ostaje „Free", premium ima „Premium".', !!shopOk, 'Shop: available / busy / owned / wearing · Ormar: locked (veil → Shop) / owned / wearing · cosmetics item source iap, SKU pip_knight'],
+      ['Budžeti iz §4 su ispunjeni i napisani.', !!budOk, 'Muncher ' + mb.nodes_total + ' nodes · atlas 1024×' + (mb.atlas && mb.atlas.at_1_5x.h) + ' @1.5× · SVG ' + ((mb.svg_bytes || 0) / 1024).toFixed(1) + ' KB · FX ' + mb.fx_frames + ' frames ≤ ' + fxLen.toFixed(2) + ' s | Sir Pip +' + addMax + ' nodes/view · atlas 1024×' + (kb.atlas && kb.atlas.at_1_5x.h) + ' @1.5× · SVG ' + ((kb.svg_bytes || 0) / 1024).toFixed(1) + ' KB'],
+      ['Nigdje blur, glow, gradijent ni maska.', !banned, 'scanned ' + Math.round(allSvg.length / 1024) + ' KB of sprite SVG · ' + Object.values(this.files).filter(Boolean).length + '/' + WANT.length + ' package files found' + (Object.values(this.files).every(Boolean) ? '' : ' · missing ' + Object.entries(this.files).filter(([k, v]) => !v).map(([k]) => k).join(', '))]
+    ];
+    return L.map(([t, ok, d], i) => ({ n: i + 1, t, ok: ok ? 'da' : 'ne', d, bg: ok ? '#A8E6CF' : '#E88B8B', edge: ok ? '#2D3436' : '#E07A7A' }));
+  }
+  renderVals() {
+    const ready = this.state.ready, checks = this.checks(), ok = checks.filter(c => c.ok === 'da').length, b = this.bud || {}, mb = b.muncher || {}, kb = b.knight || {};
+    const kb2 = v => v ? (v / 1024).toFixed(1) + ' KB' : '…';
+    return {
+      pivRef: this.pivRef, sideRef: this.sideRef, nestRef: this.nestRef, silRef: this.silRef,
+      score: ready ? ok + ' / 10 da' : 'checking…', scoreBg: ready ? (ok === 10 ? '#A8E6CF' : '#E88B8B') : '#FFFFFF', checks,
+      mViews: ready ? Object.keys(Muncher.RIGS).map(v => ({ id: v, list: Muncher.RIGS[v].nodes.map(n => n.id + (n.swap ? '⇄' : '')).join(' · ') })) : [],
+      kViews: ready ? Object.keys(PipArt.RIGS).map(v => { const sk = PipArt.SKINS.find(s => s.key === 'knight'); return { id: v, add: PipArt.RIGS[v].nodes.filter(n => n.skin === 'knight').map(n => n.id).join(', '), swap: [...new Set(PipArt.RIGS[v].nodes.filter(n => n.sprite && !n.skin && Pip.partFor(sk, v, n.sprite) !== n.sprite).map(n => n.sprite + '→' + Pip.partFor(sk, v, n.sprite)))].join(', ') }; }) : [],
+      budgets: ready && mb.atlas ? [
+        { k: 'Muncher nodes', v: mb.nodes_total + ' / 24', lim: '22 rig + 2 nest · per view ' + Object.values(mb.nodes_per_view).join('/') },
+        { k: 'Muncher atlas', v: '1024 × ' + mb.atlas.at_1_5x.h, lim: '@1.5× · 1× ' + mb.atlas.at_1x.h + ' · ' + mb.atlas.at_1x.sprites + ' sprites · ≤ 1024²' },
+        { k: 'Muncher SVG', v: kb2(mb.svg_bytes), lim: mb.svg_files + ' files · ≤ 120 KB' },
+        { k: 'Muncher FX', v: mb.fx_frames + ' frames', lim: '≤ 5 FX nodes live (+ ice) · ≤ 0.6 s · ≤ 12' },
+        { k: 'Sir Pip added nodes', v: '+' + Math.max(...Object.values(kb.added_nodes_per_view)) + ' / view', lim: Object.entries(kb.added_nodes_per_view).map(([v, n]) => v + ' ' + n).join(' · ') + ' · ≤ 10' },
+        { k: 'Sir Pip atlas', v: '1024 × ' + kb.atlas.at_1_5x.h, lim: '@1.5× · 1× ' + kb.atlas.at_1x.h + ' · ' + kb.atlas_sprites + ' sprites (own + shared, recoloured)' },
+        { k: 'Sir Pip SVG', v: kb2(kb.svg_bytes), lim: kb.svg_files + ' new files · ≤ 150 KB' },
+        { k: 'Sir Pip FX', v: '≤ 3 sprites', lim: 'k_star × 3 / k_tink / k_flag · no run trail' },
+        { k: 'Animation technique', v: 'transforms + frame swap', lim: 'position · rotation · scale · visible · frame · modulate:a only' },
+        { k: 'Clips', v: (mb.anims + kb.anims) + ' new', lim: mb.anims + ' Muncher + ' + kb.anims + ' Sir Pip (+ 77 shared reused)' }
+      ] : []
+    };
+  }
+}
+</script>
+</body>
+</html>

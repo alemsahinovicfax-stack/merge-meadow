@@ -1,0 +1,91 @@
+{
+ "schema": 1,
+ "generated": "2026-10-13T07:26:54.204Z",
+ "muncher": {
+  "nodes_total": 24,
+  "nodes_per_view": {
+   "front": 22,
+   "side": 21,
+   "back": 18
+  },
+  "nest_nodes": 2,
+  "fx_nodes": 5,
+  "ice_node": 1,
+  "fx_frames": 12,
+  "fx_max_len_s": 0.6,
+  "atlas": {
+   "at_1x": {
+    "w": 1024,
+    "h": 387,
+    "sprites": 46,
+    "scale": 1
+   },
+   "at_1_5x": {
+    "w": 1024,
+    "h": 844,
+    "sprites": 46,
+    "scale": 1.5
+   },
+   "at_2x": {
+    "w": 1024,
+    "h": 1438,
+    "sprites": 46,
+    "scale": 2
+   }
+  },
+  "svg_files": 46,
+  "svg_bytes": 27581,
+  "anims": 16
+ },
+ "knight": {
+  "added_nodes_per_view": {
+   "front": 4,
+   "three_q": 4,
+   "side": 3,
+   "back": 2,
+   "top": 3
+  },
+  "replaced_parts_per_view": {
+   "front": 8,
+   "three_q": 8,
+   "side": 8,
+   "back": 5,
+   "top": 5
+  },
+  "atlas": {
+   "at_1x": {
+    "w": 1024,
+    "h": 300,
+    "sprites": 65,
+    "scale": 1
+   },
+   "at_1_5x": {
+    "w": 1024,
+    "h": 648,
+    "sprites": 65,
+    "scale": 1.5
+   },
+   "at_2x": {
+    "w": 1024,
+    "h": 1150,
+    "sprites": 65,
+    "scale": 2
+   }
+  },
+  "atlas_sprites": 65,
+  "svg_files": 30,
+  "svg_bytes": 47657,
+  "anims": 7,
+  "fx_sprites_max": 4,
+  "trail": "none"
+ },
+ "limits": {
+  "muncher_svg": 122880,
+  "knight_svg": 153600,
+  "atlas": 1024,
+  "muncher_nodes": 24,
+  "knight_added_per_view": 10,
+  "fx": 12,
+  "fx_len_s": 0.6
+ }
+}

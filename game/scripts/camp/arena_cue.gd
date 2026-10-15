@@ -48,6 +48,7 @@ func show_message(text: String, sec: float = MESSAGE_SEC) -> void:
 		return
 	_kill_message_tween()
 	_message_on = true
+	Sfx.play("ui_toast")
 	cue.setup(message_rows(text), "up")
 	layout(_field_size())
 	cue.modulate.a = 1.0

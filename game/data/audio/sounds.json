@@ -1,0 +1,1044 @@
+{
+ "schema": 1,
+ "sfx": {
+  "ui_tap": {
+   "files": [
+    "res://assets/audio/sfx/ui_tap.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -10.6,
+   "sec": 0.09,
+   "pitch": [
+    0.96,
+    1.05
+   ],
+   "cooldown_ms": 40,
+   "max": 3
+  },
+  "ui_back": {
+   "files": [
+    "res://assets/audio/sfx/ui_back.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -10.5,
+   "sec": 0.09,
+   "pitch": [
+    0.97,
+    1.03
+   ],
+   "cooldown_ms": 60
+  },
+  "ui_tab": {
+   "files": [
+    "res://assets/audio/sfx/ui_tab.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -10.5,
+   "sec": 0.26,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown_ms": 120,
+   "group": "nav"
+  },
+  "ui_swipe": {
+   "files": [
+    "res://assets/audio/sfx/ui_swipe.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -11.0,
+   "sec": 0.22,
+   "pitch": [
+    0.92,
+    1.08
+   ],
+   "cooldown_ms": 150,
+   "group": "nav"
+  },
+  "ui_open": {
+   "files": [
+    "res://assets/audio/sfx/ui_open.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -10.0,
+   "sec": 0.41,
+   "cooldown_ms": 150
+  },
+  "ui_close": {
+   "files": [
+    "res://assets/audio/sfx/ui_close.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -10.7,
+   "sec": 0.35,
+   "cooldown_ms": 150
+  },
+  "ui_toggle_on": {
+   "files": [
+    "res://assets/audio/sfx/ui_toggle_on.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -13.1,
+   "sec": 0.16,
+   "cooldown_ms": 60
+  },
+  "ui_toggle_off": {
+   "files": [
+    "res://assets/audio/sfx/ui_toggle_off.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -13.3,
+   "sec": 0.16,
+   "cooldown_ms": 60
+  },
+  "ui_slider": {
+   "files": [
+    "res://assets/audio/sfx/ui_slider.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -13.5,
+   "sec": 0.03,
+   "pitch": [
+    0.9,
+    1.1
+   ],
+   "cooldown_ms": 55
+  },
+  "ui_denied": {
+   "files": [
+    "res://assets/audio/sfx/ui_denied.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -9.1,
+   "sec": 0.23,
+   "cooldown_ms": 250
+  },
+  "ui_toast": {
+   "files": [
+    "res://assets/audio/sfx/ui_toast.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -11.4,
+   "sec": 0.14,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown_ms": 200
+  },
+  "ui_play": {
+   "files": [
+    "res://assets/audio/sfx/ui_play.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -10.7,
+   "sec": 0.53,
+   "cooldown_ms": 300
+  },
+  "coin": {
+   "files": [
+    "res://assets/audio/sfx/coin.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -12.2,
+   "sec": 0.54,
+   "pitch": [
+    0.99,
+    1.01
+   ],
+   "cooldown_ms": 35,
+   "max": 4,
+   "chain": {
+    "window_ms": 700,
+    "step": 1,
+    "max_steps": 7
+   }
+  },
+  "coins_spend": {
+   "files": [
+    "res://assets/audio/sfx/coins_spend.wav"
+   ],
+   "source": "synth",
+   "cat": "reward",
+   "db": -9.3,
+   "sec": 0.77,
+   "cooldown_ms": 200
+  },
+  "purchase_ok": {
+   "files": [
+    "res://assets/audio/sfx/purchase_ok.wav"
+   ],
+   "source": "synth",
+   "cat": "reward",
+   "db": -7.3,
+   "sec": 1.55,
+   "cooldown_ms": 500,
+   "duck": [
+    -8.0,
+    1.2
+   ]
+  },
+  "purchase_fail": {
+   "files": [
+    "res://assets/audio/sfx/purchase_fail.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -10.7,
+   "sec": 0.53,
+   "cooldown_ms": 400
+  },
+  "unlock": {
+   "files": [
+    "res://assets/audio/sfx/unlock.wav"
+   ],
+   "source": "synth",
+   "cat": "big",
+   "db": -4.8,
+   "sec": 1.5,
+   "cooldown_ms": 600,
+   "duck": [
+    -9.0,
+    1.4
+   ]
+  },
+  "gift": {
+   "files": [
+    "res://assets/audio/sfx/gift.wav"
+   ],
+   "source": "synth",
+   "cat": "reward",
+   "db": -9.0,
+   "sec": 0.86,
+   "cooldown_ms": 400
+  },
+  "reward_tick": {
+   "files": [
+    "res://assets/audio/sfx/reward_tick.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -5.4,
+   "sec": 0.15,
+   "cooldown_ms": 30,
+   "max": 3,
+   "chain": {
+    "window_ms": 300,
+    "step": 1,
+    "max_steps": 12
+   }
+  },
+  "wear": {
+   "files": [
+    "res://assets/audio/sfx/wear.wav"
+   ],
+   "source": "synth",
+   "cat": "reward",
+   "db": -8.3,
+   "sec": 0.7,
+   "cooldown_ms": 250
+  },
+  "upgrade": {
+   "files": [
+    "res://assets/audio/sfx/upgrade.wav"
+   ],
+   "source": "synth",
+   "cat": "reward",
+   "db": -7.8,
+   "sec": 0.86,
+   "cooldown_ms": 300
+  },
+  "seed_pick": {
+   "files": [
+    "res://assets/audio/sfx/seed_pick.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -11.3,
+   "sec": 0.06,
+   "pitch": [
+    0.93,
+    1.08
+   ],
+   "cooldown_ms": 50
+  },
+  "seed_drop": {
+   "files": [
+    "res://assets/audio/sfx/seed_drop.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -8.1,
+   "sec": 0.1,
+   "pitch": [
+    0.92,
+    1.08
+   ],
+   "cooldown_ms": 50
+  },
+  "seed_wobble": {
+   "files": [
+    "res://assets/audio/sfx/seed_wobble.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -12.5,
+   "sec": 0.32,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown_ms": 120
+  },
+  "merge": {
+   "files": [
+    "res://assets/audio/sfx/merge.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -7.5,
+   "sec": 0.32,
+   "pitch": [
+    0.98,
+    1.02
+   ],
+   "cooldown_ms": 40,
+   "max": 3,
+   "chain": {
+    "window_ms": 2500,
+    "step": 1,
+    "max_steps": 9
+   }
+  },
+  "merge_t3": {
+   "files": [
+    "res://assets/audio/sfx/merge_t3.wav"
+   ],
+   "source": "synth",
+   "cat": "big",
+   "db": -6.7,
+   "sec": 1.32,
+   "cooldown_ms": 200,
+   "duck": [
+    -7.0,
+    1.0
+   ]
+  },
+  "crystal_fly": {
+   "files": [
+    "res://assets/audio/sfx/crystal_fly.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -10.6,
+   "sec": 0.75,
+   "cooldown_ms": 200
+  },
+  "pour": {
+   "files": [
+    "res://assets/audio/sfx/pour.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -6.4,
+   "sec": 0.75,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown_ms": 400
+  },
+  "seed_land": {
+   "files": [
+    "res://assets/audio/sfx/seed_land_1.wav",
+    "res://assets/audio/sfx/seed_land_2.wav",
+    "res://assets/audio/sfx/seed_land_3.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -13.0,
+   "sec": 0.05,
+   "pitch": [
+    0.9,
+    1.15
+   ],
+   "cooldown_ms": 30,
+   "max": 3
+  },
+  "vacuum": {
+   "files": [
+    "res://assets/audio/sfx/vacuum.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -8.7,
+   "sec": 0.43,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown_ms": 90,
+   "max": 2
+  },
+  "field_clear": {
+   "files": [
+    "res://assets/audio/sfx/field_clear.wav"
+   ],
+   "source": "synth",
+   "cat": "big",
+   "db": -7.2,
+   "sec": 1.22,
+   "cooldown_ms": 800,
+   "duck": [
+    -6.0,
+    1.0
+   ]
+  },
+  "gate_open": {
+   "files": [
+    "res://assets/audio/sfx/gate_open.wav"
+   ],
+   "source": "synth",
+   "cat": "reward",
+   "db": -8.5,
+   "sec": 0.99,
+   "cooldown_ms": 800
+  },
+  "muncher_wake": {
+   "files": [
+    "res://assets/audio/sfx/muncher_wake.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -7.0,
+   "sec": 0.27,
+   "cooldown_ms": 300
+  },
+  "muncher_awake": {
+   "files": [
+    "res://assets/audio/sfx/muncher_awake.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -8.7,
+   "sec": 0.68,
+   "cooldown_ms": 800
+  },
+  "muncher_chomp": {
+   "files": [
+    "res://assets/audio/sfx/muncher_chomp_1.wav",
+    "res://assets/audio/sfx/muncher_chomp_2.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -4.9,
+   "sec": 0.14,
+   "pitch": [
+    0.92,
+    1.08
+   ],
+   "cooldown_ms": 120,
+   "max": 2
+  },
+  "muncher_hmph": {
+   "files": [
+    "res://assets/audio/sfx/muncher_hmph.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -6.5,
+   "sec": 0.32,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown_ms": 500
+  },
+  "muncher_freeze": {
+   "files": [
+    "res://assets/audio/sfx/muncher_freeze.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -10.8,
+   "sec": 0.72,
+   "cooldown_ms": 300
+  },
+  "muncher_thaw": {
+   "files": [
+    "res://assets/audio/sfx/muncher_thaw.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -9.0,
+   "sec": 0.5,
+   "cooldown_ms": 300
+  },
+  "muncher_yawn": {
+   "files": [
+    "res://assets/audio/sfx/muncher_yawn.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -16.9,
+   "sec": 0.65,
+   "cooldown_ms": 1500
+  },
+  "pip_land": {
+   "files": [
+    "res://assets/audio/sfx/pip_land.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -8.4,
+   "sec": 0.1,
+   "pitch": [
+    0.93,
+    1.07
+   ],
+   "cooldown_ms": 150
+  },
+  "pip_pop": {
+   "files": [
+    "res://assets/audio/sfx/pip_pop.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -9.3,
+   "sec": 0.12,
+   "pitch": [
+    0.95,
+    1.08
+   ],
+   "cooldown_ms": 150
+  },
+  "pip_sneeze": {
+   "files": [
+    "res://assets/audio/sfx/pip_sneeze.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -8.5,
+   "sec": 0.33,
+   "pitch": [
+    0.96,
+    1.06
+   ],
+   "cooldown_ms": 600
+  },
+  "pip_bonk": {
+   "files": [
+    "res://assets/audio/sfx/pip_bonk.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -7.4,
+   "sec": 0.16,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown_ms": 300
+  },
+  "pip_thump": {
+   "files": [
+    "res://assets/audio/sfx/pip_thump.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -8.0,
+   "sec": 0.14,
+   "pitch": [
+    0.95,
+    1.05
+   ],
+   "cooldown_ms": 200
+  },
+  "pip_cough": {
+   "files": [
+    "res://assets/audio/sfx/pip_cough.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -5.8,
+   "sec": 0.16,
+   "cooldown_ms": 600
+  },
+  "pip_blow": {
+   "files": [
+    "res://assets/audio/sfx/pip_blow.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -10.4,
+   "sec": 0.45,
+   "cooldown_ms": 600
+  },
+  "run_go": {
+   "files": [
+    "res://assets/audio/sfx/run_go.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -9.7,
+   "sec": 0.68,
+   "cooldown_ms": 500
+  },
+  "lane": {
+   "files": [
+    "res://assets/audio/sfx/lane.wav"
+   ],
+   "source": "synth",
+   "cat": "ui",
+   "db": -11.4,
+   "sec": 0.13,
+   "pitch": [
+    0.92,
+    1.08
+   ],
+   "cooldown_ms": 70
+  },
+  "run_seed": {
+   "files": [
+    "res://assets/audio/sfx/run_seed.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -3.4,
+   "sec": 0.25,
+   "pitch": [
+    0.97,
+    1.03
+   ],
+   "cooldown_ms": 40,
+   "max": 3,
+   "chain": {
+    "window_ms": 900,
+    "step": 2,
+    "max_steps": 5
+   }
+  },
+  "bush": {
+   "files": [
+    "res://assets/audio/sfx/bush.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -11.1,
+   "sec": 0.52,
+   "cooldown_ms": 200
+  },
+  "run_hit": {
+   "files": [
+    "res://assets/audio/sfx/run_hit.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -3.4,
+   "sec": 0.25,
+   "cooldown_ms": 300
+  },
+  "run_fail": {
+   "files": [
+    "res://assets/audio/sfx/run_fail.wav"
+   ],
+   "source": "synth",
+   "cat": "reward",
+   "db": -6.0,
+   "sec": 0.72,
+   "cooldown_ms": 800,
+   "duck": [
+    -10.0,
+    1.4
+   ]
+  },
+  "run_finish": {
+   "files": [
+    "res://assets/audio/sfx/run_finish.wav"
+   ],
+   "source": "synth",
+   "cat": "big",
+   "db": -5.7,
+   "sec": 1.72,
+   "cooldown_ms": 800,
+   "duck": [
+    -10.0,
+    1.6
+   ]
+  },
+  "revive": {
+   "files": [
+    "res://assets/audio/sfx/revive.wav"
+   ],
+   "source": "synth",
+   "cat": "reward",
+   "db": -7.2,
+   "sec": 1.06,
+   "cooldown_ms": 600,
+   "duck": [
+    -6.0,
+    1.0
+   ]
+  },
+  "loot_reveal": {
+   "files": [
+    "res://assets/audio/sfx/loot_reveal.wav"
+   ],
+   "source": "synth",
+   "cat": "game",
+   "db": -9.2,
+   "sec": 0.42,
+   "cooldown_ms": 60,
+   "chain": {
+    "window_ms": 600,
+    "step": 2,
+    "max_steps": 6
+   }
+  },
+  "loot_double": {
+   "files": [
+    "res://assets/audio/sfx/loot_double.wav"
+   ],
+   "source": "synth",
+   "cat": "reward",
+   "db": -7.9,
+   "sec": 0.93,
+   "cooldown_ms": 500
+  },
+  "discover": {
+   "files": [
+    "res://assets/audio/sfx/discover.wav"
+   ],
+   "source": "synth",
+   "cat": "reward",
+   "db": -8.7,
+   "sec": 0.87,
+   "cooldown_ms": 300
+  },
+  "field_open": {
+   "files": [
+    "res://assets/audio/sfx/field_open.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -9.2,
+   "sec": 0.87,
+   "cooldown_ms": 300
+  },
+  "field_close": {
+   "files": [
+    "res://assets/audio/sfx/field_close.wav"
+   ],
+   "source": "synth",
+   "cat": "soft",
+   "db": -9.9,
+   "sec": 0.63,
+   "cooldown_ms": 300
+  }
+ },
+ "music": {
+  "country_bloom_home": {
+   "file": "res://assets/audio/music/country_bloom_home.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "country_bloom",
+   "level": "home",
+   "title": "Sunny Pasture",
+   "sec": 45.71,
+   "bpm": 84,
+   "lufs": -18.0,
+   "db": -6.0
+  },
+  "country_bloom_arena": {
+   "file": "res://assets/audio/music/country_bloom_arena.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "country_bloom",
+   "level": "arena",
+   "title": "Sunny Pasture",
+   "sec": 38.4,
+   "bpm": 100,
+   "lufs": -17.5,
+   "db": -6.5
+  },
+  "country_bloom_run": {
+   "file": "res://assets/audio/music/country_bloom_run.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "country_bloom",
+   "level": "run",
+   "title": "Sunny Pasture",
+   "sec": 32.0,
+   "bpm": 60,
+   "lufs": -16.4,
+   "db": -10.6
+  },
+  "frost_orchard_home": {
+   "file": "res://assets/audio/music/frost_orchard_home.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "frost_orchard",
+   "level": "home",
+   "title": "Silver Waltz",
+   "sec": 32.73,
+   "bpm": 88,
+   "lufs": -14.8,
+   "db": -9.2
+  },
+  "frost_orchard_arena": {
+   "file": "res://assets/audio/music/frost_orchard_arena.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "frost_orchard",
+   "level": "arena",
+   "title": "Silver Waltz",
+   "sec": 36.92,
+   "bpm": 104,
+   "lufs": -16.6,
+   "db": -7.4
+  },
+  "frost_orchard_run": {
+   "file": "res://assets/audio/music/frost_orchard_run.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "frost_orchard",
+   "level": "run",
+   "title": "Silver Waltz",
+   "sec": 32.0,
+   "bpm": 60,
+   "lufs": -12.4,
+   "db": -14.6
+  },
+  "lantern_meadow_home": {
+   "file": "res://assets/audio/music/lantern_meadow_home.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "lantern_meadow",
+   "level": "home",
+   "title": "Lantern Walk",
+   "sec": 53.33,
+   "bpm": 72,
+   "lufs": -14.7,
+   "db": -9.3
+  },
+  "lantern_meadow_arena": {
+   "file": "res://assets/audio/music/lantern_meadow_arena.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "lantern_meadow",
+   "level": "arena",
+   "title": "Lantern Walk",
+   "sec": 40.0,
+   "bpm": 96,
+   "lufs": -17.9,
+   "db": -6.1
+  },
+  "lantern_meadow_run": {
+   "file": "res://assets/audio/music/lantern_meadow_run.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "lantern_meadow",
+   "level": "run",
+   "title": "Lantern Walk",
+   "sec": 32.0,
+   "bpm": 60,
+   "lufs": -13.5,
+   "db": -13.5
+  },
+  "amber_canopy_home": {
+   "file": "res://assets/audio/music/amber_canopy_home.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "amber_canopy",
+   "level": "home",
+   "title": "Copper Leaves",
+   "sec": 32.0,
+   "bpm": 180,
+   "lufs": -13.4,
+   "db": -10.6
+  },
+  "amber_canopy_arena": {
+   "file": "res://assets/audio/music/amber_canopy_arena.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "amber_canopy",
+   "level": "arena",
+   "title": "Copper Leaves",
+   "sec": 25.26,
+   "bpm": 228,
+   "lufs": -15.4,
+   "db": -8.6
+  },
+  "amber_canopy_run": {
+   "file": "res://assets/audio/music/amber_canopy_run.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "amber_canopy",
+   "level": "run",
+   "title": "Copper Leaves",
+   "sec": 32.0,
+   "bpm": 60,
+   "lufs": -16.8,
+   "db": -10.2
+  },
+  "moonlit_warren_home": {
+   "file": "res://assets/audio/music/moonlit_warren_home.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "moonlit_warren",
+   "level": "home",
+   "title": "Moon Lullaby",
+   "sec": 43.64,
+   "bpm": 66,
+   "lufs": -14.2,
+   "db": -9.8
+  },
+  "moonlit_warren_arena": {
+   "file": "res://assets/audio/music/moonlit_warren_arena.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "moonlit_warren",
+   "level": "arena",
+   "title": "Moon Lullaby",
+   "sec": 40.0,
+   "bpm": 96,
+   "lufs": -15.1,
+   "db": -8.9
+  },
+  "moonlit_warren_run": {
+   "file": "res://assets/audio/music/moonlit_warren_run.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "moonlit_warren",
+   "level": "run",
+   "title": "Moon Lullaby",
+   "sec": 32.0,
+   "bpm": 60,
+   "lufs": -15.6,
+   "db": -11.4
+  },
+  "coral_tide_home": {
+   "file": "res://assets/audio/music/coral_tide_home.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "coral_tide",
+   "level": "home",
+   "title": "Seashell Bossa",
+   "sec": 38.4,
+   "bpm": 100,
+   "lufs": -15.1,
+   "db": -8.9
+  },
+  "coral_tide_arena": {
+   "file": "res://assets/audio/music/coral_tide_arena.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "coral_tide",
+   "level": "arena",
+   "title": "Seashell Bossa",
+   "sec": 34.29,
+   "bpm": 112,
+   "lufs": -15.0,
+   "db": -9.0
+  },
+  "coral_tide_run": {
+   "file": "res://assets/audio/music/coral_tide_run.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "coral_tide",
+   "level": "run",
+   "title": "Seashell Bossa",
+   "sec": 32.0,
+   "bpm": 60,
+   "lufs": -15.0,
+   "db": -12.0
+  },
+  "starfall_glade_home": {
+   "file": "res://assets/audio/music/starfall_glade_home.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "starfall_glade",
+   "level": "home",
+   "title": "Falling Stars",
+   "sec": 48.0,
+   "bpm": 80,
+   "lufs": -13.3,
+   "db": -10.7
+  },
+  "starfall_glade_arena": {
+   "file": "res://assets/audio/music/starfall_glade_arena.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "starfall_glade",
+   "level": "arena",
+   "title": "Falling Stars",
+   "sec": 35.56,
+   "bpm": 108,
+   "lufs": -13.6,
+   "db": -10.4
+  },
+  "starfall_glade_run": {
+   "file": "res://assets/audio/music/starfall_glade_run.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "starfall_glade",
+   "level": "run",
+   "title": "Falling Stars",
+   "sec": 32.0,
+   "bpm": 60,
+   "lufs": -14.6,
+   "db": -12.4
+  },
+  "ember_fen_home": {
+   "file": "res://assets/audio/music/ember_fen_home.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "ember_fen",
+   "level": "home",
+   "title": "Firelight Marsh",
+   "sec": 54.86,
+   "bpm": 70,
+   "lufs": -14.7,
+   "db": -9.3
+  },
+  "ember_fen_arena": {
+   "file": "res://assets/audio/music/ember_fen_arena.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "ember_fen",
+   "level": "arena",
+   "title": "Firelight Marsh",
+   "sec": 40.0,
+   "bpm": 96,
+   "lufs": -15.4,
+   "db": -8.6
+  },
+  "ember_fen_run": {
+   "file": "res://assets/audio/music/ember_fen_run.ogg",
+   "source": "synth",
+   "loop": true,
+   "season": "ember_fen",
+   "level": "run",
+   "title": "Firelight Marsh",
+   "sec": 32.0,
+   "bpm": 60,
+   "lufs": -16.5,
+   "db": -10.5
+  }
+ },
+ "note": "Generisano: scripts/audio/sfx_gen.py (efekti) i music_gen.py (muzika). db = pomak do ciljne glasnoće kategorije; source real = pravi zvuk, generator ga ne dira."
+}

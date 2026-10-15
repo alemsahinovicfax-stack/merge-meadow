@@ -83,7 +83,9 @@ var bushes_collected: int = 0
 
 
 func _ready() -> void:
+	Sfx.music_level("run")
 	player.hit_obstacle.connect(_on_player_hit_obstacle)
+	player.lane_changed.connect(func(_lane: int) -> void: Sfx.play("lane"))
 	pause_button.clicked.connect(_on_pause_pressed)
 	_build_popups()
 	keep_button.clicked.connect(_on_keep_running)
@@ -154,6 +156,7 @@ func _set_icon(rect: TextureRect, tex: Texture2D) -> void:
 
 func start_run() -> void:
 	_pip_play("run_start")
+	Sfx.play("run_go")
 	elapsed = 0.0
 	coin_count = 0
 	seeds_by_type = {}
@@ -255,6 +258,7 @@ func _show_tutorial(text: String) -> void:
 	var tip := Vector2(chip.get_center().x, chip.end.y + 8.0)
 	tutorial_cue.point_at(tip, 0.8, Rect2(24, 0, 1032, 1920))
 	tutorial_cue.pop_in()
+	Sfx.play("ui_toast")
 
 
 func _hide_tutorial() -> void:
@@ -325,6 +329,7 @@ func _play_fail_beat() -> void:
 		_spill_tokens()
 		_shake()
 		_show_banner(false)
+		Sfx.play("run_fail")
 	)
 	tw.tween_interval(UiRun.FAIL_SHAKE - UiRun.FAIL_FLASH)
 	tw.tween_callback(func() -> void:
@@ -338,6 +343,8 @@ func _play_fail_beat() -> void:
 
 func _play_finish_beat() -> void:
 	_pip_play("finish")
+	Sfx.play("run_finish")
+	Sfx.haptic(40)
 	# Traka: na 100 % zastavica se podigne i dobije mint prsten, pa „Time!".
 	if progress_rail and progress_rail.visible:
 		progress_rail.finish()
@@ -634,6 +641,7 @@ func _pip_play(run_id: String) -> void:
 
 func _on_coin_collected(at: Vector2) -> void:
 	coin_count += 1
+	Sfx.play("coin")
 	_pip_play("pickup_coin")
 	_update_hud()
 	if pickup_feed and pickup_feed.has_method("push_coin"):
@@ -646,6 +654,7 @@ func _on_seed_collected(type_id: String, at: Vector2) -> void:
 	# +2 ide u loot prije množitelja. Lanac otključavanja i dalje broji jedan pickup.
 	GameState.record_seed_pickup_lifetime(type_id, 1)
 	_pip_play("pickup_seed")
+	Sfx.play("run_seed")
 	_update_hud()
 	if pickup_feed and pickup_feed.has_method("push_seed"):
 		pickup_feed.push_seed(type_id, at, amount)
@@ -715,6 +724,7 @@ func _on_bush_collected(bush: RewardBush) -> void:
 	if _state == _STATE_ENDED:
 		return
 	bushes_collected += 1
+	Sfx.play("bush")
 	var at := bush.global_position
 	var kind := bush.reward_kind
 	var amount := bush.reward_amount
@@ -736,6 +746,9 @@ func _on_bush_collected(bush: RewardBush) -> void:
 
 
 func _on_player_hit_obstacle() -> void:
+	if _state == _STATE_RUNNING:
+		Sfx.play("run_hit")
+		Sfx.haptic(60)
 	_end_run(true)
 
 

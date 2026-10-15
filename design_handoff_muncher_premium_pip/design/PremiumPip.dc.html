@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="pip_art.js"></script>
+<script src="pip_runtime.js"></script>
+<script src="pip_anim.js"></script>
+<script src="knight.js"></script>
+<style>body{margin:0;background:#FFF8F0;color:#2D3436;font-family:Nunito,system-ui,sans-serif}a{color:#2E7F8C}a:hover{color:#2D3436}button,select{font-family:Nunito,sans-serif}</style>
+</helmet>
+<div style="max-width:1240px;margin:0 auto;padding:32px 24px 80px;display:flex;flex-direction:column;gap:40px">
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,360px);gap:24px;align-items:end">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font:500 13px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#555C5E">design_handoff_muncher_premium_pip · B · premium skin</div>
+      <div style="font-size:52px;font-weight:900;line-height:1">Sir Pip · Meadow Knight</div>
+      <div style="font-size:17px;font-weight:600;color:#555C5E;max-width:760px;text-wrap:pretty">The night the Muncher first dug up the clover patch, Pip swore to guard every seed. He whittled a helmet from an acorn cap, hammered a breastplate from a pewter thimble, stitched a cape from a poppy-blue petal and found a coral feather for his plume. Now he patrols the meadow — mostly by falling asleep in it. Cosmetic only: no gameplay effect anywhere.</div>
+    </div>
+    <div style="background:#EAD2FF;border:4px solid #2D3436;border-radius:28px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;box-shadow:0 8px 0 rgba(26,26,20,.22)">
+      <div style="font:700 12px 'JetBrains Mono',monospace;color:#555C5E">PRICE PROPOSAL (your call)</div>
+      <div style="font-size:40px;font-weight:900;line-height:1">€3.99 · $3.99</div>
+      <div style="font-size:15px;font-weight:700;line-height:1.4;text-wrap:pretty">Product “Sir Pip · Meadow Knight”, SKU pip_knight, non-consumable. Above impulse (€1.99) because it is a full new look in 5 views with 7 own clips; below €4.99 so it never out-prices a bundle.</div>
+    </div>
+  </div>
+
+  <section data-screen-label="Turnaround" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">1 · Five views — Classic for comparison, same pivots</div>
+    <div ref="{{ turnRef }}" style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px">
+      <sc-for list="{{ views }}" as="v" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:3px solid #2D3436;border-radius:22px;padding:10px">
+          <div style="font:700 13px 'JetBrains Mono',monospace">{{ v.id }}</div>
+          <div style="position:relative;width:100%;aspect-ratio:1;border-radius:14px;background:#BCD9A3;border:3px solid #16211B;overflow:hidden"><div data-turn="knight" data-view="{{ v.id }}" style="position:absolute;inset:0"></div></div>
+          <div style="position:relative;width:100%;aspect-ratio:1;border-radius:14px;background:#EAF3DF;border:3px solid rgba(45,52,54,.25);overflow:hidden"><div data-turn="classic" data-view="{{ v.id }}" style="position:absolute;inset:0"></div></div>
+          <div style="font:500 11px 'JetBrains Mono',monospace;color:#555C5E;line-height:1.5">{{ v.adds }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div ref="{{ silRef }}" style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;background:#FFFFFF;border:3px solid #2D3436;border-radius:22px;padding:14px 18px">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-weight:900;font-size:18px">Silhouette 64 px</div><div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E">helmet dome + plume + cape read alone</div></div>
+      <div data-sil="classic:front"></div><div data-sil="knight:front"></div><div data-sil="classic:three_q"></div><div data-sil="knight:three_q"></div><div data-sil="classic:top"></div><div data-sil="knight:top"></div>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-left:12px"><div style="font-weight:900;font-size:18px">HUD 88</div><div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E">pip_hud_knight.svg · same crop</div></div>
+      <div style="width:88px;height:88px;border-radius:50%;background:#FFF8F0;border:3px solid #2D3436;overflow:hidden"><div data-hud="classic"></div></div>
+      <div style="width:88px;height:88px;border-radius:50%;background:#FFF8F0;border:3px solid #2D3436;overflow:hidden"><div data-hud="knight"></div></div>
+    </div>
+  </section>
+
+  <section data-screen-label="Animations" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">2 · His own clips — and every shared clip runs unchanged</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <sc-for list="{{ own }}" as="o" hint-placeholder-count="5">
+        <button onClick="{{ o.go }}" style="font-weight:800;font-size:15px;padding:10px 14px;border-radius:14px;border:3px solid #2D3436;background:{{ o.bg }};cursor:pointer;color:#2D3436">{{ o.label }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-weight:900">All shared clips — tap one: both play it with their own parts <span style="font:500 13px 'JetBrains Mono',monospace;color:#555C5E">{{ animInfo }}</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;max-height:132px;overflow:auto;padding:6px;border:2px solid rgba(45,52,54,.2);border-radius:12px;background:#FFFFFF">
+        <sc-for list="{{ shared }}" as="sh" hint-placeholder-count="20">
+          <button onClick="{{ sh.go }}" style="font:700 11px 'JetBrains Mono',monospace;padding:4px 7px;border-radius:8px;border:1.5px solid #2D3436;background:{{ sh.bg }};cursor:pointer;color:#2D3436">{{ sh.id }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div ref="{{ playRef }}" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:820px">
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="position:relative;width:100%;aspect-ratio:1;border:3px solid #2D3436;border-radius:24px;background:#BCD9A3;overflow:hidden"><div style="position:absolute;left:0;right:0;bottom:0;height:22%;background:#7DAA67"></div><div data-play="knight" style="position:absolute;inset:0"></div></div><div style="font-weight:900">Sir Pip</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="position:relative;width:100%;aspect-ratio:1;border:3px solid #2D3436;border-radius:24px;background:#EAF3DF;overflow:hidden"><div style="position:absolute;left:0;right:0;bottom:0;height:22%;background:#CFE3BE"></div><div data-play="classic" style="position:absolute;inset:0"></div></div><div style="font-weight:900">Classic</div></div>
+    </div>
+    <div style="font:500 13px 'JetBrains Mono',monospace;color:#555C5E;max-width:900px;line-height:1.6;text-wrap:pretty">{{ ownInfo }}</div>
+  </section>
+
+  <section data-screen-label="Surfaces" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">3 · Every surface, next to Classic (real sizes in game px × 0.6)</div>
+    <div ref="{{ surfRef }}" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+      <sc-for list="{{ surfaces }}" as="sf" hint-placeholder-count="8">
+        <div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:3px solid #2D3436;border-radius:22px;padding:12px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><div style="font-weight:900;font-size:19px">{{ sf.title }}</div><div style="font:700 12px 'JetBrains Mono',monospace;color:#555C5E">{{ sf.size }}</div></div>
+          <div style="display:flex;gap:8px;justify-content:center;align-items:flex-end;min-height:150px;border-radius:16px;padding:8px;background:{{ sf.bg }};border:3px solid #16211B">
+            <div data-surf="{{ sf.id }}" data-skin="classic"></div>
+            <div data-surf="{{ sf.id }}" data-skin="knight"></div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ sf.events }}" as="ev" hint-placeholder-count="2">
+              <button onClick="{{ ev.go }}" style="font:700 12px 'JetBrains Mono',monospace;padding:7px 10px;border-radius:10px;border:2px solid #2D3436;background:#FFFFFF;cursor:pointer;color:#2D3436">{{ ev.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Shop" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">4 · Shop · Looks — premium card (1032 wide, shown × 0.6): available · busy · owned · wearing</div>
+    <div ref="{{ shopRef }}" style="display:flex;flex-direction:column;gap:18px">
+      <sc-for list="{{ shopCards }}" as="c" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="font:700 13px 'JetBrains Mono',monospace;color:#555C5E">{{ c.label }}</div>
+          <div style="width:619px;max-width:100%;height:{{ c.h }};overflow:hidden">
+            <div style="width:1032px;transform:scale(.6);transform-origin:top left">
+              <div style="position:relative;width:1032px;box-sizing:border-box;background:{{ c.card }};border:4px solid #2D3436;border-radius:36px;padding:20px;display:flex;flex-direction:column;gap:20px;box-shadow:0 10px 0 rgba(26,26,20,.22)">
+                <div onClick="{{ c.tap }}" style="position:relative;width:984px;height:300px;border:4px solid #2D3436;border-radius:24px;overflow:hidden;background:#BCD9A3;cursor:pointer;box-sizing:border-box">
+                  <div style="position:absolute;left:0;right:0;bottom:0;height:96px;background:#7DAA67"></div>
+                  <div style="position:absolute;left:84px;bottom:70px;width:120px;height:44px;border-radius:50%;background:#98C27F"></div>
+                  <div style="position:absolute;right:120px;bottom:80px;width:180px;height:56px;border-radius:50%;background:#98C27F"></div>
+                  <div data-shop="{{ c.id }}" style="position:absolute;left:50%;bottom:4px;transform:translateX(-50%)"></div>
+                  <div style="position:absolute;left:20px;top:20px;height:60px;padding:0 22px;border-radius:30px;background:#D4A5FF;border:4px solid #2D3436;display:flex;align-items:center;font-weight:900;font-size:34px;box-sizing:border-box">Premium</div>
+                  <sc-if value="{{ c.worn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:20px;top:20px;width:64px;height:64px;border-radius:50%;background:#A8E6CF;border:4px solid #2D3436;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:34px;box-sizing:border-box">✓</div></sc-if>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;height:120px">
+                  <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                    <div style="font-size:52px;font-weight:900;line-height:1.05">Sir Pip</div>
+                    <div style="font-size:36px;font-weight:700;color:#555C5E;line-height:1.1">Meadow Knight · Looks only</div>
+                  </div>
+                  <div onClick="{{ c.press }}" style="flex:none;min-width:280px;height:120px;padding:0 40px;border-radius:60px;border:4px solid {{ c.btnEdge }};background:{{ c.btn }};box-shadow:{{ c.btnShadow }};transform:translateY({{ c.btnY }});display:flex;align-items:center;justify-content:center;gap:16px;font-weight:900;font-size:52px;color:{{ c.btnInk }};cursor:pointer;box-sizing:border-box">{{ c.btnLabel }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Wardrobe" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">5 · Wardrobe cards (240 wide, shown × 0.6) — Classic stays “Free”, Sir Pip says “Premium”</div>
+    <div ref="{{ wardRef }}" style="width:619px;max-width:100%;height:{{ wardH }};overflow:hidden">
+      <div style="width:1032px;transform:scale(.6);transform-origin:top left;display:flex;gap:24px;flex-wrap:wrap">
+        <sc-for list="{{ wardCards }}" as="w" hint-placeholder-count="4">
+          <div onClick="{{ w.tap }}" style="position:relative;width:240px;box-sizing:border-box;padding:12px;border-radius:28px;background:{{ w.card }};border:{{ w.edge }};display:flex;flex-direction:column;gap:10px;cursor:pointer">
+            <div style="position:relative;width:210px;height:150px;border-radius:18px;overflow:hidden;background:#98C27F;border:3px solid #16211B;box-sizing:border-box">
+              <div style="position:absolute;left:0;right:0;bottom:0;height:46px;background:#7DAA67"></div>
+              <div data-ward="{{ w.id }}" style="position:absolute;left:50%;bottom:0;transform:translateX(-50%)"></div>
+              <sc-if value="{{ w.veil }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;inset:0;background:rgba(227,217,204,.84);display:flex;align-items:center;justify-content:center"><div style="width:64px;height:64px;border-radius:50%;background:#FFF8F0;border:4px solid #2D3436;display:flex;align-items:center;justify-content:center;box-sizing:border-box"><div style="position:relative;width:28px;height:22px;background:#2D3436;border-radius:5px;margin-top:10px"><div style="position:absolute;left:5px;top:-14px;width:18px;height:18px;border:4px solid #2D3436;border-bottom:none;border-radius:10px 10px 0 0;box-sizing:border-box"></div></div></div></div>
+              </sc-if>
+              <sc-if value="{{ w.worn }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:8px;top:8px;width:48px;height:48px;border-radius:50%;background:#A8E6CF;border:4px solid #2D3436;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:26px;box-sizing:border-box">✓</div></sc-if>
+            </div>
+            <div style="font-size:38px;font-weight:900;line-height:40px;text-align:center;text-wrap:balance">{{ w.title }}</div>
+            <div style="align-self:center;height:52px;padding:0 18px;border-radius:26px;background:{{ w.tagBg }};border:3px solid #2D3436;display:flex;align-items:center;font-weight:900;font-size:34px;box-sizing:border-box">{{ w.tag }}</div>
+            <div style="text-align:center;font:700 22px 'JetBrains Mono',monospace;color:#555C5E;min-height:28px">{{ w.note }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const VIEWS = ['front', 'three_q', 'side', 'back', 'top'];
+const ADDS = { front: '+ cape · collar · helmet · shield', three_q: '+ cape · collar · helmet · shield', side: '+ cape · helmet · shield', back: '+ cape · helmet', top: '+ cape · helmet · shield' };
+const SURF = [
+  { id: 'field', title: 'Home field', size: 'front 190', view: 'front', px: 190, loop: 'idle', bg: '#7DAA67', ev: [['tap', 'tap_giggle'], ['ApplyMoment', 'apply'], ['idle detail', 'idle_knight']] },
+  { id: 'card', title: 'Season card', size: 'front 230', view: 'front', px: 230, loop: 'card_idle', bg: '#BCD9A3', ev: [['jump', 'card_jump'], ['greet', 'greet']] },
+  { id: 'arena', title: 'Arena', size: 'front 150', view: 'front', px: 150, loop: 'arena_idle', bg: '#C7D8EC', ev: [['★2', 'merge_t2'], ['★3 merge', 'merge_t3'], ['muncher eats', 'muncher_eat']] },
+  { id: 'run', title: 'Run (top)', size: 'top 150', view: 'top', px: 150, loop: 'run_gallop', bg: '#3A5C41', ev: [['lane ←', 'lane_left'], ['coin', 'pickup_coin'], ['goal', 'finish'], ['restart', 'run_start']] },
+  { id: 'hud', title: 'Run HUD', size: 'head 88', view: 'front', px: 88, crop: [40, 40, 176, 176], loop: 'hud_idle', bg: '#FFF8F0', ev: [['happy', 'hud_happy'], ['wow', 'hud_wow'], ['proud', 'hud_proud']] },
+  { id: 'camp', title: 'Camp', size: 'front 150', view: 'front', px: 150, loop: 'idle', bg: '#E2C9A0', ev: [['hop', 'hop'], ['binky', 'binky']] },
+  { id: 'shop', title: 'Shop / Wardrobe stage', size: 'three_q 246', view: 'three_q', px: 246, still: true, bg: '#BCD9A3', ev: [['signature', 'SIG']] },
+  { id: 'thumb', title: 'Wardrobe thumb', size: 'three_q 126', view: 'three_q', px: 126, still: true, bg: '#98C27F', ev: [] }
+];
+class Component extends DCLogic {
+  state = { anim: 'pose_knight', shop: { available: 'buy', owned: 'owned', wearing: 'wearing' }, ward: 'knight_locked', busy: false };
+  turnRef = React.createRef(); silRef = React.createRef(); playRef = React.createRef(); surfRef = React.createRef(); shopRef = React.createRef(); wardRef = React.createRef();
+  P = {};
+  componentDidMount() { this.boot(); }
+  componentWillUnmount() { clearInterval(this.iv); Object.values(this.P).forEach(p => p.destroy && p.destroy()); }
+  boot() { if (!window.Knight || !Pip.ANIMS.sig_knight || !this.turnRef.current || !this.turnRef.current.querySelector('[data-turn]') || !this.surfRef.current.querySelector('[data-surf]') || !this.shopRef.current.querySelector('[data-shop]') || !this.wardRef.current.querySelector('[data-ward]')) { setTimeout(() => this.boot(), 60); return; } this.build(); }
+  mk(key, el, o) { if (this.P[key]) this.P[key].destroy(); return this.P[key] = Pip.create(el, o); }
+  build() {
+    this.turnRef.current.querySelectorAll('[data-turn]').forEach(el => { const sk = el.getAttribute('data-turn'), v = el.getAttribute('data-view'); const p = this.mk('t_' + sk + v, el, { view: v, skin: sk, size: el.clientWidth, loop: v === 'top' ? 'run_gallop' : v === 'three_q' ? 'stage_idle' : 'idle' }); });
+    this.silRef.current.querySelectorAll('[data-sil]').forEach(el => { const [sk, v] = el.getAttribute('data-sil').split(':'); this.mk('s_' + sk + v, el, { view: v, skin: sk, size: 64, still: true, shadow: false, sil: '#2D3436' }); });
+    this.silRef.current.querySelectorAll('[data-hud]').forEach(el => { const sk = el.getAttribute('data-hud'); this.mk('h_' + sk, el, { view: 'front', skin: sk, size: 88, crop: [40, 40, 176, 176], shadow: false, loop: 'hud_idle' }); });
+    this.surfRef.current.querySelectorAll('[data-surf]').forEach(el => { const id = el.getAttribute('data-surf'), sk = el.getAttribute('data-skin'), s = SURF.find(x => x.id === id), skin = PipArt.SKINS.find(x => x.key === sk);
+      const p = this.mk('f_' + id + sk, el, { view: s.view, skin: sk, size: Math.round(s.px * .6 * (s.crop ? 1.6 : 1)), crop: s.crop || null, shadow: !s.crop, still: !!s.still, loop: s.still ? null : s.loop }); if (s.still) p.seek(skin.showcase); });
+    this.buildShop(); this.buildWard(); this.playAnim(this.state.anim);
+    clearInterval(this.iv); this.iv = setInterval(() => { const a = Pip.ANIMS[this.state.anim]; if (a && !a.loop && this.P.pk && !this.P.pk.base && !this.P.pk.over) this.playAnim(this.state.anim); }, 900);
+  }
+  buildShop() { this.shopRef.current.querySelectorAll('[data-shop]').forEach(el => { const id = el.getAttribute('data-shop'); this.mk('shop_' + id, el, { view: 'three_q', skin: 'knight', size: 246, still: true }).seek('pose_knight'); }); }
+  buildWard() { this.wardRef.current.querySelectorAll('[data-ward]').forEach(el => { const id = el.getAttribute('data-ward'); const sk = id === 'classic' ? 'classic' : 'knight'; const s = PipArt.SKINS.find(x => x.key === sk); this.mk('w_' + id, el, { view: 'three_q', skin: sk, size: 126, still: true }).seek(s.showcase); }); }
+  playAnim(id) { const a = Pip.ANIMS[id]; if (!a || !this.playRef.current) return; const view = a.view === 'any' ? 'front' : a.view;
+    ['knight', 'classic'].forEach(sk => { const el = this.playRef.current.querySelector('[data-play=' + sk + ']'); let p = this.P['p' + sk[0]];
+      if (!p || p.o.view !== view) p = this.mk('p' + sk[0], el, { view, skin: sk, size: el.clientWidth, still: false });
+      p.loopId = null; p.base = null; p.over = null; p.idt = 99;
+      if (a.layer === 'overlay') { p.setLoop(view === 'top' ? 'run_gallop' : 'idle'); p.over = { a, t: 0 }; p.loopId = view === 'top' ? 'run_gallop' : 'idle'; }
+      else if (a.layer === 'skin') p.setLoop('idle');
+      else if (a.loop) p.setLoop(id); else p.play(id, { hold: true }); });
+    this.setState({ anim: id }); }
+  sig(p, sk) { const s = PipArt.SKINS.find(x => x.key === sk); p.still = false; p.play(s.signature, { then: () => p.seek(s.showcase) }); this.drive(p); }
+  drive(p) { let lt = 0; const f = ts => { const dt = lt ? Math.min(.05, (ts - lt) / 1000) : 0; lt = ts; p.tick(dt); if (p.base && p.base.speed !== 0) requestAnimationFrame(f); }; requestAnimationFrame(f); }
+  renderVals() {
+    const own = [['pose_knight', 'Pose (Shop / Ormar)'], ['sig_knight', 'Signature (tap)'], ['idle_knight', 'Idle detail (6–10 s)'], ['t3_knight', '★3 merge reaction'], ['goal_knight', 'Run goal reaction'], ['k_cape_idle', 'Cape layer (always on)']];
+    const a = window.Pip && Pip.ANIMS[this.state.anim];
+    const st = this.state;
+    const btn = s => s === 'buy' ? { btnLabel: '€3.99', btn: '#D4A5FF', btnEdge: '#2D3436', btnShadow: '0 8px 0 rgba(26,26,20,.28)', btnY: '0px', btnInk: '#2D3436' }
+      : s === 'busy' ? { btnLabel: '• • •', btn: '#EAD2FF', btnEdge: '#2D3436', btnShadow: 'none', btnY: '8px', btnInk: '#2D3436' }
+      : s === 'owned' ? { btnLabel: '✓ Owned', btn: '#A8E6CF', btnEdge: '#2D3436', btnShadow: 'none', btnY: '0px', btnInk: '#2D3436' }
+      : { btnLabel: '✓ Wearing', btn: '#A8E6CF', btnEdge: '#2D3436', btnShadow: 'none', btnY: '0px', btnInk: '#2D3436' };
+    const shopCards = [['available', 'Available — tap the price (→ busy → bought & worn)'], ['owned', 'Owned (bought, not worn) — tap to wear'], ['wearing', 'Wearing — card_yours + equipped badge']].map(([id, label]) => {
+      const s = st.shop[id]; return Object.assign({ id, label, h: Math.round((20 * 2 + 300 + 20 + 120 + 8 + 10) * .6) + 'px', card: s === 'wearing' ? '#FFF6D6' : '#FFFFFF', worn: s === 'wearing',
+        tap: () => { const p = this.P['shop_' + id]; if (p) this.sig(p, 'knight'); },
+        press: () => { const set = v => this.setState({ shop: Object.assign({}, this.state.shop, { [id]: v }) }); if (s === 'buy') { set('busy'); setTimeout(() => set('wearing'), 1400); } else if (s === 'owned') set('wearing'); else if (s === 'wearing' && id === 'available') set('buy'); else if (s === 'wearing') set('owned'); } }, btn(s)); });
+    const W = st.ward;
+    const wardCards = [
+      { id: 'classic', title: 'Classic Pip', tag: 'Free', tagBg: '#A8E6CF', veil: false, worn: W === 'classic', note: W === 'classic' ? 'wearing' : '' },
+      { id: 'knight_locked', title: 'Sir Pip', tag: 'Premium', tagBg: '#D4A5FF', veil: true, worn: false, note: 'tap → Shop' },
+      { id: 'knight_owned', title: 'Sir Pip', tag: 'Premium', tagBg: '#D4A5FF', veil: false, worn: false, note: 'owned · tap to wear' },
+      { id: 'knight_worn', title: 'Sir Pip', tag: 'Premium', tagBg: '#D4A5FF', veil: false, worn: true, note: 'wearing' }
+    ].map(c => Object.assign(c, { card: c.worn ? '#FFF6D6' : '#FFFFFF', edge: c.worn ? '4px solid #2D3436' : '3px solid rgba(45,52,54,.18)', tap: () => { const p = this.P['w_' + c.id]; if (p && !c.veil) { const s = PipArt.SKINS.find(x => x.key === (c.id === 'classic' ? 'classic' : 'knight')); p.play('stage_hop', { then: () => p.seek(s.showcase) }); this.drive(p); } } }));
+    return {
+      turnRef: this.turnRef, silRef: this.silRef, playRef: this.playRef, surfRef: this.surfRef, shopRef: this.shopRef, wardRef: this.wardRef,
+      views: VIEWS.map(id => ({ id, adds: ADDS[id] })),
+      own: own.map(([id, label]) => ({ label, bg: id === st.anim ? '#D4A5FF' : '#FFFFFF', go: () => this.playAnim(id) })),
+      shared: (window.Pip && Pip.ORDER || []).filter(id => !/knight|^k_/.test(id)).map(id => ({ id, bg: id === st.anim ? '#D4A5FF' : '#FFFFFF', go: () => this.playAnim(id) })),
+      animInfo: a ? a.len + ' s · ' + (a.loop ? 'loop' : 'one-shot') + ' · ' + a.view + ' · layer ' + a.layer : '',
+      ownInfo: a ? a.id + ' — ' + a.desc : '',
+      surfaces: SURF.map(s => ({ id: s.id, title: s.title, size: s.size, bg: s.bg, events: s.ev.map(([label, id]) => ({ label, go: () => ['classic', 'knight'].forEach(sk => { const p = this.P['f_' + s.id + sk]; if (!p) return; if (id === 'SIG') { this.sig(p, sk); return; }
+        if (id === 'idle_knight') { if (sk === 'knight') p.play('idle_knight'); return; }
+        if (id === 'run_start') { p.play('run_start', { then: () => p.setLoop('run_gallop') }); return; }
+        p.play(id, { hold: id === 'finish' }); }) })) })),
+      shopCards, wardCards, wardH: Math.round(420 * .6) + 'px'
+    };
+  }
+}
+</script>
+</body>
+</html>

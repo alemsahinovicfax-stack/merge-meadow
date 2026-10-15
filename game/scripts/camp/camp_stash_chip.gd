@@ -379,6 +379,7 @@ func _gui_input(event: InputEvent) -> void:
 		_pressing = true
 		_drag_dist = 0.0
 		# Odmah na pritisak — ne ceka otpustanje ni tween.
+		Sfx.play("seed_pick")
 		chip_pressed.emit(_type_id)
 		_apply_style()
 	else:

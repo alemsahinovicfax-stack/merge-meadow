@@ -139,6 +139,7 @@ class _Tiles:
 		pip.follow_equipped = false
 		pip.skin = key
 		pip.box_px = 164.0
+		pip.z_index = UiPip.HOST_LIFT
 		add_child(pip)
 		pip.pose(UiPip.pose_for_skin(key))
 		_place_pip()

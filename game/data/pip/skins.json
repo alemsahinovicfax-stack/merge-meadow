@@ -455,6 +455,479 @@
    "showcase_anim": "pose_sky",
    "signature_anim": "sig_sky",
    "detail": "Cloud-dipped ear tips and a three-puff cloud tail. Signature: a cloud hop — rises on two puffs and floats down."
+  },
+  {
+   "key": "knight",
+   "cosmetic_id": "pip_knight",
+   "title": "Sir Pip",
+   "product": "Sir Pip · Meadow Knight",
+   "source": "iap",
+   "sku": "pip_knight",
+   "coin_cost": 0,
+   "tokens": {
+    "fur": "#F5D6A6",
+    "fur_sh": "#DDAF78",
+    "fur_lt": "#FFF2DE",
+    "ear_in": "#FFC6BE",
+    "cheek": "#FFA88E",
+    "nose": "#E77B8E",
+    "iris": "#5A4433"
+   },
+   "recolor": {
+    "#A8E6CF": "#F5D6A6",
+    "#7CCBAE": "#DDAF78",
+    "#D4F5E4": "#FFF2DE",
+    "#FFCCD5": "#FFC6BE",
+    "#FFB88C": "#FFA88E",
+    "#F2899F": "#E77B8E",
+    "#3E7D69": "#5A4433"
+   },
+   "replace": {
+    "front": {
+     "foot_L": {
+      "file": "res://assets/pip/parts_knight/k_boot_f.svg",
+      "offset": [
+       -28,
+       -14
+      ],
+      "size": [
+       55,
+       27
+      ]
+     },
+     "foot_R": {
+      "file": "res://assets/pip/parts_knight/k_boot_f.svg",
+      "offset": [
+       -28,
+       -14
+      ],
+      "size": [
+       55,
+       27
+      ]
+     },
+     "body": {
+      "file": "res://assets/pip/parts_knight/k_body_f.svg",
+      "offset": [
+       -60,
+       -90
+      ],
+      "size": [
+       119,
+       101
+      ]
+     },
+     "arm_L": {
+      "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+      "offset": [
+       -13,
+       -6
+      ],
+      "size": [
+       25,
+       27
+      ]
+     },
+     "arm_R": {
+      "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+      "offset": [
+       -13,
+       -6
+      ],
+      "size": [
+       25,
+       27
+      ]
+     },
+     "ear_L": {
+      "file": "res://assets/pip/parts_knight/k_ear_l.svg",
+      "offset": [
+       -23,
+       -79
+      ],
+      "size": [
+       40,
+       87
+      ]
+     },
+     "ear_R": {
+      "file": "res://assets/pip/parts_knight/k_ear_rb.svg",
+      "offset": [
+       -21,
+       -61
+      ],
+      "size": [
+       38,
+       69
+      ]
+     },
+     "tuft": {
+      "file": "res://assets/pip/parts_knight/k_plume.svg",
+      "offset": [
+       -21,
+       -55
+      ],
+      "size": [
+       60,
+       41
+      ]
+     }
+    },
+    "three_q": {
+     "foot_R": {
+      "file": "res://assets/pip/parts_knight/k_boot_f.svg",
+      "offset": [
+       -28,
+       -14
+      ],
+      "size": [
+       55,
+       27
+      ]
+     },
+     "foot_L": {
+      "file": "res://assets/pip/parts_knight/k_boot_f.svg",
+      "offset": [
+       -28,
+       -14
+      ],
+      "size": [
+       55,
+       27
+      ]
+     },
+     "body": {
+      "file": "res://assets/pip/parts_knight/k_body_q.svg",
+      "offset": [
+       -60,
+       -90
+      ],
+      "size": [
+       119,
+       101
+      ]
+     },
+     "arm_L": {
+      "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+      "offset": [
+       -13,
+       -6
+      ],
+      "size": [
+       25,
+       27
+      ]
+     },
+     "arm_R": {
+      "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+      "offset": [
+       -13,
+       -6
+      ],
+      "size": [
+       25,
+       27
+      ]
+     },
+     "ear_L": {
+      "file": "res://assets/pip/parts_knight/k_ear_l.svg",
+      "offset": [
+       -23,
+       -79
+      ],
+      "size": [
+       40,
+       87
+      ]
+     },
+     "ear_R": {
+      "file": "res://assets/pip/parts_knight/k_ear_rb.svg",
+      "offset": [
+       -21,
+       -61
+      ],
+      "size": [
+       38,
+       69
+      ]
+     },
+     "tuft": {
+      "file": "res://assets/pip/parts_knight/k_plume.svg",
+      "offset": [
+       -21,
+       -55
+      ],
+      "size": [
+       60,
+       41
+      ]
+     }
+    },
+    "side": {
+     "foot_L": {
+      "file": "res://assets/pip/parts_knight/k_boot_s.svg",
+      "offset": [
+       -33,
+       -15
+      ],
+      "size": [
+       66,
+       24
+      ]
+     },
+     "foot_R": {
+      "file": "res://assets/pip/parts_knight/k_boot_s.svg",
+      "offset": [
+       -33,
+       -15
+      ],
+      "size": [
+       66,
+       24
+      ]
+     },
+     "body": {
+      "file": "res://assets/pip/parts_knight/k_body_s.svg",
+      "offset": [
+       -64,
+       -76
+      ],
+      "size": [
+       117,
+       87
+      ]
+     },
+     "arm_L": {
+      "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+      "offset": [
+       -13,
+       -6
+      ],
+      "size": [
+       25,
+       27
+      ]
+     },
+     "arm_R": {
+      "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+      "offset": [
+       -13,
+       -6
+      ],
+      "size": [
+       25,
+       27
+      ]
+     },
+     "ear_L": {
+      "file": "res://assets/pip/parts_knight/k_ear_l.svg",
+      "offset": [
+       -23,
+       -79
+      ],
+      "size": [
+       40,
+       87
+      ]
+     },
+     "ear_R": {
+      "file": "res://assets/pip/parts_knight/k_ear_rb.svg",
+      "offset": [
+       -21,
+       -61
+      ],
+      "size": [
+       38,
+       69
+      ]
+     },
+     "tuft": {
+      "file": "res://assets/pip/parts_knight/k_plume.svg",
+      "offset": [
+       -21,
+       -55
+      ],
+      "size": [
+       60,
+       41
+      ]
+     }
+    },
+    "back": {
+     "foot_L": {
+      "file": "res://assets/pip/parts_knight/k_boot_b.svg",
+      "offset": [
+       -25,
+       -15
+      ],
+      "size": [
+       49,
+       29
+      ]
+     },
+     "foot_R": {
+      "file": "res://assets/pip/parts_knight/k_boot_b.svg",
+      "offset": [
+       -25,
+       -15
+      ],
+      "size": [
+       49,
+       29
+      ]
+     },
+     "ear_L": {
+      "file": "res://assets/pip/parts_knight/k_ear_back.svg",
+      "offset": [
+       -23,
+       -79
+      ],
+      "size": [
+       40,
+       87
+      ]
+     },
+     "ear_R": {
+      "file": "res://assets/pip/parts_knight/k_ear_backb.svg",
+      "offset": [
+       -21,
+       -61
+      ],
+      "size": [
+       38,
+       69
+      ]
+     },
+     "tuft": {
+      "file": "res://assets/pip/parts_knight/k_plume.svg",
+      "offset": [
+       -21,
+       -55
+      ],
+      "size": [
+       60,
+       41
+      ]
+     }
+    },
+    "top": {
+     "foot_L": {
+      "file": "res://assets/pip/parts_knight/k_boot_t.svg",
+      "offset": [
+       -13,
+       -23
+      ],
+      "size": [
+       25,
+       47
+      ]
+     },
+     "foot_R": {
+      "file": "res://assets/pip/parts_knight/k_boot_t.svg",
+      "offset": [
+       -13,
+       -23
+      ],
+      "size": [
+       25,
+       47
+      ]
+     },
+     "ear_L": {
+      "file": "res://assets/pip/parts_knight/k_ear_back.svg",
+      "offset": [
+       -23,
+       -79
+      ],
+      "size": [
+       40,
+       87
+      ]
+     },
+     "ear_R": {
+      "file": "res://assets/pip/parts_knight/k_ear_backb.svg",
+      "offset": [
+       -21,
+       -61
+      ],
+      "size": [
+       38,
+       69
+      ]
+     },
+     "tuft": {
+      "file": "res://assets/pip/parts_knight/k_plume_t.svg",
+      "offset": [
+       -14,
+       -8
+      ],
+      "size": [
+       28,
+       64
+      ]
+     }
+    }
+   },
+   "overlays": [],
+   "gz": {
+    "front": {
+     "k_cape": -1,
+     "tail": -1,
+     "k_collar": 7,
+     "k_helm": 1,
+     "k_shield": 3
+    },
+    "three_q": {
+     "k_cape": -1,
+     "tail": -1,
+     "k_collar": 7,
+     "k_helm": 1,
+     "k_shield": 3
+    },
+    "side": {
+     "k_cape": 1,
+     "k_helm": 1,
+     "k_shield": 3
+    },
+    "back": {
+     "k_cape": 2,
+     "k_helm": 3
+    },
+    "top": {
+     "k_cape": 1,
+     "k_helm": 2,
+     "k_shield": 2
+    }
+   },
+   "showcase_anim": "pose_knight",
+   "signature_anim": "sig_knight",
+   "skin_layer": {
+    "loops": {
+     "default": "k_cape_idle",
+     "top": "k_cape_run"
+    }
+   },
+   "reactions": {
+    "merge_t3": "t3_knight",
+    "finish": "goal_knight"
+   },
+   "idle_detail": {
+    "anim": "idle_knight",
+    "gap_s": [
+     6,
+     10
+    ],
+    "first_s": 2.5,
+    "on": [
+     "idle",
+     "card_idle",
+     "stage_idle",
+     "arena_idle",
+     "hud_idle"
+    ]
+   },
+   "hud": "res://assets/pip/hud/pip_hud_knight.svg",
+   "detail": "Meadow armour: acorn-cap helmet with a coral plume, pewter breastplate with a gold clover, poppy-blue cape, round shield and acorn boots. Signature: plants his banner and salutes."
   }
  ]
 }

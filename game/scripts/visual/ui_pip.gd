@@ -3,6 +3,10 @@ class_name UiPip
 ## Pip cutout rig (design_handoff_pip). Jedan čvor za svaku površinu: polje, kartica,
 ## Arena, run (odozgo), HUD, Shop, Ormar. Podaci: rig / animations / skins.json.
 ## Atlas se rasterizuje jednom po skinu; po frejmu samo transformacije čvorova.
+## Premium skin (Sir Pip, design_handoff_muncher_premium_pip): skins.json `replace` mijenja
+## dijelove po pogledu (finalne boje, bez recolora), rig čvorovi sa "skin" se grade samo za
+## taj skin, `gz` je njihov z u Godotu, treći player "Skin" vrti ogrtač, `reactions` mijenja
+## merge_t3 / finish, `idle_detail` pušta overlay svakih 6–10 s dok Pip miruje.
 
 signal pip_event(event_name: String, arg: Variant)
 
@@ -10,6 +14,9 @@ const DATA_DIR := "res://data/pip/"
 const RASTER := 2.0
 const ATLAS_W := 1024
 const HUD_CROP := Rect2(40, 40, 176, 176)
+## Dijelovi idu od z −4 (sjena) do 11. Domaćin koji sam crta pozadinu (pregled u Shopu /
+## Ormaru) diže Pipa za ovoliko, inače sjena i ogrtač Sir Pipa (z −1) padnu pod pozadinu.
+const HOST_LIFT := 4
 const FRAME := {
 	"front": 256.0, "three_q": 256.0, "side": 256.0, "back": 256.0, "top": 150.0,
 }
@@ -33,12 +40,18 @@ static var _job_queue: Array[String] = []
 static var _libs: Dictionary = {}
 static var _by_view: Dictionary = {}
 static var _paths: Dictionary = {}
+## id animacije → true ako ključa čvor koji vrti sloj skina (ogrtač); takav base klip ima prednost.
+static var _keys_skin_nodes: Dictionary = {}
 
 var nodes: Dictionary = {}
 var sprites: Dictionary = {}
 var body: AnimationPlayer
 var overlay: AnimationPlayer
+## Treći player (samo skin sa skin_layer): petlja ogrtača, procesira se prije Body.
+var skin_layer: AnimationPlayer
 var loop_id: String = ""
+var _base_id: String = ""
+var _idle_timer: Timer
 var look_target: Variant = null
 var _look := Vector3.ZERO
 var _face_left: bool = false
@@ -46,6 +59,10 @@ var _after_pose: String = ""
 var _built: bool = false
 var _lib_view: String = ""
 var _lib_rm: bool = false
+## Skin s vlastitim čvorovima (Sir Pip) ima svoju biblioteku: AnimationMixer provjerava putanje
+## SVIH animacija u biblioteci, pa bi klipovi s k_cape u zajedničkoj biblioteci bacali
+## upozorenja na Classic / Blossom / Sky.
+var _lib_skin: String = ""
 
 
 static func reduce_motion() -> bool:
@@ -152,6 +169,27 @@ static func signature_for_skin(key: String) -> String:
 	return str(sk.get("signature_anim", "sig_classic"))
 
 
+## Skin iz looka kozmetike: {"skin": key} (premium) ili {"recolor": {...}}; gola recolor
+## mapa (stari pozivi) i dalje radi.
+static func skin_key_from_look(look: Dictionary) -> String:
+	data()
+	if look.has("skin") and _skins.has(str(look["skin"])):
+		return str(look["skin"])
+	if look.has("recolor") and look["recolor"] is Dictionary:
+		return skin_key_from_recolor(look["recolor"])
+	return skin_key_from_recolor(look)
+
+
+static func skin_def(key: String) -> Dictionary:
+	data()
+	return _skins.get(key, _skins.get("classic", {}))
+
+
+## Čvor riga sa "skin" (dodatak premium skina) postoji samo u tom skinu.
+static func _node_in_skin(n: Dictionary, key: String) -> bool:
+	return not n.has("skin") or str(n["skin"]) == key
+
+
 static func prewarm() -> void:
 	data()
 	for k in _skins:
@@ -249,16 +287,30 @@ static func _atlas_from(raster: Dictionary) -> Dictionary:
 static func _raster(key: String) -> Dictionary:
 	var sk: Dictionary = _skins.get(key, _skins.get("classic", {}))
 	var recolor: Dictionary = sk.get("recolor", {})
+	var replace: Dictionary = sk.get("replace", {})
+	# I dijelovi premium skina nose classic boje krzna (#A8E6CF…) za uši / šape — recolor
+	# ide na sve; boje oklopa nisu classic tokeni pa ostaju.
 	var files: Dictionary = {}
 	for v in _rig.get("views", {}):
+		var rep: Dictionary = replace.get(v, {})
 		for n in _rig["views"][v]["nodes"]:
+			if not _node_in_skin(n, key):
+				continue
+			# Overlay drugog skina (grančica Blossoma, oblaci Skya) se nikad ne crta u ovom.
+			if n.has("overlay") and not _has_overlay(sk, str(n["overlay"])):
+				continue
+			if rep.has(str(n["id"])):
+				files[str(rep[str(n["id"])]["file"])] = true
+				continue
 			if n.has("sprite") and n["sprite"] is Dictionary:
 				files[str(n["sprite"]["file"])] = true
 			if n.has("frames"):
 				for f in n["frames"]:
 					files[str(n["frames"][f]["file"])] = true
 	for f in _rig.get("fx_frames", {}):
-		files[str(_rig["fx_frames"][f]["file"])] = true
+		var fx: Dictionary = _rig["fx_frames"][f]
+		if _node_in_skin(fx, key):
+			files[str(fx["file"])] = true
 	var imgs: Dictionary = {}
 	for f in files:
 		var svg := FileAccess.get_file_as_string(str(f))
@@ -338,6 +390,8 @@ func build() -> void:
 	sprites.clear()
 	body = null
 	overlay = null
+	skin_layer = null
+	_idle_timer = null
 	var views: Dictionary = _rig.get("views", {})
 	if not views.has(view):
 		push_error("UiPip: unknown view %s" % view)
@@ -345,25 +399,35 @@ func build() -> void:
 	var v: Dictionary = views[view]
 	_apply_scale()
 	var sk: Dictionary = _skins.get(skin, _skins.get("classic", {}))
+	var rep: Dictionary = sk.get("replace", {}).get(view, {})
+	var gz: Dictionary = sk.get("gz", {}).get(view, {})
 	for n in v.get("nodes", []):
+		if not _node_in_skin(n, skin):
+			continue
 		var nd := Node2D.new()
 		nd.name = str(n["id"])
 		nd.position = Vector2(float(n["pos"][0]), float(n["pos"][1]))
 		nd.rotation_degrees = float(n["rot_deg"])
 		nd.scale = Vector2(float(n["scale"][0]), float(n["scale"][1]))
-		nd.z_index = _part_z(int(n["z"]))
+		# Paket ima i z 0,5 / 2,5 i ogrtač ispod sjene (−6): skin daje cijeli z za Godot.
+		nd.z_index = int(gz[nd.name]) if gz.has(nd.name) else _part_z(int(floorf(float(n["z"]))))
 		nd.z_as_relative = true
 		nd.visible = bool(n.get("visible", true))
 		nd.set_meta("rest", [nd.position, nd.rotation_degrees, nd.scale])
+		nd.set_meta("rig_z", float(n["z"]))
 		var parent_id: Variant = n.get("parent", null)
 		var parent: Node = self if parent_id == null else nodes[str(parent_id)]
 		parent.add_child(nd)
+		if n.has("skin"):
+			_insert_by_rig_z(parent, nd)
 		nodes[nd.name] = nd
 		var is_overlay: bool = bool(n.has("overlay"))
 		var show_overlay: bool = (not is_overlay) or _has_overlay(sk, str(n["overlay"]))
 		var spr_data: Variant = null
 		if n.has("frames"):
 			spr_data = n["frames"][str(n["default_frame"])]
+		elif rep.has(nd.name):
+			spr_data = rep[nd.name]
 		elif n.get("sprite") is Dictionary:
 			spr_data = n["sprite"]
 		var is_fx := str(n.get("sprite", "")) == "fx"
@@ -379,21 +443,111 @@ func build() -> void:
 			sprites[nd.name] = s
 		if is_overlay and not show_overlay:
 			nd.visible = false
+	_lib_view = view
+	_lib_rm = reduce_motion()
+	_lib_skin = skin if _skin_has_nodes(skin) else ""
+	var lib := library(_lib_view, _lib_rm, _lib_skin)
+	# Sloj skina prije Body: kad base klip sam ključa ogrtač, njegova vrijednost pobjeđuje.
+	if not _skin_loop_id(sk).is_empty():
+		skin_layer = AnimationPlayer.new()
+		skin_layer.name = "Skin"
+		add_child(skin_layer)
+		skin_layer.add_animation_library("", lib)
 	body = AnimationPlayer.new()
 	body.name = "Body"
 	add_child(body)
 	overlay = AnimationPlayer.new()
 	overlay.name = "Overlay"
 	add_child(overlay)
-	_lib_view = view
-	_lib_rm = reduce_motion()
-	var lib := library(_lib_view, _lib_rm)
 	body.add_animation_library("", lib)
 	overlay.add_animation_library("", lib)
 	if not body.animation_finished.is_connected(_on_body_done):
 		body.animation_finished.connect(_on_body_done)
+	if sk.get("idle_detail") is Dictionary:
+		_idle_timer = Timer.new()
+		_idle_timer.name = "IdleDetail"
+		_idle_timer.one_shot = true
+		add_child(_idle_timer)
+		_idle_timer.timeout.connect(_on_idle_detail)
+		_idle_timer.start(float(sk["idle_detail"].get("first_s", 2.5)))
 	set_process(false)
 	_built = true
+	_sync_skin_layer()
+
+
+## Dodatak skina ide prije braće s istim Godot z i većim z iz paketa (Godot pri istom z
+## crta po redu u stablu; paket ima i z 0,5 između dva cijela).
+static func _insert_by_rig_z(parent: Node, nd: Node2D) -> void:
+	var z := float(nd.get_meta("rig_z"))
+	for c in parent.get_children():
+		var sib := c as Node2D
+		if sib == null or sib == nd or not sib.has_meta("rig_z"):
+			continue
+		if sib.z_index == nd.z_index and float(sib.get_meta("rig_z")) > z:
+			parent.move_child(nd, sib.get_index())
+			return
+
+
+func _skin_loop_id(sk: Dictionary) -> String:
+	var loops: Variant = sk.get("skin_layer", {}).get("loops", {})
+	if not (loops is Dictionary):
+		return ""
+	return str((loops as Dictionary).get(view, (loops as Dictionary).get("default", "")))
+
+
+## true ako animacija ključa neki čvor koji ključa i petlja sloja skina (npr. k_cape).
+func _anim_keys_skin(id: String) -> bool:
+	if id.is_empty() or not _anims.has(id):
+		return false
+	var loop := _skin_loop_id(skin_def(skin))
+	if loop.is_empty() or not _anims.has(loop):
+		return false
+	var cache_key := id + "|" + loop
+	if _keys_skin_nodes.has(cache_key):
+		return _keys_skin_nodes[cache_key]
+	var skin_nodes := {}
+	for tr in _anims[loop].get("tracks", []):
+		skin_nodes[str(tr["node"])] = true
+	var hit := false
+	for tr in _anims[id].get("tracks", []):
+		if skin_nodes.has(str(tr["node"])):
+			hit = true
+			break
+	_keys_skin_nodes[cache_key] = hit
+	return hit
+
+
+## Petlja ogrtača svira dok Pip nije u mirnoj pozi (Shop lista), nema reduce motion i base
+## klip ne ključa ogrtač sam (poza, potpis, T3, cilj) — kao sloj „Skin" u paketu.
+func _sync_skin_layer() -> void:
+	if skin_layer == null:
+		return
+	var loop := _skin_loop_id(skin_def(skin))
+	if loop.is_empty() or still or reduce_motion() or _anim_keys_skin(_base_id):
+		if skin_layer.is_playing():
+			skin_layer.pause()
+		return
+	if str(skin_layer.current_animation) != loop:
+		_ensure_anim(loop)
+		skin_layer.play(loop)
+	elif not skin_layer.is_playing():
+		skin_layer.play()
+
+
+## Idle detalj skina (kaciga sklizne): overlay jednom u 6–10 s dok Pip miruje.
+func _on_idle_detail() -> void:
+	if _idle_timer == null:
+		return
+	var idd: Dictionary = skin_def(skin).get("idle_detail", {})
+	var gap: Array = idd.get("gap_s", [6, 10])
+	_idle_timer.start(randf_range(float(gap[0]), float(gap[1])))
+	if still or reduce_motion() or body == null or not is_visible_in_tree():
+		return
+	if overlay != null and overlay.is_playing():
+		return
+	if not (idd.get("on", []) as Array).has(str(body.current_animation)):
+		return
+	play(str(idd.get("anim", "")))
 
 
 func _apply_scale() -> void:
@@ -473,11 +627,23 @@ func set_frame(id: String, frame: String) -> void:
 
 
 func emit_event(event_name: String, arg: Variant) -> void:
+	# Zvučni događaji iz animations.json (sfx:land, pop, sneeze, bonk, thump, cough, blow) →
+	# pip_* u katalogu; samo Pip koji se vidi i živi (ne poza u Shop listi).
+	if event_name.begins_with("sfx:") and not still and is_visible_in_tree():
+		Sfx.play("pip_" + event_name.substr(4))
 	pip_event.emit(event_name, arg)
 
 
-func library(v: String, rm: bool) -> AnimationLibrary:
-	var key := "%s|%s" % [v, str(rm)]
+static func _skin_has_nodes(key: String) -> bool:
+	for v in _rig.get("views", {}):
+		for n in _rig["views"][v]["nodes"]:
+			if str(n.get("skin", "")) == key:
+				return true
+	return false
+
+
+func library(v: String, rm: bool, skin_key: String = "") -> AnimationLibrary:
+	var key := "%s|%s|%s" % [v, str(rm), skin_key]
 	if _libs.has(key):
 		return _libs[key]
 	var lib := AnimationLibrary.new()
@@ -490,7 +656,7 @@ func library(v: String, rm: bool) -> AnimationLibrary:
 func _ensure_anim(id: String) -> void:
 	if body == null or not _anims.has(id):
 		return
-	var lib := library(_lib_view, _lib_rm)
+	var lib := library(_lib_view, _lib_rm, _lib_skin)
 	if not lib.has_animation(id):
 		lib.add_animation(id, _to_animation(_anims[id], _lib_view, _lib_rm))
 
@@ -600,7 +766,18 @@ func _insert_key(an: Animation, t2: int, prop: String, key: Array, rest: Array, 
 	an.track_insert_key(t2, tt, val, trans)
 
 
+## Skin može zamijeniti klip svojim (Sir Pip: merge_t3 → t3_knight, finish → goal_knight).
+func _react(id: String) -> String:
+	var reactions: Variant = skin_def(skin).get("reactions", {})
+	if reactions is Dictionary and (reactions as Dictionary).has(id):
+		var alt := str(reactions[id])
+		if _anims.has(alt):
+			return alt
+	return id
+
+
 func play(id: String) -> void:
+	id = _react(id)
 	if not _anims.has(id) or body == null:
 		return
 	var a: Dictionary = _anims[id]
@@ -614,11 +791,13 @@ func play(id: String) -> void:
 	else:
 		if bool(a.get("loop", false)):
 			loop_id = id
+		_base_id = id
 		body.play(id)
 		if rm and str(a.get("reduce_motion", {}).get("type", "")) == "end":
 			body.seek(float(a["length"]), true)
 	if still:
 		body.pause()
+	_sync_skin_layer()
 
 
 func set_loop(id: String) -> void:
@@ -631,9 +810,11 @@ func pose(id: String) -> void:
 		return
 	still = true
 	_ensure_anim(id)
+	_base_id = id
 	body.play(id)
 	body.seek(float(_anims[id]["length"]), true)
 	body.pause()
+	_sync_skin_layer()
 
 
 func play_then_pose(id: String, pose_id: String) -> void:
@@ -660,12 +841,16 @@ func _on_body_done(id: StringName) -> void:
 		return
 	if not loop_id.is_empty() and not still:
 		_ensure_anim(loop_id)
+		_base_id = loop_id
 		body.play(loop_id)
+		_sync_skin_layer()
 
 
 func set_scroll_speed(px_s: float) -> void:
 	if body != null:
 		body.speed_scale = px_s / 400.0
+	if skin_layer != null:
+		skin_layer.speed_scale = px_s / 400.0
 
 
 func look_at_point(p: Variant) -> void:

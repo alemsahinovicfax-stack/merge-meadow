@@ -316,6 +316,7 @@ func _ensure_clear_flash() -> void:
 
 
 func _play_clear_field_vfx() -> void:
+	Sfx.play("field_clear")
 	_ensure_clear_flash()
 	if _clear_vfx_tween != null:
 		_clear_vfx_tween.kill()
@@ -607,6 +608,7 @@ func _on_combo_coin_arrived(coin: Node, chip: Control, amount: int) -> void:
 	_free_fx(coin)
 	if not is_inside_tree():
 		return
+	Sfx.play("coin")
 	get_tree().call_group("meta_hub", "show_coin_earn_pop", amount)
 	if chip == null or not is_instance_valid(chip):
 		return
@@ -644,6 +646,7 @@ func _clear_combo() -> void:
 
 
 func _on_chip_drag_started(chip: ArenaSeedChip) -> void:
+	Sfx.play("seed_pick")
 	_set_pair_pulses(chip)
 	_update_merge_hint()
 
@@ -794,6 +797,7 @@ func _get_dragging_chip() -> ArenaSeedChip:
 func _on_bag_clicked() -> void:
 	var slots := _arena_slots_available()
 	if slots <= 0:
+		Sfx.play("ui_denied")
 		_punch_seed_bag()
 		_refresh_bag()
 		return
@@ -816,9 +820,13 @@ func _on_bag_clicked() -> void:
 			_show_need_more_seeds_overlay()
 		_refresh_bag()
 		return
+	Sfx.play("pour")
 	if GameState.should_show_arena_pest_tutorial():
 		_cue.show_message(CUE_PEST_AWAKE)
 		GameState.mark_arena_pest_tutorial_shown()
+		# Oblačić već kaže „Muncher's awake" — baner munchera bi bio isti tekst dvaput.
+		if _pest:
+			_pest.hide_awake_banner()
 
 
 ## Prvi pour na prazno polje otvara sesiju: hub se zakljuca, lockovi i livada se resetuju.
@@ -1115,6 +1123,7 @@ func _pop_gate(n: int, open: bool, plate: StyleBoxFlat) -> void:
 		_gate_tween.tween_property(_gate_n, "scale", Vector2.ONE * 1.08, 0.045)
 		_gate_tween.chain().tween_property(_gate_n, "scale", Vector2.ONE, 0.045)
 	if opened:
+		Sfx.play("gate_open")
 		plate.bg_color = Color("#FFF8F0")
 		_gate_tween.tween_property(plate, "bg_color", UiCamp.MINT, 0.18)
 		_gate_mark.pivot_offset = _gate_mark.size * 0.5
@@ -1422,6 +1431,12 @@ func _on_chip_released(chip: ArenaSeedChip) -> void:
 				"pos": merged_center,
 			}
 			register_arena_combo_merge(merged_center, new_tier >= GameState.MAX_MERGE_TIER)
+			if new_tier >= GameState.MAX_MERGE_TIER:
+				Sfx.play("merge_t3")
+				Sfx.haptic(40)
+			else:
+				# Combo penje ton spajanja (pola tona po koraku iz kataloga).
+				Sfx.play("merge", maxi(0, _combo_count - 1))
 			if new_tier == 2:
 				GameState.note_arena_daily_event("merge_t2")
 			elif new_tier >= GameState.MAX_MERGE_TIER:
@@ -1455,7 +1470,10 @@ func _on_chip_released(chip: ArenaSeedChip) -> void:
 			call_deferred("_end_session_if_settled")
 			return
 	elif _has_near_miss(chip):
+		Sfx.play("seed_wobble")
 		chip.play_wobble()
+	else:
+		Sfx.play("seed_drop")
 	_resolve_overlaps(chip)
 	_repel_chips_from_bag()
 	_resolve_t3_starved_types()
@@ -1511,6 +1529,9 @@ func _play_t3_moment(type_id: String, at_local: Vector2) -> void:
 	).set_ease(Tween.EASE_IN)
 	fly.parallel().tween_property(ghost, "modulate:a", 0.0, T3_FLY_SEC * 0.5).set_delay(T3_FLY_SEC * 0.5)
 	fly.tween_callback(_on_t3_crystal_arrived.bind(ghost))
+	var whoosh := ghost.create_tween()
+	whoosh.tween_interval(T3_RING_SEC)
+	whoosh.tween_callback(func() -> void: Sfx.play("crystal_fly"))
 
 
 func _on_t3_crystal_arrived(ghost: Node) -> void:
@@ -1571,6 +1592,7 @@ func _vacuum_fly_chip(chip: ArenaSeedChip) -> void:
 	var tw := create_tween()
 	_vacuum_fly_tweens.append(tw)
 	tw.tween_interval(delay)
+	tw.tween_callback(func() -> void: Sfx.play("vacuum"))
 	tw.tween_property(ghost, "position", end_pos, VACUUM_FLY_SEC).set_trans(
 		Tween.TRANS_CUBIC
 	).set_ease(Tween.EASE_IN)

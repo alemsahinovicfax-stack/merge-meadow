@@ -33,3 +33,6 @@ game/**/admob_app_id.local.*
 
 # Claude Code — lične postavke (ne dijeliti)
 .claude/settings.local.json
+
+# Python (scripts/audio generatori zvuka)
+__pycache__/

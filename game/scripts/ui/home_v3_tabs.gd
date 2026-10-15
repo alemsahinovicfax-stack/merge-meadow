@@ -63,6 +63,7 @@ func _gui_input(event: InputEvent) -> void:
 	var was := _down
 	_down = ""
 	if not hit.is_empty() and hit == was:
+		Sfx.play("ui_tab")
 		tab_pressed.emit(hit)
 
 

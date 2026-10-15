@@ -57,7 +57,7 @@ func configure(p_item_id: String, confirm_id: String = "") -> void:
 	_badge.visible = _worn
 	var fill := UiShopV2.CARD_YOURS if yours else UiShopV2.CARD
 	preview.set_frame(UiShopV2.BORDER, UiShopV2.RADIUS_PREVIEW, UiShopV2.INK, fill)
-	var pip := CosmeticCatalog.get_recolor(GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_PIP_SKIN))
+	var pip := CosmeticCatalog.get_pip_look(GameState.get_equipped_cosmetic(CosmeticCatalog.SLOT_PIP_SKIN))
 	preview.configure(
 		str(sd.get("preview", "swatch")), CosmeticCatalog.get_look(item_id), pip, "country_bloom",
 		str(args.get("subject", "pip"))

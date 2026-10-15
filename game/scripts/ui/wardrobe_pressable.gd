@@ -11,6 +11,8 @@ signal tapped
 const TAP_SLOP := 12.0
 
 var enabled: bool = true
+## Zvuk tapa; ItemCard ga gasi (izbor skina pušta „wear" u Ormaru).
+var tap_sfx: String = "ui_tap"
 ## Kartica: scale(.97) dok je pritisnuta (80 ms); 1.0 = bez skaliranja.
 var press_scale: float = 1.0
 
@@ -50,6 +52,8 @@ func _gui_input(event: InputEvent) -> void:
 			_set_pressed(false)
 			accept_event()
 			if was and enabled and _dist < TAP_SLOP:
+				if not tap_sfx.is_empty():
+					Sfx.play(tap_sfx)
 				tapped.emit()
 	elif event is InputEventMouseMotion and _down:
 		var mm := event as InputEventMouseMotion

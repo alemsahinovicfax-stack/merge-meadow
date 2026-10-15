@@ -216,6 +216,7 @@ func _build_bar() -> void:
 	_close.position = close_rect.position
 	_close.size = close_rect.size
 	_close.set_icon(_icon("icon_close_light"))
+	_close.tap_sfx = ""
 	_close.clicked.connect(_on_close_pressed)
 	_toast = PopupToast.new()
 	_toast.name = "Toast"
@@ -326,6 +327,7 @@ func _slider_row(key: String, title: String) -> Control:
 	row.add_child(line)
 	var mute := _Tap.new()
 	mute.name = "MuteButton"
+	mute.tap_sfx = ""
 	mute.custom_minimum_size = UiSettings.MUTE
 	line.add_child(mute)
 	var mute_panel := Panel.new()
@@ -364,7 +366,7 @@ func _slider_row(key: String, title: String) -> Control:
 	thumb.size = Vector2(UiSettings.THUMB_D, UiSettings.THUMB_D)
 	slider.add_child(thumb)
 	slider.changed.connect(_on_slider.bind(key))
-	slider.released.connect(_save)
+	slider.released.connect(_on_slider_released.bind(key))
 	var value := _label("", 900, UiSettings.VALUE_FONT, UiSettings.INK)
 	value.name = "Value"
 	value.custom_minimum_size = Vector2(UiSettings.VALUE_W, UiSettings.SLIDER_HIT_H)
@@ -398,10 +400,21 @@ func _sync_slider(key: String) -> void:
 
 
 func _on_slider(v: int, key: String) -> void:
+	var was := int(values[key])
 	values[key] = v
 	values[key + "_mute"] = false
 	UiSettings.apply(values)
 	_sync_slider(key)
+	# Kvačica na svakih 5 (cooldown u katalogu) — ton prati vrijednost.
+	if floori(v / 5.0) != floori(was / 5.0):
+		Sfx.play("ui_slider", -1, 0.8 + 0.5 * float(v) / 100.0)
+
+
+## Pušten Sound effects slider: probni coin na novoj glasnoći.
+func _on_slider_released(key: String) -> void:
+	_save()
+	if key == "sfx":
+		Sfx.play("coin")
 
 
 ## Mute čuva vrijednost; unmute vraća nju (0 → 80, ne tišina).
@@ -412,6 +425,7 @@ func _on_mute(key: String) -> void:
 		values[key] = 80
 	UiSettings.apply(values)
 	_sync_slider(key)
+	Sfx.play("ui_toggle_off" if muted else "ui_toggle_on")
 	_save()
 
 
@@ -420,6 +434,7 @@ func _on_mute(key: String) -> void:
 func _toggle_row(key: String, title: String, sub: String) -> Control:
 	var row := _Tap.new()
 	row.name = "ToggleRow_%s" % key
+	row.tap_sfx = ""
 	row.press_scale = 1.0
 	row.custom_minimum_size = Vector2(0, UiSettings.ROW_MIN_H + (UiSettings.ROW_PAD_Y * 2 if not sub.is_empty() else 0))
 	var line := HBoxContainer.new()
@@ -475,6 +490,7 @@ func _on_toggle(key: String) -> void:
 	values[key] = not bool(values[key])
 	UiSettings.apply(values)
 	_sync_toggle(key, true)
+	Sfx.play("ui_toggle_on" if bool(values[key]) else "ui_toggle_off")
 	if key == "vibration" and bool(values[key]):
 		UiSettings.vibrate(30)
 	_save()
@@ -612,6 +628,7 @@ func _on_restore_done() -> void:
 		return
 	var changed := _owned_snapshot() != _restore_snapshot
 	_set_restore(UiSettings.Restore.DONE if changed else UiSettings.Restore.NONE, true)
+	Sfx.play("purchase_ok" if changed else "ui_toast")
 	_sync_ads()
 	get_tree().call_group("meta_hub", "refresh_top_bar")
 
@@ -622,6 +639,7 @@ func _on_restore_timeout() -> void:
 	if IAPManager.restore_completed.is_connected(_on_restore_done):
 		IAPManager.restore_completed.disconnect(_on_restore_done)
 	_set_restore(UiSettings.Restore.FAIL, true)
+	Sfx.play("purchase_fail")
 
 
 # --- Privacy & help ------------------------------------------------------------
@@ -788,6 +806,7 @@ func _dev_reset_tutorial() -> void:
 # --- ulaz / izlaz --------------------------------------------------------------
 
 func _animate_in() -> void:
+	Sfx.play("ui_open")
 	if GameState.reduce_motion:
 		modulate.a = 0.0
 		_tween = create_tween()
@@ -804,6 +823,7 @@ func close() -> void:
 		return
 	_closing = true
 	_save()
+	Sfx.play("ui_close")
 	remove_from_group(GROUP)
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
@@ -822,6 +842,7 @@ func close() -> void:
 
 func _on_close_pressed() -> void:
 	if _credits.visible:
+		Sfx.play("ui_back")
 		_show_credits(false)
 	else:
 		close()
@@ -857,6 +878,8 @@ class _Tap:
 	signal tapped
 
 	var press_scale := 0.97
+	## Zvuk tapa; toggle / mute / X puštaju svoj.
+	var tap_sfx := "ui_tap"
 	var _down := false
 
 	func _init() -> void:
@@ -885,6 +908,8 @@ class _Tap:
 			_down = false
 			_press(false)
 			if Rect2(Vector2.ZERO, size).has_point(at):
+				if not tap_sfx.is_empty():
+					Sfx.play(tap_sfx)
 				tapped.emit()
 
 	func _press(on: bool) -> void:

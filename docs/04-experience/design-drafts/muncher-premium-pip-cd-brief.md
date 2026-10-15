@@ -1,6 +1,6 @@
 ---
 type: dizajn
-status: aktivan
+status: zatvoreno
 milestone: M8
 tags: [dizajn, arena, muncher, pip, skin, premium, iap, claude-design, animacije]
 povezano:
@@ -14,7 +14,7 @@ ai_sažetak: "Brief za Claude Design: (A) potpuni redizajn munchera u Areni — 
 
 # Muncher redizajn + Premium Pip — Claude Design brief
 
-> **Status 2026-10-12: brief spreman, čeka CD.** Prompt je u §8. Slike: `muncher-premium-pip-ref/`.
+> **Status 2026-10-14: isporučeno i preneseno.** Paket `design_handoff_muncher_premium_pip/` („Character skin design 1.zip") je u igri — izvještaj [[muncher-premium-pip-izvjestaj]]. Prompt je u §8. Slike: `muncher-premium-pip-ref/`.
 >
 > **Prije slanja: commitaj i pushaj na `master`.** Prošli put CD nije mogao pročitati brief jer nije bio na masteru.
 

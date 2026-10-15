@@ -287,6 +287,11 @@ static func tween_reward_reveal(chips: Array) -> void:
 		var t := c.create_tween().set_parallel()
 		t.tween_property(c, "scale", Vector2.ONE, ANIM.chip_in).set_delay(i * ANIM.chip_stagger).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		t.tween_property(c, "modulate:a", 1.0, ANIM.chip_in).set_delay(i * ANIM.chip_stagger)
+		# Svaka nagrada „pop" na svom redu; ton se penje od prve do zadnje.
+		var step := i
+		var s := c.create_tween()
+		s.tween_interval(i * ANIM.chip_stagger + 0.02)
+		s.tween_callback(func() -> void: Sfx.play("loot_reveal", step))
 
 
 # ── Prenos u igru (agent) ─────────────────────────────────────────────────────

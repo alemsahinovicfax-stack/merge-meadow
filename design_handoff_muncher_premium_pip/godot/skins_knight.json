@@ -1,0 +1,553 @@
+{
+ "schema": 1,
+ "entry": {
+  "key": "knight",
+  "cosmetic_id": "pip_knight",
+  "title": "Sir Pip",
+  "product": "Sir Pip · Meadow Knight",
+  "source": "iap",
+  "sku": "pip_knight",
+  "coin_cost": null,
+  "price_proposal": {
+   "eur": "€3.99",
+   "usd": "$3.99",
+   "note": "proposal — Apple tier 4 / Google 3,99 €; final call: owner"
+  },
+  "tokens": {
+   "fur": "#F5D6A6",
+   "fur_sh": "#DDAF78",
+   "fur_lt": "#FFF2DE",
+   "ear_in": "#FFC6BE",
+   "cheek": "#FFA88E",
+   "nose": "#E77B8E",
+   "iris": "#5A4433"
+  },
+  "recolor_shared_parts": {
+   "#A8E6CF": "#F5D6A6",
+   "#7CCBAE": "#DDAF78",
+   "#D4F5E4": "#FFF2DE",
+   "#FFCCD5": "#FFC6BE",
+   "#FFB88C": "#FFA88E",
+   "#F2899F": "#E77B8E",
+   "#3E7D69": "#5A4433"
+  },
+  "rule": "Parts NOT in replace_parts_by_view keep their Classic SVG, recoloured with recolor_shared_parts (PipAssets.recolor_svg). Listed parts are swapped for the knight SVG (final colours, no recolor). Pivots unchanged.",
+  "replace_parts": {
+   "body_f": "k_body_f",
+   "body_q": "k_body_q",
+   "body_s": "k_body_s",
+   "paw_f": "k_paw_f",
+   "foot_f": "k_boot_f",
+   "foot_s": "k_boot_s",
+   "foot_b": "k_boot_b",
+   "foot_t": "k_boot_t",
+   "ear_l": "k_ear_l",
+   "ear_rb": "k_ear_rb",
+   "ear_back": "k_ear_back",
+   "ear_backb": "k_ear_backb",
+   "tuft": "k_plume",
+   "top:tuft": "k_plume_t"
+  },
+  "replace_parts_by_view": {
+   "front": {
+    "foot_L": {
+     "from": "foot_f",
+     "to": "k_boot_f",
+     "file": "res://assets/pip/parts_knight/k_boot_f.svg",
+     "offset": [
+      -28,
+      -14
+     ],
+     "size": [
+      55,
+      27
+     ]
+    },
+    "foot_R": {
+     "from": "foot_f",
+     "to": "k_boot_f",
+     "file": "res://assets/pip/parts_knight/k_boot_f.svg",
+     "offset": [
+      -28,
+      -14
+     ],
+     "size": [
+      55,
+      27
+     ]
+    },
+    "body": {
+     "from": "body_f",
+     "to": "k_body_f",
+     "file": "res://assets/pip/parts_knight/k_body_f.svg",
+     "offset": [
+      -60,
+      -90
+     ],
+     "size": [
+      119,
+      101
+     ]
+    },
+    "arm_L": {
+     "from": "paw_f",
+     "to": "k_paw_f",
+     "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+     "offset": [
+      -13,
+      -6
+     ],
+     "size": [
+      25,
+      27
+     ]
+    },
+    "arm_R": {
+     "from": "paw_f",
+     "to": "k_paw_f",
+     "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+     "offset": [
+      -13,
+      -6
+     ],
+     "size": [
+      25,
+      27
+     ]
+    },
+    "ear_L": {
+     "from": "ear_l",
+     "to": "k_ear_l",
+     "file": "res://assets/pip/parts_knight/k_ear_l.svg",
+     "offset": [
+      -23,
+      -79
+     ],
+     "size": [
+      40,
+      87
+     ]
+    },
+    "ear_R": {
+     "from": "ear_rb",
+     "to": "k_ear_rb",
+     "file": "res://assets/pip/parts_knight/k_ear_rb.svg",
+     "offset": [
+      -21,
+      -61
+     ],
+     "size": [
+      38,
+      69
+     ]
+    },
+    "tuft": {
+     "from": "tuft",
+     "to": "k_plume",
+     "file": "res://assets/pip/parts_knight/k_plume.svg",
+     "offset": [
+      -21,
+      -55
+     ],
+     "size": [
+      60,
+      41
+     ]
+    }
+   },
+   "three_q": {
+    "foot_R": {
+     "from": "foot_f",
+     "to": "k_boot_f",
+     "file": "res://assets/pip/parts_knight/k_boot_f.svg",
+     "offset": [
+      -28,
+      -14
+     ],
+     "size": [
+      55,
+      27
+     ]
+    },
+    "foot_L": {
+     "from": "foot_f",
+     "to": "k_boot_f",
+     "file": "res://assets/pip/parts_knight/k_boot_f.svg",
+     "offset": [
+      -28,
+      -14
+     ],
+     "size": [
+      55,
+      27
+     ]
+    },
+    "body": {
+     "from": "body_q",
+     "to": "k_body_q",
+     "file": "res://assets/pip/parts_knight/k_body_q.svg",
+     "offset": [
+      -60,
+      -90
+     ],
+     "size": [
+      119,
+      101
+     ]
+    },
+    "arm_L": {
+     "from": "paw_f",
+     "to": "k_paw_f",
+     "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+     "offset": [
+      -13,
+      -6
+     ],
+     "size": [
+      25,
+      27
+     ]
+    },
+    "arm_R": {
+     "from": "paw_f",
+     "to": "k_paw_f",
+     "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+     "offset": [
+      -13,
+      -6
+     ],
+     "size": [
+      25,
+      27
+     ]
+    },
+    "ear_L": {
+     "from": "ear_l",
+     "to": "k_ear_l",
+     "file": "res://assets/pip/parts_knight/k_ear_l.svg",
+     "offset": [
+      -23,
+      -79
+     ],
+     "size": [
+      40,
+      87
+     ]
+    },
+    "ear_R": {
+     "from": "ear_rb",
+     "to": "k_ear_rb",
+     "file": "res://assets/pip/parts_knight/k_ear_rb.svg",
+     "offset": [
+      -21,
+      -61
+     ],
+     "size": [
+      38,
+      69
+     ]
+    },
+    "tuft": {
+     "from": "tuft",
+     "to": "k_plume",
+     "file": "res://assets/pip/parts_knight/k_plume.svg",
+     "offset": [
+      -21,
+      -55
+     ],
+     "size": [
+      60,
+      41
+     ]
+    }
+   },
+   "side": {
+    "foot_L": {
+     "from": "foot_s",
+     "to": "k_boot_s",
+     "file": "res://assets/pip/parts_knight/k_boot_s.svg",
+     "offset": [
+      -33,
+      -15
+     ],
+     "size": [
+      66,
+      24
+     ]
+    },
+    "foot_R": {
+     "from": "foot_s",
+     "to": "k_boot_s",
+     "file": "res://assets/pip/parts_knight/k_boot_s.svg",
+     "offset": [
+      -33,
+      -15
+     ],
+     "size": [
+      66,
+      24
+     ]
+    },
+    "body": {
+     "from": "body_s",
+     "to": "k_body_s",
+     "file": "res://assets/pip/parts_knight/k_body_s.svg",
+     "offset": [
+      -64,
+      -76
+     ],
+     "size": [
+      117,
+      87
+     ]
+    },
+    "arm_L": {
+     "from": "paw_f",
+     "to": "k_paw_f",
+     "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+     "offset": [
+      -13,
+      -6
+     ],
+     "size": [
+      25,
+      27
+     ]
+    },
+    "arm_R": {
+     "from": "paw_f",
+     "to": "k_paw_f",
+     "file": "res://assets/pip/parts_knight/k_paw_f.svg",
+     "offset": [
+      -13,
+      -6
+     ],
+     "size": [
+      25,
+      27
+     ]
+    },
+    "ear_L": {
+     "from": "ear_l",
+     "to": "k_ear_l",
+     "file": "res://assets/pip/parts_knight/k_ear_l.svg",
+     "offset": [
+      -23,
+      -79
+     ],
+     "size": [
+      40,
+      87
+     ]
+    },
+    "ear_R": {
+     "from": "ear_rb",
+     "to": "k_ear_rb",
+     "file": "res://assets/pip/parts_knight/k_ear_rb.svg",
+     "offset": [
+      -21,
+      -61
+     ],
+     "size": [
+      38,
+      69
+     ]
+    },
+    "tuft": {
+     "from": "tuft",
+     "to": "k_plume",
+     "file": "res://assets/pip/parts_knight/k_plume.svg",
+     "offset": [
+      -21,
+      -55
+     ],
+     "size": [
+      60,
+      41
+     ]
+    }
+   },
+   "back": {
+    "foot_L": {
+     "from": "foot_b",
+     "to": "k_boot_b",
+     "file": "res://assets/pip/parts_knight/k_boot_b.svg",
+     "offset": [
+      -25,
+      -15
+     ],
+     "size": [
+      49,
+      29
+     ]
+    },
+    "foot_R": {
+     "from": "foot_b",
+     "to": "k_boot_b",
+     "file": "res://assets/pip/parts_knight/k_boot_b.svg",
+     "offset": [
+      -25,
+      -15
+     ],
+     "size": [
+      49,
+      29
+     ]
+    },
+    "ear_L": {
+     "from": "ear_back",
+     "to": "k_ear_back",
+     "file": "res://assets/pip/parts_knight/k_ear_back.svg",
+     "offset": [
+      -23,
+      -79
+     ],
+     "size": [
+      40,
+      87
+     ]
+    },
+    "ear_R": {
+     "from": "ear_backb",
+     "to": "k_ear_backb",
+     "file": "res://assets/pip/parts_knight/k_ear_backb.svg",
+     "offset": [
+      -21,
+      -61
+     ],
+     "size": [
+      38,
+      69
+     ]
+    },
+    "tuft": {
+     "from": "tuft",
+     "to": "k_plume",
+     "file": "res://assets/pip/parts_knight/k_plume.svg",
+     "offset": [
+      -21,
+      -55
+     ],
+     "size": [
+      60,
+      41
+     ]
+    }
+   },
+   "top": {
+    "foot_L": {
+     "from": "foot_t",
+     "to": "k_boot_t",
+     "file": "res://assets/pip/parts_knight/k_boot_t.svg",
+     "offset": [
+      -13,
+      -23
+     ],
+     "size": [
+      25,
+      47
+     ]
+    },
+    "foot_R": {
+     "from": "foot_t",
+     "to": "k_boot_t",
+     "file": "res://assets/pip/parts_knight/k_boot_t.svg",
+     "offset": [
+      -13,
+      -23
+     ],
+     "size": [
+      25,
+      47
+     ]
+    },
+    "ear_L": {
+     "from": "ear_back",
+     "to": "k_ear_back",
+     "file": "res://assets/pip/parts_knight/k_ear_back.svg",
+     "offset": [
+      -23,
+      -79
+     ],
+     "size": [
+      40,
+      87
+     ]
+    },
+    "ear_R": {
+     "from": "ear_backb",
+     "to": "k_ear_backb",
+     "file": "res://assets/pip/parts_knight/k_ear_backb.svg",
+     "offset": [
+      -21,
+      -61
+     ],
+     "size": [
+      38,
+      69
+     ]
+    },
+    "tuft": {
+     "from": "tuft",
+     "to": "k_plume_t",
+     "file": "res://assets/pip/parts_knight/k_plume_t.svg",
+     "offset": [
+      -14,
+      -8
+     ],
+     "size": [
+      28,
+      64
+     ]
+    }
+   }
+  },
+  "nodes_added": "rig_additions.json",
+  "palette_fixed": {
+   "ACORN": "#B9824A",
+   "ACORN_SH": "#8E5C30",
+   "ACORN_LT": "#D8A76C",
+   "GOLD": "#F7CB5A",
+   "GOLD_SH": "#D29B2E",
+   "CAPE": "#7F86E6",
+   "CAPE_SH": "#5E63C4",
+   "CAPE_LT": "#B4B8F8",
+   "PEW": "#DCE3EA",
+   "PEW_SH": "#A7B4C2",
+   "PEW_LT": "#F7FAFC",
+   "PLUME": "#FF8A80",
+   "PLUME_SH": "#E0615E"
+  },
+  "skin_layer": {
+   "player": "AnimationPlayer \"Skin\" (third player, only k_* nodes)",
+   "loops": {
+    "default": "k_cape_idle",
+    "top": "k_cape_run"
+   }
+  },
+  "reactions": {
+   "merge_t3": "t3_knight",
+   "finish": "goal_knight"
+  },
+  "idle_detail": {
+   "anim": "idle_knight",
+   "gap_s": [
+    6,
+    10
+   ],
+   "first_s": 2.5,
+   "on": [
+    "idle",
+    "card_idle",
+    "stage_idle",
+    "arena_idle",
+    "hud_idle"
+   ]
+  },
+  "showcase_anim": "pose_knight",
+  "signature_anim": "sig_knight",
+  "hud": "res://assets/pip/hud/pip_hud_knight.svg",
+  "overlays": [],
+  "detail": "Meadow armour: acorn-cap helmet with a coral plume, pewter breastplate with a gold clover, poppy-blue cape, round shield and acorn boots. Signature: plants his banner and salutes."
+ }
+}

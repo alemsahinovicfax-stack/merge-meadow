@@ -18,10 +18,13 @@ var _badge: Control
 var _new_tag: Control
 var _free_tag: Control
 
-const TAG_Z := 12
+## Iznad Pip riga u pregledu (HOST_LIFT 4 + dijelovi do 11).
+const TAG_Z := 16
 
 
 func _ready() -> void:
+	# Izbor pušta „wear" u WardrobeSheet.pick (nekupljen Sir Pip vodi u Shop uz swipe zvuk).
+	tap_sfx = ""
 	custom_minimum_size = Vector2(UiWardrobe.CARD)
 	size = custom_minimum_size
 	press_scale = 0.97
@@ -38,6 +41,12 @@ func is_free_skin() -> bool:
 	return is_default() and slot_id == CosmeticCatalog.SLOT_PIP_SKIN
 
 
+## Premium skin za pravi novac (Sir Pip): oznaka „Premium"; nekupljen je pod velom, a tap
+## vodi u Shop na njegovu karticu.
+func is_premium() -> bool:
+	return not is_default() and CosmeticCatalog.is_iap_item(item_id)
+
+
 ## slot: zapis slota iz kataloga; item: zapis stavke ({} = Default).
 func setup(slot: Dictionary, item: Dictionary, p_state: String, p_new: bool, pip_recolor: Dictionary, season: String) -> void:
 	slot_id = str(slot.get("id", ""))
@@ -46,7 +55,7 @@ func setup(slot: Dictionary, item: Dictionary, p_state: String, p_new: bool, pip
 	is_new = p_new and state != UiWardrobe.CARD_NONE
 	title = str(item.get("title", "")) if not item.is_empty() else str(slot.get("default_title", "Default"))
 	name = ("DefaultCard" if item.is_empty() else "ItemCard_%s" % item_id)
-	enabled = state != UiWardrobe.CARD_NONE
+	enabled = state != UiWardrobe.CARD_NONE or is_premium()
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if enabled else Control.CURSOR_ARROW
 	if preview == null:
 		_build()
@@ -122,10 +131,11 @@ func _sync() -> void:
 	var tag_w := UiHomeV3.text_w(900, UiWardrobe.MIN_TEXT, UiWardrobe.NEW_TEXT) + 28.0 + 6.0
 	_new_tag.size = Vector2(ceilf(tag_w), UiWardrobe.NEW_TAG_H)
 	_new_tag.position = Vector2(b + UiWardrobe.BADGE_INSET, b + UiWardrobe.BADGE_INSET)
-	_free_tag.visible = is_free_skin()
-	var free_w := UiHomeV3.text_w(900, UiWardrobe.MIN_TEXT, UiWardrobe.FREE_TEXT) + 28.0 + 6.0
-	_free_tag.size = Vector2(ceilf(free_w), UiWardrobe.NEW_TAG_H)
-	_free_tag.position = _new_tag.position
+	_free_tag.visible = is_free_skin() or is_premium()
+	var free_w := UiHomeV3.text_w(900, UiWardrobe.UNDER_TAG_PX, _tag_text()) + UiWardrobe.UNDER_TAG_PAD_X * 2.0
+	_free_tag.size = Vector2(ceilf(free_w), UiWardrobe.UNDER_TAG_H)
+	var name_top := pad + float(UiWardrobe.CARD_PREVIEW.y) + 12.0
+	_free_tag.position = Vector2(pad, name_top + float(UiWardrobe.CARD_NAME_LINE) + UiWardrobe.UNDER_TAG_GAP)
 	_badge.queue_redraw()
 	_new_tag.queue_redraw()
 	_free_tag.queue_redraw()
@@ -160,13 +170,18 @@ func _draw_badge() -> void:
 		_badge.draw_circle(p, 2.5, UiWardrobe.STICKER)
 
 
+func _tag_text() -> String:
+	return UiWardrobe.PREMIUM_TEXT if is_premium() else UiWardrobe.FREE_TEXT
+
+
 func _draw_free_tag() -> void:
 	var r := Rect2(Vector2.ZERO, _free_tag.size)
-	_free_tag.draw_style_box(UiWardrobe.free_tag(), r)
-	var w := UiHomeV3.text_w(900, UiWardrobe.MIN_TEXT, UiWardrobe.FREE_TEXT)
+	_free_tag.draw_style_box(UiWardrobe.premium_tag() if is_premium() else UiWardrobe.free_tag(), r)
+	var text := _tag_text()
+	var w := UiHomeV3.text_w(900, UiWardrobe.UNDER_TAG_PX, text)
 	UiHomeV3.draw_text(
-		_free_tag, 900, UiWardrobe.MIN_TEXT, UiWardrobe.FREE_TEXT,
-		Vector2((r.size.x - w) * 0.5, (r.size.y - float(UiWardrobe.MIN_TEXT)) * 0.5), UiWardrobe.INK
+		_free_tag, 900, UiWardrobe.UNDER_TAG_PX, text,
+		Vector2((r.size.x - w) * 0.5, (r.size.y - float(UiWardrobe.UNDER_TAG_PX)) * 0.5), UiWardrobe.INK
 	)
 
 

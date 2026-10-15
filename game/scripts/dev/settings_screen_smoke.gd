@@ -85,8 +85,9 @@ func _run() -> void:
 	var bus := AudioServer.get_bus_index("Music")
 	if bus < 0:
 		_fail("no Music bus")
-	elif not is_equal_approx(AudioServer.get_bus_volume_db(bus), linear_to_db(0.3)):
-		_fail("Music bus %.2f dB, expected %.2f" % [AudioServer.get_bus_volume_db(bus), linear_to_db(0.3)])
+	elif not is_equal_approx(AudioServer.get_bus_volume_db(bus), linear_to_db(0.09)):
+		# kvadratna kriva slidera: 30 → 0,3² amplitude (≈ −20,9 dB)
+		_fail("Music bus %.2f dB, expected %.2f" % [AudioServer.get_bus_volume_db(bus), linear_to_db(0.09)])
 	screen.call("_on_mute", "music")
 	if bus >= 0 and not AudioServer.is_bus_mute(bus):
 		_fail("mute did not mute the Music bus")

@@ -72,6 +72,7 @@ func _gui_input(event: InputEvent) -> void:
 	var fire := _down and inside and enabled
 	_set_down(false)
 	if fire:
+		Sfx.play("ui_play" if mode == MODE_PLAY else "ui_back")
 		pressed.emit()
 
 

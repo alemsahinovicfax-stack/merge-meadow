@@ -33,6 +33,7 @@ func setup(p_lane_y: float, p_hold: float = 1.6, p_center_x: float = 540.0) -> P
 
 ## glyph: "" | "check" | "lock" ; icon: tekstura na kremastom disku.
 func show_text(text: String, icon: Texture2D = null, glyph: String = "", hold: float = -1.0) -> Control:
+	Sfx.play("ui_toast")
 	var pill := _Pill.new()
 	pill.text = text
 	pill.icon = icon

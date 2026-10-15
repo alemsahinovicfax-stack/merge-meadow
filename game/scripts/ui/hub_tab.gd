@@ -23,6 +23,7 @@ var _badge_label: Label = null
 
 func _ready() -> void:
 	super()
+	tap_sfx = "ui_tab"
 	custom_minimum_size = Vector2(UiChrome.TAB_SLOT_W, UiChrome.FOOTER_CONTENT_H)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_build()

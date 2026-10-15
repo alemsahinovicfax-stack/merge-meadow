@@ -118,6 +118,13 @@ const S_TOAST_RESTORED := "Purchases restored"
 const S_TOAST_ADS := "Ads are off"
 const S_TOAST_PACK := "Pack added"
 const S_TOAST_LOOT := "+5 %s"
+## Premium Looks kartica (design_handoff_muncher_premium_pip · shop_export.json).
+const S_PREMIUM := "Premium"
+const S_TOAST_WEARS := "Pip wears %s"
+const PREMIUM_TAG_POS := Vector2(20, 20)
+const PREMIUM_TAG_H := 60.0
+const PREMIUM_TAG_PX := 34
+const PREMIUM_TAG_PAD_X := 24.0
 
 const TABS: Array[String] = ["seasons", "looks", "boosters", "support"]
 const TAB_LABELS: Array[String] = ["Seasons", "Looks", "Boosters", "Support"]

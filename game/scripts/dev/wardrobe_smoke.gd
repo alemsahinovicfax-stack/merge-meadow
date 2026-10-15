@@ -18,7 +18,7 @@ const PAGE := Vector2(1080.0, 1633.0)
 const LEGACY := {
 	"pip_blossom": ["pip_skin", 250], "pip_sky": ["pip_skin", 200],
 	"meadow_sunset": ["meadow_bg", 150], "meadow_lavender": ["meadow_bg", 180],
-	"journal_gold": ["journal_frame", 120],
+	"journal_gold": ["journal_frame", 120], "pip_knight": ["pip_skin", 0],
 }
 
 var _failed: bool = false
@@ -140,6 +140,12 @@ func _check_recolor() -> void:
 		return
 	for it in CosmeticCatalog.items_in_slot("pip_skin"):
 		var id := str(it.get("id", ""))
+		if CosmeticCatalog.get_look(id).has("skin"):
+			# Premium skin (Sir Pip): vlastiti dijelovi, nema recolor mape u katalogu.
+			var sk := UiPip.skin_key_from_look(CosmeticCatalog.get_look(id))
+			if sk == "classic" or UiPip.atlas_for(sk).get("texture") == null:
+				_fail("%s premium skin %s missing" % [id, sk])
+			continue
 		var map := CosmeticCatalog.get_recolor(id)
 		if map.is_empty():
 			_fail("%s has no recolor" % id)
@@ -359,9 +365,9 @@ func _check_extra() -> void:
 	if tabs.size() != 8:
 		_fail("extra: %d tabs, expected 8" % tabs.size())
 	var cards: Array = _w.call("get_cards")
-	# 12 skinova (Blossom, Sky pod velom, 9 demo, Frost iz sezone pod velom) + Classic.
-	if cards.size() != 13:
-		_fail("extra: %d Pip cards, expected 12 + Classic" % cards.size())
+	# 13 skinova (Blossom, Sky i Sir Pip pod velom, 9 demo, Frost iz sezone pod velom) + Classic.
+	if cards.size() != 14:
+		_fail("extra: %d Pip cards, expected 13 + Classic" % cards.size())
 	var veiled := 0
 	var fresh := 0
 	for c in cards:
@@ -369,8 +375,8 @@ func _check_extra() -> void:
 			veiled += 1
 		if bool(c.get("is_new")):
 			fresh += 1
-	if veiled != 2 or fresh != 1:
-		_fail("extra: veiled %d / new %d, expected 2 / 1" % [veiled, fresh])
+	if veiled != 3 or fresh != 1:
+		_fail("extra: veiled %d / new %d, expected 3 / 1" % [veiled, fresh])
 	var last := tabs[tabs.size() - 1] as Control
 	var scroll := _w.call("tabs_scroll") as ScrollContainer
 	if last.position.x + last.size.x <= scroll.size.x:

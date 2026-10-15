@@ -182,11 +182,14 @@ static func knob_x(on: bool) -> float:
 	return float(KNOB_INSET + (KNOB_TRAVEL if on else 0))
 
 
-## 0–100 → dB za AudioServer (0 → mute). Busovi „Music“ i „SFX“ postoje i bez zvukova.
+## 0–100 → dB za AudioServer (0 → mute). Kriva je kvadratna (sluh je logaritamski): 80 → −3,9 dB,
+## 50 → −12, 25 → −24 — linearna amplituda je na 50 % zvučala skoro kao puna (−6 dB) a sva
+## promjena bila pri dnu. Glasnoća tema u katalogu je postavljena za default 80.
 static func volume_db(value: int, muted: bool) -> float:
 	if muted or value <= 0:
 		return -80.0
-	return linear_to_db(float(value) / 100.0)
+	var k := float(value) / 100.0
+	return linear_to_db(k * k)
 
 
 static func load_settings() -> Dictionary:

@@ -19,6 +19,8 @@ const DOT := 20.0
 var state: String = UiShopV2.MONEY_BUY
 var price: String = ""
 var owned_label: String = "Yours"
+## Premium Looks kartica: kupljen a nenošen skin — tap na „✓ Owned" ga obuče.
+var owned_tappable: bool = false
 
 var _coin_tex: Texture2D
 var _press_k: float = 0.0
@@ -52,6 +54,8 @@ func configure(p_state: String, p_price: String, p_owned_label: String = "Yours"
 
 ## Da li tap nešto radi (coins.short reaguje drhtajem, pa je i on dodirljiv).
 func is_tappable() -> bool:
+	if state == UiShopV2.OWNED_STATE:
+		return owned_tappable
 	return state in [UiShopV2.COINS_BUY, UiShopV2.COINS_CONFIRM, UiShopV2.COINS_SHORT_STATE,
 		UiShopV2.MONEY_BUY, UiShopV2.PLAY_STATE]
 
@@ -80,10 +84,21 @@ func _on_gui_input(event: InputEvent) -> void:
 			tapped = (event as InputEventScreenTouch).pressed
 		if tapped:
 			shake()
+			Sfx.play("ui_denied")
 			short_tapped.emit()
 			accept_event()
 		return
 	super(event)
+
+
+## Potvrda coin kupovine i „Owned → obuci" puštaju svoj zvuk (coins_spend / wear); Play svoj.
+func _tap_sound() -> String:
+	match state:
+		UiShopV2.COINS_CONFIRM, UiShopV2.OWNED_STATE:
+			return ""
+		UiShopV2.PLAY_STATE:
+			return "ui_play"
+	return "ui_tap"
 
 
 func _apply_state() -> void:

@@ -12,7 +12,10 @@ tags: [hub, iskustvo]
 - [[ui-i-art-alati|ui-i-art-alati]] — **operativno:** alati, Cursor modeli, 1× Pip (ti) + 1× UI pack (Kenney)
 - [[../02-design/spec-vertical-slice|spec-vertical-slice]] — ekrani, flow, mobile UX (trenutno; stari [[_archive/ui-ux|ui-ux]] arhiviran)
 - [[art-direction|art-direction]] — stil, paleta, mood
-- [[audio-direction|audio-direction]] — muzika, SFX, ambient
+- [[audio-direction|audio-direction]] — **zvuk u igri:** AudioManager, katalog, mapa događaja, miks, zamjena pravim zvukom
+- [[zvuk-izvjestaj|zvuk-izvjestaj]] — zvuk cijele igre: 59 efekata + 3 teme (privremena sinteza), mjerenja, FPS (2026-10-14)
+- [[muzika-sezone|muzika-sezone]] — muzika po sezoni: 8 sezona × home / arena / run (tonalitet, mjera, instrumenti, ambijent)
+- [[design-drafts/muzika-brief|muzika-brief]] — brief za pravu muziku (kompozitor / paket / AI), 24 loopa po sezonama, engleski tekst za slanje
 - [[pristupacnost|pristupacnost]] — font, kontrast, difficulty
 - [[design-drafts/pip-cd-brief|pip-cd-brief]] — brief za Claude Design (redizajn Pipa)
 - [[design-drafts/pip-izvjestaj|pip-izvjestaj]] — prenos Pip riga (2026-10-07)
@@ -23,6 +26,7 @@ tags: [hub, iskustvo]
 - [[design-drafts/ispravke-settings-cd-brief|ispravke-settings-cd-brief]] — brief za Claude Design (zlatni okvir Albuma sa skrolom, Classic Pip kao skin, novi Pip u Shopu, Settings ekran)
 - [[design-drafts/ispravke-settings-izvjestaj|ispravke-settings-izvjestaj]] — prenos ispravki + Settings ekrana (2026-10-12)
 - [[design-drafts/muncher-premium-pip-cd-brief|muncher-premium-pip-cd-brief]] — brief za Claude Design (potpuni redizajn munchera u Areni sa svim animacijama; prvi premium Pip skin za pravi novac, potpuno drugačiji dizajn)
+- [[design-drafts/muncher-premium-pip-izvjestaj|muncher-premium-pip-izvjestaj]] — prenos: Nibbs (novi muncher, rig + 16 klipova) i Sir Pip (premium skin za pravi novac) (2026-10-14)
 
 ## Povezano
 

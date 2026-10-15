@@ -1,0 +1,141 @@
+{
+ "schema": 1,
+ "base": "1080 × 1920 game px; tokens = design_handoff_shop_v2 (money #D4A5FF, money_soft #EAD2FF, owned #A8E6CF, card_yours #FFF6D6, veil rgba(227,217,204,.84))",
+ "cosmetics_item": {
+  "id": "pip_knight",
+  "slot": "pip_skin",
+  "title": "Sir Pip",
+  "description": "Meadow Knight armour for Pip.",
+  "coin_cost": 0,
+  "source": "iap",
+  "sku": "pip_knight",
+  "order": 30,
+  "new_since": null,
+  "look": {
+   "skin": "knight"
+  }
+ },
+ "price_proposal": {
+  "eur": "€3.99",
+  "usd": "$3.99",
+  "why": "Single non-consumable look. Clearly more than a coin skin (own parts in 5 views + 7 own clips) so above the €1.99 impulse tier; under €4.99 so it never out-prices a bundle. Owner decides.",
+  "store_strings": "use the store-localised price string (BuyButton money.buy, 52 / 44 if > 7 chars)"
+ },
+ "shop_card": {
+  "slot": "Looks · Pip",
+  "card": [
+   1032,
+   "auto"
+  ],
+  "padding": 20,
+  "gap": 20,
+  "preview": {
+   "w": 984,
+   "h": 300,
+   "radius": 24,
+   "border": 4,
+   "pip": {
+    "view": "three_q",
+    "size": 246,
+    "anim": "pose_knight",
+    "tap": "sig_knight then back to pose"
+   }
+  },
+  "premium_tag": {
+   "text": "Premium",
+   "x": 20,
+   "y": 20,
+   "h": 60,
+   "radius": 30,
+   "fill": "#D4A5FF",
+   "border": 4,
+   "font": "Nunito 900 34"
+  },
+  "row": {
+   "h": 120,
+   "name": {
+    "text": "Sir Pip",
+    "font": 52
+   },
+   "sub": {
+    "text": "Meadow Knight · Looks only",
+    "font": 36,
+    "ink": "#555C5E"
+   },
+   "button": "BuyButton"
+  },
+  "states": {
+   "available": {
+    "button": "money.buy",
+    "label": "€3.99",
+    "fill": "#D4A5FF",
+    "shadow": "0 8 0 rgba(26,26,20,.28)"
+   },
+   "busy": {
+    "button": "money.busy",
+    "fill": "#EAD2FF",
+    "offset_y": 8,
+    "content": "3 dots (existing)"
+   },
+   "owned": {
+    "button": "owned",
+    "label": "✓ Owned",
+    "fill": "#A8E6CF",
+    "tap": "equip"
+   },
+   "wearing": {
+    "button": "owned",
+    "label": "✓ Wearing",
+    "fill": "#A8E6CF",
+    "card": "#FFF6D6",
+    "badge": "EquippedBadge 64 top-right"
+   }
+  },
+  "failed": "existing PurchaseStatus (Cancelled / Didn’t go through / Pending) under the name"
+ },
+ "wardrobe_card": {
+  "w": 240,
+  "pad": 12,
+  "radius": 28,
+  "preview": [
+   210,
+   150
+  ],
+  "name_px": 38,
+  "tag": {
+   "h": 52,
+   "font": "34/900"
+  },
+  "classic": {
+   "tag": "Free",
+   "fill": "#A8E6CF"
+  },
+  "knight": {
+   "tag": "Premium",
+   "fill": "#D4A5FF"
+  },
+  "states": {
+   "locked": {
+    "veil": "rgba(227,217,204,.84) over preview + lock 64",
+    "tap": "Shop · Looks, scroll to the Sir Pip card"
+   },
+   "owned": {
+    "tap": "wear (stage_hop)"
+   },
+   "wearing": {
+    "card": "#FFF6D6",
+    "edge": "4 px ink",
+    "badge": "✓ 48"
+   }
+  }
+ },
+ "strings_en": {
+  "title": "Sir Pip",
+  "sub": "Meadow Knight · Looks only",
+  "premium": "Premium",
+  "free": "Free",
+  "owned": "Owned",
+  "wearing": "Wearing"
+ },
+ "pillar2": "cosmetic only — no stat, no seed, no speed, no Muncher effect"
+}

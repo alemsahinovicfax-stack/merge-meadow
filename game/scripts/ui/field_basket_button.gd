@@ -176,4 +176,5 @@ func _on_gui_input(event: InputEvent) -> void:
 	if not tapped:
 		return
 	accept_event()
+	Sfx.play("ui_tap")
 	clicked.emit()

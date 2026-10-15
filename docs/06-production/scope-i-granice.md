@@ -32,8 +32,8 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - Kamp: merge, upgrade, daily chest
 - Settings ekran (zupčanik u headeru): Music i Sound effects (slider + mute), Vibration, Reduce motion, Restore purchases, Remove Ads status, Privacy choices (pristanak za reklame), Privacy policy, Contact support, Credits, Version; Dev sekcija samo u debug buildu — dodano 2026-10-12 na zahtjev, [[../04-experience/design-drafts/ispravke-settings-cd-brief|ispravke-settings-cd-brief]]
 - Classic Pip je pravi skin u Ormaru (besplatan, ne prodaje se); zlatni okvir Albuma radi sa skrolom — 2026-10-12, isti brief
-- Muncher u Areni: novi lik (cutout rig + animacije svih stanja, novo gnijezdo); pravila ponašanja ostaju — dodano 2026-10-12 na zahtjev, [[../04-experience/design-drafts/muncher-premium-pip-cd-brief|muncher-premium-pip-cd-brief]]
-- Premium Pip skin (1 komad, pravi novac): potpuno drugačiji dizajn i tema, vlastiti dijelovi i animacije, Shop Looks + Ormar; samo kozmetika (Pillar 2) — 2026-10-12, isti brief
+- Muncher u Areni: novi lik (Nibbs, krtica — u igri 2026-10-14; cutout rig + animacije svih stanja, krtičnjak); pravila ponašanja ostaju — dodano 2026-10-12 na zahtjev, [[../04-experience/design-drafts/muncher-premium-pip-cd-brief|muncher-premium-pip-cd-brief]]
+- Premium Pip skin (1 komad, pravi novac): Sir Pip · Meadow Knight (u igri 2026-10-14, SKU `pip_knight`, cijena prijedlog €3.99) — potpuno drugačiji dizajn i tema, vlastiti dijelovi i animacije, Shop Looks + Ormar; samo kozmetika (Pillar 2) — 2026-10-12, isti brief
 - Shop: remove ads, starter pack (7 dana od prvog pokretanja), boosteri (Merge Hint jednokratan, Loot Burst consumable) — Shop v2, 2026-10-02
 
 ### Monetizacija
@@ -45,7 +45,8 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 ### Tech
 - Godot 4, **Android launch prvo**; iOS export kad se prikupi ~**99 USD** (Apple Developer)
 - EN UI copy
-- SFX (pickup, merge, fail); muzika opcionalna u kampu
+- Zvuk cijele igre: SFX za svaki događaj (UI, ekonomija, Arena, muncher, Pip, run, loot) + muzika — hub, Arena i run, haptika uz velike trenutke; privremeno sintetizovano dok ne stigne pravi zvuk — prošireno 2026-10-14 na zahtjev („zvuk za cijelu igru"), [[../04-experience/audio-direction|audio-direction]]
+- Muzika po sezoni: svaka od 8 sezona ima svoje tri teme (home / arena / run) u skladu sa sezonom, muzika prati aktivnu sezonu — dodano 2026-10-14 na zahtjev, [[../04-experience/muzika-sezone|muzika-sezone]]
 - Flat 2D **flat cartoon** (pastel, soft outline) — bez pixel grida
 
 ### Content

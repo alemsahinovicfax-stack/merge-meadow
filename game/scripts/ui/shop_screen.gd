@@ -30,6 +30,8 @@ var _confirm_timer: SceneTreeTimer
 var _busy_sku: String = ""
 var _season_cards: Dictionary = {}
 var _cosmetic_cards: Dictionary = {}
+## Premium Looks (pravi novac): sku → ShopPremiumLookCard.
+var _premium_cards: Dictionary = {}
 var _slot_headers: Dictionary = {}
 var _booster_cards: Dictionary = {}
 var _support_cards: Dictionary = {}
@@ -38,6 +40,7 @@ var _restore: _RestoreLink
 var _toast: _Toast
 var _entry_override: String = ""
 var _entry_override_slot: String = ""
+var _entry_override_item: String = ""
 var _entry_override_at: int = 0
 
 
@@ -158,7 +161,7 @@ func _queue_looks() -> void:
 		var items: Array[String] = []
 		for it in CosmeticCatalog.items_in_slot(slot_id):
 			var iid := str(it.get("id", ""))
-			if CosmeticCatalog.is_shop_item(iid):
+			if CosmeticCatalog.is_shop_item(iid) or CosmeticCatalog.is_iap_item(iid):
 				items.append(iid)
 		if items.is_empty():
 			continue
@@ -185,6 +188,15 @@ func _add_slot_group(slot: Dictionary) -> void:
 
 func _add_cosmetic_card(slot_id: String, iid: String) -> void:
 	var group := (_contents["looks"] as Node).get_node("LooksSlot_%s" % slot_id)
+	if CosmeticCatalog.is_iap_item(iid):
+		var premium := ShopPremiumLookCard.new()
+		premium.name = "PremiumCard_%s" % iid
+		group.add_child(premium)
+		premium.configure(iid)
+		premium.buy_pressed.connect(_on_money_buy)
+		premium.wear_pressed.connect(_on_premium_wear)
+		_premium_cards[CosmeticCatalog.get_sku(iid)] = premium
+		return
 	var card := ShopCosmeticCard.new()
 	card.name = "CosmeticCard_%s" % iid
 	group.add_child(card)
@@ -312,23 +324,25 @@ func _enter_shop() -> void:
 		var slot := _entry_override_slot
 		_entry_override = ""
 		_show_page("looks", false)
-		_scroll_to_slot(slot)
+		_scroll_to_slot(slot, _entry_override_item)
 		return
 	_entry_override = ""
 	_show_page("seasons", false)
 
 
 ## Ormar · „More in Shop": Looks, skrol na zaglavlje slota, zaglavlje bljesne 1,2 s.
-func show_cosmetic_slot(slot: String) -> void:
+## Tap na nekupljen premium skin (Sir Pip) daje i `item_id`: skrol na njegovu karticu.
+func show_cosmetic_slot(slot: String, item_id: String = "") -> void:
 	_finish_build()
 	_entry_override = "looks"
 	_entry_override_slot = slot
+	_entry_override_item = item_id
 	_entry_override_at = Time.get_ticks_msec()
 	_show_page("looks", false)
-	_scroll_to_slot(slot)
+	_scroll_to_slot(slot, item_id)
 
 
-func _scroll_to_slot(slot: String) -> void:
+func _scroll_to_slot(slot: String, item_id: String = "") -> void:
 	var head := _slot_headers.get(slot) as _SlotHeader
 	if head == null:
 		return
@@ -337,7 +351,13 @@ func _scroll_to_slot(slot: String) -> void:
 		return
 	var scroll := _pages["looks"] as ScrollContainer
 	var box := _contents["looks"] as Control
-	var y := head.get_global_rect().position.y - box.get_global_rect().position.y
+	var target: Control = head
+	var premium: Control = null
+	if not item_id.is_empty():
+		premium = _premium_cards.get(CosmeticCatalog.get_sku(item_id)) as Control
+	if premium != null and is_instance_valid(premium):
+		target = premium
+	var y := target.get_global_rect().position.y - box.get_global_rect().position.y
 	scroll.scroll_vertical = int(maxf(0.0, y))
 	head.flash(SLOT_FLASH_SEC)
 
@@ -355,6 +375,9 @@ func refresh_shop() -> void:
 	var restoring := _busy_sku == "restore"
 	for iid in _cosmetic_cards:
 		(_cosmetic_cards[iid] as ShopCosmeticCard).configure(str(iid), _confirm_id)
+	for sku in _premium_cards:
+		var premium := _premium_cards[sku] as ShopPremiumLookCard
+		premium.configure(premium.item_id, _iap_busy_sku(), false, restoring)
 	for sku in _season_cards:
 		(_season_cards[sku] as SeasonPackCard).apply(str(sku), _iap_busy_sku(), false, restoring)
 	var loot_on := GameState.can_buy_loot_burst()
@@ -414,11 +437,27 @@ func _on_cosmetic_buy_confirmed(item_id: String) -> void:
 	if card == null:
 		return
 	if result.begins_with("Purchased"):
+		Sfx.play("coins_spend")
+		Sfx.haptic(25)
 		card.show_bought()
 		_spend_pop(cost)
 		GameState.cosmetics_changed.emit([CosmeticCatalog.get_slot(item_id)])
 	else:
 		card.show_status(UiShopV2.S_FAILED, UiShopV2.STATUS_FAIL_BG)
+
+
+## Kupljen premium skin: tap na „✓ Owned" ga obuče (toast kao u Ormaru).
+func _on_premium_wear(item_id: String) -> void:
+	if not GameState.owns_cosmetic(item_id):
+		return
+	_cancel_confirm()
+	GameState.equip_cosmetic(item_id)
+	Sfx.play("wear")
+	refresh_shop()
+	var card := _premium_cards.get(CosmeticCatalog.get_sku(item_id)) as ShopPremiumLookCard
+	if card != null:
+		card.show_bought()
+	_toast.show_text(UiShopV2.S_TOAST_WEARS % CosmeticCatalog.get_title(item_id))
 
 
 func _on_cosmetic_short(_item_id: String) -> void:
@@ -501,6 +540,13 @@ func _on_purchase_completed(sku: String) -> void:
 			var flower := str(IAPManager.last_loot_burst.get("flower", ""))
 			if not flower.is_empty():
 				_toast.show_text(UiShopV2.S_TOAST_LOOT % GameState.get_seed_display_name(flower))
+		_:
+			var cosmetic_id := CONFIG.cosmetic_for_sku(sku)
+			if not cosmetic_id.is_empty():
+				var card := _premium_cards.get(sku) as ShopPremiumLookCard
+				if card != null:
+					card.show_bought()
+				_toast.show_text(UiShopV2.S_TOAST_WEARS % CosmeticCatalog.get_title(cosmetic_id))
 
 
 func _on_purchase_failed(sku: String, reason: String) -> void:
@@ -527,6 +573,8 @@ func _card_for(sku: String) -> ShopCard:
 		return _season_cards[sku]
 	if _support_cards.has(sku):
 		return _support_cards[sku]
+	if _premium_cards.has(sku):
+		return _premium_cards[sku]
 	var booster_id := CONFIG.sku_booster_id(sku)
 	if _booster_cards.has(booster_id):
 		return _booster_cards[booster_id]
@@ -563,6 +611,11 @@ func _notify_hub_chrome() -> void:
 func get_cosmetic_card(item_id: String) -> ShopCosmeticCard:
 	_finish_build()
 	return _cosmetic_cards.get(item_id) as ShopCosmeticCard
+
+
+func get_premium_card(sku: String) -> ShopPremiumLookCard:
+	_finish_build()
+	return _premium_cards.get(sku) as ShopPremiumLookCard
 
 
 func get_booster_card(booster_id: String) -> ShopBoosterCard:
@@ -735,6 +788,7 @@ class _AllSet:
 			pip.still = true
 			pip.box_px = PIP_BOX
 			pip.skin = key
+			pip.z_index = UiPip.HOST_LIFT
 			add_child(pip)
 		else:
 			pip.set_skin(key)

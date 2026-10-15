@@ -101,6 +101,48 @@ Isti laptop. Vremenska linija starta huba = frejm po frejm prvih 5 s, koja stran
 | `settings_slider_drag` | 0 | 3,4 ms | `Fill.scale.x` + `Thumb.position.x`, bez crtanja |
 | `settings_scroll` | 0 | 3,1 ms | — |
 
+## Rezultati 2026-10-14 — Nibbs (muncher rig) i Sir Pip (premium skin)
+
+Paket `design_handoff_muncher_premium_pip/`, izvještaj [[../04-experience/design-drafts/muncher-premium-pip-izvjestaj|muncher-premium-pip-izvjestaj]]. A/B stari / novi muncher u istoj Areni, „s muncherom − bez njega", bez vsynca:
+
+| Stanje | Draw pozivi | Primitivi | Frejm |
+|---|---|---|---|
+| Spava u gnijezdu | 51 → **2** | 2 476 → 31 | +0,6 → +0,3 ms |
+| Lovi / jede | 44 → **3–4** | ~2 300 → ~0 | +1,9–2,4 → +0,4–0,6 ms |
+| Led | 49 → **2** | 3 015 → 32 | — |
+| `tick` (logika + animacija) | — | — | 0,043–0,051 → 0,024 ms |
+
+- Vsync (kao igra): svi Arena scenariji 0–2 kasna; `arena_muncher_eats` 0, najgori 18,7 ms.
+- Jednokratno: atlas munchera 68–97 ms u threadu (1024 × 840 @1,5×, NPOT), rig ~5 ms + prvi klip 1,5–5 ms; atlas Sir Pipa 185–217 ms u threadu (bilo 260–310 dok su se rasterizovali i tuđi overlayi), Classic 113–144 ms.
+- Start huba: premium kartica u Shopu je dala frejm ~61 ms (upload atlasa + rig u istom frejmu) → `ItemPreview` gradi rig frejm poslije teksture; `hub_boot_5s` 7–10 kasnih, najgori ~43 ms (kao prije).
+- Cijeli bench (`MM_ROOT=1 MM_VSYNC=1`): ostali scenariji 0–2 kasna; `settings_scroll` 13 u jednom prolazu, 0 u dva ponovljena (šum).
+
+## Rezultati 2026-10-14 (2) — zvuk cijele igre
+
+`AudioManager` + 62 fajla efekata (WAV, QOA) + 3 teme (OGG), izvještaj [[../04-experience/zvuk-izvjestaj|zvuk-izvjestaj]]. Trošak na glavnom threadu (headless, `--audio-driver Dummy`):
+
+| Šta | Koliko |
+|---|---|
+| `load()` jednog efekta | ~3 ms (najgori 6–10 ms); svih 62: 190–225 ms |
+| `load()` teme | 7–18 ms |
+| prvi `play()` teme (OGG dekoder) | 1–3 ms |
+| `play()` efekta (pool, cooldown, lanac) | 0,15 ms |
+| pozadinsko učitavanje svih efekata + prve teme | ~0,4 s bez huba (`audio_smoke`); uz hub iza stranica u redu (~1–2 s); glavni thread ne čeka |
+
+- **Regresija i popravka (#37):** prva verzija je učitavala 4 efekta po frejmu na glavnom threadu → `hub_boot_5s` 21–35 kasnih (bilo 7–11), najgori 64–97 ms. Sad: thread, po jedan fajl (red FIFO, #30), prva tema u `_ready`. A/B naizmjenično 3×, `AudioManager` zamijenjen praznim preko `override.cfg` `[autoload]`: start huba **sa zvukom 16–24 kasna, bez 21–27**; `settings_open_close` 4–13 / 6–8 — šum laptopa (drugi programi ~35–45 % CPU-a).
+- **Run, 4 varijante × 3** (`>20 ms` od ~700 frejmova; CPU glavnog threada u svim 1,5–1,7 ms):
+
+| Scenarij | Bez zvuka | Pun zvuk | Bez muzike | Bez efekata |
+|---|---|---|---|---|
+| `run_play` | 12 / 13 / 10 | 7 / 19 / 11 | 24 / 20 / 17 | 39 / 13 / 9 |
+| `run_pause_modal` | 7 / 17 / 3 | 7 / 3 / 11 | 13 / 6 / 8 | 5 / 10 / 2 |
+| `run_play_starfall` | 1 / 3 / 12 | 15 / 8 / 6 | 12 / 20 / 14 | 7 / 6 / 4 |
+
+  Nema razlike koja prati zvuk — dekodiranje muzike ide u audio threadu, a efekti su 0,15 ms po pozivu.
+- Arena A/B 2×: `arena_merges` 12–15 (bez) / 14–24 (sa), `arena_muncher_eats` 10–11 / 1–5, ostali 0–5 u oba — šum.
+- Paket (Android pck): zvuk +1,55 MB (efekti 549 KB, teme 1 038 KB) od 7,75 MB.
+- **Muzika po sezoni (24 teme):** OGG mono 24 kHz q3 ≈ 6 KB/s → 4,6 MB izvorno (3 stare teme na 44,1 kHz q4 bile 1 MB). U memoriji najviše 4 teme (`MUSIC_CACHE`), učitavanje u threadu kao i prije; provjera aktivne sezone svakih 0,25 s (poređenje stringa). `hub_boot_5s` sa sezonskom muzikom 11–17 kasnih (bilo 16–24), `settings_open_close` 1. Android pck 7,75 → 11,65 MB (teme u paketu 5,0 MB).
+
 ## Pravila za animacije (iz ovih popravki)
 
 1. **Ne crtaj iznova ono što se samo pomjera.** Crtež ide u dijete, a animacija mijenja `position` / `scale` / `modulate` (sjemenka u letu, slojevi run pozadine, magnet prsten). `queue_redraw()` svaki frejm je skup kad crtež ima StyleBoxove ili mnogo oblika.
@@ -117,6 +159,8 @@ Isti laptop. Vremenska linija starta huba = frejm po frejm prvih 5 s, koja stran
 12. **Red pozadinskog učitavanja je FIFO** (`greske-katalog.md` #30): ono što UI uskoro crta traži prije velikih scena; `load_threaded_get` čeka sve ispred.
 13. **Isprekidan krug / luk = jedna mreža trouglova** (`RenderingServer.canvas_item_add_triangle_array`), ne AA luk po crtici; `draw_multiline` s poluprozirnom bojom daje pruge na spojevima.
 14. **Ekran s mnogo kontrola (Settings, ~40–67 ms gradnje) se ne gradi na tap** — gradi se unaprijed u pozadini, dio po frejmu, i zatvaranje ga sakrije umjesto da ga obriše.
+15. **Lik od mnogo oblika → cutout rig iz jednog atlasa** (Pip, Nibbs): dijelovi iste teksture se spoje u 2–4 draw poziva, a animacija mijenja samo transforme. Upload velikog atlasa i gradnja riga ne idu u isti frejm; atlas skina rasterizuje samo dijelove koje taj skin crta.
+16. **Servis koji učitava fajlove (zvuk, podaci) ne učitava sinhrono na startu.** Izmjeri `load()` po fajlu; sve iznad ~1 ms po frejmu ide u thread, po jedan zahtjev u redu (#30, #37). Kad fajl zatreba prije reda, a baš je u threadu: `load(path, "", CACHE_MODE_IGNORE)` umjesto čekanja reda. Bench uvijek A/B sa servisom isključenim preko `override.cfg` `[autoload]`.
 
 ## Plan (još nije urađeno)
 

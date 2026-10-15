@@ -13,7 +13,8 @@ extends Control
 signal applied(pending: Dictionary, changed: Array)
 ## Sheet je sasvim spušten (ApplyMoment na polju kreće odavde).
 signal close_finished(changed: Array)
-signal shop_requested(slot_id: String)
+## item_id = nekupljen premium skin (Shop skrola na njegovu karticu); "" = ShopLink.
+signal shop_requested(slot_id: String, item_id: String)
 
 const OPEN_GROUP := "wardrobe_sheet_open"
 const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
@@ -110,6 +111,7 @@ func open(season_id: String = "", animated: bool = true) -> void:
 	_grid_scroll.scroll_vertical = 0
 	_kill_tween()
 	if animated:
+		Sfx.play("ui_open")
 		_sheet.position.y = size.y
 		_scrim.modulate.a = 0.0
 		_tween = create_tween().set_parallel()
@@ -127,6 +129,8 @@ func open(season_id: String = "", animated: bool = true) -> void:
 func close(animated: bool = true) -> void:
 	if not _is_open or _closing:
 		return
+	if animated:
+		Sfx.play("ui_close")
 	_closing = true
 	_changed = GameState.apply_wardrobe(pending)
 	GameState.cosmetics.mark_wardrobe_seen()
@@ -195,6 +199,9 @@ func pick(slot_id: String, item_id: String) -> void:
 			pending[slot_id] = item_id
 		_sync_cards()
 		_refresh_stage()
+		Sfx.play("wear")
+	else:
+		Sfx.play("ui_tap")
 	_stage_preview.hop()
 
 
@@ -379,7 +386,7 @@ func _slot_has_new(slot_id: String) -> bool:
 
 
 func _pip_recolor() -> Dictionary:
-	return CosmeticCatalog.get_recolor(str(pending.get(CosmeticCatalog.SLOT_PIP_SKIN, "")))
+	return CosmeticCatalog.get_pip_look(str(pending.get(CosmeticCatalog.SLOT_PIP_SKIN, "")))
 
 
 func _rebuild_grid() -> void:
@@ -422,7 +429,10 @@ func _rebuild_grid() -> void:
 			card.position = pos
 			_grid.add_child(card)
 			card.setup(sd, item, state, not cell.is_empty() and GameState.cosmetics.is_new(cell), pip, _season)
-			card.tapped.connect(pick.bind(_slot, cell))
+			if card.is_premium():
+				card.tapped.connect(_on_premium_locked.bind(cell))
+			else:
+				card.tapped.connect(pick.bind(_slot, cell))
 			index += 1
 	var rows := UiWardrobe.grid_rows(cells)
 	var h := GRID_TOP_PAD + float(rows) * float(UiWardrobe.CARD.y) + float(maxi(0, rows - 1)) * float(UiWardrobe.CARD_GAP) + float(UiWardrobe.CARD_GAP)
@@ -512,7 +522,16 @@ func simulate_drag(dy: float) -> void:
 
 
 func _on_shop_link() -> void:
-	shop_requested.emit(_slot)
+	shop_requested.emit(_slot, "")
+
+
+## Nekupljen Sir Pip (pod velom): tap vodi u Shop · Looks na njegovu karticu.
+func _on_premium_locked(item_id: String) -> void:
+	if _closing or GameState.owns_cosmetic(item_id):
+		pick(_slot, item_id)
+		return
+	Sfx.play("ui_tap")
+	shop_requested.emit(_slot, item_id)
 
 
 # ── Za smoke testove ──────────────────────────────────────────────────────────
@@ -604,6 +623,7 @@ class SlotTab extends WardrobePressable:
 	var dot: bool = false
 
 	func _ready() -> void:
+		tap_sfx = "ui_tab"
 		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
 	func _draw() -> void:
@@ -710,6 +730,7 @@ class EmptyState extends Control:
 ## rub 4, radius 36, sjena 8; pritisak y +6).
 class CloseButton extends WardrobePressable:
 	func _ready() -> void:
+		tap_sfx = "ui_back"
 		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
 	func _draw() -> void:

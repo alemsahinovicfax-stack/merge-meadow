@@ -614,6 +614,8 @@ func _on_field_magnet_pressed() -> void:
 		return
 	if GameState.try_upgrade_magnet(""):
 		_flash_upgrade("magnet")
+	else:
+		Sfx.play("ui_denied")
 	_refresh_field_upgrades()
 	_notify_hub_chrome()
 
@@ -623,6 +625,8 @@ func _on_field_loot_boost_pressed() -> void:
 		return
 	if GameState.try_upgrade_multiplier(""):
 		_flash_upgrade("loot")
+	else:
+		Sfx.play("ui_denied")
 	_refresh_field_upgrades()
 	_notify_hub_chrome()
 
@@ -632,11 +636,15 @@ func _on_field_twin_pressed() -> void:
 		return
 	if GameState.try_upgrade_twin():
 		_flash_upgrade("twin")
+	else:
+		Sfx.play("ui_denied")
 	_refresh_field_upgrades()
 	_notify_hub_chrome()
 
 
 func _flash_upgrade(kind: String) -> void:
+	Sfx.play("upgrade")
+	Sfx.haptic(25)
 	_upgrade_flash_kind = kind
 	var tw := create_tween()
 	tw.tween_interval(0.4)
@@ -690,6 +698,7 @@ func _on_daily_chest_pressed() -> void:
 	if _chest_ui_state == ChestUiState.OPENING:
 		return
 	if _chest_ui_state == ChestUiState.LOCKED:
+		Sfx.play("ui_denied")
 		return
 	if _chest_ui_state == ChestUiState.CLAIMED:
 		show_gift_tomorrow()
@@ -708,6 +717,8 @@ func _finish_chest_claim() -> void:
 	var bag_before: Dictionary = GameState.seed_bag.duplicate()
 	var coins_before := int(GameState.wallet_coins)
 	GameState.claim_daily_chest()
+	Sfx.play("gift")
+	Sfx.haptic(30)
 	_chest_ui_state = ChestUiState.CLAIMED
 	_refresh_chest_card()
 	_notify_hub_chrome()
@@ -1109,6 +1120,7 @@ func _fit_upgrades_panel() -> void:
 ## nadolje (280 ms cubic-in). `_close_*` zatvara odmah (prelazi, kod); dodir ide kroz `_dismiss_sheet`.
 func _open_sheet(overlay: Control, panel: Control, h: int) -> void:
 	overlay.visible = true
+	Sfx.play("ui_open")
 	var dim := overlay.get_node_or_null("Dim") as CanvasItem
 	if not is_inside_tree():
 		return
@@ -1125,6 +1137,7 @@ func _dismiss_sheet(panel: Control, close_fn: Callable) -> void:
 		close_fn.call()
 		return
 	var dim := overlay.get_node_or_null("Dim") as CanvasItem
+	Sfx.play("ui_close")
 	var t := create_tween().set_parallel()
 	t.tween_property(panel, "position:y", overlay.size.y, UiPopups.ANIM.sheet_out).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 	if dim:
@@ -1163,6 +1176,7 @@ func _on_sheet_drag(event: InputEvent, panel: Control, close_fn: Callable) -> vo
 
 func _on_basket_type_picked(type_id: String) -> void:
 	if GameState.set_loadout(type_id):
+		Sfx.play("ui_toggle_on")
 		_refresh_basket_card()
 		_close_basket_picker()
 
@@ -1231,6 +1245,7 @@ func _on_wardrobe_closed(changed: Array) -> void:
 	var slots := {}
 	for sd in CosmeticCatalog.slots():
 		slots[str(sd.get("id", ""))] = sd
+	Sfx.play("wear")
 	if UiWardrobe.changed_on_field(changed, slots):
 		var meadow := season_stage.get_node_or_null("%SeasonField") if season_stage else null
 		if meadow != null and meadow.has_method("play_apply_moment"):
@@ -1243,7 +1258,7 @@ func _on_wardrobe_closed(changed: Array) -> void:
 
 
 ## ShopLink: zatvori (= snimi) i otvori Shop · Looks na istom slotu.
-func _on_wardrobe_shop(slot_id: String) -> void:
+func _on_wardrobe_shop(slot_id: String, item_id: String = "") -> void:
 	_close_wardrobe(false)
 	var hubs := get_tree().get_nodes_in_group("meta_hub")
 	if hubs.is_empty():
@@ -1257,7 +1272,7 @@ func _on_wardrobe_shop(slot_id: String) -> void:
 		var host: Node = swipe.call("get_pages_host") if swipe and swipe.has_method("get_pages_host") else null
 		var shop := host.get_node_or_null("Page_%d" % MetaHubPages.SHOP) if host else null
 		if shop != null and shop.has_method("show_cosmetic_slot"):
-			shop.call("show_cosmetic_slot", slot_id)
+			shop.call("show_cosmetic_slot", slot_id, item_id)
 			return
 
 

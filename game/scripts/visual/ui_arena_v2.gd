@@ -1,7 +1,8 @@
 class_name UiArenaV2
 extends RefCounted
 
-## Merge Arena v2 — design_handoff_arena_v2 (muncher gusjenica, korpa, 8 livada, combo na polju).
+## Merge Arena v2 — design_handoff_arena_v2 (korpa, 8 livada, combo na polju; muncher od 2026-10-14
+## je Nibbs iz design_handoff_muncher_premium_pip).
 ## Iste vrijednosti kao godot/arena_v2_export.json (generisano iz design/arena_v2_data.js).
 ## Mjere px baze 1080x1920; Bg 1080x1633, playfield 1080x1589.
 
@@ -9,16 +10,6 @@ extends RefCounted
 const SEED_BASE := Color("#2D3436")
 const SEED_BASE_W := 4.0  # rim.grow(4); crta se ispod sjene i rima
 const SEED_BASE_T2_RADIUS := 42
-
-# --- Muncher ---
-const MUNCHER_HEAD_R := 50.0
-const MUNCHER_SEG_R := [38.0, 32.0, 26.0]
-const MUNCHER_EDGE_W := 4.0
-const MUNCHER_COLORS := {"body":"#A275CD","body_deep":"#946AC0","edge":"#3E2856","spot":"#FFEAA7","asleep_body":"#8C61B8","asleep_deep":"#7F58A8","asleep_edge":"#3E2856","frozen_body":"#A6D1FA","frozen_deep":"#95C3EE","frozen_edge":"#4F7FAE","frozen_spot":"#E8F6FF","mouth":"#3B2350","tongue":"#FF9FB4","tooth":"#FFF8F0","eye":"#FFFFFF","ink":"#2D3436","ice":"rgba(232,246,255,.58)","ice_edge":"#DCF0FF","ice_hi":"#FFFFFF","alarm":"#FFEAA7","shadow":"rgba(20,26,22,.30)"}
-const MUNCHER_POSES := {"sleep":{"segs":[[-60,18],[-40,56],[4,64]],"head_rot":8,"antenna":[[-34,-58],[30,-60]]},"wake":{"segs":[[56,10],[98,-2],[134,-22]],"head_rot":0,"antenna":[[-22,-80],[22,-80]]},"hunt":{"spacing":[56,102,144],"wave":8,"head_rot":-6,"antenna":[[-30,-74],[26,-76]]},"eat":{"spacing":[44,80,110],"wave":4,"head_rot":0,"head_scale":1.08,"antenna":[[-38,-62],[38,-62]]},"frozen":{"spacing":[56,102,144],"wave":0,"head_rot":0,"antenna":[[-24,-76],[24,-76]]}}
-const MUNCHER_NEST := {"w":250,"h":112,"bed_w":206,"bed_h":78,"fill":"#9E7A52","edge":"#735738","bed":"#6E5238","bed_edge":"#543E2A","petals":["#FFCCD5","#FFEAA7","#D4A5FF","#B8E0F5","#FFCCD5"]}
-const MUNCHER_ZZZ := {"sizes":[26,32,38],"offsets":[[58,-30],[82,-46],[108,-58]],"fill":"#FFF8F0","outline":6}
-const MUNCHER_TIMING := {"bob_period":0.6,"bob_amp":5,"chomp_period":0.25,"freeze_in":0.18,"freeze_out":0.25,"wake_pop":0.12}
 
 # --- Korpa (zamjenjuje BAG_*) ---
 const BASKET_HIT := Vector2(300, 280)

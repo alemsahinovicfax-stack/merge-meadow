@@ -104,6 +104,9 @@ class ShopTabButton:
 	var tab_id: String = ""
 	var label: String = ""
 
+	func _init() -> void:
+		tap_sfx = "ui_tab"
+
 	func _draw() -> void:
 		var w := UiHomeV3.text_w(900, 44, label)
 		UiHomeV3.draw_text(self, 900, 44, label, Vector2((size.x - w) * 0.5, (size.y - 44.0) * 0.5), UiShopV2.INK)

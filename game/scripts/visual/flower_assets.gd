@@ -36,7 +36,7 @@ static func prefetch(type_ids: Array, tier: int) -> void:
 		if _cache.has(key) or _pending.has(key):
 			continue
 		var path := DIR + key + ".svg"
-		if ResourceLoader.exists(path) and ResourceLoader.load_threaded_request(path) == OK:
+		if ResourceLoader.exists(path) and BackgroundLoad.request(path):
 			_pending[key] = path
 
 

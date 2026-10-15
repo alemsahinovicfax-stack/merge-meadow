@@ -70,4 +70,5 @@ func _gui_input(event: InputEvent) -> void:
 	_pressed = false
 	queue_redraw()
 	if was and Rect2(Vector2.ZERO, size).has_point(mb.position):
+		Sfx.play("ui_tap")
 		clicked.emit()

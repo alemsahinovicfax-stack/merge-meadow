@@ -200,6 +200,8 @@ func play_pour_in(from_center: Vector2, delay: float) -> void:
 	tw.parallel().tween_property(self, "scale", Vector2.ONE, POUR_SEC).set_trans(
 		Tween.TRANS_BACK
 	).set_ease(Tween.EASE_OUT)
+	# Sjemenka sleti: tihi „tap" (katalog: cooldown 30 ms, najviše 3 glasa — kiša, ne buka).
+	tw.tween_callback(func() -> void: Sfx.play("seed_land"))
 
 
 func play_merge_pop() -> void:

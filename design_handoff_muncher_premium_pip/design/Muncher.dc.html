@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="pip_art.js"></script>
+<script src="pip_runtime.js"></script>
+<script src="pip_anim.js"></script>
+<script src="muncher.js"></script>
+<style>body{margin:0;background:#FFF8F0;color:#2D3436;font-family:Nunito,system-ui,sans-serif}a{color:#2E7F8C}a:hover{color:#2D3436}button{font-family:Nunito,sans-serif}</style>
+</helmet>
+<div style="max-width:1240px;margin:0 auto;padding:32px 24px 80px;display:flex;flex-direction:column;gap:36px">
+  <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font:500 13px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#555C5E">design_handoff_muncher_premium_pip · A · Muncher</div>
+      <div style="font-size:48px;font-weight:900;line-height:1">Nibbs, the seed-mole</div>
+      <div style="font-size:17px;font-weight:600;color:#555C5E;max-width:780px;text-wrap:pretty">A chubby apricot mole in a bandit mask who can't keep his paws off your seeds. Flower nose, two buck teeth, molehill for a nest. Cutout rig — 22 nodes + 2 nest nodes, 3 views, 16 clips. Rules unchanged; 1 px here = 1 game px.</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button onClick="{{ toggleRm }}" style="font-weight:800;font-size:15px;padding:10px 16px;border-radius:16px;border:3px solid #2D3436;background:{{ rmBg }};cursor:pointer;color:#2D3436">reduce motion {{ rmLabel }}</button>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+    <div style="font-weight:900;font-size:16px;margin-right:4px">Meadow</div>
+    <sc-for list="{{ seasons }}" as="se" hint-placeholder-count="8">
+      <button onClick="{{ se.pick }}" style="font:700 13px 'JetBrains Mono',monospace;padding:7px 10px;border-radius:12px;border:2px solid #2D3436;background:{{ se.bg }};cursor:pointer;color:#2D3436">{{ se.name }}</button>
+    </sc-for>
+  </div>
+
+  <section data-screen-label="Arena live" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">1 · Arena, live — real rules (85 px/s, re-target 0.25 s, eat at 36 px for 0.5 s, T3 freeze 2 s)</div>
+    <div style="display:grid;grid-template-columns:minmax(0,480px) minmax(260px,1fr);gap:24px;align-items:start">
+      <div ref="{{ arenaRef }}" style="position:relative;width:100%;aspect-ratio:1080/1589;border:3px solid #2D3436;border-radius:28px;overflow:hidden;background:{{ ground }}">
+        <div style="position:absolute;left:0;right:0;top:0;height:17%;background:{{ sky }}"></div>
+        <div data-layer="nestback" style="position:absolute;inset:0;pointer-events:none"></div>
+        <div data-layer="chips" style="position:absolute;inset:0"></div>
+        <div data-layer="pest" style="position:absolute;inset:0;pointer-events:none"></div>
+        <div data-layer="nestfront" style="position:absolute;inset:0;pointer-events:none"></div>
+        <div style="position:absolute;left:50%;bottom:2.5%;width:24%;aspect-ratio:1.25;transform:translateX(-50%);background:#C99A5B;border:3px solid #2D3436;border-radius:14% 14% 26% 26%;box-sizing:border-box"><div style="position:absolute;left:-6%;right:-6%;top:-6%;height:20%;background:#E9CF9B;border:3px solid #2D3436;border-radius:10px"></div></div>
+        <div style="position:absolute;left:2.78%;bottom:1.64%;width:13.9%;aspect-ratio:1"><div data-slot="pip" style="position:absolute;inset:0"></div></div>
+        <div data-banner style="position:absolute;left:50%;top:13%;transform:translate(-50%,-260%);background:#FFF8F0;border:3px solid #2D3436;border-radius:16px;padding:6px 18px;font-weight:900;font-size:clamp(14px,2.6vw,22px);white-space:nowrap;box-shadow:0 5px 0 rgba(26,26,20,.22);transition:transform .32s cubic-bezier(.34,1.56,.64,1)">Muncher's awake!</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ actions }}" as="ac" hint-placeholder-count="6">
+            <button onClick="{{ ac.go }}" style="font-weight:800;font-size:15px;padding:10px 14px;border-radius:14px;border:3px solid #2D3436;background:{{ ac.bg }};cursor:pointer;color:#2D3436">{{ ac.label }}</button>
+          </sc-for>
+        </div>
+        <div style="background:#FFFFFF;border:3px solid #2D3436;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+          <div style="font:700 13px 'JetBrains Mono',monospace;color:#555C5E">STATE</div>
+          <div style="font-size:26px;font-weight:900">{{ liveState }}</div>
+          <div style="font:500 13px 'JetBrains Mono',monospace;color:#555C5E;white-space:pre-wrap;line-height:1.6">{{ liveInfo }}</div>
+        </div>
+        <div style="font-size:15px;font-weight:700;color:#555C5E;line-height:1.5;text-wrap:pretty">Tap a seed to merge it away while he's chasing it — he stomps (“hmph”) and re-targets. The front lip of the molehill covers him only while he sleeps in it. Pip (bottom-left, 150 box) reacts with his existing clips.</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="Focus" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">2 · Focus — props state × direction</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <sc-for list="{{ stateBtns }}" as="sb" hint-placeholder-count="10">
+        <button onClick="{{ sb.pick }}" style="font:700 13px 'JetBrains Mono',monospace;padding:8px 11px;border-radius:12px;border:2px solid #2D3436;background:{{ sb.bg }};cursor:pointer;color:#2D3436">{{ sb.id }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <sc-for list="{{ dirBtns }}" as="db" hint-placeholder-count="4">
+        <button onClick="{{ db.pick }}" style="font:700 13px 'JetBrains Mono',monospace;padding:8px 14px;border-radius:12px;border:2px solid #2D3436;background:{{ db.bg }};cursor:pointer;color:#2D3436">{{ db.id }}</button>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,520px) minmax(240px,1fr);gap:24px;align-items:start">
+      <div style="position:relative;width:100%;aspect-ratio:16/11;border:3px solid #2D3436;border-radius:28px;overflow:hidden;background:{{ ground }}">
+        <div ref="{{ focusRef }}" style="position:absolute;left:50%;top:52%;width:62%;aspect-ratio:320/300;transform:translate(-50%,-56.7%)"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:22px;font-weight:900">{{ focusTitle }}</div>
+        <div style="font:500 13px 'JetBrains Mono',monospace;color:#555C5E;white-space:pre-wrap;line-height:1.6">{{ focusInfo }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="All states" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">3 · Every state and transition (looping sequences, tap to restart)</div>
+    <div ref="{{ galRef }}" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+      <sc-for list="{{ gallery }}" as="g" hint-placeholder-count="12">
+        <div onClick="{{ g.restart }}" style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:3px solid #2D3436;border-radius:24px;padding:10px;cursor:pointer">
+          <div style="position:relative;width:100%;aspect-ratio:320/300;border:3px solid #16211B;border-radius:18px;overflow:hidden;background:{{ ground }}">
+            <div data-gal="{{ g.id }}" style="position:absolute;inset:0"></div>
+            <sc-if value="{{ g.banner }}" hint-placeholder-val="{{ false }}">
+              <div data-galbanner="{{ g.id }}" style="position:absolute;left:50%;top:6%;transform:translateX(-50%) scale(0);background:#FFF8F0;border:3px solid #2D3436;border-radius:12px;padding:3px 10px;font-weight:900;font-size:15px;white-space:nowrap">Muncher's awake!</div>
+            </sc-if>
+          </div>
+          <div style="font-weight:900;font-size:18px;padding:0 4px">{{ g.title }}</div>
+          <div style="font:500 12px 'JetBrains Mono',monospace;color:#555C5E;padding:0 4px 4px;line-height:1.5">{{ g.sub }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="8 meadows" style="display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:30px;font-weight:900">4 · Readability on all 8 meadows — next to a seed chip (Ø 140) and Pip</div>
+    <div ref="{{ meadowRef }}" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px">
+      <sc-for list="{{ meadows }}" as="m" hint-placeholder-count="8">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="position:relative;width:100%;aspect-ratio:1;border:3px solid #2D3436;border-radius:20px;overflow:hidden;background:{{ m.ground }}">
+            <div style="position:absolute;left:0;right:0;top:0;height:22%;background:{{ m.sky }}"></div>
+            <div style="position:absolute;left:8%;top:44%;width:40%;aspect-ratio:1;border-radius:50%;background:#22302A;border:5px solid #F5EEDC;box-shadow:0 0 0 3px #2D3436;box-sizing:border-box"><div style="position:absolute;left:38%;top:24%;width:24%;height:40%;border-radius:40% 40% 10% 10%;background:#9FD8A6"></div></div>
+            <div data-mead="{{ m.id }}" style="position:absolute;left:28%;top:12%;width:76%;aspect-ratio:320/300"></div>
+          </div>
+          <div style="font:700 13px 'JetBrains Mono',monospace">{{ m.name }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;sleep_nest&quot;,&quot;wake&quot;,&quot;awake&quot;,&quot;hunt&quot;,&quot;eat&quot;,&quot;freeze&quot;,&quot;frozen&quot;,&quot;thaw&quot;,&quot;doze&quot;,&quot;sleep_spot&quot;,&quot;escaped&quot;],&quot;default&quot;:&quot;hunt&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;direction&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;down&quot;,&quot;up&quot;,&quot;left&quot;,&quot;right&quot;],&quot;default&quot;:&quot;down&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const SEASONS = { country_bloom: ['Country Bloom', '#7DAA67', '#BCD9A3'], frost_orchard: ['Frost Orchard', '#9FB6CF', '#C7D8EC'], lantern_meadow: ['Lantern Meadow', '#463E66', '#CDB6E6'], amber_canopy: ['Amber Canopy', '#7F5C3B', '#B7792F'], moonlit_warren: ['Moonlit Warren', '#3B4175', '#252A55'], coral_tide: ['Coral Tide Garden', '#E2B196', '#86C9C6'], starfall_glade: ['Starfall Glade', '#3A3163', '#2A2350'], ember_fen: ['Ember Fen', '#58392F', '#C8744E'] };
+const FW = 1080, FH = 1589, NEST_C = [540, 132], SPEED = 85, EAT_R = 36, EAT_S = .5, WAKE_S = .3, FREEZE_S = 2, REEVAL = .25, KEEP = [380, 1300, 320, 289];
+const GAL = [
+  { id: 'sleep_nest', title: 'Sleeps in the nest', sub: 'm_sleep_nest · loop 2.8 s · lip covers him', nest: true, seq: [['m_sleep_nest', 99]] },
+  { id: 'wake', title: 'Wakes — “!”', sub: 'm_wake_nest 0.3 s → hunt', nest: true, seq: [['m_sleep_nest', 1.6], ['m_wake_nest', .3], ['m_hunt_front', 1.4]] },
+  { id: 'awake', title: '“Muncher’s awake!”', sub: 'first wake in a session · m_awake 1.4 s', banner: true, seq: [['m_sleep_spot', 1.2], ['m_wake_spot', .3, 'banner'], ['m_awake', 1.4], ['m_hunt_front', .8]] },
+  { id: 'hunt_down', title: 'Hunts ↓ (toward camera)', sub: 'm_hunt_front · 0.36 s · 85 px/s', seq: [['m_hunt_front', 99]] },
+  { id: 'hunt_up', title: 'Hunts ↑', sub: 'm_hunt_back · soles + tail', seq: [['m_hunt_back', 99]] },
+  { id: 'hunt_right', title: 'Hunts →', sub: 'm_hunt_side', seq: [['m_hunt_side', 99]] },
+  { id: 'hunt_left', title: 'Hunts ←', sub: 'm_hunt_side · root scale.x −1', flip: true, seq: [['m_hunt_side', 99]] },
+  { id: 'eat_front', title: 'Eats (front)', sub: 'm_eat_front 0.5 s · 2 bites · crumbs', chip: [0, 36], seq: [['m_eat_front', 99]] },
+  { id: 'eat_side', title: 'Eats (side)', sub: 'm_eat_side · mouth = eat centre', chip: [36, 0], seq: [['m_eat_side', 99]] },
+  { id: 'frozen', title: 'Frozen 2 s → thaws', sub: 'm_freeze 0.18 · m_frozen · m_thaw 0.25', seq: [['m_hunt_front', .7], ['m_freeze', .18], ['m_frozen', 1.82], ['m_thaw', .25], ['m_hunt_front', .7]] },
+  { id: 'doze', title: 'Falls asleep on the spot', sub: 'm_doze 0.9 s → m_sleep_spot', seq: [['m_hunt_front', .8], ['m_doze', .9], ['m_sleep_spot', 2.8]] },
+  { id: 'escaped', title: 'Seed got away', sub: 'm_escaped_side 0.8 s → re-target', seq: [['m_hunt_side', .8], ['m_escaped_side', .8], ['m_hunt_side', .6]] }
+];
+const FOCUS = { live: null, sleep_nest: 'm_sleep_nest', wake: 'm_wake_nest', awake: 'm_awake', hunt: 'hunt', eat: 'eat', freeze: 'm_freeze', frozen: 'm_frozen', thaw: 'm_thaw', doze: 'm_doze', sleep_spot: 'm_sleep_spot', escaped: 'escaped' };
+const chipEl = (tier) => { const d = document.createElement('div'); d.style.cssText = 'position:absolute;border-radius:50%;background:#22302A;border:6px solid #F5EEDC;box-shadow:0 0 0 3px #2D3436;box-sizing:border-box;cursor:pointer;transition:transform .12s'; const g = document.createElement('div'); g.style.cssText = 'position:absolute;inset:26%;border-radius:50%;'; d.appendChild(g); d._g = g; d._set = t => { g.style.background = t === 3 ? '#FFD56B' : t === 2 ? '#9FD8A6' : '#E9F5E1'; g.style.inset = t === 3 ? '20%' : t === 2 ? '26%' : '32%'; g.style.borderRadius = t === 3 ? '20%' : '50%'; g.style.transform = t === 3 ? 'rotate(45deg)' : ''; }; d._set(tier); return d; };
+class Component extends DCLogic {
+  state = { season: this.props.season || 'country_bloom', focus: this.props.state || 'hunt', dir: this.props.direction || 'down', rm: false, live: 'SLEEPING_NEST', info: '' };
+  arenaRef = React.createRef(); focusRef = React.createRef(); galRef = React.createRef(); meadowRef = React.createRef();
+  insts = []; gal = {};
+  componentDidMount() { this.boot(); }
+  componentWillUnmount() { cancelAnimationFrame(this.raf); }
+  componentDidUpdate(pp) { if (pp.state !== this.props.state && this.props.state) this.setFocus(this.props.state); if (pp.direction !== this.props.direction && this.props.direction) this.setDir(this.props.direction); if (pp.season !== this.props.season && this.props.season) this.setState({ season: this.props.season }); }
+  boot() { if (!window.Muncher || !window.Pip || !Pip.ANIMS.arena_idle || !this.arenaRef.current || !this.galRef.current || !this.galRef.current.querySelector('[data-gal]') || !this.meadowRef.current.querySelector('[data-mead]')) { setTimeout(() => this.boot(), 60); return; }
+    this.buildArena(); this.buildGallery(); this.buildFocus(); this.buildMeadows(); this.raf = requestAnimationFrame(this.tick); }
+  // ── arena world
+  buildArena() {
+    const A = this.arenaRef.current, k = A.clientWidth / FW; this.k = k;
+    const nb = A.querySelector('[data-layer=nestback]'), nf = A.querySelector('[data-layer=nestfront]'), pl = A.querySelector('[data-layer=pest]');
+    const box = (layer) => { const d = document.createElement('div'); d.style.cssText = 'position:absolute;left:' + (NEST_C[0] - 150) * k + 'px;top:' + (NEST_C[1] - 86) * k + 'px;width:' + 300 * k + 'px'; layer.appendChild(d); return d; };
+    this.nestB = Muncher.create(box(nb), { rig: Muncher.NEST, size: 300 * k, only: ['nest_back'] });
+    this.nestF = Muncher.create(box(nf), { rig: Muncher.NEST, size: 300 * k, only: ['nest_front'] });
+    this.pestBox = document.createElement('div'); this.pestBox.style.cssText = 'position:absolute;width:' + 320 * k + 'px'; pl.appendChild(this.pestBox);
+    this.pest = Muncher.create(this.pestBox, { view: 'front', size: 320 * k }); this.insts.push(this.pest);
+    this.pip = Pip.create(A.querySelector('[data-slot=pip]'), { view: 'front', size: A.querySelector('[data-slot=pip]').clientWidth, loop: 'arena_idle' });
+    this.chips = []; this.W = { st: 'SLEEPING_NEST', x: NEST_C[0], y: NEST_C[1], t: 0, target: null, reeval: 0, dir: [0, 1], viewT: 0, firstWake: true, view: 'front', flip: false };
+    this.pest.play('m_sleep_nest'); this.placePest(); this.nestFrontOver(true);
+  }
+  nestFrontOver(on) { const nf = this.arenaRef.current.querySelector('[data-layer=nestfront]'); nf.style.zIndex = on ? 3 : 0; this.arenaRef.current.querySelector('[data-layer=pest]').style.zIndex = 2; this.arenaRef.current.querySelector('[data-layer=chips]').style.zIndex = 1; this.arenaRef.current.querySelector('[data-layer=nestback]').style.zIndex = 0; if (!on) nf.style.zIndex = 0, nf.style.display = 'none'; else nf.style.display = ''; }
+  placePest() { const k = this.k, W = this.W; this.pestBox.style.left = (W.x - 160) * k + 'px'; this.pestBox.style.top = (W.y - 170) * k + 'px'; }
+  addChip(x, y, tier) { const k = this.k, d = chipEl(tier), c = { x, y, tier, el: d }; d.style.width = d.style.height = 140 * k + 'px'; d.style.left = (x - 70) * k + 'px'; d.style.top = (y - 70) * k + 'px'; d.onclick = () => this.mergeChip(c); this.arenaRef.current.querySelector('[data-layer=chips]').appendChild(d); this.chips.push(c); return c; }
+  removeChip(c) { c.el.remove(); this.chips = this.chips.filter(q => q !== c); }
+  freeSpot() { for (let i = 0; i < 60; i++) { const x = 90 + Math.random() * (FW - 180), y = 300 + Math.random() * (FH - 520); if (x > KEEP[0] - 60 && x < KEEP[0] + KEEP[2] + 60 && y > KEEP[1] - 80) continue; if (this.chips.every(c => Math.hypot(c.x - x, c.y - y) > 150)) return [x, y]; } return [540, 800]; }
+  pour() { for (let i = 0; i < 6; i++) { const [x, y] = this.freeSpot(); this.addChip(x, y, Math.random() < .3 ? 2 : 1); } const W = this.W;
+    if (W.st === 'SLEEPING_NEST' || W.st === 'SLEEPING_SPOT') { const inNest = W.st === 'SLEEPING_NEST'; W.st = 'WAKE_DELAY'; W.t = WAKE_S; W.inNest = inNest; this.pest.set({ view: 'front', flip: false }); this.pest.play(inNest ? 'm_wake_nest' : 'm_wake_spot', { hold: true }); this.pip.play('muncher_wake');
+      if (W.firstWake) { W.firstWake = false; W.awake = true; this.banner(true); setTimeout(() => this.banner(false), 1600); } } }
+  banner(on) { const b = this.arenaRef.current.querySelector('[data-banner]'); b.style.transform = on ? 'translate(-50%,0)' : 'translate(-50%,-260%)'; }
+  makeT3() { const W = this.W; if (this.chips.length < 2) this.pour(); const a = this.chips[0], b = this.chips[1]; this.removeChip(b); a.tier = 3; a.el._set(3); a.el.style.transform = 'scale(1.15)'; setTimeout(() => a.el.style.transform = '', 160);
+    this.pip.play('merge_t3'); W.target = null; W.st = 'FROZEN'; W.t = FREEZE_S; this.pest.set({ view: 'front', flip: false }); this.pest.play('m_freeze', { hold: true, then: () => { if (this.W.st === 'FROZEN') this.pest.play('m_frozen'); } }); }
+  mergeChip(c) { const W = this.W; const was = W.target === c && (W.st === 'HUNTING'); c.el.style.transform = 'scale(1.2)'; setTimeout(() => this.removeChip(c), 120); this.pip.play('merge_t2');
+    if (was) { W.target = null; const v = W.view === 'side' ? 'side' : 'front'; if (W.view === 'back') this.pest.set({ view: 'front', flip: false }), W.view = 'front'; this.pest.play('m_escaped_' + v, { overlay: true }); } }
+  clearField() { [...this.chips].forEach(c => this.removeChip(c)); }
+  reset() { this.clearField(); const W = this.W; Object.assign(W, { st: 'SLEEPING_NEST', x: NEST_C[0], y: NEST_C[1], target: null, view: 'front', flip: false, firstWake: true }); this.pest.over = null; this.pest.set({ view: 'front', flip: false }); this.pest.play('m_sleep_nest'); this.placePest(); this.nestFrontOver(true); }
+  edible() { return this.chips.filter(c => c.tier <= 2); }
+  pick(force) { const W = this.W; if (!force && W.target && this.chips.includes(W.target)) return; let best = null, bs = 1e9; for (const c of this.edible()) { const s = Math.hypot(c.x - W.x, c.y - W.y) + (c.tier >= 2 ? 0 : 12); if (s < bs) { bs = s; best = c; } } W.target = best; }
+  sleepSpot() { const W = this.W; W.st = 'SLEEPING_SPOT'; W.target = null; this.pest.over = null; this.pest.set({ view: 'front', flip: false }); W.view = 'front'; this.pest.play('m_doze', { hold: true, then: () => { if (this.W.st === 'SLEEPING_SPOT') this.pest.play('m_sleep_spot'); } }); this.pip.play('doze'); }
+  startHunt() { const W = this.W; W.st = 'HUNTING'; this.nestFrontOver(false); this.pick(true); if (!W.target) { this.sleepSpot(); return; } W.view = null; }
+  stepWorld(dt) {
+    const W = this.W;
+    if (W.st === 'WAKE_DELAY') { W.t -= dt; if (W.t <= 0) { if (W.awake) { W.awake = false; W.st = 'AWAKE_MOMENT'; this.pest.play('m_awake', { then: () => this.startHunt() }); } else this.startHunt(); } }
+    else if (W.st === 'FROZEN') { W.t -= dt; if (W.t <= 0) { W.st = 'THAW'; this.pest.play('m_thaw', { then: () => { if (this.edible().length) this.startHunt(); else this.sleepSpot(); } }); } }
+    else if (W.st === 'EATING') { W.t -= dt; if (W.t <= 0) { if (W.target) this.removeChip(W.target); W.target = null; if (this.edible().length) this.startHunt(); else this.sleepSpot(); } }
+    else if (W.st === 'HUNTING') {
+      if (!this.edible().length) { this.sleepSpot(); return; }
+      W.reeval -= dt; if (W.reeval <= 0) { W.reeval = REEVAL; this.pick(false); } if (!W.target || !this.chips.includes(W.target)) { this.pick(true); if (!W.target) { this.sleepSpot(); return; } }
+      const dx = W.target.x - W.x, dy = W.target.y - W.y, d = Math.hypot(dx, dy);
+      if (d <= EAT_R) { W.st = 'EATING'; W.t = EAT_S; this.pest.over = null; this.pest.play(W.view === 'side' ? 'm_eat_side' : (this.pest.set({ view: 'front', flip: false }), 'm_eat_front')); if (W.view !== 'side') W.view = 'front'; this.pip.play('muncher_eat'); W.target.el.style.transform = 'scale(.92) rotate(6deg)'; return; }
+      const step = Math.min(d, SPEED * dt); W.x += dx / d * step; W.y += dy / d * step;
+      W.x = Math.max(58, Math.min(FW - 58, W.x)); W.y = Math.max(58, Math.min(FH - 58, W.y));
+      W.viewT -= dt; const v = Muncher.viewFor(dx, dy);
+      if (W.view == null || (W.viewT <= 0 && (v.view !== W.view || v.flip !== W.flip))) { W.view = v.view; W.flip = v.flip; W.viewT = .2; this.pest.set({ flip: v.flip }); this.pest.play(v.anim); }
+      this.placePest();
+    }
+  }
+  // ── gallery / focus / meadows
+  buildGallery() {
+    GAL.forEach(g => { const el = this.galRef.current.querySelector('[data-gal="' + g.id + '"]'); if (!el) return; const w = el.clientWidth;
+      if (g.chip) { const c = chipEl(1); c.style.width = c.style.height = 140 * w / 320 + 'px'; c.style.left = (160 + g.chip[0] - 70) * w / 320 + 'px'; c.style.top = (170 + g.chip[1] - 70) * w / 320 + 'px'; c.style.cursor = 'default'; el.appendChild(c); }
+      let nb, nf; if (g.nest) { nb = document.createElement('div'); nb.style.cssText = 'position:absolute;left:' + (10 / 320 * 100) + '%;top:' + ((170 - 86) / 300 * 100) + '%;width:' + (300 / 320 * 100) + '%'; el.appendChild(nb); Muncher.create(nb, { rig: Muncher.NEST, size: w * 300 / 320, only: ['nest_back'] }); }
+      const pb = document.createElement('div'); pb.style.cssText = 'position:absolute;inset:0'; el.appendChild(pb);
+      if (g.nest) { nf = document.createElement('div'); nf.style.cssText = nb.style.cssText; el.appendChild(nf); Muncher.create(nf, { rig: Muncher.NEST, size: w * 300 / 320, only: ['nest_front'] }); }
+      const m = Muncher.create(pb, { view: 'front', size: w, flip: !!g.flip }); this.gal[g.id] = { m, g, i: -1, t: 0 }; this.insts.push(m); this.galNext(g.id); });
+  }
+  galNext(id) { const s = this.gal[id]; s.i = (s.i + 1) % s.g.seq.length; const [a, dur, cue] = s.g.seq[s.i]; s.t = dur; s.m.play(a, { hold: !Muncher.ANIMS[a].loop }); s.m.o.flip = !!s.g.flip;
+    const b = this.galRef.current.querySelector('[data-galbanner="' + id + '"]'); if (b) { b.style.transition = 'transform .3s cubic-bezier(.34,1.56,.64,1)'; b.style.transform = 'translateX(-50%) scale(' + (cue === 'banner' || a === 'm_awake' ? 1 : 0) + ')'; } }
+  buildFocus() { const el = this.focusRef.current; this.fm = Muncher.create(el, { view: 'front', size: el.clientWidth }); this.insts.push(this.fm); this.applyFocus(); }
+  applyFocus() { const f = this.state.focus, d = this.state.dir, m = this.fm; if (!m) return; m.over = null;
+    const side = d === 'left' || d === 'right'; m.o.flip = d === 'left';
+    let id = FOCUS[f] || 'hunt';
+    if (id === 'hunt') id = d === 'down' ? 'm_hunt_front' : d === 'up' ? 'm_hunt_back' : 'm_hunt_side';
+    if (id === 'eat') id = side ? 'm_eat_side' : 'm_eat_front';
+    if (id === 'escaped') id = side ? 'm_escaped_side' : 'm_escaped_front';
+    this.focusId = id; const a = Muncher.ANIMS[id]; if (a.view === 'front' && side && !/hunt|eat|escaped/.test(id)) m.o.flip = false;
+    m.play(id, { hold: !a.loop }); m.render(); this.focusT = 0; this.forceUpdate(); }
+  setFocus(f) { this.setState({ focus: f }, () => this.applyFocus()); }
+  setDir(d) { this.setState({ dir: d }, () => this.applyFocus()); }
+  buildMeadows() { this.meadowRef.current.querySelectorAll('[data-mead]').forEach((el, i) => { const m = Muncher.create(el, { view: 'front', size: el.clientWidth }); m.play('m_hunt_front'); m.base.t = i * .05; this.insts.push(m); }); }
+  tick = ts => {
+    const dt = this.lt ? Math.min(.05, (ts - this.lt) / 1000) : 0; this.lt = ts;
+    if (this.W) this.stepWorld(dt);
+    for (const id in this.gal) { const s = this.gal[id]; s.t -= dt; if (s.t <= 0) this.galNext(id); }
+    if (this.fm && this.fm.base && !this.fm.base.a.loop) { this.focusT += dt; if (this.focusT > this.fm.base.a.len + 1) { this.focusT = 0; this.fm.play(this.focusId, { hold: true }); } }
+    this.insts.forEach(m => m.tick(dt)); if (this.pip) this.pip.tick && 0;
+    if (ts - (this.ul || 0) > 250 && this.W) { this.ul = ts; const W = this.W; const info = 'pos (' + Math.round(W.x) + ', ' + Math.round(W.y) + ') · view ' + (W.view || '—') + (W.flip ? ' (flipped)' : '') + '\nseeds ' + this.chips.length + ' (edible ' + this.edible().length + ')' + (W.target ? ' · target ' + Math.round(Math.hypot(W.target.x - W.x, W.target.y - W.y)) + ' px' : '') + '\nclip ' + (this.pest.base ? this.pest.base.a.id : '—') + (this.pest.over ? ' + ' + this.pest.over.a.id : '');
+      if (W.st !== this.state.live || info !== this.state.info) this.setState({ live: W.st, info }); }
+    this.raf = requestAnimationFrame(this.tick);
+  };
+  renderVals() {
+    const S = SEASONS[this.state.season];
+    const a = this.focusId && Muncher && Muncher.ANIMS ? Muncher.ANIMS[this.focusId] : null;
+    return {
+      arenaRef: this.arenaRef, focusRef: this.focusRef, galRef: this.galRef, meadowRef: this.meadowRef, ground: S[1], sky: S[2],
+      toggleRm: () => { Muncher.reduceMotion = Pip.reduceMotion = !this.state.rm; this.setState({ rm: !this.state.rm }); }, rmLabel: this.state.rm ? 'on' : 'off', rmBg: this.state.rm ? '#A8E6CF' : '#FFFFFF',
+      seasons: Object.keys(SEASONS).map(id => ({ name: SEASONS[id][0], bg: id === this.state.season ? '#FFB88C' : '#FFFFFF', pick: () => this.setState({ season: id }) })),
+      actions: [{ label: 'Pour seeds', bg: '#FFD56B', go: () => this.pour() }, { label: 'Make ★3 (freeze)', bg: '#B8E0F5', go: () => this.makeT3() }, { label: 'Merge his target', bg: '#FFFFFF', go: () => { const t = this.W.target; if (t) this.mergeChip(t); } }, { label: 'Clear field', bg: '#FFFFFF', go: () => this.clearField() }, { label: 'Reset to nest', bg: '#FFFFFF', go: () => this.reset() }],
+      liveState: this.state.live, liveInfo: this.state.info,
+      stateBtns: Object.keys(FOCUS).filter(k => k !== 'live').map(id => ({ id, bg: id === this.state.focus ? '#FFB88C' : '#FFFFFF', pick: () => this.setFocus(id) })),
+      dirBtns: ['down', 'up', 'left', 'right'].map(id => ({ id, bg: id === this.state.dir ? '#FFB88C' : '#FFFFFF', pick: () => this.setDir(id) })),
+      focusTitle: a ? a.id : '…', focusInfo: a ? a.desc + '\n\n' + a.len + ' s · ' + (a.loop ? 'loop' : 'one-shot') + ' · view ' + a.view + ' · state ' + a.state + '\nreduce motion: ' + a.rm.type + '\ntracks ' + Object.keys(a.tracks).length + ' nodes' : '',
+      gallery: GAL.map(g => ({ id: g.id, title: g.title, sub: g.sub, banner: !!g.banner, restart: () => { const s = this.gal[g.id]; if (s) { s.i = -1; this.galNext(g.id); } } })),
+      meadows: Object.keys(SEASONS).map(id => ({ id, name: SEASONS[id][0], ground: SEASONS[id][1], sky: SEASONS[id][2] }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -52,6 +52,8 @@ const READABILITY := preload("res://scripts/ui/ui_readability.gd")
 @export_file("*.tscn") var navigation_scene: String = ""
 
 @export var guarded_click: bool = false
+## Zvuk tapa (AudioManager id); "" = bez (npr. Trade sa auto-repeatom pušta coin po prodaji).
+@export var tap_sfx: String = "ui_tap"
 
 ## Drži-za-ponavljanje: tap = 1 klik, držanje = auto_repeat_rate klikova u sekundi.
 @export var auto_repeat: bool = false
@@ -351,6 +353,8 @@ func _on_mouse_exited() -> void:
 
 
 func _emit_clicked() -> void:
+	if not tap_sfx.is_empty() and not last_click_was_repeat:
+		Sfx.play(tap_sfx)
 	if guarded_click and not navigation_scene.is_empty():
 		var guard := get_node_or_null("/root/UiClickGuard")
 		if guard:

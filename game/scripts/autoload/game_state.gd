@@ -2165,6 +2165,15 @@ func unequip_cosmetic(slot: String) -> bool:
 	return cosmetics.unequip(slot)
 
 
+## IAP kozmetika (Sir Pip): `wear` = prava kupovina (obuče se odmah), restore = samo vlasništvo.
+func grant_iap_cosmetic(cosmetic_id: String, wear: bool) -> void:
+	cosmetics.grant_iap(cosmetic_id, wear)
+
+
+func revoke_iap_cosmetics() -> void:
+	cosmetics.revoke_iap()
+
+
 ## Ormar: primijeni sve izbore odjednom (jedan save) — vraća promijenjene slotove.
 func apply_wardrobe(pending: Dictionary) -> Array:
 	return cosmetics.apply_wardrobe(pending)

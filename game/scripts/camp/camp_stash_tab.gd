@@ -147,5 +147,6 @@ func _gui_input(event: InputEvent) -> void:
 		_pressing = true
 	elif _pressing:
 		_pressing = false
+		Sfx.play("ui_tab")
 		tab_pressed.emit(kind)
 	accept_event()

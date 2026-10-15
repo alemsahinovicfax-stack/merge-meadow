@@ -103,6 +103,7 @@ func open(animated: bool = true) -> void:
 		box.scale = Vector2.ONE
 		box.modulate.a = 1.0
 		return
+	Sfx.play("ui_open")
 	scrim.modulate.a = 0.0
 	box.pivot_offset = box.size * 0.5
 	box.scale = Vector2.ONE * 0.9
@@ -116,6 +117,8 @@ func open(animated: bool = true) -> void:
 func close(animated: bool = true) -> void:
 	if not visible:
 		return
+	if animated and is_inside_tree():
+		Sfx.play("ui_close")
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
 	if not animated or not is_inside_tree():

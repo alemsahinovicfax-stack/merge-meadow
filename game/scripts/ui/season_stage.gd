@@ -590,6 +590,7 @@ func _run_field_tween(from_u: float, to_u: float, sec: float, opening: bool) -> 
 	_moving = true
 	_opening = opening
 	_set_u(from_u)
+	Sfx.play("field_open" if opening else "field_close")
 	_field_tween = create_tween()
 	_field_tween.tween_method(_set_u, from_u, to_u, sec).set_trans(Tween.TRANS_LINEAR)
 	_field_tween.finished.connect(_on_field_tween_finished, CONNECT_ONE_SHOT)
@@ -703,6 +704,7 @@ func _swap_to(tab: String, idx: int, dir_override: int = -99) -> void:
 		return
 	_swap = 0.0
 	_apply()
+	Sfx.play("ui_swipe")
 	_swap_tween = create_tween()
 	_swap_tween.tween_method(_set_swap, 0.0, 1.0, UiHomeV3.SWAP_SEC)
 	_swap_tween.finished.connect(func() -> void:
@@ -843,8 +845,11 @@ func _on_play_pressed() -> void:
 
 func _unlock(season_id: String) -> void:
 	if not GameState.unlock_free(season_id):
+		Sfx.play("ui_denied")
 		_refresh_view()
 		return
+	Sfx.play("unlock")
+	Sfx.haptic(40)
 	_known_playable[season_id] = true
 	_refresh_top_bar()
 	_refresh_view()

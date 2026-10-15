@@ -161,6 +161,8 @@ func _begin_visit() -> void:
 		want = mini(_order.size(), (_scroll_season / SEASONS_PER_CHUNK + 1) * SEASONS_PER_CHUNK)
 	_sync_groups(want)
 	if _scroll_season >= 0:
+		# Novo cvijeće u Albumu: šljokice pri ulasku (jednom po posjeti).
+		Sfx.play("discover")
 		_pending_scroll = _building
 		if not _building:
 			call_deferred("_scroll_to_new")

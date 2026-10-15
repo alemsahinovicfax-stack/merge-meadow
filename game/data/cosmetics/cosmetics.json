@@ -82,6 +82,19 @@
       "look": { "recolor": { "#A8E6CF": "#C2E2FA", "#D4F5E4": "#EAF5FE" } }
     },
     {
+      "id": "pip_knight",
+      "slot": "pip_skin",
+      "title": "Sir Pip",
+      "description": "Meadow Knight armour for Pip.",
+      "subtitle": "Meadow Knight · Looks only",
+      "coin_cost": 0,
+      "source": "iap",
+      "sku": "pip_knight",
+      "order": 30,
+      "new_since": null,
+      "look": { "skin": "knight" }
+    },
+    {
       "id": "meadow_sunset",
       "slot": "meadow_bg",
       "title": "Sunset Meadow",

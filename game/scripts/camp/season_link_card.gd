@@ -178,6 +178,8 @@ func _on_unlock_clicked() -> void:
 		return
 	_unlocking = true
 	_state = UiCamp.SEASON_UNLOCKING
+	Sfx.play("unlock")
+	Sfx.haptic(40)
 	_show(def, def.coins_cost, def.t3_flowers_required)
 	unlock_button.disabled = true
 	unlock_button.mouse_filter = Control.MOUSE_FILTER_IGNORE

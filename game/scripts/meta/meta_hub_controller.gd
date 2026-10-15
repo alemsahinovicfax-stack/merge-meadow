@@ -75,7 +75,7 @@ func _queue_background_pages() -> void:
 		if _pages_loaded[i] or _bg_pages.has(i):
 			continue
 		var path: String = MetaHubPagesScript.PAGE_SCENES[i]
-		if ResourceLoader.exists(path) and ResourceLoader.load_threaded_request(path) == OK:
+		if ResourceLoader.exists(path) and BackgroundLoad.request(path):
 			_bg_pages.append(i)
 
 
@@ -237,6 +237,10 @@ func current_page_index() -> int:
 func _on_page_changed(index: int) -> void:
 	if _current_page == MetaHubPagesScript.COLLECTION and index != MetaHubPagesScript.COLLECTION:
 		_notify_journal_left()
+	# Swipe zvuk (tab ga preduhitri: ista grupa „nav" u katalogu); Arena ima svoju temu.
+	if index != _current_page:
+		Sfx.play("ui_swipe")
+	Sfx.music_level(_music_level_for_page(index))
 	_current_page = index
 	_load_neighbors(index)
 	_update_tab_highlight(index)
@@ -245,6 +249,11 @@ func _on_page_changed(index: int) -> void:
 	# Journal briše "novo" tek u refresh_for_meta_hub, pa badge ide poslije.
 	_refresh_tab_badges()
 	_notify_arena_page_active(index == MetaHubPagesScript.ARENA)
+
+
+## Arena ima svoju temu; ostale stranice huba sviraju home temu aktivne sezone.
+func _music_level_for_page(index: int) -> String:
+	return "arena" if index == MetaHubPagesScript.ARENA else "home"
 
 
 func _load_neighbors(index: int) -> void:

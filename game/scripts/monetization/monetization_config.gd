@@ -18,6 +18,8 @@ const SKU_SEASON_MOONLIT := "season_pack_moonlit_warren"
 const SKU_SEASON_CORAL := "season_pack_coral_tide"
 const SKU_SEASON_STARFALL := "season_pack_starfall_glade"
 const SKU_SEASON_EMBER := "season_pack_ember_fen"
+## Premium Pip skin (design_handoff_muncher_premium_pip): non-consumable, samo izgled.
+const SKU_PIP_KNIGHT := "pip_knight"
 
 const BOOSTER_MERGE_HINT := "merge_hint"
 const BOOSTER_LOOT_BURST := "loot_burst"
@@ -96,6 +98,15 @@ const IAP_PRODUCTS := {
 		"consumable": false,
 		"season_id": "ember_fen",
 	},
+	## Cijena = prijedlog paketa (€3,99, iznad impulsnih €1,99, ispod €4,99); konačnu daje vlasnik.
+	SKU_PIP_KNIGHT: {
+		"title": "Sir Pip",
+		"description": "Meadow Knight armour for Pip. Looks only — no gameplay effect.",
+		"price_label": "€3.99",
+		"play_product_id": "pip_knight",
+		"consumable": false,
+		"cosmetic_id": "pip_knight",
+	},
 }
 
 
@@ -153,3 +164,8 @@ static func is_season_sku(sku: String) -> bool:
 
 static func season_id_for_sku(sku: String) -> String:
 	return str(IAP_PRODUCTS.get(sku, {}).get("season_id", ""))
+
+
+## Kozmetika koju SKU daje ("" ako nije kozmetika).
+static func cosmetic_for_sku(sku: String) -> String:
+	return str(IAP_PRODUCTS.get(sku, {}).get("cosmetic_id", ""))

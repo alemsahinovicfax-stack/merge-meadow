@@ -53,6 +53,9 @@ func owns_product(sku: String) -> bool:
 	var season_id := CONFIG.season_id_for_sku(sku)
 	if not season_id.is_empty():
 		return GameState.owned_paid_seasons.has(season_id)
+	var cosmetic_id := CONFIG.cosmetic_for_sku(sku)
+	if not cosmetic_id.is_empty():
+		return GameState.owns_cosmetic(cosmetic_id)
 	return false
 
 
@@ -110,6 +113,7 @@ func reset_purchases_for_dev() -> void:
 	GameState.starter_pack_owned = false
 	GameState.merge_hint_owned = false
 	GameState.clear_owned_paid_seasons()
+	GameState.revoke_iap_cosmetics()
 	GameState.save_player_save()
 	catalog_updated.emit()
 
@@ -282,6 +286,10 @@ func _grant_product(sku: String, purchase_token: String = "", from_user_flow: bo
 			var season_id := CONFIG.season_id_for_sku(sku)
 			if not season_id.is_empty():
 				GameState.grant_paid_season(season_id)
+			var cosmetic_id := CONFIG.cosmetic_for_sku(sku)
+			if not cosmetic_id.is_empty():
+				# Kupljen u Shopu = odmah ga nosi; restore / billing connect samo vrati vlasništvo.
+				GameState.grant_iap_cosmetic(cosmetic_id, from_user_flow)
 	GameState.save_player_save()
 
 

@@ -158,6 +158,8 @@ func _play_flyers(at: Vector2, kind: String, amount: int, target: Control) -> vo
 		tw.tween_interval(UiRun.BUSH_FLY_STAGGER * float(i))
 		tw.tween_method(_arc.bind(node, src, dst, base), 0.0, 1.0, UiRun.BUSH_FLY_TIME) \
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		# Svaki komad koji uleti u čip „otkuca" — ton se penje (lanac reward_tick u katalogu).
+		tw.tween_callback(func() -> void: Sfx.play("reward_tick"))
 		if i == count - 1 and target != null:
 			tw.tween_callback(bump_chip.bind(target))
 		tw.tween_callback(node.hide)

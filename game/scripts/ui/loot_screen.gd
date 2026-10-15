@@ -28,6 +28,7 @@ var _placement_busy: String = ""
 
 
 func _ready() -> void:
+	Sfx.music_level("home")
 	var tex: Texture2D = GameState.get("last_run_snapshot")
 	snapshot.texture = tex
 	snapshot.visible = tex != null
@@ -223,11 +224,14 @@ func _on_rewarded_completed(placement: String) -> void:
 	if placement == CONFIG.PLACEMENT_DOUBLE_LOOT:
 		if GameState.double_loot_placeholder():
 			double_state = "done"
+			Sfx.play("loot_double")
+			Sfx.haptic(30)
 		else:
 			double_state = "none"
 		_build()
 		_pulse_chips()
 	elif placement == CONFIG.PLACEMENT_REVIVE:
+		Sfx.play("revive")
 		if GameState.request_revive():
 			return
 		revive_state = "none"

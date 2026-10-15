@@ -55,14 +55,12 @@ const BAG_HIT := UiArenaV2.BASKET_HIT
 const BAG_BOTTOM_GAP := UiArenaV2.BASKET_BOTTOM_GAP
 ## Keepout relativno na (centar vrece, dno vrece) — stit oko vrece, siri od same vrece.
 const BAG_KEEPOUT := Rect2(-185, -349, 370, 520)
-## Clamp munchera u polje — logika se ne mijenja s gusjenicom (glava r 50).
-const MUNCHER_VISUAL_R := 52.0
-## Gnijezdo je 2026-09-24 otislo ~200 px gore (HUD red je otpao); nize od ovoga
-## header odsijece "zzz" iznad usnulog munchera.
-const NEST_Y := 108.0
+## Krtičnjak Nibbsa (270 × 124, paket muncher_premium_pip): centar na y 132 kao u paketu —
+## zzz iznad usnulog munchera ostaje u polju.
+const NEST_Y := 132.0
 ## Spawn keepout gnijezda (samo spawn — gnijezdo je overlay, ne prepreka).
-const NEST_KEEPOUT_HALF_W := 110.0
-const NEST_KEEPOUT_BOTTOM := 190.0
+const NEST_KEEPOUT_HALF_W := 140.0
+const NEST_KEEPOUT_BOTTOM := 215.0
 ## Meta leta T3 kristala — gornji desni ugao polja, gdje je stajao stash brojac.
 const CRYSTAL_EXIT_INSET := Vector2(120, 90)
 const PIP_SIZE := 150.0

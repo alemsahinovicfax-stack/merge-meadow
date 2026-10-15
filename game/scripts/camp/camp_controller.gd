@@ -108,6 +108,8 @@ func _setup_stash() -> void:
 
 
 func _setup_trade_button() -> void:
+	# Prodaja pušta coin (penje ton dok se drži) — bez tapa ispod njega.
+	exchange_button.tap_sfx = ""
 	exchange_button.auto_repeat = true
 	exchange_button.auto_repeat_rate = TRADE_HOLD_RATE
 	exchange_button.ghost_when_disabled = false
@@ -581,11 +583,14 @@ func _on_exchange_pressed() -> void:
 	var type_before := _selected_type()
 	var traded := _crystal_step() if _on_flowers() else _trade_step()
 	if not traded:
+		Sfx.play("ui_denied")
 		_refresh_stash_view()
 		return
 	if repeat:
 		_hold_repeating = true
 	_hold_sold += 1
+	# Prodaja: coin penje ton dok se drži (lanac po vremenu u katalogu).
+	Sfx.play("coin")
 	exchange_bar.add_gain(GameState.wallet_coins - coins_before)
 	var switched := _selected_type() != type_before and not _selected_type().is_empty()
 	_refresh_trade_light()

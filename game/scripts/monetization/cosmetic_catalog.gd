@@ -12,6 +12,7 @@ const SLOT_MEADOW_BG := "meadow_bg"
 const SLOT_JOURNAL_FRAME := "journal_frame"
 
 const SOURCE_SHOP := "shop"
+const SOURCE_IAP := "iap"
 
 static var _loaded: bool = false
 static var _data: Dictionary = {}
@@ -117,6 +118,30 @@ static func is_shop_item(item_id: String) -> bool:
 	return get_source(item_id) == SOURCE_SHOP
 
 
+## Premium kozmetika za pravi novac (Sir Pip): prodaje je IAP SKU, ne coini.
+static func is_iap_item(item_id: String) -> bool:
+	return get_source(item_id) == SOURCE_IAP and not get_sku(item_id).is_empty()
+
+
+static func get_sku(item_id: String) -> String:
+	return str(get_item(item_id).get("sku", ""))
+
+
+static func get_subtitle(item_id: String) -> String:
+	return str(get_item(item_id).get("subtitle", ""))
+
+
+## Kozmetika koju prodaje dati IAP SKU ("" ako SKU nije kozmetika).
+static func item_for_sku(sku: String) -> String:
+	_ensure()
+	if sku.is_empty():
+		return ""
+	for iid in _item_order:
+		if str(_items[iid].get("sku", "")) == sku:
+			return iid
+	return ""
+
+
 static func get_look(item_id: String) -> Dictionary:
 	return get_item(item_id).get("look", {})
 
@@ -171,6 +196,14 @@ static func get_recolor(item_id: String) -> Dictionary:
 	if item_id.is_empty():
 		return {}
 	return get_look(item_id).get("recolor", {})
+
+
+## Look Pip skina za pregled ({"recolor": …} ili {"skin": "knight"}); {} = Classic.
+## UiPip.skin_key_from_look ga pretvara u ključ skina.
+static func get_pip_look(item_id: String) -> Dictionary:
+	if item_id.is_empty():
+		return {}
+	return get_look(item_id)
 
 
 static func get_meadow_modulate(item_id: String) -> Color:

@@ -393,6 +393,8 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** u izlazu testa uvijek traži i `SCRIPT ERROR`, ne samo „OK" (`grep -c "SCRIPT ERROR"` mora biti 0).
 
+**Dopuna 2026-10-14 (zvuk):** isto važi za `class_name` klase koje test koristi direktno (`UiPip`, `UiPopups`, kartice…) — kad one statički pozovu autoload (`AudioManager.play`), `-s` test pada. Zato zvuk ide kroz `Sfx` (`scripts/visual/sfx.gd`): statičke funkcije koje autoload traže u toku igre (`root.get_node_or_null("AudioManager")`), a bez njega su tihe. Isti obrazac za svaki budući servis koji zovu i UI klase.
+
 ## #22 — tekstura iz `load()` u `_draw()` se crta kao bijeli pravougaonik
 
 **Datum:** 2026-10-05 (Sezone faza 1, prepreke u runu)
@@ -416,6 +418,8 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 **Rješenje:** poredi s `get_target()` (vraća `null` za nevažeći), stanje „prikazano" drži u svom flagu (`_shown`), ne u `visible` dok traje izlaz, a na kraju sesije i pri gašenju stranice zovi `clear_now()`.
 
 **Prevencija:** za čuvanu referencu na čvor koji može nestati nikad ne poredi `== null` / `==` direktno; prvo `is_instance_valid()`.
+
+**Dopuna 2026-10-14 (muncher, „sjemenka pobjegla"):** ista zamka. `if _target_chip != null and not is_instance_valid(_target_chip)` nikad nije uhvatio spojenu metu, jer je oslobođena meta već `== null`. Rješenje: flag `_target_held` (meta je postojala u prošlom ticku) + `is_instance_valid` / `is_queued_for_deletion()`; test `muncher_rig_smoke.gd`.
 
 ## #24 — GL Compatibility na laptopu ne reže crtanje (ni `clip_contents`)
 
@@ -545,6 +549,82 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 **Rješenje:** oznake kartice `z_index = 12` (`ItemCard.TAG_Z`); pod velom se Pip priguši `modulate.a = 0.45` (`ItemPreview.veil` setter).
 
 **Prevencija:** UI iznad Pipa u istom kontejneru mora imati z > 11; veo koji treba da prekrije Pipa ide kao čvor sa z > 11, ne u `_draw`.
+
+**Dopuna 2026-10-14:** Pip u pregledu sad stoji na `UiPip.HOST_LIFT` (+4, vidi #35), pa oznake idu na `TAG_Z = 16`; „Free" / „Premium" su ispod imena kartice, ne preko pregleda.
+
+## #34 — zajednička AnimationLibrary s klipovima za čvorove koje nemaju svi
+
+**Datum:** 2026-10-14 (Sir Pip, premium skin)
+
+**Simptom:** svaki Classic / Blossom Pip u Shopu ispiše desetine `AnimationMixer: 'k_cape_idle', couldn't resolve track: 'root/pip/body/k_cape:…'`, čim se negdje napravi Sir Pip.
+
+**Uzrok:** `UiPip` dijeli jednu `AnimationLibrary` po pogledu. AnimationMixer pri osvježavanju keša provjerava putanje **svih** animacija u biblioteci, ne samo one koja svira. Kad Sir Pip doda klipove sa `k_cape` / `k_helm`, Classic instance ih ne nalaze.
+
+**Rješenje:** skin sa vlastitim čvorovima riga ima svoju biblioteku (`_lib_skin`, ključ `pogled|rm|skin`); ostali skinovi i dalje dijele jednu.
+
+**Prevencija:** biblioteka koja se dijeli između instanci smije imati samo klipove čije putanje postoje u svakoj instanci. Test bez upozorenja: `grep -c WARNING` u izlazu `premium_pip_smoke` mora biti 0.
+
+## #35 — dio s negativnim z pada ispod pozadine domaćina
+
+**Datum:** 2026-10-14 (Sir Pip u Shopu i Ormaru)
+
+**Simptom:** ogrtač Sir Pipa (z −1) i sjena Pipa (z −4) se ne vide u pregledu u Shopu / Ormaru, a na polju se vide.
+
+**Uzrok:** `ItemPreview` (i Shop kartice) crtaju pozadinu u svom `_draw()` na z 0. Dijete sa z < 0 se crta prije roditelja, dakle ispod njegove pozadine.
+
+**Rješenje:** domaćin koji sam crta pozadinu diže Pipa: `actor.z_index = UiPip.HOST_LIFT` (4) — `ItemPreview`, „All set", Starter Pack. Najviši dio je tada 15, pa oznake kartice idu na 16.
+
+**Prevencija:** pri novom domaćinu za Pip (ili drugi rig s negativnim z) provjeri da li roditelj crta u `_draw()`; ako da, digni dijete za najniži z riga. Snimak površine s premium skinom (ogrtač iza tijela) to odmah pokaže.
+
+## #36 — pravilo iz CD paketa nije tačno za fajlove iz istog paketa
+
+**Datum:** 2026-10-14 (design_handoff_muncher_premium_pip)
+
+**Simptom:** uši i šape Sir Pipa ostaju mint u igri, a u pregledaču paketa su medene.
+
+**Uzrok:** `skins_knight.json` kaže „zamijenjeni dijelovi su u finalnim bojama, bez recolora", ali SVG-ovi `k_ear_*` / `k_paw_*` / `k_body_*` nose classic tokene krzna (`#A8E6CF`, `#7CCBAE`, `#FFCCD5`). Pregledač ih tiho preboji.
+
+**Rješenje:** recolor ide na sve dijelove skina; boje oklopa nisu classic tokeni, pa ostaju (`UiPip._raster`).
+
+**Prevencija:** poslije prenosa paketa uvijek tabla svih pogleda × skinova (Godot snimak) uz pregledač paketa — ne vjerovati opisu pravila, nego boji na ekranu. Isti paket: SVG-ovi nose ~7,7 KB C2PA metapodataka po fajlu (skida ih kopiranje u `game/assets`).
+
+## #37 — sinhroni `load()` zvukova na startu = kasni frejmovi huba
+
+**Datum:** 2026-10-14 (zvuk u igri)
+
+**Simptom:** posle dodavanja zvuka start huba (`hub_boot_5s`) ima 21–35 kasnih frejmova od ~280 (bilo 7–11), najgori 64–97 ms; bez zvuka (`AudioManager` zamijenjen praznim) opet normalno.
+
+**Uzrok:** `AudioManager` je efekte učitavao „u pozadini" sa 4 `load()` po frejmu na glavnom threadu. Jedan WAV (QOA) je ~3 ms (do 10 ms), tema (OGG) ~13 ms — pa je prvih ~16 frejmova dobilo +13 ms baš dok hub gradi stranice, a `play_music("meadow")` na startu još 13 ms.
+
+**Rješenje:** sve preko `ResourceLoader.load_threaded_request`, efekti **po jedan** (sljedeći se traži tek kad je prethodni gotov — red je FIFO, #30, pa stranice huba ne čekaju iza 62 fajla), prva tema se traži već u `_ready` autoloada, ostale kad zatrebaju (stara počne da se gasi odmah, nova uđe kad je fajl tu). Efekat koji zatreba prije reda: sinhrono (~3 ms, jednom); ako je baš taj fajl u threadu, `load(path, "", CACHE_MODE_IGNORE)` — inače bi `load()` čekao sve ispred njega u redu. A/B (3 × naizmjenično): sa zvukom 16–24 kasna, bez zvuka 21–27 — šum laptopa.
+
+**Prevencija:** svaki „preload" mjeri u ms po fajlu (`ResourceLoader.load(..., CACHE_MODE_IGNORE)` u petlji) prije nego odlučiš koliko po frejmu; više od ~1 ms po frejmu na startu ide u thread. Bench starta uvijek A/B (servis isključen preko `override.cfg` `[autoload]`), jer laptop šumi ±10 kasnih frejmova.
+
+## #38 — Vibration u Settingsu ne radi na Androidu (dozvola isključena)
+
+**Datum:** 2026-10-14 (haptika uz zvuk)
+
+**Simptom:** prekidač Vibration postoji i čuva se, `Input.vibrate_handheld()` se zove, a telefon ne vibrira.
+
+**Uzrok:** `export_presets.cfg` je imao `permissions/vibrate=false` — Android tiho ignoriše vibraciju bez dozvole `VIBRATE`.
+
+**Rješenje:** `permissions/vibrate=true` (normalna dozvola, korisnik je ne mora odobriti, ne mijenja Play listing).
+
+**Prevencija:** za svaku funkciju koja zove sistemski servis (vibracija, mreža, notifikacije) provjeri dozvolu u `export_presets.cfg` u istom koraku kad dodaješ kod; desktop i headless testovi to nikad neće uhvatiti.
+
+## #39 — izlaz usred pozadinskog učitavanja scene = „Parse Error … shop_screen.tscn"
+
+**Datum:** 2026-10-14 (smoke testovi huba, od 2026-10-10)
+
+**Simptom:** `meta_hub_smoke` (i `hub_chrome_icons_smoke`, `swipe_snap_smoke`) poslije „OK" ispiše `ERROR: Parse Error: Failed. [Resource file res://scenes/ui/shop_screen.tscn:13]` i `Failed loading resource`; exit kod 0. U 4 od 4 prolaza.
+
+**Uzrok:** test izađe 3 frejma poslije starta huba, dok se Shop stranica još učitava u threadu (`load_threaded_request`). Pri gašenju `ResourceLoader` namjerno prekida učitavanja u toku — zavisnost (skripta Shopa, linija 13 `script = ExtResource(...)`) se više ne učita, pa scena „ne parsira". Isto bi se desilo kad igrač ugasi igru u prvoj sekundi.
+
+**Rješenje:** `BackgroundLoad` (`scripts/visual/background_load.gd`): svako pozadinsko učitavanje ide kroz `BackgroundLoad.request(path)` (hub stranice, cvijeće, `AudioManager`), a na `root.tree_exiting` se preuzme sve što vlasnik nije uzeo — u toku (čeka se) i gotovo (inače „Resource still in use"). 0 grešaka u 12 prolaza; gašenje isto brzo. `meta_hub_smoke` provjerava da hub ide kroz `BackgroundLoad`.
+
+**Napomena (nije od ovoga):** muzika koja svira u trenutku `quit()` ponekad ostane u AudioServeru (zaustavljena reprodukcija se čisti tek sljedećeg frejma, kog nema) → „N resources still in use" za `.ogg`. Bezopasno; test koji pušta muziku je utiša i sačeka 0,3 s prije izlaza (`audio_smoke`).
+
+**Prevencija:** svaki `load_threaded_request` ide kroz `BackgroundLoad.request` — kao poslovi u `WorkerThreadPool` (#31), ko pokrene posao, sačeka ga i na izlazu.
 
 ## Brza dijagnostika (kad nešto "ne radi")
 

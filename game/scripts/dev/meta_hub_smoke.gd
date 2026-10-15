@@ -34,5 +34,12 @@ func _step() -> void:
 		push_error("meta_hub_smoke: arena_pest.gd missing")
 		_quit(1)
 		return
+	# Stranice van početne se učitavaju u pozadini kroz BackgroundLoad — ono se sačeka pri
+	# izlasku; inače izlaz usred učitavanja Shopa ispiše „Parse Error … shop_screen.tscn" (#39).
+	var queued: Dictionary = (load("res://scripts/visual/background_load.gd") as GDScript).get("_paths")
+	if not queued.has("res://scenes/ui/shop_screen.tscn"):
+		push_error("meta_hub_smoke: hub background pages must go through BackgroundLoad (%s)" % str(queued.keys()))
+		_quit(1)
+		return
 	print("meta_hub_smoke OK")
 	_quit(0)

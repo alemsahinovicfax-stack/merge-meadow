@@ -45,6 +45,8 @@ func request_rewarded(placement: String) -> void:
 		pass
 	_busy = true
 	_pending_placement = placement
+	# Muzika stoji dok reklama svira (i stub: 1,2 s „reklame").
+	Sfx.set_ad_playing(true)
 	match backend:
 		Backend.ADMOB_PLUGIN:
 			_request_plugin_rewarded(placement)
@@ -62,12 +64,14 @@ func _request_stub_rewarded(placement: String) -> void:
 func _finish_rewarded(placement: String) -> void:
 	_busy = false
 	_pending_placement = ""
+	Sfx.set_ad_playing(false)
 	rewarded_completed.emit(placement)
 
 
 func _fail_rewarded(placement: String, reason: String) -> void:
 	_busy = false
 	_pending_placement = ""
+	Sfx.set_ad_playing(false)
 	rewarded_failed.emit(placement, reason)
 
 

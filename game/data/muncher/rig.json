@@ -1,0 +1,2162 @@
+{
+ "schema": 1,
+ "character": "Nibbs the seed-mole (in-game name: Muncher)",
+ "units": "1 px = 1 game px (Arena, base 1080 × 1920)",
+ "root": "root = ArenaPest._pest_center = eat centre = mouth (GameState.ARENA_PEST_EAT_RADIUS 36 measured from here)",
+ "views": {
+  "front": {
+   "frame": [
+    320,
+    300
+   ],
+   "origin": [
+    160,
+    170
+   ],
+   "nodes": [
+    {
+     "id": "root",
+     "parent": null,
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "shadow",
+     "parent": "root",
+     "pos": [
+      0,
+      40
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -50,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_shadow.svg",
+      "offset": [
+       -55,
+       -12
+      ],
+      "size": [
+       110,
+       24
+      ]
+     }
+    },
+    {
+     "id": "mole",
+     "parent": "root",
+     "pos": [
+      0,
+      38
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "tail",
+     "parent": "mole",
+     "pos": [
+      0,
+      -10
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -8,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_tail.svg",
+      "offset": [
+       -9,
+       -3
+      ],
+      "size": [
+       18,
+       25
+      ]
+     },
+     "visible": false
+    },
+    {
+     "id": "foot_L",
+     "parent": "mole",
+     "pos": [
+      -24,
+      -4
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_foot.svg",
+      "offset": [
+       -16,
+       -11
+      ],
+      "size": [
+       31,
+       21
+      ]
+     }
+    },
+    {
+     "id": "foot_R",
+     "parent": "mole",
+     "pos": [
+      24,
+      -4
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_foot.svg",
+      "offset": [
+       -16,
+       -11
+      ],
+      "size": [
+       31,
+       21
+      ]
+     }
+    },
+    {
+     "id": "body",
+     "parent": "mole",
+     "pos": [
+      0,
+      -48
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_body_f.svg",
+      "offset": [
+       -61,
+       -75
+      ],
+      "size": [
+       121,
+       127
+      ]
+     }
+    },
+    {
+     "id": "ear_L",
+     "parent": "body",
+     "pos": [
+      -40,
+      -40
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_ear.svg",
+      "offset": [
+       -14,
+       -13
+      ],
+      "size": [
+       27,
+       25
+      ]
+     }
+    },
+    {
+     "id": "ear_R",
+     "parent": "body",
+     "pos": [
+      40,
+      -40
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_ear.svg",
+      "offset": [
+       -14,
+       -13
+      ],
+      "size": [
+       27,
+       25
+      ]
+     }
+    },
+    {
+     "id": "knot",
+     "parent": "body",
+     "pos": [
+      50,
+      -26
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -2,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_knot.svg",
+      "offset": [
+       -9,
+       -17
+      ],
+      "size": [
+       37,
+       45
+      ]
+     }
+    },
+    {
+     "id": "eye_L",
+     "parent": "body",
+     "pos": [
+      -21,
+      -22
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 3,
+     "swap_group": "eye",
+     "frames": {
+      "open": {
+       "file": "res://assets/muncher/parts/m_eye__open.svg",
+       "offset": [
+        -15,
+        -26
+       ],
+       "size": [
+        29,
+        42
+       ]
+      },
+      "sly": {
+       "file": "res://assets/muncher/parts/m_eye__sly.svg",
+       "offset": [
+        -15,
+        -24
+       ],
+       "size": [
+        30,
+        40
+       ]
+      },
+      "wide": {
+       "file": "res://assets/muncher/parts/m_eye__wide.svg",
+       "offset": [
+        -16,
+        -36
+       ],
+       "size": [
+        32,
+        53
+       ]
+      },
+      "closed": {
+       "file": "res://assets/muncher/parts/m_eye__closed.svg",
+       "offset": [
+        -13,
+        -2
+       ],
+       "size": [
+        26,
+        13
+       ]
+      },
+      "happy": {
+       "file": "res://assets/muncher/parts/m_eye__happy.svg",
+       "offset": [
+        -13,
+        -25
+       ],
+       "size": [
+        26,
+        32
+       ]
+      },
+      "squeeze": {
+       "file": "res://assets/muncher/parts/m_eye__squeeze.svg",
+       "offset": [
+        -15,
+        -23
+       ],
+       "size": [
+        27,
+        33
+       ]
+      },
+      "frozen": {
+       "file": "res://assets/muncher/parts/m_eye__frozen.svg",
+       "offset": [
+        -15,
+        -27
+       ],
+       "size": [
+        29,
+        43
+       ]
+      },
+      "annoyed": {
+       "file": "res://assets/muncher/parts/m_eye__annoyed.svg",
+       "offset": [
+        -16,
+        -22
+       ],
+       "size": [
+        31,
+        38
+       ]
+      }
+     },
+     "default_frame": "open"
+    },
+    {
+     "id": "eye_R",
+     "parent": "body",
+     "pos": [
+      21,
+      -22
+     ],
+     "rot_deg": 0,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": 3,
+     "swap_group": "eye",
+     "frames": {
+      "open": {
+       "file": "res://assets/muncher/parts/m_eye__open.svg",
+       "offset": [
+        -15,
+        -26
+       ],
+       "size": [
+        29,
+        42
+       ]
+      },
+      "sly": {
+       "file": "res://assets/muncher/parts/m_eye__sly.svg",
+       "offset": [
+        -15,
+        -24
+       ],
+       "size": [
+        30,
+        40
+       ]
+      },
+      "wide": {
+       "file": "res://assets/muncher/parts/m_eye__wide.svg",
+       "offset": [
+        -16,
+        -36
+       ],
+       "size": [
+        32,
+        53
+       ]
+      },
+      "closed": {
+       "file": "res://assets/muncher/parts/m_eye__closed.svg",
+       "offset": [
+        -13,
+        -2
+       ],
+       "size": [
+        26,
+        13
+       ]
+      },
+      "happy": {
+       "file": "res://assets/muncher/parts/m_eye__happy.svg",
+       "offset": [
+        -13,
+        -25
+       ],
+       "size": [
+        26,
+        32
+       ]
+      },
+      "squeeze": {
+       "file": "res://assets/muncher/parts/m_eye__squeeze.svg",
+       "offset": [
+        -15,
+        -23
+       ],
+       "size": [
+        27,
+        33
+       ]
+      },
+      "frozen": {
+       "file": "res://assets/muncher/parts/m_eye__frozen.svg",
+       "offset": [
+        -15,
+        -27
+       ],
+       "size": [
+        29,
+        43
+       ]
+      },
+      "annoyed": {
+       "file": "res://assets/muncher/parts/m_eye__annoyed.svg",
+       "offset": [
+        -16,
+        -22
+       ],
+       "size": [
+        31,
+        38
+       ]
+      }
+     },
+     "default_frame": "open"
+    },
+    {
+     "id": "nose",
+     "parent": "body",
+     "pos": [
+      0,
+      -4
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 5,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_nose.svg",
+      "offset": [
+       -17,
+       -16
+      ],
+      "size": [
+       33,
+       29
+      ]
+     }
+    },
+    {
+     "id": "mouth",
+     "parent": "body",
+     "pos": [
+      0,
+      12
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 4,
+     "swap_group": "mouth",
+     "frames": {
+      "grin": {
+       "file": "res://assets/muncher/parts/m_mouth__grin.svg",
+       "offset": [
+        -19,
+        -5
+       ],
+       "size": [
+        37,
+        19
+       ]
+      },
+      "smug": {
+       "file": "res://assets/muncher/parts/m_mouth__smug.svg",
+       "offset": [
+        -17,
+        -7
+       ],
+       "size": [
+        33,
+        20
+       ]
+      },
+      "chomp_open": {
+       "file": "res://assets/muncher/parts/m_mouth__chomp_open.svg",
+       "offset": [
+        -20,
+        -14
+       ],
+       "size": [
+        39,
+        35
+       ]
+      },
+      "chomp_shut": {
+       "file": "res://assets/muncher/parts/m_mouth__chomp_shut.svg",
+       "offset": [
+        -32,
+        -7
+       ],
+       "size": [
+        63,
+        21
+       ]
+      },
+      "snore": {
+       "file": "res://assets/muncher/parts/m_mouth__snore.svg",
+       "offset": [
+        -7,
+        -4
+       ],
+       "size": [
+        17,
+        13
+       ]
+      },
+      "o": {
+       "file": "res://assets/muncher/parts/m_mouth__o.svg",
+       "offset": [
+        -11,
+        -8
+       ],
+       "size": [
+        21,
+        23
+       ]
+      },
+      "chatter": {
+       "file": "res://assets/muncher/parts/m_mouth__chatter.svg",
+       "offset": [
+        -17,
+        -3
+       ],
+       "size": [
+        33,
+        14
+       ]
+      },
+      "pout": {
+       "file": "res://assets/muncher/parts/m_mouth__pout.svg",
+       "offset": [
+        -15,
+        -3
+       ],
+       "size": [
+        29,
+        15
+       ]
+      },
+      "yawn": {
+       "file": "res://assets/muncher/parts/m_mouth__yawn.svg",
+       "offset": [
+        -14,
+        -12
+       ],
+       "size": [
+        27,
+        33
+       ]
+      }
+     },
+     "default_frame": "grin"
+    },
+    {
+     "id": "paw_L",
+     "parent": "body",
+     "pos": [
+      -48,
+      16
+     ],
+     "rot_deg": 14,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 6,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_paw.svg",
+      "offset": [
+       -17,
+       -17
+      ],
+      "size": [
+       33,
+       45
+      ]
+     }
+    },
+    {
+     "id": "paw_R",
+     "parent": "body",
+     "pos": [
+      48,
+      16
+     ],
+     "rot_deg": -14,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": 6,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_paw.svg",
+      "offset": [
+       -17,
+       -17
+      ],
+      "size": [
+       33,
+       45
+      ]
+     }
+    },
+    {
+     "id": "ice",
+     "parent": "root",
+     "pos": [
+      0,
+      -8
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 30,
+     "swap_group": "ice",
+     "frames": {
+      "ice": {
+       "file": "res://assets/muncher/parts/m_ice__ice.svg",
+       "offset": [
+        -104,
+        -104
+       ],
+       "size": [
+        203,
+        205
+       ]
+      },
+      "crack": {
+       "file": "res://assets/muncher/parts/m_ice__crack.svg",
+       "offset": [
+        -104,
+        -104
+       ],
+       "size": [
+        203,
+        205
+       ]
+      }
+     },
+     "default_frame": "ice",
+     "visible": false
+    },
+    {
+     "id": "emote",
+     "parent": "root",
+     "pos": [
+      -58,
+      -86
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_a",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_b",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_c",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_d",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    }
+   ]
+  },
+  "side": {
+   "frame": [
+    320,
+    300
+   ],
+   "origin": [
+    160,
+    170
+   ],
+   "nodes": [
+    {
+     "id": "root",
+     "parent": null,
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "shadow",
+     "parent": "root",
+     "pos": [
+      -36,
+      40
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1.18,
+      1
+     ],
+     "z": -50,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_shadow.svg",
+      "offset": [
+       -55,
+       -12
+      ],
+      "size": [
+       110,
+       24
+      ]
+     }
+    },
+    {
+     "id": "mole",
+     "parent": "root",
+     "pos": [
+      -46,
+      38
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "tail",
+     "parent": "mole",
+     "pos": [
+      -62,
+      -40
+     ],
+     "rot_deg": 70,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -2,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_tail.svg",
+      "offset": [
+       -9,
+       -3
+      ],
+      "size": [
+       18,
+       25
+      ]
+     }
+    },
+    {
+     "id": "foot_L",
+     "parent": "mole",
+     "pos": [
+      -30,
+      -4
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.9,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_foot.svg",
+      "offset": [
+       -16,
+       -11
+      ],
+      "size": [
+       31,
+       21
+      ]
+     }
+    },
+    {
+     "id": "foot_R",
+     "parent": "mole",
+     "pos": [
+      -8,
+      -2
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_foot.svg",
+      "offset": [
+       -16,
+       -11
+      ],
+      "size": [
+       31,
+       21
+      ]
+     }
+    },
+    {
+     "id": "body",
+     "parent": "mole",
+     "pos": [
+      0,
+      -48
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_body_s.svg",
+      "offset": [
+       -65,
+       -67
+      ],
+      "size": [
+       139,
+       117
+      ]
+     }
+    },
+    {
+     "id": "ear_L",
+     "parent": "body",
+     "pos": [
+      -10,
+      -40
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.8,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_ear.svg",
+      "offset": [
+       -14,
+       -13
+      ],
+      "size": [
+       27,
+       25
+      ]
+     }
+    },
+    {
+     "id": "ear_R",
+     "parent": "body",
+     "pos": [
+      6,
+      -42
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.8,
+      1
+     ],
+     "z": 1,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_ear.svg",
+      "offset": [
+       -14,
+       -13
+      ],
+      "size": [
+       27,
+       25
+      ]
+     },
+     "visible": false
+    },
+    {
+     "id": "knot",
+     "parent": "body",
+     "pos": [
+      -32,
+      -30
+     ],
+     "rot_deg": -10,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_knot.svg",
+      "offset": [
+       -9,
+       -17
+      ],
+      "size": [
+       37,
+       45
+      ]
+     }
+    },
+    {
+     "id": "eye_R",
+     "parent": "body",
+     "pos": [
+      30,
+      -22
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.82,
+      1
+     ],
+     "z": 3,
+     "swap_group": "eye",
+     "frames": {
+      "open": {
+       "file": "res://assets/muncher/parts/m_eye__open.svg",
+       "offset": [
+        -15,
+        -26
+       ],
+       "size": [
+        29,
+        42
+       ]
+      },
+      "sly": {
+       "file": "res://assets/muncher/parts/m_eye__sly.svg",
+       "offset": [
+        -15,
+        -24
+       ],
+       "size": [
+        30,
+        40
+       ]
+      },
+      "wide": {
+       "file": "res://assets/muncher/parts/m_eye__wide.svg",
+       "offset": [
+        -16,
+        -36
+       ],
+       "size": [
+        32,
+        53
+       ]
+      },
+      "closed": {
+       "file": "res://assets/muncher/parts/m_eye__closed.svg",
+       "offset": [
+        -13,
+        -2
+       ],
+       "size": [
+        26,
+        13
+       ]
+      },
+      "happy": {
+       "file": "res://assets/muncher/parts/m_eye__happy.svg",
+       "offset": [
+        -13,
+        -25
+       ],
+       "size": [
+        26,
+        32
+       ]
+      },
+      "squeeze": {
+       "file": "res://assets/muncher/parts/m_eye__squeeze.svg",
+       "offset": [
+        -15,
+        -23
+       ],
+       "size": [
+        27,
+        33
+       ]
+      },
+      "frozen": {
+       "file": "res://assets/muncher/parts/m_eye__frozen.svg",
+       "offset": [
+        -15,
+        -27
+       ],
+       "size": [
+        29,
+        43
+       ]
+      },
+      "annoyed": {
+       "file": "res://assets/muncher/parts/m_eye__annoyed.svg",
+       "offset": [
+        -16,
+        -22
+       ],
+       "size": [
+        31,
+        38
+       ]
+      }
+     },
+     "default_frame": "open"
+    },
+    {
+     "id": "nose",
+     "parent": "body",
+     "pos": [
+      70,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 5,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_nose_s.svg",
+      "offset": [
+       -11,
+       -13
+      ],
+      "size": [
+       24,
+       24
+      ]
+     }
+    },
+    {
+     "id": "mouth",
+     "parent": "body",
+     "pos": [
+      46,
+      12
+     ],
+     "rot_deg": 0,
+     "scale": [
+      0.7,
+      1
+     ],
+     "z": 4,
+     "swap_group": "mouth",
+     "frames": {
+      "grin": {
+       "file": "res://assets/muncher/parts/m_mouth__grin.svg",
+       "offset": [
+        -19,
+        -5
+       ],
+       "size": [
+        37,
+        19
+       ]
+      },
+      "smug": {
+       "file": "res://assets/muncher/parts/m_mouth__smug.svg",
+       "offset": [
+        -17,
+        -7
+       ],
+       "size": [
+        33,
+        20
+       ]
+      },
+      "chomp_open": {
+       "file": "res://assets/muncher/parts/m_mouth__chomp_open.svg",
+       "offset": [
+        -20,
+        -14
+       ],
+       "size": [
+        39,
+        35
+       ]
+      },
+      "chomp_shut": {
+       "file": "res://assets/muncher/parts/m_mouth__chomp_shut.svg",
+       "offset": [
+        -32,
+        -7
+       ],
+       "size": [
+        63,
+        21
+       ]
+      },
+      "snore": {
+       "file": "res://assets/muncher/parts/m_mouth__snore.svg",
+       "offset": [
+        -7,
+        -4
+       ],
+       "size": [
+        17,
+        13
+       ]
+      },
+      "o": {
+       "file": "res://assets/muncher/parts/m_mouth__o.svg",
+       "offset": [
+        -11,
+        -8
+       ],
+       "size": [
+        21,
+        23
+       ]
+      },
+      "chatter": {
+       "file": "res://assets/muncher/parts/m_mouth__chatter.svg",
+       "offset": [
+        -17,
+        -3
+       ],
+       "size": [
+        33,
+        14
+       ]
+      },
+      "pout": {
+       "file": "res://assets/muncher/parts/m_mouth__pout.svg",
+       "offset": [
+        -15,
+        -3
+       ],
+       "size": [
+        29,
+        15
+       ]
+      },
+      "yawn": {
+       "file": "res://assets/muncher/parts/m_mouth__yawn.svg",
+       "offset": [
+        -14,
+        -12
+       ],
+       "size": [
+        27,
+        33
+       ]
+      }
+     },
+     "default_frame": "grin"
+    },
+    {
+     "id": "paw_L",
+     "parent": "body",
+     "pos": [
+      14,
+      32
+     ],
+     "rot_deg": -30,
+     "scale": [
+      0.9,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_paw.svg",
+      "offset": [
+       -17,
+       -17
+      ],
+      "size": [
+       33,
+       45
+      ]
+     }
+    },
+    {
+     "id": "paw_R",
+     "parent": "body",
+     "pos": [
+      24,
+      32
+     ],
+     "rot_deg": -50,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 6,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_paw.svg",
+      "offset": [
+       -17,
+       -17
+      ],
+      "size": [
+       33,
+       45
+      ]
+     }
+    },
+    {
+     "id": "ice",
+     "parent": "root",
+     "pos": [
+      0,
+      -8
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 30,
+     "swap_group": "ice",
+     "frames": {
+      "ice": {
+       "file": "res://assets/muncher/parts/m_ice__ice.svg",
+       "offset": [
+        -104,
+        -104
+       ],
+       "size": [
+        203,
+        205
+       ]
+      },
+      "crack": {
+       "file": "res://assets/muncher/parts/m_ice__crack.svg",
+       "offset": [
+        -104,
+        -104
+       ],
+       "size": [
+        203,
+        205
+       ]
+      }
+     },
+     "default_frame": "ice",
+     "visible": false
+    },
+    {
+     "id": "emote",
+     "parent": "root",
+     "pos": [
+      -58,
+      -86
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_a",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_b",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_c",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_d",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    }
+   ]
+  },
+  "back": {
+   "frame": [
+    320,
+    300
+   ],
+   "origin": [
+    160,
+    170
+   ],
+   "nodes": [
+    {
+     "id": "root",
+     "parent": null,
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "shadow",
+     "parent": "root",
+     "pos": [
+      0,
+      40
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -50,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_shadow.svg",
+      "offset": [
+       -55,
+       -12
+      ],
+      "size": [
+       110,
+       24
+      ]
+     }
+    },
+    {
+     "id": "mole",
+     "parent": "root",
+     "pos": [
+      0,
+      38
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0
+    },
+    {
+     "id": "paw_L",
+     "parent": "mole",
+     "pos": [
+      -52,
+      -30
+     ],
+     "rot_deg": -10,
+     "scale": [
+      1,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_paw.svg",
+      "offset": [
+       -17,
+       -17
+      ],
+      "size": [
+       33,
+       45
+      ]
+     }
+    },
+    {
+     "id": "paw_R",
+     "parent": "mole",
+     "pos": [
+      52,
+      -30
+     ],
+     "rot_deg": 10,
+     "scale": [
+      -1,
+      1
+     ],
+     "z": -1,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_paw.svg",
+      "offset": [
+       -17,
+       -17
+      ],
+      "size": [
+       33,
+       45
+      ]
+     }
+    },
+    {
+     "id": "body",
+     "parent": "mole",
+     "pos": [
+      0,
+      -48
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 0,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_body_b.svg",
+      "offset": [
+       -61,
+       -75
+      ],
+      "size": [
+       121,
+       127
+      ]
+     }
+    },
+    {
+     "id": "foot_L",
+     "parent": "mole",
+     "pos": [
+      -22,
+      -2
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_foot_b.svg",
+      "offset": [
+       -15,
+       -12
+      ],
+      "size": [
+       29,
+       23
+      ]
+     }
+    },
+    {
+     "id": "foot_R",
+     "parent": "mole",
+     "pos": [
+      22,
+      -2
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 2,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_foot_b.svg",
+      "offset": [
+       -15,
+       -12
+      ],
+      "size": [
+       29,
+       23
+      ]
+     }
+    },
+    {
+     "id": "tail",
+     "parent": "body",
+     "pos": [
+      0,
+      30
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 3,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_tail.svg",
+      "offset": [
+       -9,
+       -3
+      ],
+      "size": [
+       18,
+       25
+      ]
+     }
+    },
+    {
+     "id": "ear_L",
+     "parent": "body",
+     "pos": [
+      -40,
+      -40
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 1,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_ear.svg",
+      "offset": [
+       -14,
+       -13
+      ],
+      "size": [
+       27,
+       25
+      ]
+     }
+    },
+    {
+     "id": "ear_R",
+     "parent": "body",
+     "pos": [
+      40,
+      -40
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 1,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_ear.svg",
+      "offset": [
+       -14,
+       -13
+      ],
+      "size": [
+       27,
+       25
+      ]
+     }
+    },
+    {
+     "id": "knot",
+     "parent": "body",
+     "pos": [
+      0,
+      -22
+     ],
+     "rot_deg": 60,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 4,
+     "sprite": {
+      "file": "res://assets/muncher/parts/m_knot.svg",
+      "offset": [
+       -9,
+       -17
+      ],
+      "size": [
+       37,
+       45
+      ]
+     }
+    },
+    {
+     "id": "ice",
+     "parent": "root",
+     "pos": [
+      0,
+      -8
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 30,
+     "swap_group": "ice",
+     "frames": {
+      "ice": {
+       "file": "res://assets/muncher/parts/m_ice__ice.svg",
+       "offset": [
+        -104,
+        -104
+       ],
+       "size": [
+        203,
+        205
+       ]
+      },
+      "crack": {
+       "file": "res://assets/muncher/parts/m_ice__crack.svg",
+       "offset": [
+        -104,
+        -104
+       ],
+       "size": [
+        203,
+        205
+       ]
+      }
+     },
+     "default_frame": "ice",
+     "visible": false
+    },
+    {
+     "id": "emote",
+     "parent": "root",
+     "pos": [
+      -58,
+      -86
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 40,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_a",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_b",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_c",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    },
+    {
+     "id": "fx_d",
+     "parent": "root",
+     "pos": [
+      0,
+      0
+     ],
+     "rot_deg": 0,
+     "scale": [
+      1,
+      1
+     ],
+     "z": 35,
+     "sprite": "fx",
+     "swap_group": "fx",
+     "visible": false
+    }
+   ]
+  }
+ },
+ "direction_rule": "|dx| ≥ 0.8·|dy| → side, else dy > 0 → front, dy < 0 → back; re-evaluated with the target (0.25 s), min 0.2 s per view",
+ "flip": "left = root.scale.x −1 on the side view",
+ "nest": {
+  "frame": [
+   300,
+   160
+  ],
+  "origin": [
+   150,
+   86
+  ],
+  "nodes": [
+   {
+    "id": "nest_back",
+    "parent": null,
+    "pos": [
+     0,
+     0
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": -60,
+    "sprite": {
+     "file": "res://assets/muncher/nest/m_nest_back.svg",
+     "offset": [
+      -138,
+      -89
+     ],
+     "size": [
+      276,
+      154
+     ]
+    }
+   },
+   {
+    "id": "nest_front",
+    "parent": null,
+    "pos": [
+     0,
+     0
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": 20,
+    "sprite": {
+     "file": "res://assets/muncher/nest/m_nest_front.svg",
+     "offset": [
+      -137,
+      -1
+     ],
+     "size": [
+      274,
+      70
+     ]
+    }
+   }
+  ],
+  "size": [
+   270,
+   124
+  ],
+  "z_rule": "nest_back z_index −1 under the pest; nest_front +1 over the pest ONLY while SLEEPING_NEST / WAKE_DELAY at the nest, otherwise under it"
+ },
+ "fx_frames": {
+  "z": {
+   "file": "res://assets/muncher/fx/z.svg",
+   "offset": [
+    -14,
+    -14
+   ],
+   "size": [
+    27,
+    27
+   ]
+  },
+  "bang": {
+   "file": "res://assets/muncher/fx/bang.svg",
+   "offset": [
+    -35,
+    -35
+   ],
+   "size": [
+    70,
+    70
+   ]
+  },
+  "crumb_a": {
+   "file": "res://assets/muncher/fx/crumb_a.svg",
+   "offset": [
+    -10,
+    -11
+   ],
+   "size": [
+    19,
+    20
+   ]
+  },
+  "crumb_b": {
+   "file": "res://assets/muncher/fx/crumb_b.svg",
+   "offset": [
+    -9,
+    -8
+   ],
+   "size": [
+    17,
+    16
+   ]
+  },
+  "crumb_c": {
+   "file": "res://assets/muncher/fx/crumb_c.svg",
+   "offset": [
+    -8,
+    -7
+   ],
+   "size": [
+    15,
+    14
+   ]
+  },
+  "husk": {
+   "file": "res://assets/muncher/fx/husk.svg",
+   "offset": [
+    -12,
+    -9
+   ],
+   "size": [
+    23,
+    17
+   ]
+  },
+  "shard": {
+   "file": "res://assets/muncher/fx/shard.svg",
+   "offset": [
+    -11,
+    -17
+   ],
+   "size": [
+    22,
+    33
+   ]
+  },
+  "puff": {
+   "file": "res://assets/muncher/fx/puff.svg",
+   "offset": [
+    -22,
+    -22
+   ],
+   "size": [
+    42,
+    43
+   ]
+  },
+  "dirt": {
+   "file": "res://assets/muncher/fx/dirt.svg",
+   "offset": [
+    -15,
+    -11
+   ],
+   "size": [
+    27,
+    18
+   ]
+  },
+  "spark": {
+   "file": "res://assets/muncher/fx/spark.svg",
+   "offset": [
+    -14,
+    -14
+   ],
+   "size": [
+    27,
+    27
+   ]
+  },
+  "sweat": {
+   "file": "res://assets/muncher/fx/sweat.svg",
+   "offset": [
+    -10,
+    -12
+   ],
+   "size": [
+    19,
+    25
+   ]
+  },
+  "star": {
+   "file": "res://assets/muncher/fx/star.svg",
+   "offset": [
+    -12,
+    -13
+   ],
+   "size": [
+    24,
+    23
+   ]
+  }
+ },
+ "faces": {
+  "nodes": [
+   "eye_L",
+   "eye_R",
+   "mouth"
+  ],
+  "sets": {
+   "hunt": [
+    "open",
+    "open",
+    "grin"
+   ],
+   "sly": [
+    "sly",
+    "sly",
+    "smug"
+   ],
+   "wake": [
+    "wide",
+    "wide",
+    "o"
+   ],
+   "sleep": [
+    "closed",
+    "closed",
+    "snore"
+   ],
+   "bite": [
+    "squeeze",
+    "squeeze",
+    "chomp_open"
+   ],
+   "chew": [
+    "happy",
+    "happy",
+    "chomp_shut"
+   ],
+   "frozen": [
+    "frozen",
+    "frozen",
+    "chatter"
+   ],
+   "annoyed": [
+    "annoyed",
+    "annoyed",
+    "pout"
+   ],
+   "yawn": [
+    "closed",
+    "closed",
+    "yawn"
+   ],
+   "happy": [
+    "happy",
+    "happy",
+    "grin"
+   ]
+  }
+ },
+ "banner": {
+  "file": "res://assets/muncher/fx/m_banner.svg",
+  "offset": [
+   -209,
+   -37
+  ],
+  "size": [
+   418,
+   74
+  ]
+ },
+ "measures": {
+  "visual_radius": [
+   58,
+   52
+  ],
+  "length_px": {
+   "front": 116,
+   "side": 136,
+   "back": 116
+  },
+  "eat_centre": [
+   0,
+   0
+  ],
+  "mouth_rest": {
+   "front": [
+    0,
+    0
+   ],
+   "side": [
+    0,
+    2
+   ]
+  },
+  "ice": [
+   180,
+   156
+  ]
+ }
+}

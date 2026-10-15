@@ -1,0 +1,439 @@
+{
+ "schema": 1,
+ "rule": "Add to game/data/pip/rig.json views (children of existing nodes); instantiate only when skin == knight. They inherit every existing animation through their parent; only the Skin AnimationPlayer and the 7 knight clips key them.",
+ "views": {
+  "front": [
+   {
+    "id": "k_cape",
+    "parent": "body",
+    "pos": [
+     0,
+     -68
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": -6,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_cape_f.svg",
+     "offset": [
+      -69,
+      -3
+     ],
+     "size": [
+      137,
+      85
+     ]
+    }
+   },
+   {
+    "id": "k_collar",
+    "parent": "body",
+    "pos": [
+     0,
+     -58
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": 7,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_collar.svg",
+     "offset": [
+      -39,
+      -11
+     ],
+     "size": [
+      78,
+      27
+     ]
+    }
+   },
+   {
+    "id": "k_helm",
+    "parent": "head",
+    "pos": [
+     0,
+     -72
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": 1,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_helm_f.svg",
+     "offset": [
+      -76,
+      -45
+     ],
+     "size": [
+      152,
+      56
+     ]
+    }
+   },
+   {
+    "id": "k_shield",
+    "parent": "arm_L",
+    "pos": [
+     -2,
+     12
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": 2,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_shield.svg",
+     "offset": [
+      -24,
+      -24
+     ],
+     "size": [
+      47,
+      47
+     ]
+    }
+   }
+  ],
+  "three_q": [
+   {
+    "id": "k_cape",
+    "parent": "body",
+    "pos": [
+     -6,
+     -68
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": -6,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_cape_q.svg",
+     "offset": [
+      -79,
+      -3
+     ],
+     "size": [
+      137,
+      85
+     ]
+    }
+   },
+   {
+    "id": "k_collar",
+    "parent": "body",
+    "pos": [
+     8,
+     -57
+    ],
+    "rot_deg": 0,
+    "scale": [
+     0.86,
+     1
+    ],
+    "z": 7,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_collar.svg",
+     "offset": [
+      -39,
+      -11
+     ],
+     "size": [
+      78,
+      27
+     ]
+    }
+   },
+   {
+    "id": "k_helm",
+    "parent": "head",
+    "pos": [
+     4,
+     -72
+    ],
+    "rot_deg": 0,
+    "scale": [
+     0.98,
+     1
+    ],
+    "z": 1,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_helm_f.svg",
+     "offset": [
+      -76,
+      -45
+     ],
+     "size": [
+      152,
+      56
+     ]
+    }
+   },
+   {
+    "id": "k_shield",
+    "parent": "arm_L",
+    "pos": [
+     -2,
+     12
+    ],
+    "rot_deg": 0,
+    "scale": [
+     0.9,
+     1
+    ],
+    "z": 2,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_shield.svg",
+     "offset": [
+      -24,
+      -24
+     ],
+     "size": [
+      47,
+      47
+     ]
+    }
+   }
+  ],
+  "side": [
+   {
+    "id": "k_cape",
+    "parent": "body",
+    "pos": [
+     6,
+     -64
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": 1,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_cape_s.svg",
+     "offset": [
+      -63,
+      -9
+     ],
+     "size": [
+      73,
+      87
+     ]
+    }
+   },
+   {
+    "id": "k_helm",
+    "parent": "head",
+    "pos": [
+     0,
+     -72
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": 1,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_helm_s.svg",
+     "offset": [
+      -57,
+      -41
+     ],
+     "size": [
+      132,
+      51
+     ]
+    }
+   },
+   {
+    "id": "k_shield",
+    "parent": "arm_R",
+    "pos": [
+     2,
+     12
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": 2,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_shield_s.svg",
+     "offset": [
+      -16,
+      -24
+     ],
+     "size": [
+      31,
+      47
+     ]
+    }
+   }
+  ],
+  "back": [
+   {
+    "id": "k_cape",
+    "parent": "body",
+    "pos": [
+     0,
+     -68
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": 2,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_cape_b.svg",
+     "offset": [
+      -65,
+      -10
+     ],
+     "size": [
+      129,
+      92
+     ]
+    }
+   },
+   {
+    "id": "k_helm",
+    "parent": "head",
+    "pos": [
+     0,
+     -72
+    ],
+    "rot_deg": 0,
+    "scale": [
+     -1,
+     1
+    ],
+    "z": 3,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_helm_f.svg",
+     "offset": [
+      -76,
+      -45
+     ],
+     "size": [
+      152,
+      56
+     ]
+    }
+   }
+  ],
+  "top": [
+   {
+    "id": "k_cape",
+    "parent": "body",
+    "pos": [
+     0,
+     -24
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": 0.5,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_cape_t.svg",
+     "offset": [
+      -59,
+      -10
+     ],
+     "size": [
+      117,
+      90
+     ]
+    }
+   },
+   {
+    "id": "k_helm",
+    "parent": "head",
+    "pos": [
+     0,
+     -6
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": 2.5,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_helm_t.svg",
+     "offset": [
+      -35,
+      -32
+     ],
+     "size": [
+      70,
+      64
+     ]
+    }
+   },
+   {
+    "id": "k_shield",
+    "parent": "arm_L",
+    "pos": [
+     -9,
+     2
+    ],
+    "rot_deg": 0,
+    "scale": [
+     1,
+     1
+    ],
+    "z": 1,
+    "skin": "knight",
+    "sprite": {
+     "file": "res://assets/pip/parts_knight/k_shield_t.svg",
+     "offset": [
+      -12,
+      -21
+     ],
+     "size": [
+      18,
+      41
+     ]
+    }
+   }
+  ]
+ },
+ "per_view_count": {
+  "front": 4,
+  "three_q": 4,
+  "side": 3,
+  "back": 2,
+  "top": 3
+ }
+}

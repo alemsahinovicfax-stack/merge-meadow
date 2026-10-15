@@ -68,6 +68,33 @@ func buy_with_coins(cosmetic_id: String) -> String:
 	return "Purchased %s!" % CosmeticCatalog.get_title(cosmetic_id)
 
 
+## IAP kozmetika (Sir Pip): kupovina je obuče odmah; restore samo vrati vlasništvo.
+## Ne snima — IAPManager snima poslije granta.
+func grant_iap(cosmetic_id: String, wear: bool) -> void:
+	if cosmetic_id.is_empty() or CosmeticCatalog.get_item(cosmetic_id).is_empty():
+		return
+	owned[cosmetic_id] = true
+	var slot := CosmeticCatalog.get_slot(cosmetic_id)
+	if wear and not slot.is_empty() and str(equipped.get(slot, "")) != cosmetic_id:
+		equipped[slot] = cosmetic_id
+		_emit_changed([slot])
+
+
+## Dev (stub IAP): vrati IAP kozmetiku u prodavnicu; nošena → slot na Default.
+func revoke_iap() -> void:
+	var changed: Array = []
+	for iid in owned.keys():
+		if not CosmeticCatalog.is_iap_item(str(iid)):
+			continue
+		owned.erase(iid)
+		var slot := CosmeticCatalog.get_slot(str(iid))
+		if str(equipped.get(slot, "")) == str(iid):
+			equipped.erase(slot)
+			changed.append(slot)
+	if not changed.is_empty():
+		_emit_changed(changed)
+
+
 func equip(cosmetic_id: String) -> bool:
 	if not owns(cosmetic_id):
 		return false

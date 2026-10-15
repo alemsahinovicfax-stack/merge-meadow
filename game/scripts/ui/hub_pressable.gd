@@ -7,6 +7,9 @@ extends Control
 
 signal clicked
 
+## Zvuk tapa (AudioManager id); "" = bez — dugme čija radnja pušta svoj zvuk (kupovina, Play).
+var tap_sfx: String = "ui_tap"
+
 var disabled: bool = false:
 	set(value):
 		disabled = value
@@ -56,13 +59,13 @@ func _on_gui_input(event: InputEvent) -> void:
 			var was_pressing := _pressing
 			_set_pressing(false)
 			if was_pressing:
-				clicked.emit()
+				_emit_clicked()
 		accept_event()
 	elif event is InputEventScreenTouch:
 		var touch := event as InputEventScreenTouch
 		if touch.pressed:
 			_set_pressing(true)
-			clicked.emit()
+			_emit_clicked()
 		else:
 			_set_pressing(false)
 		accept_event()
@@ -70,3 +73,15 @@ func _on_gui_input(event: InputEvent) -> void:
 
 func _on_mouse_exited() -> void:
 	_set_pressing(false)
+
+
+## Podklasa može birati zvuk po stanju (ShopBuyButton).
+func _tap_sound() -> String:
+	return tap_sfx
+
+
+func _emit_clicked() -> void:
+	var s := _tap_sound()
+	if not s.is_empty():
+		Sfx.play(s)
+	clicked.emit()
