@@ -176,7 +176,6 @@ const SEASON_SOON := "soon"
 
 const USE_ON := "use"
 const USE_ARMED := "armed"
-const USE_FULL := "full"
 const USE_NONE := "none"
 
 const STATUS_OK := "ok"
@@ -237,15 +236,13 @@ static func season_mode(def: SeasonDef, busy_sku: String) -> String:
 	return buy_mode(def.iap_product_id, busy_sku)
 
 
-## Use red boostera. Cuva hint od dvostrukog trosenja i Loot Burst od punog baga.
+## Use red boostera. Cuva hint od dvostrukog trosenja. (Loot Burst više nema „pun bag" —
+## vreća je bez limita od 2026-10-16, a Burst ionako daje ★3 u stash.)
 static func use_mode(booster_id: String) -> String:
 	if booster_id == MonetizationConfig.BOOSTER_MERGE_HINT and GameState.boosters.merge_hint_active:
 		return USE_ARMED
 	if GameState.get_booster_count(booster_id) <= 0:
 		return USE_NONE
-	if booster_id == MonetizationConfig.BOOSTER_LOOT_BURST \
-			and GameState.sum_seed_bag(GameState.seed_bag) >= GameState.SEED_BAG_SOFT_CAP:
-		return USE_FULL
 	return USE_ON
 
 

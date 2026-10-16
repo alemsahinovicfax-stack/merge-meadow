@@ -160,12 +160,15 @@ func _run() -> void:
 		_fail(e)
 		return
 
-	# 5) Sve besplatne sezone otkljucane: nema hero kartice, sekcija na vrhu.
+	# 5) Sve sezone otkljucane i kupljene: nema hero kartice, sekcija na vrhu.
 	var unlocked: Array = gs.get("unlocked_seasons")
 	for id in ["country_bloom", "frost_orchard", "lantern_meadow", "amber_canopy"]:
 		if not unlocked.has(id):
 			unlocked.append(id)
 	gs.set("unlocked_seasons", unlocked)
+	# Od 2026-10-16 kartica poslije besplatnih nudi plaćene — bez kartice tek kad je sve kupljeno.
+	for def in SeasonCatalog.paid_defs():
+		gs.call("grant_paid_season", def.id)
 	gs.set("seed_bag", {"clover": 4, "daisy": 3})
 	camp.call("refresh_for_meta_hub")
 	await _settle()

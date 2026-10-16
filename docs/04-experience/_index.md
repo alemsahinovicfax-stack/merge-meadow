@@ -27,6 +27,8 @@ tags: [hub, iskustvo]
 - [[design-drafts/ispravke-settings-izvjestaj|ispravke-settings-izvjestaj]] — prenos ispravki + Settings ekrana (2026-10-12)
 - [[design-drafts/muncher-premium-pip-cd-brief|muncher-premium-pip-cd-brief]] — brief za Claude Design (potpuni redizajn munchera u Areni sa svim animacijama; prvi premium Pip skin za pravi novac, potpuno drugačiji dizajn)
 - [[design-drafts/muncher-premium-pip-izvjestaj|muncher-premium-pip-izvjestaj]] — prenos: Nibbs (novi muncher, rig + 16 klipova) i Sir Pip (premium skin za pravi novac) (2026-10-14)
+- [[design-drafts/ispravke-1016-izvjestaj|ispravke-1016-izvjestaj]] — ispravke poslije playtesta: Settings u Areni, muncher, Camp link s plaćenim sezonama, polje sezone, vreća, Shop; odgovori o vibraciji, Reduce motion, Restore i privatnosti (2026-10-16)
+- [[design-drafts/run-pickups-cd-brief|run-pickups-cd-brief]] — brief za Claude Design (A: puni redizajn pickupa u runu i dodira sa Pipom; B: Camp kartice plaćenih sezona u Season Kit stilu)
 
 ## Povezano
 

@@ -134,12 +134,12 @@ Prikaz: naslov (Failed/Complete), boja trake, `+N Coins/Seeds`, status s **X →
 **Scena:** `scenes/camp/camp_scene.tscn` · **skripta:** `scripts/camp/camp_controller.gd`
 
 ### Seed bag (ne grid slotovi)
-- Run loot → `seed_bag` (Dictionary tip→count), soft cap **40**.
+- Run loot → `seed_bag` (Dictionary tip→count), **bez limita** (do 2026-10-16 soft cap 40 — višak se gubio).
 - **Garden kartica:** sažetak `Seeds: N/40` + **vizualni bag grid** (ikona + ime + broj po tipu s count > 0).
 - **To Camp** na loot ekranu: `deposit_loot_to_camp()` → ako ima sjemena, **Merge Arena**, inače **Camp**.
 
 ### Kamp UI
-- **Izgled** (smjer 1b iz Claude Designa, 2026-09-16): hero kartica sljedeće besplatne sezone gore (Coins + ★3 cvijet, Unlock troši odmah pa Home; tap na karticu → Home bez trošenja); dolje sekcija s tabovima **Seeds · Flowers** (+ prečica **Merge** → Arena), grid chipova i **jedan Trade bar** — [[../04-experience/design-drafts/camp-cd-brief|brief + implementacija]].
+- **Izgled** (smjer 1b iz Claude Designa, 2026-09-16): hero kartica sljedeće besplatne sezone gore (Coins + ★3 cvijet, Unlock troši odmah pa Home; tap na karticu → Home bez trošenja; kad su sve besplatne otključane, ista kartica nudi sljedeću plaćenu sezonu — samo cijena, kupovina kroz IAP, 2026-10-16); dolje sekcija s tabovima **Seeds · Flowers** (+ prečica **Merge** → Arena), grid chipova i **jedan Trade bar** — [[../04-experience/design-drafts/camp-cd-brief|brief + implementacija]].
 - **Trade:** tap = 1 komad, držanje = 10/s s auto prelazom na sljedeći tip; kursevi u [[ekonomija-brojevi]]. ★3 cvijeće koje sljedeća sezona traži nosi `Kept · N / 20` i **držanje staje na granici** (tap prodaje dalje).
 - **Upgradei** (Magnet / Loot Boost, 2 cvijeta po nivou) su na Home polju, ne u Campu. **Daily chest** i **basket** su na Home.
 - U hubu nema Campovog headera/footera; standalone scena zadržava Merge / Play.

@@ -17,6 +17,10 @@ class_name CrystalStashDomain
 extends RefCounted
 
 var stash: Dictionary = {}
+## Koliko je ★3 svakog tipa IKAD uzgojeno (Arena T3, Loot Burst). Ne pada kad se cvijet proda
+## u Campu ili potroši na otključavanje sezone — Home polje sezone raste po ovome (2026-10-16:
+## polje je čitalo stash, pa se poslije prodaje ništa nije vidjelo, ni novi T3 iz Arene).
+var grown: Dictionary = {}
 
 ## Untyped on purpose — see cosmetics.gd for why.
 var _owner: Variant
@@ -28,16 +32,37 @@ func _init(owner: Variant) -> void:
 
 func apply_from_save(data: Dictionary) -> void:
 	stash = SaveDictUtils.parse_string_int_dict(data.get("garden_crystal_stash", {}))
+	grown = SaveDictUtils.parse_string_int_dict(data.get("star3_grown", {}))
 
 
 func to_save_dict() -> Dictionary:
-	return {"garden_crystal_stash": stash.duplicate()}
+	return {"garden_crystal_stash": stash.duplicate(), "star3_grown": grown.duplicate()}
+
+
+## Stari save (prije 2026-10-16) nema `star3_grown`: najmanje ono što je sada u stashu, a za
+## svaki ★3 koji je Album zapisao (kept tier 3) bar 1 — pa već uzgojeno cvijeće ne nestane.
+func seed_grown_from_history(kept_tiers: Dictionary, max_tier: int) -> void:
+	for type_id in stash:
+		grown[type_id] = maxi(int(grown.get(type_id, 0)), int(stash[type_id]))
+	for type_id in kept_tiers:
+		if int(kept_tiers[type_id]) >= max_tier:
+			grown[type_id] = maxi(int(grown.get(type_id, 0)), 1)
+
+
+## Za polje: veće od „ikad uzgojeno" i „sada u stashu" (dev / testovi pišu stash direktno).
+func grown_count(type_id: String) -> int:
+	return maxi(int(grown.get(type_id, 0)), int(stash.get(type_id, 0)))
 
 
 func add(type_id: String) -> void:
-	if type_id.is_empty():
+	add_many(type_id, 1)
+
+
+func add_many(type_id: String, count: int) -> void:
+	if type_id.is_empty() or count <= 0:
 		return
-	stash[type_id] = int(stash.get(type_id, 0)) + 1
+	stash[type_id] = int(stash.get(type_id, 0)) + count
+	grown[type_id] = int(grown.get(type_id, 0)) + count
 
 
 func take_one(type_id: String) -> bool:

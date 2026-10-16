@@ -105,7 +105,9 @@ func apply_season(season_id: String) -> void:
 
 
 ## Home stranica živi u hubu i dok je igrač u Areni: povratak na već otvoreno polje
-## ponovo pročita stash i pusti rast mjesta koja su u međuvremenu prešla prag.
+## ponovo pročita uzgojeno ★3 i pusti rast mjesta koja su u međuvremenu prešla prag.
+## Polje broji IKAD uzgojeno (GameState.star3_grown_count), ne stash: prodaja u Campu i
+## otključavanje sezone ne vene cvijeće (2026-10-16).
 func refresh_growth() -> void:
 	if _open_season_id.is_empty() or _roster_stash(_open_season_id) == _built_stash:
 		return
@@ -118,7 +120,7 @@ func _roster_stash(season_id: String) -> Dictionary:
 	if def == null:
 		return out
 	for type_id in def.seed_type_ids:
-		out[type_id] = int(GameState.garden_crystal_stash.get(type_id, 0))
+		out[type_id] = GameState.star3_grown_count(type_id)
 	return out
 
 
@@ -351,7 +353,6 @@ func _rebuild_flowers(season_id: String) -> void:
 		_restart_wander()
 		return
 	var pool: Array[String] = def.seed_type_ids
-	var stash: Dictionary = GameState.garden_crystal_stash
 	var spots := UiSeasons.spots(season_id)
 	var dark := UiSeasons.is_dark(season_id)
 	var first_build := not _seen_grown.has(season_id)
@@ -365,7 +366,7 @@ func _rebuild_flowers(season_id: String) -> void:
 		var roster_i := clampi(int(spec[3]), 0, pool.size() - 1)
 		var need := int(spec[4])
 		var type_id := str(pool[roster_i])
-		var have := int(stash.get(type_id, 0))
+		var have := GameState.star3_grown_count(type_id)
 		if have >= need:
 			var flower: SeasonFieldFlower = FLOWER_SCRIPT.new()
 			flower.name = "MeadowSpot_%d" % i

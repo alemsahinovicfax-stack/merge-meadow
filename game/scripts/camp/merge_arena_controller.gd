@@ -360,7 +360,7 @@ func _setup_pest() -> void:
 func _layout_pest_nest() -> void:
 	if _pest == null or playfield == null:
 		return
-	_pest.set_nest_position(Vector2(playfield.size.x * 0.5, UiArena.NEST_Y))
+	_pest.set_nest_position(UiArena.nest_center(playfield.size))
 	_pest.reset_to_nest()
 
 
@@ -1218,12 +1218,7 @@ func _physical_keepouts() -> Array[Rect2]:
 ## Spawn izbjegava gnijezdo (overlay, ne prepreka) — combo keepout je otpao s pilulom.
 func _spawn_keepouts() -> Array[Rect2]:
 	var out := _physical_keepouts()
-	var field := playfield.size
-	var above := 1000.0
-	out.append(Rect2(
-		field.x * 0.5 - UiArena.NEST_KEEPOUT_HALF_W, -above,
-		UiArena.NEST_KEEPOUT_HALF_W * 2.0, above + UiArena.NEST_KEEPOUT_BOTTOM
-	))
+	out.append(UiArena.nest_keepout(playfield.size))
 	return out
 
 
@@ -1757,8 +1752,6 @@ func _resolve_stranded_t2() -> void:
 		if chip.tier != 2:
 			continue
 		if _t2_has_pair_chance(chip):
-			continue
-		if GameState.seed_bag_remaining_capacity() < 2:
 			continue
 		var added := GameState.add_seeds_to_bag(chip.type_id, 2)
 		if added < 2:

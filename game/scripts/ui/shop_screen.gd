@@ -10,6 +10,8 @@ extends Control
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
 const TOAST_RECT := Rect2(190, 1456, 700, 100)
+## Štand s tabovima: iznad najvišeg sloja kartica (oznaka Premium z 16).
+const TAB_BAR_Z := 20
 const SLOT_FLASH_SEC := 1.2
 const ENTRY_OVERRIDE_MSEC := 2000
 
@@ -80,12 +82,15 @@ func _build() -> void:
 	_queue_support()
 	_tab_bar = ShopTabBar.new()
 	_tab_bar.name = "ShopTabBar"
-	_tab_bar.z_index = 3
+	# Štand iznad SVEGA na listi: Pip u pregledima ide do z 15 (HOST_LIFT 4 + dijelovi do 11), a
+	# oznake „Premium" z 16 — sa z 3 su skinovi pri skrolu izlazili preko štanda (2026-10-16).
+	# Rezanje (clip_contents) se ne može koristiti: GL Compat na laptopu ne reže (#24).
+	_tab_bar.z_index = TAB_BAR_Z
 	add_child(_tab_bar)
 	_tab_bar.tab_selected.connect(select_tab)
 	_toast = _Toast.new()
 	_toast.name = "Toast"
-	_toast.z_index = 6
+	_toast.z_index = TAB_BAR_Z + 2
 	_toast.position = TOAST_RECT.position
 	_toast.size = TOAST_RECT.size
 	add_child(_toast)

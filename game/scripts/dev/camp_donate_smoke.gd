@@ -51,9 +51,18 @@ func _run() -> void:
 		_fail("upgrade must leave the Kept reserve, got %s" % str(stash.get(flower, 0)))
 		return
 
-	_reset_upgrade_state(gs, {flower: reserve + 1}, 0, 0, 10)
+	# Od 2026-10-16 nadogradnja smije zagristi u Kept rezervu (javlja se na sheetu) —
+	# ne smije samo kad ★3 te sezone ukupno ima manje od 2.
+	_reset_upgrade_state(gs, {flower: 1}, 0, 0, 10)
 	if bool(gs.call("try_upgrade_magnet", "")):
-		_fail("magnet must fail when only 1 flower is above the reserve")
+		_fail("magnet must fail with only 1 flower")
+		return
+	_reset_upgrade_state(gs, {flower: maxi(reserve, 2)}, 0, 0, 10)
+	if reserve >= 2 and not bool(gs.call("upgrade_uses_kept_flowers", str(gs.get("active_season_id")))):
+		_fail("buying with exactly the reserve should report it uses kept flowers")
+		return
+	if not bool(gs.call("try_upgrade_magnet", "")):
+		_fail("magnet must be buyable with flowers that are only kept for the next season")
 		return
 
 	_reset_upgrade_state(gs, {flower: reserve + 2}, 0, 0, 9)

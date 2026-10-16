@@ -44,7 +44,7 @@ Paket `design_handoff_camp_v3/` (Design.zip) je provjeren stavku po stavku. Kopi
 | 10 | Na 50 pilula mint, oznaka se upali | ✅ |
 | 11 | Naslov sheeta = ime sezone u tint pilulici | ✅ centrirano (popravka 2026-10-08) |
 | 12 | UpgradeButton 340 × 132 s obje cijene, pink za ono što fali, 5 stanja | ✅ `UiCamp.upgrade_state()` |
-| 13 | Coini 10 / 20 / 40 / 60; cvijet samo iznad Kept granice | ✅ |
+| 13 | Coini 10 / 20 / 40 / 60; cvijet samo iznad Kept granice (od 2026-10-16 nadogradnje smiju i ispod nje, uz napomenu na sheetu — [[ispravke-1016-izvjestaj]]) | ✅ |
 | 14 | Nadogradnje po sezoni (nova sezona 0, povratak čita stari zapis) | ✅ + migracija starog savea |
 | 15 | Twin Seeds: p = 8 % × nivo, „+2” pop, cap 40 isti | ✅ `run_controller.gd` |
 | 16 | Korpa: samo sjeme skupljeno u runu; prazno = „Seeds you catch in a run show up here” | ✅ |

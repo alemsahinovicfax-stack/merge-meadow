@@ -296,9 +296,68 @@ func _run() -> void:
 	if not str(gs.call("next_locked_free_id")).is_empty():
 		_fail("next_locked_free_id should be empty after all free granted")
 		return
+	# Sve besplatne otključane: kartica nastavlja s prvom plaćenom koju igrač nema (2026-10-16) —
+	# samo cijena, bez coina i ★3.
+	gs.call("clear_owned_paid_seasons")
+	camp.call("refresh_for_meta_hub")
+	for _p in 4:
+		await process_frame
 	card = camp.get_node_or_null("%SeasonLinkCard") as Control
-	if card == null or card.visible:
-		_fail("SeasonLinkCard should hide when no next lock")
+	var paid_id := str(gs.call("next_unowned_paid_id"))
+	var paid_def: SeasonDef = gs.call("get_season_def", paid_id) if not paid_id.is_empty() else null
+	if card == null or not card.visible or not bool(card.call("is_paid")) or paid_def == null:
+		_fail("SeasonLinkCard should offer the next paid season when all free are unlocked")
+		return
+	if str(card.call("get_season_id")) != paid_id:
+		_fail("paid card should show %s, got %s" % [paid_id, card.call("get_season_id")])
+		return
+	unlock_btn = camp.get_node_or_null("%SeasonLinkUnlock") as Control
+	var iap := get_root().get_node("IAPManager")
+	var price := str(iap.call("get_price_label", paid_def.iap_product_id))
+	if price.is_empty() or str(unlock_btn.call("get_title")) != price:
+		_fail("paid card button should read the price '%s', got '%s'" % [price, unlock_btn.call("get_title")])
+		return
+	var coin_col := camp.get_node_or_null("%CoinProgress") as Control
+	var paid_t3_bar := camp.get_node_or_null("%SeasonLinkT3Bar") as Control
+	if coin_col == null or coin_col.visible or paid_t3_bar == null or paid_t3_bar.visible:
+		_fail("paid card must hide coin and ★3 progress (price only)")
+		return
+	coins_before = int(gs.get("wallet_coins"))
+	card.call("_on_unlock_clicked")
+	var waited := 0.0
+	while waited < 3.0 and not bool(gs.call("is_season_playable", paid_id)):
+		await process_frame
+		waited += 1.0 / 60.0
+	if not bool(gs.call("is_season_playable", paid_id)):
+		_fail("paid card purchase (stub IAP) should grant %s" % paid_id)
+		return
+	if int(gs.get("wallet_coins")) != coins_before:
+		_fail("paid purchase must not spend coins")
+		return
+	# Burst + zadržavanje (~1 s), pa skok na Home — čekaj stvarno vrijeme, ne frejmove.
+	for _w in 40:
+		await create_timer(0.1).timeout
+		if int(hub.call("current_page_index")) == MetaHubPages.MAIN:
+			break
+	if int(hub.call("current_page_index")) != MetaHubPages.MAIN:
+		_fail("after buying, the card should jump to Home")
+		return
+	if str(gs.call("paid_center_id")) != paid_id:
+		_fail("Home paid strip should focus %s, got %s" % [paid_id, gs.call("paid_center_id")])
+		return
+	_go_page(hub, MetaHubPages.CAMP)
+	for _b in 8:
+		await process_frame
+	camp = _page(hub, MetaHubPages.CAMP)
+	# Sve plaćene kupljene → kartica nestaje.
+	for def in SeasonCatalog.paid_defs():
+		gs.call("grant_paid_season", def.id)
+	camp.call("refresh_for_meta_hub")
+	for _q in 4:
+		await process_frame
+	card = camp.get_node_or_null("%SeasonLinkCard") as Control
+	if not str(gs.call("next_unowned_paid_id")).is_empty() or card == null or card.visible:
+		_fail("SeasonLinkCard should hide when every season is owned")
 		return
 
 	print("camp_season_link_smoke OK")

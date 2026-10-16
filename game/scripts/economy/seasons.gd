@@ -248,6 +248,17 @@ func next_locked_free_id() -> String:
 	return ""
 
 
+## Prva plaćena sezona koju igrač još nema — Camp link kartica nastavlja s njom kad su sve
+## besplatne otključane (2026-10-16). Preskače test-zaključanu i sezonu bez proizvoda.
+func next_unowned_paid_id() -> String:
+	for def in SeasonCatalog.paid_defs():
+		if is_test_locked(def.id) or def.iap_product_id.is_empty():
+			continue
+		if not owned_paid.has(def.id):
+			return def.id
+	return ""
+
+
 func reset_to_s1() -> void:
 	active_id = SeasonCatalog.DEFAULT_SEASON_ID
 	focus_season_id = SeasonCatalog.DEFAULT_SEASON_ID

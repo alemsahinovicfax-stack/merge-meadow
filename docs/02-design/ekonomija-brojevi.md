@@ -85,7 +85,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | merge | 2× isti `type_id` + isti tier | T1+T1=T2 |
 | T2 nakon mergea | leftover u areni → 2× T1; T3 ide u Flowers | CAMP-01: upgrade se plaća iz Flowers |
 | `collection_kept_tiers` | po `type_id` → max tier | Keep ne drži cvijet na gredici |
-| `SEED_BAG_SOFT_CAP` | **40** | torba; višak se ne prima |
+| `SEED_BAG_SOFT_CAP` | ~~40~~ | **više nije limit (2026-10-16):** vreća prima sav plijen runa, ostatak Arene i poklon. Ranije se višak tiho gubio (playtest: „sjemena iz runa ne dođu u Camp"). 40 ostaje samo kao „puna korpa" u crtežu |
 | auto-plant | pri ulasku u kamp + nakon Keep/chest | preskače tutorial CAMP1 |
 | `CAMP_BED_BONUS` | **+3** gredice | kad je Sprinkler max (9→12) |
 | `DAILY_CHEST_COINS` | **8** | jednom dnevno (save `last_daily_chest_day`) |
@@ -130,6 +130,13 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | `MULTIPLIER_MAX_LEVEL` | `4` |
 | `MULTIPLIER_COST_T3` | `2` — legacy donate broj; Loot Boost troši isti `UPGRADE_FLOWER_COST` |
 | `MULTIPLIER_VALUES` | ×1.0, ×1.25, ×1.5, ×1.75, ×2.0 |
+| Twin Seeds `UiCamp.TWIN_STEP` | **8 %** po nivou (0 / 8 / 16 / 24 / 32 %) — pokupljeno sjeme sa staze daje 2; nagradni grm nije Twin |
+
+**Loot Boost — zaokruživanje (2026-10-16):**
+- Coini: `max(raw, round(raw × m))`.
+- Sjeme: cilj = `max(ukupno, round(ukupno × m))`; svaki tip dobije `floor(n × m)` (ne manje od n), ostatak do cilja ide tipovima s najvećim razlomkom (jednako → više skupljenih, pa ime). Primjer ×1,25 na 5 tipova po 1 = 6 (ranije po tipu = 5).
+- Boost se računa **jednom**, na kraju runa (`finish_run`), i prije „Kept half" pri padu. Revive nastavlja sa sirovim brojevima.
+- Nivoi su po sezoni (`season_upgrades`) — run čita aktivnu sezonu.
 
 ### Merge Arena — Muncher pest (MA-01b, v1.1)
 

@@ -223,6 +223,9 @@ func set_nav_locked(locked: bool) -> void:
 	_nav_locked = locked
 	set_swipe_enabled(not locked)
 	set_tabs_enabled(not locked)
+	# Runda u Areni: ni Settings (2026-10-16) — kao tabovi, zupčanik je prigušen i ne reaguje.
+	if settings_button:
+		settings_button.disabled = locked
 	_apply_nav_lock_visuals()
 
 
@@ -399,6 +402,8 @@ func _on_tab_pressed(index: int) -> void:
 ## Settings (design_handoff_settings_fixes · D): pun ekran iznad huba; X na mjestu zupčanika.
 ## Po zatvaranju se osvježi stranica na kojoj si (Dev dugmad mijenjaju sezone / coine).
 func _on_settings_pressed() -> void:
+	if _nav_locked:
+		return
 	if is_instance_valid(_settings):
 		if not _settings.visible:
 			_settings.reopen()

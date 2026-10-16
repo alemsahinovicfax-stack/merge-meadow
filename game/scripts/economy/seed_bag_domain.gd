@@ -31,27 +31,19 @@ func to_save_dict() -> Dictionary:
 	return {"seed_bag": bag.duplicate()}
 
 
+## Vreća nema limit (2026-10-16): ranije je primala do 40, a višak (plijen runa, ostatak
+## Arene, poklon) se tiho gubio — igrač je vidio sjemenke na kraju runa, a u Campu ih nije
+## bilo. Sada se doda sve; Arena ionako sipa samo koliko polje prima.
 func add(type_id: String, count: int) -> int:
-	if count <= 0 or type_id.is_empty():
-		return 0
-	var room := remaining_capacity()
-	if room <= 0:
-		return 0
-	var to_add := mini(count, room)
-	bag[type_id] = int(bag.get(type_id, 0)) + to_add
-	return to_add
-
-
-## Arena vacuum: return chips even when the bag is already over SEED_BAG_SOFT_CAP (debug grant).
-func add_unbounded(type_id: String, count: int) -> int:
 	if count <= 0 or type_id.is_empty():
 		return 0
 	bag[type_id] = int(bag.get(type_id, 0)) + count
 	return count
 
 
-func remaining_capacity() -> int:
-	return maxi(0, int(_owner.SEED_BAG_SOFT_CAP) - _owner.sum_seed_bag(bag))
+## Isto kao add (ime ostaje za stare pozive: vacuum Arene, debug grant).
+func add_unbounded(type_id: String, count: int) -> int:
+	return add(type_id, count)
 
 
 func take(type_id: String, count: int) -> bool:
@@ -77,7 +69,7 @@ func sum() -> int:
 func format_label() -> String:
 	var total := sum()
 	if bag.is_empty():
-		return "Seeds in bag: none (0/%d)" % _owner.SEED_BAG_SOFT_CAP
+		return "Seeds in bag: none"
 	var parts: PackedStringArray = []
 	for type_id in bag:
 		var count := int(bag[type_id])
@@ -86,7 +78,7 @@ func format_label() -> String:
 		var display_name: String = _owner.get_seed_display_name(type_id)
 		var stars := "★".repeat(_owner.get_seed_rarity(type_id))
 		parts.append("%d %s %s" % [count, display_name, stars])
-	return "Seeds in bag (%d/%d): " % [total, _owner.SEED_BAG_SOFT_CAP] + ", ".join(parts)
+	return "Seeds in bag (%d): " % total + ", ".join(parts)
 
 
 func entries() -> Array[Dictionary]:

@@ -116,7 +116,7 @@ func _pest_tip(field_size: Vector2) -> Vector2:
 	if pest != null:
 		var c: Vector2 = pest.get("_pest_center")
 		return pest.position + c + Vector2(0.0, PEST_TIP_GAP)
-	return Vector2(field_size.x * 0.5, UiArena.NEST_Y + 60.0)
+	return UiArena.nest_center(field_size) + Vector2(0.0, 60.0)
 
 
 func _field_size() -> Vector2:

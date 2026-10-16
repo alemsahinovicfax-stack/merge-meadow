@@ -28,6 +28,8 @@ const ARENA_PEST_TARGET_REEVAL := 0.25
 
 const CAMP_BED_COUNT := 9
 const GREENHOUSE_SLOT_COUNT := 2
+## Nekadašnji limit vreće — više NIJE limit (2026-10-16, vreća prima sav plijen). Ostaje kao
+## referenca „puna korpa" (40 sjemenki = puna gomila u korpi Arene) i za stare testove.
 const SEED_BAG_SOFT_CAP := 40
 ## Arena ne krene dok zbroj stogova od 4+ nije barem ovoliko. Tip s 1–3 ne ulazi.
 const ARENA_GATE_MIN := 50
@@ -128,6 +130,14 @@ var _debug_leftover_bag_applied: bool:
 var resume_pending: bool = false
 var carry_seed_bag: Dictionary = {}
 var carry_coins: int = 0
+## Revive nastavlja run s brojevima PRIJE Loot Boosta (carry_* su već pojačani — za prikaz);
+## ranije se boost na kraju primijenio drugi put na sve skupljeno prije pada (2026-10-16).
+var carry_raw_seed_bag: Dictionary = {}
+var carry_raw_coins: int = 0
+var carry_twins: int = 0
+## Za pečat na kraju runa: koliki je Loot Boost bio i koliko je sjemenki bilo dvostruko (Twin).
+var last_loot_multiplier: float = 1.0
+var last_run_twins: int = 0
 var carry_elapsed: float = 0.0
 var carry_orbs: int = 0
 var carry_seeds: int = 0
@@ -486,6 +496,10 @@ func next_locked_free_id() -> String:
 	return seasons_domain.next_locked_free_id()
 
 
+func next_unowned_paid_id() -> String:
+	return seasons_domain.next_unowned_paid_id()
+
+
 func reset_seasons_to_s1() -> void:
 	seasons_domain.reset_to_s1()
 
@@ -628,6 +642,8 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	lifetime_seeds_collected = _parse_string_int_dict(data.get("lifetime_seeds_collected", {}))
 	save_migrations.drop_retired_seed_keys()
 	collection_kept_tiers = _parse_string_int_dict(data.get("collection_kept_tiers", {}))
+	if not data.has("star3_grown"):
+		crystal_stash_domain.seed_grown_from_history(collection_kept_tiers, MAX_MERGE_TIER)
 	last_daily_chest_day = str(data.get("last_daily_chest_day", ""))
 	arena_domain.apply_from_save(data)
 	companions.apply_from_save(data)
@@ -1174,7 +1190,7 @@ func get_almanac_chain_ui_data() -> Array[Dictionary]:
 
 func format_shop_resources_line() -> String:
 	var seeds := sum_seed_bag(seed_bag)
-	return "%d coins  ·  %d / %d seeds in bag" % [wallet_coins, seeds, SEED_BAG_SOFT_CAP]
+	return "%d coins  ·  %d seeds in bag" % [wallet_coins, seeds]
 
 
 ## Economy indirection (plan-arhitektura-refaktor.md Stage 1). Every domain that
@@ -1231,6 +1247,11 @@ func get_seed_bag_entries() -> Array[Dictionary]:
 
 func get_garden_crystal_entries() -> Array[Dictionary]:
 	return crystal_stash_domain.entries()
+
+
+## Koliko ★3 ovog tipa je ikad uzgojeno (ne pada prodajom ni otključavanjem) — Home polje.
+func star3_grown_count(type_id: String) -> int:
+	return crystal_stash_domain.grown_count(type_id)
 
 
 func _compare_seed_bag_entry_asc(a: Dictionary, b: Dictionary) -> bool:
@@ -1343,18 +1364,64 @@ func _halve_seed_bag(bag: Dictionary) -> Dictionary:
 	return out
 
 
-func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed: float) -> void:
-	var mult := get_loot_multiplier()
-	var scaled_coins := int(round(float(raw_coins) * mult))
-	var scaled_seeds: Dictionary = {}
+## Loot Boost na sjeme: bonus se računa na UKUPAN broj i raspodijeli po tipovima (najveći
+## ostatak), pa 5 različitih sjemenki × 1,25 = 6. Ranije se zaokruživalo po tipu — 1 × 1,25 = 1,
+## pa run s mnogo tipova po jedno sjeme nije dobijao ništa (playtest 2026-10-16). Nijedan tip
+## ne dobije manje nego što je skupljen.
+func scale_loot_seeds(seeds_by_type: Dictionary, mult: float) -> Dictionary:
+	var out: Dictionary = {}
+	var rows: Array = []
+	var total := 0
+	var floor_sum := 0
 	for type_id in seeds_by_type:
 		var count := int(seeds_by_type[type_id])
-		if count > 0:
-			scaled_seeds[type_id] = int(round(float(count) * mult))
+		if count <= 0:
+			continue
+		var exact := float(count) * mult
+		var base := maxi(count, int(floor(exact + 1e-9)))
+		out[type_id] = base
+		total += count
+		floor_sum += base
+		rows.append([exact - float(base), count, str(type_id)])
+	var target := maxi(total, int(round(float(total) * mult)))
+	# Najveći ostatak prvi; jednak ostatak → više skupljenih, pa ime (deterministički).
+	rows.sort_custom(func(a: Array, b: Array) -> bool:
+		if not is_equal_approx(float(a[0]), float(b[0])):
+			return float(a[0]) > float(b[0])
+		if int(a[1]) != int(b[1]):
+			return int(a[1]) > int(b[1])
+		return str(a[2]) < str(b[2])
+	)
+	var extra := target - floor_sum
+	var i := 0
+	while extra > 0 and not rows.is_empty():
+		var tid: String = rows[i % rows.size()][2]
+		out[tid] = int(out[tid]) + 1
+		extra -= 1
+		i += 1
+	return out
+
+
+func scale_loot_coins(raw_coins: int, mult: float) -> int:
+	return maxi(raw_coins, int(round(float(raw_coins) * mult)))
+
+
+func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed: float, twins: int = 0) -> void:
+	var mult := get_loot_multiplier()
+	var scaled_coins := scale_loot_coins(raw_coins, mult)
+	var scaled_seeds := scale_loot_seeds(seeds_by_type, mult)
 	last_raw_seed_total = sum_seed_bag(seeds_by_type)
 	last_raw_coins = raw_coins
 	last_failed = failed
+	last_loot_multiplier = mult
+	last_run_twins = maxi(0, twins)
 	loot_doubled = false
+	carry_raw_seed_bag = {}
+	for type_id in seeds_by_type:
+		if int(seeds_by_type[type_id]) > 0:
+			carry_raw_seed_bag[type_id] = int(seeds_by_type[type_id])
+	carry_raw_coins = raw_coins
+	carry_twins = maxi(0, twins)
 	carry_seed_bag = scaled_seeds.duplicate()
 	carry_coins = scaled_coins
 	carry_seeds = sum_seed_bag(scaled_seeds)
@@ -1498,6 +1565,9 @@ func begin_fresh_run() -> void:
 	resume_pending = false
 	carry_seed_bag = {}
 	carry_coins = 0
+	carry_raw_seed_bag = {}
+	carry_raw_coins = 0
+	carry_twins = 0
 	carry_elapsed = 0.0
 	carry_seeds = 0
 	carry_orbs = 0
@@ -1542,22 +1612,12 @@ func add_seeds_to_bag_unbounded(type_id: String, count: int) -> int:
 	return seed_bag_domain.add_unbounded(type_id, count)
 
 
-func seed_bag_remaining_capacity() -> int:
-	return seed_bag_domain.remaining_capacity()
-
-
 func take_seeds_from_bag(type_id: String, count: int) -> bool:
 	return seed_bag_domain.take(type_id, count)
 
 
 func take_seed_from_bag(type_id: String) -> bool:
 	return seed_bag_domain.take_one(type_id)
-
-
-## Koliko sjemenki plijena stane u vreću (soft cap) — R5 javlja kad nije sve.
-func pending_loot_fit() -> Vector2i:
-	var total := sum_seed_bag(last_seed_bag)
-	return Vector2i(mini(total, seed_bag_remaining_capacity()), total)
 
 
 func deposit_loot_to_camp() -> int:
@@ -1810,12 +1870,25 @@ func upgrade_flower_reserve(type_id: String) -> int:
 	return def.t3_flowers_required
 
 
+## Nadogradnje smiju potrošiti SVE ★3 cvijeće sezone (2026-10-16, playtest: „imam cvijeće i
+## coine, a dugme ne reaguje"). Ranije se čuvalo onoliko koliko traži sljedeća besplatna sezona
+## (Kept), pa je npr. 20 / 20 Crystal Peony blokiralo sve nadogradnje Frosta, a dugme je
+## pokazivalo da cvijeća nema. Kept granica ostaje za prodaju u Campu; sheet nadogradnji javlja
+## kad kupovina zadire u nju (upgrade_uses_kept_flowers).
 func spendable_upgrade_flowers(season_id: String) -> int:
 	var type_id := star3_type_id_for_season(season_id)
 	if type_id.is_empty():
 		return 0
-	var have := int(garden_crystal_stash.get(type_id, 0))
-	return maxi(0, have - upgrade_flower_reserve(type_id))
+	return maxi(0, int(garden_crystal_stash.get(type_id, 0)))
+
+
+## Kupovina nadogradnje bi spustila ★3 ispod onoga što traži sljedeća besplatna sezona.
+func upgrade_uses_kept_flowers(season_id: String) -> bool:
+	var type_id := star3_type_id_for_season(season_id)
+	var reserve := upgrade_flower_reserve(type_id)
+	if reserve <= 0:
+		return false
+	return int(garden_crystal_stash.get(type_id, 0)) - UiCamp.UP_FLOWER_COST < reserve
 
 
 func upgrade_button_state(track: String, season_id: String = "") -> String:

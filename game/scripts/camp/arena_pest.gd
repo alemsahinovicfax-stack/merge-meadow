@@ -27,6 +27,8 @@ const NEST_FRONT_OVER_Z := 10
 const BANNER_Z := 10
 ## Smjer lova (paket): |dx| ≥ 0,8·|dy| → bočno, inače naprijed / nazad; najmanje 0,2 s po pogledu.
 const SIDE_RATIO := 0.8
+## Nova meta mora biti bar ovoliko bliža od trenutne da bi je muncher zamijenio (px).
+const TARGET_SWITCH_MARGIN := 24.0
 const VIEW_MIN_SEC := 0.2
 ## Baner: vrh na 13 % polja (207 od 1589) = 112 ispod centra gnijezda; uleti 0,32 s, stoji 1,6 s.
 const BANNER_BELOW_NEST := 112.0
@@ -267,26 +269,41 @@ func _release_target() -> void:
 	_target_held = false
 
 
+## Muncher uvijek ide na sjemenku koja mu je SADA najbliža (2026-10-16): cilj se bira iznova
+## svakih ARENA_PEST_TARGET_REEVAL (0,25 s). Ranije je „zaključao" prvu metu, pa ju je igrač
+## mogao odvući na kraj polja i muncher je zaobilazio sve usputne sjemenke. Trenutna meta
+## ostaje dok nova nije bliža za TARGET_SWITCH_MARGIN — bez treperenja između dvije jednako
+## udaljene. `force` = meta je nestala ili lov tek počinje (bez prednosti stare mete).
 func _pick_target(force: bool) -> void:
-	if not force and _target_chip != null and is_instance_valid(_target_chip):
-		return
 	var chips: Array = _get_edible_chips.call() if _get_edible_chips.is_valid() else []
 	if chips.is_empty():
-		_target_chip = null
+		# Igrač drži jedinu preostalu sjemenku: muncher ne zaspi, čeka je (kao i ranije).
+		if force or _target_chip == null or not is_instance_valid(_target_chip):
+			_target_chip = null
 		return
 	var best: ArenaSeedChip = null
 	var best_score := INF
+	var current_score := INF
+	var current_ok := not force and _target_chip != null and is_instance_valid(_target_chip)
 	for raw in chips:
 		var chip := raw as ArenaSeedChip
 		if chip == null or not is_instance_valid(chip):
 			continue
-		var dist := _pest_center.distance_to(chip.get_center())
-		var tier_bias := 0.0 if chip.tier >= 2 else 12.0
-		var score := dist + tier_bias
+		var score := _target_score(chip)
+		if current_ok and chip == _target_chip:
+			current_score = score
 		if score < best_score:
 			best_score = score
 			best = chip
+	if current_ok and current_score < INF and best_score > current_score - TARGET_SWITCH_MARGIN:
+		return
 	_target_chip = best
+
+
+## Udaljenost do sjemenke; T1 ima malu kaznu (T2 je vrijedniji plijen kad su podjednako blizu).
+func _target_score(chip: ArenaSeedChip) -> float:
+	var tier_bias := 0.0 if chip.tier >= 2 else 12.0
+	return _pest_center.distance_to(chip.get_center()) + tier_bias
 
 
 func _clamp_to_bounds(center: Vector2) -> Vector2:

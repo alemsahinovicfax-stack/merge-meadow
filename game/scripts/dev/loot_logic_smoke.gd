@@ -318,7 +318,8 @@ func _run() -> void:
 	# --- C4: pause chips match finish_run kept / was ---
 	if not _pause_matches(gs, run, 0, 5, 10, 2, 3, 1, 1):
 		return
-	if not _pause_matches(gs, run, 2, 8, 15, 3, 5, 1, 2):
+	# ×1,5 na 4 sjemenke = tačno 6 (bonus na ukupno, 2026-10-16) — ranije 5 + 2 = 7 (po tipu).
+	if not _pause_matches(gs, run, 2, 8, 15, 3, 5, 1, 1):
 		return
 
 	print("loot_logic_smoke OK")

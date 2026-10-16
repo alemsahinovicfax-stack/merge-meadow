@@ -96,17 +96,27 @@ func get_chip_count() -> int:
 	return tray.chips.size() if tray else 0
 
 
+## Zlatni pečat: Loot Boost (ako je nivo > 0) i koliko je sjemenki bilo dvostruko (Twin Seeds).
+## Brojevi u chipovima su već s boostom — pečat kaže zašto su veći od brojača u runu.
+func get_boost_stamp() -> String:
+	var parts: PackedStringArray = []
+	var mult := GameState.last_loot_multiplier
+	if mult > 1.0 + 1e-6:
+		parts.append(UiPopups.S_LOOT_BOOST % String.num(mult, 2))
+	var twins := GameState.last_run_twins
+	if twins == 1:
+		parts.append(UiPopups.S_TWIN_ONE)
+	elif twins > 1:
+		parts.append(UiPopups.S_TWINS % twins)
+	return " · ".join(parts)
+
+
 func get_chips() -> Array[RewardChip]:
 	return tray.chips if tray else ([] as Array[RewardChip])
 
 
-func get_bag_note() -> String:
-	var fit := GameState.pending_loot_fit()
-	return UiPopups.S_LOOT_BAG_FULL % [fit.x, fit.y] if fit.x < fit.y else ""
-
-
 func get_all_text() -> String:
-	var parts: PackedStringArray = [get_title(), tray.stamp_text if tray else "", get_bag_note()]
+	var parts: PackedStringArray = [get_title(), tray.stamp_text if tray else "", tray.shown_boost_text() if tray else ""]
 	for b in [double_button, revive_button, retry_button, camp_button]:
 		if b.is_inside_tree() and b.visible:
 			parts.append(b.label)
@@ -119,12 +129,9 @@ func _build() -> void:
 	modal.set_title(get_title(), "fail" if is_failed() else "success")
 	_detach([double_button, revive_button, retry_button, camp_button])
 	modal.clear_content()
-	tray = RewardTray.new().setup(880.0, _make_chips(), UiPopups.S_KEPT_HALF if is_failed() else "")
+	tray = RewardTray.new().setup(880.0, _make_chips(), UiPopups.S_KEPT_HALF if is_failed() else "", get_boost_stamp())
 	tray.name = "RewardTray"
 	modal.content.add_child(PopupModal.centered(tray))
-	var fit := GameState.pending_loot_fit()
-	if fit.x < fit.y:
-		modal.content.add_child(UiPopups.modal_note(get_bag_note()))
 	var buttons := VBoxContainer.new()
 	buttons.name = "ModalButtons"
 	buttons.add_theme_constant_override("separation", 24)

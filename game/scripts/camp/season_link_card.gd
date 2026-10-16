@@ -4,6 +4,9 @@ extends PanelContainer
 ## Tap bilo gdje na kartici vodi na Home bez trosenja — bez "Details" pilule i bez
 ## "Next free season" natpisa. Unlock (300 x 120, jedna rijec) stoji desno od imena,
 ## trosi odmah (500 coina + 20 ★3), pokaze burst, pa skace na Home s fokusom.
+## Kad su sve besplatne otključane, kartica nastavlja s prvom plaćenom sezonom koju igrač
+## nema (2026-10-16, na zahtjev): umjesto coina i ★3 samo cijena (zlatno dugme, kao zlatna
+## cijena na Homeu), kupovina kroz IAPManager, pa isti burst i skok na Home (band „paid").
 ## Season Kit (design_handoff_seasons faza 2): sezona s receptom "camp" crta svoje mjesto
 ## (SeasonBackdrop 1026 x 312 unutar ruba 3 #2D3436, ništa izvan) umjesto tinta, tekst
 ## #3D3D33, jedna tvrda sjena 0 8 0; uglovi = maska u boji stranice Campa.
@@ -21,6 +24,9 @@ extends PanelContainer
 
 var _season_id: String = ""
 var _state: String = UiCamp.SEASON_SHORT
+## Plaćena sezona (nema više besplatnih): cijena umjesto napretka.
+var _paid: bool = false
+var _buying: bool = false
 var _pressing_card: bool = false
 var _unlocking: bool = false
 var _burst: float = -1.0
@@ -59,10 +65,21 @@ func _ready() -> void:
 	UiCamp.style_label(t3_label, UiCamp.FONT_SEASON_VALUE, UiCamp.DARK_INK)
 	title_label.custom_minimum_size.x = 1.0
 	unlock_button.set_fonts(UiCamp.FONT_UNLOCK)
+	IAPManager.purchase_completed.connect(_on_purchase_completed)
+	IAPManager.purchase_failed.connect(_on_purchase_failed)
 
 
 func get_state() -> String:
 	return _state
+
+
+## Kartica nudi plaćenu sezonu (sve besplatne otključane).
+func is_paid() -> bool:
+	return _paid
+
+
+func get_season_id() -> String:
+	return _season_id
 
 
 ## Kartica crta recept "camp" sezone (Season Kit).
@@ -78,12 +95,20 @@ func refresh() -> void:
 	if _unlocking:
 		return
 	var id := GameState.next_locked_free_id()
+	_paid = id.is_empty()
+	if _paid:
+		id = GameState.next_unowned_paid_id()
 	_season_id = id
 	var def: SeasonDef = GameState.get_season_def(id) if not id.is_empty() else null
-	if def == null or not def.is_free():
+	if def == null or (not _paid and not def.is_free()):
 		visible = false
 		return
 	visible = true
+	if _paid:
+		_state = UiCamp.SEASON_READY
+		_show_paid(def)
+		return
+	_set_free_layout(true)
 	var coins := GameState.wallet_coins
 	var flowers := GameState.star3_flower_count_for_unlock(id)
 	_state = UiCamp.SEASON_READY if GameState.can_unlock_free(id) else UiCamp.SEASON_SHORT
@@ -93,15 +118,7 @@ func refresh() -> void:
 func _show(def: SeasonDef, coins: int, flowers: int) -> void:
 	var coins_need := def.coins_cost
 	var flowers_need := def.t3_flowers_required
-	var recipe := UiSeasons.recipe(def.id, "camp")
-	_scene = {} if recipe.is_empty() else SeasonBackdrop.scene(
-		"camp:" + def.id, recipe, float(recipe.get("w", UiSeasons.CAMP_CARD.x)), []
-	)
-	_ink = UiSeasons.CAMP_TEXT if has_kit() else UiCamp.DARK_INK
-	for lab in [title_label, coins_label, t3_label]:
-		(lab as Label).add_theme_color_override("font_color", _ink)
-	add_theme_stylebox_override("panel", UiCamp.season_card_kit_style() if has_kit() else UiCamp.season_card_style(def.id))
-	queue_redraw()
+	_apply_card_look(def)
 	title_label.text = def.display_name
 	coins_label.text = "%d / %d" % [mini(coins, coins_need), coins_need]
 	t3_label.text = "%d / %d" % [mini(flowers, flowers_need), flowers_need]
@@ -127,6 +144,49 @@ func _show(def: SeasonDef, coins: int, flowers: int) -> void:
 	unlock_button.mouse_filter = Control.MOUSE_FILTER_STOP if ready else Control.MOUSE_FILTER_IGNORE
 
 
+## Recept „camp" sezone (Season Kit) ili tint, i boja teksta po njemu.
+func _apply_card_look(def: SeasonDef) -> void:
+	var recipe := UiSeasons.recipe(def.id, "camp")
+	_scene = {} if recipe.is_empty() else SeasonBackdrop.scene(
+		"camp:" + def.id, recipe, float(recipe.get("w", UiSeasons.CAMP_CARD.x)), []
+	)
+	_ink = UiSeasons.CAMP_TEXT if has_kit() else UiCamp.DARK_INK
+	for lab in [title_label, coins_label, t3_label]:
+		(lab as Label).add_theme_color_override("font_color", _ink)
+	add_theme_stylebox_override("panel", UiCamp.season_card_kit_style() if has_kit() else UiCamp.season_card_style(def.id))
+	queue_redraw()
+
+
+## Besplatna sezona: kolona coina, linija i traka ★3. Plaćena: samo cvijet sezone i tekst.
+func _set_free_layout(free: bool) -> void:
+	var coin_col := coins_label.get_parent().get_parent() as Control
+	if coin_col != null:
+		coin_col.visible = free
+	split_line.visible = free
+	t3_bar.visible = free
+
+
+## Plaćena sezona: ime + zlatno dugme s cijenom; u redu ispod potpisni ★3 cvijet sezone,
+## „Premium season" i koliko novih cvjetova donosi. Nema coina ni ★3 — samo cijena.
+func _show_paid(def: SeasonDef) -> void:
+	_set_free_layout(false)
+	_apply_card_look(def)
+	title_label.text = def.display_name
+	var flower_type := GameState.star3_type_id_for_season(def.id)
+	flower_art.set_art(false, flower_type, 3)
+	_fit_flower_name(UiCamp.S_PREMIUM_SEASON)
+	t3_label.text = UiCamp.S_PREMIUM_FLOWERS % def.seed_type_ids.size()
+	var price := IAPManager.get_price_label(def.iap_product_id)
+	var state := UiCamp.SEASON_UNLOCKING if _buying else UiCamp.SEASON_READY
+	var style := UiCamp.unlock_button_style(state)
+	unlock_button.set_styles(style, style)
+	unlock_button.set_text(UiCamp.S_BUYING if _buying else price)
+	unlock_button.set_ink(UiCamp.unlock_button_ink(state))
+	unlock_button.set_icon(null, UiCamp.UNLOCK_LOCK_ICON)
+	unlock_button.disabled = _buying
+	unlock_button.mouse_filter = Control.MOUSE_FILTER_IGNORE if _buying else Control.MOUSE_FILTER_STOP
+
+
 ## 42, pa 38, pa 34. Ime se nikad ne reže.
 func _fit_flower_name(text: String) -> void:
 	flower_name.text = text
@@ -138,6 +198,9 @@ func _fit_flower_name(text: String) -> void:
 
 
 func navigate_to_lock() -> void:
+	if _paid:
+		_go_home_paid(_season_id)
+		return
 	_go_home(GameState.next_locked_free_id())
 
 
@@ -165,6 +228,9 @@ func _gui_input(event: InputEvent) -> void:
 
 func _on_unlock_clicked() -> void:
 	if _unlocking:
+		return
+	if _paid:
+		_buy_paid()
 		return
 	var id := GameState.next_locked_free_id()
 	if id.is_empty():
@@ -204,9 +270,75 @@ func _finish_unlock(season_id: String) -> void:
 	_unlocking = false
 	_burst = -1.0
 	queue_redraw()
-	_go_home(season_id)
+	var def: SeasonDef = GameState.get_season_def(season_id)
+	if def != null and def.is_paid():
+		_go_home_paid(season_id)
+	else:
+		_go_home(season_id)
 	_refresh_home_after_unlock()
 	refresh()
+
+
+# --- plaćena sezona --------------------------------------------------------------
+
+func _buy_paid() -> void:
+	var def: SeasonDef = GameState.get_season_def(_season_id)
+	if def == null or def.iap_product_id.is_empty() or _buying or IAPManager.is_busy():
+		return
+	if GameState.is_season_playable(def.id):
+		refresh()
+		return
+	_buying = true
+	_show_paid(def)
+	IAPManager.purchase(def.iap_product_id)
+
+
+func _on_purchase_completed(sku: String) -> void:
+	if not _buying:
+		return
+	var def: SeasonDef = GameState.get_season_def(_season_id)
+	if def == null or def.iap_product_id != sku:
+		return
+	_buying = false
+	if not GameState.is_season_playable(def.id):
+		refresh()
+		return
+	# Isti trenutak kao besplatna: zvuk, burst, pa Home na kupljenu sezonu.
+	_unlocking = true
+	_state = UiCamp.SEASON_UNLOCKING
+	Sfx.play("unlock")
+	Sfx.haptic(40)
+	var style := UiCamp.unlock_button_style(_state)
+	unlock_button.set_styles(style, style)
+	unlock_button.set_text(UiCamp.unlock_button_text(_state))
+	unlock_button.disabled = true
+	unlock_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_refresh_top_bar()
+	if not is_inside_tree():
+		_finish_unlock(def.id)
+		return
+	_burst = 0.0
+	var tw := create_tween()
+	tw.tween_method(_set_burst, 0.0, 1.0, UiCamp.T_UNLOCK_BURST) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_interval(UiCamp.T_UNLOCK_LINGER)
+	tw.tween_callback(_finish_unlock.bind(def.id))
+
+
+func _on_purchase_failed(_sku: String, _reason: String) -> void:
+	if not _buying:
+		return
+	_buying = false
+	refresh()
+
+
+func _go_home_paid(season_id: String) -> void:
+	if season_id.is_empty():
+		return
+	GameState.set_paid_strip_focus(season_id)
+	GameState.set_home_band("paid")
+	_close_home_field()
+	GameState.go_to_meta_page(MetaHubPages.MAIN)
 
 
 func _draw() -> void:

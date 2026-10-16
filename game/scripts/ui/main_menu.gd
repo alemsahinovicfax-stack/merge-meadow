@@ -12,8 +12,6 @@ enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 @onready var field_overlay: Control = %FieldOverlay
 @onready var field_overlay_inner: Control = %FieldOverlayInner
 @onready var top_chrome: Control = %TopChrome
-@onready var grown_chip: PanelContainer = %GrownChip
-@onready var grown_count: Label = %Count
 @onready var gift_chest: HomeGiftCard = %GiftChest
 @onready var field_basket: FieldBasketButton = %BasketButton
 @onready var upgrades_button: FieldUpgradesButton = %UpgradesButton
@@ -103,7 +101,6 @@ func _ready() -> void:
 		loot_boost_button.clicked.connect(_on_field_loot_boost_pressed)
 	if field_basket:
 		field_basket.clicked.connect(_on_basket_pressed)
-	_bind_meadow_signal()
 	_setup_typography()
 	_setup_safe_area()
 	_refresh_menu()
@@ -232,8 +229,6 @@ func _sync_field_hub_swipe_chrome() -> void:
 		wardrobe_button,
 	]:
 		_set_block_hub_swipe(node as Control, open)
-	# Cip je info — swipe mora proci kroz njega.
-	_set_block_hub_swipe(grown_chip, false)
 	if season_stage:
 		var meadow: Control = season_stage.get_node_or_null("%SeasonField") as Control
 		_set_block_hub_swipe(meadow, false)
@@ -308,32 +303,12 @@ func _apply_mode_layout(field_open: bool) -> void:
 	if not field_open:
 		_close_upgrades_sheet()
 		_close_wardrobe(false)
-	_apply_field_overlay_styles()
 	if field_open:
 		_style_field_bottom_row()
 	_refresh_chest_card()
 	_refresh_tutorial_hint()
 	_refresh_upgrades_button()
 	_refresh_wardrobe_button()
-	_refresh_grown_chip()
-
-
-## Stilovi naljepnica — postavljaju se jednom po ulasku, boje ne ovise o sezoni.
-func _apply_field_overlay_styles() -> void:
-	if field_overlay == null or not field_overlay.visible:
-		return
-	if grown_chip:
-		grown_chip.add_theme_stylebox_override(
-			"panel", UiStage.pad(UiHomeField.grown_chip(), 26, 14, 26, 14)
-		)
-		var icon := grown_chip.get_node_or_null("Row/Icon") as TextureRect
-		if icon and icon.texture == null:
-			icon.texture = UiAssets.get_chrome_icon("icon_flower")
-		if grown_count:
-			grown_count.add_theme_font_override("font", UiStage.font(900, 44))
-		var word := grown_chip.get_node_or_null("Row/Word") as Label
-		if word:
-			word.add_theme_font_override("font", UiStage.font(800, 38))
 
 
 ## Donji red: Seasons 236 x 124 · Play 432 x 140 (centar x 540, JE PlayButton
@@ -386,6 +361,7 @@ func _refresh_field_upgrades() -> void:
 	var season_id := GameState.upgrade_sheet_season_id()
 	var flower_id := GameState.star3_type_id_for_season(season_id)
 	var have := GameState.spendable_upgrade_flowers(season_id)
+	_refresh_upgrade_kept_note(season_id)
 	for spec in [
 		["magnet", magnet_button, magnet_title, _magnet_effect],
 		["loot", loot_boost_button, loot_boost_title, _loot_effect],
@@ -396,6 +372,42 @@ func _refresh_field_upgrades() -> void:
 			GameState.get_upgrade_level(str(spec[0]), season_id),
 			UiCamp.UP_LEVELS, "", flower_id, have
 		)
+
+
+## Napomena ispod imena sezone (u razmaku TitleGap, bez pomjeranja kartica): kupovina bi
+## potrošila ★3 koje čeka sljedeća besplatna sezona — nije zabrana, samo da igrač zna.
+func _refresh_upgrade_kept_note(season_id: String) -> void:
+	var gap := upgrades_vbox.get_node_or_null("TitleGap") as Control if upgrades_vbox else null
+	if gap == null:
+		return
+	var note := gap.get_node_or_null("KeptNote") as Label
+	if note == null:
+		note = Label.new()
+		note.name = "KeptNote"
+		note.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_style_sheet_label(note, 800, 30, UiPopups.INK_SOFT)
+		gap.add_child(note)
+		# Širina prati TitleGap (širina sheeta) i kad je sheet još skriven.
+		note.set_anchors_preset(Control.PRESET_TOP_WIDE)
+		note.offset_top = -2.0
+		note.offset_bottom = 38.0
+	var show := false
+	var next_id := GameState.next_locked_free_id()
+	if GameState.upgrade_uses_kept_flowers(season_id) and not next_id.is_empty():
+		for track in ["magnet", "loot", "twin"]:
+			if GameState.upgrade_button_state(track, season_id) == UiCamp.UP_CAN:
+				show = true
+		if show:
+			var def: SeasonDef = GameState.get_season_def(next_id)
+			note.text = UiHomeField.S_UPGRADE_USES_KEPT % (def.display_name if def != null else next_id)
+	note.visible = show
+
+
+func get_upgrade_kept_note() -> String:
+	var gap := upgrades_vbox.get_node_or_null("TitleGap") if upgrades_vbox else null
+	var note := gap.get_node_or_null("KeptNote") as Label if gap else null
+	return note.text if note != null and note.visible else ""
 
 
 ## H5 · kartica nadogradnje (design_handoff_popups): ime 52 · 4 segmenta 96 × 22 · efekat 40/800;
@@ -1015,55 +1027,6 @@ func _on_basket_clear_picked() -> void:
 
 
 ## ── Polje v2: cip izraslih, ulaz u nadogradnje, sheet ────────────────────────
-
-func _bind_meadow_signal() -> void:
-	if season_stage == null:
-		return
-	var meadow := season_stage.get_node_or_null("%SeasonField")
-	if meadow == null or not meadow.has_signal("grown_changed"):
-		return
-	if not meadow.is_connected("grown_changed", _on_meadow_grown_changed):
-		meadow.connect("grown_changed", _on_meadow_grown_changed)
-
-
-func _on_meadow_grown_changed(grown: int, total: int) -> void:
-	_set_grown_text(grown, total)
-
-
-func _refresh_grown_chip() -> void:
-	if grown_chip == null:
-		return
-	grown_chip.visible = GameState.home_season_field_open
-	if not grown_chip.visible:
-		return
-	var grown := 0
-	if season_stage:
-		var meadow := season_stage.get_node_or_null("%SeasonField")
-		if meadow and meadow.has_method("get_meadow_grown_count"):
-			grown = int(meadow.call("get_meadow_grown_count"))
-	_set_grown_text(grown, UiHomeField.MEADOW_SPOTS.size())
-
-
-func _set_grown_text(grown: int, total: int) -> void:
-	if grown_count:
-		grown_count.text = "%d / %d" % [grown, total]
-	_center_grown_chip()
-
-
-## Cip je centriran na x 540 — sirina ovisi o broju, pa se racuna poslije teksta.
-func _center_grown_chip() -> void:
-	if grown_chip == null or not grown_chip.visible:
-		return
-	var w := grown_chip.get_combined_minimum_size().x
-	# Godot jos nije prelomio red kad stigne prvi refresh.
-	if w < 40.0:
-		await get_tree().process_frame
-		if grown_chip == null or not is_instance_valid(grown_chip):
-			return
-		w = grown_chip.get_combined_minimum_size().x
-	grown_chip.size = Vector2(w, UiHomeField.GROWN_CHIP_H)
-	grown_chip.position = Vector2(540.0 - w * 0.5, float(UiHomeField.GROWN_CHIP_Y))
-
 
 ## Zlatna tacka = bar jedna nadogradnja se moze kupiti sada.
 func _refresh_upgrades_button() -> void:

@@ -13,6 +13,9 @@ signal closed
 
 const SCENE := "res://scenes/ui/settings_screen.tscn"
 const GROUP := "settings_screen"
+## Iznad svega u hubu: Arena ima slojeve do z ~100 (letenje coina, kristal, sjemenka u ruci,
+## muncher 45 + rig), pa su sa z 50 izlazili preko Settingsa (2026-10-16).
+const Z := 200
 const ICON_DIR := "res://assets/ui/chrome/"
 const RIM := 4
 
@@ -103,7 +106,7 @@ func reopen() -> void:
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	z_index = 50
+	z_index = Z
 	values = UiSettings.load_settings()
 	_steps = [_build_base, _build_sound, _build_gameplay, _build_purchases, _build_privacy,
 		_build_tail, _build_credits_page, _build_bar]

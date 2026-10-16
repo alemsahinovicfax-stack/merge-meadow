@@ -10,14 +10,20 @@ const PAD_X := 28.0
 
 var chips: Array[RewardChip] = []
 var stamp_text: String = ""
+## Zlatni pečat desno (kraj runa: Loot Boost i Twin Seeds) — isti oblik kao HalfStamp, bez ikone.
+var boost_text: String = ""
+## Ako bi zlatni pečat udario u lijevi, crta se samo prvi dio (do „ · ").
+var boost_short: String = ""
 
 var _width: float = 880.0
 
 
-func setup(width: float, p_chips: Array, p_stamp: String = "") -> RewardTray:
+func setup(width: float, p_chips: Array, p_stamp: String = "", p_boost: String = "") -> RewardTray:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_width = width
 	stamp_text = p_stamp
+	boost_text = p_boost
+	boost_short = p_boost.get_slice(" · ", 0)
 	for c in chips:
 		if is_instance_valid(c):
 			c.queue_free()
@@ -31,7 +37,8 @@ func setup(width: float, p_chips: Array, p_stamp: String = "") -> RewardTray:
 
 
 func pad_top() -> float:
-	return float(UiPopups.TRAY_PAD_STAMP if not stamp_text.is_empty() else UiPopups.TRAY_PAD)
+	var stamped := not stamp_text.is_empty() or not boost_text.is_empty()
+	return float(UiPopups.TRAY_PAD_STAMP if stamped else UiPopups.TRAY_PAD)
 
 
 func _layout() -> void:
@@ -69,13 +76,34 @@ func _layout() -> void:
 
 func _draw() -> void:
 	draw_style_box(UiPopups.reward_tray(), Rect2(Vector2.ZERO, size))
-	if stamp_text.is_empty():
+	var left_end := 0.0
+	if not stamp_text.is_empty():
+		var tw := UiPopups.text_w(900, 38, stamp_text)
+		var r := Rect2(31.0, -UiPopups.STAMP_H * 0.45, 13.0 + 44.0 + 10.0 + tw + 22.0, UiPopups.STAMP_H)
+		draw_style_box(UiPopups.half_stamp(), r)
+		UiPopups.draw_icon(self, UiPopups.icon("icon_half"), Vector2(r.position.x + 13.0 + 22.0, r.get_center().y), 44.0)
+		UiPopups.draw_text(self, 900, 38, stamp_text, Vector2(r.position.x + 13.0 + 44.0 + 10.0, r.get_center().y - 19.0), UiPopups.OUTLINE)
+		left_end = r.end.x
+	var boost := shown_boost_text()
+	if boost.is_empty():
 		return
-	var tw := UiPopups.text_w(900, 38, stamp_text)
-	var r := Rect2(31.0, -UiPopups.STAMP_H * 0.45, 13.0 + 44.0 + 10.0 + tw + 22.0, UiPopups.STAMP_H)
-	draw_style_box(UiPopups.half_stamp(), r)
-	UiPopups.draw_icon(self, UiPopups.icon("icon_half"), Vector2(r.position.x + 13.0 + 22.0, r.get_center().y), 44.0)
-	UiPopups.draw_text(self, 900, 38, stamp_text, Vector2(r.position.x + 13.0 + 44.0 + 10.0, r.get_center().y - 19.0), UiPopups.OUTLINE)
+	var bw := UiPopups.text_w(900, 38, boost) + 44.0
+	var br := Rect2(size.x - 31.0 - bw, -UiPopups.STAMP_H * 0.45, bw, UiPopups.STAMP_H)
+	draw_style_box(UiPopups.boost_stamp(), br)
+	UiPopups.draw_text(self, 900, 38, boost, Vector2(br.position.x + 22.0, br.get_center().y - 19.0), UiPopups.OUTLINE)
+
+
+## Tekst zlatnog pečata kakav se crta (kraći kad bi udario u lijevi „Kept half").
+func shown_boost_text() -> String:
+	if boost_text.is_empty():
+		return ""
+	if stamp_text.is_empty():
+		return boost_text
+	var left_w := 31.0 + 13.0 + 44.0 + 10.0 + UiPopups.text_w(900, 38, stamp_text) + 22.0
+	var full_w := UiPopups.text_w(900, 38, boost_text) + 44.0
+	if _width - 31.0 - full_w >= left_w + 16.0:
+		return boost_text
+	return boost_short
 
 
 ## Nagrada iskoči chip po chip (nije loop).

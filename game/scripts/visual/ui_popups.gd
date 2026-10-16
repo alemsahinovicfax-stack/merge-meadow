@@ -147,6 +147,9 @@ static func reward_tray() -> StyleBoxFlat:
 static func half_stamp() -> StyleBoxFlat:
 	return _box(PINK, STAMP_H / 2, 3)
 
+static func boost_stamp() -> StyleBoxFlat:
+	return _box(COIN_GOLD, STAMP_H / 2, 3)
+
 static func reward_chip() -> StyleBoxFlat:
 	return _box(ROW_FILL, CHIP_H / 2, 3)
 
@@ -332,8 +335,11 @@ const S_NOTHING_LOST := "Nothing lost"
 const S_RUN_FAILED := "Run Failed"
 const S_RUN_COMPLETE := "Run Complete!"
 const S_KEPT_HALF := "Kept half"
+## Kraj runa: zlatni pečat desno — nadogradnje se vide (Loot Boost ×1.25 · 2 twins).
+const S_LOOT_BOOST := "Loot Boost ×%s"
+const S_TWIN_ONE := "1 twin"
+const S_TWINS := "%d twins"
 ## R5: vreća (soft cap 40) ne prima sav plijen — višak se ne prima, ali igrač to vidi.
-const S_LOOT_BAG_FULL := "Bag full · %d of %d seeds fit"
 const S_AD_DOUBLE := "Double"
 const S_AD_REVIVE := "Revive"
 const S_AD_DOUBLED := "Doubled"

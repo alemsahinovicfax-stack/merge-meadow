@@ -24,6 +24,7 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - Merge kamp — 2→1 merge, min 3 tiera orbova
 - Upgradei: magnet, množitelj (min 4 levela svaki)
 - Run: header u jednom redu, vertikalna traka napretka umjesto sekundi, nagradni grm između traka (pokupi se pri promjeni trake) — dodano 2026-10-09 na zahtjev, [[../04-experience/design-drafts/run-hud-v2-cd-brief|run-hud-v2-cd-brief]]
+- Run: puni redizajn pickupa (sjemenka i coin na stazi, magnet, dodir sa Pipom, Pip reakcije, let „+1") — samo vizuelno, pravila ista — dodano 2026-10-16 na zahtjev, [[../04-experience/design-drafts/run-pickups-cd-brief|run-pickups-cd-brief]]
 - 2 ljubimca (Pip default + 1 unlock)
 
 ### UX / flow
@@ -32,6 +33,7 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - Kamp: merge, upgrade, daily chest
 - Settings ekran (zupčanik u headeru): Music i Sound effects (slider + mute), Vibration, Reduce motion, Restore purchases, Remove Ads status, Privacy choices (pristanak za reklame), Privacy policy, Contact support, Credits, Version; Dev sekcija samo u debug buildu — dodano 2026-10-12 na zahtjev, [[../04-experience/design-drafts/ispravke-settings-cd-brief|ispravke-settings-cd-brief]]
 - Classic Pip je pravi skin u Ormaru (besplatan, ne prodaje se); zlatni okvir Albuma radi sa skrolom — 2026-10-12, isti brief
+- Camp link kartica: poslije svih besplatnih sezona nudi sljedeću plaćenu (samo cijena, IAP), dizajn plaćenih kartica u Season Kit stilu (CD); Home polje sezone pokazuje ukupno uzgojeno ★3; vreća sjemena bez limita; nadogradnje smiju trošiti i ★3 čuvano za sljedeću sezonu — 2026-10-16 na zahtjev, [[../04-experience/design-drafts/ispravke-1016-izvjestaj|ispravke-1016-izvjestaj]]
 - Muncher u Areni: novi lik (Nibbs, krtica — u igri 2026-10-14; cutout rig + animacije svih stanja, krtičnjak); pravila ponašanja ostaju — dodano 2026-10-12 na zahtjev, [[../04-experience/design-drafts/muncher-premium-pip-cd-brief|muncher-premium-pip-cd-brief]]
 - Premium Pip skin (1 komad, pravi novac): Sir Pip · Meadow Knight (u igri 2026-10-14, SKU `pip_knight`, cijena prijedlog €3.99) — potpuno drugačiji dizajn i tema, vlastiti dijelovi i animacije, Shop Looks + Ormar; samo kozmetika (Pillar 2) — 2026-10-12, isti brief
 - Shop: remove ads, starter pack (7 dana od prvog pokretanja), boosteri (Merge Hint jednokratan, Loot Burst consumable) — Shop v2, 2026-10-02

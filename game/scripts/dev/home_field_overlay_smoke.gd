@@ -134,16 +134,16 @@ func _check_controls(home: Control) -> void:
 		if not page.grow(TOL).encloses(ctrl.get_global_rect()):
 			_fail("%s spills off the page" % path)
 
-	# Ime sezone (putujuci SeasonName u SeasonStage) i cip su info — swipe mora
-	# proci, pa NISU u block_hub_swipe.
+	# Ime sezone (putujuci SeasonName u SeasonStage) je info — swipe mora proci, pa NIJE u
+	# block_hub_swipe. Čip „0 / 13 grown" je uklonjen (2026-10-16, na zahtjev).
 	var stage_n := home.get_node_or_null("%SeasonStage")
-	for path in ["%SeasonName", "%GrownChip"]:
-		var info := (stage_n.get_node_or_null(path) if path == "%SeasonName" else home.get_node_or_null(path)) as Control
-		if info == null or not info.is_visible_in_tree():
-			_fail("%s should be visible in the field" % path)
-			continue
-		if info.is_in_group("block_hub_swipe"):
-			_fail("%s must let the hub swipe through" % path)
+	var info := stage_n.get_node_or_null("%SeasonName") as Control
+	if info == null or not info.is_visible_in_tree():
+		_fail("%SeasonName should be visible in the field")
+	elif info.is_in_group("block_hub_swipe"):
+		_fail("%SeasonName must let the hub swipe through")
+	if home.get_node_or_null("%GrownChip") != null:
+		_fail("'0 / 13 grown' chip must be gone")
 	# Kontrole blokiraju swipe.
 	for path in ["%GiftChest", "%BasketButton", "%UpgradesButton", "%BottomRow"]:
 		var ctrl2 := home.get_node_or_null(path) as Control

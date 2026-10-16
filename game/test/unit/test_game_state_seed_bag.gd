@@ -22,13 +22,13 @@ func test_add_seeds_to_bag_adds_new_type() -> void:
 	assert_eq(int(_gs.seed_bag.get("clover", 0)), 5)
 
 
-func test_add_seeds_to_bag_respects_soft_cap() -> void:
-	# SEED_BAG_SOFT_CAP is 40 (game_state.gd:29) at time of writing this test.
-	var cap: int = _gs.SEED_BAG_SOFT_CAP
-	_gs.add_seeds_to_bag("clover", cap - 2)
+func test_add_seeds_to_bag_has_no_limit() -> void:
+	# 2026-10-16: vreća više nema limit 40 — višak plijena se ranije tiho gubio.
+	var old_cap: int = _gs.SEED_BAG_SOFT_CAP
+	_gs.add_seeds_to_bag("clover", old_cap - 2)
 	var added: int = _gs.add_seeds_to_bag("daisy", 10)
-	assert_eq(added, 2, "should only add up to remaining capacity, not the full request")
-	assert_eq(_gs.seed_bag_remaining_capacity(), 0)
+	assert_eq(added, 10, "the bag must take the whole amount, even past the old cap")
+	assert_eq(_gs.sum_seed_bag(_gs.seed_bag), old_cap + 8)
 
 
 func test_add_seeds_to_bag_ignores_non_positive_count() -> void:

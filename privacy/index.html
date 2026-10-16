@@ -23,7 +23,7 @@
       line-height: 1.6;
     }
     main {
-      max-width: 42rem;
+      max-width: 44rem;
       margin: 0 auto;
       padding: 2rem 1.25rem 3rem;
     }
@@ -44,8 +44,12 @@
       font-size: 0.95rem;
     }
     h2 {
-      margin: 1.5rem 0 0.5rem;
-      font-size: 1.1rem;
+      margin: 1.75rem 0 0.5rem;
+      font-size: 1.15rem;
+    }
+    h3 {
+      margin: 1.1rem 0 0.35rem;
+      font-size: 1rem;
     }
     p { margin: 0.5rem 0; }
     table {
@@ -62,77 +66,179 @@
     }
     th { background: #f3f4f6; }
     ul { margin: 0.5rem 0; padding-left: 1.25rem; }
+    li { margin: 0.25rem 0; }
     a { color: var(--accent); }
-    .contact { margin-top: 0.5rem; }
+    .summary {
+      background: #eef7f0;
+      border-radius: 12px;
+      padding: 0.9rem 1rem;
+      margin: 0 0 1rem;
+    }
+    nav ol { margin: 0.25rem 0 0; padding-left: 1.25rem; }
   </style>
 </head>
 <body>
   <main>
     <article>
       <h1>Merge Meadow — Privacy Policy</h1>
-      <p class="updated"><strong>Last updated:</strong> July 10, 2026</p>
+      <p class="updated"><strong>Last updated:</strong> October 16, 2026</p>
 
-      <h2>Introduction</h2>
+      <div class="summary">
+        <p><strong>The short version</strong></p>
+        <ul>
+          <li>You do not need an account. Your game progress is saved <strong>only on your device</strong>.</li>
+          <li>We do not run our own servers and we do not sell your data.</li>
+          <li>The free version shows ads through <strong>Google AdMob</strong>, which uses your device's advertising ID and similar data. Where the law requires it, we ask for your consent first, and you can change your choice any time in <em>Settings → Privacy choices</em>.</li>
+          <li>Purchases are handled by <strong>Google Play</strong> or the <strong>Apple App Store</strong>. We never see your payment details.</li>
+        </ul>
+      </div>
+
+      <nav>
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#who">Who we are</a></li>
+          <li><a href="#data">What data is processed and why</a></li>
+          <li><a href="#ads">Advertising and your choices</a></li>
+          <li><a href="#purchases">In-app purchases</a></li>
+          <li><a href="#notcollected">What we do not collect</a></li>
+          <li><a href="#legal">Legal bases (EEA, UK, Switzerland)</a></li>
+          <li><a href="#retention">How long data is kept</a></li>
+          <li><a href="#rights">Your rights</a></li>
+          <li><a href="#children">Children</a></li>
+          <li><a href="#transfers">International transfers</a></li>
+          <li><a href="#security">Security</a></li>
+          <li><a href="#changes">Changes to this policy</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ol>
+      </nav>
+
+      <h2 id="who">1. Who we are</h2>
       <p>
-        Merge Meadow (&ldquo;we&rdquo;, &ldquo;the app&rdquo;) is a casual mobile game.
-        This policy explains what data the app uses.
+        Merge Meadow (&ldquo;the game&rdquo;) is a casual mobile game made by an independent developer
+        (&ldquo;we&rdquo;, &ldquo;us&rdquo;). We are responsible for the processing described in this policy
+        that we control. Google and Apple are responsible for the data they process under their own policies.
+        You can reach us at
+        <a href="mailto:mergemeadow.support@gmail.com">mergemeadow.support@gmail.com</a>.
       </p>
 
-      <h2>Data we collect</h2>
+      <h2 id="data">2. What data is processed and why</h2>
       <table>
         <thead>
           <tr>
             <th>Data</th>
-            <th>Collected?</th>
-            <th>Purpose</th>
+            <th>Where it goes</th>
+            <th>Why</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Personal account / email</td>
-            <td><strong>No</strong></td>
-            <td>We do not require login</td>
+            <td>Game progress and settings (coins, seeds, flowers, unlocked seasons, sound and vibration settings)</td>
+            <td>Stored only on your device. Not sent to us.</td>
+            <td>To save your game.</td>
           </tr>
           <tr>
-            <td>Game progress</td>
-            <td><strong>Local only</strong></td>
-            <td>Saved on your device</td>
+            <td>Advertising data: advertising ID (Android) or IDFA (iOS, only if you allow tracking), app set ID, IP address, device and operating-system information, and how you interact with ads</td>
+            <td>Google AdMob</td>
+            <td>To show ads, measure them, prevent fraud and, if you agree, personalise them.</td>
           </tr>
           <tr>
-            <td>Advertising ID</td>
-            <td><strong>Yes</strong> (via AdMob)</td>
-            <td>To show ads in the free version</td>
+            <td>Purchase records (which item was bought and a purchase token)</td>
+            <td>Google Play or Apple; the token is also kept on your device</td>
+            <td>To deliver what you bought, restore it and prevent double delivery.</td>
           </tr>
           <tr>
-            <td>Purchase history</td>
-            <td><strong>Yes</strong> (via Google Play / App Store)</td>
-            <td>To process in-app purchases</td>
+            <td>Your email address and message, if you contact support</td>
+            <td>Our support mailbox</td>
+            <td>To answer you.</td>
           </tr>
         </tbody>
       </table>
 
-      <h2>Third-party services</h2>
+      <h2 id="ads">3. Advertising and your choices</h2>
+      <p>
+        The free version of the game shows rewarded ads (you choose to watch them, for example to double your
+        loot) and may show an occasional ad at the end of a run. Ads are provided by Google AdMob. Google's use of
+        data is described in
+        <a href="https://policies.google.com/technologies/partner-sites" rel="noopener noreferrer">How Google uses information from sites or apps that use our services</a>
+        and the <a href="https://policies.google.com/privacy" rel="noopener noreferrer">Google Privacy Policy</a>.
+      </p>
       <ul>
-        <li><strong>Google AdMob</strong> — ads (<a href="https://policies.google.com/privacy" rel="noopener noreferrer">Google Privacy Policy</a>)</li>
-        <li><strong>Google Play Billing / Apple StoreKit</strong> — in-app purchases</li>
+        <li><strong>EEA, UK and Switzerland:</strong> before personalised ads are shown, the game asks for your consent with Google's consent form. You can review or withdraw your choice at any time in <em>Settings → Privacy choices</em>. If you do not consent, you may still see non-personalised ads.</li>
+        <li><strong>United States:</strong> some states treat targeted advertising as &ldquo;selling&rdquo; or &ldquo;sharing&rdquo; personal information. You can opt out in <em>Settings → Privacy choices</em> and through your device settings.</li>
+        <li><strong>On any device:</strong> you can reset or delete your advertising ID (Android: <em>Settings → Privacy → Ads</em>), or deny tracking (iOS: <em>Settings → Privacy &amp; Security → Tracking</em>).</li>
+        <li>Buying <strong>Remove Ads</strong> turns off ads that you did not choose to watch.</li>
       </ul>
 
-      <h2>Children</h2>
+      <h2 id="purchases">4. In-app purchases</h2>
       <p>
-        The game is suitable for general audiences. We do not knowingly collect
-        personal information from children.
+        Purchases (for example Remove Ads, premium seasons, Pip skins and boosters) are processed by Google Play or
+        the Apple App Store under their terms. We do not receive or store your card or bank details. We receive a
+        purchase confirmation so the game can unlock the item, and we keep a purchase token on your device so the
+        same purchase is not delivered twice. <em>Restore purchases</em> asks the store again for items you already
+        own.
       </p>
 
-      <h2>Your rights</h2>
+      <h2 id="notcollected">5. What we do not collect</h2>
+      <ul>
+        <li>No account, name, email or password is needed to play.</li>
+        <li>No precise location, contacts, photos, camera or microphone.</li>
+        <li>No analytics or tracking tools of our own. If we add any in the future, we will update this policy first.</li>
+        <li>We do not sell your personal information.</li>
+      </ul>
+
+      <h2 id="legal">6. Legal bases (EEA, UK, Switzerland)</h2>
+      <ul>
+        <li><strong>Consent</strong> — personalised advertising and storing or reading advertising identifiers where consent is required.</li>
+        <li><strong>Contract</strong> — delivering items you buy.</li>
+        <li><strong>Legitimate interests</strong> — showing non-personalised ads to fund the free game, preventing ad fraud, and answering your support emails.</li>
+      </ul>
+
+      <h2 id="retention">7. How long data is kept</h2>
+      <ul>
+        <li>Game progress stays on your device until you delete the game or clear its storage.</li>
+        <li>Advertising data is kept by Google according to its own retention policies.</li>
+        <li>Support emails are kept only as long as needed to help you, and no longer than 12 months after the conversation ends.</li>
+      </ul>
+
+      <h2 id="rights">8. Your rights</h2>
       <p>
-        You can reset local data by uninstalling the app or clearing app storage
-        in your device settings.
+        Depending on where you live, you may have the right to access, correct or delete your personal data, to
+        object to or restrict processing, to data portability, and to withdraw consent at any time. Because your
+        game data stays on your device, you can delete it yourself by uninstalling the game or clearing its
+        storage. For advertising data, use <em>Settings → Privacy choices</em>, your device's ad settings, or
+        Google's tools. For anything else, email us and we will reply within 30 days. You can also complain to your
+        local data protection authority.
       </p>
 
-      <h2>Contact</h2>
-      <p class="contact">
-        If you have questions about this privacy policy or the app, contact us at:<br>
-        <strong>Email:</strong> <a href="mailto:mergemeadow.support@gmail.com">mergemeadow.support@gmail.com</a>
+      <h2 id="children">9. Children</h2>
+      <p>
+        Merge Meadow is a general-audience game and is not directed at children under 13 (or the minimum age in your
+        country). We do not knowingly collect personal information from children. If you believe a child has sent
+        us personal information, contact us and we will delete it.
+      </p>
+
+      <h2 id="transfers">10. International transfers</h2>
+      <p>
+        Google and Apple may process data in countries outside your own, including the United States. They use
+        safeguards such as the EU Standard Contractual Clauses and the EU&ndash;U.S. Data Privacy Framework.
+      </p>
+
+      <h2 id="security">11. Security</h2>
+      <p>
+        We do not run servers that store your data. Your game save stays in the game's private storage on your
+        device. Ad and payment providers protect the data they process under their own security programmes.
+      </p>
+
+      <h2 id="changes">12. Changes to this policy</h2>
+      <p>
+        If we change how the game uses data, we will update this page and the &ldquo;Last updated&rdquo; date, and
+        where the change is important, tell you in the game.
+      </p>
+
+      <h2 id="contact">13. Contact</h2>
+      <p>
+        Questions about privacy or the game:
+        <a href="mailto:mergemeadow.support@gmail.com">mergemeadow.support@gmail.com</a>
       </p>
     </article>
   </main>

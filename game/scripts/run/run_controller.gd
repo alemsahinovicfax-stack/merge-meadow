@@ -50,6 +50,8 @@ var scroll_speed: float = BASE_SCROLL_SPEED
 var elapsed: float = 0.0
 var coin_count: int = 0
 var seeds_by_type: Dictionary = {}
+## Koliko je pokupljenih sjemenki bilo dvostruko (Twin Seeds) — pečat na kraju runa.
+var twin_count: int = 0
 var spawn_timer: float = 0.0
 var _spawn_interval: float = SPAWN_INTERVAL
 var _spawn_chance: float = SPAWN_CHANCE
@@ -160,6 +162,7 @@ func start_run() -> void:
 	elapsed = 0.0
 	coin_count = 0
 	seeds_by_type = {}
+	twin_count = 0
 	_guaranteed_seed_done = false
 	_coins_callout_done = false
 	_coins_callout_hide_at = -1.0
@@ -172,8 +175,10 @@ func start_run() -> void:
 func _resume_run() -> void:
 	GameState.resume_pending = false
 	elapsed = GameState.carry_elapsed
-	coin_count = GameState.carry_coins
-	seeds_by_type = GameState.carry_seed_bag.duplicate()
+	# Sirovi brojevi (bez Loot Boosta) — boost se primijeni jednom, na kraju (2026-10-16).
+	coin_count = GameState.carry_raw_coins
+	seeds_by_type = GameState.carry_raw_seed_bag.duplicate()
+	twin_count = GameState.carry_twins
 	_guaranteed_seed_done = true
 	_coins_callout_done = true
 	_tutorial_obstacle_done = true
@@ -281,7 +286,7 @@ func _end_run(failed: bool) -> void:
 	player.set_input_enabled(false)
 	pause_overlay.close(false)
 	_hide_tutorial()
-	GameState.finish_run(seeds_by_type.duplicate(), coin_count, failed, elapsed)
+	GameState.finish_run(seeds_by_type.duplicate(), coin_count, failed, elapsed, twin_count)
 	_play_end_and_leave(failed)
 
 
@@ -491,15 +496,15 @@ func _fill_pause() -> void:
 	var chips: Array = []
 	var mult := GameState.get_loot_multiplier()
 	if coin_count > 0:
-		var scaled_coins := int(round(float(coin_count) * mult))
+		var scaled_coins := GameState.scale_loot_coins(coin_count, mult)
 		var kept_coins := int(ceil(float(scaled_coins) * 0.5))
 		chips.append(RewardChip.new().setup("coin", "", kept_coins, scaled_coins, false, false))
-	for type_id in seeds_by_type:
-		var n := int(seeds_by_type[type_id])
-		if n > 0:
-			var scaled_n := int(round(float(n) * mult))
-			var kept_n := int(ceil(float(scaled_n) * 0.5))
-			chips.append(RewardChip.new().setup("seed", str(type_id), kept_n, scaled_n, false, false))
+	# Isti Loot Boost kao finish_run (bonus na ukupno, pa po tipu).
+	var scaled_seeds := GameState.scale_loot_seeds(seeds_by_type, mult)
+	for type_id in scaled_seeds:
+		var scaled_n := int(scaled_seeds[type_id])
+		var kept_n := int(ceil(float(scaled_n) * 0.5))
+		chips.append(RewardChip.new().setup("seed", str(type_id), kept_n, scaled_n, false, false))
 	var tray := RewardTray.new().setup(880.0, chips, UiPopups.S_IF_YOU_QUIT)
 	tray.name = "RewardTray"
 	pause_overlay.content.add_child(PopupModal.centered(tray))
@@ -650,6 +655,8 @@ func _on_coin_collected(at: Vector2) -> void:
 
 func _on_seed_collected(type_id: String, at: Vector2) -> void:
 	var amount := 2 if randf() < UiCamp.twin_chance(GameState.get_twin_seeds_level()) else 1
+	if amount == 2:
+		twin_count += 1
 	seeds_by_type[type_id] = int(seeds_by_type.get(type_id, 0)) + amount
 	# +2 ide u loot prije množitelja. Lanac otključavanja i dalje broji jedan pickup.
 	GameState.record_seed_pickup_lifetime(type_id, 1)

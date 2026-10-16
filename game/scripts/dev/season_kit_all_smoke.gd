@@ -13,7 +13,7 @@ const FILLS := {"cream": "#FFF8F0", "peach": "#FFB88C", "lavender": "#D4A5FF"}
 const CTRL := [
 	["Gift", [24, 24, 180, 180], "cream"], ["Basket", [24, 220, 180, 180], "cream"],
 	["Upgrades", [876, 24, 180, 180], "cream"], ["Looks", [876, 1265, 180, 180], "cream"],
-	["GrownChip", [300, 112, 480, 76], "cream"], ["Seasons", [70, 1477, 236, 124], "cream"],
+	["Seasons", [70, 1477, 236, 124], "cream"],
 	["Play", [324, 1461, 432, 140], "peach"], ["Endless", [774, 1477, 236, 124], "lavender"],
 ]
 const TEXT := [["SeasonName", [240, 36, 600, 60]]]

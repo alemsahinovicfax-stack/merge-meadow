@@ -100,8 +100,8 @@ func _grant_loot_burst(save: bool) -> Dictionary:
 			_owner.save_player_save()
 		return {"flower": "", "added": added}
 	var flower: String = target["flower"]
-	var stash: Dictionary = _owner.garden_crystal_stash
-	stash[flower] = int(stash.get(flower, 0)) + MonetizationConfig.LOOT_BURST_STAR3
+	# Kroz domenu: ★3 iz Bursta se broji i kao uzgojen (Home polje), ne samo u stash.
+	_owner.crystal_stash_domain.add_many(flower, MonetizationConfig.LOOT_BURST_STAR3)
 	# ★3 iz Shopa je i u Albumu (Journal), kao ★3 iz Arene.
 	_owner.record_star3_in_album(flower)
 	if save:

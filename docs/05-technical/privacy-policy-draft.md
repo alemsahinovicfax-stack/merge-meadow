@@ -1,58 +1,59 @@
 ---
-status: draft
+type: tehnicko
+status: aktivan
 tags: [tehnicko, legal, privacy]
+povezano:
+  - sigurnost
+  - platforme
+  - play-internal-test
+ai_sažetak: "Politika privatnosti Merge Meadowa: izvor je privacy/index.html (objavljuje ga GitHub Pages workflow na push u master); ovdje sažetak, zašto ne kopiramo tuđu, i šta mora biti istina u igri prije launcha (UMP pristanak, ATT, Data safety, uzrast)."
 ---
 
-# Privacy policy (draft)
+# Politika privatnosti
 
-> **Status:** Predložak za M8 store submit. Hostaj na javnom URL-u (GitHub Pages, Notion, itd.).
+> **Izvor teksta:** [`privacy/index.html`](../../privacy/index.html) — engleski, za store. Push u `master` koji dira `privacy/**` pokreće workflow **Privacy policy Pages** i stranica ide javno na `https://alemsahinovicfax-stack.github.io/merge-meadow/` (link u Settingsu: `UiSettings.PRIVACY_URL`).
+>
+> **2026-10-16:** prepisana na zahtjev („premalo je"). Stara verzija je imala 5 kratkih sekcija; nova ima 13 i pokriva ono što Google Play, App Store i GDPR traže.
 
-## Merge Meadow — Privacy Policy
+## Zašto ne kopirati politiku druge igre
 
-**Last updated:** 2026-07-02
+1. **Tekst je tuđe autorsko djelo.**
+2. **Opisivala bi njihovu igru, ne našu.** Druge igre često imaju naloge, servere, analitiku (Firebase, Unity Analytics), cloud save i chat. Politika koja tvrdi nešto što igra ne radi (ili prešuti nešto što radi) je netačna. Google Play to provjerava uz *Data safety* formular, a Apple uz *App Privacy*.
 
-### Introduction
+Zato je tekst napisan prema onome što **naša** igra stvarno radi. Za provjeru može poslužiti besplatan generator (npr. *App Privacy Policy Generator*, otvoren kod), ali samo kao lista stvari koje ne smiju fale — ne kao tekst.
 
-Merge Meadow (“we”, “the app”) is a casual mobile game. This policy explains what data the app uses.
+## Šta politika kaže (sažetak)
 
-### Data we collect
+| Tema | Šta piše |
+|------|----------|
+| Nalog | Nema. Napredak je samo na uređaju (`user://player_save.json`). |
+| Reklame | Google AdMob: advertising ID / IDFA (samo uz ATT dozvolu), app set ID, IP, uređaj, interakcija s reklamama. Personalizovane uz pristanak (EEA / UK / CH), opt-out u SAD-u, *Settings → Privacy choices*. |
+| Kupovine | Google Play / App Store; mi ne vidimo podatke kartice; purchase token na uređaju (`granted_purchase_tokens`) protiv dupliranja; *Restore purchases*. |
+| Podrška | Email i poruka, samo za odgovor, najduže 12 mjeseci. |
+| Ne skupljamo | Lokaciju, kontakte, kameru, mikrofon, vlastitu analitiku; ne prodajemo podatke. |
+| Pravni osnov | Pristanak (personalizacija), ugovor (kupovine), legitimni interes (nepersonalizovane reklame, prevencija prevara, podrška). |
+| Prava | Pristup, ispravka, brisanje, prigovor, prenosivost, povlačenje pristanka; odgovor u 30 dana; žalba nadzornom tijelu. |
+| Djeca | Igra za opću publiku, nije namijenjena djeci ispod 13. |
+| Prenos | Google / Apple, SCC i EU–US Data Privacy Framework. |
 
-| Data | Collected? | Purpose |
-|------|------------|---------|
-| Personal account / email | **No** | We do not require login |
-| Game progress | **Local only** | Saved on your device |
-| Advertising ID | **Yes** (via AdMob) | To show ads in the free version |
-| Purchase history | **Yes** (via Google Play / App Store) | To process in-app purchases |
+## Mora biti istina u igri prije launcha
 
-### Third-party services
-
-- **Google AdMob** — ads ([Google Privacy Policy](https://policies.google.com/privacy))
-- **Google Play Billing / Apple StoreKit** — in-app purchases
-
-### Children
-
-The game is suitable for general audiences. We do not knowingly collect personal information from children.
-
-### Your rights
-
-You can reset local data by uninstalling the app or clearing app storage in device settings.
-
-### Contact
-
-If you have questions about this privacy policy or the app, contact us at:
-
-**Email:** mergemeadow.support@gmail.com
----
-
-## TODO prije launcha (M8)
-
-- [x] Zamijeni placeholder email
-- [ ] Objavi na javnom URL-u — vidi `privacy/index.html` + [[../06-production/play-internal-test#Korak 1|D5 korak 1]]
-- [ ] Link u Google Play Console i App Store Connect
-
-**Ciljani URL (GitHub Pages):** `https://alemsahinovicfax-stack.github.io/merge-meadow/`
+- [ ] **Identitet** — GDPR traži ime (ili firmu) i zemlju onoga ko odgovara za podatke. Na stranici je sada samo „independent developer" + email. Prije store submita dodaj u §1 svoje ime ili ime studija i zemlju (to i Play Console ionako javno prikazuje uz developer račun).
+- [ ] **Google UMP pristanak** (AdMob User Messaging Platform) prije prve reklame u EEA / UK / CH. Dugme *Privacy choices* treba da otvori UMP *privacy options* formular: Settings već zove `AdManager.show_privacy_options()` ako postoji, a dok ne postoji (AdMob još nije spojen — stub) otvara ovu stranicu.
+- [ ] **iOS:** ATT prompt prije IDFA (kad dođe iOS build).
+- [ ] **Play Console → Data safety:** uskladiti s politikom:
+  - *Device or other IDs* i *App interactions* / *Diagnostics* — prikupljeno i dijeljeno (AdMob, svrha: reklame, analitika reklama, prevencija prevara);
+  - *Purchase history* — ono što dolazi kroz Play Billing;
+  - *Personal info → Email* — samo ako korisnik piše podršci (*optional*);
+  - šifrovanje u prenosu: da (AdMob / Play);
+  - brisanje: korisnik briše lokalne podatke deinstalacijom.
+  - Googleova lista onoga što AdMob SDK prikuplja: *Google Mobile Ads SDK — data disclosure* (developers.google.com).
+- [ ] **Uzrast publike (Play → Target audience):** ako izabereš uzrast ispod 13, igra ulazi u *Families* pravila (samo certificirani ad SDK-ovi, child-directed tretman reklama) i politika se mora promijeniti. Preporuka: **13+**, uz AdMob max ad content rating **G**.
+- [ ] Ako se ikad doda analitika, crash reporting ili cloud save — prvo ažurirati politiku i Data safety.
+- [ ] Objava: GitHub Pages (repo javan ili GitHub Pro), pa URL u Play Console i App Store Connect.
 
 ## Povezano
 
 - [[sigurnost|sigurnost]]
 - [[platforme|platforme]]
+- [[../06-production/play-internal-test|play-internal-test]]

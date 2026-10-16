@@ -116,6 +116,9 @@ func _run() -> void:
 		if not unlocked.has(id):
 			unlocked.append(id)
 	gs.set("unlocked_seasons", unlocked)
+	# Od 2026-10-16 kartica poslije besplatnih nudi plaćene — bez kartice tek kad je sve kupljeno.
+	for def in SeasonCatalog.paid_defs():
+		gs.call("grant_paid_season", def.id)
 	gs.set("seed_bag", _bag(3))
 	camp.call("_on_tab_pressed", "seeds")
 	camp.call("refresh_for_meta_hub")

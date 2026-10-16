@@ -626,6 +626,53 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** svaki `load_threaded_request` ide kroz `BackgroundLoad.request` — kao poslovi u `WorkerThreadPool` (#31), ko pokrene posao, sačeka ga i na izlazu.
 
+## #40 — sloj iznad stranice (Settings, štand Shopa) ima manji z od sadržaja stranice
+
+**Datum:** 2026-10-16 (playtest)
+
+**Simptom:**
+- U Areni otvoriš Settings — neki elementi Arene (muncher, pilula „N / 50", combo oznaka) ostanu preko Settingsa.
+- U Shopu na Boosters tabu skrolaš — Pip (skin) iz kraja „All set" ide preko štanda s tabovima.
+
+**Uzrok:** `z_index` se sabira niz roditelje i važi preko cijelog canvasa, bez obzira na red u stablu:
+- Settings je imao z 50, a Arena ima slojeve do z 60 (muncher 45 + rig, pilula 60, combo 60; letenje coina je top_level z 100).
+- Štand Shopa je imao z 3, a Pip u karticama ide do z 15 (`UiPip.HOST_LIFT` 4 + dijelovi do 11), oznaka „Premium" z 16.
+- `clip_contents` ne pomaže: GL Compat na laptopu ne reže (#24), a štand je unutar iste stranice.
+
+**Rješenje:**
+- `SettingsScreen.Z` = 200.
+- Štand Shopa `TAB_BAR_Z` = 20, toast 22.
+- `fixes_1016_smoke.gd` računa efektivni z cijelog podstabla (relativni z, top_level) i traži da je sloj iznad najvišeg sadržaja.
+
+**Prevencija:** svaki sloj koji mora pokriti stranicu (overlay, štand, header) dobija z iznad **najvišeg efektivnog z sadržaja** — izmjeri ga (kao u testu), ne pretpostavljaj. Kad dodaješ novi visok z (Pip `HOST_LIFT`, oznake, letenje), provjeri overlaye iznad njega.
+
+## #41 — vreća sjemena s limitom tiho briše plijen
+
+**Datum:** 2026-10-16 (drugi put; prvi put 2026-10-05, `seasons-izvjestaj` #4)
+
+**Simptom:** na kraju runa plijen se vidi (i ×2), a u Campu sjemena nema.
+
+**Uzrok:** `SEED_BAG_SOFT_CAP` 40 — `add_seeds_to_bag` je dodavao samo do limita, a `deposit_loot_to_camp` je ostatak brisao. U save-u igrača 38 / 40 → od plijena su stala 2 sjemena. Poruka „Bag full · X of Y" na kraju runa nije bila dovoljna.
+
+**Rješenje:** vreća nema limit (`SeedBagDomain.add`). Arena ionako sipa samo koliko polje prima, pa višak čeka u vreći. Isto su ranije tiho gubili ostatak Arene (T1 natrag u vreću) i vacuum T2 → 2 × T1.
+
+**Prevencija:** pravilo koje odbacuje igračevu zaradu ne smije biti tiho — ili se ne odbacuje, ili igrač bira (prodaj / ostavi). Test: `fixes_1016_smoke` (vreća 38 + plijen 20 = 58).
+
+## #42 — množitelj po tipu „pojede" bonus; revive ga primijeni dvaput
+
+**Datum:** 2026-10-16
+
+**Simptom:** igrač kupi Loot Boost, a plijen izgleda isto kao prije („kao da se ne aplicira").
+
+**Uzrok:**
+- `finish_run` je zaokruživao svaki tip posebno: `round(1 × 1,25) = 1`. Run s mnogo tipova po jedno-dva sjemena dobije 0–1 bonusa.
+- Revive je nastavljao od `carry_seed_bag` (već pojačan), pa se na kraju množilo drugi put.
+- Nigdje se nije vidjelo da je boost primijenjen.
+
+**Rješenje:** `scale_loot_seeds` — cilj na ukupnom broju, raspodjela najvećim ostatkom; sirovi carry za revive; zlatni pečat na loot ekranu.
+
+**Prevencija:** množitelj na zbiru koji se dijeli po kategorijama računaj na **ukupno** pa raspodijeli; stanje koje se nastavlja čuvaj **prije** transformacije. Testovi: `loot_boost_twin_smoke`, GUT `test_game_state_loot_boost`.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

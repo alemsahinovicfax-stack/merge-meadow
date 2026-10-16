@@ -55,12 +55,29 @@ const BAG_HIT := UiArenaV2.BASKET_HIT
 const BAG_BOTTOM_GAP := UiArenaV2.BASKET_BOTTOM_GAP
 ## Keepout relativno na (centar vrece, dno vrece) — stit oko vrece, siri od same vrece.
 const BAG_KEEPOUT := Rect2(-185, -349, 370, 520)
-## Krtičnjak Nibbsa (270 × 124, paket muncher_premium_pip): centar na y 132 kao u paketu —
-## zzz iznad usnulog munchera ostaje u polju.
-const NEST_Y := 132.0
-## Spawn keepout gnijezda (samo spawn — gnijezdo je overlay, ne prepreka).
-const NEST_KEEPOUT_HALF_W := 140.0
-const NEST_KEEPOUT_BOTTOM := 215.0
+## Krtičnjak Nibbsa (270 × 124, paket muncher_premium_pip) stoji u SREDINI polja (2026-10-16,
+## na zahtjev — bio je na vrhu, y 132): centar polja 1080 × 1589 = (540, 795); keepout korpe
+## počinje tek na y ~1200, pa se ne preklapaju.
+const NEST_Y_FRAC := 0.5
+## Spawn keepout gnijezda oko centra (samo spawn — gnijezdo je overlay, ne prepreka). Keepout
+## je za CENTRE sjemenki, pa je krtičnjak (270 × 124, zzz ~40 iznad) proširen za poluprečnik
+## sjemenke (~67): 135 + 67 lijevo / desno, 62 + 40 + 67 iznad, 62 + 67 ispod.
+const NEST_KEEPOUT_HALF_W := 202.0
+const NEST_KEEPOUT_ABOVE := 170.0
+const NEST_KEEPOUT_BELOW := 130.0
+
+
+## Centar gnijezda u lokalnim koordinatama polja.
+static func nest_center(field_size: Vector2) -> Vector2:
+	return Vector2(field_size.x * 0.5, roundf(field_size.y * NEST_Y_FRAC))
+
+
+static func nest_keepout(field_size: Vector2) -> Rect2:
+	var c := nest_center(field_size)
+	return Rect2(
+		c.x - NEST_KEEPOUT_HALF_W, c.y - NEST_KEEPOUT_ABOVE,
+		NEST_KEEPOUT_HALF_W * 2.0, NEST_KEEPOUT_ABOVE + NEST_KEEPOUT_BELOW
+	)
 ## Meta leta T3 kristala — gornji desni ugao polja, gdje je stajao stash brojac.
 const CRYSTAL_EXIT_INSET := Vector2(120, 90)
 const PIP_SIZE := 150.0

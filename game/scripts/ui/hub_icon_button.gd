@@ -4,6 +4,8 @@ extends HubPressable
 ## Icon tile u hub headeru (Settings) — tile 100 x 100 u hit-zoni 124 x 140.
 
 const PRESSED_SCALE := 0.96
+## Zaključan (runda u Areni): kao neaktivni tabovi, 60 %.
+const DISABLED_ALPHA := 0.6
 
 var _icon_texture: Texture2D = null
 var _style_normal: StyleBoxFlat = null
@@ -33,6 +35,7 @@ func _apply_state() -> void:
 	var pressing := is_pressing()
 	_tile.add_theme_stylebox_override("panel", _style_pressed if pressing else _style_normal)
 	_tile.scale = Vector2.ONE * (PRESSED_SCALE if pressing else 1.0)
+	_tile.modulate.a = DISABLED_ALPHA if disabled else 1.0
 
 
 func _build() -> void:

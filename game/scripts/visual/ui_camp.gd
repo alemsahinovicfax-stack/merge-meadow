@@ -331,8 +331,11 @@ static func season_tint(season_id: String) -> Color:
 			return SEASON_LANTERN
 		"amber_canopy":
 			return SEASON_AMBER
-		_:
+		"frost_orchard":
 			return SEASON_FROST
+		_:
+			# Plaćene sezone na link kartici (2026-10-16): svijetla boja livade sezone.
+			return UiHomeField.MEADOW_GROUND.get(season_id, SEASON_FROST)
 
 
 ## Pilula s imenom sezone na sheetu nadogradnji (camp v3 SeasonTitle) — radi za svih 8
@@ -368,8 +371,10 @@ static func season_tint_edge(season_id: String) -> Color:
 			return SEASON_LANTERN_EDGE
 		"amber_canopy":
 			return SEASON_AMBER_EDGE
-		_:
+		"frost_orchard":
 			return SEASON_FROST_EDGE
+		_:
+			return season_tint(season_id).darkened(0.24)
 
 
 static func rarity_bg(rarity: int) -> Color:
@@ -788,6 +793,12 @@ static func unlock_button_ink(state: String) -> Color:
 	if state == SEASON_READY or state == SEASON_UNLOCKING:
 		return INK
 	return SEASON_INK_DIM
+
+
+## Plaćena sezona na link kartici (sve besplatne otključane): dugme = cijena.
+const S_PREMIUM_SEASON := "Premium season"
+const S_PREMIUM_FLOWERS := "%d new flowers"
+const S_BUYING := "…"
 
 
 ## Jedna rijec. Koliko fali vec pisu trake napretka iznad dugmeta.

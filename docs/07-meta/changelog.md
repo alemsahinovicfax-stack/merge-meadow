@@ -9,6 +9,43 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-16
+
+- **Ispravke poslije playtesta** (izvještaj `design-drafts/ispravke-1016-izvjestaj.md`):
+  - **Arena + Settings:** Settings je iznad svega (`SettingsScreen.Z` 200 — Arena ima slojeve do z 60, pa su muncher, pilula i combo virili preko njega). Dok traje runda, zupčanik je zaključan i prigušen kao tabovi.
+  - **Muncher:**
+    - gnijezdo je u sredini polja (`UiArena.nest_center`, keepout oko njega);
+    - lov uvijek ide na sjemenku koja je SADA najbliža — cilj se bira svakih 0,25 s, mijenja se kad je druga bliža bar 24 px; ranije je „zaključao" prvu metu, pa ju je igrač mogao odvući na kraj polja.
+  - **Camp link kartica:** kad su sve besplatne sezone otključane, nudi prvu plaćenu koju igrač nema — ime i zlatno dugme s cijenom (bez coina i ★3). Kupovina ide kroz IAPManager, pa burst i Home na kupljenoj sezoni; kartica nestaje kad je sve kupljeno (`next_unowned_paid_id`).
+  - **Camp cvijeće:** rezervisani ★3 tip (alert „za sljedeću sezonu") je uvijek zadnji.
+  - **Home polje sezone:**
+    - raste po ukupno uzgojenom ★3 (`star3_grown` u save-u; Arena T3 i Loot Burst ga dižu, prodaja i otključavanje ne);
+    - ranije je čitalo stash, pa se poslije prodaje ništa nije vidjelo, ni novi T3 iz Arene;
+    - stari save: brojač iz stasha i Albuma (kept ★3 = bar 1);
+    - čip „0 / 13 grown" uklonjen.
+  - **Vreća sjemena bez limita** (`SEED_BAG_SOFT_CAP` više nije limit): plijen runa, ostatak Arene i vacuum T2 su se tiho gubili kad je vreća bila blizu 40. Poruka „Bag full" i „pun bag" kod Loot Bursta uklonjeni.
+  - **Shop:** štand s tabovima z 20 — Pip u karticama (do z 15) i oznaka „Premium" (z 16) su pri skrolu išli preko njega (z 3).
+  - **Nadogradnje na polju** (Magnet / Loot Boost / Twin Seeds):
+    - smiju potrošiti sve ★3 sezone;
+    - ranije su čuvale onoliko koliko traži sljedeća besplatna sezona, pa je npr. 20 / 20 Crystal Peony na Frostu blokiralo sve tri, a dugme je izgledalo kao „nema cvijeća";
+    - kad kupovina zadire u to cvijeće, sheet kaže „Uses flowers saved for <sezona>";
+    - Kept granica ostaje za prodaju u Campu.
+  - Testovi: novi `fixes_1016_smoke`; `camp_season_link_smoke` (plaćena sezona i kupovina); `home_field_overlay_smoke`, `season_kit_all_smoke`; GUT `test_game_state_seed_bag`. Katalog grešaka #40 (z sloja iznad stranice), #41 (vreća s limitom briše plijen).
+- **Loot Boost i Twin Seeds** (playtest: „kao da mi se ne aplicira"):
+  - **Bonus na ukupno sjeme:** `scale_loot_seeds` množi ukupan broj i višak dijeli po tipovima (najveći ostatak). Ranije se zaokruživalo po tipu — 1 × 1,25 = 1, pa run s mnogo tipova po jedno-dva sjemena nije dobijao skoro ništa (5 različitih × 1,25 = 5, sada 6). Nijedan tip ne dobije manje nego što je skupljen; coini `round(raw × m)` kao i prije.
+  - **Revive:** run se nastavljao s već pojačanim brojevima (`carry_seed_bag`), pa se boost na kraju primijenio drugi put na sve prije pada. Sada se pamte sirovi brojevi (`carry_raw_seed_bag`, `carry_raw_coins`, `carry_twins`) i boost ide jednom.
+  - **Vidljivo:** na kraju runa zlatni pečat desno na plijenu — „Loot Boost ×1.25 · 3 twins" (skraćuje se do „ · " ako bi udario u „Kept half"). Pauza već pokazuje plijen s boostom.
+  - **Twin Seeds radi:** 8 % po nivou (32 % na nivou 4), samo sjeme sa staze (ne nagradni grm); broj twinova ide u pečat (`last_run_twins`).
+  - Nadogradnje su **po sezoni** — kupljeno na polju Frosta važi u runu Frosta (otvaranje polja je postavlja kao aktivnu).
+  - Testovi: novi `loot_boost_twin_smoke` (svi nivoi, kupovina po sezoni, pravi run s pickupima, Twin 0 / 4, revive, loot ekran) i GUT `test_game_state_loot_boost` (11); `loot_logic_smoke` (pauza s boostom na ukupno). Katalog grešaka #42.
+- **Politika privatnosti** (`privacy/index.html`, `privacy-policy-draft.md`):
+  - napisana iznova, 13 sekcija: AdMob i pristanak (EEA / UK / CH), opt-out u SAD-u, kupovine, šta ne skupljamo, pravni osnov, rokovi, prava, djeca, prenos, sigurnost, promjene;
+  - lista onoga što mora biti istina u igri prije launcha (UMP, ATT, Data safety, uzrast 13+, identitet).
+- **Brief za Claude Design** `run-pickups-cd-brief.md`:
+  - (A) puni redizajn pickupa u runu i dodira sa Pipom — slike `run-pickups-ref/`;
+  - (B) Camp link kartica za 4 plaćene sezone u Season Kit stilu besplatnih (recept „camp", stanja s cijenom) — slike `camp-paid-card-ref/`;
+  - u `scope-i-granice.md` (launch IN) na zahtjev.
+
 ## 2026-10-15
 
 - **Muzika po sezoni — drugi ciklus** (zahtjev „radi na unikatnosti, nemoj da zvuči slično kao druge sezone", izvještaj `zvuk-izvjestaj.md` § Drugi ciklus, dizajn `muzika-sezone.md`):

@@ -327,7 +327,7 @@ func _validate_crystal_selection() -> void:
 		return
 	if int(GameState.garden_crystal_stash.get(_selected_crystal_type, 0)) >= 1:
 		return
-	var entries := GameState.get_garden_crystal_entries()
+	var entries := _crystal_entries()
 	_selected_crystal_type = str(entries[0].get("type_id", "")) if not entries.is_empty() else ""
 
 
@@ -378,7 +378,7 @@ func _rebuild_seed_bag_grid() -> void:
 
 
 func _rebuild_crystal_grid() -> void:
-	var entries := GameState.get_garden_crystal_entries()
+	var entries := _crystal_entries()
 	if _force_default_crystal_select:
 		_force_default_crystal_select = false
 		_selected_crystal_type = str(entries[0].get("type_id", "")) if not entries.is_empty() else ""
@@ -443,6 +443,25 @@ func _sync_chip_counts(grid: GridContainer, source: Dictionary) -> void:
 
 
 # --- Rezervisano ★3 cvijece ---
+
+## Cvijeće u Campu: redoslijed iz stasha (rijetkost, ime), ali rezervisani ★3 tip (alert
+## „treba za sljedeću sezonu") uvijek na kraju liste (2026-10-16, na zahtjev) — prvo se
+## nudi ono što se slobodno prodaje.
+func _crystal_entries() -> Array[Dictionary]:
+	var entries := GameState.get_garden_crystal_entries()
+	var reserved_type := str(_reserve_info().get("type_id", ""))
+	if reserved_type.is_empty():
+		return entries
+	var out: Array[Dictionary] = []
+	var tail: Array[Dictionary] = []
+	for e in entries:
+		if str(e.get("type_id", "")) == reserved_type:
+			tail.append(e)
+		else:
+			out.append(e)
+	out.append_array(tail)
+	return out
+
 
 ## ★3 tip i broj koji sljedeca besplatna sezona trazi (npr. 20 Harvest Pumpkin
 ## za Frost Orchard); prazno kad nema sljedece sezone.
@@ -565,10 +584,10 @@ func _crystal_step() -> bool:
 		return false
 	var crystal_type := _selected_crystal_type
 	if int(GameState.garden_crystal_stash.get(crystal_type, 0)) < 1:
-		var leftover := GameState.get_garden_crystal_entries()
+		var leftover := _crystal_entries()
 		_selected_crystal_type = str(leftover[0].get("type_id", "")) if not leftover.is_empty() else ""
 		return false
-	var entries_before: Array = GameState.get_garden_crystal_entries()
+	var entries_before: Array = _crystal_entries()
 	if not GameState.exchange_garden_crystal(crystal_type, false):
 		return false
 	if int(GameState.garden_crystal_stash.get(crystal_type, 0)) < 1:
@@ -659,10 +678,7 @@ func _refresh_wallet_labels() -> void:
 	if coins_label:
 		coins_label.text = "%d" % GameState.wallet_coins
 	if seeds_label:
-		seeds_label.text = "%d / %d" % [
-			GameState.sum_seed_bag(GameState.seed_bag),
-			GameState.SEED_BAG_SOFT_CAP,
-		]
+		seeds_label.text = "%d" % GameState.sum_seed_bag(GameState.seed_bag)
 
 
 func _refresh_collection_badge() -> void:

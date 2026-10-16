@@ -71,8 +71,6 @@ const LEVEL_SEG       := Vector2i(28, 14)
 const LEVEL_SEG_GAP   := 6
 
 const SEASON_LABEL_RECT := Rect2i(228, 36, 624, 56)
-const GROWN_CHIP_Y      := 112
-const GROWN_CHIP_H      := 76
 const HINT_RECT         := Rect2i(236, 230, 600, 184)
 
 const BOTTOM_ROW   := Rect2i(70, 1461, 940, 148)
@@ -109,6 +107,8 @@ const MEADOW_SPOTS := [
 	[34, 26, 168, 5, 10],
 ]
 const PIP_SIZE := 190
+## Sheet nadogradnji: kupovina troši ★3 koje čeka sljedeća besplatna sezona (2026-10-16).
+const S_UPGRADE_USES_KEPT := "Uses flowers saved for %s"
 ## Ormar: zona sužena na x ≤ 765 (desni rub Pipa 860 = 16 do pločice Looks).
 const PIP_BASE_ZONE := Rect2i(151, 1306, 614, 131)
 const PIP_DEFAULT_BASE := Vector2i(756, 1404)
@@ -221,9 +221,6 @@ static func attention_ring() -> StyleBoxFlat:
 	var sb := _box(Color(0, 0, 0, 0), 32, 4, STICKER_EDGE)
 	sb.draw_center = false
 	return sb
-
-static func grown_chip() -> StyleBoxFlat:
-	return sticker(STICKER, 38, false)
 
 static func tutorial_hint() -> StyleBoxFlat:
 	return sticker(STICKER, 28, false)
