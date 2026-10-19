@@ -25,6 +25,7 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - Upgradei: magnet, množitelj (min 4 levela svaki)
 - Run: header u jednom redu, vertikalna traka napretka umjesto sekundi, nagradni grm između traka (pokupi se pri promjeni trake) — dodano 2026-10-09 na zahtjev, [[../04-experience/design-drafts/run-hud-v2-cd-brief|run-hud-v2-cd-brief]]
 - Run: puni redizajn pickupa (sjemenka i coin na stazi, magnet, dodir sa Pipom, Pip reakcije, let „+1") — samo vizuelno, pravila ista — dodano 2026-10-16 na zahtjev, [[../04-experience/design-drafts/run-pickups-cd-brief|run-pickups-cd-brief]]
+- Home: Level Path po sezoni — Play u polju otvara krivudavi putić od 20 levela (Pip na trenutnom), napredak odvojen po sezoni, nagrade na 5/10/15/20 (2/4/6/10 ★3 cvjetova sezone + 200/400/600/1000 coina) claim tapom uz popup — dodano 2026-10-19 na zahtjev, [[../04-experience/design-drafts/level-path-cd-brief|level-path-cd-brief]]
 - 2 ljubimca (Pip default + 1 unlock)
 
 ### UX / flow

@@ -9,6 +9,14 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-19
+
+- **Brief za Claude Design** `level-path-cd-brief.md` — Level Path po sezoni:
+  - Play u polju sezone otvara skrolabilan krivudavi putić od 20 levela; Play dugme ostaje isto i na istom mjestu;
+  - Pip stoji na trenutnom levelu; napredak odvojen po sezoni (8 dizajna);
+  - nagrade na 5 / 10 / 15 / 20: 2 / 4 / 6 / 10 ★3 cvjetova sezone + 200 / 400 / 600 / 1000 coina, claim tapom uz popup;
+  - slike `level-path-ref/` (polje svih 8 sezona, `level_path_capture.gd`); scope dopunjen.
+
 ## 2026-10-16
 
 - **Ispravke poslije playtesta** (izvještaj `design-drafts/ispravke-1016-izvjestaj.md`):
