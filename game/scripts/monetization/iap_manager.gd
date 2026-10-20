@@ -14,6 +14,21 @@ const _PRODUCT_TYPE_INAPP := 0
 const _RESPONSE_OK := 0
 const _PURCHASE_STATE_PURCHASED := 1
 
+
+## store = Play billing spreman. unavailable = Android release bez billinga (ne daruj).
+## Sve ostalo (editor, Windows, debug APK) ostaje stub da Shop i smoke i dalje rade.
+static func purchase_route(on_android: bool, billing_ready: bool, debug_or_editor: bool) -> String:
+	if on_android and billing_ready:
+		return "store"
+	if on_android and not debug_or_editor:
+		return "unavailable"
+	return "stub"
+
+
+## Consumable se završava consume-om. Acknowledge bi ga zaključao kao owned.
+static func store_finish_action(consumable: bool) -> String:
+	return "consume" if consumable else "acknowledge"
+
 var _busy: bool = false
 var _restore_pending: bool = false
 var _billing_client: Object = null
@@ -89,10 +104,18 @@ func purchase(sku: String) -> void:
 		return
 	_busy = true
 	_pending_purchase_sku = sku
-	if OS.get_name() == "Android" and _billing_ready:
-		_purchase_android(sku)
-	else:
-		_purchase_stub(sku)
+	var route := purchase_route(
+		OS.get_name() == "Android",
+		_billing_ready,
+		OS.is_debug_build() or OS.has_feature("editor")
+	)
+	match route:
+		"store":
+			_purchase_android(sku)
+		"stub":
+			_purchase_stub(sku)
+		_:
+			_fail_purchase(sku, "unavailable")
 
 
 func restore_purchases() -> void:
@@ -134,6 +157,7 @@ func _try_init_billing() -> bool:
 	_connect_billing_signal("on_purchase_updated", _on_purchase_updated)
 	_connect_billing_signal("on_purchases_updated", _on_purchase_updated)
 	_connect_billing_signal("acknowledge_purchase_response", _on_acknowledge_purchase_response)
+	_connect_billing_signal("consume_purchase_response", _on_consume_purchase_response)
 	return true
 
 
@@ -223,6 +247,22 @@ func _on_acknowledge_purchase_response(result: Dictionary) -> void:
 	_pending_ack_tokens.erase(token)
 	if sku.is_empty():
 		return
+	# Grant tek kad Play potvrdi acknowledge. Prije ovoga UI je javljao uspjeh bez predmeta.
+	_grant_product(sku, token, true)
+	_complete_purchase(sku)
+
+
+func _on_consume_purchase_response(result: Dictionary) -> void:
+	var token := str(result.get("token", ""))
+	var sku := str(_pending_ack_tokens.get(token, ""))
+	_pending_ack_tokens.erase(token)
+	if int(result.get("response_code", -1)) != _RESPONSE_OK:
+		push_warning("IAPManager: consume failed for token %s" % token)
+		_fail_purchase(sku if not sku.is_empty() else _pending_purchase_sku, "consume_failed")
+		return
+	if sku.is_empty():
+		return
+	_grant_product(sku, token, true)
 	_complete_purchase(sku)
 
 
@@ -256,6 +296,9 @@ func _process_purchase(purchase: Dictionary, from_user_flow: bool) -> void:
 	if from_user_flow:
 		_pending_purchase_sku = sku
 	var token := str(purchase.get("purchase_token", ""))
+	if CONFIG.is_consumable(sku):
+		_finish_consumable(sku, token, from_user_flow)
+		return
 	if bool(purchase.get("is_acknowledged", false)):
 		_grant_product(sku, token, from_user_flow)
 		if from_user_flow:
@@ -267,6 +310,24 @@ func _process_purchase(purchase: Dictionary, from_user_flow: bool) -> void:
 		return
 	_pending_ack_tokens[token] = sku
 	_billing_client.call("acknowledge_purchase", token)
+
+
+func _finish_consumable(sku: String, token: String, from_user_flow: bool) -> void:
+	if token.is_empty():
+		if from_user_flow:
+			_fail_purchase(sku, "missing_token")
+		return
+	if GameState.has_granted_purchase_token(token):
+		if from_user_flow:
+			_complete_purchase(sku)
+		return
+	if _billing_client == null or not _billing_client.has_method("consume_purchase"):
+		push_error("IAPManager: consume_purchase missing — Loot Burst not granted")
+		if from_user_flow:
+			_fail_purchase(sku, "consume_unavailable")
+		return
+	_pending_ack_tokens[token] = sku
+	_billing_client.call("consume_purchase", token)
 
 
 func _grant_product(sku: String, purchase_token: String = "", from_user_flow: bool = true) -> void:

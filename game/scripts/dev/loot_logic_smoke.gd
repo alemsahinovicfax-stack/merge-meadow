@@ -173,34 +173,48 @@ func _run() -> void:
 		_fail("loot burst target unexpected %s" % str(target))
 		return
 	var burst_sku := str(CONFIG.SKU_BOOSTER_LOOT_BURST)
+	# Loot Burst je consumable (MEAD-4): nagrada tek kad trgovina potvrdi consume. Lažni billing
+	# klijent odmah javi uspjeh; bez tokena nema consume-a, pa ni nagrade.
+	var fake := _FakeBilling.new()
+	fake.iap = iap
+	var real_client: Variant = iap.get("_billing_client")
+	iap.set("_billing_client", fake)
 	iap.call("_process_purchase", _acknowledged(burst_sku, "tok-a"), false)
 	if _stash_count(gs, flower) != add:
-		_fail("first restore token should grant %d, got %d" % [add, _stash_count(gs, flower)])
+		_fail("first restore token should grant %d after consume, got %d" % [add, _stash_count(gs, flower)])
+		iap.set("_billing_client", real_client)
 		return
 	iap.call("_process_purchase", _acknowledged(burst_sku, "tok-a"), false)
 	if _stash_count(gs, flower) != add:
 		_fail("same token on restore must not grant again, got %d" % _stash_count(gs, flower))
+		iap.set("_billing_client", real_client)
 		return
 	iap.call("_process_purchase", _acknowledged(burst_sku, ""), false)
-	if _stash_count(gs, flower) != add:
-		_fail("empty token on restore must not grant, got %d" % _stash_count(gs, flower))
-		return
 	iap.call("_process_purchase", _acknowledged(burst_sku, ""), true)
-	if _stash_count(gs, flower) != add * 2:
-		_fail("user purchase with empty token should still grant, got %d" % _stash_count(gs, flower))
+	if _stash_count(gs, flower) != add:
+		_fail("purchase without token cannot be consumed and must not grant, got %d" % _stash_count(gs, flower))
+		iap.set("_billing_client", real_client)
 		return
 	tokens = gs.get("granted_purchase_tokens")
 	if tokens.has(""):
 		_fail("empty token must not be recorded")
+		iap.set("_billing_client", real_client)
 		return
 	iap.call("_process_purchase", _acknowledged(burst_sku, "tok-b"), true)
-	if _stash_count(gs, flower) != add * 3:
+	if _stash_count(gs, flower) != add * 2:
 		_fail("a different token should grant once more, got %d" % _stash_count(gs, flower))
+		iap.set("_billing_client", real_client)
 		return
 	iap.call("_process_purchase", _acknowledged(burst_sku, "tok-b"), false)
-	if _stash_count(gs, flower) != add * 3:
+	if _stash_count(gs, flower) != add * 2:
 		_fail("tok-b restore must not grant again, got %d" % _stash_count(gs, flower))
+		iap.set("_billing_client", real_client)
 		return
+	if fake.consumed != ["tok-a", "tok-b"]:
+		_fail("each token should be consumed exactly once, got %s" % str(fake.consumed))
+		iap.set("_billing_client", real_client)
+		return
+	iap.set("_billing_client", real_client)
 	tokens = gs.get("granted_purchase_tokens")
 	if not tokens.has("tok-a") or not tokens.has("tok-b"):
 		_fail("both purchase tokens should be recorded, got %s" % str(tokens))
@@ -324,6 +338,18 @@ func _run() -> void:
 
 	print("loot_logic_smoke OK")
 	_quit(0)
+
+
+## Billing klijent za test: consume odmah uspije (kao Play poslije kupovine).
+class _FakeBilling:
+	extends RefCounted
+
+	var iap: Node
+	var consumed: Array[String] = []
+
+	func consume_purchase(token: String) -> void:
+		consumed.append(token)
+		iap.call("_on_consume_purchase_response", {"token": token, "response_code": 0})
 
 
 func _acknowledged(sku: String, token: String) -> Dictionary:

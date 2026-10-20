@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#211B26}a{color:#FFD56B}a:hover{color:#FFF8F0}</style>
+<script src="./pip_art.js"></script>
+<script src="./pip_runtime.js"></script>
+<script src="./pip_anim.js"></script>
+<script src="./pip_pickups.js"></script>
+<script src="./pickup_data.js"></script>
+<script src="./pickup_engine.js"></script>
+</helmet>
+<section data-screen-label="Run pickups" style="box-sizing:border-box;padding:56px 64px 80px;display:flex;flex-direction:column;gap:48px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0;min-width:1500px">
+
+  <div data-layer="Header" style="display:flex;flex-direction:column;gap:14px;max-width:1300px">
+    <div style="font:800 22px/1 Nunito,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#FFD56B">Merge Meadow · A · Run pickupi</div>
+    <div style="font:900 56px/1.05 Nunito,sans-serif">Pip ih uzima — ne nestaju.</div>
+    <div style="font:700 24px/1.4 Nunito,sans-serif;color:#E6DDEB;max-width:1100px;text-wrap:pretty">Coin se ulovi na nos, okrene se i nestane u bljesku; sjemenka se iščupa iz zemljice i skoči Pipu u šape, pa u džep na leđima. ★2 dobija oreol od latica, ★3 zlatni oreol i cvijet u letu, twin dvije sadnice i pečat ×2. Niz coina raste — prsten, krhotine i trzaj brojača jačaju do 5. coina. Ostale stranice: <a href="CampPaidCards.dc.html">B · Camp kartice</a> · <a href="Specs.dc.html">Specs</a></div>
+  </div>
+
+  <div data-layer="Toolbar" style="display:flex;flex-wrap:wrap;gap:28px;align-items:center;padding:20px 24px;border-radius:22px;background:#2E2636;border:2px solid #44394F;max-width:1500px;box-sizing:border-box">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:800 18px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#BFB3C9">Livada</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ seasons }}" as="s" hint-placeholder-count="8">
+          <div onClick="{{ s.pick }}" style="{{ s.style }}">{{ s.name }}</div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:800 18px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#BFB3C9">Magnet (glavna scena)</div>
+      <div style="display:flex;gap:8px">
+        <sc-for list="{{ magnets }}" as="m" hint-placeholder-count="5">
+          <div onClick="{{ m.pick }}" style="{{ m.style }}">{{ m.label }}</div>
+        </sc-for>
+      </div>
+    </div>
+    <div onClick="{{ toggleSlow }}" style="{{ slowStyle }}">{{ slowLabel }}</div>
+  </div>
+
+  <div data-layer="MainRow" style="display:flex;gap:48px;align-items:flex-start;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="font:900 30px/1 Nunito,sans-serif">Scena 1080 × 1920 · HUD v2</div>
+      <div data-layer="MainArtboard" style="position:relative;width:486px;height:864px;overflow:hidden;border-radius:18px;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(0,0,0,.35);flex:0 0 auto">
+        <div data-stage="main" style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;transform:scale(.45)">
+          <div data-scene="main" style="position:absolute;inset:0"></div>
+          <div data-layer="ProgressRail" style="position:absolute;left:24px;top:200px;width:116px;height:1540px;z-index:6">
+            <div style="position:absolute;left:46px;top:100px;width:28px;height:1400px;border-radius:14px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 5px 0 rgba(18,28,22,.42);box-sizing:border-box;overflow:hidden">
+              <div style="position:absolute;left:3px;right:3px;bottom:3px;height:691px;border-radius:9px;background:#A8E6CF"></div>
+              <div style="position:absolute;left:0;right:0;top:697px;height:4px;background:#2D3436"></div>
+            </div>
+            <img src="icons/progress_start.svg" alt="" style="position:absolute;left:36px;top:1488px;width:48px;height:24px">
+            <img src="icons/progress_flag.svg" alt="" style="position:absolute;left:49px;top:6px;width:64px;height:96px">
+            <div style="position:absolute;left:12px;top:754px;width:92px;height:92px;border-radius:50%;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(18,28,22,.42);box-sizing:border-box;overflow:hidden;display:grid;place-items:center">
+              <img src="icons/pip_hud_classic.svg" alt="" style="width:84px;height:84px;display:block;margin:2px 0 0 0">
+            </div>
+          </div>
+          <div data-layer="TopHud" style="position:absolute;left:0;top:60px;width:1080px;height:128px;z-index:7">
+            <div style="position:absolute;left:40px;top:0;height:128px;min-width:200px;padding:0 32px;border-radius:30px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:12px">
+              <img src="icons/progress_flag.svg" alt="" style="width:38px;height:57px;flex:0 0 auto">
+              <div style="font:900 48px/1 Nunito,sans-serif;color:#2D3436;white-space:nowrap">Level 12</div>
+            </div>
+            <div data-hud="coin" data-layer="CoinChip" style="position:absolute;left:520px;top:0;width:180px;height:128px;border-radius:30px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:10px">
+              <img src="icons/icon_coin.svg" alt="" style="width:52px;height:52px;flex:0 0 auto">
+              <div data-hud="coinNum" style="font:900 56px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">12</div>
+            </div>
+            <div data-hud="seed" data-layer="SeedChip" style="position:absolute;left:716px;top:0;width:180px;height:128px;border-radius:30px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:10px">
+              <img src="icons/icon_seed.svg" alt="" style="width:52px;height:52px;flex:0 0 auto">
+              <div data-hud="seedNum" style="font:900 56px/1 Nunito,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">5</div>
+            </div>
+            <div style="position:absolute;left:912px;top:0;width:128px;height:128px;border-radius:30px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);box-sizing:border-box;display:grid;place-items:center">
+              <img src="icons/icon_pause.svg" alt="Pause" style="width:60px;height:60px">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;width:360px">
+      <div style="font:900 30px/1 Nunito,sans-serif">Dodir</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ scenarios }}" as="sc" hint-placeholder-count="7">
+          <div onClick="{{ sc.pick }}" style="{{ sc.style }}">
+            <div>{{ sc.label }}</div>
+            <div style="font:700 18px/1.2 Nunito,sans-serif;opacity:.8">{{ sc.note }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div data-layer="Stats" style="margin-top:8px;padding:16px 18px;border-radius:16px;background:#2E2636;border:2px solid #44394F;display:flex;flex-direction:column;gap:8px;font:700 20px/1.3 Nunito,sans-serif;color:#E6DDEB">
+        <div style="font:800 16px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#BFB3C9">Mjereno uživo</div>
+        <div>FX sprite-ova sada: <b data-stat="fx">0</b></div>
+        <div>FX max u petlji: <b data-stat="maxFx">0</b> / 24</div>
+        <div>Dodira istovremeno max: <b data-stat="maxTouch">0</b> / 3</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="Closeups" style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font:900 34px/1 Nunito,sans-serif">Dodiri izbliza · 540 × 640 oko Pipa</div>
+      <div style="font:700 22px/1.3 Nunito,sans-serif;color:#BFB3C9">Svaki u petlji; prekidač „usporeno ×4" gore važi za sve.</div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px">
+      <sc-for list="{{ closeups }}" as="c" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="position:relative;width:324px;height:384px;overflow:hidden;border-radius:16px;border:3px solid #2D3436">
+            <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;transform:scale(.6) translate(-270px,-1180px)">
+              <div data-scene="{{ c.id }}" data-kind="close" style="position:absolute;inset:0"></div>
+            </div>
+          </div>
+          <div style="font:900 24px/1 Nunito,sans-serif">{{ c.label }}</div>
+          <div style="font:700 18px/1.3 Nunito,sans-serif;color:#BFB3C9;max-width:324px">{{ c.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="Pip" style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font:900 34px/1 Nunito,sans-serif">Pip reakcije · pogled top, overlay preko run_gallop</div>
+      <div style="font:700 22px/1.3 Nunito,sans-serif;color:#BFB3C9">2× uvećano. Samo pip.s / pip.r / head.r i zamjena očiju — noge, šape i uši ostaju na galopu.</div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px">
+      <sc-for list="{{ pipAnims }}" as="p" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+          <div style="{{ p.box }}">
+            <div data-pip="{{ p.id }}" style="width:300px;height:300px"></div>
+          </div>
+          <div style="font:900 24px/1 Nunito,sans-serif">{{ p.id }}</div>
+          <div style="font:700 18px/1.3 Nunito,sans-serif;color:#BFB3C9;max-width:320px">{{ p.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="Idle" style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font:900 34px/1 Nunito,sans-serif">Idle na svih 8 livada</div>
+      <div style="font:700 22px/1.3 Nunito,sans-serif;color:#BFB3C9">Coin se okreće i blješti; sadnica se njiše u zemljici s kapljicom. ★2 = oreol od 5 latica (mint), ★3 = zlatni oreol od 8 latica + 3 iskrice. Krem rub oko svega drži čitljivost na tamnim livadama.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,max-content);gap:20px">
+      <sc-for list="{{ idleTiles }}" as="t" hint-placeholder-count="8">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="position:relative;width:432px;height:236px;overflow:hidden;border-radius:14px;border:3px solid #2D3436">
+            <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;transform:scale(.4) translate(0,-80px)">
+              <div data-scene="idle" data-season="{{ t.id }}" style="position:absolute;inset:0"></div>
+            </div>
+          </div>
+          <div style="font:800 20px/1 Nunito,sans-serif">{{ t.name }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="Magnet" style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font:900 34px/1 Nunito,sans-serif">Magnet nivo 0 · 2 · 4 (radijus 40 / 136 / 232)</div>
+      <div style="font:700 22px/1.3 Nunito,sans-serif;color:#BFB3C9">Pravilo isto: pokupljeno čim uđe u krug. Novo: pickup doleti lukom do šapa za 0,12–0,2 s (ubrzava), krug se trzne 4 %. Glavna scena gore ima L0–L4.</div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">
+      <div style="position:relative;width:540px;height:600px;overflow:hidden;border-radius:14px;border:3px solid #2D3436">
+        <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;transform:scale(.5) translate(0,-720px)">
+          <div data-scene="magnet" data-magnet="tile" style="position:absolute;inset:0"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ magnetTiles }}" as="m" hint-placeholder-count="3">
+          <div onClick="{{ m.pick }}" style="{{ m.style }}">{{ m.label }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Scena&quot;},&quot;scenario&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;coin&quot;,&quot;seed1&quot;,&quot;seed2&quot;,&quot;seed3&quot;,&quot;twin&quot;,&quot;streak&quot;,&quot;magnet&quot;],&quot;default&quot;:&quot;streak&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Scena&quot;},&quot;magnet&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:0,&quot;max&quot;:4,&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scena&quot;},&quot;slow&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scena&quot;}}">
+const SEASONS = [['country_bloom', 'Country Bloom'], ['frost_orchard', 'Frost Orchard'], ['lantern_meadow', 'Lantern Meadow'], ['amber_canopy', 'Amber Canopy'], ['moonlit_warren', 'Moonlit Warren'], ['coral_tide', 'Coral Tide'], ['starfall_glade', 'Starfall Glade'], ['ember_fen', 'Ember Fen']];
+const SC = [['coin', 'Coin', 'okret + uskok na nos · 0,26 s'], ['seed1', 'Sjeme ★1', 'iščupa se, šape → džep · 0,32 s'], ['seed2', 'Sjeme ★2', 'mint oreol puca · 0,38 s'], ['seed3', 'Sjeme ★3', 'zlatni prsten, cvijet u letu · 0,40 s'], ['twin', 'Twin +2', 'dvije sadnice + pečat ×2 · 0,38 s'], ['streak', 'Niz 5 coina / s', '1,5× brzina, skretanje u nizu'], ['magnet', 'Magnet mix', 'let do šapa, i sa susjedne staze']];
+const PIPS = [['pickup_coin', '0,22 s · pop prema coinu, klimne, sretne oči'], ['pickup_seed', '0,30 s · pop, glava lijevo-desno, radost'], ['pickup_seed_rare', '0,40 s · veći pop, cijelo tijelo se njihne, oči-iskre'], ['pickup_twin', '0,36 s · dva popa, po jedan za svaku sadnicu']];
+const BTN = 'box-sizing:border-box;min-height:48px;padding:10px 16px;border-radius:14px;cursor:pointer;font:800 20px/1.1 Nunito,sans-serif;user-select:none;';
+const on = a => a ? 'background:#FFD56B;color:#2D3436;border:3px solid #2D3436' : 'background:#3A3044;color:#FFF8F0;border:3px solid #55485F';
+
+class Component extends DCLogic {
+  state = { season: this.props.season ?? 'country_bloom', slow: !!this.props.slow, magnet: this.props.magnet ?? 0, scenario: this.props.scenario ?? 'streak', magTile: 2 };
+  scenes = [];
+  componentDidMount() { const m = /m=(\d+)/.exec(location.search); this.limit = m ? Number(m[1]) : 99; if (this.limit === 0) return; this.wait = setInterval(() => { if (window.PickupEngine && window.Pip && window.PickupData) { clearInterval(this.wait); this.mount(); } }, 50); }
+  componentWillUnmount() { clearInterval(this.wait); clearInterval(this.pipTimer); clearInterval(this.pipTick); this.scenes.forEach(s => s.destroy()); }
+  componentDidUpdate() { if (!this.mounted) return; const k = JSON.stringify(this.state); if (k !== this.lastKey) this.sync(); }
+  root() { return document.querySelector('[data-screen-label="Run pickups"]'); }
+  cfgFor(el) {
+    const E = window.PickupEngine, s = this.state, id = el.dataset.scene, base = id === 'main' ? s.scenario : id;
+    const sc = E.SCENARIOS[base], season = el.dataset.season || s.season;
+    const c = Object.assign({ season, slow: s.slow, base: '../', magnet: 0, speed: 400, scroll: true, pip: true, lanes: [[0, 1]], fps: id === 'main' ? 60 : id === 'idle' ? 15 : 24 }, sc);
+    if (id === 'main') { c.magnet = base === 'magnet' ? Math.max(s.magnet, 2) : s.magnet; const r = this.root(); const q = k => r.querySelector('[data-hud="' + k + '"]'); c.hud = { coin: q('coin'), seed: q('seed'), coinNum: q('coinNum'), seedNum: q('seedNum'), coins: 12, seeds: 5 };
+      c.onStats = st => { ['fx', 'maxFx', 'maxTouch'].forEach(k => { const e = r.querySelector('[data-stat="' + k + '"]'); if (e) e.textContent = st[k]; }); }; }
+    else if (el.dataset.magnet != null) { c.magnet = s.magTile; }
+    else if (el.dataset.kind === 'close') { c.hud = {}; c.magnet = id === 'magnet' ? 2 : 0; }
+    return c;
+  }
+  mount() {
+    const r = this.root(); if (!r) return;
+    const shadowHost = el => { const sr = el.shadowRoot || el.attachShadow({ mode: 'open' }); const h = document.createElement('div'); h.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%'; sr.appendChild(h); return h; };
+    [...r.querySelectorAll('[data-scene]')].slice(0, this.limit).forEach(el => { const host = shadowHost(el); const sc = new window.PickupEngine.Scene(host, this.cfgFor(el)); sc._el = el; this.scenes.push(sc); });
+    this.pips = [...r.querySelectorAll('[data-pip]')].map(el => { const p = window.Pip.create(shadowHost(el), { view: 'top', size: 300, loop: 'run_gallop', face: 'determined' }); p._id = el.dataset.pip; p.paused = true; return p; });
+    this.pipTick = setInterval(() => this.pips.forEach(p => p.tick(1 / 30 * (this.state.slow ? .25 : 1))), 33);
+    this.mounted = true; this.sync();
+  }
+  sync() {
+    this.lastKey = JSON.stringify(this.state);
+    this.scenes.forEach(sc => sc.set(this.cfgFor(sc._el)));
+    clearInterval(this.pipTimer); this.pipTimer = setInterval(() => this.pips.forEach(p => p.play(p._id)), this.state.slow ? 4400 : 1100);
+  }
+  renderVals() {
+    const s = this.state;
+    const dark = { lantern_meadow: 1, moonlit_warren: 1, starfall_glade: 1, ember_fen: 1 };
+    return {
+      seasons: SEASONS.map(([id, name]) => ({ name, pick: () => this.setState({ season: id }), style: BTN + on(s.season === id) })),
+      magnets: [0, 1, 2, 3, 4].map(l => ({ label: 'L' + l, pick: () => this.setState({ magnet: l }), style: BTN + 'min-width:56px;text-align:center;' + on(s.magnet === l) })),
+      toggleSlow: () => this.setState({ slow: !s.slow }), slowLabel: s.slow ? 'Usporeno ×4 · uključeno' : 'Usporeno ×4', slowStyle: BTN + 'min-height:64px;padding:16px 24px;font-size:22px;' + on(s.slow),
+      scenarios: SC.map(([id, label, note]) => ({ label, note, pick: () => this.setState({ scenario: id }), style: BTN + 'display:flex;flex-direction:column;gap:4px;' + on(s.scenario === id) })),
+      closeups: SC.filter(x => x[0] !== 'magnet' && x[0] !== 'streak').concat([SC[5]]).map(([id, label, note]) => ({ id, label, note })),
+      pipAnims: PIPS.map(([id, note]) => ({ id, note, box: 'width:300px;height:300px;border-radius:20px;border:3px solid #2D3436;background:' + ((window.PickupData && window.PickupData.KIT.run[s.season]) || { lane: '#44663F' }).lane })),
+      idleTiles: SEASONS.map(([id, name]) => ({ id, name: name + (dark[id] ? ' · tamna' : ' · svijetla') })),
+      magnetTiles: [0, 2, 4].map(l => ({ label: 'Nivo ' + l + ' · r ' + (40 + 48 * l) + ' px', pick: () => this.setState({ magTile: l }), style: BTN + 'min-width:220px;' + on(s.magTile === l) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

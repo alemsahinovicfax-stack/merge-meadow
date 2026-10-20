@@ -9,6 +9,15 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-20
+
+- **Paket `design_handoff_run_pickups` u igri** (izvještaj `design-drafts/run-pickups-izvjestaj.md`):
+  - **Pickupi u runu:** idle iz jednog atlasa (512 × 512) bez `_draw`; let magnetom do Pipa (luk, 0,12–0,2 s); dodir sa Pipom po 11 događaja iz paketa (coin n1–n5, sjeme ★1–★3, twin); 4 Pip reakcije (`pickup_coin`, `pickup_seed` zamijenjene, nove `pickup_seed_rare`, `pickup_twin`) s prioritetom; krem pilula „+1 / +2" do čipa — broj raste tek po dolasku; zvuk u trenutku dodira; magnet krug od tačkica, vrti se 18°/s i trzne se.
+  - **Camp kartica plaćene sezone:** recept „camp" za Moonlit Warren, Coral Tide, Starfall Glade i Ember Fen; ink po sezoni; PREMIUM + „6 new flowers" + red cvjetova; stanja price / buying (tri tačke) / burst / failed („Purchase cancelled").
+  - **FPS:** prva verzija 3,3 ms CPU u najgorem slučaju → 0,35 ms (ispečene staze, tipizirane klase, jedan `transform` upis, bazen); GPU A/B prema starom kodu jednako ili brže, draw pozivi 72 → 45. Pravila 17–19 u `performanse.md`, katalog grešaka #44.
+  - Testovi `run_pickups_smoke`, `camp_paid_card_smoke`; benchovi `run_pickups_bench`, `run_pickups_cpu_bench`; `data/run/*.json` dodano u izvoz.
+- **7 smoke testova koji su padali i na HEAD-u popravljeno** (katalog grešaka #45): zavisili su od Reduce motion u `settings.cfg` i od pravog savea (Frost nadogradnje, lifetime sjemena, uzgojeno ★3). `CampSmokeUtil.backup_save()` u memoriji gasi Reduce motion; testovi resetuju stanje koje provjeravaju; `loot_logic_smoke` provjerava Loot Burst kroz consume (MEAD-4); `merge_arena_smoke` ispisuje „OK".
+
 ## 2026-10-19
 
 - **Brief za Claude Design** `level-path-cd-brief.md` — Level Path po sezoni:
@@ -16,6 +25,18 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
   - Pip stoji na trenutnom levelu; napredak odvojen po sezoni (8 dizajna);
   - nagrade na 5 / 10 / 15 / 20: 2 / 4 / 6 / 10 ★3 cvjetova sezone + 200 / 400 / 600 / 1000 coina, claim tapom uz popup;
   - slike `level-path-ref/` (polje svih 8 sezona, `level_path_capture.gd`); scope dopunjen.
+
+## 2026-10-17
+
+- **Improve tiketi MEAD-2 … MEAD-11** (Jira projekat MEAD):
+  - IAP grant tek nakon Play acknowledge; release Android bez billinga ne daruje kupovinu.
+  - Release Android ne daje nagradu za reklamu koja nije odgledana. Editor i Windows i dalje koriste stub.
+  - Loot Burst ide na `consume_purchase`, ne na acknowledge.
+  - Save se piše preko tmp + `.bak`. Neprazan pokvaren JSON se ne pregazi novim profilom.
+  - Pip na polju, u runu i na Home kartici čeka atlas u threadu prije `UiPip.new()`.
+  - GUT: merge čipova, coin unlock, revive clawback, deposit loota, IAP rute. `merge_arena_smoke` provjerava T1+T1.
+  - D0 checklist i CHECKPOINT više ne tvrde cap torbe, Settings placeholder, niti upaljen debug flag.
+  - Obrisan mrtav `UiShop`. Poslije brisanja `class_name` treba `godot-import.ps1` (greske-katalog #43).
 
 ## 2026-10-16
 

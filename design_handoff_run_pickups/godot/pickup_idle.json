@@ -1,0 +1,261 @@
+{
+ "schema": 1,
+ "note": "Idle = transforms + frame swap only (no _draw per frame). Phase per pickup: ph = fract(lane*0.37 + spawn_index*0.61).",
+ "idle": {
+  "coin": {
+   "sprites": [
+    "shadow",
+    "coin|coin_edge",
+    "spark"
+   ],
+   "bob": {
+    "amp": 5,
+    "w": 2.6
+   },
+   "spin": {
+    "period": 1.6,
+    "turn": 0.48,
+    "rule": "u = (t mod period)/turn; if u<1: sx = max(0.12,|cos 2πu|), frame = coin_edge while |cos|<0.25",
+    "phase": "x/1080 · period"
+   },
+   "glint": {
+    "at": [
+     30,
+     -30
+    ],
+    "t": [
+     0.62,
+     0.92
+    ],
+    "s": [
+     [
+      0.62,
+      0,
+      "back_out"
+     ],
+     [
+      0.74,
+      1,
+      "quad_in"
+     ],
+     [
+      0.92,
+      0
+     ]
+    ],
+    "r": [
+     0,
+     90
+    ]
+   },
+   "shadow": {
+    "at": [
+     0,
+     40
+    ],
+    "s": [
+     1,
+     1
+    ]
+   }
+  },
+  "seed": {
+   "1": {
+    "sprites": [
+     "shadow",
+     "soil",
+     "sapling",
+     "dew"
+    ]
+   },
+   "2": {
+    "sprites": [
+     "shadow",
+     "halo2",
+     "soil",
+     "sapling",
+     "dew",
+     "spark",
+     "spark"
+    ]
+   },
+   "3": {
+    "sprites": [
+     "shadow",
+     "halo3",
+     "soil",
+     "sapling",
+     "dew",
+     "spark",
+     "spark",
+     "spark"
+    ]
+   },
+   "soil_at": [
+    0,
+    18
+   ],
+   "sapling_base": [
+    0,
+    20
+   ],
+   "shadow": {
+    "at": [
+     0,
+     34
+    ],
+    "s": [
+     1.6,
+     1.3
+    ]
+   },
+   "dew": {
+    "at": [
+     16,
+     -44
+    ],
+    "bob": {
+     "amp": 2,
+     "w": 3.1
+    }
+   },
+   "sway": {
+    "deg": 6,
+    "period": 1.6,
+    "pivot": "sapling base"
+   },
+   "bob": {
+    "amp": 3,
+    "w": 2.4
+   },
+   "halo": {
+    "2": {
+     "sprite": "halo2",
+     "at": [
+      0,
+      -36
+     ],
+     "rot_deg_s": 40,
+     "pulse": {
+      "amp": 0.04,
+      "period": 1.6
+     },
+     "sparks": {
+      "n": 2,
+      "radius": 62,
+      "deg_s": 120,
+      "s": 0.8
+     }
+    },
+    "3": {
+     "sprite": "halo3",
+     "at": [
+      0,
+      -40
+     ],
+     "rot_deg_s": -30,
+     "pulse": {
+      "amp": 0.05,
+      "period": 1.4
+     },
+     "sapling_scale": 1.12,
+     "sparks": {
+      "n": 3,
+      "radius": 70,
+      "deg_s": -90,
+      "s": 0.9
+     }
+    }
+   }
+  }
+ },
+ "sprites": {
+  "coin": {
+   "file": "assets/pickups/coin.svg",
+   "w": 96,
+   "h": 96
+  },
+  "coin_edge": {
+   "file": "assets/pickups/coin_edge.svg",
+   "w": 96,
+   "h": 96
+  },
+  "shadow": {
+   "file": "assets/pickups/pickup_shadow.svg",
+   "w": 64,
+   "h": 18
+  },
+  "soil": {
+   "file": "assets/pickups/seed_soil.svg",
+   "w": 112,
+   "h": 52
+  },
+  "dew": {
+   "file": "assets/pickups/seed_dew.svg",
+   "w": 22,
+   "h": 28
+  },
+  "halo2": {
+   "file": "assets/pickups/seed_halo_r2.svg",
+   "w": 150,
+   "h": 150
+  },
+  "halo3": {
+   "file": "assets/pickups/seed_halo_r3.svg",
+   "w": 170,
+   "h": 170
+  },
+  "spark": {
+   "file": "assets/fx/fx_sparkle.svg",
+   "w": 30,
+   "h": 30
+  },
+  "ring_gold": {
+   "file": "assets/fx/fx_ring_gold.svg",
+   "w": 128,
+   "h": 128
+  },
+  "ring_mint": {
+   "file": "assets/fx/fx_ring_mint.svg",
+   "w": 128,
+   "h": 128
+  },
+  "ring_lav": {
+   "file": "assets/fx/fx_ring_lav.svg",
+   "w": 128,
+   "h": 128
+  },
+  "ring_peach": {
+   "file": "assets/fx/fx_ring_peach.svg",
+   "w": 128,
+   "h": 128
+  },
+  "chip": {
+   "file": "assets/fx/fx_coin_chip.svg",
+   "w": 26,
+   "h": 26
+  },
+  "crumb": {
+   "file": "assets/fx/fx_crumb.svg",
+   "w": 16,
+   "h": 16
+  },
+  "stamp_x2": {
+   "file": "assets/fx/fx_x2.svg",
+   "w": 84,
+   "h": 84
+  },
+  "sapling": {
+   "file": "res://assets/flowers/<seed>_t1.svg (crop)",
+   "w": 0,
+   "h": 104,
+   "anchor": "bottom"
+  },
+  "bloom": {
+   "file": "res://assets/flowers/<seed>_t3.svg (crop)",
+   "w": 0,
+   "h": 104,
+   "anchor": "bottom"
+  }
+ }
+}

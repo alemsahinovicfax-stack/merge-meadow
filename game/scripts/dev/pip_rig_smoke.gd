@@ -1,6 +1,6 @@
 extends SceneTree
 
-## design_handoff_pip — rig, atlas, 82 animacije, 4 skina, 5 pogleda (headless).
+## design_handoff_pip — rig, atlas, 84 animacije (82 + pickup_seed_rare, pickup_twin iz design_handoff_run_pickups), 4 skina, 5 pogleda (headless).
 ## Sir Pip (design_handoff_muncher_premium_pip): dodaci samo u knight, zamjena dijelova,
 ## Godot z ogrtača, reakcije merge_t3 / finish, sloj Skin i idle detalj.
 ## SceneTree -s: bez golih GameState identifikatora u ovoj skripti.
@@ -76,6 +76,8 @@ func _check_knight(host: Node2D) -> void:
 
 
 func _run() -> void:
+	# Petlje (ogrtač) ne smiju zavisiti od Reduce motion na ovom računaru (greske-katalog #45).
+	get_root().get_node("GameState").set("reduce_motion", false)
 	var files := [
 		"res://data/pip/rig.json",
 		"res://data/pip/animations.json",
@@ -90,8 +92,8 @@ func _run() -> void:
 			_fail("missing %s" % p)
 	UiPip.data()
 	# 77 − pickup_diamond − hud_wow (dijamanti izbačeni 2026-10-09) + 7 Sir Pip klipova.
-	if UiPip._anims.size() != 82:
-		_fail("expected 82 animations, got %d" % UiPip._anims.size())
+	if UiPip._anims.size() != 84:
+		_fail("expected 84 animations, got %d" % UiPip._anims.size())
 	if UiPip._skins.size() != 4:
 		_fail("expected 4 skins, got %d" % UiPip._skins.size())
 	if UiPip.skin_key_from_cosmetic("pip_knight") != "knight":

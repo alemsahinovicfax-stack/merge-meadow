@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#211B26}a{color:#FFD56B}a:hover{color:#FFF8F0}</style>
+<script src="./pickup_data.js"></script>
+</helmet>
+<div data-screen-label="Specs" style="box-sizing:border-box;max-width:1240px;margin:0 auto;padding:56px 40px 80px;display:flex;flex-direction:column;gap:40px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="font:800 20px/1 Nunito,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#FFD56B">Merge Meadow · Run pickupi + Camp plaćene · Specs</div>
+    <div style="font:900 48px/1.05 Nunito,sans-serif">Mjere, vremena, krive, budžeti</div>
+    <div style="font:700 20px/1.4 Nunito,sans-serif;color:#BFB3C9">Izvor istine: design/pickup_data.js i design/camp_recipes.js — godot/*.json su generisani iz njih. <a href="RunPickups.dc.html">A · RunPickups</a> · <a href="CampPaidCards.dc.html">B · CampPaidCards</a></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font:900 30px/1 Nunito,sans-serif">Budžeti §5 · stvarno</div>
+    <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) 80px;border-radius:16px;overflow:hidden;border:2px solid #44394F">
+      <div style="padding:12px 16px;background:#3A3044;font:900 18px/1.2 Nunito,sans-serif">Stavka</div>
+      <div style="padding:12px 16px;background:#3A3044;font:900 18px/1.2 Nunito,sans-serif">Budžet</div>
+      <div style="padding:12px 16px;background:#3A3044;font:900 18px/1.2 Nunito,sans-serif">Stvarno</div>
+      <div style="padding:12px 16px;background:#3A3044;font:900 18px/1.2 Nunito,sans-serif">OK</div>
+      <sc-for list="{{ budget }}" as="b" hint-placeholder-count="10">
+        <div style="padding:12px 16px;border-top:1px solid #44394F;font:700 18px/1.3 Nunito,sans-serif">{{ b.what }}</div>
+        <div style="padding:12px 16px;border-top:1px solid #44394F;font:700 18px/1.3 Nunito,sans-serif;color:#BFB3C9">{{ b.max }}</div>
+        <div style="padding:12px 16px;border-top:1px solid #44394F;font:800 18px/1.3 Nunito,sans-serif">{{ b.real }}</div>
+        <div style="padding:12px 16px;border-top:1px solid #44394F;font:900 18px/1.3 Nunito,sans-serif;color:#A8E6CF">{{ b.ok }}</div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font:900 30px/1 Nunito,sans-serif">Događaji dodira</div>
+    <div style="font:700 18px/1.4 Nunito,sans-serif;color:#BFB3C9">t = 0 kad pickup stigne u C (šape/nos, Pip + (0, −46)). Teren = kraj zadnjeg sprite-a; HUD = let pilule 0,3 s (quad_inout, luk preko (C.x + 0,25·Δx, C.y − 260)), pa trzaj čipa.</div>
+    <div style="display:grid;grid-template-columns:150px 90px 110px 110px 170px minmax(0,1fr);border-radius:16px;overflow:hidden;border:2px solid #44394F">
+      <div style="padding:10px 14px;background:#3A3044;font:900 17px/1.2 Nunito,sans-serif">Događaj</div>
+      <div style="padding:10px 14px;background:#3A3044;font:900 17px/1.2 Nunito,sans-serif">Sprite</div>
+      <div style="padding:10px 14px;background:#3A3044;font:900 17px/1.2 Nunito,sans-serif">Teren s</div>
+      <div style="padding:10px 14px;background:#3A3044;font:900 17px/1.2 Nunito,sans-serif">HUD do</div>
+      <div style="padding:10px 14px;background:#3A3044;font:900 17px/1.2 Nunito,sans-serif">Pip</div>
+      <div style="padding:10px 14px;background:#3A3044;font:900 17px/1.2 Nunito,sans-serif">Sprite-ovi</div>
+      <sc-for list="{{ events }}" as="e" hint-placeholder-count="11">
+        <div style="padding:10px 14px;border-top:1px solid #44394F;font:800 17px/1.3 Nunito,sans-serif">{{ e.id }}</div>
+        <div style="padding:10px 14px;border-top:1px solid #44394F;font:800 17px/1.3 Nunito,sans-serif">{{ e.n }}</div>
+        <div style="padding:10px 14px;border-top:1px solid #44394F;font:700 17px/1.3 Nunito,sans-serif">{{ e.field }}</div>
+        <div style="padding:10px 14px;border-top:1px solid #44394F;font:700 17px/1.3 Nunito,sans-serif">{{ e.hud }}</div>
+        <div style="padding:10px 14px;border-top:1px solid #44394F;font:700 17px/1.3 Nunito,sans-serif">{{ e.pip }}</div>
+        <div style="padding:10px 14px;border-top:1px solid #44394F;font:700 15px/1.35 Nunito,sans-serif;color:#BFB3C9">{{ e.list }}</div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px">
+    <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+      <div style="padding:20px;border-radius:18px;background:#2E2636;border:2px solid #44394F;display:flex;flex-direction:column;gap:10px">
+        <div style="font:900 24px/1.1 Nunito,sans-serif;color:#FFD56B">{{ c.title }}</div>
+        <sc-for list="{{ c.rows }}" as="r" hint-placeholder-count="4">
+          <div style="display:flex;gap:12px;font:700 17px/1.35 Nunito,sans-serif"><div style="flex:0 0 140px;color:#BFB3C9">{{ r.k }}</div><div style="flex:1;min-width:0">{{ r.v }}</div></div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() { this.w = setInterval(() => { if (window.PickupData) { clearInterval(this.w); this.forceUpdate(); } }, 50); }
+  componentWillUnmount() { clearInterval(this.w); }
+  renderVals() {
+    const D = window.PickupData;
+    const ev = D ? Object.values(D.EVENTS) : [];
+    const field = e => Math.max(...e.sprites.map(s => s.t1));
+    const maxN = ev.length ? Math.max(...ev.map(e => e.sprite_count)) : 0, maxF = ev.length ? Math.max(...ev.map(field)) : 0;
+    const budget = [
+      ['Sprite-ova po dodiru (uklj. pilulu „+1")', '≤ 8', 'max ' + maxN + ' (coin_n3–5, seed_r2, seed_r3, twin ★1)'],
+      ['Trajanje dodira na terenu', '≤ 0,4 s', 'max ' + maxF.toFixed(2) + ' s (seed_r3); coin 0,26 s'],
+      ['Istovremeni dodiri (niz coina)', '3 → ≤ 24', '3 × 8 = 24 (izmjereno u sceni: brojač „FX max")'],
+      ['Idle po pickupu', 'samo transformi', 'coin 3 · ★1 5 · ★2 8 · ★3 9 Sprite2D; poz/rot/skala/frejm, bez _draw'],
+      ['Pickupa na ekranu', '~10', '10 × ≤ 9 = ≤ 90 statičnih Sprite2D, 0 crtanja po frejmu'],
+      ['Atlas', '1 × ≤ 512²', 'pickup_fx_atlas.png 512 × 512 (iskorišteno 512 × 398), 15 regija'],
+      ['SVG ukupno', '≤ 60 KB', '13,9 KB neto (20 fajlova, bez metapodataka platforme)'],
+      ['Pip animacije', '≤ 4, ≤ 0,4 s, overlay', '4: 0,22 / 0,30 / 0,40 / 0,36 s; samo pip.s, pip.r, head.r, oči'],
+      ['Magnet let', '0,12–0,2 s', 'lerp(0,12, 0,2, d / 232), quad_in, luk 0,22·d'],
+      ['Camp recept', '≤ 12 slojeva, statično', 'Moonlit 9 · Coral 10 · Starfall 10 · Ember 10; crta se jednom, unutar 1026 × 312']
+    ].map(([what, max, real]) => ({ what, max, real, ok: 'da' }));
+    const events = ev.map(e => ({ id: e.id, n: String(e.sprite_count), field: field(e).toFixed(2), hud: (e.hud.t0 + D.HUD.flight.dur).toFixed(2), pip: e.pip, list: e.sprites.map(s => s.id + (s.own ? '*' : '')).join(', ') + ', pill  (* = sam pickup, nije novi sprite)' }));
+    const cards = [
+      { title: 'Idle · coin', rows: [{ k: 'Sprite-ovi', v: 'sjena 64×18 · coin 96 / coin_edge · iskrica 30' }, { k: 'Bob', v: '±5 px, 2,6 rad/s (kao danas)' }, { k: 'Okret', v: 'svakih 1,6 s okret 0,48 s: sx = |cos 2πu| ≥ 0,12, coin_edge dok |cos| < 0,25' }, { k: 'Blijesak', v: 'iskrica (30, −30) u 62–92 % perioda, back_out, rot 0→90°' }, { k: 'Faza', v: 'fract(lane·0,37 + i·0,61) — niz se ne okreće u taktu' }] },
+      { title: 'Idle · sjemenka ★1 / ★2 / ★3', rows: [{ k: '★1', v: 'sjena · zemljica 112×52 (krem rub) · sadnica t1 h 104 · kapljica' }, { k: 'Njihanje', v: '±6° / 1,6 s oko baze, bob 3 px' }, { k: '★2', v: '+ mint oreol 150 (40°/s, puls ±4 %) + 2 iskrice u orbiti r 62' }, { k: '★3', v: '+ zlatni oreol 170 (−30°/s, ±5 %) + 3 iskrice r 70, sadnica ×1,12' }, { k: 'Čitljivost', v: 'ink rub #2D3436 + krem #FFF8F0 = naljepnica, čita se na svih 8 livada' }] },
+      { title: 'Magnet', rows: [{ k: 'Radijus', v: '40 + 48 · nivo (40 / 88 / 136 / 184 / 232) — nepromijenjeno' }, { k: 'Pravilo', v: 'u krugu = pokupljeno (signal odmah), prikaz leti' }, { k: 'Let', v: 'cijeli pickup do C, quad_in, luk ⟂ 0,22·d dalje od sredine, skala → 0,85' }, { k: 'Krug', v: 'magnet_ring_l*.svg, 18°/s, trzaj 1,04 · 0,1 s pri hvatanju' }] },
+      { title: 'Niz coina', rows: [{ k: 'Pravilo', v: 'razmak ≤ 0,6 s → n + 1 (1–5), isto kao ton' }, { k: 'Prsten', v: '0,3 → 1 + 0,15·(n−1); n5 breskva' }, { k: 'Krhotine', v: '3 / 3 / 4 / 4 / 5, udaljenost 60 + 8n' }, { k: 'Iskrica', v: 'n3, n4 iznad nosa' }, { k: 'Pilula / čip', v: 'pilula ×(1 + 0,05(n−1)), čip trzaj 1,08 + 0,02(n−1)' }] },
+      { title: 'HUD', rows: [{ k: 'Ciljevi', v: 'CoinChip (610, 124) · SeedChip (806, 124) — Run HUD v2' }, { k: 'Pilula', v: 'h 64, r 32, krem, rub 3 ink, sjena 0 4 0, ikona 44, 900 44 px' }, { k: 'Let', v: '0,3 s quad_inout, skala 1 → 0,7, alfa 1 → 0 zadnjih 0,04 s' }, { k: 'Trzaj', v: '1 → bump (0,06 s, quad_out) → 1 (0,2 s, back_out); broj +1 pri dolasku' }, { k: 'Poruka', v: '„+1 Ime" ispod SeedChipa ostaje (1,4 s, max 2)' }] },
+      { title: 'Camp plaćena kartica', rows: [{ k: 'Kartica', v: '1032 × 318, padding 22, rub 3 #2D3436, sjena 0 8 0 rgba(26,26,20,.22)' }, { k: 'Red 1', v: 'ime 900 56 ink · dugme 300 × 120 #E8C44A / #BA9D3B, cijena 48' }, { k: 'Red 2', v: 'PREMIUM 52 h (34 px) + „6 new flowers" 42 · 6 × okvir 100 (r 22) po rijetkosti, t3 84' }, { k: 'Ink', v: 'Moonlit / Starfall / Ember #FFF8F0 (≥ 11,5:1) · Coral #3D3D33 (≥ 6,6:1)' }, { k: 'Stanja', v: 'price · buying (3 tačke, −shadow, +4 px) · burst (prsten 520, 0,42 + 0,45 s) · failed (pilula 1,6 s → price)' }] }
+    ];
+    return { budget, events, cards };
+  }
+}
+</script>
+</body>
+</html>

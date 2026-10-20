@@ -1,17 +1,21 @@
 extends Node2D
 
-## Run companion — Pip je UiPip (pogled odozgo, galop). Magnet prsten ostaje
-## u djetetu `_magnet`, nacrtan jednom; „disanje" je skala tog čvora (sezone faza 2).
+## Run companion — Pip je UiPip (pogled odozgo, galop). Magnet krug je u djetetu `_magnet`,
+## nacrtan jednom (design_handoff_run_pickups: krem tačkice s ink rubom, 0,6, jedna mreža = 1 draw
+## poziv); vrti se 18°/s i trzne 4 % kad uhvati pickup — samo rotacija i skala čvora.
 ## Mochi i dalje pada na proceduralni crtež.
 
 const COMPANION_ASSETS := preload("res://scripts/visual/companion_assets.gd")
-const _LEVEL0_RADIUS := 40.5
 
 var _magnet_radius: float = 0.0
 var _use_draw_fallback: bool = false
 var _magnet: _Magnet = null
 var actor: UiPip
 var _last_lane: int = 1
+var _pip_spawning: bool = false
+var _pickup_fx: Node = null
+var _ring_rot_deg_s: float = 18.0
+var _ring_pull: float = 1.04
 
 
 ## Ispuna i prsten magneta u lokalnom prostoru Pipa; puls = skala čvora.
@@ -48,13 +52,25 @@ func _apply_companion_visual() -> void:
 	var companion_id := GameState.get_active_companion_id()
 	if companion_id == CompanionConfig.ID_PIP:
 		_use_draw_fallback = false
-		if actor == null:
+		if actor == null and not _pip_spawning:
+			_pip_spawning = true
+			var key := UiPip.equipped_skin_key()
+			while not UiPip.atlas_ready(key):
+				UiPip.request_atlas(key)
+				await get_tree().process_frame
+				if not is_inside_tree():
+					_pip_spawning = false
+					return
 			actor = UiPip.new()
 			actor.name = "Actor"
 			actor.view = "top"
+			actor.skin = key
 			actor.box_px = 150.0
 			actor.follow_equipped = true
 			add_child(actor)
+			_pip_spawning = false
+		if actor == null:
+			return
 		actor.visible = true
 		actor.set_view("top")
 		actor.set_loop("run_gallop")
@@ -62,6 +78,14 @@ func _apply_companion_visual() -> void:
 		if actor != null:
 			actor.visible = false
 		_use_draw_fallback = true
+
+
+## PickupFx daje trzaj kruga (prvih 0,1 s leta pickupa).
+func bind_pickup_fx(fx: Node) -> void:
+	_pickup_fx = fx
+	var ring: Dictionary = PickupArt.data().get("magnet", {}).get("ring", {})
+	_ring_rot_deg_s = float(ring.get("rot_deg_s", 18))
+	_ring_pull = float(ring.get("pull_pulse", {}).get("s", 1.04))
 
 
 func set_magnet_radius(radius: float) -> void:
@@ -93,7 +117,9 @@ func _process(_delta: float) -> void:
 	if run != null and "scroll_speed" in run and actor != null:
 		actor.set_scroll_speed(float(run.scroll_speed))
 	if _magnet != null:
-		_magnet.scale = Vector2.ONE * _magnet_pulse()
+		_magnet.rotation_degrees = fmod(_magnet.rotation_degrees + _ring_rot_deg_s * _delta, 360.0)
+		var pull := float(_pickup_fx.call("get_pull")) if _pickup_fx != null else 0.0
+		_magnet.scale = Vector2.ONE * lerpf(1.0, _ring_pull, pull)
 
 
 func _draw() -> void:
@@ -103,8 +129,7 @@ func _draw() -> void:
 
 
 func _draw_magnet(canvas: CanvasItem) -> void:
-	_draw_magnet_fill(canvas)
-	_draw_magnet_ring(canvas)
+	_draw_magnet_dots(canvas)
 
 
 func _draw_ground_shadow() -> void:
@@ -118,58 +143,35 @@ func _draw_ground_shadow() -> void:
 	draw_colored_polygon(pts, Color(0.071, 0.110, 0.086, 0.28))
 
 
-func _magnet_pulse() -> float:
-	if _magnet_radius <= _LEVEL0_RADIUS:
-		return 1.0
-	var t := Time.get_ticks_msec() / 1000.0
-	return 1.0 + 0.045 * sin(TAU * t / 1.8)
-
-
-func _draw_magnet_fill(canvas: CanvasItem) -> void:
-	if _magnet_radius <= _LEVEL0_RADIUS:
-		return
-	canvas.draw_circle(Vector2.ZERO, _magnet_radius, Color(1.0, 0.973, 0.941, 0.07))
-
-
-func _draw_magnet_ring(canvas: CanvasItem) -> void:
+## magnet_ring_l*.svg: tačkice r 4,5 (krem #FFF8F0, ink rub 2 #2D3436), cijeli krug alfa 0,6;
+## razmak ~30 px po obodu (L0 12 … L4 49 tačkica). Prsten i jezgro se ne preklapaju, pa alfa
+## važi za grupu kao u SVG-u. Jedna mreža trouglova = 1 draw poziv.
+func _draw_magnet_dots(canvas: CanvasItem) -> void:
 	if _magnet_radius <= 0.0:
 		return
-	if _magnet_radius <= _LEVEL0_RADIUS:
-		canvas.draw_arc(
-			Vector2.ZERO, _magnet_radius, 0.0, TAU, 48,
-			Color(1.0, 0.973, 0.941, 0.20), 4.0, true
-		)
-		return
-	_draw_dash_ring(canvas, _magnet_radius, 14, 0.55, 7.0, Color(1.0, 0.973, 0.941, 0.42))
-
-
-## Isprekidan prsten kao jedna mreža trouglova = 1 draw poziv. AA draw_arc po crtici je ~3
-## poziva (bilo 44 od 45 poziva Pipa); draw_multiline je 1 poziv, ali se meki rubovi segmenata
-## preklapaju na poluprozirnoj boji (pruge). Meki rub je traka s alfa 0 na vanjskoj ivici.
-func _draw_dash_ring(canvas: CanvasItem, radius: float, dashes: int, fill: float, width: float,
-		color: Color) -> void:
-	const STEPS := 8
-	const FEATHER := 1.5
-	var radii := [radius - width * 0.5 - FEATHER, radius - width * 0.5,
-		radius + width * 0.5, radius + width * 0.5 + FEATHER]
-	var clear := Color(color, 0.0)
-	var band_colors := [clear, color, color, clear]
+	const SEG := 10
+	const R_IN := 3.5
+	const R_OUT := 5.5
+	var ink := Color(0.176, 0.204, 0.212, 0.6)
+	var cream := Color(1.0, 0.973, 0.941, 0.6)
+	var n := maxi(12, roundi(TAU * _magnet_radius / 30.0))
 	var points := PackedVector2Array()
 	var colors := PackedColorArray()
 	var indices := PackedInt32Array()
-	var span := TAU / float(dashes)
-	for i in dashes:
-		var a0 := float(i) * span
-		var step := span * fill / float(STEPS)
+	for i in n:
+		var c := Vector2.from_angle(TAU * float(i) / float(n)) * _magnet_radius
 		var base := points.size()
-		for k in STEPS + 1:
-			var dir := Vector2.from_angle(a0 + step * float(k))
-			for b in 4:
-				points.append(dir * float(radii[b]))
-				colors.append(band_colors[b])
-		for k in STEPS:
-			var row := base + k * 4
-			for b in 3:
-				var p := row + b
-				indices.append_array([p, p + 1, p + 4, p + 1, p + 5, p + 4])
+		points.append(c)
+		colors.append(cream)
+		for k in SEG:
+			var d := Vector2.from_angle(TAU * float(k) / float(SEG))
+			points.append(c + d * R_IN)
+			colors.append(cream)
+			points.append(c + d * R_OUT)
+			colors.append(ink)
+		for k in SEG:
+			var a := base + 1 + k * 2
+			var b := base + 1 + ((k + 1) % SEG) * 2
+			indices.append_array([base, a, b])
+			indices.append_array([a, a + 1, b, a + 1, b + 1, b])
 	RenderingServer.canvas_item_add_triangle_array(canvas.get_canvas_item(), indices, points, colors)

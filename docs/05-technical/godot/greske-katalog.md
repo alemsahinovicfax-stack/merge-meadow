@@ -673,6 +673,45 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** množitelj na zbiru koji se dijeli po kategorijama računaj na **ukupno** pa raspodijeli; stanje koje se nastavlja čuvaj **prije** transformacije. Testovi: `loot_boost_twin_smoke`, GUT `test_game_state_loot_boost`.
 
+## #43 — obrisan `class_name` sruši headless: „Identifier X not declared"
+
+**Datum:** 2026-10-17
+
+**Simptom:** poslije brisanja skripte s `class_name` (npr. `UiShop`), GUT i headless padnu na tuđim klasama (`UiSettings`, `BackgroundLoad`, `Sfx`) i `GameState` autoload se ne učita. U `.godot/global_script_class_cache.cfg` stari unos još pokazuje na obrisani fajl, a novije klase mogu nestati iz keša.
+
+**Uzrok:** Godot u headlessu registruje globalne klase iz tog keša. Pokvaren ili nepotpun keš znači da `class_name` više nije u opsegu, pa se svaka skripta koja ga koristi ne parsira.
+
+**Rješenje:** `.\scripts\godot-import.ps1` (rebuild keša). Ne ručno krpati cfg osim kao hitan korak prije importa.
+
+**Prevencija:** poslije brisanja `class_name` skripte uvijek import, pa GUT. Keš je u `.godot/` i nije u gitu.
+
+## #44 — animacija iz JSON-a čitana po frejmu: 3 ms samo za efekte
+
+**Datum:** 2026-10-20
+
+**Simptom:** efekti dodira pickupa (design_handoff_run_pickups) radili su tačno, ali headless CPU mjerenje je pokazalo ~3,3 ms po frejmu u najgorem slučaju (15 dodira / s), a idle 10 pickupa ~0,45 ms. GPU bench to nije jasno pokazao — laptop šeta i do 2× između pokretanja.
+
+**Uzrok:** za svaki sprite svaki frejm: 7 poziva `key(keys.get("x"), …)` nad Dictionary / Array iz JSON-a (dinamički tipovi, petlja kroz ključeve), plus `.get()` na podacima idle-a. U GDScriptu na ovom laptopu poziv funkcije ≈ 2–5 µs, upis svojstva čvora ≈ 1 µs.
+
+**Rješenje:** `PickupArt.events()` jednom prevede događaje u tipizirane klase (`CEvent`, `CSpr`) i ispeče staze (120 uzoraka / s) u `PackedFloat32Array`; runtime miješa dva uzorka. Jedan upis `transform` umjesto tri svojstva; alfa samo kad se mijenja; idle parametri u varijablama iz `_ready`. Rezultat ~0,35 ms najgore, ~45 µs tipično.
+
+**Prevencija:** za svaki CD paket s animacijom iz JSON-a izmjeri i **CPU skripti headless** (minimum od više naizmjeničnih prolaza, s referentnim poslom), ne samo GPU bench. Headless `-s` test koji pukne skriptnom greškom poslije `await` nikad ne pozove `quit()` — pokreći ga s vremenskim ograničenjem (`Start-Process` + `WaitForExit`).
+
+## #45 — smoke test zavisi od stanja na računaru (Reduce motion, pravi save)
+
+**Datum:** 2026-10-20
+
+**Simptom:** 7 smoke testova pada isto i na čistom HEAD-u, a kod igre je ispravan:
+- `muncher_rig_smoke` („expected m_frozen, got m_freeze"), `pip_rig_smoke` („cape loop should play while idle");
+- `fixes_1016_smoke` (napomena „Kept" u nadogradnjama prazna), `home_basket_picker_smoke` (zaključana bundeva postane loadout), `season_meadow_smoke` (polje ne raste na povratku, 13 → 13);
+- `loot_logic_smoke` (Loot Burst se ne dodijeli), `merge_arena_smoke` (bez poruke).
+
+**Uzrok:** testovi i igra dijele `user://` (#25). Na laptopu je u `settings.cfg` uključen **Reduce motion**, pa se klipovi Nibbsa i petlja ogrtača preskaču. Testovi čitaju i **pravi save**: Frost nadogradnje na max (nema „can", nema napomene), velik `lifetime_seeds_collected` (prvi pickup otključa lanac do bundeve), pun `star3_grown` (polje već puno 13 / 13). `loot_logic_smoke` je očekivao staro ponašanje Loot Bursta (nagrada na restore), a MEAD-4 ga je prebacio na `consume_purchase`; `merge_arena_smoke` je prolazio, ali nije ispisivao „OK".
+
+**Rješenje:** `CampSmokeUtil.backup_save()` u memoriji gasi Reduce motion (ne snima settings.cfg); `pip_rig_smoke` to radi sam (ne koristi backup). Testovi resetuju stanje koje provjeravaju: Frost red u `season_upgrades`, `lifetime_seeds_collected`, `crystal_stash_domain.grown`. `loot_logic_smoke` ima lažni billing klijent (consume odmah uspije) i provjerava novo pravilo: nagrada tek poslije consume-a, bez tokena nema nagrade, svaki token jednom. `merge_arena_smoke` ispisuje „OK".
+
+**Prevencija:** test postavlja **svako** stanje koje provjerava, i ono koje „obično" stoji na nuli (nivoi po sezoni, lifetime brojevi, uzgojeno). Postavke iz `settings.cfg` (Reduce motion, zvuk) nikad ne smiju odlučivati ishod testa. Kad padne test, prvo ga pokreni na čistom HEAD-u (worktree): pad i tamo = test / okruženje, ne nova izmjena. Svaki test ispisuje „<ime> OK".
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

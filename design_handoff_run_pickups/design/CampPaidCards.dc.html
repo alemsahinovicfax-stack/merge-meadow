@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#211B26}a{color:#FFD56B}a:hover{color:#FFF8F0}</style>
+</helmet>
+<section data-screen-label="Camp paid cards" style="box-sizing:border-box;padding:56px 64px 80px;display:flex;flex-direction:column;gap:48px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0;min-width:1500px">
+
+  <div data-layer="Header" style="display:flex;flex-direction:column;gap:14px;max-width:1300px">
+    <div style="font:800 22px/1 Nunito,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#FFD56B">Merge Meadow · B · Camp kartice plaćenih sezona</div>
+    <div style="font:900 56px/1.05 Nunito,sans-serif">Ista porodica, druga ponuda.</div>
+    <div style="font:700 24px/1.4 Nunito,sans-serif;color:#E6DDEB;max-width:1100px;text-wrap:pretty">Plaćena kartica crta svoje mjesto kao besplatna (Season Kit recept „camp", ≤ 12 slojeva, unutar ruba), ali umjesto coina i ★3 nudi samo cijenu: zlatno dugme, oznaka PREMIUM i red od 6 cvjetova sezone u okvirima po rijetkosti. Tamne sezone dobijaju krem ink. <a href="RunPickups.dc.html">A · Run pickupi</a> · <a href="Specs.dc.html">Specs</a></div>
+  </div>
+
+  <div data-layer="Demo" style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="font:900 30px/1 Nunito,sans-serif">Uživo · tapni cijenu</div>
+      <div style="position:relative;width:1080px;padding:24px;box-sizing:border-box;background:#4E3F5A;border-radius:22px;display:flex;flex-direction:column;gap:20px">
+        <div style="font:800 20px/1 Nunito,sans-serif;color:#E6DDEB;letter-spacing:.06em;text-transform:uppercase">Camp · iznad Seeds · Flowers</div>
+        <sc-for list="{{ demo }}" as="c" hint-placeholder-count="1">
+          <div data-layer="SeasonLinkCard" onClick="{{ c.tapCard }}" style="{{ c.root }}">
+            <img src="{{ c.artSrc }}" alt="" style="position:absolute;left:0;top:0;width:1026px;height:312px;display:block">
+            <div data-layer="UnlockBurst" style="{{ c.burst }}"></div>
+            <div data-layer="SeasonHead" style="position:relative;flex:0 0 auto;height:120px;display:flex;align-items:center;gap:20px">
+              <div data-layer="SeasonName" style="{{ c.nameS }}">{{ c.name }}</div>
+              <div data-layer="PriceButton" onClick="{{ c.tapBuy }}" style="{{ c.btn }}">
+                <sc-if value="{{ c.dots }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:12px;align-items:center">
+                    <div style="width:18px;height:18px;border-radius:50%;background:#2D3436"></div>
+                    <div style="width:18px;height:18px;border-radius:50%;background:#2D3436;opacity:.6"></div>
+                    <div style="width:18px;height:18px;border-radius:50%;background:#2D3436;opacity:.3"></div>
+                  </div>
+                </sc-if>
+                <div style="{{ c.btnLabelS }}">{{ c.btnLabel }}</div>
+              </div>
+            </div>
+            <div data-layer="SeasonOffer" style="position:relative;flex:0 0 auto;height:128px;display:flex;align-items:center;gap:20px">
+              <div style="flex:0 0 312px;display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+                <div data-layer="PremiumTag" style="box-sizing:border-box;height:52px;padding:0 18px;border-radius:14px;background:#FFD56B;border:3px solid #2D3436;display:flex;align-items:center;font:900 34px/1 Nunito,sans-serif;letter-spacing:.06em;color:#2D3436">PREMIUM</div>
+                <div style="{{ c.countS }}">{{ c.count }}</div>
+              </div>
+              <div data-layer="FlowerRow" style="display:flex;gap:10px">
+                <sc-for list="{{ c.flowers }}" as="f" hint-placeholder-count="6">
+                  <div style="{{ f.frame }}">
+                    <div style="position:absolute;inset:6px;border-radius:15px;background:#22342A"></div>
+                    <img src="{{ f.src }}" alt="" style="position:relative;width:84px;height:84px;display:block">
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <sc-if value="{{ c.failed }}" hint-placeholder-val="{{ false }}">
+              <div data-layer="FailToast" style="position:absolute;right:22px;top:150px;box-sizing:border-box;height:64px;padding:0 24px;border-radius:20px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;font:900 34px/1 Nunito,sans-serif;color:#2D3436">Purchase cancelled</div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <div style="height:120px;border-radius:20px;border:3px dashed rgba(255,248,240,.35);display:grid;place-items:center;font:800 26px/1 Nunito,sans-serif;color:rgba(255,248,240,.7)">Seeds · Flowers — nepromijenjeno (camp_v3)</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;width:340px">
+      <div style="font:900 30px/1 Nunito,sans-serif">Sezona</div>
+      <sc-for list="{{ demoPick }}" as="d" hint-placeholder-count="4">
+        <div onClick="{{ d.pick }}" style="{{ d.style }}">{{ d.label }}</div>
+      </sc-for>
+      <div onClick="{{ toggleFail }}" style="{{ failStyle }}">{{ failLabel }}</div>
+      <div style="font:700 19px/1.4 Nunito,sans-serif;color:#BFB3C9;text-wrap:pretty">Tap na cijenu: price → buying (čeka trgovinu) → burst (0,42 s + 0,45 s) → Home. Sa „otkaži u trgovini" ide buying → failed → price. Tap na karticu van dugmeta = Home bez kupovine.</div>
+      <div style="font:800 20px/1 Nunito,sans-serif;color:#FFD56B">{{ demoNote }}</div>
+    </div>
+  </div>
+
+  <div data-layer="States" style="display:flex;flex-direction:column;gap:18px">
+    <div style="font:900 34px/1 Nunito,sans-serif">4 plaćene × 4 stanja · price · buying · burst · failed</div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px">
+      <sc-for list="{{ gridPick }}" as="g" hint-placeholder-count="4">
+        <div onClick="{{ g.pick }}" style="{{ g.style }}">{{ g.label }}</div>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,max-content);gap:28px 24px">
+      <sc-for list="{{ grid }}" as="c" hint-placeholder-count="16">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="width:516px;height:163px;position:relative">
+            <div style="position:absolute;left:0;top:0;transform:scale(.5);transform-origin:0 0">
+              <div style="{{ c.root }}">
+                <img src="{{ c.artSrc }}" alt="" style="position:absolute;left:0;top:0;width:1026px;height:312px;display:block">
+                <div style="{{ c.burst }}"></div>
+                <div style="position:relative;flex:0 0 auto;height:120px;display:flex;align-items:center;gap:20px">
+                  <div style="{{ c.nameS }}">{{ c.name }}</div>
+                  <div style="{{ c.btn }}">
+                    <sc-if value="{{ c.dots }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:12px;align-items:center">
+                        <div style="width:18px;height:18px;border-radius:50%;background:#2D3436"></div>
+                        <div style="width:18px;height:18px;border-radius:50%;background:#2D3436;opacity:.6"></div>
+                        <div style="width:18px;height:18px;border-radius:50%;background:#2D3436;opacity:.3"></div>
+                      </div>
+                    </sc-if>
+                    <div style="{{ c.btnLabelS }}">{{ c.btnLabel }}</div>
+                  </div>
+                </div>
+                <div style="position:relative;flex:0 0 auto;height:128px;display:flex;align-items:center;gap:20px">
+                  <div style="flex:0 0 312px;display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+                    <div style="box-sizing:border-box;height:52px;padding:0 18px;border-radius:14px;background:#FFD56B;border:3px solid #2D3436;display:flex;align-items:center;font:900 34px/1 Nunito,sans-serif;letter-spacing:.06em;color:#2D3436">PREMIUM</div>
+                    <div style="{{ c.countS }}">{{ c.count }}</div>
+                  </div>
+                  <div style="display:flex;gap:10px">
+                    <sc-for list="{{ c.flowers }}" as="f" hint-placeholder-count="6">
+                      <div style="{{ f.frame }}">
+                        <div style="position:absolute;inset:6px;border-radius:15px;background:#22342A"></div>
+                        <img src="{{ f.src }}" alt="" style="position:relative;width:84px;height:84px;display:block">
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+                <sc-if value="{{ c.failed }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;right:22px;top:150px;box-sizing:border-box;height:64px;padding:0 24px;border-radius:20px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;font:900 34px/1 Nunito,sans-serif;color:#2D3436">Purchase cancelled</div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+          <div style="font:800 20px/1 Nunito,sans-serif">{{ c.caption }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="Family" style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font:900 34px/1 Nunito,sans-serif">Porodica · besplatne (nepromijenjene) uz plaćene</div>
+      <div style="font:700 22px/1.3 Nunito,sans-serif;color:#BFB3C9">Isti rub, sjena, ime, dugme 300 × 120 i visina reda. Besplatna: coini | linija | ★3 okvir s trakama. Plaćena: PREMIUM + red cvjetova, dugme = cijena.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,max-content);gap:28px 24px">
+      <sc-for list="{{ family }}" as="c" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="width:516px;height:163px;position:relative">
+            <div style="position:absolute;left:0;top:0;transform:scale(.5);transform-origin:0 0">
+              <div style="{{ c.root }}">
+                <img src="{{ c.artSrc }}" alt="" style="position:absolute;left:0;top:0;width:1026px;height:312px;display:block">
+                <div style="position:relative;flex:0 0 auto;height:120px;display:flex;align-items:center;gap:20px">
+                  <div style="{{ c.nameS }}">{{ c.name }}</div>
+                  <div style="{{ c.btn }}">
+                    <img src="icons/icon_lock.svg" alt="" style="{{ c.lockS }}">
+                    <div style="{{ c.btnLabelS }}">{{ c.btnLabel }}</div>
+                  </div>
+                </div>
+                <sc-if value="{{ c.free }}" hint-placeholder-val="{{ true }}">
+                  <div style="position:relative;flex:0 0 auto;height:128px;display:flex;align-items:center;gap:24px">
+                    <div style="flex:0 0 310px;display:flex;flex-direction:column;gap:12px">
+                      <div style="height:56px;display:flex;align-items:center;gap:14px">
+                        <img src="icons/icon_coin.svg" alt="" style="width:56px;height:56px;display:block">
+                        <div style="{{ c.valS }}">{{ c.coinVal }}</div>
+                      </div>
+                      <div style="margin-left:70px;height:18px;border-radius:9px;background:rgba(45,52,54,.22);overflow:hidden">
+                        <div style="{{ c.coinFill }}"></div>
+                      </div>
+                    </div>
+                    <div style="flex:0 0 5px;height:128px;border-radius:3px;background:rgba(45,52,54,.3)"></div>
+                    <div style="position:relative;flex:0 0 128px;width:128px;height:128px;box-sizing:border-box;border-radius:28px;background:#FFD56B;border:3px solid #D6A82F;display:grid;place-items:center">
+                      <div style="position:absolute;inset:7px;border-radius:21px;background:#22342A"></div>
+                      <img src="{{ c.flowerSrc }}" alt="" style="position:relative;width:108px;height:108px;display:block">
+                    </div>
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                      <div style="{{ c.flowerNameS }}">{{ c.flowerName }}</div>
+                      <div style="display:flex;align-items:center;gap:14px">
+                        <div style="{{ c.valS }}">{{ c.flowerVal }}</div>
+                        <div style="flex:1;height:18px;border-radius:9px;background:rgba(45,52,54,.22);overflow:hidden">
+                          <div style="{{ c.flowerFill }}"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ c.paid }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:relative;flex:0 0 auto;height:128px;display:flex;align-items:center;gap:20px">
+                    <div style="flex:0 0 312px;display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+                      <div style="box-sizing:border-box;height:52px;padding:0 18px;border-radius:14px;background:#FFD56B;border:3px solid #2D3436;display:flex;align-items:center;font:900 34px/1 Nunito,sans-serif;letter-spacing:.06em;color:#2D3436">PREMIUM</div>
+                      <div style="{{ c.countS }}">{{ c.count }}</div>
+                    </div>
+                    <div style="display:flex;gap:10px">
+                      <sc-for list="{{ c.flowers }}" as="f" hint-placeholder-count="6">
+                        <div style="{{ f.frame }}">
+                          <div style="position:absolute;inset:6px;border-radius:15px;background:#22342A"></div>
+                          <img src="{{ f.src }}" alt="" style="position:relative;width:84px;height:84px;display:block">
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+          <div style="font:800 20px/1 Nunito,sans-serif">{{ c.caption }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="Ink" style="display:flex;flex-direction:column;gap:14px;max-width:1300px">
+    <div style="font:900 34px/1 Nunito,sans-serif">Ink po sezoni · kontrast prema svakoj boji ispod teksta</div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+      <sc-for list="{{ inks }}" as="k" hint-placeholder-count="4">
+        <div style="padding:18px;border-radius:18px;background:#2E2636;border:2px solid #44394F;display:flex;flex-direction:column;gap:10px">
+          <div style="font:900 24px/1.1 Nunito,sans-serif">{{ k.name }}</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="{{ k.sw }}"></div>
+            <div style="font:800 20px/1 Nunito,sans-serif">ink {{ k.ink }}</div>
+          </div>
+          <div style="font:800 20px/1.2 Nunito,sans-serif;color:#A8E6CF">min {{ k.min }} : 1 · {{ k.layers }} slojeva</div>
+          <div style="font:700 16px/1.4 Nunito,sans-serif;color:#BFB3C9">{{ k.vals }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;moonlit_warren&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo&quot;}}">
+const PAID = [['moonlit_warren', 'Moonlit Warren', '€2.99'], ['coral_tide', 'Coral Tide Garden', '€3.49'], ['starfall_glade', 'Starfall Glade', '€2.99'], ['ember_fen', 'Ember Fen', '€2.99*']];
+const FREE = [['frost_orchard', 'Frost Orchard', 'short', 320, 12, 'pumpkin', 'Harvest Pumpkin'], ['lantern_meadow', 'Lantern Meadow', 'ready', 500, 20, 'crystal_peony', 'Crystal Peony'], ['amber_canopy', 'Amber Canopy', 'short', 410, 17, 'midnight_lotus', 'Midnight Lotus']];
+const NUN = 'Nunito,system-ui,sans-serif';
+const FRAME = { 1: ['#FFF8F0', '#CBC2B6'], 2: ['#A8E6CF', '#7FC9AC'], 3: ['#FFD56B', '#D6A82F'] };
+const T_BUY = 1.2, T_BURST = 0.42, T_LINGER = 0.45;
+
+class Component extends DCLogic {
+  state = { kit: null, demo: this.props.season ?? 'moonlit_warren', phase: 'price', bt: 0, failNext: false, note: '', gridSeason: 'starfall_glade' };
+  componentDidMount() {
+    Promise.all([import('./seasons_kit.js'), import('./camp_recipes.js')]).then(([K, R]) => {
+      const svg = (recipe) => { const sc = K.buildScene(recipe, 1026, 312, 1032, null);
+        return '<svg width="1026" height="312" viewBox="0 0 1026 312" style="display:block">' + sc.groups.map(g => '<path d="' + g.d + '" fill="' + g.f + '" stroke="' + g.s + '" stroke-width="' + g.sw + '" stroke-linejoin="round" stroke-linecap="round"></path>').join('') + '</svg>'; };
+      const art = {}; PAID.forEach(([id]) => { art[id] = svg(R.CAMP_PAID[id]); }); FREE.forEach(([id]) => { art[id] = svg(K.KITS[id].camp); });
+      const inks = PAID.map(([id, name]) => Object.assign({ id, name }, R.inkReport(id)));
+      const src = {}; for (const k in art) src[k] = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(art[k].replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ')); this.setState({ kit: { R, inks, src } });
+    }).catch(e => console.error(e));
+  }
+  componentWillUnmount() { clearTimeout(this.t1); clearInterval(this.t2); }
+  buy() {
+    if (this.state.phase !== 'price' && this.state.phase !== 'failed') return;
+    clearTimeout(this.t1); clearInterval(this.t2);
+    this.setState({ phase: 'buying', note: 'IAPManager.purchase(...) — čeka trgovinu' });
+    this.t1 = setTimeout(() => {
+      if (this.state.failNext) { this.setState({ phase: 'failed', note: 'purchase_failed → refresh() → price' }); this.t1 = setTimeout(() => this.setState({ phase: 'price', note: '' }), 1600); return; }
+      const t0 = performance.now(); this.setState({ phase: 'burst', bt: 0, note: 'purchase_completed → burst' });
+      this.t2 = setInterval(() => { const t = (performance.now() - t0) / 1000; if (t > T_BURST + T_LINGER) { clearInterval(this.t2); this.setState({ phase: 'price', bt: 0, note: 'go_to_meta_page(MAIN) · band „paid"' }); return; } this.setState({ bt: Math.min(1, t / T_BURST) }); }, 33);
+    }, T_BUY * 1000);
+  }
+  card(id, name, price, phase, bt) {
+    const K = this.state.kit, R = K && K.R, rec = R ? R.CAMP_PAID[id] : null, ink = rec ? rec.ink : '#3D3D33';
+    const st = phase === 'failed' ? 'price' : phase;
+    let fill = '#E8C44A', edge = '#BA9D3B', extra = ';box-shadow:0 6px 0 rgba(18,28,22,.42)', label = price, dots = false;
+    if (st === 'buying') { fill = '#FFD56B'; edge = '#D6A82F'; extra = ';transform:translateY(4px)'; label = ''; dots = true; }
+    if (st === 'burst') { fill = '#FFD56B'; edge = '#D6A82F'; extra = ''; label = 'Unlocked'; }
+    const e = 1 - Math.pow(1 - bt, 3), d = Math.round((0.2 + 0.8 * e) * 520);
+    const roster = R ? R.ROSTER_PAID[id] : [];
+    return {
+      name, btnLabel: label, dots, failed: phase === 'failed', count: roster.length + ' new flowers', artSrc: K ? K.src[id] : '',
+      root: 'position:relative;box-sizing:border-box;width:1032px;height:318px;border-radius:26px;overflow:hidden;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.22);padding:22px;display:flex;flex-direction:column;gap:20px;cursor:pointer;background:' + (rec ? rec.layers[0].c : '#262C53'),
+      burst: st === 'burst' ? 'position:absolute;left:50%;top:50%;width:' + d + 'px;height:' + d + 'px;margin:' + (-d / 2) + 'px 0 0 ' + (-d / 2) + 'px;box-sizing:border-box;border-radius:50%;border:14px solid rgba(255,245,209,' + (0.55 * (1 - bt)).toFixed(3) + ');pointer-events:none' : 'display:none',
+      nameS: 'flex:1;min-width:0;font:900 56px/1 ' + NUN + ';color:' + ink + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      countS: 'font:900 42px/1 ' + NUN + ';color:' + ink + ';white-space:nowrap',
+      btn: 'flex:0 0 auto;box-sizing:border-box;width:300px;height:120px;border-radius:20px;background:' + fill + ';border:3px solid ' + edge + ';display:flex;align-items:center;justify-content:center;gap:12px' + extra,
+      btnLabelS: label ? 'font:900 48px/1 ' + NUN + ';color:#2D3436;white-space:nowrap' : 'display:none',
+      flowers: roster.map(([f, r]) => ({ src: 'ref/flowers/' + f + '_t3.svg', frame: 'position:relative;box-sizing:border-box;width:100px;height:100px;border-radius:22px;background:' + FRAME[r][0] + ';border:3px solid ' + FRAME[r][1] + ';display:grid;place-items:center' }))
+    };
+  }
+  freeCard(id, name, st, coins, fl, flower, flowerName) {
+    const K = this.state.kit, ready = st === 'ready', ink = '#3D3D33';
+    return {
+      free: true, paid: false, name, artSrc: K ? K.src[id] : '', caption: name + ' · besplatna · ' + st,
+      root: 'position:relative;box-sizing:border-box;width:1032px;height:318px;border-radius:26px;overflow:hidden;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.22);padding:22px;display:flex;flex-direction:column;gap:20px;background:#E0ECF8',
+      nameS: 'flex:1;min-width:0;font:900 56px/1 ' + NUN + ';color:' + ink + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+      btn: 'flex:0 0 auto;box-sizing:border-box;width:300px;height:120px;border-radius:20px;background:' + (ready ? '#E8C44A' : '#FFF8F0') + ';border:3px solid ' + (ready ? '#BA9D3B' : '#CBC2B6') + ';display:flex;align-items:center;justify-content:center;gap:12px' + (ready ? ';box-shadow:0 6px 0 rgba(18,28,22,.42)' : ''),
+      lockS: ready ? 'display:none' : 'width:40px;height:40px;display:block;flex:0 0 auto;opacity:.8',
+      btnLabel: 'Unlock', btnLabelS: 'font:900 48px/1 ' + NUN + ';color:' + (ready ? '#2D3436' : '#44443A') + ';white-space:nowrap',
+      coinVal: Math.min(coins, 500) + ' / 500', flowerVal: Math.min(fl, 20) + ' / 20', flowerName, flowerSrc: 'ref/flowers/' + flower + '_t3.svg',
+      valS: 'font:900 48px/1 ' + NUN + ';color:' + ink + ';font-variant-numeric:tabular-nums;white-space:nowrap',
+      flowerNameS: 'font:900 42px/1 ' + NUN + ';color:' + ink + ';white-space:nowrap',
+      coinFill: 'height:100%;width:' + (Math.min(coins, 500) / 5) + '%;background:#FFD56B', flowerFill: 'height:100%;width:' + (Math.min(fl, 20) * 5) + '%;background:#FFF8F0'
+    };
+  }
+  renderVals() {
+    const s = this.state, K = s.kit;
+    const BTN = 'box-sizing:border-box;min-height:52px;padding:12px 16px;border-radius:14px;cursor:pointer;font:800 21px/1.1 Nunito,sans-serif;user-select:none;';
+    const on = a => a ? 'background:#FFD56B;color:#2D3436;border:3px solid #2D3436' : 'background:#3A3044;color:#FFF8F0;border:3px solid #55485F';
+    const dp = PAID.find(p => p[0] === s.demo) || PAID[0];
+    const demoCard = Object.assign(this.card(dp[0], dp[1], dp[2], s.phase, s.bt), { tapBuy: (ev) => { ev.stopPropagation(); this.buy(); }, tapCard: () => this.setState({ note: 'tap na karticu → Home (band „paid", fokus ' + dp[1] + ') bez kupovine' }) });
+    const grid = [];
+    PAID.filter(p => p[0] === s.gridSeason).forEach(([id, name, price]) => ['price', 'buying', 'burst', 'failed'].forEach(ph => grid.push(Object.assign(this.card(id, name, price, ph, ph === 'burst' ? 0.45 : 0), { caption: name + ' · ' + ph }))));
+    const family = [];
+    FREE.forEach((f, i) => { family.push(this.freeCard(...f)); const p = PAID[i]; family.push(Object.assign(this.card(p[0], p[1], p[2], 'price', 0), { free: false, paid: true, lockS: 'display:none', caption: p[1] + ' · plaćena · price' })); });
+    return {
+      demo: [demoCard], grid, family,
+      demoPick: PAID.map(([id, name]) => ({ label: name, pick: () => this.setState({ demo: id, phase: 'price', note: '' }), style: BTN + on(s.demo === id) })),
+      toggleFail: () => this.setState({ failNext: !s.failNext }), failLabel: s.failNext ? 'Otkaži u trgovini · uključeno' : 'Otkaži u trgovini', failStyle: BTN + on(s.failNext),
+      demoNote: s.note,
+      gridPick: PAID.map(([id, name]) => ({ label: name, pick: () => this.setState({ gridSeason: id }), style: BTN + on(s.gridSeason === id) })),
+      inks: K ? K.inks.map(k => ({ name: k.name, ink: k.ink, min: k.min.toFixed(2), layers: k.layers, vals: k.vals.map(v => v[0] + ' ' + v[1].toFixed(1)).join(' · '), sw: 'width:40px;height:40px;border-radius:10px;border:2px solid #2D3436;background:' + k.ink })) : []
+    };
+  }
+}
+</script>
+</body>
+</html>

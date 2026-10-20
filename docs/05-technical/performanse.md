@@ -162,6 +162,30 @@ Paket `design_handoff_muncher_premium_pip/`, izvještaj [[../04-experience/desig
 14. **Ekran s mnogo kontrola (Settings, ~40–67 ms gradnje) se ne gradi na tap** — gradi se unaprijed u pozadini, dio po frejmu, i zatvaranje ga sakrije umjesto da ga obriše.
 15. **Lik od mnogo oblika → cutout rig iz jednog atlasa** (Pip, Nibbs): dijelovi iste teksture se spoje u 2–4 draw poziva, a animacija mijenja samo transforme. Upload velikog atlasa i gradnja riga ne idu u isti frejm; atlas skina rasterizuje samo dijelove koje taj skin crta.
 16. **Servis koji učitava fajlove (zvuk, podaci) ne učitava sinhrono na startu.** Izmjeri `load()` po fajlu; sve iznad ~1 ms po frejmu ide u thread, po jedan zahtjev u redu (#30, #37). Kad fajl zatreba prije reda, a baš je u threadu: `load(path, "", CACHE_MODE_IGNORE)` umjesto čekanja reda. Bench uvijek A/B sa servisom isključenim preko `override.cfg` `[autoload]`.
+17. **Animacija iz JSON ključeva → „kompajliraj" jednom, ne čitaj Dictionary po frejmu** (`PickupArt.events()`, 2026-10-20). Prva verzija efekata pickupa čitala je ključeve iz Dictionary-ja za svaki sprite svaki frejm: ~3,3 ms u najgorem slučaju. Ispečene staze (120 uzoraka / s, `PackedFloat32Array`), tipizirane unutrašnje klase i jedan upis `transform` umjesto `position` + `scale` + `rotation` spustili su to na ~0,35 ms. Jedan GDScript poziv funkcije ≈ 2–5 µs na ovom laptopu, upis svojstva čvora ≈ 1 µs.
+18. **Efekat po događaju = bazen sprite-ova, ne novi čvorovi.** `PickupFx` grije bazen na startu runa; poslije toga dodir ne pravi nijedan čvor (provjerava `run_pickups_smoke`). Idle pickupa: parametri iz JSON-a se čitaju jednom u `_ready`.
+19. **CPU mjerenje na laptopu: naizmjenično i minimum.** Isti headless posao varira do 2× (termika). `run_pickups_cpu_bench.gd` vrti svaku varijantu 5 puta naizmjenično s referentnim poslom i ispisuje minimum; GPU A/B ide stari kod (worktree) ↔ novi, naizmjenično, 2 kruga.
+
+## Pickupi u runu (design_handoff_run_pickups, 2026-10-20)
+
+CPU skripti (headless, `run_pickups_cpu_bench.gd`, minimum od 5 naizmjeničnih; referentni posao 1000 × `sin` ≈ 103–114 µs):
+
+| Varijanta | Prije optimizacije | Poslije |
+|---|---|---|
+| idle, 10 pickupa (4 coina, 2 × ★1 / ★2 / ★3) | ~450 µs | **~66 µs** |
+| dodir, tipično (1 coin / 0,5 s) | — | **~45 µs** |
+| dodir, najgore (3 dodira / 0,2 s, ~10 istovremeno, 34 sprite-a) | ~3 310 µs | **~345 µs** |
+
+GPU A/B (`run_pickups_bench.gd`, SubViewport 1080 × 1920, Country Bloom; stari kod iz worktreea, 2 kruga naizmjenično; avg ms / draw pozivi):
+
+| Scenarij | Stari kod | Novi kod |
+|---|---|---|
+| `pk_idle10` | 4,35–5,14 / 72 | 4,20–5,12 / **45** |
+| `pk_coin_x3` (15 coina / s) | 4,36–6,27 / 55 | 4,88–6,20 / 54 |
+| `pk_seed_mix` | 5,77–6,44 / 61 | 5,26–6,50 / 62 |
+| `pk_magnet_l4` (pravi run, magnet 232 px) | 5,72–6,26 / 68–71 | **4,84–5,35** / 44–51 |
+
+Frejmova > 16 ms: isti red veličine (0–5 po scenariju u oba). Jedan skok od 206 ms u jednom NEW prolazu se nije ponovio u 4 nova prolaza (max 8–19 ms) — šum laptopa. Camp kartica plaćene sezone: recept 9–10 slojeva, crta se jednom, bez animacije.
 
 ## Plan (još nije urađeno)
 

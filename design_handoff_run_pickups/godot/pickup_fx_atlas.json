@@ -1,0 +1,148 @@
+{
+ "schema": 1,
+ "texture": "assets/pickup_fx_atlas.png",
+ "size": [
+  512,
+  512
+ ],
+ "used_h": 398,
+ "padding": 2,
+ "note": "AtlasTexture regions (px). Saplings/blooms come from existing flower textures (not in this atlas). Magnet ring = code arc (dashed, as player.gd today) or magnet_ring_l*.svg as separate small textures.",
+ "regions": {
+  "halo3": {
+   "file": "assets/pickups/seed_halo_r3.svg",
+   "region": [
+    0,
+    0,
+    170,
+    170
+   ]
+  },
+  "halo2": {
+   "file": "assets/pickups/seed_halo_r2.svg",
+   "region": [
+    172,
+    0,
+    150,
+    150
+   ]
+  },
+  "ring_gold": {
+   "file": "assets/fx/fx_ring_gold.svg",
+   "region": [
+    324,
+    0,
+    128,
+    128
+   ]
+  },
+  "ring_mint": {
+   "file": "assets/fx/fx_ring_mint.svg",
+   "region": [
+    0,
+    172,
+    128,
+    128
+   ]
+  },
+  "ring_lav": {
+   "file": "assets/fx/fx_ring_lav.svg",
+   "region": [
+    130,
+    172,
+    128,
+    128
+   ]
+  },
+  "ring_peach": {
+   "file": "assets/fx/fx_ring_peach.svg",
+   "region": [
+    260,
+    172,
+    128,
+    128
+   ]
+  },
+  "coin": {
+   "file": "assets/pickups/coin.svg",
+   "region": [
+    390,
+    172,
+    96,
+    96
+   ]
+  },
+  "coin_edge": {
+   "file": "assets/pickups/coin_edge.svg",
+   "region": [
+    0,
+    302,
+    96,
+    96
+   ]
+  },
+  "stamp_x2": {
+   "file": "assets/fx/fx_x2.svg",
+   "region": [
+    98,
+    302,
+    84,
+    84
+   ]
+  },
+  "soil": {
+   "file": "assets/pickups/seed_soil.svg",
+   "region": [
+    184,
+    302,
+    112,
+    52
+   ]
+  },
+  "spark": {
+   "file": "assets/fx/fx_sparkle.svg",
+   "region": [
+    298,
+    302,
+    30,
+    30
+   ]
+  },
+  "dew": {
+   "file": "assets/pickups/seed_dew.svg",
+   "region": [
+    330,
+    302,
+    22,
+    28
+   ]
+  },
+  "chip": {
+   "file": "assets/fx/fx_coin_chip.svg",
+   "region": [
+    354,
+    302,
+    26,
+    26
+   ]
+  },
+  "shadow": {
+   "file": "assets/pickups/pickup_shadow.svg",
+   "region": [
+    382,
+    302,
+    64,
+    18
+   ]
+  },
+  "crumb": {
+   "file": "assets/fx/fx_crumb.svg",
+   "region": [
+    448,
+    302,
+    16,
+    16
+   ]
+  }
+ }
+}

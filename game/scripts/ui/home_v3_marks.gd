@@ -33,6 +33,7 @@ var offset_x: float = 0.0
 var ink: Color = UiHomeV3.INK_DEEP
 var shadow: Array = UiHomeV3.PIP_SHADOW_CARD
 var actor: UiPip
+var _pip_spawning: bool = false
 
 
 func _init(k: String = KIND_DOTS) -> void:
@@ -47,21 +48,31 @@ func _ready() -> void:
 
 
 func _ensure_pip() -> void:
-	if kind != KIND_PIP or actor != null:
+	if kind != KIND_PIP or actor != null or _pip_spawning:
 		return
+	_pip_spawning = true
+	var key := UiPip.equipped_skin_key()
+	while not UiPip.atlas_ready(key):
+		UiPip.request_atlas(key)
+		await get_tree().process_frame
+		if not is_inside_tree():
+			_pip_spawning = false
+			return
 	actor = UiPip.new()
 	actor.name = "Actor"
 	actor.view = "front"
+	actor.skin = key
 	actor.box_px = UiHomeV3.PIP_CARD_SIZE
 	actor.follow_equipped = true
 	add_child(actor)
 	actor.set_loop("card_idle")
+	_pip_spawning = false
 	_sync_pip()
 
 
 func _sync_pip() -> void:
-	_ensure_pip()
 	if actor == null:
+		_ensure_pip()
 		return
 	if rect.size.x < 1.0:
 		actor.visible = false

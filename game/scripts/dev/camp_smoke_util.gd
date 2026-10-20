@@ -8,8 +8,14 @@ extends RefCounted
 const SAVE_PATH := "user://player_save.json"
 
 
-## Prazan string = save nije postojao.
+## Prazan string = save nije postojao. Usput gasi Reduce motion u memoriji (ne snima settings.cfg):
+## testovi animacija ne smiju zavisiti od postavke na računaru (greske-katalog #45). Test koji
+## provjerava baš Reduce motion ga sam pali.
 static func backup_save() -> String:
+	var tree := Engine.get_main_loop() as SceneTree
+	var gs: Node = tree.get_root().get_node_or_null("GameState") if tree != null else null
+	if gs != null and "reduce_motion" in gs:
+		gs.set("reduce_motion", false)
 	if not FileAccess.file_exists(SAVE_PATH):
 		return ""
 	return FileAccess.get_file_as_string(SAVE_PATH)

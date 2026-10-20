@@ -13,7 +13,7 @@ const STICKER_DROP   := Color(0.102, 0.102, 0.078, 0.28)
 const INK            := Color("2d3436")
 const INK_SOFT       := Color("555c5e")
 const ACTIVE_RIM     := Color("fff6d6")   # nošena kartica (= picker_row "chosen")
-const PEACH          := Color("ffb88c")   # aktivni tab (= UiShop.ACTIVE)
+const PEACH          := Color("ffb88c")   # aktivni tab (bivši UiShop.ACTIVE)
 const PINK           := Color("ffccd5")   # glyph ormara (= UiHomeField.PINK)
 const MINT           := Color("a8e6cf")   # New tag / WardrobeDot
 const ROW_FILL       := Color("ffffff")
@@ -22,9 +22,9 @@ const DISABLED       := Color("f1eae0")   # kartica "none"
 const DISABLED_EDGE  := Color(0.176, 0.204, 0.212, 0.10)
 const LOCK_VEIL      := Color("e3d9cc")   # = UiHomeField.LOCKED_FRAME
 const DASH_EDGE      := Color(0.176, 0.204, 0.212, 0.40)  # ShopLink / EmptyState
-const WELL_EDGE      := Color("16211b")   # rub ItemPreview (= UiShop.WELL_EDGE)
-const ALBUM_BG       := Color("2e4733")   # = UiShop.PAGE_BG
-const LABEL_CHIP     := Color(0.102, 0.141, 0.118, 0.84)  # = UiShop.LABEL_CHIP
+const WELL_EDGE      := Color("16211b")   # rub ItemPreview (bivši UiShop.WELL_EDGE)
+const ALBUM_BG       := Color("2e4733")   # bivši UiShop.PAGE_BG
+const LABEL_CHIP     := Color(0.102, 0.141, 0.118, 0.84)  # bivši UiShop.LABEL_CHIP
 const LABEL_CHIP_EDGE := Color(1.0, 0.973, 0.941, 0.40)
 const SCRIM          := Color(0.102, 0.086, 0.118, 0.55)  # = UiHomeField.SCRIM
 const TOAST_BG       := Color("2d3436")

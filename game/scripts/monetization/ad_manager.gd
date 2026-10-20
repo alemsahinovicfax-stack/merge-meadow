@@ -9,6 +9,13 @@ const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
 
 enum Backend { STUB, ADMOB_PLUGIN }
 
+
+## fail = Android release bez odgledane reklame. stub = editor, Windows, debug APK.
+static func reward_route(on_android: bool, debug_or_editor: bool) -> String:
+	if on_android and not debug_or_editor:
+		return "fail"
+	return "stub"
+
 var backend: Backend = Backend.STUB
 var backend_name: String = "stub"
 var _busy: bool = false
@@ -47,6 +54,13 @@ func request_rewarded(placement: String) -> void:
 	_pending_placement = placement
 	# Muzika stoji dok reklama svira (i stub: 1,2 s „reklame").
 	Sfx.set_ad_playing(true)
+	var route := reward_route(
+		OS.get_name() == "Android",
+		OS.is_debug_build() or OS.has_feature("editor")
+	)
+	if route == "fail":
+		_fail_rewarded(placement, "not_wired")
+		return
 	match backend:
 		Backend.ADMOB_PLUGIN:
 			_request_plugin_rewarded(placement)
@@ -124,6 +138,15 @@ func _request_plugin_rewarded(placement: String) -> void:
 	# Poing API — load → show; detalji u docs/05-technical/godot/admob-setup.md
 	if not _rewarded_loader.has_method("load"):
 		_fail_rewarded(placement, "plugin_api_missing")
+		return
+	# Load/show još nije spojen. Release ne smije dobiti nagradu; editor i dalje smije stub.
+	var route := reward_route(
+		OS.get_name() == "Android",
+		OS.is_debug_build() or OS.has_feature("editor")
+	)
+	if route == "fail":
+		push_warning("AdManager: rewarded load not wired — refusing reward for %s" % placement)
+		_fail_rewarded(placement, "not_wired")
 		return
 	push_warning("AdManager: plugin detected but rewarded load not wired — falling back to stub for %s" % placement)
 	_request_stub_rewarded(placement)

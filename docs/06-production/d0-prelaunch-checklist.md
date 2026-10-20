@@ -109,13 +109,13 @@ Legenda: ✅ gotovo · 🟡 djelomično · ❌ nedostaje · ⏸ odgođeno (plan)
 |---|--------|--------|----------|
 | U1 | Splash → tutorial → main menu | 🟡 | Tutorial ✅; **nema in-game splash** scene; Android system splash default |
 | U2 | Loot: ×2 rewarded, revive, retry, kamp | ✅ | `loot_screen.gd` + revive resume |
-| U3 | Kamp: merge, upgrade, Keep, auto-plant | ✅ | Keep oslobađa gredicu; torba soft cap 40 |
+| U3 | Kamp: merge, upgrade, Keep, auto-plant | ✅ | Keep oslobađa gredicu; vreća bez limita (cap 40 uklonjen 2026-10-16 — gutao je plijen) |
 | U4 | **Daily chest** | ✅ | `claim_daily_chest()`, save v4, kamp gumb |
 | U5 | Shop: remove ads + starter pack | ✅ | `shop_screen.gd`, `IAPManager` |
 | U6 | Shop: **boosteri** | ✅ | Shop v2 (2026-10-02): Merge Hint jednokratan (oznaka u Areni), Loot Burst consumable (+5 ★3 za sljedeću besplatnu sezonu) |
 | U7 | Shop / kamp kozmetika (3–5 itema) | ✅ | 5 coin itema u shopu (`cosmetic_catalog.gd`) |
 | U8 | **Dnevnik kolekcije** (lista otkrića) | ✅ | `collection_journal.tscn`, 📖 u kamp top baru, NEW badge |
-| U9 | Settings ekran | 🟡 | Placeholder handleri (hub/camp/menu); puni ekran **D0-P** |
+| U9 | Settings ekran | ✅ | SET-01 (2026-10-12) — pun ekran, ne placeholder |
 | U10 | EN UI copy | ✅ | Store + in-game EN |
 
 ---
@@ -139,10 +139,10 @@ Legenda: ✅ gotovo · 🟡 djelomično · ❌ nedostaje · ⏸ odgođeno (plan)
 |---|--------|--------|----------|
 | T1 | Flat cartoon art (ne greybox) | 🟡 | Pip SVG, lane BG, Kenney UI; biljke procedural (`camp_plant_draw.gd`) |
 | T2 | **10 tipova sjemena** — distinct T1/T2 sprite | 🟡 | 7 tipova procedural (camp T1/T2/T3 + run pickup); PNG kasnije |
-| T3 | **SFX** — pickup, merge, fail | ❌ | Nema `AudioStreamPlayer` / audio assets |
-| T4 | Muzika (opcionalno kamp) | ❌ | Opcionalno po scopeu — nice-to-have |
+| T3 | **SFX** — pickup, merge, fail | ✅ | ZVUK-01 (2026-10-14): sintetski efekti spojeni. Pravi snimak još otvoren |
+| T4 | Muzika po sezoni | ✅ | Sintetska muzika po sezoni je u igri. Pravi soundtrack još otvoren |
 | T5 | Set bonus (2 seta) | ❌ | F8.11 — ideje launch 🟡 |
-| T6 | `DEBUG_DEV_RESOURCES := true` | ❌ | **Isključiti** prije release builda (`game_state.gd`) |
+| T6 | `DEBUG_DEV_RESOURCES` | ✅ | Već `false` u `game_state_debug.gd`. Release AAB je i dalje otvoren (T7) |
 | T7 | Release AAB + keystore | ❌ | Faza 2 — debug APK postoji |
 | T8 | Branded splash / app icon 512 | 🟡 | `icon.svg` default; export splash prazan |
 | T9 | Vanjski playtest 5 min bez vođenja | ❌ | M7 exit kriterij — ponoviti prije launcha |

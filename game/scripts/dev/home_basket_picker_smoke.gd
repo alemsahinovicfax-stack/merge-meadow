@@ -155,6 +155,9 @@ func _run() -> void:
 	gs.call("reset_seasons_to_s1")
 	gs.set("tutorial_complete", true)
 	gs.set("seed_unlock_index", 1)
+	# Lanac otključavanja raste iz lifetime brojeva — pravi save ih ima puno, pa bi prvi
+	# record_seed_pickup_lifetime otključao i bundevu (greske-katalog #45).
+	gs.set("lifetime_seeds_collected", {})
 	gs.set("loadout_type_id", "")
 	var err := change_scene_to_file("res://scenes/main_menu.tscn")
 	if err != OK:
@@ -276,7 +279,8 @@ func _run() -> void:
 	home.call("_on_basket_type_picked", "pumpkin")
 	await process_frame
 	if str(gs.get("loadout_type_id")) != "":
-		_fail("locked pumpkin must not become loadout")
+		_fail("locked pumpkin must not become loadout (seed_unlock_index %s, pumpkin idx %d, lifetime %s)" % [
+			gs.get("seed_unlock_index"), SeedUnlockConfig.get_index("pumpkin"), gs.get("lifetime_seeds_collected")])
 		return
 	var bloom_types: Array = gs.call(
 		"get_unlocked_loadout_types_for_season", str(gs.get("home_season_field_id"))

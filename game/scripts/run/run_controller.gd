@@ -52,6 +52,12 @@ var coin_count: int = 0
 var seeds_by_type: Dictionary = {}
 ## Koliko je pokupljenih sjemenki bilo dvostruko (Twin Seeds) — pečat na kraju runa.
 var twin_count: int = 0
+## Pickupi u letu do čipa (design_handoff_run_pickups): broj na čipu raste tek kad pilula stigne.
+var _pending_coins: int = 0
+var _pending_seeds: int = 0
+var _pickup_fx: PickupFx
+var _pip_pick_prio: int = -1
+var _pip_pick_until: float = 0.0
 var spawn_timer: float = 0.0
 var _spawn_interval: float = SPAWN_INTERVAL
 var _spawn_chance: float = SPAWN_CHANCE
@@ -95,8 +101,7 @@ func _ready() -> void:
 	_build_hud_v2()
 	_apply_hud_styles()
 	_setup_pickup_hud_icons()
-	if pickup_feed and pickup_feed.has_method("bind_targets"):
-		pickup_feed.bind_targets(coin_chip, seed_chip, fly_layer)
+	_setup_pickup_fx()
 	_hide_tutorial()
 	pause_overlay.close(false)
 	fail_flash.visible = false
@@ -187,6 +192,10 @@ func _resume_run() -> void:
 
 
 func _reset_common() -> void:
+	_pending_coins = 0
+	_pending_seeds = 0
+	if _pickup_fx != null:
+		_pickup_fx.clear()
 	if not _world_ready:
 		await _wait_for_viewport()
 		if not _world_ready:
@@ -644,13 +653,17 @@ func _pip_play(run_id: String) -> void:
 		pv.call("play_event", run_id)
 
 
+## Broji se odmah (kao prije); izgled preuzima PickupFx — let do Pipa, dodir, pilula do čipa.
+## Zvuk i Pip reakcija idu u trenutku dodira (_on_pickup_touch), broj na čipu kad pilula stigne.
 func _on_coin_collected(at: Vector2) -> void:
 	coin_count += 1
-	Sfx.play("coin")
-	_pip_play("pickup_coin")
+	if _pickup_fx != null:
+		_pending_coins += 1
+		_pickup_fx.start_coin(at)
+	else:
+		Sfx.play("coin")
+		_pip_play("pickup_coin")
 	_update_hud()
-	if pickup_feed and pickup_feed.has_method("push_coin"):
-		pickup_feed.push_coin(at)
 
 
 func _on_seed_collected(type_id: String, at: Vector2) -> void:
@@ -660,11 +673,82 @@ func _on_seed_collected(type_id: String, at: Vector2) -> void:
 	seeds_by_type[type_id] = int(seeds_by_type.get(type_id, 0)) + amount
 	# +2 ide u loot prije množitelja. Lanac otključavanja i dalje broji jedan pickup.
 	GameState.record_seed_pickup_lifetime(type_id, 1)
-	_pip_play("pickup_seed")
-	Sfx.play("run_seed")
+	if _pickup_fx != null:
+		_pending_seeds += amount
+		_pickup_fx.start_seed(type_id, GameState.get_seed_rarity(type_id), amount, at)
+	else:
+		_pip_play("pickup_seed")
+		Sfx.play("run_seed")
 	_update_hud()
-	if pickup_feed and pickup_feed.has_method("push_seed"):
-		pickup_feed.push_seed(type_id, at, amount)
+
+
+# --- pickupi: dodir sa Pipom (design_handoff_run_pickups) ---
+
+## FxUnder ispred Playera (ispod Pipa), PickupFx iza njega (iznad Pipa); bazen se grije odmah.
+func _setup_pickup_fx() -> void:
+	var under := Node2D.new()
+	under.name = "PickupFxUnder"
+	add_child(under)
+	move_child(under, player.get_index())
+	_pickup_fx = PickupFx.new()
+	_pickup_fx.name = "PickupFx"
+	add_child(_pickup_fx)
+	move_child(_pickup_fx, player.get_index() + 1)
+	_pickup_fx.setup(player, under, fly_layer, coin_chip, seed_chip)
+	_pickup_fx.prewarm()
+	_pickup_fx.touch_started.connect(_on_pickup_touch)
+	_pickup_fx.pill_arrived.connect(_on_pickup_arrived)
+	PickupArt.prewarm(GameState.get_active_season_spawn_types())
+	var pv := player.get_node_or_null("PipVisual")
+	if pv != null and pv.has_method("bind_pickup_fx"):
+		pv.call("bind_pickup_fx", _pickup_fx)
+
+
+func _on_pickup_touch(t: PickupFx.Touch) -> void:
+	Sfx.play("coin" if t.is_coin else "run_seed")
+	_pip_pickup(t.ev.pip)
+
+
+## Niža reakcija ne prekida višu dok traje (coin < seed < twin < rare).
+func _pip_pickup(anim: String) -> void:
+	var prio := int(PickupArt.data().get("pip_priority", {}).get(anim, 0))
+	var now := Time.get_ticks_msec() / 1000.0
+	if now < _pip_pick_until and prio < _pip_pick_prio:
+		return
+	_pip_pick_prio = prio
+	_pip_pick_until = now + float(UiRun.PIP_PICKUP_LEN.get(anim, 0.3))
+	_pip_play(anim)
+
+
+func _on_pickup_arrived(t: PickupFx.Touch) -> void:
+	if t.is_coin:
+		_pending_coins = maxi(0, _pending_coins - t.amount)
+		_update_hud()
+		_bump_chip(coin_chip, coin_counter_label, t.ev.bump)
+	else:
+		_pending_seeds = maxi(0, _pending_seeds - t.amount)
+		_update_hud()
+		_bump_chip(seed_chip, seed_counter_label, t.ev.bump)
+		if pickup_feed and pickup_feed.has_method("push_seed_toast"):
+			pickup_feed.push_seed_toast(t.type_id, t.amount)
+
+
+## hud.bump: čip 1 → bump (0,06 s back_out) → 1 (0,2 s); broj 1,25 → 1 za 0,16 s.
+func _bump_chip(chip: Control, label: Label, bump: float) -> void:
+	if chip == null:
+		return
+	chip.pivot_offset = chip.size * 0.5
+	var old: Tween = chip.get_meta("pickup_bump") if chip.has_meta("pickup_bump") else null
+	if old != null and old.is_valid():
+		old.kill()
+	var tw := chip.create_tween().set_parallel(true)
+	tw.tween_property(chip, "scale", Vector2.ONE * bump, 0.06).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(chip, "scale", Vector2.ONE, 0.14).set_delay(0.06).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	if label != null:
+		label.pivot_offset = label.size * 0.5
+		label.scale = Vector2.ONE * 1.25
+		tw.tween_property(label, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	chip.set_meta("pickup_bump", tw)
 
 
 # --- nagradni grm (design_handoff_run_hud_v2 · run_hud_export.json → bush) ---
@@ -762,8 +846,8 @@ func _on_player_hit_obstacle() -> void:
 func _update_hud() -> void:
 	if coin_counter_label == null or seed_counter_label == null:
 		return
-	coin_counter_label.text = "%d" % coin_count
-	seed_counter_label.text = "%d" % _sum_run_seeds()
+	coin_counter_label.text = "%d" % maxi(0, coin_count - _pending_coins)
+	seed_counter_label.text = "%d" % maxi(0, _sum_run_seeds() - _pending_seeds)
 	var endless := GameState.is_endless_mode()
 	var text := UiRun.mode_text(
 		endless,

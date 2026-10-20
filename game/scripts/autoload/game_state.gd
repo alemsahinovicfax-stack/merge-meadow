@@ -98,6 +98,8 @@ const ENDLESS_DIFFICULTY_LABELS: Dictionary = {
 
 const TUTORIAL_FLAGS_PATH := "user://tutorial_flags.json"
 const PLAYER_SAVE_PATH := "user://player_save.json"
+const PLAYER_SAVE_TMP_PATH := "user://player_save.json.tmp"
+const PLAYER_SAVE_BAK_PATH := "user://player_save.json.bak"
 const SAVE_VERSION := 12
 const RETIRED_SEED_TYPE_IDS: Array[String] = ["watermelon"]
 
@@ -311,28 +313,41 @@ func _ready() -> void:
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
-		reset_garden_beds()
-		reset_greenhouse_beds()
-		tutorial.migrate_legacy_flags()
-		debug.apply_resources_if_new_game()
-		_normalize_season_progress()
-		_ensure_first_launch()
+		if not _save_unreadable:
+			reset_garden_beds()
+			reset_greenhouse_beds()
+			tutorial.migrate_legacy_flags()
+			debug.apply_resources_if_new_game()
+			_normalize_season_progress()
+			_ensure_first_launch()
 	else:
 		apply_debug_leftover_test_bag()
 
 
 func load_player_save() -> bool:
 	if not FileAccess.file_exists(PLAYER_SAVE_PATH):
+		_save_unreadable = false
 		return false
-	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.READ)
-	if file == null:
+	var text := FileAccess.get_file_as_string(PLAYER_SAVE_PATH)
+	if text.strip_edges().is_empty():
+		_save_unreadable = false
 		return false
-	var text := file.get_as_text()
-	_save_disk_hash = text.hash()
 	var parsed: Variant = JSON.parse_string(text)
-	if not parsed is Dictionary:
-		return false
-	return _apply_save_dict(parsed)
+	if parsed is Dictionary:
+		_save_unreadable = false
+		_save_disk_hash = text.hash()
+		return _apply_save_dict(parsed)
+	if FileAccess.file_exists(PLAYER_SAVE_BAK_PATH):
+		var bak_text := FileAccess.get_file_as_string(PLAYER_SAVE_BAK_PATH)
+		var bak_parsed: Variant = JSON.parse_string(bak_text)
+		if bak_parsed is Dictionary:
+			_save_unreadable = false
+			_save_disk_hash = bak_text.hash()
+			push_warning("GameState: live save unreadable — restored backup")
+			return _apply_save_dict(bak_parsed)
+	_save_unreadable = true
+	push_error("GameState: player save unreadable — refusing to overwrite")
+	return false
 
 
 ## Arena (sipanje, combo coini, dnevni zadatak, ★3) snima više puta u par sekundi, a save na
@@ -345,6 +360,8 @@ var _save_soon_pending: bool = false
 ## fajl koji je u međuvremenu promijenio neko drugi — smoke test koji vrati svoju kopiju savea
 ## pa izađe (flush na izlazu je inače upisivao testno stanje preko nje, 2026-10-10).
 var _save_disk_hash: int = 0
+## Neprazan fajl koji nije JSON rječnik. Ne tretiraj kao novu igru i ne pregazuj ga.
+var _save_unreadable: bool = false
 
 
 func save_player_save_soon() -> void:
@@ -381,6 +398,10 @@ func _notification(what: int) -> void:
 
 
 func save_player_save() -> void:
+	if _save_unreadable:
+		_save_soon_pending = false
+		push_error("GameState: save blocked — %s is unreadable" % PLAYER_SAVE_PATH)
+		return
 	_save_soon_pending = false
 	stash_upgrade_levels(active_season_id)
 	var data := {
@@ -415,13 +436,47 @@ func save_player_save() -> void:
 	data.merge(bloom_inbox_domain.to_save_dict())
 	data.merge(arena_domain.to_save_dict())
 	data.merge(seasons_domain.to_save_dict())
-	var file := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.WRITE)
-	if file == null:
-		push_error("GameState: could not write %s" % PLAYER_SAVE_PATH)
-		return
 	var text := JSON.stringify(data)
-	file.store_string(text)
+	if not _write_save_atomic(text):
+		return
 	_save_disk_hash = text.hash()
+
+
+## Piše tmp, sačuva prethodni fajl kao .bak, pa preimenuje tmp preko živog.
+## Ako preimenovanje ne uspije, živi fajl se ne briše prije uspjeha.
+func _write_save_atomic(text: String) -> bool:
+	var tmp := FileAccess.open(PLAYER_SAVE_TMP_PATH, FileAccess.WRITE)
+	if tmp == null:
+		push_error("GameState: could not write %s" % PLAYER_SAVE_TMP_PATH)
+		return false
+	tmp.store_string(text)
+	tmp.close()
+	var previous := ""
+	if FileAccess.file_exists(PLAYER_SAVE_PATH):
+		previous = FileAccess.get_file_as_string(PLAYER_SAVE_PATH)
+	# Pokvaren živi fajl ne smije pregaziti dobar .bak.
+	if not previous.is_empty() and JSON.parse_string(previous) is Dictionary:
+		var bak := FileAccess.open(PLAYER_SAVE_BAK_PATH, FileAccess.WRITE)
+		if bak == null:
+			push_error("GameState: could not write %s" % PLAYER_SAVE_BAK_PATH)
+			return false
+		bak.store_string(previous)
+		bak.close()
+	if FileAccess.file_exists(PLAYER_SAVE_PATH):
+		var removed := DirAccess.remove_absolute(PLAYER_SAVE_PATH)
+		if removed != OK:
+			push_error("GameState: could not replace save (%s)" % removed)
+			return false
+	var renamed := DirAccess.rename_absolute(PLAYER_SAVE_TMP_PATH, PLAYER_SAVE_PATH)
+	if renamed != OK:
+		push_error("GameState: rename %s failed (%s)" % [PLAYER_SAVE_TMP_PATH, renamed])
+		if not previous.is_empty():
+			var restore := FileAccess.open(PLAYER_SAVE_PATH, FileAccess.WRITE)
+			if restore != null:
+				restore.store_string(previous)
+				restore.close()
+		return false
+	return true
 
 
 func t3_flower_count() -> int:
@@ -1591,15 +1646,22 @@ func double_loot_placeholder() -> bool:
 
 
 func request_revive() -> bool:
+	if not _apply_revive_clawback():
+		return false
+	save_player_save()
+	go_to_scene(SCENE_RUN)
+	return true
+
+
+## Fail je već upisao ceil(50%) u novčanik. Revive nastavlja s punim carryjem,
+## pa se taj iznos skida da sljedeći finish ne plati coine još jednom.
+## Bez promjene scene — GUT zove ovo direktno.
+func _apply_revive_clawback() -> bool:
 	if not last_failed or revive_used_this_run or loot_doubled:
 		return false
-	# Fail je već upisao ceil(50%) u novčanik. Revive nastavlja s punim carryjem,
-	# pa se taj iznos skida da sljedeći finish ne plati coine još jednom.
 	wallet_coins = maxi(0, wallet_coins - last_run_coins)
 	revive_used_this_run = true
 	resume_pending = true
-	save_player_save()
-	go_to_scene(SCENE_RUN)
 	return true
 
 

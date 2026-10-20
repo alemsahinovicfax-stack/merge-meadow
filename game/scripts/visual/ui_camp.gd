@@ -799,6 +799,97 @@ static func unlock_button_ink(state: String) -> Color:
 const S_PREMIUM_SEASON := "Premium season"
 const S_PREMIUM_FLOWERS := "%d new flowers"
 const S_BUYING := "…"
+const S_PREMIUM_TAG := "PREMIUM"
+const S_PURCHASE_CANCELLED := "Purchase cancelled"
+
+## Plaćena kartica (design_handoff_run_pickups · camp_paid_card.json): red ispod imena = oznaka
+## PREMIUM + „6 new flowers" (kolona 312) i red od 6 cvjetova sezone u okvirima po rijetkosti.
+const PAID_OFFER_H := 128
+const PAID_LEFT_W := 312
+const PAID_GAP := 20
+const PAID_TAG_H := 52
+const PAID_TAG_FONT := 34
+const PAID_COUNT_FONT := 42
+const PAID_TILE := 100
+const PAID_TILE_GAP := 10
+const PAID_TILE_RADIUS := 22
+const PAID_WELL_INSET := 6
+const PAID_WELL_RADIUS := 15
+const PAID_WELL := Color("#22342A")
+const PAID_ART := 84
+const PAID_TILE_FRAME := {
+	1: [Color("#FFF8F0"), Color("#CBC2B6")],
+	2: [Color("#A8E6CF"), Color("#7FC9AC")],
+	3: [Color("#FFD56B"), Color("#D6A82F")],
+}
+const PAID_BTN_PRICE := Color("#E8C44A")
+const PAID_BTN_PRICE_EDGE := Color("#BA9D3B")
+const PAID_BTN_BUSY := Color("#FFD56B")
+const PAID_BTN_BUSY_EDGE := Color("#D6A82F")
+const PAID_DROP := Color(18.0 / 255.0, 28.0 / 255.0, 22.0 / 255.0, 0.42)
+const PAID_TOAST_LIFE := 1.6
+
+
+## Dugme s cijenom. price: zlatno + tvrda sjena 0 6 0; buying / burst: svjetlije zlato, bez sjene.
+static func paid_button_style(busy: bool) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.set_corner_radius_all(20)
+	s.set_border_width_all(3)
+	s.anti_aliasing = true
+	s.bg_color = PAID_BTN_BUSY if busy else PAID_BTN_PRICE
+	s.border_color = PAID_BTN_BUSY_EDGE if busy else PAID_BTN_PRICE_EDGE
+	if not busy:
+		s.shadow_color = PAID_DROP
+		s.shadow_size = 1
+		s.shadow_offset = Vector2(0, 6)
+	return s
+
+
+static func premium_tag_style() -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = PAID_BTN_BUSY
+	s.border_color = INK
+	s.set_border_width_all(3)
+	s.set_corner_radius_all(14)
+	s.content_margin_left = 18.0
+	s.content_margin_right = 18.0
+	s.anti_aliasing = true
+	return s
+
+
+static func paid_tile_style(rarity: int) -> StyleBoxFlat:
+	var c: Array = PAID_TILE_FRAME.get(clampi(rarity, 1, 3))
+	var s := StyleBoxFlat.new()
+	s.bg_color = c[0]
+	s.border_color = c[1]
+	s.set_border_width_all(3)
+	s.set_corner_radius_all(PAID_TILE_RADIUS)
+	s.anti_aliasing = true
+	return s
+
+
+static func paid_well_style() -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = PAID_WELL
+	s.set_corner_radius_all(PAID_WELL_RADIUS)
+	s.anti_aliasing = true
+	return s
+
+
+## „Purchase cancelled": krem pilula, rub 3, tvrda sjena 0 6 0.
+static func paid_toast_style() -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = UiPalette.WARM_WHITE
+	s.border_color = INK
+	s.set_border_width_all(3)
+	s.set_corner_radius_all(20)
+	s.content_margin_left = 24.0
+	s.content_margin_right = 24.0
+	s.shadow_color = PAID_DROP
+	s.shadow_size = 1
+	s.shadow_offset = Vector2(0, 6)
+	s.anti_aliasing = true
+	return s
 
 
 ## Jedna rijec. Koliko fali vec pisu trake napretka iznad dugmeta.

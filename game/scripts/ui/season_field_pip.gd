@@ -10,6 +10,7 @@ var _pose: String = "walk"
 var _walking: bool = false
 var _last_x: float = 0.0
 var _apply_playing: bool = false
+var _spawning: bool = false
 
 
 func _ready() -> void:
@@ -22,18 +23,29 @@ func _ready() -> void:
 
 
 func _ensure_actor() -> void:
-	if actor != null:
+	if actor != null or _spawning:
 		return
+	_spawning = true
+	var key := UiPip.equipped_skin_key()
+	while not UiPip.atlas_ready(key):
+		UiPip.request_atlas(key)
+		await get_tree().process_frame
+		if not is_inside_tree():
+			_spawning = false
+			return
 	actor = UiPip.new()
 	actor.name = "Actor"
 	actor.view = "front"
 	actor.box_px = PIP_SIDE
 	actor.follow_equipped = true
+	actor.skin = key
 	add_child(actor)
 	actor.place_feet_in(self)
 	actor.set_loop("idle")
 	if actor.body != null and not actor.body.animation_finished.is_connected(_on_actor_done):
 		actor.body.animation_finished.connect(_on_actor_done)
+	_spawning = false
+	set_pose(_pose, _walking)
 
 
 func _notification(what: int) -> void:
@@ -42,9 +54,11 @@ func _notification(what: int) -> void:
 
 
 func set_pose(pose: String, walking: bool = false, tilt_dir: float = 1.0) -> void:
-	_ensure_actor()
 	_pose = pose
 	_walking = walking and pose == "walk"
+	_ensure_actor()
+	if actor == null:
+		return
 	if _walking:
 		actor.set_view("side")
 		actor.set_facing(tilt_dir < 0.0)
@@ -75,6 +89,8 @@ func is_walking() -> bool:
 
 func play_apply() -> void:
 	_ensure_actor()
+	if actor == null:
+		return
 	_apply_playing = true
 	actor.set_view("front")
 	actor.play("apply")

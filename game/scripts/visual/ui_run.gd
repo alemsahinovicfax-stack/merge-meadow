@@ -41,6 +41,8 @@ const SEED_PIP_R3 := Color("#D6A82F")
 const PICKUP_SHADOW := Color(0.071, 0.110, 0.086, 0.30)
 const PICKUP_SHADOW_SIZE := Vector2(64, 18)
 const PICKUP_SHADOW_OFFSET := 40          # odvojena sjena = "pluta"
+## Trajanje Pip reakcija na pickup (animations.json) — prioritet ne pušta nižu da prekine višu.
+const PIP_PICKUP_LEN := {"pickup_coin": 0.22, "pickup_seed": 0.30, "pickup_twin": 0.36, "pickup_seed_rare": 0.40}
 
 # --- Obstacle ----------------------------------------------------------
 const OBSTACLE_BODY := Vector2(176, 150)

@@ -328,6 +328,9 @@ func _run() -> void:
 		for type_id in def.seed_type_ids:
 			stash[str(type_id)] = 5
 	gs.set("garden_crystal_stash", stash)
+	# Polje broji i „ikad uzgojeno" (star3_grown) — pravi save ga ima punog, pa bi polje već
+	# bilo puno prije testa (greske-katalog #45).
+	(gs.get("crystal_stash_domain") as Object).set("grown", {})
 
 	var err := change_scene_to_file("res://scenes/meta/meta_hub.tscn")
 	if err != OK:

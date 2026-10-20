@@ -1,0 +1,603 @@
+{
+ "schema": 1,
+ "note": "Append to game/data/pip/animations.json \"list\" (pickup_coin / pickup_seed REPLACE the existing entries). Same key format: [t_sec, value..., transition].",
+ "list": [
+  {
+   "id": "pickup_coin",
+   "length": 0.22,
+   "loop": false,
+   "layer": "overlay",
+   "view": "top",
+   "context": "run",
+   "desc": "Coin caught at the nose: squash-pop toward the coin, small head nod, happy blink.",
+   "speed_bind": null,
+   "hold_last": false,
+   "tracks": [
+    {
+     "node": "pip",
+     "prop": "scale",
+     "keys": [
+      [
+       0,
+       1,
+       1
+      ],
+      [
+       0.05,
+       1.08,
+       0.94,
+       0.5
+      ],
+      [
+       0.12,
+       0.98,
+       1.03
+      ],
+      [
+       0.22,
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "node": "head",
+     "prop": "rotation_degrees",
+     "keys": [
+      [
+       0,
+       0
+      ],
+      [
+       0.05,
+       -6
+      ],
+      [
+       0.13,
+       4
+      ],
+      [
+       0.22,
+       0
+      ]
+     ]
+    },
+    {
+     "node": "eye_L",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "happy"
+      ],
+      [
+       0.2,
+       "open"
+      ]
+     ]
+    },
+    {
+     "node": "eye_R",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "happy"
+      ],
+      [
+       0.2,
+       "open"
+      ]
+     ]
+    },
+    {
+     "node": "brow_L",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "none"
+      ],
+      [
+       0.2,
+       "cross"
+      ]
+     ]
+    },
+    {
+     "node": "brow_R",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "none"
+      ],
+      [
+       0.2,
+       "cross"
+      ]
+     ]
+    },
+    {
+     "node": "mouth",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "smile"
+      ],
+      [
+       0.2,
+       "w"
+      ]
+     ]
+    }
+   ],
+   "events": [],
+   "reduce_motion": {
+    "type": "expr"
+   }
+  },
+  {
+   "id": "pickup_seed",
+   "length": 0.3,
+   "loop": false,
+   "layer": "overlay",
+   "view": "top",
+   "context": "run",
+   "desc": "Seed ★1 caught in the paws and tucked back: pop, head wiggle, joy.",
+   "speed_bind": null,
+   "hold_last": false,
+   "tracks": [
+    {
+     "node": "pip",
+     "prop": "scale",
+     "keys": [
+      [
+       0,
+       1,
+       1
+      ],
+      [
+       0.07,
+       1.1,
+       1.1,
+       0.5
+      ],
+      [
+       0.18,
+       0.97,
+       0.97
+      ],
+      [
+       0.3,
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "node": "head",
+     "prop": "rotation_degrees",
+     "keys": [
+      [
+       0,
+       0
+      ],
+      [
+       0.07,
+       -8
+      ],
+      [
+       0.15,
+       8
+      ],
+      [
+       0.23,
+       -4
+      ],
+      [
+       0.3,
+       0
+      ]
+     ]
+    },
+    {
+     "node": "eye_L",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "happy"
+      ],
+      [
+       0.28,
+       "open"
+      ]
+     ]
+    },
+    {
+     "node": "eye_R",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "happy"
+      ],
+      [
+       0.28,
+       "open"
+      ]
+     ]
+    },
+    {
+     "node": "brow_L",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "up"
+      ],
+      [
+       0.28,
+       "cross"
+      ]
+     ]
+    },
+    {
+     "node": "brow_R",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "up"
+      ],
+      [
+       0.28,
+       "cross"
+      ]
+     ]
+    },
+    {
+     "node": "mouth",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "grin"
+      ],
+      [
+       0.28,
+       "w"
+      ]
+     ]
+    }
+   ],
+   "events": [],
+   "reduce_motion": {
+    "type": "expr"
+   }
+  },
+  {
+   "id": "pickup_seed_rare",
+   "length": 0.4,
+   "loop": false,
+   "layer": "overlay",
+   "view": "top",
+   "context": "run",
+   "desc": "Seed ★2 / ★3: bigger pop, whole-body wobble, admiring sparkle eyes.",
+   "speed_bind": null,
+   "hold_last": false,
+   "tracks": [
+    {
+     "node": "pip",
+     "prop": "scale",
+     "keys": [
+      [
+       0,
+       1,
+       1
+      ],
+      [
+       0.08,
+       1.16,
+       1.16,
+       0.5
+      ],
+      [
+       0.2,
+       0.95,
+       0.95
+      ],
+      [
+       0.3,
+       1.03,
+       1.03
+      ],
+      [
+       0.4,
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "node": "pip",
+     "prop": "rotation_degrees",
+     "keys": [
+      [
+       0,
+       0
+      ],
+      [
+       0.08,
+       -6
+      ],
+      [
+       0.18,
+       6
+      ],
+      [
+       0.3,
+       -2
+      ],
+      [
+       0.4,
+       0
+      ]
+     ]
+    },
+    {
+     "node": "head",
+     "prop": "rotation_degrees",
+     "keys": [
+      [
+       0,
+       0
+      ],
+      [
+       0.08,
+       -10
+      ],
+      [
+       0.18,
+       10
+      ],
+      [
+       0.28,
+       -4
+      ],
+      [
+       0.38,
+       0
+      ]
+     ]
+    },
+    {
+     "node": "eye_L",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "spark"
+      ],
+      [
+       0.38,
+       "open"
+      ]
+     ]
+    },
+    {
+     "node": "eye_R",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "spark"
+      ],
+      [
+       0.38,
+       "open"
+      ]
+     ]
+    },
+    {
+     "node": "brow_L",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "up"
+      ],
+      [
+       0.38,
+       "cross"
+      ]
+     ]
+    },
+    {
+     "node": "brow_R",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "up"
+      ],
+      [
+       0.38,
+       "cross"
+      ]
+     ]
+    },
+    {
+     "node": "mouth",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "smile"
+      ],
+      [
+       0.38,
+       "w"
+      ]
+     ]
+    }
+   ],
+   "events": [],
+   "reduce_motion": {
+    "type": "expr"
+   }
+  },
+  {
+   "id": "pickup_twin",
+   "length": 0.36,
+   "loop": false,
+   "layer": "overlay",
+   "view": "top",
+   "context": "run",
+   "desc": "Twin +2: two quick pops, one per sapling (left, then right), joy.",
+   "speed_bind": null,
+   "hold_last": false,
+   "tracks": [
+    {
+     "node": "pip",
+     "prop": "scale",
+     "keys": [
+      [
+       0,
+       1,
+       1
+      ],
+      [
+       0.05,
+       1.08,
+       1.08,
+       0.5
+      ],
+      [
+       0.11,
+       1,
+       1
+      ],
+      [
+       0.17,
+       1.12,
+       1.12,
+       0.5
+      ],
+      [
+       0.36,
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "node": "head",
+     "prop": "rotation_degrees",
+     "keys": [
+      [
+       0,
+       0
+      ],
+      [
+       0.05,
+       -8
+      ],
+      [
+       0.11,
+       0
+      ],
+      [
+       0.17,
+       8
+      ],
+      [
+       0.28,
+       -3
+      ],
+      [
+       0.36,
+       0
+      ]
+     ]
+    },
+    {
+     "node": "eye_L",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "happy"
+      ],
+      [
+       0.34,
+       "open"
+      ]
+     ]
+    },
+    {
+     "node": "eye_R",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "happy"
+      ],
+      [
+       0.34,
+       "open"
+      ]
+     ]
+    },
+    {
+     "node": "brow_L",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "up"
+      ],
+      [
+       0.34,
+       "cross"
+      ]
+     ]
+    },
+    {
+     "node": "brow_R",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "up"
+      ],
+      [
+       0.34,
+       "cross"
+      ]
+     ]
+    },
+    {
+     "node": "mouth",
+     "prop": "frame",
+     "keys": [
+      [
+       0,
+       "grin"
+      ],
+      [
+       0.34,
+       "w"
+      ]
+     ]
+    }
+   ],
+   "events": [],
+   "reduce_motion": {
+    "type": "expr"
+   }
+  }
+ ]
+}

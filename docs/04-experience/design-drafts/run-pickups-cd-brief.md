@@ -16,7 +16,7 @@ ai_sažetak: "Brief za Claude Design: (A) puni redizajn pickupa u runu — sjeme
 
 # Run pickupi + kartice plaćenih sezona u Campu · Claude Design brief
 
-> **Status 2026-10-16: spremno za slanje.** Slike: `run-pickups-ref/` (r01–r05, dio A) i `camp-paid-card-ref/` (c01–c06, dio B). Prompt je u §9.
+> **Status 2026-10-20: paket stigao i u igri — vidi [[run-pickups-izvjestaj|run-pickups-izvjestaj]].** Ranije (2026-10-16): spremno za slanje. Slike: `run-pickups-ref/` (r01–r05, dio A) i `camp-paid-card-ref/` (c01–c06, dio B). Prompt je u §9.
 >
 > **Prije slanja: commitaj i pushaj na `master`.** CD čita repo samo po tačnim putanjama s mastera.
 

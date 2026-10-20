@@ -1,0 +1,278 @@
+{
+ "schema": 1,
+ "size": [
+  1032,
+  318
+ ],
+ "padding": 22,
+ "gap": 20,
+ "border": [
+  3,
+  "#2D3436"
+ ],
+ "radius": "UiPalette.CORNER_RADIUS_CTA (as free card)",
+ "shadow": {
+  "y": 8,
+  "color": "rgba(26,26,20,0.22)",
+  "note": "one hard shadow, same as free kit card"
+ },
+ "layout": {
+  "head": {
+   "h": 120,
+   "name": {
+    "font": 56,
+    "weight": 900,
+    "color": "recipe.ink"
+   },
+   "button": {
+    "size": [
+     300,
+     120
+    ],
+    "radius": 20
+   }
+  },
+  "offer": {
+   "h": 128,
+   "left_col_w": 312,
+   "gap": 20,
+   "tag": {
+    "text": "PREMIUM",
+    "h": 52,
+    "pad_x": 18,
+    "radius": 14,
+    "bg": "#FFD56B",
+    "border": [
+     3,
+     "#2D3436"
+    ],
+    "font": 34,
+    "weight": 900,
+    "letter_spacing_em": 0.06,
+    "ink": "#2D3436"
+   },
+   "count": {
+    "text": "S_PREMIUM_FLOWERS \"%d new flowers\"",
+    "font": 42,
+    "weight": 900,
+    "color": "recipe.ink"
+   },
+   "flowers": {
+    "n": 6,
+    "order": "roster order (★1 ×3, ★2 ×2, ★3)",
+    "tile": 100,
+    "gap": 10,
+    "radius": 22,
+    "border": 3,
+    "well": {
+     "inset": 6,
+     "radius": 15,
+     "color": "#22342A"
+    },
+    "art": {
+     "size": 84,
+     "tier": "t3"
+    },
+    "frame_by_rarity": {
+     "1": [
+      "#FFF8F0",
+      "#CBC2B6"
+     ],
+     "2": [
+      "#A8E6CF",
+      "#7FC9AC"
+     ],
+     "3": [
+      "#FFD56B",
+      "#D6A82F"
+     ]
+    }
+   }
+  }
+ },
+ "rosters": {
+  "moonlit_warren": [
+   [
+    "moon_moss",
+    1
+   ],
+   [
+    "nightshade_petal",
+    1
+   ],
+   [
+    "silver_harebell",
+    1
+   ],
+   [
+    "lunar_orchid",
+    2
+   ],
+   [
+    "star_jasmine",
+    2
+   ],
+   [
+    "umbral_lily",
+    3
+   ]
+  ],
+  "coral_tide": [
+   [
+    "sea_thrift",
+    1
+   ],
+   [
+    "salt_daisy",
+    1
+   ],
+   [
+    "tide_anemone",
+    1
+   ],
+   [
+    "coral_hibiscus",
+    2
+   ],
+   [
+    "pearl_waterlily",
+    2
+   ],
+   [
+    "reef_crown",
+    3
+   ]
+  ],
+  "starfall_glade": [
+   [
+    "comet_sprig",
+    1
+   ],
+   [
+    "nebula_clover",
+    1
+   ],
+   [
+    "meteor_daisy",
+    1
+   ],
+   [
+    "aurora_tulip",
+    2
+   ],
+   [
+    "galaxy_sunburst",
+    2
+   ],
+   [
+    "nova_bloom",
+    3
+   ]
+  ],
+  "ember_fen": [
+   [
+    "marsh_rush",
+    1
+   ],
+   [
+    "peat_violet",
+    1
+   ],
+   [
+    "cinder_buttercup",
+    1
+   ],
+   [
+    "flame_iris",
+    2
+   ],
+   [
+    "smoke_lotus",
+    2
+   ],
+   [
+    "fenfire_crown",
+    3
+   ]
+  ]
+ },
+ "states": {
+  "price": {
+   "button": {
+    "bg": "#E8C44A",
+    "border": "#BA9D3B",
+    "shadow": "0 6 0 rgba(18,28,22,0.42)",
+    "label": "IAPManager.get_price_label(sku)",
+    "font": 48,
+    "ink": "#2D3436"
+   },
+   "input": "button → _buy_paid(); card → _go_home_paid()"
+  },
+  "buying": {
+   "button": {
+    "bg": "#FFD56B",
+    "border": "#D6A82F",
+    "shadow": null,
+    "offset_y": 4,
+    "label": "three dots 18 px #2D3436, alpha 1 / 0.6 / 0.3, gap 12 (replaces S_BUYING \"…\")"
+   },
+   "input": "disabled (card + button)"
+  },
+  "burst": {
+   "button": {
+    "bg": "#FFD56B",
+    "border": "#D6A82F",
+    "label": "unlock_button_text(UNLOCKING) \"Unlocked\""
+   },
+   "ring": {
+    "d": "(0.2 + 0.8·ease_cubic_out(t))·520",
+    "border": 14,
+    "color": "rgba(255,245,209,0.55·(1−t))",
+    "t": "T_UNLOCK_BURST 0.42 + T_UNLOCK_LINGER 0.45"
+   },
+   "then": "_go_home_paid(id)"
+  },
+  "failed": {
+   "button": "as price",
+   "toast": {
+    "text": "Purchase cancelled",
+    "at": "right 22, top 150 (over flower row)",
+    "h": 64,
+    "pad_x": 24,
+    "radius": 20,
+    "bg": "#FFF8F0",
+    "border": [
+     3,
+     "#2D3436"
+    ],
+    "shadow": "0 6 0 rgba(18,28,22,0.42)",
+    "font": 34,
+    "weight": 900,
+    "life_s": 1.6
+   },
+   "then": "price"
+  }
+ },
+ "ink": {
+  "moonlit_warren": {
+   "ink": "#FFF8F0",
+   "min": 11.46,
+   "layers": 9
+  },
+  "coral_tide": {
+   "ink": "#3D3D33",
+   "min": 6.64,
+   "layers": 10
+  },
+  "starfall_glade": {
+   "ink": "#FFF8F0",
+   "min": 14.42,
+   "layers": 10
+  },
+  "ember_fen": {
+   "ink": "#FFF8F0",
+   "min": 13.99,
+   "layers": 10
+  }
+ }
+}

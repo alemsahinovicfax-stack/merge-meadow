@@ -272,6 +272,9 @@ func _run() -> void:
 		return
 	gs.set("garden_crystal_stash", {frost_flower: need})
 	gs.set("wallet_coins", 500)
+	# Nivoi nadogradnji su po sezoni i ostaju u saveu — pravi save može imati Frost na max,
+	# pa nijedna kupovina nije „can" i napomene nema (greske-katalog #45).
+	(gs.get("season_upgrades") as Dictionary).erase("frost_orchard")
 	home.call("_open_upgrades_sheet")
 	for _u in 4:
 		await process_frame
@@ -282,7 +285,10 @@ func _run() -> void:
 			return
 	var note := str(home.call("get_upgrade_kept_note"))
 	if note.find("Lantern") < 0:
-		_fail("upgrades sheet should say the purchase uses flowers saved for Lantern, got '%s'" % note)
+		_fail("upgrades sheet should say the purchase uses flowers saved for Lantern, got '%s' (sheet %s, next %s, uses_kept %s, states %s)" % [
+			note, gs.call("upgrade_sheet_season_id"), gs.call("next_locked_free_id"),
+			gs.call("upgrade_uses_kept_flowers", "frost_orchard"),
+			[gs.call("upgrade_button_state", "magnet", "frost_orchard"), gs.call("upgrade_button_state", "loot", "frost_orchard"), gs.call("upgrade_button_state", "twin", "frost_orchard")]])
 		return
 	var twin_before := int(gs.call("get_upgrade_level", "twin", "frost_orchard"))
 	if not bool(gs.call("try_upgrade_twin")):
