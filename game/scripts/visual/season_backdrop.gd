@@ -70,6 +70,9 @@ static func draw(canvas: CanvasItem, sc: Dictionary, rect: Rect2) -> void:
 			var lxf := Transform2D(0.0, pct, 0.0, rect.position + off * k)
 			canvas.draw_polyline(lxf * (chunk["pts"] as PackedVector2Array), chunk["col"], float(chunk["w"]) * k, true)
 			continue
+		# Komad bez trokuta (npr. između dva sloja linija na putu) — RenderingServer ga ne prima.
+		if (chunk["idx"] as PackedInt32Array).is_empty():
+			continue
 		var pts := PackedVector2Array()
 		var cross: Array = []
 		for it in chunk["items"]:

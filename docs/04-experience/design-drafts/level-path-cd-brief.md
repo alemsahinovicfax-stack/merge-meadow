@@ -16,7 +16,7 @@ ai_sažetak: "Brief za Claude Design: novi ekran „Level Path" po sezoni — Pl
 
 # Level Path po sezoni · Claude Design brief
 
-> **Status 2026-10-19: spremno za slanje.** Slike: `level-path-ref/` (l00–l08). Prompt je u §9.
+> **Status 2026-10-20: paket stigao i u igri — vidi [[level-path-izvjestaj|level-path-izvjestaj]].** Ranije (2026-10-19): spremno za slanje. Slike: `level-path-ref/` (l00–l08). Prompt je u §9.
 >
 > **Prije slanja: commitaj i pushaj na `master`.** CD čita repo samo po tačnim putanjama s mastera.
 

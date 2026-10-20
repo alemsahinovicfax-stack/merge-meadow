@@ -245,8 +245,48 @@ func _set_block_hub_swipe(ctrl: Control, enabled: bool) -> void:
 
 
 func _on_seasons_row_pressed() -> void:
-	if season_stage and season_stage.has_method("close_season_field"):
+	if season_stage == null:
+		return
+	# Na putu je lijevo „‹ Field" (isto dugme): nazad na polje, ne na kartice.
+	if season_stage.has_method("is_level_path_open") and bool(season_stage.call("is_level_path_open")):
+		if not bool(season_stage.call("is_busy")):
+			season_stage.call("close_level_path")
+		return
+	if season_stage.has_method("close_season_field"):
 		season_stage.call("close_season_field")
+
+
+## Level Path · prelaz (SeasonStage): v.x = koliko je chrome polja otišao, v.y = labela
+## „Seasons" → „Field" (pretapanje u 0,16 s). Ormar ide s gornjom grupom.
+func apply_level_path_chrome(v: Vector2) -> void:
+	if wardrobe_button:
+		wardrobe_button.modulate.a = 1.0 - v.x
+		wardrobe_button.visible = v.x < 1.0 and _wardrobe_allowed()
+	if seasons_row_button:
+		var want := LevelPathKit.S_BACK if v.y >= 0.5 else "Seasons"
+		if seasons_row_button.label_text != want:
+			seasons_row_button.label_text = want
+		var row := seasons_row_button.get_node_or_null("ContentRow") as Control
+		if row:
+			row.modulate.a = absf(v.y * 2.0 - 1.0)
+
+
+func on_level_path_transition(_opening: bool) -> void:
+	if _transition_blocker:
+		_transition_blocker.visible = true
+	if field_basket:
+		field_basket.stop_attention()
+	_close_basket_picker()
+	_close_upgrades_sheet()
+	_close_wardrobe(false)
+
+
+func on_level_path_finished(opened: bool) -> void:
+	if _transition_blocker:
+		_transition_blocker.visible = false
+	apply_level_path_chrome(Vector2(1.0, 1.0) if opened else Vector2.ZERO)
+	if not opened:
+		_refresh_wardrobe_button()
 
 
 func _refresh_endless_button() -> void:
@@ -315,7 +355,8 @@ func _apply_mode_layout(field_open: bool) -> void:
 ## Homea) · Endless 236 x 124. Naljepnica rub 3 + sjenka 8; sadrzaj kao
 ## FieldScreen.dc.html: crtani chevron / dva prstena + tekst 38/900.
 func _style_field_bottom_row() -> void:
-	_style_sticker_button(seasons_row_button, UiHomeField.SEASONS_BTN.size, UiHomeField.seasons_button(), "Seasons", "chevron", 14)
+	var back_label := LevelPathKit.S_BACK if GameState.level_path_open else "Seasons"
+	_style_sticker_button(seasons_row_button, UiHomeField.SEASONS_BTN.size, UiHomeField.seasons_button(), back_label, "chevron", 14)
 	_style_sticker_button(endless_play_button, UiHomeField.ENDLESS_BTN.size, UiHomeField.endless_button(), "Endless", "rings", 12)
 
 
@@ -1169,8 +1210,13 @@ func _ensure_wardrobe() -> void:
 func _refresh_wardrobe_button() -> void:
 	if wardrobe_button == null:
 		return
-	wardrobe_button.visible = GameState.home_season_field_open
+	wardrobe_button.visible = _wardrobe_allowed() and not GameState.level_path_open
+	wardrobe_button.modulate.a = 0.0 if GameState.level_path_open else 1.0
 	wardrobe_button.set_dot(GameState.cosmetics.has_new())
+
+
+func _wardrobe_allowed() -> bool:
+	return GameState.home_season_field_open
 
 
 func _open_wardrobe() -> void:

@@ -187,6 +187,21 @@ GPU A/B (`run_pickups_bench.gd`, SubViewport 1080 × 1920, Country Bloom; stari 
 
 Frejmova > 16 ms: isti red veličine (0–5 po scenariju u oba). Jedan skok od 206 ms u jednom NEW prolazu se nije ponovio u 4 nova prolaza (max 8–19 ms) — šum laptopa. Camp kartica plaćene sezone: recept 9–10 slojeva, crta se jednom, bez animacije.
 
+## Level Path (design_handoff_level_path, 2026-10-20)
+
+`level_path_bench.gd`, pravi hub 1080 × 1920, vsync isključen; osnovica = polje sezone (ekran koji je Play otvarao). Avg ms / draw pozivi, 2 prolaza (drugi naizmjenično):
+
+| Scenarij | Country Bloom | Lantern Meadow |
+|---|---|---|
+| `lp_field` (osnovica) | 7,01–7,04 / 111–115 | 7,43–7,45 / 114 |
+| `lp_path` (Pip idle, 1 ready) | 5,98–7,53 / 109–111 | 6,79–6,87 / 108 |
+| `lp_ready4` (4 sanduka poskok + 12 iskri) | 6,20–7,49 / 105–107 | 6,79–6,91 / 104 |
+| `lp_popup` (popup + let 3 + 4) | 7,66–8,64 / 119–123 | 7,93–8,00 / 120 |
+
+Put se crta jednom (SeasonBackdrop, 302–1017 poligona), pređeni put je `Line2D` koji se mijenja samo s levelom, poskok sanduka i skok su samo transform; efekti skoka iz bazena (≤ 5 sprite-ova + Pip). Dok je put otvoren, polje je skriveno (ne crta se dvaput).
+
+20. **Ekran preko drugog ekrana → sakrij onaj ispod kad prelaz završi** (Level Path preko polja, 2026-10-20): livada s cvijećem i ambijentom ispod neprozirnog puta i dalje troši draw pozive i `_process`. Za vrijeme prelaza oba se crtaju (0,56 s), poslije samo gornji.
+
 ## Plan (još nije urađeno)
 
 - [x] **Arena, pulsirajući hint:** prsten je zaseban sloj, puls kroz `modulate.a` (2026-10-09).

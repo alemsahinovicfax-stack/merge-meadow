@@ -429,8 +429,8 @@ func _run() -> void:
 	await _frames(3)
 	if not bool(gs.get("home_season_field_open")) or str(gs.get("home_season_field_id")) != "lantern_meadow":
 		_fail("field should be open on Lantern"); return
-	if str(home.call("home_play_action")) != "run":
-		_fail("field open: Play starts the run"); return
+	if str(home.call("home_play_action")) != "path":
+		_fail("field open: Play opens the Level Path (design_handoff_level_path)"); return
 	if not _rect_is(_page_rect(play), V.PLAY_FIELD["rect"]):
 		_fail("field: Play should be FieldPlayButton 432 x 140 at (324, 1461)"); return
 	var meadow_pip := stage.get_node("%MeadowPip") as Control

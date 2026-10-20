@@ -169,6 +169,7 @@ var crystal_stash_domain: CrystalStashDomain
 var bloom_inbox_domain: BloomInboxDomain
 var arena_domain: ArenaDomain
 var seasons_domain: SeasonsDomain
+var level_path_domain: LevelPathDomain
 var save_migrations: SaveMigrations
 var debug: GameStateDebug
 
@@ -211,7 +212,16 @@ var granted_purchase_tokens: Array[String] = []
 ## (MonetizationConfig.STARTER_PACK_DAYS). Stari saveovi: počinje pri prvom
 ## pokretanju verzije koja ga zna.
 var first_launch_unix: int = 0
-var run_level: int = 1
+## Level kampanje = kamen Level Patha aktivne sezone (1…20; put završen → ponovo 20).
+## Napredak je po sezoni u level_path_domain; ovo svojstvo čitaju run i HUD.
+var run_level: int:
+	get: return level_path_domain.play_level_of(active_season_id) if level_path_domain else 1
+	set(value): level_path_domain.set_level(active_season_id, value)
+## Level Path otvoren na polju (samo u memoriji, kao home_season_field_open) — povratak
+## iz runa ide nazad na put.
+var level_path_open: bool = false
+## Pređen level čeka skok Pipa na putu: {season, from, to}; prazno = nema skoka.
+var level_path_hop: Dictionary = {}
 var endless_runs_completed: int = 0
 var endless_difficulty: int = EndlessDifficulty.NORMAL
 var run_is_endless: bool = false
@@ -308,6 +318,7 @@ func _ready() -> void:
 	bloom_inbox_domain = BloomInboxDomain.new(self)
 	arena_domain = ArenaDomain.new(self)
 	seasons_domain = SeasonsDomain.new(self)
+	level_path_domain = LevelPathDomain.new(self)
 	save_migrations = SaveMigrations.new(self)
 	debug = GameStateDebug.new(self)
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
@@ -418,7 +429,6 @@ func save_player_save() -> void:
 		"starter_pack_owned": starter_pack_owned,
 		"granted_purchase_tokens": granted_purchase_tokens.duplicate(),
 		"first_launch_unix": first_launch_unix,
-		"run_level": run_level,
 		"endless_runs_completed": endless_runs_completed,
 		"endless_difficulty": endless_difficulty,
 		"seed_unlock_index": seed_unlock_index,
@@ -436,6 +446,7 @@ func save_player_save() -> void:
 	data.merge(bloom_inbox_domain.to_save_dict())
 	data.merge(arena_domain.to_save_dict())
 	data.merge(seasons_domain.to_save_dict())
+	data.merge(level_path_domain.to_save_dict())
 	var text := JSON.stringify(data)
 	if not _write_save_atomic(text):
 		return
@@ -589,6 +600,39 @@ func open_home_season_field() -> bool:
 
 func close_home_season_field() -> void:
 	seasons_domain.close_home_season_field()
+	level_path_open = false
+
+
+# --- Level Path (design_handoff_level_path) ---
+
+## 1…20 = kamen na kojem je Pip, 21 = put završen.
+func season_level(season_id: String) -> int:
+	return level_path_domain.level_of(season_id)
+
+
+func season_level_reward_state(season_id: String, n: int) -> String:
+	return level_path_domain.reward_state(season_id, n)
+
+
+## Neuzeta nagrada puta (badge na Play u polju i na kartici sezone).
+func has_level_reward_ready(season_id: String) -> bool:
+	return level_path_domain.has_ready(season_id)
+
+
+## Claim nagrade N: ★3 sezone u stash (+ Album) i coini. Vraća {flower, flowers, coins} ili {}.
+func claim_level_reward(season_id: String, n: int) -> Dictionary:
+	var got := level_path_domain.claim(season_id, n)
+	if not got.is_empty():
+		save_player_save()
+	return got
+
+
+func take_level_path_hop(season_id: String) -> Dictionary:
+	if level_path_hop.is_empty() or str(level_path_hop.get("season", "")) != season_id:
+		return {}
+	var hop := level_path_hop
+	level_path_hop = {}
+	return hop
 
 
 func set_home_band(band: String) -> void:
@@ -686,7 +730,6 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	starter_pack_owned = bool(data.get("starter_pack_owned", false))
 	granted_purchase_tokens = _parse_string_array(data.get("granted_purchase_tokens", []))
 	first_launch_unix = maxi(0, int(data.get("first_launch_unix", 0)))
-	run_level = clampi(int(data.get("run_level", 1)), 1, RunLevelLibrary.MAX_RUN_LEVEL)
 	endless_runs_completed = maxi(0, int(data.get("endless_runs_completed", 0)))
 	endless_difficulty = clampi(
 		int(data.get("endless_difficulty", EndlessDifficulty.NORMAL)),
@@ -705,6 +748,7 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	collection_journal_pending = _parse_string_int_dict(data.get("collection_journal_pending", {}))
 	bloom_inbox_domain.apply_from_save(data)
 	seasons_domain.apply_from_save(data)
+	level_path_domain.apply_from_save(data)
 	_normalize_season_progress()
 	if data.has("season_upgrades"):
 		season_upgrades = _parse_season_upgrades(data.get("season_upgrades", {}))
@@ -1495,8 +1539,10 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 	if not last_failed and tutorial_complete:
 		if run_is_endless:
 			endless_runs_completed += 1
-		elif run_level < RunLevelLibrary.MAX_RUN_LEVEL:
-			run_level += 1
+		else:
+			var step := level_path_domain.advance(active_season_id)
+			if not step.is_empty():
+				level_path_hop = {"season": active_season_id, "from": int(step[0]), "to": int(step[1])}
 	save_player_save()
 
 

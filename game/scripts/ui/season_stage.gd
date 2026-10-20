@@ -53,6 +53,14 @@ var _chrome: Dictionary = {}
 var _chrome_home: Dictionary = {}
 
 var _seen_focus: String = ""
+## Level Path (design_handoff_level_path): put sezone iznad polja; Play u polju ga otvara.
+var level_path: LevelPathView
+var _path_u: float = 0.0
+var _path_moving: bool = false
+var _path_tween: Tween
+var _path_from := Vector2.ZERO
+var _chrome_out: float = 0.0
+var _badge: Control
 var _drag_on: bool = false
 var _drag_moved: bool = false
 var _drag_start := Vector2.ZERO
@@ -74,6 +82,7 @@ func _ready() -> void:
 	play_button.pressed.connect(_on_play_pressed)
 	IAPManager.purchase_completed.connect(_on_purchase_done)
 	IAPManager.purchase_failed.connect(_on_purchase_failed)
+	_ensure_level_path()
 	_view_season(_home_focus_id())
 	_seen_focus = _home_focus_id()
 	refresh()
@@ -101,12 +110,16 @@ func refresh() -> void:
 		_sync_field_content()
 		_set_u(1.0)
 		_release_pip()
+		if GameState.level_path_open:
+			_restore_level_path()
 	elif GameState.home_season_field_open and not _moving 			and viewed_id() != GameState.home_season_field_id:
 		# Polje otvoreno izvana na drugoj sezoni (Shop „Play" kupljene sezone): odmah ta
 		# livada, ne stara (2026-10-12).
 		_view_season(GameState.home_season_field_id)
 		_sync_field_content()
 		_release_pip()
+		if GameState.level_path_open and level_path and not _path_moving:
+			_restore_level_path()
 	elif GameState.home_season_field_open and not _moving:
 		# Polje ostalo otvoreno dok je igrač spajao u Areni: novi ★3 izrastaju odmah.
 		if season_field.has_method("refresh_growth"):
@@ -124,7 +137,7 @@ func is_field_transitioning() -> bool:
 
 
 func is_busy() -> bool:
-	return _moving or _swap < 1.0 or _drag_on or (_snap_tween != null and _snap_tween.is_running())
+	return _moving or _path_moving or _swap < 1.0 or _drag_on or (_snap_tween != null and _snap_tween.is_running())
 
 
 func is_sliding() -> bool:
@@ -176,7 +189,9 @@ func get_toast_text() -> String:
 ## polje otvoreno → "run".
 func play_action() -> String:
 	if GameState.home_season_field_open:
-		return "run"
+		if is_level_path_open() or not _uses_level_path():
+			return "run"
+		return "path"
 	return "field" if viewed_id() == GameState.active_season_id else "back"
 
 
@@ -247,6 +262,8 @@ func open_season_field(season_id: String = "", animated: bool = true) -> bool:
 func close_season_field(animated: bool = true) -> void:
 	if _moving:
 		return
+	if GameState.level_path_open or _path_u > 0.0:
+		_reset_level_path()
 	if not GameState.home_season_field_open:
 		if _u > 0.0:
 			_snap_closed()
@@ -498,13 +515,15 @@ func _apply() -> void:
 	season_name.px = lerpf(UiHomeV3.NAME_CARD_SIZE, UiHomeV3.NAME_FIELD_SIZE, e)
 	season_name.tracking = lerpf(UiHomeV3.NAME_CARD_LS, UiHomeV3.NAME_FIELD_LS, e)
 	season_name.offset_x = ox
-	season_name.modulate.a = swap_a
+	season_name.modulate.a = swap_a * (1.0 - _chrome_out)
 	season_name.queue_redraw()
 
 	# Pip: JEDAN objekat; na polju ga (u = 1) preuzima livada na istom mjestu.
 	var status := str(season_card.content.data.get("status", ""))
 	var held := bool(season_field.call("is_pip_held")) if season_field.has_method("is_pip_held") else false
 	var show_pip := (idle and status == HomeV3CardContent.ST_ACTIVE) or (u > 0.0 and (not in_field or held))
+	if _path_u > 0.0:
+		show_pip = false
 	travel_pip.visible = show_pip
 	if show_pip:
 		var from := Rect2(UiHomeV3.PIP_CARD_POS + Vector2(ox, 0.0), Vector2.ONE * UiHomeV3.PIP_CARD_SIZE)
@@ -522,7 +541,8 @@ func _apply() -> void:
 		HomeV3PlayButton.MODE_BACK if back else HomeV3PlayButton.MODE_PLAY,
 		UiHomeV3.ground(act), _signature_type(act)
 	)
-	play_button.enabled = not _moving
+	play_button.enabled = not _moving and not _path_moving
+	_apply_badges(idle, id, ox)
 
 	# Polje: sadrzaj u FieldClip-u = rect kartice (bez duhova ivica).
 	field_clip.visible = u > 0.0
@@ -551,13 +571,15 @@ func _apply_chrome(u: float, rect: Rect2, page: Vector2) -> void:
 		inner.size = page
 	var c := UiHomeV3.win(u, UiHomeV3.FIELD_CHROME_IN.x, UiHomeV3.FIELD_CHROME_IN.y)
 	var ce := UiHomeV3.ease_out(c)
+	# Level Path: chrome polja ode (alpha 1 → 0 + y −16) dok se put diže.
 	var top := _chrome.get("top") as Control
 	if top:
-		top.modulate.a = c
-		top.position.y = -UiHomeV3.FIELD_CHROME_Y * (1.0 - ce)
+		top.modulate.a = c * (1.0 - _chrome_out)
+		top.position.y = -UiHomeV3.FIELD_CHROME_Y * (1.0 - ce) - LevelPathKit.CHROME_LIFT * _chrome_out
+		top.visible = _chrome_out < 1.0
 	var hint := _chrome.get("hint") as Control
 	if hint:
-		hint.modulate.a = c
+		hint.modulate.a = c * (1.0 - _chrome_out)
 	for key in ["seasons", "endless"]:
 		var n := _chrome.get(key) as Control
 		if n == null or not _chrome_home.has(key):
@@ -610,6 +632,7 @@ func _on_field_tween_finished() -> void:
 
 func _finish_close() -> void:
 	_moving = false
+	_reset_level_path()
 	GameState.close_home_season_field()
 	if season_field.has_method("dismiss_flowers"):
 		season_field.call("dismiss_flowers")
@@ -623,6 +646,7 @@ func _finish_close() -> void:
 func _snap_closed() -> void:
 	_kill_field_tween()
 	_moving = false
+	_reset_level_path()
 	_hold_pip()
 	if season_field.has_method("dismiss_flowers"):
 		season_field.call("dismiss_flowers")
@@ -831,10 +855,15 @@ func _activate_part(part: String) -> void:
 func _on_play_pressed() -> void:
 	if _moving or _swap < 1.0:
 		return
+	if _path_moving or (level_path and level_path.is_busy()):
+		return
 	match play_action():
 		"run":
 			if _u >= 1.0:
 				play_run_requested.emit()
+		"path":
+			if _u >= 1.0:
+				open_level_path()
 		"field":
 			open_season_field(GameState.active_season_id)
 		_:
@@ -948,8 +977,13 @@ func _is_hub_on_home() -> bool:
 
 
 func _try_close_field_on_back() -> bool:
-	if not GameState.home_season_field_open or _moving:
+	if not GameState.home_season_field_open or _moving or _path_moving:
 		return false
+	if is_level_path_open():
+		if level_path.is_popup_open() or not is_visible_in_tree() or not _is_hub_on_home():
+			return false
+		close_level_path()
+		return true
 	# Ormar je otvoren — back zatvara (i primjenjuje) njega, ne polje.
 	if is_inside_tree() and not get_tree().get_nodes_in_group(WardrobeSheet.OPEN_GROUP).is_empty():
 		return false
@@ -996,3 +1030,255 @@ func _notify_host(method: String, arg: Variant = null) -> void:
 func _refresh_top_bar() -> void:
 	if is_inside_tree():
 		get_tree().call_group("meta_hub", "refresh_top_bar")
+
+
+# --- Level Path ---
+
+## Put postoji tek poslije tutorijala (tutorijal runovi ostaju direktno iz polja).
+func _uses_level_path() -> bool:
+	return GameState.tutorial_complete
+
+
+func is_level_path_open() -> bool:
+	return GameState.level_path_open and _path_u > 0.0
+
+
+func is_path_transitioning() -> bool:
+	return _path_moving
+
+
+func path_u() -> float:
+	return _path_u
+
+
+func _ensure_level_path() -> void:
+	if level_path != null:
+		return
+	level_path = LevelPathView.new()
+	level_path.visible = false
+	add_child(level_path)
+	move_child(level_path, travel_layer.get_index())
+	level_path.position = Vector2(0.0, UiHomeField.PAGE.y)
+	level_path.reward_claimed.connect(func(_n: int) -> void: _refresh_view())
+	_reparent_path_popup.call_deferred()
+	level_path.hop_finished.connect(_refresh_view)
+	_badge = _Badge.new()
+	_badge.visible = false
+	travel_layer.add_child(_badge)
+
+
+## Popup nagrade mora biti iznad FieldOverlaya (donji red ‹ Field / Endless) — scrim
+## pokriva cijelu stranicu, pa ide u MainMenu kao zadnje dijete.
+func _reparent_path_popup() -> void:
+	var host := get_parent() as Control
+	var popup := level_path.get_popup()
+	if host == null or popup == null or popup.get_parent() == host:
+		return
+	popup.reparent(host, false)
+	popup.set_anchors_preset(Control.PRESET_FULL_RECT)
+
+
+## Play u polju: put se podigne odozdo (0,56 s, out-cubic), chrome polja ode (alpha + 16 px),
+## Pip card_jump lukom 150 s polja na svoj kamen. Play se ne pomjera.
+func open_level_path(animated: bool = true) -> bool:
+	if _moving or _path_moving or not GameState.home_season_field_open or _u < 1.0:
+		return false
+	var id := GameState.home_season_field_id
+	if id.is_empty():
+		return false
+	var hop := GameState.take_level_path_hop(id)
+	level_path.show_season(id, int(hop["from"]) if not hop.is_empty() else -1)
+	GameState.level_path_open = true
+	_path_from = _field_pip_feet()
+	if season_field.has_method("hold_pip"):
+		season_field.call("hold_pip")
+	level_path.visible = true
+	_notify_host("on_level_path_transition", true)
+	if not animated or not is_inside_tree():
+		_finish_path_open(hop)
+		return true
+	_path_moving = true
+	Sfx.play("field_open")
+	level_path.play_pip("card_jump")
+	_kill_path_tween()
+	_path_tween = create_tween()
+	_path_tween.tween_method(_set_path_u, 0.0, 1.0, LevelPathKit.TO_PATH_SEC)
+	_path_tween.tween_callback(_finish_path_open.bind(hop))
+	return true
+
+
+## ‹ Field (i Android back): put se spusti (0,44 s, in-cubic), Pip skoči nazad na polje.
+func close_level_path(animated: bool = true) -> void:
+	if _path_moving or not GameState.level_path_open:
+		return
+	if level_path.is_busy():
+		return
+	_path_from = Vector2(UiHomeField.PIP_DEFAULT_BASE)
+	season_field.visible = true
+	_notify_host("on_level_path_transition", false)
+	if not animated or not is_inside_tree():
+		_finish_path_close()
+		return
+	_path_moving = true
+	Sfx.play("field_close")
+	level_path.play_pip("card_jump")
+	_kill_path_tween()
+	_path_tween = create_tween()
+	_path_tween.tween_method(_set_path_u_back, 1.0, 0.0, LevelPathKit.TO_FIELD_SEC)
+	_path_tween.tween_callback(_finish_path_close)
+
+
+## Povratak iz runa: put je bio otvoren — odmah put (bez prelaza), pa skok Pipa ako je level pređen.
+func _restore_level_path() -> void:
+	var id := GameState.home_season_field_id
+	var hop := GameState.take_level_path_hop(id)
+	level_path.show_season(id, int(hop["from"]) if not hop.is_empty() else -1)
+	if season_field.has_method("hold_pip"):
+		season_field.call("hold_pip")
+	level_path.visible = true
+	_notify_host("on_level_path_transition", true)
+	_finish_path_open(hop)
+
+
+func _field_pip_feet() -> Vector2:
+	if season_field.has_method("pip_feet"):
+		return season_field.call("pip_feet")
+	return Vector2(UiHomeField.PIP_DEFAULT_BASE)
+
+
+func _finish_path_open(hop: Dictionary) -> void:
+	_path_moving = false
+	_path_tween = null
+	_set_path_u(1.0)
+	level_path.release_pip_travel()
+	level_path.set_pip_visible(true)
+	season_field.visible = false
+	_refresh_view()
+	_notify_host("on_level_path_finished", true)
+	if not hop.is_empty():
+		level_path.play_hop(int(hop["from"]), int(hop["to"]))
+
+
+func _finish_path_close() -> void:
+	_path_moving = false
+	_path_tween = null
+	GameState.level_path_open = false
+	_set_path_u_back(0.0)
+	level_path.visible = false
+	level_path.release_pip_travel()
+	season_field.visible = true
+	_release_pip()
+	_refresh_view()
+	_notify_host("on_level_path_finished", false)
+
+
+## Put se gasi bez prelaza (polje zatvoreno izvana ili Seasons): stanje kao da nikad nije otvoren.
+func _reset_level_path() -> void:
+	if level_path == null:
+		return
+	var was := _path_u > 0.0 or GameState.level_path_open
+	_kill_path_tween()
+	_path_moving = false
+	GameState.level_path_open = false
+	_path_u = 0.0
+	_chrome_out = 0.0
+	level_path.visible = false
+	level_path.position.y = UiHomeField.PAGE.y
+	level_path.release_pip_travel()
+	season_field.visible = true
+	if was:
+		if season_field.has_method("is_pip_held") and bool(season_field.call("is_pip_held")) and GameState.home_season_field_open:
+			_release_pip()
+		_notify_host("apply_level_path_chrome", Vector2.ZERO)
+		_notify_host("on_level_path_finished", false)
+
+
+func _kill_path_tween() -> void:
+	if _path_tween:
+		_path_tween.kill()
+		_path_tween = null
+
+
+## Otvaranje: u 0 → 1 (t = u · 0,56 s).
+func _set_path_u(u: float) -> void:
+	_path_u = clampf(u, 0.0, 1.0)
+	var t := _path_u * LevelPathKit.TO_PATH_SEC
+	var e := _out3(clampf((t - 0.04) / 0.46, 0.0, 1.0))
+	level_path.position.y = (1.0 - e) * UiHomeField.PAGE.y
+	var q := LevelPathView._io2(clampf((t - 0.06) / 0.44, 0.0, 1.0))
+	_travel_pip(q, 150.0)
+	_path_chrome(clampf(t / 0.2, 0.0, 1.0), clampf((t - 0.16) / 0.16, 0.0, 1.0))
+
+
+## Zatvaranje: u 1 → 0 (t = (1 − u) · 0,44 s).
+func _set_path_u_back(u: float) -> void:
+	_path_u = clampf(u, 0.0, 1.0)
+	var t := (1.0 - _path_u) * LevelPathKit.TO_FIELD_SEC
+	var e := _in3(clampf(t / 0.4, 0.0, 1.0))
+	level_path.position.y = e * UiHomeField.PAGE.y
+	var q := LevelPathView._io2(clampf(t / 0.4, 0.0, 1.0))
+	_travel_pip(1.0 - q, 120.0)
+	_path_chrome(1.0 - clampf((t - 0.22) / 0.2, 0.0, 1.0), 1.0 - clampf(t / 0.16, 0.0, 1.0))
+
+
+## Pip leti između stopala na polju (box 190) i stopala na kamenu (box 210). q 0 = polje.
+func _travel_pip(q: float, arc: float) -> void:
+	var b := level_path.pip_page_feet() + Vector2(0.0, level_path.position.y)
+	var feet := _path_from.lerp(b, q) - Vector2(0.0, arc * sin(PI * q))
+	var k := lerpf(LevelPathKit.FIELD_PIP_BOX / LevelPathKit.PIP_BOX, 1.0, q)
+	level_path.set_pip_travel(feet - Vector2(0.0, level_path.position.y), k)
+
+
+## c = koliko je chrome polja otišao (0 … 1), l = labela ‹ Seasons → ‹ Field.
+func _path_chrome(c: float, l: float) -> void:
+	_chrome_out = c
+	season_name.modulate.a = 1.0 - c
+	_apply_chrome(_u, UiHomeV3.card_rect_at(UiHomeV3.ease_t(_u), size if size.x >= 8.0 else UiHomeV3.PAGE), size if size.x >= 8.0 else UiHomeV3.PAGE)
+	_notify_host("apply_level_path_chrome", Vector2(c, l))
+	_apply_badges(_u <= 0.0, viewed_id(), 0.0)
+
+
+# --- badge (roza tačka 48: neuzeta nagrada puta) ---
+
+func _apply_badges(idle: bool, id: String, ox: float) -> void:
+	if _badge == null:
+		return
+	var on := false
+	var rect := Rect2()
+	if idle:
+		if GameState.is_season_playable(id) and GameState.has_level_reward_ready(id):
+			var page := size if size.x >= 8.0 else UiHomeV3.PAGE
+			var card := UiHomeV3.card_rect_at(0.0, page)
+			rect = Rect2(Vector2(card.end.x - UiHomeField.DOT + 12.0 + ox, card.position.y - 12.0), Vector2.ONE * UiHomeField.DOT)
+			on = true
+	elif _u >= 1.0 and not GameState.level_path_open and not _moving and _path_u <= 0.0:
+		if _uses_level_path() and GameState.has_level_reward_ready(GameState.home_season_field_id):
+			var pr := play_button.button_rect()
+			rect = Rect2(Vector2(pr.end.x - UiHomeField.DOT + 12.0, pr.position.y - 12.0), Vector2.ONE * UiHomeField.DOT)
+			on = true
+	_badge.visible = on
+	if on:
+		_badge.position = rect.position
+		_badge.size = rect.size
+		_badge.queue_redraw()
+
+
+func has_badge() -> bool:
+	return _badge != null and _badge.visible
+
+
+static func _out3(t: float) -> float:
+	return 1.0 - pow(1.0 - t, 3.0)
+
+
+static func _in3(t: float) -> float:
+	return t * t * t
+
+
+class _Badge extends Control:
+	func _init() -> void:
+		name = "PathBadge"
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		draw_style_box(UiHomeField.corner_dot(UiHomeField.PINK), Rect2(Vector2.ZERO, size))

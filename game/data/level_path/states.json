@@ -1,0 +1,408 @@
+{
+ "meta": {
+  "source": "design_handoff_level_path/design/level_path_kit.js",
+  "units": "px, baza 1080 × 1920; y sadržaja raste nadolje",
+  "date": "2026-10-20"
+ },
+ "order": [
+  "done",
+  "current",
+  "locked",
+  "reward_locked",
+  "reward_ready",
+  "reward_claimed",
+  "complete"
+ ],
+ "rules": {
+  "cp": "n < level → done · n == level → current · n > level → locked · level 21 = complete",
+  "reward": "n ≥ level → reward_locked · inače claimed? → reward_claimed : reward_ready",
+  "passed_road": "route 0 … cp_index[min(level,20)-1]"
+ },
+ "checkpoint": {
+  "done": {
+   "sprite": "assets/path/<season>/checkpoint_done.svg",
+   "number": "#2D3436",
+   "badge": "mint ✓ (u spriteu)",
+   "pressable": false
+  },
+  "current": {
+   "sprite": "assets/path/<season>/checkpoint_current.svg",
+   "scale": 1.22,
+   "number": "#2D3436 56",
+   "pip": true,
+   "pressable": false
+  },
+  "locked": {
+   "sprite": "assets/path/<season>/checkpoint_locked.svg",
+   "number": "kits[id].path.stone.locked.num",
+   "pressable": false
+  }
+ },
+ "reward": {
+  "reward_locked": {
+   "sprite": "assets/path/chest_locked.svg | chest_big_locked.svg",
+   "tag": "krem pilula 64: ★3 crtež 52 + N · coin 44 + N (900 38)",
+   "tap": "tresenje + toast \"Finish level N to claim\""
+  },
+  "reward_ready": {
+   "sprite": "assets/path/chest_ready.svg | chest_big_ready.svg",
+   "claim_pill": "breskva 76, rub 4, sjena 0 6 0",
+   "loop": "bounce",
+   "sparks": 3,
+   "tap": "reward_popup.json"
+  },
+  "reward_claimed": {
+   "sprite": "assets/path/chest_claimed.svg | chest_big_claimed.svg",
+   "tap": null
+  }
+ },
+ "complete": {
+  "pennant_y": [
+   44,
+   22
+  ],
+  "banner": "Meadow complete! + Play repeats Level 20",
+  "play": "level 20 ponovo (coini, sjeme), nagrade ostaju uzete"
+ },
+ "per_season": {
+  "country_bloom": {
+   "stone": {
+    "shape": "round",
+    "done": {
+     "face": "#FFF8F0",
+     "rim": "#DCCFB9"
+    },
+    "locked": {
+     "face": "#D3E6C2",
+     "rim": "#B9D3A2",
+     "edge": "#A3C489",
+     "num": "#3E5A35"
+    }
+   },
+   "passed": [
+    [
+     96,
+     "#CDB46A"
+    ],
+    [
+     78,
+     "#E8D28C"
+    ]
+   ],
+   "contrast": {
+    "locked": 5.84,
+    "done": 12.04,
+    "current": 7.54
+   }
+  },
+  "frost_orchard": {
+   "stone": {
+    "shape": "hex",
+    "done": {
+     "face": "#F7FAFE",
+     "rim": "#B9CBE0"
+    },
+    "locked": {
+     "face": "#E2EAF4",
+     "rim": "#CCDAEA",
+     "edge": "#B4C6DB",
+     "num": "#3E526E"
+    }
+   },
+   "passed": [
+    [
+     96,
+     "#7D93AE"
+    ],
+    [
+     78,
+     "#C6D8EC"
+    ],
+    [
+     16,
+     "#F2F7FD"
+    ]
+   ],
+   "contrast": {
+    "locked": 6.56,
+    "done": 12.11,
+    "current": 7.54
+   }
+  },
+  "lantern_meadow": {
+   "stone": {
+    "shape": "lobe",
+    "done": {
+     "face": "#E9E1F5",
+     "rim": "#A898C8"
+    },
+    "locked": {
+     "face": "#2F2648",
+     "rim": "#221A38",
+     "edge": "#43376A",
+     "num": "#D9D0F2"
+    }
+   },
+   "passed": [
+    [
+     96,
+     "#7E6698"
+    ],
+    [
+     78,
+     "#FFE3B8"
+    ]
+   ],
+   "contrast": {
+    "locked": 9.56,
+    "done": 10,
+    "current": 7.54
+   }
+  },
+  "amber_canopy": {
+   "stone": {
+    "shape": "stump",
+    "done": {
+     "face": "#FBE3B4",
+     "rim": "#B07A44",
+     "ring": "#D9A066"
+    },
+    "locked": {
+     "face": "#E2C79A",
+     "rim": "#CBAE82",
+     "edge": "#BC9C6E",
+     "ring": "#D0B486",
+     "num": "#55361C"
+    }
+   },
+   "passed": [
+    [
+     96,
+     "#9C6A3E"
+    ],
+    [
+     78,
+     "#F0A04B"
+    ]
+   ],
+   "contrast": {
+    "locked": 6.67,
+    "done": 10.11,
+    "current": 7.54
+   }
+  },
+  "moonlit_warren": {
+   "stone": {
+    "shape": "moon",
+    "done": {
+     "face": "#EDEBFF",
+     "rim": "#A9AEF0",
+     "crater": "#D2D0F2"
+    },
+    "locked": {
+     "face": "#2E3566",
+     "rim": "#222852",
+     "edge": "#454E8A",
+     "crater": "#283063",
+     "num": "#DCDDFF"
+    }
+   },
+   "passed": [
+    [
+     96,
+     "#4D5698"
+    ],
+    [
+     78,
+     "#CFD3FF"
+    ]
+   ],
+   "contrast": {
+    "locked": 8.71,
+    "done": 10.83,
+    "current": 7.54
+   }
+  },
+  "coral_tide": {
+   "stone": {
+    "shape": "scallop",
+    "done": {
+     "face": "#FFF1E8",
+     "rim": "#E9B9A2"
+    },
+    "locked": {
+     "face": "#EBCDB4",
+     "rim": "#DDB89C",
+     "edge": "#CFA88A",
+     "num": "#6B4A36"
+    }
+   },
+   "passed": [
+    [
+     96,
+     "#2C5A62"
+    ],
+    [
+     78,
+     "#4A7F88"
+    ]
+   ],
+   "contrast": {
+    "locked": 5.24,
+    "done": 11.47,
+    "current": 7.54
+   }
+  },
+  "starfall_glade": {
+   "stone": {
+    "shape": "star",
+    "done": {
+     "face": "#FFF2BF",
+     "rim": "#CDB677"
+    },
+    "locked": {
+     "face": "#2A2456",
+     "rim": "#1D1840",
+     "edge": "#453D7A",
+     "num": "#E9E0FF"
+    }
+   },
+   "passed": [
+    [
+     96,
+     "#4A4288"
+    ],
+    [
+     78,
+     "#E9E0FF"
+    ]
+   ],
+   "contrast": {
+    "locked": 11.16,
+    "done": 11.3,
+    "current": 7.54
+   }
+  },
+  "ember_fen": {
+   "stone": {
+    "shape": "plank",
+    "done": {
+     "face": "#F7E4D8",
+     "rim": "#C29A84",
+     "seam": "#DCC1AE"
+    },
+    "locked": {
+     "face": "#3E2A22",
+     "rim": "#2A1A14",
+     "edge": "#5A3E30",
+     "seam": "#4E362A",
+     "num": "#FFD3B0"
+    }
+   },
+   "passed": [
+    [
+     96,
+     "#5A3E30"
+    ],
+    [
+     78,
+     "#C8643A"
+    ]
+   ],
+   "contrast": {
+    "locked": 9.75,
+    "done": 10.29,
+    "current": 7.54
+   }
+  }
+ },
+ "animations": {
+  "hop": {
+   "total": 1,
+   "wait": 0.12,
+   "jump": 0.7,
+   "settle": 0.18,
+   "arc_px": 74,
+   "pip_anim": "card_jump",
+   "move": "position: lerp(A,B, ease_in_out((t·0,7 − 0,1)/0,44)) − arc·sin(π·e)",
+   "sprites": {
+    "pip": 1,
+    "dust": 4,
+    "ring": 1
+   },
+   "order": "čekanje → stari kamen done + pređeni put do novog → skok → novi kamen current (pop) → prsten + prašina → nagrada stara ready (istakni)"
+  },
+  "land_pop": {
+   "scale": 1.12,
+   "sec": 0.2
+  },
+  "ready_bounce": {
+   "px": 14,
+   "sec": 1.1,
+   "squash": [
+    1.05,
+    0.94
+   ],
+   "phase_step": 0.23,
+   "transform_only": true
+  },
+  "ready_spark": {
+   "count": 3,
+   "sec": 1.6,
+   "scale": [
+    0,
+    1
+   ],
+   "rot_deg": 30
+  },
+  "highlight": {
+   "scale": 1.22,
+   "sec": 0.5
+  },
+  "locked_shake": {
+   "deg": 7,
+   "sec": 0.3
+  },
+  "complete": {
+   "pip": "binky",
+   "flag_raise": 0.4,
+   "banner_in": 0.28
+  },
+  "to_path": {
+   "sec": 0.56,
+   "path_y": [
+    1633,
+    0
+   ],
+   "ease": "out_cubic",
+   "field_chrome": "alpha 1→0 + y −16 u 0,2 s",
+   "pip": "card_jump, luk 150",
+   "left_label": "Seasons → Field (alpha, 0,16 s)"
+  },
+  "to_field": {
+   "sec": 0.44,
+   "path_y": [
+    0,
+    1633
+   ],
+   "ease": "in_cubic"
+  },
+  "scroll_to_pip": 0.36,
+  "slow_x4": 0.25
+ },
+ "budgets": {
+  "content_h": 4900,
+  "pages": 3,
+  "screens": 2.55,
+  "layers_max": 21,
+  "nodes_max": 34,
+  "hop_sprites": 6,
+  "ready_sprites": 4,
+  "ready_max": 4,
+  "popup_sprites": 16,
+  "popup_big_sprites": 24,
+  "popup_time": 1,
+  "popup_big_time": 1.18,
+  "animated_max": "Pip idle + 4 × reward_ready (sanduk + 3 iskre)"
+ }
+}

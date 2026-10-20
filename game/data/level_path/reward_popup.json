@@ -1,0 +1,123 @@
+{
+ "meta": {
+  "source": "design_handoff_level_path/design/level_path_kit.js",
+  "units": "px, baza 1080 × 1920; y sadržaja raste nadolje",
+  "date": "2026-10-20"
+ },
+ "scrim": {
+  "rect": [
+   0,
+   143,
+   1080,
+   1633
+  ],
+  "color": "rgba(26,22,30,.55)"
+ },
+ "modal": {
+  "w": 984,
+  "radius": 48,
+  "border": 4,
+  "shadow": [
+   0,
+   14,
+   "rgba(20,14,26,.45)"
+  ],
+  "pad": [
+   92,
+   48,
+   48,
+   48
+  ],
+  "gap": 36,
+  "in": 0.22,
+  "in_big": 0.3,
+  "out": 0.16,
+  "plate": {
+   "tone": "reward (COIN_GOLD)",
+   "h": 112,
+   "title": 56
+  }
+ },
+ "hero": {
+  "h": 360,
+  "h_big": 430,
+  "burst": "assets/fx/reward_burst.svg (rotacija 14°/s)",
+  "chest": "assets/path/chest_open.svg × 1,12 | chest_big_open.svg × 1,42",
+  "flower": "★3 crtež sezone 128 | 150, lebdi ±8 px",
+  "spark": 1,
+  "confetti_big": 6
+ },
+ "line": {
+  "text": "<ime ★3 cvijeta>",
+  "star": "★3 #7A4A28"
+ },
+ "tray": "RewardTray (UiPopups) — 2 RewardChipa: [★3 crtež +N] [coin +N]",
+ "button": {
+  "kind": "primary",
+  "label": "Claim",
+  "h": 132
+ },
+ "fly": {
+  "targets": {
+   "coin": [
+    66,
+    70
+   ],
+   "seed": [
+    378,
+    70
+   ],
+   "flower": [
+    690,
+    70
+   ]
+  },
+  "normal": {
+   "flowers": 3,
+   "coins": 4,
+   "sparks": 1
+  },
+  "big": {
+   "flowers": 5,
+   "coins": 5,
+   "confetti": 6
+  },
+  "sec": 0.36,
+  "sec_big": 0.4,
+  "stagger": 0.05,
+  "stagger_big": 0.04,
+  "curve": "kvadratna Bézier, kontrola iznad (−120 / −180 px), ease_in_out, scale 1 → 0,7",
+  "arrive": "brojač += dio iznosa, chip scale 1 → 1,12 → 1 / 0.12 s"
+ },
+ "toast": {
+  "y": 1393,
+  "h": 100,
+  "text": "Finish level %d to claim",
+  "disc": "icon_lock",
+  "show": 1.6
+ },
+ "strings_en": {
+  "title": "Level %d reward!",
+  "claim": "Claim",
+  "locked": "Finish level %d to claim",
+  "complete": "Meadow complete!",
+  "replay": "Play repeats Level 20",
+  "back": "Field",
+  "locator": "Pip"
+ },
+ "sequence": [
+  "tap reward_ready",
+  "scrim + modal (0,22 / 0,30)",
+  "chipovi",
+  "Claim → claim_level_reward(season, n)",
+  "modal out 0,16 + let",
+  "svaki dolazak: brojač + trzaj",
+  "kraj → sanduk reward_claimed"
+ ],
+ "budgets": {
+  "sprites": 16,
+  "sec": 1,
+  "sprites_big": 24,
+  "sec_big": 1.18
+ }
+}

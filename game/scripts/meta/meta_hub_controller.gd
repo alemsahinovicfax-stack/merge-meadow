@@ -500,6 +500,34 @@ func refresh_top_bar() -> void:
 	_refresh_tab_badges()
 
 
+## Level Path · let nagrade: centar chipa u headeru (globalno, s kanvasom).
+func top_chip_center(kind: String) -> Variant:
+	var chip: Control = coin_chip if kind == "coin" else flower_chip if kind == "flower" else seed_chip
+	if chip == null:
+		return null
+	return chip.get_global_transform_with_canvas() * (chip.size * 0.5)
+
+
+## Brojač raste po dolasku letača (nagrada je već upisana u GameState).
+func preview_top_counts(coins: int, flowers: int) -> void:
+	if coins_label:
+		coins_label.text = UiChrome.format_count(coins)
+	if flowers_label:
+		flowers_label.text = UiChrome.format_count(flowers)
+
+
+## Trzaj chipa na dolasku: scale 1 → 1,12 → 1 / 0,12 s.
+func bump_top_chip(kind: String) -> void:
+	var chip: Control = coin_chip if kind == "coin" else flower_chip if kind == "flower" else seed_chip
+	if chip == null:
+		return
+	chip.pivot_offset = chip.size * 0.5
+	var tw := chip.create_tween()
+	tw.tween_method(func(u: float) -> void:
+		chip.scale = Vector2.ONE * (1.0 + 0.12 * sin(PI * u))
+	, 0.0, 1.0, 0.12)
+
+
 func _refresh_tab_badges() -> void:
 	if _tabs.size() <= MetaHubPagesScript.COLLECTION:
 		return

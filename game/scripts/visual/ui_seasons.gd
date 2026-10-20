@@ -133,7 +133,7 @@ static func recipe(season_id: String, surface: String) -> Dictionary:
 	match surface:
 		"field", "card":
 			r = k.get("field", null)
-		"shop", "camp":
+		"shop", "camp", "path":
 			r = k.get(surface, null)
 	return r if r is Dictionary else {}
 

@@ -459,8 +459,8 @@ func _run() -> void:
 	if str(gs.get("home_season_field_id")) != "country_bloom":
 		_fail("field_id expected country_bloom got %s" % str(gs.get("home_season_field_id")))
 		return
-	if str(home.call("home_play_action")) != "run":
-		_fail("Bloom open: home_play_action should be run")
+	if str(home.call("home_play_action")) != "path":
+		_fail("Bloom open: home_play_action should be path (Level Path)")
 		return
 	if band.visible:
 		_fail("SeasonCard should hide when the field is open (u = 1)")

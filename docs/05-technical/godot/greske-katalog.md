@@ -712,6 +712,30 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** test postavlja **svako** stanje koje provjerava, i ono koje „obično" stoji na nuli (nivoi po sezoni, lifetime brojevi, uzgojeno). Postavke iz `settings.cfg` (Reduce motion, zvuk) nikad ne smiju odlučivati ishod testa. Kad padne test, prvo ga pokreni na čistom HEAD-u (worktree): pad i tamo = test / okruženje, ne nova izmjena. Svaki test ispisuje „<ime> OK".
 
+## #46 — smoke skripta s tipom klase koja koristi autoload: „Identifier not found: GameState"
+
+**Datum:** 2026-10-20
+
+**Simptom:** headless smoke (`extends SceneTree`) padne na kompajliranju: „Identifier not found: GameState" / „SceneRouter", „Failed to compile depended scripts", a MainMenu poslije javi „Trying to assign value of type 'PanelContainer' to a variable of type 'ui_click_button.gd'".
+
+**Uzrok:** `-s` skripta se kompajlira PRIJE nego što su autoloadi registrovani. Tip `var path: LevelPathView` ili `as UiClickButton` u smoke skripti povuče kompajliranje te klase (i njenih zavisnosti) u tom trenutku, a one koriste `GameState` / `SceneRouter` kao identifikator. Pokvarena klasa ostane pokvarena i za scene koje se učitaju kasnije.
+
+**Rješenje:** u smoke skripti UI čvorove drži bez tipa (`var path = stage.get("level_path")`) ili kao `Node` / `Control` i zovi `call()`. Statičke klase bez autoloada (`LevelPathKit`, `LevelPathDomain`, `UiSeasons`) smiju se tipizirati. Autoload uvijek preko `get_root().get_node("GameState")`.
+
+**Prevencija:** u `scripts/dev/*_smoke.gd` ne tipiziraj varijable klasama iz `scripts/ui/` (sve one diraju `GameState`). Smoke koji ispiše „OK" uz „SCRIPT ERROR" nije prošao — `run_some.ps1` to broji kao FAIL.
+
+## #47 — SeasonBackdrop: „Condition vertex_count == 0" kod recepta s linijama
+
+**Datum:** 2026-10-20
+
+**Simptom:** na Level Pathu u logu `ERROR: Condition "vertex_count == 0" is true` iz `canvas_item_add_triangle_array`, jednom po crtanju.
+
+**Uzrok:** `_build` zatvara komad (chunk) prije i poslije svakog sloja linije (`line`, `ridge.rim`, `fence`). Dvije linije zaredom (ruta, pa krakovi do sanduka) ostave prazan komad bez trokuta, a RenderingServer ne prima prazan niz.
+
+**Rješenje:** `SeasonBackdrop.draw` preskače komad s praznim `idx`.
+
+**Prevencija:** recepti polja i Campa to do sada nisu imali, pa greška nije bila vidljiva. Kad dodaješ novu vrstu sloja koja „zatvara" komad, pusti `season_kit_all_smoke` i pogledaj stderr.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

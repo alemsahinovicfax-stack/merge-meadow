@@ -9,6 +9,14 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-20 (2)
+
+- **Paket `design_handoff_level_path` u igri** (izvještaj `design-drafts/level-path-izvjestaj.md`):
+  - **Put sezone:** Play u polju otvara skrolabilan put (4900 px, 20 kamenova, ruta i dekor iz novog recepta `kits[id].path` za 8 sezona); Pip stoji na trenutnom levelu; isto Play dugme pokreće run, lijevo „‹ Field" vraća na polje; prelaz 0,56 / 0,44 s s Pipom koji skače polje ↔ kamen.
+  - **Napredak po sezoni:** `LevelPathDomain` (save `season_levels`, `season_level_rewards`); `GameState.run_level` je level aktivne sezone; uspješan run → Pip skoči na sljedeći kamen; poslije 20 „Meadow complete!" i Play ponavlja 20. Stari `run_level` prelazi na aktivnu sezonu; težina levela N ista u svim sezonama.
+  - **Nagrade 5 / 10 / 15 / 20:** popup (sanduk, ★3 cvijet, 2 chipa, Claim) i let cvijeća i coina u header, brojač raste po dolasku; zaključana → toast; badge na Play u polju i na kartici sezone; „Pip" lokator.
+  - **FPS:** put jednako ili brže od polja (draw −6); popup ~+1 ms dok traje. 41 SVG (39 KB bez C2PA). Test `level_path_smoke`, bench `level_path_bench`, snimke `level_path_shots`.
+
 ## 2026-10-20
 
 - **Paket `design_handoff_run_pickups` u igri** (izvještaj `design-drafts/run-pickups-izvjestaj.md`):
