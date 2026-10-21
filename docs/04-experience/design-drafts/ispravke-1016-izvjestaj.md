@@ -8,7 +8,7 @@ povezano:
   - privacy-policy-draft
   - greske-katalog
   - CHECKPOINT
-ai_sažetak: "Ispravke poslije playtesta 2026-10-16: Settings iznad Arene i zaključan zupčanik tokom runde, muncher u sredini i uvijek na najbližoj sjemenki, Camp link nastavlja s plaćenim sezonama (samo cijena), rezervisano cvijeće zadnje, Home polje raste po ukupno uzgojenom ★3, bez čipa „0 / 13 grown", vreća bez limita (plijen se više ne gubi), Shop štand iznad kartica, nadogradnje smiju trošiti i ★3 čuvano za sljedeću sezonu; Loot Boost na ukupno sjeme, bez duplog boosta na revive, vidljiv pečat (Twin provjeren); odgovori o vibraciji, Reduce motion, Restore purchases i politici privatnosti; CD brief za pickupe u runu i kartice plaćenih sezona u Campu."
+ai_sažetak: "Ispravke poslije playtesta 2026-10-16: Settings iznad Arene i zaključan zupčanik tokom runde, muncher u sredini i uvijek na najbližoj sjemenki, Camp link nastavlja s plaćenim sezonama (samo cijena), rezervisano cvijeće zadnje, Home polje raste po ukupno uzgojenom ★3 i puno je čim je svih 6 tipova sezone ★3 (prag 1 na svih 13 mjesta), bez čipa „0 / 13 grown", vreća bez limita (plijen se više ne gubi), Shop štand iznad kartica, nadogradnje smiju trošiti i ★3 čuvano za sljedeću sezonu; Loot Boost na ukupno sjeme, bez duplog boosta na revive, vidljiv pečat (Twin provjeren); odgovori o vibraciji, Reduce motion, Restore purchases i politici privatnosti; CD brief za pickupe u runu i kartice plaćenih sezona u Campu."
 ---
 
 # Ispravke 2026-10-16 — izvještaj
@@ -33,6 +33,7 @@ ai_sažetak: "Ispravke poslije playtesta 2026-10-16: Settings iznad Arene i zakl
 | 12 | Camp kartice plaćenih sezona da imaju dizajn kao besplatne | Plaćene sezone nemaju Season Kit recept „camp", pa je kartica samo obojena (sada u boji livade sezone) | **CD uputstvo, dio B** (isti brief, §4) + slike `camp-paid-card-ref/` |
 | 13 | Imam coine i cvijeće, a nadogradnju (Magnet / Loot / Twin) ne mogu kliknuti | Nadogradnje su čuvale onoliko ★3 koliko traži sljedeća besplatna sezona (Kept). Na Frostu: 20 Crystal Peony, Lantern traži tačno 20 → „nemaš cvijeća" (roza oznaka preko cvijeta), čak i sa 500 coina | Nadogradnje sada smiju potrošiti sve ★3 sezone. Kad kupovina zadire u cvijeće za sljedeću sezonu, ispod imena sezone piše „Uses flowers saved for Lantern Meadow". Kept granica ostaje samo za prodaju u Campu |
 | 14 | Loot Boost kao da se ne primjenjuje; provjeri i Twin Seeds | (a) bonus se zaokruživao **po tipu sjemena**: 1 × 1,25 = 1, pa run s mnogo tipova po jedno-dva sjemena nije dobijao skoro ništa; (b) revive je boost primjenjivao dvaput; (c) nigdje se nije vidjelo da je boost uračunat | Bonus se računa na **ukupno** sjeme i dijeli po tipovima (5 različitih × 1,25 = 6, ranije 5); revive ga primijeni jednom; na kraju runa zlatni pečat „Loot Boost ×1.25 · 3 twins". Twin Seeds je radio ispravno (8 % po nivou), sada se i vidi koliko ih je bilo |
+| 15 | Spojim sve u Areni (svi tipovi sezone ★3), a na Home polju nema svih 13 cvjetova | Nije bilo greške u brojanju — **pravilo** je bilo 1 / 5 / 10: srednji red traži 1 ★3 tipa, prednji red 5, veliko mjesto 10 najrjeđeg. Tvoj Frost: hoarfrost 3 / 5 i silver 4 / 5 → 11 od 13 | Svako mjesto traži **1** ★3 svog tipa: čim je svih 6 tipova sezone uzgojeno, polje je puno (13 / 13). Tvoj Frost i Country Bloom su sada puni |
 
 ## Nadogradnje i „Kept" cvijeće
 
@@ -69,7 +70,7 @@ Primjer (×1,25): pokupiš clover, daisy, tulip, sunflower, buttercup po 1 → r
 | **Dnevnik (Album)** | otkriveno cvijeće i najviši tier koji si imao | samo raste (Arena T3, Loot Burst) |
 | **Home polje sezone** | ukupno uzgojeno ★3 svakog tipa te sezone | samo raste (Arena T3, Loot Burst) — **od danas** |
 
-Mjesta na polju (zadani raspored; sezona sa Season Kitom može imati svoja): 6 prednjih traže po 5 komada svog tipa, 6 srednjih po 1, zadnje veliko 10. Sa jednim ★3 svakog od 6 tipova izraste 6 mjesta.
+Mjesta na polju: 13, svaki od 6 tipova sezone ima svoja (2 mjesta po tipu, najrjeđi 3 — i veliko u sredini). Svako mjesto izraste čim je njegov tip uzgojen do ★3 bar jednom, pa je sa svih 6 tipova polje puno. Ranije su prednji red i veliko mjesto tražili 5 / 10 komada (tačka 15).
 
 ## Tvoja pitanja
 
@@ -161,6 +162,7 @@ Loot Burst je potrošan (resurs) i tako je ispravno.
   - pravi run s pickupima: plijen pojačan tačno jednom; Twin na nivou 0 nikad, na nivou 4 — 112–113 od 300 sjemenki u dva prolaza (šansa je jedan `randf() < 0,32` po sjemenki; očekivano 96, granica testa 66–126); nagradni grm nije Twin;
   - revive: boost se primijeni jednom;
   - loot ekran: zlatni pečat i chipovi s boostom.
+- **Polje sezone (tačka 15):** `fixes_1016_smoke` — svih 6 tipova po 1 → 13 / 13; bez jednog tipa fale tačno njegova mjesta (2, za najrjeđi 3); prag 1 i svih 6 tipova u rasporedu svih 8 sezona; tvoj Frost (hoarfrost 3, silver 4) → 13 / 13. `season_meadow_smoke` — povratak iz Campa pusti rast praznih mjesta.
 - **GUT `test_game_state_loot_boost`** (11 testova): vrijednosti po nivou, zaokruživanje, pad (Kept half poslije boosta), sirovi carry za revive, Twin šansa.
 - **`camp_season_link_smoke` proširen:** plaćena sezona s cijenom, kupovina kroz stub IAP, skok na Home, kartica nestaje kad je sve kupljeno.
 - **Ažurirani testovi:**
@@ -182,6 +184,7 @@ Loot Burst je potrošan (resurs) i tako je ispravno.
 7. **Shop · Boosters:** skrolaj — ništa ne ide preko štanda.
 8. **Home polje Frosta → nadogradnje:** sa cvijećem koje čeka Lantern dugmad su aktivna, a ispod imena sezone piše „Uses flowers saved for Lantern Meadow".
 9. **Run s Loot Boostom / Twin Seedsom** (kupljeno na polju sezone koju igraš): na kraju runa desno iznad plijena zlatni pečat „Loot Boost ×1.25 · N twins"; brojevi u plijenu su veći od brojača u runu.
+10. **Home polje Frosta i Country Blooma:** svih 13 mjesta ima cvijet. Na sezoni gdje neki tip još nije ★3, prazna su samo mjesta tog tipa.
 
 ## Povezano
 

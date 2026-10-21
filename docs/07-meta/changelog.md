@@ -75,6 +75,10 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
   - **Twin Seeds radi:** 8 % po nivou (32 % na nivou 4), samo sjeme sa staze (ne nagradni grm); broj twinova ide u pečat (`last_run_twins`).
   - Nadogradnje su **po sezoni** — kupljeno na polju Frosta važi u runu Frosta (otvaranje polja je postavlja kao aktivnu).
   - Testovi: novi `loot_boost_twin_smoke` (svi nivoi, kupovina po sezoni, pravi run s pickupima, Twin 0 / 4, revive, loot ekran) i GUT `test_game_state_loot_boost` (11); `loot_logic_smoke` (pauza s boostom na ukupno). Katalog grešaka #42.
+- **Home polje sezone je puno kad su svih 6 tipova ★3** (playtest: „spojim sve u Areni, a polje nema svih 13"):
+  - svako od 13 mjesta sada traži **1** uzgojen ★3 svog tipa (`seasons_kit.json` `spots[*][4]` u svih 8 kitova i `UiHomeField.MEADOW_SPOTS`);
+  - ranije pragovi 1 / 5 / 10 (srednji red 1, prednji 5, veliko mjesto 10 najrjeđeg) — sa svim tipovima ★3 polje je stajalo na 6–12 od 13 (tvoj Frost: 11, jer hoarfrost 3 / 5 i silver 4 / 5);
+  - testovi: `fixes_1016_smoke` (13 / 13 sa svih 6 tipova, bez jednog tipa fale tačno njegova mjesta, prag 1 u svih 8 sezona, playtest Frost 13 / 13), `season_meadow_smoke` (povratak na polje sa pola rostera).
 - **Politika privatnosti** (`privacy/index.html`, `privacy-policy-draft.md`):
   - napisana iznova, 13 sekcija: AdMob i pristanak (EEA / UK / CH), opt-out u SAD-u, kupovine, šta ne skupljamo, pravni osnov, rokovi, prava, djeca, prenos, sigurnost, promjene;
   - lista onoga što mora biti istina u igri prije launcha (UMP, ATT, Data safety, uzrast 13+, identitet).

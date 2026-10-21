@@ -99,12 +99,15 @@ const KEEPOUT_HINT := Rect2i(220, 214, 632, 216)
 
 ## [x %, y % od poda stranice, velicina px, indeks u rosteru, prag]. Crtati ovim
 ## redom (nazad → naprijed): 4 dubine, drugi cvijet tipa stoji iza prvog.
+## Prag je 1 na svih 13 (2026-10-16): polje je puno čim je svaki od 6 tipova sezone
+## uzgojen do ★3 bar jednom. Ranije 1 / 5 / 10 — sa svim tipovima ★3 polje je ostajalo
+## na 6–12 od 13, pa je izgledalo kao da cvijeće iz Arene ne stiže (playtest).
 const MEADOW_SPOTS := [
-	[10, 55, 88, 3, 5], [26, 54, 88, 0, 5], [42, 55, 88, 1, 5],
-	[58, 54, 88, 4, 5], [74, 55, 88, 2, 5], [90, 54, 88, 5, 5],
+	[10, 55, 88, 3, 1], [26, 54, 88, 0, 1], [42, 55, 88, 1, 1],
+	[58, 54, 88, 4, 1], [74, 55, 88, 2, 1], [90, 54, 88, 5, 1],
 	[18, 40, 116, 0, 1], [50, 42, 116, 1, 1], [82, 40, 116, 2, 1],
 	[12, 29, 136, 3, 1], [66, 28, 136, 4, 1], [88, 30, 136, 5, 1],
-	[34, 26, 168, 5, 10],
+	[34, 26, 168, 5, 1],
 ]
 const PIP_SIZE := 190
 ## Sheet nadogradnji: kupovina troši ★3 koje čeka sljedeća besplatna sezona (2026-10-16).

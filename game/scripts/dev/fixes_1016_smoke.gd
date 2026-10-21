@@ -235,17 +235,47 @@ func _run() -> void:
 	for _w2 in 4:
 		await process_frame
 	var field: Node = stage.get_node_or_null("%SeasonField")
-	# Mjesta s pragom 1 (po jedno za svaki od 6 tipova rostera) izrastu iz uzgojenog ★3.
-	var want_grown := 0
-	for spec in UiSeasons.spots("country_bloom"):
-		if int(spec[4]) <= 1:
-			want_grown += 1
-	if want_grown < 1 or int(field.call("get_meadow_grown_count")) != want_grown:
-		_fail("field should grow %d one-flower spots from grown ★3 (stash empty), got %d" % [want_grown, int(field.call("get_meadow_grown_count"))])
+	# Svih 6 tipova uzgojeno bar jednom → svih 13 mjesta (prag 1 na svakom mjestu, playtest:
+	# „spojim sve u Areni, a polje nije puno" — ranije pragovi 1 / 5 / 10 → 6 od 13).
+	var spot_count := int(field.call("get_meadow_spot_count"))
+	if spot_count != 13 or int(field.call("get_meadow_grown_count")) != spot_count:
+		_fail("every type grown once should fill all %d spots (stash empty), got %d" % [spot_count, int(field.call("get_meadow_grown_count"))])
 		return
 	if home.get_node_or_null("%GrownChip") != null:
 		_fail("'0 / 13 grown' chip must be gone")
 		return
+	# Prag 1 i svih 6 tipova na polju — u svakoj sezoni i u zadanom rasporedu.
+	var layouts: Dictionary = {"default": UiHomeField.MEADOW_SPOTS}
+	for sdef in SeasonCatalog.all_defs():
+		layouts[sdef.id] = UiSeasons.spots(sdef.id)
+	for lid in layouts:
+		var sp: Array = layouts[lid]
+		var idx_seen: Dictionary = {}
+		for spec in sp:
+			if int(spec[4]) != 1:
+				_fail("%s: every meadow spot should need 1 grown ★3, got %s" % [lid, str(spec)])
+				return
+			idx_seen[int(spec[3])] = true
+		if sp.size() != 13 or idx_seen.size() != 6:
+			_fail("%s: 13 spots covering all 6 roster types expected (%d spots, %d types)" % [lid, sp.size(), idx_seen.size()])
+			return
+	# Jedan tip neuzgojen → fale tačno njegova mjesta (rijetki ima 3: srednje, prednje, veliko).
+	for missing_i in [0, 5]:
+		var g_missing := grown.duplicate()
+		g_missing.erase(roster[missing_i])
+		dom.set("grown", g_missing)
+		field.call("refresh_growth")
+		await process_frame
+		var own_spots := 0
+		for spec in UiSeasons.spots("country_bloom"):
+			if clampi(int(spec[3]), 0, roster.size() - 1) == missing_i:
+				own_spots += 1
+		if int(field.call("get_meadow_grown_count")) != 13 - own_spots:
+			_fail("without %s the field should show %d, got %d" % [roster[missing_i], 13 - own_spots, int(field.call("get_meadow_grown_count"))])
+			return
+	dom.set("grown", grown)
+	field.call("refresh_growth")
+	await process_frame
 
 	# ── 4b. Nadogradnje: 20 / 20 ★3 čuvanih za sljedeću sezonu se smiju potrošiti ─────────
 	# (playtest: Frost, 20 Crystal Peony — Lantern traži tačno 20 — dugme je bilo „nema cvijeća").
@@ -266,6 +296,17 @@ func _run() -> void:
 		await create_timer(0.02).timeout
 		if not bool(stage.call("is_field_transitioning")):
 			break
+	# Playtest save (Frost): svih 6 tipova ★3, ali hoarfrost 3 i silver 4 — ranije 11 / 13.
+	var frost_field: Node = stage.get_node_or_null("%SeasonField")
+	var g_frost := grown.duplicate()
+	g_frost.merge({"winter_camellia": 11, "frost_snowdrop": 9, "ice_crocus": 8, "hoarfrost_rose": 3, "silver_aconite": 4, "crystal_peony": 73})
+	dom.set("grown", g_frost)
+	frost_field.call("refresh_growth")
+	await process_frame
+	if int(frost_field.call("get_meadow_grown_count")) != 13:
+		_fail("playtest Frost save should fill 13 / 13, got %d" % int(frost_field.call("get_meadow_grown_count")))
+		return
+	dom.set("grown", grown)
 	var need := int(gs.call("upgrade_flower_reserve", frost_flower))
 	if need < 2:
 		_fail("Frost ★3 should be kept for the next season (reserve %d)" % need)

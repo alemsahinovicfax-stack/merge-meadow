@@ -496,7 +496,18 @@ func _run() -> void:
 	if not swipe_err.is_empty():
 		_fail("Bloom open: %s" % swipe_err)
 		return
+	# Prag je 1 na svakom mjestu (2026-10-16): pola rostera bez ★3, da povratak ima šta da pokaže.
+	var half_stash: Dictionary = (gs.get("garden_crystal_stash") as Dictionary).duplicate()
+	var half_def: SeasonDef = gs.call("get_season_def", "country_bloom")
+	for k in 3:
+		half_stash.erase(str(half_def.seed_type_ids[k]))
+	gs.set("garden_crystal_stash", half_stash)
+	field.call("refresh_growth")
+	await process_frame
 	var grown_before := int(field.call("get_meadow_grown_count"))
+	if grown_before >= int(field.call("get_meadow_spot_count")):
+		_fail("half the roster without ★3 should leave empty spots (grown %d)" % grown_before)
+		return
 	if hub.has_method("go_to_page"):
 		hub.call("go_to_page", MetaHubPages.CAMP, false)
 	for _camp_i in 12:
