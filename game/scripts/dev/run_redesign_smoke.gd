@@ -61,9 +61,10 @@ func _check_rules(run: Node, gs: Node) -> void:
 	var player_map: Dictionary = player.get_script().get_script_constant_map()
 	_expect_eq("swipe tween", player_map.get("LANE_TWEEN_DURATION", -1), 0.12)
 	_expect_eq("swipe threshold", player_map.get("SWIPE_THRESHOLD", -1), 50.0)
+	# Balans ciklus 1: 40 + 55 × nivo — max (260) dohvata susjednu stazu (270).
 	_expect_eq("magnet 0", float(gs.call("get_magnet_radius_for_level", 0)), 40.0)
-	_expect_eq("magnet 2", float(gs.call("get_magnet_radius_for_level", 2)), 136.0)
-	_expect_eq("magnet 4", float(gs.call("get_magnet_radius_for_level", 4)), 232.0)
+	_expect_eq("magnet 2", float(gs.call("get_magnet_radius_for_level", 2)), 150.0)
+	_expect_eq("magnet 4", float(gs.call("get_magnet_radius_for_level", 4)), 260.0)
 	if UiRun.FAIL_TOTAL > 0.5:
 		_fail("fail beat %.2f exceeds 0.5s" % UiRun.FAIL_TOTAL)
 	var lanes: Array = run.get("lane_x_positions")
@@ -98,27 +99,27 @@ func _check_layout(run: Node) -> void:
 		_fail("PickupFeed should be the toast control, not a text dump")
 
 
-## Run HUD v2: LevelChip ne skače po visini između modova, „Endless · Hard" stane bez rezanja,
+## Run HUD v2: LevelChip ne skače po visini između modova, „Endless · 59:59" stane bez rezanja,
 ## a stari čipovi (PickupBar, TimerChip, CompanionChip, BasketBadge) su obrisani.
 func _check_timer_stable(run: Node, gs: Node) -> void:
 	var was_endless: bool = bool(gs.get("run_is_endless"))
-	var was_diff: int = int(gs.get("endless_difficulty"))
+	var was_elapsed: float = float(run.get("elapsed"))
 	var chip := run.get_node_or_null("HUD/TopHud/LevelChip") as Control
 	var mode := run.get_node_or_null("HUD/TopHud/LevelChip/Row/ModeLabel") as Label
 	gs.set("run_is_endless", true)
-	gs.set("endless_difficulty", 2)
+	run.set("elapsed", 3599.0)
 	run.call("_update_hud")
 	var h_endless := chip.size.y
-	if mode.text != "Endless · Hard":
+	if mode.text != "Endless · 59:59":
 		_fail("endless mode line got '%s'" % mode.text)
 	if mode.clip_text:
-		_fail("Endless · Hard does not fit the LevelChip (clipped)")
+		_fail("Endless · 59:59 does not fit the LevelChip (clipped)")
 	gs.set("run_is_endless", false)
 	run.call("_update_hud")
 	if absf(chip.size.y - h_endless) > TOLERANCE:
 		_fail("LevelChip jumped %.1f → %.1f when leaving endless" % [h_endless, chip.size.y])
 	gs.set("run_is_endless", was_endless)
-	gs.set("endless_difficulty", was_diff)
+	run.set("elapsed", was_elapsed)
 	run.call("_update_hud")
 	for gone in ["HUD/TopHud/PickupBar", "HUD/TopHud/TimerChip", "HUD/TopHud/CompanionChip", "HUD/TopHud/BasketBadge"]:
 		if run.get_node_or_null(gone) != null:

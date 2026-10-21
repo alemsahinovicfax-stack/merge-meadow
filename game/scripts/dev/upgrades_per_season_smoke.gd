@@ -32,18 +32,20 @@ func _run() -> void:
 	if str(gs.call("upgrade_button_state", "magnet")) != "short_both":
 		_fail("fresh season should be short of both")
 		return
-	gs.set("wallet_coins", 10)
+	var c := UiCamp.upgrade_coin_cost(0)
+	var f := UiCamp.upgrade_flower_cost(0)
+	gs.set("wallet_coins", c)
 	if str(gs.call("upgrade_button_state", "magnet")) != "short_flower":
 		_fail("coins without flowers should be short_flower")
 		return
-	gs.set("garden_crystal_stash", {flower: reserve + 2})
-	gs.set("wallet_coins", 9)
+	gs.set("garden_crystal_stash", {flower: reserve + f})
+	gs.set("wallet_coins", c - 1)
 	if str(gs.call("upgrade_button_state", "magnet")) != "short_coin":
 		_fail("flowers without coins should be short_coin")
 		return
-	gs.set("wallet_coins", 10)
+	gs.set("wallet_coins", c)
 	if str(gs.call("upgrade_button_state", "magnet")) != "can":
-		_fail("2 above the reserve and 10 coins should be can")
+		_fail("%d above the reserve and %d coins should be can" % [f, c])
 		return
 	if not bool(gs.call("try_upgrade_magnet", "")):
 		_fail("buy failed")

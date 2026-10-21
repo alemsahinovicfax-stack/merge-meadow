@@ -9,6 +9,13 @@ const S3 := "lantern_meadow"
 const PAID := "moonlit_warren"
 
 
+## Cijene besplatnih sezona (seasons.json): S2 = Frost, S3 = Lantern, a = Amber.
+var c2 := 0
+var f2 := 0
+var c3 := 0
+var f3 := 0
+var ca := 0
+var fa := 0
 var _backup: String = ""
 
 
@@ -77,18 +84,26 @@ func _run() -> void:
 	if s1_def.seed_type_ids.has("watermelon"):
 		_fail("S1 pool must not include watermelon")
 		return
+	# Cijene su iz seasons.json (balans ciklus 1): svaka sljedeća besplatna sezona skuplja, ≥ 20 ★3.
 	var s3_def: SeasonDef = SeasonCatalog.get_def(S3)
-	if s3_def == null or s3_def.t3_flowers_required != 20 or s3_def.coins_cost != 500:
-		_fail("S3 costs expected 500 coins + 20 T3")
-		return
 	var s2_def: SeasonDef = SeasonCatalog.get_def(S2)
-	if s2_def == null or s2_def.t3_flowers_required != 20 or s2_def.coins_cost != 500:
-		_fail("S2 costs expected 500 coins + 20 T3")
-		return
 	var amber_def: SeasonDef = SeasonCatalog.get_def("amber_canopy")
-	if amber_def == null or amber_def.t3_flowers_required != 20 or amber_def.coins_cost != 500:
-		_fail("Amber costs expected 500 coins + 20 T3")
+	if s2_def == null or s3_def == null or amber_def == null:
+		_fail("free season defs missing")
 		return
+	if not (0 < s2_def.coins_cost and s2_def.coins_cost < s3_def.coins_cost and s3_def.coins_cost < amber_def.coins_cost):
+		_fail("free season coin costs should rise S2 < S3 < Amber")
+		return
+	for d in [s2_def, s3_def, amber_def]:
+		if d.t3_flowers_required < 20:
+			_fail("%s should need ≥ 20 star-3" % d.id)
+			return
+	c2 = s2_def.coins_cost
+	f2 = s2_def.t3_flowers_required
+	c3 = s3_def.coins_cost
+	f3 = s3_def.t3_flowers_required
+	ca = amber_def.coins_cost
+	fa = amber_def.t3_flowers_required
 	if s1_def.roster.is_empty() or str(s1_def.roster[0].get("id", "")) != "clover":
 		_fail("Bloom roster id 0 expected clover")
 		return
@@ -155,41 +170,41 @@ func _run() -> void:
 	if bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock with 0 coins/T3 should fail")
 		return
-	gs.set("wallet_coins", 499)
-	gs.set("garden_crystal_stash", {"pumpkin": 20})
+	gs.set("wallet_coins", c2 - 1)
+	gs.set("garden_crystal_stash", {"pumpkin": f2})
 	if bool(gs.call("unlock_free", S2)):
-		_fail("S2 unlock with 499 coins should fail")
+		_fail("S2 unlock with %d coins should fail" % (c2 - 1))
 		return
-	if int(gs.get("wallet_coins")) != 499:
+	if int(gs.get("wallet_coins")) != c2 - 1:
 		_fail("coins spent on failed coin gate")
 		return
-	gs.set("wallet_coins", 500)
+	gs.set("wallet_coins", c2)
 	gs.set("garden_crystal_stash", {})
 	if bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock with coins but 0 T3 should fail")
 		return
-	if int(gs.get("wallet_coins")) != 500:
+	if int(gs.get("wallet_coins")) != c2:
 		_fail("coins spent on failed T3 gate")
 		return
 
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"clover": 20})
+	gs.set("wallet_coins", c2)
+	gs.set("garden_crystal_stash", {"clover": f2})
 	if bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock with clover T3 (not star-3) should fail")
 		return
-	if int(gs.get("wallet_coins")) != 500:
+	if int(gs.get("wallet_coins")) != c2:
 		_fail("coins spent on clover T3 gate")
 		return
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"pumpkin": 20})
+	gs.set("wallet_coins", c2)
+	gs.set("garden_crystal_stash", {"pumpkin": f2})
 	if bool(gs.call("unlock_free", S3)):
 		_fail("S3 unlock before S2 should fail")
 		return
-	if int(gs.get("wallet_coins")) != 500:
+	if int(gs.get("wallet_coins")) != c2:
 		_fail("coins spent on blocked S3")
 		return
 	var stash_before: Dictionary = gs.get("garden_crystal_stash")
-	if int(stash_before.get("pumpkin", 0)) != 20:
+	if int(stash_before.get("pumpkin", 0)) != f2:
 		_fail("T3 stash mutated on blocked S3")
 		return
 
@@ -207,7 +222,7 @@ func _run() -> void:
 		return
 
 	_reset_new_game(gs)
-	gs.set("wallet_coins", 500)
+	gs.set("wallet_coins", c2)
 	gs.set("garden_crystal_stash", {"clover": 3, "daisy": 2})
 	if int(gs.call("t3_flower_count")) != 5:
 		_fail("t3_flower_count expected 5")
@@ -219,16 +234,16 @@ func _run() -> void:
 	if bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock with non-star-3 T3 should fail")
 		return
-	gs.set("garden_crystal_stash", {"pumpkin": 20})
+	gs.set("garden_crystal_stash", {"pumpkin": f2})
 	if not bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock should succeed")
 		return
 	if int(gs.get("wallet_coins")) != 0:
-		_fail("S2 should spend 500 coins")
+		_fail("S2 should spend %d coins" % c2)
 		return
 	stash_before = gs.get("garden_crystal_stash")
 	if int(stash_before.get("pumpkin", 0)) != 0:
-		_fail("S2 should spend 20 pumpkin star-3")
+		_fail("S2 should spend %d pumpkin star-3" % f2)
 		return
 	if str(gs.get("active_season_id")) != S2:
 		_fail("P12 auto-switch S2 failed")
@@ -236,16 +251,16 @@ func _run() -> void:
 
 	gs.set("wallet_coins", 0)
 	if bool(gs.call("unlock_free", S3)):
-		_fail("S3 after S2 still needs 500 coins")
+		_fail("S3 after S2 still needs %d coins" % c3)
 		return
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"pumpkin": 19})
+	gs.set("wallet_coins", c3)
+	gs.set("garden_crystal_stash", {"pumpkin": f3 - 1})
 	if bool(gs.call("unlock_free", S3)):
-		_fail("S3 after S2 still needs 20 star-3 from Frost")
+		_fail("S3 after S2 still needs %d star-3 from Frost" % f3)
 		return
-	gs.set("garden_crystal_stash", {"crystal_peony": 19})
+	gs.set("garden_crystal_stash", {"crystal_peony": f3 - 1})
 	if bool(gs.call("unlock_free", S3)):
-		_fail("S3 after S2 still needs 20 T3")
+		_fail("S3 after S2 still needs %d T3" % f3)
 		return
 
 	gs.set("active_season_id", S1)
@@ -261,10 +276,10 @@ func _run() -> void:
 		_fail("save round-trip missing S2")
 		return
 
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"crystal_peony": 20})
+	gs.set("wallet_coins", c3)
+	gs.set("garden_crystal_stash", {"crystal_peony": f3})
 	if not bool(gs.call("can_unlock_free", S3)):
-		_fail("S3 should be unlockable after S2 + 500 coins + 20 Frost star-3")
+		_fail("S3 should be unlockable after S2 + %d coins + %d Frost star-3" % [c3, f3])
 		return
 	if not bool(gs.call("unlock_free", S3)):
 		_fail("S3 unlock should succeed")
@@ -281,10 +296,10 @@ func _run() -> void:
 	if not bool(gs.call("is_test_locked_season", "ember_fen")):
 		_fail("ember_fen must stay test-locked")
 		return
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"midnight_lotus": 20})
+	gs.set("wallet_coins", ca)
+	gs.set("garden_crystal_stash", {"midnight_lotus": fa})
 	if not bool(gs.call("can_unlock_free", "amber_canopy")):
-		_fail("can_unlock_free(amber) should work after lantern + 500c/20 Lantern star-3")
+		_fail("can_unlock_free(amber) should work after lantern + %dc/%d Lantern star-3" % [ca, fa])
 		return
 	if not bool(gs.call("unlock_free", "amber_canopy")):
 		_fail("amber unlock should succeed")
@@ -294,8 +309,8 @@ func _run() -> void:
 		return
 
 	_reset_new_game(gs)
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"pumpkin": 20})
+	gs.set("wallet_coins", c2)
+	gs.set("garden_crystal_stash", {"pumpkin": f2})
 	if not bool(gs.call("unlock_free", S2)):
 		_fail("S2 unlock before debug skip test failed")
 		return
@@ -312,8 +327,8 @@ func _run() -> void:
 	if bool(gs.call("is_season_playable", "amber_canopy")):
 		_fail("debug_unlock_all must skip amber_canopy")
 		return
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"crystal_peony": 20})
+	gs.set("wallet_coins", c3)
+	gs.set("garden_crystal_stash", {"crystal_peony": f3})
 	if not bool(gs.call("can_unlock_free", S3)):
 		_fail("can_unlock_free(lantern) should still work")
 		return

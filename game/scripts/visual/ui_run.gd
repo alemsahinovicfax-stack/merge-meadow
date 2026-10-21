@@ -179,13 +179,22 @@ static func chip_style(radius: int = CHIP_RADIUS) -> StyleBoxFlat:
 	return s
 
 
-## Tekst LevelChipa: „Level N", „Endless · Easy/Normal/Hard" ili „Practice" (tutorial nema broj).
+## Tekst LevelChipa: „Level N", „Endless · 1:23" (preživljeno vrijeme) ili „Practice" (tutorial
+## nema broj). Konačni izgled Endless HUD-a čeka CD (leveli-endless-cd-brief).
 static func mode_text(endless: bool, endless_label: String, uses_level: bool, level: int) -> String:
 	if endless:
 		return "Endless · %s" % endless_label
 	if not uses_level:
 		return "Practice"
 	return "Level %d" % level
+
+
+## Sat Endlessa: m:ss (sat poslije 60 min: h:mm:ss).
+static func endless_clock(sec: float) -> String:
+	var s := maxi(0, int(sec))
+	if s >= 3600:
+		return "%d:%02d:%02d" % [s / 3600, (s / 60) % 60, s % 60]
+	return "%d:%02d" % [s / 60, s % 60]
 
 
 ## Endless nema cilj → bez zastavice u čipu i bez trake napretka.

@@ -24,9 +24,10 @@ const SKU_PIP_KNIGHT := "pip_knight"
 const BOOSTER_MERGE_HINT := "merge_hint"
 const BOOSTER_LOOT_BURST := "loot_burst"
 
-## Starter Pack (Shop v2): 100 coina + Pip Blossom + po 10 sjemenki prvih 5 tipova
-## Country Bloom; nudi se 7 dana od prvog pokretanja. Merge Hint više nije u paketu.
-const STARTER_PACK_COINS := 100
+## Starter Pack (Shop v2): coini + Pip Blossom + po 10 sjemenki prvih 5 tipova Country Bloom;
+## nudi se 7 dana od prvog pokretanja. Merge Hint više nije u paketu. Coini 100 → 1000 uz nove
+## cijene (balans ciklus 1) — opis proizvoda u Play Consoleu treba isto ažurirati.
+const STARTER_PACK_COINS := 1000
 const STARTER_PACK_COSMETIC := "pip_blossom"
 const STARTER_PACK_SEED_TYPES: Array[String] = ["clover", "daisy", "buttercup", "tulip", "sunflower"]
 const STARTER_PACK_SEEDS_EACH := 10
@@ -45,7 +46,7 @@ const IAP_PRODUCTS := {
 	},
 	SKU_STARTER_PACK: {
 		"title": "Starter Pack",
-		"description": "100 coins, Pip Blossom and 10 of each first five seeds. 7 days only.",
+		"description": "1,000 coins, Pip Blossom and 10 of each first five seeds. 7 days only.",
 		"price_label": "€1.99",
 		"play_product_id": "starter_pack",
 		"consumable": false,

@@ -1,12 +1,14 @@
 extends SceneTree
 
 ## design_handoff_camp — pravilo rezervisanog ★3 cvijeca: drzanje Trade staje
-## kad bi tip pao ispod broja koji sljedeca sezona trazi (Frost Orchard: 20
-## Harvest Pumpkin), tap prodaje dalje, novcici do tada ostaju. Ostali tipovi i
+## kad bi tip pao ispod broja koji sljedeca sezona trazi (Frost Orchard: REQ
+## Harvest Pumpkin iz seasons.json), tap prodaje dalje, novcici do tada ostaju. Ostali tipovi i
 ## sjemenke nisu pogodeni; bez sljedece sezone nema granice.
 
 var _backup: String = ""
 var _interval: float = 0.1
+## Uslov Frost Orcharda u ★3 (seasons.json) — granica za Harvest Pumpkin.
+var _req: int = 20
 
 
 func _initialize() -> void:
@@ -51,17 +53,19 @@ func _run() -> void:
 		_fail("Trade nodes missing")
 		return
 	_interval = 1.0 / float(button.get("auto_repeat_rate"))
+	_req = SeasonCatalog.get_def("frost_orchard").t3_flowers_required
+	var kept := "Kept · %d / %d" % [_req, _req]
 
 	gs.set("wallet_coins", 0)
-	gs.set("garden_crystal_stash", {"clover": 2, "pumpkin": 23})
+	gs.set("garden_crystal_stash", {"clover": 2, "pumpkin": _req + 3})
 	camp.call("_on_tab_pressed", "flowers")
 	camp.set("_force_default_crystal_select", true)
 	camp.call("_refresh_crystal_card")
 	camp.call("_on_crystal_chip_pressed", "pumpkin")
 	await process_frame
 	var chip := _chip(grid, "pumpkin")
-	if chip == null or not bool(chip.call("is_reserved")) or str(chip.call("get_badge_text")) != "Kept · 20 / 20":
-		_fail("pumpkin above the floor must read 'Kept · 20 / 20', got '%s'" % (str(chip.call("get_badge_text")) if chip else ""))
+	if chip == null or not bool(chip.call("is_reserved")) or str(chip.call("get_badge_text")) != kept:
+		_fail("pumpkin above the floor must read '%s', got '%s'" % [kept, str(chip.call("get_badge_text")) if chip else ""])
 		return
 	if not is_equal_approx((chip as Control).custom_minimum_size.y, 176.0):
 		_fail("reserved chip must stay 176 px tall (badge sits in the pips row)")
@@ -70,13 +74,13 @@ func _run() -> void:
 		_fail("above the floor the rule is invisible (idle), got %s" % str(bar.call("get_state")))
 		return
 
-	# 23 → tap 22 → drzanje 21, 20 → stop (ne 19).
+	# REQ+3 → tap REQ+2 → drzanje REQ+1, REQ → stop (ne REQ-1).
 	var price := int(gs.call("crystal_exchange_coins_for_type", "pumpkin"))
 	button.call("begin_press", true)
 	await process_frame
 	await _hold(button, 10)
-	if _pumpkin(gs) != 20:
-		_fail("hold must stop at the floor (20), pumpkin=%d" % _pumpkin(gs))
+	if _pumpkin(gs) != _req:
+		_fail("hold must stop at the floor (%d), pumpkin=%d" % [_req, _pumpkin(gs)])
 		return
 	if not bool(button.call("is_repeat_blocked")):
 		_fail("repeat must be blocked at the floor")
@@ -87,7 +91,7 @@ func _run() -> void:
 	if str(bar.call("get_state")) != "holdstop":
 		_fail("stopped hold must be holdstop, got %s" % str(bar.call("get_state")))
 		return
-	if str(bar.call("get_warning_text")) != "Hold stopped · Frost Orchard keeps 20":
+	if str(bar.call("get_warning_text")) != "Hold stopped · Frost Orchard keeps %d" % _req:
 		_fail("holdstop strip text wrong: '%s'" % str(bar.call("get_warning_text")))
 		return
 	if str(button.call("get_title")) != "Sell 1" or not str(button.call("get_sub")).is_empty():
@@ -96,8 +100,8 @@ func _run() -> void:
 		])
 		return
 	# v2: tekst badgea se ne mijenja na granici, samo stil (amber).
-	if str(_chip(grid, "pumpkin").call("get_badge_text")) != "Kept · 20 / 20":
-		_fail("chip badge at the floor must stay 'Kept · 20 / 20'")
+	if str(_chip(grid, "pumpkin").call("get_badge_text")) != kept:
+		_fail("chip badge at the floor must stay '%s'" % kept)
 		return
 	button.call("end_press")
 	await process_frame
@@ -105,12 +109,12 @@ func _run() -> void:
 		_fail("release must flush the save")
 		return
 
-	# Tap prodaje dalje: 20 → 19, stanje warn.
+	# Tap prodaje dalje: REQ → REQ-1, stanje warn.
 	button.call("begin_press", true)
 	await process_frame
 	button.call("end_press")
 	await process_frame
-	if _pumpkin(gs) != 19:
+	if _pumpkin(gs) != _req - 1:
 		_fail("tap below the floor must still sell 1, pumpkin=%d" % _pumpkin(gs))
 		return
 	# v2: upozorenje nose boja, lokot i strip iznad reda — ne podnaslov dugmeta.
@@ -125,7 +129,7 @@ func _run() -> void:
 	button.call("begin_press", true)
 	await process_frame
 	await _hold(button, 10)
-	if _pumpkin(gs) != 18:
+	if _pumpkin(gs) != _req - 2:
 		_fail("hold below the floor must sell only the tap, pumpkin=%d" % _pumpkin(gs))
 		return
 	button.call("end_press")
@@ -141,7 +145,7 @@ func _run() -> void:
 	if int((gs.get("garden_crystal_stash") as Dictionary).get("clover", 0)) != 0:
 		_fail("clover (not reserved) must sell out on hold")
 		return
-	if _pumpkin(gs) != 18:
+	if _pumpkin(gs) != _req - 2:
 		_fail("auto switch into pumpkin must not sell below the floor, pumpkin=%d" % _pumpkin(gs))
 		return
 

@@ -5,6 +5,9 @@ const HomeBasketPickerIcon := preload("res://scripts/ui/home_basket_picker_icon.
 
 const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
 const SHEET_PAD := Vector4(24, 24, 24, 28)   # lijevo, gore, desno, dolje (design_handoff_popups)
+## Zaključan Endless (do pređenog levela 15 sezone): prigušeno dugme + toast.
+const ENDLESS_LOCKED_ALPHA := 0.55
+const S_ENDLESS_LOCKED := "Finish level %d to unlock Endless"
 
 enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 
@@ -55,6 +58,8 @@ var _sheet_drag: Dictionary = {}
 var wardrobe_button: FieldWardrobeButton
 var wardrobe_sheet: WardrobeSheet
 var _apply_toast: ApplyToast
+## Toast polja / puta (zaključan Endless).
+var _field_toast: ApplyToast
 
 
 func _ready() -> void:
@@ -289,12 +294,31 @@ func on_level_path_finished(opened: bool) -> void:
 		_refresh_wardrobe_button()
 
 
+## Endless sezone se otvara kad je level 15 te sezone pređen (balans ciklus 1). Dok je zaključan,
+## dugme ostaje na mjestu prigušeno, a tap kaže koliko fali (privremeno — izgled zaključanog
+## stanja čeka CD, leveli-endless-cd-brief).
 func _refresh_endless_button() -> void:
 	if endless_play_button == null:
 		return
 	endless_play_button.visible = (
 		GameState.tutorial_complete and GameState.home_season_field_open
 	)
+	# self_modulate (ploča) + sadržaj: `modulate` dugmeta drži UiClickButton (disabled stil) i
+	# vraća ga na bijelo pri svakom restilu donjeg reda.
+	var a := 1.0 if is_endless_unlocked_here() else ENDLESS_LOCKED_ALPHA
+	endless_play_button.self_modulate.a = a
+	var row := endless_play_button.get_node_or_null("ContentRow") as CanvasItem
+	if row:
+		row.modulate.a = a
+
+
+func is_endless_unlocked_here() -> bool:
+	return GameState.is_endless_unlocked(_endless_season_id())
+
+
+func _endless_season_id() -> String:
+	var field_id := GameState.home_season_field_id
+	return field_id if not field_id.is_empty() else GameState.active_season_id
 
 
 func _refresh_seasons_row_button() -> void:
@@ -358,6 +382,7 @@ func _style_field_bottom_row() -> void:
 	var back_label := LevelPathKit.S_BACK if GameState.level_path_open else "Seasons"
 	_style_sticker_button(seasons_row_button, UiHomeField.SEASONS_BTN.size, UiHomeField.seasons_button(), back_label, "chevron", 14)
 	_style_sticker_button(endless_play_button, UiHomeField.ENDLESS_BTN.size, UiHomeField.endless_button(), "Endless", "rings", 12)
+	_refresh_endless_button()
 
 
 func _style_sticker_button(btn: UiClickButton, sz: Vector2i, style: StyleBoxFlat, text: String, glyph: String, gap: int) -> void:
@@ -384,11 +409,31 @@ func _style_sticker_button(btn: UiClickButton, sz: Vector2i, style: StyleBoxFlat
 func _on_endless_play_pressed() -> void:
 	if not GameState.home_season_field_open:
 		return
+	if not is_endless_unlocked_here():
+		Sfx.play("ui_denied")
+		_show_field_toast(S_ENDLESS_LOCKED % LevelPathDomain.ENDLESS_UNLOCK_LEVEL, UiAssets.get_chrome_icon("icon_lock"))
+		return
 	var field_id := GameState.home_season_field_id
 	if not field_id.is_empty():
 		GameState.set_active_season(field_id)
-	GameState.begin_endless_run(GameState.EndlessDifficulty.HARD)
+	GameState.begin_endless_run()
 	SceneRouter.change_to(GameState.SCENE_RUN)
+
+
+
+## Toast iznad polja i Level Patha (FieldOverlay je iznad puta).
+func _show_field_toast(text: String, icon: Texture2D = null) -> void:
+	if field_overlay_inner == null:
+		return
+	if _field_toast == null:
+		_field_toast = ApplyToast.new()
+		_field_toast.name = "FieldToast"
+		field_overlay_inner.add_child(_field_toast)
+	_field_toast.show_text(text, icon)
+
+
+func field_toast_text() -> String:
+	return _field_toast.text if _field_toast != null and _field_toast.visible else ""
 
 
 func _refresh_field_upgrades() -> void:
@@ -654,7 +699,7 @@ func _apply_upgrade_card(
 	else:
 		var cost := UiCamp.upgrade_coin_cost(level)
 		var can := state == UiCamp.UP_CAN
-		btn.configure("primary" if can else "disabled", "×%d" % UiCamp.UP_FLOWER_COST)
+		btn.configure("primary" if can else "disabled", "×%d" % UiCamp.upgrade_flower_cost(level))
 		btn.set_art(flower_id, 3, 64.0)
 		btn.coin_text = str(cost)
 		btn.flower_short = state == UiCamp.UP_SHORT_FLOWER or state == UiCamp.UP_SHORT_BOTH

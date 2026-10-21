@@ -395,6 +395,8 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Dopuna 2026-10-14 (zvuk):** isto važi za `class_name` klase koje test koristi direktno (`UiPip`, `UiPopups`, kartice…) — kad one statički pozovu autoload (`AudioManager.play`), `-s` test pada. Zato zvuk ide kroz `Sfx` (`scripts/visual/sfx.gd`): statičke funkcije koje autoload traže u toku igre (`root.get_node_or_null("AudioManager")`), a bez njega su tihe. Isti obrazac za svaki budući servis koji zovu i UI klase.
 
+**Dopuna 2026-10-21 (balans):** `PopupButton` → `HubPressable` → `SceneRouter` — `PopupButton.new()` u `-s` testu ne kompajlira („Identifier not found: SceneRouter"). U `economy_balance_smoke` dugme se pravi s `load("res://scripts/ui/popup/popup_button.gd").new()` i `call()` / `set()`.
+
 ## #22 — tekstura iz `load()` u `_draw()` se crta kao bijeli pravougaonik
 
 **Datum:** 2026-10-05 (Sezone faza 1, prepreke u runu)
@@ -735,6 +737,30 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 **Rješenje:** `SeasonBackdrop.draw` preskače komad s praznim `idx`.
 
 **Prevencija:** recepti polja i Campa to do sada nisu imali, pa greška nije bila vidljiva. Kad dodaješ novu vrstu sloja koja „zatvara" komad, pusti `season_kit_all_smoke` i pogledaj stderr.
+
+## #48 — „Claim" na Level Pathu ne reaguje, sanduk da
+
+**Datum:** 2026-10-21 (playtest)
+
+**Simptom:** spremni sanduk (`reward_ready`) ima breskvastu pilulu „Claim" ispod sebe; tap na pilulu ne radi ništa, tap na sam sanduk otvara popup.
+
+**Uzrok:** pilulu crta `_ChestLabel._draw()` ispod pravougaonika sanduka (y 184–260 px, sanduk je 190 px visok), a `LevelPathView._tap()` provjerava samo `Rect2(sanduk)` i kamen. Crtež izvan `size` kontrole se vidi, ali ga hit-test ne zna.
+
+**Rješenje:** pilula izbačena (korisnik: „izbacimo dugme, neka sanduk skakuće"); zona dodira sanduka produžena na `CHEST_TAP_H` (270 px × k) da hvata i traku ispod; privremena animacija skok + klimanje. Test: `level_path_smoke` tapne ispod sanduka.
+
+**Prevencija:** sve što izgleda kao dugme mora biti unutar zone dodira — ako crtaš van `size`, proširi i hit-test (ili napravi pravu kontrolu).
+
+## #49 — plijen ostaje ispred Pipa kad level stane
+
+**Datum:** 2026-10-21 (playtest)
+
+**Simptom:** na kraju levela run stane, a ispred Pipa su coini / sjeme koje više ne može pokupiti.
+
+**Uzrok:** spawn je radio do zadnje sekunde; od linije spawna (y −80) do Pipa (y ≈ 1574) predmet putuje 2,5–4 s.
+
+**Rješenje:** `run_controller._spawn_reaches_pip()` — ništa (pickup, prepreka, grm) se ne stvara ako `elapsed + put / brzina ≥ trajanje`. Brzina samo raste, pa je procjena sigurna. Endless nema kraja. Test u `economy_balance_smoke`.
+
+**Prevencija:** sve što se pojavljuje na vrhu staze mora proći provjeru „stiže li prije kraja"; cilj na kraju levela (CD) koristi istu računicu.
 
 ## Brza dijagnostika (kad nešto "ne radi")
 

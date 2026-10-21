@@ -1,11 +1,14 @@
 extends Node2D
 
 ## Run companion — Pip je UiPip (pogled odozgo, galop). Magnet krug je u djetetu `_magnet`,
-## nacrtan jednom (design_handoff_run_pickups: krem tačkice s ink rubom, 0,6, jedna mreža = 1 draw
-## poziv); vrti se 18°/s i trzne 4 % kad uhvati pickup — samo rotacija i skala čvora.
+## nacrtan jednom (design_handoff_run_pickups: krem tačkice s ink rubom, alfa MAGNET_ALPHA, jedna
+## mreža = 1 draw poziv); vrti se 18°/s i trzne 4 % kad uhvati pickup — samo rotacija i skala čvora.
 ## Mochi i dalje pada na proceduralni crtež.
 
 const COMPANION_ASSETS := preload("res://scripts/visual/companion_assets.gd")
+## Alfa tačkica magnet kruga: paket 0,6 → 0,32 (2026-10-21 — veći domet = veći krug, previše se
+## vidio dok Pip trči).
+const MAGNET_ALPHA := 0.32
 
 var _magnet_radius: float = 0.0
 var _use_draw_fallback: bool = false
@@ -143,17 +146,17 @@ func _draw_ground_shadow() -> void:
 	draw_colored_polygon(pts, Color(0.071, 0.110, 0.086, 0.28))
 
 
-## magnet_ring_l*.svg: tačkice r 4,5 (krem #FFF8F0, ink rub 2 #2D3436), cijeli krug alfa 0,6;
-## razmak ~30 px po obodu (L0 12 … L4 49 tačkica). Prsten i jezgro se ne preklapaju, pa alfa
-## važi za grupu kao u SVG-u. Jedna mreža trouglova = 1 draw poziv.
+## magnet_ring_l*.svg: tačkice r 4,5 (krem #FFF8F0, ink rub 2 #2D3436); razmak ~30 px po obodu
+## (L0 12 … L4 55 tačkica). Prsten i jezgro se ne preklapaju, pa alfa važi za grupu kao u SVG-u.
+## Alfa: MAGNET_ALPHA. Jedna mreža trouglova = 1 draw poziv.
 func _draw_magnet_dots(canvas: CanvasItem) -> void:
 	if _magnet_radius <= 0.0:
 		return
 	const SEG := 10
 	const R_IN := 3.5
 	const R_OUT := 5.5
-	var ink := Color(0.176, 0.204, 0.212, 0.6)
-	var cream := Color(1.0, 0.973, 0.941, 0.6)
+	var ink := Color(0.176, 0.204, 0.212, MAGNET_ALPHA)
+	var cream := Color(1.0, 0.973, 0.941, MAGNET_ALPHA)
 	var n := maxi(12, roundi(TAU * _magnet_radius / 30.0))
 	var points := PackedVector2Array()
 	var colors := PackedColorArray()

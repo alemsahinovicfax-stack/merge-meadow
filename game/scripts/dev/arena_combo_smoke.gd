@@ -54,26 +54,28 @@ func _run_grant_cap(gs: Node) -> bool:
 	gs.set("wallet_coins", 100)
 	gs.set("combo_coin_day", "")
 	gs.set("combo_coins_granted_today", 0)
+	var c := ArenaDomain.COMBO_COINS
+	var cap := ArenaDomain.COMBO_COIN_DAILY_CAP
 	var g1 := int(gs.call("try_grant_arena_combo_coins"))
-	if g1 != 2:
-		_fail("first grant expected 2 got %d" % g1)
+	if g1 != c:
+		_fail("first grant expected %d got %d" % [c, g1])
 		return false
 	var g2 := int(gs.call("try_grant_arena_combo_coins"))
-	if g2 != 2:
-		_fail("second grant expected 2 got %d" % g2)
+	if g2 != c:
+		_fail("second grant expected %d got %d" % [c, g2])
 		return false
-	if int(gs.get("wallet_coins")) != 104:
-		_fail("wallet after two grants expected 104 got %d" % int(gs.get("wallet_coins")))
+	if int(gs.get("wallet_coins")) != 100 + 2 * c:
+		_fail("wallet after two grants expected %d got %d" % [100 + 2 * c, int(gs.get("wallet_coins"))])
 		return false
-	if int(gs.get("combo_coins_granted_today")) != 4:
-		_fail("granted_today expected 4")
+	if int(gs.get("combo_coins_granted_today")) != 2 * c:
+		_fail("granted_today expected %d" % (2 * c))
 		return false
-	gs.set("combo_coins_granted_today", 9)
+	gs.set("combo_coins_granted_today", cap - 1)
 	var g3 := int(gs.call("try_grant_arena_combo_coins"))
 	if g3 != 1:
 		_fail("partial cap grant expected 1 got %d" % g3)
 		return false
-	gs.set("combo_coins_granted_today", 10)
+	gs.set("combo_coins_granted_today", cap)
 	var g4 := int(gs.call("try_grant_arena_combo_coins"))
 	if g4 != 0:
 		_fail("at cap expected 0 got %d" % g4)
@@ -128,12 +130,12 @@ func _run() -> void:
 		_restore_save(backup)
 		_fail("fifth merge expected combo 5")
 		return
-	if int(gs.get("wallet_coins")) != wallet_before + 2:
+	if int(gs.get("wallet_coins")) != wallet_before + ArenaDomain.COMBO_COINS:
 		_restore_save(backup)
-		_fail("combo 5 should grant 2 coins")
+		_fail("combo 5 should grant %d coins" % ArenaDomain.COMBO_COINS)
 		return
 	arena.call("register_arena_combo_merge")
-	if int(gs.get("wallet_coins")) != wallet_before + 2:
+	if int(gs.get("wallet_coins")) != wallet_before + ArenaDomain.COMBO_COINS:
 		_restore_save(backup)
 		_fail("combo 6 should not grant again this streak")
 		return

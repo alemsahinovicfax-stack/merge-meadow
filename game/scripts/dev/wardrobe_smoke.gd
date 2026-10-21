@@ -15,10 +15,11 @@ extends SceneTree
 
 const DEMO := preload("res://scripts/dev/wardrobe_demo_catalog.gd")
 const PAGE := Vector2(1080.0, 1633.0)
+## Slot i cijena po stavci (cijene: balans ciklus 1, 2026-10-21 — ranije 250/200/150/180/120).
 const LEGACY := {
-	"pip_blossom": ["pip_skin", 250], "pip_sky": ["pip_skin", 200],
-	"meadow_sunset": ["meadow_bg", 150], "meadow_lavender": ["meadow_bg", 180],
-	"journal_gold": ["journal_frame", 120], "pip_knight": ["pip_skin", 0],
+	"pip_blossom": ["pip_skin", 2500], "pip_sky": ["pip_skin", 2000],
+	"meadow_sunset": ["meadow_bg", 1000], "meadow_lavender": ["meadow_bg", 1200],
+	"journal_gold": ["journal_frame", 800], "pip_knight": ["pip_skin", 0],
 }
 
 var _failed: bool = false

@@ -400,9 +400,26 @@ func _run() -> void:
 		if not await _ok("10 Home card unlock %s" % s4, s4):
 			return
 
-	# 11. Endless iz polja S1, pa povratak.
+	# 11. Endless iz polja S1, pa povratak. Endless sezone je zaključan dok level 15 nije pređen
+	# (balans ciklus 1) — prvo tap na zaključan ne smije pokrenuti run.
+	var lp: LevelPathDomain = gs.get("level_path_domain")
+	lp.set_level(S1, LevelPathDomain.ENDLESS_UNLOCK_LEVEL)
 	_stage().call("open_season_field", S1, false)
 	await _frames(6)
+	_page(MetaHubPages.MAIN).call("_on_endless_play_pressed")
+	await _frames(6)
+	if current_scene != null and current_scene.scene_file_path == RUN_SCENE:
+		_step = "11 Endless locked"
+		_fail("locked Endless must not start a run")
+		return
+	var home_main := _page(MetaHubPages.MAIN)
+	var endless_btn := home_main.get_node("%EndlessPlayButton") as CanvasItem
+	if endless_btn.self_modulate.a > 0.9 or str(home_main.call("field_toast_text")).find("level 15") < 0:
+		_step = "11 Endless locked"
+		_fail("locked Endless should look dimmed and explain level 15 (alpha %.2f, toast '%s')" % [
+			endless_btn.self_modulate.a, str(home_main.call("field_toast_text"))])
+		return
+	lp.set_level(S1, LevelPathDomain.ENDLESS_UNLOCK_LEVEL + 1)
 	_page(MetaHubPages.MAIN).call("_on_endless_play_pressed")
 	var endless := await _until(func() -> bool:
 		return current_scene != null and current_scene.scene_file_path == RUN_SCENE, 6.0)

@@ -7,6 +7,10 @@
 ## ima samo globalni "run_level": prelazi na sezonu u kojoj se igralo (active_season_id),
 ## ograničen na 21 — pređeni nagradni leveli tada čekaju Claim (odluka 2026-10-20).
 ## Težina: level N iste je težine u svakoj sezoni (RunLevelLibrary.get_level(N)).
+##
+## Endless sezone (balans ciklus 1, 2026-10-21): otključa se kad je level ENDLESS_UNLOCK_LEVEL
+## pređen (Pip stoji na 16) — isti trenutak kad nagrada 15 postane spremna. Rekord (najduže
+## preživljeno, s) je po sezoni: "season_endless_best".
 class_name LevelPathDomain
 extends RefCounted
 
@@ -15,6 +19,7 @@ const COMPLETE := LEVELS + 1
 const REWARD_LEVELS: Array[int] = [5, 10, 15, 20]
 ## [★3 cvjetova sezone, coina]
 const REWARDS := {5: [2, 200], 10: [4, 400], 15: [6, 600], 20: [10, 1000]}
+const ENDLESS_UNLOCK_LEVEL := 15
 
 const STATE_DONE := "done"
 const STATE_CURRENT := "current"
@@ -25,6 +30,7 @@ const REWARD_CLAIMED := "reward_claimed"
 
 var levels: Dictionary = {}
 var claimed: Dictionary = {}
+var endless_best: Dictionary = {}
 
 var _owner: Variant
 
@@ -36,6 +42,7 @@ func _init(owner: Variant) -> void:
 func apply_from_save(data: Dictionary) -> void:
 	levels.clear()
 	claimed.clear()
+	endless_best.clear()
 	var raw_levels: Variant = data.get("season_levels", null)
 	if raw_levels is Dictionary:
 		for id in raw_levels:
@@ -56,18 +63,27 @@ func apply_from_save(data: Dictionary) -> void:
 						list.append(v)
 			list.sort()
 			claimed[str(id)] = list
+	var raw_best: Variant = data.get("season_endless_best", {})
+	if raw_best is Dictionary:
+		for id in raw_best:
+			endless_best[str(id)] = maxf(0.0, float(raw_best[id]))
 
 
 func to_save_dict() -> Dictionary:
 	var out_claimed := {}
 	for id in claimed:
 		out_claimed[id] = (claimed[id] as Array).duplicate()
-	return {"season_levels": levels.duplicate(), "season_level_rewards": out_claimed}
+	return {
+		"season_levels": levels.duplicate(),
+		"season_level_rewards": out_claimed,
+		"season_endless_best": endless_best.duplicate(),
+	}
 
 
 func reset() -> void:
 	levels.clear()
 	claimed.clear()
+	endless_best.clear()
 
 
 ## 1…20, ili 21 kad je put završen.
@@ -97,6 +113,22 @@ func advance(season_id: String) -> Array:
 		return []
 	set_level(season_id, from + 1)
 	return [from, from + 1]
+
+
+func is_endless_unlocked(season_id: String) -> bool:
+	return level_of(season_id) > ENDLESS_UNLOCK_LEVEL
+
+
+func endless_best_of(season_id: String) -> float:
+	return float(endless_best.get(season_id, 0.0))
+
+
+## Upiše preživljeno vrijeme Endlessa; true kad je novi rekord sezone.
+func record_endless(season_id: String, sec: float) -> bool:
+	if season_id.is_empty() or sec <= endless_best_of(season_id):
+		return false
+	endless_best[season_id] = sec
+	return true
 
 
 func claimed_of(season_id: String) -> Array[int]:

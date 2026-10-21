@@ -752,6 +752,8 @@ func _build_dev(list: VBoxContainer) -> void:
 	grid.add_child(_dev_button("DevResetSeasons", UiSettings.S.dev_reset_seasons, true, _dev_reset_seasons))
 	grid.add_child(_dev_button("DevCoins", UiSettings.S.dev_coins, false, _dev_coins))
 	grid.add_child(_dev_button("DevResetTutorial", UiSettings.S.dev_reset_tutorial, true, _dev_reset_tutorial))
+	grid.add_child(_dev_button("DevLevelUp", UiSettings.S.dev_level_up, false, _dev_level_up))
+	grid.add_child(_dev_button("DevLevelReset", UiSettings.S.dev_level_reset, true, _dev_level_reset))
 
 
 func _dev_button(node_name: String, text: String, danger: bool, action: Callable) -> Control:
@@ -804,6 +806,27 @@ func _dev_reset_tutorial() -> void:
 	GameState.tutorial_step = GameState.TutorialStep.RUN1
 	GameState.save_player_save()
 	_dev_done("Tutorial starts again")
+
+
+## Playtest balansa: aktivna sezona skače +5 levela (1 → 6 → … → 21 = put završen → 1). Nagrade
+## na putu ostaju neuzete (Claim), Endless se otvori kad level 15 bude „pređen" (16+).
+func _dev_level_up() -> void:
+	var id := GameState.active_season_id
+	var lv := GameState.season_level(id)
+	_dev_set_level(id, 1 if lv >= LevelPathDomain.COMPLETE else mini(lv + 5, LevelPathDomain.COMPLETE))
+
+
+func _dev_level_reset() -> void:
+	_dev_set_level(GameState.active_season_id, 1)
+
+
+func _dev_set_level(season_id: String, level: int) -> void:
+	GameState.level_path_domain.set_level(season_id, level)
+	GameState.save_player_save()
+	var shown := "Level %d" % level if level <= LevelPathDomain.LEVELS else "Path complete"
+	if GameState.is_endless_unlocked(season_id):
+		shown += " · Endless open"
+	_dev_done(shown)
 
 
 # --- ulaz / izlaz --------------------------------------------------------------

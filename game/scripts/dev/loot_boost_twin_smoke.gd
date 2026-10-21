@@ -103,7 +103,7 @@ func _run() -> void:
 	var season := str(gs.get("active_season_id"))
 	var flower := str(gs.call("star3_type_id_for_season", season))
 	gs.set("garden_crystal_stash", {flower: 40})
-	gs.set("wallet_coins", 1000)
+	gs.set("wallet_coins", 10000)
 	gs.set("home_season_field_open", true)
 	gs.set("home_season_field_id", season)
 	if not is_equal_approx(float(gs.call("get_loot_multiplier")), 1.0) or int(gs.call("get_twin_seeds_level")) != 0:

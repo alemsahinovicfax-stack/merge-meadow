@@ -257,8 +257,11 @@ func _run() -> void:
 		_fail("locked season: the veil must hide every flower"); return
 	if not (content.call("name_boxes") as Array).is_empty():
 		_fail("locked season: no flower name may show"); return
-	if str(content.call("coin_text")) != "320 / 500" or str(content.call("star_text")) != "14 / 20":
-		_fail("need chips expected 320 / 500 and 14 / 20 got %s / %s" % [str(content.call("coin_text")), str(content.call("star_text"))]); return
+	var amber: SeasonDef = SeasonCatalog.get_def("amber_canopy")
+	var want_coin := "320 / %d" % amber.coins_cost
+	var want_star := "14 / %d" % amber.t3_flowers_required
+	if str(content.call("coin_text")) != want_coin or str(content.call("star_text")) != want_star:
+		_fail("need chips expected %s and %s got %s / %s" % [want_coin, want_star, str(content.call("coin_text")), str(content.call("star_text"))]); return
 	if str(home.call("home_play_action")) != "focus" or str(play.get("mode")) != "back":
 		_fail("browsing locked: Play = Back"); return
 	if next.visible:
@@ -471,15 +474,16 @@ func _run() -> void:
 	stage.call("close_season_field", false)
 	await _frames(2)
 
-	# --- 11. Unlock (500 + 20 ★3) ---
-	gs.set("wallet_coins", 1250)
-	gs.set("garden_crystal_stash", {"midnight_lotus": 20})
+	# --- 11. Unlock (cijena Ambera iz seasons.json) ---
+	var amber_def: SeasonDef = SeasonCatalog.get_def("amber_canopy")
+	gs.set("wallet_coins", amber_def.coins_cost + 750)
+	gs.set("garden_crystal_stash", {"midnight_lotus": amber_def.t3_flowers_required})
 	gs.call("set_active_season", "lantern_meadow")
 	home.call("refresh_for_meta_hub")
 	stage.call("show_season", "amber_canopy", false)
 	await _frames(2)
 	if str(stage.call("card_status")) != "unlock":
-		_fail("Amber with 500 + 20: Unlock button"); return
+		_fail("Amber with its price: Unlock button"); return
 	if _veiled(content) != 6 or bool(content.call("has_roster_lock")):
 		_fail("unlock state: veil on all six, lock only on the Unlock button"); return
 	stage.call("press_part", PART_UNLOCK)

@@ -84,9 +84,10 @@ func _run() -> void:
 	if _chip_bg(daisy_chip).is_equal_approx(_chip_bg(pumpkin_chip)):
 		_fail("star-1 daisy bg should differ from star-3 pumpkin")
 		return
-	# Frost Orchard trazi 20 Harvest Pumpkin — chip nosi badge i prije prodaje.
-	if not bool(pumpkin_chip.call("is_reserved")) or str(pumpkin_chip.call("get_badge_text")) != "Kept · 1 / 20":
-		_fail("pumpkin must show 'Kept · 1 / 20', got '%s'" % str(pumpkin_chip.call("get_badge_text")))
+	# Frost Orchard trazi REQ Harvest Pumpkin (seasons.json) — chip nosi badge i prije prodaje.
+	var kept := "Kept · 1 / %d" % SeasonCatalog.get_def("frost_orchard").t3_flowers_required
+	if not bool(pumpkin_chip.call("is_reserved")) or str(pumpkin_chip.call("get_badge_text")) != kept:
+		_fail("pumpkin must show '%s', got '%s'" % [kept, str(pumpkin_chip.call("get_badge_text"))])
 		return
 	if bool(daisy_chip.call("is_reserved")):
 		_fail("daisy is not reserved")

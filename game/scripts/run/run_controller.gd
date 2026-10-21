@@ -4,14 +4,20 @@ extends Node2D
 ## Visuals: design_handoff_run direction A. Obstacle collision stays 64×64.
 ## HUD: design_handoff_run_hud_v2 — jedan red (Level · coin · seed · pauza), traka napretka
 ## lijevo i nagradni grm na šavu staza.
+## Balans ciklus 1 (2026-10-21): brzina raste po levelu (speed_ramp), prepreke mogu doći u
+## paru (dvije staze, jedna slobodna), sjeme se bira po rijetkosti (RunBalance); Endless nema
+## tajmer — stepenica („Pace") svakih RunLevelLibrary.ENDLESS_TIER_SEC s, plijen ostaje cijeli.
 
 const BASE_SCROLL_SPEED := 400.0
 const SPAWN_INTERVAL := 1.2
 const SPAWN_CHANCE := 0.7
 const OBSTACLE_CHANCE := 0.25
 const PICKUP_SEED_CHANCE := 0.30
+## Linija spawna (pickup, prepreka, grm) iznad ekrana.
+const SPAWN_Y := -80.0
+## Tutorial runovi (bez levela) — level i Endless nose svoj speed_ramp.
 const RAMP_STEP := 0.05
-const RAMP_EVERY := 15.0
+const RAMP_EVERY := RunBalance.RAMP_EVERY
 
 const _STATE_RUNNING := 0
 const _STATE_ENDED := 1
@@ -64,6 +70,16 @@ var _spawn_chance: float = SPAWN_CHANCE
 var _obstacle_chance: float = OBSTACLE_CHANCE
 var _pickup_seed_chance: float = PICKUP_SEED_CHANCE
 var _scroll_speed_base: float = BASE_SCROLL_SPEED
+var _speed_ramp: float = RAMP_STEP
+var _pair_chance: float = 0.0
+var _rare2: float = RunBalance.BASE_RARE2
+var _rare3: float = RunBalance.BASE_RARE3
+## Endless: stepenica koja je primijenjena (-1 = još nije) i sekunda prikazana u čipu.
+var _endless_tier: int = -1
+var _clock_shown: int = -1
+## Telemetrija runa (RunTelemetry, samo debug build): šta je izašlo na stazu i šta je Pip uzeo.
+var _tele: Dictionary = {}
+var _end_reason: String = "finish"
 var _guaranteed_seed_done: bool = false
 var _coins_callout_done: bool = false
 var _coins_callout_hide_at: float = -1.0
@@ -194,6 +210,15 @@ func _resume_run() -> void:
 func _reset_common() -> void:
 	_pending_coins = 0
 	_pending_seeds = 0
+	_endless_tier = -1
+	_clock_shown = -1
+	_end_reason = "finish"
+	_tele = RunTelemetry.new_counters()
+	if not _tele.is_empty():
+		# Level i cilj na startu — finish_run poslije pomjeri Level Path na sljedeći level.
+		var endless := GameState.is_endless_mode()
+		_tele["level"] = 0 if endless else GameState.run_level
+		_tele["target_sec"] = 0.0 if endless else GameState.get_run_duration()
 	if _pickup_fx != null:
 		_pickup_fx.clear()
 	if not _world_ready:
@@ -231,18 +256,29 @@ func _process(delta: float) -> void:
 
 	_update_tutorial_run_events()
 
-	var ramp_level := int(elapsed / RAMP_EVERY)
-	scroll_speed = _scroll_speed_base * pow(1.0 + RAMP_STEP, ramp_level)
+	if _endless_ramp_active():
+		_update_endless_tier()
+		scroll_speed = _scroll_speed_base
+	else:
+		var ramp_level := int(elapsed / RAMP_EVERY)
+		scroll_speed = _scroll_speed_base * pow(1.0 + _speed_ramp, ramp_level)
+	RunTelemetry.note_speed(_tele, scroll_speed, delta)
 
 	spawn_timer += delta
+	var open := _spawn_reaches_pip()
 	if spawn_timer >= _spawn_interval:
 		spawn_timer = 0.0
-		_try_spawn()
-	_update_bush_spawn()
+		if open:
+			_try_spawn()
+	if open:
+		_update_bush_spawn()
 
 	_shift_world(delta, scroll_speed)
-	# Brojevi u headeru se mijenjaju samo na pickupu; po frejmu ide samo traka.
+	# Brojevi u headeru se mijenjaju samo na pickupu; po frejmu ide samo traka. Endless čip
+	# nosi sat — tekst se mijenja jednom u sekundi.
 	_update_rail()
+	if GameState.is_endless_mode() and int(elapsed) != _clock_shown:
+		_update_hud()
 
 
 func _update_tutorial_run_events() -> void:
@@ -296,6 +332,7 @@ func _end_run(failed: bool) -> void:
 	pause_overlay.close(false)
 	_hide_tutorial()
 	GameState.finish_run(seeds_by_type.duplicate(), coin_count, failed, elapsed, twin_count)
+	RunTelemetry.log_run(_tele, _telemetry_row(failed))
 	_play_end_and_leave(failed)
 
 
@@ -442,6 +479,7 @@ func _on_quit_to_camp() -> void:
 	if _state == _STATE_ENDED:
 		return
 	pause_overlay.close(false)
+	_end_reason = "quit"
 	_end_run(true)
 
 
@@ -497,6 +535,7 @@ func _layout_popup_root() -> void:
 
 
 ## R3 · „If you quit": isti kept/was kao finish_run na padu — prvo × loot multiplier, pa ceil 50 %.
+## Endless: izlazak čuva sve (GameState.keeps_full_loot_on_fail).
 func _fill_pause() -> void:
 	for b in [keep_button, quit_button]:
 		if b.get_parent() != null:
@@ -504,16 +543,17 @@ func _fill_pause() -> void:
 	pause_overlay.clear_content()
 	var chips: Array = []
 	var mult := GameState.get_loot_multiplier()
+	var full := GameState.keeps_full_loot_on_fail()
 	if coin_count > 0:
 		var scaled_coins := GameState.scale_loot_coins(coin_count, mult)
-		var kept_coins := int(ceil(float(scaled_coins) * 0.5))
-		chips.append(RewardChip.new().setup("coin", "", kept_coins, scaled_coins, false, false))
+		var kept_coins := scaled_coins if full else int(ceil(float(scaled_coins) * 0.5))
+		chips.append(RewardChip.new().setup("coin", "", kept_coins, -1 if full else scaled_coins, false, false))
 	# Isti Loot Boost kao finish_run (bonus na ukupno, pa po tipu).
 	var scaled_seeds := GameState.scale_loot_seeds(seeds_by_type, mult)
 	for type_id in scaled_seeds:
 		var scaled_n := int(scaled_seeds[type_id])
-		var kept_n := int(ceil(float(scaled_n) * 0.5))
-		chips.append(RewardChip.new().setup("seed", str(type_id), kept_n, scaled_n, false, false))
+		var kept_n := scaled_n if full else int(ceil(float(scaled_n) * 0.5))
+		chips.append(RewardChip.new().setup("seed", str(type_id), kept_n, -1 if full else scaled_n, false, false))
 	var tray := RewardTray.new().setup(880.0, chips, UiPopups.S_IF_YOU_QUIT)
 	tray.name = "RewardTray"
 	pause_overlay.content.add_child(PopupModal.centered(tray))
@@ -559,7 +599,8 @@ func _shift_world(delta: float, speed: float) -> void:
 	var remove_y := _viewport_size().y + 100.0
 	for child in world.get_children():
 		child.position.y += speed * delta
-		if child.position.y > remove_y:
+		if child.position.y > remove_y and not child.is_queued_for_deletion():
+			RunTelemetry.note_left_screen(_tele, child)
 			child.queue_free()
 	if background and background.has_method("add_scroll"):
 		background.add_scroll(speed * delta)
@@ -579,6 +620,7 @@ func _spawn_obstacle_at_lane(lane: int) -> void:
 	obstacle.position = Vector2(lane_x_positions[lane], -80.0)
 	_decorate_obstacle(obstacle)
 	world.add_child(obstacle)
+	RunTelemetry.count(_tele, "obstacles_spawned")
 
 
 func _apply_run_level_config() -> void:
@@ -587,14 +629,59 @@ func _apply_run_level_config() -> void:
 	_spawn_chance = SPAWN_CHANCE
 	_obstacle_chance = OBSTACLE_CHANCE
 	_pickup_seed_chance = PICKUP_SEED_CHANCE
+	_speed_ramp = RAMP_STEP
+	_pair_chance = 0.0
+	_rare2 = RunBalance.BASE_RARE2
+	_rare3 = RunBalance.BASE_RARE3
 	if not GameState.uses_run_level_config():
 		return
-	var cfg = GameState.get_active_run_level_config()
+	if _endless_ramp_active():
+		# Revive nastavlja na stepenici u kojoj je Pip pao.
+		_endless_tier = -1
+		_update_endless_tier()
+		return
+	_apply_cfg(GameState.get_active_run_level_config())
+
+
+func _apply_cfg(cfg) -> void:
 	_scroll_speed_base = BASE_SCROLL_SPEED * cfg.scroll_speed_mult
+	_speed_ramp = cfg.speed_ramp
 	_spawn_interval = cfg.spawn_interval
 	_spawn_chance = cfg.spawn_chance
 	_obstacle_chance = cfg.obstacle_chance
+	_pair_chance = cfg.pair_chance
 	_pickup_seed_chance = cfg.pickup_seed_chance
+	_rare2 = cfg.rare2_mult
+	_rare3 = cfg.rare3_mult
+
+
+func _endless_ramp_active() -> bool:
+	return GameState.is_endless_mode() and GameState.uses_run_level_config()
+
+
+## Endless: nova stepenica svakih ENDLESS_TIER_SEC s — brže, gušće, više prepreka i parova.
+func _update_endless_tier() -> void:
+	var tier := RunLevelLibrary.endless_tier(elapsed)
+	if tier == _endless_tier:
+		return
+	_endless_tier = tier
+	_apply_cfg(RunLevelLibrary.get_endless_config_at(elapsed))
+	RunTelemetry.note_max(_tele, "tier_max", tier)
+
+
+## Pred kraj levela se ne stvara ništa što ne bi stiglo do Pipa prije kraja (playtest 2026-10-21:
+## plijen je ostajao ispred Pipa kad run stane). Put od linije spawna do Pipa po trenutnoj brzini —
+## brzina samo raste, pa stvarni dolazak nije kasniji. Endless nema kraja.
+func _spawn_reaches_pip() -> bool:
+	var duration := GameState.get_run_duration()
+	if is_inf(duration):
+		return true
+	return elapsed + (player.position.y - SPAWN_Y) / maxf(scroll_speed, 1.0) < duration
+
+
+## Endless stepenica (0, 1, 2…) — za HUD / provjere; -1 izvan Endlessa.
+func endless_tier() -> int:
+	return _endless_tier if _endless_ramp_active() else -1
 
 
 func _try_spawn() -> void:
@@ -607,10 +694,14 @@ func _try_spawn() -> void:
 	# Fer grm: nema prepreke u susjednim stazama ±300 px od grma — umjesto nje ide pickup.
 	if GameState.obstacles_enabled_for_run() and randf() < _obstacle_chance \
 			and not _bush_blocks_lane(lane, spawn_pos.y):
-		var obstacle := _obstacle_scene.instantiate()
-		obstacle.position = spawn_pos
-		_decorate_obstacle(obstacle)
-		world.add_child(obstacle)
+		_spawn_obstacle_at_lane(lane)
+		RunTelemetry.count(_tele, "obstacle_rows")
+		# Par: druga staza u istom redu — treća uvijek ostaje slobodna.
+		if randf() < _pair_chance:
+			var other := RunBalance.pair_lane(lane, randf())
+			if not _bush_blocks_lane(other, spawn_pos.y):
+				_spawn_obstacle_at_lane(other)
+				RunTelemetry.count(_tele, "pairs")
 	elif randf() < _effective_seed_spawn_chance():
 		var seed := _seed_scene.instantiate()
 		seed.position = spawn_pos
@@ -619,11 +710,13 @@ func _try_spawn() -> void:
 			seed.setup(type_id, GameState.get_seed_rarity(type_id))
 		seed.collected.connect(_on_seed_collected)
 		world.add_child(seed)
+		RunTelemetry.count(_tele, "seeds_spawned")
 	else:
 		var coin := _coin_scene.instantiate()
 		coin.position = spawn_pos
 		coin.collected.connect(_on_coin_collected)
 		world.add_child(coin)
+		RunTelemetry.count(_tele, "coins_spawned")
 
 
 func _decorate_obstacle(obstacle: Node) -> void:
@@ -643,7 +736,7 @@ func _effective_seed_spawn_chance() -> float:
 
 
 func _pick_seed_type_id() -> String:
-	return GameState.pick_random_run_seed_type()
+	return GameState.pick_run_seed_type(_rare2, _rare3)
 
 
 ## Pip portret u headeru je izbačen (Run HUD v2) — animacija ide samo Pipu na stazi.
@@ -657,6 +750,7 @@ func _pip_play(run_id: String) -> void:
 ## Zvuk i Pip reakcija idu u trenutku dodira (_on_pickup_touch), broj na čipu kad pilula stigne.
 func _on_coin_collected(at: Vector2) -> void:
 	coin_count += 1
+	RunTelemetry.count(_tele, "coins_collected")
 	if _pickup_fx != null:
 		_pending_coins += 1
 		_pickup_fx.start_coin(at)
@@ -671,6 +765,7 @@ func _on_seed_collected(type_id: String, at: Vector2) -> void:
 	if amount == 2:
 		twin_count += 1
 	seeds_by_type[type_id] = int(seeds_by_type.get(type_id, 0)) + amount
+	RunTelemetry.count(_tele, "seeds_collected")
 	# +2 ide u loot prije množitelja. Lanac otključavanja i dalje broji jedan pickup.
 	GameState.record_seed_pickup_lifetime(type_id, 1)
 	if _pickup_fx != null:
@@ -840,7 +935,33 @@ func _on_player_hit_obstacle() -> void:
 	if _state == _STATE_RUNNING:
 		Sfx.play("run_hit")
 		Sfx.haptic(60)
+		_end_reason = "hit"
 	_end_run(true)
+
+
+## Red za RunTelemetry poslije finish_run (plijen); level i cilj su upisani na startu (_reset_common).
+func _telemetry_row(failed: bool) -> Dictionary:
+	var by_rarity := {1: 0, 2: 0, 3: 0}
+	for type_id in seeds_by_type:
+		var r := clampi(GameState.get_seed_rarity(str(type_id)), 1, 3)
+		by_rarity[r] = int(by_rarity[r]) + int(seeds_by_type[type_id])
+	var endless := GameState.is_endless_mode()
+	return {
+		"season": GameState.active_season_id,
+		"mode": "endless" if endless else ("level" if GameState.uses_run_level_config() else "tutorial"),
+		"elapsed": elapsed,
+		"end": _end_reason if failed else "finish",
+		"magnet": GameState.magnet_level,
+		"loot": GameState.multiplier_level,
+		"twin": GameState.get_twin_seeds_level(),
+		"bushes_spawned": bushes_spawned,
+		"bushes_collected": bushes_collected,
+		"loot_coins": GameState.last_run_coins,
+		"loot_seeds": GameState.last_loot,
+		"r1": by_rarity[1],
+		"r2": by_rarity[2],
+		"r3": by_rarity[3],
+	}
 
 
 func _update_hud() -> void:
@@ -849,9 +970,10 @@ func _update_hud() -> void:
 	coin_counter_label.text = "%d" % maxi(0, coin_count - _pending_coins)
 	seed_counter_label.text = "%d" % maxi(0, _sum_run_seeds() - _pending_seeds)
 	var endless := GameState.is_endless_mode()
+	_clock_shown = int(elapsed)
 	var text := UiRun.mode_text(
 		endless,
-		GameState.get_endless_difficulty_label(),
+		UiRun.endless_clock(elapsed),
 		GameState.uses_run_level_config(),
 		GameState.run_level,
 	)

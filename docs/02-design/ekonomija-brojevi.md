@@ -8,7 +8,7 @@ povezano:
   - spec-vertical-slice
   - mehanike/_archive/merge-kamp
   - CHECKPOINT
-ai_sažetak: "Sve balans-konstante slice-a na jednom mjestu (run, loot, kamp, sprinkler) + gdje su u kodu."
+ai_sažetak: "Sve balans-konstante na jednom mjestu (run, loot, kamp, nadogradnje, cijene) + gdje su u kodu. Balans ciklus 1 (2026-10-21): leveli 1–20 u levels.json, sjeme po rijetkosti, Endless rampa, nove cijene."
 ---
 
 # Ekonomija — brojevi (live tablica)
@@ -19,25 +19,34 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 
 > Greybox draft — mijenja se nakon playtesta.
 
-## Run (`scripts/run/run_controller.gd`)
+## Run (`scripts/run/run_controller.gd` + `data/run_levels/levels.json`)
+
+> **Balans ciklus 1 (2026-10-21):** leveli 1–20 i Endless su u `levels.json` (tabela i zašto: [[balans-ciklus-1-izvjestaj|balans-ciklus-1-izvjestaj]], [[../03-content/nivoi/_index|nivoi]]). Konstante ispod važe samo za tutorial runove.
 
 | Konstanta | Vrijednost | Značenje |
 |-----------|-----------|----------|
-| `RUN_DURATION` | `60.0` s (post-tutorial) / `75` kanon M8 | `POST_TUTORIAL_RUN_DURATION` u `game_state.gd` |
-| `BASE_SCROLL_SPEED` | `400.0` px/s | početna brzina |
-| `RAMP_STEP` | `0.05` | +5% brzine po koraku |
-| `RAMP_EVERY` | `15.0` s | ramp interval |
-| `SPAWN_INTERVAL` | `1.2` s | spawn pokušaj |
-| `SPAWN_CHANCE` | `0.7` | šansa spawna |
-| `OBSTACLE_CHANCE` | `0.25` | udio prepreka |
-| `PICKUP_SEED_CHANCE` | `0.30` | udio sjemena (ostatak coin) |
+| Level 1 → 20 | 60 → 120 s · start 400 → 520 px/s · ubrzanje 2 → 3,5 % / 15 s · prepreke 6 → 30 % · parovi 0 (do L5) → 30 % · sjeme 28 → 34 % | `levels.json` → `RunLevelLibrary.get_level` |
+| Endless | stepenica svakih 20 s (`ENDLESS_TIER_SEC`), ključevi 0 / 1 / 2 / 3 / 5 / 8 min, poslije +4 % brzine po stepenici; prepreke i parovi ≤ 45 % | `levels.json` → `get_endless_config_at` |
+| `BASE_SCROLL_SPEED` | `400.0` px/s | ×`scroll_speed_mult` levela |
+| `RAMP_STEP` | `0.05` | samo tutorial; level / Endless nose `speed_ramp` |
+| `RAMP_EVERY` | `15.0` s | `RunBalance.RAMP_EVERY` |
+| `SPAWN_INTERVAL` / `SPAWN_CHANCE` / `OBSTACLE_CHANCE` / `PICKUP_SEED_CHANCE` | `1.2` / `0.7` / `0.25` / `0.30` | samo tutorial runovi |
+
+### Sjeme po rijetkosti (`scripts/run/run_balance.gd`)
+
+| Pravilo | Vrijednost |
+|---------|-----------|
+| Izbor tipa | težinski: ★1 = 1, ★2 = `rare2_mult`, ★3 = `rare3_mult` (iz levela / Endless stepenice) |
+| Level 1 → 20 | ★2 0,40 → 0,60 · ★3 0,12 → 0,30 → ★3 = 3,1 → 6,7 % sjemena (bilo 16,7 % — jednako kao ★1) |
+| Endless | ★3 0,15 → 0,55 (8 min) — uvijek rjeđi od ★2 |
+| Van runa (Loot Burst bez cilja) | težine levela 1 (`BASE_RARE2/3`) |
 
 ## Loot (`game_state.gd → finish_run`)
 
 | Pravilo | Formula |
 |---------|---------|
 | Finish | 100% sjemena + novčića |
-| Fail | `ceil(50%)` oba (novčići + sjeme) |
+| Fail | `ceil(50%)` oba (novčići + sjeme) — **ne u Endlessu** (`ENDLESS_KEEPS_FULL_LOOT`): pad / izlazak čuva sve |
 | Double | ×2 **samo loot trenutnog runa** (`last_*`); wallet + bonus jednom za ovaj run |
 | Revive | nastavi run, ne dira loot |
 | To Camp | sjemena → `seed_bag`; novčići već u `wallet_coins` pri `finish_run` |
@@ -57,12 +66,23 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | Debug playtest | `DEBUG_DEV_RESOURCES` → **20 coins + 20 Clover** na boot / ulaz u kamp |
 | Loadout (F5) | 1 slot, `LOADOUT_SPAWN_BONUS` **+5%** šanse za sjeme u runu |
 
-### Shop cijene (draft — M8)
+### Shop cijene (balans ciklus 1, 2026-10-21)
 
-| Item | Cijena (coins) |
-|------|----------------|
-| Pip skin | 250 |
-| Pozadina livade | 150 |
+| Item | Cijena (coins) | Ranije |
+|------|----------------|--------|
+| Golden Album | 800 | 120 |
+| Sunset Meadow | 1000 | 150 |
+| Lavender Meadow | 1200 | 180 |
+| Pip Sky | 2000 | 200 |
+| Pip Blossom | 2500 | 250 |
+
+### Sezone (`data/seasons/seasons.json`)
+
+| Sezona | Coini | ★3 prethodne sezone | Ranije |
+|--------|-------|---------------------|--------|
+| Frost Orchard | 2500 | 22 Harvest Pumpkin | 500 + 20 |
+| Lantern Meadow | 4500 | 26 Crystal Peony | 500 + 20 |
+| Amber Canopy | 6500 | 30 Midnight Lotus | 500 + 20 |
 
 ### Otvoreni targeti (playtest — F4 pass 1, 2026-07-29)
 
@@ -88,8 +108,9 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | `SEED_BAG_SOFT_CAP` | ~~40~~ | **više nije limit (2026-10-16):** vreća prima sav plijen runa, ostatak Arene i poklon. Ranije se višak tiho gubio (playtest: „sjemena iz runa ne dođu u Camp"). 40 ostaje samo kao „puna korpa" u crtežu |
 | auto-plant | pri ulasku u kamp + nakon Keep/chest | preskače tutorial CAMP1 |
 | `CAMP_BED_BONUS` | **+3** gredice | kad je Sprinkler max (9→12) |
-| `DAILY_CHEST_COINS` | **8** | jednom dnevno (save `last_daily_chest_day`) |
-| `DAILY_CHEST_SEEDS` | **3** | random iz unlocked spawn poola |
+| `DAILY_CHEST_COINS` | **75** (bilo 8) | jednom dnevno (save `last_daily_chest_day`) |
+| `DAILY_CHEST_SEEDS` | **5** (bilo 3) | random iz unlocked spawn poola |
+| Arena combo | **5** coina, max **30** / dan (bilo 2 / 10) | `ArenaDomain.COMBO_COINS`, `COMBO_COIN_DAILY_CAP` |
 | `discovered_blooms` | po `type_id` | priprema za dnevnik/setove |
 | `sprinkler_donations` | 0–2 | legacy save polje; CAMP-01 B **ne** koristi za Upgrade |
 | `EXCHANGE_SEED_COUNT` | `1` | sjemena po Trade tapu; držanje dugmeta trguje 10/s (`TRADE_HOLD_RATE`) i prelazi na sljedeći tip |
@@ -113,7 +134,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 |---------|------------|
 | Lanac (linearno) | Clover → Daisy → Buttercup → Tulip → Sunflower → Pumpkin → Watermelon |
 | Unlock trigger | **Lifetime** skupljeno u runovima prethodnog tipa (ne troši torbe) |
-| Pragovi | 10 / 10 / 10 / 12 / 12 / 15 / 15 (prethodni tip → sljedeći) |
+| Pragovi | **8 / 8 / 8 / 6 / 6** (prethodni tip → sljedeći; bilo 10 / 10 / 10 / 12 / 12) — ★2 je rjeđe pa su pragovi niži; Harvest Pumpkin stiže oko levela 12–14 |
 | Auto-unlock | Kad lifetime ≥ prag → sljedeći tip u **spawn poolu** odmah |
 | Coins shortcut | 120 / 150 / 150 / 180 / 200 / 220 (API only — bez Shop UI u v1) |
 | Run spawn | Samo **otključani** tipovi (+ loadout bias) |
@@ -123,10 +144,11 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | Konstanta | Vrijednost |
 |-----------|-----------|
 | `MAGNET_MAX_LEVEL` | `4` |
-| `UPGRADE_FLOWER_COST` | **2 T3 Flowers** po levelu (atomic tap u kampu) |
+| Cijena nivoa (Home polje, po sezoni) | `UiCamp.UP_COIN_COST` **100 / 250 / 500 / 800** C + `UP_FLOWER_COSTS` **2 / 2 / 3 / 3** ★3 sezone (bilo 10 / 20 / 40 / 60 + 2) |
+| `UPGRADE_FLOWER_COST` | 2 — legacy (stari Camp donate API) |
 | `MAGNET_COST_T2` | `2` — legacy broj za stari donate API; resurs upgradea je T3 |
 | `MAGNET_BASE_RADIUS` | `40` px |
-| `MAGNET_RADIUS_PER_LEVEL` | `48` px |
+| `MAGNET_RADIUS_PER_LEVEL` | `55` px (bilo 48) — max 260 px dohvata susjednu stazu (270) |
 | `MULTIPLIER_MAX_LEVEL` | `4` |
 | `MULTIPLIER_COST_T3` | `2` — legacy donate broj; Loot Boost troši isti `UPGRADE_FLOWER_COST` |
 | `MULTIPLIER_VALUES` | ×1.0, ×1.25, ×1.5, ×1.75, ×2.0 |

@@ -13,7 +13,7 @@ extends RefCounted
 ## - shadow_size 0 u Godotu ne crta sjenu — sjene imaju mali blur.
 ## - Okvir cvijeta je coin gold #FFD56B (ne UI gold), brojac taba 60 × 88 · r 14,
 ##   rub spremnog Unlock dugmeta #BA9D3B.
-## Pravila i brojevi nisu mijenjani: tap = 1, drzanje = 10/s, 500 + 20.
+## Pravila nisu mijenjana: tap = 1, drzanje = 10/s; cijena sezone je iz seasons.json.
 
 # --- Nijanse (izvedene iz ui_palette.gd) ---
 const INK := Color("#2D3436")              # = UiPalette.OUTLINE
@@ -95,8 +95,10 @@ const MERGE_LAST := Color("#FFE8B8")
 const T_MERGE_MARK := 0.14
 const T_MERGE_LINE := 0.16                   # TradeBar 152 ↔ 212 kad se linija pojavi / nestane
 const UP_LEVELS := 4
-const UP_FLOWER_COST := 2
-const UP_COIN_COST: Array[int] = [10, 20, 40, 60]
+## Cijena nivoa nadogradnje (indeks = trenutni nivo 0…3): ★3 cvjetovi sezone + coini. Balans
+## ciklus 1 (2026-10-21): ranije 2 ★3 + 10 / 20 / 40 / 60 — coini su bili u velikom višku.
+const UP_FLOWER_COSTS: Array[int] = [2, 2, 3, 3]
+const UP_COIN_COST: Array[int] = [100, 250, 500, 800]
 const TWIN_STEP := 0.08
 const UP_CAN := "can"
 const UP_SHORT_FLOWER := "short_flower"
@@ -310,7 +312,7 @@ static func twin_chance(level: int) -> float:
 static func upgrade_state(level: int, spendable_flowers: int, coins: int) -> String:
 	if level >= UP_LEVELS:
 		return UP_MAX
-	var ok_f := spendable_flowers >= UP_FLOWER_COST
+	var ok_f := spendable_flowers >= upgrade_flower_cost(level)
 	var ok_c := coins >= int(UP_COIN_COST[clampi(level, 0, UP_COIN_COST.size() - 1)])
 	if ok_f and ok_c:
 		return UP_CAN
@@ -321,6 +323,10 @@ static func upgrade_state(level: int, spendable_flowers: int, coins: int) -> Str
 
 static func upgrade_coin_cost(level: int) -> int:
 	return int(UP_COIN_COST[clampi(level, 0, UP_COIN_COST.size() - 1)])
+
+
+static func upgrade_flower_cost(level: int) -> int:
+	return int(UP_FLOWER_COSTS[clampi(level, 0, UP_FLOWER_COSTS.size() - 1)])
 
 
 ## Season Kit faza 2: kartica sezone crta recept "camp" (season_link_card.gd); tint ostaje

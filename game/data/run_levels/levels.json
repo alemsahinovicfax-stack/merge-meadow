@@ -1,0 +1,49 @@
+{
+  "_doc": [
+    "Run balans, ciklus 1 (2026-10-21). Level N je iste tezine u svakoj sezoni.",
+    "duration_sec: trajanje levela. scroll_speed_mult: brzina na startu (x 400 px/s).",
+    "speed_ramp: brzina raste x(1 + speed_ramp) svakih 15 s unutar levela.",
+    "spawn_interval / spawn_chance: pokusaj spawna i sansa. obstacle_chance: udio prepreka.",
+    "pair_chance: udio prepreka koje zatvore dvije staze (jedna uvijek slobodna).",
+    "pickup_seed_chance: udio sjemena medju pickupima (ostalo coin).",
+    "rare2_mult / rare3_mult: tezina tipa sjemena po rijetkosti (zvjezdica 1 = 1.0).",
+    "endless: stepenica ('Pace') svakih tier_sec s; vrijednosti se interpoliraju izmedju keys i",
+    "drze do sljedece stepenice. Poslije zadnjeg kljuca brzina raste after_last_speed_per_tier po stepenici.",
+    "Provjera: scripts/dev/economy_sim.gd (simulacija) i economy_balance_smoke.gd."
+  ],
+  "levels": [
+    {"id": 1, "duration_sec": 60, "scroll_speed_mult": 1.0, "speed_ramp": 0.02, "spawn_interval": 1.3, "spawn_chance": 0.65, "obstacle_chance": 0.06, "pair_chance": 0.0, "pickup_seed_chance": 0.28, "rare2_mult": 0.4, "rare3_mult": 0.12},
+    {"id": 2, "duration_sec": 64, "scroll_speed_mult": 1.02, "speed_ramp": 0.021, "spawn_interval": 1.28, "spawn_chance": 0.66, "obstacle_chance": 0.067, "pair_chance": 0.0, "pickup_seed_chance": 0.283, "rare2_mult": 0.41, "rare3_mult": 0.13},
+    {"id": 3, "duration_sec": 66, "scroll_speed_mult": 1.03, "speed_ramp": 0.022, "spawn_interval": 1.25, "spawn_chance": 0.66, "obstacle_chance": 0.076, "pair_chance": 0.0, "pickup_seed_chance": 0.286, "rare2_mult": 0.42, "rare3_mult": 0.14},
+    {"id": 4, "duration_sec": 70, "scroll_speed_mult": 1.05, "speed_ramp": 0.022, "spawn_interval": 1.23, "spawn_chance": 0.67, "obstacle_chance": 0.086, "pair_chance": 0.0, "pickup_seed_chance": 0.289, "rare2_mult": 0.43, "rare3_mult": 0.15},
+    {"id": 5, "duration_sec": 72, "scroll_speed_mult": 1.06, "speed_ramp": 0.023, "spawn_interval": 1.21, "spawn_chance": 0.68, "obstacle_chance": 0.097, "pair_chance": 0.0, "pickup_seed_chance": 0.293, "rare2_mult": 0.44, "rare3_mult": 0.16},
+    {"id": 6, "duration_sec": 76, "scroll_speed_mult": 1.08, "speed_ramp": 0.024, "spawn_interval": 1.18, "spawn_chance": 0.68, "obstacle_chance": 0.108, "pair_chance": 0.04, "pickup_seed_chance": 0.296, "rare2_mult": 0.45, "rare3_mult": 0.17},
+    {"id": 7, "duration_sec": 78, "scroll_speed_mult": 1.09, "speed_ramp": 0.025, "spawn_interval": 1.16, "spawn_chance": 0.69, "obstacle_chance": 0.12, "pair_chance": 0.054, "pickup_seed_chance": 0.299, "rare2_mult": 0.46, "rare3_mult": 0.18},
+    {"id": 8, "duration_sec": 82, "scroll_speed_mult": 1.11, "speed_ramp": 0.026, "spawn_interval": 1.13, "spawn_chance": 0.7, "obstacle_chance": 0.132, "pair_chance": 0.071, "pickup_seed_chance": 0.302, "rare2_mult": 0.47, "rare3_mult": 0.19},
+    {"id": 9, "duration_sec": 86, "scroll_speed_mult": 1.13, "speed_ramp": 0.026, "spawn_interval": 1.11, "spawn_chance": 0.7, "obstacle_chance": 0.145, "pair_chance": 0.088, "pickup_seed_chance": 0.305, "rare2_mult": 0.48, "rare3_mult": 0.2},
+    {"id": 10, "duration_sec": 88, "scroll_speed_mult": 1.14, "speed_ramp": 0.027, "spawn_interval": 1.09, "spawn_chance": 0.71, "obstacle_chance": 0.158, "pair_chance": 0.106, "pickup_seed_chance": 0.308, "rare2_mult": 0.49, "rare3_mult": 0.21},
+    {"id": 11, "duration_sec": 92, "scroll_speed_mult": 1.16, "speed_ramp": 0.028, "spawn_interval": 1.06, "spawn_chance": 0.72, "obstacle_chance": 0.171, "pair_chance": 0.124, "pickup_seed_chance": 0.312, "rare2_mult": 0.51, "rare3_mult": 0.21},
+    {"id": 12, "duration_sec": 94, "scroll_speed_mult": 1.17, "speed_ramp": 0.029, "spawn_interval": 1.04, "spawn_chance": 0.73, "obstacle_chance": 0.185, "pair_chance": 0.142, "pickup_seed_chance": 0.315, "rare2_mult": 0.52, "rare3_mult": 0.22},
+    {"id": 13, "duration_sec": 98, "scroll_speed_mult": 1.19, "speed_ramp": 0.029, "spawn_interval": 1.02, "spawn_chance": 0.73, "obstacle_chance": 0.198, "pair_chance": 0.161, "pickup_seed_chance": 0.318, "rare2_mult": 0.53, "rare3_mult": 0.23},
+    {"id": 14, "duration_sec": 102, "scroll_speed_mult": 1.21, "speed_ramp": 0.03, "spawn_interval": 0.99, "spawn_chance": 0.74, "obstacle_chance": 0.212, "pair_chance": 0.18, "pickup_seed_chance": 0.321, "rare2_mult": 0.54, "rare3_mult": 0.24},
+    {"id": 15, "duration_sec": 104, "scroll_speed_mult": 1.22, "speed_ramp": 0.031, "spawn_interval": 0.97, "spawn_chance": 0.75, "obstacle_chance": 0.226, "pair_chance": 0.2, "pickup_seed_chance": 0.324, "rare2_mult": 0.55, "rare3_mult": 0.25},
+    {"id": 16, "duration_sec": 108, "scroll_speed_mult": 1.24, "speed_ramp": 0.032, "spawn_interval": 0.94, "spawn_chance": 0.75, "obstacle_chance": 0.241, "pair_chance": 0.22, "pickup_seed_chance": 0.327, "rare2_mult": 0.56, "rare3_mult": 0.26},
+    {"id": 17, "duration_sec": 110, "scroll_speed_mult": 1.25, "speed_ramp": 0.033, "spawn_interval": 0.92, "spawn_chance": 0.76, "obstacle_chance": 0.255, "pair_chance": 0.239, "pickup_seed_chance": 0.331, "rare2_mult": 0.57, "rare3_mult": 0.27},
+    {"id": 18, "duration_sec": 114, "scroll_speed_mult": 1.27, "speed_ramp": 0.033, "spawn_interval": 0.9, "spawn_chance": 0.77, "obstacle_chance": 0.27, "pair_chance": 0.259, "pickup_seed_chance": 0.334, "rare2_mult": 0.58, "rare3_mult": 0.28},
+    {"id": 19, "duration_sec": 116, "scroll_speed_mult": 1.28, "speed_ramp": 0.034, "spawn_interval": 0.87, "spawn_chance": 0.77, "obstacle_chance": 0.285, "pair_chance": 0.28, "pickup_seed_chance": 0.337, "rare2_mult": 0.59, "rare3_mult": 0.29},
+    {"id": 20, "duration_sec": 120, "scroll_speed_mult": 1.3, "speed_ramp": 0.035, "spawn_interval": 0.85, "spawn_chance": 0.78, "obstacle_chance": 0.3, "pair_chance": 0.3, "pickup_seed_chance": 0.34, "rare2_mult": 0.6, "rare3_mult": 0.3}
+  ],
+  "endless": {
+    "tier_sec": 20,
+    "keys": [
+      {"t": 0, "scroll_speed_mult": 1.0, "spawn_interval": 1.25, "spawn_chance": 0.66, "obstacle_chance": 0.08, "pair_chance": 0.0, "pickup_seed_chance": 0.29, "rare2_mult": 0.45, "rare3_mult": 0.15},
+      {"t": 60, "scroll_speed_mult": 1.15, "spawn_interval": 1.1, "spawn_chance": 0.7, "obstacle_chance": 0.16, "pair_chance": 0.06, "pickup_seed_chance": 0.3, "rare2_mult": 0.5, "rare3_mult": 0.2},
+      {"t": 120, "scroll_speed_mult": 1.35, "spawn_interval": 0.98, "spawn_chance": 0.74, "obstacle_chance": 0.24, "pair_chance": 0.15, "pickup_seed_chance": 0.31, "rare2_mult": 0.55, "rare3_mult": 0.27},
+      {"t": 180, "scroll_speed_mult": 1.55, "spawn_interval": 0.88, "spawn_chance": 0.77, "obstacle_chance": 0.3, "pair_chance": 0.24, "pickup_seed_chance": 0.32, "rare2_mult": 0.6, "rare3_mult": 0.34},
+      {"t": 300, "scroll_speed_mult": 1.9, "spawn_interval": 0.78, "spawn_chance": 0.8, "obstacle_chance": 0.36, "pair_chance": 0.32, "pickup_seed_chance": 0.33, "rare2_mult": 0.65, "rare3_mult": 0.45},
+      {"t": 480, "scroll_speed_mult": 2.3, "spawn_interval": 0.7, "spawn_chance": 0.82, "obstacle_chance": 0.4, "pair_chance": 0.38, "pickup_seed_chance": 0.34, "rare2_mult": 0.7, "rare3_mult": 0.55}
+    ],
+    "after_last_speed_per_tier": 0.04,
+    "max": {"obstacle_chance": 0.45, "pair_chance": 0.45}
+  }
+}

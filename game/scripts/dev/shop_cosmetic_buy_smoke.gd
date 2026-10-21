@@ -38,7 +38,10 @@ func _run() -> void:
 	if shop == null or gs == null:
 		_fail("shop/GameState missing")
 		return
-	gs.set("wallet_coins", 300)
+	# Dovoljno za Sunset Meadow, a poslije kupovine premalo za Pip Blossom (cosmetics.json).
+	var price := CosmeticCatalog.get_coin_cost("meadow_sunset")
+	var start := price * 2
+	gs.set("wallet_coins", start)
 	var cosmetics: Object = gs.get("cosmetics")
 	cosmetics.set("owned", {})
 	cosmetics.set("equipped", {})
@@ -50,8 +53,8 @@ func _run() -> void:
 		_fail("meadow_sunset card missing")
 		return
 	var btn: Node = card.call("get_buy_button")
-	if str(card.call("get_state")) != "coins.buy" or str(btn.get("price")) != "150":
-		_fail("expected coins.buy 150, got %s %s" % [card.call("get_state"), btn.get("price")])
+	if str(card.call("get_state")) != "coins.buy" or str(btn.get("price")) != str(price):
+		_fail("expected coins.buy %d, got %s %s" % [price, card.call("get_state"), btn.get("price")])
 		return
 
 	# Prvi tap: potvrda na istom dugmetu, coini netaknuti.
@@ -60,7 +63,7 @@ func _run() -> void:
 	if str(shop.call("get_confirm_id")) != "meadow_sunset" or str(card.call("get_state")) != "coins.confirm":
 		_fail("first tap should arm the confirm state")
 		return
-	if int(gs.get("wallet_coins")) != 300:
+	if int(gs.get("wallet_coins")) != start:
 		_fail("first tap must not spend coins")
 		return
 	# 3 s bez tapa → nazad na coins.buy.
@@ -74,8 +77,8 @@ func _run() -> void:
 	await _frames(2)
 	btn.emit_signal("clicked")
 	await _frames(4)
-	if int(gs.get("wallet_coins")) != 150:
-		_fail("wallet expected 150 got %s" % str(gs.get("wallet_coins")))
+	if int(gs.get("wallet_coins")) != start - price:
+		_fail("wallet expected %d got %s" % [start - price, str(gs.get("wallet_coins"))])
 		return
 	if not bool(gs.call("owns_cosmetic", "meadow_sunset")):
 		_fail("meadow_sunset should be owned")
@@ -93,12 +96,12 @@ func _run() -> void:
 	# Nema dovoljno coina: coins.short, tap ne troši i ne potvrđuje.
 	var sky: Node = shop.call("get_cosmetic_card", "pip_blossom")
 	if str(sky.call("get_state")) != "coins.short":
-		_fail("pip_blossom (250) with 150 coins should be coins.short, got %s" % str(sky.call("get_state")))
+		_fail("pip_blossom with %d coins should be coins.short, got %s" % [start - price, str(sky.call("get_state"))])
 		return
 	var short_btn: Node = sky.call("get_buy_button")
 	short_btn.emit_signal("short_tapped")
 	await _frames(3)
-	if int(gs.get("wallet_coins")) != 150 or str(shop.call("get_confirm_id")) != "":
+	if int(gs.get("wallet_coins")) != start - price or str(shop.call("get_confirm_id")) != "":
 		_fail("short tap must not spend or arm confirm")
 		return
 

@@ -12,8 +12,9 @@ const CHAIN: Array[String] = [
 	"pumpkin",
 ]
 
-# CHAIN[i] lifetime collected → unlock CHAIN[i + 1]
-const LIFETIME_TO_UNLOCK_NEXT: Array[int] = [10, 10, 10, 12, 12, 15]
+# CHAIN[i] lifetime collected → unlock CHAIN[i + 1]. Balans ciklus 1: ★2 sjeme je rjeđe (težine
+# po rijetkosti), pa su pragovi niži — Harvest Pumpkin (★3) stiže oko levela 12–14 Country Blooma.
+const LIFETIME_TO_UNLOCK_NEXT: Array[int] = [8, 8, 8, 6, 6, 15]
 
 # Coins to unlock CHAIN[i] early (CHAIN[0] always free at start)
 const COIN_UNLOCK_COST: Array[int] = [0, 120, 150, 150, 180, 200]

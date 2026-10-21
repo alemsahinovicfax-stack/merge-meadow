@@ -121,13 +121,16 @@ func _check_modes(run: Node) -> void:
 	var m := _mode(run)
 	if m[0] != "Level 12" or not m[1] or not m[2] or m[3] != 48:
 		_fail("level mode → %s" % str(m))
+	# Endless (balans ciklus 1): čip nosi preživljeno vrijeme umjesto Easy / Normal / Hard.
 	_gs.set("run_is_endless", true)
-	for d in [0, 1, 2]:
-		_gs.set("endless_difficulty", d)
+	var was_elapsed := float(run.get("elapsed"))
+	for sec in [0.0, 65.0, 3599.0]:
+		run.set("elapsed", sec)
 		m = _mode(run)
-		var want := "Endless · %s" % ["Easy", "Normal", "Hard"][d]
+		var want := "Endless · %s" % UiRun.endless_clock(sec)
 		if m[0] != want or m[1] or m[2] or m[3] != 42 or m[4]:
-			_fail("endless %d → %s (want text, no flag, no rail, 42 px, not clipped)" % [d, str(m)])
+			_fail("endless %.0f s → %s (want %s, no flag, no rail, 42 px, not clipped)" % [sec, str(m), want])
+	run.set("elapsed", was_elapsed)
 	_gs.set("run_is_endless", false)
 	_gs.set("tutorial_complete", false)
 	m = _mode(run)

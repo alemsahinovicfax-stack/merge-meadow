@@ -9,6 +9,18 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-21
+
+- **Balans ekonomije — ciklus 1** (izvještaj `02-design/balans-ciklus-1-izvjestaj.md`):
+  - **Run:** leveli 1–20 u `data/run_levels/levels.json` (zamjenjuje `levels_1_10.json` + krivulju do 100) — svaki level duži (60 → 120 s), brži (start 400 → 520 px/s, ubrzanje 2 → 3,5 % / 15 s), više prepreka (6 → 30 %), od levela 6 **parovi** (dvije staze, treća slobodna, 4 → 30 %), više plijena po levelu.
+  - **Sjeme po rijetkosti** (`RunBalance`): ★1 težina 1, ★2 0,40 → 0,60, ★3 0,12 → 0,30 (level 1 → 20) — ★3 je 3–7 % sjemena umjesto 16,7 %; isto za grm. Lanac Country Blooma 10/10/10/12/12 → 8/8/8/6/6.
+  - **Endless:** bez tajmera i bez Easy / Normal / Hard — stepenica svakih 20 s (brže, gušće, više prepreka i parova, rjeđe sjeme češće), kreće kao level 2–3; plijen ostaje cijeli; rekord po sezoni (`season_endless_best`); **otključan poslije levela 15** te sezone (zaključan: prigušeno dugme + toast). Čip „Endless · m:ss", Loot ekran „Endless · m:ss" / „Best! m:ss" bez „Kept half" — privremeno do CD paketa.
+  - **Cijene:** sezone 500 + 20 ★3 → Frost 2500 + 22, Lantern 4500 + 26, Amber 6500 + 30; nadogradnje 10/20/40/60 C + 2 ★3 → 100/250/500/800 C + 2/2/3/3 ★3; izgledi 120–250 → 800–2500; dnevni poklon 8 C + 3 → 75 C + 5 sjemena; Arena combo 2 (max 10/dan) → 5 (max 30); Starter Pack 100 → 1000 coina. Vrijednost cvijeća i sjemena (Trade) i Level Path nagrade nepromijenjene.
+  - **Magnet** 40 + 48 × nivo → 40 + 55 × nivo: max (260 px) prvi put dohvata susjednu stazu.
+  - **Alati:** `scripts/dev/economy_sim.gd` (leveli, Endless, vrijednost nadogradnji, put kroz 4 sezone × 3 profila × 3 politike, kalibracija), `RunTelemetry` → `user://balance_log.csv` (samo debug build), `economy_balance_smoke`, GUT `test_run_balance` (78/78); 20 smoke testova sada čita cijene iz podataka umjesto 500 / 20.
+- **Poslije playtesta (isti dan):** odluke po preporuci (Endless poslije pređenog levela 15, Starter Pack 1000 C, magnet ostaje 40 + 55/nivo); magnet krug u runu alfa 0,6 → 0,32; pred kraj levela nema spawna koji ne bi stigao do Pipa (bio je plijen ispred Pipa kad run stane — katalog #49); Level Path: pilula „Claim" izbačena (crtala se van zone dodira — #48), dodir hvata sanduk i traku ispod, spremni sanduk skače i klima se (privremeno); CD brief dopunjen: cilj na kraju levela (A6) i spremni sanduk (C), slike e11 / e12.
+- **Brief za Claude Design** `leveli-endless-cd-brief.md` — kako izgleda nova težina i Endless (pojasevi težine, najava levela, ubrzanje, par prepreka po sezoni, zaključan / otključan Endless, Endless HUD, kraj i rekord); slike `leveli-endless-ref/` (`balance_capture.gd`).
+
 ## 2026-10-20 (2)
 
 - **Paket `design_handoff_level_path` u igri** (izvještaj `design-drafts/level-path-izvjestaj.md`):

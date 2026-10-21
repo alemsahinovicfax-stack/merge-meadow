@@ -66,12 +66,12 @@ func unlock_all_seasons() -> void:
 func grant_unlock_test_funds() -> void:
 	if not OS.is_debug_build():
 		return
-	_owner.wallet_coins = maxi(_owner.wallet_coins, 500)
 	var next_id: String = _owner.next_locked_free_id()
 	if next_id.is_empty():
 		_owner.save_player_save()
 		return
 	var def := SeasonCatalog.get_def(next_id)
+	_owner.wallet_coins = maxi(_owner.wallet_coins, def.coins_cost if def != null else 500)
 	var need := 20
 	if def != null:
 		need = def.t3_flowers_required
@@ -144,10 +144,12 @@ func fixture_s1_star3_playtest() -> void:
 	_owner.home_season_field_open = false
 	_owner.home_season_field_id = ""
 	_owner._normalize_season_progress()
-	_owner.wallet_coins = maxi(_owner.wallet_coins, 500)
+	# Jedan ★3 manje od uslova sljedeće sezone (playtest otključavanja).
+	var s2 := SeasonCatalog.get_def("frost_orchard")
+	_owner.wallet_coins = maxi(_owner.wallet_coins, s2.coins_cost if s2 != null else 500)
 	for type_id in _owner.star3_type_ids_for_season(default_id):
 		_owner.garden_crystal_stash.erase(type_id)
-	_owner.garden_crystal_stash["pumpkin"] = 19
+	_owner.garden_crystal_stash["pumpkin"] = (s2.t3_flowers_required if s2 != null else 20) - 1
 	remap_seed_bag_to_season(default_id)
 	_owner.seed_bag["pumpkin"] = 22
 	_owner.save_player_save()

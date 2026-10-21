@@ -15,8 +15,8 @@
 class_name ArenaDomain
 extends RefCounted
 
-const COMBO_COINS := 2
-const COMBO_COIN_DAILY_CAP := 10
+const COMBO_COINS := 5
+const COMBO_COIN_DAILY_CAP := 30
 const DAILY_KINDS: PackedStringArray = ["merge_t2", "make_t3", "combo_5"]
 
 var combo_coin_day: String = ""

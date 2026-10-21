@@ -49,8 +49,9 @@ func _run() -> void:
 		_fail("S1 pool must not include watermelon")
 		return
 
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"pumpkin": 20})
+	var frost: SeasonDef = SeasonCatalog.get_def("frost_orchard")
+	gs.set("wallet_coins", frost.coins_cost)
+	gs.set("garden_crystal_stash", {"pumpkin": frost.t3_flowers_required})
 	if not bool(gs.call("unlock_free", "frost_orchard")):
 		_fail("could not unlock frost_orchard")
 		return
@@ -92,8 +93,8 @@ func _run() -> void:
 	# modulate je samo kozmetika i ostaje isti; mijenja se run kita.
 	var m1: Color = bg.get("modulate")
 	var run1: Dictionary = bg.get("_run")
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"pumpkin": 20})
+	gs.set("wallet_coins", SeasonCatalog.get_def("frost_orchard").coins_cost)
+	gs.set("garden_crystal_stash", {"pumpkin": SeasonCatalog.get_def("frost_orchard").t3_flowers_required})
 	if not bool(gs.call("unlock_free", "frost_orchard")):
 		_fail("frost unlock before kit compare failed")
 		return

@@ -1,7 +1,7 @@
 extends SceneTree
 
 ## CAMP3-C / design_handoff_camp — hero kartica sljedece sezone: tap vodi na Home
-## bez trosenja; Unlock trosi odmah (500 + 20 ★3), burst na kartici, pa Home.
+## bez trosenja; Unlock trosi odmah (cijena Frosta iz seasons.json), burst na kartici, pa Home.
 
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
 const S1 := "country_bloom"
@@ -111,8 +111,11 @@ func _run() -> void:
 	if coins_lbl == null or t3_lbl == null or coins_bar == null or t3_bar == null:
 		_fail("progress widgets missing")
 		return
-	if coins_lbl.text != "100 / 500" or t3_lbl.text != "3 / 20":
-		_fail("progress expected '100 / 500' + '3 / 20' got '%s' + '%s'" % [coins_lbl.text, t3_lbl.text])
+	var frost: SeasonDef = SeasonCatalog.get_def(S2)
+	var want_c := "100 / %d" % frost.coins_cost
+	var want_f := "3 / %d" % frost.t3_flowers_required
+	if coins_lbl.text != want_c or t3_lbl.text != want_f:
+		_fail("progress expected '%s' + '%s' got '%s' + '%s'" % [want_c, want_f, coins_lbl.text, t3_lbl.text])
 		return
 	if coins_lbl.get_theme_font_size("font_size") < 44:
 		_fail("season numbers must be >= 44 px")
@@ -146,11 +149,11 @@ func _run() -> void:
 	if absf(_center_y(coins_bar) - _center_y(t3_bar)) > 2.0:
 		_fail("bars must share a row")
 		return
-	if not is_equal_approx(coins_bar.max_value, 500.0) or not is_equal_approx(coins_bar.value, 100.0):
-		_fail("coins bar expected 100/500")
+	if not is_equal_approx(coins_bar.max_value, float(frost.coins_cost)) or not is_equal_approx(coins_bar.value, 100.0):
+		_fail("coins bar expected %s" % want_c)
 		return
-	if not is_equal_approx(t3_bar.max_value, 20.0) or not is_equal_approx(t3_bar.value, 3.0):
-		_fail("T3 bar expected 3/20")
+	if not is_equal_approx(t3_bar.max_value, float(frost.t3_flowers_required)) or not is_equal_approx(t3_bar.value, 3.0):
+		_fail("T3 bar expected %s" % want_f)
 		return
 	if coins_bar.mouse_filter != Control.MOUSE_FILTER_IGNORE:
 		_fail("SeasonLinkCoinsBar must IGNORE")
@@ -220,15 +223,16 @@ func _run() -> void:
 	for _p in 8:
 		await process_frame
 	camp = _page(hub, MetaHubPages.CAMP)
-	gs.set("wallet_coins", 500)
-	gs.set("garden_crystal_stash", {"pumpkin": 20})
+	var frost_def: SeasonDef = SeasonCatalog.get_def(S2)
+	gs.set("wallet_coins", frost_def.coins_cost)
+	gs.set("garden_crystal_stash", {"pumpkin": frost_def.t3_flowers_required})
 	camp.call("refresh_for_meta_hub")
 	for _q in 4:
 		await process_frame
 	card = camp.get_node_or_null("%SeasonLinkCard") as Control
 	unlock_btn = camp.get_node_or_null("%SeasonLinkUnlock") as Control
 	if not bool(gs.call("can_unlock_free", S2)) or str(card.call("get_state")) != "ready":
-		_fail("Frost should be ready with 500c/20 Bloom star-3")
+		_fail("Frost should be ready with its price in coins + Bloom star-3")
 		return
 	if unlock_btn.mouse_filter != Control.MOUSE_FILTER_STOP or bool(unlock_btn.get("disabled")):
 		_fail("affordable Camp Unlock must be enabled and STOP")
@@ -257,12 +261,12 @@ func _run() -> void:
 	card.call("_on_unlock_clicked")
 	await process_frame
 	# Trosi odmah, burst ostaje na Campu.
-	if int(gs.get("wallet_coins")) != coins_before - 500:
-		_fail("Unlock should spend 500 coins at once, before=%d after=%d" % [coins_before, int(gs.get("wallet_coins"))])
+	if int(gs.get("wallet_coins")) != coins_before - frost_def.coins_cost:
+		_fail("Unlock should spend %d coins at once, before=%d after=%d" % [frost_def.coins_cost, coins_before, int(gs.get("wallet_coins"))])
 		return
 	var stash: Dictionary = gs.get("garden_crystal_stash")
 	if int(stash.get("pumpkin", 0)) != 0 or not bool(gs.call("is_season_playable", S2)):
-		_fail("Unlock should spend 20 pumpkin and grant Frost")
+		_fail("Unlock should spend %d pumpkin and grant Frost" % frost_def.t3_flowers_required)
 		return
 	if str(card.call("get_state")) != "unlocking" or str(unlock_btn.call("get_title")) != "Unlocked":
 		_fail("card must show the unlocking moment, state=%s title=%s" % [card.call("get_state"), unlock_btn.call("get_title")])

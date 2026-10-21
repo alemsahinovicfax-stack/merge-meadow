@@ -34,8 +34,9 @@ const SEED_BAG_SOFT_CAP := 40
 ## Arena ne krene dok zbroj stogova od 4+ nije barem ovoliko. Tip s 1–3 ne ulazi.
 const ARENA_GATE_MIN := 50
 const ARENA_MERGE_STACK := 4
-const DAILY_CHEST_COINS := 8
-const DAILY_CHEST_SEEDS := 3
+## Dnevni poklon (balans ciklus 1: ranije 8 C + 3 sjemena — nevidljivo uz nove cijene).
+const DAILY_CHEST_COINS := 75
+const DAILY_CHEST_SEEDS := 5
 const MAX_MERGE_TIER := 3
 const MAGNET_MAX_LEVEL := 4
 const MAGNET_COST_T2 := 2
@@ -73,7 +74,9 @@ const SEED_RARITY: Dictionary = {
 }
 
 const MAGNET_BASE_RADIUS := 40.0
-const MAGNET_RADIUS_PER_LEVEL := 48.0
+## Max magnet (40 + 4 × 55 = 260 px) dohvata susjednu stazu (razmak 270, pickup r 18–26) —
+## ranije 232 px ni na max nije dohvatao ništa izvan svoje staze (balans ciklus 1).
+const MAGNET_RADIUS_PER_LEVEL := 55.0
 
 const LOADOUT_SLOT_COUNT := 1
 const LOADOUT_SPAWN_BONUS := 0.05
@@ -88,13 +91,12 @@ const POST_TUTORIAL_RUN_DURATION := 60.0
 
 enum TutorialStep { RUN1, CAMP1, RUN2, CAMP_MERGE, FREE }
 
+## Legacy: Endless je od balansa ciklus 1 jedna rampa (RunLevelLibrary.get_endless_config_at);
+## enum i "endless_difficulty" ostaju samo zbog starih saveova.
 enum EndlessDifficulty { EASY, NORMAL, HARD }
 
-const ENDLESS_DIFFICULTY_LABELS: Dictionary = {
-	EndlessDifficulty.EASY: "Easy",
-	EndlessDifficulty.NORMAL: "Normal",
-	EndlessDifficulty.HARD: "Hard",
-}
+## Endless se završava samo padom ili izlaskom — plijen ostaje cijeli (ne pola kao u levelu).
+const ENDLESS_KEEPS_FULL_LOOT := true
 
 const TUTORIAL_FLAGS_PATH := "user://tutorial_flags.json"
 const PLAYER_SAVE_PATH := "user://player_save.json"
@@ -225,6 +227,10 @@ var level_path_hop: Dictionary = {}
 var endless_runs_completed: int = 0
 var endless_difficulty: int = EndlessDifficulty.NORMAL
 var run_is_endless: bool = false
+## Zadnji run je bio Endless: preživljeno (s) i da li je to novi rekord sezone (Loot ekran).
+var last_run_endless: bool = false
+var last_endless_sec: float = 0.0
+var last_endless_new_best: bool = false
 
 # Jedan slot: type_id iz baga → +LOADOUT_SPAWN_BONUS šanse za sjeme u runu.
 var loadout_type_id: String = ""
@@ -1137,13 +1143,22 @@ func is_loadout_in_active_season_pool() -> bool:
 	return get_active_season_spawn_types().has(loadout)
 
 
-## Tip sjemena u runu je ravnomjeran iz poola aktivne sezone. Korpa ne bira tip —
-## samo +LOADOUT_SPAWN_BONUS na šansu da pickup uopšte bude sjeme.
-func pick_random_run_seed_type() -> String:
+## Tip sjemena iz poola aktivne sezone, TEŽINSKI po rijetkosti (RunBalance): ★1 = 1, ★2 / ★3 =
+## težine levela ili Endless stepenice. Korpa ne bira tip — samo +LOADOUT_SPAWN_BONUS na šansu
+## da pickup uopšte bude sjeme.
+func pick_run_seed_type(rare2_mult: float, rare3_mult: float) -> String:
 	var pool := get_active_season_spawn_types()
 	if pool.is_empty():
 		return SEED_TYPE_CLOVER
-	return pool[randi() % pool.size()]
+	var rarities: Array[int] = []
+	for type_id in pool:
+		rarities.append(get_seed_rarity(type_id))
+	return RunBalance.pick_weighted(pool, rarities, rare2_mult, rare3_mult, randf())
+
+
+## Van runa (Loot Burst bez cilja): težine levela 1.
+func pick_random_run_seed_type() -> String:
+	return pick_run_seed_type(RunBalance.BASE_RARE2, RunBalance.BASE_RARE3)
 
 
 func has_pending_seed_unlock() -> bool:
@@ -1526,7 +1541,10 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 	carry_seeds = sum_seed_bag(scaled_seeds)
 	carry_orbs = carry_seeds
 	carry_elapsed = elapsed
-	if failed:
+	last_run_endless = run_is_endless
+	last_endless_sec = elapsed if run_is_endless else 0.0
+	last_endless_new_best = false
+	if failed and not keeps_full_loot_on_fail():
 		last_seed_bag = _halve_seed_bag(scaled_seeds)
 		# ceil: 1 coin na failu ne nestane u 0 (round(0.5)==0 na desktopu).
 		last_run_coins = int(ceil(float(scaled_coins) * 0.5))
@@ -1536,34 +1554,47 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 	last_loot = sum_seed_bag(last_seed_bag)
 	_add_coins(last_run_coins)
 	tutorial.advance_after_run()
-	if not last_failed and tutorial_complete:
-		if run_is_endless:
-			endless_runs_completed += 1
-		else:
-			var step := level_path_domain.advance(active_season_id)
-			if not step.is_empty():
-				level_path_hop = {"season": active_season_id, "from": int(step[0]), "to": int(step[1])}
+	if run_is_endless and tutorial_complete:
+		# Endless nema cilja: svaki kraj (pad ili izlazak) je završen run i kandidat za rekord.
+		endless_runs_completed += 1
+		last_endless_new_best = level_path_domain.record_endless(active_season_id, elapsed)
+	elif not last_failed and tutorial_complete:
+		var step := level_path_domain.advance(active_season_id)
+		if not step.is_empty():
+			level_path_hop = {"season": active_season_id, "from": int(step[0]), "to": int(step[1])}
 	save_player_save()
+
+
+## Pad u Endlessu ne prepolovi plijen (ENDLESS_KEEPS_FULL_LOOT); pad u levelu da.
+func keeps_full_loot_on_fail() -> bool:
+	return run_is_endless and ENDLESS_KEEPS_FULL_LOOT
 
 
 func is_endless_mode() -> bool:
 	return run_is_endless
 
 
-func get_endless_difficulty_label() -> String:
-	return ENDLESS_DIFFICULTY_LABELS.get(endless_difficulty, "Normal")
+## Endless sezone je otvoren kad je level 15 te sezone pređen (LevelPathDomain).
+func is_endless_unlocked(season_id: String) -> bool:
+	return level_path_domain.is_endless_unlocked(season_id)
+
+
+func endless_best_sec(season_id: String) -> float:
+	return level_path_domain.endless_best_of(season_id)
 
 
 func uses_run_level_config() -> bool:
 	return tutorial_complete
 
 
+## Config na startu runa. Endless mijenja stepenice sam (run_controller → get_endless_config_at).
 func get_active_run_level_config():
 	if is_endless_mode():
-		return RunLevelLibrary.get_endless_config_for_difficulty(endless_difficulty)
+		return RunLevelLibrary.get_endless_config_at(0.0)
 	return RunLevelLibrary.get_level(run_level)
 
 
+## Endless nema tajmer (INF) — traje dok Pip ne udari ili igrač ne izađe.
 func get_run_duration() -> float:
 	if uses_run_level_config():
 		return get_active_run_level_config().duration_sec
@@ -1651,7 +1682,8 @@ func begin_campaign_run() -> void:
 	begin_fresh_run()
 
 
-func begin_endless_run(difficulty: int) -> void:
+## `difficulty` je legacy (jedna rampa za sve) — čuva se samo u saveu.
+func begin_endless_run(difficulty: int = EndlessDifficulty.NORMAL) -> void:
 	endless_difficulty = clampi(difficulty, EndlessDifficulty.EASY, EndlessDifficulty.HARD)
 	run_is_endless = true
 	begin_fresh_run()
@@ -1996,7 +2028,10 @@ func upgrade_uses_kept_flowers(season_id: String) -> bool:
 	var reserve := upgrade_flower_reserve(type_id)
 	if reserve <= 0:
 		return false
-	return int(garden_crystal_stash.get(type_id, 0)) - UiCamp.UP_FLOWER_COST < reserve
+	var cost := UiCamp.upgrade_flower_cost(get_upgrade_level("magnet", season_id))
+	for track in ["loot", "twin"]:
+		cost = mini(cost, UiCamp.upgrade_flower_cost(get_upgrade_level(track, season_id)))
+	return int(garden_crystal_stash.get(type_id, 0)) - cost < reserve
 
 
 func upgrade_button_state(track: String, season_id: String = "") -> String:
@@ -2017,7 +2052,7 @@ func _try_upgrade_track(track: String) -> bool:
 		return false
 	var type_id := star3_type_id_for_season(season_id)
 	var have := int(garden_crystal_stash.get(type_id, 0))
-	var left := have - UiCamp.UP_FLOWER_COST
+	var left := have - UiCamp.upgrade_flower_cost(level)
 	if left <= 0:
 		garden_crystal_stash.erase(type_id)
 	else:

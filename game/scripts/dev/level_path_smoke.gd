@@ -282,11 +282,12 @@ func _check_home() -> void:
 	await _wait(0.5)
 	if path.is_locator_visible():
 		_fail("locator should hide after scrolling back to Pip")
-	# claim nagrade 5
+	# claim nagrade 5 — dodir ispod sanduka (gdje je bila pilula „Claim", 2026-10-21) otvara popup
 	var coins0 := int(_gs.get("wallet_coins"))
 	var flower := str(_gs.call("star3_type_id_for_season", "country_bloom"))
 	var f0 := int((_gs.get("garden_crystal_stash") as Dictionary).get(flower, 0))
-	path.tap_reward(5)
+	var ch5: Control = (path.get("_chests") as Dictionary)[5]
+	path.call("_tap", ch5.position + Vector2(ch5.size.x * 0.5, ch5.size.y + 40.0) - Vector2(0.0, float(path.get("_scroll"))))
 	await _wait(0.3)
 	var popup = path.get_popup()
 	if not popup.is_open() or popup.title_text() != "Level 5 reward!":

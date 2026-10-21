@@ -38,13 +38,15 @@ func _run() -> void:
 
 	var flower := str(gs.call("star3_type_id_for_season", str(gs.get("active_season_id"))))
 	var reserve := int(gs.call("upgrade_flower_reserve", flower))
-	# Iznad Kept granice treba točno 2 ★3 te sezone, plus 10 coina za prvi nivo.
-	_reset_upgrade_state(gs, {flower: reserve + 2}, 0, 0, 10)
+	# Cijena prvog nivoa (UiCamp): f ★3 te sezone + c coina.
+	var f := UiCamp.upgrade_flower_cost(0)
+	var c := UiCamp.upgrade_coin_cost(0)
+	_reset_upgrade_state(gs, {flower: reserve + f}, 0, 0, c)
 	if not bool(gs.call("try_upgrade_magnet", "")):
 		_fail("magnet upgrade with %s above the reserve failed" % flower)
 		return
 	if int(gs.get("magnet_level")) != 1 or int(gs.get("wallet_coins")) != 0:
-		_fail("magnet should reach 1 and spend 10 coins")
+		_fail("magnet should reach 1 and spend %d coins" % c)
 		return
 	var stash: Dictionary = gs.get("garden_crystal_stash")
 	if int(stash.get(flower, 0)) != reserve:
@@ -52,30 +54,30 @@ func _run() -> void:
 		return
 
 	# Od 2026-10-16 nadogradnja smije zagristi u Kept rezervu (javlja se na sheetu) —
-	# ne smije samo kad ★3 te sezone ukupno ima manje od 2.
-	_reset_upgrade_state(gs, {flower: 1}, 0, 0, 10)
+	# ne smije samo kad ★3 te sezone ukupno ima manje od cijene.
+	_reset_upgrade_state(gs, {flower: f - 1}, 0, 0, c)
 	if bool(gs.call("try_upgrade_magnet", "")):
-		_fail("magnet must fail with only 1 flower")
+		_fail("magnet must fail with only %d flower" % (f - 1))
 		return
-	_reset_upgrade_state(gs, {flower: maxi(reserve, 2)}, 0, 0, 10)
-	if reserve >= 2 and not bool(gs.call("upgrade_uses_kept_flowers", str(gs.get("active_season_id")))):
+	_reset_upgrade_state(gs, {flower: maxi(reserve, f)}, 0, 0, c)
+	if reserve >= f and not bool(gs.call("upgrade_uses_kept_flowers", str(gs.get("active_season_id")))):
 		_fail("buying with exactly the reserve should report it uses kept flowers")
 		return
 	if not bool(gs.call("try_upgrade_magnet", "")):
 		_fail("magnet must be buyable with flowers that are only kept for the next season")
 		return
 
-	_reset_upgrade_state(gs, {flower: reserve + 2}, 0, 0, 9)
-	if bool(gs.call("try_upgrade_magnet", "")) or int(gs.get("wallet_coins")) != 9:
+	_reset_upgrade_state(gs, {flower: reserve + f}, 0, 0, c - 1)
+	if bool(gs.call("try_upgrade_magnet", "")) or int(gs.get("wallet_coins")) != c - 1:
 		_fail("magnet must fail when coins are short and must not spend")
 		return
 
-	_reset_upgrade_state(gs, {flower: reserve + 2}, 0, 0, 20)
+	_reset_upgrade_state(gs, {flower: reserve + f}, 0, 0, 2 * c)
 	if not bool(gs.call("try_upgrade_multiplier", "")):
 		_fail("loot upgrade failed")
 		return
-	if int(gs.get("multiplier_level")) != 1 or int(gs.get("wallet_coins")) != 10:
-		_fail("loot should reach 1 and spend 10 of 20 coins")
+	if int(gs.get("multiplier_level")) != 1 or int(gs.get("wallet_coins")) != c:
+		_fail("loot should reach 1 and spend %d of %d coins" % [c, 2 * c])
 		return
 
 	var max_lv := 4

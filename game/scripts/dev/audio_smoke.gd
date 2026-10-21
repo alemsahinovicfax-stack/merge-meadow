@@ -390,8 +390,8 @@ func _check_hooks() -> void:
 	else:
 		FileAccess.open("user://settings.cfg", FileAccess.WRITE).store_string(cfg_backup)
 	await _frames(2)
-	# Shop: coin kupovina
-	gs.set("wallet_coins", 500)
+	# Shop: coin kupovina (cijena iz cosmetics.json)
+	gs.set("wallet_coins", CosmeticCatalog.get_coin_cost("meadow_sunset") + 100)
 	(gs.get("cosmetics") as Object).set("owned", {})
 	var shop: Control = (load("res://scenes/ui/shop_screen.tscn") as PackedScene).instantiate()
 	root.add_child(shop)

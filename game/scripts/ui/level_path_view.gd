@@ -4,7 +4,7 @@ extends Control
 ## Level Path sezone (design_handoff_level_path): cijela stranica 1080 x 1633 između headera i
 ## tab bara. Sadržaj 1080 x 4900 se crta JEDNOM (SeasonBackdrop iz kits[id].path); skrol samo
 ## pomjera sadržaj. Pređeni put (Line2D, 2–3 poteza) se mijenja samo kad se promijeni level.
-## Kamenje (20) i sanduci (4) su statični crteži; animira se samo transformom: poskok
+## Kamenje (20) i sanduci (4) su statični crteži; animira se samo transformom: skok i klimanje
 ## reward_ready sanduka + 3 iskre, skok Pipa, pop kamena, prsten i prašina.
 ## Play i ‹ Field su u donjem redu (SeasonStage / MainMenu) — ovdje nisu.
 
@@ -20,10 +20,19 @@ const LOCATOR := Rect2(880, 1316, 176, 96)
 const TOAST_Y := 1250.0
 const TITLE_Y := 24.0
 const BANNER_Y := 150.0
-const BOUNCE_PX := 14.0
-const BOUNCE_SEC := 1.1
-const BOUNCE_SQUASH := Vector2(1.05, 0.94)
+## Sanduk koji čeka Claim (2026-10-21, playtest: „Claim" pilula ispod sanduka nije reagovala na
+## dodir — uklonjena; tap na sanduk ili kamen): ciklus READY_SEC — skok, doskok sa squashom,
+## klimanje oko dna, mir. Samo transformi; konačni izgled čeka CD (leveli-endless-cd-brief).
+const READY_SEC := 1.8
+const READY_HOP_PX := 26.0
+const READY_HOP_END := 0.3
+const READY_LAND_END := 0.42
+const READY_WIGGLE_END := 0.78
+const READY_WIGGLE_DEG := 8.0
+const BOUNCE_SQUASH := Vector2(1.07, 0.92)
 const BOUNCE_PHASE := 0.23
+## Dodir sanduka hvata i traku ispod njega (oznaka nagrade), ne samo crtež.
+const CHEST_TAP_H := 270.0
 const SPARK_SEC := 1.6
 const SPARK_POS: Array[Vector2] = [Vector2(-6, 26), Vector2(164, 6), Vector2(178, 104)]
 const SPARK_SIZE := 40.0
@@ -461,7 +470,9 @@ func _tap(page_pos: Vector2) -> void:
 	var p := page_pos + Vector2(0.0, _scroll)
 	for n in _chests:
 		var ch: _Chest = _chests[n]
-		var hit := Rect2(ch.position, ch.size).has_point(p)
+		var box := Rect2(ch.position, ch.size)
+		box.size.y = maxf(box.size.y, CHEST_TAP_H * ch.label.k)
+		var hit := box.has_point(p)
 		var st: _Stone = _stones[n - 1]
 		if not hit:
 			hit = Rect2(st.position, st.size).has_point(p)
@@ -542,15 +553,25 @@ func _process(delta: float) -> void:
 		set_process(false)
 
 
-## Poskok 14 px / 1,1 s sa squashom (dno sanduka stoji) + 3 iskre (scale 0 → 1 → 0, ±30°).
+## Skok 26 px, doskok sa squashom (dno sanduka stoji), klimanje ±8° oko dna koje se smiruje, pa
+## mir do sljedećeg ciklusa (1,8 s, svaki sanduk pomaknut u fazi) + 3 iskre (scale 0 → 1 → 0, ±30°).
 func _animate_ready(ch: _Chest, i: int) -> void:
 	if ch.art_busy:
 		return
-	var u := fposmod(_anim_t / BOUNCE_SEC + float(i) * BOUNCE_PHASE, 1.0)
-	var lift := absf(sin(PI * u))
-	var q := pow(1.0 - lift, 6.0)
-	ch.art.position.y = ch.art_home.y - BOUNCE_PX * lift
-	ch.art.scale = Vector2(lerpf(1.0, BOUNCE_SQUASH.x, q), lerpf(1.0, BOUNCE_SQUASH.y, q))
+	var u := fposmod(_anim_t / READY_SEC + float(i) * BOUNCE_PHASE, 1.0)
+	var lift := 0.0
+	var squash := 0.0
+	var rot := 0.0
+	if u < READY_HOP_END:
+		lift = sin(PI * u / READY_HOP_END)
+	elif u < READY_LAND_END:
+		squash = sin(PI * (u - READY_HOP_END) / (READY_LAND_END - READY_HOP_END))
+	elif u < READY_WIGGLE_END:
+		var w := (u - READY_LAND_END) / (READY_WIGGLE_END - READY_LAND_END)
+		rot = sin(TAU * 1.5 * w) * (1.0 - w) * READY_WIGGLE_DEG
+	ch.art.position.y = ch.art_home.y - READY_HOP_PX * lift
+	ch.art.scale = Vector2(lerpf(1.0, BOUNCE_SQUASH.x, squash), lerpf(1.0, BOUNCE_SQUASH.y, squash))
+	ch.art.rotation = deg_to_rad(rot)
 	for j in ch.sparks.size():
 		var s: TextureRect = ch.sparks[j]
 		var v := fposmod(_anim_t / SPARK_SEC + float(j) * 0.33 + float(i) * 0.1, 1.0)
@@ -790,7 +811,7 @@ class _Stone extends Control:
 		UiHomeV3.draw_text(self, 900, px, txt, Vector2((size.x - w) * 0.5, cy - px * 0.52), LevelPathKit.number_color(season_id, state), 0.0, true)
 
 
-## Sanduk nagrade: sprite (poskok samo transformom), 3 iskre, oznaka nagrade ili „Claim".
+## Sanduk nagrade: sprite (skok i klimanje samo transformom), 3 iskre, oznaka nagrade dok je zaključan.
 class _Chest extends Control:
 	var n: int = 5
 	var season_id: String = ""
@@ -850,8 +871,9 @@ class _Chest extends Control:
 		label.queue_redraw()
 
 
-## Ispod sanduka: reward_locked → krem pilula (★3 crtež 52 + N · coin 44 + N);
-## reward_ready → breskvasta pilula „Claim" s tvrdom sjenom.
+## Ispod sanduka: reward_locked → krem pilula (★3 crtež 52 + N · coin 44 + N). reward_ready nema
+## oznake (2026-10-21: pilula „Claim" izgledala je kao dugme, a dodir je hvatao samo sanduk) —
+## sanduk skače i klima se, tap na njega otvara popup.
 class _ChestLabel extends Control:
 	var chest: _Chest
 	var k: float = 1.0
@@ -881,12 +903,6 @@ class _ChestLabel extends Control:
 			UiPopups.draw_icon(self, UiPopups.icon("icon_coin"), Vector2(x + 22.0, cy), 44.0)
 			x += 44.0 + 8.0
 			UiHomeV3.draw_text(self, 900, 38, co, Vector2(x, cy - 19.0), UiHomeField.OUTLINE, 0.0, true)
-		elif chest.state == LevelPathDomain.REWARD_READY:
-			var t := "Claim"
-			var w := UiHomeV3.text_w(900, 42, t) + 68.0
-			var rect := Rect2(cx - w * 0.5, (LevelPathKit.CHEST_ANCHOR.y + 8.0) * k, w, 76.0)
-			UiHomeV3.draw_panel(self, rect, UiHomeField.PEACH, 38.0, 4.0, UiHomeField.OUTLINE, 6.0, UiHomeField.STICKER_DROP)
-			UiPopups.draw_text_centered(self, 900, 42, t, rect, UiHomeField.OUTLINE)
 
 
 ## Pločica s imenom sezone (fiksna na vrhu): ime + „7 / 20", ili mint „✓ 20 / 20".

@@ -5,6 +5,12 @@ extends Control
 ## sjemena + broj); kod pada svaki broj precrtan i prepolovljen + pečat „Kept half". Reklame (Double,
 ## Revive) su lavanda AdButtoni h 120 u svom redu iznad Retry / To Camp (132) — status reklame se vidi
 ## na dugmetu („Double •••", „Doubled ✓", „No ad now"), nema reda teksta. Zatvara se samo dugmetom.
+## Endless (balans ciklus 1): kraj je uvijek pad ili izlazak, ali plijen ostaje cijeli — naslov je
+## preživljeno vrijeme („Endless · 2:34", „Best!" na rekordu), zelena varijanta, bez „Kept half".
+## Revive i dalje nastavlja Endless. Konačni Endless rezultat čeka CD (leveli-endless-cd-brief).
+
+const S_ENDLESS_TITLE := "Endless · %s"
+const S_ENDLESS_BEST := "Best! %s"
 
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
 
@@ -67,8 +73,13 @@ func _exit_tree() -> void:
 
 # --- stanje ---
 
+## Pad koji siječe plijen (level). Endless kraj nije „fail" za izgled — plijen je cijeli.
 func is_failed() -> bool:
-	return GameState.last_failed
+	return GameState.last_failed and not GameState.last_run_endless
+
+
+func is_endless() -> bool:
+	return GameState.last_run_endless
 
 
 func shows_ads() -> bool:
@@ -89,6 +100,9 @@ func shows_revive() -> bool:
 
 
 func get_title() -> String:
+	if is_endless():
+		var clock := UiRun.endless_clock(GameState.last_endless_sec)
+		return (S_ENDLESS_BEST if GameState.last_endless_new_best else S_ENDLESS_TITLE) % clock
 	return UiPopups.S_RUN_FAILED if is_failed() else UiPopups.S_RUN_COMPLETE
 
 

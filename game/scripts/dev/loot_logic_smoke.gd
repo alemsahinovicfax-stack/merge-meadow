@@ -228,11 +228,12 @@ func _run() -> void:
 	gs.set("starter_pack_owned", false)
 	gs.set("wallet_coins", 20)
 	iap.call("_process_purchase", _acknowledged(str(CONFIG.SKU_STARTER_PACK), "st-1"), false)
-	if not bool(gs.get("starter_pack_owned")) or int(gs.get("wallet_coins")) != 120:
+	var starter_wallet := 20 + MonetizationConfig.STARTER_PACK_COINS
+	if not bool(gs.get("starter_pack_owned")) or int(gs.get("wallet_coins")) != starter_wallet:
 		_fail("starter restore should grant once, wallet %s" % str(gs.get("wallet_coins")))
 		return
 	iap.call("_process_purchase", _acknowledged(str(CONFIG.SKU_STARTER_PACK), "st-1"), false)
-	if int(gs.get("wallet_coins")) != 120:
+	if int(gs.get("wallet_coins")) != starter_wallet:
 		_fail("starter restore must stay idempotent, wallet %s" % str(gs.get("wallet_coins")))
 		return
 
@@ -267,7 +268,7 @@ func _run() -> void:
 	if not tokens.is_empty():
 		_fail("missing token key should default empty, got %s" % str(tokens))
 		return
-	if int(gs.get("wallet_coins")) != 120:
+	if int(gs.get("wallet_coins")) != starter_wallet:
 		_fail("old save without the key should still apply wallet, got %s" % str(gs.get("wallet_coins")))
 		return
 

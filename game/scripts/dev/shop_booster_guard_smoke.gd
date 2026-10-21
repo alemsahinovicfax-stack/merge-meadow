@@ -118,8 +118,8 @@ func _run() -> void:
 		_fail("Starter Pack should be available on day one")
 		return
 	await _buy("starter_pack")
-	if int(gs.get("wallet_coins")) != 100:
-		_fail("Starter Pack should give 100 coins, got %d" % int(gs.get("wallet_coins")))
+	if int(gs.get("wallet_coins")) != MonetizationConfig.STARTER_PACK_COINS:
+		_fail("Starter Pack should give %d coins, got %d" % [MonetizationConfig.STARTER_PACK_COINS, int(gs.get("wallet_coins"))])
 		return
 	if not bool(gs.call("owns_cosmetic", "pip_blossom")):
 		_fail("Starter Pack should give Pip Blossom")

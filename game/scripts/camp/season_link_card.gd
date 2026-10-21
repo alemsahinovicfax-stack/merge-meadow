@@ -3,7 +3,7 @@ extends PanelContainer
 ## Hero kartica sljedece besplatne sezone (design_handoff_camp_v2 · SeasonLinkCard).
 ## Tap bilo gdje na kartici vodi na Home bez trosenja — bez "Details" pilule i bez
 ## "Next free season" natpisa. Unlock (300 x 120, jedna rijec) stoji desno od imena,
-## trosi odmah (500 coina + 20 ★3), pokaze burst, pa skace na Home s fokusom.
+## trosi odmah (coini + ★3 iz seasons.json), pokaze burst, pa skace na Home s fokusom.
 ## Kad su sve besplatne otključane, kartica nastavlja s prvom plaćenom sezonom koju igrač
 ## nema (2026-10-16, na zahtjev): umjesto coina i ★3 samo cijena (zlatno dugme, kao zlatna
 ## cijena na Homeu), kupovina kroz IAPManager, pa isti burst i skok na Home (band „paid").

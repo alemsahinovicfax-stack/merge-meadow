@@ -78,7 +78,8 @@ func _run() -> void:
 	# 1) 6 tipova sjemena, Frost Orchard sljedeca sezona (hero vidljiv).
 	gs.call("reset_seasons_to_s1")
 	gs.set("seed_bag", {"clover": 4, "daisy": 3, "buttercup": 2, "tulip": 2, "sunflower": 1, "pumpkin": 1})
-	gs.set("garden_crystal_stash", {"clover": 3, "daisy": 2, "tulip": 1, "pumpkin": 20})
+	var frost_req := SeasonCatalog.get_def("frost_orchard").t3_flowers_required
+	gs.set("garden_crystal_stash", {"clover": 3, "daisy": 2, "tulip": 1, "pumpkin": frost_req})
 	camp.call("refresh_for_meta_hub")
 	await _settle()
 	var seeds_tab := camp.get_node("%SeedsTab")
@@ -131,7 +132,7 @@ func _run() -> void:
 	await _settle()
 	var bar := camp.get_node("%ExchangeBar")
 	if str(bar.call("get_state")) != "holdstop":
-		_fail("pumpkin at 20/20 must be holdstop, got %s" % str(bar.call("get_state")))
+		_fail("pumpkin at the Frost floor must be holdstop, got %s" % str(bar.call("get_state")))
 		return
 	if not (camp.get_node("%ReservedWarning") as Control).visible:
 		_fail("holdstop must show ReservedWarning")
