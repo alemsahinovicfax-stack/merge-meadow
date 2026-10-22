@@ -97,6 +97,7 @@ const S := {
 	"dev_unlock": "Unlock all seasons", "dev_reset_seasons": "Reset seasons",
 	"dev_coins": "+1000 coins", "dev_reset_tutorial": "Reset tutorial",
 	"dev_level_up": "Level +5", "dev_level_reset": "Level 1",
+	"dev_test_bag_on": "Test seeds: on", "dev_test_bag_off": "Test seeds: off",
 }
 
 enum Restore { IDLE, BUSY, DONE, NONE, FAIL }

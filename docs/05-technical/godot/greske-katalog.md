@@ -792,6 +792,41 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** stanje „miruje" drži u samom `_process` (straža), ne samo u `_init`. Ili zovi `set_process(false)` u `_ready`, poslije auto-uključivanja. Smoke za animaciju uvijek pusti i kroz prave frejmove, ne samo ručne pozive.
 
+## #52 — debug build preskače tutorijal: „novi igrač" nije moguć bez prekidača
+
+**Datum:** 2026-10-22 (playtest „kao da prvi put igram")
+
+**Simptom:** u debug buildu (editor, `godot-run.ps1`) svako pokretanje sa saveom i svako otvaranje Arene postavi `tutorial_complete = true`, otključa 5 tipova sjemena i prepiše vreću test-sjemenkama (19 / 22 / 13 / 28 / 18). Arena se učita s hubom, pa je tutorijal preskočen već na prvom pokretanju bez savea.
+
+**Uzrok:** stari ARENA-02 fixture `apply_debug_leftover_test_bag()` (GameStateDebug) zove se iz `GameState._ready` (save postoji) i iz `merge_arena_controller._deferred_boot`, uvijek kad je `OS.is_debug_build()`. Release build nije pogođen.
+
+**Rješenje:** dev prekidač `user://dev_flags.cfg` → `[dev] leftover_test_bag=false` (Settings → Developer → „Test seeds: on / off", važi od sljedećeg pokretanja). Bez fajla je uključeno, kao i prije. Testovi koji fixture zovu direktno (`_try_apply_debug_leftover_test_bag(true)`) rade i dalje. GUT `test_dev_flags`.
+
+**Prevencija:** za playtest „novi igrač" isključi Test seeds, napravi backup i obriši `player_save.json*`. Dev fixture ne smije sam mijenjati tutorijal bez prekidača.
+
+## #53 — tutorijal nikad ne završi: „Practice" na svakom runu, „To Camp" vodi pred zatvorenu Arenu
+
+**Datum:** 2026-10-22 (playtest „kao novi igrač")
+
+**Simptom:**
+- Svaki run prve sezone ima „Practice" u čipu: nema levela, Level Patha ni korpe.
+- „To Camp" vodi u Arenu, a tamo stoji „Not enough seeds" (treba 50).
+
+**Uzrok:**
+- Stari tok RUN1 → CAMP1 → RUN2 → CAMP_MERGE završavao je tutorijal tek **prvim mergeom u Areni**. Arena od Camp v3 traži 50 sjemenki za spajanje (`UiCamp.GATE_MIN`), a tutorijal run od 45 s daje ~10. Tutorijal je zato trajao dok igrač ne skupi 50, a do tada je svaki run bio „Practice".
+- CAMP1 → RUN2 se pomjerao samo Play dugmetom **u Campu**. Play na Homeu je ostavljao igrača na CAMP1, bez prepreka.
+- `go_to_camp()` je slao u Arenu čim je vreća imala ijedno sjeme (`sum > 0`), ne kad su vrata otvorena.
+
+**Rješenje:**
+- Tutorijal su dva vođena runa: RUN1 → RUN2 → gotovo (`Tutorial.advance_after_run`). Tutorijal run ne pomjera Level Path, pa je sljedeći run Level 1.
+- Stari saveovi: CAMP1 → RUN2, CAMP_MERGE → gotovo.
+- `should_offer_merge_arena()` = `arena_gate_open()`.
+- Savjet za prvi spoj (`should_prompt_merge`) se prikazuje kad su vrata otvorena, dok prvi merge nije urađen (save `first_arena_merge_done`).
+- Hint korpe: „Unlocks after your first 2 runs".
+- Test `tutorial_flow_smoke` + GUT `test_game_state_tutorial`.
+
+**Prevencija:** kad se uvede prag (vrata Arene, cijena, minimum), provjeri i tutorijal i „put" koji vodi do tog ekrana. Tutorijal ne smije zavisiti od nečega što igrač u tom trenutku ne može imati.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

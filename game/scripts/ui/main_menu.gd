@@ -199,7 +199,7 @@ func _show_basket_hint(pop: bool) -> void:
 	if _basket_hint == null:
 		return
 	_basket_hint.setup([{
-		"text": UiPopups.S_HINT_BASKET, "icon": UiAssets.get_chrome_icon("tab_arena"), "disc": UiPopups.MINT
+		"text": UiPopups.S_HINT_BASKET, "icon": load(RunProgressRail.FLAG_TEX) as Texture2D, "disc": UiPopups.MINT
 	}], "left")
 	_basket_hint.max_w = 600.0
 	_basket_hint.setup(_basket_hint.rows, "left")

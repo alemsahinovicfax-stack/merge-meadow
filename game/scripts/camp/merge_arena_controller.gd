@@ -140,7 +140,12 @@ func _gate_modal_open() -> bool:
 
 func _deferred_boot() -> void:
 	await get_tree().process_frame
+	# Hub zatvoren u prva 2 frejma (npr. odmah u run) — Arena je već van stabla.
+	if not is_inside_tree():
+		return
 	await get_tree().process_frame
+	if not is_inside_tree():
+		return
 	# Osnove sjemenki se iscrtaju u teksture odmah pri učitavanju stranice (8 frejmova), prije
 	# prvog sipanja — inače svaka sjemenka crta 4–6 StyleBoxova (perf 2026-10-09).
 	ArenaChipBake.ensure(self)

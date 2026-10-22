@@ -25,6 +25,10 @@ const DEBUG_LEFTOVER_TEST_BAG: Dictionary = {
 	"tulip": 28,
 	"sunflower": 18,
 }
+## Dev prekidač (user://dev_flags.cfg, [dev] leftover_test_bag): automatski test-bag na svakom
+## pokretanju i otvaranju Arene (100 sjemenki + tutorijal označen gotovim) — isključi za playtest
+## „kao novi igrač". Bez fajla = uključeno (kao do sada). Settings → Developer „Test seeds".
+const DEV_FLAGS_PATH := "user://dev_flags.cfg"
 ## HOME-07 P84 + HOME-09 P111 — debug skip so a free next-lock remains; can_unlock_free still works.
 const DEBUG_SKIP_FREE_ID := "lantern_meadow"
 const DEBUG_SKIP_AMBER_ID := "amber_canopy"
@@ -191,7 +195,21 @@ func apply_resources_if_new_game() -> void:
 
 
 func apply_leftover_test_bag() -> bool:
-	return try_apply_leftover_test_bag(OS.is_debug_build())
+	return try_apply_leftover_test_bag(OS.is_debug_build() and test_bag_enabled())
+
+
+static func test_bag_enabled() -> bool:
+	var cfg := ConfigFile.new()
+	if cfg.load(DEV_FLAGS_PATH) != OK:
+		return true
+	return bool(cfg.get_value("dev", "leftover_test_bag", true))
+
+
+static func set_test_bag_enabled(on: bool) -> void:
+	var cfg := ConfigFile.new()
+	cfg.load(DEV_FLAGS_PATH)
+	cfg.set_value("dev", "leftover_test_bag", on)
+	cfg.save(DEV_FLAGS_PATH)
 
 
 func try_apply_leftover_test_bag(dev_enabled: bool) -> bool:

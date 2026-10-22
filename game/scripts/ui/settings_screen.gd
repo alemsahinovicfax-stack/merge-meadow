@@ -754,6 +754,7 @@ func _build_dev(list: VBoxContainer) -> void:
 	grid.add_child(_dev_button("DevResetTutorial", UiSettings.S.dev_reset_tutorial, true, _dev_reset_tutorial))
 	grid.add_child(_dev_button("DevLevelUp", UiSettings.S.dev_level_up, false, _dev_level_up))
 	grid.add_child(_dev_button("DevLevelReset", UiSettings.S.dev_level_reset, true, _dev_level_reset))
+	grid.add_child(_dev_button("DevTestBag", _test_bag_text(), false, _dev_toggle_test_bag))
 
 
 func _dev_button(node_name: String, text: String, danger: bool, action: Callable) -> Control:
@@ -799,6 +800,21 @@ func _dev_coins() -> void:
 	GameState.wallet_coins += 1000
 	GameState.save_player_save()
 	_dev_done("+1000 coins")
+
+
+## Test-bag (100 sjemenki + tutorijal gotov) na svakom pokretanju / Areni — isključi za playtest
+## kao novi igrač. Pamti se u user://dev_flags.cfg, važi od sljedećeg pokretanja.
+func _test_bag_text() -> String:
+	return UiSettings.S.dev_test_bag_on if GameStateDebug.test_bag_enabled() else UiSettings.S.dev_test_bag_off
+
+
+func _dev_toggle_test_bag() -> void:
+	GameStateDebug.set_test_bag_enabled(not GameStateDebug.test_bag_enabled())
+	var b := find_child("DevTestBag", true, false)
+	if b:
+		for c in b.find_children("*", "Label", true, false):
+			(c as Label).text = _test_bag_text()
+	_dev_done(_test_bag_text())
 
 
 func _dev_reset_tutorial() -> void:

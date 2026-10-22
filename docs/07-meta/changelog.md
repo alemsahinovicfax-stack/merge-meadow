@@ -11,6 +11,9 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
 ## 2026-10-22
 
+- **Tutorijal (playtest „novi igrač"):** tutorijal su sad dva vođena runa (coini + sjeme, pa prva prepreka), poslije njih Level 1 s najavom, Level Path i korpa. Ranije ga je završavao tek prvi merge u Areni, a Arena traži 50 sjemenki — „Practice" na svakom runu. „To Camp" vodi u Arenu tek kad su vrata otvorena (50 sjemenki), inače u Camp; savjet za prvi spoj tada. Play na Homeu više ne ostavlja igrača bez prepreka (stari CAMP1). Stari saveovi se pomjere naprijed. Katalog #53, test `tutorial_flow_smoke`.
+- **Playtest „novi igrač":** debug build je na svakom pokretanju i u Areni preskakao tutorijal i punio vreću test-sjemenkama (katalog #52). Novi dev prekidač „Test seeds: on / off" (Settings → Developer, `user://dev_flags.cfg`). Pravi save premješten u `user://backup_prije_novog_igraca_2026-10-22/` (save, settings, balance_log), igra kreće od nule.
+
 - **Paket `design_handoff_leveli_endless` u igri** (izvještaj `design-drafts/leveli-endless-izvjestaj.md`). Brojevi težine i plijena nepromijenjeni — ovo je izgled:
   - **Pojasevi težine** Stroll 1–5 · Jog 6–10 · Dash 11–15 · Sprint 16–20: pločica na svakom kamenu Level Patha (kraj pojasa sa zvjezdicom), zastavica s imenom uz 1 / 6 / 11 / 16, pločica u LevelChipu.
   - **Run:** najava levela na startu (1,12 s, ne blokira swipe; replay „Replay"), nalet na svaku stepenicu brzine, par prepreka kao jedan predmet preko dvije staze (3 varijante × 8 livada), **cilj na kraju levela** (8 sezona) koji Pip presiječe tačno na kraju — traka pukne, luk poskoči, konfete, „Time!". Spawn se zatvara po istom pravilu (preostali put sa stepenicama brzine).

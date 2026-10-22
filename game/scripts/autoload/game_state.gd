@@ -958,8 +958,10 @@ func go_to_collection_journal() -> void:
 	go_to_meta_page(MetaHubPages.COLLECTION)
 
 
+## „To Camp" vodi u Arenu samo kad ima dovoljno za spajanje (vrata, 50 sjemenki — UiCamp.GATE_MIN);
+## inače u Camp. Ranije je bilo dovoljno 1 sjeme pa je igrač stizao pred zatvorena vrata.
 func should_offer_merge_arena() -> bool:
-	return sum_seed_bag(seed_bag) > 0
+	return arena_gate_open()
 
 
 func should_prompt_merge_tutorial() -> bool:
@@ -1559,13 +1561,18 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 		last_run_coins = scaled_coins
 	last_loot = sum_seed_bag(last_seed_bag)
 	_add_coins(last_run_coins)
+	# Tutorijal run (i onaj koji ga završava) nije level kampanje — Level Path ostaje na 1.
+	var was_tutorial := not tutorial_complete
 	tutorial.advance_after_run()
-	if run_is_endless and tutorial_complete:
+	if was_tutorial:
+		save_player_save()
+		return
+	if run_is_endless:
 		# Endless nema cilja: svaki kraj (pad ili izlazak) je završen run i kandidat za rekord.
 		endless_runs_completed += 1
 		level_path_domain.record_endless(active_season_id, elapsed)
 		last_endless_new_best = elapsed > last_endless_prev_best
-	elif not last_failed and tutorial_complete:
+	elif not last_failed:
 		var step := level_path_domain.advance(active_season_id)
 		if not step.is_empty():
 			level_path_hop = {"season": active_season_id, "from": int(step[0]), "to": int(step[1])}
