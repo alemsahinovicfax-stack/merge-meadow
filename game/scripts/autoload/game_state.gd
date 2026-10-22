@@ -231,6 +231,8 @@ var run_is_endless: bool = false
 var last_run_endless: bool = false
 var last_endless_sec: float = 0.0
 var last_endless_new_best: bool = false
+## Rekord sezone prije ovog runa (R5 „Was 4:25" kad je oboren; 0 = nije ga bilo).
+var last_endless_prev_best: float = 0.0
 
 # Jedan slot: type_id iz baga → +LOADOUT_SPAWN_BONUS šanse za sjeme u runu.
 var loadout_type_id: String = ""
@@ -1544,6 +1546,10 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 	last_run_endless = run_is_endless
 	last_endless_sec = elapsed if run_is_endless else 0.0
 	last_endless_new_best = false
+	# Revive nastavlja isti run: rekord „prije runa" ostaje onaj s prvog pada (tada je već upisano
+	# vrijeme ovog runa), pa „New best!" / „Was" porede s pravim starim rekordom.
+	if not (run_is_endless and revive_used_this_run):
+		last_endless_prev_best = endless_best_sec(active_season_id) if run_is_endless else 0.0
 	if failed and not keeps_full_loot_on_fail():
 		last_seed_bag = _halve_seed_bag(scaled_seeds)
 		# ceil: 1 coin na failu ne nestane u 0 (round(0.5)==0 na desktopu).
@@ -1557,7 +1563,8 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 	if run_is_endless and tutorial_complete:
 		# Endless nema cilja: svaki kraj (pad ili izlazak) je završen run i kandidat za rekord.
 		endless_runs_completed += 1
-		last_endless_new_best = level_path_domain.record_endless(active_season_id, elapsed)
+		level_path_domain.record_endless(active_season_id, elapsed)
+		last_endless_new_best = elapsed > last_endless_prev_best
 	elif not last_failed and tutorial_complete:
 		var step := level_path_domain.advance(active_season_id)
 		if not step.is_empty():
@@ -1581,6 +1588,19 @@ func is_endless_unlocked(season_id: String) -> bool:
 
 func endless_best_sec(season_id: String) -> float:
 	return level_path_domain.endless_best_of(season_id)
+
+
+## Pređeno levela prema Endlessu (0…15) — prsten na zaključanom dugmetu.
+func endless_progress(season_id: String) -> int:
+	return level_path_domain.endless_progress(season_id)
+
+
+## Trenutak otključavanja Endlessa na putu (skok 15 → 16): true jednom po sezoni (sačuva se).
+func take_endless_unlock_moment(season_id: String) -> bool:
+	var first := level_path_domain.take_endless_unlock_moment(season_id)
+	if first:
+		save_player_save()
+	return first
 
 
 func uses_run_level_config() -> bool:

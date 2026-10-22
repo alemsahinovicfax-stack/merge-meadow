@@ -14,6 +14,9 @@ const PLATE_LIFT := 52.0
 
 var title: String = ""
 var tone: String = "decision"
+## Ikona lijevo od naslova na ploči (kraj Endlessa: prstenovi / trofej), gap 16.
+var plate_icon: Texture2D = null
+var plate_icon_size := Vector2.ZERO
 var on_run: bool = false
 var dismiss_on_scrim: bool = false
 ## Prostor za scrim i centriranje (hub: stranica, run: cijeli ekran). Prazno = cijeli roditelj.
@@ -171,7 +174,18 @@ func _layout() -> void:
 
 
 func _plate_w() -> float:
-	return UiPopups.text_w(900, UiPopups.PLATE_TITLE, title) + UiPopups.PLATE_PAD_X * 2.0
+	return UiPopups.text_w(900, UiPopups.PLATE_TITLE, title) + UiPopups.PLATE_PAD_X * 2.0 + _icon_w()
+
+
+func _icon_w() -> float:
+	return plate_icon_size.x + 16.0 if plate_icon != null else 0.0
+
+
+func set_plate_icon(tex: Texture2D, icon_size: Vector2) -> void:
+	plate_icon = tex
+	plate_icon_size = icon_size
+	plate.queue_redraw()
+	_layout()
 
 
 func _draw_plate() -> void:
@@ -179,7 +193,13 @@ func _draw_plate() -> void:
 		return
 	var r := Rect2(Vector2.ZERO, plate.size)
 	plate.draw_style_box(UiPopups.modal_plate(tone), r)
-	UiPopups.draw_text_centered(plate, 900, UiPopups.PLATE_TITLE, title, r, UiPopups.OUTLINE)
+	if plate_icon == null:
+		UiPopups.draw_text_centered(plate, 900, UiPopups.PLATE_TITLE, title, r, UiPopups.OUTLINE)
+		return
+	var x := UiPopups.PLATE_PAD_X
+	plate.draw_texture_rect(plate_icon, Rect2(Vector2(x, r.get_center().y - plate_icon_size.y * 0.5), plate_icon_size), false)
+	x += plate_icon_size.x + 16.0
+	UiPopups.draw_text(plate, 900, UiPopups.PLATE_TITLE, title, Vector2(x, r.get_center().y - UiPopups.PLATE_TITLE * 0.5), UiPopups.OUTLINE)
 
 
 func _on_scrim_input(event: InputEvent) -> void:

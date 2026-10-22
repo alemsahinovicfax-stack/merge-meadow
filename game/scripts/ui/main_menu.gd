@@ -5,9 +5,10 @@ const HomeBasketPickerIcon := preload("res://scripts/ui/home_basket_picker_icon.
 
 const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
 const SHEET_PAD := Vector4(24, 24, 24, 28)   # lijevo, gore, desno, dolje (design_handoff_popups)
-## Zaključan Endless (do pređenog levela 15 sezone): prigušeno dugme + toast.
-const ENDLESS_LOCKED_ALPHA := 0.55
-const S_ENDLESS_LOCKED := "Finish level %d to unlock Endless"
+## Zaključan Endless (do pređenog levela 15 sezone): krem dugme s prstenom napretka + toast
+## (design_handoff_leveli_endless · B1). Toast na y 1310 stranice, drži 1,6 s.
+const ENDLESS_TOAST_Y := 1310.0
+const ENDLESS_TOAST_HOLD := 1.6
 
 enum ChestUiState { LOCKED, READY, OPENING, CLAIMED }
 
@@ -60,6 +61,9 @@ var wardrobe_sheet: WardrobeSheet
 var _apply_toast: ApplyToast
 ## Toast polja / puta (zaključan Endless).
 var _field_toast: ApplyToast
+## Lice Endless dugmeta (zaključano / otključano / rekord) i oblačić „Endless unlocked!".
+var endless_face: EndlessButtonFace
+var _unlock_bubble: CoachBubble
 
 
 func _ready() -> void:
@@ -294,22 +298,79 @@ func on_level_path_finished(opened: bool) -> void:
 		_refresh_wardrobe_button()
 
 
-## Endless sezone se otvara kad je level 15 te sezone pređen (balans ciklus 1). Dok je zaključan,
-## dugme ostaje na mjestu prigušeno, a tap kaže koliko fali (privremeno — izgled zaključanog
-## stanja čeka CD, leveli-endless-cd-brief).
+## Endless sezone se otvara kad je level 15 te sezone pređen (balans ciklus 1). Izgled iz
+## design_handoff_leveli_endless (B1 / B8): zaključano krem + prsten „9 / 15" + katanac; otvoreno
+## lavanda + prstenovi; rekord sezone na pločici ispod. Sadržaj crta EndlessButtonFace.
 func _refresh_endless_button() -> void:
 	if endless_play_button == null:
 		return
 	endless_play_button.visible = (
 		GameState.tutorial_complete and GameState.home_season_field_open
 	)
-	# self_modulate (ploča) + sadržaj: `modulate` dugmeta drži UiClickButton (disabled stil) i
-	# vraća ga na bijelo pri svakom restilu donjeg reda.
-	var a := 1.0 if is_endless_unlocked_here() else ENDLESS_LOCKED_ALPHA
-	endless_play_button.self_modulate.a = a
+	_ensure_endless_face()
+	var id := _endless_season_id()
+	var open := is_endless_unlocked_here()
+	if endless_face.is_animating():
+		open = false
+	var style := UiHomeField.endless_button() if open else UiHomeField.sticker(UiLevels.CREAM, 28)
+	endless_play_button.set_panel_styles(style, UiHomeField.pressed_sticker(style))
+	endless_play_button.self_modulate.a = 1.0
 	var row := endless_play_button.get_node_or_null("ContentRow") as CanvasItem
 	if row:
-		row.modulate.a = a
+		row.visible = false
+	endless_face.apply(open, GameState.endless_progress(id), GameState.endless_best_sec(id))
+
+
+func _ensure_endless_face() -> void:
+	if endless_face != null or endless_play_button == null:
+		return
+	endless_face = EndlessButtonFace.new()
+	endless_play_button.add_child(endless_face)
+	endless_face.unlock_bubble_due.connect(_show_unlock_bubble)
+
+
+## B2 · prvi skok 15 → 16 u sezoni (LevelPathView → SeasonStage): dugme se otključa pred igračem.
+func on_endless_unlocked(season_id: String) -> void:
+	if endless_play_button == null or season_id != _endless_season_id():
+		return
+	_ensure_endless_face()
+	_refresh_endless_button()
+	endless_face.play_unlock(endless_play_button, GameState.endless_best_sec(season_id))
+	var t := create_tween()
+	t.tween_interval(UiLevels.UNLOCK_DELAY + UiLevels.UNLOCK_BURST.y + 0.05)
+	t.tween_callback(_refresh_endless_button)
+	Sfx.play("unlock")
+
+
+## Oblačić „Endless unlocked!" (lavanda disk + prstenovi) iznad dugmeta, drži 2,2 s.
+func _show_unlock_bubble() -> void:
+	if field_overlay_inner == null or endless_play_button == null:
+		return
+	if _unlock_bubble == null:
+		_unlock_bubble = CoachBubble.new()
+		_unlock_bubble.name = "EndlessUnlockBubble"
+		field_overlay_inner.add_child(_unlock_bubble)
+	_unlock_bubble.setup([{
+		"text": UiLevels.S_UNLOCKED, "icon": UiLevels.tex("endless/rings.svg"), "disc": UiLevels.LAVENDER
+	}], "down")
+	var r := endless_play_button.get_global_rect()
+	var host := field_overlay_inner.get_global_rect()
+	var k := field_overlay_inner.get_global_transform().get_scale().x
+	var tip := (Vector2(r.get_center().x, r.position.y - 8.0) - host.position) / maxf(k, 0.001)
+	_unlock_bubble.point_at(tip, 0.85, Rect2(24, 0, 1032, 1633))
+	_unlock_bubble.visible = true
+	_unlock_bubble.pop_in()
+	var t := _unlock_bubble.create_tween()
+	t.tween_interval(UiLevels.UNLOCK_BUBBLE_HOLD)
+	t.tween_property(_unlock_bubble, "modulate:a", 0.0, 0.18)
+	t.tween_callback(func() -> void:
+		_unlock_bubble.visible = false
+		_unlock_bubble.modulate.a = 1.0
+	)
+
+
+func unlock_bubble_text() -> String:
+	return _unlock_bubble.text() if _unlock_bubble != null and _unlock_bubble.visible else ""
 
 
 func is_endless_unlocked_here() -> bool:
@@ -411,7 +472,10 @@ func _on_endless_play_pressed() -> void:
 		return
 	if not is_endless_unlocked_here():
 		Sfx.play("ui_denied")
-		_show_field_toast(S_ENDLESS_LOCKED % LevelPathDomain.ENDLESS_UNLOCK_LEVEL, UiAssets.get_chrome_icon("icon_lock"))
+		if endless_face:
+			endless_face.play_locked_tap(endless_play_button)
+		_show_field_toast(UiLevels.S_LOCKED_TOAST, UiAssets.get_chrome_icon("icon_lock"), "lock",
+			ENDLESS_TOAST_Y, ENDLESS_TOAST_HOLD)
 		return
 	var field_id := GameState.home_season_field_id
 	if not field_id.is_empty():
@@ -422,14 +486,14 @@ func _on_endless_play_pressed() -> void:
 
 
 ## Toast iznad polja i Level Patha (FieldOverlay je iznad puta).
-func _show_field_toast(text: String, icon: Texture2D = null) -> void:
+func _show_field_toast(text: String, icon: Texture2D = null, glyph: String = "", y: float = -1.0, hold: float = -1.0) -> void:
 	if field_overlay_inner == null:
 		return
 	if _field_toast == null:
 		_field_toast = ApplyToast.new()
 		_field_toast.name = "FieldToast"
 		field_overlay_inner.add_child(_field_toast)
-	_field_toast.show_text(text, icon)
+	_field_toast.show_text(text, icon, glyph, y, hold)
 
 
 func field_toast_text() -> String:
@@ -1334,6 +1398,8 @@ func _on_wardrobe_shop(slot_id: String, item_id: String = "") -> void:
 class ApplyToast extends Control:
 	var text: String = ""
 	var icon: Texture2D = null
+	## "lock" = zlatni disk (zaključano), "check" = mint; "" = krem.
+	var glyph: String = ""
 	var _tween: Tween
 
 	func _init() -> void:
@@ -1341,21 +1407,23 @@ class ApplyToast extends Control:
 		visible = false
 
 	## H7 · toast sistema (design_handoff_popups): pilula s ikonom slota na kremastom disku.
-	func show_text(t: String, p_icon: Texture2D = null) -> void:
+	## `y` / `hold` < 0 = Ormar (1110, 2,6 s).
+	func show_text(t: String, p_icon: Texture2D = null, p_glyph: String = "", y: float = -1.0, hold: float = -1.0) -> void:
 		text = t
 		icon = p_icon
-		size = Vector2(PopupToast.pill_width(text, icon != null), UiPopups.TOAST_H)
-		position = Vector2(540.0 - size.x * 0.5, float(UiWardrobe.TOAST_Y))
+		glyph = p_glyph
+		size = Vector2(PopupToast.pill_width(text, icon != null or not glyph.is_empty()), UiPopups.TOAST_H)
+		position = Vector2(540.0 - size.x * 0.5, float(UiWardrobe.TOAST_Y) if y < 0.0 else y)
 		visible = true
 		modulate.a = 0.0
 		if _tween != null and _tween.is_valid():
 			_tween.kill()
 		UiPopups.tween_toast_in(self)
 		_tween = create_tween()
-		_tween.tween_interval(UiPopups.ANIM.toast_in + UiWardrobe.T_TOAST_HOLD)
+		_tween.tween_interval(UiPopups.ANIM.toast_in + (UiWardrobe.T_TOAST_HOLD if hold < 0.0 else hold))
 		_tween.tween_property(self, "modulate:a", 0.0, UiPopups.ANIM.toast_out)
 		_tween.tween_callback(func() -> void: visible = false)
 		queue_redraw()
 
 	func _draw() -> void:
-		PopupToast.draw_pill(self, Rect2(Vector2.ZERO, size), text, icon)
+		PopupToast.draw_pill(self, Rect2(Vector2.ZERO, size), text, icon, glyph)

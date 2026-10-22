@@ -5,12 +5,9 @@ extends Control
 ## sjemena + broj); kod pada svaki broj precrtan i prepolovljen + pečat „Kept half". Reklame (Double,
 ## Revive) su lavanda AdButtoni h 120 u svom redu iznad Retry / To Camp (132) — status reklame se vidi
 ## na dugmetu („Double •••", „Doubled ✓", „No ad now"), nema reda teksta. Zatvara se samo dugmetom.
-## Endless (balans ciklus 1): kraj je uvijek pad ili izlazak, ali plijen ostaje cijeli — naslov je
-## preživljeno vrijeme („Endless · 2:34", „Best!" na rekordu), zelena varijanta, bez „Kept half".
-## Revive i dalje nastavlja Endless. Konačni Endless rezultat čeka CD (leveli-endless-cd-brief).
-
-const S_ENDLESS_TITLE := "Endless · %s"
-const S_ENDLESS_BEST := "Best! %s"
+## Endless (design_handoff_leveli_endless · B6): ploča „Endless" (lavanda, prstenovi) ili zlatna
+## „New best!" (trofej) + pečat; veliko vrijeme 180/900, pilula „Pace N", red „Best 5:28" /
+## „Was 4:25"; plijen CIJELI s mint pečatom „All yours". Retry je primarno, Revive nastavlja Endless.
 
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
 
@@ -101,9 +98,29 @@ func shows_revive() -> bool:
 
 func get_title() -> String:
 	if is_endless():
-		var clock := UiRun.endless_clock(GameState.last_endless_sec)
-		return (S_ENDLESS_BEST if GameState.last_endless_new_best else S_ENDLESS_TITLE) % clock
+		return UiLevels.S_NEW_BEST if GameState.last_endless_new_best else UiLevels.S_ENDLESS
 	return UiPopups.S_RUN_FAILED if is_failed() else UiPopups.S_RUN_COMPLETE
+
+
+## Endless: preživljeno vrijeme, stepenica i red rekorda (testovi i snimke).
+func get_endless_score() -> Dictionary:
+	if not is_endless():
+		return {}
+	var sec := GameState.last_endless_sec
+	return {
+		"time": UiLevels.clock(sec),
+		"pace": UiLevels.S_PACE % RunLevelLibrary.endless_tier(sec),
+		"best": _endless_best_line(),
+		"stamp": GameState.last_endless_new_best,
+	}
+
+
+func _endless_best_line() -> String:
+	if GameState.last_endless_new_best:
+		var prev := GameState.last_endless_prev_best
+		return UiLevels.S_WAS % UiLevels.clock(prev) if prev > 0.0 else ""
+	var best := GameState.endless_best_sec(GameState.active_season_id)
+	return UiLevels.S_BEST % UiLevels.clock(best) if best > 0.0 else ""
 
 
 func get_chip_count() -> int:
@@ -140,10 +157,24 @@ func get_all_text() -> String:
 # --- gradnja ---
 
 func _build() -> void:
-	modal.set_title(get_title(), "fail" if is_failed() else "success")
+	var endless := is_endless()
+	if endless:
+		var best := GameState.last_endless_new_best
+		modal.set_plate_icon(UiLevels.tex("endless/trophy.svg" if best else "endless/rings.svg"), Vector2(60, 60) if best else Vector2(64, 36))
+		modal.set_title(get_title(), "reward" if best else "endless")
+	else:
+		modal.set_plate_icon(null, Vector2.ZERO)
+		modal.set_title(get_title(), "fail" if is_failed() else "success")
 	_detach([double_button, revive_button, retry_button, camp_button])
 	modal.clear_content()
-	tray = RewardTray.new().setup(880.0, _make_chips(), UiPopups.S_KEPT_HALF if is_failed() else "", get_boost_stamp())
+	if endless:
+		var score := _EndlessScore.new()
+		score.name = "EndlessScore"
+		score.setup(get_endless_score(), RunLevelLibrary.endless_tier(GameState.last_endless_sec))
+		modal.content.add_child(score)
+	var stamp := UiLevels.S_ALL_YOURS if endless else (UiPopups.S_KEPT_HALF if is_failed() else "")
+	tray = RewardTray.new().setup(880.0, _make_chips(), stamp, get_boost_stamp())
+	tray.stamp_full = endless
 	tray.name = "RewardTray"
 	modal.content.add_child(PopupModal.centered(tray))
 	var buttons := VBoxContainer.new()
@@ -202,8 +233,10 @@ func _apply_buttons() -> void:
 		retry_button.configure("loading", UiPopups.S_RETRY)
 		camp_button.configure("disabled", UiPopups.S_TO_CAMP, false, UiAssets.get_chrome_icon("tab_camp"))
 		return
-	retry_button.configure("disabled" if nav_locked else "secondary", UiPopups.S_RETRY)
-	camp_button.configure("disabled" if nav_locked else "primary", UiPopups.S_TO_CAMP, false, UiAssets.get_chrome_icon("tab_camp"))
+	# Endless: Retry je primarno (nova trka za rekord), To Camp sekundarno.
+	var endless := is_endless()
+	retry_button.configure("disabled" if nav_locked else ("primary" if endless else "secondary"), UiPopups.S_RETRY)
+	camp_button.configure("disabled" if nav_locked else ("secondary" if endless else "primary"), UiPopups.S_TO_CAMP, false, UiAssets.get_chrome_icon("tab_camp"))
 
 
 func _apply_ad(btn: PopupButton, label: String, state: String, done_label: String) -> void:
@@ -297,3 +330,88 @@ func _on_camp_pressed() -> void:
 func _set_nav_locked(locked: bool) -> void:
 	nav_locked = locked
 	_apply_buttons()
+
+
+## B6 · rezultat Endlessa iznad plijena: vrijeme 180/900 (tabular), red [Pace N] [🏆 Best 5:28];
+## na rekordu zlatni pečat „New best!" (220, 12°) gore desno, ulazi 0,22 s back-out.
+class _EndlessScore extends Control:
+	const TIME_FONT := 180
+	const PILL_H := 72.0
+	const PILL_FONT := 40
+	const GAP := 18.0
+	const STAMP := 220.0
+
+	var score: Dictionary = {}
+	var tier: int = 0
+	var _stamp: Control
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func setup(p_score: Dictionary, p_tier: int) -> void:
+		score = p_score
+		tier = p_tier
+		custom_minimum_size = Vector2(UiPopups.MODAL_W - 96.0, TIME_FONT * 0.9 + GAP + PILL_H)
+		if bool(score.get("stamp", false)):
+			_stamp = _Stamp.new()
+			_stamp.size = Vector2(STAMP, STAMP)
+			_stamp.pivot_offset = _stamp.size * 0.5
+			_stamp.rotation_degrees = 12.0
+			add_child(_stamp)
+			_stamp.scale = Vector2.ONE * 0.6
+			_stamp.modulate.a = 0.0
+			var t := _stamp.create_tween().set_parallel()
+			t.tween_property(_stamp, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			t.tween_property(_stamp, "modulate:a", 1.0, 0.22)
+		queue_redraw()
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_RESIZED and _stamp:
+			_stamp.position = Vector2(size.x + 6.0 - STAMP, -40.0)
+
+	func _pace_w() -> float:
+		return 16.0 + 36.0 + 10.0 + UiPopups.text_w(900, PILL_FONT, str(score.get("pace", ""))) + 26.0
+
+	func _best_w() -> float:
+		var b := str(score.get("best", ""))
+		return 0.0 if b.is_empty() else 16.0 + 40.0 + 10.0 + UiPopups.text_w(900, PILL_FONT, b) + 26.0
+
+	func _draw() -> void:
+		var t := str(score.get("time", ""))
+		var tw := UiHomeV3.text_w(900, TIME_FONT, t, 0.0, true)
+		UiHomeV3.draw_text(self, 900, TIME_FONT, t, Vector2((size.x - tw) * 0.5, -TIME_FONT * 0.05), UiLevels.INK, 0.0, true)
+		var y := TIME_FONT * 0.9 + GAP
+		var pw := _pace_w()
+		var bw := _best_w()
+		var row := pw + (16.0 + bw if bw > 0.0 else 0.0)
+		var x := (size.x - row) * 0.5
+		var pr := Rect2(x, y, pw, PILL_H)
+		draw_style_box(UiPopups._box(UiLevels.band_fill(UiLevels.pace_band(tier)), int(PILL_H * 0.5), 4), pr)
+		var icon := UiLevels.tex("fx/pace_up.svg")
+		if icon:
+			draw_texture_rect(icon, Rect2(pr.position.x + 16.0, pr.get_center().y - 18.0, 36.0, 36.0), false)
+		UiPopups.draw_text(self, 900, PILL_FONT, str(score.get("pace", "")), Vector2(pr.position.x + 62.0, pr.get_center().y - PILL_FONT * 0.5), UiLevels.INK)
+		if bw <= 0.0:
+			return
+		var br := Rect2(pr.end.x + 16.0, y, bw, PILL_H)
+		draw_style_box(UiPopups._box(UiLevels.RIM, int(PILL_H * 0.5), 3, UiLevels.INK_18), br)
+		var trophy := UiLevels.tex("endless/trophy.svg")
+		if trophy:
+			draw_texture_rect(trophy, Rect2(br.position.x + 16.0, br.get_center().y - 20.0, 40.0, 40.0), false)
+		UiPopups.draw_text(self, 900, PILL_FONT, str(score.get("best", "")), Vector2(br.position.x + 66.0, br.get_center().y - PILL_FONT * 0.5), UiLevels.SOFT)
+
+
+	class _Stamp extends Control:
+		func _init() -> void:
+			mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+		func _draw() -> void:
+			var tex := UiLevels.tex("endless/stamp_best.svg")
+			if tex:
+				draw_texture_rect(tex, Rect2(Vector2.ZERO, size), false)
+			var r := Rect2(Vector2.ZERO, size)
+			var lines := ["New", "best!"]
+			var h := 40.0 * 0.95
+			for i in lines.size():
+				var w := UiPopups.text_w(900, 40, str(lines[i]))
+				UiPopups.draw_text(self, 900, 40, str(lines[i]), Vector2(r.get_center().x - w * 0.5, r.get_center().y - h + float(i) * h), UiLevels.INK)

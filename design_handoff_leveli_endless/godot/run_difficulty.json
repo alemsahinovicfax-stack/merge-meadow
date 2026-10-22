@@ -1,0 +1,377 @@
+{
+  "meta": {
+    "package": "design_handoff_leveli_endless",
+    "brief": "docs/04-experience/design-drafts/leveli-endless-cd-brief.md",
+    "artboard": [
+      1080,
+      1920
+    ],
+    "units": "px (artboard), s"
+  },
+  "intro": {
+    "trigger": "RunController.start_run() (level mode; also replay of L20)",
+    "node": "FlyLayer pooled (1 panel + 1 sub pill)",
+    "sprites": 6,
+    "input_block": false,
+    "timing": {
+      "pop": 0.18,
+      "sub": [
+        0.1,
+        0.3
+      ],
+      "hold": 0.74,
+      "fly": [
+        0.74,
+        1.12
+      ],
+      "total": 1.12,
+      "chipBump": [
+        1.06,
+        1.18
+      ]
+    },
+    "plate": {
+      "h": 180,
+      "radius": 90,
+      "fill": "#FFF8F0",
+      "border": [
+        5,
+        "#2D3436"
+      ],
+      "shadow": [
+        0,
+        12,
+        "rgba(10,14,12,.55)"
+      ],
+      "pad_x": 64,
+      "gap": 28,
+      "text": "Level %d",
+      "font": [
+        96,
+        900
+      ],
+      "tag_h": 60
+    },
+    "sub": {
+      "h": 88,
+      "radius": 44,
+      "border": [
+        4,
+        "#2D3436"
+      ],
+      "disc": [
+        60,
+        "band.fill"
+      ],
+      "text": "%band · %m:%ss",
+      "text_replay": "Replay · %m:%ss",
+      "font": [
+        44,
+        900
+      ]
+    },
+    "motion": "pop scale .9→1 back-out .18 s at y 560 · sub slides in .10–.30 · hold · .74–1.12 fly to LevelChip (x −300, y 24, scale .36, fade last 30 %) · LevelChip bump 1.08 at 1.06–1.18"
+  },
+  "gust": {
+    "trigger": "int(elapsed / RAMP_EVERY) changes (15 s); Endless: on tier change",
+    "timing": {
+      "total": 0.42,
+      "streak": 0.36,
+      "lean": 0.3,
+      "jolt": 0.16,
+      "stagger": 0.03
+    },
+    "streaks": {
+      "sprite": "assets/fx/gust_streak.svg",
+      "count": 5,
+      "x": [
+        178,
+        405,
+        675,
+        902,
+        540
+      ],
+      "y0": [
+        260,
+        120,
+        180,
+        300,
+        1180
+      ],
+      "travel_y": 900,
+      "alpha_peak": 0.62,
+      "scale_y": [
+        0.5,
+        1.3
+      ],
+      "stagger": 0.03
+    },
+    "pip": "scale_y 1 → .94 → 1 over .30 s (ears flatten)",
+    "world_jolt": "World.position.y +10 px bell over .16 s",
+    "sprites": 5,
+    "text": false
+  },
+  "levels": [
+    {
+      "n": 1,
+      "band": 1,
+      "peak": false,
+      "dur": 60,
+      "v": [
+        400,
+        424
+      ],
+      "obst_per_min": 1.6,
+      "pairs_pct": 0,
+      "gate_lead_s": 3.9
+    },
+    {
+      "n": 2,
+      "band": 1,
+      "peak": false,
+      "dur": 64,
+      "v": [
+        408,
+        443
+      ],
+      "obst_per_min": 2,
+      "pairs_pct": 0,
+      "gate_lead_s": 3.73
+    },
+    {
+      "n": 3,
+      "band": 1,
+      "peak": false,
+      "dur": 66,
+      "v": [
+        412,
+        449
+      ],
+      "obst_per_min": 2.3,
+      "pairs_pct": 0,
+      "gate_lead_s": 3.68
+    },
+    {
+      "n": 4,
+      "band": 1,
+      "peak": false,
+      "dur": 70,
+      "v": [
+        420,
+        458
+      ],
+      "obst_per_min": 2.5,
+      "pairs_pct": 0,
+      "gate_lead_s": 3.61
+    },
+    {
+      "n": 5,
+      "band": 1,
+      "peak": true,
+      "dur": 72,
+      "v": [
+        424,
+        464
+      ],
+      "obst_per_min": 3.1,
+      "pairs_pct": 0,
+      "gate_lead_s": 3.56
+    },
+    {
+      "n": 6,
+      "band": 2,
+      "peak": false,
+      "dur": 76,
+      "v": [
+        432,
+        486
+      ],
+      "obst_per_min": 3.6,
+      "pairs_pct": 4,
+      "gate_lead_s": 3.46
+    },
+    {
+      "n": 7,
+      "band": 2,
+      "peak": false,
+      "dur": 78,
+      "v": [
+        436,
+        493
+      ],
+      "obst_per_min": 4.2,
+      "pairs_pct": 5,
+      "gate_lead_s": 3.36
+    },
+    {
+      "n": 8,
+      "band": 2,
+      "peak": false,
+      "dur": 82,
+      "v": [
+        444,
+        505
+      ],
+      "obst_per_min": 5,
+      "pairs_pct": 7,
+      "gate_lead_s": 3.28
+    },
+    {
+      "n": 9,
+      "band": 2,
+      "peak": false,
+      "dur": 86,
+      "v": [
+        452,
+        514
+      ],
+      "obst_per_min": 5.6,
+      "pairs_pct": 9,
+      "gate_lead_s": 3.22
+    },
+    {
+      "n": 10,
+      "band": 2,
+      "peak": true,
+      "dur": 88,
+      "v": [
+        456,
+        521
+      ],
+      "obst_per_min": 6.5,
+      "pairs_pct": 11,
+      "gate_lead_s": 3.17
+    },
+    {
+      "n": 11,
+      "band": 3,
+      "peak": false,
+      "dur": 92,
+      "v": [
+        464,
+        548
+      ],
+      "obst_per_min": 7.5,
+      "pairs_pct": 12,
+      "gate_lead_s": 3.05
+    },
+    {
+      "n": 12,
+      "band": 3,
+      "peak": false,
+      "dur": 94,
+      "v": [
+        468,
+        556
+      ],
+      "obst_per_min": 8.7,
+      "pairs_pct": 14,
+      "gate_lead_s": 2.98
+    },
+    {
+      "n": 13,
+      "band": 3,
+      "peak": false,
+      "dur": 98,
+      "v": [
+        476,
+        565
+      ],
+      "obst_per_min": 9.5,
+      "pairs_pct": 16,
+      "gate_lead_s": 2.93
+    },
+    {
+      "n": 14,
+      "band": 3,
+      "peak": false,
+      "dur": 102,
+      "v": [
+        484,
+        578
+      ],
+      "obst_per_min": 10.8,
+      "pairs_pct": 18,
+      "gate_lead_s": 2.86
+    },
+    {
+      "n": 15,
+      "band": 3,
+      "peak": true,
+      "dur": 104,
+      "v": [
+        488,
+        586
+      ],
+      "obst_per_min": 12.2,
+      "pairs_pct": 20,
+      "gate_lead_s": 2.82
+    },
+    {
+      "n": 16,
+      "band": 4,
+      "peak": false,
+      "dur": 108,
+      "v": [
+        496,
+        618
+      ],
+      "obst_per_min": 13.8,
+      "pairs_pct": 22,
+      "gate_lead_s": 2.67
+    },
+    {
+      "n": 17,
+      "band": 4,
+      "peak": false,
+      "dur": 110,
+      "v": [
+        500,
+        628
+      ],
+      "obst_per_min": 15.3,
+      "pairs_pct": 24,
+      "gate_lead_s": 2.64
+    },
+    {
+      "n": 18,
+      "band": 4,
+      "peak": false,
+      "dur": 114,
+      "v": [
+        508,
+        638
+      ],
+      "obst_per_min": 16.7,
+      "pairs_pct": 26,
+      "gate_lead_s": 2.59
+    },
+    {
+      "n": 19,
+      "band": 4,
+      "peak": false,
+      "dur": 116,
+      "v": [
+        512,
+        647
+      ],
+      "obst_per_min": 19,
+      "pairs_pct": 28,
+      "gate_lead_s": 2.56
+    },
+    {
+      "n": 20,
+      "band": 4,
+      "peak": true,
+      "dur": 120,
+      "v": [
+        520,
+        662
+      ],
+      "obst_per_min": 20.6,
+      "pairs_pct": 30,
+      "gate_lead_s": 2.5
+    }
+  ],
+  "note": "numbers copied from §4 / levels.json — not changed"
+}

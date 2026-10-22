@@ -7,6 +7,9 @@ extends Node2D
 ## Balans ciklus 1 (2026-10-21): brzina raste po levelu (speed_ramp), prepreke mogu doći u
 ## paru (dvije staze, jedna slobodna), sjeme se bira po rijetkosti (RunBalance); Endless nema
 ## tajmer — stepenica („Pace") svakih RunLevelLibrary.ENDLESS_TIER_SEC s, plijen ostaje cijeli.
+## Izgled težine (design_handoff_leveli_endless, 2026-10-22): pločica pojasa u LevelChipu, najava
+## levela, nalet na svaku stepenicu brzine, par = jedan predmet preko dvije staze, cilj na kraju
+## levela; Endless čip (sat · Pace · Best), pilula nove stepenice, novi rekord, pauza „all yours".
 
 const BASE_SCROLL_SPEED := 400.0
 const SPAWN_INTERVAL := 1.2
@@ -105,6 +108,20 @@ var _next_bush_at: float = UiRun.BUSH_FIRST_AFTER
 var bushes_spawned: int = 0
 var bushes_collected: int = 0
 
+## Leveli + Endless (design_handoff_leveli_endless).
+var band_tag: TextureRect
+var level_intro: RunLevelIntro
+var gust_fx: RunGustFx
+var endless_chip: RunEndlessChip
+var endless_fx: RunEndlessFx
+var finish_gate: RunFinishGate
+var _gate_tried: bool = false
+var _gust_step: int = 0
+## Level u čipu = level sa starta runa (finish_run ga pomjeri na sljedeći prije kraja animacije).
+var _level_shown: int = 1
+var _best_at_start: float = 0.0
+var _new_best_shown: bool = false
+
 
 func _ready() -> void:
 	Sfx.music_level("run")
@@ -167,6 +184,28 @@ func _build_hud_v2() -> void:
 	top_hud.move_child(progress_rail, 0)
 	bush_fx = RunBushFx.new()
 	fly_layer.add_child(bush_fx)
+	# A1: pločica pojasa iza „Level N" (40 h); B3: Endless čip umjesto reda u istom LevelChipu.
+	band_tag = TextureRect.new()
+	band_tag.name = "BandTag"
+	band_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	band_tag.visible = false
+	_set_icon(band_tag, null)
+	mode_label.get_parent().add_child(band_tag)
+	endless_chip = RunEndlessChip.new()
+	endless_chip.visible = false
+	level_chip.add_child(endless_chip)
+	# A3: nalet iznad svijeta i Pipa (ispod HUD-a).
+	gust_fx = RunGustFx.new()
+	add_child(gust_fx)
+	move_child(gust_fx, player.get_index() + 1)
+	gust_fx.setup(player.get_node_or_null("PipVisual") as Node2D, world)
+	# A2 najava i B4/B5 Endless trenuci: px baze, ispod pauze.
+	level_intro = RunLevelIntro.new()
+	_popup_root.add_child(level_intro)
+	_popup_root.move_child(level_intro, 0)
+	endless_fx = RunEndlessFx.new()
+	_popup_root.add_child(endless_fx)
+	_popup_root.move_child(endless_fx, 1)
 
 
 func _set_icon(rect: TextureRect, tex: Texture2D) -> void:
@@ -190,7 +229,16 @@ func start_run() -> void:
 	_tutorial_obstacle_done = false
 	_next_obstacle_stump = false
 	_next_bush_at = UiRun.BUSH_FIRST_AFTER
-	_reset_common()
+	await _reset_common()
+	_play_level_intro()
+
+
+## A2 · najava levela (samo level mode; replay levela 20 kaže „Replay").
+func _play_level_intro() -> void:
+	if level_intro == null or GameState.is_endless_mode() or not GameState.uses_run_level_config():
+		return
+	var replay := GameState.season_level(GameState.active_season_id) > LevelPathDomain.LEVELS
+	level_intro.play(GameState.run_level, replay, GameState.get_run_duration(), level_chip)
 
 
 func _resume_run() -> void:
@@ -213,6 +261,19 @@ func _reset_common() -> void:
 	_endless_tier = -1
 	_clock_shown = -1
 	_end_reason = "finish"
+	_level_shown = GameState.run_level
+	_gust_step = int(elapsed / RAMP_EVERY)
+	# Revive: rekord sa starta runa (prvi pad je već upisao ovo vrijeme kao rekord sezone).
+	_best_at_start = 0.0
+	if GameState.is_endless_mode():
+		_best_at_start = GameState.last_endless_prev_best if GameState.revive_used_this_run 			else GameState.endless_best_sec(GameState.active_season_id)
+	_new_best_shown = GameState.is_endless_mode() and _best_at_start > 0.0 and elapsed > _best_at_start
+	finish_gate = null
+	_gate_tried = false
+	if gust_fx:
+		gust_fx.stop()
+	if level_intro:
+		level_intro.stop()
 	_tele = RunTelemetry.new_counters()
 	if not _tele.is_empty():
 		# Level i cilj na startu — finish_run poslije pomjeri Level Path na sljedeći level.
@@ -259,24 +320,31 @@ func _process(delta: float) -> void:
 	if _endless_ramp_active():
 		_update_endless_tier()
 		scroll_speed = _scroll_speed_base
+		_check_new_best()
 	else:
 		var ramp_level := int(elapsed / RAMP_EVERY)
 		scroll_speed = _scroll_speed_base * pow(1.0 + _speed_ramp, ramp_level)
+		# A3: nalet kad brzina pređe na sljedeću stepenicu (svakih 15 s).
+		if ramp_level > _gust_step:
+			_gust_step = ramp_level
+			gust_fx.play(_ui_scale())
 	RunTelemetry.note_speed(_tele, scroll_speed, delta)
 
 	spawn_timer += delta
-	var open := _spawn_reaches_pip()
+	var open := _spawn_reaches_pip(run_duration)
 	if spawn_timer >= _spawn_interval:
 		spawn_timer = 0.0
 		if open:
 			_try_spawn()
 	if open:
 		_update_bush_spawn()
+	else:
+		_update_finish_gate(delta, run_duration)
 
 	_shift_world(delta, scroll_speed)
 	# Brojevi u headeru se mijenjaju samo na pickupu; po frejmu ide samo traka. Endless čip
 	# nosi sat — tekst se mijenja jednom u sekundi.
-	_update_rail()
+	_update_rail(run_duration)
 	if GameState.is_endless_mode() and int(elapsed) != _clock_shown:
 		_update_hud()
 
@@ -399,7 +467,15 @@ func _play_finish_beat() -> void:
 	# Traka: na 100 % zastavica se podigne i dobije mint prsten, pa „Time!".
 	if progress_rail and progress_rail.visible:
 		progress_rail.finish()
-	_show_banner(true)
+	# A6: traka pukne, luk poskoči, konfete iz Pipa; „Time!" stiže 0,12 s poslije.
+	if finish_gate != null and is_instance_valid(finish_gate):
+		finish_gate.pass_through(fly_layer, player.global_position)
+		get_tree().create_timer(UiLevels.FINISH_BANNER).timeout.connect(func() -> void:
+			if is_instance_valid(self) and _state == _STATE_ENDED:
+				_show_banner(true)
+		)
+	else:
+		_show_banner(true)
 	_spawn_finish_burst()
 	var start_speed := scroll_speed
 	var t := 0.0
@@ -554,9 +630,22 @@ func _fill_pause() -> void:
 		var scaled_n := int(scaled_seeds[type_id])
 		var kept_n := scaled_n if full else int(ceil(float(scaled_n) * 0.5))
 		chips.append(RewardChip.new().setup("seed", str(type_id), kept_n, -1 if full else scaled_n, false, false))
-	var tray := RewardTray.new().setup(880.0, chips, UiPopups.S_IF_YOU_QUIT)
+	# B7 · Endless: zaglavlje (prstenovi · sat · Pace), mint pečat „all yours", Quit nosi korpu.
+	if full and GameState.is_endless_mode():
+		var head := RunEndlessChip.PauseHeader.new()
+		head.setup(elapsed, maxi(0, _endless_tier))
+		pause_overlay.content.add_child(PopupModal.centered(head))
+	var stamp := UiLevels.S_QUIT_ALL_YOURS if full else UiPopups.S_IF_YOU_QUIT
+	var tray := RewardTray.new().setup(880.0, chips, stamp)
+	tray.stamp_full = full
 	tray.name = "RewardTray"
 	pause_overlay.content.add_child(PopupModal.centered(tray))
+	if full:
+		quit_button.configure("secondary", UiPopups.S_QUIT_TO_CAMP, false, UiPopups.icon("icon_basket"))
+		quit_button.icon_disc = UiLevels.MINT
+	else:
+		quit_button.configure("secondary", UiPopups.S_QUIT_TO_CAMP, false, UiPopups.icon("icon_half"))
+		quit_button.icon_disc = Color(0, 0, 0, 0)
 	var col := VBoxContainer.new()
 	col.name = "ModalButtons"
 	col.add_theme_constant_override("separation", 24)
@@ -615,12 +704,32 @@ func _spawn_guaranteed_seed(type_id: String, lane: int) -> void:
 	world.add_child(seed)
 
 
-func _spawn_obstacle_at_lane(lane: int) -> void:
+func _spawn_obstacle_at_lane(lane: int) -> Node:
 	var obstacle := _obstacle_scene.instantiate()
 	obstacle.position = Vector2(lane_x_positions[lane], -80.0)
 	_decorate_obstacle(obstacle)
 	world.add_child(obstacle)
 	RunTelemetry.count(_tele, "obstacles_spawned")
+	return obstacle
+
+
+## A4 · par kao jedan predmet (obstacle_pairs.json): susjedne staze = široki sprite koji crta
+## lijeva prepreka (desni par zrcaljen), druga ne crta ništa; lijevo + desno = dva bočna dijela
+## okrenuta ka sredini. Sudar ostaje 2 × 64 × 64.
+func _decorate_pair(a: Node, lane_a: int, b: Node, lane_b: int) -> void:
+	if not a.has_method("set_pair") or not b.has_method("set_pair"):
+		return
+	var left := a if lane_a < lane_b else b
+	var right := b if lane_a < lane_b else a
+	var lo := mini(lane_a, lane_b)
+	var hi := maxi(lane_a, lane_b)
+	if hi - lo == 1:
+		var dx := (lane_x_positions[hi] - lane_x_positions[lo]) * 0.5
+		left.set_pair("wide", dx, lo == 1)
+		right.set_pair("hidden", 0.0, false)
+	else:
+		left.set_pair("side", 0.0, false)
+		right.set_pair("side", 0.0, true)
 
 
 func _apply_run_level_config() -> void:
@@ -664,19 +773,80 @@ func _update_endless_tier() -> void:
 	var tier := RunLevelLibrary.endless_tier(elapsed)
 	if tier == _endless_tier:
 		return
+	var first := _endless_tier < 0
 	_endless_tier = tier
 	_apply_cfg(RunLevelLibrary.get_endless_config_at(elapsed))
 	RunTelemetry.note_max(_tele, "tier_max", tier)
+	if first:
+		return
+	# B4: pilula „Pace N" ispod čipa + nalet; pilula u čipu se trzne.
+	gust_fx.play(_ui_scale())
+	endless_fx.play_pace(tier, top_hud.offset_top / _ui_scale())
+	endless_chip.bump_pace()
+	_update_hud()
+
+
+## B5 · novi rekord sezone u runu: jednom, kad preživljeno pređe rekord sa starta runa.
+func _check_new_best() -> void:
+	if _new_best_shown or _best_at_start <= 0.0 or elapsed <= _best_at_start:
+		return
+	_new_best_shown = true
+	var s := _ui_scale()
+	var r := level_chip.get_global_rect()
+	endless_fx.play_best(Rect2(r.position / s, r.size / s), level_chip)
+	Sfx.play("unlock")
+	_update_hud()
+
+
+func is_new_best_live() -> bool:
+	return _new_best_shown
 
 
 ## Pred kraj levela se ne stvara ništa što ne bi stiglo do Pipa prije kraja (playtest 2026-10-21:
-## plijen je ostajao ispred Pipa kad run stane). Put od linije spawna do Pipa po trenutnoj brzini —
-## brzina samo raste, pa stvarni dolazak nije kasniji. Endless nema kraja.
-func _spawn_reaches_pip() -> bool:
-	var duration := GameState.get_run_duration()
+## plijen je ostajao ispred Pipa kad run stane). Endless nema kraja. Od 2026-10-22 po preostalom
+## putu sa stepenicama brzine (isto pravilo kao cilj) — prazna dionica JE dolazak cilja.
+func _spawn_reaches_pip(duration: float = NAN) -> bool:
+	return remaining_distance(duration) > _gate_gap()
+
+
+## Put od linije spawna (y −80) do Pipa — 1654 px na 1080 × 1920.
+func _gate_gap() -> float:
+	return player.position.y - SPAWN_Y
+
+
+## Put koji staza još pređe do kraja levela: brzina je stepenica (× (1 + ramp) svakih RAMP_EVERY s),
+## pa se integrali dionica po dionica (level_finish.json: „1654 / v_kraj" griješi kad stepenica
+## padne u zadnju dionicu). INF u Endlessu. `duration` iz _process (NAN = pročitaj iz GameState).
+func remaining_distance(duration: float = NAN) -> float:
+	if is_nan(duration):
+		duration = GameState.get_run_duration()
 	if is_inf(duration):
-		return true
-	return elapsed + (player.position.y - SPAWN_Y) / maxf(scroll_speed, 1.0) < duration
+		return INF
+	var d := 0.0
+	var x := elapsed
+	while x < duration - 1e-6:
+		var step := int(x / RAMP_EVERY)
+		var nx := minf(duration, float(step + 1) * RAMP_EVERY)
+		if nx <= x:
+			nx = minf(duration, x + RAMP_EVERY)
+		d += _scroll_speed_base * pow(1.0 + _speed_ramp, step) * (nx - x)
+		x = nx
+	return d
+
+
+## A6 · cilj: jednom, kad se spawn zatvori. Postavlja se tako da poslije ovog frejma stoji tačno
+## `remaining_distance()` iznad Pipa — traka pređe Pipa kad istekne vrijeme.
+func _update_finish_gate(delta: float, duration: float) -> void:
+	if _gate_tried or GameState.is_endless_mode():
+		return
+	_gate_tried = true
+	var gate := RunFinishGate.new().setup(GameState.active_season_id, _ui_scale())
+	if not gate.has_art():
+		gate.free()
+		return
+	finish_gate = gate
+	gate.position = Vector2(0.0, player.position.y - remaining_distance(duration) - scroll_speed * delta)
+	world.add_child(gate)
 
 
 ## Endless stepenica (0, 1, 2…) — za HUD / provjere; -1 izvan Endlessa.
@@ -694,13 +864,14 @@ func _try_spawn() -> void:
 	# Fer grm: nema prepreke u susjednim stazama ±300 px od grma — umjesto nje ide pickup.
 	if GameState.obstacles_enabled_for_run() and randf() < _obstacle_chance \
 			and not _bush_blocks_lane(lane, spawn_pos.y):
-		_spawn_obstacle_at_lane(lane)
+		var first := _spawn_obstacle_at_lane(lane)
 		RunTelemetry.count(_tele, "obstacle_rows")
 		# Par: druga staza u istom redu — treća uvijek ostaje slobodna.
 		if randf() < _pair_chance:
 			var other := RunBalance.pair_lane(lane, randf())
 			if not _bush_blocks_lane(other, spawn_pos.y):
-				_spawn_obstacle_at_lane(other)
+				var second := _spawn_obstacle_at_lane(other)
+				_decorate_pair(first, lane, second, other)
 				RunTelemetry.count(_tele, "pairs")
 	elif randf() < _effective_seed_spawn_chance():
 		var seed := _seed_scene.instantiate()
@@ -971,19 +1142,25 @@ func _update_hud() -> void:
 	seed_counter_label.text = "%d" % maxi(0, _sum_run_seeds() - _pending_seeds)
 	var endless := GameState.is_endless_mode()
 	_clock_shown = int(elapsed)
-	var text := UiRun.mode_text(
-		endless,
-		UiRun.endless_clock(elapsed),
-		GameState.uses_run_level_config(),
-		GameState.run_level,
-	)
+	# Endless: labela je skrivena (čip crta sat sam), pa tekst moda ostaje stalan.
+	var text := UiLevels.S_ENDLESS if endless else UiRun.mode_text(
+		false, "", GameState.uses_run_level_config(), _level_shown)
+	var relayout := false
+	if endless and endless_chip:
+		# B3: sat · Pace · Best (ili „New best!" poslije rekorda) — crta se kad se nešto promijeni.
+		var tier := maxi(0, _endless_tier if _endless_ramp_active() else RunLevelLibrary.endless_tier(elapsed))
+		var old_w := endless_chip.custom_minimum_size.x
+		endless_chip.set_state(int(elapsed), tier, _best_at_start, _new_best_shown)
+		relayout = not is_equal_approx(old_w, endless_chip.custom_minimum_size.x)
 	if text != _mode_shown:
 		_apply_mode(text, endless)
+	elif relayout:
+		_layout_level_chip()
 	_update_rail()
 
 
-## LevelChip: „Level N" 48 px / „Endless · X" 42 px bez zastavice / „Practice" sa zastavicom.
-## Širina raste s tekstom (min 200, max 464); traka napretka samo kad run ima cilj.
+## LevelChip: „Level N" 48 px + pločica pojasa / Endless čip u dva reda / „Practice" sa zastavicom.
+## Širina raste sa sadržajem (min 200, max 464); traka napretka samo kad run ima cilj.
 func _apply_mode(text: String, endless: bool) -> void:
 	_mode_shown = text
 	var px := UiRun.FONT_LEVEL_ENDLESS if endless else UiRun.FONT_LEVEL
@@ -991,6 +1168,20 @@ func _apply_mode(text: String, endless: bool) -> void:
 	mode_label.add_theme_font_size_override("font_size", px)
 	mode_label.text = text
 	flag_icon.visible = UiRun.has_goal(endless)
+	var row := mode_label.get_parent() as Control
+	row.visible = not endless
+	if endless_chip:
+		endless_chip.visible = endless
+		var pad := UiLevels.HUD_PAD_X if endless else float(UiRun.LEVEL_CHIP_PAD_X)
+		level_chip.add_theme_stylebox_override("panel", _padded(UiRun.chip_style(), pad, 0))
+	if band_tag:
+		var level_mode := not endless and GameState.uses_run_level_config()
+		band_tag.visible = level_mode
+		if level_mode:
+			var lv := _level_shown
+			band_tag.texture = UiLevels.tag_tex(lv)
+			var ts := UiLevels.tag_size(lv)
+			band_tag.custom_minimum_size = Vector2(UiLevels.CHIP_TAG_H * ts.x / ts.y, UiLevels.CHIP_TAG_H)
 	if progress_rail:
 		progress_rail.visible = UiRun.rail_visible(endless)
 	_layout_level_chip()
@@ -999,7 +1190,8 @@ func _apply_mode(text: String, endless: bool) -> void:
 func _layout_level_chip() -> void:
 	var s := _ui_scale()
 	var flag_w := (UiRun.LEVEL_FLAG.x + UiRun.LEVEL_GAP) if flag_icon.visible else 0.0
-	var room := float(UiRun.LEVEL_CHIP_MAX_W - 2 * UiRun.LEVEL_CHIP_PAD_X) - flag_w
+	var tag_w := (band_tag.custom_minimum_size.x + UiRun.LEVEL_GAP) if band_tag and band_tag.visible else 0.0
+	var room := float(UiRun.LEVEL_CHIP_MAX_W - 2 * UiRun.LEVEL_CHIP_PAD_X) - flag_w - tag_w
 	# Bez rezanja label nosi punu širinu teksta; tek preko max 464 dobije „…" na fiksnoj širini
 	# (Label s overrunom ima min širinu 0, pa ga ne smijemo ostaviti uključenog).
 	mode_label.custom_minimum_size.x = 0.0
@@ -1015,10 +1207,11 @@ func _layout_level_chip() -> void:
 	_place_rect(level_chip, Rect2(r.position, Vector2(w, r.size.y)), s)
 
 
-func _update_rail() -> void:
+func _update_rail(duration: float = NAN) -> void:
 	if progress_rail == null or not progress_rail.visible:
 		return
-	var duration := GameState.get_run_duration()
+	if is_nan(duration):
+		duration = GameState.get_run_duration()
 	progress_rail.set_progress(1.0 if duration <= 0.0 else elapsed / duration)
 
 

@@ -1,6 +1,6 @@
 ---
 type: dizajn
-status: aktivan
+status: zatvoreno
 milestone: M8
 tags: [dizajn, run, leveli, endless, tezina, balans, sezone, claude-design]
 povezano:

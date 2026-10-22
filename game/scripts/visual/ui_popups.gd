@@ -132,13 +132,14 @@ static func scrim() -> StyleBoxFlat:
 static func modal_panel(on_run: bool = false) -> StyleBoxFlat:
 	return _hard_shadow(_box(WARM_WHITE, MODAL_RADIUS, MODAL_BORDER), MODAL_SHADOW, RUN_DROP if on_run else PANEL_DROP)
 
-## tone: reward | success | fail | decision
+## tone: reward | success | fail | decision | endless (lavanda, kraj Endlessa)
 static func modal_plate(tone: String) -> StyleBoxFlat:
 	var fill := ACTIVE_RIM
 	match tone:
 		"reward": fill = COIN_GOLD
 		"success": fill = MINT
 		"fail": fill = PINK
+		"endless": fill = LAVENDER
 	return _box(fill, PLATE_H / 2, MODAL_BORDER)
 
 static func reward_tray() -> StyleBoxFlat:

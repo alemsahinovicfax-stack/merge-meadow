@@ -762,6 +762,36 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** sve što se pojavljuje na vrhu staze mora proći provjeru „stiže li prije kraja"; cilj na kraju levela (CD) koristi istu računicu.
 
+**Dopuna 2026-10-22 (design_handoff_leveli_endless):** provjera je sad `remaining_distance() > put` — preostali put do kraja integrisan po stepenicama brzine (isto pravilo kao cilj). „Put / trenutna brzina" griješi kad stepenica padne u zadnju dionicu (L6: 3,40 umjesto 3,46 s).
+
+## #50 — CD SVG: dio crteža van viewBoxa je odsječen (zastavica para)
+
+**Datum:** 2026-10-22 (prenos design_handoff_leveli_endless)
+
+**Simptom:** mint zastavica na paru prepreka („prolaz je ovdje") vidi se samo kao štap. Odsječena je i u CD mocku, ne samo u igri.
+
+**Uzrok:** u 16 SVG-ova `*_pair_wide/side.svg` vrh zastavice ide do x 480–490 (okvir 460) odnosno 256–271 (okvir 240), a gornji rub do y −5. I pregledač i Godot (ThorVG) režu sve van `viewBox`.
+
+**Rješenje:** pri kopiranju u `game/assets/levels_endless/obstacles/` okvir je proširen (`0 −8 496 228` / `0 −8 276 228`), a sidro u kodu pomjereno za +8 po y (`UiLevels.PAIR_*_ANCHOR`). Test provjerava veličinu teksture.
+
+**Prevencija:** za svaki CD paket pusti provjeru granica (min / max koordinata oblika prema `viewBox`; skripta u izvještaju prenosa) prije kopiranja. U briefu traži „ništa van okvira".
+
+**Dopuna (isti paket):** `fill="rgba(26,26,20,.24)"` / `stroke="rgba(…)"` Godot (ThorVG) crta kao **puno crno** — sjena sanduka, podnožje zastavice pojasa i traka cilja imali su crne mrlje (u pregledaču je sve izgledalo dobro). Rješenje: `#1A1A14` + `fill-opacity="0.24"` (16 mjesta u 12 fajlova). Prevencija: `grep -l "rgba(" *.svg` na svakom CD paketu prije kopiranja; ostatak igre nema nijedan.
+
+## #51 — `set_process(false)` u `_init` ne drži: efekat krene sam od sebe
+
+**Datum:** 2026-10-22 (design_handoff_leveli_endless, snimke)
+
+**Simptom:**
+- Traka cilja na kraju levela nije pukla: polovine su stajale na 0°, a konfete su stajale u Pipu.
+- Endless dugme se ~0,4 s poslije učitavanja huba samo „otključalo", s oblačićem „Endless unlocked!". `season_sync_smoke` je povremeno padao na koraku 11 (prsten „14 / 15", ali `unlocked = true`).
+
+**Uzrok:** Godot sam uključi processing kad čvor sa `_process` uđe u stablo (NOTIFICATION_READY), pa `set_process(false)` iz `_init` ne vrijedi. Sat efekta (`_t += delta`) je krenuo od −1 i za ~1 s „odigrao" animaciju u prazno. Cilj je zato bio „već potrošen" kad je Pip stigao, a lice dugmeta je ušlo u granu otključavanja jer `_anim` nije bio „lock". Headless testovi s ručnim frejmovima (`run._process(1/60)`) to nisu vidjeli.
+
+**Rješenje:** svaki `_process` efekta počinje stražom: `if _t < 0.0: set_process(false); return` (lice dugmeta: `if _anim.is_empty()`). Test `levels_endless_smoke` sad pušta **prave** frejmove: cilj vozi 1,2 s pa mora puknuti, lice stoji 1,6 s i mora ostati zaključano. Bez straže test pada.
+
+**Prevencija:** stanje „miruje" drži u samom `_process` (straža), ne samo u `_init`. Ili zovi `set_process(false)` u `_ready`, poslije auto-uključivanja. Smoke za animaciju uvijek pusti i kroz prave frejmove, ne samo ručne pozive.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

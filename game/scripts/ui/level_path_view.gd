@@ -7,9 +7,14 @@ extends Control
 ## Kamenje (20) i sanduci (4) su statični crteži; animira se samo transformom: skok i klimanje
 ## reward_ready sanduka + 3 iskre, skok Pipa, pop kamena, prsten i prašina.
 ## Play i ‹ Field su u donjem redu (SeasonStage / MainMenu) — ovdje nisu.
+## Pojasevi težine (design_handoff_leveli_endless · A1): pločica pojasa na svakom kamenu (crta se
+## s kamenom), zastavica s imenom uz prvi kamen pojasa (1 / 6 / 11 / 16). Spreman sanduk (C):
+## frejmovi closed / peek, odvojena sjena, ravna pločica sadržaja ispod, bez „Claim".
 
 signal reward_claimed(n: int)
 signal hop_finished
+## Skok 15 → 16 prvi put u sezoni: Endless je otključan (MainMenu animira dugme — CD B2).
+signal endless_unlocked(season_id: String)
 
 const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
 const DRAG_START := 14.0
@@ -20,20 +25,17 @@ const LOCATOR := Rect2(880, 1316, 176, 96)
 const TOAST_Y := 1250.0
 const TITLE_Y := 24.0
 const BANNER_Y := 150.0
-## Sanduk koji čeka Claim (2026-10-21, playtest: „Claim" pilula ispod sanduka nije reagovala na
-## dodir — uklonjena; tap na sanduk ili kamen): ciklus READY_SEC — skok, doskok sa squashom,
-## klimanje oko dna, mir. Samo transformi; konačni izgled čeka CD (leveli-endless-cd-brief).
-const READY_SEC := 1.8
-const READY_HOP_PX := 26.0
+## Sanduk koji čeka Claim (design_handoff_leveli_endless · chest_ready.json, bez pilule „Claim"):
+## ciklus 1,8 s (sanduk 20: 1,5 s, 34 px, ±10°) — skok 0–0,3, doskok sa squashom 0,3–0,42, poklopac
+## zaviri (frejm peek) 0,42–0,66, klimanje 0,42–0,78 (1,5 zamaha), mir. Samo transform + zamjena frejma.
 const READY_HOP_END := 0.3
 const READY_LAND_END := 0.42
+const READY_PEEK_END := 0.66
 const READY_WIGGLE_END := 0.78
-const READY_WIGGLE_DEG := 8.0
-const BOUNCE_SQUASH := Vector2(1.07, 0.92)
-const BOUNCE_PHASE := 0.23
-## Dodir sanduka hvata i traku ispod njega (oznaka nagrade), ne samo crtež.
+const READY_TIMELINE := 1.8
+const BOUNCE_SQUASH := Vector2(0.07, 0.08)
+## Dodir sanduka hvata i pločicu sadržaja ispod njega, ne samo crtež.
 const CHEST_TAP_H := 270.0
-const SPARK_SEC := 1.6
 const SPARK_POS: Array[Vector2] = [Vector2(-6, 26), Vector2(164, 6), Vector2(178, 104)]
 const SPARK_SIZE := 40.0
 const HOP_WAIT := 0.12
@@ -67,6 +69,8 @@ var _scroll_tween: Tween
 var _pip_free: bool = true
 var _built_season: String = ""
 var _claimed: Array[int] = []
+var _hop_from: int = 0
+var _hop_to: int = 0
 
 var _clip: Control
 var _content: Control
@@ -75,6 +79,7 @@ var _passed: Node2D
 var _pole: TextureRect
 var _pennant: TextureRect
 var _stones: Array[_Stone] = []
+var _flags: Array[_BandFlag] = []
 var _chests: Dictionary = {}
 var _fx: Node2D
 var _banner: _Banner
@@ -112,6 +117,11 @@ func _init() -> void:
 	_content.add_child(_pole)
 	_pennant = _tex_rect("Pennant")
 	_pole.add_child(_pennant)
+	for b in UiLevels.BANDS:
+		var f := _BandFlag.new()
+		f.band_n = int(b["n"])
+		_flags.append(f)
+		_content.add_child(f)
 	for n in LevelPathDomain.REWARD_LEVELS:
 		var ch := _Chest.new()
 		ch.n = n
@@ -235,6 +245,22 @@ func chest_state(n: int) -> String:
 	return (_chests[n] as _Chest).state
 
 
+## Frejm spremnog sanduka koji se sad crta: "closed" | "peek" | "" (nije spreman).
+func chest_frame(n: int) -> String:
+	return (_chests[n] as _Chest).frame
+
+
+func chest_node(n: int) -> Control:
+	return _chests[n] as Control
+
+
+func band_flag_rects() -> Array[Rect2]:
+	var out: Array[Rect2] = []
+	for f in _flags:
+		out.append(Rect2(f.position, f.size))
+	return out
+
+
 func is_locator_visible() -> bool:
 	return _locator.visible
 
@@ -278,6 +304,8 @@ func play_hop(from: int, to: int) -> void:
 	if _hop_running:
 		return
 	_hop_running = true
+	_hop_from = from
+	_hop_to = to
 	shown_level = from
 	_refresh_states()
 	_place_pip_on_stone()
@@ -325,6 +353,7 @@ func _build_season() -> void:
 	for st in _stones:
 		st.season_id = season_id
 		st.state = ""
+	_place_band_flags()
 	for n in _chests:
 		var ch: _Chest = _chests[n]
 		ch.season_id = season_id
@@ -350,6 +379,40 @@ func _refresh_states() -> void:
 	_title.level = lv
 	_title.queue_redraw()
 	_sync_process()
+
+
+## A1 · zastavica pojasa uz prvi kamen pojasa: dno stuba na kamen.y + 40; x desno (+96) ili lijevo
+## (−286), pa dalje (+150 / −340) — prva strana koja ne dira sanduk ni kamen (LevelBands.dc.html).
+func _place_band_flags() -> void:
+	for f in _flags:
+		var b := UiLevels.band(f.band_n)
+		var c := LevelPathKit.cp(int(b["from"]))
+		var y := c.y + UiLevels.FLAG_DROP - UiLevels.FLAG_FOOT_Y
+		var cands: Array[float] = []
+		for dx in [96.0, -286.0, 150.0, -340.0]:
+			var x := c.x + float(dx)
+			if x > 10.0 and x + 200.0 < LevelPathKit.W - 10.0:
+				cands.append(x)
+		var pick := cands[0] if not cands.is_empty() else c.x + 96.0
+		for x in cands:
+			if not _flag_hits(x, y):
+				pick = x
+				break
+		f.position = Vector2(pick, y)
+		f.size = UiLevels.FLAG
+		f.queue_redraw()
+
+
+func _flag_hits(x: float, y: float) -> bool:
+	for n in LevelPathDomain.REWARD_LEVELS:
+		var p: Vector2 = LevelPathKit.chest(n)["pos"]
+		if x < p.x + 130.0 and x + 200.0 > p.x - 130.0 and y < p.y + 20.0 and y + 214.0 > p.y - 230.0:
+			return true
+	for i in LevelPathDomain.LEVELS:
+		var o := LevelPathKit.cp(i + 1)
+		if x < o.x + 90.0 and x + 200.0 > o.x - 90.0 and y < o.y + 60.0 and y + 180.0 > o.y - 60.0:
+			return true
+	return false
 
 
 func _ready_for(level: int) -> Array:
@@ -547,37 +610,40 @@ func _process(delta: float) -> void:
 	for n in LevelPathDomain.REWARD_LEVELS:
 		var ch: _Chest = _chests[n]
 		if ch.state == LevelPathDomain.REWARD_READY and not UiPip.reduce_motion():
-			_animate_ready(ch, i)
+			_animate_ready(ch, float(i) * UiLevels.CHEST_PHASE)
 		i += 1
 	if not _any_ready() and absf(_vel) <= 0.0:
 		set_process(false)
 
 
-## Skok 26 px, doskok sa squashom (dno sanduka stoji), klimanje ±8° oko dna koje se smiruje, pa
-## mir do sljedećeg ciklusa (1,8 s, svaki sanduk pomaknut u fazi) + 3 iskre (scale 0 → 1 → 0, ±30°).
-func _animate_ready(ch: _Chest, i: int) -> void:
+## Petlja spremnog sanduka (chest_ready.json → loop), `ph` = pomak faze u s (0,23 po sanduku):
+## u (s na liniji od 1,8) = ((t + ph) mod ciklus) / ciklus × 1,8. Sjena ostaje na tlu i skuplja se
+## (1 → 0,7) dok je sanduk u zraku; 3 iskre: scale 0,4 → 1,2, rotacija 90°, alfa po zvonu (1,6 s).
+func _animate_ready(ch: _Chest, ph: float) -> void:
 	if ch.art_busy:
 		return
-	var u := fposmod(_anim_t / READY_SEC + float(i) * BOUNCE_PHASE, 1.0)
-	var lift := 0.0
-	var squash := 0.0
-	var rot := 0.0
-	if u < READY_HOP_END:
-		lift = sin(PI * u / READY_HOP_END)
-	elif u < READY_LAND_END:
-		squash = sin(PI * (u - READY_HOP_END) / (READY_LAND_END - READY_HOP_END))
-	elif u < READY_WIGGLE_END:
-		var w := (u - READY_LAND_END) / (READY_WIGGLE_END - READY_LAND_END)
-		rot = sin(TAU * 1.5 * w) * (1.0 - w) * READY_WIGGLE_DEG
-	ch.art.position.y = ch.art_home.y - READY_HOP_PX * lift
-	ch.art.scale = Vector2(lerpf(1.0, BOUNCE_SQUASH.x, squash), lerpf(1.0, BOUNCE_SQUASH.y, squash))
-	ch.art.rotation = deg_to_rad(rot)
+	var cyc := UiLevels.CHEST_CYCLE_BIG if ch.big else UiLevels.CHEST_CYCLE
+	var hop_px := UiLevels.CHEST_HOP_BIG if ch.big else UiLevels.CHEST_HOP
+	var deg := UiLevels.CHEST_WIGGLE_BIG if ch.big else UiLevels.CHEST_WIGGLE
+	var u := fposmod(_anim_t + ph, cyc) / cyc * READY_TIMELINE
+	var hop := UiLevels.bell(u, 0.0, READY_HOP_END)
+	var sq := UiLevels.bell(u, READY_HOP_END, READY_LAND_END)
+	var w := 0.0
+	if u > READY_LAND_END and u < READY_WIGGLE_END:
+		var k := (u - READY_LAND_END) / (READY_WIGGLE_END - READY_LAND_END)
+		w = sin(k * PI * 3.0) * (1.0 - k)
+	ch.art.position.y = ch.art_home.y - hop_px * hop
+	ch.art.scale = Vector2(1.0 + BOUNCE_SQUASH.x * sq, 1.0 - BOUNCE_SQUASH.y * sq)
+	ch.art.rotation = deg_to_rad(deg * w)
+	ch.shadow.scale = Vector2.ONE * (1.0 - 0.3 * hop)
+	ch.set_frame("peek" if u > READY_LAND_END and u < READY_PEEK_END else "closed")
 	for j in ch.sparks.size():
 		var s: TextureRect = ch.sparks[j]
-		var v := fposmod(_anim_t / SPARK_SEC + float(j) * 0.33 + float(i) * 0.1, 1.0)
-		var k := sin(PI * v)
-		s.scale = Vector2(k, k)
-		s.rotation = deg_to_rad(30.0 * (v - 0.5) * 2.0)
+		var v := fposmod(_anim_t + float(j) * 0.53 + ph, UiLevels.CHEST_SPARK_SEC) / UiLevels.CHEST_SPARK_SEC
+		var b := UiLevels.bell(v, 0.0, 0.5)
+		s.scale = Vector2.ONE * (0.4 + 0.8 * b)
+		s.rotation = deg_to_rad(90.0 * v)
+		s.modulate.a = b
 
 
 func _hop_wait(from: int, to: int) -> void:
@@ -656,6 +722,11 @@ func _hop_done() -> void:
 	_update_locator()
 	_sync_process()
 	hop_finished.emit()
+	if _hop_from == LevelPathDomain.ENDLESS_UNLOCK_LEVEL and _hop_to == LevelPathDomain.ENDLESS_UNLOCK_LEVEL + 1 \
+			and GameState.take_endless_unlock_moment(season_id):
+		endless_unlocked.emit(season_id)
+	_hop_from = 0
+	_hop_to = 0
 
 
 func _pop(c: Control, peak: float, sec: float) -> void:
@@ -665,6 +736,8 @@ func _pop(c: Control, peak: float, sec: float) -> void:
 	if ch:
 		ch.art_busy = true
 		c.position = ch.art_home
+		c.rotation = 0.0
+		ch.set_frame("closed")
 	var t := c.create_tween()
 	t.tween_method(func(u: float) -> void:
 		c.scale = Vector2.ONE * (1.0 + (peak - 1.0) * sin(PI * u))
@@ -809,6 +882,10 @@ class _Stone extends Control:
 		var w := UiHomeV3.text_w(900, px, txt, 0.0, true)
 		var cy := LevelPathKit.STONE_PIVOT.y * k
 		UiHomeV3.draw_text(self, 900, px, txt, Vector2((size.x - w) * 0.5, cy - px * 0.52), LevelPathKit.number_color(season_id, state), 0.0, true)
+		# A1: pločica pojasa preko donjeg ruba kamena (sva stanja); 5/10/15/20 sa zvjezdicom.
+		var tag := UiLevels.tag_tex(n)
+		if tag:
+			draw_texture_rect(tag, UiLevels.stone_tag_rect(n, k), false)
 
 
 ## Sanduk nagrade: sprite (skok i klimanje samo transformom), 3 iskre, oznaka nagrade dok je zaključan.
@@ -817,14 +894,21 @@ class _Chest extends Control:
 	var season_id: String = ""
 	var state: String = ""
 	var big: bool = false
+	var k: float = 1.0
 	var art: TextureRect
+	var shadow: TextureRect
 	var art_home := Vector2.ZERO
 	var art_busy: bool = false
 	var sparks: Array[TextureRect] = []
 	var label: _ChestLabel
+	## Spreman sanduk: "closed" | "peek"; ostala stanja "".
+	var frame: String = ""
 
 	func _init() -> void:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		shadow = LevelPathView._tex_rect("ChestShadow")
+		shadow.visible = false
+		add_child(shadow)
 		art = LevelPathView._tex_rect("ChestArt")
 		add_child(art)
 		for i in 3:
@@ -839,13 +923,17 @@ class _Chest extends Control:
 		name = "Chest%d" % n
 		var ch := LevelPathKit.chest(n)
 		big = bool(ch.get("big", false))
-		var k := LevelPathKit.CHEST_BIG_SCALE if big else 1.0
+		k = LevelPathKit.CHEST_BIG_SCALE if big else 1.0
 		size = LevelPathKit.CHEST_BOX * k
 		position = (ch["pos"] as Vector2) - LevelPathKit.CHEST_ANCHOR * k
 		art.size = size
 		art_home = Vector2.ZERO
 		art.position = art_home
 		art.pivot_offset = Vector2(size.x * 0.5, size.y * 0.92)
+		shadow.texture = UiLevels.tex("chest/shadow.svg")
+		shadow.position = UiLevels.CHEST_SHADOW.position * k
+		shadow.size = UiLevels.CHEST_SHADOW.size * k
+		shadow.pivot_offset = shadow.size * 0.5
 		var spark_tex := LevelPathKit.fx_tex("ready_spark")
 		for i in sparks.size():
 			var s := sparks[i]
@@ -860,20 +948,36 @@ class _Chest extends Control:
 		if s == state:
 			return
 		state = s
-		art.texture = LevelPathKit.chest_tex(s, big)
+		var ready := s == LevelPathDomain.REWARD_READY
+		frame = ""
+		if ready and UiLevels.tex("chest/ready_closed.svg") != null:
+			set_frame("closed")
+		else:
+			art.texture = LevelPathKit.chest_tex(s, big)
 		art.position = art_home
 		art.scale = Vector2.ONE
 		art.rotation = 0.0
-		var ready := s == LevelPathDomain.REWARD_READY
+		shadow.visible = not frame.is_empty()
+		shadow.scale = Vector2.ONE
+		# Reduce motion: iskre stoje (vidljive, mirne).
 		for sp in sparks:
-			sp.visible = ready and not UiPip.reduce_motion()
+			sp.visible = ready
 			sp.scale = Vector2.ONE
+			sp.rotation = 0.0
+			sp.modulate.a = 1.0
 		label.queue_redraw()
 
+	## Frejm spremnog sanduka (closed / peek) — tekstura se mijenja samo kad se frejm promijeni.
+	func set_frame(f: String) -> void:
+		if state != LevelPathDomain.REWARD_READY or f == frame:
+			return
+		frame = f
+		art.texture = UiLevels.tex("chest/%sready_%s.svg" % ["big_" if big else "", f])
 
-## Ispod sanduka: reward_locked → krem pilula (★3 crtež 52 + N · coin 44 + N). reward_ready nema
-## oznake (2026-10-21: pilula „Claim" izgledala je kao dugme, a dodir je hvatao samo sanduk) —
-## sanduk skače i klima se, tap na njega otvara popup.
+
+## Ispod sanduka: reward_locked → krem pilula (★3 crtež 52 + N · coin 44 + N). reward_ready →
+## ravna RIM pločica sadržaja (h 58, rub 2 ink 18 %, bez sjene — ne liči na dugme; CD C):
+## ★3 disk 46 + ×N · coin 40 + N (34/900). Tap na sanduk ili pločicu otvara popup.
 class _ChestLabel extends Control:
 	var chest: _Chest
 	var k: float = 1.0
@@ -886,6 +990,9 @@ class _ChestLabel extends Control:
 			return
 		var cx := chest.size.x * 0.5
 		var r: Array = LevelPathDomain.REWARDS[chest.n]
+		if chest.state == LevelPathDomain.REWARD_READY:
+			_draw_ready_tag(cx, "×%d" % int(r[0]), str(r[1]))
+			return
 		if chest.state == LevelPathDomain.REWARD_LOCKED:
 			var fl := str(r[0])
 			var co := str(r[1])
@@ -903,6 +1010,50 @@ class _ChestLabel extends Control:
 			UiPopups.draw_icon(self, UiPopups.icon("icon_coin"), Vector2(x + 22.0, cy), 44.0)
 			x += 44.0 + 8.0
 			UiHomeV3.draw_text(self, 900, 38, co, Vector2(x, cy - 19.0), UiHomeField.OUTLINE, 0.0, true)
+
+	func _draw_ready_tag(cx: float, fl: String, co: String) -> void:
+		var h := UiLevels.CHEST_TAG_H
+		var w := 6.0 + 46.0 + 6.0 + UiHomeV3.text_w(900, 34, fl, 0.0, true) + 6.0 + 6.0 + 40.0 + 6.0 + UiHomeV3.text_w(900, 34, co, 0.0, true) + 20.0
+		var rect := Rect2(cx - w * 0.5, chest.size.y + UiLevels.CHEST_TAG_GAP, w, h)
+		UiHomeV3.draw_panel(self, rect, UiLevels.RIM, h * 0.5, 2.0, UiLevels.INK_18)
+		var x := rect.position.x + 6.0
+		var cy := rect.get_center().y
+		var disc := Rect2(x, cy - 23.0, 46.0, 46.0)
+		UiHomeV3.draw_panel(self, disc, UiLevels.CREAM, 23.0)
+		UiPopups.draw_flower(self, disc.get_center(), GameState.star3_type_id_for_season(chest.season_id), 3, 46.0)
+		x += 46.0 + 6.0
+		UiHomeV3.draw_text(self, 900, 34, fl, Vector2(x, cy - 17.0), UiLevels.INK, 0.0, true)
+		x += UiHomeV3.text_w(900, 34, fl, 0.0, true) + 6.0 + 6.0
+		UiPopups.draw_icon(self, UiPopups.icon("icon_coin"), Vector2(x + 20.0, cy), 40.0)
+		x += 40.0 + 6.0
+		UiHomeV3.draw_text(self, 900, 34, co, Vector2(x, cy - 17.0), UiLevels.INK, 0.0, true)
+
+
+## Zastavica pojasa (180 × 214) + krem pločica „Stroll 1–5" (32/900 + 24/800). Crta se jednom.
+class _BandFlag extends Control:
+	var band_n: int = 1
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _ready() -> void:
+		name = "BandFlag%d" % band_n
+
+	func _draw() -> void:
+		var tex := UiLevels.flag_tex(band_n)
+		if tex:
+			draw_texture_rect(tex, Rect2(Vector2.ZERO, UiLevels.FLAG), false)
+		var b := UiLevels.band(band_n)
+		var nm := str(b["name"])
+		var rng := "%d–%d" % [int(b["from"]), int(b["to"])]
+		var w := 18.0 + UiHomeV3.text_w(900, 32, nm) + 8.0 + UiHomeV3.text_w(800, 24, rng) + 18.0
+		var r := Rect2(UiLevels.FLAG_LABEL.position, Vector2(w, UiLevels.FLAG_LABEL.size.y))
+		UiHomeV3.draw_panel(self, r, UiLevels.CREAM, 26.0, 3.0, UiLevels.INK)
+		var x := r.position.x + 18.0
+		var cy := r.get_center().y
+		UiHomeV3.draw_text(self, 900, 32, nm, Vector2(x, cy - 16.0), UiLevels.INK)
+		x += UiHomeV3.text_w(900, 32, nm) + 8.0
+		UiHomeV3.draw_text(self, 800, 24, rng, Vector2(x, cy - 10.0), UiLevels.SOFT)
 
 
 ## Pločica s imenom sezone (fiksna na vrhu): ime + „7 / 20", ili mint „✓ 20 / 20".

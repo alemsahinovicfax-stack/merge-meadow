@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#211B26}a{color:#FFD56B}a:hover{color:#FFF8F0}</style>
+</helmet>
+<section data-screen-label="Chest ready" ref="{{ rootRef }}" style="background:#211B26;width:max-content;box-sizing:border-box;padding:56px 64px 80px;display:flex;flex-direction:column;gap:40px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0">
+  <div data-layer="Header" style="display:flex;flex-direction:column;gap:14px;max-width:1320px">
+    <div style="font:800 22px/1 Nunito,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#FFD56B">Merge Meadow · Level Path · C</div>
+    <div style="font:900 56px/1.05 Nunito,sans-serif">Spreman sanduk zove sam — bez pilule „Claim".</div>
+    <div style="font:700 24px/1.4 Nunito,sans-serif;color:#E6DDEB;max-width:1180px;text-wrap:pretty">Ritam 1,8 s: skok 26 px → doskok sa zgnječenjem → poklopac zaviri (frejm „peek": zlatnici i zrake) → klimanje ±8° → mir. Sjena ostaje na tlu i skuplja se dok je sanduk u zraku. Sanduci u istom kadru kreću u drugoj fazi (0,23 s). Sanduk 20 je živahniji: 1,5 s, 34 px, ±10°. Ispod stoji ravna pločica sadržaja (bez sjene i ruba dugmeta). Tap na sanduk ili pločicu = popup kao danas. Reduce motion: zatvoren, miran, iskre stoje. <a href="LevelBands.dc.html">Level Path</a> · <a href="Specs.dc.html">Specs</a></div>
+  </div>
+  <div data-layer="Toolbar" style="display:flex;gap:12px;flex-wrap:wrap">
+    <div onClick="{{ toggleReduce }}" style="{{ reduceStyle }}">{{ reduceLabel }}</div>
+    <div onClick="{{ toggleSlow }}" style="{{ slowStyle }}">{{ slowLabel }}</div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+    <sc-for list="{{ boards }}" as="b" hint-placeholder-count="2">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:900 28px/1 Nunito,sans-serif">{{ b.title }}</div>
+        <div style="position:relative;width:540px;height:500px;overflow:hidden;border-radius:18px;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(0,0,0,.35)">
+          <div style="position:absolute;left:0;top:0;width:1080px;height:1000px;transform:scale(.5);transform-origin:0 0;overflow:hidden">
+            <div style="{{ b.content }}">
+              <img src="{{ b.road }}" alt="" style="position:absolute;left:0;top:0;width:1080px;height:4900px">
+              <sc-for list="{{ b.stones }}" as="s" hint-placeholder-count="6">
+                <div style="{{ s.wrap }}"><img src="{{ s.src }}" alt="" style="position:absolute;inset:0;width:100%;height:100%"><div style="{{ s.numStyle }}">{{ s.n }}</div><img src="{{ s.tag }}" alt="" style="{{ s.tagStyle }}"></div>
+              </sc-for>
+              <sc-for list="{{ b.chests }}" as="c" hint-placeholder-count="2">
+                <div data-chest="{{ c.key }}" onClick="{{ c.tap }}" style="{{ c.wrap }}">
+                  <img data-r="shadow" src="../assets/chest/shadow.svg" alt="" style="{{ c.shadowStyle }}">
+                  <div data-r="body" style="{{ c.bodyStyle }}">
+                    <img data-r="closed" src="{{ c.closed }}" alt="" style="position:absolute;inset:0;width:100%;height:100%">
+                    <img data-r="peek" src="{{ c.peek }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;display:none">
+                  </div>
+                  <sc-for list="{{ c.sparks }}" as="k" hint-placeholder-count="3"><img data-r="spark" src="ref/fx/ready_spark.svg" alt="" style="{{ k.style }}"></sc-for>
+                  <div data-layer="ContentsTag" style="{{ c.tagStyle }}">
+                    <img src="{{ c.flower }}" alt="" style="width:46px;height:46px;object-fit:cover;border-radius:23px;background:#FFF8F0"><span>{{ c.fl }}</span>
+                    <img src="icons/icon_coin.svg" alt="" style="width:40px;height:40px;margin-left:6px"><span>{{ c.coins }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ b.popup }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ closePopup }}" style="position:absolute;inset:0;background:rgba(26,22,30,.55);display:flex;align-items:center;justify-content:center;z-index:20;cursor:pointer">
+                <div style="position:relative;width:820px;box-sizing:border-box;padding:92px 48px 48px;border-radius:48px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 14px 0 rgba(20,14,26,.45);display:flex;flex-direction:column;gap:32px;align-items:center;color:#2D3436">
+                  <div style="position:absolute;left:0;right:0;top:-56px;display:flex;justify-content:center"><div style="height:112px;box-sizing:border-box;padding:0 52px;border-radius:56px;background:#FFD56B;border:4px solid #2D3436;display:flex;align-items:center;font:900 56px/1 Nunito,system-ui,sans-serif;white-space:nowrap">{{ b.popTitle }}</div></div>
+                  <img src="{{ b.popChest }}" alt="" style="width:260px;height:247px">
+                  <div style="display:flex;gap:16px">
+                    <div style="height:132px;box-sizing:border-box;padding:0 28px 0 14px;border-radius:66px;background:#FFFFFF;border:3px solid #2D3436;display:flex;align-items:center;gap:12px"><img src="{{ b.popFlower }}" alt="" style="width:92px;height:92px;border-radius:46px;background:#FFF6D6;object-fit:cover"><div style="font:900 56px/1 Nunito,system-ui,sans-serif">{{ b.popFl }}</div></div>
+                    <div style="height:132px;box-sizing:border-box;padding:0 28px 0 14px;border-radius:66px;background:#FFFFFF;border:3px solid #2D3436;display:flex;align-items:center;gap:12px"><img src="icons/icon_coin.svg" alt="" style="width:84px;height:84px"><div style="font:900 56px/1 Nunito,system-ui,sans-serif">{{ b.popCoins }}</div></div>
+                  </div>
+                  <div style="width:100%;height:132px;box-sizing:border-box;border-radius:36px;background:#FFB88C;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;font:900 52px/1 Nunito,system-ui,sans-serif">Claim</div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        <div style="font:800 20px/1.3 Nunito,sans-serif;color:#BFB3C9;max-width:540px">{{ b.note }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div data-layer="Frames" style="display:flex;flex-direction:column;gap:16px">
+    <div style="font:900 34px/1 Nunito,sans-serif">Frejmovi · 1:1 (200 × 190, sjena 160 × 28 odvojeno)</div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap">
+      <sc-for list="{{ frames }}" as="f" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center;padding:16px;border-radius:18px;background:#C9E4B4"><img src="{{ f.src }}" alt="" style="{{ f.style }}"><div style="font:800 18px/1 Nunito,sans-serif;color:#2D3436">{{ f.name }}</div></div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;reduceMotion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const BTN = 'box-sizing:border-box;min-height:56px;padding:14px 22px;border-radius:14px;cursor:pointer;font:800 22px/1.1 Nunito,sans-serif;user-select:none;';
+const on = a => a ? 'background:#FFD56B;color:#2D3436;border:3px solid #2D3436' : 'background:#3A3044;color:#FFF8F0;border:3px solid #55485F';
+const f2 = v => (Math.round(v * 100) / 100).toString();
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const bell = (t, a, b) => t <= a || t >= b ? 0 : Math.sin(Math.PI * (t - a) / (b - a));
+class Component extends DCLogic {
+  state = { LE: null, LP: null, reduce: !!this.props.reduceMotion, slow: false, popup: null };
+  rootRef = React.createRef();
+  componentDidMount() { Promise.all([import('./le_kit.js'), import('./level_path_kit.js')]).then(([LE, LP]) => this.setState({ LE, LP })); this.t0 = performance.now(); const loop = () => { if (this._dead) return; this.frame(); this._raf = requestAnimationFrame(loop); }; this._raf = requestAnimationFrame(loop); }
+  componentWillUnmount() { this._dead = true; cancelAnimationFrame(this._raf); }
+  frame() {
+    const r = this.rootRef.current; if (!r) return; const T = (performance.now() - this.t0) / 1000 * (this.state.slow ? 0.25 : 1), red = this.state.reduce;
+    r.querySelectorAll('[data-chest]').forEach(el => {
+      const [, ph, big] = el.getAttribute('data-chest').split('|'), cyc = big === '1' ? 1.5 : 1.8, H = big === '1' ? 34 : 26, R = big === '1' ? 10 : 8;
+      const u = ((T + (+ph)) % cyc) / cyc * 1.8; // u u sekundama ciklusa od 1,8
+      const body = el.querySelector('[data-r=body]'), sh = el.querySelector('[data-r=shadow]'), cl = el.querySelector('[data-r=closed]'), pk = el.querySelector('[data-r=peek]');
+      if (red) { body.style.transform = ''; sh.style.transform = ''; cl.style.display = 'block'; pk.style.display = 'none'; el.querySelectorAll('[data-r=spark]').forEach(s => { s.style.transform = ''; s.style.opacity = 1; }); return; }
+      const hop = bell(u, 0, 0.3), sq = bell(u, 0.3, 0.42), w = u > 0.42 && u < 0.78 ? Math.sin((u - 0.42) / 0.36 * Math.PI * 3) * (1 - (u - 0.42) / 0.36) : 0;
+      body.style.transform = 'translateY(' + f2(-H * hop) + 'px) rotate(' + f2(R * w) + 'deg) scale(' + f2(1 + 0.07 * sq) + ',' + f2(1 - 0.08 * sq) + ')';
+      sh.style.transform = 'scale(' + f2(1 - 0.3 * hop) + ')';
+      const peek = u > 0.42 && u < 0.66; cl.style.display = peek ? 'none' : 'block'; pk.style.display = peek ? 'block' : 'none';
+      el.querySelectorAll('[data-r=spark]').forEach((s, i) => { const v = ((T * 1.0 + i * 0.53 + (+ph)) % 1.6) / 1.6, b = bell(v, 0, 0.5); s.style.transform = 'scale(' + f2(0.4 + 0.8 * b) + ') rotate(' + f2(90 * v) + 'deg)'; s.style.opacity = f2(b); });
+    });
+  }
+  renderVals() {
+    const s = this.state, LE = s.LE, LP = s.LP;
+    const v = { rootRef: this.rootRef, boards: [], frames: [], closePopup: () => this.setState({ popup: null }), toggleReduce: () => this.setState({ reduce: !s.reduce }), reduceLabel: s.reduce ? 'Reduce motion · uključeno' : 'Reduce motion', reduceStyle: BTN + on(s.reduce), toggleSlow: () => this.setState({ slow: !s.slow }), slowLabel: s.slow ? 'Usporeno ×4 · uključeno' : 'Usporeno ×4', slowStyle: BTN + on(s.slow) };
+    if (!LE || !LP) return v;
+    const road = (season, lvl) => { const P = LP.buildPath(season), R = LP.PATHS[season].road; let b = ''; P.groups.forEach(g => b += '<path d="' + g.d + '" fill="' + (g.f || 'none') + '"' + (g.s && g.s !== 'none' ? ' stroke="' + g.s + '" stroke-width="' + g.sw + '" stroke-linecap="round" stroke-linejoin="round"' : '') + '/>'); R.passed.forEach(([w, c]) => b += '<path d="' + LP.passedD(Math.min(21, lvl)) + '" fill="none" stroke="' + c + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"/>'); return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="4900" viewBox="0 0 1080 4900">' + b + '</svg>'); };
+    const mk = (key, title, season, lvl, y0, note) => {
+      const lockedNum = LP.PATHS[season].stone.locked.num, CS = LP.CURRENT_SCALE || 1.22, ready = LP.readyList(lvl, []);
+      const stones = LP.CP.filter(c => c.y > y0 - 200 && c.y < y0 + 1200).map(c => { const st = LP.cpState(c.n, lvl), sc = st === 'current' ? CS : 1, fs = st === 'current' ? 56 : 46, peak = LE.isPeak(c.n), tw = peak ? 86 : 72; return { n: c.n, src: 'ref/path/' + season + '/checkpoint_' + st + '.svg', tag: '../assets/bands/tag_' + LE.bandOf(c.n) + (peak ? '_peak' : '') + '.svg', wrap: 'position:absolute;left:' + f2(c.x - 90 * sc) + 'px;top:' + f2(c.y - 56 * sc) + 'px;width:' + f2(180 * sc) + 'px;height:' + f2(140 * sc) + 'px;z-index:2', numStyle: 'position:absolute;left:0;right:0;top:' + f2(56 * sc - fs * 0.52) + 'px;text-align:center;font:900 ' + fs + 'px/1 Nunito,system-ui,sans-serif;color:' + (st === 'locked' ? lockedNum : '#2D3436'), tagStyle: 'position:absolute;left:' + f2(90 * sc - tw / 2 * sc) + 'px;top:' + f2(100 * sc) + 'px;width:' + f2(tw * sc) + 'px;height:' + f2(30 * sc) + 'px' }; });
+      const star = LP.STAR3 && LP.STAR3[season];
+      const flower = 'flowers/' + ({ country_bloom: 'pumpkin', frost_orchard: 'crystal_peony', lantern_meadow: 'midnight_lotus', amber_canopy: 'amber_magnolia', moonlit_warren: 'umbral_lily', coral_tide: 'reef_crown', starfall_glade: 'nova_bloom', ember_fen: 'fenfire_crown' })[season] + '_t3.svg';
+      const chests = LP.REWARD_LEVELS.filter(n => ready.includes(n) && LP.CHEST[n].y > y0 - 100 && LP.CHEST[n].y < y0 + 1150).map((n, i) => { const C = LP.CHEST[n], big = !!C.big, sc = big ? (LP.CHEST_BIG_SCALE || 1.3) : 1, w = 200 * sc, h = 190 * sc, [fl, co] = LP.REWARD[n];
+        return { key: key + n + '|' + f2(i * 0.23) + '|' + (big ? 1 : 0), closed: '../assets/chest/' + (big ? 'big_' : '') + 'ready_closed.svg', peek: '../assets/chest/' + (big ? 'big_' : '') + 'ready_peek.svg', flower, fl: '×' + fl, coins: co,
+          tap: () => this.setState({ popup: { key, n, fl, co, big, flower } }),
+          wrap: 'position:absolute;left:' + f2(C.x - w / 2) + 'px;top:' + f2(C.y - 176 * sc) + 'px;width:' + f2(w) + 'px;height:' + f2(h) + 'px;z-index:3;cursor:pointer',
+          shadowStyle: 'position:absolute;left:' + f2(w / 2 - 80 * sc) + 'px;top:' + f2(h - 30 * sc) + 'px;width:' + f2(160 * sc) + 'px;height:' + f2(28 * sc) + 'px;transform-origin:50% 50%;will-change:transform',
+          bodyStyle: 'position:absolute;inset:0;transform-origin:50% 92%;will-change:transform',
+          sparks: [[-6, 26], [164, 6], [178, 104]].map(([x, y]) => ({ style: 'position:absolute;left:' + f2(x * sc) + 'px;top:' + f2(y * sc) + 'px;width:' + f2(40 * sc) + 'px;height:' + f2(40 * sc) + 'px;pointer-events:none;will-change:transform,opacity' })),
+          tagStyle: 'position:absolute;left:50%;top:' + f2(h + 4) + 'px;transform:translateX(-50%);height:58px;box-sizing:border-box;padding:0 20px 0 6px;border-radius:29px;background:#FFF6D6;border:2px solid rgba(45,52,54,.18);display:flex;align-items:center;gap:6px;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap' }; });
+      const P = s.popup && s.popup.key === key ? s.popup : null;
+      return { title, note, road: road(season, lvl), stones, chests, content: 'position:absolute;left:0;top:0;width:1080px;height:4900px;transform:translateY(' + (-y0) + 'px)', popup: !!P, popTitle: P ? 'Level ' + P.n + ' reward' : '', popChest: P ? 'ref/path/chest_' + (P.big ? 'big_' : '') + 'open.svg' : '', popFlower: P ? P.flower : '', popFl: P ? '×' + P.fl : '', popCoins: P ? P.co : '' };
+    };
+    v.boards = [
+      mk('a', 'Country Bloom · Pip na 12 · sanduk 10 spreman', 'country_bloom', 12, 2050, 'Mali sanduk: 1,8 s · 26 px · ±8° · 3 iskre. Tap = popup (klik bilo gdje zatvara).'),
+      mk('b', 'Starfall Glade (tamna) · put završen · sanduk 20', 'starfall_glade', 21, 240, 'Sanduk 20: 1,5 s · 34 px · ±10°. Više sanduka u kadru kreće s fazom 0,23 s — nikad ne skaču zajedno.')
+    ];
+    v.frames = [['ready_closed', 'closed', 'width:200px;height:190px'], ['ready_peek', 'peek', 'width:200px;height:190px'], ['big_ready_closed', 'big closed', 'width:200px;height:190px'], ['big_ready_peek', 'big peek', 'width:200px;height:190px'], ['shadow', 'sjena', 'width:160px;height:28px;margin:81px 20px']].map(([f, name, style]) => ({ src: '../assets/chest/' + f + '.svg', name, style }));
+    return v;
+  }
+}
+
+</script>
+</body>
+</html>

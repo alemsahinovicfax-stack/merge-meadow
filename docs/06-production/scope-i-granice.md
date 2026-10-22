@@ -20,7 +20,7 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 
 ### Core gameplay
 - Lane run — swipe, skupljanje orbova, prepreke; **20 levela po sezoni** koji rastu do levela 20 (duži 60 → 120 s, brži, više prepreka, od levela 6 parovi prepreka, više plijena), level N iste težine u svakoj sezoni — balans ciklus 1, 2026-10-21 na zahtjev, [[../02-design/balans-ciklus-1-izvjestaj|balans-ciklus-1-izvjestaj]]
-- Endless mode po sezoni — bez tajmera, kreće lagano i stepenicama (20 s) postaje teži dok Pip ne padne ili igrač ne izađe; plijen ostaje cijeli; rekord po sezoni; otključava se poslije levela 15 te sezone — 2026-10-21 na zahtjev; izgled (pojasevi težine, par prepreka, Endless HUD, zaključan / otključan, kraj) čeka CD: [[../04-experience/design-drafts/leveli-endless-cd-brief|leveli-endless-cd-brief]]
+- Endless mode po sezoni — bez tajmera, kreće lagano i stepenicama (20 s) postaje teži dok Pip ne padne ili igrač ne izađe; plijen ostaje cijeli; rekord po sezoni; otključava se poslije levela 15 te sezone — 2026-10-21 na zahtjev; izgled (pojasevi težine, najava, par prepreka, cilj na kraju levela, Endless HUD, zaključan / otključan, kraj) u igri 2026-10-22: [[../04-experience/design-drafts/leveli-endless-izvjestaj|leveli-endless-izvjestaj]]
 - Ekonomija: sjeme po rijetkosti (★1 često, ★3 rijetko), cijene sezona / nadogradnji / izgleda za coine podignute, magnet max dohvata susjednu stazu; simulator `economy_sim.gd` + lokalna telemetrija runova (debug build) za sljedeći ciklus — 2026-10-21 na zahtjev
 - Merge kamp — 2→1 merge, min 3 tiera orbova
 - Upgradei: magnet, množitelj (min 4 levela svaki)

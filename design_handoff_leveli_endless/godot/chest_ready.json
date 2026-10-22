@@ -1,0 +1,105 @@
+{
+  "meta": {
+    "package": "design_handoff_leveli_endless",
+    "brief": "docs/04-experience/design-drafts/leveli-endless-cd-brief.md",
+    "artboard": [
+      1080,
+      1920
+    ],
+    "units": "px (artboard), s"
+  },
+  "replaces": "Claim pill (removed)",
+  "tap": "chest or contents tag → RewardPopup (as today); CHEST_TAP_H 270 covers both",
+  "frames": {
+    "closed": "assets/chest/ready_closed.svg",
+    "peek": "assets/chest/ready_peek.svg",
+    "big_closed": "assets/chest/big_ready_closed.svg",
+    "big_peek": "assets/chest/big_ready_peek.svg",
+    "shadow": "assets/chest/shadow.svg"
+  },
+  "loop": {
+    "small": {
+      "cycle": 1.8,
+      "hop_px": 26,
+      "hop": [
+        0,
+        0.3
+      ],
+      "squash": [
+        0.3,
+        0.42,
+        1.07,
+        0.92
+      ],
+      "peek": [
+        0.42,
+        0.66
+      ],
+      "wiggle": [
+        0.42,
+        0.78,
+        8,
+        1.5
+      ],
+      "rest": [
+        0.78,
+        1.8
+      ]
+    },
+    "big": {
+      "cycle": 1.5,
+      "hop_px": 34,
+      "wiggle_deg": 10,
+      "scale": "CHEST_BIG_SCALE"
+    },
+    "phase_step": 0.23,
+    "pivot": [
+      0.5,
+      0.92
+    ],
+    "shadow": "stays on ground, scale 1 → .7 with hop"
+  },
+  "sparks": {
+    "sprite": "ready_spark (level_path fx)",
+    "per_chest": 3,
+    "pos": [
+      [
+        -6,
+        26
+      ],
+      [
+        164,
+        6
+      ],
+      [
+        178,
+        104
+      ]
+    ],
+    "size": 40,
+    "cycle": 1.6,
+    "pulse": "scale .4→1.2, rotate 90°"
+  },
+  "contents_tag": {
+    "below_chest": 4,
+    "h": 58,
+    "radius": 29,
+    "fill": "#FFF6D6",
+    "border": [
+      2,
+      "rgba(45,52,54,.18)"
+    ],
+    "shadow": false,
+    "content": "★3 flower disc 46 + ×N, coin 40 + amount",
+    "font": [
+      34,
+      900
+    ]
+  },
+  "reduce_motion": "closed frame, no hop/wiggle, sparks visible but static",
+  "budget": {
+    "chests_max": 4,
+    "sparks_each": 3,
+    "transforms_only": true
+  }
+}

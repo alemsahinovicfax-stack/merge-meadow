@@ -40,7 +40,51 @@ func kit_texture() -> Texture2D:
 	return _tex_cache[path]
 
 
+func _pair() -> String:
+	var parent := get_parent()
+	return str(parent.pair_kind) if parent != null and "pair_kind" in parent else ""
+
+
+## Par prepreka (design_handoff_leveli_endless · obstacle_pairs.json): široki sprite 460 × 220 preko
+## dvije staze ili bočni 240 × 220; zajednički ovratnik i sjena. Sidro = centar sudara (y 0).
+func _draw_pair(kind: String) -> bool:
+	if kind == "hidden":
+		return true
+	var parent := get_parent()
+	var wide := kind == "wide"
+	var tex := _pair_texture(wide)
+	if tex == null:
+		return false
+	var dx := float(parent.pair_dx) if wide else 0.0
+	var collar_cols: Array = UiSeasons.run_def(GameState.active_season_id).get("collar", [])
+	var fill := UiSeasons.col(str(collar_cols[0])) if collar_cols.size() > 0 else UiRun.COLLAR
+	var edge := UiSeasons.col(str(collar_cols[1])) if collar_cols.size() > 1 else UiRun.COLLAR_EDGE
+	var collar := UiLevels.PAIR_WIDE_COLLAR if wide else UiLevels.PAIR_SIDE_COLLAR
+	var shadow := UiLevels.PAIR_WIDE_SHADOW if wide else UiLevels.PAIR_SIDE_SHADOW
+	var cc := Vector2(dx, KIT_COLLAR_Y)
+	_draw_ellipse(cc, collar, fill)
+	_draw_ellipse_outline(cc, collar * 0.5 - Vector2.ONE * KIT_COLLAR_EDGE_W * 0.5, edge, KIT_COLLAR_EDGE_W)
+	_draw_ellipse(Vector2(dx, KIT_SHADOW_Y), shadow, KIT_SHADOW)
+	var box := UiLevels.PAIR_WIDE if wide else UiLevels.PAIR_SIDE
+	var anchor := UiLevels.PAIR_WIDE_ANCHOR if wide else UiLevels.PAIR_SIDE_ANCHOR
+	# Zrcaljenje oko sidra (zastavica gleda u slobodnu stazu).
+	draw_set_transform(Vector2(dx, 0.0), 0.0, Vector2(-1.0 if bool(parent.pair_flip) else 1.0, 1.0))
+	draw_texture_rect(tex, Rect2(-anchor, box), false)
+	draw_set_transform_matrix(Transform2D.IDENTITY)
+	return true
+
+
+func _pair_texture(wide: bool) -> Texture2D:
+	var path := UiLevels.DIR + "obstacles/%s_pair_%s.svg" % [GameState.active_season_id, "wide" if wide else "side"]
+	if not _tex_cache.has(path):
+		_tex_cache[path] = load(path) as Texture2D if ResourceLoader.exists(path) else null
+	return _tex_cache[path]
+
+
 func _draw() -> void:
+	var pk := _pair()
+	if not pk.is_empty() and _draw_pair(pk):
+		return
 	var tex := kit_texture()
 	if tex != null:
 		_draw_kit(tex)

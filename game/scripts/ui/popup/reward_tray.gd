@@ -10,6 +10,12 @@ const PAD_X := 28.0
 
 var chips: Array[RewardChip] = []
 var stamp_text: String = ""
+## Endless (design_handoff_leveli_endless · B6/B7): plijen ostaje cijeli — mint pečat s korpom
+## („All yours", „If you quit · all yours") umjesto roze „Kept half" s ½.
+var stamp_full: bool = false:
+	set(v):
+		stamp_full = v
+		queue_redraw()
 ## Zlatni pečat desno (kraj runa: Loot Boost i Twin Seeds) — isti oblik kao HalfStamp, bez ikone.
 var boost_text: String = ""
 ## Ako bi zlatni pečat udario u lijevi, crta se samo prvi dio (do „ · ").
@@ -80,8 +86,8 @@ func _draw() -> void:
 	if not stamp_text.is_empty():
 		var tw := UiPopups.text_w(900, 38, stamp_text)
 		var r := Rect2(31.0, -UiPopups.STAMP_H * 0.45, 13.0 + 44.0 + 10.0 + tw + 22.0, UiPopups.STAMP_H)
-		draw_style_box(UiPopups.half_stamp(), r)
-		UiPopups.draw_icon(self, UiPopups.icon("icon_half"), Vector2(r.position.x + 13.0 + 22.0, r.get_center().y), 44.0)
+		draw_style_box(UiPopups._box(UiPopups.MINT, int(UiPopups.STAMP_H / 2.0), 3) if stamp_full else UiPopups.half_stamp(), r)
+		UiPopups.draw_icon(self, UiPopups.icon("icon_basket" if stamp_full else "icon_half"), Vector2(r.position.x + 13.0 + 22.0, r.get_center().y), 44.0)
 		UiPopups.draw_text(self, 900, 38, stamp_text, Vector2(r.position.x + 13.0 + 44.0 + 10.0, r.get_center().y - 19.0), UiPopups.OUTLINE)
 		left_end = r.end.x
 	var boost := shown_boost_text()

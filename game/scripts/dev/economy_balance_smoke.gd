@@ -248,13 +248,15 @@ func _check_endless_run() -> void:
 	if absf(float(run.get("_pair_chance")) - float(cfg.pair_chance)) > 1e-6:
 		_fail("Endless pairs should follow the tier")
 	run.call("_update_hud")
-	var label := run.get_node("HUD/TopHud/LevelChip/Row/ModeLabel") as Label
-	if label.text != "Endless · 1:05" or label.clip_text:
-		_fail("Endless chip should show the clock, got '%s'" % label.text)
+	# Endless čip (design_handoff_leveli_endless · B3): sat · Pace · Best u LevelChipu.
+	var ec = run.get("endless_chip")
+	if ec == null or not ec.visible or str(ec.call("clock_text")) != "1:05" or str(ec.call("pace_text")) != "Pace 3":
+		_fail("Endless chip should show 1:05 · Pace 3, got %s" % (str(ec.call("clock_text")) if ec else "no chip"))
 	run.set("elapsed", 3599.0)
 	run.call("_update_hud")
-	if label.text != "Endless · 59:59" or label.clip_text:
-		_fail("long Endless clock should fit the chip, got '%s' clip %s" % [label.text, str(label.clip_text)])
+	var chip := run.get_node("HUD/TopHud/LevelChip") as Control
+	if str(ec.call("clock_text")) != "59:59" or chip.size.x > UiRun.LEVEL_CHIP_MAX_W + 0.5:
+		_fail("long Endless clock should fit the chip, got '%s' width %.1f" % [str(ec.call("clock_text")), chip.size.x])
 	if not bool(run.call("_spawn_reaches_pip")):
 		_fail("Endless has no end — spawns must never stop")
 	# Kraj levela: ništa što ne bi stiglo do Pipa prije kraja (put 1654 px / 500 px/s ≈ 3,3 s).

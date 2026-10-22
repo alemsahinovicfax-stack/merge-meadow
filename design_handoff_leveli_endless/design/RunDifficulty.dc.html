@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<script src="./pip_art.js"></script>
+<script src="./pip_runtime.js"></script>
+<script src="./pip_anim.js"></script>
+<style>body{margin:0;background:#211B26}a{color:#FFD56B}a:hover{color:#FFF8F0}</style>
+</helmet>
+<section data-screen-label="Run difficulty" style="background:#211B26;width:max-content;box-sizing:border-box;padding:56px 64px 80px;display:flex;flex-direction:column;gap:44px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0;min-width:1500px">
+  <div data-layer="Header" style="display:flex;flex-direction:column;gap:14px;max-width:1320px">
+    <div style="font:800 22px/1 Nunito,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#FFD56B">Merge Meadow · Leveli koji rastu · A1 A2 A3 A4</div>
+    <div style="font:900 56px/1.05 Nunito,sans-serif">Težina se vidi prije prve prepreke.</div>
+    <div style="font:700 24px/1.4 Nunito,sans-serif;color:#E6DDEB;max-width:1180px;text-wrap:pretty">Četiri pojasa — Stroll · Jog · Dash · Sprint — imaju boju i 1–4 strelice. Ista pločica stoji na kamenu Level Patha, u LevelChipu i na najavi. Najava (1,12 s) uleti u LevelChip; ubrzanje svakih 15 s je nalet bez teksta; par prepreka je jedan predmet preko dvije staze s mint zastavicom na strani prolaza. Ostalo: <a href="LevelBands.dc.html">Level Path</a> · <a href="LevelFinish.dc.html">Cilj</a> · <a href="EndlessHud.dc.html">Endless</a> · <a href="Specs.dc.html">Specs</a></div>
+  </div>
+
+  <div data-layer="Toolbar" style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;padding:20px 24px;border-radius:22px;background:#2E2636;border:2px solid #44394F;max-width:1520px;box-sizing:border-box">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:800 18px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#BFB3C9">Livada</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;max-width:640px"><sc-for list="{{ seasons }}" as="s" hint-placeholder-count="8"><div onClick="{{ s.pick }}" style="{{ s.style }}">{{ s.name }}</div></sc-for></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:800 18px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#BFB3C9">Level</div>
+      <div style="display:grid;grid-template-columns:repeat(10,48px);gap:6px"><sc-for list="{{ levels }}" as="l" hint-placeholder-count="20"><div onClick="{{ l.pick }}" style="{{ l.style }}">{{ l.n }}</div></sc-for></div>
+    </div>
+    <div onClick="{{ toggleSlow }}" style="{{ slowStyle }}">{{ slowLabel }}</div>
+  </div>
+
+  <div data-layer="MainRow" style="display:flex;gap:48px;align-items:flex-start;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="font:900 30px/1 Nunito,sans-serif">Scena 1080 × 1920 · {{ seasonName }} · L{{ level }}</div>
+      <div data-layer="MainArtboard" style="position:relative;width:486px;height:864px;overflow:hidden;border-radius:18px;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(0,0,0,.35);flex:0 0 auto">
+        <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;transform:scale(.45)"><div ref="{{ stageRef }}"></div></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;width:400px">
+      <div style="font:900 30px/1 Nunito,sans-serif">Scenarij (petlja)</div>
+      <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ scenarios }}" as="sc" hint-placeholder-count="6"><div onClick="{{ sc.pick }}" style="{{ sc.style }}"><div>{{ sc.label }}</div><div style="font:700 18px/1.25 Nunito,sans-serif;opacity:.8">{{ sc.note }}</div></div></sc-for></div>
+      <div data-layer="Stats" style="padding:16px 18px;border-radius:16px;background:#2E2636;border:2px solid #44394F;display:flex;flex-direction:column;gap:8px;font:700 20px/1.35 Nunito,sans-serif;color:#E6DDEB">
+        <div style="font:800 16px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#BFB3C9">Level {{ level }} · §4</div>
+        <div>{{ facts1 }}</div>
+        <div>{{ facts2 }}</div>
+        <div>FX sprite-ova sada / max: <b ref="{{ statRef }}">0 / 0</b> (budžet: najava 6, nalet 8)</div>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="Chips" style="display:flex;flex-direction:column;gap:18px">
+    <div style="font:900 34px/1 Nunito,sans-serif">LevelChip s pojasom · 1:1 · visina 128 ostaje, širina ≤ 464</div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center">
+      <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="height:128px;box-sizing:border-box;padding:0 32px;border-radius:30px;background:#FFF8F0;border:3px solid #CBC2B6;box-shadow:0 6px 0 rgba(18,28,22,.42);display:flex;align-items:center;gap:12px;width:max-content">
+            <img src="icons/progress_flag.svg" alt="" style="width:38px;height:57px;flex:0 0 auto">
+            <div style="font:900 48px/1 Nunito,sans-serif;color:#2D3436;white-space:nowrap">{{ c.label }}</div>
+            <img src="{{ c.tag }}" alt="" style="height:40px;flex:0 0 auto">
+          </div>
+          <div style="font:800 20px/1.2 Nunito,sans-serif;color:#BFB3C9">{{ c.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="Intro" style="display:flex;flex-direction:column;gap:18px">
+    <div style="font:900 34px/1 Nunito,sans-serif">A2 · Najava levela (pojas 1 i pojas 4) · ploča 180, kao R4 baner, ali krem</div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px">
+      <sc-for list="{{ intros }}" as="i" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:22px;padding:36px 40px;border-radius:24px;background:{{ i.bg }}">
+          <div style="height:180px;box-sizing:border-box;padding:0 64px;border-radius:90px;background:#FFF8F0;border:5px solid #2D3436;box-shadow:0 12px 0 rgba(10,14,12,.55);display:flex;align-items:center;gap:28px">
+            <div style="font:900 96px/1 Nunito,sans-serif;color:#2D3436;white-space:nowrap">{{ i.label }}</div>
+            <img src="{{ i.tag }}" alt="" style="height:60px">
+          </div>
+          <div style="height:88px;box-sizing:border-box;padding:0 34px 0 18px;border-radius:44px;background:#FFF8F0;border:4px solid #2D3436;display:flex;align-items:center;gap:14px;font:900 44px/1 Nunito,sans-serif;color:#2D3436;white-space:nowrap">
+            <div style="width:60px;height:60px;box-sizing:border-box;border-radius:30px;background:{{ i.fill }};border:3px solid #2D3436;display:grid;place-items:center"><div style="width:26px;height:26px;box-sizing:border-box;border-radius:13px;border:5px solid #2D3436;position:relative"><div style="position:absolute;left:8px;top:2px;width:4px;height:9px;background:#2D3436"></div></div></div>
+            {{ i.sub }}
+          </div>
+          <div style="font:800 20px/1.2 Nunito,sans-serif;color:#FFF8F0;opacity:.85">{{ i.note }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div data-layer="Pairs" style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap"><div style="font:900 34px/1 Nunito,sans-serif">A4 · Par prepreka · 3 varijante × 8 livada</div><div onClick="{{ toggleAll }}" style="{{ allStyle }}">{{ allLabel }}</div></div>
+      <div style="font:700 22px/1.35 Nunito,sans-serif;color:#BFB3C9;max-width:1200px">Lijevo + sredina i sredina + desno = jedan široki sprite 460 × 220 (drugi je flip_h); lijevo + desno = dva bočna dijela 240 × 220 okrenuta ka sredini. Jedan zajednički ovratnik preko obje staze; mint zastavica gleda u prolaz. Sudar ostaje 2 × 64 × 64 (dvije prepreke u kodu).</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,max-content);gap:18px 20px">
+      <sc-for list="{{ pairs }}" as="p" hint-placeholder-count="24">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="position:relative;width:432px;height:152px;overflow:hidden;border-radius:14px;background:{{ p.ground }}">
+            <div style="position:absolute;left:0;top:0;width:1080px;height:380px;transform:scale(.4);transform-origin:0 0">
+              <div style="position:absolute;left:170px;top:0;width:200px;height:380px;box-sizing:border-box;background:{{ p.lane }};border-left:4px solid {{ p.edge }};border-right:4px solid {{ p.edge }}"></div>
+              <div style="position:absolute;left:440px;top:0;width:200px;height:380px;box-sizing:border-box;background:{{ p.lane }};border-left:4px solid {{ p.edge }};border-right:4px solid {{ p.edge }}"></div>
+              <div style="position:absolute;left:710px;top:0;width:200px;height:380px;box-sizing:border-box;background:{{ p.lane }};border-left:4px solid {{ p.edge }};border-right:4px solid {{ p.edge }}"></div>
+              <sc-for list="{{ p.parts }}" as="q" hint-placeholder-count="2">
+                <div style="{{ q.collar }}"></div>
+                <div style="{{ q.shadow }}"></div>
+                <img src="{{ q.src }}" alt="" style="{{ q.img }}">
+              </sc-for>
+            </div>
+          </div>
+          <div style="font:800 20px/1 Nunito,sans-serif">{{ p.label }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Scena&quot;},&quot;level&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:1,&quot;max&quot;:20,&quot;default&quot;:14,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scena&quot;},&quot;scenario&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;intro&quot;,&quot;gust&quot;,&quot;pairLM&quot;,&quot;pairMR&quot;,&quot;pairLR&quot;,&quot;mix&quot;],&quot;default&quot;:&quot;intro&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Scena&quot;},&quot;slow&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scena&quot;}}">
+const BTN = 'box-sizing:border-box;min-height:48px;padding:10px 16px;border-radius:14px;cursor:pointer;font:800 20px/1.1 Nunito,sans-serif;user-select:none;';
+const on = a => a ? 'background:#FFD56B;color:#2D3436;border:3px solid #2D3436' : 'background:#3A3044;color:#FFF8F0;border:3px solid #55485F';
+const SC = [['intro', 'A2 · Najava', 'start runa: ploča → LevelChip · 1,12 s · ≤ 6 sprite-ova'], ['gust', 'A3 · Nalet (ubrzanje)', 'svakih 15 s · 6 linija + Pip nagne + trzaj 10 px · 0,42 s'], ['pairLM', 'A4 · Par lijevo + sredina', 'prolaz desno · široki sprite'], ['pairMR', 'A4 · Par sredina + desno', 'prolaz lijevo · isti sprite, flip_h'], ['pairLR', 'A4 · Par lijevo + desno', 'prolaz u sredini · dva bočna dijela'], ['mix', 'Mix · gustina levela', 'parovi + singl + coini + nalet']];
+class Component extends DCLogic {
+  state = { LE: null, K: null, season: this.props.season ?? 'country_bloom', level: this.props.level ?? 14, scenario: this.props.scenario ?? 'intro', slow: !!this.props.slow, allPairs: !!this.props.allPairs, live: 0, maxLive: 0 };
+  stageRef = React.createRef(); statRef = React.createRef();
+  componentDidMount() { Promise.all([import('./le_kit.js'), import('./seasons_kit.js'), import('./run_stage.js')]).then(([LE, K, RS]) => { this.RS = RS; this.setState({ LE, K }); }); }
+  componentWillUnmount() { if (this.stage) this.stage.destroy(); }
+  componentDidUpdate() {
+    const { LE, K } = this.state; if (!LE || !this.stageRef.current) return;
+    const key = [this.state.season, this.state.level, this.state.scenario, this.state.slow].join('|'); if (key === this._key) return; this._key = key;
+    const cfg = this.cfg();
+    if (!this.stage) this.stage = new this.RS.RunStage(this.stageRef.current, LE, K, cfg); else this.stage.set(cfg);
+  }
+  cfg() {
+    const { LE, season, level, scenario, slow } = this.state, L = LE.LEVELS[level - 1], v = Math.round(LE.speedAt(level, L.dur * 0.6)), hit = LE.GATE_DIST / v;
+    const base = { season, mode: 'level', level, speed: v, slow, coins: 12, seeds: 5, onStats: s => { const e = this.statRef.current; if (e) e.textContent = s.live + ' / ' + s.max; } };
+    const coin = (t, lane) => ({ kind: 'coin', t, lane });
+    if (scenario === 'intro') return { ...base, speed: Math.round(LE.speedAt(level, 0)), loop: 3.2, coins: 0, seeds: 0, fxAt: [[0.25, 'intro']], items: [coin(0.4, 1), coin(0.75, 1), coin(1.1, 1)], lanes: [[0, 1]] };
+    if (scenario === 'gust') return { ...base, loop: 2.6, fxAt: [[0.4, 'gust']], items: [coin(0, 0), coin(0.35, 0), coin(0.7, 2), coin(1.05, 2)], lanes: [[0, 1]] };
+    const pair = { pairLM: [[0, 1], [[0, 1], [hit - 1.1, 2]]], pairMR: [[1, 2], [[0, 1], [hit - 1.1, 0]]], pairLR: [[0, 2], [[0, 0], [hit - 1.1, 1]]] }[scenario];
+    if (pair) return { ...base, loop: hit + 0.9, items: [{ kind: 'pair', t: 0, lanes: pair[0] }, coin(0.5, pair[1][1][1]), coin(0.85, pair[1][1][1])], lanes: pair[1] };
+    return { ...base, loop: 6, fxAt: [[1.2, 'gust']], items: [{ kind: 'pair', t: 0, lanes: [0, 1] }, coin(0.4, 2), { kind: 'single', t: 1.2, lane: 2, art: 1 }, { kind: 'pair', t: 2.2, lanes: [0, 2] }, coin(2.6, 1), coin(2.9, 1), { kind: 'pair', t: 3.5, lanes: [1, 2] }, { kind: 'single', t: 4.4, lane: 1 }, coin(4.8, 0)], lanes: [[0, 1], [hit - 1.0, 2], [hit + 1.4, 1], [hit + 2.6, 0]] };
+  }
+  renderVals() {
+    const s = this.state, LE = s.LE;
+    const vals = { stageRef: this.stageRef, statRef: this.statRef, seasons: [], levels: [], scenarios: [], chips: [], intros: [], pairs: [], seasonName: '', level: s.level, facts1: '', facts2: '', live: s.live, maxLive: s.maxLive, toggleSlow: () => this.setState({ slow: !s.slow }), toggleAll: () => this.setState({ allPairs: !s.allPairs }), allLabel: s.allPairs ? 'Prikazane sve livade (24)' : 'Prikaži sve livade (24)', allStyle: BTN + on(s.allPairs), slowLabel: s.slow ? 'Usporeno ×4 · uključeno' : 'Usporeno ×4', slowStyle: BTN + 'min-height:64px;padding:16px 24px;font-size:22px;' + on(s.slow) };
+    if (!LE) return vals;
+    const L = LE.LEVELS[s.level - 1], B = LE.BANDS[LE.bandOf(s.level) - 1];
+    Object.assign(vals, {
+      seasonName: LE.NAMES[s.season],
+      seasons: LE.SEASONS.map(id => ({ name: LE.SHORT[id] + (LE.DARK[id] ? ' ●' : ''), pick: () => this.setState({ season: id }), style: BTN + on(s.season === id) })),
+      levels: LE.LEVELS.map(x => ({ n: x.n, pick: () => this.setState({ level: x.n }), style: BTN + 'min-height:44px;padding:0;display:grid;place-items:center;' + on(s.level === x.n) + (x.n % 5 === 0 ? ';border-style:dashed' : '') + ';box-shadow:inset 0 -6px 0 ' + LE.BANDS[LE.bandOf(x.n) - 1].fill })),
+      scenarios: SC.map(([id, label, note]) => ({ label, note, pick: () => this.setState({ scenario: id }), style: BTN + 'display:flex;flex-direction:column;gap:4px;' + on(s.scenario === id) })),
+      facts1: B.name + ' (' + B.from + '–' + B.to + ') · ' + LE.fmtDur(L.dur) + ' · ' + L.v0 + ' → ' + L.v1 + ' px/s',
+      facts2: L.obst + ' prepreka/min · parova ' + L.pairs + ' % · ' + L.coins + ' coina · ' + L.seeds + ' sjemena',
+      chips: [3, 8, 14, 20, 15].map(n => ({ n, label: 'Level ' + n, tag: '../assets/bands/tag_' + LE.bandOf(n) + (LE.isPeak(n) ? '_peak' : '') + '.svg', note: LE.BANDS[LE.bandOf(n) - 1].name + (LE.isPeak(n) ? ' · kraj pojasa (★)' : '') + ' · širina ' + (32 + 38 + 12 + (n > 9 ? 196 : 168) + 12 + (LE.isPeak(n) ? 115 : 96) + 32) + ' px' })),
+      intros: [[3, LE.KITSBG || '#2F4A33', 'Country Bloom · pojas 1'], [18, '#15112A', 'Lantern Meadow · pojas 4'], [20, '#1A1E3E', 'Replay levela 20 (put završen)']].map(([n, bg, note], i) => ({ n, label: 'Level ' + n, bg, note, tag: '../assets/bands/tag_' + LE.bandOf(n) + (LE.isPeak(n) ? '_peak' : '') + '.svg', fill: LE.BANDS[LE.bandOf(n) - 1].fill, sub: (i === 2 ? 'Replay' : LE.BANDS[LE.bandOf(n) - 1].name) + ' · ' + LE.fmtDur(LE.LEVELS[n - 1].dur) })),
+      pairs: []
+    });
+    if (s.K) {
+      const K = s.K, LN = LE.LANES;
+      (s.allPairs ? LE.SEASONS : [s.season]).forEach(id => { const R = K.KITS[id].run; [[0, 1], [1, 2], [0, 2]].forEach(lanes => {
+        const parts = [], y = 200, col = R.collar;
+        const C = (cx, w, h) => 'position:absolute;left:' + (cx - w / 2) + 'px;top:' + (y + 69 - h / 2) + 'px;width:' + w + 'px;height:' + h + 'px;box-sizing:border-box;border-radius:50%;background:' + col[0] + ';border:3px solid ' + col[1];
+        const SH = (cx, w, h) => 'position:absolute;left:' + (cx - w / 2) + 'px;top:' + (y + 55 - h / 2) + 'px;width:' + w + 'px;height:' + h + 'px;border-radius:50%;background:rgba(10,14,20,.30)';
+        if (lanes[1] - lanes[0] === 1) { const mid = (LN[lanes[0]] + LN[lanes[1]]) / 2; parts.push({ collar: C(mid, 510, 56), shadow: SH(mid, 440, 44), src: '../assets/obstacles/' + id + '_pair_wide.svg', img: 'position:absolute;left:' + (mid - 230) + 'px;top:' + (y - 151) + 'px;width:460px;height:220px;' + (lanes[0] === 1 ? 'transform:scaleX(-1)' : '') }); }
+        else [0, 2].forEach(l => parts.push({ collar: C(LN[l], 240, 52), shadow: SH(LN[l], 168, 40), src: '../assets/obstacles/' + id + '_pair_side.svg', img: 'position:absolute;left:' + (LN[l] - 120) + 'px;top:' + (y - 151) + 'px;width:240px;height:220px;' + (l === 2 ? 'transform:scaleX(-1)' : '') }));
+        vals.pairs.push({ ground: R.ground, lane: R.lane, edge: R.laneEdge, parts, label: LE.SHORT[id] + ' · ' + (lanes[1] - lanes[0] === 1 ? (lanes[0] === 0 ? 'prolaz desno' : 'prolaz lijevo') : 'prolaz u sredini') });
+      }); });
+    }
+    return vals;
+  }
+}
+
+</script>
+</body>
+</html>

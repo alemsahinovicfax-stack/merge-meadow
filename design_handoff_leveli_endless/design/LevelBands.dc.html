@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<script src="./pip_art.js"></script>
+<script src="./pip_runtime.js"></script>
+<script src="./pip_anim.js"></script>
+<style>body{margin:0;background:#211B26}a{color:#FFD56B}a:hover{color:#FFF8F0}</style>
+</helmet>
+<section data-screen-label="Level bands" style="background:#211B26;width:max-content;box-sizing:border-box;padding:56px 64px 80px;display:flex;flex-direction:column;gap:40px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0">
+  <div data-layer="Header" style="display:flex;flex-direction:column;gap:14px;max-width:1320px">
+    <div style="font:800 22px/1 Nunito,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#FFD56B">Merge Meadow · Level Path · A1 B1 B2 B8</div>
+    <div style="font:900 56px/1.05 Nunito,sans-serif">Pojasevi na putu, Endless na svom mjestu.</div>
+    <div style="font:700 24px/1.4 Nunito,sans-serif;color:#E6DDEB;max-width:1180px;text-wrap:pretty">Svaki kamen nosi pločicu pojasa (boja + strelice), kamenovi 5/10/15/20 imaju zvjezdicu — kraj pojasa = sanduk. Zastavica s imenom stoji uz prvi kamen pojasa. Endless dugme 236 × 124 ostaje na istom mjestu: zaključano je krem s prstenom napretka i katancem, otključano lavanda s prstenovima, a rekord visi ispod kao pločica. <a href="RunDifficulty.dc.html">Run</a> · <a href="EndlessHud.dc.html">Endless HUD</a> · <a href="ChestReady.dc.html">Sanduk</a> · <a href="Specs.dc.html">Specs</a></div>
+  </div>
+  <div data-layer="Toolbar" style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;padding:20px 24px;border-radius:22px;background:#2E2636;border:2px solid #44394F;max-width:1520px;box-sizing:border-box">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:800 18px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#BFB3C9">Livada</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;max-width:640px"><sc-for list="{{ seasons }}" as="s" hint-placeholder-count="8"><div onClick="{{ s.pick }}" style="{{ s.style }}">{{ s.name }}</div></sc-for></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:800 18px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#BFB3C9">Pip na levelu</div>
+      <div style="display:grid;grid-template-columns:repeat(11,48px);gap:6px"><sc-for list="{{ levels }}" as="l" hint-placeholder-count="21"><div onClick="{{ l.pick }}" style="{{ l.style }}">{{ l.n }}</div></sc-for></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:800 18px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#BFB3C9">Kadar</div>
+      <div style="display:flex;gap:8px"><sc-for list="{{ views }}" as="v" hint-placeholder-count="5"><div onClick="{{ v.pick }}" style="{{ v.style }}">{{ v.name }}</div></sc-for></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:48px;align-items:flex-start;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="font:900 30px/1 Nunito,sans-serif">Stranica 1080 × 1633 · {{ seasonName }}</div>
+      <div data-layer="PathArtboard" style="position:relative;width:540px;height:817px;overflow:hidden;border-radius:18px;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(0,0,0,.35)">
+        <div style="position:absolute;left:0;top:0;width:1080px;height:1633px;transform:scale(.5);transform-origin:0 0;overflow:hidden">
+          <div data-layer="PathContent" ref="{{ contentRef }}" style="position:absolute;left:0;top:0;width:1080px;height:4900px;will-change:transform">
+            <img src="{{ roadSrc }}" alt="" style="position:absolute;left:0;top:0;width:1080px;height:4900px">
+            <sc-for list="{{ flags }}" as="f" hint-placeholder-count="4">
+              <div data-layer="BandFlag" style="{{ f.wrap }}">
+                <img src="{{ f.src }}" alt="" style="position:absolute;left:0;top:0;width:180px;height:214px">
+                <div style="position:absolute;left:28px;top:118px;height:52px;box-sizing:border-box;padding:0 18px;border-radius:26px;background:#FFF8F0;border:3px solid #2D3436;display:flex;align-items:center;gap:8px;font:900 32px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ f.name }}<span style="font:800 24px/1 Nunito,system-ui,sans-serif;color:#555C5E">{{ f.range }}</span></div>
+              </div>
+            </sc-for>
+            <sc-for list="{{ chests }}" as="c" hint-placeholder-count="4">
+              <img src="{{ c.src }}" alt="" style="{{ c.style }}">
+            </sc-for>
+            <sc-for list="{{ stones }}" as="s" hint-placeholder-count="20">
+              <div style="{{ s.wrap }}">
+                <img src="{{ s.src }}" alt="" style="position:absolute;inset:0;width:100%;height:100%">
+                <div style="{{ s.numStyle }}">{{ s.n }}</div>
+                <img src="{{ s.tag }}" alt="" style="{{ s.tagStyle }}">
+              </div>
+            </sc-for>
+            <div ref="{{ pipRef }}" style="position:absolute;left:0;top:0;width:210px;height:197px;z-index:5;will-change:transform"></div>
+          </div>
+          <div data-layer="PathTitle" style="position:absolute;left:0;top:24px;width:1080px;display:flex;justify-content:center">
+            <div style="height:100px;box-sizing:border-box;border-radius:50px;background:#FFF8F0;border:3px solid #2D3436;display:flex;align-items:center;gap:22px;padding:0 18px 0 40px">
+              <div style="font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ seasonName }}</div>
+              <div style="height:64px;box-sizing:border-box;padding:0 24px;border-radius:32px;background:#FFF6D6;border:3px solid #2D3436;display:flex;align-items:center;font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436">{{ progText }}</div>
+            </div>
+          </div>
+          <div data-layer="Toast" ref="{{ toastRef }}" style="position:absolute;left:0;top:1310px;width:1080px;display:none;justify-content:center;z-index:12">
+            <div style="height:100px;box-sizing:border-box;padding:0 40px 0 20px;border-radius:50px;background:#2D3436;border:3px solid rgba(255,248,240,.9);display:flex;align-items:center;gap:16px;font:900 44px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;white-space:nowrap">
+              <div style="width:60px;height:60px;border-radius:30px;background:#FFD56B;display:grid;place-items:center"><img src="icons/icon_lock.svg" alt="" style="width:40px;height:40px"></div>
+              {{ toastText }}
+            </div>
+          </div>
+          <div data-layer="BottomRow" style="position:absolute;left:0;top:0;width:1080px;height:1633px;pointer-events:none;z-index:10">
+            <div style="position:absolute;left:70px;top:1477px;width:236px;height:124px;box-sizing:border-box;border-radius:28px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:14px;font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436"><div style="width:18px;height:18px;border-left:7px solid #2D3436;border-bottom:7px solid #2D3436;transform:rotate(45deg);margin-left:8px"></div>Field</div>
+            <div style="position:absolute;left:324px;top:1461px;width:432px;height:140px;box-sizing:border-box;border-radius:70px;background:#FFB88C;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:22px;font:900 56px/1 Nunito,system-ui,sans-serif;color:#2D3436"><div style="width:0;height:0;border-top:26px solid transparent;border-bottom:26px solid transparent;border-left:42px solid #2D3436;margin-left:8px"></div>Play</div>
+            <div data-layer="EndlessButton" ref="{{ btnRef }}" onClick="{{ tapEndless }}" style="position:absolute;left:774px;top:1477px;width:236px;height:124px;pointer-events:auto;cursor:pointer;will-change:transform">
+              <div data-p="locked" style="position:absolute;inset:0;box-sizing:border-box;border-radius:28px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;gap:10px;padding-left:12px">
+                <div style="position:relative;width:92px;height:92px;flex:0 0 auto">
+                  <svg width="92" height="92" viewBox="0 0 92 92" style="position:absolute;inset:0"><circle cx="46" cy="46" r="39" fill="none" stroke="rgba(45,52,54,.18)" stroke-width="9"></circle><circle cx="46" cy="46" r="39" fill="none" stroke="#2D3436" stroke-width="13" stroke-dasharray="{{ ringDash }}" transform="rotate(-90 46 46)" stroke-linecap="round"></circle><circle cx="46" cy="46" r="39" fill="none" stroke="#A8E6CF" stroke-width="7" stroke-dasharray="{{ ringDash }}" transform="rotate(-90 46 46)" stroke-linecap="round"></circle></svg>
+                  <img data-p="shackle" src="../assets/endless/lock_shackle.svg" alt="" style="position:absolute;left:28px;top:14px;width:36px;height:30px">
+                  <img data-p="body" src="../assets/endless/lock_body.svg" alt="" style="position:absolute;left:22px;top:36px;width:48px;height:42px">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="font:900 28px/1 Nunito,system-ui,sans-serif;color:#555C5E">Endless</div>
+                  <div style="font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums;white-space:nowrap">{{ unlockText }}</div>
+                </div>
+              </div>
+              <div data-p="open" style="position:absolute;inset:0;box-sizing:border-box;border-radius:28px;background:#D4A5FF;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:12px">
+                <img data-p="rings" src="../assets/endless/rings.svg" alt="" style="width:54px;height:30px">
+                <div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Endless</div>
+              </div>
+              <div data-p="best" style="position:absolute;left:28px;top:100px;width:180px;height:48px;box-sizing:border-box;border-radius:24px;background:#FFF8F0;border:3px solid #2D3436;display:flex;align-items:center;justify-content:center;gap:8px;font:900 28px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums">
+                <img src="../assets/endless/trophy.svg" alt="" style="width:30px;height:30px">{{ bestText }}
+              </div>
+              <img data-p="burst" src="../assets/fx/burst_ring.svg" alt="" style="position:absolute;left:18px;top:-38px;width:200px;height:200px;opacity:0;pointer-events:none">
+            </div>
+            <div data-layer="UnlockBubble" ref="{{ bubbleRef }}" style="position:absolute;left:430px;top:1290px;display:none;transform-origin:500px 150px">
+              <div style="box-sizing:border-box;padding:26px 34px 26px 26px;border-radius:32px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;gap:16px;font:900 44px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">
+                <div style="width:72px;height:72px;box-sizing:border-box;border-radius:36px;background:#D4A5FF;border:3px solid #2D3436;display:grid;place-items:center"><img src="../assets/endless/rings.svg" alt="" style="width:46px;height:26px"></div>
+                Endless unlocked!
+              </div>
+              <div style="position:absolute;left:446px;top:118px;width:0;height:0;border-left:26px solid transparent;border-right:26px solid transparent;border-top:32px solid #2D3436"></div>
+              <div style="position:absolute;left:454px;top:116px;width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:24px solid #FFF8F0"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px;width:560px">
+      <div style="font:900 30px/1 Nunito,sans-serif">Trenuci</div>
+      <div onClick="{{ playUnlock }}" style="box-sizing:border-box;padding:16px 20px;border-radius:16px;background:#FFD56B;border:3px solid #2D3436;color:#2D3436;cursor:pointer;display:flex;flex-direction:column;gap:6px"><div style="font:900 24px/1.1 Nunito,sans-serif">B2 · Prelaz 15 → 16 + otključavanje</div><div style="font:700 18px/1.3 Nunito,sans-serif">Pip skoči (0,7 s) → pauza 0,4 s → katanac: drhti 0,18 · karika gore · tijelo iskoči · krem → lavanda · prsten · oblačić 2,2 s. Samo jednom po sezoni (save „endless_seen").</div></div>
+      <div onClick="{{ tapLocked }}" style="box-sizing:border-box;padding:16px 20px;border-radius:16px;background:#3A3044;border:3px solid #55485F;cursor:pointer;display:flex;flex-direction:column;gap:6px"><div style="font:900 24px/1.1 Nunito,sans-serif">B1 · Tap na zaključan Endless</div><div style="font:700 18px/1.3 Nunito,sans-serif;color:#E6DDEB">Dugme se trese 0,3 s, toast iz popup kita (ink, 100) 1,6 s. Isto na polju i na putu.</div></div>
+      <div style="font:900 30px/1 Nunito,sans-serif;margin-top:12px">Endless dugme · 1:1 · 236 × 124</div>
+      <div style="display:grid;grid-template-columns:repeat(2,max-content);gap:28px 32px">
+        <sc-for list="{{ btnStates }}" as="b" hint-placeholder-count="4">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="position:relative;width:236px;height:150px">
+              <sc-if value="{{ b.locked }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:0;top:0;width:236px;height:124px;box-sizing:border-box;border-radius:28px;background:#FFF8F0;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;gap:10px;padding-left:12px">
+                  <div style="position:relative;width:92px;height:92px;flex:0 0 auto">
+                    <svg width="92" height="92" viewBox="0 0 92 92" style="position:absolute;inset:0"><circle cx="46" cy="46" r="39" fill="none" stroke="rgba(45,52,54,.18)" stroke-width="9"></circle><circle cx="46" cy="46" r="39" fill="none" stroke="#2D3436" stroke-width="13" stroke-dasharray="{{ b.dash }}" transform="rotate(-90 46 46)" stroke-linecap="round"></circle><circle cx="46" cy="46" r="39" fill="none" stroke="#A8E6CF" stroke-width="7" stroke-dasharray="{{ b.dash }}" transform="rotate(-90 46 46)" stroke-linecap="round"></circle></svg>
+                    <img src="../assets/endless/lock_shackle.svg" alt="" style="position:absolute;left:28px;top:14px;width:36px;height:30px">
+                    <img src="../assets/endless/lock_body.svg" alt="" style="position:absolute;left:22px;top:36px;width:48px;height:42px">
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:6px"><div style="font:900 28px/1 Nunito,system-ui,sans-serif;color:#555C5E">Endless</div><div style="font:900 40px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ b.text }}</div></div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ b.open }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:0;top:0;width:236px;height:124px;box-sizing:border-box;border-radius:28px;background:#D4A5FF;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:12px"><img src="../assets/endless/rings.svg" alt="" style="width:54px;height:30px"><div style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Endless</div></div>
+              </sc-if>
+              <sc-if value="{{ b.best }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:28px;top:100px;width:180px;height:48px;box-sizing:border-box;border-radius:24px;background:{{ b.bestBg }};border:3px solid #2D3436;display:flex;align-items:center;justify-content:center;gap:8px;font:900 28px/1 Nunito,system-ui,sans-serif;color:#2D3436"><img src="../assets/endless/trophy.svg" alt="" style="width:30px;height:30px">{{ b.bestText }}</div>
+              </sc-if>
+            </div>
+            <div style="font:800 20px/1.25 Nunito,sans-serif;color:#BFB3C9;max-width:260px">{{ b.note }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div data-layer="Tags" style="display:flex;flex-direction:column;gap:16px">
+    <div style="font:900 34px/1 Nunito,sans-serif">A1 · Pločice pojasa · 1:1 (72 × 30, kraj pojasa 86 × 30)</div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap">
+      <sc-for list="{{ tags }}" as="t" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:16px;padding:18px 22px;border-radius:18px;background:#2E2636;border:2px solid #44394F">
+          <img src="{{ t.flag }}" alt="" style="width:90px;height:107px">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font:900 30px/1 Nunito,sans-serif">{{ t.name }} <span style="font:800 20px/1 Nunito,sans-serif;color:#BFB3C9">{{ t.range }}</span></div>
+            <div style="display:flex;gap:10px;align-items:center"><img src="{{ t.tag }}" alt="" style="height:30px"><img src="{{ t.peak }}" alt="" style="height:30px"></div>
+            <div style="font:700 18px/1.25 Nunito,sans-serif;color:#BFB3C9">{{ t.note }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;country_bloom&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;level&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:1,&quot;max&quot;:21,&quot;default&quot;:7,&quot;tsType&quot;:&quot;number&quot;},&quot;best&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:0,&quot;max&quot;:900,&quot;default&quot;:0,&quot;tsType&quot;:&quot;number&quot;,&quot;unit&quot;:&quot;s&quot;}}">
+const BTN = 'box-sizing:border-box;min-height:48px;padding:10px 16px;border-radius:14px;cursor:pointer;font:800 20px/1.1 Nunito,sans-serif;user-select:none;';
+const on = a => a ? 'background:#FFD56B;color:#2D3436;border:3px solid #2D3436' : 'background:#3A3044;color:#FFF8F0;border:3px solid #55485F';
+const f2 = v => (Math.round(v * 100) / 100).toString();
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const outBack = t => { const c = 1.70158; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const out3 = t => 1 - Math.pow(1 - t, 3);
+const bell = (t, a, b) => t <= a || t >= b ? 0 : Math.sin(Math.PI * (t - a) / (b - a));
+const CIRC = 2 * Math.PI * 39;
+class Component extends DCLogic {
+  state = { LE: null, LP: null, season: this.props.season ?? 'country_bloom', level: this.props.level ?? 7, view: 'pip', best: this.props.best ?? 0 };
+  contentRef = React.createRef(); pipRef = React.createRef(); btnRef = React.createRef(); toastRef = React.createRef(); bubbleRef = React.createRef();
+  componentDidMount() {
+    Promise.all([import('./le_kit.js'), import('./level_path_kit.js')]).then(([LE, LP]) => this.setState({ LE, LP }));
+    const loop = () => { if (this._dead) return; this.frame(); this._raf = requestAnimationFrame(loop); }; this._raf = requestAnimationFrame(loop);
+  }
+  componentWillUnmount() { this._dead = true; cancelAnimationFrame(this._raf); if (this.pip) this.pip.destroy(); }
+  componentDidUpdate() { this.place(); }
+  scrollFor(view) { const { LP, level } = this.state, CP = LP.CP; const y = view === 'pip' ? CP[Math.min(20, level) - 1].y : CP[[0, 3, 8, 13, 18][view] ?? 0].y; return clamp(y - 1100, 0, 4900 - 1633); }
+  place() {
+    const { LP } = this.state, c = this.contentRef.current, p = this.pipRef.current; if (!LP || !c || !p) return;
+    if (!this.anim) c.style.transform = 'translateY(' + f2(-this.scrollFor(this.state.view)) + 'px)';
+    if (!this.pip && window.Pip && window.Pip.create) this.pip = window.Pip.create(p, { view: 'front', skin: 'classic', size: 210, loop: 'idle', shadow: false });
+    if (!this.anim) this.pipAt(Math.min(20, this.state.level));
+    this.btnState(this.state.level > 15 ? 1 : 0);
+  }
+  pipAt(n, m, u) { const { LP } = this.state, p = this.pipRef.current; if (!p) return; const a = LP.CP[n - 1]; let x = a.x, y = a.y; if (m) { const b = LP.CP[m - 1]; x = a.x + (b.x - a.x) * u; y = a.y + (b.y - a.y) * u - 74 * 4 * u * (1 - u); } p.style.transform = 'translate(' + f2(x - 105) + 'px,' + f2(y - 44 - 210 * 240 / 256) + 'px)'; }
+  q(sel) { return this.btnRef.current && this.btnRef.current.querySelector('[data-p=' + sel + ']'); }
+  btnState(open) { const L = this.q('locked'), O = this.q('open'), B = this.q('best'); if (!L) return; if (this.anim) return; L.style.display = open ? 'none' : 'flex'; O.style.display = open ? 'flex' : 'none'; O.style.opacity = 1; O.style.transform = ''; B.style.display = open && this.state.best ? 'flex' : 'none'; const r = this.q('rings'); if (r) r.style.transform = ''; }
+  playUnlock = () => { this.setState({ level: 15, view: 'pip' }, () => { this.place(); this.anim = { kind: 'unlock', t0: performance.now() }; }); };
+  tapLocked = () => { if (this.state.level > 15) this.setState({ level: 9 }, () => { this.place(); this.anim = { kind: 'lock', t0: performance.now() }; }); else this.anim = { kind: 'lock', t0: performance.now() }; };
+  tapEndless = () => { if (this.state.level <= 15) this.tapLocked(); };
+  frame() {
+    const a = this.anim; if (!a || !this.state.LP) return; const u = (performance.now() - a.t0) / 1000, LE = this.state.LE, T = LE.TIME, btn = this.btnRef.current; if (!btn) return;
+    if (a.kind === 'lock') {
+      const k = clamp(u / T.lockTap.shake); btn.style.transform = 'translateX(' + f2(Math.sin(k * Math.PI * 4) * 8 * (1 - k)) + 'px)';
+      const tst = this.toastRef.current; const tv = clamp(u / 0.18), to = clamp((u - 0.18 - T.lockTap.toastHold) / 0.18);
+      tst.style.display = 'flex'; tst.style.opacity = f2(tv * (1 - to)); tst.style.transform = 'translateY(' + f2(24 * (1 - out3(tv))) + 'px)';
+      if (to >= 1) { tst.style.display = 'none'; btn.style.transform = ''; this.anim = null; }
+      return;
+    }
+    // unlock: hop 15 → 16 (0,12 čekanje + 0,7 skok), pa otključavanje
+    const hop0 = 0.12, hopLen = 0.7, h = clamp((u - hop0) / hopLen); this.pipAt(15, 16, h < 1 ? out3(h) * 0.15 + h * 0.85 : 1);
+    const U = T.unlock, v = u - hop0 - hopLen - U.delay;
+    const L = this.q('locked'), O = this.q('open'), sh = this.q('shackle'), bd = this.q('body'), bu = this.q('burst'), rg = this.q('rings'), bb = this.bubbleRef.current;
+    if (v < 0) { L.style.display = 'flex'; O.style.display = 'none'; return; }
+    btn.style.transform = 'translateX(' + f2(Math.sin(clamp(v / U.shake) * Math.PI * 4) * 6 * (1 - clamp(v / U.shake))) + 'px) scale(' + f2(1 + 0.08 * bell(v, U.pop[0], U.pop[1])) + ')';
+    const s1 = out3(clamp((v - U.shake) / 0.16)); sh.style.transform = 'translateY(' + f2(-16 * s1) + 'px) rotate(' + f2(-24 * s1) + 'deg)'; sh.style.transformOrigin = '0 100%';
+    const p = clamp((v - U.pop[0]) / (U.pop[1] - U.pop[0])); bd.style.transform = 'scale(' + f2(1 + 0.25 * bell(p, 0, 0.5) - 1 * clamp((p - 0.5) / 0.5)) + ')'; sh.style.opacity = bd.style.opacity = f2(1 - clamp((p - 0.6) / 0.4));
+    const fl = clamp((v - U.flip[0]) / (U.flip[1] - U.flip[0])); O.style.display = fl > 0 ? 'flex' : 'none'; O.style.opacity = f2(clamp(fl * 2)); L.style.display = fl < 1 ? 'flex' : 'none'; rg.style.transform = 'scale(' + f2(outBack(fl)) + ') rotate(' + f2(-90 * (1 - fl)) + 'deg)';
+    const br = clamp((v - U.burst[0]) / (U.burst[1] - U.burst[0])); bu.style.opacity = f2(br > 0 && br < 1 ? 1 - br : 0); bu.style.transform = 'scale(' + f2(0.6 + 1.1 * out3(br)) + ')';
+    const bv = v - U.bubble; bb.style.display = bv > 0 ? 'block' : 'none'; bb.style.transform = 'scale(' + f2(bv > 0 ? 0.6 + 0.4 * outBack(clamp(bv / 0.18)) : 0) + ')'; bb.style.opacity = f2(1 - clamp((bv - U.bubbleHold) / 0.18));
+    if (bv > U.bubbleHold + 0.2) { bb.style.display = 'none'; btn.style.transform = ''; [sh, bd].forEach(e => { e.style.transform = ''; e.style.opacity = 1; }); this.anim = null; this.setState({ level: 16 }); }
+  }
+  renderVals() {
+    const s = this.state, LE = s.LE, LP = s.LP;
+    const v = { contentRef: this.contentRef, pipRef: this.pipRef, btnRef: this.btnRef, toastRef: this.toastRef, bubbleRef: this.bubbleRef, playUnlock: this.playUnlock, tapLocked: this.tapLocked, tapEndless: this.tapEndless, seasons: [], levels: [], views: [], flags: [], chests: [], stones: [], tags: [], btnStates: [], roadSrc: '', seasonName: '', progText: '', toastText: 'Beat Level 15 to unlock Endless', unlockText: '', ringDash: '0 999', bestText: '' };
+    if (!LE || !LP) return v;
+    const season = s.season, lvl = s.level;
+    if (this._road !== season) { this._road = season; const P = LP.buildPath(season), R = LP.PATHS[season].road; let b = ''; P.groups.forEach(g => b += '<path d="' + g.d + '" fill="' + (g.f || 'none') + '"' + (g.s && g.s !== 'none' ? ' stroke="' + g.s + '" stroke-width="' + g.sw + '" stroke-linecap="round" stroke-linejoin="round"' : '') + '/>'); this._roadBody = b; this._R = R; }
+    const passed = this._R.passed.map(([w, c]) => '<path d="' + LP.passedD(Math.min(21, lvl)) + '" fill="none" stroke="' + c + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"/>').join('');
+    v.roadSrc = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="4900" viewBox="0 0 1080 4900">' + this._roadBody + passed + '</svg>');
+    const lockedNum = LP.PATHS[season].stone.locked.num, CS = LP.CURRENT_SCALE || 1.22;
+    v.stones = LP.CP.map(c => { const st = LP.cpState(c.n, lvl), sc = st === 'current' ? CS : 1, fs = st === 'current' ? 56 : 46, peak = LE.isPeak(c.n), tw = peak ? 86 : 72;
+      return { n: c.n, src: 'ref/path/' + season + '/checkpoint_' + st + '.svg', tag: '../assets/bands/tag_' + LE.bandOf(c.n) + (peak ? '_peak' : '') + '.svg',
+        wrap: 'position:absolute;left:' + f2(c.x - 90 * sc) + 'px;top:' + f2(c.y - 56 * sc) + 'px;width:' + f2(180 * sc) + 'px;height:' + f2(140 * sc) + 'px;z-index:' + (st === 'current' ? 3 : 2),
+        numStyle: 'position:absolute;left:0;right:0;top:' + f2(56 * sc - fs * 0.52) + 'px;text-align:center;font:900 ' + fs + 'px/1 Nunito,system-ui,sans-serif;color:' + (st === 'locked' ? lockedNum : '#2D3436') + ';font-variant-numeric:tabular-nums',
+        tagStyle: 'position:absolute;left:' + f2(90 * sc - tw / 2 * sc) + 'px;top:' + f2(100 * sc) + 'px;width:' + f2(tw * sc) + 'px;height:' + f2(30 * sc) + 'px' }; });
+    v.chests = LP.REWARD_LEVELS.map(n => { const C = LP.CHEST[n], st = LP.rewardState(n, lvl, []).replace('reward_', ''), sc = C.big ? (LP.CHEST_BIG_SCALE || 1.3) : 1; return { src: 'ref/path/chest_' + (C.big ? 'big_' : '') + st + '.svg', style: 'position:absolute;left:' + f2(C.x - 100 * sc) + 'px;top:' + f2(C.y - 176 * sc) + 'px;width:' + f2(200 * sc) + 'px;height:' + f2(190 * sc) + 'px;z-index:2' }; });
+    const hit = (x, y) => LP.REWARD_LEVELS.some(n => { const C = LP.CHEST[n]; return x < C.x + 130 && x + 200 > C.x - 130 && y < C.y + 20 && y + 214 > C.y - 230; }) || LP.CP.some(o => x < o.x + 90 && x + 200 > o.x - 90 && y < o.y + 60 && y + 180 > o.y - 60);
+    v.flags = LE.BANDS.map(B => { const c = LP.CP[B.from - 1], y = c.y + 40 - 206, cands = [c.x + 96, c.x - 286, c.x + 150, c.x - 340].filter(x => x > 10 && x + 200 < 1070); const x = cands.find(x => !hit(x, y)) ?? cands[0]; return { src: '../assets/bands/flag_' + B.n + '.svg', name: B.name, range: B.from + '–' + B.to, wrap: 'position:absolute;left:' + f2(x) + 'px;top:' + f2(y) + 'px;width:180px;height:214px;z-index:1' }; });
+    Object.assign(v, {
+      seasonName: LE.NAMES[season], progText: lvl > 20 ? 'Complete' : lvl + ' / 20',
+      seasons: LE.SEASONS.map(id => ({ name: LE.SHORT[id] + (LE.DARK[id] ? ' ●' : ''), pick: () => this.setState({ season: id }), style: BTN + on(season === id) })),
+      levels: Array.from({ length: 21 }, (_, i) => ({ n: i < 20 ? i + 1 : '✓', pick: () => { this.anim = null; this.setState({ level: i + 1, view: 'pip' }); }, style: BTN + 'min-height:44px;padding:0;display:grid;place-items:center;' + on(lvl === i + 1) + (i < 20 ? ';box-shadow:inset 0 -6px 0 ' + LE.BANDS[LE.bandOf(i + 1) - 1].fill : '') })),
+      views: [['pip', 'Pip'], [1, 'Stroll'], [2, 'Jog'], [3, 'Dash'], [4, 'Sprint']].map(([id, name]) => ({ name, pick: () => { this.anim = null; this.setState({ view: id }); }, style: BTN + on(s.view === id) })),
+      unlockText: LE.unlockProgress(lvl) + ' / 15', ringDash: f2(CIRC * LE.unlockProgress(lvl) / 15) + ' 999', bestText: LE.clock(s.best || 192),
+      tags: LE.BANDS.map(B => ({ name: B.name, range: 'leveli ' + B.from + '–' + B.to, flag: '../assets/bands/flag_' + B.n + '.svg', tag: '../assets/bands/tag_' + B.n + '.svg', peak: '../assets/bands/tag_' + B.n + '_peak.svg', note: B.chev + (B.chev === 1 ? ' strelica' : ' strelice') + ' · ' + B.fill })),
+      btnStates: [
+        { locked: true, dash: f2(CIRC * 6 / 15) + ' 999', text: '6 / 15', note: 'Zaključano · Pip na 7 (Country Bloom mock) · prsten = pređeni leveli / 15' },
+        { locked: true, dash: f2(CIRC * 14 / 15) + ' 999', text: '14 / 15', note: 'Zaključano · Pip na 15 (još jedan level)' },
+        { open: true, note: 'Otključano, bez rekorda (prvi put)' },
+        { open: true, best: true, bestText: '3:12', bestBg: '#FFF8F0', note: 'B8 · s rekordom sezone (Lantern Meadow 3:12) — Home i Level Path' }
+      ]
+    });
+    return v;
+  }
+}
+
+</script>
+</body>
+</html>

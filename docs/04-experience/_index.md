@@ -31,6 +31,7 @@ tags: [hub, iskustvo]
 - [[design-drafts/run-pickups-cd-brief|run-pickups-cd-brief]] — brief za Claude Design (A: puni redizajn pickupa u runu i dodira sa Pipom; B: Camp kartice plaćenih sezona u Season Kit stilu)
 - [[design-drafts/run-pickups-izvjestaj|run-pickups-izvjestaj]] — prenos: pickupi u runu (dodir sa Pipom, niz coina, twin, pilula „+1") i Camp kartice plaćenih sezona; FPS A/B (2026-10-20)
 - [[design-drafts/level-path-izvjestaj|level-path-izvjestaj]] — prenos: Level Path po sezoni (put, skok Pipa, nagrade 5/10/15/20, badge); FPS A/B prema polju (2026-10-20)
+- [[design-drafts/leveli-endless-izvjestaj|leveli-endless-izvjestaj]] — prenos: pojasevi težine, najava, nalet, par, cilj na kraju levela, Endless dugme / HUD / rekord / kraj, spreman sanduk (2026-10-22)
 - [[design-drafts/level-path-cd-brief|level-path-cd-brief]] — brief za Claude Design: Level Path po sezoni (20 checkpointa, Pip na trenutnom levelu, nagrade na 5/10/15/20, claim popup)
 
 ## Povezano

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#211B26}a{color:#FFD56B}a:hover{color:#FFF8F0}</style>
+</helmet>
+<section data-screen-label="Endless end" style="background:#211B26;width:max-content;box-sizing:border-box;padding:56px 64px 80px;display:flex;flex-direction:column;gap:40px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0">
+  <div data-layer="Header" style="display:flex;flex-direction:column;gap:14px;max-width:1500px">
+    <div style="font:800 22px/1 Nunito,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#FFD56B">Merge Meadow · Kraj Endlessa i pauza · B6 B7</div>
+    <div style="font:900 56px/1.05 Nunito,sans-serif">Vrijeme je naslov, plijen ostaje cijeli.</div>
+    <div style="font:700 24px/1.4 Nunito,sans-serif;color:#E6DDEB;max-width:1340px;text-wrap:pretty">R5 varijanta: na ploči „Endless", veliko vrijeme, pilula stepenice i red s rekordom; kad je rekord oboren ploča postaje zlatna „New best!" uz pečat. Tray plijena je pun — bez precrtavanja i bez pečata „Kept half"; umjesto njega mint pečat „All yours" s korpom. Pad i „Quit" iz pauze vode na isti ekran. U pauzi (R3) dugme „Quit to camp" nosi korpu u mint disku, ne icon_half. <a href="EndlessHud.dc.html">Endless HUD</a> · <a href="Specs.dc.html">Specs</a></div>
+  </div>
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+    <sc-for list="{{ boards }}" as="b" hint-placeholder-count="3">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font:900 28px/1 Nunito,sans-serif">{{ b.title }}</div>
+        <div style="position:relative;width:486px;height:864px;overflow:hidden;border-radius:18px;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(0,0,0,.35)">
+          <div data-screen-label="{{ b.title }}" style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform:scale(.45);transform-origin:0 0;background:#3F2A1C;font-family:Nunito,system-ui,sans-serif;color:#2D3436">
+            <div style="position:absolute;left:170px;top:0;width:200px;height:1920px;background:#6A4A30"></div>
+            <div style="position:absolute;left:440px;top:0;width:200px;height:1920px;background:#6A4A30"></div>
+            <div style="position:absolute;left:710px;top:0;width:200px;height:1920px;background:#6A4A30"></div>
+            <div style="position:absolute;inset:0;background:rgba(26,22,30,.55)"></div>
+            <div data-layer="PopupModal" style="position:absolute;left:48px;top:{{ b.top }};width:984px;box-sizing:border-box;padding:92px 48px 48px;border-radius:48px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 14px 0 rgba(20,14,26,.45);display:flex;flex-direction:column;gap:36px">
+              <div data-layer="Plate" style="position:absolute;left:0;right:0;top:-56px;display:flex;justify-content:center">
+                <div style="height:112px;box-sizing:border-box;padding:0 52px;border-radius:56px;background:{{ b.plateBg }};border:4px solid #2D3436;display:flex;align-items:center;gap:16px;font:900 60px/1 Nunito,system-ui,sans-serif;white-space:nowrap"><img src="{{ b.plateIcon }}" alt="" style="{{ b.plateIconStyle }}">{{ b.plate }}</div>
+              </div>
+              <sc-if value="{{ b.isEnd }}" hint-placeholder-val="{{ true }}">
+                <div data-layer="Score" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:18px">
+                  <div style="font:900 180px/0.9 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.02em">{{ b.time }}</div>
+                  <div style="display:flex;gap:16px;align-items:center">
+                    <div style="height:72px;box-sizing:border-box;padding:0 26px 0 16px;border-radius:36px;background:{{ b.paceBg }};border:4px solid #2D3436;display:flex;align-items:center;gap:10px;font:900 40px/1 Nunito,system-ui,sans-serif;white-space:nowrap"><img src="../assets/fx/pace_up.svg" alt="" style="width:36px;height:36px">{{ b.pace }}</div>
+                    <div style="height:72px;box-sizing:border-box;padding:0 26px 0 16px;border-radius:36px;background:#FFF6D6;border:3px solid rgba(45,52,54,.18);display:flex;align-items:center;gap:10px;font:900 40px/1 Nunito,system-ui,sans-serif;color:#555C5E;white-space:nowrap"><img src="../assets/endless/trophy.svg" alt="" style="width:40px;height:40px">{{ b.best }}</div>
+                  </div>
+                  <sc-if value="{{ b.newBest }}" hint-placeholder-val="{{ false }}">
+                    <div data-layer="NewBestStamp" style="position:absolute;right:-6px;top:-40px;width:220px;height:220px;transform:rotate(12deg)">
+                      <img src="../assets/endless/stamp_best.svg" alt="" style="position:absolute;inset:0;width:220px;height:220px">
+                      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 40px/0.95 Nunito,system-ui,sans-serif;text-align:center">New<br>best!</div>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{ b.isPause }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;justify-content:center;gap:16px;align-items:center">
+                  <img src="../assets/endless/rings.svg" alt="" style="width:64px;height:36px">
+                  <div style="font:900 72px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums">{{ b.time }}</div>
+                  <div style="height:64px;box-sizing:border-box;padding:0 22px;border-radius:32px;background:{{ b.paceBg }};border:4px solid #2D3436;display:flex;align-items:center;font:900 36px/1 Nunito,system-ui,sans-serif">{{ b.pace }}</div>
+                </div>
+              </sc-if>
+              <div data-layer="RewardTray" style="position:relative;box-sizing:border-box;padding:56px 20px 36px;border-radius:36px;background:#FFF6D6;border:3px solid rgba(45,52,54,.18);display:flex;flex-direction:column;gap:20px;align-items:center">
+                <div style="position:absolute;left:28px;top:-32px;height:64px;box-sizing:border-box;padding:0 24px 0 10px;border-radius:32px;background:#A8E6CF;border:3px solid #2D3436;display:flex;align-items:center;gap:10px;font:900 36px/1 Nunito,system-ui,sans-serif;white-space:nowrap"><img src="icons/icon_basket.svg" alt="" style="width:44px;height:44px">{{ b.stamp }}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:20px 16px;justify-content:center">
+                  <sc-for list="{{ b.chips }}" as="c" hint-placeholder-count="5">
+                    <div style="height:132px;box-sizing:border-box;padding:0 28px 0 14px;border-radius:66px;background:#FFFFFF;border:3px solid #2D3436;display:flex;align-items:center;gap:12px">
+                      <div style="width:92px;height:92px;border-radius:46px;background:#FFF6D6;display:grid;place-items:center;overflow:hidden"><img src="{{ c.icon }}" alt="" style="{{ c.iconStyle }}"></div>
+                      <div style="font:900 56px/1 Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums">{{ c.n }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:20px">
+                <sc-if value="{{ b.isEnd }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+                    <div style="height:120px;box-sizing:border-box;border-radius:36px;background:#D4A5FF;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:14px;font:900 48px/1 Nunito,system-ui,sans-serif"><img src="icons/icon_video.svg" alt="" style="width:64px;height:48px">Double</div>
+                    <div style="height:120px;box-sizing:border-box;border-radius:36px;background:#D4A5FF;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:14px;font:900 48px/1 Nunito,system-ui,sans-serif"><img src="icons/icon_video.svg" alt="" style="width:64px;height:48px">Revive</div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+                    <div style="height:132px;box-sizing:border-box;border-radius:36px;background:#FFB88C;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;font:900 52px/1 Nunito,system-ui,sans-serif">Retry</div>
+                    <div style="height:132px;box-sizing:border-box;border-radius:36px;background:#FFFFFF;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;font:900 52px/1 Nunito,system-ui,sans-serif">To Camp</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ b.isPause }}" hint-placeholder-val="{{ false }}">
+                  <div style="height:132px;box-sizing:border-box;border-radius:36px;background:#FFB88C;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;font:900 52px/1 Nunito,system-ui,sans-serif">Resume</div>
+                  <div style="height:132px;box-sizing:border-box;border-radius:36px;background:#FFFFFF;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(26,26,20,.28);display:flex;align-items:center;justify-content:center;gap:16px;font:900 52px/1 Nunito,system-ui,sans-serif"><div style="width:72px;height:72px;box-sizing:border-box;border-radius:36px;background:#A8E6CF;border:3px solid #2D3436;display:grid;place-items:center"><img src="icons/icon_basket.svg" alt="" style="width:46px;height:46px"></div>Quit to camp</div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font:800 20px/1.3 Nunito,sans-serif;color:#BFB3C9;max-width:486px">{{ b.note }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div data-layer="IconSwap" style="display:flex;flex-direction:column;gap:16px">
+    <div style="font:900 34px/1 Nunito,sans-serif">B7 · Ikona „Quit to camp" po modu</div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:16px;padding:18px 24px;border-radius:18px;background:#2E2636;border:2px solid #44394F"><div style="width:72px;height:72px;box-sizing:border-box;border-radius:36px;background:#FFCCD5;border:3px solid #2D3436;display:grid;place-items:center"><img src="icons/icon_half.svg" alt="" style="width:46px;height:46px"></div><div style="font:800 22px/1.3 Nunito,sans-serif">Level (danas): icon_half u pink disku<br><span style="color:#BFB3C9">pola plijena ostaje</span></div></div>
+      <div style="display:flex;align-items:center;gap:16px;padding:18px 24px;border-radius:18px;background:#2E2636;border:2px solid #44394F"><div style="width:72px;height:72px;box-sizing:border-box;border-radius:36px;background:#A8E6CF;border:3px solid #2D3436;display:grid;place-items:center"><img src="icons/icon_basket.svg" alt="" style="width:46px;height:46px"></div><div style="font:800 22px/1.3 Nunito,sans-serif">Endless: icon_basket u mint disku<br><span style="color:#BFB3C9">isto kao „Nothing lost" na kraju levela</span></div></div>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { LE: null };
+  componentDidMount() { import('./le_kit.js').then(LE => this.setState({ LE })); }
+  renderVals() {
+    const LE = this.state.LE; if (!LE) return { boards: [] };
+    const loot = (sec, fl) => [
+      { icon: 'icons/icon_coin.svg', iconStyle: 'width:84px;height:84px', n: Math.round(LE.LOOT_PER_MIN.coins * sec / 60) },
+      { icon: 'icons/icon_seed.svg', iconStyle: 'width:72px;height:72px', n: Math.round(LE.LOOT_PER_MIN.seeds * sec / 60) },
+      ...fl.map(([id, n]) => ({ icon: 'flowers/' + id + '_t3.svg', iconStyle: 'width:92px;height:92px;object-fit:cover', n }))
+    ];
+    const pace = t => ({ pace: 'Pace ' + LE.tierOf(t), paceBg: LE.BANDS[LE.paceBand(LE.tierOf(t)) - 1].fill });
+    const plateIcon = { plateIcon: '../assets/endless/rings.svg', plateIconStyle: 'width:64px;height:36px' };
+    return { boards: [
+      { title: 'R5 · Endless · bez rekorda', isEnd: true, top: '400px', plate: 'Endless', plateBg: '#D4A5FF', ...plateIcon, time: LE.clock(265), ...pace(265), best: 'Best 5:28', stamp: 'All yours', chips: loot(265, [['copper_leaf', 4], ['cider_dahlia', 2], ['amber_magnolia', 1]]), note: 'Amber Canopy · 4:25 (medijan „average") · Pace 13 · rekord 5:28 ostaje · plijen 21,5 coina / 8 sjemena po minuti' },
+      { title: 'R5 · Endless · New best!', isEnd: true, top: '400px', plate: 'New best!', plateBg: '#FFD56B', plateIcon: '../assets/endless/trophy.svg', plateIconStyle: 'width:60px;height:60px', time: LE.clock(420), ...pace(420), best: 'Was 4:25', stamp: 'All yours', newBest: true, chips: loot(420, [['copper_leaf', 6], ['cider_dahlia', 3], ['amber_magnolia', 2]]), note: 'Amber Canopy · 7:00 · Pace 21 · stari rekord 4:25 → „Was 4:25"; pečat ulazi 0,22 s back-out kao modal' },
+      { title: 'R3 · Pauza u Endlessu', isPause: true, top: '560px', plate: 'Paused', plateBg: '#FFF6D6', ...plateIcon, time: LE.clock(161), ...pace(161), stamp: 'If you quit · all yours', chips: loot(161, [['copper_leaf', 2], ['cider_dahlia', 1]]), note: 'Endless 2:41 · Pace 8 · „If you quit" pokazuje CIJELI plijen; Quit vodi na R5 iznad' }
+    ] };
+  }
+}
+
+</script>
+</body>
+</html>

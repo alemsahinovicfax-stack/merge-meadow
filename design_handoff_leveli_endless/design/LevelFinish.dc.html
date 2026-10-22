@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<script src="./pip_art.js"></script>
+<script src="./pip_runtime.js"></script>
+<script src="./pip_anim.js"></script>
+<style>body{margin:0;background:#211B26}a{color:#FFD56B}a:hover{color:#FFF8F0}</style>
+</helmet>
+<section data-screen-label="Level finish" style="background:#211B26;width:max-content;box-sizing:border-box;padding:56px 64px 80px;display:flex;flex-direction:column;gap:40px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0">
+  <div data-layer="Header" style="display:flex;flex-direction:column;gap:14px;max-width:1320px">
+    <div style="font:800 22px/1 Nunito,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#FFD56B">Merge Meadow · A6 · Cilj na kraju levela</div>
+    <div style="font:900 56px/1.05 Nunito,sans-serif">Cilj dolazi sa stazom i Pip ga presiječe tačno na kraju.</div>
+    <div style="font:700 24px/1.4 Nunito,sans-serif;color:#E6DDEB;max-width:1180px;text-wrap:pretty">Dva stuba, luk sa sezonskim ukrasom i mint traka preko sve tri staze — bez ovratnika i sjene, pa ne liči na prepreku. Cilj se pojavi na y −80 kad preostali put do kraja padne na 1654 px; vozi se sa svijetom (samo pozicija). Na kraju: traka pukne na dvije polovine (0,36 s), luk poskoči, konfete, pa „Time!" + „Nothing lost", zastavica na traci i usporavanje kao danas. Samo uspješan kraj; Endless nema cilj. <a href="RunDifficulty.dc.html">Run</a> · <a href="Specs.dc.html">Specs</a></div>
+  </div>
+  <div data-layer="Toolbar" style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;padding:20px 24px;border-radius:22px;background:#2E2636;border:2px solid #44394F;max-width:1520px;box-sizing:border-box">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:800 18px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#BFB3C9">Livada</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;max-width:640px"><sc-for list="{{ seasons }}" as="s" hint-placeholder-count="8"><div onClick="{{ s.pick }}" style="{{ s.style }}">{{ s.name }}</div></sc-for></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font:800 18px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#BFB3C9">Level</div>
+      <div style="display:grid;grid-template-columns:repeat(10,48px);gap:6px"><sc-for list="{{ levels }}" as="l" hint-placeholder-count="20"><div onClick="{{ l.pick }}" style="{{ l.style }}">{{ l.n }}</div></sc-for></div>
+    </div>
+    <div onClick="{{ toggleSlow }}" style="{{ slowStyle }}">{{ slowLabel }}</div>
+  </div>
+  <div style="display:flex;gap:48px;align-items:flex-start;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="font:900 30px/1 Nunito,sans-serif">{{ seasonName }} · L{{ level }} · kraj</div>
+      <div data-layer="Artboard" style="position:relative;width:486px;height:864px;overflow:hidden;border-radius:18px;border:3px solid #2D3436;box-shadow:0 8px 0 rgba(0,0,0,.35)">
+        <div style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;transform:scale(.45)"><div ref="{{ stageRef }}"></div></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;width:520px">
+      <div style="font:900 30px/1 Nunito,sans-serif">Tajming · Level {{ level }}</div>
+      <div style="padding:18px 20px;border-radius:16px;background:#2E2636;border:2px solid #44394F;display:flex;flex-direction:column;gap:10px;font:700 21px/1.35 Nunito,sans-serif;color:#E6DDEB">
+        <div>Trajanje <b>{{ dur }}</b> · brzina na kraju <b>{{ vEnd }} px/s</b></div>
+        <div>Cilj se pojavi <b>{{ lead }} s</b> prije kraja (1654 px preostalog puta, sa stepenicama brzine)</div>
+        <div style="color:#BFB3C9">Gruba formula 1654 / v_kraj = {{ naive }} s{{ naiveNote }}</div>
+        <div>Prazna dionica (bez spawna) danas ~2,5–4 s = isto vrijeme: cilj JE ta dionica.</div>
+        <div>FX sprite-ova sada / max: <b ref="{{ statRef }}">0 / 0</b> · budžet 4 (cilj) + 16 (prolaz)</div>
+      </div>
+      <div style="font:900 26px/1 Nunito,sans-serif;margin-top:8px">Vrijeme pojave po levelu (s prije kraja)</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+        <sc-for list="{{ leads }}" as="g" hint-placeholder-count="20">
+          <div style="padding:8px 10px;border-radius:10px;background:#2E2636;border:2px solid #44394F;font:800 18px/1.2 Nunito,sans-serif;display:flex;justify-content:space-between;gap:6px"><span style="color:#BFB3C9">L{{ g.n }}</span><span>{{ g.v }}</span></div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  <div data-layer="Gates" style="display:flex;flex-direction:column;gap:16px">
+    <div style="font:900 34px/1 Nunito,sans-serif">8 ciljeva · isti oblik (2 stuba + luk + traka), sezonski ukras</div>
+    <div style="display:grid;grid-template-columns:repeat(4,max-content);gap:20px">
+      <sc-for list="{{ gates }}" as="g" hint-placeholder-count="8">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="position:relative;width:324px;height:228px;overflow:hidden;border-radius:14px;background:{{ g.ground }}">
+            <div style="position:absolute;left:0;top:0;width:1080px;height:760px;transform:scale(.3);transform-origin:0 0">
+              <div style="position:absolute;left:170px;top:0;width:200px;height:760px;box-sizing:border-box;background:{{ g.lane }};border-left:4px solid {{ g.edge }};border-right:4px solid {{ g.edge }}"></div>
+              <div style="position:absolute;left:440px;top:0;width:200px;height:760px;box-sizing:border-box;background:{{ g.lane }};border-left:4px solid {{ g.edge }};border-right:4px solid {{ g.edge }}"></div>
+              <div style="position:absolute;left:710px;top:0;width:200px;height:760px;box-sizing:border-box;background:{{ g.lane }};border-left:4px solid {{ g.edge }};border-right:4px solid {{ g.edge }}"></div>
+              <img src="{{ g.arch }}" alt="" style="position:absolute;left:90px;top:40px;width:900px;height:240px">
+              <img src="{{ g.post }}" alt="" style="position:absolute;left:78px;top:148px;width:120px;height:440px">
+              <img src="{{ g.post }}" alt="" style="position:absolute;left:882px;top:148px;width:120px;height:440px;transform:scaleX(-1)">
+              <img src="../assets/finish/tape.svg" alt="" style="position:absolute;left:140px;top:480px;width:800px;height:80px">
+            </div>
+          </div>
+          <div style="font:800 20px/1 Nunito,sans-serif">{{ g.name }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;season&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;country_bloom&quot;,&quot;frost_orchard&quot;,&quot;lantern_meadow&quot;,&quot;amber_canopy&quot;,&quot;moonlit_warren&quot;,&quot;coral_tide&quot;,&quot;starfall_glade&quot;,&quot;ember_fen&quot;],&quot;default&quot;:&quot;frost_orchard&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;level&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;min&quot;:1,&quot;max&quot;:20,&quot;default&quot;:10,&quot;tsType&quot;:&quot;number&quot;},&quot;slow&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const BTN = 'box-sizing:border-box;min-height:48px;padding:10px 16px;border-radius:14px;cursor:pointer;font:800 20px/1.1 Nunito,sans-serif;user-select:none;';
+const on = a => a ? 'background:#FFD56B;color:#2D3436;border:3px solid #2D3436' : 'background:#3A3044;color:#FFF8F0;border:3px solid #55485F';
+class Component extends DCLogic {
+  state = { LE: null, K: null, season: this.props.season ?? 'frost_orchard', level: this.props.level ?? 10, slow: !!this.props.slow };
+  stageRef = React.createRef(); statRef = React.createRef();
+  componentDidMount() { Promise.all([import('./le_kit.js'), import('./seasons_kit.js'), import('./run_stage.js')]).then(([LE, K, RS]) => { this.RS = RS; this.setState({ LE, K }); }); }
+  componentWillUnmount() { if (this.stage) this.stage.destroy(); }
+  componentDidUpdate() {
+    const { LE, K, season, level, slow } = this.state; if (!LE || !this.stageRef.current) return;
+    const key = [season, level, slow].join('|'); if (key === this._key) return; this._key = key;
+    const L = LE.LEVELS[level - 1], v = Math.round(LE.speedAt(level, L.dur - 0.01)), tg = 1.0, fin = tg + LE.GATE_DIST / v;
+    const cfg = { season, mode: 'level', level, speed: v, slow, coins: L.coins, seeds: Math.round(L.seeds), t0: L.dur - fin, finishAt: fin, loop: fin + 2.4,
+      items: [{ kind: 'single', t: 0, lane: 0 }, { kind: 'coin', t: 0.0, lane: 1 }, { kind: 'gate', t: tg }], lanes: [[0, 1]],
+      onStats: s => { const e = this.statRef.current; if (e) e.textContent = s.live + ' / ' + s.max; } };
+    if (!this.stage) this.stage = new this.RS.RunStage(this.stageRef.current, LE, K, cfg); else this.stage.set(cfg);
+  }
+  renderVals() {
+    const s = this.state, LE = s.LE;
+    const v = { stageRef: this.stageRef, statRef: this.statRef, seasons: [], levels: [], leads: [], gates: [], seasonName: '', level: s.level, shownSec: '', dur: '', vEnd: '', lead: '', naive: '', naiveNote: '', toggleSlow: () => this.setState({ slow: !s.slow }), slowLabel: s.slow ? 'Usporeno ×4 · uključeno' : 'Usporeno ×4', slowStyle: BTN + 'min-height:64px;padding:16px 24px;font-size:22px;' + on(s.slow) };
+    if (!LE) return v;
+    const L = LE.LEVELS[s.level - 1], vEnd = LE.speedAt(s.level, L.dur - 0.01), lead = LE.gateLead(s.level), naive = LE.GATE_DIST / vEnd;
+    Object.assign(v, {
+      seasonName: LE.NAMES[s.season], shownSec: (1 + LE.GATE_DIST / Math.round(vEnd)).toFixed(1).replace('.', ','), dur: LE.fmtDur(L.dur), vEnd: Math.round(vEnd), lead: lead.toFixed(2).replace('.', ','), naive: naive.toFixed(2).replace('.', ','),
+      naiveNote: Math.abs(lead - naive) > 0.02 ? ' — ne valja: stepenica brzine pada u zadnjoj dionici' : ' — ovdje isto (nema stepenice u zadnjoj dionici)',
+      seasons: LE.SEASONS.map(id => ({ name: LE.SHORT[id] + (LE.DARK[id] ? ' ●' : ''), pick: () => this.setState({ season: id }), style: BTN + on(s.season === id) })),
+      levels: LE.LEVELS.map(x => ({ n: x.n, pick: () => this.setState({ level: x.n }), style: BTN + 'min-height:44px;padding:0;display:grid;place-items:center;' + on(s.level === x.n) + ';box-shadow:inset 0 -6px 0 ' + LE.BANDS[LE.bandOf(x.n) - 1].fill })),
+      leads: LE.LEVELS.map(x => ({ n: x.n, v: LE.gateLead(x.n).toFixed(2).replace('.', ',') }))
+    });
+    if (s.K) v.gates = LE.SEASONS.map(id => { const R = s.K.KITS[id].run; return { name: LE.NAMES[id], ground: R.ground, lane: R.lane, edge: R.laneEdge, arch: '../assets/finish/' + id + '_arch.svg', post: '../assets/finish/' + id + '_post.svg' }; });
+    return v;
+  }
+}
+
+</script>
+</body>
+</html>

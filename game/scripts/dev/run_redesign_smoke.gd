@@ -110,10 +110,11 @@ func _check_timer_stable(run: Node, gs: Node) -> void:
 	run.set("elapsed", 3599.0)
 	run.call("_update_hud")
 	var h_endless := chip.size.y
-	if mode.text != "Endless · 59:59":
-		_fail("endless mode line got '%s'" % mode.text)
-	if mode.clip_text:
-		_fail("Endless · 59:59 does not fit the LevelChip (clipped)")
+	var ec = run.get("endless_chip")
+	if ec == null or str(ec.call("clock_text")) != "59:59":
+		_fail("endless chip clock got '%s'" % (str(ec.call("clock_text")) if ec else "no chip"))
+	if chip.size.x > UiRun.LEVEL_CHIP_MAX_W + TOLERANCE or mode.is_visible_in_tree():
+		_fail("Endless chip 59:59 should fit 464 with the level row hidden (w %.1f)" % chip.size.x)
 	gs.set("run_is_endless", false)
 	run.call("_update_hud")
 	if absf(chip.size.y - h_endless) > TOLERANCE:

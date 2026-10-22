@@ -1,0 +1,143 @@
+{
+  "meta": {
+    "package": "design_handoff_leveli_endless",
+    "brief": "docs/04-experience/design-drafts/leveli-endless-cd-brief.md",
+    "artboard": [
+      1080,
+      1920
+    ],
+    "units": "px (artboard), s"
+  },
+  "rule": "band = ceil(level / 5); peak = level % 5 == 0",
+  "bands": [
+    {
+      "n": 1,
+      "id": "stroll",
+      "name": "Stroll",
+      "levels": [
+        1,
+        5
+      ],
+      "fill": "#A8E6CF",
+      "chevrons": 1,
+      "tag": "assets/bands/tag_1.svg",
+      "tag_peak": "assets/bands/tag_1_peak.svg",
+      "flag": "assets/bands/flag_1.svg"
+    },
+    {
+      "n": 2,
+      "id": "jog",
+      "name": "Jog",
+      "levels": [
+        6,
+        10
+      ],
+      "fill": "#FFD56B",
+      "chevrons": 2,
+      "tag": "assets/bands/tag_2.svg",
+      "tag_peak": "assets/bands/tag_2_peak.svg",
+      "flag": "assets/bands/flag_2.svg"
+    },
+    {
+      "n": 3,
+      "id": "dash",
+      "name": "Dash",
+      "levels": [
+        11,
+        15
+      ],
+      "fill": "#FF9F5A",
+      "chevrons": 3,
+      "tag": "assets/bands/tag_3.svg",
+      "tag_peak": "assets/bands/tag_3_peak.svg",
+      "flag": "assets/bands/flag_3.svg"
+    },
+    {
+      "n": 4,
+      "id": "sprint",
+      "name": "Sprint",
+      "levels": [
+        16,
+        20
+      ],
+      "fill": "#F27C8E",
+      "chevrons": 4,
+      "tag": "assets/bands/tag_4.svg",
+      "tag_peak": "assets/bands/tag_4_peak.svg",
+      "flag": "assets/bands/flag_4.svg"
+    }
+  ],
+  "stone_tag": {
+    "size": [
+      72,
+      30
+    ],
+    "size_peak": [
+      86,
+      30
+    ],
+    "anchor": "center x of stone, top = stone_top + 100 * scale (overlaps stone rim)",
+    "scale_with_stone": true,
+    "all_states": [
+      "done",
+      "current",
+      "locked"
+    ],
+    "note": "static TextureRect child of checkpoint; drawn once"
+  },
+  "band_flag": {
+    "size": [
+      180,
+      214
+    ],
+    "pole_bottom": [
+      16,
+      206
+    ],
+    "at_levels": [
+      1,
+      6,
+      11,
+      16
+    ],
+    "place": "bottom at stone.y + 40; x = stone.x + 96 (right) else stone.x - 286; first side free of chests/stones",
+    "label": {
+      "pos": [
+        28,
+        118
+      ],
+      "h": 52,
+      "radius": 26,
+      "fill": "#FFF8F0",
+      "border": [
+        3,
+        "#2D3436"
+      ],
+      "name_font": [
+        32,
+        900
+      ],
+      "range_font": [
+        24,
+        800,
+        "#555C5E"
+      ]
+    },
+    "path_shapes_added": 8
+  },
+  "level_chip": {
+    "text": "Level %d",
+    "font": [
+      48,
+      900
+    ],
+    "tag_h": 40,
+    "gap": 12,
+    "max_w": 464,
+    "h": 128,
+    "note": "flag 38 + gap 12 + \"Level NN\" + gap 12 + tag 40 h; pad 32 + 32; fits ≤ 464 for all 20"
+  },
+  "endless_pace_colors": {
+    "rule": "tier 0-2 band1 · 3-5 band2 · 6-8 band3 · 9+ band4"
+  }
+}

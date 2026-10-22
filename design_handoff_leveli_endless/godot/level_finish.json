@@ -1,0 +1,151 @@
+{
+  "meta": {
+    "package": "design_handoff_leveli_endless",
+    "brief": "docs/04-experience/design-drafts/leveli-endless-cd-brief.md",
+    "artboard": [
+      1080,
+      1920
+    ],
+    "units": "px (artboard), s"
+  },
+  "spawn_rule": "spawn gate at y −80 when remaining track distance to level end ≤ 1654 px (integrate speed steps); gate moves with World (_shift_world), position only",
+  "not_obstacle": "no collar, no shadow, no collision, spans all 3 lanes",
+  "only_success": true,
+  "endless": false,
+  "parts": {
+    "post": {
+      "size": [
+        120,
+        440
+      ],
+      "x": [
+        78,
+        882
+      ],
+      "flip_right": true,
+      "top": "y − 372"
+    },
+    "arch": {
+      "size": [
+        900,
+        240
+      ],
+      "pos": [
+        90,
+        "y − 480"
+      ],
+      "pivot": [
+        450,
+        150
+      ]
+    },
+    "tape": {
+      "size": [
+        800,
+        80
+      ],
+      "pos": [
+        140,
+        "y − 40"
+      ],
+      "sprite": "assets/finish/tape.svg"
+    },
+    "tape_half": {
+      "size": [
+        420,
+        80
+      ],
+      "pivot": [
+        12,
+        40
+      ],
+      "left_at": [
+        148,
+        "y − 40"
+      ],
+      "right": "flip_h at x 932"
+    }
+  },
+  "sprites": 4,
+  "pass": {
+    "at": "tape line y == PIP_Y (1574) exactly when elapsed == duration",
+    "timing": {
+      "tape": 0.36,
+      "confetti": 0.9,
+      "arch": 0.24,
+      "banner": 0.12,
+      "total": 1
+    },
+    "sequence": [
+      "tape → 2 halves swing to 78° back-out .36 s + 3 damped flaps .5 s",
+      "arch scale_y bump 1.06 .24 s",
+      "10 confetti from Pip .9 s",
+      "R4 banner \"Time!\" + \"Nothing lost\" at .12 s (existing)",
+      "rail flag + ring (existing)",
+      "world slows to 0 in .30 s (existing FINISH_STOP)"
+    ],
+    "sprites": 12,
+    "replaces": "nothing — extends _play_finish_beat"
+  },
+  "seasons": {
+    "country_bloom": {
+      "post": "assets/finish/country_bloom_post.svg",
+      "arch": "assets/finish/country_bloom_arch.svg"
+    },
+    "frost_orchard": {
+      "post": "assets/finish/frost_orchard_post.svg",
+      "arch": "assets/finish/frost_orchard_arch.svg"
+    },
+    "lantern_meadow": {
+      "post": "assets/finish/lantern_meadow_post.svg",
+      "arch": "assets/finish/lantern_meadow_arch.svg"
+    },
+    "amber_canopy": {
+      "post": "assets/finish/amber_canopy_post.svg",
+      "arch": "assets/finish/amber_canopy_arch.svg"
+    },
+    "moonlit_warren": {
+      "post": "assets/finish/moonlit_warren_post.svg",
+      "arch": "assets/finish/moonlit_warren_arch.svg"
+    },
+    "coral_tide": {
+      "post": "assets/finish/coral_tide_post.svg",
+      "arch": "assets/finish/coral_tide_arch.svg"
+    },
+    "starfall_glade": {
+      "post": "assets/finish/starfall_glade_post.svg",
+      "arch": "assets/finish/starfall_glade_arch.svg"
+    },
+    "ember_fen": {
+      "post": "assets/finish/ember_fen_post.svg",
+      "arch": "assets/finish/ember_fen_arch.svg"
+    }
+  },
+  "gate_lead_s": {
+    "1": 3.9,
+    "2": 3.73,
+    "3": 3.68,
+    "4": 3.61,
+    "5": 3.56,
+    "6": 3.46,
+    "7": 3.36,
+    "8": 3.28,
+    "9": 3.22,
+    "10": 3.17,
+    "11": 3.05,
+    "12": 2.98,
+    "13": 2.93,
+    "14": 2.86,
+    "15": 2.82,
+    "16": 2.67,
+    "17": 2.64,
+    "18": 2.59,
+    "19": 2.56,
+    "20": 2.5
+  },
+  "naive_wrong_example": {
+    "level": 6,
+    "naive": 3.4,
+    "correct": 3.46
+  }
+}

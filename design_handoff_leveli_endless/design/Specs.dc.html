@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#211B26}a{color:#FFD56B}a:hover{color:#FFF8F0}</style>
+</helmet>
+<section data-screen-label="Specs" style="background:#211B26;box-sizing:border-box;padding:56px 64px 80px;display:flex;flex-direction:column;gap:40px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0;max-width:1500px">
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font:800 22px/1 Nunito,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#FFD56B">design_handoff_leveli_endless · Specs</div>
+    <div style="font:900 56px/1.05 Nunito,sans-serif">Brojevi, budžeti, asseti.</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font:800 22px/1 Nunito,sans-serif"><a href="LevelBands.dc.html">LevelBands</a><a href="RunDifficulty.dc.html">RunDifficulty</a><a href="LevelFinish.dc.html">LevelFinish</a><a href="EndlessHud.dc.html">EndlessHud</a><a href="EndlessEnd.dc.html">EndlessEnd</a><a href="ChestReady.dc.html">ChestReady</a></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font:900 34px/1 Nunito,sans-serif">Leveli 1–20 (§4, fiksno) + pojas + pojava cilja</div>
+    <div style="display:grid;grid-template-columns:70px 130px 90px 150px 110px 90px 100px 100px 120px;gap:0;border-radius:16px;overflow:hidden;border:2px solid #44394F;font:700 20px/1 Nunito,sans-serif;width:max-content">
+      <sc-for list="{{ head }}" as="h" hint-placeholder-count="9"><div style="padding:12px 10px;background:#3A3044;font-weight:900;color:#FFD56B">{{ h }}</div></sc-for>
+      <sc-for list="{{ cells }}" as="c" hint-placeholder-count="180"><div style="{{ c.style }}">{{ c.t }}</div></sc-for>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font:900 34px/1 Nunito,sans-serif">Budžeti (§5) — izmjereno u mocku</div>
+    <div style="display:grid;grid-template-columns:repeat(4,max-content);border-radius:16px;overflow:hidden;border:2px solid #44394F;font:700 20px/1.25 Nunito,sans-serif">
+      <sc-for list="{{ bhead }}" as="h" hint-placeholder-count="4"><div style="padding:12px 14px;background:#3A3044;font-weight:900;color:#FFD56B">{{ h }}</div></sc-for>
+      <sc-for list="{{ bcells }}" as="c" hint-placeholder-count="48"><div style="{{ c.style }}">{{ c.t }}</div></sc-for>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font:900 34px/1 Nunito,sans-serif">Asseti (bez C2PA metapodataka)</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <sc-for list="{{ assets }}" as="a" hint-placeholder-count="6"><div style="padding:16px 20px;border-radius:16px;background:#2E2636;border:2px solid #44394F;display:flex;flex-direction:column;gap:8px;min-width:150px"><div style="font:900 26px/1 Nunito,sans-serif">{{ a.dir }}</div><div style="font:700 20px/1 Nunito,sans-serif;color:#E6DDEB">{{ a.info }}</div></div></sc-for>
+    </div>
+    <div style="font:800 22px/1.3 Nunito,sans-serif;color:#E6DDEB">{{ total }}</div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { LE: null };
+  componentDidMount() { import('./le_kit.js').then(LE => this.setState({ LE })); }
+  renderVals() {
+    const LE = this.state.LE; const v = { head: ['Lvl', 'Pojas', 'Trajanje', 'v px/s', 'Prep/min', 'Parovi', 'Coina', 'Sjemena', 'Cilj prije'], cells: [], bhead: ['Stvar', 'Budžet', 'Dizajn', 'Kako'], bcells: [], assets: [], total: '' };
+    if (!LE) return v;
+    const c = s => String(s).replace('.', ',');
+    LE.LEVELS.forEach((L, i) => { const B = LE.BANDS[LE.bandOf(L.n) - 1], bg = i % 2 ? '#2A2231' : '#2E2636', st = 'padding:10px;background:' + bg + ';white-space:nowrap';
+      [L.n + (LE.isPeak(L.n) ? ' ★' : ''), B.name, LE.fmtDur(L.dur), L.v0 + ' → ' + L.v1, c(L.obst), L.pairs + ' %', L.coins, c(L.seeds), c(LE.gateLead(L.n).toFixed(2)) + ' s'].forEach((t, j) => v.cells.push({ t, style: st + (j === 1 ? ';box-shadow:inset 6px 0 0 ' + B.fill : '') })); });
+    const rows = [
+      ['A2 najava', '≤ 1,2 s · ≤ 6 · ne blokira', '1,12 s · 6 čvorova', 'FlyLayer bazen, samo transform/alpha, input slobodan'],
+      ['A3 nalet', '≤ 0,5 s · ≤ 8', '0,42 s · 5 linija', 'Pip scale_y, World +10 px, bez _draw'],
+      ['B4 nova stepenica', '≤ 1 s · ≤ 8', '0,92 s · 3 (+5 nalet) = 8', 'pilula iz bazena, tekst 1× po stepenici'],
+      ['B5 novi rekord', '≤ 1,2 s · ≤ 12', '0,90 s · 11', 'prsten + trofej + 8 konfeta; jednom po runu'],
+      ['B2 otključavanje', '≤ 1,2 s · ≤ 12', '1,10 s · 9', 'na postojećem dugmetu + oblačić'],
+      ['A4 par', '≤ 2 sprite-a (+sjena)', 'wide 1 · side 2', 'zajednički ovratnik/sjena; draw calls = 2 prepreke ±1'],
+      ['A6 cilj', '≤ 4 (+16 prolaz) · ≤ 1,2 s', '4 · prolaz 12 · 1,0 s', 'samo pozicija sa svijetom'],
+      ['A1 pojasevi', '≤ +8 oblika po sezoni', '+8 (4 zastavice + 4 natpisa)', 'pločica na kamenu = 1 statični TextureRect po kamenu'],
+      ['B3 HUD', 'tekst ≤ 1/s', 'sat 1/s · Pace 1/20 s', 'bez StyleBoxa/čvorova po frejmu'],
+      ['C sanduk', '≤ 4 sanduka + 3 iskre', '≤ 2 u kadru · 3 iskre', 'pos/rot/scale + zamjena frejma'],
+      ['Gustina', 'ništa ne raste s gustinom', '✓', 'fx broj fiksan; parovi = 2 prepreke kao danas'],
+      ['SVG', '≤ 150 KB', '102,6 KB (61 fajl)', 'bez blura, glowa, gradijenata i maski']
+    ];
+    rows.forEach((r, i) => r.forEach(t => v.bcells.push({ t, style: 'padding:10px 14px;background:' + (i % 2 ? '#2A2231' : '#2E2636') })));
+    const per = {}; let tot = 0; LE.ASSETS().forEach(([p, s]) => { const d = p.split('/')[0]; per[d] = per[d] || [0, 0]; per[d][0]++; per[d][1] += s.length; tot += s.length; });
+    v.assets = Object.keys(per).map(d => ({ dir: d, info: per[d][0] + ' fajl. · ' + c((per[d][1] / 1024).toFixed(1)) + ' KB' }));
+    v.total = 'Ukupno ' + c((tot / 1024).toFixed(1)) + ' KB od 150 KB. Pri commitu ukloniti <metadata> (C2PA) — naredba u README.';
+    return v;
+  }
+}
+
+</script>
+</body>
+</html>

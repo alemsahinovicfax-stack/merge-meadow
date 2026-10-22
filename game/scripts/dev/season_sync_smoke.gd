@@ -188,7 +188,7 @@ func _wait_hub() -> bool:
 	return await _until(func() -> bool:
 		var hub := _hub()
 		return hub != null and _page(MetaHubPages.MAIN) != null and _page(MetaHubPages.ARENA) != null \
-			and _page(MetaHubPages.SHOP) != null and _page(MetaHubPages.CAMP) != null, 15.0)
+			and _page(MetaHubPages.SHOP) != null and _page(MetaHubPages.CAMP) != null, 40.0)
 
 
 func _buy_wait(season_id: String) -> bool:
@@ -413,11 +413,14 @@ func _run() -> void:
 		_fail("locked Endless must not start a run")
 		return
 	var home_main := _page(MetaHubPages.MAIN)
-	var endless_btn := home_main.get_node("%EndlessPlayButton") as CanvasItem
-	if endless_btn.self_modulate.a > 0.9 or str(home_main.call("field_toast_text")).find("level 15") < 0:
+	# design_handoff_leveli_endless · B1: krem + prsten „14 / 15" + katanac, toast „Beat Level 15…".
+	var face = home_main.get("endless_face")
+	if face == null or bool(face.get("unlocked")) or str(face.call("progress_text")) != "14 / 15" \
+			or str(home_main.call("field_toast_text")).find("Beat Level 15") < 0:
 		_step = "11 Endless locked"
-		_fail("locked Endless should look dimmed and explain level 15 (alpha %.2f, toast '%s')" % [
-			endless_btn.self_modulate.a, str(home_main.call("field_toast_text"))])
+		_fail("locked Endless should show the lock + 14 / 15 and explain level 15 (face %s unlocked %s anim %s, toast '%s')" % [
+			str(face.call("progress_text")) if face else "none", str(face.get("unlocked")) if face else "-",
+			str(face.call("is_animating")) if face else "-", str(home_main.call("field_toast_text"))])
 		return
 	lp.set_level(S1, LevelPathDomain.ENDLESS_UNLOCK_LEVEL + 1)
 	_page(MetaHubPages.MAIN).call("_on_endless_play_pressed")

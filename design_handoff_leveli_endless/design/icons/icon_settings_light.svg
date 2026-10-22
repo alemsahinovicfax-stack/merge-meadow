@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect x="54" y="12" width="20" height="26" rx="6" fill="#FFF8F0" transform="rotate(0 64 64)"></rect>
+  <rect x="54" y="12" width="20" height="26" rx="6" fill="#FFF8F0" transform="rotate(45 64 64)"></rect>
+  <rect x="54" y="12" width="20" height="26" rx="6" fill="#FFF8F0" transform="rotate(90 64 64)"></rect>
+  <rect x="54" y="12" width="20" height="26" rx="6" fill="#FFF8F0" transform="rotate(135 64 64)"></rect>
+  <rect x="54" y="12" width="20" height="26" rx="6" fill="#FFF8F0" transform="rotate(180 64 64)"></rect>
+  <rect x="54" y="12" width="20" height="26" rx="6" fill="#FFF8F0" transform="rotate(225 64 64)"></rect>
+  <rect x="54" y="12" width="20" height="26" rx="6" fill="#FFF8F0" transform="rotate(270 64 64)"></rect>
+  <rect x="54" y="12" width="20" height="26" rx="6" fill="#FFF8F0" transform="rotate(315 64 64)"></rect>
+  <path fill-rule="evenodd" d="M64 26 A38 38 0 1 1 63.99 26 Z M64 49 A15 15 0 1 0 64.01 49 Z" fill="#FFF8F0"></path>
+</svg>

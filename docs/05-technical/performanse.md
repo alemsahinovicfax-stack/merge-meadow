@@ -202,6 +202,23 @@ Put se crta jednom (SeasonBackdrop, 302–1017 poligona), pređeni put je `Line2
 
 20. **Ekran preko drugog ekrana → sakrij onaj ispod kad prelaz završi** (Level Path preko polja, 2026-10-20): livada s cvijećem i ambijentom ispod neprozirnog puta i dalje troši draw pozive i `_process`. Za vrijeme prelaza oba se crtaju (0,56 s), poslije samo gornji.
 
+## Leveli + Endless (design_handoff_leveli_endless, 2026-10-22)
+
+Mjereno headless dok je laptop bio pod jakim opterećenjem (pozadinska igra) — cijeli frejm je šumio 9–21 ms za isti kod, pa je pouzdanija cijena **po pozivu** (`levels_endless_bench.gd`, najbolje od 5 serija):
+
+| Stvar | µs / frejm | Koliko |
+|---|---|---|
+| nalet (5 linija + Pip + svijet) | 45–75 | 0,42 s na stepenicu |
+| pilula Pace + rekord | 100–265 | ≤ 0,92 s |
+| cilj — prolaz | 215–250 | 1 s na kraju |
+| najava levela | 16–27 | 1,12 s |
+| put — 2 spremna sanduka | 150–220 | dok je put otvoren |
+| `remaining_distance()` | 9 | svaki frejm u levelu |
+
+- `GameState.get_run_duration()` ~80 µs / poziv pod opterećenjem — run ga je zvao 3 × po frejmu, sad jednom (prosljeđuje se) → run jeftiniji nego prije paketa.
+- Budžeti sprite-ova u testu: nalet ≤ 5, cilj 4 / prolaz 15, rekord ≤ 12; ništa po frejmu u `_draw`.
+- **Pravilo:** kad je mašina zauzeta, A/B cijelog frejma ne znači ništa — mjeri po pozivu (µs) i naizmjenično.
+
 ## Plan (još nije urađeno)
 
 - [x] **Arena, pulsirajući hint:** prsten je zaseban sloj, puls kroz `modulate.a` (2026-10-09).

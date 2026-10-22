@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "package": "design_handoff_leveli_endless",
+    "brief": "docs/04-experience/design-drafts/leveli-endless-cd-brief.md",
+    "artboard": [
+      1080,
+      1920
+    ],
+    "units": "px (artboard), s"
+  },
+  "collision": "2 obstacles in code, each 64 × 64 in its lane (unchanged)",
+  "variants": {
+    "left_mid": {
+      "lanes": [
+        0,
+        1
+      ],
+      "free": 2,
+      "sprite": "pair_wide",
+      "center_x": 405,
+      "flip_h": false
+    },
+    "mid_right": {
+      "lanes": [
+        1,
+        2
+      ],
+      "free": 0,
+      "sprite": "pair_wide",
+      "center_x": 675,
+      "flip_h": true
+    },
+    "left_right": {
+      "lanes": [
+        0,
+        2
+      ],
+      "free": 1,
+      "sprite": "pair_side ×2",
+      "centers_x": [
+        270,
+        810
+      ],
+      "flip_h": [
+        false,
+        true
+      ]
+    }
+  },
+  "wide": {
+    "size": [
+      460,
+      220
+    ],
+    "anchor_in_sprite": [
+      230,
+      151
+    ],
+    "lanes_in_sprite_x": [
+      95,
+      365
+    ],
+    "collar": [
+      510,
+      56,
+      "y + 69"
+    ],
+    "shadow": [
+      440,
+      44,
+      "y + 55",
+      "rgba(10,14,20,.30)"
+    ]
+  },
+  "side": {
+    "size": [
+      240,
+      220
+    ],
+    "anchor_in_sprite": [
+      120,
+      151
+    ],
+    "collar": [
+      240,
+      52,
+      "y + 69"
+    ],
+    "shadow": [
+      168,
+      40,
+      "y + 55"
+    ]
+  },
+  "gap_flag": "mint flag drawn into sprite at the end facing the free lane (wide: right end; flip for mid_right; side: inner end)",
+  "draw": "obstacle_visual.set_pair(variant, side): first obstacle draws the wide sprite + collar + shadow, second draws nothing; side variant: each draws its own side sprite",
+  "seasons": {
+    "country_bloom": {
+      "wide": "assets/obstacles/country_bloom_pair_wide.svg",
+      "side": "assets/obstacles/country_bloom_pair_side.svg"
+    },
+    "frost_orchard": {
+      "wide": "assets/obstacles/frost_orchard_pair_wide.svg",
+      "side": "assets/obstacles/frost_orchard_pair_side.svg"
+    },
+    "lantern_meadow": {
+      "wide": "assets/obstacles/lantern_meadow_pair_wide.svg",
+      "side": "assets/obstacles/lantern_meadow_pair_side.svg"
+    },
+    "amber_canopy": {
+      "wide": "assets/obstacles/amber_canopy_pair_wide.svg",
+      "side": "assets/obstacles/amber_canopy_pair_side.svg"
+    },
+    "moonlit_warren": {
+      "wide": "assets/obstacles/moonlit_warren_pair_wide.svg",
+      "side": "assets/obstacles/moonlit_warren_pair_side.svg"
+    },
+    "coral_tide": {
+      "wide": "assets/obstacles/coral_tide_pair_wide.svg",
+      "side": "assets/obstacles/coral_tide_pair_side.svg"
+    },
+    "starfall_glade": {
+      "wide": "assets/obstacles/starfall_glade_pair_wide.svg",
+      "side": "assets/obstacles/starfall_glade_pair_side.svg"
+    },
+    "ember_fen": {
+      "wide": "assets/obstacles/ember_fen_pair_wide.svg",
+      "side": "assets/obstacles/ember_fen_pair_side.svg"
+    }
+  },
+  "sprites_per_pair": {
+    "wide": 1,
+    "side": 2
+  }
+}

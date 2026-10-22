@@ -118,18 +118,37 @@ func _mode(run: Node) -> Array:
 
 func _check_modes(run: Node) -> void:
 	_gs.set("run_level", 12)
+	run.set("_level_shown", 12)
 	var m := _mode(run)
 	if m[0] != "Level 12" or not m[1] or not m[2] or m[3] != 48:
 		_fail("level mode → %s" % str(m))
-	# Endless (balans ciklus 1): čip nosi preživljeno vrijeme umjesto Easy / Normal / Hard.
+	# Pločica pojasa (A1): L12 = Dash (3 strelice), 40 h iza „Level 12".
+	var tag := run.get_node_or_null("HUD/TopHud/LevelChip/Row/BandTag") as TextureRect
+	if tag == null or not tag.visible or tag.texture != UiLevels.tag_tex(12) or absf(tag.custom_minimum_size.y - 40.0) > 0.5:
+		_fail("Level 12 chip should carry the Dash band tag (40 h)")
+	_gs.set("run_level", 20)
+	run.set("_level_shown", 20)
+	_mode(run)
+	if tag.texture != UiLevels.tag_tex(20) or absf(tag.custom_minimum_size.x - 40.0 * 86.0 / 30.0) > 0.5:
+		_fail("Level 20 chip should carry the Sprint peak tag")
+	var lc := run.get_node("HUD/TopHud/LevelChip") as Control
+	if lc.size.x > UiRun.LEVEL_CHIP_MAX_W + TOL:
+		_fail("Level 20 chip with tag %.1f wider than 464" % lc.size.x)
+	_gs.set("run_level", 12)
+	run.set("_level_shown", 12)
+	_mode(run)
+	# Endless (design_handoff_leveli_endless · B3): čip u dva reda (sat · Pace / Best), bez trake.
 	_gs.set("run_is_endless", true)
 	var was_elapsed := float(run.get("elapsed"))
+	var ec = run.get("endless_chip")
 	for sec in [0.0, 65.0, 3599.0]:
 		run.set("elapsed", sec)
 		m = _mode(run)
-		var want := "Endless · %s" % UiRun.endless_clock(sec)
-		if m[0] != want or m[1] or m[2] or m[3] != 42 or m[4]:
-			_fail("endless %.0f s → %s (want %s, no flag, no rail, 42 px, not clipped)" % [sec, str(m), want])
+		var want := UiRun.endless_clock(sec)
+		if str(ec.call("clock_text")) != want or not ec.visible or m[1] or m[2] or tag.is_visible_in_tree() \
+				or lc.size.x > UiRun.LEVEL_CHIP_MAX_W + TOL or absf(lc.size.y - UiRun.TOP_HUD_H) > TOL:
+			_fail("endless %.0f s → clock %s chip %.0f×%.0f (want %s, no flag, no rail, ≤ 464 × 128)" % [
+				sec, str(ec.call("clock_text")), lc.size.x, lc.size.y, want])
 	run.set("elapsed", was_elapsed)
 	_gs.set("run_is_endless", false)
 	_gs.set("tutorial_complete", false)

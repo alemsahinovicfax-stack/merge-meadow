@@ -14,6 +14,8 @@ const CHECK := 40.0
 const GLYPH := 32.0
 const DOT := 14.0
 const DOT_GAP := 10.0
+const DISC := 72.0
+const DISC_ICON := 46.0
 
 var kind: String = "secondary"
 var label: String = ""
@@ -30,6 +32,12 @@ var check: bool = false
 ## Nacrtan znak umjesto ikone: "play" (pun ink trougao).
 var glyph: String = ""
 var dots: bool = false
+## Disk iza ikone (72, rub 3, ikona 46) — „Quit to camp" u Endlessu nosi korpu u mint disku
+## (design_handoff_leveli_endless · B7). Alfa 0 = bez diska.
+var icon_disc := Color(0, 0, 0, 0):
+	set(v):
+		icon_disc = v
+		queue_redraw()
 
 var _dot_t: float = 0.0
 
@@ -96,7 +104,7 @@ func content_width() -> float:
 	if not glyph.is_empty():
 		parts.append(GLYPH)
 	elif icon_tex != null:
-		parts.append(ICON)
+		parts.append(DISC if icon_disc.a > 0.0 else ICON)
 	elif not art_type.is_empty():
 		parts.append(art_size)
 	if check:
@@ -137,6 +145,11 @@ func _draw() -> void:
 			Vector2(x + 2.0, cy - 20.0), Vector2(x + GLYPH, cy), Vector2(x + 2.0, cy + 20.0)
 		]), ink)
 		x += GLYPH + GAP
+	elif icon_tex != null and icon_disc.a > 0.0:
+		var dr := Rect2(x, cy - DISC * 0.5, DISC, DISC)
+		draw_style_box(UiPopups._box(icon_disc, int(DISC * 0.5), 3), dr)
+		UiPopups.draw_icon(self, icon_tex, dr.get_center(), DISC_ICON)
+		x += DISC + GAP
 	elif icon_tex != null:
 		var col := Color(1, 1, 1, 0.5) if kind == "disabled" else Color.WHITE
 		draw_texture_rect(icon_tex, Rect2(Vector2(x, cy - ICON * 0.5), Vector2(ICON, ICON)), false, col)

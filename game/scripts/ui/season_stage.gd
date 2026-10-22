@@ -1062,6 +1062,7 @@ func _ensure_level_path() -> void:
 	level_path.reward_claimed.connect(func(_n: int) -> void: _refresh_view())
 	_reparent_path_popup.call_deferred()
 	level_path.hop_finished.connect(_refresh_view)
+	level_path.endless_unlocked.connect(func(id: String) -> void: _notify_host("on_endless_unlocked", id))
 	_badge = _Badge.new()
 	_badge.visible = false
 	travel_layer.add_child(_badge)

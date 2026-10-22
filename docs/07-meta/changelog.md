@@ -9,6 +9,17 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-22
+
+- **Paket `design_handoff_leveli_endless` u igri** (izvještaj `design-drafts/leveli-endless-izvjestaj.md`). Brojevi težine i plijena nepromijenjeni — ovo je izgled:
+  - **Pojasevi težine** Stroll 1–5 · Jog 6–10 · Dash 11–15 · Sprint 16–20: pločica na svakom kamenu Level Patha (kraj pojasa sa zvjezdicom), zastavica s imenom uz 1 / 6 / 11 / 16, pločica u LevelChipu.
+  - **Run:** najava levela na startu (1,12 s, ne blokira swipe; replay „Replay"), nalet na svaku stepenicu brzine, par prepreka kao jedan predmet preko dvije staze (3 varijante × 8 livada), **cilj na kraju levela** (8 sezona) koji Pip presiječe tačno na kraju — traka pukne, luk poskoči, konfete, „Time!". Spawn se zatvara po istom pravilu (preostali put sa stepenicama brzine).
+  - **Endless:** dugme zaključano (krem, prsten „N / 15", katanac; tap = tres + „Beat Level 15 to unlock Endless") / otvoreno (lavanda + prstenovi) / rekord sezone „🏆 3:12"; trenutak otključavanja poslije skoka 15 → 16 (jednom po sezoni, save `season_endless_seen`) + „Endless unlocked!"; HUD sat · Pace · Best; pilula nove stepenice; novi rekord u runu; pauza i kraj „All yours" (R5 „Endless" / „New best!", vrijeme, Pace, Best / Was).
+  - **Spreman sanduk:** frejmovi closed / peek, odvojena sjena, ravna pločica sadržaja, bez „Claim".
+  - **Ispravke paketa:** zastavica para bila je van okvira SVG-a (odsječena) — okvir proširen; `rgba()` boje u 12 SVG-ova Godot crta kao crno (sjena sanduka, zastavice, traka) — pretvoreno u hex + opacity (katalog #50).
+  - **Uhvaćeno na snimkama:** efekti su sami kretali jer Godot uključi `_process` kad čvor uđe u stablo — traka cilja nije pucala, Endless dugme se moglo samo „otključati" (#51, straža u svakom `_process`); LevelChip je na kraju levela pokazivao sljedeći level (finish_run ga pomjeri) — čip drži level sa starta; „11 / 15" je izlazio iz dugmeta — tekst se smanji da stane. Revive u Endlessu: „New best!" / „Was" porede s rekordom sa starta runa, ne s prvim padom.
+  - **FPS:** run čita trajanje levela jednom po frejmu umjesto 3 puta; efekti samo dok traju (≤ 0,25 ms po frejmu pod opterećenjem). Test `levels_endless_smoke`, bench `levels_endless_bench`, snimke `levels_endless_capture`.
+
 ## 2026-10-21
 
 - **Balans ekonomije — ciklus 1** (izvještaj `02-design/balans-ciklus-1-izvjestaj.md`):

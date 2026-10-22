@@ -10,7 +10,8 @@
 ##
 ## Endless sezone (balans ciklus 1, 2026-10-21): otključa se kad je level ENDLESS_UNLOCK_LEVEL
 ## pređen (Pip stoji na 16) — isti trenutak kad nagrada 15 postane spremna. Rekord (najduže
-## preživljeno, s) je po sezoni: "season_endless_best".
+## preživljeno, s) je po sezoni: "season_endless_best". Trenutak otključavanja na putu (CD B2) se
+## pokaže jednom po sezoni: "season_endless_seen" [id…].
 class_name LevelPathDomain
 extends RefCounted
 
@@ -31,6 +32,7 @@ const REWARD_CLAIMED := "reward_claimed"
 var levels: Dictionary = {}
 var claimed: Dictionary = {}
 var endless_best: Dictionary = {}
+var endless_seen: Array[String] = []
 
 var _owner: Variant
 
@@ -43,6 +45,7 @@ func apply_from_save(data: Dictionary) -> void:
 	levels.clear()
 	claimed.clear()
 	endless_best.clear()
+	endless_seen.clear()
 	var raw_levels: Variant = data.get("season_levels", null)
 	if raw_levels is Dictionary:
 		for id in raw_levels:
@@ -67,6 +70,11 @@ func apply_from_save(data: Dictionary) -> void:
 	if raw_best is Dictionary:
 		for id in raw_best:
 			endless_best[str(id)] = maxf(0.0, float(raw_best[id]))
+	var raw_seen: Variant = data.get("season_endless_seen", [])
+	if raw_seen is Array:
+		for id in raw_seen:
+			if not endless_seen.has(str(id)):
+				endless_seen.append(str(id))
 
 
 func to_save_dict() -> Dictionary:
@@ -77,6 +85,7 @@ func to_save_dict() -> Dictionary:
 		"season_levels": levels.duplicate(),
 		"season_level_rewards": out_claimed,
 		"season_endless_best": endless_best.duplicate(),
+		"season_endless_seen": endless_seen.duplicate(),
 	}
 
 
@@ -84,6 +93,7 @@ func reset() -> void:
 	levels.clear()
 	claimed.clear()
 	endless_best.clear()
+	endless_seen.clear()
 
 
 ## 1…20, ili 21 kad je put završen.
@@ -117,6 +127,19 @@ func advance(season_id: String) -> Array:
 
 func is_endless_unlocked(season_id: String) -> bool:
 	return level_of(season_id) > ENDLESS_UNLOCK_LEVEL
+
+
+## Pređeno levela prema otključavanju Endlessa (prsten na zaključanom dugmetu): 0…15.
+func endless_progress(season_id: String) -> int:
+	return clampi(level_of(season_id) - 1, 0, ENDLESS_UNLOCK_LEVEL)
+
+
+## Prvi put kad je Endless sezone otključan na putu (skok 15 → 16): true jednom, pa zapamti.
+func take_endless_unlock_moment(season_id: String) -> bool:
+	if season_id.is_empty() or endless_seen.has(season_id) or not is_endless_unlocked(season_id):
+		return false
+	endless_seen.append(season_id)
+	return true
 
 
 func endless_best_of(season_id: String) -> float:
