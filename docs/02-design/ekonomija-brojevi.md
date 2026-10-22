@@ -25,8 +25,9 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 
 | Konstanta | Vrijednost | Značenje |
 |-----------|-----------|----------|
-| Level 1 → 20 | 60 → 120 s · start 400 → 520 px/s · ubrzanje 2 → 3,5 % / 15 s · prepreke 6 → 30 % · parovi 0 (do L5) → 30 % · sjeme 28 → 34 % | `levels.json` → `RunLevelLibrary.get_level` |
-| Endless | stepenica svakih 20 s (`ENDLESS_TIER_SEC`), ključevi 0 / 1 / 2 / 3 / 5 / 8 min, poslije +4 % brzine po stepenici; prepreke i parovi ≤ 45 % | `levels.json` → `get_endless_config_at` |
+| Level 1 → 20 (ciklus 1b) | 60 → 120 s · start 432 → 550 px/s · ubrzanje 2,4 → 3,9 % / 15 s · udio prepreka 10,8 → 37,4 % · parovi 4 → 40 % (od L1) · sjeme 28 → 34 % — težina = stari level N+5 | `levels.json` → `RunLevelLibrary.get_level` |
+| Tok prepreka | redova / min = 60 / spawn_interval × spawn_chance × obstacle_chance × **3** (`obstacle_rate_mult`); razmak ≥ 300 px; L1 ≈ 9, L10 ≈ 27, L20 ≈ 80 prepreka / min | `run_controller._update_obstacle_stream` |
+| Endless | stepenica svakih 20 s (`ENDLESS_TIER_SEC`), težina 60 s ispred sata (`difficulty_offset_sec`), ključevi 0 / 1 / 2 / 3 / 5 / 8 min, poslije +4 % brzine po stepenici; prepreke i parovi ≤ 45 %; prepreke 3× | `levels.json` → `get_endless_config_at` |
 | `BASE_SCROLL_SPEED` | `400.0` px/s | ×`scroll_speed_mult` levela |
 | `RAMP_STEP` | `0.05` | samo tutorial; level / Endless nose `speed_ramp` |
 | `RAMP_EVERY` | `15.0` s | `RunBalance.RAMP_EVERY` |
@@ -38,7 +39,7 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 |---------|-----------|
 | Izbor tipa | težinski: ★1 = 1, ★2 = `rare2_mult`, ★3 = `rare3_mult` (iz levela / Endless stepenice) |
 | Level 1 → 20 | ★2 0,40 → 0,60 · ★3 0,12 → 0,30 → ★3 = 3,1 → 6,7 % sjemena (bilo 16,7 % — jednako kao ★1) |
-| Endless | ★3 0,15 → 0,55 (8 min) — uvijek rjeđi od ★2 |
+| Endless | ★3 0,25 (start, 1b) → 0,69 (8 min) — uvijek rjeđi od ★2; leveli ★3 0,15 → 0,375 (×1,25, ciklus 1b) |
 | Van runa (Loot Burst bez cilja) | težine levela 1 (`BASE_RARE2/3`) |
 
 ## Loot (`game_state.gd → finish_run`)

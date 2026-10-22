@@ -27,6 +27,9 @@ const LANE_PITCH := 270.0
 const PICKUP_R := 22.0
 ## Prepreka u dvije staze traži tačniji potez od jedne.
 const PAIR_HAZARD := 1.8
+## Tok prepreka (ciklus 1b, kao RunController): najmanji razmak redova u px / s, jitter 0,6–1,4.
+const MIN_ROW_GAP_PX := 300.0
+const MIN_ROW_GAP_SEC := 0.35
 ## Svaka prepreka u zadnje 2 s povećava rizik sljedeće (gužva na ekranu).
 const CLUTTER := 0.35
 const CLUTTER_SEC := 2.0
@@ -259,6 +262,8 @@ func _sim_run(prof: Dictionary, level: int, endless: bool, up: Dictionary, pool:
 	var end_t := duration
 	var twin_p := float(_camp_c.get("TWIN_STEP", 0.08)) * int(up.get("twin", 0))
 	var magnet := int(up.get("magnet", 0))
+	var stream := _cf(cfg, "obstacle_rate_mult", 1.0) > 1.0
+	var next_obs := _row_gap(cfg, _speed(cfg, 0.0)) if stream else INF
 	while true:
 		if tier_sec > 0.0 and int(t / tier_sec) != tier:
 			tier = int(t / tier_sec)
@@ -267,6 +272,26 @@ func _sim_run(prof: Dictionary, level: int, endless: bool, up: Dictionary, pool:
 		var v := _speed(cfg, t)
 		var arrive := t + TRAVEL_PX / v
 		if arrive >= duration:
+			break
+		# Tok prepreka: redovi između ovog i prošlog ticka.
+		while stream and next_obs <= t:
+			var ov := _speed(cfg, next_obs)
+			var o_arrive := next_obs + TRAVEL_PX / ov
+			next_obs += _row_gap(cfg, ov)
+			if o_arrive >= duration:
+				continue
+			var opair := _rng.randf() < _cf(cfg, "pair_chance", 0.0)
+			while not recent.is_empty() and recent[0] < o_arrive - CLUTTER_SEC:
+				recent.pop_front()
+			var oh: float = float(prof.hazard) * pow(ov / BASE_SPEED, 2.0) * (PAIR_HAZARD if opair else 1.0) \
+				* (1.0 + CLUTTER * recent.size())
+			recent.append(o_arrive)
+			obstacles += 2 if opair else 1
+			if _rng.randf() < oh:
+				failed = true
+				end_t = o_arrive
+				break
+		if failed:
 			break
 		while next_bush <= t:
 			var b_arrive := next_bush + TRAVEL_PX / v
@@ -281,7 +306,10 @@ func _sim_run(prof: Dictionary, level: int, endless: bool, up: Dictionary, pool:
 				seeds[bt] = int(seeds.get(bt, 0)) + int(reward.amount)
 		if _rng.randf() > float(cfg.spawn_chance):
 			continue
-		if _rng.randf() < float(cfg.obstacle_chance):
+		if stream:
+			if _rng.randf() < float(cfg.obstacle_chance):
+				continue
+		elif _rng.randf() < float(cfg.obstacle_chance):
 			var pair := _rng.randf() < _cf(cfg, "pair_chance", 0.0)
 			while not recent.is_empty() and recent[0] < arrive - CLUTTER_SEC:
 				recent.pop_front()
@@ -302,6 +330,13 @@ func _sim_run(prof: Dictionary, level: int, endless: bool, up: Dictionary, pool:
 		elif _rng.randf() < p:
 			coins += 1
 	return {"elapsed": end_t, "failed": failed, "coins": coins, "seeds": seeds, "obstacles": obstacles}
+
+
+func _row_gap(cfg: Object, v: float) -> float:
+	var rate := float(cfg.spawn_chance) * float(cfg.obstacle_chance) / maxf(float(cfg.spawn_interval), 0.1) \
+		* _cf(cfg, "obstacle_rate_mult", 1.0)
+	var base := 1.0 / maxf(rate, 0.01)
+	return maxf(base * _rng.randf_range(0.6, 1.4), maxf(MIN_ROW_GAP_SEC, MIN_ROW_GAP_PX / maxf(v, 1.0)))
 
 
 ## Plijen poslije Loot Boosta i pada (isto kao GameState.finish_run).

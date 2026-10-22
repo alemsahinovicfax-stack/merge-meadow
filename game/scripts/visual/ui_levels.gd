@@ -108,8 +108,9 @@ const S_QUIT_ALL_YOURS := "If you quit · all yours"
 ## Dugme 236 × 124: zaključano krem + prsten napretka (pređeno / 15) + katanac; otvoreno lavanda.
 const BTN_RING := Rect2(12, 16, 92, 92)
 const BTN_RING_R := 39.0
-const BTN_SHACKLE := Rect2(28, 14, 36, 30)
-const BTN_BODY := Rect2(22, 36, 48, 42)
+## Katanac je u CD markupu dijete prstena (92 × 92 na 12, 16) — ovdje u koordinatama dugmeta.
+const BTN_SHACKLE := Rect2(12 + 28, 16 + 14, 36, 30)
+const BTN_BODY := Rect2(12 + 22, 16 + 36, 48, 42)
 const BTN_BEST := Rect2(28, 100, 180, 48)
 const BTN_BURST := Rect2(18, -38, 200, 200)
 const LOCK_SHAKE_PX := 8.0

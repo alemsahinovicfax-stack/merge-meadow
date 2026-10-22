@@ -19,6 +19,9 @@ var pickup_seed_chance: float = 0.3
 ## Težina tipa sjemena po rijetkosti: ★1 = 1, ★2 = rare2_mult, ★3 = rare3_mult (RunBalance).
 var rare2_mult: float = 1.0
 var rare3_mult: float = 1.0
+## Prepreke idu svojim tokom (ciklus 1b): redova u s = spawn_chance × obstacle_chance /
+## spawn_interval × obstacle_rate_mult. 1 = stari način (prepreka umjesto pickupa na ticku).
+var obstacle_rate_mult: float = 1.0
 
 
 static func from_dict(data: Dictionary, script: GDScript):

@@ -6,6 +6,8 @@ extends Node
 ## Endless nema kraja: kreće lagano i svakih ENDLESS_TIER_SEC s („Pace") postaje teži — brže,
 ## gušće, više prepreka i parova — dok Pip ne udari ili igrač ne izađe. Vrijednosti stepenice se
 ## interpoliraju između ključeva iz JSON-a; poslije zadnjeg ključa raste samo brzina.
+## Ciklus 1b (2026-10-22, playtest „prelagano"): težina levela pomjerena +5 (u JSON-u), prepreke
+## svojim tokom × obstacle_rate_mult, Endless kreće difficulty_offset_sec ispred sata.
 
 const LEVELS_PATH := "res://data/run_levels/levels.json"
 const MAX_RUN_LEVEL := 20
@@ -21,6 +23,8 @@ var _by_id: Dictionary = {}
 var _endless_keys: Array[Dictionary] = []
 var _endless_after_speed: float = 0.0
 var _endless_max: Dictionary = {}
+var _endless_offset: float = 0.0
+var _obstacle_rate_mult: float = 1.0
 var _loaded: bool = false
 
 
@@ -32,6 +36,12 @@ func get_level(level_id: int):
 	return _default_config(id)
 
 
+## Množitelj toka prepreka (levela i Endless; tutorijal ga ne koristi).
+func obstacle_rate_mult() -> float:
+	_ensure_loaded()
+	return _obstacle_rate_mult
+
+
 ## Stepenica Endlessa u kojoj je run poslije `elapsed` s (0, 1, 2…).
 func endless_tier(elapsed: float) -> int:
 	return maxi(0, int(floor(elapsed / ENDLESS_TIER_SEC)))
@@ -41,11 +51,13 @@ func endless_tier(elapsed: float) -> int:
 func get_endless_config_at(elapsed: float):
 	_ensure_loaded()
 	var tier := endless_tier(elapsed)
-	var t := float(tier) * ENDLESS_TIER_SEC
+	# Težina je difficulty_offset_sec ispred sata (Pace u HUD-u i dalje kreće od 0).
+	var t := float(tier) * ENDLESS_TIER_SEC + _endless_offset
 	var cfg = _RunLevelConfig.new()
 	cfg.id = tier + 1
 	cfg.duration_sec = INF
 	cfg.speed_ramp = 0.0
+	cfg.obstacle_rate_mult = _obstacle_rate_mult
 	if _endless_keys.is_empty():
 		var base = get_level(1)
 		for f in _ENDLESS_FIELDS:
@@ -88,11 +100,13 @@ func _ensure_loaded() -> void:
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
 	if not parsed is Dictionary:
 		return
+	_obstacle_rate_mult = maxf(1.0, float(parsed.get("obstacle_rate_mult", 1.0)))
 	var levels: Variant = parsed.get("levels", [])
 	if levels is Array:
 		for entry in levels:
 			if entry is Dictionary:
 				var cfg = _RunLevelConfig.from_dict(entry, _RunLevelConfig)
+				cfg.obstacle_rate_mult = _obstacle_rate_mult
 				_by_id[cfg.id] = cfg
 	var endless: Variant = parsed.get("endless", {})
 	if endless is Dictionary:
@@ -103,6 +117,7 @@ func _ensure_loaded() -> void:
 					_endless_keys.append(k)
 		_endless_keys.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.t) < float(b.t))
 		_endless_after_speed = maxf(0.0, float(endless.get("after_last_speed_per_tier", 0.0)))
+		_endless_offset = maxf(0.0, float(endless.get("difficulty_offset_sec", 0.0)))
 		var mx: Variant = endless.get("max", {})
 		if mx is Dictionary:
 			_endless_max = mx

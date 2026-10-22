@@ -11,6 +11,14 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
 ## 2026-10-22
 
+- **Balans ciklus 1b — teže** (playtest „prelagano"; `balans-ciklus-1-izvjestaj` § 6c):
+  - Težina levela +5: level 1 = stari level 6, 16–20 ekstrapolirano.
+  - Prepreke 3× češće, svojim tokom: razmak ≥ 300 px, pickup nikad na prepreci, par uvijek ostavlja slobodnu stazu.
+  - Endless kreće 60 s ispred (kao stari level ~8) i ima 3× prepreke.
+  - ★3 sjeme ×1,25.
+  - Simulator modelira novi tok. Prosječan igrač: L15 30 %, L20 3 %, Endless medijan 116 s (bilo 81 % / 61 % / 265 s).
+  - Katanac na zaključanom Endless dugmetu je centriran u prstenu (CD koordinate su relativne prema prstenu).
+
 - **Tutorijal (playtest „novi igrač"):** tutorijal su sad dva vođena runa (coini + sjeme, pa prva prepreka), poslije njih Level 1 s najavom, Level Path i korpa. Ranije ga je završavao tek prvi merge u Areni, a Arena traži 50 sjemenki — „Practice" na svakom runu. „To Camp" vodi u Arenu tek kad su vrata otvorena (50 sjemenki), inače u Camp; savjet za prvi spoj tada. Play na Homeu više ne ostavlja igrača bez prepreka (stari CAMP1). Stari saveovi se pomjere naprijed. Katalog #53, test `tutorial_flow_smoke`.
 - **Playtest „novi igrač":** debug build je na svakom pokretanju i u Areni preskakao tutorijal i punio vreću test-sjemenkama (katalog #52). Novi dev prekidač „Test seeds: on / off" (Settings → Developer, `user://dev_flags.cfg`). Pravi save premješten u `user://backup_prije_novog_igraca_2026-10-22/` (save, settings, balance_log), igra kreće od nule.
 

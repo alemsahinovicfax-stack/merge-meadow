@@ -18,8 +18,9 @@ ai_sažetak: "Run leveli 1–20 po sezoni (ista težina u svakoj sezoni) i Endle
 ## Sažetak
 
 - Svaka sezona ima **Level Path od 20 levela**; level N je **iste težine u svakoj sezoni** (odluka 2026-10-20). Poslije levela 20 Play ponovo igra level 20.
-- Leveli rastu do 20: **duži** (60 → 120 s), **brži** (start 400 → 520 px/s, unutar levela +2 → +3,5 % svakih 15 s), **više prepreka** (6 → 30 % spawnova), od levela 6 **parovi** (prepreka u dvije staze, treća slobodna; 4 → 30 % prepreka), **više plijena** (gušći spawn + duže) i **češće rijetko sjeme**.
-- **Endless** nema tajmer: stepenica („Pace") svakih **20 s**, kreće kao level 2–3, na ~3 min je kao kraj levela 20, poslije 8 min brzina raste bez kraja. Plijen ostaje cijeli; rekord po sezoni.
+- Leveli rastu do 20: **duži** (60 → 120 s), **brži**, **više prepreka**, **parovi** (prepreka u dvije staze, treća slobodna), **više plijena** (gušći spawn + duže) i **češće rijetko sjeme**.
+- **Ciklus 1b (2026-10-22, „prelagano"):** težina je pomjerena **+5 levela** (level 1 = stari level 6: start 432 px/s, parovi od levela 1; 16–20 ekstrapolirano do 550 px/s, 40 % parova). Prepreke idu **svojim tokom 3× češće** (L1 ≈ 9, L10 ≈ 27, L20 ≈ 80 u minuti; razmak ≥ 300 px). ★3 ×1,25. Trajanje i plijen po levelu isti.
+- **Endless** nema tajmer: stepenica („Pace") svakih **20 s**, težina kreće 60 s ispred sata (kao stari level ~8), isto 3× prepreka; poslije 8 min (težine) brzina raste bez kraja. Plijen ostaje cijeli; rekord po sezoni.
 - **Endless sezone se otključava poslije levela 15** te sezone.
 
 ## Gdje je šta

@@ -52,6 +52,7 @@ func _run() -> void:
 	_check_pairs_and_magnet()
 	_check_prices()
 	await _check_endless_run()
+	await _check_obstacle_stream()
 	_finish()
 
 
@@ -76,9 +77,15 @@ func _check_levels() -> void:
 	var l20 = _rll.call("get_level", 20)
 	if float(l1.duration_sec) < 60.0 or float(l20.duration_sec) < 2.0 * float(l1.duration_sec) - 1.0:
 		_fail("levels should run 60 s → 120 s, got %.0f → %.0f" % [l1.duration_sec, l20.duration_sec])
-	for n in range(1, 6):
-		if float(_rll.call("get_level", n).pair_chance) > 0.0:
-			_fail("level %d should not have obstacle pairs yet" % n)
+	# Ciklus 1b (2026-10-22): težina +5 levela — level 1 = stari level 6 (parovi već od 1).
+	if absf(float(l1.scroll_speed_mult) - 1.08) > 0.001 or absf(float(l1.obstacle_chance) - 0.108) > 0.001 \
+			or float(l1.pair_chance) <= 0.0:
+		_fail("level 1 should play like old level 6 (×1.08, 10.8 %% obstacles, first pairs)")
+	if float(l20.scroll_speed_mult) <= 1.3 or float(l20.pair_chance) > 0.45 + 1e-6:
+		_fail("level 20 should be past old level 20 (extrapolated), pairs ≤ 45 %%")
+	var mult := float(_rll.call("obstacle_rate_mult"))
+	if mult < 3.0 - 1e-6:
+		_fail("obstacles should come at least 3× as often (obstacle_rate_mult %.2f)" % mult)
 	if int(_rll.call("get_level", 57).id) != 20:
 		_fail("levels above 20 should clamp to 20 (complete path replays 20)")
 
@@ -104,10 +111,11 @@ func _check_endless_ramp() -> void:
 		if not (1.0 > float(c.rare2_mult) and float(c.rare2_mult) > float(c.rare3_mult)):
 			_fail("endless at %.0f s: weights should stay ★1 > ★2 > ★3" % t)
 		prev = c
+	# Ciklus 1b: Endless kreće 60 s ispred sata — kao stari ključ t = 60 (≈ stari level 8), s parovima.
 	var start = _rll.call("get_endless_config_at", 0.0)
-	var l3 = _rll.call("get_level", 3)
-	if float(start.obstacle_chance) > float(l3.obstacle_chance) + 0.02 or float(start.pair_chance) > 0.0:
-		_fail("endless should start easy (≈ level 2–3)")
+	if absf(float(start.scroll_speed_mult) - 1.15) > 0.001 or float(start.pair_chance) <= 0.0 \
+			or float(start.obstacle_rate_mult) < 3.0 - 1e-6:
+		_fail("endless should start at the old 1:00 step (×1.15, pairs) with 3× obstacles")
 	var late = _rll.call("get_endless_config_at", 600.0)
 	var l20 = _rll.call("get_level", 20)
 	if float(late.scroll_speed_mult) <= float(l20.scroll_speed_mult) or float(late.obstacle_chance) <= float(l20.obstacle_chance):
@@ -268,3 +276,60 @@ func _check_endless_run() -> void:
 		run.set("elapsed", float(row[0]))
 		if bool(run.call("_spawn_reaches_pip")) != bool(row[1]):
 			_fail("level end: at %.1f / %.0f s spawn open should be %s" % [float(row[0]), dur, str(row[1])])
+
+
+## Ciklus 1b: prepreke idu svojim tokom × obstacle_rate_mult. 90 s levela 10 u ručnim frejmovima:
+## redova ≈ 3 × stari tick (±35 %), razmak susjednih redova ≥ 300 px, nikad sve tri staze u redu,
+## pickup nikad u istoj stazi ±170 px od prepreke.
+func _check_obstacle_stream() -> void:
+	_gs.set("tutorial_complete", true)
+	_gs.set("run_level", 10)
+	_gs.call("begin_campaign_run")
+	change_scene_to_file("res://scenes/run/run_scene.tscn")
+	await _frames(12)
+	var run := current_scene
+	run.set("_state", 2)
+	var hit := Callable(run, "_on_player_hit_obstacle")
+	if run.get_node("Player").is_connected("hit_obstacle", hit):
+		run.get_node("Player").disconnect("hit_obstacle", hit)
+	run.call("_clear_world_entities")
+	await _frames(1)
+	var world := run.get_node("World") as Node2D
+	var cfg = _rll.call("get_level", 10)
+	var old_rate := float(cfg.spawn_chance) * float(cfg.obstacle_chance) / float(cfg.spawn_interval)
+	run.set("elapsed", 5.0)
+	run.set("_state", 0)
+	var seen := {}
+	var rows := 0
+	var dt := 1.0 / 60.0
+	var sim := 0.0
+	while sim < 60.0:
+		run.call("_process", dt)
+		sim += dt
+		var fresh: Array = []
+		for c in world.get_children():
+			if c.is_queued_for_deletion() or seen.has(c.get_instance_id()):
+				continue
+			seen[c.get_instance_id()] = true
+			if c.is_in_group("obstacle"):
+				fresh.append(c)
+			if c.is_in_group("pickup") or c.is_in_group("obstacle"):
+				var other := "obstacle" if c.is_in_group("pickup") else "pickup"
+				for o in world.get_children():
+					if o != c and o.is_in_group(other) and absf(o.position.x - c.position.x) < 1.0 							and absf(o.position.y - c.position.y) < 169.0:
+						_fail("pickup and obstacle overlap in a lane (dy %.0f)" % absf(o.position.y - c.position.y))
+		if not fresh.is_empty():
+			rows += 1
+			if fresh.size() > 2:
+				_fail("an obstacle row closed all three lanes")
+			var y := float(fresh[0].position.y)
+			for o in world.get_children():
+				if o.is_in_group("obstacle") and not fresh.has(o) and absf(o.position.y - y) < 299.0:
+					_fail("obstacle rows closer than 300 px (%.0f)" % absf(o.position.y - y))
+					break
+	run.set("_state", 2)
+	var want := old_rate * float(_rll.call("obstacle_rate_mult")) * 60.0
+	if float(rows) < want * 0.65 or float(rows) > want * 1.35:
+		_fail("level 10: %d obstacle rows in 60 s, expected ≈ %.0f (3× the old %.0f)" % [rows, want, old_rate * 60.0])
+	else:
+		print("obstacle stream L10: %d rows / min (old tick %.1f)" % [rows, old_rate * 60.0])

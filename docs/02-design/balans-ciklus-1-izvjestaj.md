@@ -171,6 +171,46 @@ Rizik raste s brzinom², ×1,8 za par i s gužvom na ekranu; skupljanje pada s b
 | Cilj na vrhu kroz koji Pip prođe + animacija kraja | u CD briefu (A6) — cilj stiže tačno na kraju, po sezoni |
 | „Claim" na putu ne radi, radi samo sanduk | pilula izbačena (crtala se van zone dodira); dodir hvata sanduk i traku ispod; privremeno sanduk skače 26 px, doskoči sa squashom i klima se ±8° (ciklus 1,8 s); konačni izgled u CD briefu (C) |
 
+## 6c. Ciklus 1b — teže (playtest 2026-10-22)
+
+**Tražio si:** igra je prelagana. Težina neka se digne za 5 levela od početka (level 1 = težina levela 6), prepreke bar 3× češće, Endless teži, a zlatnog (★3) sjemena blago više.
+
+**Urađeno** (`data/run_levels/levels.json`, sve u podacima):
+
+| Šta | Kako |
+|---|---|
+| Težina +5 levela | Level N uzima brzinu, ubrzanje, udio prepreka i parova od starog levela N+5. Za levele 16–20 to je ekstrapolirano iz trenda starih 16–20, kao da postoje leveli 21–25. Parovi su sad od levela 1. **Trajanje i plijen ostaju po levelu** (60 → 120 s; spawn i udio sjemena isti). |
+| Prepreke 3× | Prepreke imaju svoj tok, nezavisno od pickupa: redova u minuti = stari tick × `obstacle_rate_mult` (3,0). Primjer, level 10: 27 redova u minuti umjesto 8,8. |
+| Pravila toka prepreka | Razmak redova je najmanje 300 px (dvije promjene staze stanu i na 900+ px/s). Coin ili sjeme se nikad ne stvori u istoj stazi ±170 px od prepreke. Par i dalje uvijek ostavlja jednu stazu slobodnu. |
+| Endless | Kreće 60 s „ispred sata" (`difficulty_offset_sec`): start je kao stara 1:00 (≈ stari level 8, s parovima), a ne kao level 2–3. I u Endlessu vrijede prepreke 3×. „Pace" u HUD-u i dalje kreće od 0. |
+| ★3 sjeme | Težina `rare3_mult` × 1,25 u svim levelima i Endless ključevima: ★3 je sad 4–9 % sjemena (bilo 3–7 %). |
+| Tutorijal | Nije diran (dva vođena runa). |
+
+**Šta simulator kaže** (prolaz %, [[balans-ciklus-1b-simulacija|sirovi izlaz]]):
+
+| Profil | L1 | L5 | L10 | L15 (otključava Endless) | L20 | Endless medijan |
+|---|---|---|---|---|---|---|
+| casual — sada | 93 | 77 | 48 | **7** | **1** | 81 s |
+| average — sada | 94 | 86 | 66 | **30** | **3** | 116 s |
+| skilled — sada | 98 | 95 | 80 | 53 | 21 | 152 s |
+| average — ciklus 1 | 100 | 98 | 94 | 81 | 61 | 265 s |
+
+**Put kroz sezone** (prosječan igrač, štedi; dani po 25 min igre):
+
+| Milestone | Ciklus 1 | Ciklus 1b |
+|---|---|---|
+| Country Bloom level 20 | 1,7 | 4,0 |
+| Frost Orchard | 1,7 | 4,0 |
+| Lantern Meadow | 4,0 | 7,5 |
+| Amber Canopy | 9,5 | 14,1 |
+
+Casual igrač u modelu skoro ne prelazi level 20 (1 %) i do Frosta treba ~8 dana. Taj dio puta drže nadogradnje (magnet, Loot) i Endless.
+
+**Na šta paziti u playtestu:**
+- Model igrača je **pretpostavka** (rizik po prepreci raste s gužvom). Ako ti je i ovo prelagano, pravi igrač je bolji od modela; telemetrija iz debug playtesta (`balance_log.csv` → `economy_sim --calibrate`) to ispravi.
+- Ako je 16–20 preteško, jedan broj je ručica za sve: `obstacle_rate_mult` (3,0 → npr. 2,5). Druga je ekstrapolacija za 16–20.
+- Endless se otključava poslije levela 15. Sa 30 % prolaza (average) to je ~3–4 pokušaja, a casual ~14.
+
 ## 7. Provjere
 
 | Provjera | Rezultat |

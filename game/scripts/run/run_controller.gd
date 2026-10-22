@@ -18,6 +18,13 @@ const OBSTACLE_CHANCE := 0.25
 const PICKUP_SEED_CHANCE := 0.30
 ## Linija spawna (pickup, prepreka, grm) iznad ekrana.
 const SPAWN_Y := -80.0
+## Tok prepreka (ciklus 1b, levels.json obstacle_rate_mult): razmak redova najmanje toliko px / s
+## (dvije promjene staze stanu i na 900+ px/s), slučajno 0,6–1,4 × prosjeka.
+const MIN_ROW_GAP_PX := 300.0
+const MIN_ROW_GAP_SEC := 0.35
+const ROW_GAP_JITTER := Vector2(0.6, 1.4)
+## Pickup i prepreka se ne stvaraju jedno na drugom u istoj stazi (±px po y).
+const CLEAR_PX := 170.0
 ## Tutorial runovi (bez levela) — level i Endless nose svoj speed_ramp.
 const RAMP_STEP := 0.05
 const RAMP_EVERY := RunBalance.RAMP_EVERY
@@ -77,6 +84,8 @@ var _speed_ramp: float = RAMP_STEP
 var _pair_chance: float = 0.0
 var _rare2: float = RunBalance.BASE_RARE2
 var _rare3: float = RunBalance.BASE_RARE3
+var _obstacle_rate_mult: float = 1.0
+var _obstacle_wait: float = 0.0
 ## Endless: stepenica koja je primijenjena (-1 = još nije) i sekunda prikazana u čipu.
 var _endless_tier: int = -1
 var _clock_shown: int = -1
@@ -338,6 +347,8 @@ func _process(delta: float) -> void:
 			_try_spawn()
 	if open:
 		_update_bush_spawn()
+		if _obstacle_stream():
+			_update_obstacle_stream(delta)
 	else:
 		_update_finish_gate(delta, run_duration)
 
@@ -742,14 +753,16 @@ func _apply_run_level_config() -> void:
 	_pair_chance = 0.0
 	_rare2 = RunBalance.BASE_RARE2
 	_rare3 = RunBalance.BASE_RARE3
+	_obstacle_rate_mult = 1.0
 	if not GameState.uses_run_level_config():
 		return
 	if _endless_ramp_active():
 		# Revive nastavlja na stepenici u kojoj je Pip pao.
 		_endless_tier = -1
 		_update_endless_tier()
-		return
-	_apply_cfg(GameState.get_active_run_level_config())
+	else:
+		_apply_cfg(GameState.get_active_run_level_config())
+	_obstacle_wait = _next_row_gap()
 
 
 func _apply_cfg(cfg) -> void:
@@ -762,6 +775,57 @@ func _apply_cfg(cfg) -> void:
 	_pickup_seed_chance = cfg.pickup_seed_chance
 	_rare2 = cfg.rare2_mult
 	_rare3 = cfg.rare3_mult
+	_obstacle_rate_mult = cfg.obstacle_rate_mult
+
+
+## Prepreke svojim tokom (levela i Endless kad je obstacle_rate_mult > 1) — tutorijal po starom.
+func _obstacle_stream() -> bool:
+	return _obstacle_rate_mult > 1.0 and GameState.obstacles_enabled_for_run()
+
+
+## Redova prepreka u sekundi: isto kao stari tick (spawn × udio prepreka) × obstacle_rate_mult.
+func obstacle_rows_per_sec() -> float:
+	return _spawn_chance * _obstacle_chance / maxf(_spawn_interval, 0.1) * _obstacle_rate_mult
+
+
+func _next_row_gap() -> float:
+	var base := 1.0 / maxf(obstacle_rows_per_sec(), 0.01)
+	var floor_gap := maxf(MIN_ROW_GAP_SEC, MIN_ROW_GAP_PX / maxf(scroll_speed, 1.0))
+	return maxf(base * randf_range(ROW_GAP_JITTER.x, ROW_GAP_JITTER.y), floor_gap)
+
+
+func _update_obstacle_stream(delta: float) -> void:
+	_obstacle_wait -= delta
+	if _obstacle_wait > 0.0:
+		return
+	_obstacle_wait = _next_row_gap() if _spawn_obstacle_row() else 0.1
+
+
+## Red prepreka na liniji spawna: staza bez grma i bez pickupa u blizini; par ostavlja treću slobodnu.
+func _spawn_obstacle_row() -> bool:
+	var lanes: Array[int] = []
+	for l in 3:
+		if not _bush_blocks_lane(l, SPAWN_Y) and not _group_near("pickup", l, SPAWN_Y):
+			lanes.append(l)
+	if lanes.is_empty():
+		return false
+	var lane: int = lanes[randi() % lanes.size()]
+	var first := _spawn_obstacle_at_lane(lane)
+	RunTelemetry.count(_tele, "obstacle_rows")
+	if randf() < _pair_chance:
+		var other := RunBalance.pair_lane(lane, randf())
+		if lanes.has(other):
+			var second := _spawn_obstacle_at_lane(other)
+			_decorate_pair(first, lane, second, other)
+			RunTelemetry.count(_tele, "pairs")
+	return true
+
+
+func _group_near(group: String, lane: int, y: float) -> bool:
+	for child in world.get_children():
+		if child.is_in_group(group) and _lane_of(child.position.x) == lane and absf(child.position.y - y) < CLEAR_PX:
+			return true
+	return false
 
 
 func _endless_ramp_active() -> bool:
@@ -861,6 +925,17 @@ func _try_spawn() -> void:
 	var lane := randi() % 3
 	var spawn_pos := Vector2(lane_x_positions[lane], -80.0)
 
+	if _obstacle_stream():
+		# Prepreke idu svojim tokom; tick nosi pickup kao prije (udio 1 − obstacle_chance),
+		# u stazi bez prepreke u blizini.
+		if randf() < _obstacle_chance:
+			return
+		lane = _free_pickup_lane(lane, spawn_pos.y)
+		if lane < 0:
+			return
+		spawn_pos.x = lane_x_positions[lane]
+		_spawn_pickup(spawn_pos)
+		return
 	# Fer grm: nema prepreke u susjednim stazama ±300 px od grma — umjesto nje ide pickup.
 	if GameState.obstacles_enabled_for_run() and randf() < _obstacle_chance \
 			and not _bush_blocks_lane(lane, spawn_pos.y):
@@ -873,7 +948,20 @@ func _try_spawn() -> void:
 				var second := _spawn_obstacle_at_lane(other)
 				_decorate_pair(first, lane, second, other)
 				RunTelemetry.count(_tele, "pairs")
-	elif randf() < _effective_seed_spawn_chance():
+	else:
+		_spawn_pickup(spawn_pos)
+
+
+func _free_pickup_lane(lane: int, y: float) -> int:
+	for k in 3:
+		var l := (lane + k) % 3
+		if not _group_near("obstacle", l, y):
+			return l
+	return -1
+
+
+func _spawn_pickup(spawn_pos: Vector2) -> void:
+	if randf() < _effective_seed_spawn_chance():
 		var seed := _seed_scene.instantiate()
 		seed.position = spawn_pos
 		var type_id := _pick_seed_type_id()

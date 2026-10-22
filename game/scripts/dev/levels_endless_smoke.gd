@@ -21,11 +21,6 @@ const SEASONS: Array[String] = [
 	"country_bloom", "frost_orchard", "lantern_meadow", "amber_canopy",
 	"moonlit_warren", "coral_tide", "starfall_glade", "ember_fen",
 ]
-## level_finish.json → gate_lead_s (CD, integrisano sa stepenicama brzine).
-const GATE_LEAD := {
-	1: 3.9, 2: 3.73, 3: 3.68, 4: 3.61, 5: 3.56, 6: 3.46, 7: 3.36, 8: 3.28, 9: 3.22, 10: 3.17,
-	11: 3.05, 12: 2.98, 13: 2.93, 14: 2.86, 15: 2.82, 16: 2.67, 17: 2.64, 18: 2.59, 19: 2.56, 20: 2.5,
-}
 const DT := 1.0 / 60.0
 
 var _backup := ""
@@ -142,11 +137,15 @@ func _remain(base: float, ramp: float, dur: float, t: float) -> float:
 	return d
 
 
+## CD tabela gate_lead_s (level_finish.json) je računata za brojeve ciklusa 1; od ciklusa 1b (težina +5 levela) se
+## provjerava da cilj stiže 2–4,5 s prije kraja i da je preostali put tada tačno 1654 px.
 func _check_gate_math() -> void:
 	for lv in range(1, 21):
 		var lead := _gate_lead(lv)
-		if absf(lead - float(GATE_LEAD[lv])) > 0.02:
-			_fail("level %d gate lead %.3f s, CD says %.2f s" % [lv, lead, float(GATE_LEAD[lv])])
+		var cfg = get_root().get_node("RunLevelLibrary").call("get_level", lv)
+		var rem := _remain(400.0 * float(cfg.scroll_speed_mult), float(cfg.speed_ramp), float(cfg.duration_sec), float(cfg.duration_sec) - lead)
+		if lead < 2.0 or lead > 4.5 or absf(rem - 1654.0) > 1.0:
+			_fail("level %d gate lead %.3f s (remaining %.1f px)" % [lv, lead, rem])
 
 
 # --- 2–5 · run u levelu ---
@@ -254,8 +253,8 @@ func _check_level_run() -> void:
 			if gate.live_sprites() != 4:
 				_fail("riding gate should draw 4 sprites, got %d" % gate.live_sprites())
 			var t_left := dur - float(run.get("elapsed"))
-			if absf(t_left - float(GATE_LEAD[6])) > 0.05:
-				_fail("L6 gate appeared %.2f s before the end, CD says %.2f" % [t_left, float(GATE_LEAD[6])])
+			if absf(t_left - _gate_lead(6)) > 0.05:
+				_fail("L6 gate appeared %.2f s before the end, math says %.2f" % [t_left, _gate_lead(6)])
 		if gate != null:
 			var last_y: float = gate.position.y
 			if float(run.get("elapsed")) >= dur:
