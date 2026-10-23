@@ -24,8 +24,8 @@ Solo F2P casual igra bez servera — **niski rizik**, ali store i SDK-ovi imaju 
 
 | Stavka | Akcija |
 |--------|--------|
-| **Tajne van gita** | AdMob app ID, IAP ključevi — env / export credentials, `.gitignore` |
-| **Minimalni permissions** | Samo Internet (+ vibrate opcionalno) — vidi [[platforme|platforme]] |
+| **Tajne van gita** | Upload keystore + lozinka (`game/export_credentials/`, `credentials.local.md`), budući Play API / service account ključevi — `.gitignore`. **AdMob App ID i ad unit ID-evi nisu tajne** (stoje u svakom APK-u) → `monetization_config.gd` (odluka 2026-10-23, LAUNCH-PREP) |
+| **Minimalni permissions** | Internet + Access network state (AdMob, Billing) + vibrate; SDK-ovi sami dodaju `AD_ID` i `BILLING` — vidi [[platforme|platforme]] |
 | **Službeni SDK-ovi** | AdMob + Google Play Billing / StoreKit — ne custom payment |
 | **Privacy policy** | URL u store listing (čak i za “ne prikupljamo podatke”) |
 | **Lokalni save** | `user://save.json` — nema osjetljivih PII; ne logiraj lične podatke |

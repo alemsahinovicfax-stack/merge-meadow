@@ -80,7 +80,7 @@ tags: [dizajn, monetizacija]
 ## Otvorena pitanja
 
 - [ ] Točan EUR pricing po regiji (store auto)
-- [ ] Ad frequency cap (max interstitial/dan)
+- [x] Ad frequency cap — odluka 2026-10-23 (blago): interstitial nikad u tutorijalu ni u sesiji u kojoj je tutorijal završen, najviše 1 na 3 Retry-ja, min 3 min razmaka; Remove Ads gasi (`AdManager.InterstitialPacer`, [[../05-technical/godot/admob-setup|admob-setup]])
 
 ## Povezano
 

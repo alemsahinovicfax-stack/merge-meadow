@@ -314,7 +314,8 @@ func _on_retry_pressed() -> void:
 	var start_run := func() -> void:
 		GameState.begin_fresh_run()
 		SceneRouter.change_to(GameState.SCENE_RUN)
-	if AdManager.can_show_interstitial(CONFIG.PLACEMENT_LOOT_RETRY):
+	# Broji Retry i pita pacer (blago ograničenje) — većinom false, pa run kreće odmah.
+	if AdManager.take_interstitial_turn(CONFIG.PLACEMENT_LOOT_RETRY):
 		retry_loading = true
 		_apply_buttons()
 		AdManager.show_interstitial(CONFIG.PLACEMENT_LOOT_RETRY, start_run)

@@ -3,8 +3,39 @@ extends RefCounted
 
 ## Public test IDs and SKUs — safe for git (see sigurnost.md).
 
-# Google AdMob test rewarded (Android) — https://developers.google.com/admob/android/test-ads
+# Google AdMob TEST ID-evi (javni) — https://developers.google.com/admob/android/test-ads
+const ADMOB_TEST_APP_ID_ANDROID := "ca-app-pub-3940256099942544~3347511713"
 const ADMOB_TEST_REWARDED_ANDROID := "ca-app-pub-3940256099942544/5224354917"
+const ADMOB_TEST_INTERSTITIAL_ANDROID := "ca-app-pub-3940256099942544/1033173712"
+
+# --- PRODUCTION IDS (TODO Alem) -------------------------------------------------------------
+# AdMob konzola → Apps → Merge Meadow:
+#   1) App ID (ima „~") → ADMOB_APP_ID_ANDROID_PROD **i** project.godot `admob/general/android/app_id`
+#      (Project Settings → AdMob; plugin ga upisuje u AndroidManifest, test_ad_manager provjerava da su
+#      isti). Dok je tamo test ID, plugin postavku ne snima u project.godot — to je normalno.
+#   2) Ad units → Rewarded i Interstitial (imaju „/") → dvije konstante ispod.
+# ID-evi nisu tajni (stoje u svakom APK-u), smiju u git. Dok su prazni, i release koristi test reklame
+# (scripts/android-export.ps1 na to upozori) — za Play produkciju moraju biti popunjeni.
+const ADMOB_APP_ID_ANDROID_PROD := ""
+const ADMOB_REWARDED_ANDROID_PROD := ""
+const ADMOB_INTERSTITIAL_ANDROID_PROD := ""
+# ---------------------------------------------------------------------------------------------
+
+
+## Prod ID samo u release buildu i samo kad je upisan; debug build uvijek test (AdMob politika:
+## vlastite reklame se ne klikaju tokom razvoja).
+static func pick_ad_unit(prod_id: String, test_id: String, release_build: bool) -> String:
+	if release_build and not prod_id.is_empty():
+		return prod_id
+	return test_id
+
+
+static func rewarded_unit_id() -> String:
+	return pick_ad_unit(ADMOB_REWARDED_ANDROID_PROD, ADMOB_TEST_REWARDED_ANDROID, not OS.is_debug_build())
+
+
+static func interstitial_unit_id() -> String:
+	return pick_ad_unit(ADMOB_INTERSTITIAL_ANDROID_PROD, ADMOB_TEST_INTERSTITIAL_ANDROID, not OS.is_debug_build())
 
 const PLACEMENT_DOUBLE_LOOT := "double_loot"
 const PLACEMENT_REVIVE := "revive"

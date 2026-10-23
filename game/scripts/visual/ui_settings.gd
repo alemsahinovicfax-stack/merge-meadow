@@ -98,6 +98,8 @@ const S := {
 	"dev_coins": "+1000 coins", "dev_reset_tutorial": "Reset tutorial",
 	"dev_level_up": "Level +5", "dev_level_reset": "Level 1",
 	"dev_test_bag_on": "Test seeds: on", "dev_test_bag_off": "Test seeds: off",
+	"dev_ump_eea_on": "Consent as EU: on", "dev_ump_eea_off": "Consent as EU: off",
+	"dev_ump_reset": "Reset ad consent",
 }
 
 enum Restore { IDLE, BUSY, DONE, NONE, FAIL }

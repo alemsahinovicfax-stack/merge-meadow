@@ -755,6 +755,8 @@ func _build_dev(list: VBoxContainer) -> void:
 	grid.add_child(_dev_button("DevLevelUp", UiSettings.S.dev_level_up, false, _dev_level_up))
 	grid.add_child(_dev_button("DevLevelReset", UiSettings.S.dev_level_reset, true, _dev_level_reset))
 	grid.add_child(_dev_button("DevTestBag", _test_bag_text(), false, _dev_toggle_test_bag))
+	grid.add_child(_dev_button("DevUmpEea", _ump_eea_text(), false, _dev_toggle_ump_eea))
+	grid.add_child(_dev_button("DevUmpReset", UiSettings.S.dev_ump_reset, true, _dev_reset_consent))
 
 
 func _dev_button(node_name: String, text: String, danger: bool, action: Callable) -> Control:
@@ -815,6 +817,26 @@ func _dev_toggle_test_bag() -> void:
 		for c in b.find_children("*", "Label", true, false):
 			(c as Label).text = _test_bag_text()
 	_dev_done(_test_bag_text())
+
+
+## UMP forma pristanka kao da je telefon u EU (test izvan EU) — user://ads_debug.cfg,
+## važi od sljedećeg pokretanja. Samo debug APK s AdMob pluginom pokazuje pravu formu.
+func _ump_eea_text() -> String:
+	return UiSettings.S.dev_ump_eea_on if AdManager.is_debug_eea_enabled() else UiSettings.S.dev_ump_eea_off
+
+
+func _dev_toggle_ump_eea() -> void:
+	AdManager.set_debug_eea(not AdManager.is_debug_eea_enabled())
+	var b := find_child("DevUmpEea", true, false)
+	if b:
+		for c in b.find_children("*", "Label", true, false):
+			(c as Label).text = _ump_eea_text()
+	_dev_done(_ump_eea_text() + " (next launch)")
+
+
+func _dev_reset_consent() -> void:
+	AdManager.reset_consent_for_dev()
+	_dev_done("Ad consent reset (next launch)")
 
 
 func _dev_reset_tutorial() -> void:
