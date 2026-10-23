@@ -19,6 +19,8 @@ ai_sažetak: "Checklist Faze 1 — što je gotovo vs što još treba prije Play 
 
 ## Sažetak (2026-07-11)
 
+> **2026-10-23 (LAUNCH-PREP):** redovi M1–M6, T7, T8, U1, L1, L4, L6 ažurirani prema stvarnom stanju (release build, Billing 3.3.0, AdMob + UMP, ikona/splash, nacrti Play formi). Brojke u ovoj tablici i timeline ispod su iz jula. Ostaje: produkcijski AdMob ID-evi, Play nalog + proizvodi, **odluka o IAP-u (BiH nije merchant zemlja)**, closed test 12 × 14 dana, vanjski playtest. Izvještaj: [[launch-prep-izvjestaj|launch-prep-izvjestaj]].
+
 | Kategorija | Gotovo | Djelomično | Nedostaje |
 |------------|--------|------------|-----------|
 | Core gameplay | 6 | 1 | 1 |
@@ -107,7 +109,7 @@ Legenda: ✅ gotovo · 🟡 djelomično · ❌ nedostaje · ⏸ odgođeno (plan)
 
 | # | Stavka | Status | Napomena |
 |---|--------|--------|----------|
-| U1 | Splash → tutorial → main menu | 🟡 | Tutorial ✅; **nema in-game splash** scene; Android system splash default |
+| U1 | Splash → tutorial → main menu | ✅ | Branded boot splash (Pip značka, krem) + Android 12 splash ikona (2026-10-23); tutorijal = 2 vođena runa |
 | U2 | Loot: ×2 rewarded, revive, retry, kamp | ✅ | `loot_screen.gd` + revive resume |
 | U3 | Kamp: merge, upgrade, Keep, auto-plant | ✅ | Keep oslobađa gredicu; vreća bez limita (cap 40 uklonjen 2026-10-16 — gutao je plijen) |
 | U4 | **Daily chest** | ✅ | `claim_daily_chest()`, save v4, kamp gumb |
@@ -124,12 +126,12 @@ Legenda: ✅ gotovo · 🟡 djelomično · ❌ nedostaje · ⏸ odgođeno (plan)
 
 | # | Stavka | Status | Napomena |
 |---|--------|--------|----------|
-| M1 | AdMob rewarded (×2 loot, revive) | 🟡 | `AdManager` **stub**; nema `addons/` Poing plugin |
-| M2 | Interstitial na loot (Retry) | 🟡 | Hook u `loot_screen.gd`; plugin pending |
-| M3 | IAP remove ads + starter pack | 🟡 | Billing hook; **stub** dok nema plugina na uređaju |
+| M1 | AdMob rewarded (×2 loot, revive) | ✅ | 2026-10-23: Poing AdMob v5.1.0 + `admob_backend.gd`; nagrada samo na `on_user_earned_reward`; test jedinice dok nema AdMob naloga ([[../05-technical/godot/admob-setup\|admob-setup]]) |
+| M2 | Interstitial na loot (Retry) | ✅ | 2026-10-23: pravi AdMob + blago ograničenje (`InterstitialPacer`: ne u tutorijalu / prvoj sesiji, 1 na 3 Retry-ja, 3 min) |
+| M3 | IAP (9 proizvoda) | 🟡 | 2026-10-23: GodotGooglePlayBilling 3.3.0 spojen (reconnect, pending, restore, GUT s lažnim klijentom). **Netestirano s Playom** — nema proizvoda u Play Consoleu; **BiH nije merchant zemlja** ([[play-console-sutra\|play-console-sutra]] § 0) |
 | M4 | Offline igra; IAP treba mrežu | ✅ | Dizajn OK |
-| M5 | Production AdMob unit ID-evi | ❌ | Još test ID u configu |
-| M6 | Play Console IAP product ID match | ❌ | Tek u Fazi 2 nakon $25 |
+| M5 | Production AdMob unit ID-evi | ❌ | Prazan blok PRODUCTION IDS u `monetization_config.gd` — čeka AdMob nalog |
+| M6 | Play Console IAP product ID match | ❌ | Lista ID-eva gotova ([[play-console-sutra\|play-console-sutra]] § 6); čeka Play nalog + merchant |
 
 ---
 
@@ -143,8 +145,8 @@ Legenda: ✅ gotovo · 🟡 djelomično · ❌ nedostaje · ⏸ odgođeno (plan)
 | T4 | Muzika po sezoni | ✅ | Sintetska muzika po sezoni je u igri. Pravi soundtrack još otvoren |
 | T5 | Set bonus (2 seta) | ❌ | F8.11 — ideje launch 🟡 |
 | T6 | `DEBUG_DEV_RESOURCES` | ✅ | Već `false` u `game_state_debug.gd`. Release AAB je i dalje otvoren (T7) |
-| T7 | Release AAB + keystore | ❌ | Faza 2 — debug APK postoji |
-| T8 | Branded splash / app icon 512 | 🟡 | `icon.svg` default; export splash prazan |
+| T7 | Release AAB + keystore | ✅ | 2026-10-23: Gradle preseti (target SDK 36, min 24), upload keystore (gitignore), `scripts/android-export.ps1 -Preset Aab` |
+| T8 | Branded splash / app icon 512 | ✅ | 2026-10-23: Pip ikona (192, adaptivna 432 ×3, store 512) + splash značka — `make_app_icons.gd` |
 | T9 | Vanjski playtest 5 min bez vođenja | ❌ | M7 exit kriterij — ponoviti prije launcha |
 | T10 | Balans pass (100 runova + ekonomija) | 🟡 | Brojke u docs; puni pass nije rađen |
 
@@ -154,12 +156,12 @@ Legenda: ✅ gotovo · 🟡 djelomično · ❌ nedostaje · ⏸ odgođeno (plan)
 
 | # | Stavka | Status | Napomena |
 |---|--------|--------|----------|
-| L1 | Privacy policy URL | ✅ | GitHub Pages live |
+| L1 | Privacy policy URL | ✅ | GitHub Pages live; usklađena s AdMob listom podataka 2026-10-23 |
 | L2 | Store listing + 8 screenshotova | ✅ | `marketing/store/` |
 | L3 | Play developer **25 USD** | ❌ | Namjerno čeka D0 |
-| L4 | AdMob + Billing plugin u exportu | ❌ | Instalirati Poing plugine |
+| L4 | AdMob + Billing plugin u exportu | ✅ | 2026-10-23: oba plugina u `game/addons/`, Gradle export |
 | L5 | Internal test upload | ❌ | [[play-internal-test|D5 runbook]] |
-| L6 | Data safety + content rating | ❌ | Play Console forma |
+| L6 | Data safety + content rating | 🟡 | Odgovori spremni za prepisati: [[play-console-sutra\|play-console-sutra]] |
 
 ---
 

@@ -827,6 +827,90 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** kad se uvede prag (vrata Arene, cijena, minimum), provjeri i tutorijal i „put" koji vodi do tog ekrana. Tutorijal ne smije zavisiti od nečega što igrač u tom trenutku ne može imati.
 
+## #54 — Android plugin „nije pronađen" iako je instaliran: `ClassDB` ne vidi GDScript `class_name`
+
+**Datum:** 2026-10-23 (LAUNCH-PREP B/C)
+
+**Simptom:** `IAPManager` i `AdManager` bi na Androidu zauvijek ostali u stubu / „unavailable", iako su Billing i AdMob plugin u `addons/`.
+
+**Uzrok:** oba managera su plugin tražila s `ClassDB.class_exists("BillingClient")` / `("RewardedAdLoader")`. `ClassDB` zna samo engine (C++/GDExtension) klase. GodotGooglePlayBilling od 3.0 i Poing AdMob 5.x su **GDScript** `class_name` omotači oko JNI singletona — za `ClassDB` ne postoje.
+
+**Rješenje:** prepoznaj plugin po fajlu (`ResourceLoader.exists("res://addons/GodotGooglePlayBilling/BillingClient.gd")`, `FileAccess.file_exists("res://addons/admob/plugin.cfg")`) i napravi objekt s `load(path).new()`. AdMob kod je u posebnoj skripti (`admob_backend.gd`) koja se učitava samo na Androidu.
+
+**Prevencija:** za GDScript klase iz addona — `ProjectSettings.get_global_class_list()` ili putanja, nikad `ClassDB`. Test s lažnim klijentom (`test_iap_billing_flow`, `test_ad_manager`) mora proći kroz isti ulaz (`attach_*`).
+
+## #55 — Gradle export pada: `game/android/` je bila ravna kopija `android_source.zip`
+
+**Datum:** 2026-10-23
+
+**Simptom:** uključen `use_gradle_build` → export bi javio „Android build template not installed".
+
+**Uzrok:** u julu je `android_source.zip` raspakovan direktno u `game/android/` (i commitan). Godot traži `res://android/build/` + `res://android/.build_version` (+ `.gdignore`). Jedina razlika od zipa bila je `screenOrientation` u manifestu, koju Godot ionako upisuje iz projekta.
+
+**Rješenje:** stari folder obrisan, `game/android/` u `.gitignore`; `scripts/android-export.ps1` svaki put zove `--install-android-build-template` uz `--export-release/--export-debug`. Pluginovi ne mijenjaju template (export pluginovi), pa ga ne treba čuvati u gitu.
+
+**Prevencija:** build template se instalira alatom (meni ili CLI flag), nikad ručnim raspakivanjem. **Ali ne na svakom exportu:** `--install-android-build-template` kad template već postoji ga reinstalira usred scana editora — drugi AAB export je pao s `exit -1` bez ijedne poruke („Scan thread aborted"). Skripta flag dodaje samo kad `game/android/.build_version` fali ili nije `4.7.stable`.
+
+## #59 — Gradle: „Unable to strip" (fali tačan NDK) i export koji visi / pada s `exit -1`
+
+**Datum:** 2026-10-23
+
+**Simptom:**
+- Gradle log: `Unable to strip the following libraries, packaging them as they are: libc++_shared.so, libgodot_android.so.` AAB 72,4 MB.
+- Drugi i svaki sljedeći AAB export iz skripte: `exit -1` bez poruke; log fajl je ostao od prvog runa. Ručno: `out-file: The process cannot access the file '…export_aab.log' because it is being used by another process`.
+
+**Uzrok:**
+- Godot 4.7 template (`config.gradle`) traži **NDK 29.0.14206865**; na laptopu su bili samo 29.0.13113456 / 13599879. AGP bez tačnog NDK-a ne ogoli `.so`.
+- **Gradle daemon** (java) naslijedi stdout pipe Godot console omotača → omotač ne izađe ni kad je export gotov, i drži `export_*.log` otvoren. Sljedeći `Tee-Object` ne može pisati u log → skripta pada prije Godota.
+
+**Rješenje:**
+- `sdkmanager "ndk;29.0.14206865"` → `stripStandardReleaseDebugSymbols` bez upozorenja, AAB 68,6 MB.
+- `android-export.ps1`: `GRADLE_OPTS=-Dorg.gradle.daemon=false` i `--verbose` (bez njega Godot ne ispiše Gradle izlaz).
+- `exclude_filter` u Android presetima: `addons/gut/*`, AdMob `assets` / `mock` / `translations` / `docs` / `ios` (samo editor).
+- Napomena o veličini: release APK za emulator (3 ABI-ja, `.so` nekompresovan) ima ~234 MB — to je normalno; Play iz AAB-a šalje samo jedan ABI.
+
+**Prevencija:** poslije Godot upgradea pročitaj `ndkVersion` u `game/android/build/config.gradle` i instaliraj tu verziju; u export logu traži „Unable to strip". Kad headless export „visi", provjeri `java.exe` / `*_console.exe` procese.
+
+## #56 — PowerShell 5.1: crtica „—" u stringu ruši skriptu; jedan rezultat `Where-Object` se indeksira po slovima
+
+**Datum:** 2026-10-23
+
+**Simptom:**
+- `android-export.ps1`: `Missing closing '}' in statement block` na liniji koja izgleda ispravno.
+- Poslije: `The term 'C' is not recognized` — Godot exe je bio samo slovo „C".
+
+**Uzrok:**
+- PowerShell 5.1 čita `.ps1` **bez BOM-a** kao Windows-1252. „—" (UTF-8 `E2 80 94`) postane `â€”`, a bajt `0x94` je u 1252 desni navodnik `"` — string se zatvori usred teksta.
+- `$c = @(...) | Where-Object {...}` s **jednim** pogotkom vrati string, ne niz → `$c[0]` je prvo slovo.
+
+**Rješenje:** u stringovima `.ps1` skripti samo ASCII (crtica `-`); u komentarima smije UTF-8. Rezultat filtera omotaj: `$c = @(@(...) | Where-Object {...})`.
+
+**Prevencija:** isto važi za `git commit -F -` s PowerShell here-stringom (poruka ode kao pathspec) i `Set-Content -Encoding utf8` (dodaje BOM) — poruku commita piši u fajl alatom Write pa `git commit -F <fajl>`.
+
+## #57 — prava Play kupovina bi pala s „missing_product_id"
+
+**Datum:** 2026-10-23 (pregled koda prije spajanja plugina)
+
+**Simptom:** (nije se desilo na uređaju — uhvaćeno čitanjem) svaka Play kupovina → `purchase_failed(..., "missing_product_id")`, ništa se ne daje.
+
+**Uzrok:** `_process_purchase` je provjeravao `product_ids is Array`. Plugin 3.x šalje **`PackedStringArray`**, a `PackedStringArray is Array` je u GDScriptu `false`.
+
+**Rješenje:** `IAPManager.first_product_id()` prima i `PackedStringArray` i `Array`; GUT `test_iap_billing_flow` šalje `PackedStringArray` kao plugin.
+
+**Prevencija:** lažni klijent u testovima mora slati iste tipove kao pravi plugin (pročitaj `BillingClient.gd` / Kotlin `Utils.kt`), ne „lijepe" Arraye.
+
+## #58 — Poing AdMob briše `admob/general/android/app_id` iz `project.godot`
+
+**Datum:** 2026-10-23
+
+**Simptom:** ručno upisan `[admob] general/android/app_id="ca-app-pub-3940256099942544~3347511713"` nestane poslije `--import`; GUT test App ID-a pada (`""`).
+
+**Uzrok:** plugin pri pokretanju editora registruje postavke s **initial value = Googleov test App ID** i snimi projekt; Godot ne piše postavku jednaku initial value. Export plugin tada u manifest upiše isti default.
+
+**Rješenje:** test čita `ProjectSettings.get_setting(path, ADMOB_TEST_APP_ID_ANDROID)`; `android-export.ps1` upozorava kad u `project.godot` **nema** produkcijskog App ID-a (ne kad ima test ID).
+
+**Prevencija:** prije zaključka „postavka nije snimljena" provjeri nije li jednaka defaultu nekog plugina.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

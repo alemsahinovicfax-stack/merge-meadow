@@ -30,7 +30,8 @@ function New-WorkerAppData([int]$i) {
     $dst = Join-Path $appdata "Godot\app_userdata\Merge Meadow"
     New-Item -ItemType Directory -Force $dst | Out-Null
     if (Test-Path $userSrc) {
-        Get-ChildItem $userSrc -File | Where-Object { $_.Extension -in ".json", ".cfg" } |
+        # Dev prekidači (dev_flags.cfg "Test seeds", ads_debug.cfg) ostaju na defaultu koji testovi očekuju.
+        Get-ChildItem $userSrc -File | Where-Object { $_.Extension -in ".json", ".cfg" -and $_.Name -notin "dev_flags.cfg", "ads_debug.cfg" } |
             ForEach-Object { Copy-Item $_.FullName $dst }
     }
     $settings = Join-Path $dst "settings.cfg"
@@ -79,7 +80,10 @@ while ($queue.Count -gt 0 -or $running.Count -gt 0) {
         $text = $r.StdOut.Result + "`n" + $r.StdErr.Result
         Set-Content -Path $r.Out -Value $text -Encoding utf8
         $name = $r.Smoke.BaseName
-        $ok = (-not $timedOut) -and $r.Proc.ExitCode -eq 0 -and ($text -match [regex]::Escape("$name OK")) -and
+        # Neki testovi pišu "shop smoke OK" (razmak umjesto _).
+        $spaced = $name -replace '_', ' '
+        $okLine = "(" + [regex]::Escape($name) + "|" + [regex]::Escape($spaced) + ") OK"
+        $ok = (-not $timedOut) -and $r.Proc.ExitCode -eq 0 -and ($text -match $okLine) -and
             ($text -notmatch "SCRIPT ERROR|Parse Error")
         $why = if ($timedOut) { "timeout" } elseif ($r.Proc.ExitCode -ne 0) { "exit $($r.Proc.ExitCode)" } elseif ($text -match "SCRIPT ERROR|Parse Error") { "script error" } elseif (-not $ok) { "no OK line" } else { "" }
         $sec = [int]((Get-Date) - $r.Start).TotalSeconds

@@ -50,7 +50,7 @@ Test ID-evi (Google, javni): App `ca-app-pub-3940256099942544~3347511713`, rewar
 
 1. **Start (Android + plugin):** `admob_backend.start()` → UMP `consent_information.update` → ako je `REQUIRED` i forma postoji → forma → `MobileAds.initialize` (`max_ad_content_rating = G`, ne under-age) → preload 1 rewarded + 1 interstitial.
 2. Reklame se traže samo kad je pristanak `NOT_REQUIRED` ili `OBTAINED`; bez toga loot ekran sakrije ad dugmad (`can_request_rewarded() == false`).
-3. **Rewarded** (×2 loot, revive): učitana → `show`; nije → load (8 s) ili `no_fill`. **Nagrada samo na `on_user_earned_reward`**; zatvorena prije kraja → `not_earned` (0,5 s grace za zakašnjeli callback). Muzika pauzirana (`Sfx.set_ad_playing`). Ostaje i poslije Remove Ads (Pillar 2).
+3. **Rewarded** (×2 loot, revive): učitana → `show`; nije → load (8 s) ili `no_fill`. Preload koji ne uspije ponavlja se za 30 s; zahtjev usred učitavanja čeka isti load. **Nagrada samo na `on_user_earned_reward`**; zatvorena prije kraja → `not_earned` (0,5 s grace za zakašnjeli callback). Muzika pauzirana (`Sfx.set_ad_playing`). Ostaje i poslije Remove Ads (Pillar 2).
 4. **Interstitial** (Retry na loot ekranu) — `AdManager.take_interstitial_turn()` broji Retry i pita `InterstitialPacer`:
    - nikad prije završenog tutorijala ni u sesiji u kojoj je tutorijal završen;
    - najviše 1 na **3 Retry-ja**, najmanje **3 min** razmaka (i od starta igre);

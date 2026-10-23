@@ -41,14 +41,26 @@ if ($p.Release -and -not $env:GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD) {
 
 if ($p.Release) {
     # Googleov test App ID u releaseu = test reklame. OK za internal test, ne za produkciju.
+    # Plugin briše postavku kad je jednaka defaultu (test ID), pa "nema postavke" = test.
     $proj = Get-Content (Get-GameProjectPath) -Raw
-    if ($proj -match 'ca-app-pub-3940256099942544~') {
+    if ($proj -notmatch 'general/android/app_id="ca-app-pub-(?!3940256099942544)\d+~\d+"') {
         Write-Warning "AdMob App ID je još Googleov TEST ID (project.godot admob/general/android/app_id) - upiši produkcijski prije Play production releasea."
     }
 }
 
 $godot = Get-GodotConsoleExecutable
 $mode = if ($p.Release) { "--export-release" } else { "--export-debug" }
+# Template samo kad fali ili je za drugu verziju Godota: ponovna instalacija usred scana
+# editora zna oboriti export (exit -1 bez poruke, katalog #55).
+$buildVersion = Join-Path $gameDir "android\.build_version"
+$installArgs = @()
+if (-not (Test-Path $buildVersion) -or (Get-Content $buildVersion -Raw).Trim() -ne "4.7.stable") {
+    $installArgs = @("--install-android-build-template")
+}
+# Gradle daemon naslijedi stdout pipe Godota, pa Godot console omotač nikad ne izađe i drži log
+# (sljedeći export: "file is being used by another process", exit -1). Bez daemona build traje
+# ~20 s duže, ali skripta se uredno završi.
+$env:GRADLE_OPTS = "-Dorg.gradle.daemon=false"
 $log = Join-Path $gameDir "export\android\export_$($Preset.ToLower()).log"
 New-Item -ItemType Directory -Force (Split-Path $log -Parent) | Out-Null
 
@@ -56,7 +68,8 @@ Write-Host "[android] $($p.Name) -> $outPath"
 Write-Host "[android] Godot: $godot"
 $prevEap = $ErrorActionPreference
 $ErrorActionPreference = "Continue"
-& $godot --headless --path $gameDir --install-android-build-template $mode $p.Name $outPath 2>&1 |
+# --verbose: bez njega Godot ne ispiše Gradle izlaz, pa pad (exit -1) ostaje bez razloga u logu.
+& $godot --headless --verbose --path $gameDir @installArgs $mode $p.Name $outPath 2>&1 |
     Tee-Object -FilePath $log | Where-Object { $_ -match 'ERROR|error:|FAILED|BUILD|savepack|Export' } | ForEach-Object { Write-Host "  $_" }
 $code = $LASTEXITCODE
 $ErrorActionPreference = $prevEap

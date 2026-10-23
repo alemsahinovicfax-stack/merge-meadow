@@ -7,8 +7,8 @@ PNG-ovi za Google Play i App Store. **Ne commitaj** draftove s osobnim podacima.
 ```
 marketing/store/
 ├── README.md
-├── app-icon-512.png          ← export iz game/icon.svg
-├── feature-graphic.png       ← 1024×500, Figma
+├── app-icon-512.png          ← generiše game/scripts/dev/make_app_icons.gd (Pip HUD portret, 2026-10-23)
+├── feature-graphic.png       ← 1024×500, Figma — JOŠ NE POSTOJI (Play ga traži)
 └── screenshots/
     ├── 01-run-lane.png       ← 1080×1920
     ├── 02-loot-double.png

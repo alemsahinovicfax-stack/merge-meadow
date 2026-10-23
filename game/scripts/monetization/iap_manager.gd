@@ -18,6 +18,7 @@ const BILLING_SCRIPT := "res://addons/GodotGooglePlayBilling/BillingClient.gd"
 const _PRODUCT_TYPE_INAPP := 0
 const _RESPONSE_OK := 0
 const _RESPONSE_USER_CANCELED := 1
+const _RESPONSE_BILLING_UNAVAILABLE := 3
 const _RESPONSE_ITEM_ALREADY_OWNED := 7
 const _RESPONSE_SERVICE_DISCONNECTED := -1
 const _PURCHASE_STATE_PURCHASED := 1
@@ -268,6 +269,10 @@ func _on_billing_connect_error(response_code: int, debug_message: String) -> voi
 	_billing_ready = false
 	push_warning("IAPManager: billing connect error %d — %s" % [response_code, debug_message])
 	_drop_in_flight("billing_disconnected")
+	# BILLING_UNAVAILABLE = uređaj bez Play billinga (emulator bez Play Storea, stari Play):
+	# ne kucaj svakih 60 s — pokušaj opet tek na resume ili kad igrač tapne kupovinu.
+	if response_code == _RESPONSE_BILLING_UNAVAILABLE:
+		return
 	_schedule_reconnect()
 
 

@@ -15,6 +15,7 @@ const ADMOB_BACKEND_SCRIPT := "res://scripts/monetization/admob_backend.gd"
 ## Debug build: dev prekidač „UMP as EEA" (Settings → Developer) da se forma vidi i izvan EU.
 const DEBUG_CFG_PATH := "user://ads_debug.cfg"
 const REWARDED_LOAD_TIMEOUT_SEC := 8.0
+const PRELOAD_RETRY_SEC := 30.0
 ## Nagrada ponekad stigne tik poslije „dismissed" — kratko sačekaj prije „nije odgledano".
 const REWARD_GRACE_SEC := 0.5
 
@@ -118,14 +119,27 @@ func _on_ads_started(can_request: bool) -> void:
 	ads_ready_changed.emit(can_request)
 
 
+## Reklama unaprijed, da je spremna kad igrač tapne (na sporom telefonu load traje i 10+ s).
+## Neuspjeh (mreža, no fill) → novi pokušaj za PRELOAD_RETRY_SEC.
 func _preload_rewarded() -> void:
 	if _ads != null and _can_request_ads:
-		_ads.call("load_rewarded", CONFIG.rewarded_unit_id(), func(_ok: bool) -> void: pass)
+		_ads.call("load_rewarded", CONFIG.rewarded_unit_id(), func(ok: bool) -> void:
+			if not ok:
+				_retry_later(_preload_rewarded)
+		)
 
 
 func _preload_interstitial() -> void:
 	if _ads != null and _can_request_ads and not GameState.ads_removed:
-		_ads.call("load_interstitial", CONFIG.interstitial_unit_id(), func(_ok: bool) -> void: pass)
+		_ads.call("load_interstitial", CONFIG.interstitial_unit_id(), func(ok: bool) -> void:
+			if not ok:
+				_retry_later(_preload_interstitial)
+		)
+
+
+func _retry_later(fn: Callable) -> void:
+	if is_inside_tree():
+		get_tree().create_timer(PRELOAD_RETRY_SEC).timeout.connect(fn, CONNECT_ONE_SHOT)
 
 
 # --- Rewarded ---
@@ -237,6 +251,8 @@ func _finish_rewarded(placement: String) -> void:
 
 
 func _fail_rewarded(placement: String, reason: String) -> void:
+	if backend == Backend.ADMOB_PLUGIN:
+		push_warning("AdManager: rewarded %s failed — %s" % [placement, reason])
 	_busy = false
 	_pending_placement = ""
 	Sfx.set_ad_playing(false)

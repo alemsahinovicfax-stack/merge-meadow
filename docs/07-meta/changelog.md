@@ -9,6 +9,18 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-23
+
+- **LAUNCH-PREP — sve za Google Play što ne traži naloge** (izvještaj `06-production/launch-prep-izvjestaj.md`, plan `launch-prep-plan.md`):
+  - **Release build:** stari ravni `game/android/` (kopija zipa iz jula) obrisan i u `.gitignore`; `scripts/android-export.ps1 -Preset Debug|Apk|Aab` sam instalira build template i pravi Gradle build. Preseti: min SDK 24, **target SDK 36** (Play obavezno od 31. 8. 2026), Internet + Access network state. **Upload keystore** u `game/export_credentials/` (gitignore), lozinka u `credentials.local.md`; AAB potpisan njime (katalog #55, #56).
+  - **Google Play Billing 3.3.0** u `addons/`; `IAPManager` ga nalazi po putanji (stari `ClassDB` ga nikad ne bi našao, #54), čita `product_ids` kao PackedStringArray (prava kupovina bi inače pala, #57), cijene iz `one_time_purchase_offer_details_list`; reconnect s backoffom, upit na resume, Shop se otključa na prekid / poslije 120 s, pending se ne daje dok se ne plati, „već kupljeno" vrati vlasništvo, restore čeka acknowledge, vraćeno vlasništvo = `purchase_restored` (bez „kupljeno" zvuka na startu), Android s pluginom nikad ne daje besplatno. GUT `test_iap_billing_flow` (11).
+  - **AdMob (Poing 5.1.0) + UMP:** `admob_backend.gd` — pristanak (forma u EEA/UK/CH) → `MobileAds` (reklame samo za sve uzraste, G) → rewarded + interstitial unaprijed. Nagrada samo kad je odgledano. **Interstitial blago:** nikad u tutorijalu ni u sesiji u kojoj je završen, najviše 1 na 3 Retry-ja, min 3 min razmaka, Remove Ads gasi (`InterstitialPacer`; odluka korisnika). *Privacy choices* otvara UMP formu kad treba. Dev: „Consent as EU", „Reset ad consent". Test ID-evi + prazan blok PRODUCTION IDS u `monetization_config.gd` (ID-evi nisu tajne — `sigurnost.md` ažuriran). GUT `test_ad_manager` (9). Katalog #58.
+  - **Politika privatnosti:** približna lokacija iz IP-a, dijagnostika, interakcije, šifrovanje u prenosu, tačan ritam interstitiala, SAD opt-out samo gdje Google poruka važi.
+  - **Ikona i splash:** `make_app_icons.gd` iz Pip HUD portreta — launcher 192, adaptivna 432 (fg / bg livada / mono), store `marketing/store/app-icon-512.png`, splash značka na kremu; boot splash + Android 12 splash.
+  - **Papiri:** `play-console-sutra.md` (Data safety, IARC, ciljna publika 13+, Advertising ID, 9 IAP proizvoda, closed test 12 × 14 dana + poziv EN/BS, payments profile, AdMob GDPR poruka, app-ads.txt). **BiH nije Google Play merchant zemlja** — IAP traži odluku. Šablon `06-production/app-ads/` (mora na GitHub user site).
+  - **Alati:** `scripts/smoke-all.ps1` — svi smoke testovi paralelno, svaki radnik svoj APPDATA (pravi save siguran, dev prekidači na defaultu).
+  - **Provjera:** GUT 107/107, smoke 79/79, AAB 68,6 MB (targetSdk 36, potpisan upload ključem); emulator: release APK bez crasha, test rewarded reklama → Revive radi. Popravljeno usput: preload reklame se ponavlja za 30 s, zahtjev usred učitavanja dobije rezultat, billing kod 3 (nema Play billinga) ne kuca svakih 60 s, export bez Gradle daemona (visio je i držao log, #59), NDK 29.0.14206865 za strip.
+
 ## 2026-10-22
 
 - **Balans ciklus 1b — teže** (playtest „prelagano"; `balans-ciklus-1-izvjestaj` § 6c):

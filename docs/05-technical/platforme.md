@@ -25,7 +25,7 @@ iOS i Android dijele ~95% koda u Godotu; razlike su export preset, safe area, st
 
 | Platforma | v1 launch | Min verzija | Napomena |
 |-----------|-----------|-------------|----------|
-| Android | ✅ Da | API 24 (Android 7.0+) | Primarni test uređaj / emulator |
+| Android | ✅ Da | API 24 (Android 7.0+), **target API 36** | Google Play traži target 36 za nove aplikacije od 31. 8. 2026 (Godot 4.7 default) |
 | iOS | ✅ Da | iOS 15+ | Finalni build zahtijeva Mac ili cloud CI |
 
 ## Orijentacija
@@ -47,7 +47,9 @@ iOS i Android dijele ~95% koda u Godotu; razlike su export preset, safe area, st
 
 | Permission | Razlog |
 |------------|--------|
-| Internet | Ads, IAP validacija |
+| Internet | Ads, IAP |
+| Access network state | AdMob, Billing (provjera veze) |
+| `AD_ID`, `BILLING` | Dodaju AdMob i Billing SDK sami (Play Console: Advertising ID deklaracija) |
 | Vibrate (opcionalno) | Haptic feedback |
 
 **Ne treba:** lokacija, kamera, kontakti, mikrofon.
@@ -75,10 +77,10 @@ iOS i Android dijele ~95% koda u Godotu; razlike su export preset, safe area, st
 |----------|------------|-------|
 | Alat | [Android Studio](https://developer.android.com/studio) | SDK + AVD Manager |
 | Uređaj | Pixel 4 (ili Pixel 5) | Standardni phone aspect |
-| API level | **30** (Android 11) ili **28** (Android 9) | Blizu starijeg telefona |
+| API level | **33** (Android 13) — AVD `Pixel_4_API33` | Godot 4 treba GLES3 guest; API 30 AVD ima samo GLES2 ([[godot/greske-katalog\|greške #7]]) |
 | ABI | x86_64 | Brže na laptopu (ako CPU podržava HAXM/Hyper-V) |
 | RAM emulatora | 2–3 GB | Ne ubij HP laptop |
-| Grafika | Hardware - GLES 2.0 | Godot 2D friendly |
+| Grafika | Hardware (`-gpu host`) | `scripts/start-android-emulator.ps1` |
 
 **Koraci (jednom):**
 1. Instaliraj Android Studio → SDK Platform + Platform Tools
@@ -86,7 +88,7 @@ iOS i Android dijele ~95% koda u Godotu; razlike su export preset, safe area, st
 3. U Godot: Editor → Export → Android → podesi SDK putanje
 4. Deploy: Run Project → odaberi emulator (ili `adb install` APK)
 
-**Godot export na Windows:** Project → Install Android Build Template → Export APK → pokreni na emulatoru.
+**Godot export na Windows (2026-10-23):** `scripts/android-export.ps1 -Preset Debug|Apk|Aab` (headless, sam instalira build template, Gradle) → `scripts/android-launch-game.ps1 -Apk <putanja>`.
 
 ### Godot editor — HP AMD (obavezno)
 
@@ -130,7 +132,7 @@ Novi projekti: renderer **Compatibility** (`gl_compatibility`).
 
 ### Godot export preset (plan)
 
-- **Android:** debug APK za emulator; release AAB za Play
+- **Android:** `Android Debug` (APK), `Android Release APK` (emulator / ručni test), `Android Release AAB` (Play) — svi Gradle; release potpisan upload ključem iz `game/export_credentials/`
 - **iOS:** export na Macu → Xcode → device ili TestFlight
 - Detalji u [[CHECKPOINT|CHECKPOINT]] sekcija B/C
 

@@ -9,6 +9,9 @@ var _rewarded: RewardedAd = null
 var _interstitial: InterstitialAd = null
 var _rewarded_loading: bool = false
 var _interstitial_loading: bool = false
+## Ko je tražio reklamu dok se već učitavala — svi dobiju isti rezultat.
+var _rewarded_waiters: Array[Callable] = []
+var _interstitial_waiters: Array[Callable] = []
 ## Callable referenca drži loadere žive dok plugin ne javi rezultat.
 var _loaders: Array = []
 
@@ -90,6 +93,7 @@ func load_rewarded(unit_id: String, on_done: Callable) -> void:
 	if _rewarded != null:
 		on_done.call(true)
 		return
+	_rewarded_waiters.append(on_done)
 	if _rewarded_loading:
 		return
 	_rewarded_loading = true
@@ -100,13 +104,20 @@ func load_rewarded(unit_id: String, on_done: Callable) -> void:
 		_rewarded_loading = false
 		_loaders.erase(loader)
 		_rewarded = ad
-		on_done.call(true)
+		_notify(_rewarded_waiters, true)
 	cb.on_ad_failed_to_load = func(error: LoadAdError) -> void:
 		_rewarded_loading = false
 		_loaders.erase(loader)
 		push_warning("AdMob rewarded load failed: %s" % (error.message if error else "unknown"))
-		on_done.call(false)
+		_notify(_rewarded_waiters, false)
 	loader.load(unit_id, AdRequest.new(), cb)
+
+
+func _notify(waiters: Array[Callable], ok: bool) -> void:
+	var pending := waiters.duplicate()
+	waiters.clear()
+	for cb in pending:
+		(cb as Callable).call(ok)
 
 
 ## on_earned() kad igrač odgleda; on_closed() kad se reklama zatvori; on_failed() ako se ne prikaže.
@@ -137,6 +148,7 @@ func load_interstitial(unit_id: String, on_done: Callable) -> void:
 	if _interstitial != null:
 		on_done.call(true)
 		return
+	_interstitial_waiters.append(on_done)
 	if _interstitial_loading:
 		return
 	_interstitial_loading = true
@@ -147,12 +159,12 @@ func load_interstitial(unit_id: String, on_done: Callable) -> void:
 		_interstitial_loading = false
 		_loaders.erase(loader)
 		_interstitial = ad
-		on_done.call(true)
+		_notify(_interstitial_waiters, true)
 	cb.on_ad_failed_to_load = func(error: LoadAdError) -> void:
 		_interstitial_loading = false
 		_loaders.erase(loader)
 		push_warning("AdMob interstitial load failed: %s" % (error.message if error else "unknown"))
-		on_done.call(false)
+		_notify(_interstitial_waiters, false)
 	loader.load(unit_id, AdRequest.new(), cb)
 
 
