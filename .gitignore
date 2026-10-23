@@ -16,8 +16,11 @@ game/*.apk.idsig
 marketing/store/*.log
 game/assets/ui/_kenney_src/
 game/assets/ui/_extract/
-game/android/**/.godot/
-game/android/libs/
+# Android build template — instalira ga scripts/android-export.ps1 (--install-android-build-template)
+game/android/
+*.aab
+*.apk
+*.apk.idsig
 *.tmp
 
 # OS
@@ -30,6 +33,8 @@ Desktop.ini
 docs/00-personal/*.local.md
 game/export_credentials/
 game/**/admob_app_id.local.*
+*.jks
+*.keystore
 
 # Claude Code — lične postavke (ne dijeliti)
 .claude/settings.local.json
