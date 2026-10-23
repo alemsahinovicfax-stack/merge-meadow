@@ -22,6 +22,17 @@ ili kopiraj exe u Desktop ili C:\Godot\
     return $candidates[0]
 }
 
+function Get-GodotConsoleExecutable {
+    # Console varijanta piše log u stdout (GUI exe ga na Windowsu gubi) — za export i testove.
+    $gui = Get-GodotExecutable
+    $candidates = @(@(
+        ($gui -replace '\.exe$', '_console.exe'),
+        "$env:USERPROFILE\Downloads\Godot_v4.7-stable_win64.exe\Godot_v4.7-stable_win64_console.exe"
+    ) | Where-Object { $_ -and (Test-Path $_ -PathType Leaf) })
+    if ($candidates) { return $candidates[0] }
+    return $gui
+}
+
 function Get-GameProjectPath {
     return Join-Path (Get-RepoRoot) "game\project.godot"
 }

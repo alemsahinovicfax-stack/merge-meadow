@@ -32,6 +32,7 @@ func test_purchase_route_matrix() -> void:
 	assert_eq(IAP_SCRIPT.purchase_route(true, false, false), "unavailable")
 	assert_eq(IAP_SCRIPT.purchase_route(true, false, true), "stub")
 	assert_eq(IAP_SCRIPT.purchase_route(false, false, false), "stub")
+	assert_eq(IAP_SCRIPT.purchase_route(true, false, true, true), "unavailable")
 
 
 func test_store_finish_action() -> void:
@@ -47,7 +48,7 @@ func test_reward_route_fails_closed_on_android_release() -> void:
 
 func test_acknowledge_grants_remove_ads_once() -> void:
 	_gs.ads_removed = false
-	_iap._pending_ack_tokens["tok-ads"] = "remove_ads"
+	_iap._pending_ack_tokens["tok-ads"] = {"sku": "remove_ads", "user": true}
 	_iap._on_acknowledge_purchase_response({"response_code": 0, "token": "tok-ads"})
 	assert_true(_gs.ads_removed, "ack must grant Remove Ads")
 	assert_false(_iap._pending_ack_tokens.has("tok-ads"))
@@ -58,7 +59,7 @@ func test_acknowledge_grants_remove_ads_once() -> void:
 func test_acknowledge_grants_starter_once() -> void:
 	_gs.starter_pack_owned = false
 	_gs.wallet_coins = 0
-	_iap._pending_ack_tokens["tok-starter"] = "starter_pack"
+	_iap._pending_ack_tokens["tok-starter"] = {"sku": "starter_pack", "user": true}
 	_iap._on_acknowledge_purchase_response({"response_code": 0, "token": "tok-starter"})
 	assert_true(_gs.starter_pack_owned)
 	var coins_after: int = _gs.wallet_coins

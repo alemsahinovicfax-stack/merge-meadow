@@ -27,17 +27,6 @@ $outPath = Join-Path $gameDir $p.Out
 New-Item -ItemType Directory -Force (Split-Path $outPath -Parent) | Out-Null
 if (Test-Path $outPath) { Remove-Item $outPath -Force }
 
-function Get-GodotConsoleExecutable {
-    # Console varijanta piše log u stdout (GUI exe ga na Windowsu gubi).
-    $gui = Get-GodotExecutable
-    $candidates = @(@(
-        ($gui -replace '\.exe$', '_console.exe'),
-        "$env:USERPROFILE\Downloads\Godot_v4.7-stable_win64.exe\Godot_v4.7-stable_win64_console.exe"
-    ) | Where-Object { $_ -and (Test-Path $_ -PathType Leaf) })
-    if ($candidates) { return $candidates[0] }
-    return $gui
-}
-
 if ($p.Release -and -not $env:GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD) {
     $cfg = Join-Path $gameDir "export_credentials\android_release.local.cfg"
     if (-not (Test-Path $cfg)) { throw "Release keystore nije podešen: nema $cfg ni GODOT_ANDROID_KEYSTORE_RELEASE_* env." }
