@@ -44,6 +44,7 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - AdMob rewarded video (×2 loot, revive)
 - Opcionalni interstitial **samo** na loot ekranu (A/B post-launch)
 - IAP: remove ads, starter pack, boosters, premium Pip skin (samo kozmetika, od 2026-10-12)
+- **Prekidač za IAP** (2026-10-23, na zahtjev): `MonetizationConfig.IAP_ENABLED = false` → v1 samo s reklamama (BiH nije Google Play merchant zemlja). Sakrije sve ponude za pravi novac (Shop tabovi Seasons / Boosters / Support, Sir Pip, Home Premium tab, Camp kartica plaćene sezone, Settings → Purchases) i ne spaja Billing; što igrač već ima ostaje. Default `true` dok se ne odluči ([[play-console-sutra|play-console-sutra]] § 0)
 - Offline gameplay; IAP zahtijeva mrežu
 
 ### Tech

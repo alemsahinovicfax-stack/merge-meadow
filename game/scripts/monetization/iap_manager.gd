@@ -90,6 +90,9 @@ var last_loot_burst: Dictionary = {}
 
 
 func _ready() -> void:
+	if not CONFIG.iap_enabled():
+		# v1 bez kupovina: ni veze s Playom ni upozorenja u logu.
+		return
 	if _try_init_billing():
 		_billing_client.call("start_connection")
 	elif OS.get_name() == "Android":
@@ -141,6 +144,9 @@ func get_price_label(sku: String) -> String:
 
 
 func purchase(sku: String) -> void:
+	if not CONFIG.iap_enabled():
+		purchase_failed.emit(sku, "unavailable")
+		return
 	if _busy:
 		purchase_failed.emit(sku, "busy")
 		return

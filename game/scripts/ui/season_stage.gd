@@ -161,12 +161,20 @@ func current_tab() -> String:
 	return _tab
 
 
+## Premium tab bez kupovina (MonetizationConfig.IAP_ENABLED = false) drži samo plaćene sezone
+## koje igrač već ima; prazan = tab se ne vidi.
 func tab_ids(tab: String) -> Array[String]:
 	var out: Array[String] = []
 	var defs := SeasonCatalog.free_defs_sorted() if tab == TAB_FREE else SeasonCatalog.paid_defs()
 	for def in defs:
+		if tab == TAB_PREMIUM and not MonetizationConfig.shows_paid_offer(GameState.owned_paid_seasons.has(def.id)):
+			continue
 		out.append(def.id)
 	return out
+
+
+func has_premium_tab() -> bool:
+	return not tab_ids(TAB_PREMIUM).is_empty()
 
 
 func page_ids() -> Array[String]:
@@ -500,7 +508,7 @@ func _apply() -> void:
 	var sel := UiHomeV3.win(u, UiHomeV3.SELECT_OUT.x, UiHomeV3.SELECT_OUT.y)
 	season_tabs.modulate.a = 1.0 - sel
 	season_tabs.position.y = UiHomeV3.TABS_RECT.position.y - UiHomeV3.SELECT_LIFT * sel
-	season_tabs.visible = sel < 1.0
+	season_tabs.visible = sel < 1.0 and has_premium_tab()
 	card_nav.modulate.a = 1.0 - sel
 	card_nav.visible = sel < 1.0
 	var ids := tab_ids(_tab)
@@ -701,7 +709,7 @@ func _page_by(delta: int) -> void:
 
 
 func _on_tab_pressed(tab: String) -> void:
-	if is_busy() or _u > 0.0 or tab == _tab:
+	if is_busy() or _u > 0.0 or tab == _tab or tab_ids(tab).is_empty():
 		return
 	var active := GameState.active_season_id
 	var idx := tab_ids(tab).find(active)

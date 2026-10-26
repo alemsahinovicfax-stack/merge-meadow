@@ -27,7 +27,7 @@ ai_sažetak: "Gotovi odgovori za Play Console (Data safety, IARC, ciljna publika
 | In-app kupovine (Remove Ads, sezone, Sir Pip…) | ❌ ne može bez payments profila u podržanoj zemlji |
 
 **Opcije** (odluka je tvoja):
-1. **v1 samo s reklamama** — igra izlazi besplatna, IAP dugmad se sakriju dok ne riješiš merchant. (Agent može dodati jedan prekidač u `monetization_config.gd` — reci ako hoćeš.)
+1. **v1 samo s reklamama** — igra izlazi besplatna, kupovine se sakriju dok ne riješiš merchant. **Prekidač postoji (2026-10-23):** u `game/scripts/monetization/monetization_config.gd` postavi `const IAP_ENABLED := false`, pa napravi novi AAB. Shop tada ima samo Looks (kozmetika za coine), nema Premium taba na Homeu, plaćene sezone u Campu, Sir Pipa ni Settings → Purchases, a Billing se ne spaja. Kad riješiš merchant: vrati na `true`, napravi proizvode u Play Consoleu (§ 6), novi AAB. U tom slučaju u Play Consoleu ne pravi IAP proizvode, a Data safety ostaje isti. Billing plugin i dalje dodaje dozvolu `BILLING` u manifest — to Play dozvoljava i bez proizvoda; ako ipak zatraži payments profil, isključi plugin (Project → Project Settings → Plugins → GodotGooglePlayBilling) i napravi novi AAB.
 2. **Firma ili prebivalište u podržanoj zemlji** — npr. Hrvatska, Srbija, Sjeverna Makedonija su podržane. Payments profil mora biti na pravno lice / osobu iz te zemlje, s računom i poreznim podacima te zemlje.
 3. ❌ **Tuđi nalog / tuđi payments profil** — ne. Google to tretira kao lažno predstavljanje i gasi nalog.
 

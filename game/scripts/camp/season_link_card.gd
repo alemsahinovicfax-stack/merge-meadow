@@ -160,7 +160,8 @@ func refresh() -> void:
 	var id := GameState.next_locked_free_id()
 	_paid = id.is_empty()
 	if _paid:
-		id = GameState.next_unowned_paid_id()
+		# Bez kupovina (MonetizationConfig.IAP_ENABLED = false) nema ponude plaćene sezone.
+		id = GameState.next_unowned_paid_id() if MonetizationConfig.iap_enabled() else ""
 	if id != _season_id:
 		_set_toast(false)
 	_season_id = id

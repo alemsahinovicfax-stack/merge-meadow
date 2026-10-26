@@ -3,6 +3,29 @@ extends RefCounted
 
 ## Public test IDs and SKUs — safe for git (see sigurnost.md).
 
+# --- KUPOVINE PRAVIM NOVCEM (IAP) — jedan prekidač ----------------------------------------
+# false = v1 samo s reklamama (BiH nije Google Play merchant zemlja — play-console-sutra § 0):
+#   - Shop: samo tab Looks (kozmetika za coine); nema Seasons / Boosters / Support ni Sir Pipa;
+#   - Home: nema taba Premium; Camp: nema kartice plaćene sezone; Ormar: nema Sir Pipa;
+#   - Settings: nema sekcije Purchases (Restore, Remove Ads); Google Play Billing se ne spaja.
+# Ono što igrač već ima (stari save, dev unlock) i dalje vidi i koristi. Reklame rade isto.
+# true = sve kupovine kao do sada.
+const IAP_ENABLED := true
+## Samo za testove (GUT / smoke): -1 = IAP_ENABLED, 0 = isključeno, 1 = uključeno.
+static var iap_override: int = -1
+
+
+static func iap_enabled() -> bool:
+	if iap_override >= 0:
+		return iap_override == 1
+	return IAP_ENABLED
+
+
+## Smije li se igraču pokazati stvar koja se kupuje pravim novcem: uvijek kad su kupovine
+## uključene, inače samo ako je već njegova.
+static func shows_paid_offer(already_owned: bool) -> bool:
+	return iap_enabled() or already_owned
+
 # Google AdMob TEST ID-evi (javni) — https://developers.google.com/admob/android/test-ads
 const ADMOB_TEST_APP_ID_ANDROID := "ca-app-pub-3940256099942544~3347511713"
 const ADMOB_TEST_REWARDED_ANDROID := "ca-app-pub-3940256099942544/5224354917"

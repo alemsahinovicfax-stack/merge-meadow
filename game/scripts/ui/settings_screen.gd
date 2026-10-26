@@ -90,9 +90,10 @@ func reopen() -> void:
 		_sync_slider(key)
 	for key in _toggles:
 		_sync_toggle(key, false)
-	_sync_ads()
-	if _restore_state != UiSettings.Restore.BUSY:
-		_set_restore(UiSettings.Restore.IDLE, false)
+	if _restore_button != null:
+		_sync_ads()
+		if _restore_state != UiSettings.Restore.BUSY:
+			_set_restore(UiSettings.Restore.IDLE, false)
 	_show_credits(false)
 	_scroll.scroll_vertical = 0
 	_closing = false
@@ -510,7 +511,11 @@ func _build_gameplay() -> void:
 
 # --- Purchases -----------------------------------------------------------------
 
+## Bez kupovina (MonetizationConfig.IAP_ENABLED = false) nema šta vratiti ni kupiti — sekcija
+## Purchases (Restore, Remove Ads) se ne gradi.
 func _build_purchases() -> void:
+	if not MonetizationConfig.iap_enabled():
+		return
 	var list := _list_node
 	var rows := _section(UiSettings.S.purchases)
 	list.add_child(rows.get_parent().get_parent().get_parent())

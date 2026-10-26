@@ -127,6 +127,15 @@ const PREMIUM_TAG_PX := 34
 const PREMIUM_TAG_PAD_X := 24.0
 
 const TABS: Array[String] = ["seasons", "looks", "boosters", "support"]
+
+
+## Tabovi koje igrač vidi: bez kupovina (MonetizationConfig.IAP_ENABLED = false) samo Looks —
+## Seasons, Boosters i Support prodaju samo za pravi novac.
+static func visible_tabs() -> Array[String]:
+	if MonetizationConfig.iap_enabled():
+		return TABS
+	var out: Array[String] = ["looks"]
+	return out
 const TAB_LABELS: Array[String] = ["Seasons", "Looks", "Boosters", "Support"]
 
 # --- Stanja dugmeta ---

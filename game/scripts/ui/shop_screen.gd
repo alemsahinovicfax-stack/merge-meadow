@@ -76,6 +76,8 @@ func _build() -> void:
 	_built = true
 	for tab_id in UiShopV2.TABS:
 		_make_page(tab_id)
+	if not UiShopV2.visible_tabs().has(_tab):
+		_tab = UiShopV2.visible_tabs()[0]
 	_queue_seasons()
 	_queue_looks()
 	_queue_boosters()
@@ -144,7 +146,11 @@ func _make_page(tab_id: String) -> void:
 	_contents[tab_id] = box
 
 
+## Seasons, Boosters i Support su samo za pravi novac — bez kupovina se ne grade
+## (MonetizationConfig.IAP_ENABLED; tab se ne vidi, stranica ostaje prazna).
 func _queue_seasons() -> void:
+	if not CONFIG.iap_enabled():
+		return
 	for def in SeasonCatalog.paid_defs():
 		if not def.iap_product_id.is_empty():
 			_build_steps.append(_add_season_card.bind(def.id, def.iap_product_id))
@@ -166,7 +172,9 @@ func _queue_looks() -> void:
 		var items: Array[String] = []
 		for it in CosmeticCatalog.items_in_slot(slot_id):
 			var iid := str(it.get("id", ""))
-			if CosmeticCatalog.is_shop_item(iid) or CosmeticCatalog.is_iap_item(iid):
+			if CosmeticCatalog.is_shop_item(iid):
+				items.append(iid)
+			elif CosmeticCatalog.is_iap_item(iid) and CONFIG.shows_paid_offer(GameState.owns_cosmetic(iid)):
 				items.append(iid)
 		if items.is_empty():
 			continue
@@ -228,6 +236,8 @@ func _add_looks_end() -> void:
 
 
 func _queue_boosters() -> void:
+	if not CONFIG.iap_enabled():
+		return
 	for booster_id in CONFIG.all_booster_ids():
 		_build_steps.append(_add_booster_card.bind(booster_id))
 	_build_steps.append(_add_boosters_end)
@@ -249,6 +259,8 @@ func _add_boosters_end() -> void:
 
 
 func _queue_support() -> void:
+	if not CONFIG.iap_enabled():
+		return
 	for sku in [CONFIG.SKU_REMOVE_ADS, CONFIG.SKU_STARTER_PACK]:
 		_build_steps.append(_add_support_card.bind(sku))
 	_build_steps.append(_add_support_end)
@@ -279,7 +291,7 @@ func _add_support_end() -> void:
 
 func select_tab(tab_id: String, animated: bool = true) -> void:
 	_finish_build()
-	if not _pages.has(tab_id):
+	if not _pages.has(tab_id) or not UiShopV2.visible_tabs().has(tab_id):
 		return
 	if tab_id == _tab and (_pages[tab_id] as Control).visible:
 		return
@@ -332,7 +344,7 @@ func _enter_shop() -> void:
 		_scroll_to_slot(slot, _entry_override_item)
 		return
 	_entry_override = ""
-	_show_page("seasons", false)
+	_show_page(UiShopV2.visible_tabs()[0], false)
 
 
 ## Ormar · „More in Shop": Looks, skrol na zaglavlje slota, zaglavlje bljesne 1,2 s.
@@ -391,11 +403,13 @@ func refresh_shop() -> void:
 		card.apply(_iap_busy_sku(), false, restoring)
 		if booster_id == CONFIG.BOOSTER_LOOT_BURST:
 			card.visible = loot_on
-	_boosters_end.visible = GameState.merge_hint_owned and not loot_on
+	if _boosters_end != null:
+		_boosters_end.visible = GameState.merge_hint_owned and not loot_on
 	for sku in _support_cards:
 		(_support_cards[sku] as ShopSupportCard).apply(_iap_busy_sku(), false, restoring)
-	_restore.visible = not IAPManager.is_stub_mode()
-	_restore.set_busy(restoring)
+	if _restore != null:
+		_restore.visible = not IAPManager.is_stub_mode()
+		_restore.set_busy(restoring)
 	_notify_hub_chrome()
 
 

@@ -55,7 +55,7 @@ NE RADI: ne otvaraj naloge, ne unosi plaćanja, ne mijenjaj cijene ni gameplay/b
 
 > Gotovi odgovori za sve forme: [[play-console-sutra|play-console-sutra]].
 
-- [ ] **Odluka: BiH nije Google Play merchant zemlja** (provjereno 2026-10-23) — IAP iz BiH ne ide. Izaberi: v1 samo s reklamama (agent sakrije IAP jednim prekidačem) **ili** payments profil u podržanoj zemlji (HR / RS / MK…). Detalji: `play-console-sutra.md` § 0
+- [ ] **Odluka: BiH nije Google Play merchant zemlja** (provjereno 2026-10-23) — IAP iz BiH ne ide. Izaberi: v1 samo s reklamama (prekidač `IAP_ENABLED` u `monetization_config.gd` je spreman — stavi `false`) **ili** payments profil u podržanoj zemlji (HR / RS / MK…). Detalji: `play-console-sutra.md` § 0
 - [ ] **Play Console nalog** (25 USD) + verifikacija identiteta
 - [ ] **Payments profile** — tek kad je zemlja riješena; banka + porez (W-8BEN / W-8BEN-E)
 - [ ] **AdMob nalog** — app + 2 ad unita (rewarded, interstitial); agentu dati App ID, ad unit ID-eve i publisher ID (nisu tajne)

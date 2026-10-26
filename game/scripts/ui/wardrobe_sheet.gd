@@ -396,7 +396,13 @@ func _rebuild_grid() -> void:
 	var sd := CosmeticCatalog.get_slot_def(_slot)
 	if sd.is_empty():
 		return
-	var items := CosmeticCatalog.items_in_slot(_slot)
+	# Bez kupovina (MonetizationConfig.IAP_ENABLED = false) Sir Pip i ostala IAP kozmetika
+	# ostaju samo ako su već tvoji.
+	var items: Array[Dictionary] = []
+	for it in CosmeticCatalog.items_in_slot(_slot):
+		var iid := str(it.get("id", ""))
+		if not CosmeticCatalog.is_iap_item(iid) or MonetizationConfig.shows_paid_offer(GameState.owns_cosmetic(iid)):
+			items.append(it)
 	var by_id := {}
 	for it in items:
 		by_id[str(it.get("id", ""))] = it
