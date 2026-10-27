@@ -466,6 +466,10 @@ func _place_pip_on_stone() -> void:
 # --- skrol ---
 
 func _on_clip_input(event: InputEvent) -> void:
+	if event is InputEventMouse and event.device == InputEvent.DEVICE_ID_EMULATION:
+		# Telefon: emulirani miš prati svaki dodir — drugi _move istog pomaka prepolovi brzinu flinga.
+		_clip.accept_event()
+		return
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
 		if mb.button_index == MOUSE_BUTTON_WHEEL_UP or mb.button_index == MOUSE_BUTTON_WHEEL_DOWN:

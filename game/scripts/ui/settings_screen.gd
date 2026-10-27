@@ -8,6 +8,7 @@ extends Control
 ## toggle odmah. Slider i toggle se pomjeraju samo transformom; ništa se ne crta po frejmu.
 ## Developer sekcija postoji samo u debug buildu. Gradnja ekrana je ~40 ms, pa se gradi samo
 ## prvi put: zatvaranje ga sakrije, sljedeće otvaranje samo osvježi vrijednosti (reopen).
+## Skriveno i u release buildu: 5 dodira na verziju → statistika igranja za testere (RET-01).
 
 signal closed
 
@@ -47,6 +48,11 @@ var _tween: Tween
 var prebuild := false
 var _steps: Array[Callable] = []
 var _list_node: VBoxContainer
+## RET-01: skriveni ekran statistike — 5 dodira na verziju za STATS_TAP_WINDOW s.
+var _stats: ScrollContainer
+var _stats_view: ActivityStatsView
+var _version_taps := 0
+var _version_tap_at := 0.0
 
 
 ## Stvara ekran iznad `host` (hub). `gear` = globalni rect zupčanika.
@@ -94,6 +100,7 @@ func reopen() -> void:
 		_sync_ads()
 		if _restore_state != UiSettings.Restore.BUSY:
 			_set_restore(UiSettings.Restore.IDLE, false)
+	_version_taps = 0
 	_show_credits(false)
 	_scroll.scroll_vertical = 0
 	_closing = false
@@ -110,7 +117,7 @@ func _ready() -> void:
 	z_index = Z
 	values = UiSettings.load_settings()
 	_steps = [_build_base, _build_sound, _build_gameplay, _build_purchases, _build_privacy,
-		_build_tail, _build_credits_page, _build_bar]
+		_build_tail, _build_credits_page, _build_stats_page, _build_bar]
 	if prebuild:
 		visible = false
 		process_mode = Node.PROCESS_MODE_DISABLED
@@ -152,16 +159,40 @@ func _build_base() -> void:
 func _build_tail() -> void:
 	if OS.is_debug_build():
 		_build_dev(_list_node)
+	# Red verzije je i skriveni ulaz u statistiku za testere (radi i u release buildu).
+	var row := _Tap.new()
+	row.name = "VersionRow"
+	row.press_scale = 1.0
+	row.tap_sfx = ""
+	row.custom_minimum_size = Vector2(0, UiSettings.VERSION_ROW_H)
 	var version := _label(UiSettings.version_text(), 800, UiSettings.VERSION_FONT, UiSettings.SUB_INK)
 	version.name = "Version"
+	version.set_anchors_preset(Control.PRESET_FULL_RECT)
 	version.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_list_node.add_child(version)
+	version.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(version)
+	row.tapped.connect(_on_version_tapped)
+	_list_node.add_child(row)
 
 
 func _build_credits_page() -> void:
 	_credits = _scroll_body("CreditsPage")
 	_credits.visible = false
 	_build_credits(_list(_credits))
+
+
+func _build_stats_page() -> void:
+	_stats = _scroll_body("StatsPage")
+	_stats.visible = false
+	var list := _list(_stats)
+	_stats_view = ActivityStatsView.new()
+	list.add_child(_stats_view)
+	var copy := _dev_button("StatsCopy", UiSettings.S.stats_copy, false, _on_stats_copy)
+	list.add_child(copy)
+	var sub := _label(UiSettings.S.stats_copy_sub, 700, UiSettings.SUB_FONT, UiSettings.SUB_INK)
+	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	list.add_child(sub)
 
 
 func _scroll_body(node_name: String) -> ScrollContainer:
@@ -733,10 +764,46 @@ func _build_credits(list: VBoxContainer) -> void:
 
 
 func _show_credits(on: bool) -> void:
+	_stats.visible = false
 	_credits.visible = on
 	_scroll.visible = not on
 	_bar_title.text = UiSettings.S.credits if on else UiSettings.S.title
 	_credits.scroll_vertical = 0
+
+
+# --- Statistika (RET-01, skriveno) ---------------------------------------------
+
+func _on_version_tapped() -> void:
+	var now := float(Time.get_ticks_msec()) / 1000.0
+	if _version_taps == 0 or now - _version_tap_at > UiSettings.STATS_TAP_WINDOW:
+		_version_taps = 0
+		_version_tap_at = now
+	_version_taps += 1
+	if _version_taps >= UiSettings.STATS_TAPS:
+		_version_taps = 0
+		Sfx.play("ui_open")
+		_show_stats(true)
+
+
+func _show_stats(on: bool) -> void:
+	if on:
+		_stats_view.refresh(GameState.activity_snapshot(),
+			str(ProjectSettings.get_setting("application/config/version", "0.1.0")))
+	_credits.visible = false
+	_stats.visible = on
+	_scroll.visible = not on
+	_bar_title.text = UiSettings.S.stats if on else UiSettings.S.title
+	_stats.scroll_vertical = 0
+
+
+## Tekst koji Copy stavi u clipboard (smoke test ga čita ovdje — headless nema clipboard).
+func stats_copy_text() -> String:
+	return GameState.activity_csv_row()
+
+
+func _on_stats_copy() -> void:
+	DisplayServer.clipboard_set(stats_copy_text())
+	_toast.show_text(UiSettings.S.stats_copied)
 
 
 # --- Developer (samo debug build) ---------------------------------------------
@@ -910,7 +977,7 @@ func close() -> void:
 
 
 func _on_close_pressed() -> void:
-	if _credits.visible:
+	if _credits.visible or _stats.visible:
 		Sfx.play("ui_back")
 		_show_credits(false)
 	else:

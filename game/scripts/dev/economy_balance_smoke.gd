@@ -10,8 +10,15 @@ extends SceneTree
 ##  5. par prepreka uvijek ostavi slobodnu stazu; max magnet dohvata susjednu stazu;
 ##  6. cijene: sezone i nadogradnje rastu, dugme nadogradnje stane i za najveću cijenu;
 ##  7. run u Endlessu: stepenica se primijeni na run, sat u čipu; pred kraj levela nema spawna
-##     koji ne bi stigao do Pipa (u Endlessu uvijek ima).
+##     koji ne bi stigao do Pipa (u Endlessu uvijek ima);
+##  8. coin cijene bez kupovina pravim novcem (v1, 2026-10-26, coin_offer_sim.gd): Remove Ads i
+##     Starter Pack se ne prodaju za coine, ostalo ima cijenu; Merge Hint jeftiniji od prve besplatne
+##     sezone (rano); teme i Sir Pip ne jeftiniji od najskupljeg izgleda (dugoročno); Loot Burst ne
+##     ispod praga po ★3 (ispod njega ubrzava besplatne sezone > 10 %).
 ## Pokretanje: godot --headless --path game -s res://scripts/dev/economy_balance_smoke.gd
+
+## Loot Burst: najmanje coina po ★3 cvijetu (cijena / LOOT_BURST_STAR3) — iz coin_offer_sim.gd D3.
+const LOOT_BURST_MIN_PER_STAR3 := 100
 
 var _backup := ""
 var _failed := false
@@ -51,6 +58,7 @@ func _run() -> void:
 	_check_endless_unlock_and_loot()
 	_check_pairs_and_magnet()
 	_check_prices()
+	_check_coin_offers()
 	await _check_endless_run()
 	await _check_obstacle_stream()
 	_finish()
@@ -229,6 +237,39 @@ func _check_prices() -> void:
 	if w > 340.0 - 24.0:
 		_fail("upgrade button content %.0f px does not fit 340" % w)
 	btn.free()
+
+
+func _check_coin_offers() -> void:
+	var first_season := 1 << 30
+	for def in SeasonCatalog.free_defs_sorted():
+		if def.coins_cost > 0:
+			first_season = mini(first_season, def.coins_cost)
+	var dearest_look := 0
+	for id in CosmeticCatalog.all_ids():
+		if CosmeticCatalog.is_shop_item(id):
+			dearest_look = maxi(dearest_look, CosmeticCatalog.get_coin_cost(id))
+	var star3_sell := int((_gs.get_script() as Script).get_script_constant_map() \
+		.get("CRYSTAL_EXCHANGE_COINS_BY_RARITY", {}).get(3, 20))
+	for sku in MonetizationConfig.all_skus():
+		var c := MonetizationConfig.coin_price(sku)
+		if sku in [MonetizationConfig.SKU_REMOVE_ADS, MonetizationConfig.SKU_STARTER_PACK]:
+			if c != 0:
+				_fail("%s must not be sold for coins (ads are the only income / coin pack)" % sku)
+			continue
+		if c <= 0:
+			_fail("%s needs a coin price for the ads-only v1" % sku)
+			continue
+		if sku == MonetizationConfig.SKU_BOOSTER_MERGE_HINT:
+			if c >= first_season:
+				_fail("Merge Hint %d should be cheaper than the first free season %d (early goal)" % [c, first_season])
+		elif sku == MonetizationConfig.SKU_BOOSTER_LOOT_BURST:
+			var per := float(c) / float(MonetizationConfig.LOOT_BURST_STAR3)
+			if per < float(LOOT_BURST_MIN_PER_STAR3):
+				_fail("Loot Burst %d C = %.0f C per ★3, below %d (speeds up free seasons)" % [c, per, LOOT_BURST_MIN_PER_STAR3])
+			if per <= float(star3_sell):
+				_fail("Loot Burst must cost more per ★3 than selling one (%d C)" % star3_sell)
+		elif c < dearest_look:
+			_fail("%s %d should not be cheaper than the dearest coin look %d (long-term goal)" % [sku, c, dearest_look])
 
 
 func _check_endless_run() -> void:

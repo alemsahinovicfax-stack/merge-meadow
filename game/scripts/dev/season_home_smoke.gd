@@ -365,12 +365,20 @@ func _run() -> void:
 	# boji, bez vela i bez katanca (zlato kaze „nije tvoje").
 	if _veiled(content) != 0 or _arts_drawn(content) != 6 or bool(content.call("has_roster_lock")):
 		_fail("premium on sale: six flowers in colour, no veil, no lock"); return
-	stage.call("show_season", "ember_fen", false)
-	await _frames(2)
-	if str(stage.call("card_status")) != "soon":
-		_fail("Ember Fen: coming soon"); return
-	if _veiled(content) != 0 or _arts_drawn(content) != 6 or not bool(content.call("is_dim")):
-		_fail("coming soon: six flowers at 50 %, no veil"); return
+	# v1 bez kupovina pravim novcem: teme za coine, Ember (test-zaključan) se ne nudi uopšte;
+	# s kupovinama stoji kao „Coming soon".
+	if not MonetizationConfig.iap_enabled():
+		if (stage.call("tab_ids", "premium") as Array).has("ember_fen"):
+			_fail("v1: Ember Fen stays hidden while it is not in the game"); return
+		if int((content.get("data") as Dictionary).get("coin_price", 0)) <= 0:
+			_fail("v1: Moonlit should carry its coin price"); return
+	else:
+		stage.call("show_season", "ember_fen", false)
+		await _frames(2)
+		if str(stage.call("card_status")) != "soon":
+			_fail("Ember Fen: coming soon"); return
+		if _veiled(content) != 0 or _arts_drawn(content) != 6 or not bool(content.call("is_dim")):
+			_fail("coming soon: six flowers at 50 %, no veil"); return
 	await _click(V.TABS_RECT.position + Vector2(8 + 254, 62))
 	await _settle(stage)
 	if str(stage.call("current_tab")) != "free" or str(stage.call("viewed_id")) != "lantern_meadow":

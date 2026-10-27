@@ -27,7 +27,8 @@ const PART_BUY := "buy"
 const DISC_BORDER := 4.0
 
 ## data: season_id, status, premium, roster [{id, name, missing}], coins,
-## coins_need, stars, stars_need, prev_type, price, buying.
+## coins_need, stars, stars_need, prev_type, price, buying; v1 bez kupovina pravim novcem još
+## coin_price (> 0 = tema za coine, `price` je tada broj) i confirm (prvi tap, čeka drugi).
 var data: Dictionary = {}
 var _pressed: String = PART_NONE
 var _gate := Rect2()
@@ -280,7 +281,8 @@ func _layout() -> void:
 		+ 56.0 + 18.0 + UiHomeV3.text_w(900, 54, str(_i("coins_need")), 0.0, true) + 48.0 + 4.0
 	_unlock = Rect2(cx - unlock_w * 0.5, mid - UiHomeV3.ACTION_H * 0.5, unlock_w, UiHomeV3.ACTION_H)
 	# Zlatna cijena bez ikone (dijamanti izbačeni 2026-10-09): padding 56 s obje strane.
-	var buy_w := 4.0 + 56.0 + UiHomeV3.text_w(900, 60, _price(), 0.0, true) + 56.0 + 4.0
+	var buy_w := _coin_buy_w() if _i("coin_price") > 0 \
+		else 4.0 + 56.0 + UiHomeV3.text_w(900, 60, _price(), 0.0, true) + 56.0 + 4.0
 	_buy = Rect2(cx - buy_w * 0.5, mid - UiHomeV3.ACTION_H * 0.5, buy_w, UiHomeV3.ACTION_H)
 	var owned_w := 4.0 + 36.0 + 31.0 + 18.0 + UiHomeV3.text_w(900, 50, "Yours") + 48.0 + 4.0
 	_owned = Rect2(cx - owned_w * 0.5, mid - 60.0, owned_w, 120.0)
@@ -434,7 +436,44 @@ func _draw_unlock() -> void:
 	UiHomeV3.draw_text(self, 900, 54, str(_i("coins_need")), Vector2(x, cy - 27.0), UiHomeV3.INK, 0.0, true)
 
 
+## Coin pilula (v1): metrika coin dijela Unlock dugmeta; potvrda dodaje kvačicu ispred.
+func _coin_buy_w() -> float:
+	var w := 4.0 + 36.0 + 56.0 + 18.0 + UiHomeV3.text_w(900, 54, _price(), 0.0, true) + 48.0 + 4.0
+	if bool(data.get("confirm", false)):
+		w += 31.0 + 18.0
+	return w
+
+
+## Tema za coine (v1 bez kupovina pravim novcem): zlatna pilula 🪙 + cijena kao coin dio Unlock
+## dugmeta; bez dovoljno coina blijeda i ravna (kao coins.short u Shopu); prvi tap = tamna
+## „✓ 🪙 cijena" (kao coins.confirm), drugi kupuje.
+func _draw_coin_buy() -> void:
+	var b := _buy
+	var afford := _i("coins") >= _i("coin_price")
+	var confirm := bool(data.get("confirm", false))
+	var down := _pressed == PART_BUY and afford
+	if down:
+		b = Rect2(b.position + Vector2(0.0, 4.0), b.size)
+	var cy := b.get_center().y
+	var x := b.position.x + 4.0 + 36.0
+	if confirm:
+		UiHomeV3.draw_panel(self, b, UiHomeV3.INK, 70.0, 4.0, UiHomeV3.INK, 4.0 if down else 8.0)
+		UiHomeV3.draw_check(self, Vector2(x, cy - 24.5), UiHomeV3.GOLD)
+		x += 31.0 + 18.0
+	elif afford:
+		UiHomeV3.draw_panel(self, b, UiHomeV3.GOLD, 70.0, 4.0, UiHomeV3.INK, 4.0 if down else 8.0)
+	else:
+		UiHomeV3.draw_panel(self, b, UiHomeV3.CREAM, 70.0, 4.0, Color(UiHomeV3.INK, 0.35))
+	_icon("icon_coin", Vector2(x + 28.0, cy), 56.0, 1.0 if afford else 0.55)
+	x += 56.0 + 18.0
+	var ink := UiHomeV3.GOLD if confirm else (UiHomeV3.INK if afford else UiShopV2.INK_SUB)
+	UiHomeV3.draw_text(self, 900, 54, _price(), Vector2(x, cy - 27.0), ink, 0.0, true)
+
+
 func _draw_buy() -> void:
+	if _i("coin_price") > 0:
+		_draw_coin_buy()
+		return
 	var b := _buy
 	var down := _pressed == PART_BUY
 	if down:
@@ -475,10 +514,10 @@ func _draw_star3(top_left: Vector2) -> void:
 	UiHomeV3.draw_text(self, 900, 38, "3", top_left + Vector2(30.0, 0.0), UiHomeV3.STAR_INK)
 
 
-func _icon(icon_name: String, center: Vector2, side: float) -> void:
+func _icon(icon_name: String, center: Vector2, side: float, alpha: float = 1.0) -> void:
 	var tex := UiAssets.get_chrome_icon(icon_name)
 	if tex:
-		draw_texture_rect(tex, Rect2(center - Vector2(side, side) * 0.5, Vector2(side, side)), false)
+		draw_texture_rect(tex, Rect2(center - Vector2(side, side) * 0.5, Vector2(side, side)), false, Color(1, 1, 1, alpha))
 
 
 func _roster() -> Array:

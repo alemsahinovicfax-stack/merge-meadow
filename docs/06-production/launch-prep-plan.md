@@ -55,14 +55,14 @@ NE RADI: ne otvaraj naloge, ne unosi plaćanja, ne mijenjaj cijene ni gameplay/b
 
 > Gotovi odgovori za sve forme: [[play-console-sutra|play-console-sutra]].
 
-- [ ] **Odluka: BiH nije Google Play merchant zemlja** (provjereno 2026-10-23) — IAP iz BiH ne ide. Izaberi: v1 samo s reklamama (prekidač `IAP_ENABLED` u `monetization_config.gd` je spreman — stavi `false`) **ili** payments profil u podržanoj zemlji (HR / RS / MK…). Detalji: `play-console-sutra.md` § 0
+- [x] **Odluka: BiH nije Google Play merchant zemlja** (provjereno 2026-10-23) — **2026-10-26: v1 samo s reklamama.** `IAP_ENABLED = false`, stvari koje su se plaćale pravim novcem kupuju se coinima, Remove Ads i Starter Pack sakriveni, Billing plugin isključen. Detalji: `play-console-sutra.md` § 0, [[ads-only-coini-izvjestaj|ads-only-coini-izvjestaj]]
 - [ ] **Play Console nalog** (25 USD) + verifikacija identiteta
-- [ ] **Payments profile** — tek kad je zemlja riješena; banka + porez (W-8BEN / W-8BEN-E)
+- [ ] **Payments profile** — ne treba za v1; tek kad se kupovine vraćaju (zemlja riješena); banka + porez (W-8BEN / W-8BEN-E)
 - [ ] **AdMob nalog** — app + 2 ad unita (rewarded, interstitial); agentu dati App ID, ad unit ID-eve i publisher ID (nisu tajne)
 - [ ] **AdMob → Privacy & messaging → GDPR poruka** (bez nje nema UMP forme ni u EU)
 - [ ] **app-ads.txt** — GitHub repo `alemsahinovicfax-stack.github.io` (user site) ili vlastita domena; agent upiše publisher ID (`docs/06-production/app-ads/`)
 - [ ] **Backup keystorea** (`game/export_credentials/merge_meadow_upload.keystore`) + lozinke (`credentials.local.md`) van laptopa (USB / cloud)
-- [ ] Play Console: aplikacija, Advertising ID deklaracija, Data safety, IARC, ciljna publika 13+, IAP proizvodi, license testeri, internal test (AAB: `game/export/android/merge_meadow.aab`)
+- [ ] Play Console: aplikacija, Advertising ID deklaracija, Data safety, IARC (varijanta bez kupovina), ciljna publika 13+, internal test (AAB: `game/export/android/merge_meadow.aab`); IAP proizvodi i license testeri tek kad se kupovine vrate
 - [ ] **Feature graphic 1024×500** za store listing (ne postoji još)
 - [ ] Skupiti **12 testera** (bolje 15–20) za closed test od 14 dana — tekst poziva EN/BS u `play-console-sutra.md` § 7
 - [ ] Test na pravom telefonu + otvoreni playtestovi iz CHECKPOINT-a

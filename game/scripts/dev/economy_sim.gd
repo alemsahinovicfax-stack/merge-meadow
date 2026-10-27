@@ -7,7 +7,10 @@ extends SceneTree
 ##   A. svaki level 1–20 i Endless za tri profila igrača (casual / average / skilled);
 ##   B. put igrača kroz 4 besplatne sezone, tri politike trošenja (rush = štedi za sljedeću
 ##      sezonu, boost = kupuje nadogradnje čim može, looks = prvo izgled iz Shopa) → tabela
-##      milestonea (runovi, minute, dani).
+##      milestonea (runovi, minute, dani);
+##   C. isti put (politika boost) za više minuta igre dnevno → kalendarski dani do L20 svake sezone,
+##      svih sezona, svih nadogradnji i izgleda; plus zid: leveli gdje casual prolazi < 10 % i koliko
+##      casual putovanja stigne do L20 po sezoni (dodano 2026-10-26, RET-01).
 ## Radi i na starim pravilima (ravnomjeran izbor sjemena, Endless s tajmerom) — tako se dobije
 ## „prije / poslije" na istom modelu.
 ##
@@ -17,7 +20,10 @@ extends SceneTree
 ## Pokretanje:
 ##   godot --headless --path game -s res://scripts/dev/economy_sim.gd -- --out=C:/put/sim.md
 ##   opcije: --reps=20 (putovanja po profilu) --runs=500 (runova po levelu) --seed=7
+##           --parts=a,a2,b,c (koji dijelovi) --day-min=25 (minuta igre dnevno u B)
+##           --day-mins=10,15,25,40 (minute dnevno u C)
 ##           --calibrate [--log=C:/put/balance_log.csv]
+##   Brojke B ostaju iste za isti seed samo kad se pokreću i A i A2 (dijele isti RNG redom).
 
 const BASE_SPEED := 400.0
 const RAMP_EVERY := 15.0
@@ -34,11 +40,12 @@ const MIN_ROW_GAP_SEC := 0.35
 const CLUTTER := 0.35
 const CLUTTER_SEC := 2.0
 const ENDLESS_CAP_SEC := 1800.0
-## Igra se ~25 min dnevno (1–2 sesije); poslije runa ~20 s na Loot / putu; ~0,5 s po sjemenki u Areni.
-const DAY_MIN := 25.0
+## Poslije runa ~20 s na Loot / putu; ~0,5 s po sjemenki u Areni.
 const RUN_OVERHEAD_SEC := 20.0
 const MERGE_SEC_PER_SEED := 0.5
 const MAX_RUNS := 2500
+## Zid: level gdje casual prolazi rjeđe od ovoga.
+const WALL_PASS := 0.10
 
 const PROFILES := {
 	"casual": {"collect": 0.55, "hazard": 0.010},
@@ -63,6 +70,14 @@ var _seasons: Array = []   # [{id, coins, t3, types[], rar[], star3}]
 var _looks: Array = []     # [{id, cost}]
 var _backup: String = ""
 var _out: PackedStringArray = []
+## Minuta igre dnevno (1–2 sesije): --day-min za B; dio C ga mijenja kroz --day-mins.
+var _day_min: float = 25.0
+## Dio C: kad su sve nadogradnje max, igrač se vraća na nepređene levele nižih sezona.
+var _finish_paths: bool = false
+var _a_stats: Dictionary = {}   # {profil: {level: {rate, attempts, to_clear}}}
+var _b_js: Dictionary = {}      # {"profil·politika": [putovanje]}
+var _c_js: Dictionary = {}      # {profil: [[putovanje] po _c_dms]}
+var _c_dms: Array[float] = []
 
 
 func _initialize() -> void:
@@ -99,10 +114,12 @@ func _main() -> void:
 	_load_seasons()
 	_load_looks()
 	_rng.seed = int(_arg("seed", "7"))
+	_day_min = float(_arg("day-min", "25"))
 	if _arg("calibrate", "") == "1":
 		_calibrate()
 	var runs := int(_arg("runs", "500"))
 	var reps := int(_arg("reps", "20"))
+	var parts := _arg("parts", "a,a2,b,c").split(",")
 	_line("# Ekonomija — simulacija (%s)" % Time.get_date_string_from_system())
 	_line("")
 	_line("Pravila: Endless %s, plijen u Endlessu %s, sjeme %s. Model: %s." % [
@@ -112,9 +129,15 @@ func _main() -> void:
 		_profiles_text(),
 	])
 	_line("")
-	_part_a(runs)
-	_part_a2(runs)
-	_part_b(reps)
+	if parts.has("a"):
+		_part_a(runs)
+	if parts.has("a2"):
+		_part_a2(runs)
+	if parts.has("b"):
+		_part_b(reps)
+	if parts.has("c"):
+		_part_c(reps)
+		_wall(runs)
 	_prices()
 	var path := _arg("out", "")
 	if not path.is_empty():
@@ -365,13 +388,18 @@ func _part_a(runs: int) -> void:
 		_line("")
 		_line("| Level | Trajanje s | Prolaz % | Coina / prolaz | Sjemena / prolaz | ★2 % | ★3 % | Coina / min | Sjem. / min | Prepreka / min | Pokušaja | Min do prolaza |")
 		_line("|---|---|---|---|---|---|---|---|---|---|---|---|")
+		_a_stats[pname] = {}
 		for n in range(1, 21):
-			_line(_level_row(str(n), prof, n, false, runs, s1))
-		_line(_level_row("Endless", prof, 0, true, runs, s1))
+			var stats := {}
+			_line(_level_row(str(n), prof, n, false, runs, s1, stats))
+			_a_stats[pname][n] = stats
+		_line(_level_row("Endless", prof, 0, true, runs, s1, {}))
 		_line("")
 
 
-func _level_row(label: String, prof: Dictionary, n: int, endless: bool, runs: int, season: Dictionary) -> String:
+## `stats` dobije {rate, attempts, to_clear} za zid.
+func _level_row(label: String, prof: Dictionary, n: int, endless: bool, runs: int, season: Dictionary,
+		stats: Dictionary) -> String:
 	var fin := 0
 	var t_sum := 0.0
 	var c_fin := 0.0
@@ -416,6 +444,9 @@ func _level_row(label: String, prof: Dictionary, n: int, endless: bool, runs: in
 		per_fin_s = s_all / runs
 	var attempts := (1.0 / rate) if rate > 0.0 else INF
 	var to_clear := (t_sum / runs + RUN_OVERHEAD_SEC) * attempts / 60.0
+	stats["rate"] = rate
+	stats["attempts"] = attempts
+	stats["to_clear"] = to_clear
 	return "| %s | %s | %s | %.0f | %.1f | %.0f | %.1f | %.1f | %.1f | %.1f | %s | %s |" % [
 		label, dur, "—" if endless else "%d" % roundi(rate * 100.0), per_fin_c, per_fin_s,
 		100.0 * r2 / maxf(1.0, s_all), 100.0 * r3 / maxf(1.0, s_all),
@@ -464,16 +495,19 @@ func _part_a2(runs: int) -> void:
 func _part_b(reps: int) -> void:
 	_line("## B. Put igrača kroz 4 besplatne sezone (medijan · p10–p90, %d putovanja)" % reps)
 	_line("")
-	_line("Dan = %d min igre. rush štedi za sljedeću sezonu; boost kupuje nadogradnje čim može; looks prvo kupuje izgled iz Shopa (pa sezonu, pa nadogradnje)." % roundi(DAY_MIN))
+	_line("Dan = %d min igre. rush štedi za sljedeću sezonu; boost kupuje nadogradnje čim može; looks prvo kupuje izgled iz Shopa (pa sezonu, pa nadogradnje)." % roundi(_day_min))
 	_line("")
 	for pname in PROFILES:
 		for policy in POLICIES:
 			var all: Array = []
 			var flows: Array = []
+			var js: Array = []
 			for r in reps:
 				var j := _journey(PROFILES[pname], policy)
 				all.append(j.ms)
 				flows.append(j.flow)
+				js.append(j)
+			_b_js["%s·%s" % [pname, policy]] = js
 			_line("### %s · %s" % [pname, policy])
 			_line("")
 			_line("| Milestone | Dan | Min igre | Runova | Dostiglo |")
@@ -492,7 +526,7 @@ func _part_b(reps: int) -> void:
 				runs_a.sort()
 				var med := mins[mins.size() / 2]
 				_line("| %s | %.1f | %d (%d–%d) | %d | %d / %d |" % [
-					key, med / DAY_MIN, roundi(med), roundi(mins[int(mins.size() * 0.1)]),
+					key, med / _day_min, roundi(med), roundi(mins[int(mins.size() * 0.1)]),
 					roundi(mins[mini(mins.size() - 1, int(mins.size() * 0.9))]),
 					roundi(runs_a[runs_a.size() / 2]), mins.size(), reps,
 				])
@@ -516,6 +550,7 @@ func _milestone_order() -> Array[String]:
 		out.append("%s nadogradnje max" % sid)
 	for l in _looks:
 		out.append("izgled %s (%d)" % [l.id, l.cost])
+	out.append("sve besplatne sezone pređene")
 	out.append("sve besplatne nadogradnje max")
 	out.append("svi izgledi za coine")
 	return out
@@ -570,6 +605,8 @@ func _journey(prof: Dictionary, policy: String) -> Dictionary:
 			st.levels[s.id] = lv + 1
 			if lv in [5, 10, 15, 20]:
 				_mark(st, "%s level %d pređen" % [s.id, lv])
+			if lv == 20 and _all_paths_done(st):
+				_mark(st, "sve besplatne sezone pređene")
 			if lv == _endless_unlock_level() or (_endless_unlock_level() == 0 and lv == 1):
 				_mark(st, "%s Endless otključan" % s.id)
 		_daily(st)
@@ -578,11 +615,12 @@ func _journey(prof: Dictionary, policy: String) -> Dictionary:
 		_shop(st, policy)
 		if _done(st):
 			break
-	return {"ms": st.ms, "flow": st.flow}
+	return {"ms": st.ms, "flow": st.flow, "levels": st.levels, "min": float(st.sec) / 60.0, "done": _done(st)}
 
 
 ## Najviša otključana sezona dok put ili sljedeća sezona čekaju; poslije toga sezona s najviše
-## preostalih nadogradnji (treba njen ★3), pa najviša (coini).
+## preostalih nadogradnji (treba njen ★3), pa najviša (coini). Uz _finish_paths, kad su sve
+## nadogradnje max, prvo najniža sezona s nepređenim putem.
 func _pick_play_season(st: Dictionary) -> int:
 	var top := int(st.unlocked) - 1
 	if int(st.levels[_seasons[top].id]) <= 20 or int(st.unlocked) < _seasons.size():
@@ -596,6 +634,10 @@ func _pick_play_season(st: Dictionary) -> int:
 		if left > best_left:
 			best_left = left
 			best = i
+	if best_left == 0 and _finish_paths:
+		for i in int(st.unlocked):
+			if int(st.levels[_seasons[i].id]) <= 20:
+				return i
 	return best
 
 
@@ -625,7 +667,7 @@ func _advance_chain(st: Dictionary) -> void:
 
 
 func _daily(st: Dictionary) -> void:
-	var day := int(float(st.sec) / 60.0 / DAY_MIN)
+	var day := int(float(st.sec) / 60.0 / _day_min)
 	while int(st.day) < day:
 		st.day = int(st.day) + 1
 		_earn(st, "coin: dnevni poklon", int(_gs_c.get("DAILY_CHEST_COINS", 8)))
@@ -770,13 +812,15 @@ func _all_upgrades_max(st: Dictionary) -> bool:
 	return true
 
 
-func _done(st: Dictionary) -> bool:
-	if int(st.unlocked) < _seasons.size():
-		return false
+func _all_paths_done(st: Dictionary) -> bool:
 	for s in _seasons:
 		if int(st.levels[s.id]) <= 20:
 			return false
-	return _all_upgrades_max(st) and st.looks.size() == _looks.size()
+	return true
+
+
+func _done(st: Dictionary) -> bool:
+	return _all_paths_done(st) and _all_upgrades_max(st) and st.looks.size() == _looks.size()
 
 
 func _mark(st: Dictionary, key: String) -> void:
@@ -791,6 +835,215 @@ func _earn(st: Dictionary, source: String, n: int) -> void:
 
 func _flow(st: Dictionary, key: String, n: int) -> void:
 	st.flow[key] = int(st.flow.get(key, 0)) + n
+
+
+# --- C: kalendarski dani po minutama igre dnevno ---
+
+func _part_c(reps: int) -> void:
+	_c_dms.clear()
+	for s in _arg("day-mins", "10,15,25,40").split(","):
+		_c_dms.append(float(s))
+	var b_day_min := _day_min
+	_finish_paths = true
+	for pname in PROFILES:
+		var cols: Array = []
+		for dm in _c_dms:
+			_day_min = dm
+			var js: Array = []
+			for r in reps:
+				js.append(_journey(PROFILES[pname], "boost"))
+			cols.append(js)
+		_c_js[pname] = cols
+	_finish_paths = false
+	_day_min = b_day_min
+	var head := ""
+	var sep := ""
+	for dm in _c_dms:
+		head += " %s min/dan |" % _num(dm)
+		sep += "---|"
+	_line("## C. Koliko kalendarskih dana traje besplatni sadržaj (boost, medijan, %d putovanja)" % reps)
+	_line("")
+	_line("Put kao u B (politika boost) za svaku vrijednost minuta igre dnevno; svaka ima svoja putovanja jer dnevni poklon i arena combo idu po danu. Razlika od B: kad su sve nadogradnje max, igrač se vraća na nepređene levele nižih sezona (u B igra Endless najviše sezone). Granica: %d runova po putovanju; medijan je preko svih putovanja (nedostignuto = beskonačno), „— (x / %d)\" = medijan nije dostignut, x putovanja je stiglo." % [MAX_RUNS, reps])
+	_line("")
+	_line("### Sažetak (dani)")
+	_line("")
+	_line("| Profil | Mjera |" + head)
+	_line("|---|---|" + sep)
+	for pname in PROFILES:
+		for key in ["sve besplatne sezone pređene", "kraj besplatnog sadržaja"]:
+			var cells: PackedStringArray = []
+			for k in _c_dms.size():
+				cells.append(_c_cell(_c_mins(_c_js[pname][k], key), _c_dms[k], false))
+			_line("| %s | %s | %s |" % [pname, key, " | ".join(cells)])
+	_line("")
+	for pname in PROFILES:
+		_line("### %s · boost (dan · min igre)" % pname)
+		_line("")
+		_line("| Milestone |" + head)
+		_line("|---|" + sep)
+		for key in _c_keys():
+			var cells: PackedStringArray = []
+			for k in _c_dms.size():
+				cells.append(_c_cell(_c_mins(_c_js[pname][k], key), _c_dms[k], true))
+			_line("| %s | %s |" % [key, " | ".join(cells)])
+		var capped: PackedStringArray = []
+		for k in _c_dms.size():
+			capped.append(_cap_cell(_c_js[pname][k], _c_dms[k]))
+		_line("| u granici (%d runova) | %s |" % [MAX_RUNS, " | ".join(capped)])
+		_line("")
+
+
+func _c_keys() -> Array[String]:
+	var out: Array[String] = []
+	for i in _seasons.size():
+		if i > 0:
+			out.append("%s otključan" % _seasons[i].id)
+		out.append("%s level 20 pređen" % _seasons[i].id)
+	out.append("sve besplatne sezone pređene")
+	out.append("sve besplatne nadogradnje max")
+	out.append("svi izgledi za coine")
+	out.append("kraj besplatnog sadržaja")
+	return out
+
+
+## Minute igre do milestonea po putovanju; INF kad ga putovanje nije dostiglo.
+func _c_mins(js: Array, key: String) -> Array[float]:
+	var out: Array[float] = []
+	for j in js:
+		if key == "kraj besplatnog sadržaja":
+			out.append(float(j.min) if bool(j.done) else INF)
+		elif (j.ms as Dictionary).has(key):
+			out.append(float(j.ms[key].min))
+		else:
+			out.append(INF)
+	return out
+
+
+func _c_cell(mins: Array[float], dm: float, with_min: bool) -> String:
+	var got := 0
+	for m in mins:
+		if not is_inf(m):
+			got += 1
+	mins.sort()
+	var med := mins[mins.size() / 2]
+	var tail := "" if got == mins.size() else " (%d / %d)" % [got, mins.size()]
+	if is_inf(med):
+		return "—" + tail
+	if with_min:
+		return "%.1f · %d%s" % [med / dm, roundi(med), tail]
+	return "%.1f%s" % [med / dm, tail]
+
+
+## Koliko putovanja udari u MAX_RUNS i kad (medijan min igre ≈ dana).
+func _cap_cell(js: Array, dm: float) -> String:
+	var mins: Array[float] = []
+	for j in js:
+		if not bool(j.done):
+			mins.append(float(j.min))
+	if mins.is_empty():
+		return "0 / %d" % js.size()
+	mins.sort()
+	var med := mins[mins.size() / 2]
+	return "%d / %d · %d min ≈ %.0f d" % [mins.size(), js.size(), roundi(med), med / dm]
+
+
+# --- zid 16–20 (casual) ---
+
+func _wall(runs: int) -> void:
+	var src := "dio A"
+	if _a_stats.is_empty():
+		src = "poseban prolaz, %d runova po levelu" % runs
+		var s1: Dictionary = _seasons[1] if _seasons.size() > 1 else _seasons[0]
+		for pname in PROFILES:
+			_a_stats[pname] = {}
+			for n in range(1, 21):
+				var stats := {}
+				_level_row(str(n), PROFILES[pname], n, false, runs, s1, stats)
+				_a_stats[pname][n] = stats
+	_line("## C2. Zid za casual igrača")
+	_line("")
+	_line("Leveli gdje casual prolazi < %d %% (%s: sezona sa svih 6 tipova, bez nadogradnji; nadogradnje u modelu ne smanjuju rizik prepreka, pa ovo važi za svaku sezonu)." % [roundi(WALL_PASS * 100.0), src])
+	_line("")
+	_line("| Level | casual prolaz % | casual pokušaja | casual min do prolaza | average prolaz % | skilled prolaz % |")
+	_line("|---|---|---|---|---|---|")
+	var sum_att := 0.0
+	var sum_min := 0.0
+	for n in range(1, 21):
+		var c: Dictionary = _a_stats.casual[n]
+		if float(c.rate) >= WALL_PASS:
+			continue
+		sum_att += float(c.attempts)
+		sum_min += float(c.to_clear)
+		_line("| %d | %.1f | %s | %s | %.0f | %.0f |" % [
+			n, float(c.rate) * 100.0, _fin("%.0f", float(c.attempts)), _fin("%.0f", float(c.to_clear)),
+			float(_a_stats.average[n].rate) * 100.0, float(_a_stats.skilled[n].rate) * 100.0,
+		])
+	_line("| ukupno | — | %s | %s | — | — |" % [_fin("%.0f", sum_att), _fin("%.0f", sum_min)])
+	_line("")
+	var per_dm: PackedStringArray = []
+	for dm in _c_dms:
+		per_dm.append("%s min/dan → %s d po sezoni, %s d za %d sezone" % [
+			_num(dm), _fin("%.0f", sum_min / dm), _fin("%.0f", sum_min * _seasons.size() / dm), _seasons.size()])
+	_line("Samo zid (očekivane minute pokušaja, bez ostatka puta): " + "; ".join(per_dm) + ".")
+	_line("")
+	var cols: Array = []
+	for policy in POLICIES:
+		var key := "casual·%s" % policy
+		if _b_js.has(key):
+			cols.append(["B %s · %s min" % [policy, _num(_day_min)], _b_js[key]])
+	if _c_js.has("casual"):
+		for k in _c_dms.size():
+			cols.append(["C boost · %s min" % _num(_c_dms[k]), _c_js.casual[k]])
+	if cols.is_empty():
+		return
+	_line("Casual putovanja koja pređu L20 (x / putovanja; „ostali\" = raspon levela na kojem su ostala kad je putovanje stalo):")
+	_line("")
+	var head := "| Sezona |"
+	var sep := "|---|"
+	for c in cols:
+		head += " %s |" % c[0]
+		sep += "---|"
+	_line(head)
+	_line(sep)
+	for s in _seasons:
+		var cells: PackedStringArray = []
+		for c in cols:
+			cells.append(_reach_cell(c[1], s.id))
+		_line("| %s | %s |" % [s.id, " | ".join(cells)])
+	var all_cells: PackedStringArray = []
+	for c in cols:
+		var got := 0
+		for j in c[1]:
+			if (j.ms as Dictionary).has("sve besplatne sezone pređene"):
+				got += 1
+		all_cells.append("%d / %d" % [got, (c[1] as Array).size()])
+	_line("| sve 4 sezone | %s |" % " | ".join(all_cells))
+	_line("")
+
+
+func _reach_cell(js: Array, sid: String) -> String:
+	var got := 0
+	var lo := 99
+	var hi := 0
+	for j in js:
+		var lv := int(j.levels[sid])
+		if lv > 20:
+			got += 1
+		else:
+			lo = mini(lo, lv)
+			hi = maxi(hi, lv)
+	if got == js.size():
+		return "%d / %d" % [got, js.size()]
+	var left := "L%d" % lo if lo == hi else "L%d–%d" % [lo, hi]
+	return "%d / %d (ostali %s)" % [got, js.size(), left]
+
+
+func _fin(fmt: String, v: float) -> String:
+	return "∞" if is_inf(v) else fmt % v
+
+
+func _num(v: float) -> String:
+	return "%d" % roundi(v) if is_equal_approx(v, roundf(v)) else "%.1f" % v
 
 
 # --- cijene (pregled) ---

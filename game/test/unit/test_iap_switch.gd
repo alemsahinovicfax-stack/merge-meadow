@@ -1,4 +1,4 @@
-## MonetizationConfig.IAP_ENABLED — jedan prekidač za v1 samo s reklamama.
+## MonetizationConfig.IAP_ENABLED — jedan prekidač za v1 samo s reklamama (coin ponude: test_coin_offers).
 extends "res://test/unit/game_state_test_base.gd"
 
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
@@ -28,13 +28,15 @@ func test_paid_offer_only_when_on_or_owned() -> void:
 	CONFIG.iap_override = 0
 	assert_false(CONFIG.shows_paid_offer(false), "IAP off hides what you don't own")
 	assert_true(CONFIG.shows_paid_offer(true), "what you already own stays")
+	assert_true(CONFIG.shows_paid_offer(false, "pip_knight"), "IAP off: Sir Pip is sold for coins")
+	assert_false(CONFIG.shows_paid_offer(false, "remove_ads"), "Remove Ads has no coin price")
 	CONFIG.iap_override = 1
 	assert_true(CONFIG.shows_paid_offer(false))
 
 
 func test_shop_tabs_follow_switch() -> void:
 	CONFIG.iap_override = 0
-	assert_eq(UiShopV2.visible_tabs(), ["looks"])
+	assert_eq(UiShopV2.visible_tabs(), ["seasons", "looks", "boosters"], "no Support tab without IAP")
 	CONFIG.iap_override = 1
 	assert_eq(UiShopV2.visible_tabs(), UiShopV2.TABS)
 

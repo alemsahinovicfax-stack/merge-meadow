@@ -301,7 +301,9 @@ func _run() -> void:
 		_fail("next_locked_free_id should be empty after all free granted")
 		return
 	# Sve besplatne otključane: kartica nastavlja s prvom plaćenom koju igrač nema (2026-10-16) —
-	# samo cijena, bez coina i ★3.
+	# samo cijena, bez coina i ★3. Ovdje Play tok (stub IAP, cijena u €) — mora raditi kad se
+	# kupovine vrate; v1 coin tok (IAP_ENABLED = false) provjerava coin_offers_smoke.
+	MonetizationConfig.iap_override = 1
 	gs.call("clear_owned_paid_seasons")
 	camp.call("refresh_for_meta_hub")
 	for _p in 4:
@@ -364,6 +366,7 @@ func _run() -> void:
 		_fail("SeasonLinkCard should hide when every season is owned")
 		return
 
+	MonetizationConfig.iap_override = -1
 	print("camp_season_link_smoke OK")
 	CampSmokeUtil.restore_save(self, _backup)
 	quit(0)

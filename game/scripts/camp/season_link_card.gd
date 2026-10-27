@@ -14,6 +14,10 @@ extends PanelContainer
 ## Season Kit (design_handoff_seasons faza 2): sezona s receptom "camp" crta svoje mjesto
 ## (SeasonBackdrop 1026 x 312 unutar ruba 3 #2D3436, ništa izvan) umjesto tinta, tekst
 ## #3D3D33, jedna tvrda sjena 0 8 0; uglovi = maska u boji stranice Campa.
+## v1 bez kupovina pravim novcem (MonetizationConfig.IAP_ENABLED = false): ista kartica nudi temu za
+## coine — 🪙 + cijena na dugmetu (blijedo kad fali), dva tapa (prvi „✓ N" 3 s), kupovina kroz
+## IAPManager.buy_with_coins pa isti burst i Home; bez coina pilula „Need N more coins" (nikad
+## „Purchase cancelled").
 
 @onready var title_label: Label = %SeasonLinkTitle
 @onready var coin_icon: TextureRect = %SeasonLinkCoinIcon
@@ -41,7 +45,10 @@ var _paid_count: Label
 var _paid_tiles: Array[_FlowerTile] = []
 var _dots: _Dots
 var _toast_until: int = 0
+var _toast_text: String = UiCamp.S_PURCHASE_CANCELLED
 var _toast_layer: _ToastLayer
+## Coin kupovina teme (v1): do kada prvi tap čeka drugi (msec).
+var _confirm_until: int = 0
 
 
 ## Okvir cvijeta plaćene sezone: okvir po rijetkosti, tamno udubljenje, t3 cvijet 84 px.
@@ -65,8 +72,8 @@ class _FlowerTile:
 			CampPlantDraw.draw_cropped_texture(self, size * 0.5, _tex, float(UiCamp.PAID_ART))
 
 
-## Sloj iznad cijele kartice (zadnje dijete): „Purchase cancelled" desno 22, gore 150 od ruba
-## kartice, h 64, 900 34 — preko reda cvjetova. Crta se samo dok traje (1,6 s).
+## Sloj iznad cijele kartice (zadnje dijete): „Purchase cancelled" (ili v1 „Need N more coins")
+## desno 22, gore 150 od ruba kartice, h 64, 900 34 — preko reda cvjetova. Crta se samo dok traje (1,6 s).
 class _ToastLayer:
 	extends Control
 
@@ -77,7 +84,7 @@ class _ToastLayer:
 			return
 		const PX := 34
 		var font := UiCamp.tight_font(PX)
-		var text := UiCamp.S_PURCHASE_CANCELLED
+		var text := str(card.call("get_toast_text"))
 		var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, PX).x + 54.0
 		var r := Rect2(Vector2(card.size.x - 22.0 - w, 150.0) - position, Vector2(w, 64.0))
 		draw_style_box(UiCamp.paid_toast_style(), r)
@@ -160,8 +167,12 @@ func refresh() -> void:
 	var id := GameState.next_locked_free_id()
 	_paid = id.is_empty()
 	if _paid:
-		# Bez kupovina (MonetizationConfig.IAP_ENABLED = false) nema ponude plaćene sezone.
-		id = GameState.next_unowned_paid_id() if MonetizationConfig.iap_enabled() else ""
+		# Bez kupovina pravim novcem (MonetizationConfig.IAP_ENABLED = false) ista ponuda za coine.
+		id = GameState.next_unowned_paid_id()
+		var paid_def: SeasonDef = GameState.get_season_def(id) if not id.is_empty() else null
+		if paid_def != null and not MonetizationConfig.iap_enabled() \
+				and not IAPManager.is_coin_offer(paid_def.iap_product_id):
+			id = ""
 	if id != _season_id:
 		_set_toast(false)
 	_season_id = id
@@ -315,12 +326,18 @@ func _set_dots(on: bool) -> void:
 	unlock_button.get_title_label().visible = not on
 
 
-## price | buying (čeka trgovinu) | burst (kupljeno, prsten pa Home).
+## price | buying (čeka trgovinu) | burst (kupljeno, prsten pa Home); v1 coin tema još
+## confirm (prvi tap čeka drugi) i short (fale coini).
 func get_paid_button_state() -> String:
 	if _unlocking:
 		return "burst"
 	if _buying:
 		return "buying"
+	if not MonetizationConfig.iap_enabled() and _paid:
+		if _is_confirming():
+			return "confirm"
+		if int(GameState.wallet_coins) < _coin_price():
+			return "short"
 	return "price"
 
 
@@ -330,6 +347,11 @@ func get_paid_tiles() -> Array:
 
 func is_cancel_toast_visible() -> bool:
 	return Time.get_ticks_msec() < _toast_until
+
+
+## Tekst pilule dok se vidi („Purchase cancelled" ili v1 „Need N more coins"), inače "".
+func get_toast_text() -> String:
+	return _toast_text if is_cancel_toast_visible() else ""
 
 
 ## Plaćena sezona: ime + zlatno dugme s cijenom; u redu ispod potpisni ★3 cvijet sezone,
@@ -349,6 +371,9 @@ func _show_paid(def: SeasonDef) -> void:
 		var f: Array = roster[i] if i < roster.size() else ["", 1]
 		_paid_tiles[i].set_flower(str(f[0]), int(f[1]))
 		_paid_tiles[i].visible = i < roster.size()
+	if not MonetizationConfig.iap_enabled():
+		_show_paid_coins()
+		return
 	var price := IAPManager.get_price_label(def.iap_product_id)
 	unlock_button.set_styles(UiCamp.paid_button_style(_buying), UiCamp.paid_button_style(true))
 	unlock_button.set_text(price)
@@ -357,6 +382,43 @@ func _show_paid(def: SeasonDef) -> void:
 	_set_dots(_buying)
 	unlock_button.disabled = _buying
 	unlock_button.mouse_filter = Control.MOUSE_FILTER_IGNORE if _buying else Control.MOUSE_FILTER_STOP
+
+
+## v1 bez kupovina pravim novcem: 🪙 + cijena teme; zlatno kad je coina dovoljno, blijedo (kao
+## Unlock kad fali) kad nije, tamno „✓ N" dok prvi tap čeka drugi.
+func _show_paid_coins() -> void:
+	var price := _coin_price()
+	var state := get_paid_button_state()
+	var style: StyleBoxFlat
+	match state:
+		"confirm":
+			style = UiCamp.paid_confirm_style()
+		"short":
+			style = UiCamp.unlock_button_style(UiCamp.SEASON_SHORT)
+		_:
+			style = UiCamp.paid_button_style(_buying)
+	unlock_button.set_styles(style, UiCamp.paid_button_style(true) if state == "price" else style)
+	unlock_button.set_text(("✓ %d" if state == "confirm" else "%d") % price)
+	match state:
+		"confirm":
+			unlock_button.set_ink(UiCamp.COIN_GOLD)
+		"short":
+			unlock_button.set_ink(UiCamp.SEASON_INK_DIM)
+		_:
+			unlock_button.set_ink(UiCamp.INK)
+	unlock_button.set_icon(UiAssets.get_chrome_icon("icon_coin"), UiCamp.UNLOCK_LOCK_ICON)
+	_set_dots(_buying)
+	unlock_button.disabled = _buying
+	unlock_button.mouse_filter = Control.MOUSE_FILTER_IGNORE if _buying else Control.MOUSE_FILTER_STOP
+
+
+func _coin_price() -> int:
+	var def: SeasonDef = GameState.get_season_def(_season_id) if not _season_id.is_empty() else null
+	return IAPManager.get_coin_price(def.iap_product_id) if def != null else 0
+
+
+func _is_confirming() -> bool:
+	return Time.get_ticks_msec() < _confirm_until
 
 
 ## 42, pa 38, pa 34. Ime se nikad ne reže.
@@ -370,6 +432,7 @@ func _fit_flower_name(text: String) -> void:
 
 
 func navigate_to_lock() -> void:
+	_confirm_until = 0
 	if _paid:
 		_go_home_paid(_season_id)
 		return
@@ -460,10 +523,45 @@ func _buy_paid() -> void:
 	if GameState.is_season_playable(def.id):
 		refresh()
 		return
+	if not MonetizationConfig.iap_enabled():
+		_buy_paid_coins(def)
+		return
 	_buying = true
 	_set_toast(false)
 	_show_paid(def)
 	IAPManager.purchase(def.iap_product_id)
+
+
+## v1: dva tapa kao u Shopu — prvi „✓ N" (3 s), drugi IAPManager.buy_with_coins (isti grant);
+## uspjeh ide kroz _on_purchase_completed (burst + Home). Bez coina: pilula koliko fali.
+func _buy_paid_coins(def: SeasonDef) -> void:
+	var price := _coin_price()
+	if int(GameState.wallet_coins) < price:
+		_confirm_until = 0
+		Sfx.play("ui_denied")
+		if is_inside_tree():
+			get_tree().call_group("meta_hub", "pulse_coin_chip")
+		_flash_toast(UiShopV2.need_coins_text(price))
+		_show_paid(def)
+		return
+	if not _is_confirming():
+		_confirm_until = Time.get_ticks_msec() + int(UiShopV2.T_CONFIRM_TIMEOUT * 1000.0)
+		Sfx.play("ui_tap")
+		_show_paid(def)
+		if is_inside_tree():
+			get_tree().create_timer(UiShopV2.T_CONFIRM_TIMEOUT + 0.05).timeout.connect(_on_confirm_timeout)
+		return
+	_confirm_until = 0
+	_buying = true
+	_set_toast(false)
+	_show_paid(def)
+	IAPManager.buy_with_coins(def.iap_product_id)
+
+
+func _on_confirm_timeout() -> void:
+	if _is_confirming() or _buying or _unlocking:
+		return
+	refresh()
 
 
 func _on_purchase_completed(sku: String) -> void:
@@ -484,6 +582,8 @@ func _on_purchase_completed(sku: String) -> void:
 	var busy := UiCamp.paid_button_style(true)
 	unlock_button.set_styles(busy, busy)
 	_set_dots(false)
+	unlock_button.set_icon(null, UiCamp.UNLOCK_LOCK_ICON)
+	unlock_button.set_ink(UiCamp.INK)
 	unlock_button.set_text(UiCamp.unlock_button_text(_state))
 	unlock_button.disabled = true
 	unlock_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -499,19 +599,30 @@ func _on_purchase_completed(sku: String) -> void:
 	tw.tween_callback(_finish_unlock.bind(def.id))
 
 
-func _on_purchase_failed(_sku: String, _reason: String) -> void:
+func _on_purchase_failed(sku: String, reason: String) -> void:
 	if not _buying:
 		return
 	_buying = false
 	refresh()
+	if not MonetizationConfig.iap_enabled():
+		# Coin kupovina: nikad „Purchase cancelled" — samo kad fale coini, koliko fali.
+		if reason == "need_coins":
+			_flash_toast(UiShopV2.need_coins_text(IAPManager.get_coin_price(sku)))
+		return
 	# failed: kratka pilula preko reda cvjetova, pa nazad na cijenu (camp_paid_card.json).
-	_set_toast(true)
+	_flash_toast(UiCamp.S_PURCHASE_CANCELLED)
+
+
+func _flash_toast(text: String) -> void:
+	_set_toast(true, text)
 	if is_inside_tree():
 		get_tree().create_timer(UiCamp.PAID_TOAST_LIFE).timeout.connect(_toast_layer.queue_redraw)
 
 
-func _set_toast(on: bool) -> void:
+func _set_toast(on: bool, text: String = UiCamp.S_PURCHASE_CANCELLED) -> void:
 	_toast_until = Time.get_ticks_msec() + int(UiCamp.PAID_TOAST_LIFE * 1000.0) if on else 0
+	if on:
+		_toast_text = text
 	if _toast_layer != null:
 		_toast_layer.queue_redraw()
 

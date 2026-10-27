@@ -17,11 +17,14 @@ static func find_scroll(from: Node) -> ScrollContainer:
 
 
 ## Vertikalni pomak gesture; 0.0 ako event nije drag s pritisnutim pointerom.
+## Emulirani miš (telefon) se preskače — isti pomak već stiže kao ScreenDrag.
 static func drag_delta(event: InputEvent) -> float:
 	if event is InputEventScreenDrag:
 		return (event as InputEventScreenDrag).relative.y
 	if event is InputEventMouseMotion:
 		var motion := event as InputEventMouseMotion
+		if motion.device == InputEvent.DEVICE_ID_EMULATION:
+			return 0.0
 		if motion.button_mask & MOUSE_BUTTON_MASK_LEFT:
 			return motion.relative.y
 	return 0.0

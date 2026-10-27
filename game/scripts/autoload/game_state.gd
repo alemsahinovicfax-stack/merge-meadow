@@ -174,6 +174,9 @@ var seasons_domain: SeasonsDomain
 var level_path_domain: LevelPathDomain
 var save_migrations: SaveMigrations
 var debug: GameStateDebug
+## RET-01: lokalni brojač aktivnosti (dani, sesije, vrijeme igre) — opcioni ključ "activity".
+var activity: ActivityLog
+var _activity_timer: Timer
 
 ## Shop v2: Merge Hint je jednokratna kupovina — boosters.merge_hint_owned je izvor.
 var merge_hint_owned: bool:
@@ -329,6 +332,7 @@ func _ready() -> void:
 	level_path_domain = LevelPathDomain.new(self)
 	save_migrations = SaveMigrations.new(self)
 	debug = GameStateDebug.new(self)
+	activity = ActivityLog.new()
 	# Desktop dev: miš mora ostati miš (emulacija toucha lomi BaseButton.signale).
 	Input.emulate_touch_from_mouse = false
 	if not load_player_save():
@@ -341,6 +345,7 @@ func _ready() -> void:
 			_ensure_first_launch()
 	else:
 		apply_debug_leftover_test_bag()
+	_start_activity()
 
 
 func load_player_save() -> bool:
@@ -411,9 +416,63 @@ func _save_changed_on_disk() -> bool:
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_RESUMED:
+		if _activity_timer != null:
+			activity.resume(_today_key(), int(Time.get_unix_time_from_system()))
+		return
+	if (what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED) \
+			and _activity_timer != null:
+		# Vrijeme igre do pauze mora na disk i kad ništa drugo ne čeka snimanje — Android
+		# smije ubiti aplikaciju u pozadini bez novog obavještenja.
+		activity.pause(_today_key(), int(Time.get_unix_time_from_system()))
+		_save_soon_pending = true
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED \
 			or what == NOTIFICATION_PREDELETE:
 		flush_save_soon()
+
+
+## RET-01: brojač radi samo kad igra stvarno teče (ne headless testovi). Pokretanje = sesija.
+func _start_activity() -> void:
+	if not ActivityLog.enabled() or _save_unreadable:
+		return
+	activity.start(_today_key(), int(Time.get_unix_time_from_system()), first_launch_unix)
+	_activity_timer = Timer.new()
+	_activity_timer.name = "ActivityTick"
+	_activity_timer.wait_time = ActivityLog.TICK_SEC
+	_activity_timer.timeout.connect(_tick_activity)
+	add_child(_activity_timer)
+	_activity_timer.start()
+	# Dan se upiše i kad igrač zatvori igru prije prvog drugog snimanja.
+	save_player_save_soon()
+
+
+func _tick_activity() -> void:
+	activity.tick(_today_key(), int(Time.get_unix_time_from_system()))
+
+
+## Ekran statistike (Settings → 5 dodira na verziju): stanje do ove sekunde.
+func activity_snapshot() -> Dictionary:
+	if _activity_timer != null:
+		_tick_activity()
+	return activity.snapshot(_today_key())
+
+
+## Copy red za kalkulator (scripts/analytics/retention_forecast.py cohort).
+func activity_csv_row() -> String:
+	if _activity_timer != null:
+		_tick_activity()
+	var version := str(ProjectSettings.get_setting("application/config/version", "0.1.0"))
+	return activity.csv_row(version, _today_key())
+
+
+func _note_activity_run(played_level: int) -> void:
+	if _activity_timer == null:
+		return
+	var today := _today_key()
+	activity.note_run(today, int(Time.get_unix_time_from_system()), played_level, active_season_id)
+	var top := highest_unlocked_free_id()
+	var passed := level_path_domain.level_of(top) - 1 if not top.is_empty() else 0
+	activity.note_progress(today, tutorial_complete, is_endless_unlocked(active_season_id), top, passed)
 
 
 func save_player_save() -> void:
@@ -423,6 +482,8 @@ func save_player_save() -> void:
 		return
 	_save_soon_pending = false
 	stash_upgrade_levels(active_season_id)
+	if _activity_timer != null:
+		_tick_activity()
 	var data := {
 		"version": SAVE_VERSION,
 		"wallet_coins": wallet_coins,
@@ -455,6 +516,7 @@ func save_player_save() -> void:
 	data.merge(arena_domain.to_save_dict())
 	data.merge(seasons_domain.to_save_dict())
 	data.merge(level_path_domain.to_save_dict())
+	data.merge(activity.to_save_dict())
 	var text := JSON.stringify(data)
 	if not _write_save_atomic(text):
 		return
@@ -757,6 +819,7 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	bloom_inbox_domain.apply_from_save(data)
 	seasons_domain.apply_from_save(data)
 	level_path_domain.apply_from_save(data)
+	activity.apply_from_save(data)
 	_normalize_season_progress()
 	if data.has("season_upgrades"):
 		season_upgrades = _parse_season_upgrades(data.get("season_upgrades", {}))
@@ -1563,8 +1626,10 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 	_add_coins(last_run_coins)
 	# Tutorijal run (i onaj koji ga završava) nije level kampanje — Level Path ostaje na 1.
 	var was_tutorial := not tutorial_complete
+	var played_level := 0 if was_tutorial else run_level
 	tutorial.advance_after_run()
 	if was_tutorial:
+		_note_activity_run(played_level)
 		save_player_save()
 		return
 	if run_is_endless:
@@ -1576,6 +1641,7 @@ func finish_run(seeds_by_type: Dictionary, raw_coins: int, failed: bool, elapsed
 		var step := level_path_domain.advance(active_season_id)
 		if not step.is_empty():
 			level_path_hop = {"season": active_season_id, "from": int(step[0]), "to": int(step[1])}
+	_note_activity_run(played_level)
 	save_player_save()
 
 
@@ -2365,7 +2431,10 @@ func spawn_arena_chips_from_bag() -> Array:
 
 
 func try_merge_arena_chips(chip_a: int, chip_b: int, chip_data: Dictionary) -> Dictionary:
-	return arena_domain.try_merge_chips(chip_a, chip_b, chip_data)
+	var result := arena_domain.try_merge_chips(chip_a, chip_b, chip_data)
+	if bool(result.get("ok", false)) and _activity_timer != null:
+		activity.note_merge(_today_key(), int(Time.get_unix_time_from_system()))
+	return result
 
 
 ## Resolve one arena leftover chip. Never silently drops T2+ (Bug-016).

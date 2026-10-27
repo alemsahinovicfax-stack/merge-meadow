@@ -13,6 +13,8 @@ tags: [hub, produkcija]
 - [[plan-arhitektura-refaktor|plan-arhitektura-refaktor]] — kod arhitektura refaktor (nakon CAMP-06)
 - [[d0-prelaunch-checklist|d0-prelaunch-checklist]] — Faza 1 checklist (prije Play $25)
 - [[troskovi-launcha|troskovi-launcha]] — naknade store + faze objave (Android → iOS)
+- [[procjena-igraca|procjena-igraca]] — koliko će ljudi igrati: retencija, DAU, brojač u igri, kalkulator, odluka o analitici (RET-01)
+- [[testiranje|testiranje]] — playtest prvog iskustva + protokol closed testa
 - [[scope-i-granice|scope-i-granice]] — što JE i što NIJE u v1
 - [[verzije-nakon-launcha|verzije-nakon-launcha]] — v1.1+ parking (ne planirati detaljno sada)
 - [[ideje-roadmap-implementacije|ideje-roadmap-implementacije]] — build order F0–F9 (staro, vidi CHECKPOINT za trenutno stanje)

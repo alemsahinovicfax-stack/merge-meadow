@@ -368,6 +368,10 @@ func _gui_input(event: InputEvent) -> void:
 	var down := false
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
+		# Telefon: emulirani miš prati svaki dodir — pritisak ide samo kroz touch.
+		if mb.device == InputEvent.DEVICE_ID_EMULATION:
+			accept_event()
+			return
 		if mb.button_index != MOUSE_BUTTON_LEFT:
 			return
 		down = mb.pressed

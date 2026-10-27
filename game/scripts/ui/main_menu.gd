@@ -844,6 +844,10 @@ func is_basket_attention_active() -> bool:
 
 
 func _on_daily_chest_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
+		# Telefon: emulirani miš prati svaki dodir — tap ide samo kroz touch.
+		gift_chest.accept_event()
+		return
 	var tapped := false
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
@@ -1100,7 +1104,9 @@ func _on_picker_dim_gui_input(event: InputEvent) -> void:
 	var tapped := false
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
-		tapped = mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT
+		# Telefon: emulirani miš prati svaki dodir — tap ide samo kroz touch.
+		tapped = mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT \
+				and mb.device != InputEvent.DEVICE_ID_EMULATION
 	elif event is InputEventScreenTouch:
 		tapped = (event as InputEventScreenTouch).pressed
 	if tapped:
@@ -1215,7 +1221,9 @@ func _on_upgrades_dim_gui_input(event: InputEvent) -> void:
 	var tapped := false
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
-		tapped = mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT
+		# Telefon: emulirani miš prati svaki dodir — tap ide samo kroz touch.
+		tapped = mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT \
+				and mb.device != InputEvent.DEVICE_ID_EMULATION
 	elif event is InputEventScreenTouch:
 		tapped = (event as InputEventScreenTouch).pressed
 	if tapped:

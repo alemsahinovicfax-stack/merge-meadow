@@ -100,7 +100,27 @@ const S := {
 	"dev_test_bag_on": "Test seeds: on", "dev_test_bag_off": "Test seeds: off",
 	"dev_ump_eea_on": "Consent as EU: on", "dev_ump_eea_off": "Consent as EU: off",
 	"dev_ump_reset": "Reset ad consent",
+	"stats": "Your stats", "stats_day": "Day %d", "stats_since": "since %s", "stats_version": "Version %s",
+	"stats_back": "Came back", "stats_days": "Days played: %d of %d", "stats_first_days": "First 14 days",
+	"stats_play": "Play", "stats_sessions": "sessions", "stats_minutes": "minutes", "stats_runs": "runs",
+	"stats_furthest": "Furthest", "stats_levels": "%s · %d / 20",
+	"stats_tutorial": "Tutorial done", "stats_endless": "Endless unlocked", "stats_merge": "First merge",
+	"stats_on_day": "day %d", "stats_not_yet": "not yet", "stats_play_time": "%d:%02d of play",
+	"stats_yes": "✓", "stats_no": "No", "stats_later": "Later", "stats_unknown": "?",
+	"stats_copy": "Copy for the developer", "stats_copied": "Copied",
+	"stats_copy_sub": "Copies one line of text. Nothing leaves your phone unless you send it.",
 }
+
+# --- Ekran statistike (RET-01): 5 dodira na verziju za 3 s ---
+const STATS_TAPS := 5
+const STATS_TAP_WINDOW := 3.0
+const STATS_RETENTION_DAYS: Array[int] = [1, 3, 7, 14, 30]
+const STATS_STRIP_DAYS := 14
+const STATS_CHIP := Vector2(168, 132)
+const STATS_CELL := Vector2(120, 60)
+const STATS_ROW_H := 64
+const STATS_NUMBER_FONT := 56
+const VERSION_ROW_H := 96
 
 enum Restore { IDLE, BUSY, DONE, NONE, FAIL }
 

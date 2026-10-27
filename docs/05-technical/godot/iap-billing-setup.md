@@ -9,11 +9,13 @@ povezano:
   - admob-setup
   - sigurnost
   - play-console-sutra
-ai_sažetak: "GodotGooglePlayBilling 3.3.0 je u game/addons (od 2026-10-23); IAPManager ga učitava po putanji (GDScript class_name, ne ClassDB): connect → katalog → purchase → acknowledge/consume → grant, reconnect, pending, restore; proizvodi u Play Consoleu još ne postoje."
+ai_sažetak: "GodotGooglePlayBilling 3.3.0 je u game/addons (od 2026-10-23), za v1 (samo reklame, 2026-10-26) isključen u project.godot; IAPManager ga učitava po putanji (GDScript class_name, ne ClassDB): connect → katalog → purchase → acknowledge/consume → grant, reconnect, pending, restore; proizvodi u Play Consoleu još ne postoje."
 ---
 
 # Google Play Billing setup (Godot 4.7)
 
+> **Stanje 2026-10-26 (v1 samo s reklamama):** `MonetizationConfig.IAP_ENABLED = false` i plugin je **isključen** u `project.godot` → `[editor_plugins]` (fajlovi ostaju u `addons/`), pa AAB nema `.aar` ni dozvolu `com.android.vending.BILLING`. Stvari iz tabele ispod kupuju se coinima (`IAPManager.buy_with_coins`, isti grant). **Povratak IAP-a:** Project Settings → Plugins → GodotGooglePlayBilling on, `IAP_ENABLED := true`, proizvodi u Play Consoleu, novi AAB.
+>
 > **Stanje 2026-10-23 (LAUNCH-PREP B):** plugin **3.3.0** je instaliran u `game/addons/GodotGooglePlayBilling/` i uključen u `project.godot`. `IAPManager` radi pravi Play tok na Androidu, a stub na desktopu / u editoru. **Netestirano s pravim Playom** — proizvodi u Play Consoleu još ne postoje (vidi [[../../06-production/play-console-sutra|play-console-sutra]] § 0: BiH nije merchant zemlja).
 
 ## 1. Plugin

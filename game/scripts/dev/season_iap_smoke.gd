@@ -1,6 +1,7 @@
 extends SceneTree
 
 ## SEZ-E — stub season IAP grant + own + dev reset (does not change free unlock math).
+## Play tok → iap_override = 1 (mora raditi kad se kupovine vrate; v1 coin tok: coin_offers_smoke).
 
 const SAVE_PATH := "user://player_save.json"
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
@@ -15,10 +16,12 @@ var _backup: String = ""
 
 func _initialize() -> void:
 	_backup = CampSmokeUtil.backup_save()
+	MonetizationConfig.iap_override = 1
 	call_deferred("_run")
 
 
 func _quit(code: int) -> void:
+	MonetizationConfig.iap_override = -1
 	CampSmokeUtil.restore_save(self, _backup)
 	quit(code)
 

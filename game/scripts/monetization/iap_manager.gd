@@ -1,6 +1,8 @@
 extends Node
 
 ## IAP — stub on desktop/editor; Google Play Billing 3.x (GodotGooglePlayBilling) on Android.
+## v1 bez kupovina pravim novcem (MonetizationConfig.IAP_ENABLED = false): iste stvari za coine kroz
+## buy_with_coins — isti grant i isti signali.
 
 signal purchase_completed(sku: String)
 signal purchase_failed(sku: String, reason: String)
@@ -87,6 +89,8 @@ var _pending_purchase_sku: String = ""
 var _pending_ack_tokens: Dictionary = {}
 ## Zadnji Loot Burst {flower, added} — Shop iz njega pravi toast „+5 <cvijet>".
 var last_loot_burst: Dictionary = {}
+## true samo dok traje purchase_completed coin kupovine (AudioManager: coins_spend, ne purchase_ok).
+var _coin_purchase: bool = false
 
 
 func _ready() -> void:
@@ -136,6 +140,9 @@ func owns_product(sku: String) -> bool:
 
 
 func get_price_label(sku: String) -> String:
+	if not CONFIG.iap_enabled():
+		# v1 bez kupovina: nikad „€" — coin cijenu UI čita iz get_coin_price.
+		return ""
 	var store_price := str(_store_prices.get(sku, ""))
 	if not store_price.is_empty():
 		return store_price
@@ -183,6 +190,64 @@ func purchase(sku: String) -> void:
 			if _billing_client != null:
 				_schedule_reconnect()
 			purchase_failed.emit(sku, "unavailable")
+
+
+# --- kupovina za coine (v1 bez kupovina pravim novcem, 2026-10-26) ----------------------------
+
+## Cijena u coinima dok su kupovine pravim novcem isključene (0 = ne prodaje se za coine).
+func get_coin_price(sku: String) -> int:
+	return CONFIG.coin_price(sku) if CONFIG.sells_for_coins(sku) else 0
+
+
+## Prodaje li se SKU sada za coine: IAP isključen, ima coin cijenu i nije sezona koja još nije u
+## igri (Ember dok je test-zaključan ostaje skriven).
+func is_coin_offer(sku: String) -> bool:
+	if not CONFIG.sells_for_coins(sku):
+		return false
+	return not GameState.is_test_locked_season(CONFIG.season_id_for_sku(sku))
+
+
+func is_coin_purchase() -> bool:
+	return _coin_purchase
+
+
+## Kupovina za coine kroz ISTI grant kao Play (_grant_product — ista save polja i otključavanje):
+## prvo sve provjere, pa coini atomarno (GameState._try_spend_coins), pa grant (snima). Bez
+## dovoljno coina ništa se ne daje. Javlja se istim signalima kao Play, pa Shop / Home / Camp rade
+## kao za IAP. Poruke kao Cosmetics.buy_with_coins.
+func buy_with_coins(sku: String) -> String:
+	if not is_coin_offer(sku):
+		purchase_failed.emit(sku, "unavailable")
+		return "Not available."
+	if owns_product(sku):
+		purchase_failed.emit(sku, "already_owned")
+		return "Already yours."
+	if sku == CONFIG.SKU_BOOSTER_LOOT_BURST and not GameState.can_buy_loot_burst():
+		# Sve besplatne sezone otključane — kao s Playom: kartica nestaje, kupovina se odbija.
+		purchase_failed.emit(sku, "unavailable")
+		return "Not available."
+	var cost := get_coin_price(sku)
+	if not GameState._try_spend_coins(cost):
+		purchase_failed.emit(sku, "need_coins")
+		return "Need %d coins." % cost
+	last_loot_burst = {}
+	_grant_product(sku, "", true)
+	if not _coin_grant_ok(sku):
+		# Ne bi trebalo (provjere su gore) — ali coini se nikad ne gube.
+		GameState._add_coins(cost)
+		GameState.save_player_save()
+		purchase_failed.emit(sku, "grant_failed")
+		return "Didn’t go through."
+	_coin_purchase = true
+	purchase_completed.emit(sku)
+	_coin_purchase = false
+	return "Purchased %s!" % CONFIG.get_product_title(sku)
+
+
+func _coin_grant_ok(sku: String) -> bool:
+	if CONFIG.is_consumable(sku):
+		return not last_loot_burst.is_empty()
+	return owns_product(sku)
 
 
 func restore_purchases() -> void:

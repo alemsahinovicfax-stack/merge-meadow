@@ -9,12 +9,12 @@ povezano:
   - play-internal-test
   - privacy-policy-draft
   - iap-billing-setup
-ai_sažetak: "Gotovi odgovori za Play Console (Data safety, IARC, ciljna publika, IAP proizvodi, closed test + poziv testerima, payments profile — BiH nije merchant zemlja, app-ads.txt) — korisnik samo prepisuje."
+ai_sažetak: "Gotovi odgovori za Play Console (Data safety, IARC, ciljna publika, closed test + poziv testerima, app-ads.txt) — korisnik samo prepisuje. v1 izlazi samo s reklamama (odluka 2026-10-26: BiH nije merchant zemlja; IAP stvari za coine, Billing plugin isključen); IAP proizvodi i payments profile tek kad se vrati merchant."
 ---
 
 # Play Console — odgovori za prepisati
 
-> Roditelj: [[06-production/_index|06-production]] · Plan: [[launch-prep-plan|launch-prep-plan]] · Napisano 2026-10-23 prema onome što igra **stvarno radi** (provjereno u kodu, ne pretpostavljeno).
+> Roditelj: [[06-production/_index|06-production]] · Plan: [[launch-prep-plan|launch-prep-plan]] · Napisano 2026-10-23 prema onome što igra **stvarno radi** (provjereno u kodu, ne pretpostavljeno); 2026-10-26 prebačeno na v1 bez kupovina (§ 0, § 4, § 5).
 
 ## 0. Prvo pročitaj — BiH i prodaja
 
@@ -26,12 +26,15 @@ ai_sažetak: "Gotovi odgovori za Play Console (Data safety, IARC, ciljna publika
 | AdMob reklame i isplata zarade od reklama | ✅ poseban program, ne treba Play merchant (provjeri da AdMob isplaćuje na BiH račun) |
 | In-app kupovine (Remove Ads, sezone, Sir Pip…) | ❌ ne može bez payments profila u podržanoj zemlji |
 
-**Opcije** (odluka je tvoja):
-1. **v1 samo s reklamama** — igra izlazi besplatna, kupovine se sakriju dok ne riješiš merchant. **Prekidač postoji (2026-10-23):** u `game/scripts/monetization/monetization_config.gd` postavi `const IAP_ENABLED := false`, pa napravi novi AAB. Shop tada ima samo Looks (kozmetika za coine), nema Premium taba na Homeu, plaćene sezone u Campu, Sir Pipa ni Settings → Purchases, a Billing se ne spaja. Kad riješiš merchant: vrati na `true`, napravi proizvode u Play Consoleu (§ 6), novi AAB. U tom slučaju u Play Consoleu ne pravi IAP proizvode, a Data safety ostaje isti. Billing plugin i dalje dodaje dozvolu `BILLING` u manifest — to Play dozvoljava i bez proizvoda; ako ipak zatraži payments profil, isključi plugin (Project → Project Settings → Plugins → GodotGooglePlayBilling) i napravi novi AAB.
-2. **Firma ili prebivalište u podržanoj zemlji** — npr. Hrvatska, Srbija, Sjeverna Makedonija su podržane. Payments profil mora biti na pravno lice / osobu iz te zemlje, s računom i poreznim podacima te zemlje.
-3. ❌ **Tuđi nalog / tuđi payments profil** — ne. Google to tretira kao lažno predstavljanje i gasi nalog.
+**Odluka (2026-10-26): v1 izlazi samo s reklamama.** U kodu je `const IAP_ENABLED := false` (`game/scripts/monetization/monetization_config.gd`):
+- Stvari koje su se prodavale pravim novcem kupuju se **coinima iz igre** (isti grant kao Play): teme Moonlit / Coral / Starfall, Sir Pip, Merge Hint i Loot Burst — Shop · Seasons / Looks / Boosters, Home · Premium, Camp poslije besplatnih sezona. Cijene: [[../02-design/ekonomija-brojevi#Coin cijene bez kupovina (v1, 2026-10-26)|ekonomija-brojevi]].
+- **Remove Ads** i **Starter Pack** se ne nude (reklame su jedina zarada; paket daje coine i ima tajmer), nema taba Support ni Settings → Purchases / Restore.
+- **Billing plugin je isključen** (Project Settings → Plugins → GodotGooglePlayBilling), pa AAB nema dozvolu `com.android.vending.BILLING` — inače Play obično na listingu pokaže „In-app purchases" iako proizvoda nema. Billing se ne spaja.
+- U Play Consoleu **ne pravi** IAP proizvode (§ 6) ni payments profile (§ 9); Data safety i IARC odgovaraj po varijanti bez kupovina (§ 4, § 5).
 
-Dok merchant nije riješen, Play Console neće ni dozvoliti pravljenje IAP proizvoda (traži payments profil). Kod je spreman: kad proizvodi postoje, Shop sam povuče prave cijene.
+**Kad se jednom riješi merchant** (firma ili prebivalište u podržanoj zemlji — npr. Hrvatska, Srbija, Sjeverna Makedonija; payments profil na pravno lice / osobu iz te zemlje): uključi plugin, `IAP_ENABLED := true`, napravi proizvode (§ 6), promijeni odgovore u § 4 i § 5 na varijantu s kupovinama, novi AAB. Što je igrač kupio coinima ostaje njegovo (Play restore ništa ne oduzima, prikazuje se kao Owned).
+
+❌ **Tuđi nalog / tuđi payments profil** — ne. Google to tretira kao lažno predstavljanje i gasi nalog.
 
 ---
 
@@ -64,7 +67,7 @@ Store tekst i 8 screenshotova: [[store-listing-en|store-listing-en]], `marketing
 
 ## 4. App content → Data safety
 
-Igra **nema server ni nalog**. Napredak je samo na telefonu (`user://player_save.json`). Jedini SDK koji šalje podatke je **Google Mobile Ads (AdMob)**; Google Play Billing obrađuje kupovine kod Googlea. Googleova lista podataka koje AdMob skuplja: [Play data disclosure](https://developers.google.com/admob/android/privacy/play-data-disclosure).
+Igra **nema server ni nalog**. Napredak je samo na telefonu (`user://player_save.json`). Jedini SDK koji šalje podatke je **Google Mobile Ads (AdMob)**. v1 nema kupovina — Billing plugin nije u buildu (§ 0). Googleova lista podataka koje AdMob skuplja: [Play data disclosure](https://developers.google.com/admob/android/privacy/play-data-disclosure).
 
 **Opšta pitanja**
 
@@ -85,8 +88,8 @@ Igra **nema server ni nalog**. Napredak je samo na telefonu (`user://player_save
 
 **Ne označavaj:** ime, kontakte, fotografije, poruke, preciznu lokaciju, zdravlje.
 
-**Dva granična slučaja** (Play definicija: „collected" = aplikacija šalje podatak s uređaja):
-- *Financial info → Purchase history* — kupovinu obrađuje Google Play, igra token čuva samo lokalno i nikome ga ne šalje → po definiciji nije „collected". **Sigurnija varijanta:** označi Collected = Yes, Shared = No, svrha *App functionality* — ništa ne gubiš, a pregled ne može reći da si nešto prešutio.
+**Granični slučajevi** (Play definicija: „collected" = aplikacija šalje podatak s uređaja):
+- *Financial info → Purchase history* — **v1: ne označavaj** (nema kupovina ni Billinga; coini iz igre nisu finansijski podatak). *Kad se IAP vrati:* kupovinu obrađuje Google Play, igra token čuva samo lokalno i nikome ga ne šalje → po definiciji nije „collected"; sigurnija varijanta je Collected = Yes, Shared = No, svrha *App functionality*.
 - *Personal info → Email address* — igrač piše podršci iz svoje email aplikacije, ne iz igre → ne označavaj. (Ako jednom dodaš formular za podršku u igri, onda da.)
 
 > Ako kasnije dodaš analitiku, crash reporting ili cloud save → ovaj formular **i** politika se moraju ažurirati.
@@ -104,12 +107,16 @@ Igra **nema server ni nalog**. Napredak je samo na telefonu (`user://player_save
 | Kockanje (pravi novac / simulirano) | No |
 | Korisnici međusobno komuniciraju / dijele sadržaj | No (nema chata, naloga ni dijeljenja) |
 | Dijeli lokaciju korisnika s drugim korisnicima | No |
-| Digitalne kupovine | **Yes** |
-| Nasumični predmeti za pravi novac (loot box) | **Yes (sigurniji odgovor)** — Loot Burst daje određene ★3 cvjetove, ali kad nema cilja, daje 5 **nasumičnih** sjemenki. Oznaka će biti „In-Game Purchases (Includes Random Items)". |
+| Digitalne kupovine | **No** — v1 nema kupovina pravim novcem; teme, Sir Pip i boosteri se kupuju coinima zarađenim u igri (coini se ne prodaju) |
+| Nasumični predmeti za pravi novac (loot box) | **No** — ništa se ne prodaje za pravi novac (Loot Burst je za coine i daje određene ★3 cvjetove) |
 
-Očekivano: PEGI 3 / ESRB Everyone, uz oznake In-Game Purchases.
+Očekivano: PEGI 3 / ESRB Everyone, **bez** oznake In-Game Purchases.
+
+*Kad se IAP vrati:* Digitalne kupovine = **Yes**; nasumični predmeti = **Yes (sigurniji odgovor)** — Loot Burst kad nema cilja daje 5 nasumičnih sjemenki (stari saveovi) → oznaka „In-Game Purchases (Includes Random Items)". IARC upitnik se tada ponovo ispunjava.
 
 ## 6. Monetize → Products → In-app products (one-time)
+
+> **Tek kad se vrati merchant** (§ 0: plugin uključen + `IAP_ENABLED := true`). Za v1 ovdje ništa ne pravi — Play bez payments profila to ni ne dozvoljava.
 
 Play više nema tip „consumable" na proizvodu — igra sama odlučuje (`consume_purchase` za Loot Burst, `acknowledge` za ostalo). **Product ID mora biti tačno ovakav** (kod: `game/scripts/monetization/monetization_config.gd`). Cijene ispod su rezervne cijene iz igre — unesi iste EUR iznose (ili ih promijeni na oba mjesta).
 
@@ -138,6 +145,7 @@ Za lične naloge napravljene poslije 13. 11. 2023: **najmanje 12 testera, neprek
 3. Upload AAB: `game/export/android/merge_meadow.aab` (pravi ga `scripts/android-export.ps1 -Preset Aab`).
 4. Pošalji poziv (tekst ispod) s **opt-in linkom** iz Play Consolea.
 5. Prati 14 dana; svaki tester mora ostati prijavljen. Poslije: Production → Apply for production (Google pita šta si naučio iz testa — zapisuj feedback).
+6. **Mjerenje (RET-01):** igra sama broji dane igranja. **Ne podsjećaj testere da igraju** — tek 15. dan ili kasnije pošalji poruku za kraj testa (ispod) i kratku anketu. Red sa ekrana statistike ide u `testeri.csv` → `python scripts/analytics/retention_forecast.py cohort --csv testeri.csv`. Cijeli protokol: [[testiranje#Closed test — mjerenje (RET-01)|testiranje § Closed test]].
 
 **Poziv testerima — EN**
 
@@ -145,7 +153,7 @@ Za lične naloge napravljene poslije 13. 11. 2023: **najmanje 12 testera, neprek
 > 1. Open this link on your Android phone and tap **"Become a tester"**: [OPT-IN LINK]
 > 2. Install Merge Meadow from the Play Store link on that page.
 > 3. Keep it installed for 14 days and play a few minutes when you feel like it.
-> Purchases in the test are free (test card). Any feedback — bugs, what felt hard or boring — is gold. Thank you! 🌼
+> Any feedback — bugs, what felt hard or boring — is gold. After the 14 days I'll ask you for one short survey and one line of stats from the game (it takes a minute). Thank you! 🌼
 
 **Poziv testerima — BS**
 
@@ -153,7 +161,15 @@ Za lične naloge napravljene poslije 13. 11. 2023: **najmanje 12 testera, neprek
 > 1. Na Android telefonu otvori ovaj link i klikni **„Become a tester"**: [OPT-IN LINK]
 > 2. Instaliraj Merge Meadow s Play Store linka na toj stranici.
 > 3. Drži je instaliranu 14 dana i igraj par minuta kad ti se da.
-> Kupovine u testu su besplatne. Svaki komentar — bug, šta je teško ili dosadno — puno pomaže. Hvala! 🌼
+> Svaki komentar — bug, šta je teško ili dosadno — puno pomaže. Poslije 14 dana zamolit ću te za kratku anketu i jedan red statistike iz igre (traje minut). Hvala! 🌼
+
+**Poruka za kraj testa (15. dan ili kasnije) — EN**
+
+> Thanks for testing Merge Meadow! Last step (1 minute): open the game → ⚙️ Settings → scroll to the bottom → tap the version line **5 times** → **Copy for the developer** → paste that line into this form: [FORM LINK]. The line only has play days and counts — nothing personal. Even if you stopped playing on day 1, your line helps a lot. 🌼
+
+**Poruka za kraj testa (15. dan ili kasnije) — BS**
+
+> Hvala što si testirao/la Merge Meadow! Zadnji korak (1 minut): otvori igru → ⚙️ Settings → skroz dolje → tapni red s verzijom **5 puta** → **Copy for the developer** → zalijepi taj red u ovu formu: [FORM LINK]. U redu su samo dani igranja i brojevi — ništa lično. I ako si prestao/la igrati prvi dan, tvoj red puno pomaže. 🌼
 
 ## 8. AdMob + app-ads.txt
 
@@ -167,7 +183,7 @@ Za lične naloge napravljene poslije 13. 11. 2023: **najmanje 12 testera, neprek
    - Šablon fajla: `docs/06-production/app-ads/app-ads.txt` — agent upiše tvoj publisher ID i objavi kad ga dobije.
 5. Crawl traje do 24 h; status u AdMob → Apps → app-ads.txt.
 
-## 9. Payments profile (kad riješiš zemlju — § 0)
+## 9. Payments profile (tek kad se vraćaju kupovine — § 0)
 
 1. Play Console → Setup → Payments profile → Create (ili poveži postojeći Google payments profil).
 2. Tip: Individual ili Business, zemlja = **podržana merchant zemlja**.

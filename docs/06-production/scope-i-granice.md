@@ -14,7 +14,7 @@ ai_sažetak: "v1 IN/OUT scope za solo deva; scope guard referenca za agenta."
 
 ## Sažetak
 
-v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), realan za solo studenta (~5–8 h/tj., 4–6 mj.).
+v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju, realan za solo studenta (~5–8 h/tj., 4–6 mj.). **v1 izlazi samo s reklamama** (odluka 2026-10-26: BiH nije Google Play merchant zemlja) — ono što se planiralo za pravi novac kupuje se coinima iz igre; IAP se vraća kad se riješi merchant.
 
 ## v1 launch — IN scope ✅
 
@@ -33,19 +33,20 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - Splash → tutorial run (prvi launch) → main menu
 - Loot ekran: ×2 rewarded, revive rewarded (max 1/run), retry, u kamp
 - Kamp: merge, upgrade, daily chest
-- Settings ekran (zupčanik u headeru): Music i Sound effects (slider + mute), Vibration, Reduce motion, Restore purchases, Remove Ads status, Privacy choices (pristanak za reklame), Privacy policy, Contact support, Credits, Version; Dev sekcija samo u debug buildu — dodano 2026-10-12 na zahtjev, [[../04-experience/design-drafts/ispravke-settings-cd-brief|ispravke-settings-cd-brief]]
+- Settings ekran (zupčanik u headeru): Music i Sound effects (slider + mute), Vibration, Reduce motion, Restore purchases i Remove Ads status (samo s IAP-om — u v1 ih nema), Privacy choices (pristanak za reklame), Privacy policy, Contact support, Credits, Version; Dev sekcija samo u debug buildu — dodano 2026-10-12 na zahtjev, [[../04-experience/design-drafts/ispravke-settings-cd-brief|ispravke-settings-cd-brief]]
 - Classic Pip je pravi skin u Ormaru (besplatan, ne prodaje se); zlatni okvir Albuma radi sa skrolom — 2026-10-12, isti brief
-- Camp link kartica: poslije svih besplatnih sezona nudi sljedeću plaćenu (samo cijena, IAP), dizajn plaćenih kartica u Season Kit stilu (CD); Home polje sezone pokazuje ukupno uzgojeno ★3; vreća sjemena bez limita; nadogradnje smiju trošiti i ★3 čuvano za sljedeću sezonu — 2026-10-16 na zahtjev, [[../04-experience/design-drafts/ispravke-1016-izvjestaj|ispravke-1016-izvjestaj]]
+- Camp link kartica: poslije svih besplatnih sezona nudi sljedeću plaćenu (samo cijena — u v1 coin cijena, dva tapa; s IAP-om €), dizajn plaćenih kartica u Season Kit stilu (CD); Home polje sezone pokazuje ukupno uzgojeno ★3; vreća sjemena bez limita; nadogradnje smiju trošiti i ★3 čuvano za sljedeću sezonu — 2026-10-16 na zahtjev, [[../04-experience/design-drafts/ispravke-1016-izvjestaj|ispravke-1016-izvjestaj]]
 - Muncher u Areni: novi lik (Nibbs, krtica — u igri 2026-10-14; cutout rig + animacije svih stanja, krtičnjak); pravila ponašanja ostaju — dodano 2026-10-12 na zahtjev, [[../04-experience/design-drafts/muncher-premium-pip-cd-brief|muncher-premium-pip-cd-brief]]
-- Premium Pip skin (1 komad, pravi novac): Sir Pip · Meadow Knight (u igri 2026-10-14, SKU `pip_knight`, cijena prijedlog €3.99) — potpuno drugačiji dizajn i tema, vlastiti dijelovi i animacije, Shop Looks + Ormar; samo kozmetika (Pillar 2) — 2026-10-12, isti brief
-- Shop: remove ads, starter pack (7 dana od prvog pokretanja), boosteri (Merge Hint jednokratan, Loot Burst consumable) — Shop v2, 2026-10-02
+- Premium Pip skin (1 komad): Sir Pip · Meadow Knight (u igri 2026-10-14, SKU `pip_knight`; v1 za coine, s IAP-om prijedlog €3.99) — potpuno drugačiji dizajn i tema, vlastiti dijelovi i animacije, Shop Looks + Ormar; samo kozmetika (Pillar 2) — 2026-10-12, isti brief
+- Shop: boosteri (Merge Hint jednokratan, Loot Burst više puta) i teme — Shop v2, 2026-10-02. **v1 (2026-10-26):** tabovi Seasons · Looks · Boosters, sve za coine (dva tapa, „Need N more coins"); tab Support (Remove Ads, Starter Pack 7 dana, Restore) samo s IAP-om
 
 ### Monetizacija
 - AdMob rewarded video (×2 loot, revive)
 - Opcionalni interstitial **samo** na loot ekranu (A/B post-launch)
-- IAP: remove ads, starter pack, boosters, premium Pip skin (samo kozmetika, od 2026-10-12)
-- **Prekidač za IAP** (2026-10-23, na zahtjev): `MonetizationConfig.IAP_ENABLED = false` → v1 samo s reklamama (BiH nije Google Play merchant zemlja). Sakrije sve ponude za pravi novac (Shop tabovi Seasons / Boosters / Support, Sir Pip, Home Premium tab, Camp kartica plaćene sezone, Settings → Purchases) i ne spaja Billing; što igrač već ima ostaje. Default `true` dok se ne odluči ([[play-console-sutra|play-console-sutra]] § 0)
-- Offline gameplay; IAP zahtijeva mrežu
+- IAP (kad se vrati merchant): remove ads, starter pack, boosters, teme, premium Pip skin (samo kozmetika, od 2026-10-12)
+- **Prekidač za IAP** (2026-10-23, na zahtjev): `MonetizationConfig.IAP_ENABLED`; `true` = kupovine pravim novcem kao do sada ([[play-console-sutra|play-console-sutra]] § 0)
+- **v1 samo s reklamama — IAP stvari za coine** (2026-10-26, na zahtjev): `IAP_ENABLED = false`. Teme (Moonlit, Coral, Starfall; Ember tek kad izađe), Sir Pip, Merge Hint i Loot Burst kupuju se coinima kroz isti grant kao IAP (`IAPManager.buy_with_coins`) — Shop, Home · Premium, Camp kartica, Ormar; dva tapa svuda, bez coina „Need N more coins". Remove Ads i Starter Pack se ne nude; Settings bez Purchases; Billing se ne spaja i plugin je isključen (AAB bez dozvole `BILLING`). Kupljeno coinima ostaje i kad se IAP vrati. Cijene: [[../02-design/ekonomija-brojevi#Coin cijene bez kupovina (v1, 2026-10-26)|ekonomija-brojevi]], izvještaj [[ads-only-coini-izvjestaj|ads-only-coini-izvjestaj]]
+- Offline gameplay; IAP (kad se vrati) zahtijeva mrežu
 
 ### Tech
 - Godot 4, **Android launch prvo**; iOS export kad se prikupi ~**99 USD** (Apple Developer)
@@ -53,6 +54,7 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 - Zvuk cijele igre: SFX za svaki događaj (UI, ekonomija, Arena, muncher, Pip, run, loot) + muzika — hub, Arena i run, haptika uz velike trenutke; privremeno sintetizovano dok ne stigne pravi zvuk — prošireno 2026-10-14 na zahtjev („zvuk za cijelu igru"), [[../04-experience/audio-direction|audio-direction]]
 - Muzika po sezoni: svaka od 8 sezona ima svoje tri teme (home / arena / run) u skladu sa sezonom, muzika prati aktivnu sezonu — dodano 2026-10-14 na zahtjev, [[../04-experience/muzika-sezone|muzika-sezone]]
 - Flat 2D **flat cartoon** (pastel, soft outline) — bez pixel grida
+- Mjerenje igrača (RET-01) — lokalni brojač aktivnosti u saveu (dani 0–30, sesije, vrijeme igre, runovi, napredak, prvi merge; ništa ne šalje, radi i u release buildu) + skriveni ekran „Your stats" (Settings → 5 dodira na verziju, Copy red za kalkulator); simulator trajanja sadržaja u danima (`economy_sim.gd --day-min`, [[../02-design/sadrzaj-trajanje-simulacija|sadrzaj-trajanje-simulacija]]); kalkulator prognoze `scripts/analytics/retention_forecast.py`. Analitika za javni launch **čeka odluku** — dodano 2026-10-26 na zahtjev, [[procjena-igraca|procjena-igraca]]
 
 ### Content
 - 20 run levela po sezoni (`levels.json`, ista težina u svakoj sezoni) + Endless rampa (2026-10-21; ranije plan 100 levela)
@@ -74,7 +76,9 @@ v1 **launch** scope za Merge Meadow — dovoljno za monetizaciju (ads + IAP), re
 | Web build | Nije revenue target |
 | Level generator na launch | Mjesec 2 — launch s 100 + endless |
 | **SEZ-01 sezone / teme** | v1.1+ (P0 freeze) — nije launch blocker |
-| Dijamanti (valuta, rijetki pickup u runu, „+1” pop, ikona) | Izbačeno 2026-10-09 na zahtjev — valuta se nigdje nije trošila. Premium sezone ostaju IAP (zlatni tab / zlatna cijena bez ikone) |
+| Dijamanti (valuta, rijetki pickup u runu, „+1” pop, ikona) | Izbačeno 2026-10-09 na zahtjev — valuta se nigdje nije trošila. Premium sezone ostaju IAP (zlatni tab / zlatna cijena bez ikone); u v1 se kupuju coinima (2026-10-26) |
+| Kupovine pravim novcem u v1 (Remove Ads, Starter Pack, teme, Sir Pip, boosteri) | BiH nije Google Play merchant zemlja (2026-10-26) — vraća se kad se riješi merchant; do tada sve osim Remove Ads / Starter Packa za coine |
+| Paketi coina, popusti, tajmeri, „limited" ponude | Krši Pillar 2 — coini se samo zarađuju igranjem |
 
 ## v1.1+ — IN scope ✅ (SEZ-P0, 2026-08-19)
 

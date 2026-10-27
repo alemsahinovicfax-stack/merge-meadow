@@ -9,6 +9,8 @@ tags: [dizajn, monetizacija]
 
 **F2P hybrid** — rewarded video (primarno) + lagani IAP. Core loop uvijek besplatan (Pillar 2).
 
+> **v1 (odluka 2026-10-26): samo reklame.** BiH nije Google Play merchant zemlja, pa je `MonetizationConfig.IAP_ENABLED = false`: teme, Sir Pip, Merge Hint i Loot Burst kupuju se coinima zarađenim u igri (isti grant kao IAP), Remove Ads i Starter Pack se ne nude, coini se ne prodaju. Cijene: [[ekonomija-brojevi#Coin cijene bez kupovina (v1, 2026-10-26)|ekonomija-brojevi]]; izvještaj [[../06-production/ads-only-coini-izvjestaj|ads-only-coini-izvjestaj]]. Tabela ispod važi kad se IAP vrati.
+
 ## Model
 
 - [ ] Premium (jednokratna kupnja)

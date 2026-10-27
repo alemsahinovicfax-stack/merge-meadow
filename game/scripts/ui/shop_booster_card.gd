@@ -8,6 +8,7 @@ extends ShopCard
 ##   loot_burst — više puta: portret ★3 cvijeta (204) s „+5", katanac + ime sljedeće
 ##                sezone + have / 20 i traka (have puna, +5 isprekidano). Nestaje kad su sve
 ##                besplatne sezone otključane (to odlučuje ShopScreen).
+## Bez kupovina pravim novcem (v1) oba se kupuju coinima, dva tapa kao kozmetika (ShopCard.coin_*).
 
 signal buy_pressed(sku: String)
 
@@ -63,16 +64,20 @@ func setup(p_booster_id: String) -> void:
 		_visual.add_child(over)
 	_make_buy()
 	buy.clicked.connect(_on_buy)
+	buy.short_tapped.connect(func() -> void: coin_short.emit(sku))
 
 
-func apply(busy_sku: String, pending: bool, restoring: bool) -> void:
-	_state = UiShopV2.money_state(sku, busy_sku, pending, restoring)
+func apply(busy_sku: String, pending: bool, restoring: bool, confirm_id: String = "") -> void:
+	if MonetizationConfig.iap_enabled():
+		_state = UiShopV2.money_state(sku, busy_sku, pending, restoring)
+	else:
+		_state = UiShopV2.coin_state(sku, confirm_id)
 	yours = _state == UiShopV2.OWNED_STATE
 	if booster_id == MonetizationConfig.BOOSTER_LOOT_BURST:
 		_target = GameState.get_loot_burst_target()
 		if not _target.is_empty():
 			_portrait.setup(str(_target["flower"]), UiShopV2.LOOT_PORTRAIT)
-	buy.configure(_state, IAPManager.get_price_label(sku), UiShopV2.S_YOURS)
+	buy.configure(_state, ShopCard.offer_price_text(sku), UiShopV2.S_YOURS)
 	queue_redraw()
 	for c in _visual.get_children():
 		if c is _Overlay:
@@ -91,6 +96,8 @@ func _on_buy() -> void:
 	clear_status()
 	if _state == UiShopV2.MONEY_BUY:
 		buy_pressed.emit(sku)
+	else:
+		_coin_tap(_state, sku)
 
 
 func _draw() -> void:

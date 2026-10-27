@@ -5,6 +5,8 @@ extends SceneTree
 ## nestaje kad je sve otključano („All set here"), Starter Pack daje 100 coina + Pip
 ## Blossom + 5 × 10 sjemenki bez Merge Hinta i poslije 7 dana je istekao (veo, ne kupuje se).
 ## Stara zaliha boostera se migrira (merge_hint > 0 → owned).
+## Play tok (€, Starter Pack) → iap_override = 1, jer mora raditi kad se kupovine vrate; v1
+## kupovina boostera za coine je u coin_offers_smoke.
 
 var _backup := ""
 
@@ -36,6 +38,7 @@ func _buy(sku: String) -> void:
 
 func _run() -> void:
 	_backup = CampSmokeUtil.backup_save()
+	MonetizationConfig.iap_override = 1
 	var gs := _gs()
 	var iap := get_root().get_node_or_null("IAPManager")
 	if gs == null or iap == null:
@@ -147,6 +150,7 @@ func _run() -> void:
 		_fail("an expired Starter Pack must not be bought")
 		return
 	iap.call("reset_purchases_for_dev")
+	MonetizationConfig.iap_override = -1
 	CampSmokeUtil.restore_save(self, _backup)
 	print("shop_booster_guard_smoke OK")
 	quit(0)

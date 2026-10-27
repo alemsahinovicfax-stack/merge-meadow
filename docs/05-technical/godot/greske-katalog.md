@@ -911,6 +911,18 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** prije zaključka „postavka nije snimljena" provjeri nije li jednaka defaultu nekog plugina.
 
+## #60 — na telefonu jedan dodir = dva klika (emulirani miš + touch)
+
+**Datum:** 2026-10-26 (release APK na emulatoru, RET-01)
+
+**Simptom:** desktop radi; na telefonu jedan tap na X u Settingsu dok je otvoren Credits / „Your stats" zatvori cijeli Settings umjesto da vrati na listu. Isto pogađa vlastita dugmad koja čitaju i miš i touch — npr. coin kupovina u Shopu ide na jedan tap (Buy → Confirm → kupljeno).
+
+**Uzrok:** `emulate_mouse_from_touch` je po defaultu uključen. `Input` uz svaki dodir pošalje i `InputEventMouseButton` s `device = InputEvent.DEVICE_ID_EMULATION`, i to **prije** `InputEventScreenTouch` (pritisak i otpuštanje). Kontrole iz #5 kliknu na touch pritisak i ponovo na mišje otpuštanje (`HubPressable`, `UiClickButton`), ili na oba pritiska (`FieldBasketButton`, `FieldUpgradesButton`, scrim `PopupModal`, Gift / dim sheetova u `main_menu`, `CampStashChip`), ili na oba otpuštanja (`ArenaSeedBag`, `ShopBuyButton` u coins.short).
+
+**Rješenje:** u grani za miš `event.device == InputEvent.DEVICE_ID_EMULATION` → `accept_event()` i ništa — na telefonu klik ide samo kroz touch, pravi miš na desktopu kao prije. Isto pravilo za drag gdje stižu i `ScreenDrag` i emulirani `MouseMotion`: `drag_scroll.drag_delta` (skrol zalihe u Campu išao duplo brže), `level_path_view` (drugi `_move` istog pomaka prepolovi brzinu flinga). GUT `test_touch_emulated_click` šalje sekvencu s telefona (na starom kodu 2 klika).
+
+**Prevencija:** nova kontrola koja čita i `InputEventMouseButton` i `InputEventScreenTouch` mora preskočiti emulirani miš (ili čitati samo miš, kao `WardrobePressable`). Obrazac „pritisak postavi stanje, otpuštanje klikne ako je stanje još tu" (`_Tap` u Settingsu, `HomeV3Tabs`, `SeasonLinkCard`) ne duplira, ali i dalje dobije oba eventa.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

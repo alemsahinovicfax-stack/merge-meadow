@@ -4,6 +4,7 @@ extends ShopCard
 ## Shop v2 · SeasonCard 1032 x 364. Šest portreta (5 × 148 + ★3 172, pravi crteži) i red: ime 52 + jedno
 ## dugme (cijena u store stringu → kupi; kupljena → ▶ Play vodi na Home). Ember Fen:
 ## crteži 50 %, „Coming soon" s isprekidanim rubom, bez cijene i dugmeta.
+## Bez kupovina pravim novcem (v1): cijena u coinima, dva tapa kao kozmetika (ShopCard.coin_*).
 ## Season Kit (design_handoff_seasons, faze 1 + 2): svaka plaćena sezona crta PANORAMU svog
 ## mjesta (recept "shop", SeasonBackdrop 1024 x 356 unutar ruba, ništa izvan); ime je u boji
 ## kita. Stare tri trake su obrisane; bez recepta kartica je ravna (boja livade).
@@ -26,7 +27,8 @@ func _ready() -> void:
 	_ready_now()
 
 
-func apply(pack_sku: String, busy_sku: String = "", pending: bool = false, restoring: bool = false) -> void:
+func apply(pack_sku: String, busy_sku: String = "", pending: bool = false, restoring: bool = false,
+		confirm_id: String = "") -> void:
 	sku = pack_sku
 	season_id = MonetizationConfig.season_id_for_sku(pack_sku)
 	_def = SeasonCatalog.get_def(season_id)
@@ -34,7 +36,7 @@ func apply(pack_sku: String, busy_sku: String = "", pending: bool = false, resto
 		return
 	if buy == null:
 		_ready_now()
-	_state = UiShopV2.season_state(_def, busy_sku, pending, restoring)
+	_state = UiShopV2.season_state(_def, busy_sku, pending, restoring, confirm_id)
 	_ground = UiHomeField.MEADOW_GROUND.get(season_id, Color("e6f2db"))
 	var recipe := UiSeasons.recipe(season_id, "shop")
 	_panorama = {} if recipe.is_empty() else SeasonBackdrop.scene(
@@ -46,7 +48,7 @@ func apply(pack_sku: String, busy_sku: String = "", pending: bool = false, resto
 		p.modulate.a = 0.5 if soon else 1.0
 	buy.visible = not soon
 	if not soon:
-		buy.configure(_state, IAPManager.get_price_label(sku))
+		buy.configure(_state, ShopCard.offer_price_text(sku))
 	queue_redraw()
 
 
@@ -56,6 +58,7 @@ func _ready_now() -> void:
 	set_card_height(UiShopV2.SEASON_CARD_H)
 	_make_buy()
 	buy.clicked.connect(_on_buy)
+	buy.short_tapped.connect(func() -> void: coin_short.emit(sku))
 
 
 func _build_portraits() -> void:
@@ -91,6 +94,8 @@ func _on_buy() -> void:
 		open_home_pressed.emit(season_id)
 	elif _state == UiShopV2.MONEY_BUY:
 		buy_pressed.emit(sku)
+	else:
+		_coin_tap(_state, sku)
 
 
 func get_state() -> String:

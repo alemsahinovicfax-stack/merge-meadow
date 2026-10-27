@@ -167,6 +167,10 @@ func _set_attention(on: bool) -> void:
 
 
 func _on_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
+		# Telefon: emulirani miš prati svaki dodir — tap ide samo kroz touch.
+		accept_event()
+		return
 	var tapped := false
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton

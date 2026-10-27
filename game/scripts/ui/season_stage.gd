@@ -10,6 +10,9 @@ extends Control
 ## zajedno — a blijedjenja na sirovom u (§ Prelaz u README-u paketa).
 ## Ime, Pip i Play su po JEDAN objekat od kartice do polja; livada ne crta svoje
 ## trake dok je u < 1 (kartica JESTE livada), pa predaja nema sav.
+## v1 bez kupovina pravim novcem (MonetizationConfig.IAP_ENABLED = false): tab Premium nudi teme za
+## coine (zlatna pilula s coinom, dva tapa — prvi „✓ cijena" 3 s; bez coina toast „Need N more
+## coins"), kupovina kroz IAPManager.buy_with_coins — isti grant i isti „Yours" kao s Playom.
 
 signal play_run_requested
 
@@ -47,6 +50,9 @@ var _swap_tween: Tween
 var _snap_tween: Tween
 var _toast_tween: Tween
 var _buying_id: String = ""
+## Coin kupovina teme (v1): sezona čija pilula čeka drugi tap; serial poništava stari timer.
+var _confirm_buy_id: String = ""
+var _confirm_serial: int = 0
 var _known_playable: Dictionary = {}
 var _known_ready: bool = false
 var _chrome: Dictionary = {}
@@ -161,16 +167,23 @@ func current_tab() -> String:
 	return _tab
 
 
-## Premium tab bez kupovina (MonetizationConfig.IAP_ENABLED = false) drži samo plaćene sezone
-## koje igrač već ima; prazan = tab se ne vidi.
+## Premium tab bez kupovina pravim novcem (MonetizationConfig.IAP_ENABLED = false) drži teme koje
+## se prodaju za coine (Ember dok nije u igri ne) i plaćene sezone koje igrač već ima; prazan = tab
+## se ne vidi.
 func tab_ids(tab: String) -> Array[String]:
 	var out: Array[String] = []
 	var defs := SeasonCatalog.free_defs_sorted() if tab == TAB_FREE else SeasonCatalog.paid_defs()
 	for def in defs:
-		if tab == TAB_PREMIUM and not MonetizationConfig.shows_paid_offer(GameState.owned_paid_seasons.has(def.id)):
+		if tab == TAB_PREMIUM and not _shows_paid(def):
 			continue
 		out.append(def.id)
 	return out
+
+
+func _shows_paid(def: SeasonDef) -> bool:
+	if MonetizationConfig.iap_enabled() or GameState.owned_paid_seasons.has(def.id):
+		return true
+	return IAPManager.is_coin_offer(def.iap_product_id)
 
 
 func has_premium_tab() -> bool:
@@ -253,6 +266,7 @@ func open_season_field(season_id: String = "", animated: bool = true) -> bool:
 		return false
 	_seen_focus = _home_focus_id()
 	_kill_swap()
+	_drop_buy_confirm()
 	_view_season(id)
 	_swap = 1.0
 	_drag_x = 0.0
@@ -379,6 +393,10 @@ func _card_data(season_id: String) -> Dictionary:
 		else:
 			status = HomeV3CardContent.ST_BUY
 	var prev := GameState.previous_free_id_for(season_id) if def.is_free() else ""
+	var coin_price := _coin_price_of(def)
+	var price := str(coin_price) if coin_price > 0 else (
+		IAPManager.get_price_label(def.iap_product_id) if not def.iap_product_id.is_empty() else ""
+	)
 	return {
 		"season_id": season_id,
 		"name": def.display_name,
@@ -390,7 +408,9 @@ func _card_data(season_id: String) -> Dictionary:
 		"stars": GameState.star3_flower_count_for_unlock(season_id) if not prev.is_empty() else 0,
 		"stars_need": def.t3_flowers_required,
 		"prev_type": GameState.star3_type_id_for_season(prev) if not prev.is_empty() else "",
-		"price": IAPManager.get_price_label(def.iap_product_id) if not def.iap_product_id.is_empty() else "",
+		"price": price,
+		"coin_price": coin_price,
+		"confirm": coin_price > 0 and season_id == _confirm_buy_id,
 		"buying": season_id == _buying_id,
 		# Season Kit: tekst direktno na livadi kartice (imena cvijeća) je boja kita.
 		"ink_field": UiSeasons.ink_field(season_id),
@@ -723,6 +743,7 @@ func _swap_to(tab: String, idx: int, dir_override: int = -99) -> void:
 	if dir_override != -99:
 		dir = dir_override
 	_kill_swap()
+	_drop_buy_confirm()
 	_tab = tab
 	_idx = idx
 	_dir = dir
@@ -904,11 +925,69 @@ func _buy(season_id: String) -> void:
 	if GameState.is_season_playable(season_id):
 		open_season_field(season_id)
 		return
+	if not MonetizationConfig.iap_enabled():
+		_buy_with_coins(def)
+		return
 	if def.iap_product_id.is_empty() or IAPManager.is_busy():
 		return
 	_buying_id = season_id
 	_refresh_view()
 	IAPManager.purchase(def.iap_product_id)
+
+
+## v1 bez kupovina pravim novcem: cijena teme u coinima (0 = nije coin ponuda ili IAP uključen).
+func _coin_price_of(def: SeasonDef) -> int:
+	if not def.is_paid() or not IAPManager.is_coin_offer(def.iap_product_id):
+		return 0
+	return IAPManager.get_coin_price(def.iap_product_id)
+
+
+## Tema za coine u dva tapa kao u Shopu: prvi tap „✓ cijena" (3 s), drugi kupuje kroz
+## IAPManager.buy_with_coins (isti grant; _on_purchase_done pokaže „Yours"). Bez dovoljno coina:
+## puls coin čipa + toast koliko fali, ništa se ne troši.
+func _buy_with_coins(def: SeasonDef) -> void:
+	var price := _coin_price_of(def)
+	if price <= 0:
+		return
+	if int(GameState.wallet_coins) < price:
+		_cancel_buy_confirm()
+		Sfx.play("ui_denied")
+		if is_inside_tree():
+			get_tree().call_group("meta_hub", "pulse_coin_chip")
+		_show_toast(UiShopV2.need_coins_text(price))
+		return
+	if _confirm_buy_id != def.id:
+		_confirm_buy_id = def.id
+		_confirm_serial += 1
+		var serial := _confirm_serial
+		if is_inside_tree():
+			get_tree().create_timer(UiShopV2.T_CONFIRM_TIMEOUT).timeout.connect(func() -> void:
+				if serial == _confirm_serial:
+					_cancel_buy_confirm()
+			, CONNECT_ONE_SHOT)
+		Sfx.play("ui_tap")
+		_refresh_view()
+		return
+	_drop_buy_confirm()
+	_buying_id = def.id
+	if not IAPManager.buy_with_coins(def.iap_product_id).begins_with("Purchased"):
+		_buying_id = ""
+		_refresh_view()
+		if int(GameState.wallet_coins) < price:
+			_show_toast(UiShopV2.need_coins_text(price))
+
+
+## Potvrda kupovine teme pada (timer, druga kartica, polje) — bez osvježavanja.
+func _drop_buy_confirm() -> void:
+	_confirm_buy_id = ""
+	_confirm_serial += 1
+
+
+func _cancel_buy_confirm() -> void:
+	if _confirm_buy_id.is_empty():
+		return
+	_drop_buy_confirm()
+	_refresh_view()
 
 
 func _on_purchase_done(_sku: String) -> void:

@@ -50,6 +50,8 @@ Iz OUT / “kasnije” liste — **samo ako launch uspije**:
 
 Redoslijed: **SEZ-01 (B→E, sada)** može paralelno s v1.1.0 paketom (MA-01 + MA-01b + UX-04) i R-P4/R-P5. **DG-01** ostaje v1.1.1.
 
+**Rok iz simulatora (RET-01, 2026-10-26):** igrači koji igraju 25+ min dnevno završe sav besplatni sadržaj za ~3–4 sedmice (average ~27, skilled ~21 dan) → DG-01 ili novi dugoročni cilj treba biti spreman **do ~3. sedmice od launcha** da D30 ne padne. Izvor: [[procjena-igraca|procjena-igraca]] § 7.
+
 - Level generator (procedural) — već planirano “mjesec 2”
 - Treći ljubimac (Bramble)
 - `speed_merge_24h` IAP ([[../02-design/monetizacija|monetizacija]])

@@ -7,6 +7,8 @@ extends SceneTree
 ##  3. stanja: price (cijena na dugmetu) → buying (tri tačke, naslov sakriven) → failed (pilula
 ##     „Purchase cancelled", nazad na price);
 ##  4. ništa iz recepta ne izlazi izvan kartice (SeasonBackdrop crta unutar ruba).
+## Stanja 3. su Play tok (€) — iap_override = 1, jer mora raditi kad se kupovine vrate; v1 coin
+## stanja (price / confirm / short, „Need N more coins") provjerava coin_offers_smoke.
 ## Pokretanje: godot --headless --path game -s scripts/dev/camp_paid_card_smoke.gd
 
 const MetaHubPages := preload("res://scripts/meta/meta_hub_pages.gd")
@@ -30,6 +32,7 @@ func _fail(msg: String) -> void:
 
 
 func _quit() -> void:
+	MonetizationConfig.iap_override = -1
 	CampSmokeUtil.restore_save(self, _backup)
 	quit(1 if _failed else 0)
 
@@ -41,6 +44,7 @@ func _frames(n: int) -> void:
 
 func _run() -> void:
 	_backup = CampSmokeUtil.backup_save()
+	MonetizationConfig.iap_override = 1
 	var gs := get_root().get_node("GameState")
 	for id in PAID:
 		var recipe := UiSeasons.recipe(id, "camp")

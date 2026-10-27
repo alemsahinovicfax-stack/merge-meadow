@@ -1,8 +1,11 @@
 ## LAUNCH-PREP B — Play Billing 3.3.0 tok s lažnim BillingClientom:
 ## connect → katalog → purchase → acknowledge / consume → grant; pending, cancel, disconnect, restore.
+## Tok kupovine pravim novcem mora raditi i kad je v1 bez nje (IAP_ENABLED = false) — zato
+## iap_override = 1 (merchant se jednom vrati).
 extends "res://test/unit/game_state_test_base.gd"
 
 const IAP_SCRIPT := preload("res://scripts/monetization/iap_manager.gd")
+const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
 
 
 ## Isti signali i metode kao BillingClient.gd iz plugina; bilježi pozive, odgovore šalje test.
@@ -52,6 +55,7 @@ var _events: Array[String] = []
 
 func before_each() -> void:
 	super.before_each()
+	CONFIG.iap_override = 1
 	_iap = get_node("/root/IAPManager")
 	_ads_before = _gs.ads_removed
 	_hint_before = _gs.merge_hint_owned
@@ -84,6 +88,7 @@ func after_each() -> void:
 	_fake.queue_free()
 	_gs.ads_removed = _ads_before
 	_gs.merge_hint_owned = _hint_before
+	CONFIG.iap_override = -1
 	super.after_each()
 	_gs.load_player_save()
 

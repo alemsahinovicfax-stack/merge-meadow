@@ -851,6 +851,15 @@ static func paid_button_style(busy: bool) -> StyleBoxFlat:
 	return s
 
 
+## v1 bez kupovina pravim novcem: prvi tap na coin cijenu teme — tamno dugme, zlatni „✓ N"
+## (kao coins.confirm u Shopu), drugi tap kupuje.
+static func paid_confirm_style() -> StyleBoxFlat:
+	var s := paid_button_style(false)
+	s.bg_color = INK
+	s.border_color = INK
+	return s
+
+
 static func premium_tag_style() -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = PAID_BTN_BUSY

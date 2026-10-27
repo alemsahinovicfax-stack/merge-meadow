@@ -7,6 +7,7 @@ extends ShopCard
 ##   money.buy (cijena iz prodavnice) → money.busy → owned („✓ Owned", tap = obuci) / wearing
 ##   („✓ Wearing", kartica `#FFF6D6`, EquippedBadge 64 gore desno).
 ## Samo izgled (Pillar 2): nikakav efekat na sjemenke, brzinu, munchera ni nagrade.
+## Bez kupovina pravim novcem (v1): cijena u coinima, dva tapa kao kozmetika (ShopCard.coin_*).
 
 signal buy_pressed(sku: String)
 signal wear_pressed(item_id: String)
@@ -59,21 +60,26 @@ func _ensure() -> void:
 	_make_buy()
 	buy.owned_tappable = true
 	buy.clicked.connect(_on_buy)
+	buy.short_tapped.connect(func() -> void: coin_short.emit(sku))
 
 
-func configure(p_item_id: String, busy_sku: String = "", pending: bool = false, restoring: bool = false) -> void:
+func configure(p_item_id: String, busy_sku: String = "", pending: bool = false, restoring: bool = false,
+		confirm_id: String = "") -> void:
 	_ensure()
 	item_id = p_item_id
 	sku = CosmeticCatalog.get_sku(item_id)
 	var slot := CosmeticCatalog.get_slot(item_id)
-	_state = UiShopV2.money_state(sku, busy_sku, pending, restoring)
+	if MonetizationConfig.iap_enabled():
+		_state = UiShopV2.money_state(sku, busy_sku, pending, restoring)
+	else:
+		_state = UiShopV2.coin_state(sku, confirm_id)
 	_worn = _state == UiShopV2.OWNED_STATE and GameState.get_equipped_cosmetic(slot) == item_id
 	yours = _worn
 	_badge.visible = _worn
 	preview.set_frame(UiShopV2.BORDER, UiShopV2.RADIUS_PREVIEW, UiShopV2.INK, UiShopV2.CARD_YOURS if yours else UiShopV2.CARD)
 	preview.configure("companion", CosmeticCatalog.get_look(item_id), {}, "country_bloom", "pip")
 	buy.owned_tappable = _state == UiShopV2.OWNED_STATE and not _worn
-	buy.configure(_state, IAPManager.get_price_label(sku), UiShopV2.S_WEARING if _worn else UiShopV2.S_OWNED)
+	buy.configure(_state, ShopCard.offer_price_text(sku), UiShopV2.S_WEARING if _worn else UiShopV2.S_OWNED)
 	queue_redraw()
 
 
@@ -103,6 +109,8 @@ func _on_buy() -> void:
 		UiShopV2.OWNED_STATE:
 			if not _worn:
 				wear_pressed.emit(item_id)
+		_:
+			_coin_tap(_state, sku)
 
 
 func _draw() -> void:

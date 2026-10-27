@@ -8,6 +8,8 @@ extends SceneTree
 ##   5. restore (bez user flowa) vraća vlasništvo, ne mijenja nošeni skin;
 ##   6. Ormar: „Premium" oznaka; nekupljen je pod velom, a tap vodi u Shop na njegovu karticu;
 ##   7. dev reset (stub) ga vraća u prodavnicu i slot na Classic.
+## Sve je Play tok (€) → iap_override = 1, jer mora raditi kad se kupovine vrate; v1 kupovina Sir
+## Pipa za coine je u coin_offers_smoke.
 
 const SKU := "pip_knight"
 const ITEM := "pip_knight"
@@ -41,6 +43,7 @@ func _frames(n: int) -> void:
 
 
 func _finish() -> void:
+	MonetizationConfig.iap_override = -1
 	CampSmokeUtil.restore_save(self, _backup)
 	if _failed:
 		quit(1)
@@ -51,6 +54,7 @@ func _finish() -> void:
 
 func _run() -> void:
 	_backup = CampSmokeUtil.backup_save()
+	MonetizationConfig.iap_override = 1
 	var gs := _gs()
 	var iap := _iap()
 	var Catalog = load("res://scripts/monetization/cosmetic_catalog.gd")

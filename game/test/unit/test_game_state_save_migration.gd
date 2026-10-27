@@ -100,3 +100,33 @@ func test_apply_save_dict_does_not_migrate_when_version_is_current() -> void:
 		"bloom_inbox": [],
 	})
 	assert_eq(_gs.count_bloom_inbox(2), 0, "a save already at the current version must not re-run bed migration")
+
+
+## RET-01: save bez "activity" (sve do 2026-10-26) se učita bez promjene SAVE_VERSION; brojač
+## počne od danas, a prvi dan ostaje pravi (iz first_launch_unix), raniji dani nepoznati.
+func test_save_without_activity_starts_log_with_unknown_past() -> void:
+	var first_launch := int(Time.get_unix_time_from_system()) - 5 * 86400
+	var ok: bool = _gs.call("_apply_save_dict", {"version": _gs.SAVE_VERSION, "first_launch_unix": first_launch})
+	assert_true(ok)
+	var act: ActivityLog = _gs.activity
+	assert_eq(act.first_day, "", "headless GameState does not start the log by itself")
+	var today: String = _gs.call("_today_key")
+	act.start(today, int(Time.get_unix_time_from_system()), _gs.first_launch_unix)
+	assert_eq(act.first_day, ActivityLog.local_day_key(first_launch))
+	assert_gt(act.since, 0, "days before the log existed are unknown")
+
+
+func test_activity_round_trips_through_save_dict() -> void:
+	var ok: bool = _gs.call("_apply_save_dict", {
+		"version": _gs.SAVE_VERSION,
+		"activity": {"v": 1, "first_day": "2026-10-26", "since": 0, "days": [{"d": 0, "s": 2, "sec": 300, "r": 4, "lv": 3, "se": "country_bloom"}], "tot": {"s": 2, "sec": 300, "r": 4}},
+	})
+	assert_true(ok)
+	var act: ActivityLog = _gs.activity
+	assert_eq(act.first_day, "2026-10-26")
+	assert_eq(act.total_runs, 4)
+	_gs.save_player_save()
+	var saved: Variant = JSON.parse_string(FileAccess.get_file_as_string(PLAYER_SAVE_PATH))
+	assert_true(saved is Dictionary and (saved as Dictionary).has("activity"), "save must carry the activity key")
+	assert_eq(str(saved.activity.first_day), "2026-10-26")
+	assert_eq(int(saved.activity.tot.r), 4)

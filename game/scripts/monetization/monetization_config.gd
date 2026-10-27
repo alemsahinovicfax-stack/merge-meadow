@@ -4,13 +4,17 @@ extends RefCounted
 ## Public test IDs and SKUs — safe for git (see sigurnost.md).
 
 # --- KUPOVINE PRAVIM NOVCEM (IAP) — jedan prekidač ----------------------------------------
-# false = v1 samo s reklamama (BiH nije Google Play merchant zemlja — play-console-sutra § 0):
-#   - Shop: samo tab Looks (kozmetika za coine); nema Seasons / Boosters / Support ni Sir Pipa;
-#   - Home: nema taba Premium; Camp: nema kartice plaćene sezone; Ormar: nema Sir Pipa;
-#   - Settings: nema sekcije Purchases (Restore, Remove Ads); Google Play Billing se ne spaja.
-# Ono što igrač već ima (stari save, dev unlock) i dalje vidi i koristi. Reklame rade isto.
-# true = sve kupovine kao do sada.
-const IAP_ENABLED := true
+# false = v1 samo s reklamama (BiH nije Google Play merchant zemlja — play-console-sutra § 0;
+#   odluka 2026-10-26). Ono što se prodavalo pravim novcem kupuje se COINIMA iz igre
+#   (`coin_price` u IAP_PRODUCTS, isti grant kao Play — IAPManager.buy_with_coins):
+#   - Shop: tabovi Seasons · Looks (Sir Pip) · Boosters, dva tapa kao kozmetika; nema taba Support;
+#   - Home: tab Premium s temama za coine; Camp: kartica sljedeće teme za coine; Ormar: Sir Pip;
+#   - Remove Ads i Starter Pack (coin_price 0) se ne nude; Settings nema Purchases (Restore);
+#   - Google Play Billing se ne spaja, a za v1 je i plugin isključen (project.godot) — AAB nema
+#     dozvolu BILLING. Ember (test-zaključan) ima cijenu, ali se ne nudi dok sezona nije u igri.
+# true = sve kupovine pravim novcem kao do sada (€ iz Playa). Povratak: true + plugin uključen +
+#   proizvodi u Play Consoleu. Što je igrač kupio coinima ostaje njegovo (Play restore ne oduzima).
+const IAP_ENABLED := false
 ## Samo za testove (GUT / smoke): -1 = IAP_ENABLED, 0 = isključeno, 1 = uključeno.
 static var iap_override: int = -1
 
@@ -21,10 +25,20 @@ static func iap_enabled() -> bool:
 	return IAP_ENABLED
 
 
-## Smije li se igraču pokazati stvar koja se kupuje pravim novcem: uvijek kad su kupovine
-## uključene, inače samo ako je već njegova.
-static func shows_paid_offer(already_owned: bool) -> bool:
-	return iap_enabled() or already_owned
+## Smije li se igraču pokazati stvar koja se prodavala pravim novcem: uvijek kad su kupovine
+## uključene; bez njih kad je već njegova ili se prodaje za coine (`sku` s coin cijenom).
+static func shows_paid_offer(already_owned: bool, sku: String = "") -> bool:
+	return iap_enabled() or already_owned or sells_for_coins(sku)
+
+
+## Cijena u coinima iz IAP_PRODUCTS (0 = nema coin varijante — Remove Ads, Starter Pack).
+static func coin_price(sku: String) -> int:
+	return maxi(0, int(IAP_PRODUCTS.get(sku, {}).get("coin_price", 0)))
+
+
+## Prodaje li se SKU za coine: samo kad su kupovine pravim novcem isključene i ima coin cijenu.
+static func sells_for_coins(sku: String) -> bool:
+	return not iap_enabled() and coin_price(sku) > 0
 
 # Google AdMob TEST ID-evi (javni) — https://developers.google.com/admob/android/test-ads
 const ADMOB_TEST_APP_ID_ANDROID := "ca-app-pub-3940256099942544~3347511713"
@@ -90,11 +104,15 @@ const STARTER_PACK_DAYS := 7
 ## Loot Burst: +5 ★3 cvjetova sezone koja otključava sljedeću besplatnu.
 const LOOT_BURST_STAR3 := 5
 
+## price_label = rezervna € cijena (s IAP-om, dok Play ne javi pravu). coin_price = cijena u coinima
+## kad su kupovine pravim novcem isključene (v1, 2026-10-26); 0 = ne nudi se za coine. Cijene i
+## zašto: docs/02-design/ekonomija-brojevi.md § Coin cijene bez kupovina (coin_offer_sim.gd).
 const IAP_PRODUCTS := {
 	SKU_REMOVE_ADS: {
 		"title": "Remove Ads",
 		"description": "Turn off interstitial ads between runs. Rewarded videos stay optional.",
 		"price_label": "€3.99",
+		"coin_price": 0,
 		"play_product_id": "remove_ads",
 		"consumable": false,
 	},
@@ -102,6 +120,7 @@ const IAP_PRODUCTS := {
 		"title": "Starter Pack",
 		"description": "1,000 coins, Pip Blossom and 10 of each first five seeds. 7 days only.",
 		"price_label": "€1.99",
+		"coin_price": 0,
 		"play_product_id": "starter_pack",
 		"consumable": false,
 	},
@@ -109,6 +128,7 @@ const IAP_PRODUCTS := {
 		"title": "Merge Hint",
 		"description": "Marks the closest match while you hold a seed in the Arena. Yours for good.",
 		"price_label": "€0.99",
+		"coin_price": 1500,
 		"play_product_id": "booster_merge_hint",
 		"consumable": false,
 		"booster_id": BOOSTER_MERGE_HINT,
@@ -117,6 +137,7 @@ const IAP_PRODUCTS := {
 		"title": "Loot Burst",
 		"description": "+5 ★3 flowers toward the next free season.",
 		"price_label": "€0.99",
+		"coin_price": 500,
 		"play_product_id": "booster_loot_burst",
 		"consumable": true,
 		"booster_id": BOOSTER_LOOT_BURST,
@@ -125,6 +146,7 @@ const IAP_PRODUCTS := {
 		"title": "Moonlit Warren",
 		"description": "Unlock the Moonlit Warren theme. Cosmetic only — no extra loot or magnet power.",
 		"price_label": "€2.99",
+		"coin_price": 3000,
 		"play_product_id": "season_pack_moonlit_warren",
 		"consumable": false,
 		"season_id": "moonlit_warren",
@@ -133,6 +155,7 @@ const IAP_PRODUCTS := {
 		"title": "Coral Tide Garden",
 		"description": "Unlock the Coral Tide Garden theme. Cosmetic only — no extra loot or magnet power.",
 		"price_label": "€3.49",
+		"coin_price": 3500,
 		"play_product_id": "season_pack_coral_tide",
 		"consumable": false,
 		"season_id": "coral_tide",
@@ -141,6 +164,7 @@ const IAP_PRODUCTS := {
 		"title": "Starfall Glade",
 		"description": "Unlock the Starfall Glade theme. Cosmetic only — no extra loot or magnet power.",
 		"price_label": "€2.99",
+		"coin_price": 3000,
 		"play_product_id": "season_pack_starfall_glade",
 		"consumable": false,
 		"season_id": "starfall_glade",
@@ -149,6 +173,7 @@ const IAP_PRODUCTS := {
 		"title": "Ember Fen",
 		"description": "Unlock the Ember Fen theme. Cosmetic only — no extra loot or magnet power.",
 		"price_label": "€3.49",
+		"coin_price": 3500,
 		"play_product_id": "season_pack_ember_fen",
 		"consumable": false,
 		"season_id": "ember_fen",
@@ -158,6 +183,7 @@ const IAP_PRODUCTS := {
 		"title": "Sir Pip",
 		"description": "Meadow Knight armour for Pip. Looks only — no gameplay effect.",
 		"price_label": "€3.99",
+		"coin_price": 3000,
 		"play_product_id": "pip_knight",
 		"consumable": false,
 		"cosmetic_id": "pip_knight",

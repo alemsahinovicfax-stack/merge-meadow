@@ -4,6 +4,12 @@ extends Control
 ## Shop v2 · zajednička kartica: bijela (ili `#FFF6D6` kad je tvoje), rub 4 ink, radius 36,
 ## tvrda sjena 0 10 0. Kartica crta pozadinu, ime i mali PurchaseStatus ispod imena; dugme
 ## (ShopBuyButton) je dijete koje kartica postavlja u red od 120 px.
+## Bez kupovina pravim novcem (v1) sezona / booster / Sir Pip prodaju za coine istim dugmetom kao
+## kozmetika: coins.buy → potvrda → kupi; coins.short drhti (ShopBuyButton) i javlja coin_short.
+
+signal coin_buy_requested(sku: String)
+signal coin_buy_confirmed(sku: String)
+signal coin_short(sku: String)
 
 const PAD := 20.0
 const NAME_PX := 52
@@ -64,6 +70,30 @@ func clear_status() -> void:
 
 func get_status_text() -> String:
 	return status_text
+
+
+## Stanje dugmeta (UiShopV2.*); kartice ga nadjačaju.
+func get_state() -> String:
+	return ""
+
+
+## Tap na dugme u coin stanju → signal; false = nije coin stanje (pozivalac radi svoje).
+func _coin_tap(state: String, sku: String) -> bool:
+	match state:
+		UiShopV2.COINS_BUY:
+			coin_buy_requested.emit(sku)
+		UiShopV2.COINS_CONFIRM:
+			coin_buy_confirmed.emit(sku)
+		_:
+			return false
+	return true
+
+
+## Cijena na dugmetu: € iz prodavnice dok su kupovine pravim novcem uključene, inače coini.
+static func offer_price_text(sku: String) -> String:
+	if MonetizationConfig.iap_enabled():
+		return IAPManager.get_price_label(sku)
+	return str(IAPManager.get_coin_price(sku))
 
 
 func _draw_card_bg(fill: Color) -> void:

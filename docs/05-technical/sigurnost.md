@@ -60,7 +60,7 @@ Solo F2P casual igra bez servera — **niski rizik**, ali store i SDK-ovi imaju 
 ## Otvorena pitanja
 
 - [ ] Hosting privacy policy (GitHub Pages / Notion — besplatno)
-- [ ] Treba li analytics u v1 (preporuka: **ne** na startu — manje GDPR brige)
+- [ ] Treba li analytics u v1 — 2026-10-26: lokalni brojač (RET-01) ne šalje ništa; za javni launch preporuka **Aptabase dnevni sažetak bez ID-a**, čeka odluku → [[../06-production/procjena-igraca|procjena-igraca]] § 8
 
 ## Povezano
 

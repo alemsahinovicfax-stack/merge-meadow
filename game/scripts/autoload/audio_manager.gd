@@ -92,7 +92,8 @@ func _ready() -> void:
 	call_deferred("_connect_services")
 
 
-## Kupovina pravim novcem zvuči isto svuda (Shop, kartica sezone, Starter Pack).
+## Kupovina pravim novcem zvuči isto svuda (Shop, kartica sezone, Starter Pack); kupovina za coine
+## (v1 bez IAP-a, IAPManager.buy_with_coins) zvuči kao coin kupovina u Looks.
 func _connect_services() -> void:
 	var iap := get_node_or_null("/root/IAPManager")
 	if iap == null:
@@ -103,13 +104,19 @@ func _connect_services() -> void:
 
 
 func _on_purchase_completed(_sku: String) -> void:
+	var iap := get_node_or_null("/root/IAPManager")
+	if iap != null and bool(iap.call("is_coin_purchase")):
+		play("coins_spend")
+		haptic(25)
+		return
 	play("purchase_ok")
 	haptic(35)
 
 
-## Odustao / nije prošlo = mekan pad; razlozi koje UI sam odbije (busy, već tvoje) su tihi.
+## Odustao / nije prošlo = mekan pad; razlozi koje UI sam odbije (busy, već tvoje, fale coini —
+## dugme / kartica sami sviraju „denied") su tihi.
 func _on_purchase_failed(_sku: String, reason: String) -> void:
-	if reason in ["busy", "already_owned", "unknown_sku", "test_locked", "expired", "unavailable"]:
+	if reason in ["busy", "already_owned", "unknown_sku", "test_locked", "expired", "unavailable", "need_coins"]:
 		return
 	play("purchase_fail")
 

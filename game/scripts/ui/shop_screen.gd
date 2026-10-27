@@ -6,6 +6,9 @@ extends Control
 ## si u Shopu). Ulaz iz footera uvijek otvara Seasons od vrha; „More in Shop" iz Ormara
 ## otvara Looks na slotu (zaglavlje bljesne). Na svakoj kartici koja prodaje je jedno dugme
 ## koje nosi cijenu i kupuje. SKU-ovi i cijene su nepromijenjeni.
+## v1 bez kupovina pravim novcem (MonetizationConfig.IAP_ENABLED = false, 2026-10-26): tabovi
+## Seasons · Looks · Boosters; teme, Sir Pip i boosteri za coine kao kozmetika (dva tapa na istom
+## dugmetu, IAPManager.buy_with_coins); bez dovoljno coina pilula „Need N more coins"; nema Supporta.
 
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
@@ -146,14 +149,24 @@ func _make_page(tab_id: String) -> void:
 	_contents[tab_id] = box
 
 
-## Seasons, Boosters i Support su samo za pravi novac — bez kupovina se ne grade
-## (MonetizationConfig.IAP_ENABLED; tab se ne vidi, stranica ostaje prazna).
+## Bez kupovina pravim novcem (MonetizationConfig.IAP_ENABLED = false) teme se prodaju za coine
+## (IAPManager.is_coin_offer — Ember dok nije u igri ne) i ostaju one koje su tvoje.
 func _queue_seasons() -> void:
-	if not CONFIG.iap_enabled():
-		return
 	for def in SeasonCatalog.paid_defs():
-		if not def.iap_product_id.is_empty():
-			_build_steps.append(_add_season_card.bind(def.id, def.iap_product_id))
+		if def.iap_product_id.is_empty() or not _offers(def.iap_product_id):
+			continue
+		_build_steps.append(_add_season_card.bind(def.id, def.iap_product_id))
+
+
+## Ponuda iz IAP tabele se gradi: s kupovinama uvijek; bez njih kad je coin ponuda ili tvoja.
+func _offers(sku: String) -> bool:
+	return CONFIG.iap_enabled() or IAPManager.is_coin_offer(sku) or IAPManager.owns_product(sku)
+
+
+func _connect_coin_card(card: ShopCard) -> void:
+	card.coin_buy_requested.connect(_on_coin_buy_requested)
+	card.coin_buy_confirmed.connect(_on_coin_buy_confirmed)
+	card.coin_short.connect(_on_coin_short)
 
 
 func _add_season_card(season_id: String, sku: String) -> void:
@@ -163,6 +176,7 @@ func _add_season_card(season_id: String, sku: String) -> void:
 	card.apply(sku)
 	card.buy_pressed.connect(_on_money_buy)
 	card.open_home_pressed.connect(_on_open_on_home)
+	_connect_coin_card(card)
 	_season_cards[sku] = card
 
 
@@ -174,7 +188,8 @@ func _queue_looks() -> void:
 			var iid := str(it.get("id", ""))
 			if CosmeticCatalog.is_shop_item(iid):
 				items.append(iid)
-			elif CosmeticCatalog.is_iap_item(iid) and CONFIG.shows_paid_offer(GameState.owns_cosmetic(iid)):
+			elif CosmeticCatalog.is_iap_item(iid) \
+					and CONFIG.shows_paid_offer(GameState.owns_cosmetic(iid), CosmeticCatalog.get_sku(iid)):
 				items.append(iid)
 		if items.is_empty():
 			continue
@@ -208,6 +223,7 @@ func _add_cosmetic_card(slot_id: String, iid: String) -> void:
 		premium.configure(iid)
 		premium.buy_pressed.connect(_on_money_buy)
 		premium.wear_pressed.connect(_on_premium_wear)
+		_connect_coin_card(premium)
 		_premium_cards[CosmeticCatalog.get_sku(iid)] = premium
 		return
 	var card := ShopCosmeticCard.new()
@@ -236,10 +252,9 @@ func _add_looks_end() -> void:
 
 
 func _queue_boosters() -> void:
-	if not CONFIG.iap_enabled():
-		return
 	for booster_id in CONFIG.all_booster_ids():
-		_build_steps.append(_add_booster_card.bind(booster_id))
+		if _offers(CONFIG.booster_sku(booster_id)):
+			_build_steps.append(_add_booster_card.bind(booster_id))
 	_build_steps.append(_add_boosters_end)
 
 
@@ -249,6 +264,7 @@ func _add_booster_card(booster_id: String) -> void:
 	(_contents["boosters"] as VBoxContainer).add_child(card)
 	card.setup(booster_id)
 	card.buy_pressed.connect(_on_money_buy)
+	_connect_coin_card(card)
 	_booster_cards[booster_id] = card
 
 
@@ -258,6 +274,7 @@ func _add_boosters_end() -> void:
 	(_contents["boosters"] as VBoxContainer).add_child(_boosters_end)
 
 
+## Support (Remove Ads, Starter Pack, Restore) je samo za pravi novac — bez kupovina se ne gradi.
 func _queue_support() -> void:
 	if not CONFIG.iap_enabled():
 		return
@@ -335,6 +352,7 @@ func _show_page(tab_id: String, animated: bool) -> void:
 ## kad je upravo stigao link iz Ormara.
 func _enter_shop() -> void:
 	_finish_build()
+	_clear_need_pills()
 	for id in _pages:
 		(_pages[id] as ScrollContainer).scroll_vertical = 0
 	if not _entry_override.is_empty() and Time.get_ticks_msec() - _entry_override_at < ENTRY_OVERRIDE_MSEC:
@@ -391,16 +409,22 @@ func refresh_shop() -> void:
 		return
 	var restoring := _busy_sku == "restore"
 	for iid in _cosmetic_cards:
-		(_cosmetic_cards[iid] as ShopCosmeticCard).configure(str(iid), _confirm_id)
+		var look := _cosmetic_cards[iid] as ShopCosmeticCard
+		look.configure(str(iid), _confirm_id)
+		_sync_need_pill(look, CosmeticCatalog.get_coin_cost(str(iid)))
 	for sku in _premium_cards:
 		var premium := _premium_cards[sku] as ShopPremiumLookCard
-		premium.configure(premium.item_id, _iap_busy_sku(), false, restoring)
+		premium.configure(premium.item_id, _iap_busy_sku(), false, restoring, _confirm_id)
+		_sync_need_pill(premium, IAPManager.get_coin_price(str(sku)))
 	for sku in _season_cards:
-		(_season_cards[sku] as SeasonPackCard).apply(str(sku), _iap_busy_sku(), false, restoring)
+		var season := _season_cards[sku] as SeasonPackCard
+		season.apply(str(sku), _iap_busy_sku(), false, restoring, _confirm_id)
+		_sync_need_pill(season, IAPManager.get_coin_price(str(sku)))
 	var loot_on := GameState.can_buy_loot_burst()
 	for booster_id in _booster_cards:
 		var card := _booster_cards[booster_id] as ShopBoosterCard
-		card.apply(_iap_busy_sku(), false, restoring)
+		card.apply(_iap_busy_sku(), false, restoring, _confirm_id)
+		_sync_need_pill(card, IAPManager.get_coin_price(card.sku))
 		if booster_id == CONFIG.BOOSTER_LOOT_BURST:
 			card.visible = loot_on
 	if _boosters_end != null:
@@ -426,10 +450,16 @@ func _on_catalog_updated() -> void:
 
 
 func _on_cosmetic_buy_requested(item_id: String) -> void:
-	_confirm_id = item_id
+	_request_confirm(item_id)
+
+
+## Prvi tap coin kupovine (kozmetika; bez kupovina pravim novcem i teme, Sir Pip, boosteri): isto
+## dugme postaje potvrda, 3 s bez tapa → nazad. `id` = item id kozmetike ili SKU ponude.
+func _request_confirm(id: String) -> void:
+	_confirm_id = id
 	refresh_shop()
 	_confirm_timer = get_tree().create_timer(UiShopV2.T_CONFIRM_TIMEOUT)
-	_confirm_timer.timeout.connect(_on_confirm_timeout.bind(item_id, _confirm_timer))
+	_confirm_timer.timeout.connect(_on_confirm_timeout.bind(id, _confirm_timer))
 
 
 func _on_confirm_timeout(item_id: String, timer: SceneTreeTimer) -> void:
@@ -461,6 +491,8 @@ func _on_cosmetic_buy_confirmed(item_id: String) -> void:
 		card.show_bought()
 		_spend_pop(cost)
 		GameState.cosmetics_changed.emit([CosmeticCatalog.get_slot(item_id)])
+	elif result.begins_with("Need"):
+		_show_need(card, cost)
 	else:
 		card.show_status(UiShopV2.S_FAILED, UiShopV2.STATUS_FAIL_BG)
 
@@ -479,10 +511,65 @@ func _on_premium_wear(item_id: String) -> void:
 	_toast.show_text(UiShopV2.S_TOAST_WEARS % CosmeticCatalog.get_title(item_id))
 
 
-func _on_cosmetic_short(_item_id: String) -> void:
+func _on_cosmetic_short(item_id: String) -> void:
+	_short_feedback(_cosmetic_cards.get(item_id) as ShopCard, CosmeticCatalog.get_coin_cost(item_id))
+
+
+## coins.short: dugme već drhti (ShopBuyButton); coin čip pulsira, a kartica kaže koliko fali.
+func _short_feedback(card: ShopCard, price: int) -> void:
 	_cancel_confirm()
 	if is_inside_tree():
 		get_tree().call_group("meta_hub", "pulse_coin_chip")
+	_show_need(card, price)
+
+
+func _show_need(card: ShopCard, price: int) -> void:
+	if card != null and price > 0:
+		card.show_status(UiShopV2.need_coins_text(price), UiShopV2.STATUS_PENDING_BG)
+
+
+## Pilula „Need N more coins" živi dok je kartica u coins.short (broj prati coine); čim ih ima
+## dovoljno, nestaje.
+func _sync_need_pill(card: ShopCard, price: int) -> void:
+	if not card.get_status_text().begins_with("Need"):
+		return
+	if card.get_state() == UiShopV2.COINS_SHORT_STATE:
+		_show_need(card, price)
+	else:
+		card.clear_status()
+
+
+func _clear_need_pills() -> void:
+	for cards in [_cosmetic_cards, _premium_cards, _season_cards, _booster_cards]:
+		for key in cards:
+			var card := cards[key] as ShopCard
+			if card.get_status_text().begins_with("Need"):
+				card.clear_status()
+
+
+# --- coin ponude (v1 bez kupovina pravim novcem) ---
+
+
+func _on_coin_buy_requested(sku: String) -> void:
+	_request_confirm(sku)
+
+
+## Drugi tap: IAPManager.buy_with_coins (isti grant kao Play). Refresh i toastovi stižu kroz
+## _on_purchase_completed; pop „−N" ispod coin čipa kao u Looks.
+func _on_coin_buy_confirmed(sku: String) -> void:
+	var price := IAPManager.get_coin_price(sku)
+	_confirm_id = ""
+	_confirm_timer = null
+	if IAPManager.buy_with_coins(sku).begins_with("Purchased"):
+		_spend_pop(price)
+		return
+	refresh_shop()
+	if int(GameState.wallet_coins) < price:
+		_show_need(_card_for(sku), price)
+
+
+func _on_coin_short(sku: String) -> void:
+	_short_feedback(_card_for(sku), IAPManager.get_coin_price(sku))
 
 
 func _spend_pop(amount: int) -> void:

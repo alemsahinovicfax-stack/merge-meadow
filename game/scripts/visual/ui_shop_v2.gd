@@ -118,6 +118,8 @@ const S_TOAST_RESTORED := "Purchases restored"
 const S_TOAST_ADS := "Ads are off"
 const S_TOAST_PACK := "Pack added"
 const S_TOAST_LOOT := "+5 %s"
+## Coin kupovina bez dovoljno coina (Shop pilula, Home i Camp toast): koliko fali.
+const S_NEED_COINS := "Need %d more coins"
 ## Premium Looks kartica (design_handoff_muncher_premium_pip · shop_export.json).
 const S_PREMIUM := "Premium"
 const S_TOAST_WEARS := "Pip wears %s"
@@ -129,12 +131,13 @@ const PREMIUM_TAG_PAD_X := 24.0
 const TABS: Array[String] = ["seasons", "looks", "boosters", "support"]
 
 
-## Tabovi koje igrač vidi: bez kupovina (MonetizationConfig.IAP_ENABLED = false) samo Looks —
-## Seasons, Boosters i Support prodaju samo za pravi novac.
+## Tabovi koje igrač vidi: bez kupovina pravim novcem (MonetizationConfig.IAP_ENABLED = false, v1)
+## Seasons, Looks i Boosters prodaju za coine; Support (Remove Ads, Starter Pack, Restore) je samo
+## za pravi novac i ne vidi se.
 static func visible_tabs() -> Array[String]:
 	if MonetizationConfig.iap_enabled():
 		return TABS
-	var out: Array[String] = ["looks"]
+	var out: Array[String] = ["seasons", "looks", "boosters"]
 	return out
 const TAB_LABELS: Array[String] = ["Seasons", "Looks", "Boosters", "Support"]
 
@@ -180,11 +183,30 @@ static func cosmetic_state(item: Dictionary, confirm_id: String) -> String:
 	return COINS_SHORT_STATE
 
 
-static func season_state(def: SeasonDef, busy_sku: String, pending: bool, restoring: bool) -> String:
+## Coin ponuda (v1 bez kupovina pravim novcem): isti obrazac kao cosmetic_state, po SKU-u i
+## cijeni iz IAPManagera (potvrda = isti `confirm_id` kao kod kozmetike).
+static func coin_state(sku: String, confirm_id: String) -> String:
+	if IAPManager.owns_product(sku):
+		return OWNED_STATE
+	if confirm_id == sku:
+		return COINS_CONFIRM
+	if GameState.wallet_coins >= IAPManager.get_coin_price(sku):
+		return COINS_BUY
+	return COINS_SHORT_STATE
+
+
+## „Need N more coins" — N = koliko fali do cijene (barem 1).
+static func need_coins_text(price: int) -> String:
+	return S_NEED_COINS % maxi(1, price - int(GameState.wallet_coins))
+
+
+static func season_state(def: SeasonDef, busy_sku: String, pending: bool, restoring: bool, confirm_id: String = "") -> String:
 	if GameState.is_test_locked_season(def.id) or def.iap_product_id.is_empty():
 		return "soon"
 	if IAPManager.owns_product(def.iap_product_id):
 		return PLAY_STATE
+	if not MonetizationConfig.iap_enabled():
+		return coin_state(def.iap_product_id, confirm_id)
 	return money_state(def.iap_product_id, busy_sku, pending, restoring)
 
 
@@ -210,7 +232,8 @@ static func status_for(reason: String) -> Array:
 			return ["Cancelled", STATUS_FAIL_BG]
 		"purchase_pending", "ack_failed":
 			return ["Pending", STATUS_PENDING_BG]
-		"already_owned", "busy", "test_locked", "expired", "unavailable":
+		"already_owned", "busy", "test_locked", "expired", "unavailable", "need_coins":
+			# need_coins: kartica sama kaže koliko fali (S_NEED_COINS).
 			return []
 		_:
 			return ["Didn’t go through", STATUS_FAIL_BG]

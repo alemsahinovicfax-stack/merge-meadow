@@ -1,0 +1,8 @@
+mm1,version,first_day,days,sessions,minutes,runs,season,level,tut_day,end_day,merge_sec,late_days,last_day
+# PRIMJER: izmišljeni testeri (verzija 0.1.0-primjer) samo da se vidi format; pravi redovi idu u testeri.csv
+mm1,0.1.0-primjer,2026-11-02,1111110111101101---------------,31,486,112,frost_orchard,4,0,5,41,0,15
+mm1,0.1.0-primjer,2026-11-02,1100000010000001---------------,8,95,24,country_bloom,9,0,-1,63,0,15
+mm1,0.1.0-primjer,2026-11-03,100000000000001----------------,2,9,2,country_bloom,1,-1,-1,214,0,14
+mm1,0.1.0-primjer,2026-10-15,----------111011101111011010110,64,1210,260,lantern_meadow,7,10,10,15,4,36
+mm1,0.1.0-primjer,2026-11-17,111----------------------------,4,52,13,country_bloom,6,0,-1,38,0,2
+mm1,0.1.0-primjer,2026-11-04,1010010010001101---------------,12,140,38,country_bloom,13,0,12,77,0,15

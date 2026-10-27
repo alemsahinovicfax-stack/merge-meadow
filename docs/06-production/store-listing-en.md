@@ -51,10 +51,10 @@ Merge Meadow blends quick arcade runs with satisfying merge upgrades in a cozy p
 ⚡ GROW — Upgrade your magnet, equip a seed basket for bonus spawns, and unlock stronger runs as you clear 100 campaign levels or push Endless mode.
 
 ✨ FAIR FREE TO PLAY
-• Core loop is always free — no energy gates
+• No in-app purchases — everything is earned by playing
+• Premium themes, Sir Pip's knight armour and boosters are bought with coins you collect
 • Optional rewarded videos for double loot or a second chance
-• Remove interstitial ads anytime with a one-time purchase
-• Starter pack for a cozy boost — no loot boxes, no gacha
+• No energy gates, no loot boxes, no gacha
 
 Perfect for coffee-break sessions that still feel rewarding tomorrow.
 
@@ -125,7 +125,7 @@ Koristi `game/icon.svg` → export 512×512 PNG → `marketing/store/app-icon-51
 | Support email | mergemeadow.support@gmail.com |
 | Website | *(opcionalno — GitHub Pages ili landing)* |
 | Ads | Yes (AdMob rewarded + optional interstitial) |
-| In-app purchases | Yes (remove ads, starter pack) |
+| In-app purchases | **No** (v1 samo s reklamama, 2026-10-26 — teme, Sir Pip i boosteri se kupuju coinima iz igre; kad se IAP vrati, ovaj red i blok „Fair free to play" se mijenjaju) |
 
 ---
 

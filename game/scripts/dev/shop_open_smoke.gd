@@ -3,6 +3,8 @@ extends SceneTree
 ## Shop v2 (design_handoff_shop_v2): četiri taba = četiri ScrollContainera, Seasons prvi i
 ## podrazumijevani, tab pamti skrol, pergament umjesto zelene, jedno dugme po prodajnoj
 ## kartici, pravi portreti (6, >= 148), Looks iz cosmetics.json, nema izbačenog teksta.
+## Raspored s kupovinama pravim novcem (4 taba, Support) → iap_override = 1; v1 raspored (3 taba,
+## coin cijene) provjerava iap_off_smoke.
 
 const REMOVED := [
 	"6 flowers for your Album", "same runs, same rewards", "yours to keep", "one-time",
@@ -19,6 +21,7 @@ func _initialize() -> void:
 
 func _fail(msg: String) -> void:
 	push_error("shop_open_smoke: %s" % msg)
+	MonetizationConfig.iap_override = -1
 	CampSmokeUtil.restore_save(self, _backup)
 	quit(1)
 
@@ -30,6 +33,7 @@ func _frames(n: int) -> void:
 
 func _run() -> void:
 	_backup = CampSmokeUtil.backup_save()
+	MonetizationConfig.iap_override = 1
 	var err := change_scene_to_file("res://scenes/ui/shop_screen.tscn")
 	if err != OK:
 		_fail("shop failed %d" % err)
@@ -127,6 +131,7 @@ func _run() -> void:
 		if text.findn(phrase) >= 0:
 			_fail("removed copy still present: %s" % phrase)
 			return
+	MonetizationConfig.iap_override = -1
 	CampSmokeUtil.restore_save(self, _backup)
 	print("shop_open_smoke OK")
 	quit(0)

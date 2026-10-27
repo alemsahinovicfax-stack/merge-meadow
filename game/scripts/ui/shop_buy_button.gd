@@ -77,6 +77,10 @@ func _set_shake(x: float) -> void:
 func _on_gui_input(event: InputEvent) -> void:
 	if state == UiShopV2.COINS_SHORT_STATE:
 		var tapped := false
+		if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
+			# Telefon: emulirani miš prati svaki dodir — tap ide samo kroz touch.
+			accept_event()
+			return
 		if event is InputEventMouseButton:
 			var mb := event as InputEventMouseButton
 			tapped = mb.button_index == MOUSE_BUTTON_LEFT and not mb.pressed

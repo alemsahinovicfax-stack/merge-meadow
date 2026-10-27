@@ -2,10 +2,11 @@ extends SceneTree
 
 ## design_handoff_settings_fixes · D — Settings u pravom hubu (headless):
 ##  1. zupčanik otvara SettingsScreen; X stoji tačno na mjestu zupčanika;
-##  2. sekcije Sound / Gameplay / Purchases / Privacy & help (+ Developer u debug buildu);
+##  2. sekcije Sound / Gameplay / Purchases / Privacy & help (+ Developer u debug buildu) —
+##     Purchases samo s kupovinama pravim novcem (v1 bez njih: MonetizationConfig.IAP_ENABLED = false);
 ##  3. slider Music 30 → bus „Music" = linear_to_db(0,3); mute → bus utišan; unmute vraća 30;
 ##  4. toggle Reduce motion / Vibration mijenja GameState odmah;
-##  5. Restore purchases (stub) završi u DONE ili NONE, ne ostaje BUSY;
+##  5. Restore purchases (stub) završi u DONE ili NONE, ne ostaje BUSY (samo s kupovinama);
 ##  6. zatvaranje sprema user://settings.cfg; Back (ui_cancel) zatvara; Credits → X vraća.
 ## Postavke se vraćaju na kraju (fajl settings.cfg i stanje GameState).
 
@@ -73,7 +74,12 @@ func _run() -> void:
 	var close := screen.find_child("CloseButton", true, false) as Control
 	if close == null or close.get_global_rect().position.distance_to(gear.get_global_rect().position) > 2.0:
 		_fail("X is not where the gear is")
+	var iap := MonetizationConfig.iap_enabled()
 	for sec in ["Section_Sound", "Section_Gameplay", "Section_Purchases", "Section_Privacyhelp"]:
+		if sec == "Section_Purchases" and not iap:
+			if screen.find_child(sec, true, false) != null:
+				_fail("v1 without purchases must not build %s" % sec)
+			continue
 		if screen.find_child(sec, true, false) == null:
 			_fail("missing %s" % sec)
 	var dev := screen.find_child("Section_Developer", true, false)
@@ -108,12 +114,13 @@ func _run() -> void:
 	if bool(gs.get("vibration_enabled")) == vib:
 		_fail("Vibration toggle did not reach GameState")
 
-	# Restore (stub)
-	screen.call("_on_restore")
-	await _frames(10)
-	var state := int(screen.get("_restore_state"))
-	if state != UiS.Restore.DONE and state != UiS.Restore.NONE:
-		_fail("restore ended in state %d" % state)
+	# Restore (stub) — samo kad postoji (kupovine pravim novcem uključene)
+	if iap:
+		screen.call("_on_restore")
+		await _frames(10)
+		var state := int(screen.get("_restore_state"))
+		if state != UiS.Restore.DONE and state != UiS.Restore.NONE:
+			_fail("restore ended in state %d" % state)
 
 	# Credits ↔ Settings, pa X zatvara i sprema
 	screen.call("_show_credits", true)
