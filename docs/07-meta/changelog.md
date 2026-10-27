@@ -9,6 +9,16 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-27
+
+- **v1 samo s reklamama — IAP stvari za coine (ADS-ONLY)** (na zahtjev, odluka o scopeu; BiH nije Google Play merchant zemlja; izvještaj `06-production/ads-only-coini-izvjestaj.md`). Kod je većim dijelom ušao u commit `bd3d677` (napravila ga druga sesija 2026-10-27); ovdje konačne cijene, simulacija i dokumentacija.
+  - `MonetizationConfig.IAP_ENABLED = false`; `coin_price` u `IAP_PRODUCTS`, `coin_price()` / `sells_for_coins()`, `shows_paid_offer(owned, sku)`. `IAPManager.buy_with_coins` — provjere prije trošenja, `GameState._try_spend_coins`, **isti** `_grant_product` kao Play (ista save polja i otključavanje), isti signali; neuspjeli grant vraća coine. `get_price_label` bez IAP-a nikad ne vrati „€".
+  - **Shop:** tabovi Seasons · Looks · Boosters (Support s Remove Ads / Starter Pack / Restore samo s IAP-om); teme, Merge Hint, Loot Burst i Sir Pip istim dugmetom kao kozmetika (coins.buy → ✓ → kupljeno), Ember dok nije u igri ne. Bez dovoljno coina: drhtaj + puls coin čipa + pilula **„Need N more coins"** (N = koliko fali) — i u Looks. **Home:** Premium tab nudi teme za coine (zlatna pilula 🪙 + cijena, blijeda kad fali, dva tapa, toast). **Camp:** kartica sljedeće teme poslije besplatnih sezona za coine (dva tapa, toast umjesto „Purchase cancelled"). **Ormar:** Sir Pip se vraća (pod velom, tap → Shop). Coin kupovina svira `coins_spend`.
+  - **Cijene** (`coin_offer_sim.gd`, model iz `economy_sim.gd`, `02-design/coin-ponude-simulacija.md`): Merge Hint **1500** (casual 2,1 / average 1,5 / skilled 1,2 dana), Loot Burst **1000** (početni prijedlog 500 → casual otključa Frost Orchard 37 % ranije; 750 → 27 %; 1000 → 0 % za sve profile), Moonlit / Starfall / Sir Pip **3000**, Coral / Ember **3500** (u normalnoj igri poslije besplatnih sezona: average 37.–42. dan). `economy_balance_smoke` čuva granice.
+  - **Build:** Billing plugin isključen u `project.godot` → AAB bez dozvole `com.android.vending.BILLING` (probni AAB 68,2 MB, potpisan). Povratak: plugin on + `IAP_ENABLED = true` + proizvodi u Play Consoleu.
+  - **Docs:** `play-console-sutra` (odluka, Data safety bez Purchase history, IARC Digital purchases / Random items = No, § 6 i § 9 tek uz merchant, bez „Purchases in the test are free"), `store-listing-en` (bez kupovina), politika privatnosti (ova verzija nema kupovina; Billing dio ostaje uz napomenu), `scope-i-granice`, `monetizacija`, `iap-billing-setup`, `launch-prep-plan`, `ekonomija-brojevi`.
+  - **Testovi:** GUT `test_coin_offers` (12: cijene, dovoljno / premalo coina, dupla trajna kupovina, Loot Burst 2× s ciljem i bez cilja, Remove Ads / Starter Pack sakriveni, Ember, IAP on odbija coin kupovinu, on/off + Play restore bez gubitka vlasništva), `test_iap_switch`, `test_iap_billing_flow` (`iap_override = 1`); smoke `coin_offers_smoke` (novi), `iap_off_smoke` (coin režim + skener teksta), Play tok u `camp_paid_card`, `camp_season_link`, `premium_pip`, `season_iap`, `shop_booster_guard`, `shop_open` kroz `iap_override = 1`; `season_home` i `settings_screen` prate režim. GUT 149/149.
+
 ## 2026-10-26
 
 - **RET-01 — procjena i mjerenje igrača** (na zahtjev; strategija `06-production/procjena-igraca.md`):

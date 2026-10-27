@@ -12,6 +12,7 @@ tags: [hub, dizajn]
 - [[gdd-overview|gdd-overview]] — sažetak cijelog GDD-a
 - ⭐ [[spec-vertical-slice|spec-vertical-slice]] — **source of truth** za M7 (kod prati ovo)
 - ⭐ [[ekonomija-brojevi|ekonomija-brojevi]] — sve balans-konstante slice-a
+- [[coin-ponude-simulacija|coin-ponude-simulacija]] — v1 bez kupovina: dani do coin ponuda, Loot Burst ubrzanje (2026-10-27)
 - [[core-loop|core-loop]] — 30s / 5min / 1h petlje
 - [[kontrole-i-input|kontrole-i-input]] — touch geste, HUD
 - [[progresija|progresija]] — napredak kroz sate/dane

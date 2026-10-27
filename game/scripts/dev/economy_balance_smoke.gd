@@ -17,8 +17,9 @@ extends SceneTree
 ##     ispod praga po ★3 (ispod njega ubrzava besplatne sezone > 10 %).
 ## Pokretanje: godot --headless --path game -s res://scripts/dev/economy_balance_smoke.gd
 
-## Loot Burst: najmanje coina po ★3 cvijetu (cijena / LOOT_BURST_STAR3) — iz coin_offer_sim.gd D3.
-const LOOT_BURST_MIN_PER_STAR3 := 100
+## Loot Burst: najmanje coina po ★3 cvijetu (cijena / LOOT_BURST_STAR3) — coin_offer_sim.gd D3
+## (2026-10-27): 500 C (100 / ★3) ubrza casualu Frost Orchard 37 %, 1000 C (200 / ★3) 0 %.
+const LOOT_BURST_MIN_PER_STAR3 := 200
 
 var _backup := ""
 var _failed := false

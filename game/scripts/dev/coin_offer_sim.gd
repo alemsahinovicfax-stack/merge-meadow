@@ -8,9 +8,9 @@ extends "res://scripts/dev/economy_sim.gd"
 ##   D1. prva kupovina — dan kad UKUPNA zarada (politika rush) prvi put dostigne cijenu: koliko dugo
 ##       štedi igrač kojem je ta stvar prvi cilj;
 ##   D2. normalna igra — rush + Merge Hint čim ga može platiti; teme i Sir Pip tek kad su sve
-##       besplatne sezone otključane (dugoročni cilj): dan kupovine i koliko kasne besplatne sezone;
-##   D2b. isto, ali tema / Sir Pip čim poslije kupovine ostane dovoljno coina za sljedeću besplatnu
-##       sezonu (kao izgledi u rushu) — igrač koji ih želi, a ne odgađa sezone;
+##       besplatne sezone otključane (dugoročni cilj): dan kupovine i koliko kasne besplatne sezone.
+##       (Varijanta „tema čim ostane coina za sljedeću sezonu" daje iste dane: rush taj višak već
+##       troši na nadogradnje i izglede — provjereno 2026-10-27.)
 ##   D3. Loot Burst za coine (+5 ★3 sezone koja otključava sljedeću besplatnu) — koliko ranije se
 ##       otključaju besplatne sezone: „pametno" (kupi samo kad coini za sezonu već postoje, fali samo
 ##       ★3) i „sve" (kupi čim fali ★3), za više cijena (--burst-prices).
@@ -20,7 +20,7 @@ extends "res://scripts/dev/economy_sim.gd"
 ## Pokretanje (APPDATA kopija kao u scripts/smoke-all.ps1):
 ##   godot --headless --path game -s res://scripts/dev/coin_offer_sim.gd -- --reps=10
 ##   opcije: --burst-prices=500,750,1000,1500,2000 --profiles=casual,average,skilled --seed=7
-##           --parts=d1,d2,d2b,d3 --out=C:/put/coin.md
+##           --parts=d1,d2,d3 --out=C:/put/coin.md
 
 ## Minuta igre dnevno — isti zadani dan kao dio B u economy_sim.gd (samo za ispis dana).
 const DAY_LEN := 25.0
@@ -72,13 +72,11 @@ func _main() -> void:
 	var rush := {}
 	for pname in profiles:
 		rush[pname] = _runs_of(pname, "rush_ref", reps)
-	var parts := _arg("parts", "d1,d2,d2b,d3").split(",")
+	var parts := _arg("parts", "d1,d2,d3").split(",")
 	if parts.has("d1"):
 		_part_d1(profiles, reps)
 	if parts.has("d2"):
-		_part_d2(profiles, reps, rush, "coins")
-	if parts.has("d2b"):
-		_part_d2(profiles, reps, rush, "coins_keep")
+		_part_d2(profiles, reps, rush)
 	if parts.has("d3"):
 		_part_d3(profiles, reps, prices, rush)
 	_offer_prices()
@@ -149,11 +147,7 @@ func _shop(st: Dictionary, policy: String) -> void:
 			_buy_hint(st)
 			super._shop(st, "rush")
 			if int(st.unlocked) >= _seasons.size():
-				_buy_offers(st, 0)
-		"coins_keep":
-			_buy_hint(st)
-			super._shop(st, "rush")
-			_buy_offers(st, _reserve(st))
+				_buy_offers(st)
 		"burst":
 			_buy_bursts(st)
 			super._shop(st, "rush")
@@ -170,7 +164,7 @@ func _done(st: Dictionary) -> bool:
 				if not (st.ms as Dictionary).has(_earned_key(c)):
 					return false
 			return true
-		"coins", "coins_keep":
+		"coins":
 			# Kraj kad su sve besplatne sezone i sve coin ponude tu (casual inače melje L20 do MAX_RUNS).
 			var want := _offers.size() + (0 if _hint.is_empty() else 1)
 			return int(st.unlocked) >= _seasons.size() and _owned_count(st) >= want
@@ -210,20 +204,14 @@ func _buy_hint(st: Dictionary) -> void:
 	_buy(st, _hint)
 
 
-## Teme i Sir Pip: najjeftinija koju još nema, čim poslije kupovine ostane `keep` coina.
-func _buy_offers(st: Dictionary, keep: int) -> void:
+## Teme i Sir Pip poslije svih besplatnih sezona: najjeftinija koju još nema, čim je coini pokriju.
+func _buy_offers(st: Dictionary) -> void:
 	for o in _offers:
 		if _owns(st, str(o.sku)):
 			continue
-		if int(st.wallet) - int(o.cost) < keep:
+		if int(st.wallet) < int(o.cost):
 			return
 		_buy(st, o)
-
-
-## Coini za sljedeću besplatnu sezonu (0 kad su sve otključane) — kao rezerva u rushu.
-func _reserve(st: Dictionary) -> int:
-	var nxt := int(st.unlocked)
-	return int(_seasons[nxt].coins) if nxt < _seasons.size() else 0
 
 
 ## Loot Burst: +5 ★3 cvijeta sezone koja otključava sljedeću besplatnu (kao Boosters.loot_target).
@@ -333,22 +321,20 @@ func _part_d1(profiles: Array[String], reps: int) -> void:
 				continue
 			var d := _day(js[p], _earned_key(int(_hint.cost)))
 			parts.append("%s %.1f dana (cilj ≤ %.0f) %s" % [p, d, float(HINT_MAX_DAYS[p]), "✓" if d <= float(HINT_MAX_DAYS[p]) else "✗"])
-		_line("Merge Hint (%d C): %s." % [int(_hint.cost), "; ".join(parts)])
-		_line("")
+		if not parts.is_empty():
+			_line("Merge Hint (%d C): %s." % [int(_hint.cost), "; ".join(parts)])
+			_line("")
 
 
 # --- D2 ---
 
-func _part_d2(profiles: Array[String], reps: int, rush: Dictionary, policy: String) -> void:
-	if policy == "coins":
-		_line("## D2. Normalna igra — rush + Merge Hint čim ga može platiti; teme i Sir Pip poslije besplatnih sezona")
-	else:
-		_line("## D2b. Rush + Merge Hint čim ga može platiti; tema / Sir Pip čim ostane dovoljno coina za sljedeću besplatnu sezonu")
+func _part_d2(profiles: Array[String], reps: int, rush: Dictionary) -> void:
+	_line("## D2. Normalna igra — rush + Merge Hint čim ga može platiti; teme i Sir Pip poslije besplatnih sezona")
 	_line("")
 	_line("Kašnjenje = koliko kasnije se otključa besplatna sezona nego u čistom rushu (isti seedovi).")
 	_line("")
 	for pname in profiles:
-		var js := _runs_of(pname, policy, reps)
+		var js := _runs_of(pname, "coins", reps)
 		_line("### %s" % pname)
 		_line("")
 		_line("| Milestone | Dan (runova) | rush dan | Kašnjenje |")
@@ -415,12 +401,12 @@ func _part_d3(profiles: Array[String], reps: int, prices: Array[int], rush: Dict
 		var v: Dictionary = verdict.get(price, {})
 		var pass_all := true
 		var parts: PackedStringArray = []
-		for p in ["casual", "average"]:
+		for p in ["casual", "average", "skilled"]:
 			if not v.has(p):
 				continue
 			var w := float(v[p])
 			parts.append("%s %d %%" % [p, roundi(w * 100.0)])
-			if w > BURST_MAX_SPEEDUP:
+			if w > BURST_MAX_SPEEDUP and p != "skilled":
 				pass_all = false
 		lines.append("- %d C: najveće ubrzanje %s → %s" % [price, ", ".join(parts), "✓" if pass_all else "✗"])
 		if pass_all and ok_price < 0:

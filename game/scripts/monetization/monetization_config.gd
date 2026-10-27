@@ -137,7 +137,8 @@ const IAP_PRODUCTS := {
 		"title": "Loot Burst",
 		"description": "+5 ★3 flowers toward the next free season.",
 		"price_label": "€0.99",
-		"coin_price": 500,
+		# 500 C: casual otključa Frost Orchard 37 % ranije (jedan Burst zatvori manjak ★3); od 1000 C 0 %.
+		"coin_price": 1000,
 		"play_product_id": "booster_loot_burst",
 		"consumable": true,
 		"booster_id": BOOSTER_LOOT_BURST,

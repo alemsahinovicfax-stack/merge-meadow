@@ -16,6 +16,7 @@ tags: [hub, produkcija]
 - [[procjena-igraca|procjena-igraca]] — koliko će ljudi igrati: retencija, DAU, brojač u igri, kalkulator, odluka o analitici (RET-01)
 - [[testiranje|testiranje]] — playtest prvog iskustva + protokol closed testa
 - [[scope-i-granice|scope-i-granice]] — što JE i što NIJE u v1
+- [[ads-only-coini-izvjestaj|ads-only-coini-izvjestaj]] — v1 samo s reklamama: IAP stvari za coine, cijene, šta nije testirano (2026-10-27)
 - [[verzije-nakon-launcha|verzije-nakon-launcha]] — v1.1+ parking (ne planirati detaljno sada)
 - [[ideje-roadmap-implementacije|ideje-roadmap-implementacije]] — build order F0–F9 (staro, vidi CHECKPOINT za trenutno stanje)
 - [[rizici|rizici]] — što može poći po zlu

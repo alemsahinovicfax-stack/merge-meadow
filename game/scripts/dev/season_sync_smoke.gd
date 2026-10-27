@@ -273,10 +273,14 @@ func _run() -> void:
 	if not await _ok("3 Camp link unlock S3", S3):
 		return
 
-	# 4. Home premium: kupi P1 (stub IAP), pa prebacuj tabove.
+	# 4. Home premium: kupi P1 (stub IAP; v1 bez kupovina pravim novcem: za coine, dva tapa), pa
+	# prebacuj tabove.
 	stage = _stage()
 	stage.call("show_season", p1, false)
 	await _frames(4)
+	if not MonetizationConfig.iap_enabled():
+		gs.set("wallet_coins", 100000)
+		stage.call("_buy", p1)
 	stage.call("_buy", p1)
 	if not await _buy_wait(p1):
 		_step = "4 Home buy"
@@ -303,7 +307,10 @@ func _run() -> void:
 		return
 	await _go(MetaHubPages.SHOP)
 	var shop := _page(MetaHubPages.SHOP)
-	shop.call("_on_money_buy", SeasonCatalog.get_def(p2).iap_product_id)
+	if MonetizationConfig.iap_enabled():
+		shop.call("_on_money_buy", SeasonCatalog.get_def(p2).iap_product_id)
+	else:
+		shop.call("_on_coin_buy_confirmed", SeasonCatalog.get_def(p2).iap_product_id)
 	if not await _buy_wait(p2):
 		_step = "5 Shop buy"
 		_fail("P2 %s not owned after Shop purchase" % p2)
