@@ -4,7 +4,9 @@ extends SceneTree
 ##  1. leveli 1–20: duži (60 → 120 s), brži, više prepreka i parova, više plijena i rijetkog
 ##     sjemena — svaki level barem kao prethodni;
 ##  2. Endless: lagan start, stepenice svakih 20 s samo teže, bez tajmera, granice prepreka;
-##  3. sjeme po rijetkosti: ★1 > ★2 > ★3 (udio iz RunBalance = stvarni izbor, 30 000 izvlačenja);
+##  3. sjeme po rijetkosti: ★1 > ★2 > ★3 po tipu u svakom levelu i Endless koraku (udio iz
+##     RunBalance = stvarni izbor, 30 000 izvlačenja); ★3 ×2 od 2026-10-27 (na zahtjev), ali svaki
+##     ★3 tip i dalje rjeđi od svakog ★2 tipa (L1 ★3 ≥ 6 %, nigdje > 13 % u levelima);
 ##  4. Endless sezone se otključa poslije levela 15; rekord po sezoni; pad u Endlessu čuva cijeli
 ##     plijen, pad u levelu pola;
 ##  5. par prepreka uvijek ostavi slobodnu stazu; max magnet dohvata susjednu stazu;
@@ -81,6 +83,9 @@ func _check_levels() -> void:
 				_fail("level %d spawns slower than level %d" % [n, n - 1])
 			if float(c.duration_sec) <= float(prev.duration_sec):
 				_fail("level %d is not longer than level %d" % [n, n - 1])
+		# Po tipu: svaki ★1 tip češći od svakog ★2, a ★2 od ★3 (i poslije ★3 ×2, 2026-10-27).
+		if not (1.0 > float(c.rare2_mult) and float(c.rare2_mult) > float(c.rare3_mult)):
+			_fail("level %d weights should be ★1 > ★2 > ★3 (1 / %.2f / %.2f)" % [n, c.rare2_mult, c.rare3_mult])
 		prev = c
 	var l1 = _rll.call("get_level", 1)
 	var l20 = _rll.call("get_level", 20)
@@ -149,11 +154,12 @@ func _check_seed_weights() -> void:
 			var got := float(counts[r]) / draws
 			if absf(got - want) > 0.01:
 				_fail("level %d ★%d share %.3f, formula %.3f" % [n, r, got, want])
-		# Po tipu: svaki ★1 tip češći od svakog ★2, a ★2 od ★3.
-		if not (1.0 > r2 and r2 > r3):
-			_fail("level %d weights should be ★1 > ★2 > ★3 (1 / %.2f / %.2f)" % [n, r2, r3])
-		if RunBalance.rarity_share(rar, 3, r2, r3) > 0.09:
-			_fail("level %d: ★3 should be rare (≤ 9 %% of seeds)" % n)
+		# ★3 ×2 (2026-10-27): L1 7,3 %, najviše 12,3 % (L20) jer ★3 tip ostaje ispod ★2 tipa.
+		var s3 := RunBalance.rarity_share(rar, 3, r2, r3)
+		if s3 > 0.13:
+			_fail("level %d: ★3 should be rare (≤ 13 %% of seeds), got %.1f %%" % [n, s3 * 100.0])
+		if n == 1 and s3 < 0.06:
+			_fail("level 1: ★3 should be doubled (≥ 6 %% of seeds), got %.1f %%" % (s3 * 100.0))
 	if not RunBalance.pick_weighted([] as Array[String], [] as Array[int], 1.0, 1.0, 0.5).is_empty():
 		_fail("empty pool should give empty type")
 

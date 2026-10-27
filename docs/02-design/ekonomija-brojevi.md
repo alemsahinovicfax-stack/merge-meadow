@@ -38,9 +38,11 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 | Pravilo | Vrijednost |
 |---------|-----------|
 | Izbor tipa | težinski: ★1 = 1, ★2 = `rare2_mult`, ★3 = `rare3_mult` (iz levela / Endless stepenice) |
-| Level 1 → 20 | ★2 0,40 → 0,60 · ★3 0,12 → 0,30 → ★3 = 3,1 → 6,7 % sjemena (bilo 16,7 % — jednako kao ★1) |
-| Endless | ★3 0,25 (start, 1b) → 0,69 (8 min) — uvijek rjeđi od ★2; leveli ★3 0,15 → 0,375 (×1,25, ciklus 1b) |
-| Van runa (Loot Burst bez cilja) | težine levela 1 (`BASE_RARE2/3`) |
+| Level 1 → 20 | ★2 0,40 → 0,60 · ★3 **0,30 → 0,59** (2026-10-27 ×2 na zahtjev, ali najviše ★2 − 0,01; ciklus 1b 0,15 → 0,375; ciklus 1 0,12 → 0,30) → ★3 = **7,3 → 12,3 %** sjemena (sezona s 3 ★1, 2 ★2, 1 ★3) |
+| Endless | ★3 0,376 (0 min) → 0,69 (8 min) — uvijek rjeđi od ★2 → ★3 8,8 → 13,6 % sjemena |
+| ★3 ×2 i ★2 | svaki ★3 tip uvijek rjeđi od svakog ★2 tipa: L1–7 puni ×2, od levela 8 i u Endlessu od 1 min ★3 = ★2 − 0,01 (npr. L20 0,59 umjesto 0,75) |
+| Van runa (Loot Burst bez cilja, dnevni poklon) i tutorijal runovi | `BASE_RARE2` 0,40 · `BASE_RARE3` **0,24** (bilo 0,12) |
+| Čuva | `economy_balance_smoke`: težina ★1 > ★2 > ★3 po tipu u svakom levelu i Endless koraku, ★3 ≤ 13 % u levelima, L1 ★3 ≥ 6 % |
 
 ## Loot (`game_state.gd → finish_run`)
 
@@ -93,27 +95,28 @@ v1 izlazi samo s reklamama (`MonetizationConfig.IAP_ENABLED = false`): stvari ko
 |-------|-----|-------|------------|-----------|
 | Merge Hint | `booster_merge_hint` | **1500** | €0.99 | trajno |
 | Loot Burst | `booster_loot_burst` | **1000** (početni prijedlog 500) | €0.99 | više puta, +5 ★3 sezone koja otključava sljedeću besplatnu; bez cilja se ne nudi |
-| Moonlit Warren | `season_pack_moonlit_warren` | **3000** | €2.99 | trajno |
-| Coral Tide Garden | `season_pack_coral_tide` | **3500** | €3.49 | trajno |
-| Starfall Glade | `season_pack_starfall_glade` | **3000** | €2.99 | trajno |
-| Ember Fen | `season_pack_ember_fen` | **3500** | €3.49 | ne nudi se dok sezona nije u igri (test-zaključana) |
+| Moonlit Warren | `season_pack_moonlit_warren` | **10000** (do 2026-10-27: 3000) | €2.99 | trajno |
+| Coral Tide Garden | `season_pack_coral_tide` | **10000** (do 2026-10-27: 3500) | €3.49 | trajno |
+| Starfall Glade | `season_pack_starfall_glade` | **10000** (do 2026-10-27: 3000) | €2.99 | trajno |
+| Ember Fen | `season_pack_ember_fen` | **10000** (do 2026-10-27: 3500) | €3.49 | ne nudi se dok sezona nije u igri (test-zaključana) |
 | Sir Pip | `pip_knight` | **3000** | €3.99 | trajno |
 | Remove Ads · Starter Pack | `remove_ads` · `starter_pack` | — (0) | €3.99 · €1.99 | ne nude se (reklame su jedina zarada; paket daje coine i ima tajmer) |
 
-**Simulacija (medijan dana, u zagradi runova):**
+**Simulacija (medijan dana, u zagradi runova; drugi krug 2026-10-27 — teme 10000, ★3 ×2 uz ★3 tip rjeđi od ★2 tipa):**
 
 | | casual | average | skilled |
 |---|---|---|---|
 | Merge Hint 1500 — kad zarada prvi put dostigne cijenu (cilj ≤ 3 / ≤ 2 dana) | 2,1 (44) ✓ | 1,5 (24) ✓ | 1,2 (18) |
-| Tema / Sir Pip 3000 — isto | 5,3 (126) | 2,9 (51) | 2,2 (36) |
-| Coral Tide 3500 — isto | 7,0 (174) | 2,9 (51) | 2,2 (36) |
-| Teme i Sir Pip u normalnoj igri (rush, kupuje ih poslije sve 4 besplatne sezone) | Moonlit 60, Starfall 78; Sir Pip i Coral 5 / 10 putovanja do 2500 runova | 37–42 | 28–33 |
-| Merge Hint kupljen odmah → besplatne sezone kasne | +3–8 % | +11–20 % | +17–32 % |
-| Loot Burst 500 — najveće ubrzanje besplatne sezone (kupuje kad coini za sezonu već postoje) | **37 %** (Frost 8,3 → 5,3 d; 1 Burst) | 0 % | 0 % |
-| Loot Burst 750 — isto | 27 % | 0 % | 0 % |
+| Sir Pip 3000 — isto | 5,3 (126) | 2,9 (51) | 2,2 (36) |
+| Tema 10000 — isto | 19,0 (478) | 9,0 (168) | 6,7 (99) |
+| Besplatne sezone u čistom rushu (Frost / Lantern / Amber) | 5,9 / 14,1 / 30,9 (prije ★3 ×2: 8,3 / 18,9 / 33,4) | 2,9 / 7,1 / 14,1 (prije: 2,9 / 7,4 / 14,1) | 2,2 / 4,4 / 9,5 (prije: 9,6) |
+| Sir Pip i teme u normalnoj igri (rush, kupuje ih poslije sve 4 besplatne sezone) | Sir Pip 78, Moonlit 88, Coral 95; Starfall 5 / 10 putovanja do 2500 runova | Sir Pip 36, teme 41 / 45 / 50 | Sir Pip 28, teme 32 / 36 / 40 |
+| Merge Hint kupljen odmah → besplatne sezone kasne | +16–49 % (Frost 5,9 → 8,8 d) | +12–21 % | +18–36 % |
+| Loot Burst 500 — najveće ubrzanje besplatne sezone (kupuje kad coini za sezonu već postoje) | 11 % (prvi krug, ★3 ×1: **37 %**) | 0 % | 0 % |
+| Loot Burst 750 — isto | 0 % (prvi krug: 27 %) | 0 % | 0 % |
 | **Loot Burst 1000** — isto | **0 %** | 0 % | 0 % |
 
-Kupovina Burstova „čim fali ★3" nikad ne ubrza (troši coine koji trebaju za sezonu: +23–115 % kasnije). Plaćene teme imaju svoj Level Path (2200 C + 22 ★3 njihovog cvijeta + Endless), pa tema kupljena coinima igranjem vrati dio cijene — zato nisu jeftinije od najskupljeg izgleda (2500). Granice čuva `economy_balance_smoke` (Merge Hint < prva sezona, teme ≥ najskuplji izgled, Loot Burst ≥ 200 C po ★3).
+Dupli ★3 skraćuje casual put (★3 mu je bio usko grlo); average i skilled koče coini i nagrada staze na L20, pa se skoro ne mijenjaju. Zato Merge Hint casual igraču sada „košta" više dana: coini su postali usko grlo. Loot Burst bi sa duplim ★3 prošao kriterij i na 750 C (500 C: casual 11 %), ali ostaje 1000 (cijena nije tražena za promjenu). Kupovina Burstova „čim fali ★3" nikad ne ubrza (troši coine koji trebaju za sezonu: do +97 % kasnije). Plaćene teme imaju svoj Level Path (2200 C + 22 ★3 njihovog cvijeta + Endless), pa tema kupljena coinima igranjem vrati dio cijene — zato nisu jeftinije od najskupljeg izgleda (2500). Granice čuva `economy_balance_smoke` (Merge Hint < prva sezona, teme ≥ najskuplji izgled, Loot Burst ≥ 200 C po ★3).
 
 ### Otvoreni targeti (playtest — F4 pass 1, 2026-07-29)
 

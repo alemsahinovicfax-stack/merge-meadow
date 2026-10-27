@@ -33,6 +33,8 @@ tags: [hub, iskustvo]
 - [[design-drafts/level-path-izvjestaj|level-path-izvjestaj]] — prenos: Level Path po sezoni (put, skok Pipa, nagrade 5/10/15/20, badge); FPS A/B prema polju (2026-10-20)
 - [[design-drafts/leveli-endless-izvjestaj|leveli-endless-izvjestaj]] — prenos: pojasevi težine, najava, nalet, par, cilj na kraju levela, Endless dugme / HUD / rekord / kraj, spreman sanduk (2026-10-22)
 - [[design-drafts/level-path-cd-brief|level-path-cd-brief]] — brief za Claude Design: Level Path po sezoni (20 checkpointa, Pip na trenutnom levelu, nagrade na 5/10/15/20, claim popup)
+- [[design-drafts/ads-only-cd-izvjestaj|ads-only-cd-izvjestaj]] — izvještaj sesije za CD: v1 bez kupovina pravim novcem — šta je promijenilo Shop (3 taba), Home (Free / Premium), Camp i Ormar; 16 snimaka (2026-10-27)
+- [[design-drafts/ads-only-cd-brief|ads-only-cd-brief]] — brief za Claude Design: Shop tenda za 3 / 4 taba, Home sezone kad sve košta coine, jedan sistem coin cijene, oznaka „Premium" bez pravog novca, Camp kartica teme
 
 ## Povezano
 

@@ -20,7 +20,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	custom_minimum_size = Vector2(1080, UiShopV2.TABBAR_H)
 	size = custom_minimum_size
-	# Bez kupovina ostaje samo Looks — tabovi koji postoje centrirani na tendi.
+	# Bez kupovina pravim novcem (v1) nema Supporta — tabovi koji postoje centrirani na tendi.
 	var shown := UiShopV2.visible_tabs()
 	if not shown.has(active):
 		active = shown[0]
@@ -85,8 +85,10 @@ func _draw() -> void:
 						Rect2(x, 0.0, float(UiShopV2.AWNING_STRIPE_W), h), 30.0,
 						UiShopV2.AWNING_B if i % 2 else UiShopV2.AWNING_A
 					)
-	for i in UiShopV2.TABS.size():
-		var r := Rect2(Vector2(UiShopV2.TAB_X0 + i * UiShopV2.TAB_STEP, UiShopV2.TAB_Y), Vector2(UiShopV2.TAB_W, UiShopV2.TAB_H))
+	# Pozadina samo za tabove koji se vide (v1 bez kupovina: 3, centrirani) — ranije su se crtale
+	# sve 4 pozicije i preklapale s pomjerenim dugmadima (2026-10-27).
+	for tab_id in UiShopV2.visible_tabs():
+		var r := Rect2(Vector2(_x_for(tab_id), UiShopV2.TAB_Y), Vector2(UiShopV2.TAB_W, UiShopV2.TAB_H))
 		draw_style_box(UiShopV2.tab_style(false), r)
 	var thumb := Rect2(Vector2(_thumb_x, UiShopV2.TAB_Y), Vector2(UiShopV2.TAB_W, UiShopV2.TAB_H))
 	draw_style_box(UiShopV2.box(Color(UiShopV2.SHADOW_CARD, 0.24), UiShopV2.RADIUS_BUTTON), Rect2(thumb.position + Vector2(0, 6), thumb.size))

@@ -104,6 +104,10 @@ const STARTER_PACK_DAYS := 7
 ## Loot Burst: +5 ★3 cvjetova sezone koja otključava sljedeću besplatnu.
 const LOOT_BURST_STAR3 := 5
 
+## Plaćene (premium) sezone bez kupovina pravim novcem: sve ista cijena u coinima (2026-10-27, na
+## zahtjev — ranije 3000 / 3500).
+const PREMIUM_SEASON_COINS := 10000
+
 ## price_label = rezervna € cijena (s IAP-om, dok Play ne javi pravu). coin_price = cijena u coinima
 ## kad su kupovine pravim novcem isključene (v1, 2026-10-26); 0 = ne nudi se za coine. Cijene i
 ## zašto: docs/02-design/ekonomija-brojevi.md § Coin cijene bez kupovina (coin_offer_sim.gd).
@@ -147,7 +151,7 @@ const IAP_PRODUCTS := {
 		"title": "Moonlit Warren",
 		"description": "Unlock the Moonlit Warren theme. Cosmetic only — no extra loot or magnet power.",
 		"price_label": "€2.99",
-		"coin_price": 3000,
+		"coin_price": PREMIUM_SEASON_COINS,
 		"play_product_id": "season_pack_moonlit_warren",
 		"consumable": false,
 		"season_id": "moonlit_warren",
@@ -156,7 +160,7 @@ const IAP_PRODUCTS := {
 		"title": "Coral Tide Garden",
 		"description": "Unlock the Coral Tide Garden theme. Cosmetic only — no extra loot or magnet power.",
 		"price_label": "€3.49",
-		"coin_price": 3500,
+		"coin_price": PREMIUM_SEASON_COINS,
 		"play_product_id": "season_pack_coral_tide",
 		"consumable": false,
 		"season_id": "coral_tide",
@@ -165,7 +169,7 @@ const IAP_PRODUCTS := {
 		"title": "Starfall Glade",
 		"description": "Unlock the Starfall Glade theme. Cosmetic only — no extra loot or magnet power.",
 		"price_label": "€2.99",
-		"coin_price": 3000,
+		"coin_price": PREMIUM_SEASON_COINS,
 		"play_product_id": "season_pack_starfall_glade",
 		"consumable": false,
 		"season_id": "starfall_glade",
@@ -174,7 +178,7 @@ const IAP_PRODUCTS := {
 		"title": "Ember Fen",
 		"description": "Unlock the Ember Fen theme. Cosmetic only — no extra loot or magnet power.",
 		"price_label": "€3.49",
-		"coin_price": 3500,
+		"coin_price": PREMIUM_SEASON_COINS,
 		"play_product_id": "season_pack_ember_fen",
 		"consumable": false,
 		"season_id": "ember_fen",

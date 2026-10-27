@@ -11,9 +11,10 @@ extends RefCounted
 
 ## Brzina levela raste svakih RAMP_EVERY s (speed_ramp iz levela).
 const RAMP_EVERY := 15.0
-## Kad nema runa (dnevni poklon, Loot Burst bez cilja): težine kao level 1.
+## Kad nema runa (dnevni poklon, Loot Burst bez cilja) i u tutorijal runovima. ★3 ×2 (2026-10-27,
+## na zahtjev: dupli spawn ★3 sjemena — kao i rare3_mult u levels.json).
 const BASE_RARE2 := 0.40
-const BASE_RARE3 := 0.12
+const BASE_RARE3 := 0.24
 
 
 static func rarity_weight(rarity: int, rare2_mult: float, rare3_mult: float) -> float:
