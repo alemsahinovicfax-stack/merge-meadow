@@ -12,6 +12,8 @@ ai_sažetak: "8 screenshotova portrait 1080×1920 — redoslijed, caption overla
 
 # Store screenshots — plan i capture
 
+> **2026-10-28:** zamijenjeno s [[../04-experience/design-drafts/store-assets-cd-brief|store-assets-cd-brief]] — kadrovi iz igre snima `game/scripts/dev/store_capture.gd` (bez emulatora), CD radi okvire i naslove. Redoslijed ispod je stari.
+>
 > **Output folder:** `marketing/store/screenshots/`  
 > **Format:** PNG, **1080×1920** (portrait, 9:16)
 

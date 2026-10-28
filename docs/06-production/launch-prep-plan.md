@@ -63,7 +63,7 @@ NE RADI: ne otvaraj naloge, ne unosi plaćanja, ne mijenjaj cijene ni gameplay/b
 - [ ] **app-ads.txt** — GitHub repo `alemsahinovicfax-stack.github.io` (user site) ili vlastita domena; agent upiše publisher ID (`docs/06-production/app-ads/`)
 - [ ] **Backup keystorea** (`game/export_credentials/merge_meadow_upload.keystore`) + lozinke (`credentials.local.md`) van laptopa (USB / cloud)
 - [ ] Play Console: aplikacija, Advertising ID deklaracija, Data safety, IARC (varijanta bez kupovina), ciljna publika 13+, internal test (AAB: `game/export/android/merge_meadow.aab`); IAP proizvodi i license testeri tek kad se kupovine vrate
-- [ ] **Feature graphic 1024×500** za store listing (ne postoji još)
+- [ ] **Feature graphic 1024×500** za store listing — 2026-10-28: CD brief za cijeli store paket (feature graphic, 8 screenshotova s hookom, ikona, promo 1200×630) u `docs/04-experience/design-drafts/store-assets-cd-brief.md`, kadrovi `store-assets-ref/` (snima `game/scripts/dev/store_capture.gd`)
 - [ ] Skupiti **12 testera** (bolje 15–20) za closed test od 14 dana — tekst poziva EN/BS u `play-console-sutra.md` § 7
 - [ ] Test na pravom telefonu + otvoreni playtestovi iz CHECKPOINT-a
 
