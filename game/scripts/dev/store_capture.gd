@@ -101,10 +101,10 @@ func _fast_to(run: Node, sec: float) -> void:
 
 
 ## Plijen na stazi: coin niz u jednoj stazi, sjeme ★1–★3 u drugim, ispred Pipa (stvarni pickupi).
-func _stage_pickups(run: Node, coins: int, seeds: Dictionary) -> void:
+func _stage_pickups(run: Node, coins: int, seeds: Dictionary, clear_obstacles: bool = false) -> void:
 	var world := run.get_node("World")
 	for c in world.get_children():
-		if not c.is_in_group("obstacle"):
+		if clear_obstacles or not c.is_in_group("obstacle"):
 			c.free()
 	var lanes: Array = run.get("lane_x_positions")
 	var types: Array = _gs.call("get_active_season_spawn_types")
@@ -156,8 +156,12 @@ func _run_shots() -> void:
 	var run := await _start_run("amber_canopy", 0)
 	run.set("elapsed", 262.0)
 	await _fast_to(run, 264.6)
-	await create_timer(0.62).timeout
+	# Poslije naleta: „New best!" ostaje u čipu, plijen na stazi, brojači puni.
+	await create_timer(1.6).timeout
 	run.set("_state", 2)
+	var amber: Array = _gs.call("get_active_season_spawn_types")
+	_stage_pickups(run, 212, {str(amber[0]): 11, str(amber[1]): 6, str(amber[2]): 2}, true)
+	await _frames(12)
 	await _capture("s05_endless_new_best_amber")
 
 
