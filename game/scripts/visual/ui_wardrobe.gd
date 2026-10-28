@@ -120,10 +120,8 @@ const SHOP_LINK    := "More in Shop"
 const NEW_TEXT     := "New"
 ## Classic Pip (settings_fixes · B): oznaka umjesto cijene — besplatan, uvijek tvoj.
 const FREE_TEXT    := "Free"
-## Sir Pip (premium, pravi novac): ista pločica, ljubičasta kao novac u Shopu.
-const PREMIUM_TEXT := "Premium"
-const PREMIUM_FILL := Color("d4a5ff")
-## „Free" / „Premium" stoje ispod imena (muncher_premium_pip · Wardrobe cards), ne preko
+## Sir Pip (posebno za coine): oznaka „Special" S (SpecialTag) na mjestu pločice „Free".
+## „Free" / „Special" stoje ispod imena (muncher_premium_pip · Wardrobe cards), ne preko
 ## pregleda — tamo se sudarala s kvačicom nošenog skina.
 const UNDER_TAG_H     := 44
 const UNDER_TAG_PX    := 30
@@ -324,11 +322,6 @@ static func new_tag() -> StyleBoxFlat:
 ## „Free" na Classic Pipu: mint pilula ispod imena, rub 3.
 static func free_tag() -> StyleBoxFlat:
 	return _box(MINT, UNDER_TAG_H / 2, 3, STICKER_EDGE)
-
-
-## „Premium" na Sir Pipu: isti oblik kao „Free", ispuna `#D4A5FF`.
-static func premium_tag() -> StyleBoxFlat:
-	return _box(PREMIUM_FILL, UNDER_TAG_H / 2, 3, STICKER_EDGE)
 
 
 ## ShopLink kartica i EmptyState: isprekidan rub se crta u _draw() (dash 14 / gap 10, 3 px) — StyleBox nema dash.

@@ -1,0 +1,136 @@
+{
+  "source": "design/CoinPrice.dc.html",
+  "scripts": [
+    "game/scripts/ui/shop_buy_button.gd",
+    "ui_shop_v2.gd coin_state / need_coins_text"
+  ],
+  "format": "UiChrome.format_count -> \"10,000\"",
+  "sizes": {
+    "S": {
+      "w": 300,
+      "h": 120,
+      "font": 44,
+      "icon": 48,
+      "gap": 12,
+      "use": [
+        "camp_theme",
+        "shop_season"
+      ]
+    },
+    "M": {
+      "w": 320,
+      "h": 120,
+      "font": 52,
+      "icon": 56,
+      "gap": 12,
+      "use": [
+        "shop_looks",
+        "shop_boosters"
+      ]
+    },
+    "L": {
+      "w": 360,
+      "h": 132,
+      "font": 56,
+      "icon": 64,
+      "gap": 14,
+      "use": [
+        "home_theme"
+      ]
+    }
+  },
+  "width_rule": "fixed per size; identical in every state (confirm adds +0 px)",
+  "states": {
+    "buy": {
+      "bg": "#FFD56B",
+      "border": "#2D3436",
+      "border_w": 4,
+      "shadow": "0 8 0 #1A1A1447",
+      "text": "price",
+      "icon": "icon_coin.svg"
+    },
+    "short": {
+      "bg": "#F1EAE0",
+      "border": "#2D343659",
+      "shadow": null,
+      "offset_y": 8,
+      "text_color": "#555C5E",
+      "icon": "icon_coin.svg",
+      "on_tap": [
+        "shake 0.32s",
+        "coin_chip_pulse 0.30s",
+        "need_bubble 1.6s"
+      ]
+    },
+    "confirm": {
+      "bg": "#2D3436",
+      "text_color": "#FFD56B",
+      "icon": "check_confirm.svg",
+      "icon_size": "= coin icon",
+      "timer_bar": {
+        "h": 8,
+        "color": "#FFD56B",
+        "inset": "h/2",
+        "scale_x": "1->0",
+        "seconds": 3
+      },
+      "pop": {
+        "scale": 1.06,
+        "s": 0.22
+      }
+    },
+    "buying": {
+      "bg": "#A8E6CF",
+      "offset_y": 8,
+      "icon": "check_ink.svg (0.8x)",
+      "ring": {
+        "sprite": 1,
+        "border": 12,
+        "color": "#FFF5D1",
+        "scale": "0.3->1.6",
+        "s": 0.42
+      },
+      "total_s": 0.6,
+      "font": "min(size.font, 48)"
+    },
+    "owned_theme": {
+      "bg": "#FFB88C",
+      "icon": "play triangle",
+      "text": "Play",
+      "font": "min(size.font, 52) -> S 44 · M 52 · L 52",
+      "use": "Shop season card only"
+    },
+    "owned_item": {
+      "bg": "#A8E6CF",
+      "icon": "check_ink.svg",
+      "text": [
+        "Yours",
+        "Wearing"
+      ],
+      "offset_y": 8,
+      "font": "min(size.font, 48) -> S 44 · M 48 · L 48",
+      "use": "Looks, Boosters, Home theme card (Home: big Play button below)"
+    },
+    "eur_iap_only": {
+      "bg": "#D4A5FF",
+      "text": "store price",
+      "enabled_when": "MonetizationConfig.iap_enabled"
+    }
+  },
+  "need_bubble": {
+    "text": "Need {n} more coins",
+    "n": "format_count(price - wallet)",
+    "h": 64,
+    "radius": 32,
+    "font": 34,
+    "bg": "#FFE8B8",
+    "border": 3,
+    "shadow_y": 4,
+    "anchor": "above button, right-aligned, tail at button center",
+    "camp_anchor": "below button",
+    "life_s": 1.6,
+    "replaces": "toast (Home, Camp)",
+    "overlap": "accepted: may cover neighbours (Camp flower frames, Home savings pill) for 1.6 s"
+  },
+  "confirm_timeout_s": 3
+}

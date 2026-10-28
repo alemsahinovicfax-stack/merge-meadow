@@ -1,0 +1,47 @@
+{
+  "source": "design/PremiumTag.dc.html",
+  "label": "Special",
+  "icon": "icon_special.svg",
+  "bg": "#C2E2FA",
+  "text": "#2D3436",
+  "border": 3,
+  "shadow": null,
+  "contrast": "11:1",
+  "sizes": {
+    "L": {
+      "h": 60,
+      "font": 34,
+      "icon": 36,
+      "pad_l": 14,
+      "pad_r": 24,
+      "gap": 8
+    },
+    "M": {
+      "h": 52,
+      "font": 32,
+      "icon": 32,
+      "pad_l": 12,
+      "pad_r": 20,
+      "gap": 8
+    },
+    "S": {
+      "h": 44,
+      "font": 26,
+      "icon": 26,
+      "pad_l": 10,
+      "pad_r": 16,
+      "gap": 6
+    }
+  },
+  "placements": {
+    "shop_sir_pip": "L, image top-left +20",
+    "camp_theme": "M, above \"6 new flowers\"",
+    "wardrobe_item_card": "S, top-left +16",
+    "home_tab": "icon + #C2E2FA active bg (no word)"
+  },
+  "money_purple": {
+    "hex": "#D4A5FF",
+    "v1": "unused",
+    "iap": "only eur price-button face"
+  }
+}

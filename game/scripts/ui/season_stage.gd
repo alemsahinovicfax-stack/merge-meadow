@@ -52,6 +52,8 @@ var _toast_tween: Tween
 var _buying_id: String = ""
 ## Coin kupovina teme (v1): sezona čija pilula čeka drugi tap; serial poništava stari timer.
 var _confirm_buy_id: String = ""
+## „Need N more coins" iznad cijene teme (zamjenjuje toast).
+var _need_bubble: NeedCoinsBubble
 var _confirm_serial: int = 0
 var _known_playable: Dictionary = {}
 var _known_ready: bool = false
@@ -337,6 +339,8 @@ func _view_season(season_id: String) -> void:
 		idx = maxi(0, tab_ids(TAB_FREE).find(GameState.active_season_id))
 	_tab = tab
 	_idx = idx
+	if _need_bubble != null:
+		_need_bubble.hide_now()
 
 
 func _is_paid(season_id: String) -> bool:
@@ -739,6 +743,8 @@ func _on_tab_pressed(tab: String) -> void:
 func _swap_to(tab: String, idx: int, dir_override: int = -99) -> void:
 	if tab == _tab and idx == _idx:
 		return
+	if _need_bubble != null:
+		_need_bubble.hide_now()
 	var dir := 0 if tab != _tab else signi(idx - _idx)
 	if dir_override != -99:
 		dir = dir_override
@@ -944,7 +950,7 @@ func _coin_price_of(def: SeasonDef) -> int:
 
 ## Tema za coine u dva tapa kao u Shopu: prvi tap „✓ cijena" (3 s), drugi kupuje kroz
 ## IAPManager.buy_with_coins (isti grant; _on_purchase_done pokaže „Yours"). Bez dovoljno coina:
-## puls coin čipa + toast koliko fali, ništa se ne troši.
+## puls coin čipa + oblačić koliko fali (1,6 s), ništa se ne troši.
 func _buy_with_coins(def: SeasonDef) -> void:
 	var price := _coin_price_of(def)
 	if price <= 0:
@@ -954,7 +960,7 @@ func _buy_with_coins(def: SeasonDef) -> void:
 		Sfx.play("ui_denied")
 		if is_inside_tree():
 			get_tree().call_group("meta_hub", "pulse_coin_chip")
-		_show_toast(UiShopV2.need_coins_text(price))
+		_show_need(price)
 		return
 	if _confirm_buy_id != def.id:
 		_confirm_buy_id = def.id
@@ -974,7 +980,7 @@ func _buy_with_coins(def: SeasonDef) -> void:
 		_buying_id = ""
 		_refresh_view()
 		if int(GameState.wallet_coins) < price:
-			_show_toast(UiShopV2.need_coins_text(price))
+			_show_need(price)
 
 
 ## Potvrda kupovine teme pada (timer, druga kartica, polje) — bez osvježavanja.
@@ -1030,6 +1036,23 @@ func _detect_fresh() -> void:
 
 
 # --- toast ---
+
+## Oblačić iznad dugmeta cijene na kartici (isti kao u Shopu i Campu).
+func _show_need(price: int) -> void:
+	var content := get_card_content()
+	if content == null:
+		return
+	if _need_bubble == null:
+		_need_bubble = NeedCoinsBubble.new()
+		add_child(_need_bubble)
+	var face := content.part_rect(HomeV3CardContent.PART_BUY)
+	var anchor := get_global_transform().affine_inverse() * (content.get_global_transform() * face)
+	_need_bubble.show_need(UiShopV2.need_coins_text(price), anchor)
+
+
+func get_need_text() -> String:
+	return _need_bubble.get_text() if _need_bubble != null else ""
+
 
 func _show_toast(text: String) -> void:
 	if stage_toast == null:

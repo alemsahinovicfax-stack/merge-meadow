@@ -9,6 +9,10 @@ extends Control
 ## Runda 3: zakljucana besplatna sezona (locked i unlock) ima veo preko svakog
 ## diska i jedan katanac na bloku — cvijece se ne prepoznaje dok se sezona ne
 ## otkljuci. Tap na Unlock dize veo disk po disk (play_reveal).
+##
+## Teme (design_handoff_ads_only · home_season_tabs.json): rub „Special" #C2E2FA (8, ink obrub 3),
+## dugme cijene = UiCoinPrice L (buy / short / confirm + traka 3 s / buying + prsten / „✓ Yours",
+## € u IAP režimu) i iznad njega mirna pilula štednje „4,200 / 10,000" (B3; ne u IAP režimu).
 
 const ST_ACTIVE := "active"
 const ST_OPEN := "open"
@@ -25,6 +29,11 @@ const PART_UNLOCK := "unlock"
 const PART_BUY := "buy"
 
 const DISC_BORDER := 4.0
+## B3 pilula štednje (home_season_tabs.json savings_pill_b3).
+const SAVINGS_H := 72.0
+const SAVINGS_FONT := 38.0
+const SAVINGS_ICON := 44
+const SAVINGS_GAP := 16.0
 
 ## data: season_id, status, premium, roster [{id, name, missing}], coins,
 ## coins_need, stars, stars_need, prev_type, price, buying; v1 bez kupovina pravim novcem još
@@ -46,6 +55,14 @@ var _veil_node: RosterVeil
 ## Napredak podizanja vela u sekundama; < 0 = nema reveala u toku.
 var _reveal_t: float = -1.0
 var _reveal_tween: Tween
+## Pilula štednje iznad coin cijene teme (B3).
+var _savings := Rect2()
+## Traka potvrde 1 → 0 (T_CONFIRM_TIMEOUT) i prsten kupovine 0 → 1; < 0 = nema.
+var _bar_k: float = 0.0
+var _bar_tween: Tween
+var _ring_k: float = -1.0
+var _buying_anim: bool = false
+var _buy_tween: Tween
 
 
 ## Crtez cvijeta u disku kao zaseban cvor — modulate daje siluetu (crno .28) i
@@ -108,7 +125,18 @@ func _init() -> void:
 
 
 func configure(d: Dictionary) -> void:
+	var old := data
 	data = d
+	var same := str(old.get("season_id", "")) == str(d.get("season_id", ""))
+	var was_confirm := same and bool(old.get("confirm", false))
+	if bool(d.get("confirm", false)) != was_confirm:
+		_start_bar(bool(d.get("confirm", false)))
+	elif not same:
+		_start_bar(false)
+	if same and str(old.get("status", "")) == ST_BUY and status() == ST_OWNED:
+		_play_buying()
+	elif not same:
+		_stop_buying()
 	_stop_reveal()
 	_layout()
 	_apply_veil()
@@ -249,6 +277,61 @@ func star_text() -> String:
 	return "%d / %d" % [mini(_i("stars"), _i("stars_need")), _i("stars_need")]
 
 
+## Traka potvrde: puna na prvi tap, skupi se za T_CONFIRM_TIMEOUT.
+func _start_bar(on: bool) -> void:
+	if _bar_tween != null and _bar_tween.is_valid():
+		_bar_tween.kill()
+	_bar_k = 1.0 if on else 0.0
+	if on and is_inside_tree():
+		_bar_tween = create_tween()
+		_bar_tween.tween_method(_set_bar, 1.0, 0.0, UiShopV2.T_CONFIRM_TIMEOUT)
+
+
+func _set_bar(k: float) -> void:
+	_bar_k = k
+	queue_redraw()
+
+
+## Kupljeno: 0,6 s mint „✓ Yours" + prsten 0,42 s, pa obično „✓ Yours".
+func _play_buying() -> void:
+	_stop_buying()
+	if not is_inside_tree():
+		return
+	_buying_anim = true
+	_ring_k = 0.0
+	_buy_tween = create_tween()
+	_buy_tween.tween_method(_set_ring, 0.0, 1.0, UiCoinPrice.T_RING).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_buy_tween.tween_interval(UiCoinPrice.T_BUYING - UiCoinPrice.T_RING)
+	_buy_tween.tween_callback(_stop_buying)
+
+
+func _stop_buying() -> void:
+	if _buy_tween != null and _buy_tween.is_valid():
+		_buy_tween.kill()
+	_buying_anim = false
+	_ring_k = -1.0
+	queue_redraw()
+
+
+func _set_ring(k: float) -> void:
+	_ring_k = k
+	queue_redraw()
+
+
+func is_buying_anim() -> bool:
+	return _buying_anim
+
+
+## Pilula štednje se vidi samo kod teme za coine koja još nije kupljena.
+func has_savings() -> bool:
+	return status() == ST_BUY and _i("coin_price") > 0
+
+
+func savings_text() -> String:
+	var price := _i("coin_price")
+	return "%s / %s" % [UiChrome.format_count(mini(_i("coins"), price)), UiChrome.format_count(price)]
+
+
 # --- raspored ---
 
 func _layout() -> void:
@@ -280,12 +363,20 @@ func _layout() -> void:
 	var unlock_w := 4.0 + 36.0 + 56.0 + 18.0 + UiHomeV3.text_w(900, 54, "Unlock") + 18.0 + 15.0 + 18.0 \
 		+ 56.0 + 18.0 + UiHomeV3.text_w(900, 54, str(_i("coins_need")), 0.0, true) + 48.0 + 4.0
 	_unlock = Rect2(cx - unlock_w * 0.5, mid - UiHomeV3.ACTION_H * 0.5, unlock_w, UiHomeV3.ACTION_H)
-	# Zlatna cijena bez ikone (dijamanti izbačeni 2026-10-09): padding 56 s obje strane.
-	var buy_w := _coin_buy_w() if _i("coin_price") > 0 \
-		else 4.0 + 56.0 + UiHomeV3.text_w(900, 60, _price(), 0.0, true) + 56.0 + 4.0
-	_buy = Rect2(cx - buy_w * 0.5, mid - UiHomeV3.ACTION_H * 0.5, buy_w, UiHomeV3.ACTION_H)
-	var owned_w := 4.0 + 36.0 + 31.0 + 18.0 + UiHomeV3.text_w(900, 50, "Yours") + 48.0 + 4.0
-	_owned = Rect2(cx - owned_w * 0.5, mid - 60.0, owned_w, 120.0)
+	# Cijena teme = UiCoinPrice L (360 x 132) u svim stanjima; s pilulom štednje (72) iznad,
+	# razmak 16, blok je centriran na status.
+	var face := UiCoinPrice.button_size(UiCoinPrice.L)
+	var block := face.y + UiCoinPrice.SHADOW_Y
+	if has_savings():
+		var pill_w := 4.0 + 24.0 + float(SAVINGS_ICON) + 12.0 \
+			+ UiHomeV3.text_w(900, SAVINGS_FONT, savings_text(), 0.0, true) + 28.0 + 4.0
+		var top := mid - (SAVINGS_H + SAVINGS_GAP + block) * 0.5
+		_savings = Rect2(cx - pill_w * 0.5, top, pill_w, SAVINGS_H)
+		_buy = Rect2(Vector2(cx - face.x * 0.5, top + SAVINGS_H + SAVINGS_GAP), face)
+	else:
+		_savings = Rect2()
+		_buy = Rect2(Vector2(cx - face.x * 0.5, mid - block * 0.5), face)
+	_owned = Rect2(Vector2(cx - face.x * 0.5, mid - block * 0.5), face)
 	var soon_w := 4.0 + 52.0 + UiHomeV3.text_w(900, 50, "Coming soon") + 52.0 + 4.0
 	_soon = Rect2(cx - soon_w * 0.5, mid - 60.0, soon_w, 120.0)
 
@@ -296,8 +387,13 @@ func _draw() -> void:
 	if data.is_empty():
 		return
 	if bool(data.get("premium", false)):
+		# Rub „Special": ink obrub 3 oko plave trake 8 (StyleBoxFlat border, bez maske).
 		var rim := Rect2(Vector2.ZERO, size).grow(-UiHomeV3.PREMIUM_RIM_INSET)
-		var sb := UiStage.box(Color.TRANSPARENT, UiHomeV3.PREMIUM_RIM_RADIUS, UiHomeV3.PREMIUM_RIM_WIDTH, UiHomeV3.GOLD)
+		var w := UiHomeV3.PREMIUM_RIM_WIDTH
+		var outline := UiStage.box(Color.TRANSPARENT, UiHomeV3.PREMIUM_RIM_RADIUS + 3, w + 6, UiHomeV3.INK)
+		outline.draw_center = false
+		draw_style_box(outline, rim.grow(3.0))
+		var sb := UiStage.box(Color.TRANSPARENT, UiHomeV3.PREMIUM_RIM_RADIUS, w, SpecialTag.FILL)
 		sb.draw_center = false
 		draw_style_box(sb, rim)
 	_draw_roster()
@@ -436,65 +532,39 @@ func _draw_unlock() -> void:
 	UiHomeV3.draw_text(self, 900, 54, str(_i("coins_need")), Vector2(x, cy - 27.0), UiHomeV3.INK, 0.0, true)
 
 
-## Coin pilula (v1): metrika coin dijela Unlock dugmeta; potvrda dodaje kvačicu ispred.
-func _coin_buy_w() -> float:
-	var w := 4.0 + 36.0 + 56.0 + 18.0 + UiHomeV3.text_w(900, 54, _price(), 0.0, true) + 48.0 + 4.0
+## Lice dugmeta cijene teme u UiCoinPrice rječniku.
+func buy_face() -> String:
+	if _i("coin_price") <= 0:
+		return UiCoinPrice.EUR
 	if bool(data.get("confirm", false)):
-		w += 31.0 + 18.0
-	return w
+		return UiCoinPrice.CONFIRM
+	return UiCoinPrice.BUY if _i("coins") >= _i("coin_price") else UiCoinPrice.SHORT
 
 
-## Tema za coine (v1 bez kupovina pravim novcem): zlatna pilula 🪙 + cijena kao coin dio Unlock
-## dugmeta; bez dovoljno coina blijeda i ravna (kao coins.short u Shopu); prvi tap = tamna
-## „✓ 🪙 cijena" (kao coins.confirm), drugi kupuje.
-func _draw_coin_buy() -> void:
-	var b := _buy
-	var afford := _i("coins") >= _i("coin_price")
-	var confirm := bool(data.get("confirm", false))
-	var down := _pressed == PART_BUY and afford
-	if down:
-		b = Rect2(b.position + Vector2(0.0, 4.0), b.size)
-	var cy := b.get_center().y
-	var x := b.position.x + 4.0 + 36.0
-	if confirm:
-		UiHomeV3.draw_panel(self, b, UiHomeV3.INK, 70.0, 4.0, UiHomeV3.INK, 4.0 if down else 8.0)
-		UiHomeV3.draw_check(self, Vector2(x, cy - 24.5), UiHomeV3.GOLD)
-		x += 31.0 + 18.0
-	elif afford:
-		UiHomeV3.draw_panel(self, b, UiHomeV3.GOLD, 70.0, 4.0, UiHomeV3.INK, 4.0 if down else 8.0)
-	else:
-		UiHomeV3.draw_panel(self, b, UiHomeV3.CREAM, 70.0, 4.0, Color(UiHomeV3.INK, 0.35))
-	_icon("icon_coin", Vector2(x + 28.0, cy), 56.0, 1.0 if afford else 0.55)
-	x += 56.0 + 18.0
-	var ink := UiHomeV3.GOLD if confirm else (UiHomeV3.INK if afford else UiShopV2.INK_SUB)
-	UiHomeV3.draw_text(self, 900, 54, _price(), Vector2(x, cy - 27.0), ink, 0.0, true)
-
-
+## Tema za coine (v1): coin cijena L — zlatna kad ima dovoljno, krem i spuštena kad fali, tamna
+## sa SVG kvačicom i trakom 3 s na prvi tap; iznad mirna pilula štednje. IAP: € lice.
 func _draw_buy() -> void:
-	if _i("coin_price") > 0:
-		_draw_coin_buy()
-		return
-	var b := _buy
-	var down := _pressed == PART_BUY
-	if down:
-		b = Rect2(b.position + Vector2(0.0, 4.0), b.size)
-	var busy := bool(data.get("buying", false))
-	UiHomeV3.draw_panel(self, b, UiHomeV3.GOLD, 70.0, 4.0, UiHomeV3.INK, 4.0 if down else 8.0)
-	var cy := b.get_center().y
-	var x := b.position.x + 4.0 + 56.0
-	UiHomeV3.draw_text(self, 900, 60, _price(), Vector2(x, cy - 30.0), UiHomeV3.INK, 0.0, true)
-	if busy:
-		draw_style_box(UiStage.box(Color(UiHomeV3.CREAM, 0.45), 70), b)
+	if has_savings():
+		var enough := _i("coins") >= _i("coin_price")
+		UiHomeV3.draw_panel(self, _savings, UiHomeV3.MINT if enough else UiHomeV3.CREAM, SAVINGS_H * 0.5, 4.0)
+		var cy := _savings.get_center().y
+		var x := _savings.position.x + 4.0 + 24.0
+		_icon("icon_coin", Vector2(x + SAVINGS_ICON * 0.5, cy), float(SAVINGS_ICON))
+		x += float(SAVINGS_ICON) + 12.0
+		UiHomeV3.draw_text(self, 900, SAVINGS_FONT, savings_text(), Vector2(x, cy - SAVINGS_FONT * 0.5), UiHomeV3.INK, 0.0, true)
+	var face := buy_face()
+	var label := UiCoinPrice.price_text(_i("coin_price")) if face != UiCoinPrice.EUR else _price()
+	var press := 1.0 if _pressed == PART_BUY and face != UiCoinPrice.SHORT else 0.0
+	UiCoinPrice.draw(self, _buy.position, UiCoinPrice.L, face, label, press, _bar_k)
+	if face == UiCoinPrice.EUR and bool(data.get("buying", false)):
+		draw_style_box(UiStage.box(Color(UiHomeV3.CREAM, 0.45), roundi(_buy.size.y * 0.5)), _buy)
 
 
+## Kupljena tema: „✓ Yours" (veliko Play dugme je ispod kartice); 0,6 s poslije kupovine mint
+## lice s prstenom.
 func _draw_owned() -> void:
-	var b := _owned
-	UiHomeV3.draw_panel(self, b, UiHomeV3.MINT, 60.0, 4.0)
-	var cy := b.get_center().y
-	var x := b.position.x + 4.0 + 36.0
-	UiHomeV3.draw_check(self, Vector2(x, cy - 24.5), UiHomeV3.INK)
-	x += 31.0 + 18.0
-	UiHomeV3.draw_text(self, 900, 50, "Yours", Vector2(x, cy - 25.0), UiHomeV3.INK)
+	var face := UiCoinPrice.BUYING if _buying_anim else UiCoinPrice.OWNED
+	UiCoinPrice.draw(self, _owned.position, UiCoinPrice.L, face, UiShopV2.S_YOURS, 0.0, 0.0, _ring_k)
 
 
 func _draw_soon() -> void:

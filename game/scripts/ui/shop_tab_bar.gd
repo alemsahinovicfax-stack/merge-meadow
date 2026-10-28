@@ -2,7 +2,8 @@ class_name ShopTabBar
 extends Control
 
 ## Shop v2 · ShopTabBar (1080 x 172): tenda s mint/krem prugama (18 × 60, zaobljeno dno r 30,
-## ink rub 4, tvrda sjena 6) drži 4 taba 249 x 120. Neaktivni su bijeli s rubom 3; aktivan je
+## ink rub 4, tvrda sjena 6). Tabovi pune 1032 px tende (design_handoff_ads_only · shop_tabs.json):
+## 3 taba 336 x 120 (v1 bez kupovina), 4 taba 249 x 120 (IAP). Neaktivni su bijeli s rubom 3; aktivan je
 ## peach klizač (rub 4, sjena 6) koji klizne 0,2 s cubic-out.
 
 signal tab_selected(tab_id: String)
@@ -20,7 +21,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	custom_minimum_size = Vector2(1080, UiShopV2.TABBAR_H)
 	size = custom_minimum_size
-	# Bez kupovina pravim novcem (v1) nema Supporta — tabovi koji postoje centrirani na tendi.
+	# Bez kupovina pravim novcem (v1) nema Supporta — 3 taba pune tendu.
 	var shown := UiShopV2.visible_tabs()
 	if not shown.has(active):
 		active = shown[0]
@@ -30,7 +31,7 @@ func _ready() -> void:
 		t.tab_id = tab_id
 		t.label = UiShopV2.TAB_LABELS[UiShopV2.TABS.find(tab_id)]
 		t.position = Vector2(_x_for(tab_id), UiShopV2.TAB_Y)
-		t.size = Vector2(UiShopV2.TAB_W, UiShopV2.TAB_H)
+		t.size = Vector2(UiShopV2.tab_w(shown.size()), UiShopV2.TAB_H)
 		add_child(t)
 		t.clicked.connect(_on_tab.bind(tab_id))
 		_tabs.append(t)
@@ -61,8 +62,8 @@ func _on_tab(tab_id: String) -> void:
 
 func _x_for(tab_id: String) -> float:
 	var shown := UiShopV2.visible_tabs()
-	var x0 := float(UiShopV2.TAB_X0) + float((UiShopV2.TABS.size() - shown.size()) * UiShopV2.TAB_STEP) * 0.5
-	return x0 + float(maxi(0, shown.find(tab_id)) * UiShopV2.TAB_STEP)
+	var n := shown.size()
+	return float(UiShopV2.tab_x0(n) + maxi(0, shown.find(tab_id)) * UiShopV2.tab_step(n))
 
 
 func _set_thumb(x: float) -> void:
@@ -85,12 +86,11 @@ func _draw() -> void:
 						Rect2(x, 0.0, float(UiShopV2.AWNING_STRIPE_W), h), 30.0,
 						UiShopV2.AWNING_B if i % 2 else UiShopV2.AWNING_A
 					)
-	# Pozadina samo za tabove koji se vide (v1 bez kupovina: 3, centrirani) — ranije su se crtale
-	# sve 4 pozicije i preklapale s pomjerenim dugmadima (2026-10-27).
+	# Pozadina samo za tabove koji se vide (v1 bez kupovina: 3).
+	var tab_size := Vector2(UiShopV2.tab_w(), UiShopV2.TAB_H)
 	for tab_id in UiShopV2.visible_tabs():
-		var r := Rect2(Vector2(_x_for(tab_id), UiShopV2.TAB_Y), Vector2(UiShopV2.TAB_W, UiShopV2.TAB_H))
-		draw_style_box(UiShopV2.tab_style(false), r)
-	var thumb := Rect2(Vector2(_thumb_x, UiShopV2.TAB_Y), Vector2(UiShopV2.TAB_W, UiShopV2.TAB_H))
+		draw_style_box(UiShopV2.tab_style(false), Rect2(Vector2(_x_for(tab_id), UiShopV2.TAB_Y), tab_size))
+	var thumb := Rect2(Vector2(_thumb_x, UiShopV2.TAB_Y), tab_size)
 	draw_style_box(UiShopV2.box(Color(UiShopV2.SHADOW_CARD, 0.24), UiShopV2.RADIUS_BUTTON), Rect2(thumb.position + Vector2(0, 6), thumb.size))
 	draw_style_box(UiShopV2.box(UiShopV2.TAB_ACTIVE, UiShopV2.RADIUS_BUTTON, 4), thumb)
 

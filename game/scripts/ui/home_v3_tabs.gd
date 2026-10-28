@@ -2,13 +2,17 @@ class_name HomeV3Tabs
 extends Control
 
 ## SeasonTabs (HomeScreen.dc.html): staza 1032 x 124 (radius 62, rgba .10) s dva
-## taba 508 x 108. Izabrani Free = krem, izabrani Premium = zlatni; oba rub 3 ink
-## i sjenka 0 6 0. Nijedan tap na tab ne mijenja aktivnu sezonu.
+## taba 508 x 108. design_handoff_ads_only (home_season_tabs.json): „Journey" (sjemenka, izabran
+## krem) = besplatni put, uvijek prvi; „Themes" (zvjezdica „Special", izabran #C2E2FA) = teme.
+## ID-evi free / premium ostaju interni — mijenja se samo prikaz. Oba rub 3 ink i sjenka 0 6 0.
+## Nijedan tap na tab ne mijenja aktivnu sezonu.
 
 signal tab_pressed(tab: String)
 
 const FREE := "free"
 const PREMIUM := "premium"
+const LABEL_FREE := "Journey"
+const LABEL_PREMIUM := "Themes"
 
 var premium: bool = false:
 	set(v):
@@ -73,11 +77,10 @@ func _draw() -> void:
 		var r := tab_rect(tab)
 		var on := (tab == PREMIUM) == premium
 		if on:
-			var fill := UiHomeV3.GOLD if tab == PREMIUM else UiHomeV3.CREAM
+			var fill := SpecialTag.FILL if tab == PREMIUM else UiHomeV3.CREAM
 			UiHomeV3.draw_panel(self, r, fill, 54.0, 3.0, UiHomeV3.INK, 6.0, UiHomeV3.TAB_SHADOW)
-		var label := "Premium" if tab == PREMIUM else "Free"
-		# Premium nema ikonu (dijamanti su izbačeni 2026-10-09) — prepoznaje se po zlatnom tabu.
-		var icon: Texture2D = UiAssets.get_chrome_icon("icon_seed") if tab == FREE else null
+		var label := LABEL_PREMIUM if tab == PREMIUM else LABEL_FREE
+		var icon: Texture2D = UiAssets.get_chrome_icon("icon_special" if tab == PREMIUM else "icon_seed")
 		var icon_w: float = UiHomeV3.TAB_ICON + 16.0 if icon != null else 0.0
 		var tw := UiHomeV3.text_w(900, UiHomeV3.TAB_LABEL, label)
 		var x := r.get_center().x - (icon_w + tw) * 0.5

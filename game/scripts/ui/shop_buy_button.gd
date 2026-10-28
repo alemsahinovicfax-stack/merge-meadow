@@ -6,6 +6,9 @@ extends HubPressable
 ##   coins.buy · coins.confirm · coins.short · money.buy · money.busy · money.dim · play · owned
 ## Pritisak: y +4, sjena 8 → 4. Promjena stanja: scale 1 → 1,06 → 1 (0,22 s). coins.short:
 ## drhtaj (−12 / 12 / −8 / 8 / 0, 0,32 s). money.busy: tri tačke — jedini loop u Shopu.
+## Coin cijena (design_handoff_ads_only · coin_price.json): sa `size_key` (S sezona, M Looks i
+## Boosters) dugme je fiksne širine u svim stanjima i crta ga UiCoinPrice — potvrda = SVG kvačica
+## umjesto novčića + traka 3 s; kupovina = mint „✓ Yours" + prsten 0,42 s (0,6 s), pa kupljeno.
 
 signal short_tapped
 
@@ -19,8 +22,14 @@ const DOT := 20.0
 var state: String = UiShopV2.MONEY_BUY
 var price: String = ""
 var owned_label: String = "Yours"
-## Premium Looks kartica: kupljen a nenošen skin — tap na „✓ Owned" ga obuče.
+## Premium Looks kartica: kupljen a nenošen skin — tap na „✓ Yours" ga obuče.
 var owned_tappable: bool = false
+## UiCoinPrice veličina (S / M / L); prazno = stara širina po sadržaju (Support, samo IAP).
+var size_key: String = "":
+	set(v):
+		size_key = v
+		_fit()
+		queue_redraw()
 
 var _coin_tex: Texture2D
 var _press_k: float = 0.0
@@ -28,18 +37,26 @@ var _shake_x: float = 0.0
 var _pop_tween: Tween
 var _shake_tween: Tween
 var _dot_t: float = 0.0
+var _bar_k: float = 0.0
+var _bar_tween: Tween
+var _ring_k: float = -1.0
+var _buying: bool = false
+var _buy_tween: Tween
 
 
 func _ready() -> void:
 	super()
 	_coin_tex = UiAssets.get_chrome_icon("icon_coin")
 	custom_minimum_size = Vector2(UiShopV2.BUTTON_MIN_W, UiShopV2.BUTTON_H + UiShopV2.SHADOW_BUTTON_Y)
+	_fit()
 	set_process(false)
 
 
 ## Postavi stanje; `pop` = kratki skok skale kad se stanje stvarno promijeni.
 func configure(p_state: String, p_price: String, p_owned_label: String = "Yours", pop: bool = true) -> void:
 	var changed := p_state != state
+	var bought := changed and state == UiShopV2.COINS_CONFIRM \
+		and p_state in [UiShopV2.OWNED_STATE, UiShopV2.PLAY_STATE]
 	state = p_state
 	price = p_price
 	owned_label = p_owned_label
@@ -47,9 +64,76 @@ func configure(p_state: String, p_price: String, p_owned_label: String = "Yours"
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if is_tappable() else Control.CURSOR_ARROW
 	_fit()
 	set_process(state == UiShopV2.MONEY_BUSY)
+	if changed:
+		_sync_confirm_bar()
+	if bought and not size_key.is_empty() and is_inside_tree():
+		_play_buying()
 	if changed and pop and is_inside_tree():
 		_pop()
 	queue_redraw()
+
+
+## Traka potvrde: puna kad se uđe u coins.confirm, skupi se za T_CONFIRM_TIMEOUT.
+func _sync_confirm_bar() -> void:
+	if _bar_tween != null and _bar_tween.is_valid():
+		_bar_tween.kill()
+	_bar_k = 0.0
+	if state != UiShopV2.COINS_CONFIRM or size_key.is_empty():
+		return
+	_bar_k = 1.0
+	if is_inside_tree():
+		_bar_tween = create_tween()
+		_bar_tween.tween_method(_set_bar, 1.0, 0.0, UiShopV2.T_CONFIRM_TIMEOUT)
+
+
+func _set_bar(k: float) -> void:
+	_bar_k = k
+	queue_redraw()
+
+
+## Kupljeno iz potvrde: 0,6 s mint „✓ Yours" + prsten (0,42 s), pa krajnje stanje.
+func _play_buying() -> void:
+	if _buy_tween != null and _buy_tween.is_valid():
+		_buy_tween.kill()
+	_buying = true
+	_ring_k = 0.0
+	_buy_tween = create_tween()
+	_buy_tween.tween_method(_set_ring, 0.0, 1.0, UiCoinPrice.T_RING).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_buy_tween.tween_interval(UiCoinPrice.T_BUYING - UiCoinPrice.T_RING)
+	_buy_tween.tween_callback(func() -> void:
+		_buying = false
+		_ring_k = -1.0
+		queue_redraw()
+	)
+
+
+func _set_ring(k: float) -> void:
+	_ring_k = k
+	queue_redraw()
+
+
+func is_buying() -> bool:
+	return _buying
+
+
+## Stanje lica u UiCoinPrice rječniku; "" = staro crtanje (money.busy / money.dim).
+func coin_face() -> String:
+	if _buying:
+		return UiCoinPrice.BUYING
+	match state:
+		UiShopV2.COINS_BUY:
+			return UiCoinPrice.BUY
+		UiShopV2.COINS_SHORT_STATE:
+			return UiCoinPrice.SHORT
+		UiShopV2.COINS_CONFIRM:
+			return UiCoinPrice.CONFIRM
+		UiShopV2.OWNED_STATE:
+			return UiCoinPrice.OWNED
+		UiShopV2.PLAY_STATE:
+			return UiCoinPrice.PLAY
+		UiShopV2.MONEY_BUY:
+			return UiCoinPrice.EUR
+	return ""
 
 
 ## Da li tap nešto radi (coins.short reaguje drhtajem, pa je i on dodirljiv).
@@ -133,6 +217,10 @@ func _price_px() -> int:
 
 
 func _fit() -> void:
+	if not size_key.is_empty():
+		custom_minimum_size = UiCoinPrice.footprint(size_key)
+		update_minimum_size()
+		return
 	var w := 0.0
 	match state:
 		UiShopV2.COINS_BUY, UiShopV2.COINS_SHORT_STATE:
@@ -152,10 +240,18 @@ func _fit() -> void:
 
 
 func _draw() -> void:
+	if not size_key.is_empty() and not coin_face().is_empty():
+		var face := coin_face()
+		var label := price
+		if face in [UiCoinPrice.OWNED, UiCoinPrice.BUYING]:
+			label = owned_label if face == UiCoinPrice.OWNED else UiShopV2.S_YOURS
+		UiCoinPrice.draw(self, Vector2(_shake_x, 0.0), size_key, face, label, _press_k, _bar_k, _ring_k)
+		return
 	var w := custom_minimum_size.x
 	var flat := state in [UiShopV2.COINS_SHORT_STATE, UiShopV2.MONEY_DIM, UiShopV2.OWNED_STATE, UiShopV2.MONEY_BUSY]
 	var down := 8.0 if state == UiShopV2.MONEY_BUSY else _press_k * 4.0
-	var rect := Rect2(Vector2(_shake_x, down), Vector2(w, UiShopV2.BUTTON_H))
+	var h := UiCoinPrice.button_size(size_key).y if not size_key.is_empty() else float(UiShopV2.BUTTON_H)
+	var rect := Rect2(Vector2(_shake_x, down), Vector2(w, h))
 	if not flat:
 		draw_style_box(
 			UiShopV2.box(UiShopV2.SHADOW_BUTTON, UiShopV2.RADIUS_BUTTON),

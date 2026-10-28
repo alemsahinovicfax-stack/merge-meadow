@@ -9,6 +9,16 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-28
+
+- **CD-ADS — paket `design_handoff_ads_only` u igri** (na zahtjev; izvještaj `04-experience/design-drafts/ads-only-prenos-izvjestaj.md`):
+  - Paket provjeren u pregledaču (Playwright): § 6.3 drži; 5 sitnica u mockovima (preklapanje u PremiumTag, prelijevanje u CoinPrice, „Seasonsaktivan“, Play / Yours na Homeu, font kupljenih stanja) — CD ih ispravio u drugoj verziji, ta je prenesena (README § Odlučeno prenumerisan).
+  - **Tenda:** `UiShopV2.tab_w / tab_step / tab_x0` iz broja vidljivih tabova — 3 taba 336 (x 24 / 372 / 720), 4 taba 249 (= Shop v2).
+  - **Coin cijena:** `UiCoinPrice` — S 300 / M 320 / L 360, fiksna širina u svakom stanju; potvrda = `check_confirm.svg` + traka 3 s; kupovina = mint „✓ Yours“ + prsten 0,42 s; cijene i „Need N“ kroz `UiChrome.format_count` („10,000“). Shop (`ShopBuyButton.size_key`), Home kartica teme (L), Camp (`_PriceFace` S).
+  - **„Need N more coins“:** `NeedCoinsBubble` iznad dugmeta (Camp ispod), 1,6 s — zamjenjuje Shop pilulu i Home / Camp toast.
+  - **„Special“:** `SpecialTag` L / M / S (#C2E2FA + zvjezdica) umjesto „Premium“ / „PREMIUM“ (Shop Sir Pip, Camp, Ormar); Home tabovi **Journey / Themes**, plavi rub teme, pilula štednje „4,200 / 10,000“. Kupljeno nenošeno: „Yours“ (bilo „Owned“).
+  - **Testovi:** novi `ads_only_design_smoke`; ažurirani `coin_offers`, `iap_off`, `shop_cosmetic_buy`, `season_home`; GUT 149/149, smoke 80/83 (`arena_nav_lock`, `fixes_1016`, `levels_endless` padaju isto i prije prenosa u Linux okruženju).
+
 ## 2026-10-27
 
 - **ADS-ONLY drugi krug — teme 10000 C, ★3 ×2, Shop header, CD brief** (na zahtjev):

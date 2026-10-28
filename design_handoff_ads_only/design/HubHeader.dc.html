@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="Header" style="width:1080px;height:143px;position:relative;z-index:5;background:#2A2233;box-shadow:0 6px 0 rgba(20,14,26,.34)">
+  <div style="height:140px;display:flex;align-items:center;gap:16px;padding:0 0 0 20px;box-sizing:border-box">
+    <div data-layer="CoinChip" ref="{{ chipRef }}" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="icons/icon_coin.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;white-space:nowrap">{{ coinsText }}</div></div>
+    <div data-layer="SeedChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="icons/icon_seed.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;white-space:nowrap">100</div></div>
+    <div data-layer="FlowerChip" style="width:296px;height:100px;flex:0 0 auto;box-sizing:border-box;border-radius:20px;display:flex;align-items:center;gap:10px;padding:0 18px 0 14px;background:#1F1926;border:2px solid rgba(255,248,240,.14)"><img src="icons/icon_flower.svg" alt="" style="width:64px;height:64px;flex:0 0 auto"><div style="flex:1;min-width:0;text-align:right;font:800 48px/1 Nunito,system-ui,sans-serif;color:#FFF8F0;font-variant-numeric:tabular-nums;white-space:nowrap">4</div></div>
+    <div data-layer="SettingsSlot" style="width:124px;height:140px;flex:0 0 auto;display:flex;align-items:center;padding-left:4px;box-sizing:border-box"><div style="width:100px;height:100px;box-sizing:border-box;border-radius:20px;background:rgba(255,248,240,.10);border:2px solid rgba(255,248,240,.38);display:grid;place-items:center"><img src="icons/icon_settings_light.svg" alt="" style="width:56px;height:56px"></div></div>
+  </div>
+  <div style="height:3px;background:rgba(255,248,240,.55)"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:143},&quot;coins&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:4200,&quot;tsType&quot;:&quot;number&quot;},&quot;pulseKey&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;slow&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;}}">
+const fmt = n => String(Math.round(+n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+class Component extends DCLogic {
+  chipRef = React.createRef();
+  componentDidUpdate(pp) { if (this.props.pulseKey && pp.pulseKey !== this.props.pulseKey) this.pulse(); }
+  pulse() {
+    const el = this.chipRef.current, k = Math.max(1, +(this.props.slow || 1));
+    if (el && el.animate) el.animate([{ transform: 'scale(1)', boxShadow: '0 0 0 0 #FFD56B' }, { transform: 'scale(1.06)', boxShadow: '0 0 0 6px #FFD56B' }, { transform: 'scale(1)', boxShadow: '0 0 0 0 #FFD56B' }], { duration: 300 * k, easing: 'ease-out' });
+  }
+  renderVals() { return { chipRef: this.chipRef, coinsText: fmt(this.props.coins ?? 4200) }; }
+}
+</script>
+</body>
+</html>

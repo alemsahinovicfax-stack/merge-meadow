@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-screen-label="ShopTabs" style="width:2400px;box-sizing:border-box;padding:96px;display:flex;flex-direction:column;gap:72px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0">
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:1500px">
+    <div style="font:900 72px/1.05 Nunito,system-ui,sans-serif">A · Shop tenda — jedno pravilo za 3 i 4 taba</div>
+    <div style="font:700 34px/1.4 Nunito,system-ui,sans-serif;color:#E6DCEB;text-wrap:pretty">Tabovi uvijek pune unutrašnjih 1032 px tende (x 24 → 1056) s razmakom 12. Širina taba = ⌊(1032 − 12·(n−1)) / n⌋. Za n = 4 to je tačno današnji Shop v2 (249 / korak 261 / x0 24); za n = 3 tabovi su 336 i srednji tab stoji na sredini tende (x 540). Pruge 18 × 60 se ne mijenjaju — crtaju se jednom.</div>
+  </div>
+
+  <div style="display:flex;gap:72px;align-items:flex-start;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;align-items:center;gap:16px"><span style="font:900 40px/1 Nunito,system-ui,sans-serif">A1 · v1, 3 taba</span><span style="font:800 26px/1 ui-monospace,Menlo,monospace;color:#C9BED0">w 336 · korak 348 · x0 24</span></div>
+      <div style="width:1080px;height:300px;position:relative;overflow:hidden;border-radius:24px;background:#FBEDD7;border:4px solid #2D3436">
+        <dc-import name="AwningTabs" n="{{ 3 }}" active="{{ a3 }}" guides="{{ guides }}" slow="{{ slow }}" on-tab="{{ setA3 }}" hint-size="1080px,172px"></dc-import>
+      </div>
+      <div style="display:flex;gap:16px">
+        <sc-for list="{{ pick3 }}" as="b" hint-placeholder-count="3">
+          <div onClick="{{ b.onTap }}" style="height:72px;box-sizing:border-box;padding:0 28px;border-radius:36px;border:3px solid #FFF8F0;display:flex;align-items:center;font:900 30px/1 Nunito,system-ui,sans-serif;cursor:pointer;background:{{ b.bg }};color:{{ b.ink }}">{{ b.label }}&#160;aktivan</div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;align-items:center;gap:16px"><span style="font:900 40px/1 Nunito,system-ui,sans-serif">A2 · IAP, 4 taba</span><span style="font:800 26px/1 ui-monospace,Menlo,monospace;color:#C9BED0">w 249 · korak 261 · x0 24 (= Shop v2)</span></div>
+      <div style="width:1080px;height:300px;position:relative;overflow:hidden;border-radius:24px;background:#FBEDD7;border:4px solid #2D3436">
+        <dc-import name="AwningTabs" n="{{ 4 }}" active="{{ a4 }}" guides="{{ guides }}" slow="{{ slow }}" on-tab="{{ setA4 }}" hint-size="1080px,172px"></dc-import>
+      </div>
+      <div style="display:flex;gap:16px">
+        <sc-for list="{{ pick4 }}" as="b" hint-placeholder-count="4">
+          <div onClick="{{ b.onTap }}" style="height:72px;box-sizing:border-box;padding:0 28px;border-radius:36px;border:3px solid #FFF8F0;display:flex;align-items:center;font:900 30px/1 Nunito,system-ui,sans-serif;cursor:pointer;background:{{ b.bg }};color:{{ b.ink }}">{{ b.label }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:72px;align-items:flex-start;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:20px;width:1080px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Danas (a01): 3 × 249 centrirano</div>
+      <div style="width:1080px;height:300px;overflow:hidden;border-radius:24px;border:4px solid #2D3436;position:relative"><img src="ref/a01_shop_seasons_coins_short.jpg" alt="" style="position:absolute;left:0;top:-140px;width:1080px;display:block"></div>
+      <div style="font:700 30px/1.4 Nunito,system-ui,sans-serif;color:#E6DCEB">~154 px prazne tende lijevo i desno; tabovi ne prate ritam pruga.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px;width:1080px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Pravilo (Godot)</div>
+      <div style="box-sizing:border-box;padding:32px 36px;border-radius:28px;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 8px 0 rgba(0,0,0,.35);color:#2D3436;font:700 30px/1.5 ui-monospace,Menlo,monospace;white-space:pre">n      = visible_tabs().size()
+TAB_W  = floor((1032 - 12 * (n - 1)) / n)
+STEP   = TAB_W + 12
+X0     = 24 + round((1032 - n*TAB_W - (n-1)*12) / 2)
+_x_for(i) = X0 + i * STEP
+n = 3 → 336 / 348 / 24     n = 4 → 249 / 261 / 24</div>
+      <div style="font:700 30px/1.4 Nunito,system-ui,sans-serif;color:#E6DCEB;text-wrap:pretty">Klizač: jedan StyleBox, x se tweenuje 0,2 s cubic-out (× 4 kad je „usporeno" uključeno). Labela 44 / 900 ostaje ista — „Boosters" (≈ 190 px) ima 73 px zraka s obje strane u 336.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;guides&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;slow4&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { a3: 'seasons', a4: 'seasons' };
+  renderVals() {
+    const p = this.props, s = this.state;
+    const mk = (ids, key) => ids.map(([id, label]) => ({ label, bg: s[key] === id ? '#FFB88C' : 'transparent', ink: s[key] === id ? '#2D3436' : '#FFF8F0', onTap: () => this.setState({ [key]: id }) }));
+    const T = [['seasons', 'Seasons'], ['looks', 'Looks'], ['boosters', 'Boosters'], ['support', 'Support']];
+    return {
+      a3: s.a3, a4: s.a4, guides: p.guides ?? true, slow: p.slow4 ? 4 : 1,
+      setA3: id => this.setState({ a3: id }), setA4: id => this.setState({ a4: id }),
+      pick3: mk(T.slice(0, 3), 'a3'), pick4: mk(T, 'a4')
+    };
+  }
+}
+</script>
+</body>
+</html>

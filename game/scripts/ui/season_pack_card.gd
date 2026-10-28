@@ -56,7 +56,7 @@ func _ready_now() -> void:
 	if buy != null:
 		return
 	set_card_height(UiShopV2.SEASON_CARD_H)
-	_make_buy()
+	_make_buy(UiCoinPrice.S)
 	buy.clicked.connect(_on_buy)
 	buy.short_tapped.connect(func() -> void: coin_short.emit(sku))
 

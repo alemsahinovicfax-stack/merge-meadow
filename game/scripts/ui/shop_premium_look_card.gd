@@ -21,7 +21,7 @@ var sku: String = ""
 var preview: ItemPreview
 var _state: String = ""
 var _worn: bool = false
-var _tag: Control
+var _tag: SpecialTag
 var _badge: Control
 
 
@@ -40,13 +40,11 @@ func _ensure() -> void:
 	preview.position = PREVIEW_POS
 	preview.size = UiShopV2.PREVIEW_SIZE
 	add_child(preview)
-	_tag = Control.new()
+	# Oznaka „Special" L (design_handoff_ads_only · premium_tag.json), lijevo gore +20 na slici.
+	_tag = SpecialTag.new()
 	_tag.name = "PremiumTag"
-	_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tag.size_key = "L"
 	_tag.z_index = TAG_Z
-	_tag.draw.connect(_draw_tag)
-	var tw := UiHomeV3.text_w(900, UiShopV2.PREMIUM_TAG_PX, UiShopV2.S_PREMIUM)
-	_tag.size = Vector2(ceilf(tw + UiShopV2.PREMIUM_TAG_PAD_X * 2.0), UiShopV2.PREMIUM_TAG_H)
 	_tag.position = UiShopV2.PREMIUM_TAG_POS
 	preview.add_child(_tag)
 	_badge = Control.new()
@@ -57,7 +55,7 @@ func _ensure() -> void:
 	_badge.position = Vector2(UiShopV2.PREVIEW_SIZE.x - 16.0 - 64.0, 16.0)
 	_badge.draw.connect(_draw_worn_badge)
 	preview.add_child(_badge)
-	_make_buy()
+	_make_buy(UiCoinPrice.M)
 	buy.owned_tappable = true
 	buy.clicked.connect(_on_buy)
 	buy.short_tapped.connect(func() -> void: coin_short.emit(sku))
@@ -79,7 +77,7 @@ func configure(p_item_id: String, busy_sku: String = "", pending: bool = false, 
 	preview.set_frame(UiShopV2.BORDER, UiShopV2.RADIUS_PREVIEW, UiShopV2.INK, UiShopV2.CARD_YOURS if yours else UiShopV2.CARD)
 	preview.configure("companion", CosmeticCatalog.get_look(item_id), {}, "country_bloom", "pip")
 	buy.owned_tappable = _state == UiShopV2.OWNED_STATE and not _worn
-	buy.configure(_state, ShopCard.offer_price_text(sku), UiShopV2.S_WEARING if _worn else UiShopV2.S_OWNED)
+	buy.configure(_state, ShopCard.offer_price_text(sku), UiShopV2.S_WEARING if _worn else UiShopV2.S_YOURS)
 	queue_redraw()
 
 
@@ -116,13 +114,6 @@ func _on_buy() -> void:
 func _draw() -> void:
 	_draw_card_bg(UiShopV2.CARD_YOURS if yours else UiShopV2.CARD)
 	_draw_name_block(CosmeticCatalog.get_title(item_id), CosmeticCatalog.get_subtitle(item_id))
-
-
-func _draw_tag() -> void:
-	var r := Rect2(Vector2.ZERO, _tag.size)
-	_tag.draw_style_box(UiShopV2.box(UiShopV2.MONEY, int(UiShopV2.PREMIUM_TAG_H * 0.5), UiShopV2.BORDER), r)
-	var px := UiShopV2.PREMIUM_TAG_PX
-	UiHomeV3.draw_text(_tag, 900, px, UiShopV2.S_PREMIUM, Vector2(UiShopV2.PREMIUM_TAG_PAD_X, (r.size.y - px) * 0.5), UiShopV2.INK)
 
 
 func _draw_worn_badge() -> void:

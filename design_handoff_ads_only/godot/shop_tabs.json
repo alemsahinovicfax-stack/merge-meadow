@@ -1,0 +1,72 @@
+{
+  "source": "design/ShopTabs.dc.html",
+  "script": "game/scripts/ui/shop_tab_bar.gd + ui_shop_v2.gd (TAB_*, AWNING_*)",
+  "rule": "tab_w = floor((1032 - 12*(n-1)) / n); x = x0 + i*(tab_w+12)",
+  "inner_w": 1032,
+  "gap": 12,
+  "tab_h": 120,
+  "tab_radius": 60,
+  "tab_y": 10,
+  "bar_h": 172,
+  "layouts": {
+    "3": {
+      "n": 3,
+      "tab_w": 336,
+      "step": 348,
+      "x0": 24,
+      "xs": [
+        24,
+        372,
+        720
+      ],
+      "tabs": [
+        "seasons",
+        "looks",
+        "boosters"
+      ]
+    },
+    "4": {
+      "n": 4,
+      "tab_w": 249,
+      "step": 261,
+      "x0": 24,
+      "xs": [
+        24,
+        285,
+        546,
+        807
+      ],
+      "tabs": [
+        "seasons",
+        "looks",
+        "boosters",
+        "support"
+      ]
+    }
+  },
+  "awning": {
+    "stripes": 18,
+    "stripe_w": 60,
+    "stripe_h": 160,
+    "radius_bottom": 30,
+    "edge": 4,
+    "shadow_y": 6,
+    "colors": [
+      "#A8E6CF",
+      "#FFF8F0"
+    ],
+    "edge_color": "#2D3436",
+    "drawn": "once (on ready / resize / visible_tabs change)"
+  },
+  "tab": {
+    "bg": "#FFFFFF",
+    "border": 3,
+    "font": 44
+  },
+  "thumb": {
+    "bg": "#FFB88C",
+    "border": 4,
+    "shadow_y": 6,
+    "slide_s": 0.2
+  }
+}

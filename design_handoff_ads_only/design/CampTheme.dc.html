@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div style="box-sizing:border-box;padding:96px;display:flex;flex-direction:column;gap:56px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0;width:max-content">
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:1900px">
+    <div style="font:900 72px/1.05 Nunito,system-ui,sans-serif">E · Camp — kartica sljedeće teme</div>
+    <div style="font:700 34px/1.4 Nunito,system-ui,sans-serif;color:#E6DCEB;text-wrap:pretty">Ime, „6 new flowers" i 6 okvira ostaju. Žuta „PREMIUM" pločica postaje „Special" (M, 52), dugme je coin cijena S iz C (300 × 120, „10,000" na 44 px). Potvrda koristi SVG kvačicu — nema više „√". „Need N" oblačić stoji ispod dugmeta (iznad nema mjesta) — isto mjesto kao stari toast.</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;padding-top:8px">
+      <sc-for list="{{ ctl }}" as="b" hint-placeholder-count="4">
+        <div onClick="{{ b.onTap }}" style="height:72px;box-sizing:border-box;padding:0 28px;border-radius:36px;border:3px solid #FFF8F0;display:flex;align-items:center;font:900 30px/1 Nunito,system-ui,sans-serif;cursor:pointer;background:{{ b.bg }};color:{{ b.ink }}">{{ b.label }}</div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:80px;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Camp · živo</div>
+      <div data-screen-label="Camp live" style="position:relative;width:1080px;height:1920px;overflow:hidden;border-radius:24px;border:4px solid #2D3436;background:#4E3F5A">
+        <dc-import name="HubHeader" coins="{{ wallet }}" pulse-key="{{ pulse }}" slow="{{ slow }}" hint-size="1080px,143px"></dc-import>
+        <div style="position:absolute;left:0;top:490px;width:1080px;height:1286px;overflow:hidden"><img src="ref/a12_camp_theme_price.jpg" alt="" style="position:absolute;left:0;top:-490px;width:1080px;display:block"></div>
+        <div style="position:absolute;left:0;top:143px;width:1080px;height:347px;background:#4E3F5A"></div>
+        <sc-if value="{{ jumped }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:24px;top:167px;width:1032px;height:318px;box-sizing:border-box;border-radius:36px;border:4px dashed #FFF8F0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#FFF8F0">
+            <span style="font:900 48px/1 Nunito,system-ui,sans-serif">→ Home · Themes · {{ curName }}</span>
+            <span style="font:700 30px/1 Nunito,system-ui,sans-serif;color:#E6DCEB">skok kao danas (band „paid"); kartica nudi sljedeću temu</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ hasCard }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;left:24px;top:167px">
+            <div data-layer="SeasonLinkCard" style="position:relative;width:1032px;height:318px">
+              <div style="position:absolute;left:0;top:8px;width:1032px;height:318px;border-radius:36px;background:rgba(18,28,22,.42)"></div>
+              <div style="position:absolute;inset:0;box-sizing:border-box;border-radius:36px;border:3px solid #2D3436;overflow:hidden;background:{{ live.near }}"><div style="height:44px;background:{{ live.s0 }}"></div><div style="height:44px;background:{{ live.s1 }}"></div><div style="height:44px;background:{{ live.s2 }}"></div><div style="height:44px;background:{{ live.s3 }}"></div><div style="height:60px;background:{{ live.far }}"></div></div>
+              <div style="position:absolute;left:24px;top:46px;font:900 56px/1 Nunito,system-ui,sans-serif;color:{{ live.ink }};white-space:nowrap">{{ live.name }}</div>
+              <div style="position:absolute;left:24px;top:170px;display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+                <dc-import name="SpecialTag" size="M" hint-size="180px,52px"></dc-import>
+                <span style="font:800 42px/1 Nunito,system-ui,sans-serif;color:{{ live.ink }}">6 new flowers</span>
+              </div>
+              <div style="position:absolute;right:24px;top:174px;display:flex;gap:10px">
+                <sc-for list="{{ live.tiles }}" as="t" hint-placeholder-count="6">
+                  <div style="width:100px;height:100px;box-sizing:border-box;border-radius:22px;background:{{ t.frame }};border:3px solid #2D3436;padding:3px"><div style="width:100%;height:100%;border-radius:15px;background:#22342A;display:grid;place-items:center"><img src="{{ t.src }}" alt="" style="width:76px;height:76px;display:block"></div></div>
+                </sc-for>
+              </div>
+              <div style="position:absolute;right:24px;top:22px;z-index:2">
+                <dc-import name="PriceButton" size="S" price="{{ 10000 }}" wallet="{{ wallet }}" mode="{{ mode }}" eur="{{ live.eur }}" slow="{{ slow }}" reset-key="{{ resetKey }}" on-short="{{ onShort }}" on-buy="{{ onBuy }}" hint-size="300px,128px"></dc-import>
+                <sc-if value="{{ need }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="NeedBubble" style="position:absolute;right:0;top:142px;height:64px;box-sizing:border-box;padding:0 26px;border-radius:32px;background:#FFE8B8;border:3px solid #2D3436;box-shadow:0 4px 0 rgba(26,26,20,.22);display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ needText }}<div style="position:absolute;right:139px;top:-14px;width:22px;height:22px;box-sizing:border-box;background:#FFE8B8;border-left:3px solid #2D3436;border-top:3px solid #2D3436;transform:rotate(45deg)"></div></div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <div style="position:absolute;left:0;top:1776px"><dc-import name="HubFooter" active="camp" hint-size="1080px,144px"></dc-import></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:40px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Sva stanja (statično)</div>
+      <sc-for list="{{ states }}" as="x" hint-placeholder-count="5">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;gap:16px;align-items:baseline"><span style="font:900 34px/1 Nunito,system-ui,sans-serif">{{ x.t }}</span><span style="font:700 26px/1.3 Nunito,system-ui,sans-serif;color:#C9BED0">{{ x.n }}</span></div>
+          <div style="width:1080px;height:{{ x.h }}px;box-sizing:border-box;padding:24px;border-radius:24px;background:#4E3F5A">
+            <div style="position:relative;width:1032px;height:318px">
+              <div style="position:absolute;left:0;top:8px;width:1032px;height:318px;border-radius:36px;background:rgba(18,28,22,.42)"></div>
+              <div style="position:absolute;inset:0;box-sizing:border-box;border-radius:36px;border:3px solid #2D3436;overflow:hidden;background:#1A1E3E"><div style="height:44px;background:#141833"></div><div style="height:44px;background:#191E3D"></div><div style="height:44px;background:#1F2547"></div><div style="height:44px;background:#262C53"></div><div style="height:60px;background:#232955"></div></div>
+              <div style="position:absolute;left:24px;top:46px;font:900 56px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">Moonlit Warren</div>
+              <div style="position:absolute;left:24px;top:170px;display:flex;flex-direction:column;gap:12px;align-items:flex-start"><dc-import name="SpecialTag" size="M" hint-size="180px,52px"></dc-import><span style="font:800 42px/1 Nunito,system-ui,sans-serif;color:#FFF8F0">6 new flowers</span></div>
+              <div style="position:absolute;right:24px;top:174px;display:flex;gap:10px">
+                <sc-for list="{{ moonTiles }}" as="t" hint-placeholder-count="6">
+                  <div style="width:100px;height:100px;box-sizing:border-box;border-radius:22px;background:{{ t.frame }};border:3px solid #2D3436;padding:3px"><div style="width:100%;height:100%;border-radius:15px;background:#22342A;display:grid;place-items:center"><img src="{{ t.src }}" alt="" style="width:76px;height:76px;display:block"></div></div>
+                </sc-for>
+              </div>
+              <div style="position:absolute;right:24px;top:22px;z-index:2">
+                <dc-import name="PriceButton" size="S" price="{{ 10000 }}" wallet="{{ x.wallet }}" force="{{ x.force }}" mode="{{ x.mode }}" eur="€2.99" owned-as="yours" hint-size="300px,128px"></dc-import>
+                <sc-if value="{{ x.need }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;right:0;top:142px;height:64px;box-sizing:border-box;padding:0 26px;border-radius:32px;background:#FFE8B8;border:3px solid #2D3436;box-shadow:0 4px 0 rgba(26,26,20,.22);display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Need 5,800 more coins<div style="position:absolute;right:139px;top:-14px;width:22px;height:22px;box-sizing:border-box;background:#FFE8B8;border-left:3px solid #2D3436;border-top:3px solid #2D3436;transform:rotate(45deg)"></div></div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const fmt = n => String(Math.round(+n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const FR = { 1: '#F3EEE4', 2: '#A8E6CF', 3: '#FFD56B' };
+const TH = [
+  { id: 'moonlit_warren', name: 'Moonlit Warren', sky: ['#141833', '#191E3D', '#1F2547', '#262C53'], far: '#232955', near: '#1A1E3E', ink: '#FFF8F0', eur: '€2.99', roster: ['moon_moss', 'nightshade_petal', 'silver_harebell', 'lunar_orchid', 'star_jasmine', 'umbral_lily'] },
+  { id: 'coral_tide', name: 'Coral Tide Garden', sky: ['#E6F7F8', '#CDEEF2', '#CDEEF2', '#93D7D4'], far: '#F2D6BC', near: '#F5DEC8', ink: '#1A1A14', eur: '€3.49', roster: ['sea_thrift', 'salt_daisy', 'tide_anemone', 'coral_hibiscus', 'pearl_waterlily', 'reef_crown'] },
+  { id: 'starfall_glade', name: 'Starfall Glade', sky: ['#0C0A1F', '#100D26', '#14102D', '#191434'], far: '#1E1840', near: '#171233', ink: '#FFF8F0', eur: '€2.99', roster: ['comet_sprig', 'nebula_clover', 'meteor_daisy', 'aurora_tulip', 'galaxy_sunburst', 'nova_bloom'] }
+];
+const tiles = r => r.map((t, i) => ({ src: 'flowers/' + t + '_t3.svg', frame: FR[i < 3 ? 1 : i < 5 ? 2 : 3] }));
+class Component extends DCLogic {
+  state = { wallet: 4200, mode: 'coins', slow: false, pulse: 0, need: false, idx: 0, jumped: false, resetKey: 0 };
+  componentWillUnmount() { clearTimeout(this.t1); clearTimeout(this.t2); }
+  renderVals() {
+    const s = this.state, k = s.slow ? 4 : 1, iap = s.mode === 'eur';
+    const c = TH[s.idx] || null;
+    const btn = (label, on, onTap) => ({ label, onTap, bg: on ? '#FFB88C' : 'transparent', ink: on ? '#2D3436' : '#FFF8F0' });
+    return {
+      wallet: s.wallet, mode: s.mode, slow: k, pulse: s.pulse, resetKey: s.resetKey, need: s.need && !iap, jumped: s.jumped,
+      needText: 'Need ' + fmt(Math.max(1, 10000 - s.wallet)) + ' more coins',
+      hasCard: !!c && !s.jumped, curName: (TH[Math.max(0, s.idx - 1)] || TH[0]).name,
+      live: c ? { name: c.name, ink: c.ink, near: c.near, far: c.far, s0: c.sky[0], s1: c.sky[1], s2: c.sky[2], s3: c.sky[3], eur: c.eur, tiles: tiles(c.roster) } : { tiles: [] },
+      onShort: () => { this.setState(st => ({ pulse: st.pulse + 1, need: true })); clearTimeout(this.t1); this.t1 = setTimeout(() => this.setState({ need: false }), 1600 * k); },
+      onBuy: () => { clearTimeout(this.t2); this.t2 = setTimeout(() => { this.setState(st => ({ wallet: iap ? st.wallet : st.wallet - 10000, idx: st.idx + 1, jumped: true })); this.t1 = setTimeout(() => this.setState({ jumped: false }), 1800 * k); }, 600 * k); },
+      ctl: [
+        btn('wallet 4,200', s.wallet === 4200, () => this.setState({ wallet: 4200, resetKey: s.resetKey + 1 })),
+        btn('wallet 12,000', s.wallet === 12000, () => this.setState({ wallet: 12000, resetKey: s.resetKey + 1 })),
+        btn(iap ? 'režim: IAP €' : 'režim: v1 coini', iap, () => this.setState({ mode: iap ? 'coins' : 'eur', resetKey: s.resetKey + 1 })),
+        btn('usporeno ×4', s.slow, () => this.setState({ slow: !s.slow })),
+        btn('reset', false, () => this.setState({ idx: 0, jumped: false, need: false, resetKey: s.resetKey + 1 }))
+      ],
+      moonTiles: tiles(TH[0].roster),
+      states: [
+        { t: 'Dovoljno coina', n: 'wallet 12,000 · zlatno', force: 'buy', wallet: 12000, h: 366 },
+        { t: 'Fali + „Need N"', n: 'wallet 4,200 · oblačić ispod dugmeta 1,6 s', force: 'short', wallet: 4200, need: true, h: 366 },
+        { t: 'Potvrda 3 s', n: 'SVG kvačica (ne „√"), traka 3 s, širina 300', force: 'confirm', wallet: 12000, h: 366 },
+        { t: 'Kupuje se → Home', n: '0,6 s pop + prsten, pa skok na Home · Themes', force: 'buying', wallet: 12000, h: 366 },
+        { t: 'IAP režim', n: 'MONEY ljubičasta + €; ostalo isto', force: 'eur', mode: 'eur', wallet: 4200, h: 366 }
+      ].map(x => ({ mode: 'coins', need: false, ...x }))
+    };
+  }
+}
+</script>
+</body>
+</html>

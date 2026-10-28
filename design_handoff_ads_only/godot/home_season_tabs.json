@@ -1,0 +1,74 @@
+{
+  "source": "design/HomeSeasons.dc.html",
+  "scripts": [
+    "game/scripts/ui/home_v3_tabs.gd",
+    "season_stage.gd",
+    "home_v3_card_content.gd"
+  ],
+  "logic_unchanged": true,
+  "tabs": [
+    {
+      "id": "free",
+      "label": "Journey",
+      "icon": "icon_seed.svg",
+      "active_bg": "#FFF8F0",
+      "order": 0,
+      "default": true
+    },
+    {
+      "id": "premium",
+      "label": "Themes",
+      "icon": "icon_special.svg",
+      "active_bg": "#C2E2FA",
+      "order": 1
+    }
+  ],
+  "bar": {
+    "w": 1032,
+    "h": 124,
+    "radius": 62,
+    "bg": "#2D34361A",
+    "x": 24,
+    "y": 24
+  },
+  "tab": {
+    "w": 508,
+    "h": 108,
+    "radius": 54,
+    "border": 3,
+    "shadow_y": 6,
+    "font": 46,
+    "icon": 56,
+    "inset": 8
+  },
+  "theme_card": {
+    "special_rim": {
+      "inset": 14,
+      "width": 8,
+      "color": "#C2E2FA",
+      "outline": "3 #2D3436"
+    },
+    "price_button": "coin_price.L",
+    "status_top": {
+      "with_savings": 846,
+      "without": 904
+    }
+  },
+  "savings_pill_b3": {
+    "optional": true,
+    "text": "{wallet} / 10,000",
+    "h": 72,
+    "font": 38,
+    "icon": 44,
+    "bg_short": "#FFF8F0",
+    "bg_enough": "#A8E6CF",
+    "hidden_when": [
+      "owned",
+      "iap"
+    ]
+  },
+  "iap_mode_b4": {
+    "price_button_state": "eur_iap_only",
+    "savings_pill": false
+  }
+}

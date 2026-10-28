@@ -53,7 +53,7 @@ func _run() -> void:
 		_fail("meadow_sunset card missing")
 		return
 	var btn: Node = card.call("get_buy_button")
-	if str(card.call("get_state")) != "coins.buy" or str(btn.get("price")) != str(price):
+	if str(card.call("get_state")) != "coins.buy" or str(btn.get("price")) != UiChrome.format_count(price):
 		_fail("expected coins.buy %d, got %s %s" % [price, card.call("get_state"), btn.get("price")])
 		return
 
@@ -105,12 +105,12 @@ func _run() -> void:
 		_fail("short tap must not spend or arm confirm")
 		return
 
-	# Ormar skine (Default) → Shop kaže Owned, ne Wearing.
+	# Ormar skine (Default) → Shop kaže Yours, ne Wearing.
 	gs.call("apply_wardrobe", {"meadow_bg": ""})
 	shop.call("refresh_shop")
 	await _frames(3)
-	if bool(card.call("is_worn")) or str(btn.get("owned_label")) != "Owned":
-		_fail("after Default in the Wardrobe the Shop should show Owned")
+	if bool(card.call("is_worn")) or str(btn.get("owned_label")) != "Yours":
+		_fail("after Default in the Wardrobe the Shop should show Yours")
 		return
 	CampSmokeUtil.restore_save(self, _backup)
 	print("shop_cosmetic_buy_smoke OK")

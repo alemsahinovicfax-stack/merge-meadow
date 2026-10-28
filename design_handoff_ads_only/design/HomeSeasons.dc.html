@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div style="box-sizing:border-box;padding:96px;display:flex;flex-direction:column;gap:56px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0;width:max-content">
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:1900px">
+    <div style="font:900 72px/1.05 Nunito,system-ui,sans-serif">B · Home — Journey · Themes</div>
+    <div style="font:700 34px/1.4 Nunito,system-ui,sans-serif;color:#E6DCEB;text-wrap:pretty">„Free / Premium" postaje <b>Journey</b> (sjemenka, krem — besplatni put, uvijek lijevo i otvoren prvi) i <b>Themes</b> (zvjezdica, nebo-plava #C2E2FA — boja oznake „Special" iz D). Struktura, mjere tabova i logika ostaju: mijenja se samo prikaz. Kartica teme dobija coin cijenu L iz C i mirni red štednje „4,200 / 10,000" (B3) u istom obliku kao pilule besplatnog puta.</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;padding-top:8px">
+      <sc-for list="{{ ctl }}" as="b" hint-placeholder-count="6">
+        <div onClick="{{ b.onTap }}" style="height:72px;box-sizing:border-box;padding:0 28px;border-radius:36px;border:3px solid #FFF8F0;display:flex;align-items:center;font:900 30px/1 Nunito,system-ui,sans-serif;cursor:pointer;background:{{ b.bg }};color:{{ b.ink }}">{{ b.label }}</div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:80px;align-items:flex-start">
+    <sc-for list="{{ boards }}" as="bd" hint-placeholder-count="4">
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div style="font:900 40px/1 Nunito,system-ui,sans-serif">{{ bd.title }}</div>
+        <div data-screen-label="{{ bd.title }}" style="position:relative;width:1080px;height:1920px;overflow:hidden;border-radius:24px;border:4px solid #2D3436;background:{{ bd.page }}">
+          <dc-import name="HubHeader" coins="{{ wallet }}" pulse-key="{{ pulse }}" slow="{{ slow }}" hint-size="1080px,143px"></dc-import>
+          <div style="position:absolute;left:0;top:143px;width:1080px;height:1633px">
+            <div data-layer="SeasonTabs" style="position:absolute;left:24px;top:24px;width:1032px;height:124px;border-radius:62px;background:rgba(45,52,54,.10)">
+              <sc-for list="{{ bd.tabs }}" as="t" hint-placeholder-count="2">
+                <div data-tab="{{ t.id }}" style="position:absolute;left:{{ t.x }}px;top:8px;width:508px;height:108px">
+                  <sc-if value="{{ t.on }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute;left:0;top:6px;width:508px;height:108px;border-radius:54px;background:rgba(26,26,20,.22)"></div>
+                    <div style="position:absolute;inset:0;box-sizing:border-box;border-radius:54px;border:3px solid #2D3436;background:{{ t.fill }}"></div>
+                  </sc-if>
+                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:16px;font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436"><img src="{{ t.icon }}" alt="" style="width:56px;height:56px;display:block">{{ t.label }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div data-layer="SeasonCard" style="position:absolute;left:24px;top:172px;width:1032px;height:1160px">
+              <div style="position:absolute;left:0;top:12px;width:1032px;height:1160px;border-radius:48px;background:rgba(26,26,20,.26)"></div>
+              <div style="position:absolute;inset:0;box-sizing:border-box;border-radius:48px;border:4px solid #2D3436;overflow:hidden;background:{{ bd.near }}">
+                <div style="height:93px;background:{{ bd.s0 }}"></div><div style="height:93px;background:{{ bd.s1 }}"></div><div style="height:93px;background:{{ bd.s2 }}"></div><div style="height:92px;background:{{ bd.s3 }}"></div><div style="height:418px;background:{{ bd.far }}"></div>
+              </div>
+              <sc-if value="{{ bd.theme }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="SpecialRim" style="position:absolute;inset:14px;box-sizing:border-box;border-radius:36px;border:8px solid #C2E2FA;outline:3px solid #2D3436;outline-offset:0"></div>
+              </sc-if>
+              <div style="position:absolute;left:0;right:0;top:72px;text-align:center;font:900 80px/1 Nunito,system-ui,sans-serif;letter-spacing:-0.015em;color:{{ bd.ink }}">{{ bd.name }}</div>
+              <sc-for list="{{ bd.discs }}" as="d" hint-placeholder-count="6">
+                <div style="position:absolute;left:{{ d.x }}px;top:{{ d.y }}px;width:{{ d.d }}px;height:{{ d.d }}px;box-sizing:border-box;border-radius:50%;background:{{ d.bg }};border:4px solid #2D3436;display:grid;place-items:center"><sc-if value="{{ d.art }}" hint-placeholder-val="{{ true }}"><img src="{{ d.src }}" alt="" style="width:{{ d.a }}px;height:{{ d.a }}px;display:block"></sc-if></div>
+                <sc-if value="{{ d.art }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;left:{{ d.nx }}px;top:{{ d.ny }}px;width:234px;text-align:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:{{ bd.ink }};text-wrap:balance">{{ d.name }}</div></sc-if>
+              </sc-for>
+              <sc-if value="{{ bd.locked }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:456px;top:436px;width:120px;height:120px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center"><img src="icons/icon_lock.svg" alt="" style="width:60px;height:60px"></div>
+              </sc-if>
+              <div style="position:absolute;left:28px;top:680px;width:120px;height:120px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center"><div style="width:26px;height:26px;border-left:9px solid #2D3436;border-bottom:9px solid #2D3436;transform:translateX(5px) rotate(45deg)"></div></div>
+              <div style="position:absolute;left:884px;top:680px;width:120px;height:120px;box-sizing:border-box;border-radius:50%;background:#FFF8F0;border:4px solid #2D3436;box-shadow:0 6px 0 rgba(26,26,20,.24);display:grid;place-items:center"><div style="width:26px;height:26px;border-right:9px solid #2D3436;border-top:9px solid #2D3436;transform:translateX(-5px) rotate(45deg)"></div></div>
+
+              <sc-if value="{{ bd.locked }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:0;right:0;top:910px;display:flex;justify-content:center;gap:24px">
+                  <div style="height:120px;box-sizing:border-box;padding:0 40px 0 28px;border-radius:60px;background:#A8E6CF;border:4px solid #2D3436;display:flex;align-items:center;gap:16px;font:900 52px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums"><img src="icons/icon_coin.svg" alt="" style="width:56px;height:56px">2,500 / 2,500</div>
+                  <div style="height:120px;box-sizing:border-box;padding:0 40px 0 24px;border-radius:60px;background:#FFF8F0;border:4px solid #2D3436;display:flex;align-items:center;gap:12px;font:900 52px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums"><img src="flowers/pumpkin_t3.svg" alt="" style="width:64px;height:64px"><span style="color:#9E6645;font-size:40px">★3</span>4 / 22</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ bd.theme }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:0;right:0;top:{{ bd.statusTop }}px;display:flex;flex-direction:column;align-items:center;gap:24px">
+                  <sc-if value="{{ bd.showSave }}" hint-placeholder-val="{{ false }}">
+                    <div data-layer="SavingsPill" style="height:72px;box-sizing:border-box;padding:0 28px 0 18px;border-radius:36px;background:{{ bd.saveBg }};border:3px solid #2D3436;display:flex;align-items:center;gap:12px;font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums"><img src="icons/icon_coin.svg" alt="" style="width:44px;height:44px">{{ bd.saveText }}</div>
+                  </sc-if>
+                  <div style="position:relative">
+                    <sc-if value="{{ bd.need }}" hint-placeholder-val="{{ false }}">
+                      <div data-layer="NeedBubble" style="position:absolute;left:50%;transform:translateX(-50%);bottom:156px;height:64px;box-sizing:border-box;padding:0 26px;border-radius:32px;background:#FFE8B8;border:3px solid #2D3436;box-shadow:0 4px 0 rgba(26,26,20,.22);display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;z-index:2">{{ bd.needText }}<div style="position:absolute;left:50%;margin-left:-11px;bottom:-14px;width:22px;height:22px;box-sizing:border-box;background:#FFE8B8;border-right:3px solid #2D3436;border-bottom:3px solid #2D3436;transform:rotate(45deg)"></div></div>
+                    </sc-if>
+                    <dc-import name="PriceButton" size="L" price="{{ 10000 }}" wallet="{{ wallet }}" mode="{{ bd.mode }}" eur="{{ bd.eur }}" owned="{{ bd.owned }}" owned-as="yours" force="{{ bd.force }}" slow="{{ slow }}" reset-key="{{ resetKey }}" on-short="{{ bd.onShort }}" on-buy="{{ bd.onBuy }}" hint-size="360px,140px"></dc-import>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="position:absolute;left:0;right:0;top:1352px;display:flex;justify-content:center;gap:22px">
+              <sc-for list="{{ bd.dots }}" as="o" hint-placeholder-count="3">
+                <div style="width:{{ o.w }}px;height:24px;box-sizing:border-box;border-radius:12px;background:{{ o.bg }};border:{{ o.bd }}"></div>
+              </sc-for>
+            </div>
+            <div style="position:absolute;left:280px;top:1423px;width:520px;height:180px;border-radius:90px;background:rgba(26,26,20,.30)"></div>
+            <div data-layer="PlayButton" style="position:absolute;left:280px;top:1413px;width:520px;height:180px;box-sizing:border-box;border-radius:90px;background:#FFB88C;border:4px solid #2D3436;display:flex;align-items:center;justify-content:center;gap:24px;color:#2D3436">
+              <sc-if value="{{ bd.play }}" hint-placeholder-val="{{ false }}">
+                <div style="width:0;height:0;border-top:30px solid transparent;border-bottom:30px solid transparent;border-left:48px solid #2D3436"></div><span style="font:900 76px/1 Nunito,system-ui,sans-serif">Play</span>
+              </sc-if>
+              <sc-if value="{{ bd.back }}" hint-placeholder-val="{{ true }}">
+                <div style="width:104px;height:104px;box-sizing:border-box;border-radius:50%;background:#E8F3E0;border:3px solid #2D3436;display:grid;place-items:center"><img src="flowers/pumpkin_t3.svg" alt="" style="width:80px;height:80px"></div>
+                <div style="width:20px;height:20px;border-left:8px solid #2D3436;border-bottom:8px solid #2D3436;transform:rotate(45deg)"></div>
+                <span style="font:900 66px/1 Nunito,system-ui,sans-serif">Back</span>
+              </sc-if>
+            </div>
+          </div>
+          <div style="position:absolute;left:0;top:1776px"><dc-import name="HubFooter" active="home" hint-size="1080px,144px"></dc-import></div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 48px/1 Nunito,system-ui,sans-serif">B2 · status kartice teme — sva stanja (Moonlit Warren)</div>
+    <div style="display:flex;gap:32px;flex-wrap:wrap">
+      <sc-for list="{{ strip }}" as="x" hint-placeholder-count="7">
+        <div style="display:flex;flex-direction:column;gap:16px;width:520px">
+          <div style="height:380px;box-sizing:border-box;border-radius:36px;border:4px solid #2D3436;background:#1A1E3E;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:24px;padding-bottom:56px">
+            <sc-if value="{{ x.save }}" hint-placeholder-val="{{ false }}">
+              <div style="height:72px;box-sizing:border-box;padding:0 28px 0 18px;border-radius:36px;background:{{ x.saveBg }};border:3px solid #2D3436;display:flex;align-items:center;gap:12px;font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436;font-variant-numeric:tabular-nums"><img src="icons/icon_coin.svg" alt="" style="width:44px;height:44px">{{ x.saveText }}</div>
+            </sc-if>
+            <div style="position:relative">
+              <sc-if value="{{ x.need }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:156px;height:64px;box-sizing:border-box;padding:0 26px;border-radius:32px;background:#FFE8B8;border:3px solid #2D3436;box-shadow:0 4px 0 rgba(26,26,20,.22);display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;z-index:2">Need 5,800 more coins<div style="position:absolute;left:50%;margin-left:-11px;bottom:-14px;width:22px;height:22px;box-sizing:border-box;background:#FFE8B8;border-right:3px solid #2D3436;border-bottom:3px solid #2D3436;transform:rotate(45deg)"></div></div>
+              </sc-if>
+              <dc-import name="PriceButton" size="L" price="{{ 10000 }}" wallet="{{ x.wallet }}" force="{{ x.force }}" owned-as="yours" mode="{{ x.mode }}" eur="€2.99" hint-size="360px,140px"></dc-import>
+            </div>
+          </div>
+          <div style="font:900 32px/1.2 Nunito,system-ui,sans-serif">{{ x.t }}</div>
+          <div style="font:700 26px/1.35 Nunito,system-ui,sans-serif;color:#C9BED0;text-wrap:pretty">{{ x.n }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const fmt = n => String(Math.round(+n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const S = {
+  frost_orchard: { name: 'Frost Orchard', sky: ['#D9E7F6', '#E0ECF8', '#E7F0FA', '#EEF5FC'], far: '#EAF1F9', near: '#F3F7FC', ink: '#1A1A14', page: '#EEF4FB', roster: [] },
+  moonlit_warren: { name: 'Moonlit Warren', sky: ['#141833', '#191E3D', '#1F2547', '#262C53'], far: '#232955', near: '#1A1E3E', ink: '#FFF8F0', page: '#DFE1FF', eur: '€2.99',
+    roster: [['moon_moss', 'Moon Moss'], ['nightshade_petal', 'Nightshade Petal'], ['silver_harebell', 'Silver Harebell'], ['lunar_orchid', 'Lunar Orchid'], ['star_jasmine', 'Star Jasmine'], ['umbral_lily', 'Umbral Lily']] },
+  coral_tide: { name: 'Coral Tide Garden', sky: ['#E6F7F8', '#CDEEF2', '#CDEEF2', '#93D7D4'], far: '#F2D6BC', near: '#F5DEC8', ink: '#1A1A14', page: '#EAF7F6', eur: '€3.49',
+    roster: [['sea_thrift', 'Sea Thrift'], ['salt_daisy', 'Salt Daisy'], ['tide_anemone', 'Tide Anemone'], ['coral_hibiscus', 'Coral Hibiscus'], ['pearl_waterlily', 'Pearl Waterlily'], ['reef_crown', 'Reef Crown']] }
+};
+const R6 = [[186, 256, 180], [406, 230, 220], [666, 256, 180], [186, 560, 180], [426, 560, 180], [666, 560, 180]];
+const ORDER = [0, 5, 3, 1, 2, 4];
+class Component extends DCLogic {
+  state = { wallet: 4200, mode: 'coins', slow: false, b3: true, pulse: 0, need: {}, owned: {}, resetKey: 0 };
+  timers = {};
+  componentWillUnmount() { Object.values(this.timers).forEach(clearTimeout); }
+  short(id) {
+    this.setState(s => ({ pulse: s.pulse + 1, need: { ...s.need, [id]: true } }));
+    clearTimeout(this.timers[id]);
+    this.timers[id] = setTimeout(() => this.setState(s => ({ need: { ...s.need, [id]: false } })), 1600 * (this.state.slow ? 4 : 1));
+  }
+  buy(id) { setTimeout(() => this.setState(s => ({ wallet: s.mode === 'coins' ? s.wallet - 10000 : s.wallet, owned: { ...s.owned, [id]: true } })), 600 * (this.state.slow ? 4 : 1)); }
+  board(id, title, opts) {
+    const s = this.state, c = S[id], iap = opts.iap, theme = opts.theme, owned = !!s.owned[id];
+    const discs = R6.map(([x, y, d], i) => {
+      const f = c.roster[ORDER[i]];
+      return { x, y, d, a: Math.round(d * 0.78), art: !!f, bg: f ? '#FFF8F0' : '#E3D9CC', src: f ? 'flowers/' + f[0] + '_t3.svg' : '', name: f ? f[1] : '', nx: x + d / 2 - 117, ny: y + d + 12 };
+    });
+    const enough = s.wallet >= 10000;
+    const showSave = theme && !iap && !owned && s.b3;
+    return {
+      title, page: c.page, name: c.name, ink: c.ink, far: c.far, near: c.near, s0: c.sky[0], s1: c.sky[1], s2: c.sky[2], s3: c.sky[3],
+      theme, locked: !theme, discs, mode: iap ? 'eur' : 'coins', eur: c.eur || '', owned, force: '',
+      showSave, saveText: fmt(Math.min(s.wallet, 10000)) + ' / 10,000', saveBg: enough ? '#A8E6CF' : '#FFF8F0',
+      statusTop: showSave ? 846 : 904, need: !!s.need[id] && !iap, needText: 'Need ' + fmt(Math.max(1, 10000 - s.wallet)) + ' more coins',
+      onShort: () => this.short(id), onBuy: () => this.buy(id),
+      play: theme && owned, back: !(theme && owned),
+      tabs: [
+        { id: 'journey', label: 'Journey', icon: 'icons/icon_seed.svg', x: 8, on: !theme, fill: '#FFF8F0' },
+        { id: 'themes', label: 'Themes', icon: 'icons/icon_special.svg', x: 516, on: theme, fill: '#C2E2FA' }
+      ],
+      dots: (theme ? [0, 1, 2] : [0, 1, 2, 3]).map(i => {
+        const cur = theme ? i === opts.dot : i === 1;
+        const here = !theme && i === 0;
+        return { w: cur ? 64 : 24, bg: cur ? '#2D3436' : here ? '#FFB88C' : 'rgba(45,52,54,.28)', bd: here ? '3px solid #2D3436' : 'none' };
+      })
+    };
+  }
+  renderVals() {
+    const s = this.state, iap = s.mode === 'eur';
+    const btn = (label, on, onTap) => ({ label, onTap, bg: on ? '#FFB88C' : 'transparent', ink: on ? '#2D3436' : '#FFF8F0' });
+    return {
+      wallet: s.wallet, slow: s.slow ? 4 : 1, pulse: s.pulse, resetKey: s.resetKey,
+      ctl: [
+        btn('wallet 4,200', s.wallet === 4200, () => this.setState({ wallet: 4200, resetKey: s.resetKey + 1 })),
+        btn('wallet 12,000', s.wallet === 12000, () => this.setState({ wallet: 12000, resetKey: s.resetKey + 1 })),
+        btn(iap ? 'režim: IAP €' : 'režim: v1 coini', iap, () => this.setState({ mode: iap ? 'coins' : 'eur', resetKey: s.resetKey + 1 })),
+        btn('B3 štednja', s.b3, () => this.setState({ b3: !s.b3 })),
+        btn('usporeno ×4', s.slow, () => this.setState({ slow: !s.slow })),
+        btn('reset kupovina', false, () => this.setState({ owned: {}, need: {}, resetKey: s.resetKey + 1 }))
+      ],
+      boards: [
+        this.board('frost_orchard', 'Journey · Frost Orchard (zaključana)', { theme: false, iap }),
+        this.board('moonlit_warren', 'Themes · Moonlit Warren (tamna)', { theme: true, iap, dot: 0 }),
+        this.board('coral_tide', 'Themes · Coral Tide Garden (svijetla)', { theme: true, iap, dot: 1 }),
+        this.board('moonlit_warren', 'B4 · IAP režim (€)', { theme: true, iap: true, dot: 0 })
+      ],
+      strip: [
+        { t: 'Može se kupiti', n: 'Wallet 12,000. Pilula štednje mint (puno), kao „2,500 / 2,500" na putu.', force: 'buy', wallet: 12000, save: true, saveBg: '#A8E6CF', saveText: '10,000 / 10,000' },
+        { t: 'Fali coina', n: 'Wallet 4,200. Mirna pilula „4,200 / 10,000" — cilj, ne pritisak.', force: 'short', wallet: 4200, save: true, saveBg: '#FFF8F0', saveText: '4,200 / 10,000' },
+        { t: '„Need N more coins"', n: 'Tap kad fali: drhtaj, puls čipa, oblačić 1,6 s iznad dugmeta.', force: 'short', wallet: 4200, save: true, saveBg: '#FFF8F0', saveText: '4,200 / 10,000', need: true },
+        { t: 'Potvrda 3 s', n: 'SVG kvačica, traka se skuplja; ista širina 360.', force: 'confirm', wallet: 12000, save: true, saveBg: '#A8E6CF', saveText: '10,000 / 10,000' },
+        { t: 'Kupljeno', n: '„✓ Yours" u kartici, dole ▶ Play. Pilula štednje nestaje.', force: 'owned', wallet: 2000, save: false },
+        { t: 'Aktivna tema', n: 'Isto „✓ Yours"; dole „‹ Back" na livadu (kao danas).', force: 'owned', wallet: 2000, save: false },
+        { t: 'B4 · IAP', n: 'Ista mjesta, MONEY ljubičasta + €; bez pilule štednje.', force: 'eur', mode: 'eur', wallet: 4200, save: false }
+      ].map(x => ({ mode: 'coins', need: false, saveBg: '#FFF8F0', saveText: '', ...x }))
+    };
+  }
+}
+</script>
+</body>
+</html>

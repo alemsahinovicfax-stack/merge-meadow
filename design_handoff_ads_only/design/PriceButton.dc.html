@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="CoinPrice" data-state="{{ st }}" data-size="{{ size }}" ref="{{ rootRef }}" onClick="{{ tap }}" style="position:relative;flex:0 0 auto;width:{{ w }}px;height:{{ hb }}px;font-family:Nunito,system-ui,sans-serif;user-select:none;cursor:{{ cursor }}">
+  <div data-layer="PriceFace" ref="{{ faceRef }}" style="position:absolute;left:0;top:{{ down }}px;width:{{ w }}px;height:{{ h }}px;box-sizing:border-box;border-radius:{{ r }}px;background:{{ bg }};border:4px solid {{ edge }};box-shadow:{{ shadow }};display:flex;align-items:center;justify-content:center;gap:{{ gap }}px">
+    <sc-if value="{{ showCoin }}" hint-placeholder-val="{{ true }}">
+      <img src="icons/icon_coin.svg" alt="" style="width:{{ icon }}px;height:{{ icon }}px;flex:0 0 auto;display:block">
+    </sc-if>
+    <sc-if value="{{ showCheckGold }}" hint-placeholder-val="{{ false }}">
+      <img src="icons/check_confirm.svg" alt="" style="width:{{ icon }}px;height:{{ icon }}px;flex:0 0 auto;display:block">
+    </sc-if>
+    <sc-if value="{{ showCheckInk }}" hint-placeholder-val="{{ false }}">
+      <img src="icons/check_ink.svg" alt="" style="width:{{ iconSm }}px;height:{{ iconSm }}px;flex:0 0 auto;display:block">
+    </sc-if>
+    <sc-if value="{{ showPlay }}" hint-placeholder-val="{{ false }}">
+      <div style="width:0;height:0;flex:0 0 auto;border-top:22px solid transparent;border-bottom:22px solid transparent;border-left:36px solid #2D3436"></div>
+    </sc-if>
+    <span data-role="price" style="font:900 {{ fs }}px/1 Nunito,system-ui,sans-serif;color:{{ ink }};font-variant-numeric:tabular-nums;white-space:nowrap">{{ text }}</span>
+    <sc-if value="{{ isConfirm }}" hint-placeholder-val="{{ false }}">
+      <div data-layer="ConfirmTimer" ref="{{ barRef }}" style="position:absolute;left:{{ barL }}px;right:{{ barL }}px;bottom:12px;height:8px;border-radius:4px;background:#FFD56B;transform-origin:left center"></div>
+    </sc-if>
+  </div>
+  <div data-layer="BuyRing" ref="{{ ringRef }}" style="position:absolute;left:50%;top:50%;width:{{ ring }}px;height:{{ ring }}px;margin-left:{{ ringM }}px;margin-top:{{ ringM }}px;box-sizing:border-box;border-radius:50%;border:12px solid #FFF5D1;opacity:0;pointer-events:none"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:380,&quot;height&quot;:160},&quot;size&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;S&quot;,&quot;M&quot;,&quot;L&quot;],&quot;default&quot;:&quot;M&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;price&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:10000,&quot;tsType&quot;:&quot;number&quot;},&quot;wallet&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12000,&quot;tsType&quot;:&quot;number&quot;},&quot;mode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;coins&quot;,&quot;eur&quot;],&quot;default&quot;:&quot;coins&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;eur&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;€2.99&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;owned&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;ownedAs&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;play&quot;,&quot;yours&quot;,&quot;wearing&quot;],&quot;default&quot;:&quot;play&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;force&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;&quot;,&quot;buy&quot;,&quot;short&quot;,&quot;confirm&quot;,&quot;buying&quot;,&quot;owned&quot;,&quot;eur&quot;],&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;slow&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1,&quot;tsType&quot;:&quot;number&quot;},&quot;shakeKey&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;resetKey&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;onBuy&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onBought&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onShort&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(need:number) =&gt; void&quot;},&quot;onConfirm&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onOwnedTap&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
+const SZ = {
+  S: { w: 300, h: 120, fs: 44, icon: 48, gap: 12 },
+  M: { w: 320, h: 120, fs: 52, icon: 56, gap: 12 },
+  L: { w: 360, h: 132, fs: 56, icon: 64, gap: 14 }
+};
+const fmt = n => String(Math.round(+n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+class Component extends DCLogic {
+  rootRef = React.createRef(); faceRef = React.createRef(); barRef = React.createRef(); ringRef = React.createRef();
+  state = { phase: '', pressed: false };
+  timers = [];
+  componentWillUnmount() { this.clear(); }
+  clear() { this.timers.forEach(clearTimeout); this.timers = []; }
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
+  k() { return Math.max(1, +(this.props.slow || 1)); }
+  componentDidUpdate(pp, ps) {
+    const p = this.props;
+    if (pp.resetKey !== p.resetKey && this.state.phase === 'confirm') { this.clear(); this.setState({ phase: '' }); }
+    if (p.shakeKey && pp.shakeKey !== p.shakeKey) this.shake();
+    const st = this.cur();
+    if (st === 'confirm' && this._lastSt !== 'confirm') this.runBar();
+    if (st !== this._lastSt && (st === 'confirm' || st === 'buying')) this.pop(st === 'buying');
+    this._lastSt = st;
+  }
+  componentDidMount() { this._lastSt = this.cur(); if (this._lastSt === 'confirm' && !this.props.force) this.runBar(); if (this.props.force === 'confirm' && this.props.frozenBar == null) this.runBar(true); }
+  runBar(loop) {
+    const el = this.barRef.current; if (!el || !el.animate) return;
+    el.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: 3000 * this.k(), easing: 'linear', fill: 'forwards', iterations: loop ? Infinity : 1 });
+  }
+  pop(ring) {
+    const el = this.faceRef.current, k = this.k();
+    if (el && el.animate) el.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }, { transform: 'scale(1)' }], { duration: 220 * k, easing: 'cubic-bezier(.34,1.56,.64,1)' });
+    const r = this.ringRef.current;
+    if (ring && r && r.animate) r.animate([{ transform: 'scale(.3)', opacity: 1 }, { transform: 'scale(1.6)', opacity: 0 }], { duration: 420 * k, easing: 'cubic-bezier(.33,1,.68,1)' });
+  }
+  shake() {
+    const el = this.faceRef.current;
+    if (el && el.animate) el.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-12px)' }, { transform: 'translateX(12px)' }, { transform: 'translateX(-8px)' }, { transform: 'translateX(8px)' }, { transform: 'translateX(0)' }], { duration: 320 * this.k(), easing: 'ease-out' });
+  }
+  cur() {
+    const p = this.props;
+    if (p.force) return p.force;
+    if (this.state.phase === 'buying') return 'buying';
+    if (p.owned) return 'owned';
+    if (p.mode === 'eur') return 'eur';
+    if (this.state.phase === 'confirm') return 'confirm';
+    return (+p.wallet || 0) >= (+p.price || 0) ? 'buy' : 'short';
+  }
+  onTap = ev => {
+    if (ev && ev.stopPropagation) ev.stopPropagation();
+    const p = this.props, st = this.cur(), k = this.k();
+    if (p.force) { if (st === 'short') this.shake(); return; }
+    if (st === 'owned') { if (p.onOwnedTap) p.onOwnedTap(); return; }
+    if (st === 'buying') return;
+    if (st === 'short') { this.shake(); if (p.onShort) p.onShort(Math.max(1, (+p.price || 0) - (+p.wallet || 0))); return; }
+    if (st === 'buy') { this.clear(); this.setState({ phase: 'confirm' }); this.later(() => { if (this.state.phase === 'confirm') this.setState({ phase: '' }); }, 3000 * k); if (p.onConfirm) p.onConfirm(); return; }
+    if (st === 'confirm' || st === 'eur') {
+      this.clear(); this.setState({ phase: 'buying' });
+      if (p.onBuy) p.onBuy();
+      this.later(() => { this.setState({ phase: '' }); if (p.onBought) p.onBought(); }, 600 * k);
+    }
+  };
+  renderVals() {
+    const p = this.props, size = SZ[p.size] ? p.size : 'M', z = SZ[size], st = this.cur();
+    const ownedAs = p.ownedAs || 'play';
+    let bg = '#FFD56B', edge = '#2D3436', ink = '#2D3436', shadow = '0 8px 0 rgba(26,26,20,.28)', text = fmt(p.price), fs = z.fs;
+    let showCoin = true, showCheckGold = false, showCheckInk = false, showPlay = false, down = 0, cursor = 'pointer';
+    if (st === 'short') { bg = '#F1EAE0'; edge = 'rgba(45,52,54,.35)'; ink = '#555C5E'; shadow = 'none'; down = 8; }
+    else if (st === 'confirm') { bg = '#2D3436'; ink = '#FFD56B'; showCoin = false; showCheckGold = true; }
+    else if (st === 'buying') { bg = '#A8E6CF'; shadow = 'none'; down = 8; showCoin = false; showCheckInk = true; text = ownedAs === 'wearing' ? 'Wearing' : 'Yours'; fs = Math.min(z.fs, 48); cursor = 'default'; }
+    else if (st === 'owned') {
+      showCoin = false;
+      if (ownedAs === 'play') { bg = '#FFB88C'; showPlay = true; text = 'Play'; fs = Math.min(z.fs, 52); }
+      else { bg = '#A8E6CF'; shadow = 'none'; down = 8; showCheckInk = true; text = ownedAs === 'wearing' ? 'Wearing' : 'Yours'; fs = Math.min(z.fs, 48); cursor = p.onOwnedTap ? 'pointer' : 'default'; }
+    } else if (st === 'eur') { bg = '#D4A5FF'; showCoin = false; text = p.eur || '€2.99'; fs = String(text).length > 7 ? 44 : Math.min(z.fs, 52); }
+    if (this.state.pressed && shadow !== 'none') { down = 4; shadow = '0 4px 0 rgba(26,26,20,.28)'; }
+    return {
+      rootRef: this.rootRef, faceRef: this.faceRef, barRef: this.barRef, ringRef: this.ringRef,
+      st, size, w: z.w, h: z.h, hb: z.h + 8, r: z.h / 2, fs, icon: z.icon, iconSm: Math.round(z.icon * 0.8), gap: z.gap,
+      bg, edge, ink, shadow, text, down, cursor, showCoin, showCheckGold, showCheckInk, showPlay,
+      isConfirm: st === 'confirm', barL: z.h / 2, ring: z.h * 2, ringM: -z.h,
+      tap: this.onTap
+    };
+  }
+}
+</script>
+</body>
+</html>

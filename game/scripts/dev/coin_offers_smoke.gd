@@ -15,7 +15,7 @@ const MOONLIT := "season_pack_moonlit_warren"
 const CORAL := "season_pack_coral_tide"
 const STARFALL := "season_pack_starfall_glade"
 const KNIGHT := "pip_knight"
-const NEED := "Need %d more coins"
+const NEED := "Need %s more coins"
 
 var _backup := ""
 var _failed := false
@@ -97,7 +97,7 @@ func _check_shop() -> void:
 		_fail("Moonlit Warren card missing")
 		return
 	var btn: Node = card.get("buy")
-	if str(card.call("get_state")) != "coins.buy" or str(btn.get("price")) != str(price):
+	if str(card.call("get_state")) != "coins.buy" or str(btn.get("price")) != UiChrome.format_count(price):
 		_fail("Moonlit should be coins.buy %d, got %s %s" % [price, card.call("get_state"), btn.get("price")])
 		return
 	await _tap(btn)
@@ -167,22 +167,22 @@ func _check_shop() -> void:
 		return
 	(coral.get("buy") as Node).emit_signal("short_tapped")
 	await _frames(3)
-	var want := NEED % (_price(CORAL) - 10)
-	if str(coral.call("get_status_text")) != want:
-		_fail("short tap should show '%s', got '%s'" % [want, coral.call("get_status_text")])
+	var want := NEED % UiChrome.format_count(_price(CORAL) - 10)
+	if str(shop.call("get_need_text")) != want:
+		_fail("short tap should show '%s', got '%s'" % [want, shop.call("get_need_text")])
 	if str(shop.call("get_confirm_id")) != "" or int(_gs.get("wallet_coins")) != 10 \
 			or (_gs.get("owned_paid_seasons") as Array).has("coral_tide"):
 		_fail("short tap must not arm, spend or grant")
 	var blossom: Node = shop.call("get_cosmetic_card", "pip_blossom")
 	(blossom.call("get_buy_button") as Node).emit_signal("short_tapped")
 	await _frames(3)
-	if str(blossom.call("get_status_text")) != NEED % (CosmeticCatalog.get_coin_cost("pip_blossom") - 10):
-		_fail("Looks short tap should show the same pill, got '%s'" % blossom.call("get_status_text"))
+	if str(shop.call("get_need_text")) != NEED % UiChrome.format_count(CosmeticCatalog.get_coin_cost("pip_blossom") - 10):
+		_fail("Looks short tap should show the same bubble, got '%s'" % shop.call("get_need_text"))
 	_gs.set("wallet_coins", _price(CORAL))
 	shop.call("refresh_shop")
 	await _frames(3)
-	if not str(coral.call("get_status_text")).is_empty() or str(coral.call("get_state")) != "coins.buy":
-		_fail("pill should clear once the coins are there")
+	if not str(shop.call("get_need_text")).is_empty() or str(coral.call("get_state")) != "coins.buy":
+		_fail("bubble should clear once the coins are there")
 
 
 # --- 4 Home ---
@@ -226,9 +226,9 @@ func _check_home() -> void:
 	await _frames(3)
 	stage.call("press_part", "buy")
 	await _frames(3)
-	var want := NEED % (_price(STARFALL) - 3)
-	if str(stage.call("get_toast_text")) != want:
-		_fail("Home without coins should toast '%s', got '%s'" % [want, stage.call("get_toast_text")])
+	var want := NEED % UiChrome.format_count(_price(STARFALL) - 3)
+	if str(stage.call("get_need_text")) != want:
+		_fail("Home without coins should show '%s', got '%s'" % [want, stage.call("get_need_text")])
 	if (_gs.get("owned_paid_seasons") as Array).has("starfall_glade") or bool((content.get("data") as Dictionary).get("confirm", false)):
 		_fail("Home without coins must not buy or arm")
 
@@ -260,8 +260,8 @@ func _check_camp() -> void:
 	if not card.visible or not bool(card.call("is_paid")) or str(card.call("get_season_id")) != "moonlit_warren":
 		_fail("Camp card should offer Moonlit Warren for coins")
 		return
-	if str(card.call("get_paid_button_state")) != "price" or str(btn.call("get_title")) != str(price):
-		_fail("Camp button should read %d, got %s / %s" % [price, card.call("get_paid_button_state"), btn.call("get_title")])
+	if str(card.call("get_paid_button_state")) != "price" or str(card.call("get_price_text")) != UiChrome.format_count(price):
+		_fail("Camp button should read %d, got %s / %s" % [price, card.call("get_paid_button_state"), card.call("get_price_text")])
 		return
 	await _tap(btn)
 	if str(card.call("get_paid_button_state")) != "confirm" or int(_gs.get("wallet_coins")) != price + 1:
@@ -284,8 +284,8 @@ func _check_camp() -> void:
 		return
 	var next_def: SeasonDef = SeasonCatalog.get_def(str(card.call("get_season_id")))
 	await _tap(btn)
-	var want := NEED % _price(next_def.iap_product_id)
-	if not bool(card.call("is_cancel_toast_visible")) or str(card.call("get_toast_text")) != want:
-		_fail("Camp without coins should toast '%s', got '%s'" % [want, card.call("get_toast_text")])
+	var want := NEED % UiChrome.format_count(_price(next_def.iap_product_id))
+	if str(card.call("get_need_text")) != want:
+		_fail("Camp without coins should show '%s', got '%s'" % [want, card.call("get_need_text")])
 	if (_gs.get("owned_paid_seasons") as Array).has(str(card.call("get_season_id"))):
 		_fail("Camp without coins must not buy")

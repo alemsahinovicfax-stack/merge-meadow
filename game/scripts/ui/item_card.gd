@@ -132,8 +132,12 @@ func _sync() -> void:
 	_new_tag.size = Vector2(ceilf(tag_w), UiWardrobe.NEW_TAG_H)
 	_new_tag.position = Vector2(b + UiWardrobe.BADGE_INSET, b + UiWardrobe.BADGE_INSET)
 	_free_tag.visible = is_free_skin() or is_premium()
-	var free_w := UiHomeV3.text_w(900, UiWardrobe.UNDER_TAG_PX, _tag_text()) + UiWardrobe.UNDER_TAG_PAD_X * 2.0
-	_free_tag.size = Vector2(ceilf(free_w), UiWardrobe.UNDER_TAG_H)
+	if is_premium():
+		# „Special" S (design_handoff_ads_only · premium_tag.json) na istom mjestu kao „Free".
+		_free_tag.size = SpecialTag.tag_size("S")
+	else:
+		var free_w := UiHomeV3.text_w(900, UiWardrobe.UNDER_TAG_PX, _tag_text()) + UiWardrobe.UNDER_TAG_PAD_X * 2.0
+		_free_tag.size = Vector2(ceilf(free_w), UiWardrobe.UNDER_TAG_H)
 	var name_top := pad + float(UiWardrobe.CARD_PREVIEW.y) + 12.0
 	_free_tag.position = Vector2(pad, name_top + float(UiWardrobe.CARD_NAME_LINE) + UiWardrobe.UNDER_TAG_GAP)
 	_badge.queue_redraw()
@@ -171,12 +175,15 @@ func _draw_badge() -> void:
 
 
 func _tag_text() -> String:
-	return UiWardrobe.PREMIUM_TEXT if is_premium() else UiWardrobe.FREE_TEXT
+	return SpecialTag.LABEL if is_premium() else UiWardrobe.FREE_TEXT
 
 
 func _draw_free_tag() -> void:
+	if is_premium():
+		SpecialTag.draw_tag(_free_tag, Vector2.ZERO, "S")
+		return
 	var r := Rect2(Vector2.ZERO, _free_tag.size)
-	_free_tag.draw_style_box(UiWardrobe.premium_tag() if is_premium() else UiWardrobe.free_tag(), r)
+	_free_tag.draw_style_box(UiWardrobe.free_tag(), r)
 	var text := _tag_text()
 	var w := UiHomeV3.text_w(900, UiWardrobe.UNDER_TAG_PX, text)
 	UiHomeV3.draw_text(

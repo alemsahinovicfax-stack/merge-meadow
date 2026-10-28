@@ -39,7 +39,7 @@ func _ensure() -> void:
 	_badge.name = "EquippedBadge"
 	_badge.position = Vector2(UiShopV2.PREVIEW_SIZE.x - 16.0 - 64.0, 16.0)
 	preview.add_child(_badge)
-	_make_buy()
+	_make_buy(UiCoinPrice.M)
 	buy.clicked.connect(_on_buy)
 	buy.short_tapped.connect(func() -> void: short_tapped.emit(item_id))
 
@@ -62,7 +62,7 @@ func configure(p_item_id: String, confirm_id: String = "") -> void:
 		str(sd.get("preview", "swatch")), CosmeticCatalog.get_look(item_id), pip, "country_bloom",
 		str(args.get("subject", "pip"))
 	)
-	buy.configure(_state, str(CosmeticCatalog.get_coin_cost(item_id)), UiShopV2.S_WEARING if _worn else UiShopV2.S_OWNED)
+	buy.configure(_state, UiCoinPrice.price_text(CosmeticCatalog.get_coin_cost(item_id)), UiShopV2.S_WEARING if _worn else UiShopV2.S_YOURS)
 	queue_redraw()
 
 

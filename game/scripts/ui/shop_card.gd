@@ -27,10 +27,12 @@ func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
-func _make_buy() -> ShopBuyButton:
+## `size_key` = UiCoinPrice veličina (S sezona, M Looks / Boosters); prazno = širina po sadržaju.
+func _make_buy(size_key: String = "") -> ShopBuyButton:
 	buy = ShopBuyButton.new()
 	buy.name = "BuyButton"
 	add_child(buy)
+	buy.size_key = size_key
 	buy.resized.connect(_place_buy)
 	return buy
 
@@ -89,11 +91,12 @@ func _coin_tap(state: String, sku: String) -> bool:
 	return true
 
 
-## Cijena na dugmetu: € iz prodavnice dok su kupovine pravim novcem uključene, inače coini.
+## Cijena na dugmetu: € iz prodavnice dok su kupovine pravim novcem uključene, inače coini
+## („10,000", kao header).
 static func offer_price_text(sku: String) -> String:
 	if MonetizationConfig.iap_enabled():
 		return IAPManager.get_price_label(sku)
-	return str(IAPManager.get_coin_price(sku))
+	return UiCoinPrice.price_text(IAPManager.get_coin_price(sku))
 
 
 func _draw_card_bg(fill: Color) -> void:

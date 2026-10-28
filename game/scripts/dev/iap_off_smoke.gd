@@ -144,7 +144,7 @@ func _check_coin_card(card: Node, sku: String, iap: Node) -> void:
 		return
 	var btn: Node = card.get("buy")
 	var price := int(iap.call("get_coin_price", sku))
-	if price <= 0 or str(btn.get("price")) != str(price):
+	if price <= 0 or str(btn.get("price")) != UiChrome.format_count(price):
 		_fail("%s button should show %d coins, got '%s'" % [sku, price, btn.get("price")])
 
 
@@ -258,7 +258,7 @@ func _check_camp(gs: Node) -> void:
 	if not card.visible or not bool(card.call("is_paid")) or str(card.call("get_season_id")) != "moonlit_warren":
 		_fail("Camp should offer the first theme for coins")
 		return
-	var title := str(camp.get_node("%SeasonLinkUnlock").call("get_title"))
-	if not title.is_valid_int():
+	var title := str(card.call("get_price_text"))
+	if not title.replace(",", "").is_valid_int():
 		_fail("Camp button should show a coin price, got '%s'" % title)
 	_scan(camp, "Camp")

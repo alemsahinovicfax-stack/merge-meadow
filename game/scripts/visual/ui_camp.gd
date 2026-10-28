@@ -805,16 +805,14 @@ static func unlock_button_ink(state: String) -> Color:
 const S_PREMIUM_SEASON := "Premium season"
 const S_PREMIUM_FLOWERS := "%d new flowers"
 const S_BUYING := "…"
-const S_PREMIUM_TAG := "PREMIUM"
 const S_PURCHASE_CANCELLED := "Purchase cancelled"
 
 ## Plaćena kartica (design_handoff_run_pickups · camp_paid_card.json): red ispod imena = oznaka
-## PREMIUM + „6 new flowers" (kolona 312) i red od 6 cvjetova sezone u okvirima po rijetkosti.
+## „Special" (SpecialTag M, design_handoff_ads_only) + „6 new flowers" (kolona 312) i red od 6
+## cvjetova sezone u okvirima po rijetkosti.
 const PAID_OFFER_H := 128
 const PAID_LEFT_W := 312
 const PAID_GAP := 20
-const PAID_TAG_H := 52
-const PAID_TAG_FONT := 34
 const PAID_COUNT_FONT := 42
 const PAID_TILE := 100
 const PAID_TILE_GAP := 10
@@ -848,27 +846,6 @@ static func paid_button_style(busy: bool) -> StyleBoxFlat:
 		s.shadow_color = PAID_DROP
 		s.shadow_size = 1
 		s.shadow_offset = Vector2(0, 6)
-	return s
-
-
-## v1 bez kupovina pravim novcem: prvi tap na coin cijenu teme — tamno dugme, zlatni „✓ N"
-## (kao coins.confirm u Shopu), drugi tap kupuje.
-static func paid_confirm_style() -> StyleBoxFlat:
-	var s := paid_button_style(false)
-	s.bg_color = INK
-	s.border_color = INK
-	return s
-
-
-static func premium_tag_style() -> StyleBoxFlat:
-	var s := StyleBoxFlat.new()
-	s.bg_color = PAID_BTN_BUSY
-	s.border_color = INK
-	s.set_border_width_all(3)
-	s.set_corner_radius_all(14)
-	s.content_margin_left = 18.0
-	s.content_margin_right = 18.0
-	s.anti_aliasing = true
 	return s
 
 

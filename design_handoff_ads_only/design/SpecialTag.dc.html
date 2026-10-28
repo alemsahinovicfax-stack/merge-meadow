@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+</helmet>
+<div data-layer="SpecialTag" data-size="{{ size }}" style="height:{{ h }}px;box-sizing:border-box;padding:0 {{ padR }}px 0 {{ padL }}px;border-radius:{{ r }}px;background:#C2E2FA;border:3px solid #2D3436;display:inline-flex;align-items:center;gap:{{ gap }}px;font:900 {{ fs }}px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap;flex:0 0 auto">
+  <img src="icons/icon_special.svg" alt="" style="width:{{ icon }}px;height:{{ icon }}px;display:block;flex:0 0 auto">
+  <span>Special</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:220,&quot;height&quot;:80},&quot;size&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;L&quot;,&quot;M&quot;,&quot;S&quot;],&quot;default&quot;:&quot;L&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const SZ = { L: { h: 60, fs: 34, icon: 36, padL: 14, padR: 24, gap: 8 }, M: { h: 52, fs: 32, icon: 32, padL: 12, padR: 20, gap: 8 }, S: { h: 44, fs: 26, icon: 26, padL: 10, padR: 16, gap: 6 } };
+class Component extends DCLogic {
+  renderVals() { const size = SZ[this.props.size] ? this.props.size : 'L', z = SZ[size]; return { size, ...z, r: z.h / 2 }; }
+}
+</script>
+</body>
+</html>

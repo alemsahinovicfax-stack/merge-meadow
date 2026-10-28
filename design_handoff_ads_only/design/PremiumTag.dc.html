@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div style="box-sizing:border-box;padding:96px;display:flex;flex-direction:column;gap:64px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0;width:2400px">
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:1800px">
+    <div style="font:900 72px/1.05 Nunito,system-ui,sans-serif">D · Jedna oznaka „Special" — za coine</div>
+    <div style="font:700 34px/1.4 Nunito,system-ui,sans-serif;color:#E6DCEB;text-wrap:pretty">Riječ „Premium" i ljubičasta u v1 nestaju: obje su govorile „pravi novac". Nova oznaka: <b>zvjezdica + „Special"</b> na nebo-plavoj <b>#C2E2FA</b> (iz Seasons palete, kontrast teksta #2D3436 = 11 : 1). Jedna oznaka, jedna boja, četiri mjesta. Ljubičasta <b>MONEY #D4A5FF</b> ostaje rezervisana samo za € dugme kad se IAP vrati — nikad za oznaku.</div>
+  </div>
+
+  <div style="display:flex;gap:64px;align-items:flex-start;flex-wrap:wrap">
+    <div style="box-sizing:border-box;padding:48px;border-radius:32px;background:#FBEDD7;border:4px solid #2D3436;color:#2D3436;display:flex;flex-direction:column;gap:32px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Veličine</div>
+      <sc-for list="{{ sizes }}" as="z" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:32px">
+          <div style="width:240px"><dc-import name="SpecialTag" size="{{ z.id }}" hint-size="200px,60px"></dc-import></div>
+          <span style="font:800 26px/1.3 ui-monospace,Menlo,monospace;color:#555C5E;white-space:pre">{{ z.cap }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="box-sizing:border-box;padding:48px;border-radius:32px;background:#FBEDD7;border:4px solid #2D3436;color:#2D3436;display:flex;flex-direction:column;gap:28px;width:1100px">
+      <div style="font:900 40px/1 Nunito,system-ui,sans-serif">Prije → poslije</div>
+      <sc-for list="{{ swaps }}" as="s" hint-placeholder-count="4">
+        <div style="display:grid;grid-template-columns:230px 470px minmax(0,1fr);gap:24px;align-items:center">
+          <span style="font:900 32px/1.1 Nunito,system-ui,sans-serif">{{ s.where }}</span>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="height:52px;box-sizing:border-box;padding:0 20px;border-radius:{{ s.oldR }}px;background:{{ s.oldBg }};border:3px solid #2D3436;display:flex;align-items:center;font:900 28px/1 Nunito,system-ui,sans-serif;color:#2D3436;text-decoration:line-through;flex:0 0 auto">{{ s.old }}</div>
+            <span style="font:900 36px/1 Nunito,system-ui,sans-serif">→</span>
+            <sc-if value="{{ s.isTag }}" hint-placeholder-val="{{ true }}">
+              <dc-import name="SpecialTag" size="{{ s.size }}" hint-size="180px,52px"></dc-import>
+            </sc-if>
+            <sc-if value="{{ s.isTab }}" hint-placeholder-val="{{ false }}">
+              <div style="height:60px;box-sizing:border-box;padding:0 24px 0 14px;border-radius:30px;background:#C2E2FA;border:3px solid #2D3436;display:flex;align-items:center;gap:10px;font:900 32px/1 Nunito,system-ui,sans-serif;color:#2D3436;flex:0 0 auto"><img src="icons/icon_special.svg" alt="" style="width:36px;height:36px">Themes</div>
+            </sc-if>
+          </div>
+          <span style="font:700 26px/1.35 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">{{ s.note }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:24px">
+    <div style="font:900 44px/1 Nunito,system-ui,sans-serif">Na mjestu</div>
+    <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <span style="font:900 30px/1 Nunito,system-ui,sans-serif">Home · tab Themes</span>
+        <div style="width:1032px;height:124px;border-radius:62px;background:rgba(255,248,240,.85);position:relative">
+          <div style="position:absolute;left:8px;top:8px;width:508px;height:108px;display:flex;align-items:center;justify-content:center;gap:16px;font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436"><img src="icons/icon_seed.svg" alt="" style="width:56px;height:56px">Journey</div>
+          <div style="position:absolute;left:516px;top:14px;width:508px;height:108px;border-radius:54px;background:rgba(26,26,20,.22)"></div>
+          <div style="position:absolute;left:516px;top:8px;width:508px;height:108px;box-sizing:border-box;border-radius:54px;border:3px solid #2D3436;background:#C2E2FA;display:flex;align-items:center;justify-content:center;gap:16px;font:900 46px/1 Nunito,system-ui,sans-serif;color:#2D3436"><img src="icons/icon_special.svg" alt="" style="width:56px;height:56px">Themes</div>
+        </div>
+        <span style="font:700 24px/1.3 Nunito,system-ui,sans-serif;color:#C9BED0">tab = ista zvjezdica + ista boja kao oznaka (bez riječi „Special")</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <span style="font:900 30px/1 Nunito,system-ui,sans-serif">Ormar · kartica Sir Pip</span>
+        <div style="position:relative;width:300px;height:380px">
+          <div style="position:absolute;left:0;top:8px;width:300px;height:380px;border-radius:32px;background:rgba(26,26,20,.22)"></div>
+          <div style="position:absolute;inset:0;box-sizing:border-box;border-radius:32px;background:#FFFFFF;border:4px solid #2D3436;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:28px;gap:12px">
+            <img src="icons/pip_hud_knight.svg" alt="" style="width:180px;height:180px">
+            <span style="font:900 38px/1 Nunito,system-ui,sans-serif;color:#2D3436">Sir Pip</span>
+            <div style="display:flex;align-items:center;gap:8px;font:900 32px/1 Nunito,system-ui,sans-serif;color:#555C5E"><img src="icons/icon_coin.svg" alt="" style="width:36px;height:36px">3,000</div>
+          </div>
+          <div style="position:absolute;left:16px;top:16px"><dc-import name="SpecialTag" size="S" hint-size="140px,44px"></dc-import></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <span style="font:900 30px/1 Nunito,system-ui,sans-serif">Shop · Camp</span>
+        <span style="font:700 26px/1.4 Nunito,system-ui,sans-serif;color:#E6DCEB;max-width:520px;text-wrap:pretty">Vidi <a href="ShopCoins.dc.html">ShopCoins</a> (Sir Pip, L 60 lijevo-gore na slici) i <a href="CampTheme.dc.html">CampTheme</a> (M 52 iznad „6 new flowers").</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="box-sizing:border-box;padding:40px 48px;border-radius:32px;background:#FFF8F0;border:4px solid #2D3436;color:#2D3436;display:flex;flex-direction:column;gap:14px;font:700 30px/1.45 Nunito,system-ui,sans-serif;max-width:1800px">
+    <div style="font:900 36px/1 Nunito,system-ui,sans-serif">Odluka o ljubičastoj MONEY</div>
+    <div>• v1: <b>nigdje</b>. Nijedna oznaka, tab, okvir ni dugme ne koristi #D4A5FF.</div>
+    <div>• IAP režim: <b>samo</b> lice € dugmeta (PriceButton state „eur"). Oznaka ostaje „Special" plava — sadržaj je isti, mijenja se samo način plaćanja.</div>
+    <div>• Konstanta <span style="font-family:ui-monospace,Menlo,monospace">MONEY</span> u ui_shop_v2.gd ostaje; čita je samo <span style="font-family:ui-monospace,Menlo,monospace">button_style("eur")</span>.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      sizes: [
+        { id: 'L', cap: 'L · h 60 · font 34 · ikona 36\nShop Sir Pip (na slici)' },
+        { id: 'M', cap: 'M · h 52 · font 32 · ikona 32\nCamp kartica teme' },
+        { id: 'S', cap: 'S · h 44 · font 26 · ikona 26\nOrmar (item_card)' }
+      ],
+      swaps: [
+        { where: 'Shop · Sir Pip', old: 'Premium', oldBg: '#D4A5FF', oldR: 26, size: 'L', note: 'Ljubičasta „Premium" pločica → Special L.' },
+        { where: 'Camp · tema', old: 'PREMIUM', oldBg: '#FFD56B', oldR: 12, size: 'M', note: 'Žuta (bila je ista kao cijena) → Special M.' },
+        { where: 'Ormar', old: 'Premium', oldBg: '#D4A5FF', oldR: 22, size: 'S', note: 'Pip izgledi za coine → Special S.' },
+        { where: 'Home · tab', old: 'Premium', oldBg: '#FFF8F0', oldR: 26, size: 'M', note: 'Tab postaje „Themes": samo zvjezdica + plava podloga, bez riječi „Special".' }
+      ].map(s => ({ ...s, isTab: s.where === 'Home · tab', isTag: s.where !== 'Home · tab' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -359,7 +359,8 @@ func _run() -> void:
 	await _settle(stage)
 	if str(stage.call("current_tab")) != "premium" or str(stage.call("viewed_id")) != "moonlit_warren":
 		_fail("Premium tab should open on Moonlit Warren"); return
-	if str(stage.call("card_status")) != "buy" or (content.call("part_rect", PART_BUY) as Rect2).size.y < 139.0:
+	# Cijena teme = UiCoinPrice L 360 x 132 (design_handoff_ads_only).
+	if str(stage.call("card_status")) != "buy" or (content.call("part_rect", PART_BUY) as Rect2).size != Vector2(360, 132):
 		_fail("Moonlit: price button"); return
 	# Runda 3: premium se kupuje, pa pokazuje sta se kupuje — sest cvjetova u
 	# boji, bez vela i bez katanca (zlato kaze „nije tvoje").

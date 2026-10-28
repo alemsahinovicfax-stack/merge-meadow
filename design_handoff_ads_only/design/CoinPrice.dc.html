@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#1A1420}a{color:#FFB88C}a:hover{color:#FFF8F0}</style>
+</helmet>
+<div data-screen-label="CoinPrice" style="width:2600px;box-sizing:border-box;padding:96px;display:flex;flex-direction:column;gap:72px;font-family:Nunito,system-ui,sans-serif;color:#FFF8F0">
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:1700px">
+    <div style="font:900 72px/1.05 Nunito,system-ui,sans-serif">C · Jedan sistem coin cijene — Shop, Home, Camp</div>
+    <div style="font:700 34px/1.4 Nunito,system-ui,sans-serif;color:#E6DCEB;text-wrap:pretty">Jedno dugme, tri veličine. Širina je fiksna po veličini i ne mijenja se ni u jednom stanju — potvrda samo zamijeni novčić SVG kvačicom iste veličine i doda traku od 3 s (+0 px). Broj uvijek kroz <span style="font-family:ui-monospace,Menlo,monospace">UiChrome.format_count</span>: „10,000", kao header.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:0;border-radius:32px;overflow:hidden;border:4px solid #2D3436;background:#FBEDD7;color:#2D3436;width:max-content">
+    <div style="display:grid;grid-template-columns:420px 440px 460px 500px;background:#2D3436;color:#FFF8F0">
+      <div style="padding:28px 32px;font:900 34px/1 Nunito,system-ui,sans-serif">Stanje</div>
+      <div style="padding:28px 32px;display:flex;flex-direction:column;gap:8px"><span style="font:900 34px/1 Nunito,system-ui,sans-serif">S · 300 × 120</span><span style="font:800 24px/1 ui-monospace,Menlo,monospace;color:#C9BED0">Camp · Shop tema · 44 px</span></div>
+      <div style="padding:28px 32px;display:flex;flex-direction:column;gap:8px"><span style="font:900 34px/1 Nunito,system-ui,sans-serif">M · 320 × 120</span><span style="font:800 24px/1 ui-monospace,Menlo,monospace;color:#C9BED0">Shop Looks · Boosters · 52 px</span></div>
+      <div style="padding:28px 32px;display:flex;flex-direction:column;gap:8px"><span style="font:900 34px/1 Nunito,system-ui,sans-serif">L · 360 × 132</span><span style="font:800 24px/1 ui-monospace,Menlo,monospace;color:#C9BED0">Home kartica teme · 56 px</span></div>
+    </div>
+    <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+      <div style="display:grid;grid-template-columns:420px 440px 460px 500px;border-top:3px solid rgba(45,52,54,.18);background:{{ r.bg }}">
+        <div style="padding:28px 32px;display:flex;flex-direction:column;gap:10px;justify-content:center">
+          <span style="font:900 36px/1.1 Nunito,system-ui,sans-serif">{{ r.title }}</span>
+          <span style="font:700 26px/1.35 Nunito,system-ui,sans-serif;color:#555C5E;text-wrap:pretty">{{ r.note }}</span>
+        </div>
+        <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="3">
+          <div style="position:relative;display:flex;align-items:center;justify-content:center;padding:{{ r.padTop }}px 24px 36px">
+            <div style="position:relative">
+              <sc-if value="{{ r.need }}" hint-placeholder-val="{{ false }}">
+                <div data-layer="NeedBubble" style="position:absolute;right:0;bottom:142px;height:64px;box-sizing:border-box;padding:0 26px;border-radius:32px;background:#FFE8B8;border:3px solid #2D3436;box-shadow:0 4px 0 rgba(26,26,20,.22);display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">Need 5,800 more coins<div style="position:absolute;right:{{ c.tail }}px;bottom:-14px;width:22px;height:22px;box-sizing:border-box;background:#FFE8B8;border-right:3px solid #2D3436;border-bottom:3px solid #2D3436;transform:rotate(45deg)"></div></div>
+              </sc-if>
+              <dc-import name="PriceButton" size="{{ c.size }}" price="{{ r.price }}" wallet="{{ r.wallet }}" force="{{ r.force }}" owned-as="{{ r.ownedAs }}" eur="{{ r.eur }}" mode="{{ r.mode }}" hint-size="320px,128px"></dc-import>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;gap:72px;flex-wrap:wrap;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:24px;width:1200px">
+      <div style="font:900 44px/1 Nunito,system-ui,sans-serif">Živo — tapni (dva tapa, drhtaj, „Need N")</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <sc-for list="{{ walletBtns }}" as="b" hint-placeholder-count="2">
+          <div onClick="{{ b.onTap }}" style="height:72px;box-sizing:border-box;padding:0 28px;border-radius:36px;border:3px solid #FFF8F0;display:flex;align-items:center;font:900 30px/1 Nunito,system-ui,sans-serif;cursor:pointer;background:{{ b.bg }};color:{{ b.ink }}">{{ b.label }}</div>
+        </sc-for>
+        <div onClick="{{ toggleSlow }}" style="height:72px;box-sizing:border-box;padding:0 28px;border-radius:36px;border:3px solid #FFF8F0;display:flex;align-items:center;font:900 30px/1 Nunito,system-ui,sans-serif;cursor:pointer;background:{{ slowBg }};color:{{ slowInk }}">usporeno ×4</div>
+        <div onClick="{{ reset }}" style="height:72px;box-sizing:border-box;padding:0 28px;border-radius:36px;border:3px solid #FFF8F0;display:flex;align-items:center;font:900 30px/1 Nunito,system-ui,sans-serif;cursor:pointer">reset</div>
+      </div>
+      <div style="width:1080px;border-radius:28px;overflow:hidden;border:4px solid #2D3436;background:#FBEDD7">
+        <dc-import name="HubHeader" coins="{{ wallet }}" pulse-key="{{ pulse }}" slow="{{ slow }}" hint-size="1080px,143px"></dc-import>
+        <div style="display:flex;justify-content:space-around;align-items:flex-end;padding:150px 24px 48px">
+          <sc-for list="{{ live }}" as="l" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:20px">
+              <div style="position:relative">
+                <sc-if value="{{ l.need }}" hint-placeholder-val="{{ false }}">
+                  <div data-layer="NeedBubble" style="position:absolute;right:{{ l.bubbleR }}px;bottom:142px;height:64px;box-sizing:border-box;padding:0 26px;border-radius:32px;background:#FFE8B8;border:3px solid #2D3436;box-shadow:0 4px 0 rgba(26,26,20,.22);display:flex;align-items:center;font:900 34px/1 Nunito,system-ui,sans-serif;color:#2D3436;white-space:nowrap">{{ l.needText }}<div style="position:absolute;right:{{ l.tail }}px;bottom:-14px;width:22px;height:22px;box-sizing:border-box;background:#FFE8B8;border-right:3px solid #2D3436;border-bottom:3px solid #2D3436;transform:rotate(45deg)"></div></div>
+                </sc-if>
+                <dc-import name="PriceButton" size="{{ l.size }}" price="{{ l.price }}" wallet="{{ wallet }}" owned="{{ l.owned }}" owned-as="{{ l.ownedAs }}" slow="{{ slow }}" reset-key="{{ resetKey }}" on-short="{{ l.onShort }}" on-buy="{{ l.onBuy }}" hint-size="320px,128px"></dc-import>
+              </div>
+              <span style="font:800 26px/1 ui-monospace,Menlo,monospace;color:#555C5E">{{ l.cap }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:24px;width:1200px">
+      <div style="font:900 44px/1 Nunito,system-ui,sans-serif">4 cifre i 5 cifara u S (najmanja)</div>
+      <div style="box-sizing:border-box;padding:40px;border-radius:28px;background:#FBEDD7;border:4px solid #2D3436;display:grid;grid-template-columns:repeat(2,max-content);gap:32px 40px">
+        <sc-for list="{{ digits }}" as="d" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:20px">
+            <dc-import name="PriceButton" size="S" price="{{ d.p }}" wallet="{{ 12000 }}" force="{{ d.f }}" hint-size="300px,128px"></dc-import>
+            <span style="font:800 24px/1.3 ui-monospace,Menlo,monospace;color:#555C5E;white-space:pre">{{ d.cap }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="box-sizing:border-box;padding:32px 36px;border-radius:28px;background:#FFF8F0;border:4px solid #2D3436;color:#2D3436;display:flex;flex-direction:column;gap:14px;font:700 30px/1.45 Nunito,system-ui,sans-serif">
+        <div style="font:900 34px/1 Nunito,system-ui,sans-serif">Pravila</div>
+        <div>• <b>Fali</b>: krem #F1EAE0, rub ink 35 %, bez sjene, spušteno 8 px — „još ne", a cijena ostaje čitljiva (#555C5E, 6,5 : 1). Tap: drhtaj 0,32 s + puls coin čipa 0,3 s + oblačić.</div>
+        <div>• <b>„Need N more coins"</b>: oblačić #FFE8B8 h 64 iznad dugmeta, desno poravnat, rep na sredini dugmeta. Isti na Shopu, Homeu i u Campu (zamjenjuje toast), živi 1,6 s.</div>
+        <div>• <b>Potvrda</b>: ink pozadina, zlatna SVG kvačica <span style="font-family:ui-monospace,Menlo,monospace">check_confirm.svg</span> na mjestu novčića, traka 8 px se skuplja 3 s (scaleX). Širina +0 px.</div>
+        <div>• <b>Kupuje se</b>: 0,6 s — pop 0,22 s + prsten (1 sprite), pa mint „✓ Yours" / ▶ Play.</div>
+        <div>• <b>IAP</b>: ista geometrija, ljubičasta MONEY #D4A5FF i € tekst — samo kad je IAP uključen.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const fmt = n => String(Math.round(+n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const SIZES = ['S', 'M', 'L'];
+const BW = { S: 300, M: 320, L: 360 };
+class Component extends DCLogic {
+  state = { wallet: 4200, slow: false, pulse: 0, need: {}, owned: {}, resetKey: 0 };
+  timers = {};
+  componentWillUnmount() { Object.values(this.timers).forEach(clearTimeout); }
+  showNeed(id) {
+    this.setState(s => ({ pulse: s.pulse + 1, need: { ...s.need, [id]: true } }));
+    clearTimeout(this.timers[id]);
+    this.timers[id] = setTimeout(() => this.setState(s => ({ need: { ...s.need, [id]: false } })), 1600 * (this.state.slow ? 4 : 1));
+  }
+  renderVals() {
+    const s = this.state;
+    const R = [
+      { title: 'Može se kupiti', note: 'Zlatno #FFD56B, rub 4, sjena 0 8 0.', force: 'buy', price: 10000 },
+      { title: 'Fali coina', note: 'Krem, spušteno, cijena se i dalje čita.', force: 'short', price: 10000 },
+      { title: '„Need N more coins"', note: 'Prvi tap kad fali: drhtaj + oblačić 1,6 s.', force: 'short', price: 10000, need: true },
+      { title: 'Potvrda (3 s)', note: 'SVG kvačica umjesto novčića, traka 3 s. +0 px.', force: 'confirm', price: 10000 },
+      { title: 'Kupuje se (0,6 s)', note: 'Pop + prsten, pa kupljeno.', force: 'buying', price: 10000 },
+      { title: 'Kupljeno · Shop tema', note: '▶ Play (peach). Home kartica: „✓ Yours" — Play je veliko dugme ispod.', force: 'owned', ownedAs: 'play', price: 10000 },
+      { title: 'Kupljeno · izgled / booster', note: 'Mint „✓ Yours" / „✓ Wearing".', force: 'owned', ownedAs: 'yours', price: 3000 },
+      { title: 'IAP režim (kasnije)', note: 'Ista geometrija, MONEY #D4A5FF, € cijena.', force: 'eur', mode: 'eur', eur: '€2.99', price: 10000 }
+    ];
+    const rows = R.map((r, i) => ({
+      ...r, wallet: r.force === 'short' ? 4200 : 12000, ownedAs: r.ownedAs || 'play', mode: r.mode || 'coins', eur: r.eur || '',
+      need: !!r.need, padTop: r.need ? 120 : 36, bg: i % 2 ? '#F7E4C8' : '#FBEDD7',
+      cells: SIZES.map(z => ({ size: z, tail: BW[z] / 2 - 11 }))
+    }));
+    const LIVE = [['S', 10000, 'S · tema (Shop/Camp)', 'play'], ['M', 3000, 'M · Sir Pip', 'wearing'], ['L', 10000, 'L · Home tema', 'yours']];
+    const k = s.slow ? 4 : 1;
+    return {
+      rows, wallet: s.wallet, pulse: s.pulse, slow: k, resetKey: s.resetKey,
+      slowBg: s.slow ? '#FFB88C' : 'transparent', slowInk: s.slow ? '#2D3436' : '#FFF8F0',
+      toggleSlow: () => this.setState({ slow: !s.slow }),
+      reset: () => this.setState(st => ({ owned: {}, need: {}, resetKey: st.resetKey + 1, wallet: st.wallet })),
+      walletBtns: [4200, 12000].map(w => ({ label: 'wallet ' + fmt(w), bg: s.wallet === w ? '#FFB88C' : 'transparent', ink: s.wallet === w ? '#2D3436' : '#FFF8F0', onTap: () => this.setState({ wallet: w, resetKey: s.resetKey + 1 }) })),
+      live: LIVE.map(([z, p, cap, oa], i) => ({
+        size: z, price: p, cap, ownedAs: oa, owned: !!s.owned[i], need: !!s.need[i],
+        needText: 'Need ' + fmt(Math.max(1, p - s.wallet)) + ' more coins', bubbleR: z === 'S' ? -60 : 0, tail: BW[z] / 2 - 11 + (z === 'S' ? 60 : 0),
+        onShort: () => this.showNeed(i),
+        onBuy: () => setTimeout(() => this.setState(st => ({ wallet: st.wallet - p, owned: { ...st.owned, [i]: true } })), 600 * k)
+      })),
+      digits: [[1000, 'buy', 'Loot Burst\n1,000'], [1500, 'buy', 'Merge Hint\n1,500'], [3000, 'confirm', 'Sir Pip potvrda\n3,000'], [10000, 'confirm', 'tema potvrda\n10,000 · 44px']].map(([p, f, cap]) => ({ p, f, cap }))
+    };
+  }
+}
+</script>
+</body>
+</html>

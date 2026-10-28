@@ -50,11 +50,14 @@ const SHADOW_BUTTON_Y := 8
 const TABBAR_H := 172
 const AWNING_STRIPE_W := 60
 const AWNING_H := 160
-const TAB_X0 := 24
+## Tenda (design_handoff_ads_only · shop_tabs.json): tabovi uvijek pune unutrašnjih 1032 px s
+## razmakom 12 — širina iz broja vidljivih tabova (tab_w / tab_step / tab_x0). n = 3 → 336 / 348 /
+## 24 (v1 bez kupovina), n = 4 → 249 / 261 / 24 (= Shop v2, kad se IAP vrati).
+const TAB_INNER_X := 24
+const TAB_INNER_W := 1032
+const TAB_GAP := 12
 const TAB_Y := 10
-const TAB_W := 249
 const TAB_H := 120
-const TAB_STEP := 261
 const T_TAB := 0.2
 const TAB_SLIDE_PX := 48
 
@@ -118,15 +121,11 @@ const S_TOAST_RESTORED := "Purchases restored"
 const S_TOAST_ADS := "Ads are off"
 const S_TOAST_PACK := "Pack added"
 const S_TOAST_LOOT := "+5 %s"
-## Coin kupovina bez dovoljno coina (Shop pilula, Home i Camp toast): koliko fali.
-const S_NEED_COINS := "Need %d more coins"
-## Premium Looks kartica (design_handoff_muncher_premium_pip · shop_export.json).
-const S_PREMIUM := "Premium"
+## Coin kupovina bez dovoljno coina (NeedCoinsBubble u Shopu, na Homeu i u Campu): koliko fali.
+const S_NEED_COINS := "Need %s more coins"
 const S_TOAST_WEARS := "Pip wears %s"
+## Oznaka „Special" L na slici Sir Pipa (design_handoff_ads_only · premium_tag.json).
 const PREMIUM_TAG_POS := Vector2(20, 20)
-const PREMIUM_TAG_H := 60.0
-const PREMIUM_TAG_PX := 34
-const PREMIUM_TAG_PAD_X := 24.0
 
 const TABS: Array[String] = ["seasons", "looks", "boosters", "support"]
 
@@ -140,6 +139,19 @@ static func visible_tabs() -> Array[String]:
 	var out: Array[String] = ["seasons", "looks", "boosters"]
 	return out
 const TAB_LABELS: Array[String] = ["Seasons", "Looks", "Boosters", "Support"]
+
+
+static func tab_w(n: int = visible_tabs().size()) -> int:
+	return floori(float(TAB_INNER_W - TAB_GAP * (n - 1)) / float(maxi(1, n)))
+
+
+static func tab_step(n: int = visible_tabs().size()) -> int:
+	return tab_w(n) + TAB_GAP
+
+
+## Ostatak deljenja (do n − 1 px) ide pola lijevo, pola desno.
+static func tab_x0(n: int = visible_tabs().size()) -> int:
+	return TAB_INNER_X + roundi(float(TAB_INNER_W - n * tab_w(n) - (n - 1) * TAB_GAP) * 0.5)
 
 # --- Stanja dugmeta ---
 const COINS_BUY := "coins.buy"
@@ -195,9 +207,9 @@ static func coin_state(sku: String, confirm_id: String) -> String:
 	return COINS_SHORT_STATE
 
 
-## „Need N more coins" — N = koliko fali do cijene (barem 1).
+## „Need N more coins" — N = koliko fali do cijene (barem 1), formatirano kao header („5,800").
 static func need_coins_text(price: int) -> String:
-	return S_NEED_COINS % maxi(1, price - int(GameState.wallet_coins))
+	return S_NEED_COINS % UiChrome.format_count(maxi(1, price - int(GameState.wallet_coins)))
 
 
 static func season_state(def: SeasonDef, busy_sku: String, pending: bool, restoring: bool, confirm_id: String = "") -> String:

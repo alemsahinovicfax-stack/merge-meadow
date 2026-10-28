@@ -62,7 +62,7 @@ func setup(p_booster_id: String) -> void:
 		_visual.add_child(badge)
 	else:
 		_visual.add_child(over)
-	_make_buy()
+	_make_buy(UiCoinPrice.M)
 	buy.clicked.connect(_on_buy)
 	buy.short_tapped.connect(func() -> void: coin_short.emit(sku))
 

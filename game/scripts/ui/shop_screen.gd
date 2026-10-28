@@ -43,6 +43,9 @@ var _support_cards: Dictionary = {}
 var _boosters_end: Control
 var _restore: _RestoreLink
 var _toast: _Toast
+## „Need N more coins" iznad dugmeta (jedan po ekranu) i kartica kojoj trenutno pripada.
+var _need_bubble: NeedCoinsBubble
+var _need_card: ShopCard
 var _entry_override: String = ""
 var _entry_override_slot: String = ""
 var _entry_override_item: String = ""
@@ -99,6 +102,9 @@ func _build() -> void:
 	_toast.position = TOAST_RECT.position
 	_toast.size = TOAST_RECT.size
 	add_child(_toast)
+	_need_bubble = NeedCoinsBubble.new()
+	_need_bubble.z_index = TAB_BAR_Z + 1
+	add_child(_need_bubble)
 	_show_page(_tab, false)
 	if _hub_embedded and is_inside_tree():
 		get_tree().process_frame.connect(_build_next_step)
@@ -497,7 +503,7 @@ func _on_cosmetic_buy_confirmed(item_id: String) -> void:
 		card.show_status(UiShopV2.S_FAILED, UiShopV2.STATUS_FAIL_BG)
 
 
-## Kupljen premium skin: tap na „✓ Owned" ga obuče (toast kao u Ormaru).
+## Kupljen premium skin: tap na „✓ Yours" ga obuče (toast kao u Ormaru).
 func _on_premium_wear(item_id: String) -> void:
 	if not GameState.owns_cosmetic(item_id):
 		return
@@ -515,7 +521,8 @@ func _on_cosmetic_short(item_id: String) -> void:
 	_short_feedback(_cosmetic_cards.get(item_id) as ShopCard, CosmeticCatalog.get_coin_cost(item_id))
 
 
-## coins.short: dugme već drhti (ShopBuyButton); coin čip pulsira, a kartica kaže koliko fali.
+## coins.short: dugme već drhti (ShopBuyButton); coin čip pulsira, a oblačić iznad dugmeta kaže
+## koliko fali (1,6 s).
 func _short_feedback(card: ShopCard, price: int) -> void:
 	_cancel_confirm()
 	if is_inside_tree():
@@ -524,27 +531,32 @@ func _short_feedback(card: ShopCard, price: int) -> void:
 
 
 func _show_need(card: ShopCard, price: int) -> void:
-	if card != null and price > 0:
-		card.show_status(UiShopV2.need_coins_text(price), UiShopV2.STATUS_PENDING_BG)
-
-
-## Pilula „Need N more coins" živi dok je kartica u coins.short (broj prati coine); čim ih ima
-## dovoljno, nestaje.
-func _sync_need_pill(card: ShopCard, price: int) -> void:
-	if not card.get_status_text().begins_with("Need"):
+	if card == null or price <= 0 or card.buy == null or _need_bubble == null:
 		return
-	if card.get_state() == UiShopV2.COINS_SHORT_STATE:
-		_show_need(card, price)
-	else:
-		card.clear_status()
+	_need_card = card
+	var face := Rect2(card.buy.get_global_rect().position, UiCoinPrice.button_size(card.buy.size_key))
+	if card.buy.size_key.is_empty():
+		face.size = Vector2(card.buy.size.x, float(UiShopV2.BUTTON_H))
+	_need_bubble.show_need(UiShopV2.need_coins_text(price), get_global_transform().affine_inverse() * face)
+
+
+## Oblačić pripada kartici dok je u coins.short; čim coina ima dovoljno, nestaje.
+func _sync_need_pill(card: ShopCard, _price: int) -> void:
+	if card != _need_card or _need_bubble == null or not _need_bubble.visible:
+		return
+	if card.get_state() != UiShopV2.COINS_SHORT_STATE:
+		_clear_need_pills()
 
 
 func _clear_need_pills() -> void:
-	for cards in [_cosmetic_cards, _premium_cards, _season_cards, _booster_cards]:
-		for key in cards:
-			var card := cards[key] as ShopCard
-			if card.get_status_text().begins_with("Need"):
-				card.clear_status()
+	_need_card = null
+	if _need_bubble != null:
+		_need_bubble.hide_now()
+
+
+## Tekst oblačića „Need N more coins" dok se vidi (testovi).
+func get_need_text() -> String:
+	return _need_bubble.get_text() if _need_bubble != null else ""
 
 
 # --- coin ponude (v1 bez kupovina pravim novcem) ---
