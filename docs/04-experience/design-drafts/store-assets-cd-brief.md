@@ -16,7 +16,7 @@ ai_sažetak: "Brief za Claude Design: kompletan Play Store paket za Merge Meadow
 
 # Play Store paket · Claude Design brief
 
-> **Status 2026-10-28: spremno za slanje.** Kadrovi: `store-assets-ref/` (s01–s17). Prompt je u §9.
+> **Status 2026-10-29: ZATVORENO.** CD round 3 prihvaćen i prenesen u `marketing/store/` — izvještaj [[store-assets-izvjestaj]]. (2026-10-28: spremno za slanje; kadrovi `store-assets-ref/` s01–s17 + s05b; prompt u §9.)
 >
 > **Prije slanja: commitaj i pushaj na `master`.** CD čita repo samo po tačnim putanjama s mastera.
 

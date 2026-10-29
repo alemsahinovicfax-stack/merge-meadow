@@ -62,7 +62,7 @@ Kopiraj iz [[store-listing-en|store-listing-en]]:
 | Short description | store-listing-en § Google Play |
 | Full description | store-listing-en § Full description |
 | App icon | 512×512 PNG *(TODO asset)* |
-| Feature graphic | 1024×500 *(TODO asset)* |
+| Feature graphic | `marketing/store/feature-graphic.png` (1024×500) |
 | Phone screenshots | Upload `01`–`08` iz `marketing/store/screenshots/` |
 
 ### 4. App content (obavezno prije publish)

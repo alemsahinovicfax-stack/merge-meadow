@@ -1,6 +1,6 @@
 ---
 type: produkcija
-status: aktivan
+status: zatvoreno
 milestone: M8
 tags: [produkcija, launch, store, screenshots, marketing]
 povezano:
@@ -12,7 +12,22 @@ ai_sažetak: "8 screenshotova portrait 1080×1920 — redoslijed, caption overla
 
 # Store screenshots — plan i capture
 
-> **2026-10-28:** zamijenjeno s [[../04-experience/design-drafts/store-assets-cd-brief|store-assets-cd-brief]] — kadrovi iz igre snima `game/scripts/dev/store_capture.gd` (bez emulatora), CD radi okvire i naslove. Redoslijed ispod je stari.
+> **2026-10-29 — GOTOVO.** Finalnih 8 screenshotova (Claude Design round 3) je u `marketing/store/screenshots/`:
+>
+> | # | Fajl | Naslov |
+> |---|---|---|
+> | 1 | `01_run_merge_bloom.png` | Run. Merge. Bloom. |
+> | 2 | `02_merge_two_of_a_kind.png` | Merge two of a kind |
+> | 3 | `03_watch_your_meadow_grow.png` | Watch your meadow grow |
+> | 4 | `04_seven_meadows.png` | 7 meadows to explore |
+> | 5 | `05_140_levels.png` | 140 levels to bloom |
+> | 6 | `06_beat_your_best.png` | Beat your best |
+> | 7 | `07_loot_every_run.png` | Loot after every run |
+> | 8 | `08_no_energy_no_timers.png` | No energy. No timers. |
+>
+> Sirovi kadrovi: `docs/04-experience/design-drafts/store-assets-ref/` (snima `game/scripts/dev/store_capture.gd`). Izmjena naslova: `marketing/store/design/source/Store Assets v3.dc.html`. Brief: [[../04-experience/design-drafts/store-assets-cd-brief|store-assets-cd-brief]].
+>
+> **Sve ispod je stari plan (emulator, 2026-07) — samo historija.**
 >
 > **Output folder:** `marketing/store/screenshots/`  
 > **Format:** PNG, **1080×1920** (portrait, 9:16)

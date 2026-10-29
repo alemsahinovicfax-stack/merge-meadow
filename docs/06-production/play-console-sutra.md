@@ -53,7 +53,7 @@ ai_sažetak: "Gotovi odgovori za Play Console (Data safety, IARC, ciljna publika
 | Politika privatnosti | `https://alemsahinovicfax-stack.github.io/merge-meadow/` |
 | Play App Signing | **Uključeno** (Google drži ključ aplikacije; ti uploaduješ s upload ključem iz `game/export_credentials/`) |
 
-Store tekst i 8 screenshotova: [[store-listing-en|store-listing-en]], `marketing/store/screenshots/`. Store ikona 512×512: `marketing/store/app-icon-512.png`. **Feature graphic 1024×500 još ne postoji** — Play ga traži za listing.
+Store tekst i 8 screenshotova: [[store-listing-en|store-listing-en]], `marketing/store/screenshots/`. Store ikona 512×512: `marketing/store/app-icon-512.png`. Feature graphic 1024×500: `marketing/store/feature-graphic.png` (tamna rezerva `feature-graphic-dark.png`). Sve od Claude Designa, 2026-10-29.
 
 ## 2. App content → Ads i Advertising ID
 

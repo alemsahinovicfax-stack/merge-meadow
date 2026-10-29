@@ -9,6 +9,14 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-10-29
+
+- **STORE-CD — Play Store paket u projektu** (na zahtjev; izvještaj `04-experience/design-drafts/store-assets-izvjestaj.md`):
+  - Claude Design, 3 kruga: hook **Run. Merge. Bloom.**, feature graphic svijetla (Country Bloom) i tamna (Starfall), 8 screenshotova 1080×1920 iz pravih kadrova, promo 1200×630, „hero Pip" (cijeli zec s kristalnim cvijetom, samo za marketing), nova ikona.
+  - `marketing/store/`: `app-icon-512.png`, `feature-graphic.png` (+ `-dark`), `promo-1200x630.png`, `screenshots/01_…08_`; stari emulator screenshoti (07-2026) obrisani; CD izvor i pregled u `design/`.
+  - **Ikona u igri:** `make_app_icons.gd` čita CD mastere (`marketing/store/design/source/icon/`) — 512 i adaptivni fg / bg / mono 1:1, 192 i splash značka izvedeni. Release AAB 68,9 MB s novom ikonom.
+  - `store-listing-en.md` prepisan (7 livada, 140 levela, Endless, bez kupovina; nema više „100 levels" ni Easy / Normal / Hard), `store-screenshots.md` zatvoren, `play-console-sutra` / `play-internal-test` / `launch-prep-plan` upućuju na nove fajlove.
+
 ## 2026-10-28
 
 - **CD-ADS — paket `design_handoff_ads_only` u igri** (na zahtjev; izvještaj `04-experience/design-drafts/ads-only-prenos-izvjestaj.md`):

@@ -1,0 +1,34 @@
+{
+ "builder": "build_hero_pip_v3.js",
+ "variants": {
+  "hero_pip_crystal_peony": {},
+  "hero_pip_nova_bloom": {
+   "flower": "sprites/nova_bloom_t3.svg",
+   "stemInk": "#1C1534",
+   "stemFill": "#6D9FA6",
+   "glow": "#F3D9FF"
+  },
+  "hero_pip_crystal_peony_disc": {
+   "disc": true,
+   "viewBox": [
+    -84,
+    -290,
+    300,
+    302
+   ]
+  },
+  "hero_pip_nova_bloom_disc": {
+   "flower": "sprites/nova_bloom_t3.svg",
+   "stemInk": "#1C1534",
+   "stemFill": "#6D9FA6",
+   "glow": "#F3D9FF",
+   "disc": true,
+   "viewBox": [
+    -84,
+    -290,
+    300,
+    302
+   ]
+  }
+ }
+}
