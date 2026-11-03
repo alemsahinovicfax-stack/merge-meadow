@@ -8,6 +8,10 @@
 
 config_version=5
 
+[admob]
+
+general/android/app_id="ca-app-pub-5130939300662754~6507142440"
+
 [application]
 
 config/name="Merge Meadow"

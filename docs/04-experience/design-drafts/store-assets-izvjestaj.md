@@ -84,7 +84,7 @@ Starih 8 screenshotova s emulatora (`01-run-lane.png` … `08-collection.png`, j
 
 ## Otvoreno (tvoj dio)
 
-- [ ] **Developer name** — upiši ga u Play Console kad otvoriš nalog (u screenshotima ga nema, pa se ništa ne mora mijenjati).
+- [x] **Developer name** — Alem Šahinović (2026-11-03); upiši ga u Play Console kad otvoriš nalog (u screenshotima ga nema, pa se ništa ne mora mijenjati).
 - [ ] Upload: ikona, feature graphic, 8 screenshotova, short i full description iz `store-listing-en.md`.
 - [ ] Odluči koji banner ide: svijetli je preporuka (tamni je rezerva).
 - Ako se kasnije doda Ember Fen kao osma livada: promijeni naslov u `Store Assets v3.dc.html` („8 meadows") i exportuj artboard ponovo.

@@ -24,7 +24,7 @@ ai_sažetak: "Copy-paste EN tekst za Google Play i App Store (hook Run. Merge. B
 |-------|--------|
 | **App name** | Merge Meadow |
 | **Subtitle** (App Store, 30 znakova max) | Run. Merge. Bloom. |
-| **Developer name** | *(tvoj Play / Apple dev account)* |
+| **Developer name** | Alem Šahinović |
 | **Category** | Games → Casual |
 | **Content rating** | Everyone / PEGI 3 *(nakon upitnika)* |
 | **Privacy policy URL** | *(hostaj [[../05-technical/privacy-policy-draft\|privacy-policy-draft]] prije submita)* |
@@ -140,7 +140,7 @@ Pregled svega: otvori `marketing/store/design/store_preview.html` u browseru.
 - [x] 8 screenshot PNG (1080×1920) — `marketing/store/screenshots/` (2026-10-29)
 - [x] Feature graphic 1024×500 — `marketing/store/feature-graphic.png` (2026-10-29)
 - [x] App icon 512×512 — `marketing/store/app-icon-512.png` (2026-10-29)
-- [ ] Developer name upisan (Play Console)
+- [x] Developer name upisan (Play Console) — Alem Šahinović (2026-11-03)
 - [ ] Short + full description copy-paste iz ovog doca
 - [ ] Content rating upitnik (Play + Apple)
 

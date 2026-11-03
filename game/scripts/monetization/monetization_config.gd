@@ -53,9 +53,11 @@ const ADMOB_TEST_INTERSTITIAL_ANDROID := "ca-app-pub-3940256099942544/1033173712
 #   2) Ad units → Rewarded i Interstitial (imaju „/") → dvije konstante ispod.
 # ID-evi nisu tajni (stoje u svakom APK-u), smiju u git. Dok su prazni, i release koristi test reklame
 # (scripts/android-export.ps1 na to upozori) — za Play produkciju moraju biti popunjeni.
-const ADMOB_APP_ID_ANDROID_PROD := ""
-const ADMOB_REWARDED_ANDROID_PROD := ""
-const ADMOB_INTERSTITIAL_ANDROID_PROD := ""
+const ADMOB_APP_ID_ANDROID_PROD := "ca-app-pub-5130939300662754~6507142440"
+# AdMob ad unit „Nagrađeni" (Rewarded) — Revive, dupli plijen, ponovni loot.
+const ADMOB_REWARDED_ANDROID_PROD := "ca-app-pub-5130939300662754/7270218917"
+# AdMob ad unit „Međuprostorni" (Interstitial) — između runova.
+const ADMOB_INTERSTITIAL_ANDROID_PROD := "ca-app-pub-5130939300662754/1774736691"
 # ---------------------------------------------------------------------------------------------
 
 
