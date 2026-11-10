@@ -166,8 +166,28 @@ func _setup_world() -> void:
 	_calculate_lanes()
 	_layout_hud()
 	_setup_safe_area()
-	player.position.y = _viewport_size().y * UiRun.PLAYER_Y_RATIO
+	_place_player_y()
 	_world_ready = true
+	if not get_viewport().size_changed.is_connected(_on_viewport_resized):
+		get_viewport().size_changed.connect(_on_viewport_resized)
+
+
+func _on_viewport_resized() -> void:
+	if not _world_ready:
+		return
+	_calculate_lanes()
+	_layout_hud()
+	_setup_safe_area()
+	_place_player_y()
+
+
+func _place_player_y() -> void:
+	var view := _viewport_size()
+	var bottom := SAFE_AREA.get_insets(get_viewport()).z
+	# 0.82 of 1920 with no inset is unchanged. A gesture bar lifts the bunny off it.
+	var y := view.y * UiRun.PLAYER_Y_RATIO
+	var floor_y := view.y - bottom - 96.0
+	player.position.y = minf(y, floor_y)
 
 
 func _setup_safe_area() -> void:

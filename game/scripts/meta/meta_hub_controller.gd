@@ -62,6 +62,10 @@ func _ready() -> void:
 	swipe_pager.current_page = start
 	call_deferred("_finish_boot", start)
 	_setup_chrome()
+	if not get_viewport().size_changed.is_connected(_refresh_safe_insets):
+		get_viewport().size_changed.connect(_refresh_safe_insets)
+	# Android reports the cutout a frame after the window exists.
+	call_deferred("_refresh_safe_insets")
 	refresh_top_bar()
 
 
@@ -151,6 +155,18 @@ func _setup_nav_lock_pill() -> void:
 
 
 ## Traka se produžava u safe area (notch gore, gesture bar dolje) — bez tamne "rupe".
+## Notch / status bar grows the header; gesture bar grows the footer. The pager
+## keeps whatever height is left, so a 20:9 phone fills the screen and 16:9
+## (insets zero) stays 143 + 1633 + 144.
+func _refresh_safe_insets() -> void:
+	var next := SAFE_AREA.get_insets(get_viewport())
+	if next.is_equal_approx(_safe_insets) and top_bar_panel.has_theme_stylebox_override("panel"):
+		return
+	_safe_insets = next
+	top_bar_panel.add_theme_stylebox_override("panel", _header_style())
+	_apply_nav_lock_visuals()
+
+
 func _header_style() -> StyleBoxFlat:
 	var style := UiChrome.chrome_style(true)
 	style.content_margin_top = _safe_insets.x

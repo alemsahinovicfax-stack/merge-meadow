@@ -64,6 +64,11 @@ func _apply_companion_visual() -> void:
 				if not is_inside_tree():
 					_pip_spawning = false
 					return
+			if not UiPip.atlas_has_regions(key):
+				_use_draw_fallback = true
+				_pip_spawning = false
+				queue_redraw()
+				return
 			actor = UiPip.new()
 			actor.name = "Actor"
 			actor.view = "top"

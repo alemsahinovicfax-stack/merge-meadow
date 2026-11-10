@@ -1027,7 +1027,9 @@ func _on_back_to_camp_pressed() -> void:
 	if _gate_play_run:
 		_gate_play_run = false
 		_hide_need_more_overlay()
-		GameState.go_to_scene(GameState.SCENE_MAIN)
+		# Standalone main_menu has no hub header or tab bar, and the open field
+		# blocks swipe — the player cannot leave. Stay in the hub, on Home.
+		GameState.go_to_meta_home()
 		return
 	_end_session_to_camp()
 

@@ -9,6 +9,10 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-11-10
+
+- **Playtest na telefonu** (snimak internal testa): visok ekran više nije 16:9 s crnim trakama (expand samo kad je prozor viši od 16:9, Android `edge_to_edge`, safe area u viewport px; donji red Homea prati dno na ekranu višem od 1633). Zeko u runu se pojavi i kad pozadinski SVG atlas ne završi (glavni thread + proceduralni fallback). „Play a run" na praznoj Areni ostaje u hubu (`go_to_meta_home`) — Home više ne ostane bez headera i taba. Hint „Tap Play to start" samo dok dugme stvarno kaže Play. Pečat „Kept half" ima lijevi razmak 32 (van zaobljene kape). „Basket" → „Choose" poslije 2. vođenog runa je namjerno, nije dirano. `phone_playtest_smoke`. Katalog #61, #62.
+
 ## 2026-10-29
 
 - **STORE-CD — Play Store paket u projektu** (na zahtjev; izvještaj `04-experience/design-drafts/store-assets-izvjestaj.md`):

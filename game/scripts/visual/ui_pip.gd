@@ -236,14 +236,56 @@ static func request_atlas(key: String) -> void:
 
 
 ## true kad je atlas spreman (završen posao se ovdje preuzme); inače pokreće sljedeći u redu.
+## Worker SVG raster on Android can sit forever (ThorVG / pck read off the main
+## thread). After this, finish on the main thread so the run bunny is not only
+## the magnet ring. A finished-but-empty atlas is rebuilt once the same way.
+const ATLAS_WAIT_MSEC := 1200
+static var _job_since: Dictionary = {}
+static var _main_raster: Dictionary = {}
+## Tasks we stopped waiting on during play. _drain_jobs still joins them so a
+## late GDScript write cannot run while scripts are freed (#31).
+static var _abandoned_tasks: Array[int] = []
+
+
+static func atlas_has_regions(key: String) -> bool:
+	if not _atlas.has(key):
+		return false
+	var regions: Dictionary = _atlas[key].get("regions", {})
+	return not regions.is_empty()
+
+
 static func atlas_ready(key: String) -> bool:
 	if _atlas.has(key):
+		if atlas_has_regions(key) or bool(_main_raster.get(key, false)):
+			return true
+		_raster_on_main(key)
 		return true
 	if _jobs.has(key) and WorkerThreadPool.is_task_completed(int(_jobs[key]["task"])):
 		_finish_job(key)
+		if not atlas_has_regions(key):
+			_raster_on_main(key)
 		return true
+	if _jobs.has(key):
+		var since := int(_job_since.get(key, 0))
+		if since > 0 and Time.get_ticks_msec() - since >= ATLAS_WAIT_MSEC:
+			_raster_on_main(key)
+			return true
 	_pump_jobs()
 	return false
+
+
+## Drop a stuck worker without waiting on it, then raster here. The worker may
+## still write its own dictionary; nothing reads that after _jobs.erase.
+static func _raster_on_main(key: String) -> void:
+	data()
+	_main_raster[key] = true
+	_job_queue.erase(key)
+	if _jobs.has(key):
+		_abandoned_tasks.append(int(_jobs[key]["task"]))
+		_jobs.erase(key)
+	_job_since.erase(key)
+	_atlas.erase(key)
+	_atlas[key] = _atlas_from(_raster(key))
 
 
 static func _pump_jobs() -> void:
@@ -258,6 +300,7 @@ static func _pump_jobs() -> void:
 	var job := {}
 	job["task"] = WorkerThreadPool.add_task(func() -> void: job["raster"] = _raster(key))
 	_jobs[key] = job
+	_job_since[key] = Time.get_ticks_msec()
 	# GDScript u threadu dok se skripte gase pri izlasku = pad (exit 139): sačekaj posao.
 	var loop := Engine.get_main_loop() as SceneTree
 	if loop != null and loop.root != null and not loop.root.tree_exiting.is_connected(_drain_jobs):
@@ -266,6 +309,9 @@ static func _pump_jobs() -> void:
 
 static func _drain_jobs() -> void:
 	_job_queue.clear()
+	for task_id in _abandoned_tasks:
+		WorkerThreadPool.wait_for_task_completion(task_id)
+	_abandoned_tasks.clear()
 	for k in _jobs.keys():
 		WorkerThreadPool.wait_for_task_completion(int(_jobs[k]["task"]))
 	_jobs.clear()

@@ -923,6 +923,30 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** nova kontrola koja čita i `InputEventMouseButton` i `InputEventScreenTouch` mora preskočiti emulirani miš (ili čitati samo miš, kao `WardrobePressable`). Obrazac „pritisak postavi stanje, otpuštanje klikne ako je stanje još tu" (`_Tap` u Settingsu, `HomeV3Tabs`, `SeasonLinkCard`) ne duplira, ali i dalje dobije oba eventa.
 
+## #61 — na visokom telefonu crne trake; u runu samo magnet prsten
+
+**Datum:** 2026-11-10 (snimak s telefona, internal test)
+
+**Simptom:** na 19:9 ekranu igra je 16:9 s debelim crnim trakama. U runu se zeko ne vidi, samo isprekidani krug. Isti atlas kasni i na kartici Homea (nema Pipa na Country Bloom).
+
+**Uzrok:** `window/stretch/aspect` nije bio postavljen (default `keep` = letterbox), a Android export je imao `edge_to_edge=false` uz target SDK 36 (prozor ne ide ispod sistemskih traka). Pipov atlas se slaže u `WorkerThreadPool`; na Androidu taj posao može da ne završi, a `atlas_ready` je čekao u petlji — `UiPip` se nikad ne napravi, magnet krug (`pip_visual.gd`) se crta i bez njega. Ikona na traci napretka je zasebna uvezena tekstura, zato ona radi.
+
+**Rješenje:** kad je prozor viši od 16:9, `content_scale_aspect` prelazi na expand (širina ostaje 1080, visina raste); 16:9 i širi prozor ostaju keep, pa headless testovi i laptop ne pomjere layout. `edge_to_edge=true` na sva tri Android preseta, safe area u viewport pikselima na headeru, footeru i HUD-u runa. Donji red Homea (Play, tačke, Seasons) prati dno stranice kad je stranica viša od 1633. `atlas_ready` poslije 1,2 s (ili praznog atlasa) rasterizuje na glavnom threadu; run bez regiona crta proceduralni fallback.
+
+**Prevencija:** `phone_playtest_smoke` traži `expand`, `edge_to_edge=true` i teksturirani sprite zeke u runu.
+
+## #62 — „Play a run" na praznoj Areni otvara Home bez headera i taba
+
+**Datum:** 2026-11-10 (snimak: Run Failed → To Camp → Arena → „Play a run")
+
+**Simptom:** Home (Country Bloom, polje otvoreno) nema gornju traku ni donji nav i ne može se napustiti. Dugmad su na y iz dizajna 1461, ne ispod headera (143+1461).
+
+**Uzrok:** prazna vreća mijenja dugme modala u „Play a run", a ono zove `go_to_scene(SCENE_MAIN)` — `main_menu.tscn` kao korijen, van huba. Polje otvoreno blokira swipe, a taba nema.
+
+**Rješenje:** isto dugme zove `go_to_meta_home()` (hub, stranica Home).
+
+**Prevencija:** `phone_playtest_smoke` ide Camp → Arena → Home i pritisne „Play a run"; header i nav moraju ostati, stranica Home između njih.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

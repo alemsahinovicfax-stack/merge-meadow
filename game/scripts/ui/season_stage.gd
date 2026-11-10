@@ -567,6 +567,11 @@ func _apply() -> void:
 
 	# Play: JEDAN objekat — na u = 1 je FieldPlayButton.
 	play_button.set_progress(e)
+	# Taller than 16:9 (stretch aspect expand): keep Play, the dots and the field
+	# row the same distance from the nav. On 1080x1920 extra is 0.
+	var extra_y := maxf(0.0, page.y - UiHomeV3.PAGE.y)
+	play_button.position.y += extra_y
+	season_dots.position.y = extra_y
 	var back := idle and id != GameState.active_season_id
 	var act := GameState.active_season_id
 	play_button.set_mode(
@@ -618,7 +623,8 @@ func _apply_chrome(u: float, rect: Rect2, page: Vector2) -> void:
 			continue
 		var sgn := 1.0 if key == "seasons" else -1.0
 		n.modulate.a = c
-		n.position = (_chrome_home[key] as Vector2) + Vector2(sgn * UiHomeV3.FIELD_SIDE_SLIDE * (1.0 - ce), 0.0)
+		var extra_y := maxf(0.0, page.y - UiHomeV3.PAGE.y)
+		n.position = (_chrome_home[key] as Vector2) + Vector2(sgn * UiHomeV3.FIELD_SIDE_SLIDE * (1.0 - ce), extra_y)
 
 
 func _season_name(season_id: String) -> String:
@@ -1073,6 +1079,15 @@ func _show_toast(text: String) -> void:
 
 
 # --- nazad (Android back / Esc) ---
+
+## „Tap Play to start" only while the button under it really says Play.
+## On another card the same control is „Back" (or the card's coin unlock).
+func shows_play_hint() -> bool:
+	if _u > 0.0:
+		return false
+	var id := viewed_id()
+	return id == GameState.active_season_id and GameState.is_season_playable(id)
+
 
 func _is_hub_on_home() -> bool:
 	if not is_inside_tree():

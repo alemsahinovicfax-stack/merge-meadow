@@ -7,6 +7,12 @@ extends Control
 
 ## Bočni razmak (dizajn: 3 chipa „18 → 9" staju u jedan red od 824).
 const PAD_X := 28.0
+## HalfStamp is a capsule (radius = height / 2 = 32). A 13 px inset put the
+## half-icon inside the round cap, so on a phone it sat on the stroke.
+const STAMP_PAD_L := 32.0
+const STAMP_ICON := 44.0
+const STAMP_GAP := 10.0
+const STAMP_PAD_R := 22.0
 
 var chips: Array[RewardChip] = []
 var stamp_text: String = ""
@@ -85,10 +91,10 @@ func _draw() -> void:
 	var left_end := 0.0
 	if not stamp_text.is_empty():
 		var tw := UiPopups.text_w(900, 38, stamp_text)
-		var r := Rect2(31.0, -UiPopups.STAMP_H * 0.45, 13.0 + 44.0 + 10.0 + tw + 22.0, UiPopups.STAMP_H)
+		var r := Rect2(31.0, -UiPopups.STAMP_H * 0.45, STAMP_PAD_L + STAMP_ICON + STAMP_GAP + tw + STAMP_PAD_R, UiPopups.STAMP_H)
 		draw_style_box(UiPopups._box(UiPopups.MINT, int(UiPopups.STAMP_H / 2.0), 3) if stamp_full else UiPopups.half_stamp(), r)
-		UiPopups.draw_icon(self, UiPopups.icon("icon_basket" if stamp_full else "icon_half"), Vector2(r.position.x + 13.0 + 22.0, r.get_center().y), 44.0)
-		UiPopups.draw_text(self, 900, 38, stamp_text, Vector2(r.position.x + 13.0 + 44.0 + 10.0, r.get_center().y - 19.0), UiPopups.OUTLINE)
+		UiPopups.draw_icon(self, UiPopups.icon("icon_basket" if stamp_full else "icon_half"), Vector2(r.position.x + STAMP_PAD_L + STAMP_ICON * 0.5, r.get_center().y), STAMP_ICON)
+		UiPopups.draw_text(self, 900, 38, stamp_text, Vector2(r.position.x + STAMP_PAD_L + STAMP_ICON + STAMP_GAP, r.get_center().y - 19.0), UiPopups.OUTLINE)
 		left_end = r.end.x
 	var boost := shown_boost_text()
 	if boost.is_empty():
@@ -105,7 +111,7 @@ func shown_boost_text() -> String:
 		return ""
 	if stamp_text.is_empty():
 		return boost_text
-	var left_w := 31.0 + 13.0 + 44.0 + 10.0 + UiPopups.text_w(900, 38, stamp_text) + 22.0
+	var left_w := 31.0 + STAMP_PAD_L + STAMP_ICON + STAMP_GAP + UiPopups.text_w(900, 38, stamp_text) + STAMP_PAD_R
 	var full_w := UiPopups.text_w(900, 38, boost_text) + 44.0
 	if _width - 31.0 - full_w >= left_w + 16.0:
 		return boost_text

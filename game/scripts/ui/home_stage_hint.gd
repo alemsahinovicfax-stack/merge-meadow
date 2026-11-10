@@ -31,6 +31,14 @@ func get_title() -> String:
 	return TITLE
 
 
+func set_target(r: Rect2) -> void:
+	if target.is_equal_approx(r):
+		return
+	target = r
+	_place_bubble()
+	queue_redraw()
+
+
 ## H1 · (design_handoff_popups) oblačić sistema s repom dolje na Play (lijevo od Pipa) i ink prsten
 ## 6 px oko Play koji se širi 1 → 1,16 i gasi (1,2 s) — jedini loop na Homeu, staje na Play.
 func _ensure_bubble() -> void:
