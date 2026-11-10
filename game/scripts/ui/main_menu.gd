@@ -186,7 +186,11 @@ func _refresh_tutorial_hint() -> void:
 	var first := not GameState.tutorial_complete
 	var open := GameState.home_season_field_open
 	if stage_hint:
-		stage_hint.visible = first and not open
+		var playable := season_stage != null and season_stage.has_method("shows_play_hint") and bool(season_stage.call("shows_play_hint"))
+		stage_hint.visible = first and not open and playable
+		var play := get_play_button()
+		if play != null and stage_hint.has_method("set_target"):
+			stage_hint.set_target(Rect2(play.position, play.size))
 	if tutorial_hint_panel:
 		var show := first and open
 		if show and not tutorial_hint_panel.visible:
@@ -412,7 +416,7 @@ func _start_run() -> void:
 
 
 func refresh_play_chip() -> void:
-	pass
+	_refresh_tutorial_hint()
 
 
 ## Home v3: Play nosi samo „Play" / „Back" — ime sezone je na kartici.

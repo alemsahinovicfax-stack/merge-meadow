@@ -320,6 +320,10 @@ var skip_debug_season_unlock: bool = false
 func _ready() -> void:
 	# Settings (zvuk, vibracija, pokreti) prije svega ostalog — busovi postoje i bez zvukova.
 	UiSettings.apply(UiSettings.load_settings())
+	_apply_tall_screen()
+	var window := get_window()
+	if window != null and not window.size_changed.is_connected(_apply_tall_screen):
+		window.size_changed.connect(_apply_tall_screen)
 	cosmetics = Cosmetics.new(self)
 	boosters = Boosters.new(self)
 	companions = Companions.new(self)
@@ -947,6 +951,21 @@ func reset_greenhouse_beds() -> void:
 	greenhouse_beds.clear()
 	for _i in GREENHOUSE_SLOT_COUNT:
 		greenhouse_beds.append(null)
+
+
+## Portrait phones taller than 16:9 fill the screen (expand). 16:9 and wider
+## windows keep the design viewport, including headless layout tests.
+func _apply_tall_screen() -> void:
+	var window := get_window()
+	if window == null:
+		return
+	var design := Vector2i(
+		int(ProjectSettings.get_setting("display/window/size/viewport_width", 1080)),
+		int(ProjectSettings.get_setting("display/window/size/viewport_height", 1920))
+	)
+	var aspect := Window.CONTENT_SCALE_ASPECT_EXPAND if SafeAreaHelper.wants_expand(window.size, design) else Window.CONTENT_SCALE_ASPECT_KEEP
+	if window.content_scale_aspect != aspect:
+		window.content_scale_aspect = aspect
 
 
 func go_to_scene(path: String) -> void:
