@@ -84,7 +84,7 @@ Razlozi u `purchase_failed`: `purchase_cancelled`, `purchase_pending`, `already_
 ### Android (kad postoje proizvodi u Play Consoleu)
 
 1. Play Console → **License testing** → dodaj svoj Gmail (kupovine bez naplate).
-2. Upload AAB na **internal test** (`scripts/android-export.ps1 -Preset Aab`), instaliraj **s Play Store linka** (sideload APK ne dobija billing).
+2. Upload AAB na **internal test** (`scripts/release-check.ps1`), instaliraj **s Play Store linka** (sideload APK ne dobija billing).
 3. Shop pokazuje Play cijene (npr. „3,99 KM") umjesto rezervnih.
 4. Kupi svaki tip: trajni (Remove Ads), potrošni (Loot Burst ×2), sezonu, Sir Pip.
 5. Test kartica „Slow test card, approves after a few minutes" → Pending → grant poslije.

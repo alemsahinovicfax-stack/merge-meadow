@@ -6,9 +6,16 @@
 # Release potpis: env GODOT_ANDROID_KEYSTORE_RELEASE_PATH/_USER/_PASSWORD, inače
 # game\export_credentials\android_release.local.cfg (gitignore; pravi ga keystore korak, vidi credentials.local.md).
 
+#
+# AAB je ZAKLJUCAN iza kapije: -Preset Aab radi samo kad ga pozove scripts\release-check.ps1
+# (ona postavi MM_RELEASE_GATE=1). Rucno, bez provjera:
+#   .\scripts\android-export.ps1 -Preset Aab -NoGate  -> game\export\android\merge_meadow_UNCHECKED.aab
+# Taj fajl NE ide na Play. Apk i Debug (emulator) nisu zakljucani.
+
 param(
     [ValidateSet("Aab", "Apk", "Debug")]
-    [string]$Preset = "Aab"
+    [string]$Preset = "Aab",
+    [switch]$NoGate
 )
 
 $ErrorActionPreference = "Stop"
@@ -23,6 +30,15 @@ $presets = @{
     Debug = @{ Name = "Android Debug"; Out = "merge_meadow_debug.apk"; Release = $false }
 }
 $p = $presets[$Preset]
+if ($Preset -eq "Aab") {
+    # Prije bilo kakvog brisanja: odbijen poziv ne smije dirati postojeci AAB.
+    if ($NoGate) {
+        $p.Out = "export\android\merge_meadow_UNCHECKED.aab"
+        Write-Warning "AAB BEZ KAPIJE (-NoGate): nista nije provjereno. Izlaz je merge_meadow_UNCHECKED.aab i NE ide na Play."
+    } elseif ($env:MM_RELEASE_GATE -ne "1") {
+        throw "AAB za Play se pravi samo kroz kapiju: .\scripts\release-check.ps1 (testovi + testovi iz paketa + version code + sadrzaj). Za probni AAB bez provjera: -Preset Aab -NoGate."
+    }
+}
 $outPath = Join-Path $gameDir $p.Out
 New-Item -ItemType Directory -Force (Split-Path $outPath -Parent) | Out-Null
 if (Test-Path $outPath) { Remove-Item $outPath -Force }

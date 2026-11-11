@@ -142,7 +142,7 @@ Za lične naloge napravljene poslije 13. 11. 2023: **najmanje 12 testera, neprek
 
 1. Testing → Closed testing → Create track „closed-1".
 2. Testers → Email list (Google grupa ili lista Gmailova) — **minimum 12, uzmi 15–20** (neko uvijek odustane).
-3. Upload AAB: `game/export/android/merge_meadow.aab` (pravi ga `scripts/android-export.ps1 -Preset Aab`).
+3. Upload AAB: `game/export/android/merge_meadow.aab` (pravi ga kapija `scripts/release-check.ps1`; direktan `android-export.ps1 -Preset Aab` je zaključan).
 4. Pošalji poziv (tekst ispod) s **opt-in linkom** iz Play Consolea.
 5. Prati 14 dana; svaki tester mora ostati prijavljen. Poslije: Production → Apply for production (Google pita šta si naučio iz testa — zapisuj feedback).
 6. **Mjerenje (RET-01):** igra sama broji dane igranja. **Ne podsjećaj testere da igraju** — tek 15. dan ili kasnije pošalji poruku za kraj testa (ispod) i kratku anketu. Red sa ekrana statistike ide u `testeri.csv` → `python scripts/analytics/retention_forecast.py cohort --csv testeri.csv`. Cijeli protokol: [[testiranje#Closed test — mjerenje (RET-01)|testiranje § Closed test]].

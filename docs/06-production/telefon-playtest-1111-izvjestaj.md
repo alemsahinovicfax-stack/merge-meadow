@@ -84,6 +84,7 @@ Novi AAB je **version code 11** (verzija 1.0.1). **Ništa od ovoga još nije pro
 ## 6. Kako se ovo više ne ponavlja
 
 - **`scripts/release-check.ps1`** — jedna skripta prije svakog uploada. Pada na prvoj grešci; upload samo kad piše `RELEASE OK`. Koraci: SVG tekst → GUT + svi smoke testovi na čistom saveu → **isti testovi pokrenuti iz exportovanog paketa** → version code veći od zadnjeg uploadanog → AAB + provjera sadržaja → lista za ručnu provjeru.
+- **AAB je zaključan iza kapije** — `android-export.ps1 -Preset Aab` odbija ručni poziv; AAB za Play nastaje samo kroz `release-check.ps1`. Probni AAB (`-NoGate`) se zove `merge_meadow_UNCHECKED.aab` i ne ide na Play. Export iz Godot editora skripta ne može zaključati — za Play ga ne koristiti.
 - **`scripts/phone-like-run.ps1`** — igra iz paketa u prozoru omjera telefona. Bug s telefona se prvo reprodukuje ovdje.
 - **`scripts/screen-matrix.ps1`** — slike na 6 omjera.
 - Novi testovi: `svg_source_smoke`, `touch_scroll_smoke` (pravi dodir), `hub_switch_bench` (mjerenje ulaska na stranice).

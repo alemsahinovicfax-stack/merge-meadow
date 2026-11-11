@@ -18,6 +18,7 @@ Promjene u dizajnu i dokumentaciji kroz vrijeme.
   - **Sitno:** loot ekran piše „Continue" poslije pređenog levela; kraj merge runde ima oznaku („Round over" + ishod); „Open meadow" / „Merge in Arena" imaju SVG strelicu umjesto znaka „↗"; novčići trejda iz poola.
   - **Journal:** lista se gradi u pozadini (prewarm iz huba), izlazak je ne skraćuje, novi napredak ne ruši redove; ulazak 7–20 ms → ~4 ms na laptopu (`hub_switch_bench`).
   - **Kapija prije uploada:** `scripts/release-check.ps1` (testovi na čistom saveu, testovi iz exportovanog paketa, version code, sadržaj AAB-a, lista za ručnu provjeru), `phone-like-run.ps1`, `screen-matrix.ps1`, `play-uploads.md`. Version code 11.
+  - **AAB zaključan iza kapije:** `android-export.ps1 -Preset Aab` radi samo kad ga pozove `release-check.ps1`; ručno traži `-NoGate` i tada pravi `merge_meadow_UNCHECKED.aab` (ne ide na Play). Kapija na početku briše stari `merge_meadow.aab`, pa poslije pada ne ostaje build koji izgleda kao da je prošao.
 
 ## 2026-11-10
 

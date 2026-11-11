@@ -39,6 +39,12 @@ function Run([string]$script, [string[]]$scriptArgs = @()) {
 # (phone_playtest_smoke nije ovdje: cita export_presets.cfg, kojeg u paketu nema.)
 $packSmokes = @("svg_source_smoke", "touch_scroll_smoke", "shop_open_smoke")
 
+# Stari AAB se brise na pocetku pravog prolaza: ako kapija padne, u folderu ne ostaje
+# merge_meadow.aab od ranije koji izgleda kao da je prosao.
+if (-not $SkipSmokes) {
+    Remove-Item (Join-Path $gameDir "export\android\merge_meadow.aab") -Force -ErrorAction SilentlyContinue
+}
+
 Step "1/6 SVG tekst za export"
 if ((Run "sync-svg-src.ps1") -ne 0) { Fail "sync-svg-src.ps1 nije uspio." }
 if ((Run "smoke-all.ps1" @("-Filter", "svg_source", "-CleanSave")) -ne 0) { Fail "svg_source_smoke pada - skinovi / Nibbs ne bi postojali u buildu." }
@@ -113,8 +119,19 @@ if ($code -le $lastCode) { Fail "version/code $code nije veći od zadnjeg upload
 Write-Host "  verzija $name, code $code (zadnji uploadan: $lastCode)"
 
 Step "5/6 AAB + sadržaj"
-if ((Run "android-export.ps1" @("-Preset", "Aab")) -ne 0) { Fail "Export AAB-a nije uspio." }
-$aab = Join-Path $gameDir "export\android\merge_meadow.aab"
+# android-export.ps1 pravi AAB samo uz MM_RELEASE_GATE=1 (postavlja ga jedino ova skripta).
+# Proba (-SkipSmokes) nije prosla testove, pa dobija -NoGate i ime ..._UNCHECKED.aab.
+if ($SkipSmokes) {
+    $aabArgs = @("-Preset", "Aab", "-NoGate")
+    $aab = Join-Path $gameDir "export\android\merge_meadow_UNCHECKED.aab"
+} else {
+    $aabArgs = @("-Preset", "Aab")
+    $aab = Join-Path $gameDir "export\android\merge_meadow.aab"
+    $env:MM_RELEASE_GATE = "1"
+}
+$exportCode = Run "android-export.ps1" $aabArgs
+Remove-Item Env:MM_RELEASE_GATE -ErrorAction SilentlyContinue
+if ($exportCode -ne 0) { Fail "Export AAB-a nije uspio." }
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip = [IO.Compression.ZipFile]::OpenRead($aab)
 try { $entries = @($zip.Entries | ForEach-Object { $_.FullName }) } finally { $zip.Dispose() }

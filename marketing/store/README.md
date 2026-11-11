@@ -42,7 +42,7 @@ Ikone u `game/assets/branding/` se prave iz `design/source/icon/`:
 ```powershell
 & "$env:USERPROFILE\Desktop\Godot_v4.7-stable_win64.exe" --headless --rendering-driver opengl3 --path game --script res://scripts/dev/make_app_icons.gd
 .\scripts\godot-import.ps1
-.\scripts\android-export.ps1 -Preset Aab
+.\scripts\release-check.ps1
 ```
 
 ## Novi kadrovi iz igre

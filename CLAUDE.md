@@ -98,6 +98,7 @@ Ne implementiraj dok korisnik ne potvrdi.
 
 Nijedan AAB ne ide na Play bez **`scripts/release-check.ps1`** → mora završiti s `RELEASE OK` (testovi na čistom saveu, testovi IZ exportovanog paketa, version code, sadržaj AAB-a). Uveden 2026-11-11 jer je build bez skinova i Nibbsa otišao na internal test (`greske-katalog.md` #63–#65).
 
+- **AAB je zaključan iza kapije:** `scripts/android-export.ps1 -Preset Aab` odbija ručni poziv — AAB za Play pravi samo `release-check.ps1`. `-NoGate` daje `merge_meadow_UNCHECKED.aab`, koji **nikad** ne ide na Play. Ne exportuj AAB iz Godot editora (to skripta ne može zaključati)
 - **Bug s telefona → prvo ga reprodukuj na kompjuteru:** `scripts/phone-like-run.ps1` (igra iz paketa, omjer telefona) ili `scripts/screen-matrix.ps1` (slike na 6 omjera); pa test koji ga hvata; tek onda ispravka
 - **Nikad `FileAccess` na `res://` asset koji ima `.import`** (u exportu ne postoji) — SVG tekst ide kroz `SvgSource.read()`; poslije izmjene SVG-ova u `assets/pip`, `assets/muncher`, `assets/sprites/pip_*` pokreni `scripts/sync-svg-src.ps1` i commitaj `data/svg_src/`
 - **Raspored:** nikad konstanta 1633 / 1920 za „pri dnu" — stranica je viša na visokim telefonima
