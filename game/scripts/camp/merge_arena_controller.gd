@@ -1,6 +1,14 @@
 extends Control
 
 const ArenaSeedChip := preload("res://scripts/camp/arena_seed_chip.gd")
+## Kraj runde: toast pilule pri vrhu polja (px baze), malo duže od običnog toasta.
+const ROUND_END_TOAST_Y := 96.0
+const ROUND_END_HOLD_SEC := 2.4
+const S_ROUND_OVER := "Round over"
+const S_ROUND_BLOOM_ONE := "%d bloom made"
+const S_ROUND_BLOOMS := "%d blooms made"
+const S_ROUND_EATEN := "Nibbs ate the rest"
+const S_ROUND_EMPTY := "Field cleared"
 const ArenaSeedBag := preload("res://scripts/camp/arena_seed_bag.gd")
 const ArenaVacuumFly := preload("res://scripts/camp/arena_vacuum_fly.gd")
 const ArenaPest := preload("res://scripts/camp/arena_pest.gd")
@@ -80,6 +88,9 @@ var _combo_window_left: float = 0.0
 var _combo_coin_granted_this_streak: bool = false
 var _auto_pouring: bool = false
 var _session_t3_count: int = 0
+## Zadnje sjeme s polja je pojeo Nibbs (tekst kraja runde).
+var _last_out_by_pest: bool = false
+var _round_toast: PopupToast = null
 var _pip_react_tween: Tween = null
 var _clear_vfx_done_this_pour: bool = false
 var _clear_vfx_tween: Tween = null
@@ -384,6 +395,7 @@ func _get_edible_chips_for_pest() -> Array:
 func _pest_eat_chip(chip: ArenaSeedChip) -> void:
 	if not _chips.has(chip):
 		return
+	_last_out_by_pest = true
 	_remove_chip(chip)
 	_resolve_t3_starved_types()
 	_resolve_stranded_t2()
@@ -854,12 +866,40 @@ func _end_session_if_settled() -> void:
 		return
 	_session_open = false
 	GameState.commit_arena_chips_to_bag(_chip_data)
+	_show_round_end()
 	_clear_combo()
 	_clear_pair_pulses()
 	_clear_merge_hint()
 	_update_tutorial_cue()
 	_refresh_bag()
 	_sync_hub_nav_lock()
+
+
+## Kraj runde (polje prazno): jasna oznaka umjesto tihog povratka na vreću (FIX-TEL 2026-11 —
+## „merge run nema oznake za kraj kad muncher sve pojede"). Dvije toast pilule: „Round over" i
+## ishod — koliko je ★3 cvjetova napravljeno, ili da je Nibbs pojeo ostatak.
+func _show_round_end() -> void:
+	if playfield == null or not is_inside_tree():
+		return
+	if _round_toast == null or not is_instance_valid(_round_toast):
+		_round_toast = PopupToast.new()
+		_round_toast.name = "RoundEndToast"
+		_round_toast.z_index = 30
+		playfield.add_child(_round_toast)
+	_round_toast.setup(ROUND_END_TOAST_Y, ROUND_END_HOLD_SEC, playfield.size.x * 0.5)
+	_round_toast.clear()
+	_round_toast.show_text(S_ROUND_OVER, null, "check")
+	_round_toast.show_text(get_round_end_text())
+
+
+func get_round_end_text() -> String:
+	if _session_t3_count > 0:
+		return (S_ROUND_BLOOM_ONE if _session_t3_count == 1 else S_ROUND_BLOOMS) % _session_t3_count
+	return S_ROUND_EATEN if _last_out_by_pest else S_ROUND_EMPTY
+
+
+func get_round_end_toast() -> PopupToast:
+	return _round_toast
 
 
 func _bag_has_pourable_set() -> bool:
@@ -1414,6 +1454,7 @@ func _resolve_overlaps_any(moved: ArenaSeedChip) -> bool:
 
 
 func _on_chip_released(chip: ArenaSeedChip) -> void:
+	_last_out_by_pest = false
 	_clear_magnet_lock()
 	_clear_pair_pulses()
 	_sync_chip_pos(chip)

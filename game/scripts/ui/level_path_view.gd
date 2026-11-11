@@ -199,8 +199,18 @@ func get_scroll() -> float:
 	return _scroll
 
 
+## Stranica viša od 1633 (visok telefon): prozor puta raste do dna, skrol staje ranije.
+func set_page_height(h: float) -> void:
+	var want := maxf(h, float(UiHomeField.PAGE.y))
+	LevelPathKit.page_h = want
+	if is_equal_approx(size.y, want):
+		return
+	size.y = want
+	set_scroll(_scroll)
+
+
 func set_scroll(v: float) -> void:
-	_scroll = clampf(v, 0.0, LevelPathKit.SCROLL_MAX)
+	_scroll = clampf(v, 0.0, LevelPathKit.scroll_max())
 	_content.position.y = -_scroll
 	if _pip_free:
 		_place_pip_on_stone()
@@ -551,7 +561,7 @@ func _tap(page_pos: Vector2) -> void:
 func _scroll_to(target: float, sec: float, done: Callable = Callable()) -> void:
 	_kill_scroll_tween()
 	_vel = 0.0
-	target = clampf(target, 0.0, LevelPathKit.SCROLL_MAX)
+	target = clampf(target, 0.0, LevelPathKit.scroll_max())
 	if absf(target - _scroll) < 1.0 or not is_inside_tree():
 		set_scroll(target)
 		if done.is_valid():
@@ -607,7 +617,7 @@ func _process(delta: float) -> void:
 	if absf(_vel) > 0.0 and not _press:
 		set_scroll(_scroll + _vel * delta)
 		_vel *= exp(-FRICTION * delta)
-		if absf(_vel) < MIN_FLING or _scroll <= 0.0 or _scroll >= LevelPathKit.SCROLL_MAX:
+		if absf(_vel) < MIN_FLING or _scroll <= 0.0 or _scroll >= LevelPathKit.scroll_max():
 			_vel = 0.0
 	_anim_t += delta
 	var i := 0

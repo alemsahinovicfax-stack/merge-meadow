@@ -150,8 +150,8 @@ func _run() -> void:
 	if not (camp.get_node("%EmptyState") as Control).visible:
 		_fail("empty bag must show EmptyState")
 		return
-	if str(camp.get_node("%EmptyCta").call("get_title")) != "Open meadow ↗":
-		_fail("empty bag CTA must read 'Open meadow ↗'")
+	if str(camp.get_node("%EmptyCta").call("get_title")) != "Open meadow":
+		_fail("empty bag CTA must read 'Open meadow'")
 		return
 	if (camp.get_node("%ExchangeBar") as Control).visible:
 		_fail("empty bag must hide the Trade bar")

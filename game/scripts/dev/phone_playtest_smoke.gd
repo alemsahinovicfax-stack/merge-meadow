@@ -71,11 +71,12 @@ func _run() -> void:
 	if hint.visible:
 		_fail("Tap Play hint must hide on a locked theme (Moonlit Warren)")
 		return
-	stage.call("show_season", "country_bloom", false)
+	# Aktivna sezona iz savea (ne uvijek Country Bloom — test radi i s kopijom pravog savea).
+	stage.call("show_season", str(gs.active_season_id), false)
 	home.call("refresh_play_chip")
 	await process_frame
 	if not hint.visible:
-		_fail("Tap Play hint should return on Country Bloom")
+		_fail("Tap Play hint should return on the active season")
 		return
 
 	gs.tutorial_complete = true

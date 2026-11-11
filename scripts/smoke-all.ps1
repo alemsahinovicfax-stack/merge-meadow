@@ -4,12 +4,16 @@
 #   .\scripts\smoke-all.ps1                 # svi, 4 radnika
 #   .\scripts\smoke-all.ps1 -Filter iap     # samo oni čije ime sadrži "iap"
 #   .\scripts\smoke-all.ps1 -Workers 2 -TimeoutSec 600
+#   .\scripts\smoke-all.ps1 -CleanSave       # prazan save (ne zavisi od tvog napretka)
 # Prolaz = exit 0 + "<ime> OK" u ispisu + nema "SCRIPT ERROR" / "Parse Error".
 
 param(
     [int]$Workers = 4,
     [int]$TimeoutSec = 420,
-    [string]$Filter = ""
+    [string]$Filter = "",
+    # Bez kopije pravog savea: testovi kreću od praznog user:// (kapija release-check.ps1).
+    # S kopijom savea dio Camp testova zavisi od toga dokle je igrač stigao.
+    [switch]$CleanSave
 )
 
 $ErrorActionPreference = "Stop"
@@ -29,7 +33,7 @@ function New-WorkerAppData([int]$i) {
     $appdata = Join-Path $runRoot "appdata_$i"
     $dst = Join-Path $appdata "Godot\app_userdata\Merge Meadow"
     New-Item -ItemType Directory -Force $dst | Out-Null
-    if (Test-Path $userSrc) {
+    if ((-not $CleanSave) -and (Test-Path $userSrc)) {
         # Dev prekidači (dev_flags.cfg "Test seeds", ads_debug.cfg) ostaju na defaultu koji testovi očekuju.
         Get-ChildItem $userSrc -File | Where-Object { $_.Extension -in ".json", ".cfg" -and $_.Name -notin "dev_flags.cfg", "ads_debug.cfg" } |
             ForEach-Object { Copy-Item $_.FullName $dst }
@@ -54,6 +58,11 @@ while ($queue.Count -gt 0 -or $running.Count -gt 0) {
     for ($w = 0; $w -lt $Workers; $w++) {
         if ($running.ContainsKey($w) -or $queue.Count -eq 0) { continue }
         $smoke = $queue.Dequeue()
+        if ($CleanSave) {
+            # Svaki test krece od praznog user://: prethodni test u istom radniku ostavi svoj save.
+            $userDir = Join-Path $appdatas[$w] "Godot\app_userdata\Merge Meadow"
+            if (Test-Path $userDir) { Get-ChildItem $userDir -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue }
+        }
         $out = Join-Path $runRoot "$($smoke.BaseName).log"
         $psi = New-Object System.Diagnostics.ProcessStartInfo
         $psi.FileName = $godot

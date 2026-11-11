@@ -131,7 +131,7 @@ static func _raster() -> Dictionary:
 		files[str(_rig["banner"]["file"])] = true
 	var imgs: Dictionary = {}
 	for f in files:
-		var svg := FileAccess.get_file_as_string(str(f))
+		var svg := SvgSource.read(str(f))
 		var img := Image.new()
 		if not svg.is_empty() and img.load_svg_from_string(svg, RASTER) == OK and not img.is_empty():
 			imgs[f] = img

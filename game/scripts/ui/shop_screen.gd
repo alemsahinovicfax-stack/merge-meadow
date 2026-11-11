@@ -12,6 +12,7 @@ extends Control
 
 const CONFIG := preload("res://scripts/monetization/monetization_config.gd")
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
+const DRAG_SCROLL := preload("res://scripts/ui/drag_scroll.gd")
 const TOAST_RECT := Rect2(190, 1456, 700, 100)
 ## Štand s tabovima: iznad najvišeg sloja kartica (oznaka Premium z 16).
 const TAB_BAR_Z := 20
@@ -137,6 +138,8 @@ func _make_page(tab_id: String) -> void:
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	scroll.visible = false
 	add_child(scroll)
+	# Skrol prstom preko kartica, prozora skinova i dugmadi (ne samo između njih).
+	TouchScroller.attach(scroll)
 	var pad := MarginContainer.new()
 	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -440,6 +443,9 @@ func refresh_shop() -> void:
 	if _restore != null:
 		_restore.visible = not IAPManager.is_stub_mode()
 		_restore.set_busy(restoring)
+	# Kartice i prozori skinova ne smiju pojesti dodir: cijela stranica ispod tabova skrola.
+	for id in _pages:
+		DRAG_SCROLL.let_touch_through(_pages[id])
 	_notify_hub_chrome()
 
 

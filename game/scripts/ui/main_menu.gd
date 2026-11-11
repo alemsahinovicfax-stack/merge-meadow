@@ -1316,8 +1316,9 @@ func _ensure_wardrobe() -> void:
 		return
 	wardrobe_button = FieldWardrobeButton.new()
 	field_overlay_inner.add_child(wardrobe_button)
-	wardrobe_button.position = Vector2(UiHomeField.WARDROBE_RECT.position)
 	wardrobe_button.size = Vector2(UiHomeField.WARDROBE_RECT.size)
+	_place_wardrobe_button()
+	field_overlay_inner.resized.connect(_place_wardrobe_button)
 	wardrobe_button.clicked.connect(_open_wardrobe)
 	_apply_toast = ApplyToast.new()
 	_apply_toast.name = "ApplyToast"
@@ -1328,9 +1329,19 @@ func _ensure_wardrobe() -> void:
 	wardrobe_sheet.shop_requested.connect(_on_wardrobe_shop)
 
 
+## Pločica „Looks" drži razmak od donjeg reda: na stranici višoj od 1633 (visok telefon)
+## spušta se s njim, inače ostane na sredini ekrana (FIX-TEL).
+func _place_wardrobe_button() -> void:
+	if wardrobe_button == null or field_overlay_inner == null:
+		return
+	var extra := maxf(0.0, field_overlay_inner.size.y - float(UiHomeField.PAGE.y))
+	wardrobe_button.position = Vector2(UiHomeField.WARDROBE_RECT.position) + Vector2(0.0, extra)
+
+
 func _refresh_wardrobe_button() -> void:
 	if wardrobe_button == null:
 		return
+	_place_wardrobe_button()
 	wardrobe_button.visible = _wardrobe_allowed() and not GameState.level_path_open
 	wardrobe_button.modulate.a = 0.0 if GameState.level_path_open else 1.0
 	wardrobe_button.set_dot(GameState.cosmetics.has_new())

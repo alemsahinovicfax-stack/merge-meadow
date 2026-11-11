@@ -27,9 +27,17 @@ var row_width: float = 0.0
 ## Ključevi zadnjeg stila — _refresh ne dira theme override koji se nije promijenio
 ## (svaki override ponovo računa raspored, a Journal ima do 48 redova).
 var _applied: Dictionary = {}
+var _entry_hash: int = 0
 
 
 func apply(entry: Dictionary) -> void:
+	# Isti podaci kao prošli put → ništa (FIX-TEL 2026-11): svaki ulazak na Journal zove apply
+	# na svim redovima, a _refresh dira labele i raspored i kad se ništa nije promijenilo.
+	var h := entry.hash()
+	if _built and h == _entry_hash:
+		_entry = entry
+		return
+	_entry_hash = h
 	_entry = entry
 	if _built:
 		_refresh()

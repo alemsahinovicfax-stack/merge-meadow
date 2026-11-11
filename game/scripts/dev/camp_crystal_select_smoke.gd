@@ -147,8 +147,8 @@ func _run() -> void:
 	if bar == null or bar.visible:
 		_fail("empty flower stash must hide the Trade bar")
 		return
-	if cta == null or str(cta.call("get_title")) != "Merge in Arena ↗":
-		_fail("empty stash CTA should read 'Merge in Arena ↗'")
+	if cta == null or str(cta.call("get_title")) != "Merge in Arena":
+		_fail("empty stash CTA should read 'Merge in Arena'")
 		return
 
 	print("camp_crystal_select_smoke OK")

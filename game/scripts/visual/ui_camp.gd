@@ -911,7 +911,8 @@ static func empty_art_style(seed: bool) -> StyleBoxFlat:
 	return s
 
 
-## CTA u praznom stanju: panel 100 px unutar 120 px dodira ("Open meadow ↗").
+## CTA u praznom stanju: panel 100 px unutar 120 px dodira ("Open meadow" + ikona strelice).
+const EMPTY_CTA_ICON := 40.0
 static func empty_cta_style(pressed: bool = false) -> StyleBoxFlat:
 	var s := shortcut_style(pressed)
 	s.content_margin_left = 36

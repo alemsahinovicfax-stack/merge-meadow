@@ -96,6 +96,14 @@ func shows_revive() -> bool:
 	)
 
 
+## Dugme za novi run: „Continue" kad je level pređen (sljedeći run je sljedeći level),
+## „Retry" kad je run pao i u Endlessu (ista trka ponovo).
+func get_run_again_label() -> String:
+	if is_endless() or GameState.last_failed:
+		return UiPopups.S_RETRY
+	return UiPopups.S_CONTINUE
+
+
 func get_title() -> String:
 	if is_endless():
 		return UiLevels.S_NEW_BEST if GameState.last_endless_new_best else UiLevels.S_ENDLESS
@@ -230,12 +238,12 @@ func _apply_buttons() -> void:
 		rs = "dim"
 	_apply_ad(revive_button, UiPopups.S_AD_REVIVE, rs, UiPopups.S_AD_REVIVE)
 	if retry_loading:
-		retry_button.configure("loading", UiPopups.S_RETRY)
+		retry_button.configure("loading", get_run_again_label())
 		camp_button.configure("disabled", UiPopups.S_TO_CAMP, false, UiAssets.get_chrome_icon("tab_camp"))
 		return
 	# Endless: Retry je primarno (nova trka za rekord), To Camp sekundarno.
 	var endless := is_endless()
-	retry_button.configure("disabled" if nav_locked else ("primary" if endless else "secondary"), UiPopups.S_RETRY)
+	retry_button.configure("disabled" if nav_locked else ("primary" if endless else "secondary"), get_run_again_label())
 	camp_button.configure("disabled" if nav_locked else ("secondary" if endless else "primary"), UiPopups.S_TO_CAMP, false, UiAssets.get_chrome_icon("tab_camp"))
 
 

@@ -359,7 +359,7 @@ static func _raster(key: String) -> Dictionary:
 			files[str(fx["file"])] = true
 	var imgs: Dictionary = {}
 	for f in files:
-		var svg := FileAccess.get_file_as_string(str(f))
+		var svg := SvgSource.read(str(f))
 		if svg.is_empty():
 			continue
 		var img := Image.new()

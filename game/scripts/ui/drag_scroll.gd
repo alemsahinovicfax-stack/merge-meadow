@@ -30,6 +30,24 @@ static func drag_delta(event: InputEvent) -> float:
 	return 0.0
 
 
+## Dugme unutar skrola (FIX-TEL): dodir NE smije stati na dugmetu, inače lista skrola samo
+## između kartica. Dugme je zato MOUSE_FILTER_PASS, dodir ne prihvata (ScrollContainer ga
+## dobije i skrola sam, s inercijom), a tap okida tek na puštanje ako je pomak <= TAP_SLOP.
+static func in_scroll(control: Control) -> bool:
+	return find_scroll(control.get_parent()) != null
+
+
+## Djeca skrola koja samo crtaju ne smiju pojesti dodir (Control je po defaultu STOP).
+static func let_touch_through(node: Node) -> void:
+	for child in node.get_children():
+		if child is ScrollContainer:
+			continue
+		var c := child as Control
+		if c != null and c.mouse_filter == Control.MOUSE_FILTER_STOP:
+			c.mouse_filter = Control.MOUSE_FILTER_PASS
+		let_touch_through(child)
+
+
 static func apply(scroll: ScrollContainer, dy: float) -> void:
 	if scroll == null or is_zero_approx(dy):
 		return

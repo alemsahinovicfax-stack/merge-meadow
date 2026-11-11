@@ -9,6 +9,16 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-11-11
+
+- **FIX-TEL — ispravke poslije prvog playtesta na telefonu** (plan `06-production/plan-telefon-playtest-1111.md`, izvještaj `06-production/telefon-playtest-1111-izvjestaj.md`):
+  - **Skinovi, novi Pip i Nibbs u buildu:** export nije nosio sirove SVG-ove iz kojih se likovi rasterizuju (0 `.svg` u AAB-u). `SvgSource` + kopije `data/svg_src/*.svgsrc` (168), `sync-svg-src.ps1`, čuvar u `android-export.ps1`. Katalog #63.
+  - **Svi omjeri ekrana:** Level Path do dna, „Looks" dolje desno, Camp lista do dna na visokim telefonima (#64). Tableti: igra ostaje portrait stupac s trakama sa strane (odluka: ukrasne strane kasnije).
+  - **Dodir:** Shop skrola prstom preko kartica i dugmadi (`TouchScroller`, tap na puštanje), sjeme u Areni prati prst (#65), prsten oko coin čipa tačan (#66).
+  - **Sitno:** loot ekran piše „Continue" poslije pređenog levela; kraj merge runde ima oznaku („Round over" + ishod); „Open meadow" / „Merge in Arena" imaju SVG strelicu umjesto znaka „↗"; novčići trejda iz poola.
+  - **Journal:** lista se gradi u pozadini (prewarm iz huba), izlazak je ne skraćuje, novi napredak ne ruši redove; ulazak 7–20 ms → ~4 ms na laptopu (`hub_switch_bench`).
+  - **Kapija prije uploada:** `scripts/release-check.ps1` (testovi na čistom saveu, testovi iz exportovanog paketa, version code, sadržaj AAB-a, lista za ručnu provjeru), `phone-like-run.ps1`, `screen-matrix.ps1`, `play-uploads.md`. Version code 11.
+
 ## 2026-11-10
 
 - **Playtest na telefonu** (snimak internal testa): visok ekran više nije 16:9 s crnim trakama (expand samo kad je prozor viši od 16:9, Android `edge_to_edge`, safe area u viewport px; donji red Homea prati dno na ekranu višem od 1633). Zeko u runu se pojavi i kad pozadinski SVG atlas ne završi (glavni thread + proceduralni fallback). „Play a run" na praznoj Areni ostaje u hubu (`go_to_meta_home`) — Home više ne ostane bez headera i taba. Hint „Tap Play to start" samo dok dugme stvarno kaže Play. Pečat „Kept half" ima lijevi razmak 32 (van zaobljene kape). „Basket" → „Choose" poslije 2. vođenog runa je namjerno, nije dirano. `phone_playtest_smoke`. Katalog #61, #62.

@@ -256,7 +256,11 @@ func _gui_input(event: InputEvent) -> void:
 	elif event is InputEventScreenDrag:
 		var drag := event as InputEventScreenDrag
 		if _dragging:
-			global_position = drag.position - _drag_offset
+			# drag.position je LOKALNA koordinata chipa (kao i touch.position u _begin_drag).
+			# Ranije je išla pravo u global_position, pa je chip skakao u gornji lijevi ugao;
+			# na telefonu ga je vraćao tek emulirani miš, a puštanje ga je znalo zateći gore
+			# (FIX-TEL 2026-11: „sjeme se teleportuje gore lijevo").
+			global_position = get_global_transform() * drag.position - _drag_offset
 		accept_event()
 	elif event is InputEventMouseButton:
 		var mouse := event as InputEventMouseButton

@@ -4,10 +4,13 @@ extends Control
 ## PageHead 175 + lista. NEW ostaje vidljiv cijelu posjetu iako se tab badge
 ## briše na otvaranje. Sezonska poglavlja i auto-scroll na prvi NEW.
 ## Redoslijed (2026-10-06): aktivna sezona, pa djelimično otključane, pa potpune, pa bez
-## ijednog cvijeta (UiJournal.order_seasons). Lista se puni po 3 sezone: na ulazu prve tri,
-## a kad igrač skrola do kraja učitanog, sljedeće tri — i tako dok ne ponestane sezona.
-## Svaki ulazak počinje opet od tri (izlazak zadrži samo prve tri). Redovi se grade u
-## frejmovima po vremenskom budžetu (tekstura cvijeta + red), pa ulazak ne zastaje.
+## ijednog cvijeta (UiJournal.order_seasons). Lista se puni po 3 sezone: prve tri, a kad igrač
+## skrola do kraja učitanog, sljedeće tri — i tako dok ne ponestane sezona.
+## FIX-TEL 2026-11 (štekanje pri svakom ulasku na telefonu):
+##  · redovi se grade i dok stranica NIJE na ekranu (prewarm iz huba, tik na process_frame —
+##    process_mode stranice je tada DISABLED), pa ulazak zatekne gotovu listu;
+##  · izlazak više ne skraćuje listu, a novi napredak (kept 3 → 4, nova sezona na vrhu) ne ruši
+##    sezone: grupa se prepozna po sezoni i samo premjesti / osvježi; gradi se samo ono što fali.
 
 const JournalRow := preload("res://scripts/ui/collection_journal_row.gd")
 
@@ -16,6 +19,9 @@ const SEASONS_PER_CHUNK := 3
 ## 3 ms (perf 2026-10-09; bilo 6): novi redovi se još i raspoređuju i prvi put crtaju u istom
 ## frejmu, pa je 6 ms budžeta uz to prelazilo 16,7 ms dok igrač skrola.
 const FRAME_BUDGET_USEC := 3000
+## Gradnja u pozadini (igrač je na drugoj stranici): jedan red svaki N-ti frejm, da stranica
+## koju gleda (Arena, Home) ne plati Journal.
+const BACKGROUND_EVERY_N_FRAMES := 3
 ## Sljedeće tri sezone kreću kad je do kraja učitanog ostalo manje od ovoga (px).
 const LOAD_AHEAD_PX := 400.0
 
@@ -43,12 +49,16 @@ const LOAD_AHEAD_PX := 400.0
 
 ## Sezone u redoslijedu prikaza: [{sid, entries, kept, total, unlocked}].
 var _order: Array[Dictionary] = []
-## Sezone koje su na listi (ili u gradnji), istim redom: [{sid, group, gap, rows, sig}].
+## Sezone koje su na listi (ili u gradnji), istim redom:
+## [{sid, group, gap, rows, sig, entries, count_label, count_text, dead}].
 var _groups: Array[Dictionary] = []
-## Redovi koji čekaju gradnju: [{group_index, entry}].
+## Redovi koji čekaju gradnju: [{g (grupa), row (indeks u g.entries)}].
 var _work: Array[Dictionary] = []
 var _building: bool = false
+var _tick_connected: bool = false
+var _bg_frame: int = 0
 var _bottom: Control = null
+var _top: Control = null
 var _new_snapshot: Dictionary = {}
 var _scroll_season: int = -1
 var _scroll_row: int = -1
@@ -70,7 +80,6 @@ func _ready() -> void:
 	list.resized.connect(_update_grabber)
 	grabber.add_theme_stylebox_override("panel", UiJournal.grabber_style())
 	_style_head()
-	set_process(false)
 	if GameState.is_meta_hub_embedded(self):
 		_apply_frame()
 		return
@@ -97,20 +106,51 @@ func season_order() -> Array[String]:
 	return out
 
 
-func _process(_delta: float) -> void:
-	if not _building or list == null:
-		set_process(false)
+func _exit_tree() -> void:
+	_set_building(false)
+
+
+## Gradnja ide na SceneTree.process_frame, ne u _process: stranica van ekrana ima
+## process_mode DISABLED (hub), a lista se mora graditi baš tada.
+func _set_building(on: bool) -> void:
+	_building = on
+	var tree := get_tree() if is_inside_tree() else null
+	if tree == null:
+		_tick_connected = false
 		return
+	if on and not _tick_connected:
+		tree.process_frame.connect(_build_tick)
+		_tick_connected = true
+	elif not on and _tick_connected:
+		if tree.process_frame.is_connected(_build_tick):
+			tree.process_frame.disconnect(_build_tick)
+		_tick_connected = false
+
+
+func _build_tick() -> void:
+	if not _building or list == null:
+		_set_building(false)
+		return
+	if not _active:
+		_bg_frame += 1
+		if _bg_frame % BACKGROUND_EVERY_N_FRAMES != 0:
+			return
 	var t0 := Time.get_ticks_usec()
 	var built := 0
-	while not _work.is_empty() and (built == 0 or Time.get_ticks_usec() - t0 < FRAME_BUDGET_USEC):
+	while not _work.is_empty() and (built == 0 or (_active and Time.get_ticks_usec() - t0 < FRAME_BUDGET_USEC)):
 		var item: Dictionary = _work.pop_front()
-		var entry: Dictionary = item["entry"]
+		var g: Dictionary = item["g"]
+		if bool(g.get("dead", false)):
+			continue
+		var entries: Array = g["entries"]
+		var ri := int(item["row"])
+		if ri >= entries.size():
+			continue
+		var entry: Dictionary = entries[ri]
 		# Tekstura prije reda: crtež cvijeta se učita ovdje, u budžetu, a ne u _draw.
 		var filled := UiJournal.filled_tiers(str(entry.get("state", "locked")))
 		for tier in range(1, filled + 1):
 			FlowerAssets.get_texture(str(entry.get("type_id", "")), tier)
-		var g: Dictionary = _groups[int(item["group_index"])]
 		var row := JournalRow.new()
 		_size_row(row)
 		(g["group"] as Node).add_child(row)
@@ -119,13 +159,21 @@ func _process(_delta: float) -> void:
 		built += 1
 	if not _work.is_empty():
 		return
-	_building = false
-	set_process(false)
+	_set_building(false)
 	if _pending_scroll:
 		_pending_scroll = false
 		# Skrol tek kad lista ima punu visinu, inace se zaustavi na tadasnjem maksimumu.
 		call_deferred("_scroll_to_new")
 	call_deferred("_maybe_load_more")
+
+
+## Hub: stranica je učitana ali nije na ekranu — pripremi listu unaprijed (bez „viđeno",
+## bez zvuka i skrola). Ulazak poslije toga samo osvježi redove.
+func prewarm() -> void:
+	if _active or not is_inside_tree():
+		return
+	_order = UiJournal.order_seasons(GameState.get_collection_journal_entries(), GameState.active_season_id)
+	_sync_groups(maxi(mini(SEASONS_PER_CHUNK, _order.size()), mini(_groups.size(), _order.size())))
 
 
 func _style_head() -> void:
@@ -159,6 +207,8 @@ func _begin_visit() -> void:
 	var want := mini(SEASONS_PER_CHUNK, _order.size())
 	if _scroll_season >= 0:
 		want = mini(_order.size(), (_scroll_season / SEASONS_PER_CHUNK + 1) * SEASONS_PER_CHUNK)
+	# Već učitane sezone ostaju (izlazak ih više ne briše).
+	want = maxi(want, mini(_groups.size(), _order.size()))
 	_sync_groups(want)
 	if _scroll_season >= 0:
 		# Novo cvijeće u Albumu: šljokice pri ulasku (jednom po posjeti).
@@ -176,8 +226,8 @@ func refresh_for_meta_hub() -> void:
 	_begin_visit()
 
 
-## Odlazak: NEW se gasi na izgrađenim redovima, a lista se skrati na prve tri sezone —
-## sljedeći ulazak opet učitava po tri.
+## Odlazak: NEW se gasi na izgrađenim redovima. Lista OSTAJE (ranije se kratila na tri sezone,
+## pa je svaki sljedeći ulazak opet gradio — štekanje); nedovršena gradnja ide dalje u pozadini.
 func on_meta_page_left() -> void:
 	_active = false
 	_new_snapshot.clear()
@@ -187,87 +237,141 @@ func on_meta_page_left() -> void:
 		for entry in s["entries"]:
 			entry["is_new"] = false
 			entry["new_tier"] = 0
-	for gi in _groups.size():
-		var entries: Array = _order[gi]["entries"] if gi < _order.size() else []
-		var rows: Array = _groups[gi]["rows"]
+	for g in _groups:
+		var entries: Array = g["entries"]
+		var rows: Array = g["rows"]
 		for i in rows.size():
 			if i < entries.size():
 				(rows[i] as CollectionJournalRow).apply(entries[i])
-	_trim_groups(SEASONS_PER_CHUNK)
 
 
-## Potpis sezone: sve što određuje redove i zaglavlje osim napretka unutar reda.
+## Potpis sezone: ono što određuje KOJI su redovi i zaglavlje (bez brojača „kept" — on se
+## mijenja svakim novim cvijetom i samo se prepiše u labeli, ne ruši sezonu).
 func _season_signature(s: Dictionary) -> String:
 	var sid := str(s["sid"])
-	var parts := PackedStringArray([sid, str(s["kept"]), str(s["total"]), str(GameState.is_season_playable(sid))])
+	var parts := PackedStringArray([sid, str(s["total"]), str(GameState.is_season_playable(sid))])
 	for entry in s["entries"]:
 		parts.append(str(entry.get("type_id", "")))
 	return "|".join(parts)
 
 
-## Lista = prvih `want` sezona iz _order. Sezona koja je već na istom mjestu s istim
-## potpisom i svim redovima samo osvježi redove (bez rušenja); od prve razlike nadalje
-## gradi se iznova.
+func _count_text(s: Dictionary) -> String:
+	return "%d / %d kept" % [int(s.get("kept", 0)), int(s.get("total", 0))]
+
+
+## Lista = prvih `want` sezona iz _order. Sezona koja je već izgrađena (isti potpis) se
+## prepozna po id-u gdje god da je sada u redoslijedu: grupa se premjesti i redovi osvježe.
+## Gradi se samo sezona koje nema ili kojoj se promijenio sastav.
 func _sync_groups(want: int) -> void:
-	var keep := 0
-	while keep < _groups.size() and keep < want:
-		var g: Dictionary = _groups[keep]
-		var entries: Array = _order[keep]["entries"]
-		if str(g["sig"]) != _season_signature(_order[keep]) or (g["rows"] as Array).size() != entries.size():
-			break
-		keep += 1
-	_trim_groups(keep)
-	for i in keep:
-		var rows: Array = _groups[i]["rows"]
-		var entries: Array = _order[i]["entries"]
-		for r in rows.size():
-			(rows[r] as CollectionJournalRow).apply(entries[r])
-	while _groups.size() < want:
-		_add_season(_groups.size())
+	if list == null:
+		return
+	var old: Dictionary = {}
+	for g in _groups:
+		old[str(g["sid"])] = g
+	var next: Array[Dictionary] = []
+	for i in mini(want, _order.size()):
+		var s: Dictionary = _order[i]
+		var sid := str(s["sid"])
+		var found: Variant = old.get(sid)
+		if found != null and str(found["sig"]) == _season_signature(s):
+			var g: Dictionary = found
+			old.erase(sid)
+			g["entries"] = s["entries"]
+			var text := _count_text(s)
+			if str(g["count_text"]) != text and is_instance_valid(g["count_label"]):
+				(g["count_label"] as Label).text = text
+				g["count_text"] = text
+			var rows: Array = g["rows"]
+			var entries: Array = s["entries"]
+			for r in mini(rows.size(), entries.size()):
+				(rows[r] as CollectionJournalRow).apply(entries[r])
+			next.append(g)
+		else:
+			next.append(_new_group(s))
+	for sid in old:
+		_free_group(old[sid])
+	_groups = next
+	_drop_dead_work()
+	_place_groups()
+	if _groups.is_empty():
+		_clear_list()
+
+
+func _new_group(s: Dictionary) -> Dictionary:
+	var gap := _spacer(UiJournal.SEASON_GAP)
+	list.add_child(gap)
+	var group := VBoxContainer.new()
+	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	group.add_theme_constant_override("separation", UiJournal.SEASON_HEADER_GAP)
+	var header := _season_header(str(s["sid"]), s)
+	group.add_child(header)
+	list.add_child(group)
+	var g := {
+		"sid": s["sid"], "group": group, "gap": gap, "rows": [], "sig": _season_signature(s),
+		"entries": s["entries"], "count_label": header.get_node_or_null("Count"),
+		"count_text": _count_text(s), "dead": false,
+	}
+	for ri in (s["entries"] as Array).size():
+		_work.append({"g": g, "row": ri})
+	_set_building(true)
+	return g
+
+
+func _free_group(g: Dictionary) -> void:
+	g["dead"] = true
+	for key in ["group", "gap"]:
+		var n: Node = g.get(key)
+		if n != null and is_instance_valid(n):
+			if n.get_parent() != null:
+				n.get_parent().remove_child(n)
+			n.queue_free()
+
+
+func _drop_dead_work() -> void:
+	var kept: Array[Dictionary] = []
+	for item in _work:
+		if not bool((item["g"] as Dictionary).get("dead", false)):
+			kept.append(item)
+	_work = kept
+	_set_building(not _work.is_empty())
+
+
+## Čvorovi liste istim redom kao _groups: vrh, [razmak] sezona, …, dno. Razmak prve je sakriven.
+func _place_groups() -> void:
+	if list == null or _groups.is_empty():
+		return
+	if _top == null or not is_instance_valid(_top):
+		_top = _spacer(UiJournal.LIST_TOP)
+		list.add_child(_top)
+	if _bottom == null or not is_instance_valid(_bottom):
+		_bottom = _spacer(UiJournal.LIST_BOTTOM)
+		list.add_child(_bottom)
+	var idx := 0
+	list.move_child(_top, idx)
+	idx += 1
+	for i in _groups.size():
+		var g: Dictionary = _groups[i]
+		var gap := g["gap"] as Control
+		gap.visible = i > 0
+		list.move_child(gap, idx)
+		idx += 1
+		list.move_child(g["group"] as Node, idx)
+		idx += 1
+	list.move_child(_bottom, list.get_child_count() - 1)
 
 
 func _add_season(index: int) -> void:
 	if list == null or index >= _order.size():
 		return
-	if list.get_child_count() == 0:
-		list.add_child(_spacer(UiJournal.LIST_TOP))
-	if _bottom == null or not is_instance_valid(_bottom):
-		_bottom = _spacer(UiJournal.LIST_BOTTOM)
-		list.add_child(_bottom)
-	var s: Dictionary = _order[index]
-	var gap: Control = null
-	if index > 0:
-		gap = _spacer(UiJournal.SEASON_GAP)
-		list.add_child(gap)
-	var group := VBoxContainer.new()
-	group.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	group.add_theme_constant_override("separation", UiJournal.SEASON_HEADER_GAP)
-	group.add_child(_season_header(str(s["sid"]), s))
-	list.add_child(group)
-	list.move_child(_bottom, list.get_child_count() - 1)
-	_groups.append({"sid": s["sid"], "group": group, "gap": gap, "rows": [], "sig": _season_signature(s)})
-	for entry in s["entries"]:
-		_work.append({"group_index": index, "entry": entry})
-	_building = true
-	set_process(true)
+	_groups.append(_new_group(_order[index]))
+	_place_groups()
 
 
 ## Ostavi prvih `count` sezona; ostale (i njihov nedovršen rad) se brišu.
 func _trim_groups(count: int) -> void:
 	while _groups.size() > count:
-		var g: Dictionary = _groups.pop_back()
-		for key in ["group", "gap"]:
-			var n: Node = g.get(key)
-			if n != null and is_instance_valid(n):
-				n.get_parent().remove_child(n)
-				n.queue_free()
-	var kept: Array[Dictionary] = []
-	for item in _work:
-		if int(item["group_index"]) < _groups.size():
-			kept.append(item)
-	_work = kept
-	_building = not _work.is_empty()
-	set_process(_building)
+		_free_group(_groups.pop_back())
+	_drop_dead_work()
 	if _groups.is_empty():
 		_clear_list()
 
@@ -322,6 +426,7 @@ func _season_header(season_id: String, count: Dictionary) -> HBoxContainer:
 	var kept := int(count.get("kept", 0))
 	var total := int(count.get("total", 0))
 	var num := Label.new()
+	num.name = "Count"
 	num.text = "%d / %d kept" % [kept, total]
 	UiStage.style(num, 800, UiJournal.SEASON_COUNT_FONT, UiJournal.SUB_INK)
 	header.add_child(num)
@@ -343,10 +448,13 @@ func _scroll_to_new() -> void:
 
 
 func _clear_list() -> void:
+	for g in _groups:
+		g["dead"] = true
 	_groups.clear()
 	_work.clear()
-	_building = false
+	_set_building(false)
 	_bottom = null
+	_top = null
 	if list == null:
 		return
 	for child in list.get_children():

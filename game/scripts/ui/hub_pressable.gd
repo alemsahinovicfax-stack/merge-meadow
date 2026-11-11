@@ -18,11 +18,20 @@ var disabled: bool = false:
 		mouse_default_cursor_shape = Control.CURSOR_ARROW if disabled else Control.CURSOR_POINTING_HAND
 		_apply_state()
 
+const DRAG_SCROLL := preload("res://scripts/ui/drag_scroll.gd")
+
 var _pressing: bool = false
+## Dugme u ScrollContaineru: dodir prolazi do skrola, tap tek na puštanje (DragScroll.in_scroll).
+var _in_scroll: bool = false
+var _touch_travel: float = 0.0
+## Prst je dolje na dugmetu u skrolu. Odvojeno od _pressing: mouse_exited (raspored se
+## pomjeri, emulirani miš) gasi _pressing usred dodira, a tap se ne smije izgubiti.
+var _touch_down: bool = false
 
 
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	_in_scroll = DRAG_SCROLL.in_scroll(self)
+	mouse_filter = Control.MOUSE_FILTER_PASS if _in_scroll else Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	focus_mode = Control.FOCUS_NONE
 	gui_input.connect(_on_gui_input)
@@ -46,7 +55,7 @@ func _set_pressing(on: bool) -> void:
 
 func _on_gui_input(event: InputEvent) -> void:
 	if disabled or SceneRouter.is_input_blocked():
-		if event is InputEventMouseButton or event is InputEventScreenTouch:
+		if event is InputEventMouseButton or (event is InputEventScreenTouch and not _in_scroll):
 			accept_event()
 		return
 	if event is InputEventMouseButton:
@@ -67,15 +76,38 @@ func _on_gui_input(event: InputEvent) -> void:
 		accept_event()
 	elif event is InputEventScreenTouch:
 		var touch := event as InputEventScreenTouch
+		if _in_scroll:
+			# Bez accept_event: isti dodir mora stići do ScrollContainera.
+			if touch.pressed:
+				_touch_travel = 0.0
+				_touch_down = true
+				_set_pressing(true)
+			else:
+				var was_down := _touch_down
+				_touch_down = false
+				_set_pressing(false)
+				if was_down:
+					_emit_clicked()
+			return
 		if touch.pressed:
 			_set_pressing(true)
 			_emit_clicked()
 		else:
 			_set_pressing(false)
 		accept_event()
+	elif event is InputEventScreenDrag and _in_scroll and _touch_down:
+		_touch_travel += (event as InputEventScreenDrag).relative.length()
+		if _touch_travel > DRAG_SCROLL.TAP_SLOP:
+			cancel_press()
 
 
 func _on_mouse_exited() -> void:
+	_set_pressing(false)
+
+
+## TouchScroller: gesta je postala skrol — dugme pod prstom ne klikne.
+func cancel_press() -> void:
+	_touch_down = false
 	_set_pressing(false)
 
 

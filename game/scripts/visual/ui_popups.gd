@@ -346,6 +346,8 @@ const S_AD_REVIVE := "Revive"
 const S_AD_DOUBLED := "Doubled"
 const S_AD_NONE := "No ad now"
 const S_RETRY := "Retry"
+## Pređen level: isto dugme vodi na SLJEDEĆI level, pa ne piše „Retry" (FIX-TEL 2026-11).
+const S_CONTINUE := "Continue"
 const S_TO_CAMP := "To Camp"
 const S_ROUND_IN_PROGRESS := "Round in progress"
 const S_UNLOCKED := "Unlocked"

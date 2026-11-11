@@ -947,6 +947,54 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** `phone_playtest_smoke` ide Camp → Arena → Home i pritisne „Play a run"; header i nav moraju ostati, stranica Home između njih.
 
+## #63 — u buildu nema skinova, novog Pipa ni Nibbsa: export ne nosi sirovi `.svg`
+
+**Datum:** 2026-11-11 (prvi playtest na telefonu, AAB 1.0.1 code 10)
+
+**Simptom:** na telefonu stari Pip, u Shopu / Ormaru / runu nema skinova, Nibbs u Areni nevidljiv. Na kompjuteru sve radi. Jučerašnji #61 („u runu samo magnet prsten") je bio isti uzrok, zakrpljen fallbackom.
+
+**Uzrok:** Pip rig, recolor skinova i Nibbs se rasterizuju iz SVG **teksta** (`FileAccess.get_file_as_string("res://assets/…svg")`). Za fajl koji ima `.import` Godot u export stavlja samo `.ctex` i `.import`; `include_filter` s putanjama `.svg` fajlova **ne** dodaje sirovi fajl. `unzip -l merge_meadow.aab` → 0 fajlova `.svg` (isto u svim ranijim APK-ovima).
+
+**Rješenje:** `SvgSource.read()` (`game/scripts/visual/svg_source.gd`) čita sirovi fajl, a kad ga nema kopiju `res://data/svg_src/<putanja>.svgsrc` (ekstenzija bez importera, u export ulazi kroz `include_filter="*.svgsrc"`). Kopije pravi `scripts/sync-svg-src.ps1` (zove ga `android-export.ps1`).
+
+**Prevencija:** `svg_source_smoke` (kopija fali / zastarjela → pad; atlasi svih skinova i Nibbsa imaju regione) — pokreće se i **iz exportovanog paketa** (`scripts/phone-like-run.ps1 -Smoke …`). `android-export.ps1` poslije builda broji `.svgsrc` u AAB-u i pada ako fale. Pravilo: **nikad `FileAccess` na `res://` asset koji ima `.import`**; sve što radi u editoru a čita fajl s diska provjeri iz paketa.
+
+## #64 — visok telefon: bijela traka na Level Pathu, kontrole „na sredini", lista ne ide do dna
+
+**Datum:** 2026-11-11
+
+**Simptom:** na 20:9 ekranu Level Path ima bijelu traku u donjih ~20 % ekrana, pločica „Looks" na Homeu stoji na sredini desne ivice, Camp sekcija (lista + Trade bar) staje prije dna.
+
+**Uzrok:** od #61 viewport na visokom telefonu je 1080 × 2400, a stranice huba računaju s fiksnih 1633 px (`PAGE_H`, `UiHomeField.PAGE.y`, `UiCamp.section_height`). 2400 − 1920 = 480 px = 20 %.
+
+**Rješenje:** visina se čita sa stvarne stranice: `LevelPathKit.page_h` / `scroll_max()` + `LevelPathView.set_page_height()`, `SeasonStage._path_page_h()`, pločica „Looks" prati dno (`_place_wardrobe_button`), Camp sekcija dobije višak visine (samo u hubu — samostalna scena je cijeli ekran).
+
+**Prevencija:** `scripts/screen-matrix.ps1` slika svih 5 stranica + polje + Level Path na 6 omjera (16:9, 19,5:9, 20:9, 21:9, tablet 16:10, tablet 4:3). Nova stranica / kontrola: **nikad konstanta 1633 ili 1920 za poziciju „pri dnu"** — uzmi `size.y` roditelja.
+
+## #65 — prstom ne radi, mišem radi: Shop skrol i sjeme u Areni
+
+**Datum:** 2026-11-11
+
+**Simptom A:** Shop skrola samo između kartica; povlačenje koje počne na kartici skina ili dugmetu za kupovinu ne skrola. **Simptom B:** sjeme spušteno na par u Areni skoči u gornji lijevi ugao.
+
+**Uzrok A:** `ScrollContainer` skrola na dodir samo kad dodir stigne do njega; `HubPressable` / `UiClickButton` ga prihvate (`accept_event`, klik na pritisak), a obični `Control` je po defaultu `MOUSE_FILTER_STOP`. **Uzrok B:** u `_gui_input` je `InputEventScreenDrag.position` **lokalna** koordinata kontrole, a išla je pravo u `global_position`; miš je koristio `get_global_mouse_position()`. Na telefonu je chip vraćao tek emulirani miš, pa ga je puštanje znalo zateći gore lijevo.
+
+**Rješenje:** `TouchScroller` (dijete skrola, gleda dodir u `_input` kao `SwipePager`): pomak > 12 px i pretežno vertikalan → lista prati prst + inercija, dugmad dobiju `cancel_press()`. Dugme u skrolu okida tap na **puštanje**. Chip: `get_global_transform() * drag.position`.
+
+**Prevencija:** `touch_scroll_smoke` šalje prave `InputEventScreenTouch` / `ScreenDrag` (skrol s dugmeta i s kartice, tap prije i poslije, chip prati prst). Zamke pri pisanju takvog testa: (1) `ScrollContainer` na kompjuteru **ne** skrola na dodir (`DisplayServer.is_touchscreen_available()`), (2) headless frejm traje djelić milisekunde — inerciju čekaj **vremenom** (`create_timer`), ne brojem frejmova, (3) `mouse_exited` gasi „pritisnuto" usred dodira — stanje dodira drži u posebnoj zastavici.
+
+## #66 — dijete `PanelContainer`-a ne ostaje gdje ga postaviš (prsten oko coin čipa)
+
+**Datum:** 2026-11-11
+
+**Simptom:** prsten „fali coina" oko coin čipa u headeru je pomjeren i manji od čipa (i na kompjuteru).
+
+**Uzrok:** prsten je bio dijete `CoinChip` (`PanelContainer`), a kontejner svako dijete rasporedi u svoj sadržaj i pregazi `size` / `position` postavljene u kodu.
+
+**Rješenje:** `top_level = true` + globalni rect čipa; radius uglova iz stila čipa + debljina prstena.
+
+**Prevencija:** ukras koji mora izaći iz okvira kontejnera nikad nije obično dijete kontejnera (`top_level`, ili roditelj koji nije kontejner).
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

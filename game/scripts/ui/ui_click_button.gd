@@ -88,11 +88,19 @@ var _repeat_touch: bool = false
 var _repeat_delay_left: float = 0.0
 var _repeat_accum: float = 0.0
 var _repeat_blocked: bool = false
+## Dugme u ScrollContaineru: dodir prolazi do skrola, tap tek na puštanje (DragScroll.in_scroll).
+var _in_scroll: bool = false
+var _touch_travel: float = 0.0
+## Prst je dolje na dugmetu u skrolu (odvojeno od _pressing, koji gasi mouse_exited).
+var _touch_down: bool = false
+
+const DRAG_SCROLL := preload("res://scripts/ui/drag_scroll.gd")
 
 
 func _ready() -> void:
 	set_process(false)
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	_in_scroll = not Engine.is_editor_hint() and DRAG_SCROLL.in_scroll(self)
+	mouse_filter = Control.MOUSE_FILTER_PASS if _in_scroll else Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	focus_mode = Control.FOCUS_NONE
 	_build_styles()
@@ -236,7 +244,7 @@ func _update_icon() -> void:
 func _apply_disabled() -> void:
 	# Dok traje hold input mora ostati na dugmetu, inače release nikad ne stigne.
 	var block_input := disabled and not _repeat_active
-	mouse_filter = Control.MOUSE_FILTER_IGNORE if block_input else Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if block_input else (Control.MOUSE_FILTER_PASS if _in_scroll else Control.MOUSE_FILTER_STOP)
 	mouse_default_cursor_shape = Control.CURSOR_ARROW if disabled else Control.CURSOR_POINTING_HAND
 	if disabled:
 		modulate = Color(1.0, 1.0, 1.0, 0.6 if ghost_when_disabled else 0.45)
@@ -366,13 +374,23 @@ func _emit_clicked() -> void:
 	clicked.emit()
 
 
+## TouchScroller: gesta je postala skrol — dugme pod prstom ne klikne.
+func cancel_press() -> void:
+	if auto_repeat:
+		end_press()
+	_touch_down = false
+	_pressing = false
+	_apply_panel_style()
+
+
 func _on_gui_input(event: InputEvent) -> void:
 	if disabled or SceneRouter.is_input_blocked():
 		if event is InputEventMouseButton or event is InputEventScreenTouch:
 			# Hold koji je usput postao disabled mora primiti svoj release.
 			if not event.is_pressed():
 				end_press()
-			accept_event()
+			if not (_in_scroll and event is InputEventScreenTouch):
+				accept_event()
 		return
 	if event is InputEventMouseButton:
 		var mouse := event as InputEventMouseButton
@@ -395,6 +413,24 @@ func _on_gui_input(event: InputEvent) -> void:
 			_pressing = false
 			_apply_panel_style()
 		accept_event()
+	elif event is InputEventScreenTouch and _in_scroll and not auto_repeat:
+		# U skrolu: bez accept_event (dodir ide i ScrollContaineru), tap tek na puštanje.
+		var st := event as InputEventScreenTouch
+		if st.pressed:
+			_touch_travel = 0.0
+			_touch_down = true
+			_pressing = true
+		else:
+			var was_down := _touch_down
+			_touch_down = false
+			_pressing = false
+			if was_down:
+				_emit_clicked()
+		_apply_panel_style()
+	elif event is InputEventScreenDrag and _in_scroll and _touch_down and not auto_repeat:
+		_touch_travel += (event as InputEventScreenDrag).relative.length()
+		if _touch_travel > DRAG_SCROLL.TAP_SLOP:
+			cancel_press()
 	elif event is InputEventScreenTouch:
 		var touch := event as InputEventScreenTouch
 		if touch.pressed:

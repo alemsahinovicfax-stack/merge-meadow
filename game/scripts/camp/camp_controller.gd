@@ -61,6 +61,7 @@ var _tab_tween: Tween
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	resized.connect(_apply_stash_layout)
 	_meta_hub_embedded = bool(get_meta("meta_hub_embedded", false))
 	GameState.ensure_loot_in_camp_bag()
 	_setup_stash()
@@ -294,14 +295,22 @@ func _apply_empty_state(flowers: bool) -> void:
 	)
 	# Bez rečenice ispod naslova — CTA vec kaze odakle stvari dolaze (v2).
 	empty_title.text = "No flowers yet" if flowers else "Your bag is empty"
-	empty_cta.set_text("Merge in Arena ↗" if flowers else "Open meadow ↗")
+	# Strelica je SVG ikona (icon_external), ne znak „↗" u tekstu: font igre ga nema, pa ga je
+	# telefon crtao svojim sistemskim fontom (druga, „stara" ikona — FIX-TEL 2026-11).
+	empty_cta.set_text("Merge in Arena" if flowers else "Open meadow")
+	empty_cta.set_icon(UiAssets.get_chrome_icon("icon_external"), UiCamp.EMPTY_CTA_ICON, true)
 
 
 ## v2: sekcija je uvijek iste visine (1253 s karticom sezone, 1549 bez nje), pa
 ## nema rupe u sredini stranice. Lista uzima ostatak i skrola kad ima vise redova.
 func _apply_stash_layout() -> void:
 	var hero := season_link_card.visible
-	stash_section.custom_minimum_size.y = UiCamp.section_height(hero)
+	# Visok telefon: stranica je viša od 1633 — sekcija (lista + Trade bar) ide do dna.
+	# Samo u hubu: tamo je visina stranice zadana izvana (samostalna scena je cijeli ekran).
+	var extra := maxf(0.0, size.y - float(UiCamp.PAGE_H)) if _meta_hub_embedded else 0.0
+	var want := float(UiCamp.section_height(hero)) + extra
+	if not is_equal_approx(stash_section.custom_minimum_size.y, want):
+		stash_section.custom_minimum_size.y = want
 	stash_section.size_flags_vertical = Control.SIZE_FILL
 
 

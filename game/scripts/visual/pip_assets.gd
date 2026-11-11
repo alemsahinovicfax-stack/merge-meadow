@@ -72,7 +72,7 @@ static func get_pose_texture(pose: String, skin_id: String = EQUIPPED) -> Textur
 
 static func _pose_source(path: String) -> String:
 	if not _pose_sources.has(path):
-		_pose_sources[path] = FileAccess.get_file_as_string(path) if FileAccess.file_exists(path) else ""
+		_pose_sources[path] = SvgSource.read(path)
 	return _pose_sources[path]
 
 
@@ -136,13 +136,12 @@ static func texture_for_recolor(recolor: Dictionary, raster_scale: float = SKIN_
 	return tex
 
 
-## Tekst izvornog pip_idle.svg (export: include_filter u export_presets.cfg).
+## Tekst izvornog pip_idle.svg (export: kopija .svgsrc, vidi SvgSource).
 static func svg_source() -> String:
 	if _svg_tried:
 		return _svg_source
 	_svg_tried = true
-	if FileAccess.file_exists(SPRITE_PATH):
-		_svg_source = FileAccess.get_file_as_string(SPRITE_PATH)
+	_svg_source = SvgSource.read(SPRITE_PATH)
 	return _svg_source
 
 

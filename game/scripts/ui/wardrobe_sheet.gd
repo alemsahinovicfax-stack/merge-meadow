@@ -240,7 +240,7 @@ func _build() -> void:
 	_sheet.mouse_filter = Control.MOUSE_FILTER_STOP
 	_sheet.add_theme_stylebox_override("panel", UiWardrobe.sheet())
 	_sheet.size = Vector2(UiHomeField.PAGE.x, UiWardrobe.SHEET_H)
-	_sheet.position = Vector2(0.0, float(UiHomeField.PAGE.y))
+	_sheet.position = Vector2(0.0, maxf(size.y, float(UiHomeField.PAGE.y)))
 	add_child(_sheet)
 
 	_head = Control.new()

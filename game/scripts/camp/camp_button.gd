@@ -121,10 +121,15 @@ func set_ink(color: Color) -> void:
 	_sub.add_theme_color_override("font_color", color)
 
 
-func set_icon(texture: Texture2D, side: float) -> void:
+## after_text: ikona desno od teksta (strelica „otvori"), inače lijevo.
+func set_icon(texture: Texture2D, side: float, after_text: bool = false) -> void:
 	_ensure_camp_content()
 	if _icon_rect == null:
 		return
+	if _row_box != null and _text_col != null:
+		var want := _text_col.get_index() + 1 if after_text else 0
+		if after_text != (_icon_rect.get_index() > _text_col.get_index()):
+			_row_box.move_child(_icon_rect, mini(want, _row_box.get_child_count() - 1))
 	_icon_rect.texture = texture
 	_icon_rect.custom_minimum_size = Vector2(side, side)
 	_icon_rect.visible = texture != null

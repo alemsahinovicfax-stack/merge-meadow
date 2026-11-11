@@ -91,6 +91,7 @@ func _ready() -> void:
 	IAPManager.purchase_completed.connect(_on_purchase_done)
 	IAPManager.purchase_failed.connect(_on_purchase_failed)
 	_ensure_level_path()
+	resized.connect(_sync_path_page)
 	_view_season(_home_focus_id())
 	_seen_focus = _home_focus_id()
 	refresh()
@@ -1183,7 +1184,8 @@ func _ensure_level_path() -> void:
 	level_path.visible = false
 	add_child(level_path)
 	move_child(level_path, travel_layer.get_index())
-	level_path.position = Vector2(0.0, UiHomeField.PAGE.y)
+	level_path.set_page_height(_path_page_h())
+	level_path.position = Vector2(0.0, _path_page_h())
 	level_path.reward_claimed.connect(func(_n: int) -> void: _refresh_view())
 	_reparent_path_popup.call_deferred()
 	level_path.hop_finished.connect(_refresh_view)
@@ -1309,7 +1311,7 @@ func _reset_level_path() -> void:
 	_path_u = 0.0
 	_chrome_out = 0.0
 	level_path.visible = false
-	level_path.position.y = UiHomeField.PAGE.y
+	level_path.position.y = _path_page_h()
 	level_path.release_pip_travel()
 	season_field.visible = true
 	if was:
@@ -1317,6 +1319,19 @@ func _reset_level_path() -> void:
 			_release_pip()
 		_notify_host("apply_level_path_chrome", Vector2.ZERO)
 		_notify_host("on_level_path_finished", false)
+
+
+## Visina stranice za put: stvarna (visok telefon), nikad manja od 1633.
+func _path_page_h() -> float:
+	return maxf(size.y, float(UiHomeField.PAGE.y))
+
+
+func _sync_path_page() -> void:
+	if level_path == null:
+		return
+	level_path.set_page_height(_path_page_h())
+	if not _path_moving:
+		level_path.position.y = 0.0 if GameState.level_path_open else _path_page_h()
 
 
 func _kill_path_tween() -> void:
@@ -1330,7 +1345,7 @@ func _set_path_u(u: float) -> void:
 	_path_u = clampf(u, 0.0, 1.0)
 	var t := _path_u * LevelPathKit.TO_PATH_SEC
 	var e := _out3(clampf((t - 0.04) / 0.46, 0.0, 1.0))
-	level_path.position.y = (1.0 - e) * UiHomeField.PAGE.y
+	level_path.position.y = (1.0 - e) * _path_page_h()
 	var q := LevelPathView._io2(clampf((t - 0.06) / 0.44, 0.0, 1.0))
 	_travel_pip(q, 150.0)
 	_path_chrome(clampf(t / 0.2, 0.0, 1.0), clampf((t - 0.16) / 0.16, 0.0, 1.0))
@@ -1341,7 +1356,7 @@ func _set_path_u_back(u: float) -> void:
 	_path_u = clampf(u, 0.0, 1.0)
 	var t := (1.0 - _path_u) * LevelPathKit.TO_FIELD_SEC
 	var e := _in3(clampf(t / 0.4, 0.0, 1.0))
-	level_path.position.y = e * UiHomeField.PAGE.y
+	level_path.position.y = e * _path_page_h()
 	var q := LevelPathView._io2(clampf(t / 0.4, 0.0, 1.0))
 	_travel_pip(1.0 - q, 120.0)
 	_path_chrome(1.0 - clampf((t - 0.22) / 0.2, 0.0, 1.0), 1.0 - clampf(t / 0.16, 0.0, 1.0))

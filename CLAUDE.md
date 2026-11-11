@@ -94,6 +94,16 @@ Ne implementiraj dok korisnik ne potvrdi.
 - Za provjeru grešaka tokom rada koristi **headless smoke-test** (`--headless ... --quit-after N`), ne GUI
 - Detalji: `docs/05-technical/godot-dev-setup.md`, `docs/05-technical/godot/dev-workflow.md`
 
+## Build za Play (obavezno prije uploada)
+
+Nijedan AAB ne ide na Play bez **`scripts/release-check.ps1`** → mora završiti s `RELEASE OK` (testovi na čistom saveu, testovi IZ exportovanog paketa, version code, sadržaj AAB-a). Uveden 2026-11-11 jer je build bez skinova i Nibbsa otišao na internal test (`greske-katalog.md` #63–#65).
+
+- **Bug s telefona → prvo ga reprodukuj na kompjuteru:** `scripts/phone-like-run.ps1` (igra iz paketa, omjer telefona) ili `scripts/screen-matrix.ps1` (slike na 6 omjera); pa test koji ga hvata; tek onda ispravka
+- **Nikad `FileAccess` na `res://` asset koji ima `.import`** (u exportu ne postoji) — SVG tekst ide kroz `SvgSource.read()`; poslije izmjene SVG-ova u `assets/pip`, `assets/muncher`, `assets/sprites/pip_*` pokreni `scripts/sync-svg-src.ps1` i commitaj `data/svg_src/`
+- **Raspored:** nikad konstanta 1633 / 1920 za „pri dnu" — stranica je viša na visokim telefonima
+- **Dodir:** dugme u skrol listi okida na puštanje; ponašanje prstom testiraj pravim `InputEventScreenTouch` (`touch_scroll_smoke`)
+- Poslije uploada: red u `docs/06-production/play-uploads.md`
+
 ## Pisanje Godot koda (game/)
 
 Prije pisanja/izmjene koda u `game/` konzultiraj **Godot priručnik**: `docs/05-technical/godot/_index.md`.

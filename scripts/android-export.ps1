@@ -1,4 +1,4 @@
-# Headless Android export (Gradle build) - debug APK, release APK (emulator) ili release AAB (Play).
+﻿# Headless Android export (Gradle build) - debug APK, release APK (emulator) ili release AAB (Play).
 # Primjeri:
 #   .\scripts\android-export.ps1 -Preset Aab      -> game\export\android\merge_meadow.aab
 #   .\scripts\android-export.ps1 -Preset Apk      -> game\export\android\merge_meadow_release.apk
@@ -48,6 +48,9 @@ if ($p.Release) {
     }
 }
 
+# Kopije SVG teksta (.svgsrc) - bez njih telefon nema skinove ni Nibbsa (greske-katalog #63).
+& "$PSScriptRoot\sync-svg-src.ps1"
+
 $godot = Get-GodotConsoleExecutable
 $mode = if ($p.Release) { "--export-release" } else { "--export-debug" }
 # Template samo kad fali ili je za drugu verziju Godota: ponovna instalacija usred scana
@@ -81,5 +84,14 @@ if ($p.Release) {
 if ($code -ne 0 -or -not (Test-Path $outPath)) {
     throw "Export nije uspio (exit $code). Log: $log"
 }
+# Cuvar: paket mora nositi SVG tekst koji kod cita (SvgSource). Ako ga nema, build je neupotrebljiv.
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$zip = [IO.Compression.ZipFile]::OpenRead($outPath)
+try { $svgSrc = @($zip.Entries | Where-Object { $_.FullName -like "*data/svg_src/*.svgsrc" }).Count } finally { $zip.Dispose() }
+$svgWant = @(Get-ChildItem (Join-Path $gameDir "data\svg_src") -Filter "*.svgsrc" -File -Recurse).Count
+if ($svgSrc -lt $svgWant -or $svgWant -eq 0) {
+    throw "Export nema SVG tekst: $svgSrc od $svgWant .svgsrc fajlova u paketu (include_filter *.svgsrc u export_presets.cfg)."
+}
+Write-Host "[android] SVG tekst u paketu: $svgSrc / $svgWant"
 $mb = [math]::Round((Get-Item $outPath).Length / 1MB, 1)
 Write-Host "[android] OK - $outPath ($mb MB). Log: $log"

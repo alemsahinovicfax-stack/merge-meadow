@@ -158,25 +158,15 @@ func _set_shake(x: float) -> void:
 	queue_redraw()
 
 
-func _on_gui_input(event: InputEvent) -> void:
+## coins.short: tap drhti i javi „fali coina" — istim putem kao svaki tap (HubPressable),
+## pa u skrolu okida tek na puštanje i povlačenje preko dugmeta skrola listu.
+func _emit_clicked() -> void:
 	if state == UiShopV2.COINS_SHORT_STATE:
-		var tapped := false
-		if event is InputEventMouseButton and event.device == InputEvent.DEVICE_ID_EMULATION:
-			# Telefon: emulirani miš prati svaki dodir — tap ide samo kroz touch.
-			accept_event()
-			return
-		if event is InputEventMouseButton:
-			var mb := event as InputEventMouseButton
-			tapped = mb.button_index == MOUSE_BUTTON_LEFT and not mb.pressed
-		elif event is InputEventScreenTouch:
-			tapped = (event as InputEventScreenTouch).pressed
-		if tapped:
-			shake()
-			Sfx.play("ui_denied")
-			short_tapped.emit()
-			accept_event()
+		shake()
+		Sfx.play("ui_denied")
+		short_tapped.emit()
 		return
-	super(event)
+	super()
 
 
 ## Potvrda coin kupovine i „Owned → obuci" puštaju svoj zvuk (coins_spend / wear); Play svoj.

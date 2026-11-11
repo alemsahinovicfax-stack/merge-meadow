@@ -7,6 +7,9 @@ const PICKUP_ASSETS := preload("res://scripts/visual/pickup_assets.gd")
 const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
 
 ## Settings ekran je D0-P — do tada kratka poruka ispod headera (kao ranije na Home).
+## Debljina prstena „fali coina" oko čipa u headeru (px baze).
+const COIN_RING_W := 6
+const JOURNAL_PREWARM_DELAY_SEC := 0.9
 const COIN_POP_POS := Vector2(150, 132)  # design_handoff_shop · CoinSpendPop
 
 @onready var swipe_pager: SwipePager = $RootVBox/SwipePager
@@ -196,6 +199,7 @@ func _finish_boot(start: int) -> void:
 		FlowerAssets.prefetch_rosters()
 		_queue_background_pages()
 	, CONNECT_ONE_SHOT)
+	_prewarm_journal_soon()
 	swipe_pager.go_to_page(start, false)
 	_on_page_changed(start)
 	_show_swipe_hint_if_needed()
@@ -268,6 +272,27 @@ func _on_page_changed(index: int) -> void:
 	# Journal briše "novo" tek u refresh_for_meta_hub, pa badge ide poslije.
 	_refresh_tab_badges()
 	_notify_arena_page_active(index == MetaHubPagesScript.ARENA)
+	_prewarm_journal_soon()
+
+
+## Journal gradi listu dok igrač gleda drugu stranicu (FIX-TEL 2026-11): ulazak zatekne gotove
+## redove umjesto da ih gradi pred igračem. Odgoda da prelaz stranice prođe bez dodatnog rada.
+func _prewarm_journal_soon() -> void:
+	if not is_inside_tree() or _current_page == MetaHubPagesScript.COLLECTION:
+		return
+	get_tree().create_timer(JOURNAL_PREWARM_DELAY_SEC).timeout.connect(_prewarm_journal)
+
+
+func _prewarm_journal() -> void:
+	if _current_page == MetaHubPagesScript.COLLECTION or swipe_pager == null:
+		return
+	if swipe_pager.has_method("is_moving") and bool(swipe_pager.call("is_moving")):
+		_prewarm_journal_soon()
+		return
+	var host: Control = swipe_pager.get_pages_host() as Control
+	var page := host.get_node_or_null("Page_%d" % MetaHubPagesScript.COLLECTION) if host else null
+	if page != null and page.has_method("prewarm"):
+		page.call("prewarm")
 
 
 ## Arena ima svoju temu; ostale stranice huba sviraju home temu aktivne sezone.
@@ -562,17 +587,36 @@ func pulse_coin_chip() -> void:
 	var tw := coin_chip.create_tween()
 	tw.tween_property(coin_chip, "scale", Vector2.ONE * 1.06, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.tween_property(coin_chip, "scale", Vector2.ONE, 0.18)
+	# Prsten prati stvarni oblik čipa: isti radius uglova + debljina prstena, tačno oko ruba
+	# (ranije fiksni radius 26 — na čipu drugog radiusa prsten je odstajao u uglovima).
+	var old_ring := coin_chip.get_node_or_null("CoinPulseRing")
+	if old_ring != null:
+		old_ring.queue_free()
 	var ring := Panel.new()
+	ring.name = "CoinPulseRing"
 	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var grow := COIN_RING_W
 	var sb := StyleBoxFlat.new()
 	sb.draw_center = false
-	sb.set_border_width_all(6)
+	sb.set_border_width_all(COIN_RING_W)
 	sb.border_color = Color("#FFD56B")
-	sb.set_corner_radius_all(26)
+	sb.anti_aliasing = true
+	var chip_sb := coin_chip.get_theme_stylebox("panel") as StyleBoxFlat
+	if chip_sb != null:
+		sb.corner_radius_top_left = chip_sb.corner_radius_top_left + grow
+		sb.corner_radius_top_right = chip_sb.corner_radius_top_right + grow
+		sb.corner_radius_bottom_left = chip_sb.corner_radius_bottom_left + grow
+		sb.corner_radius_bottom_right = chip_sb.corner_radius_bottom_right + grow
+	else:
+		sb.set_corner_radius_all(int(coin_chip.size.y * 0.5) + grow)
 	ring.add_theme_stylebox_override("panel", sb)
-	ring.size = coin_chip.size + Vector2(12, 12)
-	ring.position = Vector2(-6, -6)
+	# CoinChip je PanelContainer: dijete bi rasporedio u svoj sadržaj (zato je stari prsten
+	# bio pomjeren i manji od čipa). top_level ga vadi iz rasporeda; rect je u koordinatama huba.
+	ring.top_level = true
 	coin_chip.add_child(ring)
+	var chip_rect := coin_chip.get_global_rect()
+	ring.global_position = chip_rect.position - Vector2(grow, grow)
+	ring.size = chip_rect.size + Vector2(grow, grow) * 2.0
 	var rt := ring.create_tween()
 	rt.tween_property(ring, "modulate:a", 0.0, 0.3)
 	rt.tween_callback(ring.queue_free)

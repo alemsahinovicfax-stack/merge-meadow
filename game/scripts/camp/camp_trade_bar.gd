@@ -27,6 +27,8 @@ var _gain: int = 0
 var _hold_ticks: int = 0
 var _switch_tween: Tween
 var _fly_coins: Array[Control] = []
+## Novčići koji su stigli i čekaju sljedeći let (sakriveni, ostaju djeca huba).
+var _coin_pool: Array[TextureRect] = []
 var _bump: Panel = null
 var _bump_tween: Tween
 var _feedback_tween: Tween
@@ -261,18 +263,28 @@ func _fly_coin() -> void:
 	var chip := hub.get("coin_chip") as Control
 	if chip == null or not is_instance_valid(chip):
 		return
-	var coin := TextureRect.new()
-	coin.name = "FlyCoin"
+	# Pool (FIX-TEL 2026-11): držanje dugmeta = 10 trejdova u sekundi; novi čvor + brisanje po
+	# trejdu je štekalo na telefonu. Najviše FLY_COIN_MAX novčića, isti čvorovi kruže.
+	var coin: TextureRect = null
+	while not _coin_pool.is_empty() and coin == null:
+		var pooled: TextureRect = _coin_pool.pop_back()
+		if is_instance_valid(pooled) and pooled.get_parent() == hub:
+			coin = pooled
+	if coin == null:
+		coin = TextureRect.new()
+		coin.name = "FlyCoin"
+		coin.custom_minimum_size = Vector2(UiCamp.FLY_COIN, UiCamp.FLY_COIN)
+		coin.size = coin.custom_minimum_size
+		coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		coin.top_level = true
+		coin.z_index = 100
+		coin.pivot_offset = coin.size * 0.5
+		hub.add_child(coin)
 	coin.texture = feedback_coin.texture
-	coin.custom_minimum_size = Vector2(UiCamp.FLY_COIN, UiCamp.FLY_COIN)
-	coin.size = coin.custom_minimum_size
-	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	coin.top_level = true
-	coin.z_index = 100
-	coin.pivot_offset = coin.size * 0.5
-	hub.add_child(coin)
+	coin.scale = Vector2.ONE
+	coin.visible = true
 	_fly_coins.append(coin)
 	coin.global_position = button.global_position + button.size * 0.5 - coin.size * 0.5
 	var to := chip.global_position + chip.size * 0.5 - coin.size * 0.5
@@ -287,7 +299,8 @@ func _fly_coin() -> void:
 func _on_fly_coin_arrived(coin: Control, chip: Control) -> void:
 	_fly_coins.erase(coin)
 	if is_instance_valid(coin):
-		coin.queue_free()
+		coin.visible = false
+		_coin_pool.append(coin)
 	_bump_coin_chip(chip)
 
 

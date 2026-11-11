@@ -290,13 +290,36 @@ func _run() -> void:
 		push_error("collection_journal_smoke: all seasons loaded should show 48 rows, got %d" % _bloom_rows(list).size())
 		_quit(1)
 		return
-	# Izlazak ostavi prve tri; sljedeći ulazak opet puni po tri.
+	# FIX-TEL 2026-11: izlazak NE skraćuje listu (svaki ulazak je inače opet gradio = štekanje).
+	var all_rows: Array[int] = []
+	for r in _bloom_rows(list):
+		all_rows.append(r.get_instance_id())
 	journal.call("on_meta_page_left")
 	await process_frame
-	if int(journal.call("loaded_season_count")) != 3:
-		push_error("collection_journal_smoke: leaving should keep 3 seasons, got %d" % int(journal.call("loaded_season_count")))
+	if int(journal.call("loaded_season_count")) != 8:
+		push_error("collection_journal_smoke: leaving should keep all 8 loaded seasons, got %d" % int(journal.call("loaded_season_count")))
 		_quit(1)
 		return
+	# Novi napredak (cvijet više u Albumu) mijenja brojač „kept" i zna promijeniti redoslijed
+	# sezona — redovi ostaju isti čvorovi, ništa se ne gradi iznova.
+	var kept_more: Dictionary = (gs.get("collection_kept_tiers") as Dictionary).duplicate()
+	kept_more["daisy"] = 3
+	gs.set("collection_kept_tiers", kept_more)
+	journal.call("prewarm")
+	await _wait_built(journal)
+	journal.call("refresh_for_meta_hub")
+	await _wait_built(journal)
+	var rows_after: Array[int] = []
+	for r in _bloom_rows(list):
+		rows_after.append(r.get_instance_id())
+	all_rows.sort()
+	rows_after.sort()
+	if all_rows.size() != 48 or all_rows != rows_after:
+		push_error("collection_journal_smoke: new progress rebuilt rows (%d -> %d, same nodes: %s)" % [all_rows.size(), rows_after.size(), str(all_rows == rows_after)])
+		_quit(1)
+		return
+	journal.call("on_meta_page_left")
+	await process_frame
 
 	# Loot Burst (Shop): ★3 ide u stash I u Album (bug Crystal Peony 2026-10-06).
 	gs.call("reset_seasons_to_s1")

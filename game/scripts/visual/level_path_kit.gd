@@ -17,6 +17,14 @@ const W := 1080.0
 const H := 4900.0
 const PAGE_H := 1633.0
 const SCROLL_MAX := H - PAGE_H
+## Stvarna visina stranice (visok telefon: > 1633). Postavlja je LevelPathView.set_page_height;
+## bez toga je put na 20:9 ekranu završavao 480 px prije dna (bijela traka, FIX-TEL).
+static var page_h: float = PAGE_H
+
+
+static func scroll_max() -> float:
+	return maxf(0.0, H - maxf(page_h, PAGE_H))
+
 const OPEN_Y := 1100.0
 const VIEW_SAFE := Vector2(150.0, 1440.0)
 const STONE_BOX := Vector2(180, 140)
@@ -169,7 +177,7 @@ static func open_scroll(level: int, ready: Array) -> float:
 			bottom = maxf(bottom, p.y + 100.0)
 	if bottom > -INF and bottom - y > VIEW_SAFE.y - 20.0:
 		y = bottom - (VIEW_SAFE.y - 20.0)
-	return clampf(y, 0.0, SCROLL_MAX)
+	return clampf(y, 0.0, scroll_max())
 
 
 static func path_recipe(season_id: String) -> Dictionary:
