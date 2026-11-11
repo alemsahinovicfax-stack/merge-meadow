@@ -61,7 +61,6 @@ Puna dokumentacija: `docs/07-meta/frontmatter-shema.md`.
 - `docs/templates/` — predlošci
 - `docs/00-personal/credentials.local.md` i `*.local.md` — **gitignore, tajne**
 - Zatvorena B0 sekcija kad je `b0_aktivan: false`
-- `.obsidian/app.json`, `daily-notes.json`, `templates.json` — dijeljena Obsidian konfiguracija
 
 ## Proaktivne ideje (max 1 po sesiji)
 
