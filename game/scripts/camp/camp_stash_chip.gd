@@ -41,6 +41,9 @@ var _price_label: Label
 var _count_pill: PanelContainer
 var _price_pill: PanelContainer
 var _mark: Panel
+## Stanje + rijetkost za koje su theme overrideovi zadnji put postavljeni.
+var _styled_key: String = ""
+var _merge_styled: bool = false
 
 
 func _ready() -> void:
@@ -90,12 +93,19 @@ func get_badge_text() -> String:
 
 
 ## Lagani update za hold-trade — bez ponovnog crtanja arta.
+## FIX-TEL-2 (2026-11-12): trejd zove set_count na SVIM chipovima (10 puta u sekundi dok se
+## drži). Isti broj = ništa; novi broj = samo labela. Stil i oznaka se diraju tek kad se stanje
+## stvarno promijeni (ranije: theme override na svakom chipu po trejdu = ~40 ms po trejdu).
 func set_count(count: int) -> void:
+	if count == _count and _count_label != null and _count_label.text == str(count):
+		return
 	var was_mergeable := _kind == "seed" and UiCamp.is_mergeable(_count)
 	_count = count
 	if _count_label:
 		_count_label.text = str(count)
-	_apply_merge_mark(was_mergeable != (_kind == "seed" and UiCamp.is_mergeable(_count)))
+	var now_mergeable := _kind == "seed" and UiCamp.is_mergeable(_count)
+	if was_mergeable != now_mergeable:
+		_apply_merge_mark(true)
 	_apply_style()
 
 
@@ -306,7 +316,9 @@ func _apply_merge_mark(animate: bool) -> void:
 	if _merge_mark == null:
 		return
 	var show := _kind == "seed" and not _reserved and UiCamp.is_mergeable(_count)
-	_merge_mark.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(false))  # chip je uvijek mint; amber disk samo u liniji ispod Tradea
+	if not _merge_styled:
+		_merge_styled = true
+		_merge_mark.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(false))  # chip je uvijek mint; amber disk samo u liniji ispod Tradea
 	if show == _merge_mark.visible and not animate:
 		return
 	_merge_mark.visible = show
@@ -331,6 +343,10 @@ func _apply_style() -> void:
 		_state = UiCamp.CHIP_PRESSED
 	else:
 		_state = UiCamp.CHIP_IDLE
+	var key := "%s|%d" % [_state, _rarity]
+	if key == _styled_key:
+		return
+	_styled_key = key
 	add_theme_stylebox_override("panel", UiCamp.chip_style(_state, _rarity, 0.0))
 	var ink := UiCamp.chip_ink(_state)
 	UiCamp.style_label(_name_label, UiCamp.FONT_CHIP_NAME, ink, UiCamp.HEAVY, 1.05)

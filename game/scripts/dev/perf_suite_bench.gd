@@ -451,6 +451,7 @@ func _run_suite() -> void:
 				ps["open"] = not ps["open"])
 		if bool(ps["open"]):
 			run.call("_on_keep_running")
+			run.call("skip_resume_countdown")
 	run.queue_free()
 	await _frames(3)
 	if _wants("run"):

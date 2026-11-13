@@ -12,6 +12,10 @@ tags: [hub, produkcija]
 - [[CHECKPOINT|CHECKPOINT]] — **dnevni operativni vodič** (otvori prvo); jedini izvor istine za fazu/milestone
 - [[plan-telefon-playtest-1111|plan-telefon-playtest-1111]] — FIX-TEL: ispravke poslije prvog playtesta na telefonu (2026-11-11)
 - [[telefon-playtest-1111-izvjestaj|telefon-playtest-1111-izvjestaj]] — FIX-TEL izvještaj: šta je popravljeno, šta nije potvrđeno, lista za telefon
+- [[plan-telefon-playtest-1112|plan-telefon-playtest-1112]] — FIX-TEL-2: drugi krug prijava s telefona (2026-11-12)
+- [[telefon-playtest-1112-izvjestaj|telefon-playtest-1112-izvjestaj]] — FIX-TEL-2 izvještaj: šta je urađeno, mjerenja, šta provjeriti na telefonu
+- [[plan-telefon-playtest-1112b|plan-telefon-playtest-1112b]] — FIX-TEL-3: treći krug prijava s telefona (2026-11-12)
+- [[telefon-playtest-1112b-izvjestaj|telefon-playtest-1112b-izvjestaj]] — FIX-TEL-3 izvještaj: Arena štekanje, Level Path, Journal, Muncher, cijene
 - [[play-uploads|play-uploads]] — dnevnik uploada na Play (version code); čita ga kapija `release-check.ps1`
 - [[plan-arhitektura-refaktor|plan-arhitektura-refaktor]] — kod arhitektura refaktor (nakon CAMP-06)
 - [[d0-prelaunch-checklist|d0-prelaunch-checklist]] — Faza 1 checklist (prije Play $25)

@@ -84,6 +84,13 @@ static func _crop_rect(tex: Texture2D) -> Rect2:
 	if _crop_cache.has(key):
 		return _crop_cache[key]
 	var rect := Rect2(Vector2.ZERO, tex.get_size())
+	# Tabela (FlowerCropTable, generisana) prije svega: tex.get_image() čita teksturu nazad s
+	# grafičke kartice — na telefonu zastoj pri prvom crtanju svake vrste cvijeta.
+	var row: Variant = FlowerCropTable.TABLE.get(tex.resource_path)
+	if row is Array and row.size() >= 6 and Vector2(row[4], row[5]) == tex.get_size():
+		rect = Rect2(row[0], row[1], row[2], row[3])
+		_crop_cache[key] = rect
+		return rect
 	var image := tex.get_image()
 	if image != null:
 		var used := image.get_used_rect()

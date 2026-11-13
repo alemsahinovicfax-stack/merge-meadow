@@ -314,8 +314,10 @@ func _run() -> void:
 	gs.set("garden_crystal_stash", {frost_flower: need})
 	gs.set("wallet_coins", 500)
 	# Nivoi nadogradnji su po sezoni i ostaju u saveu — pravi save može imati Frost na max,
-	# pa nijedna kupovina nije „can" i napomene nema (greske-katalog #45).
-	(gs.get("season_upgrades") as Dictionary).erase("frost_orchard")
+	# pa nijedna kupovina nije „can" i napomene nema (greske-katalog #45). Od 2026-11-12 ★3
+	# cvijet plaća level 3 i 4 (level 1 i 2 idu u ★2 cvjetovima), pa test kreće od levela 2.
+	(gs.get("season_upgrades") as Dictionary)["frost_orchard"] = {"magnet": 2, "loot": 2, "twin": 2}
+	gs.call("apply_active_upgrade_levels")
 	home.call("_open_upgrades_sheet")
 	for _u in 4:
 		await process_frame

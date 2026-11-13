@@ -226,18 +226,22 @@ func _check_prices() -> void:
 			continue
 		if def.coins_cost <= prev:
 			_fail("free season %s should cost more than the one before" % def.id)
-		if def.t3_flowers_required < 20:
-			_fail("free season %s needs ≥ 20 ★3" % def.id)
+		if def.t3_flowers_required < 30:
+			_fail("free season %s needs ≥ 30 ★3 (30 / 35 / 40 od 2026-11-12)" % def.id)
 		prev = def.coins_cost
 	for lv in UiCamp.UP_LEVELS - 1:
-		if UiCamp.upgrade_coin_cost(lv + 1) <= UiCamp.upgrade_coin_cost(lv) or UiCamp.upgrade_flower_cost(lv + 1) < UiCamp.upgrade_flower_cost(lv):
-			_fail("upgrade level %d should cost more than %d" % [lv + 1, lv])
-	if UiCamp.upgrade_state(2, 2, 100000) != UiCamp.UP_SHORT_FLOWER:
-		_fail("level 3 upgrade needs %d ★3, 2 should be short" % UiCamp.upgrade_flower_cost(2))
+		if UiCamp.upgrade_coin_cost(lv + 1) <= UiCamp.upgrade_coin_cost(lv):
+			_fail("upgrade level %d should cost more coins than %d" % [lv + 1, lv])
+	# Cvijeće po levelu (od 2026-11-12): 5 × prvi ★2, 10 × drugi ★2, 2 × ★3, 5 × ★3 — unutar
+	# iste vrste cijena raste (★2: 5 → 10, ★3: 2 → 5).
+	if UiCamp.UP_FLOWER_COSTS != [5, 10, 2, 5] or UiCamp.UP_FLOWER_SLOT != [0, 1, 2, 2]:
+		_fail("boost flower prices should be 5 / 10 / 2 / 5 in slots 0 / 1 / 2 / 2, got %s %s" % [str(UiCamp.UP_FLOWER_COSTS), str(UiCamp.UP_FLOWER_SLOT)])
+	if UiCamp.upgrade_state(2, 1, 100000) != UiCamp.UP_SHORT_FLOWER:
+		_fail("level 3 upgrade needs %d ★3, 1 should be short" % UiCamp.upgrade_flower_cost(2))
 	# Najskuplje dugme nadogradnje (cvijet + „×3" + coin + cijena) stane u 340 px. PopupButton se
 	# učitava tek ovdje — zavisi od autoloada (SceneRouter), pa se ne smije spomenuti statički.
 	var btn: Control = (load("res://scripts/ui/popup/popup_button.gd") as GDScript).new()
-	btn.call("configure", "primary", "×%d" % UiCamp.upgrade_flower_cost(UiCamp.UP_LEVELS - 1))
+	btn.call("configure", "primary", "×%d" % UiCamp.UP_FLOWER_COSTS.max())
 	btn.call("set_art", "pumpkin", 3, 64.0)
 	btn.set("coin_text", str(UiCamp.upgrade_coin_cost(UiCamp.UP_LEVELS - 1)))
 	var w := float(btn.call("content_width"))
@@ -299,15 +303,15 @@ func _check_endless_run() -> void:
 	run.set("elapsed", 65.0)
 	run.call("_update_endless_tier")
 	var cfg = _rll.call("get_endless_config_at", 65.0)
-	if int(run.call("endless_tier")) != 3 or absf(float(run.get("_obstacle_chance")) - float(cfg.obstacle_chance)) > 1e-6:
-		_fail("tier 3 config should be live in the run at 65 s")
+	if int(run.call("endless_tier")) != 6 or absf(float(run.get("_obstacle_chance")) - float(cfg.obstacle_chance)) > 1e-6:
+		_fail("tier 6 config should be live in the run at 65 s (Pace every 10 s)")
 	if absf(float(run.get("_pair_chance")) - float(cfg.pair_chance)) > 1e-6:
 		_fail("Endless pairs should follow the tier")
 	run.call("_update_hud")
 	# Endless čip (design_handoff_leveli_endless · B3): sat · Pace · Best u LevelChipu.
 	var ec = run.get("endless_chip")
-	if ec == null or not ec.visible or str(ec.call("clock_text")) != "1:05" or str(ec.call("pace_text")) != "Pace 3":
-		_fail("Endless chip should show 1:05 · Pace 3, got %s" % (str(ec.call("clock_text")) if ec else "no chip"))
+	if ec == null or not ec.visible or str(ec.call("clock_text")) != "1:05" or str(ec.call("pace_text")) != "Pace 6":
+		_fail("Endless chip should show 1:05 · Pace 6, got %s" % (str(ec.call("clock_text")) if ec else "no chip"))
 	run.set("elapsed", 3599.0)
 	run.call("_update_hud")
 	var chip := run.get_node("HUD/TopHud/LevelChip") as Control

@@ -85,6 +85,8 @@ const TRADE_H := 152
 const TRADE_H_STRIP := 224             # + ReservedWarning 60 + gap 12
 const MERGE_MIN := 4
 const GATE_MIN := 50
+## Najviše sjemenki u jednoj merge rundi (FIX-TEL-2 2026-11-12). Ostatak čeka sljedeću rundu.
+const GATE_MAX := 200
 const MERGE_MARK := Vector2(64, 42)
 const MERGE_MARK_ICON := 40
 const MERGE_LINE_H := 48
@@ -97,7 +99,13 @@ const T_MERGE_LINE := 0.16                   # TradeBar 152 ↔ 212 kad se linij
 const UP_LEVELS := 4
 ## Cijena nivoa nadogradnje (indeks = trenutni nivo 0…3): ★3 cvjetovi sezone + coini. Balans
 ## ciklus 1 (2026-10-21): ranije 2 ★3 + 10 / 20 / 40 / 60 — coini su bili u velikom višku.
-const UP_FLOWER_COSTS: Array[int] = [2, 2, 3, 3]
+## Cijena Boosta po levelu (FIX-TEL-3 2026-11-12, na zahtjev) — T3 cvjetovi sezone:
+##   level 1 = 5 × prvi ljubičasti (★2), level 2 = 10 × drugi ljubičasti (★2),
+##   level 3 = 2 × zlatni (★3), level 4 = 5 × zlatni (★3). Ranije ★3 × 2, 2, 3, 3.
+## UP_FLOWER_SLOT: koji cvijet sezone plaća level (0 = prvi ★2, 1 = drugi ★2, 2 = ★3).
+const UP_FLOWER_COSTS: Array[int] = [5, 10, 2, 5]
+const UP_FLOWER_SLOT: Array[int] = [0, 1, 2, 2]
+const UP_SLOT_STAR3 := 2
 const UP_COIN_COST: Array[int] = [100, 250, 500, 800]
 const TWIN_STEP := 0.08
 const UP_CAN := "can"
@@ -327,6 +335,11 @@ static func upgrade_coin_cost(level: int) -> int:
 
 static func upgrade_flower_cost(level: int) -> int:
 	return int(UP_FLOWER_COSTS[clampi(level, 0, UP_FLOWER_COSTS.size() - 1)])
+
+
+## Koji cvijet sezone plaća ovaj level: 0 = prvi ★2, 1 = drugi ★2, UP_SLOT_STAR3 = ★3.
+static func upgrade_flower_slot(level: int) -> int:
+	return int(UP_FLOWER_SLOT[clampi(level, 0, UP_FLOWER_SLOT.size() - 1)])
 
 
 ## Season Kit faza 2: kartica sezone crta recept "camp" (season_link_card.gd); tint ostaje

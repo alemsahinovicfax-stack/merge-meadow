@@ -15,7 +15,15 @@ extends Control
 const SIZE_THUMB := "thumb"
 const SIZE_STAGE := "stage"
 const TITLE_PATH := "res://assets/ui/title_bloom_album.png"
-const LOCK_PATH := "res://assets/ui/chrome/icon_lock.svg"
+const LOCK_PATH := "res://assets/ui/chrome/icon_lock_ink.svg"
+## Katanac nekupljene stavke: pun (neproziran) bedž u gornjem desnom uglu, IZNAD Pipa — ranije
+## se crtao u sredini ispod prigušenog Pipa pa su se stopili (FIX-TEL-2 2026-11-12).
+const LOCK_BADGE := 60.0
+const LOCK_BADGE_INSET := 8.0
+const LOCK_ICON := 38.0
+## Najviši skin u pozi seže 107 % kutije iznad stopala (uši Pip Sky); rezerva do okvira.
+const PIP_TOP_RATIO := 1.09
+const PIP_TOP_MARGIN := 6.0
 const ALBUM_ROWS: Array[Color] = [Color("b8d4f0"), Color("e0c4ff"), Color("ffe8b8"), Color("e4e4e0")]
 const CREATURE_SHADOW := Color(0.102, 0.102, 0.078, 0.16)
 const RUN_SHADOW := Color(0.071, 0.110, 0.086, 0.28)
@@ -35,6 +43,7 @@ var veil: bool = false:
 	set(v):
 		veil = v
 		_apply_veil_alpha()
+		_sync_lock()
 
 var frame_border: float = 3.0
 var frame_radius: float = 18.0
@@ -51,6 +60,7 @@ var _skin_key: String = "classic"
 ## Ormar ostaje sinhron — tap na skin odmah mijenja pregled.
 var async_atlas: bool = false
 var _atlas_wait: bool = false
+var _lock: Control
 
 static var _title_tex: Texture2D
 static var _lock_tex: Texture2D
@@ -77,6 +87,7 @@ func set_frame(border: float, radius: float, color: Color, parent_bg: Color) -> 
 	frame_radius = radius
 	frame_color = color
 	corner_bg = parent_bg
+	_sync_lock()
 	queue_redraw()
 
 
@@ -106,6 +117,7 @@ func _set_hop(k: float) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		_sync_actor()
+		_sync_lock()
 		queue_redraw()
 
 
@@ -148,7 +160,9 @@ func _sync_actor() -> void:
 	var h := inner.size.y
 	var side := roundf(h * (0.80 if stage else 0.84)) if kind == "companion" else roundf(h * (0.56 if stage else 0.62))
 	var feet := h - roundf(h * (0.05 if kind == "companion" else 0.06))
-	actor.box_px = side
+	# Cijeli lik u okviru: uši / kapa najvišeg skina ne smiju preko gornjeg ruba.
+	side = minf(side, floorf((feet - PIP_TOP_MARGIN) / PIP_TOP_RATIO))
+	actor.set_box(side)
 	actor.position = inner.position + Vector2(inner.size.x * 0.5, feet)
 	if live_pose:
 		actor.still = false
@@ -162,6 +176,38 @@ func _sync_actor() -> void:
 func _apply_veil_alpha() -> void:
 	if actor != null:
 		actor.modulate.a = VEIL_PIP_ALPHA if veil else 1.0
+
+
+## Bedž katanca je dijete iznad riga (dijelovi Pipa imaju z do HOST_LIFT + 11).
+func _sync_lock() -> void:
+	if not veil:
+		if _lock != null:
+			_lock.visible = false
+		return
+	if _lock == null:
+		_lock = Control.new()
+		_lock.name = "LockBadge"
+		_lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_lock.z_index = UiPip.HOST_LIFT + 12
+		_lock.size = Vector2(LOCK_BADGE, LOCK_BADGE)
+		_lock.draw.connect(_draw_lock)
+		add_child(_lock)
+	_lock.visible = true
+	_lock.position = Vector2(size.x - frame_border - LOCK_BADGE_INSET - LOCK_BADGE, frame_border + LOCK_BADGE_INSET)
+	_lock.queue_redraw()
+
+
+func lock_badge() -> Control:
+	return _lock if _lock != null and _lock.visible else null
+
+
+func _draw_lock() -> void:
+	var r := Rect2(Vector2.ZERO, _lock.size)
+	_lock.draw_style_box(UiStage.box(Color.WHITE, 18, 3, UiWardrobe.INK), r)
+	if _lock_tex == null and ResourceLoader.exists(LOCK_PATH):
+		_lock_tex = load(LOCK_PATH) as Texture2D
+	if _lock_tex != null:
+		_lock.draw_texture_rect(_lock_tex, Rect2(r.get_center() - Vector2(LOCK_ICON, LOCK_ICON) * 0.5, Vector2(LOCK_ICON, LOCK_ICON)), false)
 
 
 func _wait_for_atlas() -> void:
@@ -425,12 +471,6 @@ func _draw_swatch(r: Rect2) -> void:
 # ── veo (kartica "none") i okvir ──────────────────────────────────────────────
 func _draw_veil(r: Rect2) -> void:
 	draw_rect(r, UiWardrobe.LOCK_VEIL)
-	var box := Rect2(r.get_center() - Vector2(36, 36), Vector2(72, 72))
-	draw_style_box(UiStage.box(UiWardrobe.VEIL_LOCK_FILL, 20, 3, UiWardrobe.VEIL_LOCK_EDGE), box)
-	if _lock_tex == null and ResourceLoader.exists(LOCK_PATH):
-		_lock_tex = load(LOCK_PATH) as Texture2D
-	if _lock_tex != null:
-		draw_texture_rect(_lock_tex, Rect2(r.get_center() - Vector2(20, 20), Vector2(40, 40)), false)
 
 
 func _draw_frame() -> void:

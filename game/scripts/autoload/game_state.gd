@@ -19,10 +19,12 @@ const ARENA_MAX_CHIPS := 30
 const ARENA_SNAP_DISTANCE := 140.0
 const ARENA_MAGNET_RADIUS := 182.0
 
-const ARENA_PEST_SPEED := 85.0
+## FIX-TEL-3 (2026-11-12, na zahtjev): Muncher je bio preslab — +30 % brzine (85 → 110,5),
+## zaleđenost poslije T3 prepolovljena (2 → 1 s).
+const ARENA_PEST_SPEED := 110.5
 const ARENA_PEST_EAT_RADIUS := 36.0
 const ARENA_PEST_EAT_DURATION := 0.5
-const ARENA_PEST_T3_FREEZE := 2.0
+const ARENA_PEST_T3_FREEZE := 1.0
 const ARENA_PEST_WAKE_DELAY := 0.3
 const ARENA_PEST_TARGET_REEVAL := 0.25
 
@@ -390,6 +392,9 @@ var _save_soon_pending: bool = false
 var _save_disk_hash: int = 0
 ## Neprazan fajl koji nije JSON rječnik. Ne tretiraj kao novu igru i ne pregazuj ga.
 var _save_unreadable: bool = false
+## Odgođeni save piše u pozadinskoj niti (vidi _on_save_soon_timer). Test ga pali ručno.
+var save_async_enabled: bool = DisplayServer.get_name() != "headless"
+var _save_task: int = -1
 
 
 func save_player_save_soon() -> void:
@@ -399,16 +404,61 @@ func save_player_save_soon() -> void:
 		save_player_save()
 		return
 	_save_soon_pending = true
-	get_tree().create_timer(SAVE_SOON_SEC, true).timeout.connect(flush_save_soon)
+	get_tree().create_timer(SAVE_SOON_SEC, true).timeout.connect(_on_save_soon_timer)
 
 
 func flush_save_soon() -> void:
 	if not _save_soon_pending:
 		return
+	_join_save_task()
 	if _save_changed_on_disk():
 		_save_soon_pending = false
 		return
 	save_player_save()
+
+
+## Odgođeni save kad istekne tajmer. Pisanje na disk (tmp, .bak, brisanje, preimenovanje — 5
+## operacija, ~7 ms na laptopu, višestruko na telefonu) ide u pozadinsku nit: padalo je 0,5 s
+## poslije sipanja u Areni, tačno dok sjemenke lete (FIX-TEL-3 2026-11-12). Na glavnoj niti
+## ostaje samo slaganje teksta. Headless testovi pišu odmah (čitaju fajl odmah poslije).
+func _on_save_soon_timer() -> void:
+	if not _save_soon_pending:
+		return
+	if not save_async_enabled:
+		flush_save_soon()
+		return
+	var text := _build_save_text()
+	_save_soon_pending = false
+	if text.is_empty():
+		return
+	_join_save_task()
+	var expect := _save_disk_hash
+	# Optimistično: ako nit preskoči pisanje (fajl je promijenio neko drugi), hash na disku se
+	# i dalje razlikuje od ovog, pa i sljedeći odgođeni save preskoči — isto kao sinhroni put.
+	_save_disk_hash = text.hash()
+	_save_task = WorkerThreadPool.add_task(_save_thread_body.bind(text, expect), false, "player save")
+
+
+## Pozadinska nit: dira samo fajlove i svoje argumente.
+func _save_thread_body(text: String, expect_hash: int) -> void:
+	if expect_hash != 0:
+		if not FileAccess.file_exists(PLAYER_SAVE_PATH):
+			return
+		if FileAccess.get_file_as_string(PLAYER_SAVE_PATH).hash() != expect_hash:
+			return
+	_write_save_atomic(text)
+
+
+## Sačekaj pozadinsko pisanje (prije sinhronog savea, pauze i izlaza) — dva pisanja se ne miješaju.
+func _join_save_task() -> void:
+	if _save_task < 0:
+		return
+	WorkerThreadPool.wait_for_task_completion(_save_task)
+	_save_task = -1
+
+
+func is_save_task_running() -> bool:
+	return _save_task >= 0 and not WorkerThreadPool.is_task_completed(_save_task)
 
 
 func _save_changed_on_disk() -> bool:
@@ -433,6 +483,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED \
 			or what == NOTIFICATION_PREDELETE:
 		flush_save_soon()
+		_join_save_task()
 
 
 ## RET-01: brojač radi samo kad igra stvarno teče (ne headless testovi). Pokretanje = sesija.
@@ -480,11 +531,21 @@ func _note_activity_run(played_level: int) -> void:
 
 
 func save_player_save() -> void:
-	if _save_unreadable:
-		_save_soon_pending = false
-		push_error("GameState: save blocked — %s is unreadable" % PLAYER_SAVE_PATH)
-		return
+	var text := _build_save_text()
 	_save_soon_pending = false
+	if text.is_empty():
+		return
+	_join_save_task()
+	if not _write_save_atomic(text):
+		return
+	_save_disk_hash = text.hash()
+
+
+## Cijelo stanje kao JSON tekst; prazno ako je save blokiran (nečitljiv fajl).
+func _build_save_text() -> String:
+	if _save_unreadable:
+		push_error("GameState: save blocked — %s is unreadable" % PLAYER_SAVE_PATH)
+		return ""
 	stash_upgrade_levels(active_season_id)
 	if _activity_timer != null:
 		_tick_activity()
@@ -521,10 +582,7 @@ func save_player_save() -> void:
 	data.merge(seasons_domain.to_save_dict())
 	data.merge(level_path_domain.to_save_dict())
 	data.merge(activity.to_save_dict())
-	var text := JSON.stringify(data)
-	if not _write_save_atomic(text):
-		return
-	_save_disk_hash = text.hash()
+	return JSON.stringify(data)
 
 
 ## Piše tmp, sačuva prethodni fajl kao .bak, pa preimenuje tmp preko živog.
@@ -839,6 +897,7 @@ func _apply_save_dict(data: Dictionary) -> bool:
 	_ensure_first_launch()
 	# Samo u memoriji — upiše se sa sljedećim snimanjem (učitavanje ne prepisuje fajl).
 	_repair_album_from_stash()
+	_repair_album_from_lifetime()
 	if boosters.migrate_legacy_inventory():
 		save_player_save()
 	return true
@@ -1181,7 +1240,33 @@ func record_seed_pickup_lifetime(type_id: String, count: int = 1) -> void:
 	if type_id.is_empty() or count <= 0:
 		return
 	lifetime_seeds_collected[type_id] = get_lifetime_seeds_collected(type_id) + count
+	# Journal: sjeme pokupljeno u runu je ★T1 te vrste — upisuje se odmah, s oznakom NEW
+	# (FIX-TEL-3 2026-11-12: prva sjemena nove sezone se nisu vidjela u Journalu dok se ne
+	# spoje u Areni). T2 i T3 se i dalje otključavaju spajanjem (record_merge_tier_in_album).
+	if not bool(discovered_blooms.get(type_id, false)):
+		discovered_blooms[type_id] = true
+		_mark_collection_journal_new(type_id, 1)
 	_refresh_seed_unlock_from_lifetime()
+
+
+## Arena: prvo spajanje u T2 (ili T3) te vrste upisuje taj tier u Journal.
+func record_merge_tier_in_album(type_id: String, tier: int) -> void:
+	if type_id.is_empty() or tier < 2:
+		return
+	discovered_blooms[type_id] = true
+	if tier > int(collection_kept_tiers.get(type_id, 0)):
+		collection_kept_tiers[type_id] = mini(tier, MAX_MERGE_TIER)
+		_mark_collection_journal_new(type_id, tier)
+
+
+## Stari saveovi: vrsta čije je sjeme već pokupljeno u runu dobija ★T1 u Journalu (bez NEW).
+func _repair_album_from_lifetime() -> bool:
+	var fixed := false
+	for type_id in lifetime_seeds_collected:
+		if int(lifetime_seeds_collected[type_id]) > 0 and not bool(discovered_blooms.get(type_id, false)):
+			discovered_blooms[str(type_id)] = true
+			fixed = true
+	return fixed
 
 
 func _refresh_seed_unlock_from_lifetime() -> void:
@@ -2127,11 +2212,32 @@ func upgrade_flower_reserve(type_id: String) -> int:
 ## (Kept), pa je npr. 20 / 20 Crystal Peony blokiralo sve nadogradnje Frosta, a dugme je
 ## pokazivalo da cvijeća nema. Kept granica ostaje za prodaju u Campu; sheet nadogradnji javlja
 ## kad kupovina zadire u nju (upgrade_uses_kept_flowers).
-func spendable_upgrade_flowers(season_id: String) -> int:
-	var type_id := star3_type_id_for_season(season_id)
+func spendable_upgrade_flowers(season_id: String, level: int = -1) -> int:
+	var type_id := upgrade_flower_type(season_id, level)
 	if type_id.is_empty():
 		return 0
 	return maxi(0, int(garden_crystal_stash.get(type_id, 0)))
+
+
+## Vrsta cvijeta (T3 iz stasha) kojom se plaća nadogradnja S levela `level` na sljedeći.
+## Level < 0 = ★3 sezone (stari pozivi). Sezona bez dva ★2 cvijeta pada na ★3.
+func upgrade_flower_type(season_id: String, level: int = -1) -> String:
+	var star3 := star3_type_id_for_season(season_id)
+	if level < 0:
+		return star3
+	var slot := UiCamp.upgrade_flower_slot(level)
+	if slot >= UiCamp.UP_SLOT_STAR3:
+		return star3
+	var def: SeasonDef = get_season_def(season_id)
+	if def == null:
+		return star3
+	var epics: Array[String] = []
+	for type_id in def.seed_type_ids:
+		if not type_id.is_empty() and get_seed_rarity(type_id) == 2 and not epics.has(type_id):
+			epics.append(type_id)
+	if slot >= epics.size():
+		return star3
+	return epics[slot]
 
 
 ## Kupovina nadogradnje bi spustila ★3 ispod onoga što traži sljedeća besplatna sezona.
@@ -2140,19 +2246,21 @@ func upgrade_uses_kept_flowers(season_id: String) -> bool:
 	var reserve := upgrade_flower_reserve(type_id)
 	if reserve <= 0:
 		return false
-	var cost := UiCamp.upgrade_flower_cost(get_upgrade_level("magnet", season_id))
-	for track in ["loot", "twin"]:
-		cost = mini(cost, UiCamp.upgrade_flower_cost(get_upgrade_level(track, season_id)))
-	return int(garden_crystal_stash.get(type_id, 0)) - cost < reserve
+	# Samo leveli koji se plaćaju ★3 cvijetom (3 i 4) mogu zadirati u Kept; ★2 leveli ne.
+	var have := int(garden_crystal_stash.get(type_id, 0))
+	for track in ["magnet", "loot", "twin"]:
+		var level := get_upgrade_level(track, season_id)
+		if level >= UiCamp.UP_LEVELS or upgrade_flower_type(season_id, level) != type_id:
+			continue
+		if have - UiCamp.upgrade_flower_cost(level) < reserve:
+			return true
+	return false
 
 
 func upgrade_button_state(track: String, season_id: String = "") -> String:
 	var id := season_id if not season_id.is_empty() else upgrade_sheet_season_id()
-	return UiCamp.upgrade_state(
-		get_upgrade_level(track, id),
-		spendable_upgrade_flowers(id),
-		wallet_coins
-	)
+	var level := get_upgrade_level(track, id)
+	return UiCamp.upgrade_state(level, spendable_upgrade_flowers(id, level), wallet_coins)
 
 
 func _try_upgrade_track(track: String) -> bool:
@@ -2160,9 +2268,9 @@ func _try_upgrade_track(track: String) -> bool:
 	if season_id.is_empty():
 		return false
 	var level := get_upgrade_level(track, season_id)
-	if UiCamp.upgrade_state(level, spendable_upgrade_flowers(season_id), wallet_coins) != UiCamp.UP_CAN:
+	if UiCamp.upgrade_state(level, spendable_upgrade_flowers(season_id, level), wallet_coins) != UiCamp.UP_CAN:
 		return false
-	var type_id := star3_type_id_for_season(season_id)
+	var type_id := upgrade_flower_type(season_id, level)
 	var have := int(garden_crystal_stash.get(type_id, 0))
 	var left := have - UiCamp.upgrade_flower_cost(level)
 	if left <= 0:

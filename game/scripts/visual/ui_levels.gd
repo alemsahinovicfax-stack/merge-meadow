@@ -50,15 +50,19 @@ const S_REPLAY := "Replay"
 const GUST_TOTAL := 0.42
 const GUST_STREAK := 0.36
 const GUST_LEAN := 0.30
-const GUST_JOLT := 0.16
+const GUST_JOLT := 0.24
 const GUST_STAGGER := 0.03
 const GUST_X := [178.0, 405.0, 675.0, 902.0, 540.0]
 const GUST_Y := [260.0, 120.0, 180.0, 300.0, 1180.0]
 const GUST_TRAVEL := 900.0
-const GUST_ALPHA := 0.62
+const GUST_ALPHA := 0.9
 const GUST_SIZE := Vector2(18, 240)
-const GUST_JOLT_PX := 10.0
-const GUST_LEAN_Y := 0.06
+## Nalet gurne stazu prema Pipu (FIX-TEL-2 2026-11-12: 10 px → 50, „vjetar se ne osjeti").
+## Množi se s brzinom staze / osnovnom (viši level, viši Pace = jači), najviše GUST_STRENGTH_MAX.
+## Staza se NE vraća nazad: povratak bi predmet na trenutak gurnuo u Pipa pa ga odmakao.
+const GUST_JOLT_PX := 50.0
+const GUST_STRENGTH_MAX := 2.5
+const GUST_LEAN_Y := 0.12
 
 # --- A4 · par prepreka (jedan predmet preko dvije staze) ------------------------------
 ## SVG je proširen na 496 / 276 × 228 (viewBox od y −8) da mint zastavica ne bude odsječena;
@@ -93,7 +97,7 @@ const FINISH_CONFETTI_N := 10
 const FINISH_BANNER := 0.12
 
 # --- B · Endless -------------------------------------------------------------
-const TIER_SEC := 20
+const TIER_SEC := 10
 ## Boja stepenice po „toplini" pojaseva: 0–2 · 3–5 · 6–8 · 9+.
 const UNLOCK_LEVEL := 15
 const S_LOCKED_TOAST := "Beat Level 15 to unlock Endless"

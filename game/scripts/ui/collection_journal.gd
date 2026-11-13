@@ -22,6 +22,11 @@ const FRAME_BUDGET_USEC := 3000
 ## Gradnja u pozadini (igrač je na drugoj stranici): jedan red svaki N-ti frejm, da stranica
 ## koju gleda (Arena, Home) ne plati Journal.
 const BACKGROUND_EVERY_N_FRAMES := 3
+## Dok igrač gleda Journal: najviše jedan red, svaki N-ti frejm (FIX-TEL-2 2026-11-12). Red se
+## gradi, raspoređuje i prvi put crta u istom frejmu — na telefonu je više njih u nizu trzalo.
+## Sezona zato odmah zauzme punu visinu, a mjesta redova drži „kostur" s natpisom Loading….
+const ACTIVE_EVERY_N_FRAMES := 2
+const ROW_FADE_SEC := 0.16
 ## Sljedeće tri sezone kreću kad je do kraja učitanog ostalo manje od ovoga (px).
 const LOAD_AHEAD_PX := 400.0
 
@@ -86,6 +91,16 @@ func _ready() -> void:
 	_begin_visit()
 
 
+## Sezone koje se još učitavaju (imaju kostur „Loading…") — testovi.
+func loading_season_count() -> int:
+	var n := 0
+	for g in _groups:
+		var skel: Variant = g.get("skel")
+		if skel != null and is_instance_valid(skel):
+			n += 1
+	return n
+
+
 ## Učitane sezone i redoslijed (testovi).
 func loaded_season_count() -> int:
 	return _groups.size()
@@ -131,13 +146,11 @@ func _build_tick() -> void:
 	if not _building or list == null:
 		_set_building(false)
 		return
-	if not _active:
-		_bg_frame += 1
-		if _bg_frame % BACKGROUND_EVERY_N_FRAMES != 0:
-			return
-	var t0 := Time.get_ticks_usec()
+	_bg_frame += 1
+	if _bg_frame % (ACTIVE_EVERY_N_FRAMES if _active else BACKGROUND_EVERY_N_FRAMES) != 0:
+		return
 	var built := 0
-	while not _work.is_empty() and (built == 0 or (_active and Time.get_ticks_usec() - t0 < FRAME_BUDGET_USEC)):
+	while not _work.is_empty() and built == 0:
 		var item: Dictionary = _work.pop_front()
 		var g: Dictionary = item["g"]
 		if bool(g.get("dead", false)):
@@ -153,9 +166,24 @@ func _build_tick() -> void:
 			FlowerAssets.get_texture(str(entry.get("type_id", "")), tier)
 		var row := JournalRow.new()
 		_size_row(row)
-		(g["group"] as Node).add_child(row)
+		var group := g["group"] as Node
+		group.add_child(row)
 		row.apply(entry)
 		(g["rows"] as Array).append(row)
+		# Kostur ostaje zadnji i kraći za jedan red: visina sezone se ne mijenja.
+		var skel := g.get("skel") as JournalSkeleton
+		if skel != null and is_instance_valid(skel):
+			var left := entries.size() - (g["rows"] as Array).size()
+			if left <= 0:
+				group.remove_child(skel)
+				skel.queue_free()
+				g["skel"] = null
+			else:
+				group.move_child(skel, -1)
+				skel.set_left(left)
+		if _active and not GameState.reduce_motion:
+			row.modulate.a = 0.0
+			row.create_tween().tween_property(row, "modulate:a", 1.0, ROW_FADE_SEC)
 		built += 1
 	if not _work.is_empty():
 		return
@@ -306,10 +334,13 @@ func _new_group(s: Dictionary) -> Dictionary:
 	var header := _season_header(str(s["sid"]), s)
 	group.add_child(header)
 	list.add_child(group)
+	var skel := JournalSkeleton.new()
+	group.add_child(skel)
+	skel.set_left((s["entries"] as Array).size())
 	var g := {
 		"sid": s["sid"], "group": group, "gap": gap, "rows": [], "sig": _season_signature(s),
 		"entries": s["entries"], "count_label": header.get_node_or_null("Count"),
-		"count_text": _count_text(s), "dead": false,
+		"count_text": _count_text(s), "dead": false, "skel": skel,
 	}
 	for ri in (s["entries"] as Array).size():
 		_work.append({"g": g, "row": ri})
@@ -559,3 +590,49 @@ func _on_back_pressed() -> void:
 func set_meta_hub_mode(enabled: bool) -> void:
 	if back_button:
 		back_button.visible = not enabled
+
+
+## Mjesta redova koji se još grade (FIX-TEL-2): blijedi obrisi reda 200 px + tri kruga tiera,
+## u prvom natpis „Loading…" s tačkicama. Drži punu visinu sezone od prve sekunde, pa se lista
+## ne pomjera dok redovi stižu. Crta se samo kad se promijeni broj redova ili faza tačkica.
+class JournalSkeleton extends Control:
+	const DOT_SEC := 0.3
+	const S_LOADING := "Loading"
+
+	var left: int = 0
+	var _phase: int = 0
+	var _t: float = 0.0
+
+	func _init() -> void:
+		name = "SeasonLoading"
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+	func set_left(n: int) -> void:
+		left = maxi(0, n)
+		custom_minimum_size.y = float(left * UiJournal.ROW_H + maxi(0, left - 1) * UiJournal.ROW_GAP)
+		queue_redraw()
+
+	func _process(delta: float) -> void:
+		if GameState.reduce_motion:
+			return
+		_t += delta
+		if _t >= DOT_SEC:
+			_t = 0.0
+			_phase = (_phase + 1) % 4
+			queue_redraw()
+
+	func _draw() -> void:
+		var ink := UiJournal.INK
+		var fill := UiStage.box(Color(ink, 0.04), 26, 3, Color(ink, 0.10))
+		var ring := UiStage.box(Color(ink, 0.03), int(UiJournal.SLOT_COMPACT / 2.0), 3, Color(ink, 0.08))
+		var slot := float(UiJournal.SLOT_COMPACT)
+		for i in left:
+			var r := Rect2(0.0, float(i * (UiJournal.ROW_H + UiJournal.ROW_GAP)), size.x, float(UiJournal.ROW_H))
+			draw_style_box(fill, r)
+			for k in 3:
+				var x := r.end.x - 27.0 - slot - float(k) * (slot + 12.0)
+				draw_style_box(ring, Rect2(x, r.position.y + (r.size.y - slot) * 0.5, slot, slot))
+			if i == 0:
+				var text := S_LOADING + ".".repeat(_phase if not GameState.reduce_motion else 3)
+				UiHomeV3.draw_text(self, 800, 40, text, Vector2(31.0, r.position.y + (r.size.y - 40.0) * 0.5), Color(ink, 0.55))

@@ -595,17 +595,18 @@ func _run() -> void:
 	if gift_tile == null or not gift_tile.is_visible_in_tree():
 		_fail("Bloom open: GiftChest should be visible in the field")
 		return
-	# Gift i korpa dijele kolonu i mjeru (180), korpa je odmah ispod.
+	# Gift i korpa dijele mjeru (180); korpa je desno, odmah ispod Boostova (FIX-TEL-2).
 	if absf(gift_tile.size.x - basket.size.x) > 1.5 or absf(gift_tile.size.y - basket.size.y) > 1.5:
 		_fail("Gift and Basket must share the tile size, got %s / %s" % [
 			str(gift_tile.size), str(basket.size)
 		])
 		return
-	if absf(basket.global_position.x - gift_tile.global_position.x) > 1.5:
-		_fail("Basket should sit directly under Gift")
+	var boosts_tile: Control = home.get_node_or_null("%UpgradesButton") as Control
+	if boosts_tile == null or absf(basket.global_position.x - boosts_tile.global_position.x) > 1.5:
+		_fail("Basket should sit directly under Boosts (right column)")
 		return
-	if basket.get_global_rect().position.y + 0.5 < gift_tile.get_global_rect().end.y:
-		_fail("Bloom open: Basket should sit below Gift")
+	if basket.get_global_rect().position.y + 0.5 < boosts_tile.get_global_rect().end.y:
+		_fail("Bloom open: Basket should sit below Boosts")
 		return
 	if absf(basket.size.y - float(UI_FIELD.TILE)) > 1.5:
 		_fail("Bloom open: Basket tile expected 180 got %s" % str(basket.size))

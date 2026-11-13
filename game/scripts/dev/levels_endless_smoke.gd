@@ -204,8 +204,8 @@ func _check_level_run() -> void:
 	for row in made:
 		for o in row:
 			var shape := (o as Node).get_node("CollisionShape2D") as CollisionShape2D
-			if (shape.shape as RectangleShape2D).size != Vector2(64, 64):
-				_fail("pair collision must stay 64 × 64 per lane")
+			if (shape.shape as RectangleShape2D).size != Vector2(64, 92):
+				_fail("pair collision must stay 64 × 92 per lane")
 	run.call("_clear_world_entities")
 	await _frames(1)
 
@@ -221,12 +221,15 @@ func _check_level_run() -> void:
 	var jolt := 0.0
 	for _i in 4:
 		run.call("_process", DT)
+	# Skok staze: efekat daje px po frejmu (surge_step), kontroler ih dodaje pomaku svijeta.
+	# 50 px × jačina (brzina / 400, najviše 2,5), bez povratka; World čvor se ne pomjera.
 	for _i in 30:
 		gust.call("_process", DT)
 		max_live = maxi(max_live, gust.live_sprites())
-		jolt = maxf(jolt, world.position.y)
+		jolt += float(gust.call("surge_step"))
 	run.set("_state", 2)
-	if gust.played != played + 1 or max_live < 1 or max_live > 5 or jolt < 1.0 or jolt > 10.5:
+	var want_jolt := UiLevels.GUST_JOLT_PX * float(gust.call("strength"))
+	if gust.played != played + 1 or max_live < 1 or max_live > 5 or absf(jolt - want_jolt) > 0.5 or want_jolt < 50.0 or want_jolt > 125.5:
 		_fail("gust at 15 s: played %d→%d, %d streaks, jolt %.1f" % [played, gust.played, max_live, jolt])
 	if gust.is_playing() or absf(world.position.y) > 0.01 or not pv.scale.is_equal_approx(Vector2.ONE):
 		_fail("gust should end within 0.5 s and reset world / Pip")
@@ -352,7 +355,7 @@ func _check_endless_run() -> void:
 	var ec = run.get("endless_chip")
 	var gust = run.get("gust_fx")
 	var g0: int = gust.played
-	run.set("elapsed", 19.99)
+	run.set("elapsed", 9.99)
 	run.set("_state", 0)
 	for _i in 3:
 		run.call("_process", DT)
@@ -364,6 +367,8 @@ func _check_endless_run() -> void:
 	await _wait(1.1)
 	if fx.is_pace_visible():
 		_fail("Pace pill should be gone after 0.92 s")
+	# Stepenica je već 3 (Pace svakih 10 s) — ovdje se mjeri samo efekat rekorda.
+	run.set("_endless_tier", 3)
 	run.set("elapsed", 30.5)
 	run.set("_state", 0)
 	run.call("_process", DT)
@@ -415,7 +420,7 @@ func _check_endless_loot() -> void:
 	var loot := current_scene
 	var score: Dictionary = loot.call("get_endless_score")
 	if str(loot.call("get_title")) != "New best!" or str(score.get("time", "")) != "7:00" \
-			or str(score.get("pace", "")) != "Pace 21" or str(score.get("best", "")) != "Was 4:25" or not bool(score.get("stamp", false)):
+			or str(score.get("pace", "")) != "Pace 42" or str(score.get("best", "")) != "Was 4:25" or not bool(score.get("stamp", false)):
 		_fail("R5 new best → %s %s" % [str(loot.call("get_title")), str(score)])
 	var tray = loot.get("tray")
 	if tray == null or not tray.stamp_full or tray.stamp_text != UiLevels.S_ALL_YOURS:

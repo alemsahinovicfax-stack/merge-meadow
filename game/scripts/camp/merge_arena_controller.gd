@@ -9,6 +9,10 @@ const S_ROUND_BLOOM_ONE := "%d bloom made"
 const S_ROUND_BLOOMS := "%d blooms made"
 const S_ROUND_EATEN := "Nibbs ate the rest"
 const S_ROUND_EMPTY := "Field cleared"
+## Cap runde: vreća više ne dolijeva kad je u ovoj rundi izašlo UiCamp.GATE_MAX sjemenki.
+const CUE_ROUND_CAP := "%d seeds this round. Clear the field to start the next one."
+const GATE_PULSE_SEC := 1.3
+const GATE_PULSE_SCALE := 1.05
 const ArenaSeedBag := preload("res://scripts/camp/arena_seed_bag.gd")
 const ArenaVacuumFly := preload("res://scripts/camp/arena_vacuum_fly.gd")
 const ArenaPest := preload("res://scripts/camp/arena_pest.gd")
@@ -52,7 +56,7 @@ const T3_FLY_SEC := 0.52
 const T3_FLY_END_SCALE := 0.45
 
 ## Jedini tekst koji je ostao u areni — prolazna poruka u oblacicu iznad vrece.
-const CUE_PEST_AWAKE := "Muncher's awake — a T3 freezes it 2s."
+const CUE_PEST_AWAKE := "Muncher's awake — a T3 freezes it 1s."
 
 @onready var meadow_bg: ArenaMeadowBg = $Bg
 @onready var playfield: Control = $RootVBox/Playfield
@@ -71,6 +75,9 @@ var _gate_last_n: int = -1
 var _gate_last_open: bool = false
 var _gate_tween: Tween
 var _gate_play_run: bool = false
+var _gate_pulse: Tween
+## Koliko je sjemenki izašlo iz vreće u ovoj rundi (najviše UiCamp.GATE_MAX).
+var _session_poured: int = 0
 var _modal_count: HBoxContainer
 var _modal_count_n: Label
 var back_to_camp_button: PopupButton
@@ -111,6 +118,9 @@ var _combo_ripples: Array[Panel] = []
 var _combo_ripple_next: int = 0
 var _combo_ripple_tweens: Array[Tween] = []
 var _hint_mark: MergeHintMark = null
+var _geo_frame: int = -1
+var _geo_bounds: Rect2 = Rect2()
+var _geo_keepouts: Array[Rect2] = []
 
 
 func _ready() -> void:
@@ -195,6 +205,8 @@ func _layout_bag() -> void:
 		return
 	var x := (field.x - UiArenaV2.BASKET_HIT.x) * 0.5
 	var y := field.y - UiArenaV2.BASKET_BOTTOM_GAP - UiArenaV2.BASKET_HIT.y
+	if _seed_bag.get_base_position() != Vector2(x, y):
+		_geo_frame = -1
 	_seed_bag.set_layout_position(Vector2(x, y))
 	if _gate_count != null:
 		var gw := _gate_count.get_combined_minimum_size().x
@@ -205,6 +217,7 @@ func _layout_bag() -> void:
 
 
 func _layout_playfield_chrome() -> void:
+	_geo_frame = -1
 	_layout_bag()
 	_layout_arena_pip()
 	_layout_pest_nest()
@@ -829,6 +842,14 @@ func _on_bag_clicked() -> void:
 		_refresh_bag()
 		return
 	_start_session_if_needed()
+	if round_cap_left() <= 0:
+		# Cap runde: vreća se trzne i oblačić kaže zašto (nije „You need more seeds").
+		Sfx.play("ui_denied")
+		_punch_seed_bag()
+		if _cue:
+			_cue.show_message(CUE_ROUND_CAP % UiCamp.GATE_MAX)
+		_refresh_bag()
+		return
 	var poured := _pour_available_seeds()
 	if poured <= 0:
 		if _bag_has_pourable_set():
@@ -851,6 +872,7 @@ func _start_session_if_needed() -> void:
 	if _session_open or not _chips.is_empty():
 		return
 	_session_open = true
+	_session_poured = 0
 	GameState.clear_arena_pour_locks()
 	_reset_session_feel()
 	if _pest:
@@ -1080,6 +1102,7 @@ func _build_gate_count(playfield: Node) -> void:
 	_gate_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_gate_count.z_index = 60
 	playfield.add_child(_gate_count)
+	_gate_count.resized.connect(func() -> void: _gate_count.pivot_offset = _gate_count.size * 0.5)
 	var row := HBoxContainer.new()
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -1121,6 +1144,8 @@ func _apply_gate_count(show: bool) -> void:
 	if _gate_count == null:
 		return
 	_gate_count.visible = show
+	if not show:
+		_stop_gate_pulse()
 	# Oblačić tutoriala stoji iznad pilule kad je vidljiva (ArenaCue._bag_tip).
 	if _cue != null and playfield != null:
 		_cue.call_deferred("layout", playfield.size)
@@ -1128,7 +1153,10 @@ func _apply_gate_count(show: bool) -> void:
 		return
 	var n := GameState.mergeable_seed_count()
 	var open := n >= UiCamp.GATE_MIN
-	_gate_n.text = str(n)
+	# Ispod praga „N / 50" (koliko fali). Od praga naviše „N / 200": toliko staje u jednu rundu
+	# (više od 200 ostaje u vreći), pilula je mint, s oznakom i blagim pulsom = možeš igrati.
+	_gate_n.text = str(mini(n, UiCamp.GATE_MAX) if open else n)
+	_gate_of.text = "/ %d" % (UiCamp.GATE_MAX if open else UiCamp.GATE_MIN)
 	UiCamp.style_label(_gate_n, 60, UiCamp.INK)
 	var plate := StyleBoxFlat.new()
 	plate.bg_color = UiCamp.MINT if open else Color("#FFF8F0")
@@ -1147,6 +1175,36 @@ func _apply_gate_count(show: bool) -> void:
 	_gate_mark.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(false))
 	_gate_mark.modulate.a = 1.0 if open else 0.28
 	_pop_gate(n, open, plate)
+	_sync_gate_pulse(open)
+
+
+## Otvorena vrata dišu (1 → 1,05 → 1 svakih 1,3 s) dok igrač ne krene; bez Reduce motion.
+func _sync_gate_pulse(open: bool) -> void:
+	if not open or GameState.reduce_motion or not _gate_count.is_inside_tree():
+		_stop_gate_pulse()
+		return
+	_gate_count.pivot_offset = _gate_count.size * 0.5
+	if _gate_pulse != null and _gate_pulse.is_valid():
+		return
+	_gate_pulse = _gate_count.create_tween().set_loops()
+	_gate_pulse.tween_property(_gate_count, "scale", Vector2.ONE * GATE_PULSE_SCALE, GATE_PULSE_SEC * 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_gate_pulse.tween_property(_gate_count, "scale", Vector2.ONE, GATE_PULSE_SEC * 0.5).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
+func _stop_gate_pulse() -> void:
+	if _gate_pulse != null and _gate_pulse.is_valid():
+		_gate_pulse.kill()
+	_gate_pulse = null
+	if _gate_count != null:
+		_gate_count.scale = Vector2.ONE
+
+
+func is_gate_pulsing() -> bool:
+	return _gate_pulse != null and _gate_pulse.is_valid()
+
+
+func get_gate_text() -> String:
+	return "%s %s" % [_gate_n.text, _gate_of.text] if _gate_count != null and _gate_count.visible else ""
 
 
 ## GateCount: novi broj = pop 1 → 1,08 → 1 (0,09 s); prelaz na 50 = krem → mint i oznaka
@@ -1180,6 +1238,15 @@ func _pop_gate(n: int, open: bool, plate: StyleBoxFlat) -> void:
 		mk.tween_property(_gate_mark, "scale", Vector2.ONE, 0.06)
 
 
+## Koliko sjemenki ova runda još smije dobiti iz vreće (cap UiCamp.GATE_MAX po rundi).
+func round_cap_left() -> int:
+	return maxi(0, UiCamp.GATE_MAX - _session_poured)
+
+
+func get_session_poured() -> int:
+	return _session_poured
+
+
 func _arena_slots_available() -> int:
 	return maxi(0, GameState.ARENA_MAX_CHIPS - _chips.size())
 
@@ -1201,10 +1268,13 @@ func _pour_available_seeds() -> int:
 	var bag_count := GameState.sum_seed_bag_only()
 	if bag_count <= 0:
 		return 0
-	var to_pour := mini(slots, bag_count)
+	var to_pour := mini(mini(slots, bag_count), round_cap_left())
+	if to_pour <= 0:
+		return 0
 	var pulled: Array = GameState.pull_seeds_to_arena(to_pour, _field_type_counts())
 	if pulled.is_empty():
 		return 0
+	_session_poured += pulled.size()
 	var spawned := _spawn_poured_chips(pulled)
 	_animate_pour(spawned)
 	_repel_chips_from_bag()
@@ -1224,7 +1294,7 @@ func _try_auto_refill() -> void:
 		return
 	if GameState.sum_seed_bag_only() <= 0:
 		return
-	if _arena_slots_available() <= 0:
+	if _arena_slots_available() <= 0 or round_cap_left() <= 0:
 		return
 	_auto_pouring = true
 	var poured := _pour_available_seeds()
@@ -1236,6 +1306,7 @@ func _try_auto_refill() -> void:
 		and _chips.size() <= ARENA_AUTO_REFILL_AT
 		and GameState.sum_seed_bag_only() > 0
 		and _arena_slots_available() > 0
+		and round_cap_left() > 0
 	):
 		call_deferred("_try_auto_refill")
 
@@ -1323,6 +1394,8 @@ func _spawn_poured_chips(entries: Array) -> Array[ArenaSeedChip]:
 		_chips.size() + entries.size(), bounds, _spawn_keepouts(), existing, CHIP_MIN_DIST, _rng
 	)
 	var spawned: Array[ArenaSeedChip] = []
+	# Crtež sjemenke nastaje u letu (ArenaSeedChip.play_pour_in) — samo kad leta ima.
+	var lazy_art := _seed_bag != null and is_inside_tree()
 	for entry in entries:
 		var chip_id := int(entry.get("chip_id", 0))
 		var type_id := str(entry.get("type_id", ""))
@@ -1330,7 +1403,7 @@ func _spawn_poured_chips(entries: Array) -> Array[ArenaSeedChip]:
 		var pos: Vector2 = slots.pop_back() if not slots.is_empty() else _random_chip_position(existing, bounds)
 		existing.append(pos)
 		var chip := ArenaSeedChip.new()
-		chip.setup(chip_id, type_id, pos, tier)
+		chip.setup(chip_id, type_id, pos, tier, lazy_art)
 		chip.drag_started.connect(_on_chip_drag_started)
 		chip.drag_released.connect(_on_chip_released)
 		playfield.add_child(chip)
@@ -1391,12 +1464,19 @@ func _random_chip_position(existing: Array[Vector2], bounds: Rect2) -> Vector2:
 	return best
 
 
+## Granice i zone se u jednom frejmu ne mijenjaju, a razmicanje pri sipanju zove ovo stotinama
+## puta (svaki poziv je ranije gradio dva niza) — računaju se jednom po frejmu.
 func _sync_chip_pos(chip: ArenaSeedChip) -> void:
-	var bounds := _playfield_bounds()
+	var frame := Engine.get_process_frames()
+	if frame != _geo_frame:
+		_geo_frame = frame
+		_geo_bounds = _playfield_bounds()
+		_geo_keepouts = _physical_keepouts()
+	var bounds := _geo_bounds
 	var center := chip.get_center()
 	center.x = clampf(center.x, bounds.position.x, bounds.end.x)
 	center.y = clampf(center.y, bounds.position.y, bounds.end.y)
-	for zone in _physical_keepouts():
+	for zone in _geo_keepouts:
 		if zone.has_point(center):
 			center = _push_out_of(zone, center, bounds)
 	chip.set_center(center)
@@ -1708,7 +1788,8 @@ func _type_t1_eq(type_id: String) -> int:
 func _pourable_bag_t1(type_id: String) -> int:
 	if GameState.is_arena_pour_locked(type_id):
 		return 0
-	var bag_n := int(GameState.seed_bag.get(type_id, 0))
+	# Cap runde: iz vreće može doći samo ono što runda još smije dobiti.
+	var bag_n := mini(int(GameState.seed_bag.get(type_id, 0)), round_cap_left())
 	if bag_n < 4:
 		return 0
 	return bag_n
@@ -1759,7 +1840,7 @@ func _resolve_t3_starved_types() -> void:
 			GameState.lock_arena_pour_type(id)
 		vacuumed_any = true
 	if vacuumed_any:
-		GameState.save_player_save()
+		GameState.save_player_save_soon()
 		# S32 — empty field after leftover that now makes a T3 set; do not dump other bag types.
 		if leftover_became_pourable and _chips.is_empty() and not _auto_pouring:
 			_auto_pouring = true
@@ -1782,7 +1863,7 @@ func _t2_has_pair_chance(chip: ArenaSeedChip) -> bool:
 			field_t1 += 1
 	if other_t2 > 0:
 		return true
-	if int(GameState.seed_bag.get(type_id, 0)) > 0:
+	if int(GameState.seed_bag.get(type_id, 0)) > 0 and round_cap_left() > 0:
 		return true
 	return field_t1 >= 2
 
@@ -1807,7 +1888,7 @@ func _resolve_stranded_t2() -> void:
 		_vacuum_fly_chip(chip)
 		recycled_any = true
 	if recycled_any:
-		GameState.save_player_save()
+		GameState.save_player_save_soon()
 		_try_auto_refill()
 
 
@@ -1817,8 +1898,10 @@ func _refresh_bag() -> void:
 	var bag_count := GameState.sum_seed_bag_only()
 	var slots := _arena_slots_available()
 	var gate_open := _session_open or not _chips.is_empty() or GameState.arena_gate_open()
-	var can_pour := bag_count > 0 and slots > 0 and gate_open
-	_seed_bag.set_state(bag_count, can_pour, GameState.get_bag_preview_types())
+	# U rundi brojač vreće pokazuje koliko OVA runda još može dobiti (cap 200), ne cijelu vreću.
+	var cap_left := round_cap_left() if _session_open else UiCamp.GATE_MAX
+	var can_pour := bag_count > 0 and slots > 0 and gate_open and cap_left > 0
+	_seed_bag.set_state(mini(bag_count, cap_left), can_pour, GameState.get_bag_preview_types())
 	var show_gate := not _session_open and _chips.is_empty()
 	_seed_bag.set_counter_visible(not show_gate)
 	_apply_gate_count(show_gate)

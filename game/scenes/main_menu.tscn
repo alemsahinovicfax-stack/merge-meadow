@@ -69,9 +69,9 @@ script = ExtResource("9_gift")
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 180)
 layout_mode = 0
-offset_left = 24.0
+offset_left = 876.0
 offset_top = 220.0
-offset_right = 204.0
+offset_right = 1056.0
 offset_bottom = 400.0
 script = ExtResource("11_basket_btn")
 

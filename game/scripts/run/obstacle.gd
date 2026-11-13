@@ -1,6 +1,7 @@
 extends Area2D
 
-## v1 visual motif. Collision shape stays 64×64 (not the drawn 176×150 body).
+## v1 visual motif. Collision 64×92: uska kao prije, ali produžena prema Pipu (y −32…+60) do
+## donjeg ruba nacrtanog tijela, pa sudar počinje kad glava dotakne prepreku (FIX-TEL-2).
 var kind: String = "stone"
 ## Par (design_handoff_leveli_endless · A4): "" singl · "wide" široki sprite preko dvije staze
 ## (crta ga lijeva, `pair_dx` = pomak do sredine para) · "hidden" (druga u širokom paru) · "side".

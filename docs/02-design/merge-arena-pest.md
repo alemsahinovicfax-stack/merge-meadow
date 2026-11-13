@@ -27,7 +27,7 @@ Mali **Muncher** (štetočina livade) dodaje pritisak u Merge Areni: spava u sre
 | 3 | Jede **T1 i T2** na playfieldu (ne bag, ne inbox, ne T3). Uvijek ide na sjemenku koja mu je **sada najbliža**: cilj se bira svakih 0,25 s, a mijenja se kad je druga bliža bar 24 px (od 2026-10-16; ranije je zaključao prvu metu). Sjemenku koju igrač drži ne lovi |
 | 4 | Polje prazno → spava **gdje je stao / pojeo zadnje sjeme** |
 | 5 | Sljedeći pour → budi se s sleep spot-a |
-| 6 | **T3 merge** → freeze 2 s |
+| 6 | **T3 merge** → freeze 1 s (od 2026-11-12; ranije 2 s) |
 | 7 | Exit arena → reset na nest |
 
 ## Konstante

@@ -1,10 +1,10 @@
 extends Node2D
 
-## Prepreka — tijelo 176×150 + ovratnik. Kolizija ostaje 64×64 na roditelju.
+## Prepreka — tijelo 176×150 + ovratnik. Kolizija 64×92 je na roditelju.
 ## v1 motivi: stone i stump. Hay je u UiRun.obstacle_colors, ali se ne spawna.
 ## Season Kit (design_handoff_seasons § Odlučeno 9): sezona s kitom crta svoje dvije
 ## prepreke (SVG 176 x 150; "stone" → prva, "stump" → druga) s ovratnikom u boji kita
-## i sjenom ispod; kolizija 64 x 64 ostaje na roditelju.
+## i sjenom ispod; kolizija 64 x 92 je na roditelju.
 
 ## Iz RunScreen.dc.html (kutija 260 x 230 oko centra): sjena 168 x 40 na y +55,
 ## ovratnik na y +69, tijelo centrirano na y −6.

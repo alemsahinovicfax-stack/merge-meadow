@@ -198,17 +198,17 @@ func _refresh_tutorial_hint() -> void:
 		tutorial_hint_panel.visible = show
 
 
-## H2 · oblačić s repom lijevo prema korpi (u HINT_RECT), ikona Arene na mint disku.
+## H2 · oblačić s repom desno prema korpi (u HINT_RECT), ikona Arene na mint disku.
 func _show_basket_hint(pop: bool) -> void:
 	if _basket_hint == null:
 		return
 	_basket_hint.setup([{
 		"text": UiPopups.S_HINT_BASKET, "icon": load(RunProgressRail.FLAG_TEX) as Texture2D, "disc": UiPopups.MINT
-	}], "left")
+	}], "right")
 	_basket_hint.max_w = 600.0
-	_basket_hint.setup(_basket_hint.rows, "left")
+	_basket_hint.setup(_basket_hint.rows, "right")
 	var basket_c := Vector2(UiHomeField.BASKET_RECT.get_center())
-	var tip := Vector2(UiHomeField.BASKET_RECT.end.x + 12.0, basket_c.y) - Vector2(UiHomeField.HINT_RECT.position)
+	var tip := Vector2(float(UiHomeField.BASKET_RECT.position.x) - 12.0, basket_c.y) - Vector2(UiHomeField.HINT_RECT.position)
 	_basket_hint.point_at(tip, 0.5)
 	_basket_hint.visible = true
 	if pop:
@@ -282,6 +282,13 @@ func apply_level_path_chrome(v: Vector2) -> void:
 		var row := seasons_row_button.get_node_or_null("ContentRow") as Control
 		if row:
 			row.modulate.a = absf(v.y * 2.0 - 1.0)
+
+
+## Hub: igrač je otišao s Homea (stranica je već van vida). Otvoren Level Path se gasi —
+## povratak na Home pokazuje polje, ne put.
+func on_meta_page_left() -> void:
+	if season_stage != null and season_stage.has_method("reset_level_path_for_page_leave"):
+		season_stage.call("reset_level_path_for_page_leave")
 
 
 func on_level_path_transition(_opening: bool) -> void:
@@ -513,18 +520,19 @@ func _refresh_field_upgrades() -> void:
 	_ensure_upgrade_extras()
 	_style_upgrade_season_title()
 	var season_id := GameState.upgrade_sheet_season_id()
-	var flower_id := GameState.star3_type_id_for_season(season_id)
-	var have := GameState.spendable_upgrade_flowers(season_id)
 	_refresh_upgrade_kept_note(season_id)
 	for spec in [
 		["magnet", magnet_button, magnet_title, _magnet_effect],
 		["loot", loot_boost_button, loot_boost_title, _loot_effect],
 		["twin", _twin_button, _twin_title, _twin_effect],
 	]:
+		# Cvijet na dugmetu prati level: ★2 (prvi, drugi) za level 1 i 2, ★3 za 3 i 4.
+		var level := GameState.get_upgrade_level(str(spec[0]), season_id)
 		_apply_upgrade_card(
 			str(spec[0]), spec[1], spec[2], null, spec[3], null, null,
-			GameState.get_upgrade_level(str(spec[0]), season_id),
-			UiCamp.UP_LEVELS, "", flower_id, have
+			level, UiCamp.UP_LEVELS, "",
+			GameState.upgrade_flower_type(season_id, level),
+			GameState.spendable_upgrade_flowers(season_id, level)
 		)
 
 
@@ -549,8 +557,12 @@ func _refresh_upgrade_kept_note(season_id: String) -> void:
 	var show := false
 	var next_id := GameState.next_locked_free_id()
 	if GameState.upgrade_uses_kept_flowers(season_id) and not next_id.is_empty():
+		var star3 := GameState.star3_type_id_for_season(season_id)
 		for track in ["magnet", "loot", "twin"]:
-			if GameState.upgrade_button_state(track, season_id) == UiCamp.UP_CAN:
+			# Samo nadogradnja koja se plaća ★3 cvijetom dira ono što čeka sljedeća sezona.
+			var level := GameState.get_upgrade_level(track, season_id)
+			if GameState.upgrade_button_state(track, season_id) == UiCamp.UP_CAN \
+					and GameState.upgrade_flower_type(season_id, level) == star3:
 				show = true
 		if show:
 			var def: SeasonDef = GameState.get_season_def(next_id)
@@ -1084,6 +1096,20 @@ func on_field_transition_finished(opened: bool) -> void:
 		_transition_blocker.visible = false
 	if opened:
 		_refresh_basket_card()
+		_prewarm_wardrobe_soon()
+
+
+## Ormar se izgradi dok igrač gleda polje (pola sekunde poslije otvaranja), pa tap na „Looks"
+## zatekne gotove kartice i sheet uđe bez trzaja (FIX-TEL-2).
+func _prewarm_wardrobe_soon() -> void:
+	if wardrobe_sheet == null or not is_inside_tree():
+		return
+	await get_tree().create_timer(0.5).timeout
+	if not is_instance_valid(self) or not is_inside_tree() or wardrobe_sheet == null:
+		return
+	if not GameState.home_season_field_open or _stage_transitioning() or wardrobe_sheet.is_open():
+		return
+	wardrobe_sheet.prewarm(GameState.home_season_field_id)
 
 
 func _sync_basket_attention() -> void:
@@ -1249,14 +1275,14 @@ func _open_sheet(overlay: Control, panel: Control, h: int) -> void:
 	var dim := overlay.get_node_or_null("Dim") as CanvasItem
 	if not is_inside_tree():
 		return
-	panel.position.y = overlay.size.y - float(h)
-	UiPopups.tween_sheet_in(panel, h)
-	if dim:
-		dim.modulate.a = 0.0
-		create_tween().tween_property(dim, "modulate:a", 1.0, UiPopups.ANIM.modal_in)
+	# SheetSlide (FIX-TEL-2): sadržaj se upravo izgradio — ulazak kreće dva frejma kasnije i
+	# spor frejm ga uspori umjesto da preskoči put (trzaj Boosts / Basket na telefonu).
+	var rest := overlay.size.y - float(h)
+	SheetSlide.run(panel, rest + float(h), rest, UiPopups.ANIM.sheet_in, dim, UiPopups.ANIM.modal_in)
 
 
 func _dismiss_sheet(panel: Control, close_fn: Callable) -> void:
+	SheetSlide.stop_on(panel)
 	var overlay := panel.get_parent() as Control
 	if overlay == null or not overlay.visible or not is_inside_tree():
 		close_fn.call()

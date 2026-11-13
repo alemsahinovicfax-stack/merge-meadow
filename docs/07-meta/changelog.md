@@ -9,6 +9,23 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-11-12
+
+- **FIX-TEL-3 — treći krug poslije playtesta na telefonu (build 12)** (plan `06-production/plan-telefon-playtest-1112b.md`, izvještaj `06-production/telefon-playtest-1112b-izvjestaj.md`; sve na zahtjev vlasnika):
+  - **Arena, štekanje pri tapu na vreću:** odgođeni save piše na disk u pozadinskoj niti (padao je 0,5 s poslije sipanja, usred leta); korpa se ne crta ponovo kad se promijeni samo broj; sjemenka pri sipanju je jedan čvor (crtež stiže u letu); rub crteža cvijeta iz generisane tabele `FlowerCropTable` (bez čitanja teksture s grafičke). Katalog #71, #72.
+  - **Home:** s otvorenog Level Patha vodoravan potez mijenja stranicu huba; odlazak s Homea gasi put (povratak pokazuje polje).
+  - **Journal:** sjeme pokupljeno u runu odmah upisuje ★T1 (NEW); T2 se upisuje prvim spajanjem u T2 u Areni, T3 prvim T3.
+  - **Muncher:** brzina 85 → 110,5 px/s (+30 %), zaleđenost poslije T3 2 → 1 s.
+  - **Ekonomija:** pragovi sezona (Journey) 22 / 26 / 30 → **30 / 35 / 40** ★3 cvjetova prethodne sezone (Themes i dalje samo coini). **Boostovi:** cijena po levelu u T3 cvjetovima sezone — 5 × prvi ★2, 10 × drugi ★2, 2 × ★3, 5 × ★3 (bilo 2 / 2 / 3 / 3 ★3); coini uz to isti (100 / 250 / 500 / 800).
+  - Version code 13.
+- **FIX-TEL-2 — drugi krug poslije playtesta na telefonu (build 11)** (plan `06-production/plan-telefon-playtest-1112.md`, izvještaj `06-production/telefon-playtest-1112-izvjestaj.md`; sve na zahtjev vlasnika):
+  - **Run:** kontakt glavom — kolizija Pipa 56 × 92 (od vrha glave), prepreka 64 × 92 produžena prema Pipu, coin r 36; razmak redova prepreka 300 → 366 px (isti prostor za izmicanje). **Vjetar ×5:** nalet gurne stazu 50 px × (brzina / 400), najviše ×2,5, bez povratka. **Odbrojavanje 3 → 2 → 1** poslije „Keep running". **Endless: Pace svakih 10 s** (bilo 20; težina po Pace-u ista, stiže duplo brže — `ENDLESS_KEY_SEC_PER_TIER`).
+  - **Home:** Basket desno ispod Boostova; Ormar — skinovi cijeli u okviru (katalog #67), katanac pun bedž u uglu iznad Pipa; Ormar / Boosts / Basket ulaze kroz `SheetSlide` (gradnja prije animacije, spor frejm ne preskače put), mreža Ormara se gradi unaprijed.
+  - **Camp trejd:** 31 ms → 1,4 ms po trejdu (katalog #68), novčići kao pickupi u runu (`CoinStreamFx`).
+  - **Journal:** sezona odmah zauzme punu visinu, redovi stižu jedan po jedan preko kostura „Loading…".
+  - **Arena:** najviše **200 sjemenki po merge rundi** (`UiCamp.GATE_MAX`); pilula iznad vreće „N / 50" → „N / 200" (mint, puls) kad se može igrati.
+  - Kapija: ispravljena putanja izolovanog GUT savea (#70). Version code 12.
+
 ## 2026-11-11
 
 - **FIX-TEL — ispravke poslije prvog playtesta na telefonu** (plan `06-production/plan-telefon-playtest-1111.md`, izvještaj `06-production/telefon-playtest-1111-izvjestaj.md`):

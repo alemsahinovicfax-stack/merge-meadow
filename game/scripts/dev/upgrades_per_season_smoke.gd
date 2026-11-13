@@ -38,14 +38,20 @@ func _run() -> void:
 	if str(gs.call("upgrade_button_state", "magnet")) != "short_flower":
 		_fail("coins without flowers should be short_flower")
 		return
-	gs.set("garden_crystal_stash", {flower: reserve + f})
+	# Level 1 se plaća prvim ★2 cvijetom sezone (od 2026-11-12), ne ★3.
+	var pay := str(gs.call("upgrade_flower_type", "country_bloom", 0))
+	gs.set("garden_crystal_stash", {flower: reserve + 50})
+	if str(gs.call("upgrade_button_state", "magnet")) != "short_flower":
+		_fail("★3 flowers must not pay level 1 (needs %s)" % pay)
+		return
+	gs.set("garden_crystal_stash", {pay: f})
 	gs.set("wallet_coins", c - 1)
 	if str(gs.call("upgrade_button_state", "magnet")) != "short_coin":
 		_fail("flowers without coins should be short_coin")
 		return
 	gs.set("wallet_coins", c)
 	if str(gs.call("upgrade_button_state", "magnet")) != "can":
-		_fail("%d above the reserve and %d coins should be can" % [f, c])
+		_fail("%d %s and %d coins should be can" % [f, pay, c])
 		return
 	if not bool(gs.call("try_upgrade_magnet", "")):
 		_fail("buy failed")

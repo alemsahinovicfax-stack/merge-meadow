@@ -181,7 +181,8 @@ func _check_escaped(rig: Node) -> void:
 		_fail("he should keep hunting after the hmph")
 
 
-## Led 2 s: m_freeze → m_frozen, zadnjih 0,25 s m_thaw, pa lov.
+## Led 1 s (GameState.ARENA_PEST_T3_FREEZE; do 2026-11-12 bio 2 s): m_freeze → m_frozen,
+## zadnjih 0,25 s m_thaw, pa lov.
 func _check_freeze() -> void:
 	_pest.call("on_t3_created")
 	await _frames(1)
@@ -190,12 +191,15 @@ func _check_freeze() -> void:
 	await _wait(0.4)
 	if _clip() != "m_frozen":
 		_fail("T3: expected m_frozen, got %s" % _clip())
-	await _wait(1.45)
+	var freeze_sec := float(root.get_node("GameState").get_script().get_script_constant_map().get("ARENA_PEST_T3_FREEZE", 1.0))
+	if not is_equal_approx(freeze_sec, 1.0):
+		_fail("T3 freeze should last 1 s, constant is %s" % str(freeze_sec))
+	await _wait(freeze_sec - 0.4 - 0.15)
 	if _clip() != "m_thaw" or str(_pest.call("get_pose_key")) != "frozen":
 		_fail("T3: last 0.25 s should be m_thaw while still frozen, got %s" % _clip())
 	await _wait(0.35)
 	if str(_pest.call("get_pose_key")) == "frozen":
-		_fail("T3: freeze must end at 2 s")
+		_fail("T3: freeze must end at 1 s")
 
 
 ## Prazno polje: m_doze → m_sleep_spot; drugo buđenje u sesiji je bez banera i bez m_awake.

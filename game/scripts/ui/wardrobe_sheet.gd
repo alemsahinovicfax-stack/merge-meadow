@@ -36,6 +36,10 @@ var _is_open: bool = false
 var _closing: bool = false
 var _changed: Array = []
 var _tween: Tween
+## Ulazak (SheetSlide) još traje — sheet ne smije skočiti na mjesto pri promjeni veličine.
+var _slide: SheetSlide
+## Šta je trenutno izgrađeno u mreži (slot, sezona, vlasništvo, „new"): isto = bez nove gradnje.
+var _grid_sig: String = ""
 
 var _scrim: ColorRect
 var _sheet: Panel
@@ -107,17 +111,14 @@ func open(season_id: String = "", animated: bool = true) -> void:
 	visible = true
 	add_to_group(OPEN_GROUP)
 	add_to_group(BLOCK_HUB_SWIPE_GROUP)
-	_rebuild_all()
+	_build_for_open()
 	_grid_scroll.scroll_vertical = 0
 	_kill_tween()
 	if animated:
 		Sfx.play("ui_open")
-		_sheet.position.y = size.y
-		_scrim.modulate.a = 0.0
-		_tween = create_tween().set_parallel()
-		_tween.tween_property(_sheet, "position:y", open_y(), UiWardrobe.T_OPEN) \
-			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		_tween.tween_property(_scrim, "modulate:a", 1.0, UiWardrobe.T_OPEN * 0.62)
+		# SheetSlide: gradnja i prvo crtanje prođu ispod ekrana, spor frejm ne preskače put.
+		_slide = SheetSlide.run(_sheet, size.y, open_y(), UiWardrobe.T_OPEN, _scrim, UiWardrobe.T_OPEN * 0.62)
+		_slide.finished.connect(func() -> void: _slide = null)
 	else:
 		_sheet.position.y = open_y()
 		_scrim.modulate.a = 1.0
@@ -165,6 +166,47 @@ func _kill_tween() -> void:
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
 	_tween = null
+	if _slide != null:
+		SheetSlide.stop_on(_sheet)
+		_slide = null
+
+
+## Mreža se gradi samo kad se nešto promijenilo (slot, sezona, kupljeno, „new"); inače se
+## kartice samo usklade s onim što se nosi. Prvi put je obično već izgrađena (`prewarm`).
+func _build_for_open() -> void:
+	_rebuild_tabs()
+	var sig := _grid_signature()
+	if sig == _grid_sig and _grid.get_child_count() > 0:
+		_sync_cards()
+	else:
+		_rebuild_grid()
+	_refresh_stage()
+
+
+func _grid_signature() -> String:
+	var parts := PackedStringArray([_slot, _season, str(MonetizationConfig.iap_enabled())])
+	for it in CosmeticCatalog.items_in_slot(_slot):
+		var iid := str(it.get("id", ""))
+		parts.append("%s:%d%d" % [iid, int(GameState.owns_cosmetic(iid)), int(GameState.cosmetics.is_new(iid))])
+	return "|".join(parts)
+
+
+## Home: izgradi mrežu dok igrač još gleda polje, da tap na „Looks" ne čeka gradnju kartica
+## (rigovi Pipa po skinu). Sheet ostaje sakriven.
+func prewarm(season_id: String) -> void:
+	if _is_open or not is_inside_tree():
+		return
+	_season = season_id
+	var ids := _visible_slot_ids()
+	if _slot.is_empty() or not ids.has(_slot):
+		_slot = ids[0] if not ids.is_empty() else ""
+	pending = {}
+	for sid in CosmeticCatalog.slot_ids():
+		var eq := GameState.get_equipped_cosmetic(sid)
+		if not eq.is_empty():
+			pending[sid] = eq
+	if _grid_signature() != _grid_sig or _grid.get_child_count() == 0:
+		_rebuild_grid()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -182,7 +224,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST and _is_open and not SettingsScreen.is_open(get_tree()):
 		close()
-	elif what == NOTIFICATION_RESIZED and _sheet != null and _is_open and not _closing and _tween == null:
+	elif what == NOTIFICATION_RESIZED and _sheet != null and _is_open and not _closing and _tween == null and _slide == null:
 		_sheet.position.y = open_y()
 
 
@@ -393,6 +435,7 @@ func _rebuild_grid() -> void:
 	for c in _grid.get_children():
 		_grid.remove_child(c)
 		c.queue_free()
+	_grid_sig = _grid_signature()
 	var sd := CosmeticCatalog.get_slot_def(_slot)
 	if sd.is_empty():
 		return

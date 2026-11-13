@@ -26,11 +26,9 @@ var _info: Dictionary = {}
 var _gain: int = 0
 var _hold_ticks: int = 0
 var _switch_tween: Tween
-var _fly_coins: Array[Control] = []
-## Novčići koji su stigli i čekaju sljedeći let (sakriveni, ostaju djeca huba).
-var _coin_pool: Array[TextureRect] = []
-var _bump: Panel = null
-var _bump_tween: Tween
+## Izgled koji je zadnji put postavljen (stanje + tip + tekstovi): isti = trejd dira samo liniju.
+var _applied_key: String = ""
+var _merge_amber: int = -1
 var _feedback_tween: Tween
 var _strip_tween: Tween
 var _merge_row: HBoxContainer
@@ -155,7 +153,10 @@ func _apply_merge_line(text: String) -> void:
 		_merge_text = ""
 		return
 	var count := int(_info.get("count", 0))
-	_merge_disc.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(count == UiCamp.MERGE_MIN))
+	var amber := int(count == UiCamp.MERGE_MIN)
+	if amber != _merge_amber:
+		_merge_amber = amber
+		_merge_disc.add_theme_stylebox_override("panel", UiCamp.merge_mark_style(amber == 1))
 	if text == _merge_text:
 		return
 	_merge_text = text
@@ -174,6 +175,16 @@ func apply_state(state: String, info: Dictionary) -> void:
 	var disabled := state == UiCamp.TRADE_DISABLED
 	var merge_text := UiCamp.merge_line_text(int(info.get("count", 0))) if seed and not disabled else ""
 	_set_bar_height(UiCamp.trade_height_v3(state, not merge_text.is_empty()))
+	# FIX-TEL-2: dok se drži Trade, stanje i tip su isti iz trejda u trejd — mijenja se samo broj.
+	# Tada se ne diraju stilovi dugmeta, ikona ni okvir (svaki theme override ponovo računa raspored).
+	var key := "%s|%s|%s|%s|%s|%d|%d" % [
+		state, str(info.get("kind", "")), str(info.get("type_id", "")), str(info.get("label", "")),
+		str(info.get("season_name", "")), int(info.get("need", 0)), int(info.get("left", 0)),
+	]
+	if key == _applied_key and prev == state and not disabled:
+		_apply_merge_line(merge_text)
+		return
+	_applied_key = key
 
 	if disabled:
 		# Bez imena i bez "Nothing selected" — prazan okvir sam kaze da nema sta prodati.
@@ -253,9 +264,10 @@ func flash_switch() -> void:
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
-## Novcic 44 px odleti od dugmeta do coin chipa u headeru (max 3 ziva, bez cestica).
+## Novčić odleti od dugmeta do coin chipa u headeru. Letači su CoinStreamFx na hubu (bazen
+## Sprite2D, jedan _process — kao pickupi u runu); ovdje se samo lansira (FIX-TEL-2).
 func _fly_coin() -> void:
-	if not is_inside_tree() or _fly_coins.size() >= UiCamp.FLY_COIN_MAX:
+	if not is_inside_tree():
 		return
 	var hub := _find_hub()
 	if hub == null:
@@ -263,71 +275,16 @@ func _fly_coin() -> void:
 	var chip := hub.get("coin_chip") as Control
 	if chip == null or not is_instance_valid(chip):
 		return
-	# Pool (FIX-TEL 2026-11): držanje dugmeta = 10 trejdova u sekundi; novi čvor + brisanje po
-	# trejdu je štekalo na telefonu. Najviše FLY_COIN_MAX novčića, isti čvorovi kruže.
-	var coin: TextureRect = null
-	while not _coin_pool.is_empty() and coin == null:
-		var pooled: TextureRect = _coin_pool.pop_back()
-		if is_instance_valid(pooled) and pooled.get_parent() == hub:
-			coin = pooled
-	if coin == null:
-		coin = TextureRect.new()
-		coin.name = "FlyCoin"
-		coin.custom_minimum_size = Vector2(UiCamp.FLY_COIN, UiCamp.FLY_COIN)
-		coin.size = coin.custom_minimum_size
-		coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		coin.top_level = true
-		coin.z_index = 100
-		coin.pivot_offset = coin.size * 0.5
-		hub.add_child(coin)
-	coin.texture = feedback_coin.texture
-	coin.scale = Vector2.ONE
-	coin.visible = true
-	_fly_coins.append(coin)
-	coin.global_position = button.global_position + button.size * 0.5 - coin.size * 0.5
-	var to := chip.global_position + chip.size * 0.5 - coin.size * 0.5
-	var tw := coin.create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(coin, "global_position", to, UiCamp.T_FLY_COIN) \
-		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tw.tween_property(coin, "scale", Vector2.ONE * 0.7, UiCamp.T_FLY_COIN)
-	tw.chain().tween_callback(_on_fly_coin_arrived.bind(coin, chip))
+	var stream := CoinStreamFx.on(hub, feedback_coin.texture)
+	stream.launch(button.get_global_rect().get_center(), chip)
 
 
-func _on_fly_coin_arrived(coin: Control, chip: Control) -> void:
-	_fly_coins.erase(coin)
-	if is_instance_valid(coin):
-		coin.visible = false
-		_coin_pool.append(coin)
-	_bump_coin_chip(chip)
-
-
-## Prsten preko coin chipa kad novcic stigne — put od dugmeta do brojaca se vidi.
-func _bump_coin_chip(chip: Control) -> void:
-	if chip == null or not is_instance_valid(chip) or not is_inside_tree():
-		return
+## Tok novčića ovog huba (testovi); null dok nijedan nije poletio.
+func coin_stream() -> CoinStreamFx:
+	if not is_inside_tree():
+		return null
 	var hub := _find_hub()
-	if hub == null:
-		return
-	if _bump == null or not is_instance_valid(_bump):
-		_bump = Panel.new()
-		_bump.name = "CoinChipBump"
-		_bump.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_bump.add_theme_stylebox_override("panel", UiCamp.coin_bump_style())
-		_bump.top_level = true
-		_bump.z_index = 99
-		hub.add_child(_bump)
-	_bump.size = chip.size + Vector2(12, 12)
-	_bump.global_position = chip.global_position - Vector2(6, 6)
-	_bump.modulate.a = 0.0
-	_bump.visible = true
-	if _bump_tween and _bump_tween.is_valid():
-		_bump_tween.kill()
-	_bump_tween = _bump.create_tween()
-	_bump_tween.tween_property(_bump, "modulate:a", 1.0, UiCamp.T_COIN_BUMP * 0.4)
-	_bump_tween.tween_property(_bump, "modulate:a", 0.0, UiCamp.T_COIN_BUMP * 0.6)
+	return hub.get_node_or_null(CoinStreamFx.NODE_NAME) as CoinStreamFx if hub != null else null
 
 
 func _button_icon(icon_name: String) -> Texture2D:

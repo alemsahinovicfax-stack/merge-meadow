@@ -130,12 +130,12 @@ func _check_timer_stable(run: Node, gs: Node) -> void:
 func _check_collisions() -> void:
 	var obstacle := (load("res://scenes/run/obstacle.tscn") as PackedScene).instantiate()
 	var shape := obstacle.get_node("CollisionShape2D").shape as RectangleShape2D
-	if shape == null or shape.size != Vector2(64, 64):
-		_fail("obstacle collision changed from 64×64")
+	if shape == null or shape.size != Vector2(64, 92):
+		_fail("obstacle collision changed from 64×92")
 	obstacle.free()
 	var coin := (load("res://scenes/run/coin.tscn") as PackedScene).instantiate()
 	var coin_shape := coin.get_node("CollisionShape2D").shape as CircleShape2D
-	if coin_shape == null or not is_equal_approx(coin_shape.radius, 18.0):
+	if coin_shape == null or not is_equal_approx(coin_shape.radius, 36.0):
 		_fail("coin collision radius changed")
 	coin.free()
 	var seed := (load("res://scenes/run/seed_pickup.tscn") as PackedScene).instantiate()

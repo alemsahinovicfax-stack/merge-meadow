@@ -995,6 +995,98 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** ukras koji mora izaći iz okvira kontejnera nikad nije obično dijete kontejnera (`top_level`, ili roditelj koji nije kontejner).
 
+## #67 — Pip u sličici izrezan (uši, glava): `actor.box_px = N` ne mijenja skalu
+
+**Datum:** 2026-11-12
+
+**Simptom:** u Ormaru (i Shop · Looks) skinovima fale uši, nekima i dio glave; na kompjuteru isto.
+
+**Uzrok:** `UiPip.box_px` je bio obična `@export` varijabla. Skala se računa u `build()` / `set_box()`, pa `actor.box_px = 121` **poslije** `add_child` nije radio ništa — Pip je ostajao na zadanih 190 px u okviru za 121.
+
+**Rješenje:** `box_px` ima setter (`_apply_scale()` kad je rig izgrađen); `ItemPreview` dodatno ograniči veličinu prema najvišem skinu (uši Pip Sky sežu 107 % kutije).
+
+**Prevencija:** `scripts/dev/pip_bounds_probe.gd` ispiše stvarne granice crteža po skinu i pogledu. Svojstvo koje mijenja izgled a računa se samo pri gradnji mora imati setter.
+
+## #68 — Camp trejd šteka: stil svih chipova po trejdu + rušenje liste i save na svako puštanje
+
+**Datum:** 2026-11-12
+
+**Simptom:** Trade u Campu trza, najviše kad se klikće dok novčić leti (telefon).
+
+**Uzrok:** mjerenje (`camp_trade_bench`): jedan trejd **31 ms** na laptopu. (1) `_sync_chip_counts` zove `set_count` na svim chipovima, a `set_count` je svaki put radio `add_theme_stylebox_override` + tri `style_label` (≈ 40 ms za listu); (2) svako puštanje dugmeta — i običan tap — zvalo je `_refresh_ui()` (ruši i gradi obje liste) i `save_player_save()` (7–21 ms). Let novčića je bio 0,03 ms — nije on.
+
+**Rješenje:** setter-i s ranim izlazom (chip, tab, Trade bar, kartica sezone: isti izgled = samo brojevi), puštanje dugmeta radi lagano osvježavanje i `save_player_save_soon()`, letači su `CoinStreamFx` (bazen `Sprite2D`, jedan `_process`, kao pickupi u runu). Poslije: **1,4 ms** po trejdu.
+
+**Prevencija:** kad nešto „šteka", prvo izmjeri po koracima (bench skripta), ne pogađaj po onome što se vidi na ekranu. Theme override nikad u kodu koji se zove po događaju bez provjere „je li se išta promijenilo".
+
+## #69 — broj u krugu se ne vidi: `draw_set_transform` + pomoćna `draw_text`
+
+**Datum:** 2026-11-12
+
+**Simptom:** odbrojavanje poslije pauze crta krug, ali bez broja.
+
+**Uzrok:** `UiHomeV3.draw_text` (i `UiPopups.draw_text*`) sami zovu `draw_set_transform(pos, …)` i na kraju ga vrate na identitet — vanjski `draw_set_transform` pozivaoca se gubi, pa tekst završi u uglu kontrole.
+
+**Rješenje:** bez vanjskog transforma: skalu uračunati u rect i veličinu fonta.
+
+**Prevencija:** novi crtež uvijek slikati (`fix_tel2_capture.gd`), ne samo testirati logiku.
+
+## #70 — `\` u Python zakrpi iz Bash heredoca: `\n` ostane kao tekst, `\a` postane zvono
+
+**Datum:** 2026-11-12
+
+**Simptom:** (1) `Parse Error: Expected new line after "\"` u `.gd` fajlu poslije zakrpe; (2) `release-check.ps1` pada s „Illegal characters in path" (`Godot<BEL>pp_userdata`).
+
+**Uzrok:** zakrpe pisane kao Python u `bash <<'EOF'`: nastavak reda (`\` + novi red) i putanja `Godot\app_userdata` su prošli kroz Python string escape.
+
+**Rješenje / prevencija:** Python zakrpu koja sadrži `\` pisati alatom Write u fajl (ili `chr(92)`), nikad u heredoc; poslije zakrpe skripte za kapiju **pokrenuti je** (jučerašnja izmjena kapije nije bila pokrenuta pa je greška čekala do danas). Poslije nove `class_name` skripte prvo `scripts/godot-import.ps1` (inače „Could not find type").
+
+## #71 — Arena šteka kad se tapne vreća dok sjemenke lete: save na disk usred leta + korpa se crta dvaput
+
+**Datum:** 2026-11-12
+
+**Simptom:** na telefonu jak trzaj pri tapu na vreću i pola sekunde poslije, dok sjemenke još lete. Na laptopu se skoro ne vidi.
+
+**Uzrok (mjereno, `arena_bag_tap_bench`):** (1) svako sipanje zove `save_player_save_soon()` — save padne 0,5 s kasnije, usred leta (let traje do 1,6 s), a 94 % savea je rad s diskom na glavnoj niti: pročitaj fajl, piši tmp, pročitaj prethodni, piši .bak, obriši, preimenuj (7 ms na SSD-u laptopa); (2) `ArenaSeedBag.set_state` i `play_pour` su pri svakoj promjeni BROJA crtali cijelu korpu (pleter + 12 cvjetova, +4,9 ms po crtanju, dvaput po sipanju); (3) 30 sjemenki × 3 čvora u jednom frejmu.
+
+**Rješenje:** odgođeni save slaže tekst na glavnoj niti, a piše u `WorkerThreadPool` niti (`GameState._on_save_soon_timer`; sinhroni save i pauza / izlaz čekaju nit); tijelo korpe se crta samo kad se promijeni vidljiva gomila ili vrste, broj je u sloju Front; crtež sjemenke (`Art`) nastaje kad dođe njen red u letu, prsten tek kad zatreba.
+
+**Prevencija:** rad s diskom nikad na glavnoj niti u toku igre — samo kroz `save_player_save_soon()`. Skup crtež (`_draw` s mnogo primitiva) ne vezati za broj koji se često mijenja: broj u svoj sloj. Testovi: `arena_pour_light_smoke`, `save_async_smoke`.
+
+## #72 — prvi crtež svake vrste cvijeta čita teksturu nazad s grafičke kartice
+
+**Datum:** 2026-11-12
+
+**Simptom:** zastoj pri prvom sipanju vrste, prvom T2 i prvom T3 (jednom po vrsti i tieru u sesiji); prvo sipanje 23 ms, sljedeća 7 ms na laptopu.
+
+**Uzrok:** `CampPlantDraw._crop_rect()` traži rub vidljivog crteža preko `tex.get_image().get_used_rect()` — `get_image()` na teksturi je čitanje s GPU-a (sinhrono, skupo na telefonu).
+
+**Rješenje:** rubovi su u generisanoj tabeli `scripts/visual/flower_crop_table.gd` (alat `scripts/dev/flower_crop_gen.gd`, pokreće se s prozorom). Red vrijedi samo ako se veličina teksture poklapa, inače stari put.
+
+**Prevencija:** `Texture2D.get_image()` nikad u igri — samo u alatima. Poslije izmjene SVG-ova cvjetova pokrenuti `flower_crop_gen.gd` (ili `--check`).
+
+## #73 — mjerna skripta s prozorom visi: `preload` skripte koja koristi autoload
+
+**Datum:** 2026-11-12
+
+**Simptom:** `-s scripts/dev/x.gd` s prozorom ne izlazi (prozor ostane otvoren do timeouta); headless ispiše `Compile Error: Identifier not found: GameState`.
+
+**Uzrok:** `const X := preload(...)` skripte koja spominje autoload — u `-s` skripti se prevodi prije nego što autoloadi postoje. Skripta se ne učita, pa niko ne pozove `quit()`.
+
+**Rješenje / prevencija:** u dev skriptama `load()` u `_run()`, ne `preload` na vrhu; novu skriptu prvo pokrenuti headless (greška se vidi odmah), pa tek s prozorom, uvijek pod `timeout`. I: `git stash` za „mjerenje prije izmjena" NE koristiti — u radnom stablu su i necommitane izmjene prethodnog kruga, pa stash vrati više od namjeravanog.
+
+## #74 — `Control` koji se okreće ili skalira crta se u svakom frejmu (korpa u Areni)
+
+**Datum:** 2026-11-12
+
+**Simptom:** Arena je na telefonu „teška" cijelu rundu; test koji broji crtanja korpe našao je 288 crtanja za 288 frejmova.
+
+**Uzrok:** `Control.set_rotation()`, `set_scale()` i `set_pivot_offset()` u Godotu sami zovu `queue_redraw()`. Korpa se klatila preko `_body.rotation = …` u `_process`, pa se njen `_draw` (pleter s AA linijama + 12 cvjetova) izvršavao u svakom frejmu — +1,4 ms po frejmu na laptopu. Komentar u skripti je tvrdio suprotno („crtež se ne obnavlja svaki frejm").
+
+**Rješenje:** klaćenje preko `Node2D` stožera (`BodyPivot`) čije dijete je `Control` s crtežom — `Node2D.rotation` mijenja samo transform.
+
+**Prevencija:** ono što se animira svaki frejm (rotacija, skala) ne smije biti `Control` sa skupim `_draw` — roditelj `Node2D` ili `modulate` / `position`. Provjera: `scripts/dev/redraw_audit.gd` ispiše čvorove koji se crtaju u svakom frejmu; `arena_pour_light_smoke` čuva korpu.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

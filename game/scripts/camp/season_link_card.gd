@@ -53,6 +53,9 @@ var _price_face: _PriceFace
 var _need_bubble: NeedCoinsBubble
 ## Coin kupovina teme (v1): do kada prvi tap čeka drugi (msec).
 var _confirm_until: int = 0
+## Sezona + vrsta + stanje za koje je kartica zadnji put cijela postavljena. Isto = trejd u
+## Campu mijenja samo brojeve i trake (FIX-TEL-2: pun refresh je bio ~3 ms po trejdu).
+var _look_key: String = ""
 
 
 ## Okvir cvijeta plaćene sezone: okvir po rijetkosti, tamno udubljenje, t3 cvijet 84 px.
@@ -223,16 +226,39 @@ func refresh() -> void:
 	if def == null or (not _paid and not def.is_free()):
 		visible = false
 		return
+	var was_visible := visible
 	visible = true
 	if _paid:
 		_state = UiCamp.SEASON_READY
+		var paid_key := "paid|%s|%s|%s" % [id, str(_buying), str(MonetizationConfig.iap_enabled())]
+		if was_visible and paid_key == _look_key and not MonetizationConfig.iap_enabled():
+			_show_paid_coins()
+			return
+		_look_key = paid_key
 		_show_paid(def)
 		return
-	_set_free_layout(true)
 	var coins := GameState.wallet_coins
 	var flowers := GameState.star3_flower_count_for_unlock(id)
 	_state = UiCamp.SEASON_READY if GameState.can_unlock_free(id) else UiCamp.SEASON_SHORT
+	var free_key := "free|%s|%s" % [id, _state]
+	if was_visible and free_key == _look_key:
+		_show_numbers(def, coins, flowers)
+		return
+	_look_key = free_key
+	_set_free_layout(true)
 	_show(def, coins, flowers)
+
+
+## Samo brojevi i trake (izgled, dugme i cvijet su već postavljeni za ovu sezonu i stanje).
+func _show_numbers(def: SeasonDef, coins: int, flowers: int) -> void:
+	var coins_text := "%d / %d" % [mini(coins, def.coins_cost), def.coins_cost]
+	if coins_label.text != coins_text:
+		coins_label.text = coins_text
+		coins_bar.value = mini(coins, def.coins_cost)
+	var t3_text := "%d / %d" % [mini(flowers, def.t3_flowers_required), def.t3_flowers_required]
+	if t3_label.text != t3_text:
+		t3_label.text = t3_text
+		t3_bar.value = mini(flowers, def.t3_flowers_required)
 
 
 func _show(def: SeasonDef, coins: int, flowers: int) -> void:

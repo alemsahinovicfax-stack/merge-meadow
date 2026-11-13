@@ -1,7 +1,7 @@
 extends SceneTree
 
 ## design_handoff_run_pickups: novčić na stazi = regija „coin" atlasa pickupa (96 × 96, isti crtež
-## kao icon_coin), sjena ISPOD novčića (prvo dijete), bez _draw. Kolizija ostaje r 18.
+## kao icon_coin), sjena ISPOD novčića (prvo dijete), bez _draw. Kolizija r 36 (crtež).
 
 const COIN_SCENE := "res://scenes/run/coin.tscn"
 
@@ -53,8 +53,8 @@ func _run() -> void:
 			_fail("CoinVisual must not draw per frame")
 	var shape := coin.get_node_or_null("CollisionShape2D") as CollisionShape2D
 	var circle := shape.shape as CircleShape2D if shape else null
-	if circle == null or not is_equal_approx(circle.radius, 18.0):
-		_fail("coin collision must stay r 18")
+	if circle == null or not is_equal_approx(circle.radius, 36.0):
+		_fail("coin collision must be r 36 (the drawn coin, FIX-TEL-2)")
 	coin.queue_free()
 	if _failed:
 		_quit(1)

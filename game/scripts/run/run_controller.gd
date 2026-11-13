@@ -1,7 +1,10 @@
 extends Node2D
 
 ## Lane runner. Mechanics (lanes, swipe, spawn, magnet, 50/100 loot) stay as in §2.
-## Visuals: design_handoff_run direction A. Obstacle collision stays 64×64.
+## Visuals: design_handoff_run direction A.
+## Kolizije (FIX-TEL-2 2026-11-12, „glava pređe preko predmeta"): Pip 56 × 92 od vrha glave
+## (y −64) do starog donjeg ruba (+28); prepreka 64 × 92 produžena samo prema Pipu (y −32…+60);
+## coin r 36 (kao crtež). Zadnji rubovi su isti kao prije — predmet koji je prošao ne kažnjava duže.
 ## HUD: design_handoff_run_hud_v2 — jedan red (Level · coin · seed · pauza), traka napretka
 ## lijevo i nagradni grm na šavu staza.
 ## Balans ciklus 1 (2026-10-21): brzina raste po levelu (speed_ramp), prepreke mogu doći u
@@ -20,7 +23,7 @@ const PICKUP_SEED_CHANCE := 0.30
 const SPAWN_Y := -80.0
 ## Tok prepreka (ciklus 1b, levels.json obstacle_rate_mult): razmak redova najmanje toliko px / s
 ## (dvije promjene staze stanu i na 900+ px/s), slučajno 0,6–1,4 × prosjeka.
-const MIN_ROW_GAP_PX := 300.0
+const MIN_ROW_GAP_PX := 366.0
 const MIN_ROW_GAP_SEC := 0.35
 const ROW_GAP_JITTER := Vector2(0.6, 1.4)
 ## Pickup i prepreka se ne stvaraju jedno na drugom u istoj stazi (±px po y).
@@ -32,6 +35,8 @@ const RAMP_EVERY := RunBalance.RAMP_EVERY
 const _STATE_RUNNING := 0
 const _STATE_ENDED := 1
 const _STATE_PAUSED := 2
+## Poslije „Keep running": meni je zatvoren, ide 3 → 2 → 1, staza još stoji.
+const _STATE_COUNTDOWN := 3
 
 const SAFE_AREA := preload("res://scripts/ui/safe_area_helper.gd")
 const TOKEN_SCRIPT := preload("res://scripts/run/run_token.gd")
@@ -106,6 +111,7 @@ var pause_overlay: PopupModal
 var keep_button: PopupButton
 var quit_button: PopupButton
 var finish_banner: RunBanner
+var resume_countdown: RunResumeCountdown
 var _banner_shown_at: float = -1.0
 
 ## Run HUD v2: traka napretka (sakrivena u Endlessu) i nagradni grm.
@@ -300,7 +306,7 @@ func _reset_common() -> void:
 	finish_gate = null
 	_gate_tried = false
 	if gust_fx:
-		gust_fx.stop()
+		gust_fx.reset()
 	if level_intro:
 		level_intro.stop()
 	_tele = RunTelemetry.new_counters()
@@ -317,6 +323,8 @@ func _reset_common() -> void:
 			_setup_world()
 	_state = _STATE_RUNNING
 	pause_overlay.visible = false
+	if resume_countdown:
+		resume_countdown.cancel()
 	fail_flash.visible = false
 	finish_banner.visible = false
 	position.x = 0.0
@@ -335,6 +343,10 @@ func _reset_common() -> void:
 
 
 func _process(delta: float) -> void:
+	if _state == _STATE_COUNTDOWN:
+		if resume_countdown.advance(delta):
+			_resume_now()
+		return
 	if _state != _STATE_RUNNING or not _world_ready:
 		return
 
@@ -356,7 +368,7 @@ func _process(delta: float) -> void:
 		# A3: nalet kad brzina pređe na sljedeću stepenicu (svakih 15 s).
 		if ramp_level > _gust_step:
 			_gust_step = ramp_level
-			gust_fx.play(_ui_scale())
+			gust_fx.play(_ui_scale(), _gust_strength())
 	RunTelemetry.note_speed(_tele, scroll_speed, delta)
 
 	spawn_timer += delta
@@ -373,6 +385,10 @@ func _process(delta: float) -> void:
 		_update_finish_gate(delta, run_duration)
 
 	_shift_world(delta, scroll_speed)
+	# A3 nalet: staza skoči prema Pipu (px iz efekta, bez povratka).
+	var surge := gust_fx.surge_step()
+	if surge > 0.0:
+		_shift_world(1.0, surge)
 	# Brojevi u headeru se mijenjaju samo na pickupu; po frejmu ide samo traka. Endless čip
 	# nosi sat — tekst se mijenja jednom u sekundi.
 	_update_rail(run_duration)
@@ -421,6 +437,11 @@ func get_tutorial_text() -> String:
 
 func is_paused() -> bool:
 	return _state == _STATE_PAUSED
+
+
+## Odbrojavanje 3 → 1 poslije pauze još traje (staza stoji, meni je zatvoren).
+func is_resuming() -> bool:
+	return _state == _STATE_COUNTDOWN
 
 
 func _end_run(failed: bool) -> void:
@@ -566,25 +587,44 @@ func _spawn_finish_burst() -> void:
 
 
 func _on_pause_pressed() -> void:
-	if _state != _STATE_RUNNING:
+	# Pauza usred odbrojavanja ga prekida i vraća meni.
+	if _state != _STATE_RUNNING and _state != _STATE_COUNTDOWN:
 		return
+	resume_countdown.cancel()
 	_state = _STATE_PAUSED
+	gust_fx.set_paused(true)
 	player.set_input_enabled(false)
 	_fill_pause()
 	pause_overlay.open(true)
 
 
+## „Keep running": meni se skloni, pa 3 → 2 → 1 na sredini; staza krene tek poslije (FIX-TEL-2).
 func _on_keep_running() -> void:
 	if _state != _STATE_PAUSED:
 		return
 	pause_overlay.close(true)
+	_state = _STATE_COUNTDOWN
+	resume_countdown.start()
+
+
+func _resume_now() -> void:
+	if _state != _STATE_COUNTDOWN:
+		return
+	resume_countdown.cancel()
 	_state = _STATE_RUNNING
+	gust_fx.set_paused(false)
 	player.set_input_enabled(true)
+
+
+## Testovi: preskoči odbrojavanje (isto što i kad istekne).
+func skip_resume_countdown() -> void:
+	_resume_now()
 
 
 func _on_quit_to_camp() -> void:
 	if _state == _STATE_ENDED:
 		return
+	resume_countdown.cancel()
 	pause_overlay.close(false)
 	_end_reason = "quit"
 	_end_run(true)
@@ -623,6 +663,8 @@ func _build_popups() -> void:
 	quit_button = PopupButton.new()
 	quit_button.name = "QuitButton"
 	quit_button.configure("secondary", UiPopups.S_QUIT_TO_CAMP, false, UiPopups.icon("icon_half"))
+	resume_countdown = RunResumeCountdown.new()
+	_popup_root.add_child(resume_countdown)
 	_layout_popup_root()
 
 
@@ -637,6 +679,9 @@ func _layout_popup_root() -> void:
 	pause_overlay.position = Vector2.ZERO
 	pause_overlay.size = base
 	pause_overlay.area = Rect2(Vector2.ZERO, base)
+	if resume_countdown:
+		resume_countdown.position = Vector2.ZERO
+		resume_countdown.size = base
 	finish_banner.position = Vector2(0.0, UiPopups.BANNER_Y * base.y / 1920.0)
 	finish_banner.size = Vector2(base.x, 300.0)
 
@@ -848,6 +893,11 @@ func _group_near(group: String, lane: int, y: float) -> bool:
 	return false
 
 
+## Jačina naleta: brzina staze prema osnovnoj (400 px/s) — viši level i viši Pace pušu jače.
+func _gust_strength() -> float:
+	return scroll_speed / BASE_SCROLL_SPEED
+
+
 func _endless_ramp_active() -> bool:
 	return GameState.is_endless_mode() and GameState.uses_run_level_config()
 
@@ -864,7 +914,7 @@ func _update_endless_tier() -> void:
 	if first:
 		return
 	# B4: pilula „Pace N" ispod čipa + nalet; pilula u čipu se trzne.
-	gust_fx.play(_ui_scale())
+	gust_fx.play(_ui_scale(), _gust_strength())
 	endless_fx.play_pace(tier, top_hud.offset_top / _ui_scale())
 	endless_chip.bump_pace()
 	_update_hud()

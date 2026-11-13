@@ -37,6 +37,8 @@ func setup(tab_kind: String) -> void:
 
 
 func set_active(on: bool) -> void:
+	if on == _active and _icon != null:
+		return
 	_active = on
 	_apply()
 
@@ -46,6 +48,8 @@ func is_active() -> bool:
 
 
 func set_count(count: int) -> void:
+	if count == _count and _count_label != null and _count_label.text == str(count):
+		return
 	_count = count
 	if _count_label:
 		_count_label.text = str(count)

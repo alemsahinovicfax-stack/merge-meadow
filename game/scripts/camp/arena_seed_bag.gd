@@ -38,6 +38,7 @@ var _wiggle_t: float = 0.0
 var _can_pour: bool = false
 var _show_counter: bool = true
 var _state_drawn: bool = false
+var _pile_drawn: int = -1
 var _base_position: Vector2 = Vector2.ZERO
 var _pour_tilt: float = 0.0
 var _pour_fly: float = 0.0
@@ -45,6 +46,7 @@ var _tilt_tween: Tween = null
 var _fly_tween: Tween = null
 var _colors: Dictionary = {}
 var _body: Control = null
+var _body_pivot: Node2D = null
 var _front: Control = null
 var _rim_box: StyleBoxFlat = null
 
@@ -57,19 +59,27 @@ func _ready() -> void:
 	z_index = 50
 	for key in UiArenaV2.BASKET_COLORS:
 		_colors[key] = UiArenaV2.col(str(UiArenaV2.BASKET_COLORS[key]))
-	_body = _make_layer("Body", _draw_body)
-	_body.pivot_offset = UiArenaV2.BASKET_PIVOT
+	# Klaćenje ide preko Node2D stožera (BodyPivot), a ne preko Control.rotation: Control koji
+	# mijenja rotaciju (ili skalu) sam sebi zove queue_redraw, pa se cijela korpa (pleter + 12
+	# cvjetova) crtala U SVAKOM FREJMU dok se klati — +1,4 ms po frejmu na laptopu, stalno
+	# (FIX-TEL-3 2026-11-12, katalog #74). Node2D mijenja samo transform.
+	_body_pivot = Node2D.new()
+	_body_pivot.name = "BodyPivot"
+	_body_pivot.position = UiArenaV2.BASKET_PIVOT
+	add_child(_body_pivot)
+	_body = _make_layer("Body", _draw_body, _body_pivot)
+	_body.position = -UiArenaV2.BASKET_PIVOT
 	_front = _make_layer("Front", _draw_front)
 	gui_input.connect(_on_gui_input)
 
 
-func _make_layer(layer_name: String, painter: Callable) -> Control:
+func _make_layer(layer_name: String, painter: Callable, parent: Node = null) -> Control:
 	var layer := Control.new()
 	layer.name = layer_name
 	layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layer.size = UiArenaV2.BASKET_HIT
 	layer.draw.connect(painter)
-	add_child(layer)
+	(parent if parent != null else self).add_child(layer)
 	return layer
 
 
@@ -81,8 +91,8 @@ func _process(delta: float) -> void:
 		angle += OPEN_TILT + sin(_wiggle_t) * WIGGLE_AMP
 	else:
 		position = _base_position
-	if _body != null:
-		_body.rotation = angle
+	if _body_pivot != null and not is_equal_approx(_body_pivot.rotation, angle):
+		_body_pivot.rotation = angle
 	if _pour_fly > 0.0 and _front != null:
 		_front.queue_redraw()
 
@@ -103,17 +113,24 @@ func set_state(seed_count: int, can_pour: bool, preview_types: Array) -> void:
 	var types: Array[String] = []
 	for t in preview_types:
 		types.append(str(t))
-	var changed := seed_count != _seed_count or can_pour != _can_pour or types != _preview_types \
-		or not _state_drawn
+	# Tijelo korpe (pleter + gomila do 12 cvjetova) je ~5 ms po crtanju na laptopu, a sipanje
+	# mijenja samo BROJ: tijelo se crta ponovo tek kad se promijeni vidljiva gomila ili vrste,
+	# broj je u sloju Front (FIX-TEL-3 2026-11-12 — svako sipanje je crtalo korpu dvaput).
+	var pile := UiArenaV2.basket_visible(seed_count)
+	var body_changed := pile != _pile_drawn or types != _preview_types or not _state_drawn
+	var count_changed := seed_count != _seed_count
 	_seed_count = seed_count
 	_can_pour = can_pour
 	_open = seed_count >= 2
 	_preview_types = types
 	visible = true
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	if changed:
+	if body_changed:
 		_state_drawn = true
+		_pile_drawn = pile
 		_redraw_all()
+	elif count_changed and _front != null:
+		_front.queue_redraw()
 
 
 func _redraw_all() -> void:
@@ -123,14 +140,19 @@ func _redraw_all() -> void:
 		_front.queue_redraw()
 
 
+func _redraw_front() -> void:
+	if _front != null:
+		_front.queue_redraw()
+
+
 func get_seed_count() -> int:
 	return _seed_count
 
 
-## Koliko cvjetova se vidi u gomili (0 prazna, 12 puna).
+## Koliko cvjetova se vidi u gomili (0 prazna, 12 puna). Gomila se pri sipanju ne smanjuje
+## privremeno (ranije −2 dok cvjetovi lete): to je tražilo dva puna crtanja korpe po sipanju.
 func get_visible_pile() -> int:
-	var vis := UiArenaV2.basket_visible(_seed_count)
-	return maxi(0, vis - 2) if _pour_fly > 0.0 else vis
+	return UiArenaV2.basket_visible(_seed_count)
 
 
 ## Nagib pri sipanju: -12° (0,1 s) pa nazad (0,25 s back) oko dna korpe.
@@ -150,12 +172,13 @@ func play_pour() -> void:
 	if _fly_tween != null and _fly_tween.is_valid():
 		_fly_tween.kill()
 	_pour_fly = 1.0
-	_redraw_all()
+	if _front != null:
+		_front.queue_redraw()
 	_fly_tween = create_tween()
 	_fly_tween.tween_property(self, "_pour_fly", 0.0, POUR_FLY_SEC).set_trans(Tween.TRANS_CUBIC).set_ease(
 		Tween.EASE_IN
 	)
-	_fly_tween.tween_callback(_redraw_all)
+	_fly_tween.tween_callback(_redraw_front)
 
 
 ## Usta korpe (centar otvora) u koordinatama roditelja.
@@ -167,7 +190,7 @@ func set_counter_visible(on: bool) -> void:
 	if on == _show_counter:
 		return
 	_show_counter = on
-	_redraw_all()
+	_redraw_front()
 
 
 func _on_gui_input(event: InputEvent) -> void:

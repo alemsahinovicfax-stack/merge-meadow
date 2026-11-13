@@ -5,7 +5,7 @@ class_name ArenaPest
 ## Vizual (design_handoff_muncher_premium_pip · A): Nibbs, seed-mole — MuncherRig (cutout,
 ## 3 pogleda, klipovi stanja) + krtičnjak (zadnji dio ispod, prednja usna preko njega samo dok
 ## spava / budi se u njemu) + baner „Muncher's awake!" pri prvom buđenju u sesiji. Pravila
-## (brzina, cilj, jedenje, led 2 s) su ista; kod samo bira klip. Ništa se ne crta po frejmu.
+## (brzina, cilj, jedenje, led 1 s) su ista; kod samo bira klip. Ništa se ne crta po frejmu.
 
 enum State {
 	SLEEPING_NEST,
@@ -169,7 +169,7 @@ func tick(delta: float) -> void:
 					_pick_target(true)
 		State.FROZEN:
 			_freeze_timer -= delta
-			# Led ukupno 2 s: zadnjih 0,25 s je pucanje (m_thaw), pravila se ne mijenjaju.
+			# Led ukupno ARENA_PEST_T3_FREEZE (1 s): zadnjih 0,25 s je pucanje (m_thaw).
 			if not _thawing and _freeze_timer <= FREEZE_OUT_SEC:
 				_thawing = true
 				if _rig != null:

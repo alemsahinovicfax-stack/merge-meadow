@@ -3,7 +3,7 @@ extends Node2D
 ## Novčić na stazi (design_handoff_run_pickups · pickup_fx.json → idle.coin): sjena, novčić koji
 ## se povremeno okrene (frejm coin_edge kad je „na ivici") i blijesak iskrice. Tri Sprite2D iz
 ## atlasa, samo transformi — ništa se ne crta po frejmu. Parametri se čitaju jednom (_ready).
-## Kolizija ostaje r 18 na roditelju.
+## Kolizija je r 36 na roditelju (kao crtež — Pip ga pokupi na prvom dodiru glavom).
 
 var _t: float = 0.0
 var _ph: float = 0.0

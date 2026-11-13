@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://scripts/run/obstacle_visual.gd" id="2_visual"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_obs"]
-size = Vector2(64, 64)
+size = Vector2(64, 92)
 
 [node name="Obstacle" type="Area2D" groups=["obstacle"]]
 collision_layer = 2
@@ -15,4 +15,5 @@ script = ExtResource("1_obs")
 script = ExtResource("2_visual")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 14)
 shape = SubResource("RectangleShape2D_obs")

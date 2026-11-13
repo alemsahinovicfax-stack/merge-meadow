@@ -11,7 +11,12 @@ extends Node
 
 const LEVELS_PATH := "res://data/run_levels/levels.json"
 const MAX_RUN_LEVEL := 20
-const ENDLESS_TIER_SEC := 20.0
+## FIX-TEL-2 (2026-11-12): Pace se mijenja svakih 10 s (bilo 20). Ključevi težine u levels.json
+## ostaju na staroj skali (ENDLESS_KEY_SEC_PER_TIER s po stepenici), pa je Pace N iste težine
+## kao prije — samo stiže duplo brže. Preteško? Stavi ENDLESS_KEY_SEC_PER_TIER na 10: stepenice
+## ostaju na 10 s, a težina po sekundi se vraća na staro.
+const ENDLESS_TIER_SEC := 10.0
+const ENDLESS_KEY_SEC_PER_TIER := 20.0
 const _RunLevelConfig := preload("res://scripts/run/run_level_config.gd")
 ## Polja koja se interpoliraju između Endless ključeva.
 const _ENDLESS_FIELDS: Array[String] = [
@@ -52,7 +57,7 @@ func get_endless_config_at(elapsed: float):
 	_ensure_loaded()
 	var tier := endless_tier(elapsed)
 	# Težina je difficulty_offset_sec ispred sata (Pace u HUD-u i dalje kreće od 0).
-	var t := float(tier) * ENDLESS_TIER_SEC + _endless_offset
+	var t := float(tier) * ENDLESS_KEY_SEC_PER_TIER + _endless_offset
 	var cfg = _RunLevelConfig.new()
 	cfg.id = tier + 1
 	cfg.duration_sec = INF
@@ -67,7 +72,7 @@ func get_endless_config_at(elapsed: float):
 	if t >= float(last.t):
 		for f in _ENDLESS_FIELDS:
 			cfg.set(f, float(last.get(f, cfg.get(f))))
-		var extra_tiers := floorf((t - float(last.t)) / ENDLESS_TIER_SEC)
+		var extra_tiers := floorf((t - float(last.t)) / ENDLESS_KEY_SEC_PER_TIER)
 		cfg.scroll_speed_mult = float(last.scroll_speed_mult) + _endless_after_speed * extra_tiers
 	else:
 		var i := 0

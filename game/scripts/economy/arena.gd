@@ -249,6 +249,8 @@ func try_merge_chips(chip_a: int, chip_b: int, chip_data: Dictionary) -> Diction
 	var center: Vector2 = (a.get("pos", Vector2.ZERO) + b.get("pos", Vector2.ZERO)) * 0.5
 	chip_data.erase(chip_b)
 	chip_data[chip_a] = {"chip_id": chip_a, "type_id": type_id, "tier": new_tier, "pos": center}
+	# Journal: T2 se otključava prvim spajanjem u Areni (T3 ide kroz stash_garden_crystal).
+	_owner.record_merge_tier_in_album(type_id, new_tier)
 	return {"ok": true, "to_inbox": false, "new_tier": new_tier}
 
 

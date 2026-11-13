@@ -89,7 +89,10 @@ class _Ring:
 		ArenaChipDraw.draw_ring(self, size * 0.5, chip.tier, kind)
 
 
-func setup(id: int, seed_type: String, at: Vector2, seed_tier: int = 1) -> void:
+## `lazy_art`: crtež (čvor Art) nastaje tek kad sjemenka dođe na red u letu iz korpe
+## (play_pour_in), prsten tek kad zatreba. Sipanje 30 sjemenki je ranije pravilo 90 čvorova u
+## jednom frejmu (6–9 ms na laptopu, FIX-TEL-3 2026-11-12); sada 30, a ostali stižu jedan po jedan.
+func setup(id: int, seed_type: String, at: Vector2, seed_tier: int = 1, lazy_art: bool = false) -> void:
 	chip_id = id
 	type_id = seed_type
 	tier = seed_tier
@@ -100,8 +103,8 @@ func setup(id: int, seed_type: String, at: Vector2, seed_tier: int = 1) -> void:
 	position = at - Vector2(CHIP_RADIUS, CHIP_RADIUS)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	set_process(false)
-	_ensure_art()
-	_redraw()
+	if not lazy_art:
+		_ensure_art()
 
 
 func _ensure_art() -> void:
@@ -113,6 +116,14 @@ func _ensure_art() -> void:
 	_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_art.size = size
 	add_child(_art)
+	if _ring != null:
+		move_child(_ring, -1)
+	_set_fly_offset(_fly_offset)
+
+
+func _ensure_ring() -> void:
+	if _ring != null:
+		return
 	_ring = _Ring.new()
 	_ring.name = "Ring"
 	_ring.chip = self
@@ -120,18 +131,23 @@ func _ensure_art() -> void:
 	_ring.size = size
 	_ring.visible = false
 	add_child(_ring)
+	_set_fly_offset(_fly_offset)
+
+
+func has_art() -> bool:
+	return _art != null
 
 
 func _redraw() -> void:
-	if _art != null:
+	if _art == null:
+		_ensure_art()
+	else:
 		_art.queue_redraw()
 
 
 ## Prioritet kao prije: merge flash > partner > puls. Crtež prstena se gradi samo kad se vrsta
 ## promijeni; puls i merge mijenjaju samo modulate.
 func _update_ring() -> void:
-	if _ring == null:
-		return
 	var kind := ArenaChipDraw.Ring.NONE
 	var alpha := 1.0
 	if _merge_ring > 0.0:
@@ -142,6 +158,10 @@ func _update_ring() -> void:
 	elif _pulse_highlight:
 		kind = ArenaChipDraw.Ring.PULSE
 		alpha = _pulse_alpha()
+	if _ring == null:
+		if kind == ArenaChipDraw.Ring.NONE:
+			return
+		_ensure_ring()
 	_ring.visible = kind != ArenaChipDraw.Ring.NONE
 	_ring.modulate.a = alpha
 	if kind != _ring.kind:
@@ -185,15 +205,15 @@ func play_pour_in(from_center: Vector2, delay: float) -> void:
 	_fly_offset = from_center - get_center()
 	scale = Vector2.ONE * POUR_START_SCALE
 	_set_fly_offset(_fly_offset)
-	# Skriven crtež se ne crta (ni ne gradi) dok ne dođe red: prvi crtež ~30 sjemenki se
-	# raspodijeli kroz razmak sipanja umjesto da padne u jedan frejm.
+	# Crtež se ne gradi (ni čvor, ni crtanje) dok ne dođe red: ~30 sjemenki se raspodijeli
+	# kroz razmak sipanja umjesto da padne u jedan frejm.
 	if _art != null:
 		_art.visible = false
 	var tw := create_tween()
 	tw.tween_interval(delay)
 	tw.tween_callback(func() -> void:
-		if _art != null:
-			_art.visible = true)
+		_ensure_art()
+		_art.visible = true)
 	tw.tween_method(_set_fly_offset, _fly_offset, Vector2.ZERO, POUR_SEC).set_trans(
 		Tween.TRANS_BACK
 	).set_ease(Tween.EASE_OUT)

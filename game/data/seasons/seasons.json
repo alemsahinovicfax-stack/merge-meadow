@@ -31,7 +31,7 @@
 			"display_name": "Frost Orchard",
 			"tagline": "Crisp air, silver blossom.",
 			"coins_cost": 2500,
-			"t3_flowers_required": 22,
+			"t3_flowers_required": 30,
 			"iap_product_id": "",
 			"seed_type_ids": ["frost_snowdrop", "ice_crocus", "silver_aconite", "winter_camellia", "hoarfrost_rose", "crystal_peony"],
 			"roster": [
@@ -55,7 +55,7 @@
 			"display_name": "Lantern Meadow",
 			"tagline": "Dusk lights among tall grass.",
 			"coins_cost": 4500,
-			"t3_flowers_required": 26,
+			"t3_flowers_required": 35,
 			"iap_product_id": "",
 			"seed_type_ids": ["dusk_firefly_grass", "paper_lantern_bloom", "evening_primrose", "foxfire_lily", "glow_wisteria", "midnight_lotus"],
 			"roster": [
@@ -79,7 +79,7 @@
 			"display_name": "Amber Canopy",
 			"tagline": "Warm late-season light through high leaves.",
 			"coins_cost": 6500,
-			"t3_flowers_required": 30,
+			"t3_flowers_required": 40,
 			"iap_product_id": "",
 			"seed_type_ids": ["copper_leaf", "maple_aster", "russet_mallow", "cider_dahlia", "golden_oak_bloom", "amber_magnolia"],
 			"roster": [

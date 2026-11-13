@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://scripts/run/coin_visual.gd" id="2_visual"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_coin"]
-radius = 18.0
+radius = 36.0
 
 [node name="Coin" type="Area2D" groups=["coin", "pickup"]]
 collision_layer = 2

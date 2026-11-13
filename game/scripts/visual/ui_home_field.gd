@@ -61,7 +61,8 @@ const MEADOW_BANDS := [0.32, 0.68]
 const TILE            := 180
 const TILE_ICON       := 84
 const GIFT_RECT       := Rect2i(24, 24, 180, 180)
-const BASKET_RECT     := Rect2i(24, 220, 180, 180)
+## Basket je desno ispod Boostova (FIX-TEL-2 2026-11-12; bio lijevo ispod poklona).
+const BASKET_RECT     := Rect2i(876, 220, 180, 180)
 const UPGRADES_RECT   := Rect2i(876, 24, 180, 180)
 ## Ormar (design_handoff_wardrobe): desna kolona, 16 iznad donjeg reda.
 const WARDROBE_RECT   := Rect2i(876, 1265, 180, 180)
@@ -89,8 +90,8 @@ const UPGRADE_SEG      := Vector2i(64, 18)
 
 ## Zone koje chrome pokriva — nijedno mjesto ni Pip ne smiju u njih.
 const KEEPOUT := [
-	Rect2i(8, 8, 212, 408),       # Gift + Basket
-	Rect2i(860, 8, 212, 212),     # Upgrades
+	Rect2i(8, 8, 212, 212),       # Gift
+	Rect2i(860, 8, 212, 408),     # Upgrades + Basket
 	Rect2i(212, 20, 656, 184),    # ime + cip (swipe prolazi)
 	Rect2i(54, 1445, 972, 188),   # donji red
 	Rect2i(860, 1249, 212, 212),  # Ormar (Looks)

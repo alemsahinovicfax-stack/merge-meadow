@@ -41,7 +41,7 @@
     {"id": 20, "duration_sec": 120, "scroll_speed_mult": 1.375, "speed_ramp": 0.0388, "spawn_interval": 0.85, "spawn_chance": 0.78, "obstacle_chance": 0.374, "pair_chance": 0.4, "pickup_seed_chance": 0.34, "rare2_mult": 0.6, "rare3_mult": 0.59}
   ],
   "endless": {
-    "tier_sec": 20,
+    "tier_sec": 10,
     "keys": [
       {"t": 0, "scroll_speed_mult": 1.0, "spawn_interval": 1.25, "spawn_chance": 0.66, "obstacle_chance": 0.08, "pair_chance": 0.0, "pickup_seed_chance": 0.29, "rare2_mult": 0.45, "rare3_mult": 0.376},
       {"t": 60, "scroll_speed_mult": 1.15, "spawn_interval": 1.1, "spawn_chance": 0.7, "obstacle_chance": 0.16, "pair_chance": 0.06, "pickup_seed_chance": 0.3, "rare2_mult": 0.5, "rare3_mult": 0.49},

@@ -12,7 +12,9 @@ const DRAG_SCROLL := preload("res://scripts/ui/drag_scroll.gd")
 
 const TRADE_HOLD_RATE := 10.0
 ## Save ide na otpuštanje, plus periodično da dug hold ne izgubi puno.
-const TRADE_SAVE_EVERY := 30
+## FIX-TEL-2: save usred držanja je 20+ ms zastoja svake 3 s — sada tek na 150 trejdova (15 s);
+## puštanje dugmeta snima odgođeno (GameState.save_player_save_soon), izlazak iz Campa odmah.
+const TRADE_SAVE_EVERY := 150
 
 @onready var root_vbox: VBoxContainer = %RootVBox
 @onready var header_panel: PanelContainer = %HeaderPanel
@@ -138,6 +140,14 @@ func _flush_trade_save() -> void:
 	_pending_trade_save = false
 	_trades_since_save = 0
 	GameState.save_player_save()
+
+
+func _save_trade_soon() -> void:
+	if not _pending_trade_save:
+		return
+	_pending_trade_save = false
+	_trades_since_save = 0
+	GameState.save_player_save_soon()
 
 
 func _mark_trade_save() -> void:
@@ -643,13 +653,17 @@ func _sellable_left() -> int:
 	return maxi(have - int(reserve.get("need", 0)), 0)
 
 
+## FIX-TEL-2 (2026-11-12): ranije je SVAKO puštanje dugmeta (i običan tap) odmah snimalo save i
+## rušilo pa gradilo obje liste chipova (_refresh_ui) — to je bio trzaj pri kliktanju Trade dok
+## novčić leti. Lista je već tačna (svaki trejd uskladi brojeve i izbaci prazan chip), pa ovdje
+## ide samo lagano osvježavanje, a save pola sekunde kasnije (više tapova = jedan save).
 func _on_trade_press_ended() -> void:
 	_hold_repeating = false
 	_hold_sold = 0
 	exchange_bar.release_gain()
 	exchange_bar.on_press_ended()
-	_flush_trade_save()
-	_refresh_ui()
+	_save_trade_soon()
+	_refresh_trade_light()
 
 
 func _on_trade_repeat_blocked() -> void:

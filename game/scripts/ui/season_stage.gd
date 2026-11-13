@@ -1300,6 +1300,14 @@ func _finish_path_close() -> void:
 	_notify_host("on_level_path_finished", false)
 
 
+## Igrač je otišao s Homea na drugu stranicu huba dok je put bio otvoren: put se ugasi bez
+## prelaza (stranica je van vida), povratak pokazuje polje (FIX-TEL-3 2026-11-12).
+func reset_level_path_for_page_leave() -> void:
+	if GameState.level_path_open or _path_u > 0.0:
+		_reset_level_path()
+		_refresh_view()
+
+
 ## Put se gasi bez prelaza (polje zatvoreno izvana ili Seasons): stanje kao da nikad nije otvoren.
 func _reset_level_path() -> void:
 	if level_path == null:

@@ -23,7 +23,13 @@ const FRAME := {
 
 @export var view: String = "front"
 @export var skin: String = "classic"
-@export var box_px: float = 190.0
+## Setter (FIX-TEL-2 2026-11-12): `actor.box_px = N` poslije gradnje ranije NIJE mijenjao skalu
+## (samo set_box), pa je Pip u sličicama Ormara / Shopa ostajao na 190 px i ispadao iz okvira.
+@export var box_px: float = 190.0:
+	set(v):
+		box_px = v
+		if _built:
+			_apply_scale()
 @export var still: bool = false
 @export var crop_head: bool = false
 @export var follow_equipped: bool = true

@@ -18,6 +18,7 @@ signal endless_unlocked(season_id: String)
 
 const BLOCK_HUB_SWIPE_GROUP := "block_hub_swipe"
 const DRAG_START := 14.0
+const HUB_SWIPE_DOMINANCE := 1.15
 const FRICTION := 5.0
 const MIN_FLING := 40.0
 const LOCATOR := Rect2(880, 1316, 176, 96)
@@ -157,8 +158,11 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	if not _clip.is_in_group(BLOCK_HUB_SWIPE_GROUP):
-		_clip.add_to_group(BLOCK_HUB_SWIPE_GROUP)
+	# Put NIJE u grupi koja blokira swipe huba (FIX-TEL-3 2026-11-12: „s Level Patha ne mogu
+	# swipeati na Camp / Journal"). Smjer prvog pomaka odlučuje: vodoravno uzima hub
+	# (SwipePager), uspravno skrola put (_move).
+	if _clip.is_in_group(BLOCK_HUB_SWIPE_GROUP):
+		_clip.remove_from_group(BLOCK_HUB_SWIPE_GROUP)
 	_ensure_actor()
 	set_process(false)
 
@@ -529,8 +533,15 @@ func _pointer(pos: Vector2, pressed: bool) -> void:
 func _move(pos: Vector2) -> void:
 	if _hop_running or _popup.is_busy():
 		return
-	if not _dragging and absf(pos.y - _press_pos.y) < DRAG_START:
-		return
+	if not _dragging:
+		var d := pos - _press_pos
+		# Vodoravan potez pripada hubu (ista dominacija kao SwipePager): put ga pušta — ni
+		# skrol ni tap na kovčeg.
+		if absf(d.x) >= DRAG_START and absf(d.x) >= absf(d.y) * HUB_SWIPE_DOMINANCE:
+			_press = false
+			return
+		if absf(d.y) < DRAG_START:
+			return
 	if not _dragging:
 		_dragging = true
 		_kill_scroll_tween()

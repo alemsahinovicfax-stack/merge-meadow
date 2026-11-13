@@ -83,9 +83,9 @@ Konkretne konstante za feel i balans. [[ekonomija|ekonomija]] = *zašto*; ovaj d
 
 | Sezona | Coini | ★3 prethodne sezone | Ranije |
 |--------|-------|---------------------|--------|
-| Frost Orchard | 2500 | 22 Harvest Pumpkin | 500 + 20 |
-| Lantern Meadow | 4500 | 26 Crystal Peony | 500 + 20 |
-| Amber Canopy | 6500 | 30 Midnight Lotus | 500 + 20 |
+| Frost Orchard | 2500 | **30** Harvest Pumpkin (2026-11-12, na zahtjev; bilo 22) | 500 + 20 |
+| Lantern Meadow | 4500 | **35** Crystal Peony (bilo 26) | 500 + 20 |
+| Amber Canopy | 6500 | **40** Midnight Lotus (bilo 30) | 500 + 20 |
 
 ### Coin cijene bez kupovina (v1, 2026-10-26)
 
@@ -178,7 +178,7 @@ Dupli ★3 skraćuje casual put (★3 mu je bio usko grlo); average i skilled ko
 | Konstanta | Vrijednost |
 |-----------|-----------|
 | `MAGNET_MAX_LEVEL` | `4` |
-| Cijena nivoa (Home polje, po sezoni) | `UiCamp.UP_COIN_COST` **100 / 250 / 500 / 800** C + `UP_FLOWER_COSTS` **2 / 2 / 3 / 3** ★3 sezone (bilo 10 / 20 / 40 / 60 + 2) |
+| Cijena nivoa (Home polje, po sezoni) | `UiCamp.UP_COIN_COST` **100 / 250 / 500 / 800** C + `UP_FLOWER_COSTS` **5 / 10 / 2 / 5** T3 cvjetova sezone, vrsta po levelu (`UP_FLOWER_SLOT`): level 1 = prvi ★2, level 2 = drugi ★2, level 3 i 4 = ★3 (2026-11-12, na zahtjev; bilo 2 / 2 / 3 / 3 ★3) |
 | `UPGRADE_FLOWER_COST` | 2 — legacy (stari Camp donate API) |
 | `MAGNET_COST_T2` | `2` — legacy broj za stari donate API; resurs upgradea je T3 |
 | `MAGNET_BASE_RADIUS` | `40` px |
@@ -198,10 +198,10 @@ Dupli ★3 skraćuje casual put (★3 mu je bio usko grlo); average i skilled ko
 
 | Konstanta | Vrijednost | Napomena |
 |-----------|------------|----------|
-| `ARENA_PEST_SPEED` | 85 px/s | @ 1080×1920 |
+| `ARENA_PEST_SPEED` | 110,5 px/s | @ 1080×1920 (2026-11-12, na zahtjev: +30 %; bilo 85) |
 | `ARENA_PEST_EAT_RADIUS` | 36 px | |
 | `ARENA_PEST_EAT_DURATION` | 0.5 s | |
-| `ARENA_PEST_T3_FREEZE` | 2.0 s | nakon T3 mergea |
+| `ARENA_PEST_T3_FREEZE` | 1.0 s | nakon T3 mergea (2026-11-12, na zahtjev: prepolovljeno; bilo 2.0) |
 | `ARENA_PEST_WAKE_DELAY` | 0.3 s | prije lova |
 | `ARENA_PEST_TARGET_REEVAL` | 0.25 s | |
 

@@ -102,7 +102,11 @@ func _run() -> void:
 	gs.call("apply_active_upgrade_levels")
 	var season := str(gs.get("active_season_id"))
 	var flower := str(gs.call("star3_type_id_for_season", season))
-	gs.set("garden_crystal_stash", {flower: 40})
+	# Od 2026-11-12 level 1 i 2 se plaćaju ★2 cvjetovima sezone, 3 i 4 ★3 cvijetom.
+	var boost_stash := {flower: 40}
+	for lv in 2:
+		boost_stash[str(gs.call("upgrade_flower_type", season, lv))] = 40
+	gs.set("garden_crystal_stash", boost_stash)
 	gs.set("wallet_coins", 10000)
 	gs.set("home_season_field_open", true)
 	gs.set("home_season_field_id", season)

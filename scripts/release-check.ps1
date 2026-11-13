@@ -56,7 +56,7 @@ if ($SkipSmokes) {
     # GUT pise u user:// (test atomarnog savea) - na kopiju, ne na pravi save igraca.
     $realAppData = $env:APPDATA
     $gutAppData = Join-Path ([IO.Path]::GetTempPath()) "mm_release_gut_appdata"
-    New-Item -ItemType Directory -Force (Join-Path $gutAppData "Godotpp_userdata\Merge Meadow") | Out-Null
+    New-Item -ItemType Directory -Force (Join-Path $gutAppData "Godot\app_userdata\Merge Meadow") | Out-Null
     $env:APPDATA = $gutAppData
     $gutCode = Run "gut-run.ps1"
     $env:APPDATA = $realAppData
@@ -146,16 +146,18 @@ Write-Host "  AAB $mb MB, data JSON $($dataWant.Count) / $($dataWant.Count), bez
 
 Step "6/6 Provjeri rukom na telefonu (internal test, ~5 min)"
 @(
-    "Home: Pip je NOVI (rig), 'Looks' dolje desno, Level Path do dna ekrana",
+    "Home: Pip je NOVI (rig), 'Looks' dolje desno, Basket desno ispod Boostova, Level Path do dna ekrana",
+    "Home: s otvorenog Level Patha potez lijevo / desno mijenja stranicu; povratak na Home pokazuje polje",
+    "Boosts: level 1 trazi 5 prvog ljubicastog cvijeta, level 2 10 drugog, level 3 i 4 zlatni (2 pa 5)",
+    "Ormar: skinovi cijeli u slicicama, katanac jasan; Ormar / Boosts / Basket ulaze bez trzaja",
     "Shop > Looks: skinovi se vide; skrol prstom preko kartica i dugmadi; tap kupuje / javlja 'Need N more coins'",
-    "Shop bez coina: prsten tačno oko coin čipa u headeru",
-    "Ormar: obuci skin -> isti skin na Homeu i u runu",
-    "Run: pređi level -> dugme piše 'Continue'; padni -> 'Retry'",
-    "Arena: Nibbs se vidi; sjeme prati prst i spaja se; kraj runde pokaže 'Round over'",
-    "Camp: lista i Trade bar do dna; drži Trade - bez štekanja; prazna vreća -> ikona strelice",
-    "Journal: ulazak bez zastoja, i poslije novog cvijeta",
-    "Okreni kroz svih 5 tabova 3 puta - bez zastoja",
-    "Zatvori i otvori igru - napredak je tu"
+    "Run: coin / sjeme / prepreka reaguju na dodir GLAVE; nalet vjetra se osjeti; pauza > 3, 2, 1",
+    "Run u novoj sezoni: pokupi sjeme > Journal odmah pokaze tu vrstu (tier 1, NEW)",
+    "Arena: tapkaj vrecu dok sjemenke lete - bez stekanja; pilula 'N / 200'; runda stane na 200",
+    "Arena: Muncher je brzi; T3 ga zaledi 1 s; prvi T2 neke vrste otkljuca tier 2 u Journalu",
+    "Camp: lista i Trade bar do dna; klikci i drzi Trade - bez stekanja; prag sezone 30 / 35 / 40",
+    "Journal: ulazak bez zastoja; skrol do dna - 'Loading' pa redovi",
+    "Okreni kroz svih 5 tabova 3 puta - bez zastoja; zatvori i otvori igru - napredak je tu"
 ) | ForEach-Object { Write-Host "  [ ] $_" }
 
 $mins = [math]::Round(((Get-Date) - $started).TotalMinutes, 1)

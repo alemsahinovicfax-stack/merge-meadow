@@ -10,6 +10,8 @@ const UI_ASSETS := preload("res://scripts/visual/ui_assets.gd")
 ## Debljina prstena „fali coina" oko čipa u headeru (px baze).
 const COIN_RING_W := 6
 const JOURNAL_PREWARM_DELAY_SEC := 0.9
+## Koliko poslije odlaska s Homea stranica sigurno nije u vidu (SwipePager.SNAP_DURATION 0,28 s).
+const HOME_LEFT_DELAY_SEC := 0.35
 const COIN_POP_POS := Vector2(150, 132)  # design_handoff_shop · CoinSpendPop
 
 @onready var swipe_pager: SwipePager = $RootVBox/SwipePager
@@ -260,6 +262,8 @@ func current_page_index() -> int:
 func _on_page_changed(index: int) -> void:
 	if _current_page == MetaHubPagesScript.COLLECTION and index != MetaHubPagesScript.COLLECTION:
 		_notify_journal_left()
+	if _current_page == MetaHubPagesScript.MAIN and index != MetaHubPagesScript.MAIN:
+		_notify_home_left_soon()
 	# Swipe zvuk (tab ga preduhitri: ista grupa „nav" u katalogu); Arena ima svoju temu.
 	if index != _current_page:
 		Sfx.play("ui_swipe")
@@ -387,6 +391,23 @@ func _hide_node(root: Node, path: String) -> void:
 	var node := root.get_node_or_null(path)
 	if node:
 		node.visible = false
+
+
+## Home dobija javku tek kad stranica isklizi iz vida (trajanje snapa), i samo ako se igrač
+## u međuvremenu nije vratio — Level Path se tada gasi bez da to iko vidi.
+func _notify_home_left_soon() -> void:
+	if not is_inside_tree():
+		return
+	get_tree().create_timer(HOME_LEFT_DELAY_SEC).timeout.connect(_notify_home_left)
+
+
+func _notify_home_left() -> void:
+	if _current_page == MetaHubPagesScript.MAIN or swipe_pager == null:
+		return
+	var host: Control = swipe_pager.get_pages_host() as Control
+	var page := host.get_node_or_null("Page_%d" % MetaHubPagesScript.MAIN) if host else null
+	if page != null and page.has_method("on_meta_page_left"):
+		page.call("on_meta_page_left")
 
 
 func _notify_journal_left() -> void:
