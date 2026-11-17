@@ -16,6 +16,15 @@ const DOT := 14.0
 const DOT_GAP := 10.0
 const DISC := 72.0
 const DISC_ICON := 46.0
+const PORTRAIT := 108.0
+const PORTRAIT_ART := 96.0
+const STACK_PX := 44
+const STACK_COIN_PX := 36
+const STACK_COIN := 34.0
+const TONE := {
+	"epic": [Color("#D4A5FF"), Color("#EFE0FF"), Color("#B79AD8")],
+	"gold": [Color("#FFD56B"), Color("#FFF0C2"), Color("#D8BC72")],
+}
 
 var kind: String = "secondary"
 var label: String = ""
@@ -28,6 +37,10 @@ var art_size: float = 81.0
 var coin_text: String = ""
 var flower_short: bool = false
 var coin_short: bool = false
+## FIX-TEL-4 (2026-11-14) · dugme Boosta: boja tiera cvijeta kojim se plaća ("epic" = ljubičasti ★2,
+## "gold" = zlatni ★3) i veliki portret cvijeta u krem disku, „×N" iznad coina (stacked).
+var tone: String = ""
+var stacked: bool = false
 var check: bool = false
 ## Nacrtan znak umjesto ikone: "play" (pun ink trougao).
 var glyph: String = ""
@@ -57,6 +70,8 @@ func configure(p_kind: String, p_label: String, p_ad: bool = false, p_icon: Text
 	coin_text = ""
 	flower_short = false
 	coin_short = false
+	tone = ""
+	stacked = false
 	dots = kind == "loading"
 	check = kind == "done"
 	_sync()
@@ -96,7 +111,47 @@ func _apply_state() -> void:
 	queue_redraw()
 
 
+## Boja tiera: [puno dugme, blijedo (ne može se kupiti), rub blijedog]. Prazno = obično dugme.
+func tone_colors() -> Array:
+	return TONE.get(tone, []) if kind in ["primary", "disabled"] else []
+
+
+func _stack_widths() -> Vector2:
+	var w1 := UiPopups.text_w(900, STACK_PX, label)
+	var w2 := STACK_COIN + 6.0 + UiPopups.text_w(900, STACK_COIN_PX, coin_text) if not coin_text.is_empty() else 0.0
+	return Vector2(w1, w2)
+
+
+func _draw_stacked(rect: Rect2, ink: Color) -> void:
+	var ws := _stack_widths()
+	var col_w := maxf(ws.x, ws.y)
+	var x := (size.x - (PORTRAIT + GAP + col_w)) * 0.5
+	var cy := rect.get_center().y
+	var disc := Rect2(x, cy - PORTRAIT * 0.5, PORTRAIT, PORTRAIT)
+	var edge := UiPopups.OUTLINE if kind != "disabled" else UiPopups.DISABLED_EDGE
+	draw_style_box(UiPopups._box(Color("#FFF8F0"), int(PORTRAIT * 0.5), 3, edge), disc)
+	UiPopups.draw_flower(self, disc.get_center(), art_type, art_tier, PORTRAIT_ART)
+	x += PORTRAIT + GAP
+	var two := not coin_text.is_empty()
+	var y1 := cy - (50.0 if two else STACK_PX * 0.5)
+	if flower_short:
+		_draw_short_pill(Rect2(x - 10.0, y1 - 3.0, ws.x + 20.0, STACK_PX + 8.0))
+	UiPopups.draw_text(self, 900, STACK_PX, label, Vector2(x, y1), ink)
+	if not two:
+		return
+	var y2 := cy + 8.0
+	if coin_short:
+		_draw_short_pill(Rect2(x - 10.0, y2 - 3.0, ws.y + 20.0, STACK_COIN_PX + 8.0))
+	var coin := UiAssets.get_chrome_icon("icon_coin")
+	if coin:
+		draw_texture_rect(coin, Rect2(Vector2(x, y2 + (STACK_COIN_PX - STACK_COIN) * 0.5 + 2.0), Vector2(STACK_COIN, STACK_COIN)), false, Color.WHITE)
+	UiPopups.draw_text(self, 900, STACK_COIN_PX, coin_text, Vector2(x + STACK_COIN + 6.0, y2), ink)
+
+
 func content_width() -> float:
+	if stacked and not art_type.is_empty():
+		var ws := _stack_widths()
+		return PORTRAIT + GAP + maxf(ws.x, ws.y)
 	var px := UiPopups.AD_BUTTON_TEXT if ad else UiPopups.BUTTON_TEXT
 	var parts: Array[float] = []
 	if ad:
@@ -126,11 +181,20 @@ func _draw() -> void:
 	var press := is_pressing() and not disabled
 	var dy := 6.0 if press else 0.0
 	var sb := UiPopups.button(kind, ad)
+	var tc := tone_colors()
+	if not tc.is_empty():
+		sb = sb.duplicate() as StyleBoxFlat
+		sb.bg_color = tc[0] if kind == "primary" else tc[1]
+		if kind == "disabled":
+			sb.border_color = tc[2]
 	if press:
 		sb = UiPopups.button_pressed(sb)
 	var rect := Rect2(0.0, dy, size.x, h)
 	draw_style_box(sb, rect)
 	var ink := UiPopups.button_ink(kind)
+	if stacked and not art_type.is_empty():
+		_draw_stacked(rect, ink)
+		return
 	var px := UiPopups.AD_BUTTON_TEXT if ad else UiPopups.BUTTON_TEXT
 	var x := (size.x - content_width()) * 0.5
 	var cy := rect.get_center().y

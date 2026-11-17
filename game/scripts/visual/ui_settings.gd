@@ -103,7 +103,7 @@ const S := {
 	"stats": "Your stats", "stats_day": "Day %d", "stats_since": "since %s", "stats_version": "Version %s",
 	"stats_back": "Came back", "stats_days": "Days played: %d of %d", "stats_first_days": "First 14 days",
 	"stats_play": "Play", "stats_sessions": "sessions", "stats_minutes": "minutes", "stats_runs": "runs",
-	"stats_furthest": "Furthest", "stats_levels": "%s · %d / 20",
+	"stats_furthest": "Furthest", "stats_levels": "%s · %d / 25",
 	"stats_tutorial": "Tutorial done", "stats_endless": "Endless unlocked", "stats_merge": "First merge",
 	"stats_on_day": "day %d", "stats_not_yet": "not yet", "stats_play_time": "%d:%02d of play",
 	"stats_yes": "✓", "stats_no": "No", "stats_later": "Later", "stats_unknown": "?",

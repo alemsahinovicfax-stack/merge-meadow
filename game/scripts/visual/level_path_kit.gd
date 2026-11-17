@@ -1,7 +1,7 @@
 class_name LevelPathKit
 extends RefCounted
 
-## Level Path (design_handoff_level_path): raspored 20 kamenova, ruta, sanduci, zastavica i
+## Level Path (design_handoff_level_path): raspored 25 kamenova, ruta, sanduci, zastavica i
 ## recept pozadine po sezoni. Brojevi su iz godot/level_path_layout.json (= level_path_kit.js);
 ## recept je kits[id].path u seasons_kit.json. Tri vrste sloja vezane za rutu (route,
 ## route_marks, spurs) i stripes se ovdje JEDNOM prevedu u obične slojeve Season Kita
@@ -14,7 +14,10 @@ const POPUP_PATH := "res://data/level_path/reward_popup.json"
 const ASSET_DIR := "res://assets/level_path/"
 
 const W := 1080.0
-const H := 4900.0
+## FIX-TEL-4 (2026-11-14): 25 levela — sadržaj je viši za 1030 px (bilo 4900). Recepti pozadine
+## su u % sadržaja, pa se razvuku s njim; rasuti dekor se množi s H / RECIPE_H da ostane iste gustine.
+const H := 5930.0
+const RECIPE_H := 4900.0
 const PAGE_H := 1633.0
 const SCROLL_MAX := H - PAGE_H
 ## Stvarna visina stranice (visok telefon: > 1633). Postavlja je LevelPathView.set_page_height;
@@ -59,7 +62,7 @@ const S_TITLE := "Level %d reward!"
 const S_CLAIM := "Claim"
 const S_LOCKED := "Finish level %d to claim"
 const S_COMPLETE := "Meadow complete!"
-const S_REPLAY := "Play repeats Level 20"
+const S_REPLAY := "Play repeats Level 25"
 const S_BACK := "Field"
 const S_LOCATOR := "Pip"
 
@@ -115,7 +118,7 @@ static func popup_spec() -> Dictionary:
 	return _popup
 
 
-## Centar lica kamena levela n (1…20) u px sadržaja.
+## Centar lica kamena levela n (1…25) u px sadržaja.
 static func cp(n: int) -> Vector2:
 	layout()
 	return _cps[clampi(n, 1, _cps.size()) - 1]
@@ -147,14 +150,14 @@ static func cp_index(n: int) -> int:
 	return int(idx[clampi(n, 1, idx.size()) - 1])
 
 
-## Pređeni dio rute: od ulaza do kamena trenutnog levela (complete → do 20).
+## Pređeni dio rute: od ulaza do kamena trenutnog levela (complete → do zadnjeg).
 static func passed_points(level: int) -> PackedVector2Array:
-	return route().slice(0, cp_index(clampi(level, 1, 20)) + 1)
+	return route().slice(0, cp_index(clampi(level, 1, cp_count())) + 1)
 
 
-## Stopala Pipa na kamenu levela (complete → na 20).
+## Stopala Pipa na kamenu levela (complete → na zadnjem).
 static func pip_feet(level: int) -> Vector2:
-	return cp(clampi(level, 1, 20)) + Vector2(0.0, PIP_FEET_DY)
+	return cp(clampi(level, 1, cp_count())) + Vector2(0.0, PIP_FEET_DY)
 
 
 ## Ishodište UiPip (dno boxa) za stopala.
@@ -165,7 +168,7 @@ static func pip_origin(feet: Vector2) -> Vector2:
 ## Skrol na otvaranju: Pipov kamen na y 1100 stranice; neuzeta nagrada do 560 px ispod
 ## njega spušta kadar tako da „Claim" stoji iznad donjeg reda (openScroll u JS).
 static func open_scroll(level: int, ready: Array) -> float:
-	var c := cp(clampi(level, 1, 20))
+	var c := cp(clampi(level, 1, cp_count()))
 	var y := c.y - OPEN_Y
 	var bottom := -INF
 	for n in ready:
@@ -232,7 +235,7 @@ static func scene(season_id: String) -> Dictionary:
 	return SeasonBackdrop.scene("path:" + season_id, expand(r), W, avoid())
 
 
-## Recept puta → slojevi Season Kita (u % sadržaja 1080 x 4900).
+## Recept puta → slojevi Season Kita (u % sadržaja 1080 x H).
 static func expand(r: Dictionary) -> Dictionary:
 	var layers: Array = []
 	for L in r.get("layers", []):
@@ -251,6 +254,11 @@ static func expand(r: Dictionary) -> Dictionary:
 				layers.append(_marks_layer(L))
 			"stripes":
 				layers.append_array(_stripe_layers(L))
+			"scatter":
+				# Viši sadržaj, ista gustina dekora.
+				var S: Dictionary = (L as Dictionary).duplicate()
+				S["n"] = roundi(float(L.get("n", 0)) * H / RECIPE_H)
+				layers.append(S)
 			_:
 				layers.append(L)
 	return {"layers": layers}

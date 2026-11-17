@@ -1,6 +1,6 @@
 extends RefCounted
 
-## Jedan red iz data/run_levels/levels.json (level 1–20) ili Endless stepenica (RunLevelLibrary).
+## Jedan red iz data/run_levels/levels.json (level 1–25) ili Endless stepenica (RunLevelLibrary).
 ## Polja bez vrijednosti u JSON-u ostaju na starom ponašanju (ramp 5 % / 15 s, bez parova,
 ## sjeme ravnomjerno).
 

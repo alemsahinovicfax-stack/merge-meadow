@@ -782,6 +782,9 @@ func _apply_upgrade_card(
 		btn.configure("primary" if can else "disabled", "×%d" % UiCamp.upgrade_flower_cost(level))
 		btn.set_art(flower_id, 3, 64.0)
 		btn.coin_text = str(cost)
+		# FIX-TEL-4: boja dugmeta = tier cvijeta kojim se plaća; veliki portret, „×N" iznad coina.
+		btn.tone = "gold" if UiCamp.upgrade_flower_slot(level) >= UiCamp.UP_SLOT_STAR3 else "epic"
+		btn.stacked = true
 		btn.flower_short = state == UiCamp.UP_SHORT_FLOWER or state == UiCamp.UP_SHORT_BOTH
 		btn.coin_short = state == UiCamp.UP_SHORT_COIN or state == UiCamp.UP_SHORT_BOTH
 		btn.queue_redraw()

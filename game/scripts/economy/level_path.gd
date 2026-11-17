@@ -1,11 +1,11 @@
 ## Level Path domain (design_handoff_level_path). Owned by GameState as `level_path_domain`.
-## Napredak je po sezoni: level 1…20 je kamen na kojem Pip stoji, 21 = put završen
-## („complete": Play ponovo igra level 20, nagrade se ne daju ponovo). Nagrade na 5 / 10 /
-## 15 / 20 se ne daju same — kad je level pređen, sanduk čeka tap i Claim (claim()).
+## Napredak je po sezoni: level 1…25 je kamen na kojem Pip stoji, 26 = put završen
+## („complete": Play ponovo igra level 25, nagrade se ne daju ponovo). Nagrade na 5 / 10 /
+## 15 / 20 / 25 se ne daju same — kad je level pređen, sanduk čeka tap i Claim (claim()).
 ##
-## Save: "season_levels" {id: 1…21} i "season_level_rewards" {id: [5, 10, …]}. Stari save
+## Save: "season_levels" {id: 1…26} i "season_level_rewards" {id: [5, 10, …]}. Stari save
 ## ima samo globalni "run_level": prelazi na sezonu u kojoj se igralo (active_season_id),
-## ograničen na 21 — pređeni nagradni leveli tada čekaju Claim (odluka 2026-10-20).
+## ograničen na COMPLETE — pređeni nagradni leveli tada čekaju Claim (odluka 2026-10-20).
 ## Težina: level N iste je težine u svakoj sezoni (RunLevelLibrary.get_level(N)).
 ##
 ## Endless sezone (balans ciklus 1, 2026-10-21): otključa se kad je level ENDLESS_UNLOCK_LEVEL
@@ -15,11 +15,15 @@
 class_name LevelPathDomain
 extends RefCounted
 
-const LEVELS := 20
+## FIX-TEL-4 (2026-11-14): 25 levela (bilo 20). Stari save s 21 („put završen") sada stoji na
+## levelu 21 i nastavlja; uzeti sanduci ostaju uzeti.
+const LEVELS := 25
 const COMPLETE := LEVELS + 1
-const REWARD_LEVELS: Array[int] = [5, 10, 15, 20]
-## [★3 cvjetova sezone, coina]
-const REWARDS := {5: [2, 200], 10: [4, 400], 15: [6, 600], 20: [10, 1000]}
+const REWARD_LEVELS: Array[int] = [5, 10, 15, 20, 25]
+## [T3 cvjetova, coina, koji cvijet sezone: 0 = prvi ★2, 1 = drugi ★2, 2 = ★3 (UiCamp.UP_SLOT_STAR3)].
+## FIX-TEL-4: 10 × prvi ljubičasti, 15 i 20 × drugi ljubičasti, 5 i 10 × zlatni; coini kao prije,
+## level 25 daje 2000.
+const REWARDS := {5: [10, 200, 0], 10: [15, 400, 1], 15: [20, 600, 1], 20: [5, 1000, 2], 25: [10, 2000, 2]}
 const ENDLESS_UNLOCK_LEVEL := 15
 
 const STATE_DONE := "done"
@@ -96,12 +100,12 @@ func reset() -> void:
 	endless_seen.clear()
 
 
-## 1…20, ili 21 kad je put završen.
+## 1…25, ili 26 kad je put završen.
 func level_of(season_id: String) -> int:
 	return clampi(int(levels.get(season_id, 1)), 1, COMPLETE)
 
 
-## Level koji Play igra (complete → ponovo 20).
+## Level koji Play igra (complete → ponovo 25).
 func play_level_of(season_id: String) -> int:
 	return mini(level_of(season_id), LEVELS)
 
@@ -191,12 +195,19 @@ func has_ready(season_id: String) -> bool:
 	return not ready_list(season_id).is_empty()
 
 
-## Nagrada N: ★3 cvijet sezone (stash + Album) i coini. Vraća {flower, flowers, coins} ili {}.
+## Koji T3 cvijet sezone daje sanduk n (★2 ili ★3 vrsta).
+func reward_flower(season_id: String, n: int) -> String:
+	if not REWARDS.has(n):
+		return ""
+	return _owner.season_flower_by_slot(season_id, int(REWARDS[n][2]))
+
+
+## Nagrada N: T3 cvijet sezone (stash + Album) i coini. Vraća {flower, flowers, coins} ili {}.
 func claim(season_id: String, n: int) -> Dictionary:
 	if reward_state(season_id, n) != REWARD_READY:
 		return {}
 	var r: Array = REWARDS[n]
-	var flower: String = _owner.star3_type_id_for_season(season_id)
+	var flower: String = reward_flower(season_id, n)
 	var list := claimed_of(season_id)
 	list.append(n)
 	list.sort()

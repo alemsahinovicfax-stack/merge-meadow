@@ -1087,6 +1087,18 @@ row.buy_pressed.connect(_on_cosmetic_buy)  # koristi emitirani ID
 
 **Prevencija:** ono što se animira svaki frejm (rotacija, skala) ne smije biti `Control` sa skupim `_draw` — roditelj `Node2D` ili `modulate` / `position`. Provjera: `scripts/dev/redraw_audit.gd` ispiše čvorove koji se crtaju u svakom frejmu; `arena_pour_light_smoke` čuva korpu.
 
+## #75 — GUT vraća izlazni kod 0 i kad test padne (kapija propustila build)
+
+**Datum:** 2026-11-14
+
+**Simptom:** `release-check.ps1` je završio s RELEASE OK, a u logu je pisalo „1 failing tests".
+
+**Uzrok:** `gut_cmdln.gd -gexit` izlazi s kodom 0 bez obzira na ishod; `gut-run.ps1` je prosljeđivao samo taj kod.
+
+**Rješenje:** `gut-run.ps1` čita ispis i vraća 1 kad vidi „N failing tests" ili „Failing Tests N". Bez `2>&1` u pipeu — uz `$ErrorActionPreference = Stop` prva linija na stderr prekine skriptu.
+
+**Prevencija:** svaku novu provjeru u kapiji probati i namjerno pokvarenim ulazom — kapija koja nikad nije viđena kako pada nije dokazana.
+
 ## Brza dijagnostika (kad nešto "ne radi")
 
 1. **Otvori Debugger/Output panel** u Godotu — greška je skoro uvijek tu.

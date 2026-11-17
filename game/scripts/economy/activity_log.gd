@@ -39,7 +39,7 @@ var endless_day: int = -1
 ## Sekunde igre do prvog mergea (KPI prvog iskustva: < 4 min).
 var first_merge_sec: int = -1
 var best_season: String = ""
-## Pređenih levela u najdaljoj besplatnoj sezoni (0…20).
+## Pređenih levela u najdaljoj besplatnoj sezoni (0…25).
 var best_level: int = 0
 
 ## Unix zadnjeg ticka; 0 = ne broji (pozadina ili još nije počelo).

@@ -9,6 +9,17 @@ tags: [meta, changelog]
 
 Promjene u dizajnu i dokumentaciji kroz vrijeme.
 
+## 2026-11-14
+
+- **FIX-TEL-4 — balans i 25 levela** (plan `06-production/plan-telefon-playtest-1114.md`, izvještaj `06-production/telefon-playtest-1114-izvjestaj.md`; sve na zahtjev vlasnika):
+  - **25 levela po sezoni:** `levels.json` 21–25 nastavljaju korak 16–20; `MAX_RUN_LEVEL` i `LevelPathDomain.LEVELS` = 25; `layout.json` produžen za 1030 px (kamenje 21–25, veliki sanduk i zastavica na 25); peti pojas „Blitz" (`tag_5`, `tag_5_peak`, `flag_5`). Stari save s završenim putem nastavlja od levela 21.
+  - **Level najviše 2 minute** (`RunLevelLibrary.MAX_LEVEL_SEC`).
+  - **Pragovi Journey sezona:** 40 / 45 / 50 (bilo 30 / 35 / 40).
+  - **Sanduci Level Patha:** 10 × prvi ★2, 15 i 20 × drugi ★2, 5 i 10 × ★3; coini 200 / 400 / 600 / 1000 / 2000.
+  - **Endless:** `pace_strength` 1,1 (korak težine po Paceu), `spawn_rate_mult` 1,2.
+  - **Boost dugme:** boja tiera cvijeta (lavanda / zlatna), portret 96 px, „× N" iznad coina.
+  - Version code 14. Simulacija ekonomije nije ponovo puštena.
+
 ## 2026-11-12
 
 - **FIX-TEL-3 — treći krug poslije playtesta na telefonu (build 12)** (plan `06-production/plan-telefon-playtest-1112b.md`, izvještaj `06-production/telefon-playtest-1112b-izvjestaj.md`; sve na zahtjev vlasnika):

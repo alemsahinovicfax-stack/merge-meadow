@@ -80,15 +80,16 @@ func _check_domain() -> void:
 	d.set_level(id, 16)
 	if d.ready_list(id) != [5, 10, 15]:
 		_fail("ready list at 16 should be [5, 10, 15], got %s" % str(d.ready_list(id)))
-	var flower := str(_gs.call("star3_type_id_for_season", id))
+	# FIX-TEL-4: sanduk 10 daje 15 × drugi ljubičasti (★2) cvijet sezone.
+	var flower := str(_gs.call("season_flower_by_slot", id, 1))
 	var stash: Dictionary = _gs.get("garden_crystal_stash")
 	var before_f := int(stash.get(flower, 0))
 	var before_c := int(_gs.get("wallet_coins"))
 	var got: Dictionary = _gs.call("claim_level_reward", id, 10)
-	if int(got.get("flowers", 0)) != 4 or int(got.get("coins", 0)) != 400 or str(got.get("flower", "")) != flower:
-		_fail("claim 10 should give 4 × %s + 400, got %s" % [flower, str(got)])
+	if int(got.get("flowers", 0)) != 15 or int(got.get("coins", 0)) != 400 or str(got.get("flower", "")) != flower:
+		_fail("claim 10 should give 15 × %s + 400, got %s" % [flower, str(got)])
 	stash = _gs.get("garden_crystal_stash")
-	if int(stash.get(flower, 0)) != before_f + 4 or int(_gs.get("wallet_coins")) != before_c + 400:
+	if int(stash.get(flower, 0)) != before_f + 15 or int(_gs.get("wallet_coins")) != before_c + 400:
 		_fail("claim 10 did not reach stash / wallet")
 	if not (_gs.call("claim_level_reward", id, 10) as Dictionary).is_empty():
 		_fail("second claim of 10 must give nothing")
@@ -116,9 +117,9 @@ func _check_save() -> void:
 		_fail("old run_level should move to the active season only")
 	legacy.apply_from_save({"run_level": 57, "active_season_id": "amber_canopy"})
 	if legacy.level_of("amber_canopy") != LevelPathDomain.COMPLETE:
-		_fail("old run_level above 20 should mean complete")
+		_fail("old run_level above 25 should mean complete")
 	legacy.apply_from_save({"season_levels": {"coral_tide": 99}, "season_level_rewards": {"coral_tide": [5, 5, 7, 20]}})
-	if legacy.level_of("coral_tide") != 21 or legacy.claimed_of("coral_tide") != [5, 20]:
+	if legacy.level_of("coral_tide") != 26 or legacy.claimed_of("coral_tide") != [5, 20]:
 		_fail("bad save values must be clamped / filtered")
 
 
@@ -143,13 +144,13 @@ func _check_finish_run() -> void:
 	_gs.call("finish_run", {}, 0, true, 30.0)
 	if d.level_of("country_bloom") != 5:
 		_fail("failed run must not advance")
-	d.set_level("country_bloom", 20)
+	d.set_level("country_bloom", 25)
 	_gs.call("finish_run", {}, 0, false, 30.0)
-	if d.level_of("country_bloom") != 21 or int(_gs.get("run_level")) != 20:
-		_fail("passing 20 → complete (21), Play repeats 20")
+	if d.level_of("country_bloom") != 26 or int(_gs.get("run_level")) != 25:
+		_fail("passing 25 → complete (26), Play repeats 25")
 	_gs.set("level_path_hop", {})
 	_gs.call("finish_run", {}, 0, false, 30.0)
-	if d.level_of("country_bloom") != 21 or not (_gs.get("level_path_hop") as Dictionary).is_empty():
+	if d.level_of("country_bloom") != 26 or not (_gs.get("level_path_hop") as Dictionary).is_empty():
 		_fail("complete path must stay complete without a hop")
 	_gs.set("run_is_endless", true)
 	d.set_level("country_bloom", 3)
@@ -162,13 +163,13 @@ func _check_finish_run() -> void:
 
 
 func _check_layout() -> void:
-	if LevelPathKit.cp_count() != 20:
-		_fail("layout should have 20 checkpoints")
+	if LevelPathKit.cp_count() != 25:
+		_fail("layout should have 25 checkpoints")
 	if LevelPathKit.route().size() < 200:
 		_fail("route is too short")
-	if LevelPathKit.cp(1).y <= LevelPathKit.cp(20).y:
-		_fail("level 1 must be at the bottom, 20 at the top")
-	for lv in range(1, 22):
+	if LevelPathKit.cp(1).y <= LevelPathKit.cp(25).y:
+		_fail("level 1 must be at the bottom, 25 at the top")
+	for lv in range(1, 27):
 		var claimed: Array = []
 		var s := LevelPathKit.open_scroll(lv, [])
 		var feet_y := LevelPathKit.pip_feet(lv).y - s
@@ -259,8 +260,8 @@ func _check_home() -> void:
 		_fail("stones at 7 wrong")
 	if path.chest_state(5) != "reward_ready" or path.chest_state(10) != "reward_locked":
 		_fail("chests at 7 wrong")
-	if path.title_text().find("7 / 20") < 0:
-		_fail("title should show 7 / 20, got %s" % path.title_text())
+	if path.title_text().find("7 / 25") < 0:
+		_fail("title should show 7 / 25, got %s" % path.title_text())
 	var feet: Vector2 = path.pip_page_feet()
 	if feet.y < LevelPathKit.VIEW_SAFE.x or feet.y > LevelPathKit.VIEW_SAFE.y:
 		_fail("Pip out of view on open (y %.0f)" % feet.y)
@@ -284,7 +285,7 @@ func _check_home() -> void:
 		_fail("locator should hide after scrolling back to Pip")
 	# claim nagrade 5 — dodir ispod sanduka (gdje je bila pilula „Claim", 2026-10-21) otvara popup
 	var coins0 := int(_gs.get("wallet_coins"))
-	var flower := str(_gs.call("star3_type_id_for_season", "country_bloom"))
+	var flower := str(_gs.call("season_flower_by_slot", "country_bloom", 0))
 	var f0 := int((_gs.get("garden_crystal_stash") as Dictionary).get(flower, 0))
 	var ch5: Control = (path.get("_chests") as Dictionary)[5]
 	path.call("_tap", ch5.position + Vector2(ch5.size.x * 0.5, ch5.size.y + 40.0) - Vector2(0.0, float(path.get("_scroll"))))
@@ -293,8 +294,8 @@ func _check_home() -> void:
 	if not popup.is_open() or popup.title_text() != "Level 5 reward!":
 		_fail("ready reward should open the popup")
 	popup.claim()
-	if int(_gs.get("wallet_coins")) != coins0 + 200 or int((_gs.get("garden_crystal_stash") as Dictionary).get(flower, 0)) != f0 + 2:
-		_fail("claim 5 should add 200 coins and 2 × %s" % flower)
+	if int(_gs.get("wallet_coins")) != coins0 + 200 or int((_gs.get("garden_crystal_stash") as Dictionary).get(flower, 0)) != f0 + 10:
+		_fail("claim 5 should add 200 coins and 10 × %s" % flower)
 	await _wait(0.3)
 	var fly = popup.get_node("RewardFly")
 	if fly.get_child_count() > 16:
@@ -319,23 +320,23 @@ func _check_home() -> void:
 		_fail("after the hop Pip should stand on 8")
 	if path.fx_sprite_count() > 5:
 		_fail("hop fx over budget: %d sprites (+ Pip ≤ 6)" % path.fx_sprite_count())
-	# nagrada 20 i complete
-	d.set_level("country_bloom", 21)
-	_gs.set("level_path_hop", {"season": "country_bloom", "from": 20, "to": 21})
+	# nagrada 25 i complete
+	d.set_level("country_bloom", 26)
+	_gs.set("level_path_hop", {"season": "country_bloom", "from": 25, "to": 26})
 	stage.call("_restore_level_path")
 	await _wait(2.0)
-	if not path.is_banner_visible() or path.title_text().find("20 / 20") < 0:
-		_fail("complete: banner and 20 / 20 expected")
-	if path.chest_state(20) != "reward_ready":
-		_fail("reward 20 should be ready after completing")
-	path.tap_reward(20)
+	if not path.is_banner_visible() or path.title_text().find("25 / 25") < 0:
+		_fail("complete: banner and 25 / 25 expected")
+	if path.chest_state(25) != "reward_ready":
+		_fail("reward 25 should be ready after completing")
+	path.tap_reward(25)
 	await _wait(0.4)
-	if not popup.is_open() or popup.title_text() != "Level 20 reward!":
-		_fail("reward 20 popup should be open")
+	if not popup.is_open() or popup.title_text() != "Level 25 reward!":
+		_fail("reward 25 popup should be open")
 	popup.claim()
 	await _wait(0.3)
 	if fly.get_child_count() != 10:
-		_fail("reward 20 should launch 5 + 5 flyers, got %d" % fly.get_child_count())
+		_fail("reward 25 should launch 5 + 5 flyers, got %d" % fly.get_child_count())
 	await _wait(1.3)
 	# ‹ Field nazad
 	home.call("_on_seasons_row_pressed")

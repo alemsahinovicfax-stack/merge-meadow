@@ -15,6 +15,10 @@
     "endless: stepenica ('Pace') svakih tier_sec s; vrijednosti se interpoliraju izmedju keys i",
     "drze do sljedece stepenice; difficulty_offset_sec = koliko je tezina Endlessa ispred sata (60 s).",
     "Poslije zadnjeg kljuca brzina raste after_last_speed_per_tier po stepenici.",
+    "FIX-TEL-4 (2026-11-14): leveli 21-25 nastavljaju korak 16-20 (brzina, rampa, gustina, prepreke, parovi);",
+    "  trajanje je najvise 120 s (kod reze sve preko: RunLevelLibrary.MAX_LEVEL_SEC).",
+    "endless.pace_strength: korak tezine po stepenici Pacea x toliko (1.1 = svaki Pace 10 % jaci).",
+    "endless.spawn_rate_mult: spawn_interval Endlessa / toliko (1.2 = prepreke i pickupi 20 % cesce).",
     "Provjera: scripts/dev/economy_sim.gd (simulacija) i economy_balance_smoke.gd."
   ],
   "obstacle_rate_mult": 3.0,
@@ -38,7 +42,12 @@
     {"id": 17, "duration_sec": 110, "scroll_speed_mult": 1.33, "speed_ramp": 0.0365, "spawn_interval": 0.92, "spawn_chance": 0.76, "obstacle_chance": 0.33, "pair_chance": 0.34, "pickup_seed_chance": 0.331, "rare2_mult": 0.57, "rare3_mult": 0.56},
     {"id": 18, "duration_sec": 114, "scroll_speed_mult": 1.345, "speed_ramp": 0.0373, "spawn_interval": 0.9, "spawn_chance": 0.77, "obstacle_chance": 0.344, "pair_chance": 0.36, "pickup_seed_chance": 0.334, "rare2_mult": 0.58, "rare3_mult": 0.57},
     {"id": 19, "duration_sec": 116, "scroll_speed_mult": 1.36, "speed_ramp": 0.038, "spawn_interval": 0.87, "spawn_chance": 0.77, "obstacle_chance": 0.359, "pair_chance": 0.38, "pickup_seed_chance": 0.337, "rare2_mult": 0.59, "rare3_mult": 0.58},
-    {"id": 20, "duration_sec": 120, "scroll_speed_mult": 1.375, "speed_ramp": 0.0388, "spawn_interval": 0.85, "spawn_chance": 0.78, "obstacle_chance": 0.374, "pair_chance": 0.4, "pickup_seed_chance": 0.34, "rare2_mult": 0.6, "rare3_mult": 0.59}
+    {"id": 20, "duration_sec": 120, "scroll_speed_mult": 1.375, "speed_ramp": 0.0388, "spawn_interval": 0.85, "spawn_chance": 0.78, "obstacle_chance": 0.374, "pair_chance": 0.4, "pickup_seed_chance": 0.34, "rare2_mult": 0.6, "rare3_mult": 0.59},
+    {"id": 21, "duration_sec": 120, "scroll_speed_mult": 1.39, "speed_ramp": 0.0395, "spawn_interval": 0.83, "spawn_chance": 0.79, "obstacle_chance": 0.389, "pair_chance": 0.42, "pickup_seed_chance": 0.343, "rare2_mult": 0.61, "rare3_mult": 0.6},
+    {"id": 22, "duration_sec": 120, "scroll_speed_mult": 1.405, "speed_ramp": 0.0403, "spawn_interval": 0.8, "spawn_chance": 0.8, "obstacle_chance": 0.404, "pair_chance": 0.44, "pickup_seed_chance": 0.347, "rare2_mult": 0.62, "rare3_mult": 0.61},
+    {"id": 23, "duration_sec": 120, "scroll_speed_mult": 1.42, "speed_ramp": 0.041, "spawn_interval": 0.78, "spawn_chance": 0.8, "obstacle_chance": 0.418, "pair_chance": 0.46, "pickup_seed_chance": 0.35, "rare2_mult": 0.63, "rare3_mult": 0.62},
+    {"id": 24, "duration_sec": 120, "scroll_speed_mult": 1.435, "speed_ramp": 0.0418, "spawn_interval": 0.76, "spawn_chance": 0.81, "obstacle_chance": 0.433, "pair_chance": 0.48, "pickup_seed_chance": 0.353, "rare2_mult": 0.64, "rare3_mult": 0.63},
+    {"id": 25, "duration_sec": 120, "scroll_speed_mult": 1.45, "speed_ramp": 0.0425, "spawn_interval": 0.73, "spawn_chance": 0.82, "obstacle_chance": 0.448, "pair_chance": 0.5, "pickup_seed_chance": 0.356, "rare2_mult": 0.65, "rare3_mult": 0.64}
   ],
   "endless": {
     "tier_sec": 10,
@@ -52,6 +61,8 @@
     ],
     "after_last_speed_per_tier": 0.04,
     "max": {"obstacle_chance": 0.45, "pair_chance": 0.45},
-    "difficulty_offset_sec": 60
+    "difficulty_offset_sec": 60,
+    "pace_strength": 1.1,
+    "spawn_rate_mult": 1.2
   }
 }

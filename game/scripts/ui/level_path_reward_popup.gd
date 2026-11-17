@@ -84,7 +84,7 @@ func open_for(p_season_id: String, p_n: int) -> void:
 	season_id = p_season_id
 	n = p_n
 	big = p_n == LevelPathDomain.LEVELS
-	flower_type = GameState.star3_type_id_for_season(season_id)
+	flower_type = GameState.level_path_domain.reward_flower(season_id, n)
 	_busy = true
 	var r: Array = LevelPathDomain.REWARDS[n]
 	modal.set_title(LevelPathKit.S_TITLE % n, "reward")
@@ -96,6 +96,7 @@ func open_for(p_season_id: String, p_n: int) -> void:
 	modal.content.add_child(PopupModal.centered(_hero))
 	_line = _Line.new()
 	_line.text = GameState.get_seed_display_name(flower_type) if not flower_type.is_empty() else ""
+	_line.star = "★%d" % clampi(GameState.get_seed_rarity(flower_type), 1, 3)
 	modal.content.add_child(PopupModal.centered(_line))
 	var chips: Array = []
 	if not flower_type.is_empty():
@@ -333,13 +334,13 @@ class _FlowerArt extends Control:
 ## Ime cvijeta + „★3".
 class _Line extends Control:
 	var text: String = ""
+	var star: String = "★3"
 
 	func _init() -> void:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		custom_minimum_size = Vector2(888.0, 52.0)
 
 	func _draw() -> void:
-		var star := "★3"
 		var w1 := UiPopups.text_w(900, 48, text)
 		var w2 := UiPopups.text_w(900, 44, star)
 		var x := (size.x - w1 - 14.0 - w2) * 0.5

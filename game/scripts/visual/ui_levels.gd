@@ -7,12 +7,14 @@ extends RefCounted
 
 const DIR := "res://assets/levels_endless/"
 
-# --- A1 · pojasevi: pojas = ceil(level / 5), kraj pojasa (5/10/15/20) = sanduk ---------
+# --- A1 · pojasevi: pojas = ceil(level / 5), kraj pojasa (5/10/15/20/25) = sanduk ---------
 const BANDS := [
 	{"n": 1, "id": "stroll", "name": "Stroll", "from": 1, "to": 5, "fill": Color("#A8E6CF")},
 	{"n": 2, "id": "jog", "name": "Jog", "from": 6, "to": 10, "fill": Color("#FFD56B")},
 	{"n": 3, "id": "dash", "name": "Dash", "from": 11, "to": 15, "fill": Color("#FF9F5A")},
 	{"n": 4, "id": "sprint", "name": "Sprint", "from": 16, "to": 20, "fill": Color("#F27C8E")},
+	# FIX-TEL-4 (2026-11-14): peti pojas — crtež po uzoru na prva četiri (pet ševrona, tamnija lavanda).
+	{"n": 5, "id": "blitz", "name": "Blitz", "from": 21, "to": 25, "fill": Color("#B98BF0")},
 ]
 ## Pločica pojasa na kamenu: 72 × 30 (kraj pojasa 86 × 30 sa zvjezdicom), vrh = vrh kamena + 100.
 const TAG := Vector2(72, 30)
@@ -175,7 +177,7 @@ const CHEST_TAG_H := 58.0
 
 
 static func band_of(level: int) -> int:
-	return clampi(ceili(float(clampi(level, 1, 20)) / 5.0), 1, 4)
+	return clampi(ceili(float(clampi(level, 1, BANDS[BANDS.size() - 1]["to"])) / 5.0), 1, BANDS.size())
 
 
 static func is_peak(level: int) -> bool:
@@ -183,7 +185,7 @@ static func is_peak(level: int) -> bool:
 
 
 static func band(n: int) -> Dictionary:
-	return BANDS[clampi(n, 1, 4) - 1]
+	return BANDS[clampi(n, 1, BANDS.size()) - 1]
 
 
 static func band_fill(n: int) -> Color:

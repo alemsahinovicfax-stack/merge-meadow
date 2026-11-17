@@ -219,7 +219,7 @@ var granted_purchase_tokens: Array[String] = []
 ## (MonetizationConfig.STARTER_PACK_DAYS). Stari saveovi: počinje pri prvom
 ## pokretanju verzije koja ga zna.
 var first_launch_unix: int = 0
-## Level kampanje = kamen Level Patha aktivne sezone (1…20; put završen → ponovo 20).
+## Level kampanje = kamen Level Patha aktivne sezone (1…25; put završen → ponovo 25).
 ## Napredak je po sezoni u level_path_domain; ovo svojstvo čitaju run i HUD.
 var run_level: int:
 	get: return level_path_domain.play_level_of(active_season_id) if level_path_domain else 1
@@ -2225,7 +2225,13 @@ func upgrade_flower_type(season_id: String, level: int = -1) -> String:
 	var star3 := star3_type_id_for_season(season_id)
 	if level < 0:
 		return star3
-	var slot := UiCamp.upgrade_flower_slot(level)
+	return season_flower_by_slot(season_id, UiCamp.upgrade_flower_slot(level))
+
+
+## Cvijet sezone po slotu: 0 = prvi ★2 (ljubičasti), 1 = drugi ★2, UP_SLOT_STAR3 = ★3 (zlatni).
+## Sezona bez tog ★2 pada na ★3. Koriste Boostovi i sanduci Level Patha.
+func season_flower_by_slot(season_id: String, slot: int) -> String:
+	var star3 := star3_type_id_for_season(season_id)
 	if slot >= UiCamp.UP_SLOT_STAR3:
 		return star3
 	var def: SeasonDef = get_season_def(season_id)

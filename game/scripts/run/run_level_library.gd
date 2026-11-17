@@ -1,6 +1,6 @@
 extends Node
 
-## Run leveli 1–20 (Level Path svake sezone; level N iste je težine u svakoj sezoni) i Endless
+## Run leveli 1–25 (Level Path svake sezone; level N iste je težine u svakoj sezoni) i Endless
 ## rampa — sve iz data/run_levels/levels.json (balans ciklus 1, 2026-10-21).
 ##
 ## Endless nema kraja: kreće lagano i svakih ENDLESS_TIER_SEC s („Pace") postaje teži — brže,
@@ -10,7 +10,9 @@ extends Node
 ## svojim tokom × obstacle_rate_mult, Endless kreće difficulty_offset_sec ispred sata.
 
 const LEVELS_PATH := "res://data/run_levels/levels.json"
-const MAX_RUN_LEVEL := 20
+const MAX_RUN_LEVEL := 25
+## FIX-TEL-4 (2026-11-14): level traje najviše 2 minute, ma šta pisalo u tabeli.
+const MAX_LEVEL_SEC := 120.0
 ## FIX-TEL-2 (2026-11-12): Pace se mijenja svakih 10 s (bilo 20). Ključevi težine u levels.json
 ## ostaju na staroj skali (ENDLESS_KEY_SEC_PER_TIER s po stepenici), pa je Pace N iste težine
 ## kao prije — samo stiže duplo brže. Preteško? Stavi ENDLESS_KEY_SEC_PER_TIER na 10: stepenice
@@ -29,6 +31,9 @@ var _endless_keys: Array[Dictionary] = []
 var _endless_after_speed: float = 0.0
 var _endless_max: Dictionary = {}
 var _endless_offset: float = 0.0
+## FIX-TEL-4: korak težine po stepenici Pacea × toliko; spawn Endlessa toliko puta češći.
+var _endless_pace_strength: float = 1.0
+var _endless_spawn_rate: float = 1.0
 var _obstacle_rate_mult: float = 1.0
 var _loaded: bool = false
 
@@ -57,7 +62,7 @@ func get_endless_config_at(elapsed: float):
 	_ensure_loaded()
 	var tier := endless_tier(elapsed)
 	# Težina je difficulty_offset_sec ispred sata (Pace u HUD-u i dalje kreće od 0).
-	var t := float(tier) * ENDLESS_KEY_SEC_PER_TIER + _endless_offset
+	var t := float(tier) * ENDLESS_KEY_SEC_PER_TIER * _endless_pace_strength + _endless_offset
 	var cfg = _RunLevelConfig.new()
 	cfg.id = tier + 1
 	cfg.duration_sec = INF
@@ -72,7 +77,7 @@ func get_endless_config_at(elapsed: float):
 	if t >= float(last.t):
 		for f in _ENDLESS_FIELDS:
 			cfg.set(f, float(last.get(f, cfg.get(f))))
-		var extra_tiers := floorf((t - float(last.t)) / ENDLESS_KEY_SEC_PER_TIER)
+		var extra_tiers := (t - float(last.t)) / ENDLESS_KEY_SEC_PER_TIER
 		cfg.scroll_speed_mult = float(last.scroll_speed_mult) + _endless_after_speed * extra_tiers
 	else:
 		var i := 0
@@ -87,6 +92,7 @@ func get_endless_config_at(elapsed: float):
 			cfg.set(f, va + (float(b.get(f, va)) - va) * k)
 	for f in _endless_max:
 		cfg.set(f, minf(float(cfg.get(f)), float(_endless_max[f])))
+	cfg.spawn_interval = cfg.spawn_interval / _endless_spawn_rate
 	return cfg
 
 
@@ -112,6 +118,7 @@ func _ensure_loaded() -> void:
 			if entry is Dictionary:
 				var cfg = _RunLevelConfig.from_dict(entry, _RunLevelConfig)
 				cfg.obstacle_rate_mult = _obstacle_rate_mult
+				cfg.duration_sec = minf(cfg.duration_sec, MAX_LEVEL_SEC)
 				_by_id[cfg.id] = cfg
 	var endless: Variant = parsed.get("endless", {})
 	if endless is Dictionary:
@@ -123,6 +130,8 @@ func _ensure_loaded() -> void:
 		_endless_keys.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.t) < float(b.t))
 		_endless_after_speed = maxf(0.0, float(endless.get("after_last_speed_per_tier", 0.0)))
 		_endless_offset = maxf(0.0, float(endless.get("difficulty_offset_sec", 0.0)))
+		_endless_pace_strength = maxf(0.1, float(endless.get("pace_strength", 1.0)))
+		_endless_spawn_rate = maxf(0.1, float(endless.get("spawn_rate_mult", 1.0)))
 		var mx: Variant = endless.get("max", {})
 		if mx is Dictionary:
 			_endless_max = mx

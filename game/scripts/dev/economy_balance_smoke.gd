@@ -69,7 +69,7 @@ func _run() -> void:
 
 func _check_levels() -> void:
 	var prev = null
-	for n in range(1, 21):
+	for n in range(1, 26):
 		var c = _rll.call("get_level", n)
 		if int(c.id) != n:
 			_fail("level %d missing from levels.json" % n)
@@ -81,7 +81,10 @@ func _check_levels() -> void:
 					_fail("level %d %s %.3f < level %d %.3f" % [n, f, float(c.get(f)), n - 1, float(prev.get(f))])
 			if float(c.spawn_interval) > float(prev.spawn_interval) + 1e-6:
 				_fail("level %d spawns slower than level %d" % [n, n - 1])
-			if float(c.duration_sec) <= float(prev.duration_sec):
+			# FIX-TEL-4: od levela 20 trajanje stoji na 120 s (gornja granica).
+			if float(c.duration_sec) > 120.0 + 1e-6:
+				_fail("level %d is longer than 2 minutes" % n)
+			if n <= 20 and float(c.duration_sec) <= float(prev.duration_sec):
 				_fail("level %d is not longer than level %d" % [n, n - 1])
 		# Po tipu: svaki ★1 tip češći od svakog ★2, a ★2 od ★3 (i poslije ★3 ×2, 2026-10-27).
 		if not (1.0 > float(c.rare2_mult) and float(c.rare2_mult) > float(c.rare3_mult)):
@@ -100,8 +103,8 @@ func _check_levels() -> void:
 	var mult := float(_rll.call("obstacle_rate_mult"))
 	if mult < 3.0 - 1e-6:
 		_fail("obstacles should come at least 3× as often (obstacle_rate_mult %.2f)" % mult)
-	if int(_rll.call("get_level", 57).id) != 20:
-		_fail("levels above 20 should clamp to 20 (complete path replays 20)")
+	if int(_rll.call("get_level", 57).id) != 25:
+		_fail("levels above 25 should clamp to 25 (complete path replays 25)")
 
 
 func _check_endless_ramp() -> void:

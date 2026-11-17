@@ -16,6 +16,8 @@ tags: [hub, produkcija]
 - [[telefon-playtest-1112-izvjestaj|telefon-playtest-1112-izvjestaj]] — FIX-TEL-2 izvještaj: šta je urađeno, mjerenja, šta provjeriti na telefonu
 - [[plan-telefon-playtest-1112b|plan-telefon-playtest-1112b]] — FIX-TEL-3: treći krug prijava s telefona (2026-11-12)
 - [[telefon-playtest-1112b-izvjestaj|telefon-playtest-1112b-izvjestaj]] — FIX-TEL-3 izvještaj: Arena štekanje, Level Path, Journal, Muncher, cijene
+- [[plan-telefon-playtest-1114|plan-telefon-playtest-1114]] — FIX-TEL-4: balans i 25 levela (2026-11-14)
+- [[telefon-playtest-1114-izvjestaj|telefon-playtest-1114-izvjestaj]] — FIX-TEL-4 izvještaj: 25 levela, sanduci, pragovi, Endless, Boost dugme
 - [[play-uploads|play-uploads]] — dnevnik uploada na Play (version code); čita ga kapija `release-check.ps1`
 - [[plan-arhitektura-refaktor|plan-arhitektura-refaktor]] — kod arhitektura refaktor (nakon CAMP-06)
 - [[d0-prelaunch-checklist|d0-prelaunch-checklist]] — Faza 1 checklist (prije Play $25)

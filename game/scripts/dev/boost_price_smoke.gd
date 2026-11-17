@@ -4,7 +4,7 @@ extends SceneTree
 ## levelu, u T3 cvjetovima sezone iz stasha:
 ##   level 1 = 5 × prvi ljubičasti (★2), level 2 = 10 × drugi ljubičasti (★2),
 ##   level 3 = 2 × zlatni (★3), level 4 = 5 × zlatni (★3). Coini uz to ostaju 100 / 250 / 500 / 800.
-## I pragovi sezona (Journey): Frost 30, Lantern 35, Amber 40 ★3 cvjetova prethodne sezone;
+## I pragovi sezona (Journey): Frost 40, Lantern 45, Amber 50 ★3 (FIX-TEL-4) cvjetova prethodne sezone;
 ## Themes (plaćene sezone) nemaju prag u cvijeću.
 
 const EXPECT := {
@@ -19,7 +19,7 @@ const EXPECT := {
 }
 const COSTS := [5, 10, 2, 5]
 const COINS := [100, 250, 500, 800]
-const UNLOCK := {"frost_orchard": 30, "lantern_meadow": 35, "amber_canopy": 40}
+const UNLOCK := {"frost_orchard": 40, "lantern_meadow": 45, "amber_canopy": 50}
 
 var _backup := ""
 var _failed := false

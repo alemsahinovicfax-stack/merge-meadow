@@ -10,10 +10,10 @@ func after_each() -> void:
 
 
 func test_band_of_level() -> void:
-	var want := {1: 1, 5: 1, 6: 2, 10: 2, 11: 3, 15: 3, 16: 4, 20: 4, 21: 4, 0: 1}
+	var want := {1: 1, 5: 1, 6: 2, 10: 2, 11: 3, 15: 3, 16: 4, 20: 4, 21: 5, 25: 5, 26: 5, 0: 1}
 	for lv in want:
 		assert_eq(UiLevels.band_of(lv), int(want[lv]), "level %d" % lv)
-	for lv in [5, 10, 15, 20]:
+	for lv in [5, 10, 15, 20, 25]:
 		assert_true(UiLevels.is_peak(lv), "peak %d" % lv)
 	assert_false(UiLevels.is_peak(14))
 

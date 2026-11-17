@@ -4,7 +4,7 @@ extends Control
 ## Level Path sezone (design_handoff_level_path): cijela stranica 1080 x 1633 između headera i
 ## tab bara. Sadržaj 1080 x 4900 se crta JEDNOM (SeasonBackdrop iz kits[id].path); skrol samo
 ## pomjera sadržaj. Pređeni put (Line2D, 2–3 poteza) se mijenja samo kad se promijeni level.
-## Kamenje (20) i sanduci (4) su statični crteži; animira se samo transformom: skok i klimanje
+## Kamenje (25) i sanduci (5) su statični crteži; animira se samo transformom: skok i klimanje
 ## reward_ready sanduka + 3 iskre, skok Pipa, pop kamena, prsten i prašina.
 ## Play i ‹ Field su u donjem redu (SeasonStage / MainMenu) — ovdje nisu.
 ## Pojasevi težine (design_handoff_leveli_endless · A1): pločica pojasa na svakom kamenu (crta se
@@ -907,7 +907,7 @@ class _Stone extends Control:
 		var w := UiHomeV3.text_w(900, px, txt, 0.0, true)
 		var cy := LevelPathKit.STONE_PIVOT.y * k
 		UiHomeV3.draw_text(self, 900, px, txt, Vector2((size.x - w) * 0.5, cy - px * 0.52), LevelPathKit.number_color(season_id, state), 0.0, true)
-		# A1: pločica pojasa preko donjeg ruba kamena (sva stanja); 5/10/15/20 sa zvjezdicom.
+		# A1: pločica pojasa preko donjeg ruba kamena (sva stanja); 5/10/15/20/25 sa zvjezdicom.
 		var tag := UiLevels.tag_tex(n)
 		if tag:
 			draw_texture_rect(tag, UiLevels.stone_tag_rect(n, k), false)
@@ -1028,7 +1028,7 @@ class _ChestLabel extends Control:
 			var cy := rect.get_center().y
 			var disc := Rect2(x, cy - 26.0, 52.0, 52.0)
 			UiHomeV3.draw_panel(self, disc, UiHomeField.ACTIVE_RIM, 26.0, 2.0, Color(0.176, 0.204, 0.212, 0.18))
-			UiPopups.draw_flower(self, disc.get_center(), GameState.star3_type_id_for_season(chest.season_id), 3, 44.0)
+			UiPopups.draw_flower(self, disc.get_center(), GameState.level_path_domain.reward_flower(chest.season_id, chest.n), 3, 44.0)
 			x += 52.0 + 8.0
 			UiHomeV3.draw_text(self, 900, 38, fl, Vector2(x, cy - 19.0), UiHomeField.OUTLINE, 0.0, true)
 			x += UiHomeV3.text_w(900, 38, fl, 0.0, true) + 8.0 + 6.0
@@ -1045,7 +1045,7 @@ class _ChestLabel extends Control:
 		var cy := rect.get_center().y
 		var disc := Rect2(x, cy - 23.0, 46.0, 46.0)
 		UiHomeV3.draw_panel(self, disc, UiLevels.CREAM, 23.0)
-		UiPopups.draw_flower(self, disc.get_center(), GameState.star3_type_id_for_season(chest.season_id), 3, 46.0)
+		UiPopups.draw_flower(self, disc.get_center(), GameState.level_path_domain.reward_flower(chest.season_id, chest.n), 3, 46.0)
 		x += 46.0 + 6.0
 		UiHomeV3.draw_text(self, 900, 34, fl, Vector2(x, cy - 17.0), UiLevels.INK, 0.0, true)
 		x += UiHomeV3.text_w(900, 34, fl, 0.0, true) + 6.0 + 6.0
@@ -1081,7 +1081,7 @@ class _BandFlag extends Control:
 		UiHomeV3.draw_text(self, 800, 24, rng, Vector2(x, cy - 10.0), UiLevels.SOFT)
 
 
-## Pločica s imenom sezone (fiksna na vrhu): ime + „7 / 20", ili mint „✓ 20 / 20".
+## Pločica s imenom sezone (fiksna na vrhu): ime + „7 / 25", ili mint „✓ 25 / 25".
 class _Title extends Control:
 	var season_id: String = ""
 	var level: int = 1
@@ -1094,7 +1094,8 @@ class _Title extends Control:
 
 	func text_for() -> String:
 		var done := level >= LevelPathDomain.COMPLETE
-		return "%s %s" % [_name(), ("✓ 20 / 20" if done else "%d / 20" % mini(level, 20))]
+		var total := LevelPathDomain.LEVELS
+		return "%s %s" % [_name(), ("✓ %d / %d" % [total, total] if done else "%d / %d" % [mini(level, total), total])]
 
 	func _name() -> String:
 		var def: SeasonDef = GameState.get_season_def(season_id)
@@ -1103,7 +1104,8 @@ class _Title extends Control:
 	func _draw() -> void:
 		var name_txt := _name()
 		var done := level >= LevelPathDomain.COMPLETE
-		var chip_txt := "20 / 20" if done else "%d / 20" % mini(level, 20)
+		var total := LevelPathDomain.LEVELS
+		var chip_txt := "%d / %d" % [total if done else mini(level, total), total]
 		var chip_w := UiHomeV3.text_w(900, 40, chip_txt, 0.0, true) + (24.0 + 18.0 + 22.0 if done else 48.0)
 		var w := 36.0 + UiHomeV3.text_w(900, 46, name_txt) + 22.0 + chip_w + 18.0
 		var r := Rect2((size.x - w) * 0.5, 0.0, w, 100.0)
@@ -1167,7 +1169,7 @@ class _Locator extends Control:
 		UiHomeV3.draw_text(self, 900, 40, "Pip", Vector2(x + 44.0, cy - 20.0), UiHomeField.OUTLINE)
 
 
-## „Meadow complete!" + „▶ Play repeats Level 20" iznad cilja.
+## „Meadow complete!" + „▶ Play repeats Level 25" iznad cilja.
 class _Banner extends Control:
 	func _init() -> void:
 		name = "CompleteBanner"

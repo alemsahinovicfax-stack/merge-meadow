@@ -76,18 +76,18 @@ func _run() -> void:
 # --- 1 ---
 
 func _check_bands_and_assets() -> void:
-	var want := {1: 1, 5: 1, 6: 2, 10: 2, 11: 3, 15: 3, 16: 4, 20: 4}
+	var want := {1: 1, 5: 1, 6: 2, 10: 2, 11: 3, 15: 3, 16: 4, 20: 4, 21: 5, 25: 5}
 	for lv in want:
 		if UiLevels.band_of(lv) != int(want[lv]):
 			_fail("level %d should be band %d" % [lv, int(want[lv])])
-	for lv in range(1, 21):
+	for lv in range(1, 26):
 		if UiLevels.is_peak(lv) != (lv % 5 == 0) or UiLevels.tag_tex(lv) == null:
 			_fail("level %d tag / peak wrong" % lv)
 	var heat := {0: 1, 2: 1, 3: 2, 5: 2, 6: 3, 8: 3, 9: 4, 30: 4}
 	for t in heat:
 		if UiLevels.pace_band(t) != int(heat[t]):
 			_fail("Endless tier %d should use band %d color" % [t, int(heat[t])])
-	for b in range(1, 5):
+	for b in range(1, 6):
 		if UiLevels.flag_tex(b) == null:
 			_fail("missing band flag %d" % b)
 	for id in SEASONS:
@@ -140,7 +140,7 @@ func _remain(base: float, ramp: float, dur: float, t: float) -> float:
 ## CD tabela gate_lead_s (level_finish.json) je računata za brojeve ciklusa 1; od ciklusa 1b (težina +5 levela) se
 ## provjerava da cilj stiže 2–4,5 s prije kraja i da je preostali put tada tačno 1654 px.
 func _check_gate_math() -> void:
-	for lv in range(1, 21):
+	for lv in range(1, 26):
 		var lead := _gate_lead(lv)
 		var cfg = get_root().get_node("RunLevelLibrary").call("get_level", lv)
 		var rem := _remain(400.0 * float(cfg.scroll_speed_mult), float(cfg.speed_ramp), float(cfg.duration_sec), float(cfg.duration_sec) - lead)
@@ -471,13 +471,13 @@ func _check_path() -> void:
 		lp.set_level(id, 12)
 		view.show_season(id)
 		var flags: Array = view.band_flag_rects()
-		if flags.size() != 4:
-			_fail("%s should have 4 band flags" % id)
+		if flags.size() != 5:
+			_fail("%s should have 5 band flags" % id)
 		for i in flags.size():
 			var r: Rect2 = flags[i]
 			if r.position.x < 0.0 or r.end.x > LevelPathKit.W:
 				_fail("%s flag %d off the path page" % [id, i + 1])
-			for n in [5, 10, 15, 20]:
+			for n in [5, 10, 15, 20, 25]:
 				var cr := Rect2(view.chest_node(n).position, view.chest_node(n).size)
 				if r.grow(-20.0).intersects(cr):
 					_fail("%s band flag %d covers chest %d" % [id, i + 1, n])

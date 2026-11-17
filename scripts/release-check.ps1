@@ -149,13 +149,16 @@ Step "6/6 Provjeri rukom na telefonu (internal test, ~5 min)"
     "Home: Pip je NOVI (rig), 'Looks' dolje desno, Basket desno ispod Boostova, Level Path do dna ekrana",
     "Home: s otvorenog Level Patha potez lijevo / desno mijenja stranicu; povratak na Home pokazuje polje",
     "Boosts: level 1 trazi 5 prvog ljubicastog cvijeta, level 2 10 drugog, level 3 i 4 zlatni (2 pa 5)",
+    "Boosts: dugme je ljubicasto za ljubicasti cvijet, zlatno za zlatni; portret cvijeta je velik",
+    "Level Path: 25 kamenova, peti pojas Blitz 21-25, veliki sanduk i zastavica na 25; sanduci daju novo cvijece",
+    "Run: level 20-25 traje 2:00; Endless je gusci (vise prepreka i pickupa) i Pace jace steze",
     "Ormar: skinovi cijeli u slicicama, katanac jasan; Ormar / Boosts / Basket ulaze bez trzaja",
     "Shop > Looks: skinovi se vide; skrol prstom preko kartica i dugmadi; tap kupuje / javlja 'Need N more coins'",
     "Run: coin / sjeme / prepreka reaguju na dodir GLAVE; nalet vjetra se osjeti; pauza > 3, 2, 1",
     "Run u novoj sezoni: pokupi sjeme > Journal odmah pokaze tu vrstu (tier 1, NEW)",
     "Arena: tapkaj vrecu dok sjemenke lete - bez stekanja; pilula 'N / 200'; runda stane na 200",
     "Arena: Muncher je brzi; T3 ga zaledi 1 s; prvi T2 neke vrste otkljuca tier 2 u Journalu",
-    "Camp: lista i Trade bar do dna; klikci i drzi Trade - bez stekanja; prag sezone 30 / 35 / 40",
+    "Camp: lista i Trade bar do dna; klikci i drzi Trade - bez stekanja; prag sezone 40 / 45 / 50",
     "Journal: ulazak bez zastoja; skrol do dna - 'Loading' pa redovi",
     "Okreni kroz svih 5 tabova 3 puta - bez zastoja; zatvori i otvori igru - napredak je tu"
 ) | ForEach-Object { Write-Host "  [ ] $_" }
